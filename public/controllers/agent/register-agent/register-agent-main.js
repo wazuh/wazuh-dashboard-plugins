@@ -19,7 +19,6 @@ import {
   EuiFlexItem,
   EuiPanel,
   EuiButtonGroup,
-  EuiComboBox,
   EuiFieldText,
   EuiText,
   EuiCodeBlock,
@@ -31,20 +30,29 @@ import {
   EuiCallOut,
   EuiSpacer,
   EuiProgress,
-  EuiCode,
-  EuiLink,
   EuiIcon,
   EuiSwitch
 } from '@elastic/eui';
-import { WzRequest } from '../../../react-services/wz-request';
 import { withErrorBoundary } from '../../../components/common/hocs';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
-import { architectureButtons, architectureCentos5OrRedHat5, osButtons, versionButtonsCentosOrRedHat } from './config'
-import { optionalPackages } from './services'
+import { 
+  architectureButtons, 
+  architectureCentos5OrRedHat5, 
+  osButtons, 
+  versionButtonsCentosOrRedHat,
+  codeBlock } from './config'
 import { AgentGroup, ServerAddress } from './steps'
+import { getGroups, 
+  getAuthInfo, 
+  getHighlightCodeLanguage, 
+  obfuscatePassword, 
+  systemSelector,
+  checkMissingOSSelection,
+  getCommandText } from './register-agent-service'
+import { WindowsAdvice } from './components';
 
 export const RegisterAgent = withErrorBoundary(
 
@@ -70,8 +78,8 @@ export const RegisterAgent = withErrorBoundary(
         showPassword: false,
       };
       this.restartAgentCommand = {
-        rpm: this.systemSelector(),
-        deb: this.systemSelector(),
+        rpm: systemSelector(this.state.selectedOS, this.state.selectedSYS),
+        deb: systemSelector(this.state.selectedOS, this.state.selectedSYS),
         macos: 'sudo /Library/Ossec/bin/wazuh-control start',
         win: 'NET START WazuhSvc'
       };
@@ -88,7 +96,10 @@ export const RegisterAgent = withErrorBoundary(
         if (!serverAddress) {
           serverAddress = await this.props.getCurrentApiAddress();
         }
-        let authInfo = await this.getAuthInfo();
+        let authInfo = await getAuthInfo();
+        if(!authInfo  || authInfo?.error){
+          this.setState({ gotErrorRegistrationServiceInfo: true });
+        }
         const needsPassword = (authInfo.auth || {}).use_password === 'yes';
         if (needsPassword) {
           wazuhPassword = this.configuration['enrollment.password'] || authInfo['authd.pass'] || '';
@@ -96,9 +107,7 @@ export const RegisterAgent = withErrorBoundary(
             hidePasswordInput = true;
           }
         }
-
-        const udpProtocol = await this.getRemoteInfo();
-        const groups = await this.getGroups();
+        const groups = await getGroups();
         this.setState({
           serverAddress,
           needsPassword,
@@ -107,7 +116,6 @@ export const RegisterAgent = withErrorBoundary(
           architectureButtons,
           architectureCentos5OrRedHat5,
           wazuhPassword,
-          udpProtocol,
           wazuhVersion,
           groups,
           loading: false,
@@ -133,26 +141,6 @@ export const RegisterAgent = withErrorBoundary(
       }
     }
 
-    async getAuthInfo() {
-      try {
-        const result = await WzRequest.apiReq('GET', '/agents/000/config/auth/auth', {});
-        return (result.data || {}).data || {};
-      } catch (error) {
-        this.setState({ gotErrorRegistrationServiceInfo: true });
-        throw new Error(error);
-      }
-    }
-
-    async getRemoteInfo() {
-      try {
-        const result = await WzRequest.apiReq('GET', '/agents/000/config/request/remote', {});
-        const remote = ((result.data || {}).data || {}).remote || {};
-        return (remote[0] || {}).protocol !== 'tcp' && (remote[0] || {}).protocol[0] !== 'TCP';
-      } catch (error) {
-        throw new Error(error);
-      }
-    }
-
     selectOS(os) {
       this.setState({
         selectedOS: os,
@@ -160,18 +148,6 @@ export const RegisterAgent = withErrorBoundary(
         selectedArchitecture: '',
         selectedSYS: 'systemd',
       });
-    }
-
-    systemSelector() {
-      if (this.state.selectedOS === 'rpm') {
-        if (this.state.selectedSYS === 'systemd') {
-          return 'sudo systemctl daemon-reload\nsudo systemctl enable wazuh-agent\nsudo systemctl start wazuh-agent';
-        } else return 'sudo chkconfig --add wazuh-agent\nsudo service wazuh-agent start';
-      } else if (this.state.selectedOS === 'deb') {
-        if (this.state.selectedSYS === 'systemd') {
-          return 'sudo systemctl daemon-reload\nsudo systemctl enable wazuh-agent\nsudo systemctl start wazuh-agent';
-        } else return 'sudo update-rc.d wazuh-agent defaults 95 10\nsudo service wazuh-agent start';
-      } else return '';
     }
 
     selectSYS(sys) {
@@ -202,83 +178,6 @@ export const RegisterAgent = withErrorBoundary(
       this.setState({ showPassword: event.target.checked });
     }
 
-    obfuscatePassword(text) {
-      let obfuscate = '';
-      const regex = /WAZUH_REGISTRATION_PASSWORD=?\040?\'(.*?)\'/gm;
-      const match = regex.exec(text);
-      const password = match[1];
-      if (password) {
-        [...password].forEach(() => (obfuscate += '*'));
-        text = text.replace(password, obfuscate);
-      }
-      return text;
-    }
-
-    async getGroups() {
-      try {
-        const result = await WzRequest.apiReq('GET', '/groups', {});
-        return result.data.data.affected_items.map((item) => ({ label: item.name, id: item.name }));
-      } catch (error) {
-        throw new Error(error);
-      }
-    }
-
-    optionalDeploymentVariables() {
-      let deployment = `WAZUH_MANAGER='${this.state.serverAddress}' `;
-
-      if (this.state.selectedOS == 'win') {
-        deployment += `WAZUH_REGISTRATION_SERVER='${this.state.serverAddress}' `;
-      }
-
-      if (this.state.needsPassword) {
-        deployment += `WAZUH_REGISTRATION_PASSWORD='${this.state.wazuhPassword}' `;
-      }
-
-      if (this.state.udpProtocol) {
-        deployment += `WAZUH_PROTOCOL='UDP' `;
-      }
-
-      if (this.state.selectedGroup.length) {
-        deployment += `WAZUH_AGENT_GROUP='${this.state.selectedGroup
-          .map((item) => item.label)
-          .join(',')}' `;
-      }
-
-      // macos doesnt need = param
-      if (this.state.selectedOS === 'macos') {
-        return deployment.replace(/=/g, ' ');
-      }
-
-      return deployment;
-    }
-
-    checkMissingOSSelection() {
-      if (!this.state.selectedOS) {
-        return ['Operating system'];
-      }
-      switch (this.state.selectedOS) {
-        case 'rpm':
-          return [
-            ...(!this.state.selectedVersion ? ['OS version'] : []),
-            ...(this.state.selectedVersion && !this.state.selectedArchitecture
-              ? ['OS architecture']
-              : []),
-          ];
-        case 'deb':
-          return [...(!this.state.selectedArchitecture ? ['OS architecture'] : [])];
-        default:
-          return [];
-      }
-    }
-
-    getHighlightCodeLanguage(selectedSO) {
-      if (selectedSO.toLowerCase() === 'win') {
-        return 'powershell';
-      } else {
-        return 'bash';
-      }
-    }
-
     render() {
       const appVersionMajorDotMinor = this.state.wazuhVersion.split('.').slice(0, 2).join('.');
       const urlCheckConnectionDocumentation = webDocumentationLink('user-manual/agents/agent-connection.html', appVersionMajorDotMinor);
@@ -290,8 +189,7 @@ export const RegisterAgent = withErrorBoundary(
           </a>
         </p>
       );
-      const missingOSSelection = this.checkMissingOSSelection();
-
+      const missingOSSelection = checkMissingOSSelection(this.state.selectedOS, this.state.selectedVersion, this.state.selectedArchitecture);
       const passwordInput = (
         <EuiFieldText
           placeholder="Wazuh password"
@@ -300,41 +198,8 @@ export const RegisterAgent = withErrorBoundary(
         />
       );
 
-      const codeBlock = {
-        zIndex: '100',
-      };
-      const customTexts = {
-        rpmText: `sudo ${this.optionalDeploymentVariables()}yum install ${optionalPackages(this.state.selectedOS, this.state.selectedArchitecture, this.state.wazuhVersion)}`,
-        debText: `curl -so wazuh-agent-${this.state.wazuhVersion
-          }.deb ${optionalPackages(this.state.selectedOS, this.state.selectedArchitecture, this.state.wazuhVersion)} && sudo ${this.optionalDeploymentVariables()}dpkg -i ./wazuh-agent-${this.state.wazuhVersion
-          }.deb`,
-        macosText: `curl -so wazuh-agent-${this.state.wazuhVersion
-          }.pkg https://packages.wazuh.com/4.x/macos/wazuh-agent-${this.state.wazuhVersion
-          }-1.pkg && sudo launchctl setenv ${this.optionalDeploymentVariables()}&& sudo installer -pkg ./wazuh-agent-${this.state.wazuhVersion
-          }.pkg -target /`,
-        winText: `Invoke-WebRequest -Uri https://packages.wazuh.com/4.x/windows/wazuh-agent-${this.state.wazuhVersion
-          }-1.msi -OutFile \${env:tmp}\\wazuh-agent-${this.state.wazuhVersion}.msi; msiexec.exe /i \${env:tmp}\\wazuh-agent-${this.state.wazuhVersion
-          }.msi /q ${this.optionalDeploymentVariables()}`,
-      };
-
-      const field = `${this.state.selectedOS}Text`;
-      const text = customTexts[field];
-      const language = this.getHighlightCodeLanguage(this.state.selectedOS);
-      const windowsAdvice = this.state.selectedOS === 'win' && (
-        <>
-          <EuiCallOut
-            title="Requirements"
-            iconType="iInCircle"
-          >
-            <ul class="wz-callout-list">
-              <li><span>You will need administrator privileges to perform this installation.</span></li>
-              <li><span>PowerShell 3.0 or greater is required.</span></li>
-            </ul>
-            <p>Keep in mind you need to run this command in a Windows PowerShell terminal.</p>
-          </EuiCallOut>
-          <EuiSpacer></EuiSpacer>
-        </>
-      );
+      const text = getCommandText({ ...this.state });
+      const language = getHighlightCodeLanguage(this.state.selectedOS);
       const restartAgentCommand = this.restartAgentCommand[this.state.selectedOS];
       const onTabClick = (selectedTab) => {
         this.selectSYS(selectedTab.id);
@@ -372,10 +237,10 @@ export const RegisterAgent = withErrorBoundary(
                   iconType="iInCircle"
                 />
                 <EuiSpacer />
-                {windowsAdvice}
+                { this.state.selectedOS === 'win' && <WindowsAdvice /> }
                 <div className="copy-codeblock-wrapper">
                   <EuiCodeBlock style={codeBlock} language={language}>
-                    {this.state.wazuhPassword && !this.state.showPassword ? this.obfuscatePassword(text) : text}
+                    {this.state.wazuhPassword && !this.state.showPassword ? obfuscatePassword(text) : text}
                   </EuiCodeBlock>
                   <EuiCopy textToCopy={text}>
                     {(copy) => (
@@ -408,9 +273,9 @@ export const RegisterAgent = withErrorBoundary(
               <EuiText>
                 <div className="copy-codeblock-wrapper">
                   <EuiCodeBlock style={codeBlock} language={language}>
-                    {this.systemSelector()}
+                    {systemSelector(this.state.selectedOS, this.state.selectedSYS)}
                   </EuiCodeBlock>
-                  <EuiCopy textToCopy={this.systemSelector()}>
+                  <EuiCopy textToCopy={systemSelector(this.state.selectedOS, this.state.selectedSYS)}>
                     {(copy) => (
                       <div className="copy-overlay" onClick={copy}>
                         <p><EuiIcon type="copy" /> Copy command</p>
@@ -433,9 +298,9 @@ export const RegisterAgent = withErrorBoundary(
               <EuiText>
                 <div className="copy-codeblock-wrapper">
                   <EuiCodeBlock style={codeBlock} language={language}>
-                    {this.systemSelector()}
+                    {systemSelector(this.state.selectedOS, this.state.selectedSYS)}
                   </EuiCodeBlock>
-                  <EuiCopy textToCopy={this.systemSelector()}>
+                  <EuiCopy textToCopy={systemSelector(this.state.selectedOS, this.state.selectedSYS)}>
                     {(copy) => (
                       <div className="copy-overlay" onClick={copy}>
                         <p><EuiIcon type="copy" /> Copy command</p>

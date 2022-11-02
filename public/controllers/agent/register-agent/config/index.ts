@@ -77,3 +77,9 @@ const architectureButtons = [
   ];
 
 export { architectureButtons, architectureCentos5OrRedHat5, versionButtonsCentosOrRedHat, osButtons, sysButtons };
+
+const codeBlock = {
+  zIndex: '100',
+};
+
+export { codeBlock };
