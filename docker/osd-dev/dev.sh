@@ -75,6 +75,12 @@ then
 	export WAZUH_DASHBOARD_CONF=./config/${OSD_MAJOR}/osd/opensearch_dashboards_saml.yml
 fi
 
+export SEC_CONFIG_PATH=/usr/share/opensearch/plugins/opensearch-security/securityconfig
+if [[ "$OSD_MAJOR" == "2.x" ]]
+then
+	export SEC_CONFIG_PATH=/usr/share/opensearch/config/opensearch-security
+fi
+
 case "$4" in
 	up)
 		docker compose --profile $profile -f dev.yml up -Vd

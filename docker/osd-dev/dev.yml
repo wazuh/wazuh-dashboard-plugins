@@ -146,10 +146,11 @@ services:
     volumes:
       - wi_certs:/usr/share/opensearch/config/certs/
       - ./config/${OSD_MAJOR}/os/opensearch.yml:/usr/share/opensearch/config/opensearch.yml
-      - ./config/${OSD_MAJOR}/os/internal_users.yml:/usr/share/opensearch/config/opensearch-security/internal_users.yml
-      - ./config/${OSD_MAJOR}/os/config.yml:/usr/share/opensearch/config/opensearch-security/config.yml
-      - ./config/${OSD_MAJOR}/os/roles_mapping.yml:/usr/share/opensearch/config/opensearch-security/roles_mapping.yml
-      - ./config/${OSD_MAJOR}/os/roles.yml:/usr/share/opensearch/config/opensearch-security/roles.yml
+      - ./config/${OSD_MAJOR}/os/internal_users.yml:${SEC_CONFIG_PATH}/internal_users.yml
+      - ./config/${OSD_MAJOR}/os/config.yml:${SEC_CONFIG_PATH}/config.yml
+      - ./config/${OSD_MAJOR}/os/roles_mapping.yml:${SEC_CONFIG_PATH}/roles_mapping.yml
+      - ./config/${OSD_MAJOR}/os/roles.yml:${SEC_CONFIG_PATH}/roles.yml
+
       - os_logs:/var/log/os1
       - os_data:/var/lib/os1
     networks:
@@ -237,7 +238,7 @@ services:
       - wm_certs:/certs/wm
       - idp_certs:/certs/idp
     entrypoint: /bin/bash
-    command: > 
+    command: >
       -c '
         # trust store
         for i in /certs/idp/ca.pem /certs/wd/osd.pem /certs/wi/os1.pem
@@ -280,7 +281,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 6
-  
+
   idpsetup:
     image: badouralix/curl-jq
     depends_on:
