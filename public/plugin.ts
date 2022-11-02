@@ -65,9 +65,9 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
       id: `wazuh`,
       title: 'Wazuh',
       icon: core.http.basePath.prepend(
-        logosInitialState?.logos?.[SIDEBAR_LOGO] !== getSettingDefaultValue(SIDEBAR_LOGO) ?
+        logosInitialState?.logos?.[SIDEBAR_LOGO] ?
           getAssetURL(logosInitialState?.logos?.[SIDEBAR_LOGO]) :
-          getThemeAssetURL(logosInitialState?.logos?.[SIDEBAR_LOGO], UI_THEME)),
+          getThemeAssetURL('icon.svg', UI_THEME)),
       mount: async (params: AppMountParameters) => {
         try {
           if (!this.initializeInnerAngular) {
