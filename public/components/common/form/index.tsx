@@ -59,9 +59,9 @@ export const InputForm = ({
 const Input = {
   switch: InputFormSwitch,
   editor: InputFormEditor,
+  filepicker: InputFormFilePicker,
   number: InputFormNumber,
   select: InputFormSelect,
   text: InputFormText,
   textarea: InputFormTextArea,
-  filepicker: InputFormFilePicker
 };
