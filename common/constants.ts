@@ -941,6 +941,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
 		defaultValue: true,
 		isConfigurableFromFile: true,
 		isConfigurableFromUI: true,
+    requiresReloadingBrowserTab: true,
 		options: {
 			switch: {
 				values: {
@@ -1076,6 +1077,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     defaultValue: "",
     isConfigurableFromFile: true,
     isConfigurableFromUI: true,
+    requiresReloadingBrowserTab: true,
     options: {
 			file: {
 				type: 'image',

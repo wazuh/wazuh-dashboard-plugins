@@ -30,8 +30,8 @@ import { webDocumentationLink } from '../../../../../../../../common/services/we
 import classNames from 'classnames';
 import { InputForm } from '../../../../../../common/form';
 import { useDispatch } from 'react-redux';
-import { getHttp, getPluginUpdater } from '../../../../../../../kibana-services';
-import { getAssetURL, getThemeAssetURL } from '../../../../../../../utils/assets';
+import { getHttp } from '../../../../../../../kibana-services';
+import { getAssetURL } from '../../../../../../../utils/assets';
 import { UI_ERROR_SEVERITIES } from '../../../../../../../react-services/error-orchestrator/types';
 import { WzRequest } from '../../../../../../../react-services';
 import { updateAppConfig } from '../../../../../../../redux/actions/appConfigActions';
@@ -179,18 +179,6 @@ const InputFormFilePickerPreInput = ({image, field}: {image: string, field: any}
               try{
                 const response = await WzRequest.genericReq('DELETE', `/utils/configuration/files/${field.key}`);
                 dispatch(updateAppConfig(response.data.data.updatedConfiguration));
-                
-                // This updates the plugin definition, updating the logo in the platform menu
-                if ( 'customization.logo.sidebar' in response.data.data.updatedConfiguration ) {
-                  getPluginUpdater().updater(() => ({
-                    category: {
-                      id: 'wazuh',
-                      label: 'Wazuh',
-                      order: 0,
-                      euiIconType: getHttp().basePath.prepend(getThemeAssetURL('icon.svg')),
-                    }
-                  }));
-                };
 
                 // Show the toasts if necessary
                 const { requiresRunningHealthCheck, requiresReloadingBrowserTab, requiresRestartingPluginPlatform } = response.data.data;
