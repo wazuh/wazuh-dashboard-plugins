@@ -108,10 +108,13 @@ const checks = {
   timeFilter: {
     title: `Check ${PLUGIN_PLATFORM_SETTING_NAME_TIME_FILTER} setting`,
     label: `${PLUGIN_PLATFORM_SETTING_NAME_TIME_FILTER} setting`,
-    validator: checkPluginPlatformSettings(PLUGIN_PLATFORM_SETTING_NAME_TIME_FILTER, JSON.stringify(WAZUH_PLUGIN_PLATFORM_SETTING_TIME_FILTER), (checkLogger: CheckLogger, options: {defaultAppValue: any}) => {
-      getDataPlugin().query.timefilter.timefilter.setTime(WAZUH_PLUGIN_PLATFORM_SETTING_TIME_FILTER)
-        && checkLogger.action(`Timefilter set to ${JSON.stringify(options.defaultAppValue)}`);
-    }),
+    validator: checkPluginPlatformSettings(
+      PLUGIN_PLATFORM_SETTING_NAME_TIME_FILTER,
+      JSON.stringify(WAZUH_PLUGIN_PLATFORM_SETTING_TIME_FILTER),
+      (checkLogger: CheckLogger, options: { defaultAppValue: any }) => {
+        getDataPlugin().query.timefilter.timefilter.setTime(WAZUH_PLUGIN_PLATFORM_SETTING_TIME_FILTER)
+          && checkLogger.action(`Timefilter set to ${JSON.stringify(options.defaultAppValue)}`);
+      }),
     awaitFor: [],
     canRetry: true,
   }
@@ -171,7 +174,11 @@ function HealthCheckComponent() {
   }
 
 
-  const logoUrl = getHttp().basePath.prepend(appConfig.data['customization.logo.healthcheck'] ? getAssetURL(appConfig.data['customization.logo.healthcheck']) : getThemeAssetURL('logo.svg'));
+  const logoUrl = getHttp().basePath.prepend(
+    appConfig.data['customization.enabled'] && appConfig.data['customization.logo.healthcheck'] ?
+      getAssetURL(appConfig.data['customization.logo.healthcheck']) :
+      getThemeAssetURL('logo.svg')
+  );
   const thereAreErrors = Object.keys(checkErrors).length > 0;
 
   const renderChecks = () => {
