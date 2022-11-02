@@ -1060,11 +1060,6 @@ export const RegisterAgent = withErrorBoundary(
                 Might require some extra installation <EuiLink target="_blank" href={webDocumentationLink('installation-guide/wazuh-agent/wazuh-agent-package-linux.html', appVersionMajorDotMinor)}>steps</EuiLink>.
               </span>
             }>
-            </EuiCallOut> : this.state.selectedVersion == 'centos5' ? <EuiCallOut color="warning" className='message' iconType="iInCircle" title={
-              <span>
-                Might require some extra installation <EuiLink target="_blank" href={webDocumentationLink('installation-guide/wazuh-agent/wazuh-agent-package-linux.html', appVersionMajorDotMinor)}>steps</EuiLink>.
-              </span>
-            }>
             </EuiCallOut> : ''}
           </>
         )
