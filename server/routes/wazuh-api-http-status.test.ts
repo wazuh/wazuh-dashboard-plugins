@@ -3,7 +3,7 @@
 import { Router } from '../../../../src/core/server/http/router/router';
 import { HttpServer } from '../../../../src/core/server/http/http_server';
 import { loggingSystemMock } from '../../../../src/core/server/logging/logging_system.mock';
-import { ByteSizeValue } from '@kbn/config-schema';
+import { ByteSizeValue } from '@osd/config-schema';
 import supertest from 'supertest';
 import { WazuhApiRoutes } from './wazuh-api';
 import { createDataDirectoryIfNotExists, createDirectoryIfNotExists } from '../lib/filesystem';

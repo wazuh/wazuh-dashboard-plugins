@@ -9,6 +9,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added the option to sort by the agents count in the group table. [#4323](https://github.com/wazuh/wazuh-kibana-app/pull/4323)
 - Added agent synchronization status in the agent module. [#3874](https://github.com/wazuh/wazuh-kibana-app/pull/3874)
 - Redesign the SCA table from agent's dashboard [#4512](https://github.com/wazuh/wazuh-kibana-app/pull/4512)
+- Enhanced the plugin setting description displayed in the UI and the configuration file. [#4501](https://github.com/wazuh/wazuh-kibana-app/pull/4501)
+- Added validation to the plugin settings in the form of `Settings/Configuration` and the endpoint to update the plugin configuration [#4503](https://github.com/wazuh/wazuh-kibana-app/pull/4503)[#4785](https://github.com/wazuh/wazuh-kibana-app/pull/4785)
+- Added new plugin settings to customize the header and footer on the PDF reports [#4505](https://github.com/wazuh/wazuh-kibana-app/pull/4505)
+- Add a new plugin setting to enable or disable the customization [#4507](https://github.com/wazuh/wazuh-kibana-app/pull/4507)
 
 ### Changed
 
@@ -18,6 +22,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed loading icons of the Agents Overview section to work independently [#4363](https://github.com/wazuh/wazuh-kibana-app/pull/4363)
 - Enhance the message shown when a mismatch between Wazuh API and Wazuh APP occurs [#4544](https://github.com/wazuh/wazuh-kibana-app/pull/4544)
 - Changed breadcrumb styling to support OpenSearch dashboard 2.x. [#4649](https://github.com/wazuh/wazuh-kibana-app/pull/4649)
+- Made Agents Overview icons load independently [#4363](https://github.com/wazuh/wazuh-kibana-app/pull/4363)
+- Improved the message displayed when there is a versions mismatch between the Wazuh API and the Wazuh APP [#4529](https://github.com/wazuh/wazuh-kibana-app/pull/4529)
+- Changed the endpoint that updates the plugin configuration to support multiple settings. [#4501](https://github.com/wazuh/wazuh-kibana-app/pull/4501)
+- Allowed to upload an image for the `customization.logo.*` settings in `Settings/Configuration` [#4504](https://github.com/wazuh/wazuh-kibana-app/pull/4504)
 
 ### Removed
 

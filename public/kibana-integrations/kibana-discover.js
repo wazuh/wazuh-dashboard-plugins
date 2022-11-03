@@ -97,6 +97,7 @@ import { createFixedScroll } from './discover/application/angular/directives/fix
 
 import './discover/application/index.scss';
 import { getFilterWithAuthorizedAgents } from '../react-services/filter-authorization-agents';
+import { getSettingDefaultValue } from '../../common/services/settings';
 
 const fetchStatuses = {
   UNINITIALIZED: 'uninitialized',
@@ -160,7 +161,7 @@ function discoverController(
   }
 
   (async () => {
-     const services = await buildServices(
+    const services = await buildServices(
       getCore(),
       getPlugins(),
       { env: { packageInfo: { branch: "7.10" } } },
@@ -302,14 +303,14 @@ function discoverController(
         next: () => {
           //Patch empty fields
           const filters = filterManager.getAppFilters();
-          if(filters.filter(item=> item.meta.params && item.meta.params.query === '').length){
+          if (filters.filter(item => item.meta.params && item.meta.params.query === '').length) {
             getToasts().add({
               color: 'warning',
               title: 'Invalid field value',
               text: 'The filter field contains invalid value',
               toastLifeTimeMs: 10000,
             });
-            filterManager.setFilters(filters.filter(item=>item.meta.params.query));
+            filterManager.setFilters(filters.filter(item => item.meta.params.query));
           }
           //end of patch empty fields
           $scope.state.filters = filters;
@@ -501,8 +502,8 @@ function discoverController(
     savedSearch: savedSearch,
     indexPatternList: $route.current.locals.ip.list,
     config: config,
-    fixedScroll: $scope.tabView === 'discover'? createFixedScroll($scope, $timeout) : () => {},
-    setHeaderActionMenu: () => {} //getHeaderActionMenuMounter(),
+    fixedScroll: $scope.tabView === 'discover' ? createFixedScroll($scope, $timeout) : () => { },
+    setHeaderActionMenu: () => { } //getHeaderActionMenuMounter(),
   };
 
   const shouldSearchOnPageLoad = () => {
@@ -547,7 +548,7 @@ function discoverController(
                         negate: true,
                         params: { query: '000' },
                         type: 'phrase',
-                        index: AppState.getCurrentPattern() || WAZUH_ALERTS_PATTERN
+                        index: AppState.getCurrentPattern() || getSettingDefaultValue('pattern')
                       },
                       query: { match_phrase: { 'agent.id': '000' } },
                       $state: { store: 'appState' }
@@ -712,13 +713,13 @@ function discoverController(
     // Wazuh filters are not ready yet
     if (!filtersAreReady()) return;
     if (!_.isEqual(query, appStateContainer.getState().query) || isUpdate === false) {
-       /// Wazuh 7.7.x
-       let q = { ...query };
-       if (query && typeof query === 'object') {
-         q.timestamp = new Date().getTime().toString();
-       }
-       ///
-       setAppState({ query: q });
+      /// Wazuh 7.7.x
+      let q = { ...query };
+      if (query && typeof query === 'object') {
+        q.timestamp = new Date().getTime().toString();
+      }
+      ///
+      setAppState({ query: q });
       // WAZUH query from search bar
       discoverPendingUpdates.removeAll();
       discoverPendingUpdates.addItem($scope.state.query, filterManager.filters);
@@ -1076,7 +1077,7 @@ function discoverController(
     if ($scope.fetchStatus !== fetchStatuses.UNINITIALIZED) {
       setTimeout(() => {
         modulesHelper.hideCloseButtons();
-      },  100);
+      }, 100);
     }
   });
 

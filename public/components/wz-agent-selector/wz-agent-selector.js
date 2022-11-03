@@ -23,7 +23,7 @@ import { connect } from 'react-redux';
 import { showExploreAgentModalGlobal } from '../../redux/actions/appStateActions';
 import store from '../../redux/store';
 import { AgentSelectionTable } from '../../controllers/overview/components/overview-actions/agents-selection-table';
-import { WAZUH_ALERTS_PATTERN } from '../../../common/constants';
+import { getSettingDefaultValue } from '../../../common/services/settings';
 import { AppState } from '../../react-services/app-state';
 import { getAngularModule, getDataPlugin } from '../../kibana-services';
 
@@ -70,7 +70,7 @@ class WzAgentSelector extends Component {
             "negate": false,
             "params": { "query": agentIdList[0] },
             "type": "phrase",
-            "index": AppState.getCurrentPattern() || WAZUH_ALERTS_PATTERN
+            "index": AppState.getCurrentPattern() || getSettingDefaultValue('pattern')
           },
           "query": {
             "match": {

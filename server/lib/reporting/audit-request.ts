@@ -11,7 +11,7 @@
  */
 import { Base } from './base-query';
 import AuditMap from './audit-map';
-import { WAZUH_ALERTS_PATTERN } from '../../../common/constants';
+import { getSettingDefaultValue } from '../../../common/services/settings';
 
 /**
    * Returns top 3 agents that execute sudo commands without success
@@ -26,7 +26,7 @@ export const getTop3AgentsSudoNonSuccessful = async (
   gte,
   lte,
   filters,
-  pattern = WAZUH_ALERTS_PATTERN
+  pattern = getSettingDefaultValue('pattern')
 ) => {
   try {
     const base = {};
@@ -93,7 +93,7 @@ export const getTop3AgentsFailedSyscalls = async (
   gte,
   lte,
   filters,
-  pattern = WAZUH_ALERTS_PATTERN
+  pattern = getSettingDefaultValue('pattern')
 ) => {
   try {
     const base = {};
@@ -172,7 +172,7 @@ export const getTopFailedSyscalls = async (
   gte,
   lte,
   filters,
-  pattern = WAZUH_ALERTS_PATTERN
+  pattern = getSettingDefaultValue('pattern')
 ) => {
   try {
     const base = {};
