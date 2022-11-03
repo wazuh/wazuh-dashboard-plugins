@@ -56,17 +56,17 @@ export class SettingsValidator {
    * @param options
    * @returns
    */
-  static multipleLinesString(options: { min?: number, max?: number, maxLength?: number } = {}) {
+  static multipleLinesString(options: { minRows?: number, maxRows?: number, maxLength?: number } = {}) {
     return function (value: number) {
       const lines = value.split(/\r\n|\r|\n/).length;
       if (typeof options.maxLength !== 'undefined' && value.split('\n').some(line => line.length > options.maxLength)) {
         return `The maximum length of a line is ${options.maxLength} characters.`;
       };
-      if (typeof options.min !== 'undefined' && lines < options.min) {
-        return `The string should have more or ${options.min} line/s.`;
+      if (typeof options.minRows !== 'undefined' && lines < options.minRows) {
+        return `The string should have more or ${options.minRows} line/s.`;
       };
-      if (typeof options.max !== 'undefined' && lines > options.max) {
-        return `The string should have less or equal to ${options.max} line/s.`;
+      if (typeof options.maxRows !== 'undefined' && lines > options.maxRows) {
+        return `The string should have less or equal to ${options.maxRows} line/s.`;
       };
     }
   };
