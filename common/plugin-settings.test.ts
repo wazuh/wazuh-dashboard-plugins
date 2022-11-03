@@ -93,6 +93,7 @@ describe('[settings] Input validation', () => {
     ${'cron.statistics.interval'}       | ${true}                                    | ${"Interval is not valid."}
     ${'cron.statistics.status'}         | ${true}                                    | ${undefined}
     ${'cron.statistics.status'}         | ${0}                                       | ${'It should be a boolean. Allowed values: true or false.'}
+    ${'customization.enabled'}          | ${true}                                    | ${undefined}
     ${'customization.logo.app'}         | ${{size: 124000, name: 'image.jpg'}}       | ${undefined}
     ${'customization.logo.app'}         | ${{size: 124000, name: 'image.jpeg'}}      | ${undefined}
     ${'customization.logo.app'}         | ${{size: 124000, name: 'image.png'}}       | ${undefined}

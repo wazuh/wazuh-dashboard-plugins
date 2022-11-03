@@ -179,7 +179,7 @@ const InputFormFilePickerPreInput = ({image, field}: {image: string, field: any}
               try{
                 const response = await WzRequest.genericReq('DELETE', `/utils/configuration/files/${field.key}`);
                 dispatch(updateAppConfig(response.data.data.updatedConfiguration));
-                
+
                 // Show the toasts if necessary
                 const { requiresRunningHealthCheck, requiresReloadingBrowserTab, requiresRestartingPluginPlatform } = response.data.data;
                 requiresRunningHealthCheck && toastRequiresRunningHealthcheck();
