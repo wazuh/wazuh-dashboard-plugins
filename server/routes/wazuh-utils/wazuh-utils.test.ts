@@ -310,13 +310,13 @@ hosts:
     ${'customization.reports.footer'}   | ${'Test\nTest'}                            | ${200}             | ${null}
     ${'customization.reports.footer'}   | ${'Test\nTest\nTest\nTest\nTest'}          | ${400}             | ${"[request body.customization.reports.footer]: The string should have less or equal to 2 line/s."}
     ${'customization.reports.footer'}   | ${'Line with 30 characters       \nTest'}  | ${200}             | ${undefined}
-    ${'customization.reports.footer'}   | ${'Line with 31 characters        \nTest'} | ${400}             | ${"[request body.customization.reports.footer]: The maximum length of a line is 30 characters."}
+    ${'customization.reports.footer'}   | ${'Testing the maximum length of a line of 50 characters\nTest'}| ${400}             | ${"[request body.customization.reports.footer]: The maximum length of a line is 50 characters."}
     ${'customization.reports.footer'}   | ${true}                                    | ${400}             | ${'[request body.customization.reports.footer]: expected value of type [string] but got [boolean]'}
     ${'customization.reports.header'}   | ${'Test'}                                  | ${200}             | ${null}
     ${'customization.reports.header'}   | ${'Test\nTest'}                            | ${200}             | ${null}
     ${'customization.reports.header'}   | ${'Test\nTest\nTest\nTest\nTest'}          | ${400}             | ${"[request body.customization.reports.header]: The string should have less or equal to 3 line/s."}
     ${'customization.reports.header'}   | ${'Line with 20 charact\nTest'}            | ${200}             | ${undefined}
-    ${'customization.reports.header'}   | ${'Line with 23 characters\nTest'}         | ${400}             | ${"[request body.customization.reports.header]: The maximum length of a line is 20 characters."}
+    ${'customization.reports.header'}   | ${'Testing maximum length of a line of 40 characters\nTest'}    | ${400}             | ${"[request body.customization.reports.header]: The maximum length of a line is 40 characters."}
     ${'customization.reports.header'}   | ${true}                                    | ${400}             | ${'[request body.customization.reports.header]: expected value of type [string] but got [boolean]'}
     ${'disabled_roles'}                 | ${['test']}                                | ${200}             | ${null}
     ${'disabled_roles'}                 | ${['']}                                    | ${400}             | ${'[request body.disabled_roles.0]: Value can not be empty.'}
