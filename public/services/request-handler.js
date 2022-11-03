@@ -30,6 +30,7 @@ export const initializeInterceptor = () => {
                 httpErrorResponse.response?.status === 401
             ) {
                 disableRequests();
+                setTimeout(() => window.location.reload(), 1000);
             }
         },
     });
