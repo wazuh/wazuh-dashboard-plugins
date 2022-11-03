@@ -1,12 +1,11 @@
-import { EuiComboBoxOptionOption } from '@elastic/eui';
 import { WzRequest } from '../../../../react-services/wz-request';
-import { RegisterAgentState } from '../register-agent-main';
+import { RegisterAgentState } from '../types';
 import { optionalPackages } from '../services';
 
 /**
  * Get groups list from API and return with combobox format
  */
-export async function getGroups(): Promise<EuiComboBoxOptionOption<any>[]> {
+export async function getGroups(): Promise<any[]> {
   try {
     const result = await WzRequest.apiReq('GET', '/groups', {});
     return result.data.data.affected_items.map(item => ({
@@ -21,7 +20,7 @@ export async function getGroups(): Promise<EuiComboBoxOptionOption<any>[]> {
 /**
  * Get the agents auth configuration
  */
-export async function getAuthInfo(): Promise<object|{error:boolean}> {
+export async function getAuthInfo(): Promise<any|{error:boolean}> {
   try {
     const result = await WzRequest.apiReq(
       'GET',
@@ -57,8 +56,8 @@ export function obfuscatePassword(text: string) {
   const regex = /WAZUH_REGISTRATION_PASSWORD=?\040?\'(.*?)\'/gm;
   const match = regex.exec(text);
   const password = match && match[1] ;
-  if (password) {
-    [...password].forEach(() => (obfuscate += '*'));
+  if (password) { 
+    [...password].forEach(() => (obfuscate += '*')); 
     text = text.replace(password, obfuscate);
   }
   return text;

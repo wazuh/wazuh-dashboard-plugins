@@ -28,25 +28,41 @@ import {
   EuiCallOut,
   EuiSpacer,
   EuiProgress,
-  EuiIcon
+  EuiIcon,
 } from '@elastic/eui';
 import { withErrorBoundary } from '../../../components/common/hocs';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
-import { 
-  architectureButtons, 
-  architectureCentos5OrRedHat5, 
-  osButtons, 
-  versionButtonsCentosOrRedHat} from './config'
-import { AgentGroup, InstallEnrollAgent, ServerAddress, StartAgentTabs, WazuhPassword } from './steps'
-import { getGroups, 
-  getAuthInfo, 
+import {
+  architectureButtons,
+  architectureCentos5OrRedHat5,
+  osButtons,
+  versionButtonsCentosOrRedHat,
+} from './config';
+import {
+  AgentGroup,
+  InstallEnrollAgent,
+  ServerAddress,
+  StartAgentTabs,
+  WazuhPassword,
+} from './steps';
+import {
+  getGroups,
+  getAuthInfo,
   systemSelector,
   checkMissingOSSelection,
   getCommandText,
-  getHighlightCodeLanguage } from './services/register-agent-service'
-
+  getHighlightCodeLanguage,
+} from './services/register-agent-service';
+import {
+  OSArchitecture,
+  OSSys,
+  OSSystems,
+  OSVersion,
+  RegisterAgentState,
+} from './types';
+import { PermissionsAdvice } from './components';
 
 type Props = {
   hasAgents(): boolean;
@@ -54,29 +70,7 @@ type Props = {
   reload: () => void;
   getCurrentApiAddress(): string;
   getWazuhVersion(): string;
-}
-
-export type OSSystems = 'rpm' | 'deb' | 'macos' | 'win';
-export type RegisterAgentState = {
-  status: string;
-  selectedOS: OSSystems | '';
-  selectedSYS: string;
-  selectedArchitecture: string;
-  selectedVersion: string;
-  serverAddress: string | false;
-  groups: { label: string, id: string }[];
-  selectedGroup: { label: string, id: string }[];
-  udpProtocol: boolean;
-  showPassword: boolean;
-  wazuhVersion: string;
-  wazuhPassword: string;
-  version: string;
-  loading: boolean;
-  gotErrorRegistrationServiceInfo?: boolean;
-  needsPassword?: boolean;
-  hidePasswordInput?: boolean;
-}
-
+};
 
 export const RegisterAgent = withErrorBoundary(
   class RegisterAgent extends Component<Props, RegisterAgentState> {
@@ -101,13 +95,13 @@ export const RegisterAgent = withErrorBoundary(
         selectedGroup: [],
         udpProtocol: false,
         showPassword: false,
-        loading: false
+        loading: false,
       };
       this.restartAgentCommand = {
         rpm: systemSelector(this.state.selectedOS, this.state.selectedSYS),
         deb: systemSelector(this.state.selectedOS, this.state.selectedSYS),
         macos: 'sudo /Library/Ossec/bin/wazuh-control start',
-        win: 'NET START WazuhSvc'
+        win: 'NET START WazuhSvc',
       };
     }
 
@@ -115,20 +109,23 @@ export const RegisterAgent = withErrorBoundary(
       try {
         this.setState({ loading: true });
         const wazuhVersion = await this.props.getWazuhVersion();
-        let serverAddress = false;
+        let serverAddress = null;
         let wazuhPassword = '';
         let hidePasswordInput = false;
-        serverAddress = this.configuration['enrollment.dns'] || false;
+        serverAddress = this.configuration['enrollment.dns'] || null;
         if (!serverAddress) {
           serverAddress = await this.props.getCurrentApiAddress();
         }
         let authInfo = await getAuthInfo();
-        if(!authInfo  || authInfo?.error){
+        if (!authInfo || authInfo?.error) {
           this.setState({ gotErrorRegistrationServiceInfo: true });
         }
         const needsPassword = (authInfo.auth || {}).use_password === 'yes';
         if (needsPassword) {
-          wazuhPassword = this.configuration['enrollment.password'] || authInfo['authd.pass'] || '';
+          wazuhPassword =
+            this.configuration['enrollment.password'] ||
+            authInfo['authd.pass'] ||
+            '';
           if (wazuhPassword) {
             hidePasswordInput = true;
           }
@@ -138,9 +135,6 @@ export const RegisterAgent = withErrorBoundary(
           serverAddress,
           needsPassword,
           hidePasswordInput,
-          versionButtonsCentosOrRedHat,
-          architectureButtons,
-          architectureCentos5OrRedHat5,
           wazuhPassword,
           wazuhVersion,
           groups,
@@ -167,7 +161,7 @@ export const RegisterAgent = withErrorBoundary(
       }
     }
 
-    selectOS(os: string) {
+    selectOS(os: OSSystems) {
       this.setState({
         selectedOS: os,
         selectedVersion: '',
@@ -176,23 +170,23 @@ export const RegisterAgent = withErrorBoundary(
       });
     }
 
-    selectSYS(sys: string) {
+    selectSYS(sys: OSSys) {
       this.setState({ selectedSYS: sys });
     }
 
     setServerAddress = (serverAddress: string) => {
       this.setState({ serverAddress });
-    }
+    };
 
-    setGroupName = (selectedGroup: {label: string, id: string}[]) => {
+    setGroupName = (selectedGroup: { label: string; id: string }[]) => {
       this.setState({ selectedGroup });
-    }
+    };
 
-    setArchitecture(selectedArchitecture: string) {
+    setArchitecture(selectedArchitecture: OSArchitecture) {
       this.setState({ selectedArchitecture });
     }
 
-    setVersion(selectedVersion: string) {
+    setVersion(selectedVersion: OSVersion) {
       this.setState({ selectedVersion, selectedArchitecture: '' });
     }
 
@@ -205,170 +199,197 @@ export const RegisterAgent = withErrorBoundary(
     }
 
     render() {
-      const missingOSSelection = checkMissingOSSelection(this.state.selectedOS, this.state.selectedVersion, this.state.selectedArchitecture);
+      const missingOSSelection = checkMissingOSSelection(
+        this.state.selectedOS,
+        this.state.selectedVersion,
+        this.state.selectedArchitecture,
+      );
       const language = getHighlightCodeLanguage(this.state.selectedOS);
 
       const Commandtext = getCommandText({ ...this.state });
-      const restartAgentCommand = this.restartAgentCommand[this.state.selectedOS];
-      const onTabClick = (selectedTab: {label: string, id: string}) => {
-        this.selectSYS(selectedTab.id);
+      const restartAgentCommand = this.restartAgentCommand[
+        this.state.selectedOS
+      ];
+      const onTabClick = (selectedTab: { label: string; id: string }) => {
+        this.selectSYS(selectedTab.id as OSSys);
       };
 
-      const calloutErrorRegistrationServiceInfo = this.state.gotErrorRegistrationServiceInfo ? (
-        <EuiCallOut
-          color="danger"
-          title='This section could not be displayed because you do not have permission to get access to the registration service.'
-          iconType="iInCircle"
-        />
+      const calloutErrorRegistrationServiceInfo = this.state
+        .gotErrorRegistrationServiceInfo ? (
+        <PermissionsAdvice />
       ) : null;
-
 
       const steps = [
         {
           title: 'Choose the Operating system',
           children: (
             <EuiButtonGroup
-              color="primary"
-              legend="Choose the Operating system"
+              color='primary'
+              legend='Choose the Operating system'
               options={osButtons}
               idSelected={this.state.selectedOS}
-              onChange={(os) => this.selectOS(os)}
+              onChange={(os: any) => this.selectOS(os)}
             />
           ),
         },
         ...(this.state.selectedOS == 'rpm'
           ? [
-            {
-              title: 'Choose the version',
-              children: (
-                <EuiButtonGroup
-                  color="primary"
-                  legend="Choose the version"
-                  options={versionButtonsCentosOrRedHat}
-                  idSelected={this.state.selectedVersion}
-                  onChange={(version) => this.setVersion(version)}
-                />
-              ),
-            },
-          ]
+              {
+                title: 'Choose the version',
+                children: (
+                  <EuiButtonGroup
+                    color='primary'
+                    legend='Choose the version'
+                    options={versionButtonsCentosOrRedHat}
+                    idSelected={this.state.selectedVersion}
+                    onChange={(version: any) => this.setVersion(version)}
+                  />
+                ),
+              },
+            ]
           : []),
-        ...(this.state.selectedOS == 'rpm' && this.state.selectedVersion == 'centos5' || this.state.selectedVersion == 'redhat5' 
+        ...((this.state.selectedOS == 'rpm' &&
+          this.state.selectedVersion == 'centos5') ||
+        this.state.selectedVersion == 'redhat5'
           ? [
-            {
-              title: 'Choose the architecture',
-              children: (
-                <EuiButtonGroup
-                  color="primary"
-                  legend="Choose the architecture"
-                  options={architectureCentos5OrRedHat5}
-                  idSelected={this.state.selectedArchitecture}
-                  onChange={(architecture) => this.setArchitecture(architecture)}
-                />
-              ),
-            },
-          ]
+              {
+                title: 'Choose the architecture',
+                children: (
+                  <EuiButtonGroup
+                    color='primary'
+                    legend='Choose the architecture'
+                    options={architectureCentos5OrRedHat5}
+                    idSelected={this.state.selectedArchitecture}
+                    onChange={(architecture: any) =>
+                      this.setArchitecture(architecture)
+                    }
+                  />
+                ),
+              },
+            ]
           : []),
         ...(this.state.selectedOS == 'deb' ||
-          (this.state.selectedOS == 'rpm' && this.state.selectedVersion == 'centos6' || this.state.selectedVersion == 'redhat6')
+        (this.state.selectedOS == 'rpm' &&
+          this.state.selectedVersion == 'centos6') ||
+        this.state.selectedVersion == 'redhat6'
           ? [
-            {
-              title: 'Choose the architecture',
-              children: (
-                <EuiButtonGroup
-                  color="primary"
-                  legend="Choose the architecture"
-                  options={architectureButtons}
-                  idSelected={this.state.selectedArchitecture}
-                  onChange={(architecture) => this.setArchitecture(architecture)}
-                />
-              ),
-            },
-          ]
+              {
+                title: 'Choose the architecture',
+                children: (
+                  <EuiButtonGroup
+                    color='primary'
+                    legend='Choose the architecture'
+                    options={architectureButtons}
+                    idSelected={this.state.selectedArchitecture}
+                    onChange={(architecture: any) =>
+                      this.setArchitecture(architecture)
+                    }
+                  />
+                ),
+              },
+            ]
           : []),
         {
           title: 'Wazuh server address',
-          children: <Fragment><ServerAddress defaultValue={this.state.serverAddress} onChange={this.setServerAddress}/></Fragment>,
+          children: (
+            <Fragment>
+              <ServerAddress
+                defaultValue={this.state.serverAddress}
+                onChange={this.setServerAddress}
+              />
+            </Fragment>
+          ),
         },
         ...(!(!this.state.needsPassword || this.state.hidePasswordInput)
           ? [
-            {
-              title: 'Wazuh password',
-              children: 
-                <Fragment>
-                  <WazuhPassword 
-                    defaultValue={this.state.wazuhPassword}
-                    onChange={ (value: string) => this.setWazuhPassword(value) }/>
-                </Fragment>,
-            },
-          ]
+              {
+                title: 'Wazuh password',
+                children: (
+                  <Fragment>
+                    <WazuhPassword
+                      defaultValue={this.state.wazuhPassword}
+                      onChange={(value: string) => this.setWazuhPassword(value)}
+                    />
+                  </Fragment>
+                ),
+              },
+            ]
           : []),
         {
           title: 'Assign the agent to a group',
-          children: <Fragment><AgentGroup options={this.state.groups} onChange={this.setGroupName}/></Fragment>,
+          children: (
+            <Fragment>
+              <AgentGroup
+                options={this.state.groups}
+                onChange={(value: any) => this.setGroupName(value)}
+              />
+            </Fragment>
+          ),
         },
         {
           title: 'Install and enroll the agent',
-          children: this.state.gotErrorRegistrationServiceInfo ?
+          children: this.state.gotErrorRegistrationServiceInfo ? (
             calloutErrorRegistrationServiceInfo
-            : missingOSSelection.length ? (
-              <EuiCallOut
-                color="warning"
-                title={`Please select the ${missingOSSelection.join(', ')}.`}
-                iconType="iInCircle"
+          ) : missingOSSelection.length ? (
+            <EuiCallOut
+              color='warning'
+              title={`Please select the ${missingOSSelection.join(', ')}.`}
+              iconType='iInCircle'
+            />
+          ) : (
+            <div>
+              <InstallEnrollAgent
+                language={language}
+                commandText={Commandtext}
+                {...this.state}
+                onSetShowPassword={this.setShowPassword}
               />
-            ) : (
-              <div>
-                <InstallEnrollAgent 
-                  language={language}
-                  commandText={Commandtext}
-                  {...this.state}
-                  onSetShowPassword={this.setShowPassword}
-                />
-              </div>
-            ),
+            </div>
+          ),
         },
         ...(this.state.selectedOS == 'rpm' || this.state.selectedOS == 'deb'
           ? [
-            {
-              title: 'Start the agent',
-              children: this.state.gotErrorRegistrationServiceInfo ?
-                calloutErrorRegistrationServiceInfo
-                : missingOSSelection.length ? (
+              {
+                title: 'Start the agent',
+                children: this.state.gotErrorRegistrationServiceInfo ? (
+                  calloutErrorRegistrationServiceInfo
+                ) : missingOSSelection.length ? (
                   <EuiCallOut
-                    color="warning"
-                    title={`Please select the ${missingOSSelection.join(', ')}.`}
-                    iconType="iInCircle"
+                    color='warning'
+                    title={`Please select the ${missingOSSelection.join(
+                      ', ',
+                    )}.`}
+                    iconType='iInCircle'
                   />
                 ) : (
-                  <StartAgentTabs
-                    onTabClick={onTabClick}
-                    { ...this.state }
-                  />
+                  <StartAgentTabs onTabClick={onTabClick} {...this.state} />
                 ),
-            },
-          ]
+              },
+            ]
           : []),
 
         ...(!missingOSSelection.length &&
-          this.state.selectedOS !== 'rpm' &&
-          this.state.selectedOS !== 'deb' &&
-          restartAgentCommand
+        this.state.selectedOS !== 'rpm' &&
+        this.state.selectedOS !== 'deb' &&
+        restartAgentCommand
           ? [
-            {
-              title: 'Start the agent',
-              children: this.state.gotErrorRegistrationServiceInfo ?
-                calloutErrorRegistrationServiceInfo
-                : (
-                  <EuiFlexGroup direction="column">
+              {
+                title: 'Start the agent',
+                children: this.state.gotErrorRegistrationServiceInfo ? (
+                  calloutErrorRegistrationServiceInfo
+                ) : (
+                  <EuiFlexGroup direction='column'>
                     <EuiText>
-                      <div className="copy-codeblock-wrapper">
+                      <div className='copy-codeblock-wrapper'>
                         <EuiCodeBlock language={language}>
                           {restartAgentCommand}
                         </EuiCodeBlock>
                         <EuiCopy textToCopy={restartAgentCommand}>
-                          {(copy) => (
-                            <div className="copy-overlay" onClick={copy}>
-                              <p><EuiIcon type="copy" /> Copy command</p>
+                          {copy => (
+                            <div className='copy-overlay' onClick={copy}>
+                              <p>
+                                <EuiIcon type='copy' /> Copy command
+                              </p>
                             </div>
                           )}
                         </EuiCopy>
@@ -376,13 +397,13 @@ export const RegisterAgent = withErrorBoundary(
                     </EuiText>
                   </EuiFlexGroup>
                 ),
-            },
-          ]
+              },
+            ]
           : []),
       ];
       return (
         <div>
-          <EuiPage restrictWidth="1000px" style={{ background: 'transparent' }}>
+          <EuiPage restrictWidth='1000px' style={{ background: 'transparent' }}>
             <EuiPageBody>
               <EuiFlexGroup>
                 <EuiFlexItem>
@@ -392,23 +413,22 @@ export const RegisterAgent = withErrorBoundary(
                         <EuiTitle>
                           <h2>Deploy a new agent</h2>
                         </EuiTitle>
-                        { JSON.stringify(this.state) }
                       </EuiFlexItem>
                       <EuiFlexItem grow={false}>
                         {this.props.hasAgents() && (
                           <EuiButtonEmpty
-                            size="s"
+                            size='s'
                             onClick={() => this.props.addNewAgent(false)}
-                            iconType="cross"
+                            iconType='cross'
                           >
                             Close
                           </EuiButtonEmpty>
                         )}
                         {!this.props.hasAgents() && (
                           <EuiButtonEmpty
-                            size="s"
+                            size='s'
                             onClick={() => this.props.reload()}
-                            iconType="refresh"
+                            iconType='refresh'
                           >
                             Refresh
                           </EuiButtonEmpty>
@@ -419,7 +439,7 @@ export const RegisterAgent = withErrorBoundary(
                     {this.state.loading && (
                       <>
                         <EuiFlexItem>
-                          <EuiProgress size="xs" color="primary" />
+                          <EuiProgress size='xs' color='primary' />
                         </EuiFlexItem>
                         <EuiSpacer></EuiSpacer>
                       </>
@@ -437,5 +457,5 @@ export const RegisterAgent = withErrorBoundary(
         </div>
       );
     }
-  }
+  },
 );

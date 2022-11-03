@@ -9,7 +9,7 @@ import {
   EuiIcon,
 } from '@elastic/eui';
 import { obfuscatePassword } from '../services/register-agent-service';
-import { WindowsAdvice } from '../components';
+import { PermissionsAdvice, WindowsAdvice } from '../components';
 
 export default function InstallEnrollAgent(props: any) {
   const {
@@ -25,14 +25,8 @@ export default function InstallEnrollAgent(props: any) {
 
   return (
     <div>
-      {gotErrorRegistrationServiceInfo ? (
-        <EuiCallOut
-          color='danger'
-          title='This section could not be displayed because you do not have permission to get access to the registration service.'
-          iconType='iInCircle'
-        />
-      ) : (
-        selectedOS && (
+      {gotErrorRegistrationServiceInfo ? (<PermissionsAdvice />) 
+      : ( selectedOS && (
           <EuiText>
             <p>
               You can use this command to install and enroll the Wazuh agent in
