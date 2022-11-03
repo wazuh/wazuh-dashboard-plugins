@@ -9,7 +9,7 @@ export const InputFormTextArea = ({ value, isInvalid, onChange, options } : IInp
 			value={value}
 			isInvalid={isInvalid}
 			onChange={onChange}
-      rows={options?.rowsSize}
+      rows={options?.maxRows}
 		/>
 	);
 };
