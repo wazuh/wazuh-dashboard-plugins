@@ -1,1 +1,1 @@
-export { default as WindowsAdvice } from './WindowsAdvice'
+export { default as WindowsAdvice } from './windows-advice'
