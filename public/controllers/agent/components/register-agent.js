@@ -1277,16 +1277,6 @@ export const RegisterAgent = withErrorBoundary(
             },
           ]
           : []),
-        ...(this.state.selectedVersion == 'debian7' || this.state.selectedVersion == 'debian8' || this.state.selectedVersion == 'debian9'
-          ? [
-            {
-              title: 'Choose the architecture',
-              children: (
-                buttonGroup("Choose the architecture", architectureButtons, this.state.selectedArchitecture, (architecture) => this.setArchitecture(architecture))
-              ),
-            },
-          ]
-          : []),
         ...(this.state.selectedVersion == 'centos7' || this.state.selectedVersion == 'amazonlinux2' || this.state.selectedVersion == 'suse12' || this.state.selectedVersion == '22' || this.state.selectedVersion == 'debian9' || this.state.selectedVersion == 'debian10' || this.state.selectedVersion == 'busterorgreater'
           ? [
             {
