@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment } from 'react';
 import {
   EuiCodeBlock,
   EuiCopy,
@@ -23,9 +23,8 @@ const StartAgentTabs = (props: any) => {
   );
 
   const onHandleTabClick = (tabSelected: any) => {
-    setSeletectTab(tabSelected);
     onTabClick(tabSelected);
-  }
+  };
 
   const textAndLinkToCheckConnectionDocumentation = (
     <p>
@@ -35,7 +34,28 @@ const StartAgentTabs = (props: any) => {
       </a>
     </p>
   );
-  
+
+  const CommandCodeBlock = () => (
+    <EuiText>
+      <div className='copy-codeblock-wrapper'>
+        <EuiCodeBlock language={language}>
+          {systemSelector(selectedOS, selectedSYS)}
+        </EuiCodeBlock>
+        <EuiCopy textToCopy={systemSelector(selectedOS, selectedSYS)}>
+          {copy => (
+            <div className='copy-overlay' onClick={copy}>
+              <p>
+                <EuiIcon type='copy' /> Copy command
+              </p>
+            </div>
+          )}
+        </EuiCopy>
+      </div>
+      <EuiSpacer size='s' />
+      {textAndLinkToCheckConnectionDocumentation}
+    </EuiText>
+  );
+
   const tabs = [
     {
       id: 'systemd',
@@ -43,22 +63,7 @@ const StartAgentTabs = (props: any) => {
       content: (
         <Fragment>
           <EuiSpacer />
-          <EuiText>
-            <div className="copy-codeblock-wrapper">
-              <EuiCodeBlock language={language}>
-                {systemSelector(selectedOS, selectedSYS)}
-              </EuiCodeBlock>
-              <EuiCopy textToCopy={systemSelector(selectedOS, selectedSYS)}>
-                {(copy) => (
-                  <div className="copy-overlay" onClick={copy}>
-                    <p><EuiIcon type="copy" /> Copy command</p>
-                  </div>
-                )}
-              </EuiCopy>
-            </div>
-            <EuiSpacer size='s'/>
-            {textAndLinkToCheckConnectionDocumentation}
-          </EuiText>
+          <CommandCodeBlock />
         </Fragment>
       ),
     },
@@ -68,38 +73,13 @@ const StartAgentTabs = (props: any) => {
       content: (
         <Fragment>
           <EuiSpacer />
-          <EuiText>
-            <div className="copy-codeblock-wrapper">
-              <EuiCodeBlock language={language}>
-                {systemSelector(selectedOS, selectedSYS)}
-              </EuiCodeBlock>
-              <EuiCopy textToCopy={systemSelector(selectedOS, selectedSYS)}>
-                {(copy) => (
-                  <div className="copy-overlay" onClick={copy}>
-                    <p><EuiIcon type="copy" /> Copy command</p>
-                  </div>
-                )}
-              </EuiCopy>
-            </div>
-            <EuiSpacer size='s'/>
-            {textAndLinkToCheckConnectionDocumentation}
-          </EuiText>
+          <CommandCodeBlock />
         </Fragment>
       ),
     },
   ];
 
-
-  const [seletecTab, setSeletectTab] = useState(tabs.filter((tab) => tab.id === selectedSYS)[0]);
-
- 
-  return (
-    <EuiTabbedContent
-      tabs={tabs}
-      selectedTab={seletecTab}
-      onTabClick={onHandleTabClick}
-    />
-  );
+  return (<EuiTabbedContent tabs={tabs} onTabClick={onHandleTabClick} />);
 };
 
 export default StartAgentTabs;
