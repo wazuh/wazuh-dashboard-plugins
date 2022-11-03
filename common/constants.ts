@@ -1116,7 +1116,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     defaultValueIfNotSet: REPORTS_PAGE_FOOTER_TEXT,
 		isConfigurableFromFile: true,
 		isConfigurableFromUI: true,
-    options: { maxRows: 2, maxLength: 30 },
+    options: { maxRows: 2, maxLength: 50 },
     validate: function (value) {
       return SettingsValidator.multipleLinesString({
         maxRows: this.options?.maxRows,
@@ -1136,7 +1136,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     defaultValueIfNotSet: REPORTS_PAGE_HEADER_TEXT,
     isConfigurableFromFile: true,
     isConfigurableFromUI: true,
-    options: { maxRows: 3, maxLength: 20 },
+    options: { maxRows: 3, maxLength: 40 },
     validate: function (value) {
       return SettingsValidator.multipleLinesString({
         maxRows: this.options?.maxRows,
