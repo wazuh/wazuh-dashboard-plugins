@@ -8,7 +8,11 @@ const removeController = (id) => {
     const index = aborts.findIndex(object => {
         return object.id === id;
     });
-    aborts.splice(index)
+    if(!id){
+        return;
+    }
+    aborts.splice(index);
+    return;
 }
 
 export const disableRequests = () => {
