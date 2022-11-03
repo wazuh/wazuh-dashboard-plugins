@@ -358,7 +358,8 @@ export enum SettingCategory {
 };
 
 type TPluginSettingOptionsTextArea = {
-  rowsSize?: number
+  maxRows?: number
+  minRows?: number
   maxLength?: number
 };
 
@@ -1115,11 +1116,11 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     defaultValueIfNotSet: REPORTS_PAGE_FOOTER_TEXT,
 		isConfigurableFromFile: true,
 		isConfigurableFromUI: true,
-    options: { rowsSize: 2, maxLength: 30 },
+    options: { maxRows: 2, maxLength: 30 },
     validate: function (value) {
       return SettingsValidator.multipleLinesString({
-        max: this.options.rowsSize,
-        maxLength: this.options.maxLength
+        maxRows: this.options?.maxRows,
+        maxLength: this.options?.maxLength
       })(value)
     },
     validateBackend: function (schema) {
@@ -1135,10 +1136,10 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     defaultValueIfNotSet: REPORTS_PAGE_HEADER_TEXT,
     isConfigurableFromFile: true,
     isConfigurableFromUI: true,
-    options: { rowsSize: 3, maxLength: 20 },
+    options: { maxRows: 3, maxLength: 20 },
     validate: function (value) {
       return SettingsValidator.multipleLinesString({
-        max: this.options.rowsSize,
+        maxRows: this.options?.maxRows,
         maxLength: this.options?.maxLength
       })(value)
     },
