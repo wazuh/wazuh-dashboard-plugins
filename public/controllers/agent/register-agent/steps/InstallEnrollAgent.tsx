@@ -8,7 +8,7 @@ import {
   EuiSwitch,
   EuiIcon,
 } from '@elastic/eui';
-import { obfuscatePassword } from '../register-agent-service';
+import { obfuscatePassword } from '../services/register-agent-service';
 import { WindowsAdvice } from '../components';
 
 export default function InstallEnrollAgent(props: any) {

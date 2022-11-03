@@ -45,7 +45,7 @@ import { getGroups,
   systemSelector,
   checkMissingOSSelection,
   getCommandText,
-  getHighlightCodeLanguage } from './register-agent-service'
+  getHighlightCodeLanguage } from './services/register-agent-service'
 
 
 type Props = {

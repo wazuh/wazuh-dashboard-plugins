@@ -10,7 +10,7 @@ import {
 import {
   getHighlightCodeLanguage,
   systemSelector,
-} from '../register-agent-service';
+} from '../services/register-agent-service';
 import { webDocumentationLink } from '../../../../../common/services/web_documentation';
 
 const StartAgentTabs = (props: any) => {
