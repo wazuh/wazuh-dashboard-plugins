@@ -20,6 +20,9 @@ services:
       - wm_certs:/certs/wm
       - idp_certs:/certs/idp
       - ./config/certs:/conf
+    # Included to avoid docker from creating duplicated networks
+    networks:
+      - wz-rel
     entrypoint: /bin/bash
     command: >
         -c '
