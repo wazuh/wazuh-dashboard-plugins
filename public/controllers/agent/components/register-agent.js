@@ -31,10 +31,9 @@ import {
   EuiCallOut,
   EuiSpacer,
   EuiProgress,
-  EuiCode,
-  EuiLink,
   EuiIcon,
-  EuiSwitch
+  EuiSwitch,
+  EuiLink
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
 import { withErrorBoundary } from '../../../components/common/hocs';
@@ -42,84 +41,7 @@ import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
-
-const architectureButtons = [
-  {
-    id: 'i386',
-    label: 'i386',
-  },
-  {
-    id: 'x86_64',
-    label: 'x86_64',
-  },
-  {
-    id: 'armhf',
-    label: 'armhf',
-  },
-  {
-    id: 'aarch64',
-    label: 'aarch64',
-  },
-];
-const architectureCentos5OrRedHat5 = [
-  {
-    id: 'i386',
-    label: 'i386',
-  },
-  {
-    id: 'x86_64',
-    label: 'x86_64',
-  },
-];
-
-const versionButtonsCentosOrRedHat = [
-  {
-    id: 'centos5',
-    label: 'CentOS5',
-  },
-  {
-    id: 'centos6',
-    label: 'CentOS6 or higher',
-  },
-  {
-    id: 'redhat5',
-    label: 'Red Hat 5',
-  },
-  {
-    id: 'redhat6',
-    label: 'Red Hat 6 or higher',
-  },
-];
-
-const osButtons = [
-  {
-    id: 'rpm',
-    label: 'Red Hat / CentOS',
-  },
-  {
-    id: 'deb',
-    label: 'Debian / Ubuntu',
-  },
-  {
-    id: 'win',
-    label: 'Windows',
-  },
-  {
-    id: 'macos',
-    label: 'MacOS',
-  },
-];
-
-const sysButtons = [
-  {
-    id: 'systemd',
-    label: 'Systemd',
-  },
-  {
-    id: 'sysV',
-    label: 'SysV Init',
-  },
-];
+import { architectureButtons, architectureButtonsi386, architecturei386Andx86_64, versionButtonsRaspbian, versionButtonsSuse, versionButtonsOracleLinux, versionButtonFedora, architectureButtonsSolaris, architectureButtonsWithPPC64LE, architectureButtonsOpenSuse, architectureButtonsAix, architectureButtonsHpUx, versionButtonAmazonLinux, versionButtonsRedHat, versionButtonsCentos, architectureButtonsMacos, osButtons, versionButtonsDebian, versionButtonsUbuntu, versionButtonsWindows, versionButtonsMacOS, versionButtonsOpenSuse, versionButtonsSolaris, versionButtonsAix, versionButtonsHPUX } from '../wazuh-config'
 
 export const RegisterAgent = withErrorBoundary(
 
@@ -138,15 +60,20 @@ export const RegisterAgent = withErrorBoundary(
         version: '',
         wazuhVersion: '',
         serverAddress: '',
+        agentName: '',
         wazuhPassword: '',
         groups: [],
         selectedGroup: [],
         udpProtocol: false,
         showPassword: false,
+        showProtocol: true,
       };
       this.restartAgentCommand = {
         rpm: this.systemSelector(),
+        cent: this.systemSelector(),
         deb: this.systemSelector(),
+        ubu: this.systemSelector(),
+        oraclelinux: this.systemSelector(),
         macos: 'sudo /Library/Ossec/bin/wazuh-control start',
         win: 'NET START WazuhSvc'
       };
@@ -178,11 +105,30 @@ export const RegisterAgent = withErrorBoundary(
           serverAddress,
           needsPassword,
           hidePasswordInput,
-          versionButtonsCentosOrRedHat,
+          versionButtonsRedHat,
+          versionButtonsCentos,
+          versionButtonsDebian,
+          versionButtonsUbuntu,
+          versionButtonsWindows,
+          versionButtonsMacOS,
+          versionButtonsOpenSuse,
+          versionButtonsSolaris,
+          versionButtonAmazonLinux,
+          versionButtonsSuse,
+          versionButtonsAix,
+          versionButtonsHPUX,
+          versionButtonsOracleLinux,
+          versionButtonsRaspbian,
+          versionButtonFedora,
           architectureButtons,
-          architectureCentos5OrRedHat5,
+          architectureButtonsi386,
+          architecturei386Andx86_64,
+          architectureButtonsSolaris,
+          architectureButtonsAix,
+          architectureButtonsHpUx,
+          architectureButtonsMacos,
+          architectureButtonsWithPPC64LE,
           wazuhPassword,
-          udpProtocol,
           wazuhVersion,
           groups,
           loading: false,
@@ -222,7 +168,9 @@ export const RegisterAgent = withErrorBoundary(
       try {
         const result = await WzRequest.apiReq('GET', '/agents/000/config/request/remote', {});
         const remote = ((result.data || {}).data || {}).remote || {};
-        return (remote[0] || {}).protocol !== 'tcp' && (remote[0] || {}).protocol[0] !== 'TCP';
+        if (remote.length === 2) {
+          this.setState({ udpProtocol: true })
+        }
       } catch (error) {
         throw new Error(error);
       }
@@ -233,20 +181,34 @@ export const RegisterAgent = withErrorBoundary(
         selectedOS: os,
         selectedVersion: '',
         selectedArchitecture: '',
-        selectedSYS: 'systemd',
+        selectedSYS: '',
       });
     }
 
     systemSelector() {
-      if (this.state.selectedOS === 'rpm') {
-        if (this.state.selectedSYS === 'systemd') {
-          return 'sudo systemctl daemon-reload\nsudo systemctl enable wazuh-agent\nsudo systemctl start wazuh-agent';
-        } else return 'sudo chkconfig --add wazuh-agent\nsudo service wazuh-agent start';
-      } else if (this.state.selectedOS === 'deb') {
-        if (this.state.selectedSYS === 'systemd') {
-          return 'sudo systemctl daemon-reload\nsudo systemctl enable wazuh-agent\nsudo systemctl start wazuh-agent';
-        } else return 'sudo update-rc.d wazuh-agent defaults 95 10\nsudo service wazuh-agent start';
-      } else return '';
+      if (this.state.selectedVersion === 'redhat7' || this.state.selectedVersion === 'amazonlinux2022' || this.state.selectedVersion === 'centos7' || this.state.selectedVersion === 'suse11' || this.state.selectedVersion === 'suse12' || this.state.selectedVersion === 'oraclelinux5' || this.state.selectedVersion === '22' || this.state.selectedVersion === 'amazonlinux2' || this.state.selectedVersion === 'debian8' || this.state.selectedVersion === 'debian9' || this.state.selectedVersion === 'debian10' || this.state.selectedVersion === 'busterorgreater' || this.state.selectedVersion === 'ubuntu15' || this.state.selectedVersion === 'ubuntu16' || this.state.selectedVersion === 'leap15') {
+        return 'sudo systemctl daemon-reload\nsudo systemctl enable wazuh-agent\nsudo systemctl start wazuh-agent';
+      } else if (this.state.selectedVersion === 'redhat5' || this.state.selectedVersion === 'redhat6' || this.state.selectedVersion === 'centos5' || this.state.selectedVersion === 'centos6' || this.state.selectedVersion === 'oraclelinux6' || this.state.selectedVersion === 'amazonlinux1' || this.state.selectedVersion === 'debian7' || this.state.selectedVersion === 'ubuntu14') {
+        return ('service wazuh-agent start');
+      }
+    }
+
+    systemSelectorNet() {
+      if (this.state.selectedVersion === 'windowsxp' || this.state.selectedVersion === 'windows8') {
+        return ('update-rc.d wazuh-agent defaults && service wazuh-agent start');
+      }
+    }
+
+    systemSelectorWazuhControlMacos() {
+      if (this.state.selectedVersion == 'sierra' || this.state.selectedVersion == 'highSierra' || this.state.selectedVersion == 'mojave' || this.state.selectedVersion == 'catalina' || this.state.selectedVersion == 'bigSur' || this.state.selectedVersion == 'monterrey') {
+        return ('/Library/Ossec/bin/wazuh-control start');
+      }
+    }
+
+    systemSelectorWazuhControl() {
+      if (this.state.selectedVersion === 'solaris10' || this.state.selectedVersion === 'solaris11' || this.state.selectedVersion === '6.1 TL9' || this.state.selectedVersion === '11.31') {
+        return ('/var/ossec/bin/wazuh-control start');
+      }
     }
 
     selectSYS(sys) {
@@ -255,6 +217,10 @@ export const RegisterAgent = withErrorBoundary(
 
     setServerAddress(event) {
       this.setState({ serverAddress: event.target.value });
+    }
+
+    setAgentName(event) {
+      this.setState({ agentName: event.target.value });
     }
 
     setGroupName(selectedGroup) {
@@ -299,8 +265,7 @@ export const RegisterAgent = withErrorBoundary(
     }
 
     optionalDeploymentVariables() {
-      let deployment = `WAZUH_MANAGER='${this.state.serverAddress}' `;
-
+      let deployment = `WAZUH_MANAGER='${this.state.serverAddress}' `;      
       if (this.state.selectedOS == 'win') {
         deployment += `WAZUH_REGISTRATION_SERVER='${this.state.serverAddress}' `;
       }
@@ -309,7 +274,7 @@ export const RegisterAgent = withErrorBoundary(
         deployment += `WAZUH_REGISTRATION_PASSWORD='${this.state.wazuhPassword}' `;
       }
 
-      if (this.state.udpProtocol) {
+      if (!this.state.udpProtocol == true) {
         deployment += `WAZUH_PROTOCOL='UDP' `;
       }
 
@@ -327,24 +292,22 @@ export const RegisterAgent = withErrorBoundary(
       return deployment;
     }
 
+    agentNameVariable() {
+      let agentName = `WAZUH_AGENT_NAME='${this.state.agentName}' `;
+
+      if (this.state.selectedArchitecture && this.state.agentName !== '') {
+        return agentName;
+      } else {
+        return '';
+      }
+    }
+
     resolveRPMPackage() {
       switch (`${this.state.selectedVersion}-${this.state.selectedArchitecture}`) {
-        case 'centos5-i386':
-          return `https://packages.wazuh.com/4.x/yum5/i386/wazuh-agent-${this.state.wazuhVersion}-1.el5.i386.rpm`;
-        case 'centos5-x86_64':
-          return `https://packages.wazuh.com/4.x/yum5/x86_64/wazuh-agent-${this.state.wazuhVersion}-1.el5.x86_64.rpm`;
         case 'redhat5-i386':
           return `https://packages.wazuh.com/4.x/yum5/i386/wazuh-agent-${this.state.wazuhVersion}-1.el5.i386.rpm`;
         case 'redhat5-x86_64':
           return `https://packages.wazuh.com/4.x/yum5/x86_64/wazuh-agent-${this.state.wazuhVersion}-1.el5.x86_64.rpm`;
-        case 'centos6-i386':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.i386.rpm`;
-        case 'centos6-aarch64':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.aarch64.rpm`;
-        case 'centos6-x86_64':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`;
-        case 'centos6-armhf':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.armv7hl.rpm`;
         case 'redhat6-i386':
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.i386.rpm`;
         case 'redhat6-aarch64':
@@ -353,23 +316,236 @@ export const RegisterAgent = withErrorBoundary(
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`;
         case 'redhat6-armhf':
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.armv7hl.rpm`;
+        case 'redhat7-i386':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.i386.rpm`;
+        case 'redhat7-aarch64':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.aarch64.rpm`;
+        case 'redhat7-x86_64':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`;
+        case 'redhat7-armhf':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.armv7hl.rpm`;
         default:
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`;
+      }
+    }
+
+    resolveORACLELINUXPackage() {
+      switch (`${this.state.selectedVersion}-${this.state.selectedArchitecture}`) {
+        case 'oraclelinux5-i386':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.i386.rpm`;
+        case 'oraclelinux5-aarch64':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.aarch64.rpm`;
+        case 'oraclelinux5-x86_64':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`;
+        case 'oraclelinux5-armhf':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.armv7hl.rpm`;
+        case 'oraclelinux5-powerpc':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.ppc64le.rpm`;
+        case 'oraclelinux6-i386':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.i386.rpm`;
+        case 'oraclelinux6-aarch64':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.aarch64.rpm`;
+        case 'oraclelinux6-x86_64':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.x86_64.rpm`;
+        case 'oraclelinux6-armhf':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.armv7hl.rpm`;
+        default:
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`;
+      }
+    }
+
+    resolveCENTPackage() {
+      switch (`${this.state.selectedVersion}-${this.state.selectedArchitecture}`) {
+        case 'centos5-i386':
+          return `https://packages.wazuh.com/4.x/yum/i386/wazuh-agent-${this.state.wazuhVersion}.el5.i386.rpm`;
+        case 'centos5-x86_64':
+          return `https://packages.wazuh.com/4.x/yum/x86_64/wazuh-agent-${this.state.wazuhVersion}.el5.x86_64.rpm`;
+        case 'centos6-i386':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.i386.rpm`;
+        case 'centos6-aarch64':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.aarch64.rpm`;
+        case 'centos6-x86_64':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.x86_64.rpm`;
+        case 'centos6-armhf':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.armv7hl.rpm`;
+        case 'centos7-i386':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.i386.rpm`;
+        case 'centos7-aarch64':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.aarch64.rpm`;
+        case 'centos7-x86_64':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.x86_64.rpm`;
+        case 'centos7-armhf':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.armv7hl.rpm`;
+        case 'centos7-powerpc':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.ppc64le.rpm`;
+        default:
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.x86_64.rpm`;
+      }
+    }
+
+    resolveSUSEPackage() {
+      switch (`${this.state.selectedVersion}-${this.state.selectedArchitecture}`) {
+        case 'suse11-i386':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.i386.rpm`;
+        case 'suse11-x86_64':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.x86_64.rpm`;
+        case 'suse12-i386':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.i386.rpm`;
+        case 'suse12-aarch64':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.aarch64.rpm`;
+        case 'suse12-x86_64':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.x86_64.rpm`;
+        case 'suse12-armhf':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.armv7hl.rpm`;
+        case 'suse12-powerpc':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.ppc64le.rpm`;
+        default:
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.x86_64.rpm`;
+      }
+    }
+
+    resolveFEDORAPachage() {
+      switch (`${this.state.selectedVersion}-${this.state.selectedArchitecture}`) {
+        case '22-i386':
+          return `https://packages.wazuh.com/4.x/yum/i386/wazuh-agent-${this.state.wazuhVersion}-1.el5.i386.rpm`;
+        case '22-aarch64':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.aarch64.rpm`;
+        case '22-x86_64':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.x86_64.rpm`;
+        case '22-armhf':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.armv7hl.rpm`;
+        case '22-powerpc':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.ppc64le.rpm`;
+        default:
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.x86_64.rpm`;
+      }
+    }
+
+    resolveAMAZONLPackage() {
+      switch (`${this.state.selectedVersion}-${this.state.selectedArchitecture}`) {
+        case '1-i386':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.i386.rpm`;
+        case '1-aarch64':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.aarch64.rpm`;
+        case '1-x86_64':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.x86_64.rpm`;
+        case '1-armhf':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.armv7hl.rpm`;
+        case '1-powerpc':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.ppc64le.rpm`;
+        case '2-i386':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.i386.rpm`;
+        case '2-aarch64':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.aarch64.rpm`;
+        case '2-x86_64':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.x86_64.rpm`;
+        case '2-armhf':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.armv7hl.rpm`;
+        case '2-powerpc':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.ppc64le.rpm`;
+        case 'amazonlinux2022-i386':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.i386.rpm`;
+        case 'amazonlinux2022-aarch64':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.aarch64.rpm`;
+        case 'amazonlinux2022-x86_64':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`;
+        case 'amazonlinux2022-armhf':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.armv7hl.rpm`;
+        default:
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.x86_64.rpm`;
       }
     }
 
     resolveDEBPackage() {
       switch (`${this.state.selectedArchitecture}`) {
         case 'i386':
-          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}-1_i386.deb`;
+          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_i386.deb`;
         case 'aarch64':
-          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}-1_arm64.deb`;
+          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_amd64.deb`;
         case 'armhf':
-          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}-1_armhf.deb`;
+          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_armhf.deb`;
         case 'x86_64':
-          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}-1_amd64.deb`;
+          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_arm64.deb`;
+        case 'powerpc':
+          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}.ppc64le.rpm`;
         default:
-          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}-1_amd64.deb`;
+          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_amd64.deb`;
+      }
+    }
+
+    resolveRASPBIANPackage() {
+      switch (`${this.state.selectedArchitecture}`) {
+        case 'busterorgreater-i386':
+          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_i386.deb`;
+        case 'busterorgreater-aarch64':
+          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_amd64.deb`;
+        case 'busterorgreater-armhf':
+          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_armhf.deb`;
+        case 'busterorgreater-x86_64':
+          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_arm64.deb`;
+        case 'busterorgreater-powerpc':
+          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}.ppc64le.rpm`;
+        default:
+          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_amd64.deb`;
+      }
+    }
+
+    resolveUBUNTUPackage() {
+      switch (`${this.state.selectedVersion}-${this.state.selectedArchitecture}`) {
+        case 'i386':
+          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_i386.deb`;
+        case 'aarch64':
+          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_amd64.deb`;
+        case 'armhf':
+          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_armhf.deb`;
+        case 'x86_64':
+          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_arm64.deb`;
+        default:
+          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_amd64.deb`;
+      }
+    }
+
+    resolveOPENSUSEPackage() {
+      switch (`${this.state.selectedVersion}-${this.state.selectedArchitecture}`) {
+        case 'leap15-i386':
+          return `https://packages.wazuh.com/4.x/yum/i386/wazuh-agent-${this.state.wazuhVersion}.x86_64.rpm`;
+        case 'leap15-x86_64':
+          return `https://packages.wazuh.com/4.x/yum/x86_64/wazuh-agent-${this.state.wazuhVersion}.armv7hl.rpm`
+        default:
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.x86_64.rpm`;
+      }
+    }
+
+    resolveSOLARISPackage() {
+      switch (`${this.state.selectedVersion}-${this.state.selectedArchitecture}`) {
+        case 'solaris10-i386':
+          return `https://packages.wazuh.com/4.x/yum/i386/wazuh-agent-${this.state.wazuhVersion}-sol10-i386.pkg`;
+        case 'solaris10-spark':
+          return `https://packages.wazuh.com/4.x/yum/i386/wazuh-agent-${this.state.wazuhVersion}-sol10-sparc.pkg`;
+        case 'solaris11-i386':
+          return `https://packages.wazuh.com/4.x/yum/i386/wazuh-agent-${this.state.wazuhVersion}-sol11-i386.p5p`;
+        case 'solaris11-spark':
+          return `https://packages.wazuh.com/4.x/yum/x86_64/wazuh-agent-${this.state.wazuhVersion}-sol11-sparc.p5p`
+        default:
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-sol11-sparc.p5p`;
+      }
+    }
+
+    resolveAIXPackage() {
+      switch (`${this.state.selectedVersion}-${this.state.selectedArchitecture}`) {
+        case '6.1 TL9-powerpc':
+          return `https://packages.wazuh.com/4.x/yum/i386/wazuh-agent-${this.state.wazuhVersion}.aix.ppc.rpm`;
+        default:
+          return `https://packages.wazuh.com/4.x/yum/i386/wazuh-agent-${this.state.wazuhVersion}.aix.ppc.rpm`;
+      }
+    }
+
+    resolveHPPackage() {
+      switch (`${this.state.selectedVersion}-${this.state.selectedArchitecture}`) {
+        case '11.31-itanium2':
+          return `https://packages.wazuh.com/4.x/yum/i386/wazuh-agent-${this.state.wazuhVersion}-hpux-11v3-ia64.tar`;
+        default:
+          return `https://packages.wazuh.com/4.x/yum/i386/wazuh-agent-${this.state.wazuhVersion}-hpux-11v3-ia64.tar`;
       }
     }
 
@@ -377,10 +553,32 @@ export const RegisterAgent = withErrorBoundary(
       switch (this.state.selectedOS) {
         case 'rpm':
           return this.resolveRPMPackage();
+        case 'cent':
+          return this.resolveCENTPackage();
         case 'deb':
           return this.resolveDEBPackage();
+        case 'ubu':
+          return this.resolveUBUNTUPackage();
+        case 'open':
+          return this.resolveOPENSUSEPackage();
+        case 'sol':
+          return this.resolveSOLARISPackage();
+        case 'aix':
+          return this.resolveAIXPackage();
+        case 'hp':
+          return this.resolveHPPackage();
+        case 'amazonlinux':
+          return this.resolveAMAZONLPackage();
+        case 'fedora':
+          return this.resolveFEDORAPachage();
+        case 'oraclelinux':
+          return this.resolveORACLELINUXPackage();
+        case 'suse':
+          return this.resolveSUSEPackage();
+        case 'raspbian':
+          return this.resolveRASPBIANPackage();
         default:
-          return `https://packages.wazuh.com/4.x/yum5/x86_64/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/x86_64/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`;
       }
     }
 
@@ -396,8 +594,104 @@ export const RegisterAgent = withErrorBoundary(
               ? ['OS architecture']
               : []),
           ];
+        case 'cent':
+          return [
+            ...(!this.state.selectedVersion ? ['OS version'] : []),
+            ...(this.state.selectedVersion && !this.state.selectedArchitecture
+              ? ['OS architecture']
+              : []),
+          ];
         case 'deb':
-          return [...(!this.state.selectedArchitecture ? ['OS architecture'] : [])];
+          return [
+            ...(!this.state.selectedVersion ? ['OS version'] : []),
+            ...(this.state.selectedVersion && !this.state.selectedArchitecture
+              ? ['OS architecture']
+              : []),
+          ];
+        case 'ubu':
+          return [
+            ...(!this.state.selectedVersion ? ['OS version'] : []),
+            ...(this.state.selectedVersion && !this.state.selectedArchitecture
+              ? ['OS architecture']
+              : []),
+          ];
+        case 'win':
+          return [
+            ...(!this.state.selectedVersion ? ['OS version'] : []),
+            ...(this.state.selectedVersion && !this.state.selectedArchitecture
+              ? ['OS architecture']
+              : []),
+          ];
+        case 'macos':
+          return [
+            ...(!this.state.selectedVersion ? ['OS version'] : []),
+            ...(this.state.selectedVersion && !this.state.selectedArchitecture
+              ? ['OS architecture']
+              : []),
+          ];
+        case 'open':
+          return [
+            ...(!this.state.selectedVersion ? ['OS version'] : []),
+            ...(this.state.selectedVersion && !this.state.selectedArchitecture
+              ? ['OS architecture']
+              : []),
+          ];
+        case 'sol':
+          return [
+            ...(!this.state.selectedVersion ? ['OS version'] : []),
+            ...(this.state.selectedVersion && !this.state.selectedArchitecture
+              ? ['OS architecture']
+              : []),
+          ];
+        case 'aix':
+          return [
+            ...(!this.state.selectedVersion ? ['OS version'] : []),
+            ...(this.state.selectedVersion && !this.state.selectedArchitecture
+              ? ['OS architecture']
+              : []),
+          ];
+        case 'hp':
+          return [
+            ...(!this.state.selectedVersion ? ['OS version'] : []),
+            ...(this.state.selectedVersion && !this.state.selectedArchitecture
+              ? ['OS architecture']
+              : []),
+          ];
+        case 'amazonlinux':
+          return [
+            ...(!this.state.selectedVersion ? ['OS version'] : []),
+            ...(this.state.selectedVersion && !this.state.selectedArchitecture
+              ? ['OS architecture']
+              : []),
+          ];
+        case 'fedora':
+          return [
+            ...(!this.state.selectedVersion ? ['OS version'] : []),
+            ...(this.state.selectedVersion && !this.state.selectedArchitecture
+              ? ['OS architecture']
+              : []),
+          ];
+        case 'oraclelinux':
+          return [
+            ...(!this.state.selectedVersion ? ['OS version'] : []),
+            ...(this.state.selectedVersion && !this.state.selectedArchitecture
+              ? ['OS architecture']
+              : []),
+          ];
+        case 'suse':
+          return [
+            ...(!this.state.selectedVersion ? ['OS version'] : []),
+            ...(this.state.selectedVersion && !this.state.selectedArchitecture
+              ? ['OS architecture']
+              : []),
+          ];
+        case 'raspbian':
+          return [
+            ...(!this.state.selectedVersion ? ['OS version'] : []),
+            ...(this.state.selectedVersion && !this.state.selectedArchitecture
+              ? ['OS architecture']
+              : []),
+          ];
         default:
           return [];
       }
@@ -410,7 +704,6 @@ export const RegisterAgent = withErrorBoundary(
         return 'bash';
       }
     }
-
     render() {
       const appVersionMajorDotMinor = this.state.wazuhVersion.split('.').slice(0, 2).join('.');
       const urlCheckConnectionDocumentation = webDocumentationLink('user-manual/agents/agent-connection.html', appVersionMajorDotMinor);
@@ -436,35 +729,45 @@ export const RegisterAgent = withErrorBoundary(
         </EuiText>
       );
 
+      const agentName = (
+        <EuiFieldText
+          placeholder="Name agent"
+          value={this.state.agentName}
+          onChange={(event) => this.setAgentName(event)}
+        />
+      );
       const groupInput = (
         <>
           {!this.state.groups.length && (
             <>
-              <EuiCallOut
+              <EuiCallOut style={{ marginTop: '1.5rem' }}
                 color="warning"
                 title='This section could not be configured because you do not have permission to read groups.'
                 iconType="iInCircle"
               />
-              <EuiSpacer />
             </>
           )}
-          <EuiText>
-            <p>Select one or more existing groups</p>
-            <EuiComboBox
-              placeholder={!this.state.groups.length ? "Default" : "Select group"}
-              options={this.state.groups}
-              selectedOptions={this.state.selectedGroup}
-              onChange={(group) => {
-                this.setGroupName(group);
-              }}
-              isDisabled={!this.state.groups.length}
-              isClearable={true}
-              data-test-subj="demoComboBox"
-            />
-          </EuiText>
         </>
       );
 
+
+
+      const agentGroup = (
+        <EuiText style={{ marginTop: '1.5rem' }}>
+          <p>Select one or more existing groups</p>
+          <EuiComboBox
+            placeholder={!this.state.groups.length ? "Default" : "Select group"}
+            options={this.state.groups}
+            selectedOptions={this.state.selectedGroup}
+            onChange={(group) => {
+              this.setGroupName(group);
+            }}
+            isDisabled={!this.state.groups.length}
+            isClearable={true}
+            data-test-subj="demoComboBox"
+          />
+        </EuiText>
+      )
       const passwordInput = (
         <EuiFieldText
           placeholder="Wazuh password"
@@ -477,17 +780,32 @@ export const RegisterAgent = withErrorBoundary(
         zIndex: '100',
       };
       const customTexts = {
-        rpmText: `sudo ${this.optionalDeploymentVariables()}yum install ${this.optionalPackages()}`,
+        rpmText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
+        centText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
         debText: `curl -so wazuh-agent-${this.state.wazuhVersion
-          }.deb ${this.optionalPackages()} && sudo ${this.optionalDeploymentVariables()}dpkg -i ./wazuh-agent-${this.state.wazuhVersion
+          }.deb ${this.optionalPackages()} && sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}dpkg -i ./wazuh-agent-${this.state.wazuhVersion
+          }.deb`,
+        ubuText: `curl -so wazuh-agent-${this.state.wazuhVersion
+          }.deb ${this.optionalPackages()} && sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}dpkg -i ./wazuh-agent-${this.state.wazuhVersion
           }.deb`,
         macosText: `curl -so wazuh-agent-${this.state.wazuhVersion
           }.pkg https://packages.wazuh.com/4.x/macos/wazuh-agent-${this.state.wazuhVersion
-          }-1.pkg && sudo launchctl setenv ${this.optionalDeploymentVariables()}&& sudo installer -pkg ./wazuh-agent-${this.state.wazuhVersion
+          }-1.pkg && sudo launchctl setenv ${this.optionalDeploymentVariables()}${this.agentNameVariable()}&& sudo installer -pkg ./wazuh-agent-${this.state.wazuhVersion
           }.pkg -target /`,
         winText: `Invoke-WebRequest -Uri https://packages.wazuh.com/4.x/windows/wazuh-agent-${this.state.wazuhVersion
           }-1.msi -OutFile \${env:tmp}\\wazuh-agent-${this.state.wazuhVersion}.msi; msiexec.exe /i \${env:tmp}\\wazuh-agent-${this.state.wazuhVersion
-          }.msi /q ${this.optionalDeploymentVariables()}`,
+          }.msi /q ${this.optionalDeploymentVariables()}${this.agentNameVariable()}`,
+        openText: `sudo rpm --import https://packages.wazuh.com/key/GPG-KEY-WAZUH && sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()} zypper install -y ${this.optionalPackages()}`,
+        solText: `sudo curl -so ${this.optionalPackages()} && sudo ${this.agentNameVariable()}&& ${this.state.selectedVersion == 'solaris11' ? 'pkg install -g wazuh-agent.p5p wazuh-agent' : 'pkgadd -d wazuh-agent.pkg'}`,
+        aixText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}rpm -ivh ${this.optionalPackages()}`,
+        hpText: `cd / && sudo curl -so ${this.optionalPackages()} && sudo ${this.agentNameVariable()}groupadd wazuh && sudo useradd -G wazuh wazuh && sudo tar -xvf wazuh-agent.tar`,
+        amazonlinuxText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
+        fedoraText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
+        oraclelinuxText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
+        suseText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
+        raspbianText: `curl -so wazuh-agent-${this.state.wazuhVersion
+          }.deb ${this.optionalPackages()} && sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}dpkg -i ./wazuh-agent-${this.state.wazuhVersion
+          }.deb`,
       };
 
       const field = `${this.state.selectedOS}Text`;
@@ -552,8 +870,8 @@ export const RegisterAgent = withErrorBoundary(
                   </EuiCodeBlock>
                   <EuiCopy textToCopy={text}>
                     {(copy) => (
-                      <div className="copy-overlay"  onClick={copy}>
-                        <p><EuiIcon type="copy"/> Copy command</p>
+                      <div className="copy-overlay" onClick={copy}>
+                        <p><EuiIcon type="copy" /> Copy command</p>
                       </div>
                     )}
                   </EuiCopy>
@@ -571,32 +889,7 @@ export const RegisterAgent = withErrorBoundary(
         </div>
       );
 
-      const tabs = [
-        {
-          id: 'systemd',
-          name: 'Systemd',
-          content: (
-            <Fragment>
-              <EuiSpacer />
-              <EuiText>
-                <div className="copy-codeblock-wrapper">
-                  <EuiCodeBlock style={codeBlock} language={language}>
-                    {this.systemSelector()}
-                  </EuiCodeBlock>
-                  <EuiCopy textToCopy={this.systemSelector()}>
-                    {(copy) => (
-                      <div className="copy-overlay" onClick={copy}>
-                        <p><EuiIcon type="copy" /> Copy command</p>
-                      </div>
-                    )}
-                  </EuiCopy>
-                </div>
-                <EuiSpacer size='s'/>
-                {textAndLinkToCheckConnectionDocumentation}
-              </EuiText>
-            </Fragment>
-          ),
-        },
+      const tabSysV = [
         {
           id: 'sysV',
           name: 'SysV Init',
@@ -616,7 +909,7 @@ export const RegisterAgent = withErrorBoundary(
                     )}
                   </EuiCopy>
                 </div>
-                <EuiSpacer size='s'/>
+                <EuiSpacer size='s' />
                 {textAndLinkToCheckConnectionDocumentation}
               </EuiText>
             </Fragment>
@@ -624,17 +917,183 @@ export const RegisterAgent = withErrorBoundary(
         },
       ];
 
-      const steps = [
+      const tabSystemD = [
         {
-          title: 'Choose the Operating system',
-          children: (
+          id: 'systemd',
+          name: 'Systemd',
+          content: (
+            <Fragment>
+              <EuiSpacer />
+              <EuiText>
+                <div className="copy-codeblock-wrapper">
+                  <EuiCodeBlock style={codeBlock} language={language}>
+                    {this.systemSelector()}
+                  </EuiCodeBlock>
+                  <EuiCopy textToCopy={this.systemSelector()}>
+                    {(copy) => (
+                      <div className="copy-overlay" onClick={copy}>
+                        <p><EuiIcon type="copy" /> Copy command</p>
+                      </div>
+                    )}
+                  </EuiCopy>
+                </div>
+                <EuiSpacer size='s' />
+                {textAndLinkToCheckConnectionDocumentation}
+              </EuiText>
+            </Fragment>
+          ),
+        },
+      ];
+
+      const tabNet = [
+        {
+          id: 'NET',
+          name: 'NET',
+          content: (
+            <Fragment>
+              <EuiSpacer />
+              <EuiText>
+                <div className="copy-codeblock-wrapper">
+                  <EuiCodeBlock style={codeBlock} language={language}>
+                    {this.systemSelectorNet()}
+                  </EuiCodeBlock>
+                  <EuiCopy textToCopy={this.systemSelectorNet()}>
+                    {(copy) => (
+                      <div className="copy-overlay" onClick={copy}>
+                        <p><EuiIcon type="copy" /> Copy command</p>
+                      </div>
+                    )}
+                  </EuiCopy>
+                </div>
+                <EuiSpacer size='s' />
+                {textAndLinkToCheckConnectionDocumentation}
+              </EuiText>
+            </Fragment>
+          ),
+        },
+      ];
+
+      const tabWazuhControlMacos = [
+        {
+          id: 'Wazuh-control-macos',
+          name: 'Wazuh-control-macos',
+          content: (
+            <Fragment>
+              <EuiSpacer />
+              <EuiText>
+                <div className="copy-codeblock-wrapper">
+                  <EuiCodeBlock style={codeBlock} language={language}>
+                    {this.systemSelectorWazuhControlMacos()}
+                  </EuiCodeBlock>
+                  <EuiCopy textToCopy={this.systemSelectorWazuhControlMacos()}>
+                    {(copy) => (
+                      <div className="copy-overlay" onClick={copy}>
+                        <p><EuiIcon type="copy" /> Copy command</p>
+                      </div>
+                    )}
+                  </EuiCopy>
+                </div>
+                <EuiSpacer size='s' />
+                {textAndLinkToCheckConnectionDocumentation}
+              </EuiText>
+            </Fragment>
+          ),
+        },
+      ];
+
+      const tabWazuhControl = [
+        {
+          id: 'Wazuh-control',
+          name: 'Wazuh-control',
+          content: (
+            <Fragment>
+              <EuiSpacer />
+              <EuiText>
+                <div className="copy-codeblock-wrapper">
+                  <EuiCodeBlock style={codeBlock} language={language}>
+                    {this.systemSelectorWazuhControl()}
+                  </EuiCodeBlock>
+                  <EuiCopy textToCopy={this.systemSelectorWazuhControl()}>
+                    {(copy) => (
+                      <div className="copy-overlay" onClick={copy}>
+                        <p><EuiIcon type="copy" /> Copy command</p>
+                      </div>
+                    )}
+                  </EuiCopy>
+                </div>
+                <EuiSpacer size='s' />
+                {textAndLinkToCheckConnectionDocumentation}
+              </EuiText>
+            </Fragment>
+          ),
+        },
+      ];
+
+      const buttonGroup = (legend, options, idSelected, onChange) => {
+        return (
+          <EuiButtonGroup
+            color="primary"
+            legend={legend}
+            options={options}
+            idSelected={idSelected}
+            onChange={onChange}
+            className={'osButtonsStyle'} />
+        )
+      }
+
+      const buttonGroupWithMessage = (legend, options, idSelected, onChange) => {
+        return (
+          <>
             <EuiButtonGroup
               color="primary"
-              legend="Choose the Operating system"
-              options={osButtons}
-              idSelected={this.state.selectedOS}
-              onChange={(os) => this.selectOS(os)}
+              legend={legend}
+              options={options}
+              idSelected={idSelected}
+              onChange={onChange}
+              className={'osButtonsStyle'}
             />
+            {this.state.selectedVersion == 'solaris10' || this.state.selectedVersion == 'solaris11' ? <EuiCallOut color="warning" className='message' iconType="iInCircle" title={
+              <span>
+                Might require some extra installation <EuiLink target="_blank" href={webDocumentationLink('installation-guide/wazuh-agent/wazuh-agent-package-solaris.html', appVersionMajorDotMinor)}>steps</EuiLink>.
+              </span>
+            }>
+            </EuiCallOut> : this.state.selectedVersion == '6.1 TL9' ? <EuiCallOut color="warning" className='message' iconType="iInCircle" title={
+              <span>
+                Might require some extra installation <EuiLink target="_blank" href={webDocumentationLink('installation-guide/wazuh-agent/wazuh-agent-package-aix.html', appVersionMajorDotMinor)}>steps</EuiLink>.
+              </span>
+            }>
+            </EuiCallOut> : this.state.selectedVersion == '11.31' ? <EuiCallOut color="warning" className='message' iconType="iInCircle" title={
+              <span>
+                Might require some extra installation <EuiLink target="_blank" href={webDocumentationLink('installation-guide/wazuh-agent/wazuh-agent-package-hpux.html', appVersionMajorDotMinor)}>steps</EuiLink>.
+              </span>
+            }>
+            </EuiCallOut> : this.state.selectedVersion == 'debian7' || this.state.selectedVersion == 'debian8' || this.state.selectedVersion == 'debian9' || this.state.selectedVersion == 'debian10' ? <EuiCallOut color="warning" className='message' iconType="iInCircle" title={
+              <span>
+                Might require some extra installation <EuiLink target="_blank" href={webDocumentationLink('installation-guide/wazuh-agent/wazuh-agent-package-linux.html', appVersionMajorDotMinor)}>steps</EuiLink>.
+              </span>
+            }>
+            </EuiCallOut> : ''}
+          </>
+        )
+      }
+
+      const selectedVersionMac = (legend, options, idSelected, onChange) => {
+        return (
+          <EuiButtonGroup
+            color="primary"
+            legend={legend}
+            options={options}
+            idSelected={idSelected}
+            onChange={onChange}
+            className={'osButtonsStyleMac'} />
+        )
+      }
+
+      const steps = [
+        {
+          title: 'Choose the operating system',
+          children: (
+            buttonGroup("Choose the Operating system", osButtons, this.state.selectedOS, (os) => this.selectOS(os))
           ),
         },
         ...(this.state.selectedOS == 'rpm'
@@ -642,46 +1101,238 @@ export const RegisterAgent = withErrorBoundary(
             {
               title: 'Choose the version',
               children: (
-                <EuiButtonGroup
-                  color="primary"
-                  legend="Choose the version"
-                  options={versionButtonsCentosOrRedHat}
-                  idSelected={this.state.selectedVersion}
-                  onChange={(version) => this.setVersion(version)}
-                />
+                this.state.selectedVersion == 'redhat5' || this.state.selectedVersion == 'redhat6' ? buttonGroupWithMessage("Choose the version", versionButtonsRedHat, this.state.selectedVersion, (version) => this.setVersion(version)) : buttonGroup("Choose the version", versionButtonsRedHat, this.state.selectedVersion, (version) => this.setVersion(version))
               ),
             },
           ]
           : []),
-        ...(this.state.selectedOS == 'rpm' && this.state.selectedVersion == 'centos5' || this.state.selectedVersion == 'redhat5' 
+        ...(this.state.selectedOS == 'oraclelinux'
           ? [
             {
-              title: 'Choose the architecture',
+              title: 'Choose the version',
               children: (
-                <EuiButtonGroup
-                  color="primary"
-                  legend="Choose the architecture"
-                  options={architectureCentos5OrRedHat5}
-                  idSelected={this.state.selectedArchitecture}
-                  onChange={(architecture) => this.setArchitecture(architecture)}
-                />
+                buttonGroup("Choose the version", versionButtonsOracleLinux, this.state.selectedVersion, (version) => this.setVersion(version))
               ),
             },
           ]
           : []),
-        ...(this.state.selectedOS == 'deb' ||
-          (this.state.selectedOS == 'rpm' && this.state.selectedVersion == 'centos6' || this.state.selectedVersion == 'redhat6')
+        ...(this.state.selectedOS == 'raspbian'
+          ? [
+            {
+              title: 'Choose the version',
+              children: (
+                buttonGroup("Choose the version", versionButtonsRaspbian, this.state.selectedVersion, (version) => this.setVersion(version))
+              ),
+            },
+          ]
+          : []),
+        ...(this.state.selectedOS == 'amazonlinux'
+          ? [
+            {
+              title: 'Choose the version',
+              children: (
+                buttonGroup("Choose the version", versionButtonAmazonLinux, this.state.selectedVersion, (version) => this.setVersion(version))
+              ),
+            },
+          ]
+          : []),
+        ...(this.state.selectedOS == 'cent'
+          ? [
+            {
+              title: 'Choose the version',
+              children: (
+                this.state.selectedVersion == 'centos5' || this.state.selectedVersion == 'centos6' ? buttonGroupWithMessage("Choose the version", versionButtonsCentos, this.state.selectedVersion, (version) => this.setVersion(version)) : buttonGroup("Choose the version", versionButtonsCentos, this.state.selectedVersion, (version) => this.setVersion(version))
+              ),
+            },
+          ]
+          : []),
+        ...(this.state.selectedOS == 'fedora'
+          ? [
+            {
+              title: 'Choose the version',
+              children: (
+                buttonGroup("Choose the version", versionButtonFedora, this.state.selectedVersion, (version) => this.setVersion(version))
+              ),
+            },
+          ]
+          : []),
+        ...(this.state.selectedOS == 'deb'
+          ? [
+            {
+              title: 'Choose the version',
+              children: (
+                this.state.selectedVersion == 'debian7' || this.state.selectedVersion == 'debian8' || this.state.selectedVersion == 'debian9' || this.state.selectedVersion == 'debian10' ? buttonGroupWithMessage("Choose the version", versionButtonsDebian, this.state.selectedVersion, (version) => this.setVersion(version)) : buttonGroup("Choose the version", versionButtonsDebian, this.state.selectedVersion, (version) => this.setVersion(version))
+              ),
+            },
+          ]
+          : []),
+        ...(this.state.selectedOS == 'ubu'
+          ? [
+            {
+              title: 'Choose the version',
+              children: (
+                this.state.selectedVersion == 'ubuntu14' ? buttonGroupWithMessage("Choose the version", versionButtonsUbuntu, this.state.selectedVersion, (version) => this.setVersion(version)) : buttonGroup("Choose the version", versionButtonsUbuntu, this.state.selectedVersion, (version) => this.setVersion(version))
+              ),
+            },
+          ]
+          : []),
+        ...(this.state.selectedOS == 'win'
+          ? [
+            {
+              title: 'Choose the version',
+              children: (
+                this.state.selectedVersion == 'windowsxp' ? buttonGroupWithMessage("Choose the version", versionButtonsWindows, this.state.selectedVersion, (version) => this.setVersion(version)) : buttonGroup("Choose the version", versionButtonsWindows, this.state.selectedVersion, (version) => this.setVersion(version))
+              ),
+            },
+          ]
+          : []),
+        ...(this.state.selectedOS == 'macos'
+          ? [
+            {
+              title: 'Choose the version',
+              children: (
+                selectedVersionMac("Choose the version", versionButtonsMacOS, this.state.selectedVersion, (version) => this.setVersion(version))
+              ),
+            },
+          ]
+          : []),
+        ...(this.state.selectedOS == 'suse'
+          ? [
+            {
+              title: 'Choose the version',
+              children: (
+                selectedVersionMac("Choose the version", versionButtonsSuse, this.state.selectedVersion, (version) => this.setVersion(version))
+              ),
+            },
+          ]
+          : []),
+        ...(this.state.selectedOS == 'open'
+          ? [
+            {
+              title: 'Choose the version',
+              children: (
+                buttonGroup("Choose the version", versionButtonsOpenSuse, this.state.selectedVersion, (version) => this.setVersion(version))
+              ),
+            },
+          ]
+          : []),
+        ...(this.state.selectedOS == 'sol'
+          ? [
+            {
+              title: 'Choose the version',
+              children: (
+                this.state.selectedVersion == 'solaris10' || this.state.selectedVersion == 'solaris11' ? buttonGroupWithMessage("Choose the version", versionButtonsSolaris, this.state.selectedVersion, (version) => this.setVersion(version)) : buttonGroup("Choose the version", versionButtonsSolaris, this.state.selectedVersion, (version) => this.setVersion(version))
+              ),
+            },
+          ]
+          : []),
+        ...(this.state.selectedOS == 'aix'
+          ? [
+            {
+              title: 'Choose the version',
+              children: (
+                this.state.selectedVersion == '6.1 TL9' ? buttonGroupWithMessage("Choose the version", versionButtonsAix, this.state.selectedVersion, (version) => this.setVersion(version)) : buttonGroup("Choose the version", versionButtonsAix, this.state.selectedVersion, (version) => this.setVersion(version))
+              ),
+            },
+          ]
+          : []),
+        ...(this.state.selectedOS == 'hp'
+          ? [
+            {
+              title: 'Choose the version',
+              children: (
+                this.state.selectedVersion == '11.31' ? buttonGroupWithMessage("Choose the version", versionButtonsHPUX, this.state.selectedVersion, (version) => this.setVersion(version)) : buttonGroup("Choose the version", versionButtonsHPUX, this.state.selectedVersion, (version) => this.setVersion(version))
+
+              ),
+            },
+          ]
+          : []),
+        ...(this.state.selectedVersion == 'centos5' || this.state.selectedVersion == 'redhat5' || this.state.selectedVersion == 'oraclelinux5' || this.state.selectedVersion == 'suse11'
           ? [
             {
               title: 'Choose the architecture',
               children: (
-                <EuiButtonGroup
-                  color="primary"
-                  legend="Choose the architecture"
-                  options={architectureButtons}
-                  idSelected={this.state.selectedArchitecture}
-                  onChange={(architecture) => this.setArchitecture(architecture)}
-                />
+                buttonGroup("Choose the architecture", architecturei386Andx86_64, this.state.selectedArchitecture, (architecture) => this.setArchitecture(architecture))
+              ),
+            },
+          ]
+          : []),
+        ...(this.state.selectedVersion == 'leap15'
+          ? [
+            {
+              title: 'Choose the architecture',
+              children: (
+                buttonGroup("Choose the architecture", architectureButtonsOpenSuse, this.state.selectedArchitecture, (architecture) => this.setArchitecture(architecture))
+              ),
+            },
+          ]
+          : []),
+        ...(this.state.selectedVersion == 'centos6' || this.state.selectedVersion == 'oraclelinux6' || this.state.selectedVersion == 'amazonlinux1' || this.state.selectedVersion == 'redhat6' || this.state.selectedVersion == 'redhat7' || this.state.selectedVersion == 'amazonlinux2022' || this.state.selectedVersion == 'debian7' || this.state.selectedVersion == 'debian8' || this.state.selectedVersion == 'ubuntu14' || this.state.selectedVersion == 'ubuntu15' || this.state.selectedVersion == 'ubuntu16'
+          ? [
+            {
+              title: 'Choose the architecture',
+              children: (
+                buttonGroup("Choose the architecture", architectureButtons, this.state.selectedArchitecture, (architecture) => this.setArchitecture(architecture))
+              ),
+            },
+          ]
+          : []),
+        ...(this.state.selectedVersion == 'centos7' || this.state.selectedVersion == 'amazonlinux2' || this.state.selectedVersion == 'suse12' || this.state.selectedVersion == '22' || this.state.selectedVersion == 'debian9' || this.state.selectedVersion == 'debian10' || this.state.selectedVersion == 'busterorgreater'
+          ? [
+            {
+              title: 'Choose the architecture',
+              children: (
+                buttonGroup("Choose the architecture", architectureButtonsWithPPC64LE, this.state.selectedArchitecture, (architecture) => this.setArchitecture(architecture))
+              ),
+            },
+          ]
+          : []),
+        ...(this.state.selectedVersion == 'windowsxp' || this.state.selectedVersion == 'windows8'
+          ? [
+            {
+              title: 'Choose the architecture',
+              children: (
+                buttonGroup("Choose the architecture", architectureButtonsi386, this.state.selectedArchitecture, (architecture) => this.setArchitecture(architecture))
+              ),
+            },
+          ]
+          : []),
+        ...(this.state.selectedVersion == 'sierra' || this.state.selectedVersion == 'highSierra' || this.state.selectedVersion == 'mojave' || this.state.selectedVersion == 'catalina' || this.state.selectedVersion == 'bigSur' || this.state.selectedVersion == 'monterrey'
+          ? [
+            {
+              title: 'Choose the architecture',
+              children: (
+                buttonGroup("Choose the architecture", architectureButtonsMacos, this.state.selectedArchitecture, (architecture) => this.setArchitecture(architecture))
+              ),
+            },
+          ]
+          : []),
+        ...(this.state.selectedVersion == 'solaris10' || this.state.selectedVersion == 'solaris11'
+          ? [
+            {
+              title: 'Choose the architecture',
+              children: (
+                buttonGroup("Choose the architecture", architectureButtonsSolaris, this.state.selectedArchitecture, (architecture) => this.setArchitecture(architecture))
+              ),
+            },
+          ]
+          : []),
+        ...(this.state.selectedVersion == '6.1 TL9'
+          ? [
+            {
+              title: 'Choose the architecture',
+              children: (
+                buttonGroup("Choose the architecture", architectureButtonsAix, this.state.selectedArchitecture, (architecture) => this.setArchitecture(architecture))
+              ),
+            },
+          ]
+          : []),
+        ...(this.state.selectedVersion == '11.31'
+          ? [
+            {
+              title: 'Choose the architecture',
+              children: (
+                buttonGroup("Choose the architecture", architectureButtonsHpUx, this.state.selectedArchitecture, (architecture) => this.setArchitecture(architecture))
               ),
             },
           ]
@@ -699,8 +1350,8 @@ export const RegisterAgent = withErrorBoundary(
           ]
           : []),
         {
-          title: 'Assign the agent to a group',
-          children: <Fragment>{groupInput}</Fragment>,
+          title: 'Assign a name and a group to the agent',
+          children: <Fragment>{agentName}{groupInput}{agentGroup}</Fragment>,
         },
         {
           title: 'Install and enroll the agent',
@@ -716,7 +1367,7 @@ export const RegisterAgent = withErrorBoundary(
               <div>{guide}</div>
             ),
         },
-        ...(this.state.selectedOS == 'rpm' || this.state.selectedOS == 'deb'
+        ...(this.state.selectedOS == 'rpm' || this.state.selectedOS == 'cent' || this.state.selectedOS == 'suse' || this.state.selectedOS == 'fedora' || this.state.selectedOS == 'oraclelinux' || this.state.selectedOS == 'amazonlinux' || this.state.selectedOS == 'deb' || this.state.selectedOS == 'raspbian' || this.state.selectedOS == 'ubu' || this.state.selectedOS == 'win' || this.state.selectedOS == 'macos' || this.state.selectedOS == 'open' || this.state.selectedOS == 'sol' || this.state.selectedOS == 'aix' || this.state.selectedOS == 'hp'
           ? [
             {
               title: 'Start the agent',
@@ -730,7 +1381,7 @@ export const RegisterAgent = withErrorBoundary(
                   />
                 ) : (
                   <EuiTabbedContent
-                    tabs={tabs}
+                    tabs={this.state.selectedVersion == 'redhat7' || this.state.selectedVersion == 'amazonlinux2022' || this.state.selectedVersion == 'centos7' || this.state.selectedVersion == 'suse11' || this.state.selectedVersion == 'suse12' || this.state.selectedVersion == 'oraclelinux5' || this.state.selectedVersion == 'amazonlinux2' || this.state.selectedVersion == '22' || this.state.selectedVersion == 'debian8' || this.state.selectedVersion == 'debian10' || this.state.selectedVersion == 'busterorgreater' || this.state.selectedVersion == 'busterorgreater' || this.state.selectedVersion === 'ubuntu15' || this.state.selectedVersion === 'ubuntu16' || this.state.selectedVersion === 'leap15' ? tabSystemD : this.state.selectedVersion == 'windowsxp' || this.state.selectedVersion == 'windows8' ? tabNet : this.state.selectedVersion == 'sierra' || this.state.selectedVersion == 'highSierra' || this.state.selectedVersion == 'mojave' || this.state.selectedVersion == 'catalina' || this.state.selectedVersion == 'bigSur' || this.state.selectedVersion == 'monterrey' ? tabWazuhControlMacos : this.state.selectedVersion == 'solaris10' || this.state.selectedVersion == 'solaris11' || this.state.selectedVersion == '6.1 TL9' || this.state.selectedVersion == '11.31' ? tabWazuhControl : tabSysV}
                     selectedTab={this.selectedSYS}
                     onTabClick={onTabClick}
                   />
@@ -742,6 +1393,19 @@ export const RegisterAgent = withErrorBoundary(
         ...(!missingOSSelection.length &&
           this.state.selectedOS !== 'rpm' &&
           this.state.selectedOS !== 'deb' &&
+          this.state.selectedOS !== 'cent' &&
+          this.state.selectedOS !== 'ubu' &&
+          this.state.selectedOS !== 'win' &&
+          this.state.selectedOS !== 'macos' &&
+          this.state.selectedOS !== 'open' &&
+          this.state.selectedOS !== 'sol' &&
+          this.state.selectedOS !== 'aix' &&
+          this.state.selectedOS !== 'hp' &&
+          this.state.selectedOS !== 'amazonlinux' &&
+          this.state.selectedOS !== 'fedora' &&
+          this.state.selectedOS !== 'oraclelinux' &&
+          this.state.selectedOS !== 'suse' &&
+          this.state.selectedOS !== 'raspbian' &&
           restartAgentCommand
           ? [
             {
