@@ -1,7 +1,12 @@
-import { WzRequest } from '../../../react-services/wz-request';
-import { optionalPackages } from './services';
+import { EuiComboBoxOptionOption } from '@elastic/eui';
+import { WzRequest } from '../../../../react-services/wz-request';
+import { RegisterAgentState } from '../register-agent-main';
+import { optionalPackages } from '../services';
 
-export async function getGroups() {
+/**
+ * Get groups list from API and return with combobox format
+ */
+export async function getGroups(): Promise<EuiComboBoxOptionOption<any>[]> {
   try {
     const result = await WzRequest.apiReq('GET', '/groups', {});
     return result.data.data.affected_items.map(item => ({
@@ -13,7 +18,10 @@ export async function getGroups() {
   }
 }
 
-export async function getAuthInfo() {
+/**
+ * Get the agents auth configuration
+ */
+export async function getAuthInfo(): Promise<object|{error:boolean}> {
   try {
     const result = await WzRequest.apiReq(
       'GET',
@@ -28,6 +36,10 @@ export async function getAuthInfo() {
   }
 }
 
+/**
+ * Return the cli command type by selected OS
+ * @param selectedSO 
+ */
 export function getHighlightCodeLanguage(selectedSO: string) {
   if (selectedSO.toLowerCase() === 'win') {
     return 'powershell';
@@ -36,11 +48,15 @@ export function getHighlightCodeLanguage(selectedSO: string) {
   }
 }
 
+/**
+ * Return the password obfuscated
+ * @param text 
+ */
 export function obfuscatePassword(text: string) {
   let obfuscate = '';
   const regex = /WAZUH_REGISTRATION_PASSWORD=?\040?\'(.*?)\'/gm;
   const match = regex.exec(text);
-  const password = match[1];
+  const password = match && match[1] ;
   if (password) {
     [...password].forEach(() => (obfuscate += '*'));
     text = text.replace(password, obfuscate);
@@ -48,17 +64,10 @@ export function obfuscatePassword(text: string) {
   return text;
 }
 
-type deployAgentState = {
-  serverAddress: string;
-  selectedArchitecture: string;
-  selectedOS: string;
-  selectedGroup: { label: string; value: string }[];
-  udpProtocol: string;
-  needsPassword: string;
-  wazuhPassword: string;
-  wazuhVersion: string;
-};
 
+/**
+ * Add optionals parameters in the register agent command text 
+ */
 export function optionalDeploymentVariables({
   serverAddress,
   selectedOS,
@@ -66,7 +75,7 @@ export function optionalDeploymentVariables({
   selectedGroup,
   needsPassword,
   wazuhPassword,
-}: deployAgentState) {
+}: RegisterAgentState) {
   let deployment = `WAZUH_MANAGER='${serverAddress}' `;
 
   if (selectedOS == 'win') {
@@ -95,6 +104,11 @@ export function optionalDeploymentVariables({
   return deployment;
 }
 
+/**
+ * Returns the command to start an agent depending on the OS and the SYS
+ * @param selectedOS 
+ * @param selectedSYS 
+ */
 export function systemSelector(selectedOS: string, selectedSYS: string) {
   if (selectedOS === 'rpm') {
     if (selectedSYS === 'systemd') {
@@ -109,6 +123,12 @@ export function systemSelector(selectedOS: string, selectedSYS: string) {
   } else return '';
 }
 
+/**
+ * Get what is the SO incomplete in the deploy agent screen. Using the SO, Version and Architecture 
+ * @param selectedOS 
+ * @param selectedVersion 
+ * @param selectedArchitecture 
+ */
 export function checkMissingOSSelection(
   selectedOS: string,
   selectedVersion: string,
@@ -132,18 +152,23 @@ export function checkMissingOSSelection(
   }
 }
 
-export function getCommandText(props: deployAgentState) {
+/**
+ * Get the register agent command text depending on the selected Options
+ * @param props 
+ */
+export function getCommandText(props: RegisterAgentState) {
   const {
     selectedOS,
+    selectedVersion,
     selectedArchitecture,
     wazuhVersion,
   } = props;
 
   switch (selectedOS) {
     case 'rpm':
-        return `sudo ${optionalDeploymentVariables({...props})}yum install ${optionalPackages(selectedOS,selectedArchitecture,wazuhVersion)}`;
+        return `sudo ${optionalDeploymentVariables({...props})}yum install ${optionalPackages(selectedOS,selectedVersion,selectedArchitecture,wazuhVersion)}`;
     case 'deb':
-        return `curl -so wazuh-agent-${wazuhVersion}.deb ${optionalPackages(selectedOS,selectedArchitecture,wazuhVersion)} && sudo ${optionalDeploymentVariables({...props})}dpkg -i ./wazuh-agent-${wazuhVersion}.deb`;
+        return `curl -so wazuh-agent-${wazuhVersion}.deb ${optionalPackages(selectedOS,selectedVersion,selectedArchitecture,wazuhVersion)} && sudo ${optionalDeploymentVariables({...props})}dpkg -i ./wazuh-agent-${wazuhVersion}.deb`;
     case 'macos':
         return `curl -so wazuh-agent-${wazuhVersion}.pkg https://packages.wazuh.com/4.x/macos/wazuh-agent-${wazuhVersion}-1.pkg && sudo launchctl setenv ${optionalDeploymentVariables({...props})}&& sudo installer -pkg ./wazuh-agent-${wazuhVersion}.pkg -target /`;
     case 'win':

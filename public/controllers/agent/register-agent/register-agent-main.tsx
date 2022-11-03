@@ -56,9 +56,10 @@ type Props = {
   getWazuhVersion(): string;
 }
 
-type State = {
+export type OSSystems = 'rpm' | 'deb' | 'macos' | 'win';
+export type RegisterAgentState = {
   status: string;
-  selectedOS: string;
+  selectedOS: OSSystems | '';
   selectedSYS: string;
   selectedArchitecture: string;
   selectedVersion: string;
@@ -76,10 +77,9 @@ type State = {
   hidePasswordInput?: boolean;
 }
 
-type OSSystems = 'rpm' | 'deb' | 'macos' | 'win';
 
 export const RegisterAgent = withErrorBoundary(
-  class RegisterAgent extends Component<Props, State> {
+  class RegisterAgent extends Component<Props, RegisterAgentState> {
     wazuhConfig: any;
     configuration: any;
     restartAgentCommand: { [key: string]: string };
@@ -392,6 +392,7 @@ export const RegisterAgent = withErrorBoundary(
                         <EuiTitle>
                           <h2>Deploy a new agent</h2>
                         </EuiTitle>
+                        { JSON.stringify(this.state) }
                       </EuiFlexItem>
                       <EuiFlexItem grow={false}>
                         {this.props.hasAgents() && (

@@ -1,3 +1,9 @@
+/**
+ * Get the agent package url depending on the OS, architecture and the version
+ * @param OSVersion 
+ * @param OSArchitecture 
+ * @param wazuhVersion 
+ */
 const resolveRPMPackage = (OSVersion: string, OSArchitecture: string, wazuhVersion: string) => {
     switch (`${OSVersion}-${OSArchitecture}`) {
       case 'centos5-i386':
@@ -29,6 +35,11 @@ const resolveRPMPackage = (OSVersion: string, OSArchitecture: string, wazuhVersi
     }
   }
 
+  /**
+   * Get the agent package url depending on the architecture and the version
+   * @param OSArchitecture 
+   * @param wazuhVersion 
+   */
   const resolveDEBPackage = (OSArchitecture: string, wazuhVersion: string) => {
     switch (`${OSArchitecture}`) {
       case 'i386':
@@ -44,10 +55,17 @@ const resolveRPMPackage = (OSVersion: string, OSArchitecture: string, wazuhVersi
     }
   }
 
-  export const optionalPackages = (OSVersion: string, OSArchitecture: string, wazuhVersion: string) => {
+  /**
+   * Get the agent package url depending on the os version selected
+   * @param OSVersion 
+   * @param selectedVersion
+   * @param OSArchitecture 
+   * @param wazuhVersion 
+   */
+  export const optionalPackages = (OSVersion: string, selectedVersion: string, OSArchitecture: string, wazuhVersion: string) => {
     switch (OSVersion) {
       case 'rpm':
-        return resolveRPMPackage(OSVersion, OSArchitecture, wazuhVersion);
+        return resolveRPMPackage(selectedVersion, OSArchitecture, wazuhVersion);
       case 'deb':
         return resolveDEBPackage(OSArchitecture, wazuhVersion);
       default:
