@@ -119,3 +119,21 @@ kbn-dis doc-table .kbnDocViewer__warning {
 .header__breadcrumbsWithExtensionContainer .header__breadcrumbsAppendExtension {
     flex-grow: 0;
 }
+
+.osButtonsStyle {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-gap: 10px;
+}
+
+.osButtonsStyleMac {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-gap: 10px;
+}
+
+.message {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: row;
+}
