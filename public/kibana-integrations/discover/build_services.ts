@@ -41,7 +41,6 @@ import { SavedObjectKibanaServices } from 'src/plugins/saved_objects/public';
 
 //import { createSavedSearchesLoader, SavedSearch } from './saved_searches';
 import { getHistory } from './kibana_services';
-import { KibanaLegacyStart } from '../../../../../src/plugins/kibana_legacy/public';
 import { UrlForwardingStart } from '../../../../../src/plugins/url_forwarding/public';
 import { NavigationPublicPluginStart } from '../../../../../src/plugins/navigation/public';
 import { getDataPlugin, getNavigationPlugin, getVisualizationsPlugin } from '../../kibana-services';
@@ -62,7 +61,7 @@ export interface DiscoverServices {
   metadata: { branch: string };
   navigation: NavigationPublicPluginStart;
   share?: SharePluginStart;
-  kibanaLegacy: KibanaLegacyStart;
+  kibanaLegacy: any; // TODO: review if it is required or can be removed
   urlForwarding: UrlForwardingStart;
   timefilter: TimefilterContract;
   toastNotifications: ToastsStart;

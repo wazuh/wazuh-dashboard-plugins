@@ -82,7 +82,7 @@ import {
   search,
   UI_SETTINGS,
 } from '../../../../src/plugins/data/public';
-import { addFatalError } from '../../../../src/plugins/kibana_legacy/public';
+import { addFatalError } from './plugins/kibana_legacy/public';
 import {
   DEFAULT_COLUMNS_SETTING,
   SAMPLE_SIZE_SETTING,

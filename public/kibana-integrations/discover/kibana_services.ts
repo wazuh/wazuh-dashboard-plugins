@@ -98,7 +98,7 @@ export const [getScopedHistory, setScopedHistory] = createGetterSetter<ScopedHis
 
 export const { getResponseInspectorStats, tabifyAggResponse } = search;
 export { unhashUrl, redirectWhenMissing } from '../../../../../src/plugins/kibana_utils/public';
-export { formatMsg, formatStack, subscribeWithScope } from '../../../../../src/plugins/kibana_legacy/public';
+export { formatMsg, formatStack, subscribeWithScope } from '../plugins/kibana_legacy/public';
 
 // EXPORT types
 export {
