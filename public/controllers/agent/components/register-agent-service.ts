@@ -12,8 +12,8 @@ type RemoteItem = {
 
 type RemoteConfig = {
   name: string;
-  protocols: Protocol[];
-  haveConnectionSecure: boolean | null;
+  isUdp: boolean | null;
+  haveSecureConnection: boolean | null;
 };
 
 /**
@@ -24,8 +24,8 @@ export const getRemoteConfiguration = async (
 ): Promise<RemoteConfig> => {
   let config: RemoteConfig = {
     name: nodeName,
-    protocols: [],
-    haveConnectionSecure: null,
+    isUdp: null,
+    haveSecureConnection: null,
   };
   const result = await WzRequest.apiReq(
     'GET',
@@ -40,17 +40,31 @@ export const getRemoteConfiguration = async (
     });
 
     remoteFiltered.length > 0
-      ? (config.haveConnectionSecure = true)
-      : (config.haveConnectionSecure = false);
+      ? (config.haveSecureConnection = true)
+      : (config.haveSecureConnection = false);
 
+    let protocolsAvailable: Protocol[] = [];
     remote.forEach((item: RemoteItem) => {
       // get all protocols available
       item.protocol.forEach(protocol => {
-        if (!config.protocols.includes(protocol)) {
-          config.protocols.push(protocol);
-        }
+        protocolsAvailable = protocolsAvailable.concat(protocol);
       });
     });
+
+    config.isUdp =
+      getRemoteProtocol(protocolsAvailable) === 'UDP' ? true : false;
   }
   return config;
+};
+
+/**
+ * Get the remote protocol available from list of protocols
+ * @param protocols 
+ */
+const getRemoteProtocol = (protocols: Protocol[]) => {
+  if (protocols.length === 1) {
+    return protocols[0];
+  } else {
+    return !protocols.includes('TCP') ? 'UDP' : 'TCP';
+  }
 };

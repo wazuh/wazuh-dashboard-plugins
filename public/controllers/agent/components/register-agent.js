@@ -43,7 +43,7 @@ import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
 import { architectureButtons, architectureButtonsi386, architecturei386Andx86_64, versionButtonsRaspbian, versionButtonsSuse, versionButtonsOracleLinux, versionButtonFedora, architectureButtonsSolaris, architectureButtonsWithPPC64LE, architectureButtonsOpenSuse, architectureButtonsAix, architectureButtonsHpUx, versionButtonAmazonLinux, versionButtonsRedHat, versionButtonsCentos, architectureButtonsMacos, osButtons, versionButtonsDebian, versionButtonsUbuntu, versionButtonsWindows, versionButtonsMacOS, versionButtonsOpenSuse, versionButtonsSolaris, versionButtonsAix, versionButtonsHPUX } from '../wazuh-config'
 import  ServerAddress  from '../register-agent/steps/server-address';
-import { fetchClusterNodesOptions, parseNodeIPs } from '../register-agent/utils'
+import { fetchClusterNodesOptions } from '../register-agent/utils'
 import { getRemoteConfiguration } from './register-agent-service'
 
 export const RegisterAgent = withErrorBoundary(
@@ -67,11 +67,11 @@ export const RegisterAgent = withErrorBoundary(
         wazuhPassword: '',
         groups: [],
         selectedGroup: [],
+        defaultServerAddress: '',
         udpProtocol: false,
         showPassword: false,
         showProtocol: true,
-        connectionSecure: true,
-        remoteNodesInfo: []
+        connectionSecure: true
       };
       this.restartAgentCommand = {
         rpm: this.systemSelector(),
@@ -90,6 +90,7 @@ export const RegisterAgent = withErrorBoundary(
         const wazuhVersion = await this.props.getWazuhVersion();
         let wazuhPassword = '';
         let hidePasswordInput = false;
+        this.getEnrollDNSConfig();
         let authInfo = await this.getAuthInfo();
         const needsPassword = (authInfo.auth || {}).use_password === 'yes';
         if (needsPassword) {
@@ -148,6 +149,16 @@ export const RegisterAgent = withErrorBoundary(
           },
         };
         getErrorOrchestrator().handleError(options);
+      }
+    }
+
+    getEnrollDNSConfig = () => {
+      let serverAddress = this.configuration['enrollment.dns'] || '';
+      this.setState({ defaultServerAddress: serverAddress });
+      if(serverAddress){
+        this.setState({ udpProtocol: true });
+      }else{
+        this.setState({ udpProtocol: null });
       }
     }
 
@@ -1162,33 +1173,33 @@ export const RegisterAgent = withErrorBoundary(
         )
       }
 
-
-      const getRemoteInfo = async (selectedNodes) => {
-        selectedNodes.forEach(async (node)=> {
-          const nodeName = node.label;
-          const existsNodeInfo = this.state.remoteNodesInfo.some(node => node.name === nodeName);
-          // check if the node info is already exists in state
-          if(this.state.remoteNodesInfo.length == 0 || !existsNodeInfo){
-            await getRemoteConfiguration(nodeName);
-          }
-
-        })
-      }
-
-      const suggestProtocol = (selectedNodes) => {
-
-      }
-
-      const checkConnectionSecure = (selectedNodes) => {
-
-      }
-
       const onChangeServerAddress = async (selectedNodes) => {
-        const nodesParsed = parseNodeIPs(selectedNodes, this.state.selectedOS);
-        this.setState({ serverAddress: nodesParsed });
-        await getRemoteInfo(selectedNodes);
+        if(selectedNodes.length === 0){
+          this.setState({
+            serverAddress: '',
+            udpProtocol: false,
+            connectionSecure: null
+          })
+          
+        }else{
+          const nodeSelected = selectedNodes[0];
+          await setRemoteConfiguration(nodeSelected)
+        }
       }
 
+      const setRemoteConfiguration = async (nodeSelected) => {
+        const nodeName = nodeSelected?.label;
+        if(!this.state.defaultServerAddress){
+          if(nodeSelected.nodeType !== 'custom'){
+            const remoteConfig = await getRemoteConfiguration(nodeName);
+            this.setState({ serverAddress: remoteConfig.name, udpProtocol: remoteConfig.isUdp, connectionSecure: remoteConfig.haveSecureConnection });
+          }else{
+            this.setState({ serverAddress: nodeName, udpProtocol: true, connectionSecure: true });
+          }
+        }else{
+          this.setState({ serverAddress: nodeName, udpProtocol: true, connectionSecure: true });
+        }
+      }
 
       const steps = [
         {
@@ -1440,7 +1451,8 @@ export const RegisterAgent = withErrorBoundary(
         {
           title: 'Wazuh server address',
           children: <Fragment>
-            <ServerAddress 
+            <ServerAddress
+              defaultValue={this.state.defaultServerAddress}
               onChange={onChangeServerAddress} 
               fetchOptions={fetchClusterNodesOptions}/>
             </Fragment>,
@@ -1551,7 +1563,6 @@ export const RegisterAgent = withErrorBoundary(
                         <EuiTitle>
                           <h2>Deploy a new agent</h2>
                         </EuiTitle>
-                        { JSON.stringify(this.state.remoteNodesInfo) }
                       </EuiFlexItem>
                       <EuiFlexItem grow={false}>
                         {this.props.hasAgents() && (
