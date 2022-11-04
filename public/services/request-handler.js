@@ -40,6 +40,7 @@ export const request = async (info) => {
     if (!allow) {
         return Promise.reject();
     }
+    try {
 
     let { method, path, headers, data, timeout } = info;
     const core = getCore();
@@ -61,7 +62,6 @@ export const request = async (info) => {
     
     if (allow) {
         aborts.push({ id: options.id, controller: abort })
-        try {
             if (!method | ! path){
                 throw new Error("Missing parameters")
             }
@@ -78,8 +78,8 @@ export const request = async (info) => {
                 return Promise.resolve({ data: requestData });
             }
         }
-        catch (e) {
-            return Promise.reject(e);
-        }
     }
-}
+    catch (e) {
+        return Promise.reject(e);
+    }
+ }
