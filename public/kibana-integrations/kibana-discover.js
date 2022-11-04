@@ -96,6 +96,7 @@ import { createFixedScroll } from './discover/application/angular/directives/fix
 import './discover/application/index.scss';
 import { getFilterWithAuthorizedAgents } from '../react-services/filter-authorization-agents';
 import { getSettingDefaultValue } from '../../common/services/settings';
+import { FilterStateStore } from '@kbn/es-query';
 
 const fetchStatuses = {
   UNINITIALIZED: 'uninitialized',
@@ -246,7 +247,7 @@ function discoverController(
     data.query,
     appStateContainer,
     {
-      filters: esFilters.FilterStateStore.APP_STATE,
+      filters: FilterStateStore.APP_STATE,
       query: true,
     }
   );
