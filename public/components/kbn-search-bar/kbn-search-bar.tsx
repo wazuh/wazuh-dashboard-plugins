@@ -11,7 +11,7 @@
  */
 
 import React from 'react';
-import { I18nProvider } from '@kbn/i18n/react';
+import { I18nProvider } from '@kbn/i18n-react';
 import { TimeRange, Query, Filter } from '../../../../../src/plugins/data/public';
 
 import { KibanaContextProvider } from '../../../../../src/plugins/kibana_react/public';

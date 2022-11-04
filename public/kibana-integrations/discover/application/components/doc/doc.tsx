@@ -17,7 +17,7 @@
  * under the License.
  */
 import React from 'react';
-import { FormattedMessage, I18nProvider } from '@kbn/i18n/react';
+import { FormattedMessage, I18nProvider } from '@kbn/i18n-react';
 import { EuiCallOut, EuiLink, EuiLoadingSpinner, EuiPageContent } from '@elastic/eui';
 import { IndexPatternsContract } from 'src/plugins/data/public';
 import { ElasticRequestState, useEsDocSearch } from './use_es_doc_search';

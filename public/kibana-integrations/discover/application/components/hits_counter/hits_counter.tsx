@@ -18,7 +18,7 @@
  */
 import React from 'react';
 import { EuiButtonEmpty, EuiFlexGroup, EuiFlexItem, EuiText } from '@elastic/eui';
-import { FormattedMessage, I18nProvider } from '@kbn/i18n/react';
+import { FormattedMessage, I18nProvider } from '@kbn/i18n-react';
 import { i18n } from '@kbn/i18n';
 import { formatNumWithCommas } from '../../helpers';
 

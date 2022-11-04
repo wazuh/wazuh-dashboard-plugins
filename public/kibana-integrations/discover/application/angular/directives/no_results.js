@@ -18,7 +18,7 @@
  */
 
 import React, { Component, Fragment } from 'react';
-import { FormattedMessage, I18nProvider } from '@kbn/i18n/react';
+import { FormattedMessage, I18nProvider } from '@kbn/i18n-react';
 import PropTypes from 'prop-types';
 
 import {

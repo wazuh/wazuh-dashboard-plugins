@@ -20,7 +20,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import classNames from 'classnames';
 import { EuiButtonEmpty, EuiButtonIcon } from '@elastic/eui';
 import { i18n } from '@kbn/i18n';
-import { FormattedMessage, I18nProvider } from '@kbn/i18n/react';
+import { FormattedMessage, I18nProvider } from '@kbn/i18n-react';
 import { IUiSettingsClient, MountPoint } from 'kibana/public';
 import { HitsCounter } from './hits_counter';
 import { TimechartHeader } from './timechart_header';
