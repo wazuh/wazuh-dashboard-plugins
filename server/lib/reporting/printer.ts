@@ -62,7 +62,8 @@ const pageConfiguration = ({ pathToLogo, pageHeader, pageFooter }) => ({
         text: pageHeader,
         alignment: 'right',
         margin: [0, 0, 40, 0],
-        color: COLORS.PRIMARY
+        color: COLORS.PRIMARY,
+        width: 'auto'
       }
     ]
   },
@@ -79,7 +80,8 @@ const pageConfiguration = ({ pathToLogo, pageHeader, pageFooter }) => ({
           text: 'Page ' + currentPage.toString() + ' of ' + pageCount,
           alignment: 'right',
           margin: [0, 40, 40, 0],
-          color: COLORS.PRIMARY
+          color: COLORS.PRIMARY,
+          width: 'auto'
         }
       ]
     };

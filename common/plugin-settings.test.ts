@@ -122,12 +122,12 @@ describe('[settings] Input validation', () => {
     ${'customization.reports.footer'}   | ${'Test\nTest'}                            | ${undefined}
     ${'customization.reports.footer'}   | ${'Test\nTest\nTest\nTest\nTest'}          | ${'The string should have less or equal to 2 line/s.'}
     ${'customization.reports.footer'}   | ${'Line with 30 characters       \nTest'}  | ${undefined}
-    ${'customization.reports.footer'}   | ${'Line with 31 characters        \nTest'} | ${"The maximum length of a line is 30 characters."}
+    ${'customization.reports.footer'}   | ${'Testing maximum length of a line of more than 50 characters\nTest'} | ${"The maximum length of a line is 50 characters."}
     ${'customization.reports.header'}   | ${'Test'}                                  | ${undefined}
     ${'customization.reports.header'}   | ${'Test\nTest'}                            | ${undefined}
     ${'customization.reports.header'}   | ${'Test\nTest\nTest\nTest\nTest'}          | ${'The string should have less or equal to 3 line/s.'}
     ${'customization.reports.header'}   | ${'Line with 20 charact\nTest'}            | ${undefined}
-    ${'customization.reports.header'}   | ${'Line with 23 characters\nTest'}         | ${"The maximum length of a line is 20 characters."}
+    ${'customization.reports.header'}   | ${'Testing maximum length of a line of 40 characters\nTest'}         | ${"The maximum length of a line is 40 characters."}
     ${'disabled_roles'}                 | ${['test']}                                | ${undefined}
     ${'disabled_roles'}                 | ${['']}                                    | ${'Value can not be empty.'}
     ${'disabled_roles'}                 | ${['test space']}                          | ${"No whitespaces allowed."}
