@@ -42,7 +42,11 @@ export class WazuhApiCtrl {
   async getToken(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
     try {
       const { force, idHost } = request.body;
-      const { username } = await context.wazuh.security.getCurrentUser(request, context);
+      const contextWazuh = await context.wazuh;
+      const { username } = await contextWazuh.security.getCurrentUser(
+        request,
+        context,
+      );
       if (!force && request.headers.cookie && username === getCookieValueByName(request.headers.cookie, 'wz-user') && idHost === getCookieValueByName(request.headers.cookie,'wz-api')) {
         const wzToken = getCookieValueByName(request.headers.cookie, 'wz-token');
         if (wzToken) {
@@ -61,13 +65,13 @@ export class WazuhApiCtrl {
       }
       let token;
       if (await APIUserAllowRunAs.canUse(idHost) == API_USER_STATUS_RUN_AS.ENABLED) {
-        token = await context.wazuh.api.client.asCurrentUser.authenticate(idHost);
+        token = await contextWazuh.api.client.asCurrentUser.authenticate(idHost);
       } else {
-        token = await context.wazuh.api.client.asInternalUser.authenticate(idHost);
+        token = await contextWazuh.api.client.asInternalUser.authenticate(idHost);
       };
 
       let textSecure='';
-      if(context.wazuh.server.info.protocol === 'https'){
+      if(contextWazuh.server.info.protocol === 'https'){
         textSecure = ';Secure';
       }
 
@@ -113,12 +117,14 @@ export class WazuhApiCtrl {
       log('wazuh-api:checkStoredAPI', `${id} exists`, 'debug');
 
       // Fetch needed information about the cluster and the manager itself
-      const responseManagerInfo = await context.wazuh.api.client.asInternalUser.request(
-        'get',
-        `/manager/info`,
-        {},
-        { apiHostID: id, forceRefresh: true }
-      );
+      const contextWazuh = await context.wazuh;
+      const responseManagerInfo =
+        await contextWazuh.api.client.asInternalUser.request(
+          'get',
+          `/manager/info`,
+          {},
+          { apiHostID: id, forceRefresh: true },
+        );
 
       // Look for socket-related errors
       if (this.checkResponseIsDown(responseManagerInfo)) {
@@ -134,17 +140,18 @@ export class WazuhApiCtrl {
       if (responseManagerInfo.status === HTTP_STATUS_CODES.OK && responseManagerInfo.data) {
         // Clear and update cluster information before being sent back to frontend
         delete api.cluster_info;
-        const responseAgents = await context.wazuh.api.client.asInternalUser.request(
-          'GET',
-          `/agents`,
-          { params: { agents_list: '000' } },
-          { apiHostID: id }
-        );
+        const responseAgents =
+          await contextWazuh.api.client.asInternalUser.request(
+            'GET',
+            `/agents`,
+            { params: { agents_list: '000' } },
+            { apiHostID: id },
+          );
 
         if (responseAgents.status === HTTP_STATUS_CODES.OK) {
           const managerName = responseAgents.data.data.affected_items[0].manager;
 
-          const responseClusterStatus = await context.wazuh.api.client.asInternalUser.request(
+          const responseClusterStatus = await contextWazuh.api.client.asInternalUser.request(
             'GET',
             `/cluster/status`,
             {},
@@ -152,7 +159,7 @@ export class WazuhApiCtrl {
           );
           if (responseClusterStatus.status === HTTP_STATUS_CODES.OK) {
             if (responseClusterStatus.data.data.enabled === 'yes') {
-              const responseClusterLocalInfo = await context.wazuh.api.client.asInternalUser.request(
+              const responseClusterLocalInfo = await contextWazuh.api.client.asInternalUser.request(
                 'GET',
                 `/cluster/local/info`,
                 {},
@@ -230,12 +237,13 @@ export class WazuhApiCtrl {
             try {
               const id = Object.keys(api)[0];
 
-              const responseManagerInfo = await context.wazuh.api.client.asInternalUser.request(
-                'GET',
-                `/manager/info`,
-                {},
-                { apiHostID: id }
-              );
+              const responseManagerInfo =
+                await contextWazuh.api.client.asInternalUser.request(
+                  'GET',
+                  `/manager/info`,
+                  {},
+                  { apiHostID: id },
+                );
 
               if (this.checkResponseIsDown(responseManagerInfo)) {
                 return ErrorResponse(
@@ -332,12 +340,14 @@ export class WazuhApiCtrl {
       }
       let responseManagerInfo;
       try{
-        responseManagerInfo = await context.wazuh.api.client.asInternalUser.request(
-          'GET',
-          `/manager/info`,
-          {},
-          options
-        );
+        const contextWazuh = await context.wazuh;
+        responseManagerInfo =
+          await contextWazuh.api.client.asInternalUser.request(
+            'GET',
+            `/manager/info`,
+            {},
+            options,
+          );
       }catch(error){
         return ErrorResponse(
           `ERROR3099 - ${error.response?.data?.detail || 'Wazuh not ready yet'}`,
@@ -349,31 +359,35 @@ export class WazuhApiCtrl {
 
       log('wazuh-api:checkAPI', `${request.body.id} credentials are valid`, 'debug');
       if (responseManagerInfo.status === HTTP_STATUS_CODES.OK && responseManagerInfo.data) {
-        let responseAgents = await context.wazuh.api.client.asInternalUser.request(
-          'GET',
-          `/agents`,
-          { params: { agents_list: '000' } },
-          { apiHostID: request.body.id }
-        );
+        const contextWazuh = await context.wazuh;
+        let responseAgents =
+          await contextWazuh.api.client.asInternalUser.request(
+            'GET',
+            `/agents`,
+            { params: { agents_list: '000' } },
+            { apiHostID: request.body.id },
+          );
 
         if (responseAgents.status === HTTP_STATUS_CODES.OK) {
           const managerName = responseAgents.data.data.affected_items[0].manager;
 
-          let responseCluster = await context.wazuh.api.client.asInternalUser.request(
-            'GET',
-            `/cluster/status`,
-            {},
-            { apiHostID: request.body.id }
-          );
+          let responseCluster =
+            await contextWazuh.api.client.asInternalUser.request(
+              'GET',
+              `/cluster/status`,
+              {},
+              { apiHostID: request.body.id },
+            );
 
           // Check the run_as for the API user and update it
           let apiUserAllowRunAs = API_USER_STATUS_RUN_AS.ALL_DISABLED;
-          const responseApiUserAllowRunAs = await context.wazuh.api.client.asInternalUser.request(
-            'GET',
-            `/security/users/me`,
-            {},
-            { apiHostID: request.body.id }
-          );
+          const responseApiUserAllowRunAs =
+            await contextWazuh.api.client.asInternalUser.request(
+              'GET',
+              `/security/users/me`,
+              {},
+              { apiHostID: request.body.id },
+            );
           if (responseApiUserAllowRunAs.status === HTTP_STATUS_CODES.OK) {
             const allow_run_as = responseApiUserAllowRunAs.data.data.affected_items[0].allow_run_as;
 
@@ -399,12 +413,13 @@ export class WazuhApiCtrl {
             log('wazuh-api:checkStoredAPI', `Wazuh API response is valid`, 'debug');
             if (responseCluster.data.data.enabled === 'yes') {
               // If cluster mode is active
-              let responseClusterLocal = await context.wazuh.api.client.asInternalUser.request(
-                'GET',
-                `/cluster/local/info`,
-                {},
-                { apiHostID: request.body.id }
-              );
+              let responseClusterLocal =
+                await contextWazuh.api.client.asInternalUser.request(
+                  'GET',
+                  `/cluster/local/info`,
+                  {},
+                  { apiHostID: request.body.id },
+                );
 
               if (responseClusterLocal.status === HTTP_STATUS_CODES.OK) {
                 return response.ok({
@@ -489,11 +504,12 @@ export class WazuhApiCtrl {
    */
   async checkDaemons(context, api, path) {
     try {
-      const response = await context.wazuh.api.client.asInternalUser.request(
+      const contextWazuh = await context.wazuh;
+      const response = await contextWazuh.api.client.asInternalUser.request(
         'GET',
         '/manager/status',
         {},
-        { apiHostID: api.id }
+        { apiHostID: api.id },
       );
 
       const daemons = ((((response || {}).data || {}).data || {}).affected_items || [])[0] || {};
@@ -608,7 +624,13 @@ export class WazuhApiCtrl {
           startAt: new Date(Date.now() + delay),
           run: async () => {
             try{
-              await context.wazuh.api.client.asCurrentUser.request(method, path, data, options);
+              const contextWazuh = await context.wazuh;
+              await contextWazuh.api.client.asCurrentUser.request(
+                method,
+                path,
+                data,
+                options,
+              );
             }catch(error){
               log('queue:delayApiRequest',`An error ocurred in the delayed request: "${method} ${path}": ${error.message || error}`);
             };
@@ -653,7 +675,13 @@ export class WazuhApiCtrl {
         }
       }
 
-      const responseToken = await context.wazuh.api.client.asCurrentUser.request(method, path, data, options);
+      const contextWazuh = await context.wazuh;
+      const responseToken = await contextWazuh.api.client.asCurrentUser.request(
+        method,
+        path,
+        data,
+        options,
+      );
       const responseIsDown = this.checkResponseIsDown(responseToken);
       if (responseIsDown) {
         return ErrorResponse(
@@ -794,12 +822,12 @@ export class WazuhApiCtrl {
       }
 
       let itemsArray = [];
-
-      const output = await context.wazuh.api.client.asCurrentUser.request(
+      const contextWazuh = await context.wazuh;
+      const output = await contextWazuh.api.client.asCurrentUser.request(
         'GET',
         `/${tmpPath}`,
         { params: params },
-        { apiHostID: request.body.id }
+        { apiHostID: request.body.id },
       );
 
       const isList = request.body.path.includes('/lists') && request.body.filters && request.body.filters.length && request.body.filters.find(filter => filter._isCDBList);
@@ -811,12 +839,13 @@ export class WazuhApiCtrl {
         itemsArray.push(...output.data.data.affected_items);
         while (itemsArray.length < totalItems && params.offset < totalItems) {
           params.offset += params.limit;
-          const tmpData = await context.wazuh.api.client.asCurrentUser.request(
-            'GET',
-            `/${tmpPath}`,
-            { params: params },
-            { apiHostID: request.body.id }
-          );
+          const tmpData =
+            await contextWazuh.api.client.asCurrentUser.request(
+              'GET',
+              `/${tmpPath}`,
+              { params: params },
+              { apiHostID: request.body.id },
+            );
           itemsArray.push(...tmpData.data.data.affected_items);
         }
       }
@@ -1041,10 +1070,20 @@ export class WazuhApiCtrl {
       }
 
       const { agent } = request.params;
-
+      const contextWazuh = await context.wazuh;
       const data = await Promise.all([
-        context.wazuh.api.client.asInternalUser.request('GET', `/syscollector/${agent}/hardware`, {}, { apiHostID }),
-        context.wazuh.api.client.asInternalUser.request('GET', `/syscollector/${agent}/os`, {}, { apiHostID })
+        contextWazuh.api.client.asInternalUser.request(
+          'GET',
+          `/syscollector/${agent}/hardware`,
+          {},
+          { apiHostID },
+        ),
+        contextWazuh.api.client.asInternalUser.request(
+          'GET',
+          `/syscollector/${agent}/os`,
+          {},
+          { apiHostID },
+        ),
       ]);
 
       const result = data.map(item => (item.data || {}).data || []);
@@ -1082,7 +1121,13 @@ export class WazuhApiCtrl {
 
       const disabledRoles = ( await getConfiguration() )['disabled_roles'] || [];
       const logoSidebar = ( await getConfiguration() )['customization.logo.sidebar'];
-      const data = (await context.wazuh.security.getCurrentUser(request, context)).authContext;
+      const contextWazuh = await context.wazuh;
+      const data = (
+        await contextWazuh.security.getCurrentUser(
+          request,
+          context,
+        )
+      ).authContext;
 
       const isWazuhDisabled = +(data.roles || []).some((role) => disabledRoles.includes(role));
 
