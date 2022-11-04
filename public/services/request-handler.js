@@ -37,14 +37,20 @@ export const initializeInterceptor = () => {
     });
 }
 
-export const request = async (info) => {
+export const request = async (info = '') => {
     if (!allow) {
-        return Promise.reject();
+        return Promise.reject('Requests are disabled');
+    }
+
+
+    if (!info.method | !info.path) {
+        return Promise.reject("Missing parameters")
     }
 
     let { method, path, headers, data, timeout } = info;
     const core = getCore();
     const url = path.split('?')[0]
+
     const query = Object.fromEntries([... new URLSearchParams(path.split('?')[1])])
     const abort = new AbortController();
     let options = {
@@ -63,15 +69,12 @@ export const request = async (info) => {
     if (allow) {
         try {
             aborts.push({ id: options.id, controller: abort })
-            if (!method | !path) {
-                throw new Error("Missing parameters")
-            }
             if (timeout && timeout !== 0) {
                 const id = setTimeout(() => abort.abort(), timeout);
                 const requestData = await core.http.fetch(url, options);
                 clearTimeout(id);
                 removeController(options.id);
-                return Promise.resolve({ data: requestData });
+                return Promise.resolve({ data: requestData, timeout: timeout });
             }
             else {
                 const requestData = await core.http.fetch(url, options);
@@ -80,7 +83,6 @@ export const request = async (info) => {
             }
         }
         catch (e) {
-            console.log('Rejecting with', e)
             return Promise.reject(e);
         }
     }
