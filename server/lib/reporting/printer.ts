@@ -11,7 +11,7 @@ import { log } from '../logger';
 import * as TimSort from 'timsort';
 import { getConfiguration } from '../get-configuration';
 import { REPORTS_PRIMARY_COLOR} from '../../../common/constants';
-import { getSettingDefaultValue } from '../../../common/services/settings';
+import { getCustomizationSetting } from '../../../common/services/settings';
 
 const COLORS = {
   PRIMARY: REPORTS_PRIMARY_COLOR
@@ -62,7 +62,8 @@ const pageConfiguration = ({ pathToLogo, pageHeader, pageFooter }) => ({
         text: pageHeader,
         alignment: 'right',
         margin: [0, 0, 40, 0],
-        color: COLORS.PRIMARY
+        color: COLORS.PRIMARY,
+        width: 'auto'
       }
     ]
   },
@@ -79,7 +80,8 @@ const pageConfiguration = ({ pathToLogo, pageHeader, pageFooter }) => ({
           text: 'Page ' + currentPage.toString() + ' of ' + pageCount,
           alignment: 'right',
           margin: [0, 40, 40, 0],
-          color: COLORS.PRIMARY
+          color: COLORS.PRIMARY,
+          width: 'auto'
         }
       ]
     };
@@ -619,9 +621,9 @@ export class ReportPrinter{
       try {
         const configuration = getConfiguration();
 
-        const pathToLogo = configuration['customization.logo.reports'] || getSettingDefaultValue('customization.logo.reports');
-        const pageHeader = configuration['customization.reports.header'] || getSettingDefaultValue('customization.reports.header');
-        const pageFooter = configuration['customization.reports.footer'] || getSettingDefaultValue('customization.reports.footer');
+        const pathToLogo = getCustomizationSetting(configuration, 'customization.logo.reports');
+        const pageHeader = getCustomizationSetting(configuration, 'customization.reports.header');
+        const pageFooter = getCustomizationSetting(configuration, 'customization.reports.footer');
 
         const document = this._printer.createPdfKitDocument({ ...pageConfiguration({ pathToLogo, pageHeader, pageFooter }), content: this._content });
 

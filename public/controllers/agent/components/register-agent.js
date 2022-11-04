@@ -161,6 +161,18 @@ export const RegisterAgent = withErrorBoundary(
       }
     }
 
+    async getRemoteInfo() {
+      try {
+        const result = await WzRequest.apiReq('GET', '/agents/000/config/request/remote', {});
+        const remote = ((result.data || {}).data || {}).remote || {};
+        if (remote.length === 2) {
+          this.setState({ udpProtocol: true })
+        }
+      } catch (error) {
+        throw new Error(error);
+      }
+    }
+
     selectOS(os) {
       this.setState({
         selectedOS: os,
@@ -202,6 +214,10 @@ export const RegisterAgent = withErrorBoundary(
 
     setServerAddress(serverAddress) {
       this.setState({ serverAddress });
+    }
+
+    setAgentName(event) {
+      this.setState({ agentName: event.target.value });
     }
 
     setAgentName(event) {
@@ -250,9 +266,9 @@ export const RegisterAgent = withErrorBoundary(
     }
 
     optionalDeploymentVariables() {
+
       let deployment = this.state.serverAddress && `WAZUH_MANAGER='${this.state.serverAddress}' `;
       const protocol = false
-
       if (this.state.selectedOS == 'win') {
         deployment += `WAZUH_REGISTRATION_SERVER='${this.state.serverAddress}' `;
       }
@@ -260,6 +276,7 @@ export const RegisterAgent = withErrorBoundary(
       if (this.state.needsPassword) {
         deployment += `WAZUH_REGISTRATION_PASSWORD='${this.state.wazuhPassword}' `;
       }
+
       if (this.state.udpProtocol) {
         deployment += `WAZUH_PROTOCOL='UDP' `;
       }
@@ -280,7 +297,6 @@ export const RegisterAgent = withErrorBoundary(
 
     agentNameVariable() {
       let agentName = `WAZUH_AGENT_NAME='${this.state.agentName}' `;
-
       if(this.state.selectedArchitecture && this.state.agentName !== '') {
         return agentName;
       } else {
@@ -710,12 +726,12 @@ export const RegisterAgent = withErrorBoundary(
           value={this.state.agentName}
           onChange={(event) => this.setAgentName(event)}
         />
-    );
+      );
       const groupInput = (
         <>
           {!this.state.groups.length && (
             <>
-              <EuiCallOut style={{marginTop: '1.5rem'}}
+              <EuiCallOut style={{ marginTop: '1.5rem' }}
                 color="warning"
                 title='This section could not be configured because you do not have permission to read groups.'
                 iconType="iInCircle"
@@ -1124,12 +1140,12 @@ export const RegisterAgent = withErrorBoundary(
                 Might require some extra installation <EuiLink target="_blank" href={webDocumentationLink('installation-guide/wazuh-agent/wazuh-agent-package-hpux.html', appVersionMajorDotMinor)}>steps</EuiLink>.
               </span>
             }>
-            </EuiCallOut> : <EuiCallOut color="warning" className='message' iconType="iInCircle" title={
+            </EuiCallOut> : this.state.selectedVersion == 'debian7' || this.state.selectedVersion == 'debian8' || this.state.selectedVersion == 'debian9' || this.state.selectedVersion == 'debian10' ? <EuiCallOut color="warning" className='message' iconType="iInCircle" title={
               <span>
-                The selected OS version reached its end of life (EOL). To install Wazuh follow our <EuiLink href={webDocumentationLink('#', appVersionMajorDotMinor)}>guide</EuiLink>.
+                Might require some extra installation <EuiLink target="_blank" href={webDocumentationLink('installation-guide/wazuh-agent/wazuh-agent-package-linux.html', appVersionMajorDotMinor)}>steps</EuiLink>.
               </span>
             }>
-            </EuiCallOut>}
+            </EuiCallOut> : ''}
           </>
         )
       }
@@ -1145,6 +1161,7 @@ export const RegisterAgent = withErrorBoundary(
             className={'osButtonsStyleMac'} />
         )
       }
+
 
       const getRemoteInfo = async (selectedNodes) => {
         selectedNodes.forEach(async (node)=> {
@@ -1171,6 +1188,7 @@ export const RegisterAgent = withErrorBoundary(
         this.setState({ serverAddress: nodesParsed });
         await getRemoteInfo(selectedNodes);
       }
+
 
       const steps = [
         {
@@ -1244,7 +1262,7 @@ export const RegisterAgent = withErrorBoundary(
             {
               title: 'Choose the version',
               children: (
-                this.state.selectedVersion == 'debian7' || this.state.selectedVersion == 'debian8' ? buttonGroupWithMessage("Choose the version", versionButtonsDebian, this.state.selectedVersion, (version) => this.setVersion(version)) : buttonGroup("Choose the version", versionButtonsDebian, this.state.selectedVersion, (version) => this.setVersion(version))
+                this.state.selectedVersion == 'debian7' || this.state.selectedVersion == 'debian8' || this.state.selectedVersion == 'debian9' || this.state.selectedVersion == 'debian10' ? buttonGroupWithMessage("Choose the version", versionButtonsDebian, this.state.selectedVersion, (version) => this.setVersion(version)) : buttonGroup("Choose the version", versionButtonsDebian, this.state.selectedVersion, (version) => this.setVersion(version))
               ),
             },
           ]
@@ -1325,7 +1343,6 @@ export const RegisterAgent = withErrorBoundary(
               title: 'Choose the version',
               children: (
                 this.state.selectedVersion == '11.31' ? buttonGroupWithMessage("Choose the version", versionButtonsHPUX, this.state.selectedVersion, (version) => this.setVersion(version)) : buttonGroup("Choose the version", versionButtonsHPUX, this.state.selectedVersion, (version) => this.setVersion(version))
-
               ),
             },
           ]
