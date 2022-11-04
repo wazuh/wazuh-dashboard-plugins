@@ -18,7 +18,8 @@
  */
 
 import { SavedObjectsClientContract } from 'kibana/public';
-import { SavedObjectLoader, SavedObjectsStart } from '../../../../../../src/plugins/saved_objects/public';
+import { SavedObjectsStart } from '../../../../../../src/plugins/saved_objects/public';
+import { SavedObjectLoader } from '../../plugins/saved_object_loader/saved_object_loader';
 import { createSavedSearchClass } from './_saved_search';
 
 interface Services {
