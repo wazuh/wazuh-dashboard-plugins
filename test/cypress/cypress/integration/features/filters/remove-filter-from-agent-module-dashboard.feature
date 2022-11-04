@@ -1,4 +1,4 @@
-Feature: Validate that the added filter label is remove after click remove filter option modules Dashboard
+Feature: Validate that the added filter label is remove after click remove filter option agent modules Dashboard
 
   As a Wazuh user
   I want to set a new filter
