@@ -8,7 +8,7 @@ const removeController = (id) => {
     const index = aborts.findIndex(object => {
         return object.id === id;
     });
-    if(!id){
+    if (!id) {
         return;
     }
     aborts.splice(index);
@@ -18,7 +18,8 @@ const removeController = (id) => {
 export const disableRequests = () => {
     allow = false;
     aborts.forEach(item => {
-    item.controller.abort();})
+        item.controller.abort();
+    })
     return;
 }
 
@@ -40,7 +41,6 @@ export const request = async (info) => {
     if (!allow) {
         return Promise.reject();
     }
-    try {
 
     let { method, path, headers, data, timeout } = info;
     const core = getCore();
@@ -55,14 +55,15 @@ export const request = async (info) => {
         id: currentid
     }
     currentid++;
-    
+
     if (method !== 'GET') {
         options = { ...options, body: JSON.stringify(data) }
     }
-    
+
     if (allow) {
-        aborts.push({ id: options.id, controller: abort })
-            if (!method | ! path){
+        try {
+            aborts.push({ id: options.id, controller: abort })
+            if (!method | !path) {
                 throw new Error("Missing parameters")
             }
             if (timeout && timeout !== 0) {
@@ -78,8 +79,9 @@ export const request = async (info) => {
                 return Promise.resolve({ data: requestData });
             }
         }
+        catch (e) {
+            console.log('Rejecting with', e)
+            return Promise.reject(e);
+        }
     }
-    catch (e) {
-        return Promise.reject(e);
-    }
- }
+}
