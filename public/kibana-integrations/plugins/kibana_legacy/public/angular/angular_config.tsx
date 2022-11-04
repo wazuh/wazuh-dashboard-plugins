@@ -26,7 +26,7 @@ import {
   IRootScopeService,
 } from 'angular';
 import $ from 'jquery';
-import { set } from '@elastic/safer-lodash-set';
+import { set } from '@kbn/safer-lodash-set';
 import { get } from 'lodash';
 import * as Rx from 'rxjs';
 import { ChromeBreadcrumb, EnvironmentMode, PackageInfo } from 'kibana/public';
