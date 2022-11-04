@@ -10,7 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 
-import axios from 'axios';
 import { AppState } from './app-state';
 import { WazuhConfig } from './wazuh-config';
 import { ApiCheck } from './wz-api-check';
@@ -18,6 +17,7 @@ import { WzMisc } from '../factories/misc';
 import { OdfeUtils } from '../utils';
 import { getHttp, getDataPlugin } from '../kibana-services';
 import { PLUGIN_PLATFORM_REQUEST_HEADERS } from '../../common/constants';
+import { request } from '../services/request-handler';
 
 export class GenericRequest {
   static async request(method, path, payload = null, returnError = false) {
@@ -33,9 +33,9 @@ export class GenericRequest {
       };
       const tmpUrl = getHttp().basePath.prepend(path);
 
-      try{
+      try {
         requestHeaders.pattern = (await getDataPlugin().indexPatterns.get(AppState.getCurrentPattern())).title;
-      }catch(error){};
+      } catch (error) { };
 
       try {
         requestHeaders.id = JSON.parse(AppState.getCurrentAPI()).id;
@@ -48,40 +48,36 @@ export class GenericRequest {
       if (method === 'GET') {
         options = {
           method: method,
-          headers: requestHeaders,
-          url: tmpUrl,
+          path: path,
           timeout: timeout || 20000
         };
       }
       if (method === 'PUT') {
         options = {
           method: method,
-          headers: requestHeaders,
           data: payload,
-          url: tmpUrl,
+          path: path,
           timeout: timeout || 20000
         };
       }
       if (method === 'POST') {
         options = {
           method: method,
-          headers: requestHeaders,
           data: payload,
-          url: tmpUrl,
+          path: path,
           timeout: timeout || 20000
         };
       }
       if (method === 'DELETE') {
         options = {
           method: method,
-          headers: requestHeaders,
           data: payload,
-          url: tmpUrl,
+          path: path,
           timeout: timeout || 20000
         };
       }
 
-      Object.assign(data, await axios(options));
+      Object.assign(data, await request(options));
       if (!data) {
         throw new Error(
           `Error doing a request to ${tmpUrl}, method: ${method}.`
@@ -100,9 +96,9 @@ export class GenericRequest {
           const wzMisc = new WzMisc();
           wzMisc.setApiIsDown(true);
 
-          if (!window.location.hash.includes('#/settings') && 
-          !window.location.hash.includes('#/health-check') &&
-          !window.location.hash.includes('#/blank-screen')) {
+          if (!window.location.hash.includes('#/settings') &&
+            !window.location.hash.includes('#/health-check') &&
+            !window.location.hash.includes('#/blank-screen')) {
             window.location.href = getHttp().basePath.prepend('/app/wazuh#/health-check');
           }
         }
