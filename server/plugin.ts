@@ -35,6 +35,7 @@ import * as ApiInterceptor  from './lib/api-interceptor';
 import { schema, TypeOf } from '@kbn/config-schema';
 import type { Observable } from 'rxjs';
 import { first } from 'rxjs/operators';
+import {disableRequests} from '../public/services/request-handler'
 
 declare module 'kibana/server' {
   interface RequestHandlerContext {
@@ -73,6 +74,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     let wazuhSecurity;
     core.http.registerRouteHandlerContext('wazuh', async(context, request) => {
       !wazuhSecurity && (wazuhSecurity = await SecurityObj(plugins, context));
+       if(!request.auth.isAuthenticated){
+        disableRequests();
+      }
       return {
         logger: this.logger,
         server: {
