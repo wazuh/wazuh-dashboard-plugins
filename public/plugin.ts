@@ -41,13 +41,19 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
   private innerAngularInitialized: boolean = false;
   private stateUpdater = new BehaviorSubject<AppUpdater>(() => ({}));
   private hideTelemetryBanner?: () => void;
-  public async setup(core: CoreSetup, plugins: WazuhSetupPlugins): WazuhSetup {
+
+  public async logoInitialStateFunction(core: CoreSetup){
+    const logosInitialState = await core.http.get('/api/logos');
+    return logosInitialState;
+  }
+
+  public setup(core: CoreSetup, plugins: WazuhSetupPlugins): WazuhSetup {
     const UI_THEME = core.uiSettings.get('theme:darkMode') ? 'dark' : 'light';
 
     // Get custom logos configuration to start up the app with the correct logos
     let logosInitialState={};
     try{
-      logosInitialState = await core.http.get(`/api/logos`);
+      logosInitialState = this.logoInitialStateFunction(core);
     }
     catch(error){
       console.error('plugin.ts: Error getting logos configuration', error);
