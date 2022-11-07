@@ -252,7 +252,7 @@ export const statisticsTemplate = {
       },
       "timestamp" : {
         "type" : "date",
-        "format" : "dateOptionalTime"
+        "format" : "date_optional_time"
       }
     }
   }

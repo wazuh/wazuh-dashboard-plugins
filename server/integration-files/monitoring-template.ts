@@ -18,7 +18,7 @@ export const monitoringTemplate = {
     properties: {
       timestamp: {
         type: 'date',
-        format: 'dateOptionalTime'
+        format: 'date_optional_time'
       },
       status: {
         type: 'keyword'
