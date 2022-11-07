@@ -1,10 +1,9 @@
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react';
+import { render, fireEvent, findByText } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { act } from 'react-dom/test-utils';
 import ServerAddress from './server-address';
 import * as registerAgentsUtils from '../utils';
-import { parseNodeIPs } from '../utils';
 
 const mockedNodesIps = [
   {
@@ -41,7 +40,7 @@ const mockedClusterNodes = {
 };
 
 const promiseFetchOptions = Promise.resolve(
-  registerAgentsUtils.parseNodesInOptions(mockedClusterNodes)
+  registerAgentsUtils.parseNodesInOptions(mockedClusterNodes),
 );
 const mockedFetchOptions = () => promiseFetchOptions;
 
@@ -55,28 +54,49 @@ describe('Server Address Combobox', () => {
       <ServerAddress
         onChange={() => {}}
         fetchOptions={() =>
-          Promise.resolve(registerAgentsUtils.parseNodesInOptions(mockedClusterNodes))
+          Promise.resolve(
+            registerAgentsUtils.parseNodesInOptions(mockedClusterNodes),
+          )
         }
-      />
+      />,
     );
     expect(container).toBeInTheDocument();
   });
 
   it('should match snapshot', () => {
     const { container } = render(
-      <ServerAddress onChange={() => {}} fetchOptions={mockedFetchOptions} />
+      <ServerAddress onChange={() => {}} fetchOptions={mockedFetchOptions} />,
     );
     expect(container).toMatchSnapshot();
   });
 
-  it('should set "master node" like default value when combobox is initiliazed', async () => {
-    const { container, getByText } = render(
+  it('should set default combobox value and disable input when defaultValue is defined', async () => {
+    const onChangeMocked = jest.fn();
+    const { container, getByText, getByRole } = render(
       <ServerAddress
-        onChange={() => {}}
+        defaultValue={'default-dns'}
+        onChange={onChangeMocked}
         fetchOptions={mockedFetchOptions}
-      />
+      />,
     );
-    const spy = jest.spyOn(registerAgentsUtils, 'parseNodeIPs');
+
+    await act(async () => {
+      await promiseFetchOptions;
+      expect(onChangeMocked).toBeCalledTimes(1);
+      expect(onChangeMocked).toBeCalledWith([
+        { label: 'default-dns', value: 'default-dns' },
+      ]);
+      expect(getByText('default-dns')).toBeInTheDocument();
+      expect(getByRole('textbox')).toHaveAttribute('disabled');
+      expect(container).toBeInTheDocument();
+    });
+  });
+
+  it('should set node type master like default value when combobox is initiliazed and not have defaultValue', async () => {
+    const { container, getByText } = render(
+      <ServerAddress onChange={() => {}} fetchOptions={mockedFetchOptions} />,
+    );
+
     await act(async () => {
       await promiseFetchOptions; // waiting for the combobox items are loaded
       expect(getByText('master-node')).toBeInTheDocument();
@@ -85,170 +105,91 @@ describe('Server Address Combobox', () => {
   });
 
   it('should render the correct number of options', async () => {
-    const { getByRole, getByText } = render(
-      <ServerAddress
-        onChange={() => {}}
-        fetchOptions={mockedFetchOptions}
-      />
+    const { getByRole, findByText } = render(
+      <ServerAddress onChange={() => {}} fetchOptions={mockedFetchOptions} />,
     );
+
     await act(async () => {
       await promiseFetchOptions; // waiting for the combobox items are loaded
-      fireEvent.click(getByRole('button', { name: 'Open list of options'}));
-      expect(getByText(mockedNodesIps[0].name)).toBeInTheDocument(); 
-      mockedNodesIps.splice(1,mockedNodesIps.length).forEach(nodeItem => {
-        expect(getByText(`${nodeItem.name}:${nodeItem.ip}`)).toBeInTheDocument();
-      })
+      fireEvent.click(getByRole('button', { name: 'Clear input' }));
+      await findByText(`${mockedNodesIps[0].name}:${mockedNodesIps[0].ip}`);
+      await findByText(`${mockedNodesIps[1].name}:${mockedNodesIps[1].ip}`);
+      await findByText(`${mockedNodesIps[2].name}:${mockedNodesIps[2].ip}`);
     });
+    
   });
 
-  it('should allow multiple selection and return options selecteds', async () => {
-    const { getByRole, getByText, container } = render(
-      <ServerAddress
-        onChange={() => {}}
-        fetchOptions={mockedFetchOptions}
-      />
-    );
-    await act(async () => {
-      await promiseFetchOptions; // waiting for the combobox items are loaded
-      fireEvent.click(getByRole('button', { name: 'Clear input' }));      
-      fireEvent.click(getByText(`master-node:wazuh-master`));
-      fireEvent.click(getByText(`worker1:172.26.0.7`));
-      fireEvent.click(getByText(`worker2:172.26.0.6`));
-      expect(container).toBeInTheDocument();
-    });
-  });
-
-
-
-  it('should allow multiple selection and return options selecteds delimitered by COMMA when OS is NOT WINDOWS', async () => {
-
-    const onChangeMocked = (value) => {
-      parseNodeIPs(value, 'aix');
-    }
-
-    const { getByRole, getByText, container } = render(
+  it('should allow only single selection', async () => {
+    const onChangeMocked = jest.fn();
+    const { getByRole, getByText,findByText } = render(
       <ServerAddress
         onChange={onChangeMocked}
         fetchOptions={mockedFetchOptions}
-      />
+      />,
     );
-    const spy = jest.spyOn(registerAgentsUtils, 'parseNodeIPs');
     await act(async () => {
       await promiseFetchOptions; // waiting for the combobox items are loaded
-      fireEvent.click(getByRole('button', { name: 'Clear input' }));      
-      fireEvent.click(getByText(`master-node:wazuh-master`));
-      fireEvent.click(getByText(`worker1:172.26.0.7`));
-      fireEvent.click(getByText(`worker2:172.26.0.6`));
-      expect(spy).toBeCalledTimes(5);
-      expect(spy.mock.results[4].value).toBe('wazuh-master,172.26.0.7,172.26.0.6');
-      expect(container).toBeInTheDocument();
-    });
-  });
-
-
-  it('should allow multiple selection and return options selecteds delimitered by SEMICOLON when OS is WINDOWS', async () => {
-
-    const onChangeMocked = (value) => {
-      parseNodeIPs(value, 'win');
-    }
-
-    const { getByRole, getByText, container } = render(
-      <ServerAddress
-        onChange={onChangeMocked}
-        fetchOptions={mockedFetchOptions}
-      />
-    );
-    const spy = jest.spyOn(registerAgentsUtils, 'parseNodeIPs');
-    await act(async () => {
-      await promiseFetchOptions; // waiting for the combobox items are loaded
-      fireEvent.click(getByRole('button', { name: 'Clear input' }));      
-      fireEvent.click(getByText(`master-node:wazuh-master`));
-      fireEvent.click(getByText(`worker1:172.26.0.7`));
-      fireEvent.click(getByText(`worker2:172.26.0.6`));
-      expect(spy).toBeCalledTimes(5);
-      expect(spy.mock.results[4].value).toBe('wazuh-master;172.26.0.7;172.26.0.6');
-      expect(container).toBeInTheDocument();
+      fireEvent.click(getByRole('button', { name: 'Clear input' }));
+      const serverAddresInput = getByRole('textbox');
+      fireEvent.change(serverAddresInput, { target: { value: 'first-typed' } });
+      fireEvent.keyDown(serverAddresInput, { key: 'Enter', code: 'Enter' });
+      fireEvent.change(serverAddresInput, { target: { value: 'last-typed' } });
+      fireEvent.keyDown(serverAddresInput, { key: 'Enter', code: 'Enter' });
+      expect(onChangeMocked).toHaveBeenLastCalledWith([{ label: 'last-typed', value: 'last-typed', nodetype: 'custom' }]);
+      expect(getByText('last-typed')).toBeInTheDocument();
     });
   });
 
   it('should return EMPTY parsed Node IPs when options are not selected', async () => {
-
-    const onChangeMocked = (value) => {
-      parseNodeIPs(value, 'win');
-    }
-
+    const onChangeMocked = jest.fn();
     const { getByRole, container } = render(
       <ServerAddress
         onChange={onChangeMocked}
         fetchOptions={mockedFetchOptions}
-      />
+      />,
     );
-    const spy = jest.spyOn(registerAgentsUtils, 'parseNodeIPs');
     await act(async () => {
       await promiseFetchOptions; // waiting for the combobox items are loaded
       fireEvent.click(getByRole('button', { name: 'Clear input' }));
-      expect(spy).toBeCalledTimes(2);
-      expect(spy.mock.results[1].value).toBe('');
+      expect(onChangeMocked).toBeCalledTimes(2);
+      expect(onChangeMocked).toBeCalledWith([]);
       expect(container).toBeInTheDocument();
     });
   });
 
   it('should allow create customs options when user type and trigger enter key', async () => {
-
-    const onChangeMocked = (value) => {
-      parseNodeIPs(value, 'win');
-    }
+    const onChangeMocked = jest.fn();
 
     const { getByRole } = render(
       <ServerAddress
         onChange={onChangeMocked}
         fetchOptions={mockedFetchOptions}
-      />
+      />,
     );
-    const spy = jest.spyOn(registerAgentsUtils, 'parseNodeIPs');
     await act(async () => {
       await promiseFetchOptions; // waiting for the combobox items are loaded
-      fireEvent.change(getByRole('textbox'), { target: { value: 'custom-ip-dns' }})
+      fireEvent.change(getByRole('textbox'), {
+        target: { value: 'custom-ip-dns' },
+      });
       fireEvent.keyDown(getByRole('textbox'), { key: 'Enter', code: 'Enter' });
-      expect(spy).toBeCalledTimes(2);
-      expect(spy.mock.results[1].value).toBe('wazuh-master;custom-ip-dns');
+      expect(onChangeMocked).toBeCalledTimes(2);
+      expect(onChangeMocked).toHaveBeenNthCalledWith(2,[{ label: 'custom-ip-dns', value: 'custom-ip-dns', nodetype: 'custom' }]);
     });
-  })
+  });
 
   it('should show "node.name:node.ip" in the combobox options', async () => {
     const { getByRole, getByText } = render(
-      <ServerAddress
-        onChange={() => {}}
-        fetchOptions={mockedFetchOptions}
-      />
+      <ServerAddress onChange={() => {}} fetchOptions={mockedFetchOptions} />,
     );
     await act(async () => {
       await promiseFetchOptions; // waiting for the combobox items are loaded
       fireEvent.click(getByRole('button', { name: 'Clear input' }));
-      mockedNodesIps.forEach(nodeItem => {
-        expect(getByText(`${nodeItem.name}:${nodeItem.ip}`)).toBeInTheDocument();
-      })
     });
-  })
 
-  it('should paste only "node.name" when is selected and return "node.ip"', async () => {
-    const onChangeMocked = (value) => {
-      parseNodeIPs(value, 'win');
-    }
-    const spy = jest.spyOn(registerAgentsUtils, 'parseNodeIPs');
-    const { getByRole, getByText } = render(
-      <ServerAddress
-        onChange={onChangeMocked}
-        fetchOptions={mockedFetchOptions}
-      />
-    );
-    await act(async () => {
-      await promiseFetchOptions; // waiting for the combobox items are loaded
-      fireEvent.click(getByRole('button', { name: 'Clear input' }));
-      fireEvent.click(getByText(`master-node:wazuh-master`));
-      fireEvent.click(getByText(`worker1:172.26.0.7`));
-      fireEvent.click(getByText(`worker2:172.26.0.6`));
-      expect(spy.mock.results[4].value).toBe('wazuh-master;172.26.0.7;172.26.0.6');
+    mockedNodesIps.forEach(nodeItem => {
+      expect(
+        getByText(`${nodeItem.name}:${nodeItem.ip}`),
+      ).toBeInTheDocument();
     });
-  })
+  });
 });

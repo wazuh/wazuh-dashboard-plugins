@@ -116,7 +116,7 @@ const ServerAddress = (props: Props) => {
     const newOption = {
       value: inputValue,
       label: inputValue,
-      nodeType: 'custom',
+      nodetype: 'custom',
     };
     // Create the option if it doesn't exist.
     if (
@@ -128,7 +128,7 @@ const ServerAddress = (props: Props) => {
       setNodeIPs([...nodeIPs, newOption]);
     }
     // Select the option.
-    handleOnChange([...selectedNodeIPs, newOption]);
+    handleOnChange([newOption]);
   };
 
   return (

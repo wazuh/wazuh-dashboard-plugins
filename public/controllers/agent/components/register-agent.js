@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component, Fragment } from 'react';
+import React, { Component, Fragment, useCallback } from 'react';
 import { version } from '../../../../package.json';
 import { WazuhConfig } from '../../../react-services/wazuh-config';
 import {
@@ -916,7 +916,7 @@ export const RegisterAgent = withErrorBoundary(
               <EuiCodeBlock style={codeBlock} language={language}>
                 {this.state.wazuhPassword && !this.state.showPassword ? this.obfuscatePassword(text) : text}
               </EuiCodeBlock>
-              <EuiCopy textToCopy={text}>
+              <EuiCopy textToCopy={text || ''}>
                 {(copy) => (
                   <div className="copy-overlay"  onClick={copy}>
                     <p><EuiIcon type="copy"/> Copy command</p>
@@ -952,7 +952,7 @@ export const RegisterAgent = withErrorBoundary(
                   <EuiCodeBlock style={codeBlock} language={language}>
                     {this.state.wazuhPassword && !this.state.showPassword ? this.obfuscatePassword(text) : text}
                   </EuiCodeBlock>
-                  <EuiCopy textToCopy={text}>
+                  <EuiCopy textToCopy={text || ''}>
                     {(copy) => (
                       <div className="copy-overlay" onClick={copy}>
                         <p><EuiIcon type="copy" /> Copy command</p>
@@ -1190,7 +1190,7 @@ export const RegisterAgent = withErrorBoundary(
       const setRemoteConfiguration = async (nodeSelected) => {
         const nodeName = nodeSelected?.label;
         if(!this.state.defaultServerAddress){
-          if(nodeSelected.nodeType !== 'custom'){
+          if(nodeSelected.nodetype !== 'custom'){
             const remoteConfig = await getRemoteConfiguration(nodeName);
             this.setState({ serverAddress: remoteConfig.name, udpProtocol: remoteConfig.isUdp, connectionSecure: remoteConfig.haveSecureConnection });
           }else{

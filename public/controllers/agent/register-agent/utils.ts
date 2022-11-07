@@ -16,22 +16,6 @@ type NodeResponse = {
 }
 
 /**
- * Get a list of nodes and parsed into a string separated by semicolon
- * @param selectedNodes
- * @param osSelected
- */
-export const parseNodeIPs = (selectedNodes: any, osSelected: string): string => {
-  const delimiter = osSelected === 'win' ? ';' : ','; // by default any another OS use comma as delimiter, to prevent add every OS here
-  let allNodeIps = '';
-  if (selectedNodes.length > 1) {
-    allNodeIps = selectedNodes.map((o: ServerAddressOptions ) => o.value).join(delimiter);
-  } else if (selectedNodes.length === 1) {
-    allNodeIps = selectedNodes[0].value;
-  }
-  return allNodeIps;
-};
-
-/**
  * Get the list of the cluster nodes and parse it into a list of options
  */
 export const getNodeIPs = async (): Promise<any> => {
