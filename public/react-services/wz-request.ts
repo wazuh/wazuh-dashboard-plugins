@@ -9,7 +9,6 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import axios from 'axios';
 import { AppState } from './app-state';
 import { ApiCheck } from './wz-api-check';
 import { WzAuthentication } from './wz-authentication';
@@ -18,7 +17,7 @@ import { WazuhConfig } from './wazuh-config';
 import { OdfeUtils } from '../utils';
 import IApiResponse from './interfaces/api-response.interface';
 import { getHttp } from '../kibana-services';
-import { PLUGIN_PLATFORM_REQUEST_HEADERS } from '../../common/constants';
+import { request } from '../services/request-handler';
 export class WzRequest {
   static wazuhConfig: any;
 
@@ -32,15 +31,13 @@ export class WzRequest {
     method,
     path,
     payload: any = null,
-    extraOptions: { shouldRetry?: boolean, checkCurrentApiIsUp?: boolean, overwriteHeaders?: any } = {
-      shouldRetry: true, 
-      checkCurrentApiIsUp: true,
-      overwriteHeaders: {}
+    extraOptions: { shouldRetry?: boolean, checkCurrentApiIsUp?: boolean } = {
+      shouldRetry: true,
+      checkCurrentApiIsUp: true
     }
   ) {
-    const shouldRetry = typeof extraOptions.shouldRetry === 'boolean' ? extraOptions.shouldRetry : true; 
+    const shouldRetry = typeof extraOptions.shouldRetry === 'boolean' ? extraOptions.shouldRetry : true;
     const checkCurrentApiIsUp = typeof extraOptions.checkCurrentApiIsUp === 'boolean' ? extraOptions.checkCurrentApiIsUp : true;
-    const overwriteHeaders = typeof extraOptions.overwriteHeaders === 'object' ? extraOptions.overwriteHeaders : {};
     try {
       if (!method || !path) {
         throw new Error('Missing parameters');
@@ -52,13 +49,12 @@ export class WzRequest {
       const url = getHttp().basePath.prepend(path);
       const options = {
         method: method,
-        headers: { ...PLUGIN_PLATFORM_REQUEST_HEADERS, 'content-type': 'application/json', ...overwriteHeaders },
-        url: url,
+        path: path,
         data: payload,
         timeout: timeout,
       };
 
-      const data = await axios(options);
+      const data = await request(options);
 
       if (data['error']) {
         throw new Error(data['error']);
@@ -68,7 +64,7 @@ export class WzRequest {
     } catch (error) {
       OdfeUtils.checkOdfeSessionExpired(error);
       //if the requests fails, we need to check if the API is down
-      if(checkCurrentApiIsUp){
+      if (checkCurrentApiIsUp) {
         const currentApi = JSON.parse(AppState.getCurrentAPI() || '{}');
         if (currentApi && currentApi.id) {
           try {
@@ -102,7 +98,7 @@ export class WzRequest {
       }
       return errorMessage
         ? Promise.reject(this.returnErrorInstance(error, errorMessage))
-        : Promise.reject(this.returnErrorInstance(error,'Server did not respond'));
+        : Promise.reject(this.returnErrorInstance(error, 'Server did not respond'));
     }
   }
 
@@ -113,9 +109,9 @@ export class WzRequest {
    * @param {Object} body Request body
    */
   static async apiReq(
-    method, 
-    path, 
-    body, 
+    method,
+    path,
+    body,
     options: { checkCurrentApiIsUp?: boolean } = { checkCurrentApiIsUp: true }
   ): Promise<IApiResponse<any>> {
     try {
@@ -172,8 +168,8 @@ export class WzRequest {
    * @param message 
    * @returns error
    */
-  static returnErrorInstance(error, message){
-    if(!error || typeof error === 'string'){
+  static returnErrorInstance(error, message) {
+    if (!error || typeof error === 'string') {
       return new Error(message || error);
     }
     error.message = message
