@@ -1,4 +1,5 @@
 import { WzRequest } from '../../../react-services/wz-request';
+import { ServerAddressOptions } from '../register-agent/steps';
 
 type Protocol = 'TCP' | 'UDP';
 
@@ -17,11 +18,11 @@ type RemoteConfig = {
 };
 
 /**
- * Get the remote configuration from nodes registered in the cluster
+ * Get the remote configuration from api
  */
-export const getRemoteConfiguration = async (
+async function getRemoteConfiguration(
   nodeName: string,
-): Promise<RemoteConfig> => {
+): Promise<RemoteConfig>{
   let config: RemoteConfig = {
     name: nodeName,
     isUdp: null,
@@ -61,10 +62,36 @@ export const getRemoteConfiguration = async (
  * Get the remote protocol available from list of protocols
  * @param protocols 
  */
-const getRemoteProtocol = (protocols: Protocol[]) => {
+function getRemoteProtocol(protocols: Protocol[]) {
   if (protocols.length === 1) {
     return protocols[0];
   } else {
     return !protocols.includes('TCP') ? 'UDP' : 'TCP';
   }
 };
+
+
+/**
+ * Get the remote configuration from nodes registered in the cluster and decide the protocol to setting up in deploy agent param
+ * @param nodeSelected 
+ * @param defaultServerAddress 
+ */
+async function getConnectionConfig(nodeSelected: ServerAddressOptions, defaultServerAddress?: string) {
+  const nodeName = nodeSelected?.label;
+  if(!defaultServerAddress){
+    if(nodeSelected.nodetype !== 'custom'){
+      const remoteConfig = await getRemoteConfiguration(nodeName);
+      return { serverAddress: remoteConfig.name, udpProtocol: remoteConfig.isUdp, connectionSecure: remoteConfig.haveSecureConnection };
+    }else{
+      return { serverAddress: nodeName, udpProtocol: true, connectionSecure: true };
+    }
+  }else{
+    return { serverAddress: defaultServerAddress, udpProtocol: true, connectionSecure: true };
+  }
+}
+
+
+export {
+  getConnectionConfig,
+  getRemoteConfiguration,
+}

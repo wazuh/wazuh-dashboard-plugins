@@ -52,7 +52,7 @@ const ServerAddress = (props: Props) => {
    */
   const setDefaultValue = async () => {
     if (defaultValue) {
-      const defaultNode = [{ label: defaultValue, value: defaultValue }];
+      const defaultNode = [{ label: defaultValue, value: defaultValue, nodetype: 'custom' }];
       handleOnChange(defaultNode);
       setIsDisabled(true);
     } else {

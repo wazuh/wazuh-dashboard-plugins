@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, fireEvent, findByText } from '@testing-library/react';
+import { render, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { act } from 'react-dom/test-utils';
 import ServerAddress from './server-address';
@@ -84,7 +84,7 @@ describe('Server Address Combobox', () => {
       await promiseFetchOptions;
       expect(onChangeMocked).toBeCalledTimes(1);
       expect(onChangeMocked).toBeCalledWith([
-        { label: 'default-dns', value: 'default-dns' },
+        { label: 'default-dns', value: 'default-dns', nodetype: 'custom' }
       ]);
       expect(getByText('default-dns')).toBeInTheDocument();
       expect(getByRole('textbox')).toHaveAttribute('disabled');

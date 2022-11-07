@@ -44,7 +44,7 @@ import { webDocumentationLink } from '../../../../common/services/web_documentat
 import { architectureButtons, architectureButtonsi386, architecturei386Andx86_64, versionButtonsRaspbian, versionButtonsSuse, versionButtonsOracleLinux, versionButtonFedora, architectureButtonsSolaris, architectureButtonsWithPPC64LE, architectureButtonsOpenSuse, architectureButtonsAix, architectureButtonsHpUx, versionButtonAmazonLinux, versionButtonsRedHat, versionButtonsCentos, architectureButtonsMacos, osButtons, versionButtonsDebian, versionButtonsUbuntu, versionButtonsWindows, versionButtonsMacOS, versionButtonsOpenSuse, versionButtonsSolaris, versionButtonsAix, versionButtonsHPUX } from '../wazuh-config'
 import  ServerAddress  from '../register-agent/steps/server-address';
 import { fetchClusterNodesOptions } from '../register-agent/utils'
-import { getRemoteConfiguration } from './register-agent-service'
+import { getConnectionConfig } from './register-agent-service'
 
 export const RegisterAgent = withErrorBoundary(
 
@@ -168,18 +168,6 @@ export const RegisterAgent = withErrorBoundary(
         return (result.data || {}).data || {};
       } catch (error) {
         this.setState({ gotErrorRegistrationServiceInfo: true });
-        throw new Error(error);
-      }
-    }
-
-    async getRemoteInfo() {
-      try {
-        const result = await WzRequest.apiReq('GET', '/agents/000/config/request/remote', {});
-        const remote = ((result.data || {}).data || {}).remote || {};
-        if (remote.length === 2) {
-          this.setState({ udpProtocol: true })
-        }
-      } catch (error) {
         throw new Error(error);
       }
     }
@@ -1183,23 +1171,15 @@ export const RegisterAgent = withErrorBoundary(
           
         }else{
           const nodeSelected = selectedNodes[0];
-          await setRemoteConfiguration(nodeSelected)
+          const remoteConfig = await getConnectionConfig(nodeSelected);
+          this.setState({
+            serverAddress: remoteConfig.serverAddress,
+            udpProtocol: remoteConfig.udpProtocol,
+            connectionSecure: remoteConfig.connectionSecure
+          })
         }
       }
-
-      const setRemoteConfiguration = async (nodeSelected) => {
-        const nodeName = nodeSelected?.label;
-        if(!this.state.defaultServerAddress){
-          if(nodeSelected.nodetype !== 'custom'){
-            const remoteConfig = await getRemoteConfiguration(nodeName);
-            this.setState({ serverAddress: remoteConfig.name, udpProtocol: remoteConfig.isUdp, connectionSecure: remoteConfig.haveSecureConnection });
-          }else{
-            this.setState({ serverAddress: nodeName, udpProtocol: true, connectionSecure: true });
-          }
-        }else{
-          this.setState({ serverAddress: nodeName, udpProtocol: true, connectionSecure: true });
-        }
-      }
+      
 
       const steps = [
         {
