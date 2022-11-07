@@ -60,13 +60,16 @@ declare module 'kibana/server' {
 
 export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
   private readonly logger: Logger;
+  private savedObjectsIndex: string
 
   constructor(private readonly initializerContext: PluginInitializerContext) {
     this.logger = initializerContext.logger.get();
+    this.savedObjectsIndex = '';
   }
 
   public async setup(core: CoreSetup, plugins: PluginSetup) {
     this.logger.debug('Wazuh-wui: Setup');
+    this.savedObjectsIndex = core.savedObjects.getKibanaIndex();
 
     const serverInfo = core.http.getServerInfo();
 
@@ -132,7 +135,8 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         logger: this.logger.get('initialize'),
         api: wazuhApiClient
       },
-      server: contextServer
+      server: contextServer,
+      savedObjectsIndex: this.savedObjectsIndex
     });
 
     // Migration tasks
@@ -142,7 +146,8 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         logger: this.logger.get('migration-task'),
         api: wazuhApiClient
       },
-      server: contextServer
+      server: contextServer,
+      savedObjectsIndex: this.savedObjectsIndex
     });
 
     // Monitoring
@@ -152,7 +157,8 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         logger: this.logger.get('monitoring'),
         api: wazuhApiClient
       },
-      server: contextServer
+      server: contextServer,
+      savedObjectsIndex: this.savedObjectsIndex
     });
 
     // Scheduler
@@ -162,7 +168,8 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         logger: this.logger.get('cron-scheduler'),
         api: wazuhApiClient
       },
-      server: contextServer
+      server: contextServer,
+      savedObjectsIndex: this.savedObjectsIndex
     });
 
     // Queue
@@ -172,7 +179,8 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         logger: this.logger.get('queue'),
         api: wazuhApiClient
       },
-      server: contextServer
+      server: contextServer,
+      savedObjectsIndex: this.savedObjectsIndex
     });
     return {};
   }

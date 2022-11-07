@@ -45,10 +45,10 @@ const checkPluginPlatformStatus = async function (context) {
  const checkElasticsearchServer = async function (context) {
    try {
      const data = await context.core.elasticsearch.client.asInternalUser.indices.exists({
-       index: context.server.config.kibana.index
+       index: context.savedObjectsIndex
      });
  
-     return data.body;
+     return data;
    } catch (error) {
      log('scheduler-handler:checkElasticsearchServer', error.message || error);
      return Promise.reject(error);

@@ -22,7 +22,7 @@ import { getSettingDefaultValue, getSettingsDefault } from '../../../common/serv
 
 
 export function jobInitializeRun(context) {
-  const PLUGIN_PLATFORM_INDEX = context.server.config.kibana.index;
+  const PLUGIN_PLATFORM_INDEX = context.savedObjectsIndex;
   log('initialize', `${PLUGIN_PLATFORM_NAME} index: ${PLUGIN_PLATFORM_INDEX}`, 'info');
   log('initialize', `App revision: ${packageJSON.revision}`, 'info');
 
@@ -274,7 +274,7 @@ export function jobInitializeRun(context) {
       const response = await context.core.elasticsearch.client.asInternalUser.indices.exists({
         index: PLUGIN_PLATFORM_INDEX
       });
-      if (response.body) {
+      if (response) {
         // It exists, initialize!
         await init();
       } else {

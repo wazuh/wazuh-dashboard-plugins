@@ -312,10 +312,10 @@ async function checkPluginPlatformStatus(context) {
 async function checkElasticsearchServer(context) {
   try {
     const data = await context.core.elasticsearch.client.asInternalUser.indices.exists({
-      index: context.server.config.kibana.index
+      index: context.savedObjectsIndex
     });
 
-    return data.body;
+    return data;
     // TODO: check if Elasticsearch can receive requests
     // if (data) {
     //   const pluginsData = await this.server.plugins.elasticsearch.waitUntilReady();
