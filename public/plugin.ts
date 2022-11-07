@@ -42,30 +42,13 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
   private innerAngularInitialized: boolean = false;
   private stateUpdater = new BehaviorSubject<AppUpdater>(() => ({}));
   private hideTelemetryBanner?: () => void;
-
-  public async logoInitialStateFunction(core: CoreSetup){
-    const logosInitialState = await core.http.get('/api/logos');
-    return logosInitialState;
-  }
-
   public setup(core: CoreSetup, plugins: WazuhSetupPlugins): WazuhSetup {
     const UI_THEME = core.uiSettings.get('theme:darkMode') ? 'dark' : 'light';
-
-    // Get custom logos configuration to start up the app with the correct logos
-    let logosInitialState={};
-    try{
-      logosInitialState = this.logoInitialStateFunction(core);
-    }
-    catch(error){
-      console.error('plugin.ts: Error getting logos configuration', error);
-    }
 
     core.application.register({
       id: `wazuh`,
       title: 'Wazuh',
       icon: core.http.basePath.prepend(
-        logosInitialState?.logos?.[SIDEBAR_LOGO] ?
-          getAssetURL(logosInitialState?.logos?.[SIDEBAR_LOGO]) :
           getThemeAssetURL('icon.svg', UI_THEME)),
       mount: async (params: AppMountParameters) => {
         try {
@@ -73,10 +56,20 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
             throw Error('Wazuh plugin method initializeInnerAngular is undefined');
           }
 
+          // Get custom logos configuration to start up the app with the correct logos
+          let logosInitialState={};
+          try{
+            logosInitialState = await core.http.get(`/api/logos`);
+          }
+          catch(error){
+            console.error('plugin.ts: Error getting logos configuration', error);
+          }
+
           // Update redux app state logos with the custom logos
           if (logosInitialState?.logos) {
             store.dispatch(updateAppConfig(logosInitialState.logos));
-          }
+          };
+
           // hide the telemetry banner.
           // Set the flag in the telemetry saved object as the notice was seen and dismissed
           this.hideTelemetryBanner && await this.hideTelemetryBanner();
@@ -125,7 +118,7 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
         id: 'wazuh',
         label: 'Wazuh',
         order: 0,
-        euiIconType: core.http.basePath.prepend(logosInitialState?.logos?.[SIDEBAR_LOGO] ? getAssetURL(logosInitialState?.logos?.[SIDEBAR_LOGO]) : getThemeAssetURL('icon.svg', UI_THEME)),
+        euiIconType: core.http.basePath.prepend(getThemeAssetURL('icon.svg', UI_THEME)),
       },
       updater$: this.stateUpdater
     });
