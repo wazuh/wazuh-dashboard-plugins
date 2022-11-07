@@ -29,6 +29,8 @@ import { setErrorOrchestrator } from './react-services/common-services';
 import { ErrorOrchestratorService } from './react-services/error-orchestrator/error-orchestrator.service';
 import { getThemeAssetURL, getAssetURL } from './utils/assets';
 import { WzRequest } from './react-services/wz-request';
+import { initializeInterceptor } from './services/request-handler';
+
 const innerAngularName = 'app/wazuh';
 export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlugins, WazuhStartPlugins> {
   constructor(private readonly initializerContext: PluginInitializerContext) {}
@@ -141,6 +143,7 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
     setSavedObjects(core.savedObjects);
     setOverlays(core.overlays);
     setErrorOrchestrator(ErrorOrchestratorService);
+    initializeInterceptor();
     return {};
   }
 }
