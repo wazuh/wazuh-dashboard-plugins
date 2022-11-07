@@ -15,6 +15,7 @@ import {
   setCore,
   setPlugins,
   setCookies,
+  setUnifiedSearchPlugin,
 } from './kibana-services';
 import {
   AppPluginStartDependencies,
@@ -163,6 +164,7 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
     setHttp(core.http);
     setToasts(core.notifications.toasts);
     setDataPlugin(plugins.data);
+    setUnifiedSearchPlugin(plugins.navigation);
     setUiSettings(core.uiSettings);
     setChrome(core.chrome);
     setNavigationPlugin(plugins.navigation);

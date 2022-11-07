@@ -34,6 +34,8 @@ export const [getVisualizationsPlugin, setVisualizationsPlugin] =
   createGetterSetter<VisualizationsStart>('VisualizationsPlugin');
 export const [getNavigationPlugin, setNavigationPlugin] =
   createGetterSetter<NavigationPublicPluginStart>('NavigationPlugin');
+export const [getUnifiedSearchPlugin, setUnifiedSearchPlugin] =
+  createGetterSetter<NavigationPublicPluginStart>('UnifiedSearchPlugin');
 
 /**
  * set bootstrapped inner angular module

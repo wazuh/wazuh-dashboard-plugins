@@ -17,7 +17,7 @@ import { TimeRange, Query, Filter } from '../../../../../src/plugins/data/public
 import { KibanaContextProvider } from '../../../../../src/plugins/kibana_react/public';
 import { withPluginPlatformContext, withPluginPlatformContextExtendsProps } from '../common/hocs';
 import { storage } from './lib';
-import { getDataPlugin, getCore } from '../../kibana-services';
+import { getDataPlugin, getCore, getUnifiedSearchPlugin } from '../../kibana-services';
 import { AUTHORIZED_AGENTS } from '../../../common/constants';
 
 export interface IKbnSearchBarProps {
@@ -27,7 +27,7 @@ export interface IKbnSearchBarProps {
   onFiltersUpdated?: (filters: Filter[]) => void;
 }
 
-const SearchBar = getDataPlugin().ui.SearchBar;
+const SearchBar = getUnifiedSearchPlugin().ui.SearchBar;
 
 const KbnSearchBar: React.FunctionComponent<IKbnSearchBarProps> = (
   props: IKbnSearchBarProps & withPluginPlatformContextExtendsProps
