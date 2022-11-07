@@ -123,7 +123,7 @@ async function checkTemplate(context) {
         name: WAZUH_MONITORING_TEMPLATE_NAME
       });
       // Copy already created index patterns
-      monitoringTemplate.index_patterns = currentTemplate.body[WAZUH_MONITORING_TEMPLATE_NAME].index_patterns;
+      monitoringTemplate.index_patterns = currentTemplate[WAZUH_MONITORING_TEMPLATE_NAME].index_patterns;
     }catch (error) {
       // Init with the default index pattern
       monitoringTemplate.index_patterns = [getSettingDefaultValue('wazuh.monitoring.pattern')];
@@ -168,7 +168,7 @@ async function insertMonitoringDataElasticsearch(context, data) {
     try {
       await tryCatchForIndexPermissionError(monitoringIndexName) (async() => {
         const exists = await context.core.elasticsearch.client.asInternalUser.indices.exists({index: monitoringIndexName});
-        if(!exists.body){
+        if(!exists){
           await createIndex(context, monitoringIndexName);
         };
 
