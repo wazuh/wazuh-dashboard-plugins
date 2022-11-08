@@ -20,7 +20,7 @@ export async function getGroups(): Promise<any[]> {
 /**
  * Get the agents auth configuration
  */
-export async function getAuthInfo(): Promise<any|{error:boolean}> {
+export async function getAuthInfo(): Promise<any | { error: boolean }> {
   try {
     const result = await WzRequest.apiReq(
       'GET',
@@ -37,7 +37,7 @@ export async function getAuthInfo(): Promise<any|{error:boolean}> {
 
 /**
  * Return the cli command type by selected OS
- * @param selectedSO 
+ * @param selectedSO
  */
 export function getHighlightCodeLanguage(selectedSO: string) {
   if (selectedSO.toLowerCase() === 'win') {
@@ -49,23 +49,22 @@ export function getHighlightCodeLanguage(selectedSO: string) {
 
 /**
  * Return the password obfuscated
- * @param text 
+ * @param text
  */
 export function obfuscatePassword(text: string) {
   let obfuscate = '';
   const regex = /WAZUH_REGISTRATION_PASSWORD=?\040?\'(.*?)\'/gm;
   const match = regex.exec(text);
-  const password = match && match[1] ;
-  if (password) { 
-    [...password].forEach(() => (obfuscate += '*')); 
+  const password = match && match[1];
+  if (password) {
+    [...password].forEach(() => (obfuscate += '*'));
     text = text.replace(password, obfuscate);
   }
   return text;
 }
 
-
 /**
- * Add optionals parameters in the register agent command text 
+ * Add optionals parameters in the register agent command text
  */
 export function optionalDeploymentVariables({
   serverAddress,
@@ -105,8 +104,8 @@ export function optionalDeploymentVariables({
 
 /**
  * Returns the command to start an agent depending on the OS and the SYS
- * @param selectedOS 
- * @param selectedSYS 
+ * @param selectedOS
+ * @param selectedSYS
  */
 export function systemSelector(selectedOS: string, selectedSYS: string) {
   if (selectedOS === 'rpm') {
@@ -123,10 +122,10 @@ export function systemSelector(selectedOS: string, selectedSYS: string) {
 }
 
 /**
- * Get what is the SO incomplete in the deploy agent screen. Using the SO, Version and Architecture 
- * @param selectedOS 
- * @param selectedVersion 
- * @param selectedArchitecture 
+ * Get what is the SO incomplete in the deploy agent screen. Using the SO, Version and Architecture
+ * @param selectedOS
+ * @param selectedVersion
+ * @param selectedArchitecture
  */
 export function checkMissingOSSelection(
   selectedOS: string,
@@ -144,8 +143,99 @@ export function checkMissingOSSelection(
           ? ['OS architecture']
           : []),
       ];
+    case 'cent':
+      return [
+        ...(!selectedVersion ? ['OS version'] : []),
+        ...(selectedVersion && !selectedArchitecture
+          ? ['OS architecture']
+          : []),
+      ];
     case 'deb':
       return [...(!selectedArchitecture ? ['OS architecture'] : [])];
+    case 'ubu':
+      return [
+        ...(!selectedVersion ? ['OS version'] : []),
+        ...(selectedVersion && !selectedArchitecture
+          ? ['OS architecture']
+          : []),
+      ];
+    case 'win':
+      return [
+        ...(!selectedVersion ? ['OS version'] : []),
+        ...(selectedVersion && !selectedArchitecture
+          ? ['OS architecture']
+          : []),
+      ];
+    case 'macos':
+      return [
+        ...(!selectedVersion ? ['OS version'] : []),
+        ...(selectedVersion && !selectedArchitecture
+          ? ['OS architecture']
+          : []),
+      ];
+    case 'open':
+      return [
+        ...(!selectedVersion ? ['OS version'] : []),
+        ...(selectedVersion && !selectedArchitecture
+          ? ['OS architecture']
+          : []),
+      ];
+    case 'sol':
+      return [
+        ...(!selectedVersion ? ['OS version'] : []),
+        ...(selectedVersion && !selectedArchitecture
+          ? ['OS architecture']
+          : []),
+      ];
+    case 'aix':
+      return [
+        ...(!selectedVersion ? ['OS version'] : []),
+        ...(selectedVersion && !selectedArchitecture
+          ? ['OS architecture']
+          : []),
+      ];
+    case 'hp':
+      return [
+        ...(!selectedVersion ? ['OS version'] : []),
+        ...(selectedVersion && !selectedArchitecture
+          ? ['OS architecture']
+          : []),
+      ];
+    case 'amazonlinux':
+      return [
+        ...(!selectedVersion ? ['OS version'] : []),
+        ...(selectedVersion && !selectedArchitecture
+          ? ['OS architecture']
+          : []),
+      ];
+    case 'fedora':
+      return [
+        ...(!selectedVersion ? ['OS version'] : []),
+        ...(selectedVersion && !selectedArchitecture
+          ? ['OS architecture']
+          : []),
+      ];
+    case 'oraclelinux':
+      return [
+        ...(!selectedVersion ? ['OS version'] : []),
+        ...(selectedVersion && !selectedArchitecture
+          ? ['OS architecture']
+          : []),
+      ];
+    case 'suse':
+      return [
+        ...(!selectedVersion ? ['OS version'] : []),
+        ...(selectedVersion && !selectedArchitecture
+          ? ['OS architecture']
+          : []),
+      ];
+    case 'raspbian':
+      return [
+        ...(!selectedVersion ? ['OS version'] : []),
+        ...(selectedVersion && !selectedArchitecture
+          ? ['OS architecture']
+          : []),
+      ];
     default:
       return [];
   }
@@ -153,7 +243,7 @@ export function checkMissingOSSelection(
 
 /**
  * Get the register agent command text depending on the selected Options
- * @param props 
+ * @param props
  */
 export function getCommandText(props: RegisterAgentState) {
   const {
@@ -165,12 +255,30 @@ export function getCommandText(props: RegisterAgentState) {
 
   switch (selectedOS) {
     case 'rpm':
-        return `sudo ${optionalDeploymentVariables({...props})}yum install ${optionalPackages(selectedOS,selectedVersion,selectedArchitecture,wazuhVersion)}`;
+      return `sudo ${optionalDeploymentVariables({
+        ...props,
+      })}yum install ${optionalPackages(
+        selectedOS,
+        selectedVersion,
+        selectedArchitecture,
+        wazuhVersion,
+      )}`;
     case 'deb':
-        return `curl -so wazuh-agent-${wazuhVersion}.deb ${optionalPackages(selectedOS,selectedVersion,selectedArchitecture,wazuhVersion)} && sudo ${optionalDeploymentVariables({...props})}dpkg -i ./wazuh-agent-${wazuhVersion}.deb`;
+      return `curl -so wazuh-agent-${wazuhVersion}.deb ${optionalPackages(
+        selectedOS,
+        selectedVersion,
+        selectedArchitecture,
+        wazuhVersion,
+      )} && sudo ${optionalDeploymentVariables({
+        ...props,
+      })}dpkg -i ./wazuh-agent-${wazuhVersion}.deb`;
     case 'macos':
-        return `curl -so wazuh-agent-${wazuhVersion}.pkg https://packages.wazuh.com/4.x/macos/wazuh-agent-${wazuhVersion}-1.pkg && sudo launchctl setenv ${optionalDeploymentVariables({...props})}&& sudo installer -pkg ./wazuh-agent-${wazuhVersion}.pkg -target /`;
+      return `curl -so wazuh-agent-${wazuhVersion}.pkg https://packages.wazuh.com/4.x/macos/wazuh-agent-${wazuhVersion}-1.pkg && sudo launchctl setenv ${optionalDeploymentVariables(
+        { ...props },
+      )}&& sudo installer -pkg ./wazuh-agent-${wazuhVersion}.pkg -target /`;
     case 'win':
-        return `Invoke-WebRequest -Uri https://packages.wazuh.com/4.x/windows/wazuh-agent-${wazuhVersion}-1.msi -OutFile \${env:tmp}\\wazuh-agent-${wazuhVersion}.msi; msiexec.exe /i \${env:tmp}\\wazuh-agent-${wazuhVersion}.msi /q ${optionalDeploymentVariables({...props})}`;
-    }
+      return `Invoke-WebRequest -Uri https://packages.wazuh.com/4.x/windows/wazuh-agent-${wazuhVersion}-1.msi -OutFile \${env:tmp}\\wazuh-agent-${wazuhVersion}.msi; msiexec.exe /i \${env:tmp}\\wazuh-agent-${wazuhVersion}.msi /q ${optionalDeploymentVariables(
+        { ...props },
+      )}`;
+  }
 }
