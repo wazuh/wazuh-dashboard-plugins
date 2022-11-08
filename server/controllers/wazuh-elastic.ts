@@ -64,7 +64,7 @@ export class WazuhElasticCtrl {
       const data =
         await awaitContext.elasticsearch.client.asInternalUser.cat.templates();
 
-      const templates = data.body;
+      const templates = data;
       if (!templates || typeof templates !== 'string') {
         throw new Error(
           'An unknown error occurred when fetching templates from Elasticseach'
