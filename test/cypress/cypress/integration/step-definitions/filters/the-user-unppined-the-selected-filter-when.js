@@ -8,7 +8,8 @@ const pinFilterAction = getSelector('pinFilterAction', pageName);
 When('The user unppined the selected filter', () => {
   elementIsVisible(pinnedFilter);
   clickElement(pinnedFilter);
-  elementIsVisible(pinFilterAction);
-  clickElement(pinFilterAction);
+  cy.wait(12000);
+  //elementIsVisible(pinFilterAction);
+  //clickElement(pinFilterAction);
 
 })
