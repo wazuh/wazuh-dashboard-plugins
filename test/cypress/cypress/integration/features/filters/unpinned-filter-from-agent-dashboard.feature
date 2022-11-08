@@ -1,7 +1,7 @@
-Feature: Remove Pin filter from agent - Dashboard
+Feature: Unppined filter from agent - Dashboard
 
   As a Wazuh user
-  I want to pin a filter
+  I want to unppined a filter
   in order to aplly it across the modules
   Background:
     Given The wazuh admin user is logged
@@ -15,10 +15,11 @@ Feature: Remove Pin filter from agent - Dashboard
     And The user checks filter label is added
     And The user pins a filter
     And The user checks if the filter is displayed
+    And The user unppined the selected filter
     And The user navigates to the agent page
     And The user navigates to the agent dashboard
     And The user navigates to agentModule <Module Name>
-    Then The user checks if the filter is displayed
+    Then The user checks filter label is not added
     Examples:
       | Module Name          |
       | Security Events      |
