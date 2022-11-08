@@ -60,7 +60,9 @@ export class WazuhElasticCtrl {
    */
   async getTemplate(context: RequestHandlerContext, request: KibanaRequest<{ pattern: string }>, response: KibanaResponseFactory) {
     try {
-      const data = await context.core.elasticsearch.client.asInternalUser.cat.templates();
+      const awaitContext = await context.core;
+      const data =
+        await awaitContext.elasticsearch.client.asInternalUser.cat.templates();
 
       const templates = data.body;
       if (!templates || typeof templates !== 'string') {
@@ -144,7 +146,10 @@ export class WazuhElasticCtrl {
    */
   async checkPattern(context: RequestHandlerContext, request: KibanaRequest<{ pattern: string }>, response: KibanaResponseFactory) {
     try {
-      const data = await context.core.savedObjects.client.find<SavedObjectsFindResponse<SavedObject>>({ type: 'index-pattern' });
+      const awaitContext = await context.core;
+      const data = await awaitContext.savedObjects.client.find<
+        SavedObjectsFindResponse<SavedObject>
+      >({ type: 'index-pattern' });
 
       const existsIndexPattern = data.saved_objects.find(
         item => item.attributes.title === request.params.pattern
@@ -239,11 +244,14 @@ export class WazuhElasticCtrl {
         );
       payload.aggs['2'].terms.field = request.params.field;
 
-      const data = await context.core.elasticsearch.client.asCurrentUser.search({
-        size: 1,
-        index: request.params.pattern,
-        body: payload
-      });
+      const awaitContext = await context.core;
+      const data = await awaitContext.elasticsearch.client.asCurrentUser.search(
+        {
+          size: 1,
+          index: request.params.pattern,
+          body: payload,
+        },
+      );
 
       return data.body.hits.total.value === 0 ||
         typeof data.body.aggregations['2'].buckets[0] === 'undefined'
@@ -276,8 +284,9 @@ export class WazuhElasticCtrl {
       let results = false,
         forbidden = false;
       try {
-        results = await context.core.elasticsearch.client.asCurrentUser.search({
-          index: item.title
+        const awaitContext = await context.core;
+        results = await awaitContext.elasticsearch.client.asCurrentUser.search({
+          index: item.title,
         });
       } catch (error) {
         forbidden = true;
@@ -326,10 +335,12 @@ export class WazuhElasticCtrl {
    */
   async getCurrentPlatform(context: RequestHandlerContext, request: KibanaRequest<{ user: string }>, response: KibanaResponseFactory) {
     try {
+      const contextWazuh = await context.wazuh;
+      console.log(contextWazuh);
       return response.ok({
         body: {
-          platform: context.wazuh.security.platform
-        }
+          platform: contextWazuh.security.platform,
+        },
       });
     } catch (error) {
       log('wazuh-elastic:getCurrentPlatform', error.message || error);
@@ -539,7 +550,11 @@ export class WazuhElasticCtrl {
         return response.notFound({body:{message: `Visualizations not found for ${request.params.tab}`}});
       }
       log('wazuh-elastic:createVis', `${tabPrefix}[${tabSufix}] with index pattern ${request.params.pattern}`, 'debug');
-      const namespace = context.wazuh.plugins.spaces && context.wazuh.plugins.spaces.spacesService && context.wazuh.plugins.spaces.spacesService.getSpaceId(request);
+      const contextWazuh = await context.wazuh;
+      const namespace =
+        contextWazuh.plugins.spaces &&
+        contextWazuh.plugins.spaces.spacesService &&
+        contextWazuh.plugins.spaces.spacesService.getSpaceId(request);
       const raw = await this.buildVisualizationsRaw(
         file,
         request.params.pattern,
@@ -613,10 +628,14 @@ export class WazuhElasticCtrl {
   async haveSampleAlerts(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
     try {
       // Check if wazuh sample alerts index exists
-      const results = await Promise.all(Object.keys(WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS)
-        .map((category) => context.core.elasticsearch.client.asCurrentUser.indices.exists({
-          index: this.buildSampleIndexByCategory(category)
-        })));
+      const awaitContext = await context.core;
+      const results = await Promise.all(
+        Object.keys(WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS).map(category =>
+          awaitContext.elasticsearch.client.asCurrentUser.indices.exists({
+            index: this.buildSampleIndexByCategory(category),
+          }),
+        ),
+      );
       return response.ok({
         body: { sampleAlertsInstalled: results.some(result => result.body) }
       });
@@ -636,9 +655,11 @@ export class WazuhElasticCtrl {
     try {
       const sampleAlertsIndex = this.buildSampleIndexByCategory(request.params.category);
       // Check if wazuh sample alerts index exists
-      const existsSampleIndex = await context.core.elasticsearch.client.asCurrentUser.indices.exists({
-        index: sampleAlertsIndex
-      });
+      const awaitContext = await context.core;
+      const existsSampleIndex =
+        await awaitContext.elasticsearch.client.asCurrentUser.indices.exists({
+          index: sampleAlertsIndex,
+        });
       return response.ok({
         body: { index: sampleAlertsIndex, exists: existsSampleIndex.body }
       })
@@ -690,7 +711,14 @@ export class WazuhElasticCtrl {
       if (!apiHostID) {
         return ErrorResponse('No API id provided', 401, 401, response);
       };
-      const responseTokenIsWorking = await context.wazuh.api.client.asCurrentUser.request('GET', `//`, {}, { apiHostID });
+      const contextWazuh = await context.wazuh;
+      const responseTokenIsWorking =
+        await contextWazuh.api.client.asCurrentUser.request(
+          'GET',
+          `//`,
+          {},
+          { apiHostID },
+        );
       if (responseTokenIsWorking.status !== 200) {
         return ErrorResponse('Token is not valid', 500, 500, response);
       };
@@ -708,9 +736,11 @@ export class WazuhElasticCtrl {
       // Index alerts
 
       // Check if wazuh sample alerts index exists
-      const existsSampleIndex = await context.core.elasticsearch.client.asCurrentUser.indices.exists({
-        index: sampleAlertsIndex
-      });
+      const awaitContext = await context.core;
+      const existsSampleIndex =
+        await awaitContext.elasticsearch.client.asCurrentUser.indices.exists({
+          index: sampleAlertsIndex,
+        });
       if (!existsSampleIndex.body) {
         // Create wazuh sample alerts index
 
@@ -723,9 +753,10 @@ export class WazuhElasticCtrl {
           }
         };
 
-        await context.core.elasticsearch.client.asCurrentUser.indices.create({
+        const awaitContext = await context.core;
+        await awaitContext.elasticsearch.client.asCurrentUser.indices.create({
           index: sampleAlertsIndex,
-          body: configuration
+          body: configuration,
         });
         log(
           'wazuh-elastic:createSampleAlerts',
@@ -733,8 +764,7 @@ export class WazuhElasticCtrl {
           'debug'
         );
       }
-
-      await context.core.elasticsearch.client.asCurrentUser.bulk({
+      await awaitContext.elasticsearch.client.asCurrentUser.bulk({
         index: sampleAlertsIndex,
         body: bulk
       });
@@ -751,9 +781,9 @@ export class WazuhElasticCtrl {
         'wazuh-elastic:createSampleAlerts',
         `Error adding sample alerts to ${sampleAlertsIndex} index: ${error.message || error}`
       );
-      
+
       const [statusCode, errorMessage] = this.getErrorDetails(error);
-      
+
       return ErrorResponse(errorMessage || error, 1000, statusCode, response);
     }
   }
@@ -787,18 +817,29 @@ export class WazuhElasticCtrl {
       if (!apiHostID) {
         return ErrorResponse('No API id provided', 401, 401, response);
       };
-      const responseTokenIsWorking = await context.wazuh.api.client.asCurrentUser.request('GET', `//`, {}, { apiHostID });
+      const contextWazuh = await context.wazuh;
+      const responseTokenIsWorking =
+        await contextWazuh.api.client.asCurrentUser.request(
+          'GET',
+          `//`,
+          {},
+          { apiHostID },
+        );
       if (responseTokenIsWorking.status !== 200) {
         return ErrorResponse('Token is not valid', 500, 500, response);
       };
 
       // Check if Wazuh sample alerts index exists
-      const existsSampleIndex = await context.core.elasticsearch.client.asCurrentUser.indices.exists({
-        index: sampleAlertsIndex
-      });
+      const contextCore = await context.core;
+      const existsSampleIndex =
+        await contextCore.elasticsearch.client.asCurrentUser.indices.exists({
+          index: sampleAlertsIndex,
+        });
       if (existsSampleIndex.body) {
         // Delete Wazuh sample alerts index
-        await context.core.elasticsearch.client.asCurrentUser.indices.delete({ index: sampleAlertsIndex });
+        await contextCore.elasticsearch.client.asCurrentUser.indices.delete({
+          index: sampleAlertsIndex,
+        });
         log(
           'wazuh-elastic:deleteSampleAlerts',
           `Deleted ${sampleAlertsIndex} index`,
@@ -823,7 +864,10 @@ export class WazuhElasticCtrl {
 
   async alerts(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
     try {
-      const data = await context.core.elasticsearch.client.asCurrentUser.search(request.body);
+      const awaitContext = await context.core;
+      const data = await awaitContext.elasticsearch.client.asCurrentUser.search(
+        request.body,
+      );
       return response.ok({
         body: data.body
       });
@@ -838,10 +882,12 @@ export class WazuhElasticCtrl {
     try {
       const config = getConfiguration();
       const statisticsPattern = `${config['cron.prefix'] || 'wazuh'}-${config['cron.statistics.index.name'] || 'statistics'}*`; //TODO: replace by default as constants instead hardcoded ('wazuh' and 'statistics')
-      const existIndex = await context.core.elasticsearch.client.asCurrentUser.indices.exists({
-        index: statisticsPattern,
-        allow_no_indices: false
-      });
+      const awaitContext = await context.core;
+      const existIndex =
+        await awaitContext.elasticsearch.client.asCurrentUser.indices.exists({
+          index: statisticsPattern,
+          allow_no_indices: false,
+        });
       return response.ok({
         body: existIndex.body
       });
@@ -856,7 +902,8 @@ export class WazuhElasticCtrl {
     try {
       const config = getConfiguration();
       const monitoringIndexPattern = config['wazuh.monitoring.pattern'] || WAZUH_MONITORING_PATTERN;
-      const existIndex = await context.core.elasticsearch.client.asCurrentUser.indices.exists({
+      const awaitContext = await context.core;
+      const existIndex = await awaitContext.elasticsearch.client.asCurrentUser.indices.exists({
         index: monitoringIndexPattern,
         allow_no_indices: false
       });
@@ -871,9 +918,11 @@ export class WazuhElasticCtrl {
 
   async usingCredentials(context) {
     try {
-      const data = await context.core.elasticsearch.client.asInternalUser.cluster.getSettings(
-        { include_defaults: true }
-      );
+      const awaitContext = await context.core;
+      const data =
+        await awaitContext.elasticsearch.client.asInternalUser.cluster.getSettings(
+          { include_defaults: true },
+        );
       return (((((data || {}).body || {}).defaults || {}).xpack || {}).security || {}).user !== null;
     } catch (error) {
       return Promise.reject(error);
