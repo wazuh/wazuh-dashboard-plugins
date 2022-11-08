@@ -335,23 +335,20 @@ export const AgentsTable = withErrorBoundary(
     }
 
     addIconPlatformRender(agent) {
-      let icon = false;
+      let icon = '';
       const checkField = (field) => {
-        return field !== undefined ? field : '-';
+        return field !== undefined ? field : '';
       };
-      const os = (agent || {}).os;
+      const os = agent?.os || {};
 
-      if (((os || {}).uname || '').includes('Linux')) {
+      if ((os?.uname || '').includes('Linux')) {
         icon = 'linux';
-      } else if ((os || {}).platform === 'windows') {
+      } else if (os?.platform === 'windows') {
         icon = 'windows';
-      } else if ((os || {}).platform === 'darwin') {
+      } else if (os?.platform === 'darwin') {
         icon = 'apple';
       }
-      const os_name =
-        checkField(((agent || {}).os || {}).name) +
-        ' ' +
-        checkField(((agent || {}).os || {}).version);
+      const os_name = `${checkField(agent?.os?.name || '')} ${checkField(agent?.os?.version || '')}`;
 
       return (
         <span className="euiTableCellContent__text euiTableCellContent--truncateText">
@@ -359,7 +356,7 @@ export const AgentsTable = withErrorBoundary(
             className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`}
             aria-hidden="true"
           ></i>{' '}
-          {os_name === '- -' ? '-' : os_name}
+          {os_name.trim() || '-'}
         </span>
       );
     }
