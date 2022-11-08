@@ -3,7 +3,7 @@ import { render, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { act } from 'react-dom/test-utils';
 import ServerAddress from './server-address';
-import * as registerAgentsUtils from '../utils';
+import * as registerAgentsUtils from '../../components/register-agent-service';
 
 const mockedNodesIps = [
   {
