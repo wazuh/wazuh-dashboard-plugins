@@ -336,7 +336,6 @@ export class WazuhElasticCtrl {
   async getCurrentPlatform(context: RequestHandlerContext, request: KibanaRequest<{ user: string }>, response: KibanaResponseFactory) {
     try {
       const contextWazuh = await context.wazuh;
-      console.log(contextWazuh);
       return response.ok({
         body: {
           platform: contextWazuh.security.platform,
