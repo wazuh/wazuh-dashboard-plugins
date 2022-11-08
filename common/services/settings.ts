@@ -116,6 +116,10 @@ export function groupSettingsByCategory(settings: TPluginSettingWithKey[]){
 		// File size
 		...((options?.file?.size && typeof options.file.size.minBytes !== 'undefined') ? [`Minimum file size: ${formatBytes(options.file.size.minBytes)}.`] : []),
 		...((options?.file?.size && typeof options.file.size.maxBytes !== 'undefined') ? [`Maximum file size: ${formatBytes(options.file.size.maxBytes)}.`] : []),
+		// Multi line text
+		...((options?.maxRows && typeof options.maxRows !== 'undefined' ? [`Maximum amount of lines: ${options.maxRows}.`] : [])),
+		...((options?.minRows && typeof options.minRows !== 'undefined' ? [`Minimum amount of lines: ${options.minRows}.`] : [])),
+		...((options?.maxLength && typeof options.maxLength !== 'undefined' ? [`Maximum lines length is ${options.maxLength} characters.`] : [])),
 	].join(' ');
 };
 
@@ -129,4 +133,35 @@ export function formatLabelValuePair(label, value){
 	return label !== `${value}`
 		? `${value} (${label})`
 		: `${value}`
+};
+
+/**
+ * Get the configuration value if the customization is enabled.
+ * @param configuration JSON object from `wazuh.yml`
+ * @param settingKey key of the setting
+ * @returns 
+ */
+export function getCustomizationSetting(configuration: {[key: string]: any }, settingKey: string): any {
+  const isCustomizationEnabled = typeof configuration['customization.enabled'] === 'undefined'
+    ? getSettingDefaultValue('customization.enabled')
+    : configuration['customization.enabled'];
+  const defaultValue = getSettingDefaultValue(settingKey);
+
+	if ( isCustomizationEnabled && settingKey.startsWith('customization') && settingKey !== 'customization.enabled'){
+		return (typeof configuration[settingKey] !== 'undefined' ? resolveEmptySetting(settingKey, configuration[settingKey]) : defaultValue);
+	}else{
+		return defaultValue;
+	};
+};
+
+/**
+ * Returns the default value if not set when the setting is an empty string
+ * @param settingKey plugin setting
+ * @param value value of the plugin setting
+ * @returns 
+ */
+function resolveEmptySetting(settingKey: string, value : unknown){
+	return typeof value === 'string' && value.length === 0 && PLUGIN_SETTINGS[settingKey].defaultValueIfNotSet
+		? getSettingDefaultValue(settingKey)
+		: value;
 };
