@@ -31,7 +31,6 @@ import { getThemeAssetURL, getAssetURL } from './utils/assets';
 import { WzRequest } from './react-services/wz-request';
 import store from './redux/store';
 import { updateAppConfig } from './redux/actions/appConfigActions';
-import { initializeInterceptor } from './services/request-handler';
 
 const SIDEBAR_LOGO = 'customization.logo.sidebar';
 const innerAngularName = 'app/wazuh';
@@ -165,7 +164,6 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
     setSavedObjects(core.savedObjects);
     setOverlays(core.overlays);
     setErrorOrchestrator(ErrorOrchestratorService);
-    initializeInterceptor();
     return {};
   }
 }
