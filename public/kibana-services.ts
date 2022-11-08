@@ -12,6 +12,7 @@ import { createGetterSetter } from '../../../src/plugins/kibana_utils/common';
 import { DataPublicPluginStart } from '../../../src/plugins/data/public';
 import { VisualizationsStart } from '../../../src/plugins/visualizations/public';
 import { NavigationPublicPluginStart } from '../../../src/plugins/navigation/public';
+import { UnifiedSearchPublicPluginStart } from '../../../src/plugins/unified_search/public';
 import { AppPluginStartDependencies } from './types';
 
 let angularModule: any = null;
@@ -35,7 +36,7 @@ export const [getVisualizationsPlugin, setVisualizationsPlugin] =
 export const [getNavigationPlugin, setNavigationPlugin] =
   createGetterSetter<NavigationPublicPluginStart>('NavigationPlugin');
 export const [getUnifiedSearchPlugin, setUnifiedSearchPlugin] =
-  createGetterSetter<NavigationPublicPluginStart>('UnifiedSearchPlugin');
+  createGetterSetter<UnifiedSearchPublicPluginStart>('UnifiedSearchPlugin');
 
 /**
  * set bootstrapped inner angular module
