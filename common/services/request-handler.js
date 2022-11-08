@@ -1,4 +1,4 @@
-import { getCore } from '../../public/kibana-services'; //TODO: eplace with the corresponding 
+import { getCore } from '../../public/kibana-services'; //TODO: replace with the corresponding 
 import axios from 'axios';
 
 let allow = true;
@@ -17,17 +17,14 @@ const removeController = (id) => {
 }
 
 export const disableRequests = () => {
-    console.log('Disabling requests')
     allow = false;
     aborts.forEach(item => {
-      console.log('aborting request with id',item.id)
         item.controller.abort();
     })
     return;
 }
 
 export const initializeInterceptor = () => {
-  console.log('interceptor initialized')
     const core = getCore();
     core.http.intercept({
         responseError: (httpErrorResponse, controller) => {
@@ -43,7 +40,6 @@ export const initializeInterceptor = () => {
 
 export const request = async (options = '') => {
     if (!allow) {
-        console.log('tried to do request', options.method, options.url, 'but requests are disabled')
         return Promise.reject('Requests are disabled');
     }
     if (!options.method | !options.url) {
@@ -53,7 +49,6 @@ export const request = async (options = '') => {
     currentid++;
     const abort = new AbortController();
     if (allow) {
-      console.log('Doing request', options.method, options.url, 'with ID', requestId)
         try {
             aborts.push({ id: requestId, controller: abort });
             const requestData = await axios(options);
