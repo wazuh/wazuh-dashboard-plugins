@@ -9,7 +9,6 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import axios from 'axios';
 import { AppState } from './app-state';
 import { ApiCheck } from './wz-api-check';
 import { WzAuthentication } from './wz-authentication';
@@ -19,6 +18,8 @@ import { OdfeUtils } from '../utils';
 import IApiResponse from './interfaces/api-response.interface';
 import { getHttp } from '../kibana-services';
 import { PLUGIN_PLATFORM_REQUEST_HEADERS } from '../../common/constants';
+import { request } from '../../common/services/request-handler';
+
 export class WzRequest {
   static wazuhConfig: any;
 
@@ -58,7 +59,7 @@ export class WzRequest {
         timeout: timeout,
       };
 
-      const data = await axios(options);
+      const data = await request(options);
 
       if (data['error']) {
         throw new Error(data['error']);
