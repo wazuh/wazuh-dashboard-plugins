@@ -120,20 +120,25 @@ kbn-dis doc-table .kbnDocViewer__warning {
     flex-grow: 0;
 }
 
-.osButtonsStyle {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    grid-gap: 10px;
-}
-
-.osButtonsStyleMac {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-gap: 10px;
-}
-
 .message {
     margin-top: 10px;
     display: flex;
     flex-direction: row;
+}
+
+.euiButtonGroup__buttons {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-gap: 10px;
+    padding: 0 3px;
+}
+
+.flex {
+    display: flex;
+}
+
+.euiButtonGroup--small {
+    &.euiButtonGroupButton:not(:first-child) {
+    margin-left: 0;
+    }
 }
