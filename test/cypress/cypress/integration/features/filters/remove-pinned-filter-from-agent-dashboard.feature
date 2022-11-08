@@ -15,7 +15,6 @@ Feature: Remove Pin filter from agent - Dashboard
     And The user checks filter label is added
     And The user pins a filter
     And The user checks if the filter is displayed
-    And The user navigates overview page
     And The user navigates to the agent page
     And The user navigates to the agent dashboard
     And The user navigates to agentModule <Module Name>
