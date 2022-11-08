@@ -5,7 +5,10 @@ import {
   EuiText,
 } from '@elastic/eui';
 import React, { useEffect, useState } from 'react';
-import { getMasterNode } from '../utils';
+import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
+import { getErrorOrchestrator } from '../../../../react-services/common-services';
+import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
+import { getMasterNode } from '../../components/register-agent-service';
 
 type Props = {
   onChange: (value: EuiComboBoxOptionOption<ServerAddressOptions>[]) => void;
@@ -43,7 +46,19 @@ const ServerAddress = (props: Props) => {
       setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
-      throw new Error(`Error initializing Server Address: ${error}`);
+      const options = {
+        context: `${ServerAddress.name}.initialize`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        display: true,
+        store: false,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   };
 

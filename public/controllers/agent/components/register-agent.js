@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component, Fragment, useCallback } from 'react';
+import React, { Component, Fragment } from 'react';
 import { version } from '../../../../package.json';
 import { WazuhConfig } from '../../../react-services/wazuh-config';
 import {
@@ -43,8 +43,7 @@ import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
 import { architectureButtons, architectureButtonsi386, architecturei386Andx86_64, versionButtonsRaspbian, versionButtonsSuse, versionButtonsOracleLinux, versionButtonFedora, architectureButtonsSolaris, architectureButtonsWithPPC64LE, architectureButtonsOpenSuse, architectureButtonsAix, architectureButtonsHpUx, versionButtonAmazonLinux, versionButtonsRedHat, versionButtonsCentos, architectureButtonsMacos, osButtons, versionButtonsDebian, versionButtonsUbuntu, versionButtonsWindows, versionButtonsMacOS, versionButtonsOpenSuse, versionButtonsSolaris, versionButtonsAix, versionButtonsHPUX } from '../wazuh-config'
 import  ServerAddress  from '../register-agent/steps/server-address';
-import { fetchClusterNodesOptions } from '../register-agent/utils'
-import { getConnectionConfig } from './register-agent-service'
+import { getConnectionConfig, fetchClusterNodesOptions } from './register-agent-service'
 
 export const RegisterAgent = withErrorBoundary(
 
@@ -1168,16 +1167,37 @@ export const RegisterAgent = withErrorBoundary(
             udpProtocol: false,
             connectionSecure: null
           })
-          
         }else{
           const nodeSelected = selectedNodes[0];
-          const remoteConfig = await getConnectionConfig(nodeSelected);
-          this.setState({
-            serverAddress: remoteConfig.serverAddress,
-            udpProtocol: remoteConfig.udpProtocol,
-            connectionSecure: remoteConfig.connectionSecure
-          })
+          try {
+            const remoteConfig = await getConnectionConfig(nodeSelected);
+            this.setState({
+              serverAddress: remoteConfig.serverAddress,
+              udpProtocol: remoteConfig.udpProtocol,
+              connectionSecure: remoteConfig.connectionSecure
+            })
+          }catch(error){
+            const options = {
+              context: `${RegisterAgent.name}.onChangeServerAddress`,
+              level: UI_LOGGER_LEVELS.ERROR,
+              severity: UI_ERROR_SEVERITIES.BUSINESS,
+              display: true,
+              store: false,
+              error: {
+                error: error,
+                message: error.message || error,
+                title: error.name || error,
+              },
+            };
+            getErrorOrchestrator().handleError(options);
+            this.setState({
+              serverAddress: nodeSelected.label,
+              udpProtocol: null,
+              connectionSecure: false
+            })
+          }
         }
+          
       }
       
 
