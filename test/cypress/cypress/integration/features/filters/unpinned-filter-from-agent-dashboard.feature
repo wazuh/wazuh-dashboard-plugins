@@ -2,7 +2,7 @@ Feature: Unppined filter from agent - Dashboard
 
   As a Wazuh user
   I want to unppined a filter
-  in order to aplly it across the modules
+  in order to apply it across the modules
   Background:
     Given The wazuh admin user is logged
     And The user navigates to the agent page
@@ -15,7 +15,7 @@ Feature: Unppined filter from agent - Dashboard
     And The user checks filter label is added
     And The user pins a filter
     And The user checks if the filter is displayed
-    And The user unppined the selected filter
+    And The user unpinned the selected filter
     And The user navigates to the agent page
     And The user navigates to the agent dashboard
     And The user navigates to agentModule <Module Name>
