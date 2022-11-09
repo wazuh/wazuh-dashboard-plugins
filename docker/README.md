@@ -274,8 +274,20 @@ error getting credentials - err: exit status 1, out: `error getting credentials 
 
 **Solution:** pull the image manually from [Quay][4] and try again.
 
+2. `security_exception: action [indices:admin/settings/update] is unauthorized for user`
+
+**Solution:** setup the permissions for the app as described [here][5].
+
+
+
+
+
+
+
+
 [0]: <https://docs.docker.com/get-docker/> "Docker Desktop"
 [1]: <https://grafana.com/> "Grafana"
 [2]: <https://grafana.com/oss/loki/> "Loki"
 [3]: <https://prometheus.io/docs/visualization/grafana/> "Prometheus"
 [4]: <https://quay.io/organization/wazuh> "quay.io/wazuh"
+[5]: <https://github.com/wazuh/wazuh-kibana-app/issues/3872#issuecomment-1305507626> "App permissions"
