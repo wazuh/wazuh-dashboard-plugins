@@ -1087,8 +1087,7 @@ export const RegisterAgent = withErrorBoundary(
             legend={legend}
             options={options}
             idSelected={idSelected}
-            onChange={onChange}
-            className={'osButtonsStyleMac'} />
+            onChange={onChange} />
         )
       }
 
