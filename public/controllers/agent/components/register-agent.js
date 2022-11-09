@@ -324,6 +324,8 @@ export const RegisterAgent = withErrorBoundary(
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`;
         case 'redhat7-armhf':
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.armv7hl.rpm`;
+        case 'redhat7-powerpc':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.ppc64le.rpm`;
         default:
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`;
       }
@@ -1037,7 +1039,7 @@ export const RegisterAgent = withErrorBoundary(
             options={options}
             idSelected={idSelected}
             onChange={onChange}
-            className={'osButtonsStyle'} />
+            className={'flex'} />
         )
       }
 
@@ -1050,7 +1052,7 @@ export const RegisterAgent = withErrorBoundary(
               options={options}
               idSelected={idSelected}
               onChange={onChange}
-              className={'osButtonsStyle'}
+              className={'flex'}
             />
             {this.state.selectedVersion == 'solaris10' || this.state.selectedVersion == 'solaris11' ? <EuiCallOut color="warning" className='message' iconType="iInCircle" title={
               <span>
@@ -1267,7 +1269,7 @@ export const RegisterAgent = withErrorBoundary(
             },
           ]
           : []),
-        ...(this.state.selectedVersion == 'centos6' || this.state.selectedVersion == 'oraclelinux6' || this.state.selectedVersion == 'amazonlinux1' || this.state.selectedVersion == 'redhat6' || this.state.selectedVersion == 'redhat7' || this.state.selectedVersion == 'amazonlinux2022' || this.state.selectedVersion == 'debian7' || this.state.selectedVersion == 'debian8' || this.state.selectedVersion == 'ubuntu14' || this.state.selectedVersion == 'ubuntu15' || this.state.selectedVersion == 'ubuntu16'
+        ...(this.state.selectedVersion == 'centos6' || this.state.selectedVersion == 'oraclelinux6' || this.state.selectedVersion == 'amazonlinux1' || this.state.selectedVersion == 'redhat6' || this.state.selectedVersion == 'amazonlinux2022' || this.state.selectedVersion == 'debian7' || this.state.selectedVersion == 'debian8' || this.state.selectedVersion == 'ubuntu14' || this.state.selectedVersion == 'ubuntu15' || this.state.selectedVersion == 'ubuntu16'
           ? [
             {
               title: 'Choose the architecture',
@@ -1277,7 +1279,7 @@ export const RegisterAgent = withErrorBoundary(
             },
           ]
           : []),
-        ...(this.state.selectedVersion == 'centos7' || this.state.selectedVersion == 'amazonlinux2' || this.state.selectedVersion == 'suse12' || this.state.selectedVersion == '22' || this.state.selectedVersion == 'debian9' || this.state.selectedVersion == 'debian10' || this.state.selectedVersion == 'busterorgreater'
+        ...(this.state.selectedVersion == 'centos7' || this.state.selectedVersion == 'redhat7' || this.state.selectedVersion == 'amazonlinux2' || this.state.selectedVersion == 'suse12' || this.state.selectedVersion == '22' || this.state.selectedVersion == 'debian9' || this.state.selectedVersion == 'debian10' || this.state.selectedVersion == 'busterorgreater'
           ? [
             {
               title: 'Choose the architecture',
