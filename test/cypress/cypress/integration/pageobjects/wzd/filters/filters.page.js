@@ -15,5 +15,6 @@ export const FILTERS_PAGE = {
   removeFilterButton: '//*[contains(@class,"euiContextMenuPanel")]//*[contains(text(),"Delete")]',
   operatorList: '.euiPanel[data-test-subj="comboBoxOptionsList filterOperatorList-optionsList"] .euiComboBoxOptionsList__rowWrap',
   searchInputSelector: '[role="combobox"] [data-test-subj="queryInput"]',
-  noResultMessage: '#moduleDashboard .euiCallOut--warning span'
+  noResultMessage: '#moduleDashboard .euiCallOut--warning span',
+  unPinFilterAction:'[data-test-subj="pinFilter"]'
 };

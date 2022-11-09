@@ -2,14 +2,14 @@ import { When } from 'cypress-cucumber-preprocessor/steps';
 import { elementIsVisible, clickElement, getSelector} from '../../utils/driver';
 import { FILTERS_PAGE as pageName} from '../../utils/pages-constants';
 const pinnedFilter = getSelector('pinnedFilter', pageName);
-const pinFilterAction = getSelector('pinFilterAction', pageName);
+const unPinFilterAction = getSelector('unPinFilterAction', pageName);
 
 
 When('The user unppined the selected filter', () => {
   elementIsVisible(pinnedFilter);
+  cy.wait(1000);
   clickElement(pinnedFilter);
-  cy.wait(12000);
-  //elementIsVisible(pinFilterAction);
-  //clickElement(pinFilterAction);
-
+  cy.wait(1000);
+  elementIsVisible(unPinFilterAction);
+  clickElement(unPinFilterAction);
 })
