@@ -1,5 +1,5 @@
 import { WzRequest } from '../../../../react-services/wz-request';
-import { RegisterAgentState } from '../types';
+import { OSArchitecture, OSVersion, RegisterAgentState } from '../types';
 import { optionalPackages } from '../services';
 
 /**
@@ -107,19 +107,53 @@ export function optionalDeploymentVariables({
  * @param selectedOS
  * @param selectedSYS
  */
-export function systemSelector(selectedOS: string, selectedSYS: string) {
-  if (selectedOS === 'rpm') {
-    if (selectedSYS === 'systemd') {
-      return 'sudo systemctl daemon-reload\nsudo systemctl enable wazuh-agent\nsudo systemctl start wazuh-agent';
-    } else
-      return 'sudo chkconfig --add wazuh-agent\nsudo service wazuh-agent start';
-  } else if (selectedOS === 'deb') {
-    if (selectedSYS === 'systemd') {
-      return 'sudo systemctl daemon-reload\nsudo systemctl enable wazuh-agent\nsudo systemctl start wazuh-agent';
-    } else
-      return 'sudo update-rc.d wazuh-agent defaults 95 10\nsudo service wazuh-agent start';
-  } else return '';
+export function systemSelector(selectedVersion: OSVersion | '') {
+  if (selectedVersion === 'redhat7' || selectedVersion === 'amazonlinux2022' || selectedVersion === 'centos7' || selectedVersion === 'suse11' || selectedVersion === 'suse12' || selectedVersion === 'oraclelinux5' || selectedVersion === '22' || selectedVersion === 'amazonlinux2' || selectedVersion === 'debian8' || selectedVersion === 'debian9' || selectedVersion === 'debian10' || selectedVersion === 'busterorgreater' || selectedVersion === 'ubuntu15' || selectedVersion === 'ubuntu16' || selectedVersion === 'leap15') {
+    return 'sudo systemctl daemon-reload\nsudo systemctl enable wazuh-agent\nsudo systemctl start wazuh-agent';
+  } else if (selectedVersion === 'redhat5' || selectedVersion === 'redhat6' || selectedVersion === 'centos5' || selectedVersion === 'centos6' || selectedVersion === 'oraclelinux6' || selectedVersion === 'amazonlinux1' || selectedVersion === 'debian7' || selectedVersion === 'ubuntu14') {
+    return ('service wazuh-agent start');
+  }
 }
+
+// move to service
+export const systemSelectorNet = (selectedVersion: OSVersion | '') => {
+  if (
+    selectedVersion === 'windowsxp' ||
+    selectedVersion === 'windows8'
+  ) {
+    return 'update-rc.d wazuh-agent defaults && service wazuh-agent start';
+  }
+}
+
+export const systemSelectorWazuhControlMacos = (selectedVersion: OSVersion | '') => {
+  if (
+    selectedVersion == 'sierra' ||
+    selectedVersion == 'highSierra' ||
+    selectedVersion == 'mojave' ||
+    selectedVersion == 'catalina' ||
+    selectedVersion == 'bigSur' ||
+    selectedVersion == 'monterrey'
+  ) {
+    return '/Library/Ossec/bin/wazuh-control start';
+  }
+}
+
+export const systemSelectorWazuhControl = (selectedVersion: OSVersion  | '') => {
+  if (
+    selectedVersion === 'solaris10' ||
+    selectedVersion === 'solaris11' ||
+    selectedVersion === '6.1 TL9' ||
+    selectedVersion === '11.31'
+  ) {
+    return '/var/ossec/bin/wazuh-control start';
+  }
+}
+
+export const agentNameVariable = (agentName: string, selectedArchitecture: OSArchitecture) => {
+  let parsedAgentName = `WAZUH_AGENT_NAME='${agentName}' `;
+  return selectedArchitecture && agentName !== '' ? parsedAgentName: '';
+}
+
 
 /**
  * Get what is the SO incomplete in the deploy agent screen. Using the SO, Version and Architecture
@@ -251,34 +285,39 @@ export function getCommandText(props: RegisterAgentState) {
     selectedVersion,
     selectedArchitecture,
     wazuhVersion,
+    agentName,
   } = props;
 
   switch (selectedOS) {
     case 'rpm':
-      return `sudo ${optionalDeploymentVariables({
-        ...props,
-      })}yum install ${optionalPackages(
-        selectedOS,
-        selectedVersion,
-        selectedArchitecture,
-        wazuhVersion,
-      )}`;
-    case 'deb':
-      return `curl -so wazuh-agent-${wazuhVersion}.deb ${optionalPackages(
-        selectedOS,
-        selectedVersion,
-        selectedArchitecture,
-        wazuhVersion,
-      )} && sudo ${optionalDeploymentVariables({
-        ...props,
-      })}dpkg -i ./wazuh-agent-${wazuhVersion}.deb`;
-    case 'macos':
-      return `curl -so wazuh-agent-${wazuhVersion}.pkg https://packages.wazuh.com/4.x/macos/wazuh-agent-${wazuhVersion}-1.pkg && sudo launchctl setenv ${optionalDeploymentVariables(
-        { ...props },
-      )}&& sudo installer -pkg ./wazuh-agent-${wazuhVersion}.pkg -target /`;
+      return `sudo ${optionalDeploymentVariables({...props})}${agentName}yum install -y ${optionalPackages(selectedOS,selectedVersion,selectedArchitecture,wazuhVersion)}`;
+    case 'cent':
+      return `sudo ${optionalDeploymentVariables({...props})}${agentName}yum install -y ${optionalPackages(selectedOS,selectedVersion,selectedArchitecture,wazuhVersion)}`;
+    case 'deb':   
+      return `curl -so wazuh-agent-${wazuhVersion}.deb ${optionalPackages(selectedOS,selectedVersion,selectedArchitecture,wazuhVersion)} && sudo ${optionalDeploymentVariables({...props})}${agentName}dpkg -i ./wazuh-agent-${wazuhVersion}.deb`;
+    case 'ubu': 
+      return `curl -so wazuh-agent-${wazuhVersion}.deb ${optionalPackages(selectedOS,selectedVersion,selectedArchitecture,wazuhVersion)} && sudo ${optionalDeploymentVariables({...props})}${agentName}dpkg -i ./wazuh-agent-${wazuhVersion}.deb`;
+    case 'macos': 
+      return `curl -so wazuh-agent-${wazuhVersion}.pkg https://packages.wazuh.com/4.x/macos/wazuh-agent-${wazuhVersion}-1.pkg && sudo launchctl setenv ${optionalDeploymentVariables({...props})}${agentName}&& sudo installer -pkg ./wazuh-agent-${wazuhVersion}.pkg -target /`;
     case 'win':
-      return `Invoke-WebRequest -Uri https://packages.wazuh.com/4.x/windows/wazuh-agent-${wazuhVersion}-1.msi -OutFile \${env:tmp}\\wazuh-agent-${wazuhVersion}.msi; msiexec.exe /i \${env:tmp}\\wazuh-agent-${wazuhVersion}.msi /q ${optionalDeploymentVariables(
-        { ...props },
-      )}`;
+      return `Invoke-WebRequest -Uri https://packages.wazuh.com/4.x/windows/wazuh-agent-${wazuhVersion}-1.msi -OutFile \${env:tmp}\\wazuh-agent-${wazuhVersion}.msi; msiexec.exe /i \${env:tmp}\\wazuh-agent-${wazuhVersion}.msi /q ${optionalDeploymentVariables({...props})}${agentName}`;
+    case 'wopen': 
+      return `sudo rpm --import https://packages.wazuh.com/key/GPG-KEY-WAZUH && sudo ${optionalDeploymentVariables({...props})}${agentName} zypper install -y ${optionalPackages(selectedOS,selectedVersion,selectedArchitecture,wazuhVersion)}`;
+    case 'sol': 
+      return `sudo curl -so ${optionalPackages(selectedOS,selectedVersion,selectedArchitecture,wazuhVersion)} && sudo ${agentName}&& ${selectedVersion == 'solaris11' ? 'pkg install -g wazuh-agent.p5p wazuh-agent' : 'pkgadd -d wazuh-agent.pkg'}`;
+    case 'aix': 
+      return `sudo ${optionalDeploymentVariables({...props})}${agentName}rpm -ivh ${optionalPackages(selectedOS,selectedVersion,selectedArchitecture,wazuhVersion)}`;
+    case 'hp': 
+      return `cd / && sudo curl -so ${optionalPackages(selectedOS,selectedVersion,selectedArchitecture,wazuhVersion)} && sudo ${agentName}groupadd wazuh && sudo useradd -G wazuh wazuh && sudo tar -xvf wazuh-agent.tar`;
+    case 'amazonlinux': 
+      return `sudo ${optionalDeploymentVariables({...props})}${agentName}yum install -y ${optionalPackages(selectedOS,selectedVersion,selectedArchitecture,wazuhVersion)}`;
+    case 'fedora': 
+      return `sudo ${optionalDeploymentVariables({...props})}${agentName}yum install -y ${optionalPackages(selectedOS,selectedVersion,selectedArchitecture,wazuhVersion)}`;
+    case 'oraclelinux': 
+      return `sudo ${optionalDeploymentVariables({...props})}${agentName}yum install -y ${optionalPackages(selectedOS,selectedVersion,selectedArchitecture,wazuhVersion)}`;
+    case 'suse': 
+      return `sudo ${optionalDeploymentVariables({...props})}${agentName}yum install -y ${optionalPackages(selectedOS,selectedVersion,selectedArchitecture,wazuhVersion)}`;
+    case 'raspbian': 
+      return `curl -so wazuh-agent-${wazuhVersion}.deb ${optionalPackages(selectedOS,selectedVersion,selectedArchitecture,wazuhVersion)} && sudo ${optionalDeploymentVariables({...props})}${agentName}dpkg -i ./wazuh-agent-${wazuhVersion}.deb`;
   }
 }

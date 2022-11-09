@@ -191,6 +191,7 @@ export const RegisterAgent = withErrorBoundary(
       } else if (this.state.selectedVersion === 'redhat5' || this.state.selectedVersion === 'redhat6' || this.state.selectedVersion === 'centos5' || this.state.selectedVersion === 'centos6' || this.state.selectedVersion === 'oraclelinux6' || this.state.selectedVersion === 'amazonlinux1' || this.state.selectedVersion === 'debian7' || this.state.selectedVersion === 'ubuntu14') {
         return ('service wazuh-agent start');
       }
+      return '';
     }
 
     systemSelectorNet() {

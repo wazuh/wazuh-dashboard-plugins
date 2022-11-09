@@ -13,8 +13,9 @@ import {
 } from '../services/register-agent-service';
 import { webDocumentationLink } from '../../../../../common/services/web_documentation';
 
+
 const StartAgentTabs = (props: any) => {
-  const { selectedOS, selectedSYS, wazuhVersion, onTabClick } = props;
+  const { selectedOS, selectedSYS, selectedVersion, wazuhVersion, onTabClick } = props;
   const appVersionMajorDotMinor = wazuhVersion.split('.').slice(0, 2).join('.');
   const language = getHighlightCodeLanguage(selectedOS);
   const urlCheckConnectionDocumentation = webDocumentationLink(
@@ -39,9 +40,9 @@ const StartAgentTabs = (props: any) => {
     <EuiText>
       <div className='copy-codeblock-wrapper'>
         <EuiCodeBlock language={language}>
-          {systemSelector(selectedOS, selectedSYS)}
+          {systemSelector(selectedOS)}
         </EuiCodeBlock>
-        <EuiCopy textToCopy={systemSelector(selectedOS, selectedSYS)}>
+        <EuiCopy textToCopy={systemSelector(selectedVersion) || ''}>
           {copy => (
             <div className='copy-overlay' onClick={copy}>
               <p>
@@ -70,6 +71,36 @@ const StartAgentTabs = (props: any) => {
     {
       id: 'sysV',
       name: 'SysV Init',
+      content: (
+        <Fragment>
+          <EuiSpacer />
+          <CommandCodeBlock />
+        </Fragment>
+      ),
+    },
+    {
+      id: 'NET',
+      name: 'NET',
+      content: (
+        <Fragment>
+          <EuiSpacer />
+          <CommandCodeBlock />
+        </Fragment>
+      ),
+    },
+    {
+      id: 'Wazuh-control-macos',
+      name: 'Wazuh-control-macos',
+      content: (
+        <Fragment>
+          <EuiSpacer />
+          <CommandCodeBlock />
+        </Fragment>
+      ),
+    },
+    {
+      id: 'Wazuh-control',
+      name: 'Wazuh-control',
       content: (
         <Fragment>
           <EuiSpacer />
