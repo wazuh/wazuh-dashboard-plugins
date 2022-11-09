@@ -25,17 +25,16 @@ import {
 } from '../utils/utils';
 
 import { connect } from 'react-redux';
+import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
 const helpLinks = [
   {
-    text: 'How to configure the syslog output',
-    href:
-      'https://documentation.wazuh.com/current/user-manual/manager/manual-syslog-output.html'
+    text: 'Configuring syslog output',
+    href: webDocumentationLink('user-manual/manager/manual-syslog-output.html')
   },
   {
     text: 'Syslog output reference',
-    href:
-      'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/syslog-output.html'
+    href: webDocumentationLink('user-manual/reference/ossec-conf/syslog-output.html')
   }
 ];
 

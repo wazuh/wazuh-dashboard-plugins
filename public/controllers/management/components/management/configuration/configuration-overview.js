@@ -33,6 +33,7 @@ import { connect } from 'react-redux';
 import { isString, isFunction } from './utils/utils';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 import { API_NAME_AGENT_STATUS } from '../../../../../../common/constants';
+import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
 
 const columns = [
   {
@@ -47,19 +48,16 @@ const columns = [
 
 const helpLinks = [
   {
-    text: 'Wazuh administration documentation',
-    href:
-      'https://documentation.wazuh.com/current/user-manual/manager/index.html'
+    text: 'Wazuh server administration',
+    href: webDocumentationLink('user-manual/manager/index.html')
   },
   {
-    text: 'Wazuh capabilities documentation',
-    href:
-      'https://documentation.wazuh.com/current/user-manual/capabilities/index.html'
+    text: 'Wazuh capabilities',
+    href: webDocumentationLink('user-manual/capabilities/index.html')
   },
   {
     text: 'Local configuration reference',
-    href:
-      'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/index.html'
+    href: webDocumentationLink('user-manual/reference/ossec-conf/index.html')
   }
 ];
 

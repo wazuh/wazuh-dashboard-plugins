@@ -10,7 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component, Fragment } from 'react';
-import { version as appVersion} from '../../../package.json';
 import { visualizations } from './visualizations';
 import { agentVisualizations } from './agent-visualizations';
 import KibanaVis from '../../kibana-integrations/kibana-vis';
@@ -41,6 +40,7 @@ import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
 import { satisfyPluginPlatformVersion } from '../../../common/semver';
+import { webDocumentationLink } from '../../../common/services/web_documentation';
 
 const visHandler = new VisHandlers();
 
@@ -76,13 +76,31 @@ export const WzVisualize = compose(
       this.agentsStatus = false;
     }
 
+    /**
+     * Reset the visualizations when the type of Dashboard is changed.
+     * 
+     * There are 2 kinds of Dashboards:
+     *   - General or overview   --> When to agent is pinned.
+     *   - Specific or per agent --> When there is an agent pinned.
+     * 
+     * The visualizations are reset only when the type of Dashboard changes 
+     * from a type to another, but aren't when the pinned agent changes.
+     * 
+     * More info:
+     * https://github.com/wazuh/wazuh-kibana-app/issues/4230#issuecomment-1152161434
+     * 
+     * @param {Object} prevProps 
+     */
     async componentDidUpdate(prevProps) {
-      if (prevProps.isAgent !== this.props.isAgent) {
+      if (
+        (!prevProps.isAgent && this.props.isAgent) ||
+        (prevProps.isAgent && !this.props.isAgent)
+      ) {
         this._isMount &&
           this.setState({
             visualizations: !!this.props.isAgent ? agentVisualizations : visualizations,
           });
-        typeof prevProps.isAgent !== 'undefined' && visHandler.removeAll();
+        visHandler.removeAll();
       }
     }
 
@@ -130,8 +148,6 @@ export const WzVisualize = compose(
     };
     reloadToast = () => {
       const toastLifeTimeMs = 300000;
-      const [mayor, minor] = appVersion.split('.');
-      const urlTroubleShootingDocs = `https://documentation.wazuh.com/${mayor}.${minor}/user-manual/elasticsearch/troubleshooting.html#index-pattern-was-refreshed-toast-keeps-popping-up`;
       if(satisfyPluginPlatformVersion('<7.11')){
         getToasts().add({
           color: 'success',
@@ -142,7 +158,7 @@ export const WzVisualize = compose(
               You need to refresh the page to apply the changes.
               <a
                 title="More information in Wazuh documentation"
-                href={urlTroubleShootingDocs}
+                href={webDocumentationLink('user-manual/elasticsearch/troubleshooting.html#index-pattern-was-refreshed-toast-keeps-popping-up')}
                 target="documentation"
               >
                 Troubleshooting
