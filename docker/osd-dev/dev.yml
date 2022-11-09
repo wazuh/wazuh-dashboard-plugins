@@ -150,7 +150,7 @@ services:
       - wi_certs:/usr/share/opensearch/config/certs/
       - ./config/${OSD_MAJOR}/os/opensearch.yml:/usr/share/opensearch/config/opensearch.yml
       - ./config/${OSD_MAJOR}/os/internal_users.yml:${SEC_CONFIG_PATH}/internal_users.yml
-      - ./config/${OSD_MAJOR}/os/config.yml:${SEC_CONFIG_PATH}/config.yml
+      - ${SEC_CONFIG_FILE}:${SEC_CONFIG_PATH}/config.yml
       - ./config/${OSD_MAJOR}/os/roles_mapping.yml:${SEC_CONFIG_PATH}/roles_mapping.yml
       - ./config/${OSD_MAJOR}/os/roles.yml:${SEC_CONFIG_PATH}/roles.yml
 
