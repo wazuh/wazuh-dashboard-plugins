@@ -36,6 +36,7 @@ commands of Start the agent in the deploy new agent section [#4458](https://gith
 - Improved the message displayed when there is a versions mismatch between the Wazuh API and the Wazuh APP [#4529](https://github.com/wazuh/wazuh-kibana-app/pull/4529)
 - Changed the endpoint that updates the plugin configuration to support multiple settings. [#4501](https://github.com/wazuh/wazuh-kibana-app/pull/4501)
 - Allowed to upload an image for the `customization.logo.*` settings in `Settings/Configuration` [#4504](https://github.com/wazuh/wazuh-kibana-app/pull/4504)
+- Fixed the OS styles and their versions. [#4830](https://github.com/wazuh/wazuh-kibana-app/pull/4830)
 
 ### Removed
 
