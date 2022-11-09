@@ -49,6 +49,9 @@ services:
       - ./config/${OSD_MAJOR}/certs:/conf
       - os_logs:/logs
       - os_data:/data
+    # Included to avoid docker from creating duplicated networks
+    networks:
+      - os-dev
     entrypoint: /bin/bash
     command: >
         -c '
@@ -237,6 +240,9 @@ services:
       - wd_certs:/certs/wd
       - wm_certs:/certs/wm
       - idp_certs:/certs/idp
+    # Included to avoid docker from creating duplicated networks
+    networks:
+      - os-dev
     entrypoint: /bin/bash
     command: >
       -c '
