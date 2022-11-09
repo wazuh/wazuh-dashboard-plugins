@@ -268,14 +268,6 @@ export const RegisterAgent = withErrorBoundary(
         'user-manual/agents/agent-connection.html',
         appVersionMajorDotMinor,
       );
-      const textAndLinkToCheckConnectionDocumentation = (
-        <p>
-          To verify the connection with the Wazuh server, please follow this{' '}
-          <a href={urlCheckConnectionDocumentation} target='_blank'>
-            document.
-          </a>
-        </p>
-      );
       const missingOSSelection = checkMissingOSSelection(
         this.state.selectedOS,
         this.state.selectedVersion,
@@ -447,179 +439,7 @@ export const RegisterAgent = withErrorBoundary(
         );
       };
 
-      const tabSysV = [
-        {
-          id: 'sysV',
-          name: 'SysV Init',
-          content: (
-            <Fragment>
-              <EuiSpacer />
-              <EuiText>
-                <div className='copy-codeblock-wrapper'>
-                  <EuiCodeBlock language={language}>
-                    {systemSelector(this.state.selectedVersion)}
-                  </EuiCodeBlock>
-                  <EuiCopy
-                    textToCopy={systemSelector(this.state.selectedVersion) || ''}
-                  >
-                    {copy => (
-                      <div className='copy-overlay' onClick={copy}>
-                        <p>
-                          <EuiIcon type='copy' /> Copy command
-                        </p>
-                      </div>
-                    )}
-                  </EuiCopy>
-                </div>
-                <EuiSpacer size='s' />
-                {textAndLinkToCheckConnectionDocumentation}
-              </EuiText>
-            </Fragment>
-          ),
-        },
-      ];
-
-      const tabSystemD = [
-        {
-          id: 'systemd',
-          name: 'Systemd',
-          content: (
-            <Fragment>
-              <EuiSpacer />
-              <EuiText>
-                <div className='copy-codeblock-wrapper'>
-                  <EuiCodeBlock language={language}>
-                    {systemSelector(this.state.selectedVersion)}
-                  </EuiCodeBlock>
-                  <EuiCopy
-                    textToCopy={
-                      systemSelector(this.state.selectedVersion) || ''
-                    }
-                  >
-                    {copy => (
-                      <div className='copy-overlay' onClick={copy}>
-                        <p>
-                          <EuiIcon type='copy' /> Copy command
-                        </p>
-                      </div>
-                    )}
-                  </EuiCopy>
-                </div>
-                <EuiSpacer size='s' />
-                {textAndLinkToCheckConnectionDocumentation}
-              </EuiText>
-            </Fragment>
-          ),
-        },
-      ];
-
-      const tabNet = [
-        {
-          id: 'NET',
-          name: 'NET',
-          content: (
-            <Fragment>
-              <EuiSpacer />
-              <EuiText>
-                <div className='copy-codeblock-wrapper'>
-                  <EuiCodeBlock language={language}>
-                    {systemSelectorNet(this.state.selectedVersion)}
-                  </EuiCodeBlock>
-                  <EuiCopy
-                    textToCopy={
-                      systemSelectorNet(this.state.selectedVersion) || ''
-                    }
-                  >
-                    {copy => (
-                      <div className='copy-overlay' onClick={copy}>
-                        <p>
-                          <EuiIcon type='copy' /> Copy command
-                        </p>
-                      </div>
-                    )}
-                  </EuiCopy>
-                </div>
-                <EuiSpacer size='s' />
-                {textAndLinkToCheckConnectionDocumentation}
-              </EuiText>
-            </Fragment>
-          ),
-        },
-      ];
-
-      const tabWazuhControlMacos = [
-        {
-          id: 'Wazuh-control-macos',
-          name: 'Wazuh-control-macos',
-          content: (
-            <Fragment>
-              <EuiSpacer />
-              <EuiText>
-                <div className='copy-codeblock-wrapper'>
-                  <EuiCodeBlock language={language}>
-                    {systemSelectorWazuhControlMacos(
-                      this.state.selectedVersion,
-                    )}
-                  </EuiCodeBlock>
-                  <EuiCopy
-                    textToCopy={
-                      systemSelectorWazuhControlMacos(
-                        this.state.selectedVersion,
-                      ) || ''
-                    }
-                  >
-                    {copy => (
-                      <div className='copy-overlay' onClick={copy}>
-                        <p>
-                          <EuiIcon type='copy' /> Copy command
-                        </p>
-                      </div>
-                    )}
-                  </EuiCopy>
-                </div>
-                <EuiSpacer size='s' />
-                {textAndLinkToCheckConnectionDocumentation}
-              </EuiText>
-            </Fragment>
-          ),
-        },
-      ];
-
-      const tabWazuhControl = [
-        {
-          id: 'Wazuh-control',
-          name: 'Wazuh-control',
-          content: (
-            <Fragment>
-              <EuiSpacer />
-              <EuiText>
-                <div className='copy-codeblock-wrapper'>
-                  <EuiCodeBlock language={language}>
-                    {systemSelectorWazuhControl(this.state.selectedVersion)}
-                  </EuiCodeBlock>
-                  <EuiCopy
-                    textToCopy={
-                      systemSelectorWazuhControl(this.state.selectedVersion) ||
-                      ''
-                    }
-                  >
-                    {copy => (
-                      <div className='copy-overlay' onClick={copy}>
-                        <p>
-                          <EuiIcon type='copy' /> Copy command
-                        </p>
-                      </div>
-                    )}
-                  </EuiCopy>
-                </div>
-                <EuiSpacer size='s' />
-                {textAndLinkToCheckConnectionDocumentation}
-              </EuiText>
-            </Fragment>
-          ),
-        },
-      ];
-
+    
       const steps = [
         {
           title: 'Choose the operating system',
@@ -1126,41 +946,8 @@ export const RegisterAgent = withErrorBoundary(
                     iconType='iInCircle'
                   />
                 ) : (
-                  <EuiTabbedContent
-                    tabs={
-                      this.state.selectedVersion == 'redhat7' ||
-                      this.state.selectedVersion == 'amazonlinux2022' ||
-                      this.state.selectedVersion == 'centos7' ||
-                      this.state.selectedVersion == 'suse11' ||
-                      this.state.selectedVersion == 'suse12' ||
-                      this.state.selectedVersion == 'oraclelinux5' ||
-                      this.state.selectedVersion == 'amazonlinux2' ||
-                      this.state.selectedVersion == '22' ||
-                      this.state.selectedVersion == 'debian8' ||
-                      this.state.selectedVersion == 'debian10' ||
-                      this.state.selectedVersion == 'busterorgreater' ||
-                      this.state.selectedVersion === 'ubuntu15' ||
-                      this.state.selectedVersion === 'ubuntu16' ||
-                      this.state.selectedVersion === 'leap15'
-                        ? tabSystemD
-                        : this.state.selectedVersion == 'windowsxp' ||
-                          this.state.selectedVersion == 'windows8'
-                        ? tabNet
-                        : this.state.selectedVersion == 'sierra' ||
-                          this.state.selectedVersion == 'highSierra' ||
-                          this.state.selectedVersion == 'mojave' ||
-                          this.state.selectedVersion == 'catalina' ||
-                          this.state.selectedVersion == 'bigSur' ||
-                          this.state.selectedVersion == 'monterrey'
-                        ? tabWazuhControlMacos
-                        : this.state.selectedVersion == 'solaris10' ||
-                          this.state.selectedVersion == 'solaris11' ||
-                          this.state.selectedVersion == '6.1 TL9' ||
-                          this.state.selectedVersion == '11.31'
-                        ? tabWazuhControl
-                        : tabSysV
-                    }
-                    selectedTab={this.selectedSYS}
+                  <StartAgentTabs 
+                    {...this.state}
                     onTabClick={onTabClick}
                   />
                 ),

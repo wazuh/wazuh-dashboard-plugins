@@ -113,6 +113,7 @@ export function systemSelector(selectedVersion: OSVersion | '') {
   } else if (selectedVersion === 'redhat5' || selectedVersion === 'redhat6' || selectedVersion === 'centos5' || selectedVersion === 'centos6' || selectedVersion === 'oraclelinux6' || selectedVersion === 'amazonlinux1' || selectedVersion === 'debian7' || selectedVersion === 'ubuntu14') {
     return ('service wazuh-agent start');
   }
+  return '';
 }
 
 // move to service
@@ -123,6 +124,7 @@ export const systemSelectorNet = (selectedVersion: OSVersion | '') => {
   ) {
     return 'update-rc.d wazuh-agent defaults && service wazuh-agent start';
   }
+  return '';
 }
 
 export const systemSelectorWazuhControlMacos = (selectedVersion: OSVersion | '') => {
@@ -136,6 +138,7 @@ export const systemSelectorWazuhControlMacos = (selectedVersion: OSVersion | '')
   ) {
     return '/Library/Ossec/bin/wazuh-control start';
   }
+  return '';
 }
 
 export const systemSelectorWazuhControl = (selectedVersion: OSVersion  | '') => {
@@ -147,6 +150,7 @@ export const systemSelectorWazuhControl = (selectedVersion: OSVersion  | '') => 
   ) {
     return '/var/ossec/bin/wazuh-control start';
   }
+  return '';
 }
 
 export const agentNameVariable = (agentName: string, selectedArchitecture: OSArchitecture) => {

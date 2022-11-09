@@ -10,12 +10,22 @@ import {
 import {
   getHighlightCodeLanguage,
   systemSelector,
+  systemSelectorNet,
+  systemSelectorWazuhControl,
+  systemSelectorWazuhControlMacos,
 } from '../services/register-agent-service';
 import { webDocumentationLink } from '../../../../../common/services/web_documentation';
+import { OSVersion, OSSystems } from '../types';
 
+interface Props {
+  selectedOS: OSSystems;
+  selectedVersion: OSVersion;
+  wazuhVersion: string;
+  onTabClick: (tab: { label: string; id: string }) => void;
+}
 
-const StartAgentTabs = (props: any) => {
-  const { selectedOS, selectedSYS, selectedVersion, wazuhVersion, onTabClick } = props;
+const StartAgentTabs = (props: Props) => {
+  const { selectedOS, selectedVersion, wazuhVersion, onTabClick } = props;
   const appVersionMajorDotMinor = wazuhVersion.split('.').slice(0, 2).join('.');
   const language = getHighlightCodeLanguage(selectedOS);
   const urlCheckConnectionDocumentation = webDocumentationLink(
@@ -36,26 +46,30 @@ const StartAgentTabs = (props: any) => {
     </p>
   );
 
-  const CommandCodeBlock = () => (
-    <EuiText>
-      <div className='copy-codeblock-wrapper'>
-        <EuiCodeBlock language={language}>
-          {systemSelector(selectedOS)}
-        </EuiCodeBlock>
-        <EuiCopy textToCopy={systemSelector(selectedVersion) || ''}>
-          {copy => (
-            <div className='copy-overlay' onClick={copy}>
-              <p>
-                <EuiIcon type='copy' /> Copy command
-              </p>
-            </div>
-          )}
-        </EuiCopy>
-      </div>
-      <EuiSpacer size='s' />
-      {textAndLinkToCheckConnectionDocumentation}
-    </EuiText>
-  );
+  const CommandCodeBlock = ({
+    commandText,
+  }: {
+    commandText: string | undefined;
+  }) => {
+    return (
+      <EuiText>
+        <div className='copy-codeblock-wrapper'>
+          <EuiCodeBlock language={language}>{commandText}</EuiCodeBlock>
+          <EuiCopy textToCopy={commandText || ''}>
+            {copy => (
+              <div className='copy-overlay' onClick={copy}>
+                <p>
+                  <EuiIcon type='copy' /> Copy command
+                </p>
+              </div>
+            )}
+          </EuiCopy>
+        </div>
+        <EuiSpacer size='s' />
+        {textAndLinkToCheckConnectionDocumentation}
+      </EuiText>
+    );
+  };
 
   const tabs = [
     {
@@ -64,7 +78,7 @@ const StartAgentTabs = (props: any) => {
       content: (
         <Fragment>
           <EuiSpacer />
-          <CommandCodeBlock />
+          <CommandCodeBlock commandText={systemSelector(selectedVersion)} />
         </Fragment>
       ),
     },
@@ -74,7 +88,7 @@ const StartAgentTabs = (props: any) => {
       content: (
         <Fragment>
           <EuiSpacer />
-          <CommandCodeBlock />
+          <CommandCodeBlock commandText={systemSelector(selectedVersion)} />
         </Fragment>
       ),
     },
@@ -84,7 +98,7 @@ const StartAgentTabs = (props: any) => {
       content: (
         <Fragment>
           <EuiSpacer />
-          <CommandCodeBlock />
+          <CommandCodeBlock commandText={systemSelectorNet(selectedVersion)} />
         </Fragment>
       ),
     },
@@ -94,7 +108,9 @@ const StartAgentTabs = (props: any) => {
       content: (
         <Fragment>
           <EuiSpacer />
-          <CommandCodeBlock />
+          <CommandCodeBlock
+            commandText={systemSelectorWazuhControlMacos(selectedVersion)}
+          />
         </Fragment>
       ),
     },
@@ -104,13 +120,67 @@ const StartAgentTabs = (props: any) => {
       content: (
         <Fragment>
           <EuiSpacer />
-          <CommandCodeBlock />
+          <CommandCodeBlock
+            commandText={systemSelectorWazuhControl(selectedVersion)}
+          />
         </Fragment>
       ),
     },
   ];
 
-  return (<EuiTabbedContent tabs={tabs} onTabClick={onHandleTabClick} />);
+  /**
+   * Get code tabs depending on OS Version
+   * @param version 
+   */
+  const getCurrentTab = (version: OSVersion) => {
+    if (
+      [
+        'amazonlinux2022',
+        'redhat7',
+        'centos7',
+        'suse11',
+        'suse12',
+        'oraclelinux5',
+        'amazonlinux2',
+        '22',
+        'debian8',
+        'debian10',
+        'busterorgreater',
+        'ubuntu15',
+        'ubuntu16',
+        'leap15',
+      ].includes(version)
+    ) {
+      return tabs.filter(tab => tab.id === 'systemd');
+    }
+    if (['windowsxp', 'windows8'].includes(version)) {
+      return tabs.filter(tab => tab.id === 'NET');
+    }
+
+    if (
+      [
+        'sierra',
+        'highSierra',
+        'mojave',
+        'catalina',
+        'bigSur',
+        'monterrey',
+      ].includes(version)
+    ) {
+      return tabs.filter(tab => tab.id === 'Wazuh-control-macos');
+    }
+    if (['solaris10', 'solaris11', '6.1 TL9', '11.31'].includes(version)) {
+      return tabs.filter(tab => tab.id === 'Wazuh-control');
+    }
+    return tabs.filter(tab => tab.id === 'sysV');
+  };
+
+  return (
+    <EuiTabbedContent
+      tabs={getCurrentTab(selectedVersion)}
+      onTabClick={onHandleTabClick}
+    />
+  );
 };
 
 export default StartAgentTabs;
