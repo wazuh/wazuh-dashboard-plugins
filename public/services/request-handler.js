@@ -1,25 +1,14 @@
 import axios from 'axios';
+import { HTTP_STATUS_CODES } from '../../common/constants';
 
 let allow = true;
-let aborts = [];
-let currentid = 0;
+const cancelToken = axios.CancelToken
+const source = cancelToken.source();
 
-const removeController = (id) => {
-    const index = aborts.findIndex(object => {
-        return object.id === id;
-    });
-    if (!id) {
-        return;
-    }
-    aborts.splice(index);
-    return;
-}
 
-export const disableRequests = () => {
+const disableRequests = () => {
     allow = false;
-    aborts.forEach(item => {
-        item.controller.abort();
-    })
+    source.cancel('Requests cancelled');
     return;
 }
 
@@ -30,7 +19,6 @@ export const initializeInterceptor = (core) => {
                 httpErrorResponse.response?.status === 401
             ) {
                 disableRequests();
-                setTimeout(() => window.location.reload(), 1000);
             }
         },
     });
@@ -43,14 +31,21 @@ export const request = async (options = '') => {
     if (!options.method | !options.url) {
         return Promise.reject("Missing parameters")
     }
-    const requestId = currentid;
-    currentid++;
-    const abort = new AbortController();
+
+    options = {
+        ...options, cancelToken: source.token, validateStatus: function (status) {
+            return (status >= 200 && status < 300) || status === 401;
+        },
+    }
     if (allow) {
         try {
-            aborts.push({ id: requestId, controller: abort });
             const requestData = await axios(options);
-            removeController(requestId);
+            if (requestData.status === HTTP_STATUS_CODES.UNAUTHORIZED) {
+                if (requestData.data.message === 'Unauthorized' || requestData.data.message === 'Authentication required') {
+                    disableRequests();
+                }
+                throw new Error(requestData.data.message)
+            }
             return Promise.resolve(requestData);
         }
         catch (e) {
