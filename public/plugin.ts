@@ -31,7 +31,7 @@ import { getThemeAssetURL, getAssetURL } from './utils/assets';
 import { WzRequest } from './react-services/wz-request';
 import store from './redux/store';
 import { updateAppConfig } from './redux/actions/appConfigActions';
-import { initializeInterceptor } from '../common/services/request-handler';
+import { initializeInterceptor } from './services/request-handler';
 
 const SIDEBAR_LOGO = 'customization.logo.sidebar';
 const innerAngularName = 'app/wazuh';

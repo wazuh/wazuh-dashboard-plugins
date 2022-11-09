@@ -18,7 +18,7 @@ import { OdfeUtils } from '../utils';
 import IApiResponse from './interfaces/api-response.interface';
 import { getHttp } from '../kibana-services';
 import { PLUGIN_PLATFORM_REQUEST_HEADERS } from '../../common/constants';
-import { request } from '../../common/services/request-handler';
+import { request } from '../services/request-handler';
 
 export class WzRequest {
   static wazuhConfig: any;

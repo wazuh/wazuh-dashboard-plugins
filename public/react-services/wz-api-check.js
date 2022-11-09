@@ -14,7 +14,7 @@ import { AppState } from './app-state';
 import { WzMisc } from '../factories/misc';
 import { getHttp } from '../kibana-services';
 import { PLUGIN_PLATFORM_REQUEST_HEADERS } from '../../common/constants';
-import { request } from '../../common/services/request-handler';
+import { request } from '../services/request-handler';
 
 export class ApiCheck {
   static async checkStored(data, idChanged = false) {

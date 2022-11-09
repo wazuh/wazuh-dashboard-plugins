@@ -17,7 +17,7 @@ import { WzMisc } from '../factories/misc';
 import { OdfeUtils } from '../utils';
 import { getHttp, getDataPlugin } from '../kibana-services';
 import { PLUGIN_PLATFORM_REQUEST_HEADERS } from '../../common/constants';
-import { request } from '../../common/services/request-handler';
+import { request } from '../services/request-handler';
 
 export class GenericRequest {
   static async request(method, path, payload = null, returnError = false) {
