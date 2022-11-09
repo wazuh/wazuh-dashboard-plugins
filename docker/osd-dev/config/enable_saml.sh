@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# idp container launches and docker-compose returns too quickly, do not wait for container to 
-# be healthy as it has no dependencies, so we wait before continuing
+# idp container launches and docker-compose returns too quickly, do not wait
+# for container to be healthy as it has no dependencies, so we wait before
+# continuing
 sleep 7
-
 
 indexer="$1-os1-1"
 dashboard="$1-osd-1"
@@ -24,7 +24,7 @@ ACCESS_TOKEN=$(curl -sS \
   -d 'username=admin' \
   -d 'password=admin' \
   -d 'grant_type=password' \
-  "${B}/realms/master/protocol/openid-connect/token"  | jq -r '.access_token')
+  "${B}/realms/master/protocol/openid-connect/token" | jq -r '.access_token')
 
 H=('-H' 'Content-Type: application/json' '-H' "Authorization: Bearer $ACCESS_TOKEN")
 
@@ -38,14 +38,13 @@ P='{
 
 curl -sS -L -X POST "${B}/admin/realms" "${H[@]}" -d "$P" | grep -v "Conflict detected"
 
-
-# Add admin certificates to keycloak as these are used by indexer to sign saml 
-# messages. These should be uploaded to keycloak if we want it to verify indexer messages.
+# Add admin certificates to keycloak as these are used by indexer to sign saml
+# messages. These should be uploaded to keycloak if we want it to verify indexer
+# messages.
 key=$(cat /certs/wi/admin-key.pem | grep -v "PRIVATE KEY" | tr -d "\n")
-cert=$(cat /certs/wi/admin.pem | grep -v CERTIFICATE| tr -d "\n")
+cert=$(cat /certs/wi/admin.pem | grep -v CERTIFICATE | tr -d "\n")
 
-
-# Create client 
+# Create client
 # By default the client does not verify the client signature on saml messages
 # but it could be enabled for testing purposes
 PC="{
@@ -65,17 +64,17 @@ PC="{
     \"saml.signing.private.key\": \"$key\",
     \"saml.client.signature\": \"true\",
     \"saml_single_logout_service_url_redirect\": \"https://localhost:5601\",
-    \"post.logout.redirect.uris\": \"https://localhost:5601*\" 
+    \"post.logout.redirect.uris\": \"https://localhost:5601*\"
   }
 }"
 
 curl -sS -L -X POST "${B}/admin/realms/${REALM}/clients" "${H[@]}" -d "$PC" | grep -v "Client wazuh already exists"
 
 # Get a client json representation
-CLIENT=$(curl -sS -L -X GET "${B}/admin/realms/${REALM}/clients" "${H[@]}" -G -d 'clientId=wazuh' |jq '.[] | select(.clientId=="wazuh")')
+CLIENT=$(curl -sS -L -X GET "${B}/admin/realms/${REALM}/clients" "${H[@]}" -G -d 'clientId=wazuh' | jq '.[] | select(.clientId=="wazuh")')
 
-# Get client id 
-CID=$(echo $CLIENT | jq -r '.id' )
+# Get client id
+CID=$(echo $CLIENT | jq -r '.id')
 
 # Generate all-access and admin role for the realm
 PR1='{
@@ -89,7 +88,6 @@ PR2='{
 }'
 
 curl -sS -L -X POST "${B}/admin/realms/${REALM}/roles" "${H[@]}" -d "$PR2" | grep -v "Role with name admin already exists"
-
 
 ## create new user
 PU='{
@@ -106,13 +104,13 @@ PU='{
 curl -sS -L -X POST "${B}/admin/realms/${REALM}/users" "${H[@]}" -d "$PU" | grep -v "User exists with same username"
 
 ## Get a user json representation
-USER=$(curl -sS -L -X GET "${B}/admin/realms/${REALM}/users" "${H[@]}" -G -d 'username=wazuh' |jq '.[] | select(.username=="wazuh")')
+USER=$(curl -sS -L -X GET "${B}/admin/realms/${REALM}/users" "${H[@]}" -G -d 'username=wazuh' | jq '.[] | select(.username=="wazuh")')
 
-### Get user id 
-USERID=$(echo $USER | jq -r '.id' )
+### Get user id
+USERID=$(echo $USER | jq -r '.id')
 
 # Get roles
-ROLES=$(curl -sS -L -X GET "${B}/admin/realms/${REALM}/roles" "${H[@]}" -d "$PR2" )
+ROLES=$(curl -sS -L -X GET "${B}/admin/realms/${REALM}/roles" "${H[@]}" -d "$PR2")
 
 ## Assign role
 ADMINID=$(echo $ROLES | jq -r '.[] | select(.name=="admin").id')
@@ -136,13 +134,12 @@ PA1="[
   }
 ]"
 
-curl -sS -L -X POST  "${B}/admin/realms/${REALM}/users/${USERID}/role-mappings/realm" "${H[@]}" -d "$PA1"
+curl -sS -L -X POST "${B}/admin/realms/${REALM}/users/${USERID}/role-mappings/realm" "${H[@]}" -d "$PA1"
 
 # Get list of client scopes
 CSCOPES=$(curl -sS -L -X GET "${B}/admin/realms/${REALM}/client-scopes" "${H[@]}")
 CSID=$(echo $CSCOPES | jq -r '.[] | select(.name=="role_list").id ')
 CSR=$(echo $CSCOPES | jq -r '.[] | select(.name=="role_list") ')
-
 
 # Set single to true, so opensearch works
 UPDATE=$(echo $CSR | jq '.protocolMappers[] | select(.name=="role list").config.single |= "true"  ')
@@ -161,5 +158,3 @@ config_path="/usr/share/opensearch/config/opensearch-security"
 
 echo "To update configuration in indexer, you can run:"
 echo docker exec -e JAVA_HOME=/usr/share/opensearch/jdk $indexer $securityadmin -cacert $ca -cert $cert -key $key -cd $config_path
-
-

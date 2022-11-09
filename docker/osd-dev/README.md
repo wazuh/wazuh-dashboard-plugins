@@ -6,13 +6,20 @@ Use always the provided script to bring up or down the development
 environment. For example:
 
 ```bash
-./dev.sh 1.2.4 1.2.0 $WZ_HOME up
+./dev.sh 1.2.4 1.2.0 $WZ_HOME up [saml]
 ```
 
 The script will ask you all the required parameters to bring up the
 environment, including the version of the elastic stack you want to
 develop for, and the source code folder where the wazuh-kibana-app is
 located.
+
+Use the `saml` flag to bring up KeyCloak IDP. **Add idp to your hosts**.
+
+```apacheconf
+# /etc/hosts
+127.0.0.1 idp
+```
 
 **The script will not select the appropriate version of the
 wazuh-kibana-app to use, so be sure to check out the appropriate version
