@@ -63,7 +63,7 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
           getThemeAssetURL('icon.svg', UI_THEME)),
       mount: async (params: AppMountParameters) => {
         try {
-          initializeInterceptor();
+          initializeInterceptor(core);
           if (!this.initializeInnerAngular) {
             throw Error('Wazuh plugin method initializeInnerAngular is undefined');
           }

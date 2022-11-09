@@ -1,4 +1,3 @@
-import { getCore } from '../../public/kibana-services'; //TODO: replace with the corresponding 
 import axios from 'axios';
 
 let allow = true;
@@ -24,8 +23,7 @@ export const disableRequests = () => {
     return;
 }
 
-export const initializeInterceptor = () => {
-    const core = getCore();
+export const initializeInterceptor = (core) => {
     core.http.intercept({
         responseError: (httpErrorResponse, controller) => {
             if (
