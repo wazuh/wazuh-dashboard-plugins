@@ -14,10 +14,12 @@ environment, including the version of the elastic stack you want to
 develop for, and the source code folder where the wazuh-kibana-app is
 located.
 
-Use the `saml` flag to bring up KeyCloak IDP. **Add idp to your hosts**.
+Use the `saml` flag to bring up KeyCloak IDP. **Add idp to your hosts and start
+the server using the `--no-base-path`**.
 
 ```apacheconf
-# /etc/hosts
+# Linux systems: /etc/hosts
+# Windows systems: C:\Windows\System32\drivers\etc\hosts
 127.0.0.1 idp
 ```
 
