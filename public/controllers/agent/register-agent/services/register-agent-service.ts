@@ -167,7 +167,7 @@ export const agentNameVariable = (agentName: string, selectedArchitecture: OSArc
  */
 export function checkMissingOSSelection(
   selectedOS: string,
-  selectedVersion: string,
+  selectedVersion: OSVersion,
   selectedArchitecture: string,
 ) {
   if (!selectedOS) {
