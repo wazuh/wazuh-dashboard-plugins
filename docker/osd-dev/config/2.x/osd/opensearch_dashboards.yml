@@ -6,7 +6,7 @@ opensearch.ssl.verificationMode: certificate
 # opensearch.requestHeadersWhitelist: ["securitytenant","Authorization"]
 #
 # osd 2.0
-opensearch.requestHeadersAllowlist: ["securitytenant","Authorization"]
+opensearch.requestHeadersAllowlist: ["securitytenant", "Authorization"]
 #
 opensearch_security.multitenancy.enabled: false
 opensearch_security.readonly_mode.roles: ["kibana_read_only"]

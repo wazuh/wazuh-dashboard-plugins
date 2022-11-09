@@ -18,9 +18,9 @@ services:
       - os-dev
       - mon
     command:
-      - '--es.uri=https://admin:${PASSWORD}@os1:9200'
-      - '--es.ssl-skip-verify'
-      - '--es.all'
+      - "--es.uri=https://admin:${PASSWORD}@os1:9200"
+      - "--es.ssl-skip-verify"
+      - "--es.all"
 
   imposter:
     image: outofcoffee/imposter
@@ -54,68 +54,68 @@ services:
       - os-dev
     entrypoint: /bin/bash
     command: >
-        -c '
-          export certs=/tmp/certs
-          mkdir $$certs
-        	cd $$certs
+      -c '
+        export certs=/tmp/certs
+        mkdir $$certs
+      	cd $$certs
 
-        	echo "Generating CA"
-        	cfssl gencert -initca /conf/ca.json | cfssljson -bare ca
+      	echo "Generating CA"
+      	cfssl gencert -initca /conf/ca.json | cfssljson -bare ca
 
-        	echo "Generating servers certificates"
-        	for i in os1 osd imposter; do
+      	echo "Generating servers certificates"
+      	for i in os1 osd imposter; do
+      		echo "Generating cert for $$i"
+      		cat /conf/host.json | \
+      		sed "s/HOST/$$i/g" | \
+      		cfssl gencert \
+      			-ca $$certs/ca.pem \
+      			-ca-key $$certs/ca-key.pem \
+      			-config /conf/cfssl.json \
+      			-profile=server - | \
+      		cfssljson -bare $$i
+      		openssl pkcs8 -topk8 -inform pem -in $$i-key.pem -outform pem -nocrypt -out $$i.key
+      	done
+
+      	echo "Generating clients certificates"
+        	for i in admin filebeat saml; do
         		echo "Generating cert for $$i"
-        		cat /conf/host.json | \
-        		sed "s/HOST/$$i/g" | \
-        		cfssl gencert \
-        			-ca $$certs/ca.pem \
-        			-ca-key $$certs/ca-key.pem \
-        			-config /conf/cfssl.json \
-        			-profile=server - | \
-        		cfssljson -bare $$i
-        		openssl pkcs8 -topk8 -inform pem -in $$i-key.pem -outform pem -nocrypt -out $$i.key
-        	done
+      		cat /conf/host.json | \
+      		sed "s/HOST/$$i/g" | \
+      		cfssl gencert \
+      			-ca $$certs/ca.pem \
+      			-ca-key $$certs/ca-key.pem \
+      			-config /conf/cfssl.json \
+      			-profile=client - | \
+      		cfssljson -bare $$i
+      		openssl pkcs8 -topk8 -inform pem -in $$i-key.pem -outform pem -nocrypt -out $$i.key
+      	done
 
-        	echo "Generating clients certificates"
-          	for i in admin filebeat saml; do
-          		echo "Generating cert for $$i"
-        		cat /conf/host.json | \
-        		sed "s/HOST/$$i/g" | \
-        		cfssl gencert \
-        			-ca $$certs/ca.pem \
-        			-ca-key $$certs/ca-key.pem \
-        			-config /conf/cfssl.json \
-        			-profile=client - | \
-        		cfssljson -bare $$i
-        		openssl pkcs8 -topk8 -inform pem -in $$i-key.pem -outform pem -nocrypt -out $$i.key
-        	done
+          echo "Setting up permissions"
 
-            echo "Setting up permissions"
+          rm /certs/wi/* /certs/wd/* /certs/wm/*
 
-            rm /certs/wi/* /certs/wd/* /certs/wm/*
+          mv $$certs/os1* /certs/wi
+          mv $$certs/admin* /certs/wi
+          mv /certs/wi/admin.key /certs/wi/admin-key.pem
+          cp $$certs/*ca* /certs/wi
 
-            mv $$certs/os1* /certs/wi
-            mv $$certs/admin* /certs/wi
-            mv /certs/wi/admin.key /certs/wi/admin-key.pem
-            cp $$certs/*ca* /certs/wi
+          mv $$certs/osd* /certs/wd
+          cp $$certs/*ca* /certs/wd
 
-            mv $$certs/osd* /certs/wd
-            cp $$certs/*ca* /certs/wd
+          mv $$certs/saml* /certs/idp
+          mv /certs/idp/saml.key /certs/idp/saml-key.pem
+          cp $$certs/*ca* /certs/idp
 
-            mv $$certs/saml* /certs/idp
-            mv /certs/idp/saml.key /certs/idp/saml-key.pem
-            cp $$certs/*ca* /certs/idp
+          mv $$certs/*.* /certs/wm
 
-            mv $$certs/*.* /certs/wm
+          chmod 640 /certs/wi/* /certs/wd/* /certs/wm/*
+          chown -R 1000:1000 /certs/*
+          ls -alR /certs/
 
-            chmod 640 /certs/wi/* /certs/wd/* /certs/wm/*
-            chown -R 1000:1000 /certs/*
-            ls -alR /certs/
-
-            chown 1000:1000 /data /logs
-            chmod 775 /data /logs
-            sleep 300
-        '
+          chown 1000:1000 /data /logs
+          chmod 775 /data /logs
+          sleep 300
+      '
     healthcheck:
       test: ["CMD-SHELL", "[ -r /certs/wi/os1.pem ]"]
       interval: 2s
@@ -160,7 +160,11 @@ services:
       - os-dev
       - mon
     healthcheck:
-      test: ["CMD-SHELL", "curl -v --cacert config/certs/ca.pem https://os1:9200 2>&1 | grep -q '401 Unauthorized'"]
+      test:
+        [
+          "CMD-SHELL",
+          "curl -v --cacert config/certs/ca.pem https://os1:9200 2>&1 | grep -q '401 Unauthorized'",
+        ]
       interval: 1s
       timeout: 5s
       retries: 120
@@ -181,7 +185,7 @@ services:
     <<: *logging
     # restart: always
     entrypoint:
-      - '/bin/bash'
+      - "/bin/bash"
     command: >
       -c '
         mkdir -p /etc/filebeat
@@ -305,11 +309,11 @@ services:
       - ./config/enable_saml.sh:/enable_saml.sh
     entrypoint: /bin/sh
     command: >
-     -c '
-      apk add bash
-      bash /enable_saml.sh
-      exit 0
-     '
+      -c '
+       apk add bash
+       bash /enable_saml.sh
+       exit 0
+      '
 
 networks:
   os-dev:

@@ -13,43 +13,43 @@ _meta:
 all_access:
   reserved: false
   backend_roles:
-  - "admin"
+    - "admin"
   description: "Maps admin to all_access"
 
 own_index:
   reserved: false
   users:
-  - "*"
+    - "*"
   description: "Allow full access to an index named like the username"
 
 logstash:
   reserved: false
   backend_roles:
-  - "logstash"
+    - "logstash"
 
 kibana_user:
   reserved: false
   backend_roles:
-  - "kibanauser"
+    - "kibanauser"
   users:
-  - "wazuh_user"
-  - "wazuh_admin"    
+    - "wazuh_user"
+    - "wazuh_admin"
   description: "Maps kibanauser to kibana_user"
 
 readall:
   reserved: false
   backend_roles:
-  - "readall"
+    - "readall"
 
 manage_snapshots:
   reserved: false
   backend_roles:
-  - "snapshotrestore"
+    - "snapshotrestore"
 
 kibana_server:
   reserved: true
   users:
-  - "kibanaserver"
+    - "kibanaserver"
 
 wazuh_ui_admin:
   reserved: true
@@ -57,8 +57,8 @@ wazuh_ui_admin:
   backend_roles: []
   hosts: []
   users:
-  - "wazuh_admin"
-  - "kibanaserver"
+    - "wazuh_admin"
+    - "kibanaserver"
   and_backend_roles: []
 
 wazuh_ui_user:
@@ -67,5 +67,5 @@ wazuh_ui_user:
   backend_roles: []
   hosts: []
   users:
-  - "wazuh_user"
+    - "wazuh_user"
   and_backend_roles: []
