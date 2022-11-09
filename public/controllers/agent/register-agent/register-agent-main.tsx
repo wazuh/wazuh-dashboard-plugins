@@ -625,10 +625,9 @@ export const RegisterAgent = withErrorBoundary(
               },
             ]
           : []),
-        ...(this.state.selectedVersion == 'centos5' ||
-        this.state.selectedVersion == 'redhat5' ||
-        this.state.selectedVersion == 'oraclelinux5' ||
-        this.state.selectedVersion == 'suse11'
+        ...(['centos5', 'redhat5', 'oraclelinux5', 'suse11'].includes(
+          this.state.selectedVersion,
+        )
           ? [
               {
                 title: 'Choose the architecture',
@@ -654,17 +653,9 @@ export const RegisterAgent = withErrorBoundary(
               },
             ]
           : []),
-        ...(this.state.selectedVersion == 'centos6' ||
-        this.state.selectedVersion == 'oraclelinux6' ||
-        this.state.selectedVersion == 'amazonlinux1' ||
-        this.state.selectedVersion == 'redhat6' ||
-        this.state.selectedVersion == 'redhat7' ||
-        this.state.selectedVersion == 'amazonlinux2022' ||
-        this.state.selectedVersion == 'debian7' ||
-        this.state.selectedVersion == 'debian8' ||
-        this.state.selectedVersion == 'ubuntu14' ||
-        this.state.selectedVersion == 'ubuntu15' ||
-        this.state.selectedVersion == 'ubuntu16'
+        ...([
+          'centos6','oraclelinux6','amazonlinux1','redhat6','redhat7','amazonlinux2022','debian7','debian8','ubuntu14','ubuntu15','ubuntu16',
+        ].includes(this.state.selectedVersion)
           ? [
               {
                 title: 'Choose the architecture',
@@ -677,13 +668,7 @@ export const RegisterAgent = withErrorBoundary(
               },
             ]
           : []),
-        ...(this.state.selectedVersion == 'centos7' ||
-        this.state.selectedVersion == 'amazonlinux2' ||
-        this.state.selectedVersion == 'suse12' ||
-        this.state.selectedVersion == '22' ||
-        this.state.selectedVersion == 'debian9' ||
-        this.state.selectedVersion == 'debian10' ||
-        this.state.selectedVersion == 'busterorgreater'
+        ...(['centos7','amazonlinux2','suse12','22','debian9','debian10','busterorgreater'].includes(this.state.selectedVersion)
           ? [
               {
                 title: 'Choose the architecture',
@@ -696,8 +681,7 @@ export const RegisterAgent = withErrorBoundary(
               },
             ]
           : []),
-        ...(this.state.selectedVersion == 'windowsxp' ||
-        this.state.selectedVersion == 'windows8'
+        ...(['windowsxp','windows8'].includes(this.state.selectedVersion)
           ? [
               {
                 title: 'Choose the architecture',
@@ -710,12 +694,7 @@ export const RegisterAgent = withErrorBoundary(
               },
             ]
           : []),
-        ...(this.state.selectedVersion == 'sierra' ||
-        this.state.selectedVersion == 'highSierra' ||
-        this.state.selectedVersion == 'mojave' ||
-        this.state.selectedVersion == 'catalina' ||
-        this.state.selectedVersion == 'bigSur' ||
-        this.state.selectedVersion == 'monterrey'
+        ...(['sierra','highSierra','mojave','catalina','bigSur','monterrey'].includes(this.state.selectedVersion)
           ? [
               {
                 title: 'Choose the architecture',
@@ -728,8 +707,7 @@ export const RegisterAgent = withErrorBoundary(
               },
             ]
           : []),
-        ...(this.state.selectedVersion == 'solaris10' ||
-        this.state.selectedVersion == 'solaris11'
+        ...(['solaris10','solaris11'].includes(this.state.selectedVersion)
           ? [
               {
                 title: 'Choose the architecture',
@@ -827,21 +805,7 @@ export const RegisterAgent = withErrorBoundary(
             </div>
           ),
         },
-        ...(this.state.selectedOS == 'rpm' ||
-        this.state.selectedOS == 'cent' ||
-        this.state.selectedOS == 'suse' ||
-        this.state.selectedOS == 'fedora' ||
-        this.state.selectedOS == 'oraclelinux' ||
-        this.state.selectedOS == 'amazonlinux' ||
-        this.state.selectedOS == 'deb' ||
-        this.state.selectedOS == 'raspbian' ||
-        this.state.selectedOS == 'ubu' ||
-        this.state.selectedOS == 'win' ||
-        this.state.selectedOS == 'macos' ||
-        this.state.selectedOS == 'open' ||
-        this.state.selectedOS == 'sol' ||
-        this.state.selectedOS == 'aix' ||
-        this.state.selectedOS == 'hp'
+        ...(['rpm','cent','suse','fedora','oraclelinux','amazonlinux','deb','raspbian','ubu','win','macos','open','sol','aix','hp'].includes(this.state.selectedOS)
           ? [
               {
                 title: 'Start the agent',
@@ -863,21 +827,8 @@ export const RegisterAgent = withErrorBoundary(
           : []),
 
         ...(!missingOSSelection.length &&
-        this.state.selectedOS !== 'rpm' &&
-        this.state.selectedOS !== 'deb' &&
-        this.state.selectedOS !== 'cent' &&
-        this.state.selectedOS !== 'ubu' &&
-        this.state.selectedOS !== 'win' &&
-        this.state.selectedOS !== 'macos' &&
-        this.state.selectedOS !== 'open' &&
-        this.state.selectedOS !== 'sol' &&
-        this.state.selectedOS !== 'aix' &&
-        this.state.selectedOS !== 'hp' &&
-        this.state.selectedOS !== 'amazonlinux' &&
-        this.state.selectedOS !== 'fedora' &&
-        this.state.selectedOS !== 'oraclelinux' &&
-        this.state.selectedOS !== 'suse' &&
-        this.state.selectedOS !== 'raspbian' &&
+        ['rpm'  ,'deb', 'cent' ,'ubu' ,'win',' macos',  'open'  ,'sol'  ,'aix ','hp','amazon linux',
+        'fedora','oracle  linux', 'suse','raspbian'].includes(this.state.selectedOS) &&
         restartAgentCommand
           ? [
               {
