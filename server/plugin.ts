@@ -73,7 +73,6 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     let wazuhSecurity;
     core.http.registerRouteHandlerContext('wazuh', async(context, request) => {
       !wazuhSecurity && (wazuhSecurity = await SecurityObj(plugins, context));
-
       return {
         logger: this.logger,
         server: {

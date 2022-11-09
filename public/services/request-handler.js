@@ -2,9 +2,7 @@ import axios from 'axios';
 import { HTTP_STATUS_CODES } from '../../common/constants';
 
 let allow = true;
-const cancelToken = axios.CancelToken
-const source = cancelToken.source();
-
+const source = axios.CancelToken.source();
 
 const disableRequests = () => {
     allow = false;
@@ -31,7 +29,6 @@ export const request = async (options = '') => {
     if (!options.method | !options.url) {
         return Promise.reject("Missing parameters")
     }
-
     options = {
         ...options, cancelToken: source.token, validateStatus: function (status) {
             return (status >= 200 && status < 300) || status === 401;
