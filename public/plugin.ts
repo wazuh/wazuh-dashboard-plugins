@@ -54,6 +54,16 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
       console.error('plugin.ts: Error getting logos configuration', error);
     }
 
+    //Check if user has wazuh disabled and avoid registering the application if not
+    let response={isWazuhDisabled:1};
+    try{
+    response = await core.http.get('/api/check-wazuh');
+    }
+    catch(error){
+      console.error('plugin.ts: Error checking if Wazuh is enabled', error);
+    }
+
+    if (!response.isWazuhDisabled){
     core.application.register({
       id: `wazuh`,
       title: 'Wazuh',
@@ -87,21 +97,11 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
             window.location.reload();
           }
           await this.initializeInnerAngular();
-          //Check is user has Wazuh disabled
-          const response = await WzRequest.genericReq(
-            'GET',
-            `/api/check-wazuh`,
-          )
-
           params.element.classList.add('dscAppWrapper', 'wz-app');
           const unmount = await renderApp(innerAngularName, params.element);
-          //Update if user has Wazuh disabled
           this.stateUpdater.next(() => {
-            if (response.data.isWazuhDisabled) {
-              unmount();
-            }
             return {
-              status: response.data.isWazuhDisabled,
+              status: 0,
               category: {
                 id: 'wazuh',
                 label: 'Wazuh',
@@ -124,6 +124,7 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
       },
       updater$: this.stateUpdater
     });
+  }
     return {};
   }
   public start(core: CoreStart, plugins: AppPluginStartDependencies): WazuhStart {
