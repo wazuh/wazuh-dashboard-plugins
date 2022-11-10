@@ -45,6 +45,7 @@ commands of Start the agent in the deploy new agent section [#4458](https://gith
 - Fixed issue when logging out from Wazuh when SAML is enabled [#4595](https://github.com/wazuh/wazuh-kibana-app/issues/4595)
 - Fixed server errors with code 500 when the Wazuh API is not reachable / up. [#4710](https://github.com/wazuh/wazuh-kibana-app/pull/4710) [#4728](https://github.com/wazuh/wazuh-kibana-app/pull/4728)
 - Fixed pagination to SCA table [#4653](https://github.com/wazuh/wazuh-kibana-app/issues/4653)
+- Added powerPC architecture in redhat7, in the section 'Deploy new agent'. [4833](https://github.com/wazuh/wazuh-kibana-app/pull/4833)
 
 ## Wazuh v4.3.9 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4310
 
