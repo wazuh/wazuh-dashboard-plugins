@@ -157,7 +157,7 @@ export const RegisterAgent = withErrorBoundary(
       if(serverAddress){
         this.setState({ udpProtocol: true });
       }else{
-        this.setState({ udpProtocol: null });
+        this.setState({ udpProtocol: false });
       }
     }
 
@@ -1194,7 +1194,7 @@ export const RegisterAgent = withErrorBoundary(
             getErrorOrchestrator().handleError(options);
             this.setState({
               serverAddress: nodeSelected.label,
-              udpProtocol: null,
+              udpProtocol: false,
               connectionSecure: false
             })
           }
