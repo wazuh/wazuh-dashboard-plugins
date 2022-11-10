@@ -802,6 +802,7 @@ export const RegisterAgent = withErrorBoundary(
       const field = `${this.state.selectedOS}Text`;
       const text = customTexts[field];
       const language = this.getHighlightCodeLanguage(this.state.selectedOS);
+      const warningUpgrade = 'If the installer finds another Wazuh agent in the system, it will upgrade it preserving the configuration.'
       const windowsAdvice = this.state.selectedOS === 'win' && (
         <>
           <EuiCallOut
@@ -845,11 +846,7 @@ export const RegisterAgent = withErrorBoundary(
             </p>
             <EuiCallOut
               color="warning"
-              title={
-                <>
-                  If the installer finds another Wazuh agent in the system, it will upgrade it preserving the configuration.
-                </>
-              }
+              title={warningUpgrade}
               iconType="iInCircle"
             />
             <EuiSpacer />
@@ -882,11 +879,7 @@ export const RegisterAgent = withErrorBoundary(
             </p>
             <EuiCallOut
               color="warning"
-              title={
-                <>
-                  If the installer finds another Wazuh agent in the system, it will upgrade it preserving the configuration.
-                </>
-              }
+              title={warningUpgrade}
               iconType="iInCircle"
             />
             <EuiSpacer />
@@ -928,11 +921,7 @@ export const RegisterAgent = withErrorBoundary(
                 </p>
                 <EuiCallOut
                   color="warning"
-                  title={
-                    <>
-                      If the installer finds another Wazuh agent in the system, it will upgrade it preserving the configuration.
-                    </>
-                  }
+                  title={warningUpgrade}
                   iconType="iInCircle"
                 />
                 <EuiSpacer />
