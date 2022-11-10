@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { HTTP_STATUS_CODES } from '../../common/constants';
 
 let allow = true;
 const source = axios.CancelToken.source();
@@ -30,22 +29,17 @@ export const request = async (options = '') => {
         return Promise.reject("Missing parameters")
     }
     options = {
-        ...options, cancelToken: source.token, validateStatus: function (status) {
-            return (status >= 200 && status < 300) || status === 401;
-        },
+        ...options, cancelToken: source.token
     }
     if (allow) {
         try {
             const requestData = await axios(options);
-            if (requestData.status === HTTP_STATUS_CODES.UNAUTHORIZED) {
-                if (requestData.data.message === 'Unauthorized' || requestData.data.message === 'Authentication required') {
-                    disableRequests();
-                }
-                throw new Error(requestData.data.message)
-            }
             return Promise.resolve(requestData);
         }
         catch (e) {
+            if (e.response?.data?.message === 'Unauthorized' || e.response?.data?.message === 'Authentication required') {
+                disableRequests();
+            }
             return Promise.reject(e);
         }
     }
