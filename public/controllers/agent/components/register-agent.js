@@ -1040,11 +1040,7 @@ export const RegisterAgent = withErrorBoundary(
             options={options}
             idSelected={idSelected}
             onChange={onChange}
-<<<<<<< HEAD
             className={'wz-flex'}
-=======
-            className={'flex'}
->>>>>>> aa360f958615c1905187af4d47591bb5fb5af35a
             />
         )
       }
@@ -1058,11 +1054,7 @@ export const RegisterAgent = withErrorBoundary(
               options={options}
               idSelected={idSelected}
               onChange={onChange}
-<<<<<<< HEAD
               className={'wz-flex'}
-=======
-              className={'flex'}
->>>>>>> aa360f958615c1905187af4d47591bb5fb5af35a
             />
             {this.state.selectedVersion == 'solaris10' || this.state.selectedVersion == 'solaris11' ? <EuiCallOut color="warning" className='wz-callout-message' iconType="iInCircle" title={
               <span>
