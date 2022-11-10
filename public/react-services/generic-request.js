@@ -14,7 +14,6 @@ import { AppState } from './app-state';
 import { WazuhConfig } from './wazuh-config';
 import { ApiCheck } from './wz-api-check';
 import { WzMisc } from '../factories/misc';
-import { OdfeUtils } from '../utils';
 import { getHttp, getDataPlugin } from '../kibana-services';
 import { PLUGIN_PLATFORM_REQUEST_HEADERS } from '../../common/constants';
 import { request } from '../services/request-handler';
@@ -90,7 +89,6 @@ export class GenericRequest {
 
       return data;
     } catch (err) {
-      OdfeUtils.checkOdfeSessionExpired(err);
       //if the requests fails, we need to check if the API is down
       const currentApi = JSON.parse(AppState.getCurrentAPI() || '{}');
       if (currentApi && currentApi.id) {

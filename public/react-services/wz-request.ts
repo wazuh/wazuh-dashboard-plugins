@@ -14,7 +14,6 @@ import { ApiCheck } from './wz-api-check';
 import { WzAuthentication } from './wz-authentication';
 import { WzMisc } from '../factories/misc';
 import { WazuhConfig } from './wazuh-config';
-import { OdfeUtils } from '../utils';
 import IApiResponse from './interfaces/api-response.interface';
 import { getHttp } from '../kibana-services';
 import { PLUGIN_PLATFORM_REQUEST_HEADERS } from '../../common/constants';
@@ -67,7 +66,6 @@ export class WzRequest {
 
       return Promise.resolve(data);
     } catch (error) {
-      OdfeUtils.checkOdfeSessionExpired(error);
       //if the requests fails, we need to check if the API is down
       if(checkCurrentApiIsUp){
         const currentApi = JSON.parse(AppState.getCurrentAPI() || '{}');
