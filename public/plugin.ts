@@ -101,7 +101,7 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
           const unmount = await renderApp(innerAngularName, params.element);
           this.stateUpdater.next(() => {
             return {
-              status: 0,
+              status: response.isWazuhDisabled,
               category: {
                 id: 'wazuh',
                 label: 'Wazuh',
