@@ -26,11 +26,12 @@ export const request = async (options = '') => {
         return Promise.reject('Requests are disabled');
     }
     if (!options.method | !options.url) {
-        return Promise.reject("Missing parameters")
+        return Promise.reject("Missing parameters");
     }
     options = {
         ...options, cancelToken: source.token
-    }
+    };
+    
     if (allow) {
         try {
             const requestData = await axios(options);
@@ -39,6 +40,7 @@ export const request = async (options = '') => {
         catch (e) {
             if (e.response?.data?.message === 'Unauthorized' || e.response?.data?.message === 'Authentication required') {
                 disableRequests();
+                window.location.reload();
             }
             return Promise.reject(e);
         }
