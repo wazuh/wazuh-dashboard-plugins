@@ -279,7 +279,7 @@ resources:
     path: /decoders/files/{filename}
     queryParams:
       raw: true
-    response: 
+    response:
       statusCode: 200
       staticFile: rules/get_rule_raw.txt
 
@@ -400,7 +400,7 @@ resources:
     path: /lists/files/{filename}
     queryParams:
       raw: true
-    response: 
+    response:
       statusCode: 200
       staticFile: lists/get_list_raw.txt
 
@@ -580,7 +580,7 @@ resources:
     path: /rules/files/{filename}
     queryParams:
       raw: true
-    response: 
+    response:
       statusCode: 200
       staticFile: rules/get_rule_raw.txt
 
@@ -621,7 +621,7 @@ resources:
     response:
       statusCode: 200
       scriptFile: security/login.js
-    
+
   # Logout current user
   - method: DELETE
     path: /security/user/authenticate
@@ -846,44 +846,6 @@ resources:
   # Get agent vulnerabilities' field summary
   - method: GET
     path: /vulnerability/{agent_id}/summary/{field}
-
-  - path: /vulnerability/{agent_id}/summary/cvss3_score
-    method: get
     response:
       statusCode: 200
-      staticFile: vulnerability/vulnerabilities_summary_cvss3_score.json
-  
-  # Get agent vulnerabilities' cvss2_score field summary
-  - path: /vulnerability/{agent_id}/summary/cvss2_score
-    method: get
-    response:
-      statusCode: 200
-      staticFile: vulnerability/vulnerabilities_summary_cvss2_score.json
-  
-  # Get agent vulnerabilities' cve field summary
-  - path: /vulnerability/{agent_id}/summary/cve
-    method: get
-    response:
-      statusCode: 200
-      staticFile: vulnerability/vulnerabilities_summary_cve.json
-  
-  # Get agent vulnerabilities' name field summary
-  - path: /vulnerability/{agent_id}/summary/name
-    method: get
-    response:
-      statusCode: 200
-      staticFile: vulnerability/vulnerabilities_summary_name.json
-  
-  # Get agent vulnerabilities' version field summary
-  - path: /vulnerability/{agent_id}/summary/version
-    method: get
-    response:
-      statusCode: 200
-      staticFile: vulnerability/vulnerabilities_summary_version.json
-  
-  # Get agent vulnerabilities' severity field summary
-  - path: /vulnerability/{agent_id}/summary/severity
-    method: get
-    response:
-      statusCode: 200
-      staticFile: vulnerability/vulnerabilities_summary_severity.json
+      scriptFile: vulnerability/vulnerabilities_summary.js
