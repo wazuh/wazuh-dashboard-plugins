@@ -19,16 +19,16 @@ In general, the environment consist of:
 
 ## Pre-requisites
 
-> IMPORTANT: you will need 2 copies of the Wazuh Kibana App repository, one 
+> **IMPORTANT**: you will need 2 copies of the Wazuh Kibana App repository, one 
 > for the Docker environments, and other one for the plugin source code in the
-> required branch (4.x-7.16, 4.x-wzd, ...). My recommendation is:
+> required branch (`4.x-7.16`, `4.x-wzd`, ...). Our recommendation is:
 > 
 >  - **wazuh-kibana-docker** : on the master branch.
 >  - **wazuh-kibana-app**    : on any development branch. This one will be used 
 >                              as source code and mounted as volume in the 
 >                              platform's container.
 >
-> In future releases, the containers (4.5) and higher, we expect that every 
+> In future releases, the containers (`4.5`) and higher, we expect that every 
 > development branch will contain this folder and this duplication won't be
 > necessary anymore.
 
