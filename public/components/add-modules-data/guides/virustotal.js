@@ -9,13 +9,15 @@
 *
 * Find more information about this on the LICENSE file.
 */
+import { webDocumentationLink } from "../../../../common/services/web_documentation";
+
 export default {
   id: 'virustotal',
   xml_tag: 'integration',
   name: 'VirusTotal',
   description: 'Configuration options of the VirusTotal integration.',
   category: 'Threat detection and response',
-  documentation_link: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/integration.html',
+  documentation_link: webDocumentationLink('user-manual/reference/ossec-conf/integration.html'),
   icon: 'securityApp',
   avaliable_for_manager: true,
   steps: [

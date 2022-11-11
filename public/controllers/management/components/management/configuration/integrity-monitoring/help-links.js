@@ -10,15 +10,15 @@
  * Find more information about this on the LICENSE file.
  */
 
+import { webDocumentationLink } from "../../../../../../../common/services/web_documentation";
+
 export default [
   {
     text: 'Integrity monitoring documentation',
-    href:
-      'https://documentation.wazuh.com/current/user-manual/capabilities/file-integrity/index.html'
+    href: webDocumentationLink('user-manual/capabilities/file-integrity/index.html')
   },
   {
     text: 'Syscheck reference',
-    href:
-      'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/syscheck.html'
+    href: webDocumentationLink('user-manual/reference/ossec-conf/syscheck.html')
   }
 ];

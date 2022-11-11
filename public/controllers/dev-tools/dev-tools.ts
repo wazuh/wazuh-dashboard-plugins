@@ -30,6 +30,7 @@ import {
   UILogLevel,
 } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
+import { webDocumentationLink } from '../../../common/services/web_documentation';
 
 export class DevToolsController {
   /**
@@ -82,9 +83,9 @@ export class DevToolsController {
     $(this.$document[0]).keyup(e => {
       this.multipleKeyPressed = [];
     });
-
+    const element = this.$document[0].getElementById('api_input');
     this.apiInputBox = CodeMirror.fromTextArea(
-      this.$document[0].getElementById('api_input'),
+      element,
       {
         lineNumbers: true,
         matchBrackets: true,
@@ -146,9 +147,7 @@ export class DevToolsController {
    * Open API reference documentation
    */
   help() {
-    this.$window.open(
-      'https://documentation.wazuh.com/current/user-manual/api/reference.html'
-    );
+    this.$window.open(webDocumentationLink('user-manual/api/reference.html'));
   }
 
   /**
@@ -831,19 +830,21 @@ export class DevToolsController {
       };
       getErrorOrchestrator().handleError(options);
 
-      if ((error || {}).status === -1) {
-        return this.apiOutputBox.setValue(
-          'Wazuh API is not reachable. Reason: timeout.'
-        );
+      return this.apiOutputBox.setValue(this.parseError(error));
+    }
+  }
+
+  parseError(error){
+    if ((error || {}).status === -1) {
+      return 'Wazuh API is not reachable. Reason: timeout.';
+    } else {
+      const parsedError = ErrorHandler.handle(error, '', { silent: true });
+      if (typeof parsedError === 'string') {
+        return parsedError;
+      } else if (error && error.data && typeof error.data === 'object') {
+        return JSON.stringify(error);
       } else {
-        const parsedError = ErrorHandler.handle(error, '', { silent: true });
-        if (typeof parsedError === 'string') {
-          return this.apiOutputBox.setValue(error);
-        } else if (error && error.data && typeof error.data === 'object') {
-          return this.apiOutputBox.setValue(JSON.stringify(error));
-        } else {
-          return this.apiOutputBox.setValue('Empty');
-        }
+        return 'Empty';
       }
     }
   }

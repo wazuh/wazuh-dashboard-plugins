@@ -21,8 +21,6 @@ import {
   EuiFlexItem,
   EuiCard,
   EuiStat,
-  EuiText,
-  EuiIcon,
   EuiToolTip,
   euiPaletteColorBlind,
 } from '@elastic/eui';

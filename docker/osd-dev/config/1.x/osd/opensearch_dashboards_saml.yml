@@ -14,7 +14,7 @@ opensearch.username: "kibanaserver"
 opensearch.password: "kibanaserver"
 
 opensearch_security.auth.type: "saml"
-server.xsrf.allowlist:
+server.xsrf.whitelist:
   [
     /_plugins/_security/saml/acs,
     /_opendistro/_security/saml/acs,
