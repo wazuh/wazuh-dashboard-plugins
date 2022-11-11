@@ -177,7 +177,7 @@ describe('[endpoint] PUT /utils/configuration', () => {
   footer              | header                                | responseStatusCode | expectedMD5                           | tab
   ${null}             | ${null}                               | ${200}             | ${'9fbdebb41c6c4fe09841fc94a14de174'} | ${'pm'}
   ${'Custom\nFooter'} | ${'info@company.com\nFake Avenue 123'}| ${200}             | ${'f01f3aa26436cca6c92e7c45da72efce'} | ${'general'}
-  ${''}               | ${''}                                 | ${200}             | ${'5d1f91d81efc69d1ca9bc46604022372'} | ${'fim'}
+  ${''}               | ${''}                                 | ${200}             | ${'fa6c0527535b314aaf50d27e98fda093'} | ${'fim'}
   ${'Custom Footer'}  | ${null}                               | ${200}             | ${'e4aba02dcb618387a4da4103ce833238'} | ${'aws'}
   ${null}             | ${'Custom Header'}                    | ${200}             | ${'102c342384edd4796a02045e28f970cd'} | ${'gcp'}
 `(`Set custom report header and footer - Verify PDF output`, async ({footer, header, responseStatusCode, expectedMD5, tab}) => {
