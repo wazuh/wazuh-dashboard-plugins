@@ -1,0 +1,83 @@
+# Wazuh App Copyright (C) 2021 Wazuh Inc. (License GPLv2)
+version: '3.9'
+
+x-logging: &logging
+  logging:
+    driver: loki
+    options:
+      loki-url: "http://host.docker.internal:3100/loki/api/v1/push"
+
+services:
+  loki:
+    image: grafana/loki:2.5.0
+    hostname: loki
+    networks:
+      - mon
+    # restart: always
+    ports:
+      - 3100:3100
+    volumes:
+      - ./config/loki:/mnt/config
+      - lokidata:/loki
+    command: -config.file=/mnt/config/loki-config.yaml
+
+  prometheus:
+    image: prom/prometheus:v2.35.0
+    hostname: prometheus
+    networks:
+      - mon
+    depends_on:
+      - loki
+      - cadvisor
+    <<: *logging
+    # restart: always
+    command: --config.file=/etc/prometheus/prometheus.yml
+    volumes:
+      - ./config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheusdata:/prometheus
+      - ./config/prometheus/targets:/etc/prometheus/targets
+
+  grafana:
+    image: grafana/grafana:8.5.3
+    hostname: grafana
+    networks:
+      - mon
+    depends_on:
+      - loki
+    <<: *logging
+    # restart: always
+    ports:
+      - 3000:3000
+    volumes:
+      - ./config/grafana/provisioning:/etc/grafana/provisioning
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.39.3
+    hostname: cadvisor
+    networks:
+      - mon
+    depends_on:
+      - loki
+    <<: *logging
+    ports:
+      - "8081:8080"
+    volumes:
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+        # On linux use:
+      - /var/lib/docker/:/var/lib/docker:ro
+        # On Windows:
+        # run $ sudo mount -t drvfs '\\wsl$\docker-desktop-data\version-pack-data\community\docker' /mnt/my-docker
+        # and mount volume: /mnt/my-docker:/rootfs/var/lib/docker:ro
+        # - /mnt/my-docker:/var/lib/docker:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /etc/machine-id:/etc/machine-id:ro
+      - /var/lib/dbus/machine-id:/var/lib/dbus/machine-id:ro
+networks:
+  mon:
+    external: true
+
+volumes:
+  keycloak-data:
+  lokidata:
+  prometheusdata:

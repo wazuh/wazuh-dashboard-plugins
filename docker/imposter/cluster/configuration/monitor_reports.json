@@ -1,0 +1,16 @@
+{
+    "data": {
+        "affected_items": [{
+            "reports": [{
+                "category": "syscheck",
+                "title": "Daily report: File changes",
+                "email_to": "example@test.com"
+            }]
+        }],
+        "total_affected_items": 1,
+        "total_failed_items": 0,
+        "failed_items": []
+    },
+    "message": "Could not read active configuration in specified node",
+    "error": 0
+}
