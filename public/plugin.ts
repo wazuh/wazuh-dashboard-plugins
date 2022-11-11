@@ -28,7 +28,6 @@ import { AppState } from './react-services/app-state';
 import { setErrorOrchestrator } from './react-services/common-services';
 import { ErrorOrchestratorService } from './react-services/error-orchestrator/error-orchestrator.service';
 import { getThemeAssetURL, getAssetURL } from './utils/assets';
-import { WzRequest } from './react-services/wz-request';
 import store from './redux/store';
 import { updateAppConfig } from './redux/actions/appConfigActions';
 import { initializeInterceptor } from './services/request-handler';
