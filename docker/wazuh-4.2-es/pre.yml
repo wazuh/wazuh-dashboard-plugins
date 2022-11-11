@@ -71,6 +71,7 @@ services:
     volumes:
       - certs:/usr/share/elasticsearch/config/certs
       - ./config/wazuh_indexer_ssl_certs/:/tmp/certs
+      - ./config/setup_permissions.sh:/tmp/setup_permissions.sh
     user: "0"
     command: >
       bash -c '
@@ -126,6 +127,10 @@ services:
         until curl -s --cacert config/certs/ca/ca.crt https://es01:9200 | grep -q "missing authentication credentials"; do sleep 30; done;
         echo "Setting kibana_system password";
         until curl -s -X POST --cacert config/certs/ca/ca.crt -u elastic:${ELASTIC_PASSWORD} -H "Content-Type: application/json" https://es01:9200/_security/user/kibana_system/_password -d "{\"password\":\"${KIBANA_PASSWORD}\"}" | grep -q "^{}"; do sleep 10; done;
+
+        # Setup permissions for the app
+        sh /tmp/setup_permissions.sh es01;
+
         echo "All done!";
       '
     healthcheck:
@@ -291,8 +296,8 @@ services:
     environment:
       - SERVERNAME=kibana
       - ELASTICSEARCH_HOSTS=https://es01:9200
-      - ELASTICSEARCH_USERNAME=kibana_system
-      - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
+      - ELASTICSEARCH_USERNAME=wazuh_app
+      - ELASTICSEARCH_PASSWORD=wazuh_app
       - ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES=config/certs/ca/ca.crt
       - XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY=xpack.encryptedSavedObjects.encr"
     healthcheck:
