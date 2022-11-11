@@ -1,0 +1,178 @@
+{
+    "data": {
+        "affected_items": [
+            {
+                "syscheck": {
+                    "disabled": "no",
+                    "frequency": 43200,
+                    "skip_nfs": "yes",
+                    "skip_dev": "yes",
+                    "skip_sys": "yes",
+                    "skip_proc": "yes",
+                    "scan_on_start": "yes",
+                    "max_files_per_second": 0,
+                    "file_limit": {
+                        "enabled": "yes",
+                        "entries": 100000
+                    },
+                    "diff": {
+                        "disk_quota": {
+                            "enabled": "yes",
+                            "limit": 1048576
+                        },
+                        "file_size": {
+                            "enabled": "yes",
+                            "limit": 51200
+                        }
+                    },
+                    "directories": [
+                        {
+                            "opts": [
+                                "check_md5sum",
+                                "check_sha1sum",
+                                "check_perm",
+                                "check_size",
+                                "check_owner",
+                                "check_group",
+                                "check_mtime",
+                                "check_inode",
+                                "realtime",
+                                "check_sha256sum"
+                            ],
+                            "dir": "/bin",
+                            "recursion_level": 256,
+                            "diff_size_limit": 51200
+                        },
+                        {
+                            "opts": [
+                                "check_md5sum",
+                                "check_sha1sum",
+                                "check_perm",
+                                "check_size",
+                                "check_owner",
+                                "check_group",
+                                "check_mtime",
+                                "check_inode",
+                                "realtime",
+                                "check_sha256sum"
+                            ],
+                            "dir": "/boot",
+                            "recursion_level": 256,
+                            "diff_size_limit": 51200
+                        },
+                        {
+                            "opts": [
+                                "check_md5sum",
+                                "check_sha1sum",
+                                "check_perm",
+                                "check_size",
+                                "check_owner",
+                                "check_group",
+                                "check_mtime",
+                                "check_inode",
+                                "realtime",
+                                "check_sha256sum"
+                            ],
+                            "dir": "/etc",
+                            "recursion_level": 256,
+                            "diff_size_limit": 51200
+                        },
+                        {
+                            "opts": [
+                                "check_md5sum",
+                                "check_sha1sum",
+                                "check_perm",
+                                "check_size",
+                                "check_owner",
+                                "check_group",
+                                "check_mtime",
+                                "check_inode",
+                                "realtime",
+                                "check_sha256sum"
+                            ],
+                            "dir": "/sbin",
+                            "recursion_level": 256,
+                            "diff_size_limit": 51200
+                        },
+                        {
+                            "opts": [
+                                "check_md5sum",
+                                "check_sha1sum",
+                                "check_perm",
+                                "check_size",
+                                "check_owner",
+                                "check_group",
+                                "check_mtime",
+                                "check_inode",
+                                "realtime",
+                                "check_sha256sum"
+                            ],
+                            "dir": "/usr/bin",
+                            "recursion_level": 256,
+                            "diff_size_limit": 51200
+                        },
+                        {
+                            "opts": [
+                                "check_md5sum",
+                                "check_sha1sum",
+                                "check_perm",
+                                "check_size",
+                                "check_owner",
+                                "check_group",
+                                "check_mtime",
+                                "check_inode",
+                                "realtime",
+                                "check_sha256sum"
+                            ],
+                            "dir": "/usr/sbin",
+                            "recursion_level": 256,
+                            "diff_size_limit": 51200
+                        }
+                    ],
+                    "nodiff": [
+                        "/etc/ssl/private.key"
+                    ],
+                    "ignore": [
+                        "/etc/mtab",
+                        "/etc/hosts.deny",
+                        "/etc/mail/statistics",
+                        "/etc/random-seed",
+                        "/etc/random.seed",
+                        "/etc/adjtime",
+                        "/etc/httpd/logs",
+                        "/etc/utmpx",
+                        "/etc/wtmpx",
+                        "/etc/cups/certs",
+                        "/etc/dumpdates",
+                        "/etc/svc/volatile"
+                    ],
+                    "ignore_sregex": [
+                        ".alert$",
+                        ".log$|.swp$"
+                    ],
+                    "whodata": {
+                        "restart_audit": "yes",
+                        "startup_healthcheck": "yes"
+                    },
+                    "allow_remote_prefilter_cmd": "no",
+                    "synchronization": {
+                        "enabled": "yes",
+                        "max_interval": 3600,
+                        "interval": 300,
+                        "response_timeout": 30,
+                        "queue_size": 16384,
+                        "max_eps": 10
+                    },
+                    "max_eps": 100,
+                    "process_priority": 10,
+                    "database": "disk"
+                }
+            }
+        ],
+        "total_affected_items": 1,
+        "total_failed_items": 0,
+        "failed_items": []
+    },
+    "message": "Active configuration was successfully read in specified node",
+    "error": 0
+}
