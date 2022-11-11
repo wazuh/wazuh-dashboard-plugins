@@ -1,0 +1,851 @@
+---
+plugin: openapi
+specFile: https://raw.githubusercontent.com/wazuh/wazuh/4.4/api/api/spec/spec.yaml
+system:
+  stores:
+    # this store is preloaded from file
+    storeWazuh:
+      preloadFile: initial_data.json
+
+resources:
+
+  # ===================================================== #
+  #   API INFO
+  # ===================================================== #
+
+  # Get API info
+  - method: GET
+    path: /
+    response:
+      statusCode: 200
+      staticFile: api-info/api_info.json
+
+  # ===================================================== #
+  #   ACTIVE-RESPONSE
+  # ===================================================== #
+
+  # Run command
+  - method: PUT
+    path: /active-response
+
+  # ===================================================== #
+  #   AGENTS
+  # ===================================================== #
+
+  # Delete agents
+  - method: DELETE
+    path: /agents
+
+  # List agents
+
+  - method: GET
+    path: /agents
+    response:
+      statusCode: 200
+      scriptFile: agents/agents.js
+
+  # Add agent
+  - method: POST
+    path: /agents
+
+  # Get active configuration
+  - method: GET
+    path: /agents/{agent_id}/config/{component}/{configuration}
+
+  # Remove agent from groups
+  - method: DELETE
+    path: /agents/{agent_id}/group
+
+  # Get configuration sync status
+  - method: GET
+    path: /agents/{agent_id}/group/is_sync
+
+  # Remove agent from group
+  - method: DELETE
+    path: /agents/{agent_id}/group/{group_id}
+
+  # Assign agent to group
+  - method: PUT
+    path: /agents/{agent_id}/group/{group_id}
+
+  # Get key
+  - method: GET
+    path: /agents/{agent_id}/key
+
+  # Restart agent
+  - method: PUT
+    path: /agents/{agent_id}/restart
+
+  # Get agent's component stats
+  - method: GET
+    path: /agents/{agent_id}/stats/{component}
+
+  # Upgrade agents
+  - method: PUT
+    path: /agents/upgrade
+
+  # Upgrade agents custom
+  - method: PUT
+    path: /agents/upgrade_custom
+
+  # Get upgrade results
+  - method: GET
+    path: /agents/upgrade_result
+
+  # Remove agents from group
+  - method: DELETE
+    path: /agents/group
+
+  # Assign agents to group
+  - method: PUT
+    path: /agents/group
+
+  # Restart agents in group
+  - method: PUT
+    path: /agents/group/{group_id}/restart
+
+  # Add agent full
+  - method: POST
+    path: /agents/insert
+
+  # Add agent quick
+  - method: POST
+    path: /agents/insert/quick
+
+  # List agents without group
+  - method: GET
+    path: /agents/no_group
+
+  # Restart agents in node
+  - method: PUT
+    path: /agents/node/{node_id}/restart
+
+  # List outdated agents
+  - method: GET
+    path: /agents/outdated
+
+  # Force reconnect agents
+  - method: PUT
+    path: /agents/reconnect
+
+  # Restart agents
+  - method: PUT
+    path: /agents/restart
+
+  # List agents distinct
+  - method: GET
+    path: /agents/stats/distinct
+
+  # Summarize agents OS
+  - method: GET
+    path: /agents/summary/os
+
+  # Summarize agents status
+  - method: GET
+    path: /agents/summary/status
+
+
+  # ===================================================== #
+  #   CISCAT
+  # ===================================================== #
+
+  # Get results
+  - method: GET
+    path: /ciscat/{agent_id}/results
+
+  # ===================================================== #
+  #   CLUSTER
+  # ===================================================== #
+
+  # Get local node info
+  - method: GET
+    path: /cluster/local/info
+
+  # Get nodes info
+  - method: GET
+    path: /cluster/nodes
+    response:
+      statusCode: 200
+      scriptFile: cluster/cluster_node_info.js
+
+  # Get nodes healthcheck
+  - method: GET
+    path: /cluster/healthcheck
+
+  # Get cluster nodes ruleset synchronization status
+  - method: GET
+    path: /cluster/ruleset/synchronization
+    response:
+      statusCode: 200
+      scriptFile: cluster/cluster_sync.js
+      # staticFile: cluster/cluster_sync_no_sync.json
+
+  # Get cluster status
+  - method: GET
+    path: /cluster/status
+
+  # Get local node config
+  - method: GET
+    path: /cluster/local/config
+
+  # Get nodes API config
+  - method: GET
+    path: /cluster/api/config
+
+  # Get node status
+  - method: GET
+    path: /cluster/{node_id}/status
+
+  # Get node info
+  - method: GET
+    path: /cluster/{node_id}/info
+
+  # Get node config
+  - method: GET
+    path: /cluster/{node_id}/configuration
+    queryParams:
+      raw: true
+    response:
+      statusCode: 200
+      staticFile: cluster/configuration_node.txt
+
+  # Update node configuration
+  - method: PUT
+    path: /cluster/{node_id}/configuration
+
+  # Get node stats
+  - method: GET
+    path: /cluster/{node_id}/stats
+
+  # Get node stats hour
+  - method: GET
+    path: /cluster/{node_id}/stats/hourly
+
+  # Get node stats week
+  - method: GET
+    path: /cluster/{node_id}/stats/weekly
+
+  # Get node stats analysisd
+  - method: GET
+    path: /cluster/{node_id}/stats/analysisd
+
+  # Get node stats remoted
+  - method: GET
+    path: /cluster/{node_id}/stats/remoted
+
+  # Get node logs
+  - method: GET
+    path: /cluster/{node_id}/logs
+
+  # Get node logs summary
+  - method: GET
+    path: /cluster/{node_id}/logs/summary
+
+  # Restart nodes
+  - method: PUT
+    path: /cluster/restart
+    response:
+      statusCode: 200
+      scriptFile: cluster/cluster_restart.js
+
+  # Check nodes config
+  - method: GET
+    path: /cluster/configuration/validation
+    # response:
+    #   statusCode: 200
+    #   staticFile: cluster/error.json
+
+  # Get node active configuration
+  - method: GET
+    path: /cluster/{node_id}/configuration/{component}/{configuration}
+    response:
+      statusCode: 200
+      scriptFile: cluster/component_configuration.js
+
+  # ===================================================== #
+  #   DECODERS
+  # ===================================================== #
+
+  # List decoders
+  - method: GET
+    path: /decoders
+
+  # Get files
+  - method: GET
+    path: /decoders/files
+
+  # Get decoders file content
+  - method: GET
+    path: /decoders/files/{filename}
+    queryParams:
+      raw: true
+    response:
+      statusCode: 200
+      staticFile: rules/get_rule_raw.txt
+
+  # Update decoders file
+  - method: PUT
+    path: /decoders/files/{filename}
+
+  # Delete decoders file
+  - method: DELETE
+    path: /decoders/files/{filename}
+
+  # Get parent decoders
+  - method: GET
+    path: /decoders/parents
+
+  # ===================================================== #
+  #   EXPERIMENTAL
+  # ===================================================== #
+
+  # Clearrootcheck results
+  - method: DELETE
+    path: /experimental/rootcheck
+
+  # Clearagents FIM results
+  - method: DELETE
+    path: /experimental/syscheck
+
+  # Get agents CIS-CAT results
+  - method: GET
+    path: /experimental/ciscat/results
+
+  # Get agents hardware
+  - method: GET
+    path: /experimental/syscollector/hardware
+
+  # Get agents netaddr
+  - method: GET
+    path: /experimental/syscollector/netaddr
+
+  # Get agents netiface
+  - method: GET
+    path: /experimental/syscollector/netiface
+
+  # Get agents netproto
+  - method: GET
+    path: /experimental/syscollector/netproto
+
+  # Get agents OS
+  - method: GET
+    path: /experimental/syscollector/os
+
+  # Get agents packages
+  - method: GET
+    path: /experimental/syscollector/packages
+
+  # Get agents ports
+  - method: GET
+    path: /experimental/syscollector/ports
+
+  # Get agents processes
+  - method: GET
+    path: /experimental/syscollector/processes
+
+  # Get agents hotfixes
+  - method: GET
+    path: /experimental/syscollector/hotfixes
+
+  # ===================================================== #
+  #   GROUPS
+  # ===================================================== #
+
+  # Delete groups
+  - method: DELETE
+    path: /groups
+
+  # Delete groups
+  - method: GET
+    path: /groups
+
+  # Create a group
+  - method: POST
+    path: /groups
+
+  # Get agents in a group
+  - method: GET
+    path: /groups/{group_id}/agents
+
+  # Get group configuration
+  - method: GET
+    path: /groups/{group_id}/configuration
+
+  # Update group configuration
+  - method: PUT
+    path: /groups/{group_id}/configuration
+
+  # Get group files
+  - method: GET
+    path: /groups/{group_id}/files
+
+  # Get a file in group
+  - method: GET
+    path: /groups/{group_id}/files/{file_name}/json
+
+  # Get a file in group
+  - method: GET
+    path: /groups/{group_id}/files/{file_name}/xml
+
+  # ===================================================== #
+  #   LISTS
+  # ===================================================== #
+
+  # Get CDB lists info
+  - method: GET
+    path: /lists
+
+  # Get CDB list file content
+  - method: GET
+    path: /lists/files/{filename}
+    queryParams:
+      raw: true
+    response:
+      statusCode: 200
+      staticFile: lists/get_list_raw.txt
+
+  # Update CDB list file
+  - method: PUT
+    path: /lists/files/{filename}
+
+  # Delete CDB list file
+  - method: DELETE
+    path: /lists/files/{filename}
+
+  # Get CDB lists files
+  - method: GET
+    path: /lists/files
+
+  # ===================================================== #
+  #   LOGTEST
+  # ===================================================== #
+
+  # Run logtest
+  - method: PUT
+    path: /logtest
+
+  # End session
+  - method: DELETE
+    path: /logtest/sessions/{token}
+
+  # ===================================================== #
+  #   MANAGER
+  # ===================================================== #
+
+  # Get status
+  - method: GET
+    path: /manager/status
+
+  # Get information
+  - method: GET
+    path: /manager/info
+
+  # Get configuration
+  - method: GET
+    path: /manager/configuration
+
+  # Update Wazuh configuration
+  - method: PUT
+    path: /manager/configuration
+
+  # Get stats
+  - method: GET
+    path: /manager/stats
+
+  # Get stats hour
+  - method: GET
+    path: /manager/stats/hourly
+
+  # Get stats week
+  - method: GET
+    path: /manager/stats/weekly
+
+  # Get stats analysisd
+  - method: GET
+    path: /manager/stats/analysisd
+
+  # Get stats remoted
+  - method: GET
+    path: /manager/stats/remoted
+
+  # Get logs
+  - method: GET
+    path: /manager/logs
+
+  # Get logs summary
+  - method: GET
+    path: /manager/logs/summary
+
+  # Get API config
+  - method: GET
+    path: /manager/api/config
+
+  # Restart manager
+  - method: PUT
+    path: /manager/restart
+
+  # Check config
+  - method: GET
+    path: /manager/configuration/validation
+
+  # Get active configuration
+  - method: GET
+    path: /manager/configuration/{component}/{configuration}
+
+  # ===================================================== #
+  #   MITRE
+  # ===================================================== #
+
+  # Get MITRE groups
+  - method: GET
+    path: /mitre/groups
+
+  # Get MITRE metadata
+  - method: GET
+    path: /mitre/metadata
+
+  # Get MITRE mitigations
+  - method: GET
+    path: /mitre/mitigations
+
+  # Get MITRE references
+  - method: GET
+    path: /mitre/references
+
+  # Get MITRE software
+  - method: GET
+    path: /mitre/software
+
+  # Get MITRE tactics
+  - method: GET
+    path: /mitre/tactics
+
+  # Get MITRE techniques
+  - method: GET
+    path: /mitre/techniques
+
+  # ===================================================== #
+  #   OVERVIEW
+  # ===================================================== #
+
+  # Get agents overview
+  - method: GET
+    path: /overview/agents
+
+  # ===================================================== #
+  #   ROOTCHECK
+  # ===================================================== #
+
+  # Run scan
+  - method: PUT
+    path: /rootcheck
+
+  # Get results
+  - method: GET
+    path: /rootcheck/{agent_id}
+
+  # Clearresults
+  - method: DELETE
+    path: /rootcheck/{agent_id}
+
+  # Get last scan datetime
+  - method: GET
+    path: /rootcheck/{agent_id}/last_scan
+
+  # ===================================================== #
+  #   RULES
+  # ===================================================== #
+
+  # List rules
+  - method: GET
+    path: /rules
+
+  # Get groups
+  - method: GET
+    path: /rules/groups
+
+  # Get requirements
+  - method: GET
+    path: /rules/requirement/{requirement}
+
+  # Get files
+  - method: GET
+    path: /rules/files
+    response:
+      statusCode: 200
+      staticFile: rules/get_rules.json
+
+  # Get rules file content
+  - method: GET
+    path: /rules/files/{filename}
+    queryParams:
+      raw: true
+    response:
+      statusCode: 200
+      staticFile: rules/get_rule_raw.txt
+
+  # Update rules file
+  - method: PUT
+    path: /rules/files/{filename}
+
+  # Delete rules file
+  - method: DELETE
+    path: /rules/files/{filename}
+
+  # ===================================================== #
+  #   SCA
+  # ===================================================== #
+
+  # Get results
+  - method: GET
+    path: /sca/{agent_id}
+
+  # Get policy checks
+  - method: GET
+    path: /sca/{agent_id}/checks/{policy_id}
+
+  # ===================================================== #
+  #   SECURITY
+  # ===================================================== #
+
+  # Login
+  - method: POST
+    path: /security/user/authenticate
+    response:
+      statusCode: 200
+      scriptFile: security/login.js
+
+  # Login (@deprecated in 4.4.0)
+  - method: GET
+    path: /security/user/authenticate
+    response:
+      statusCode: 200
+      scriptFile: security/login.js
+
+  # Logout current user
+  - method: DELETE
+    path: /security/user/authenticate
+
+  # Login auth_context
+  - method: POST
+    path: /security/user/authenticate/run_as
+
+  # Get current user info
+  - method: GET
+    path: /security/users/me
+
+  # Get current user processed policies
+  - method: GET
+    path: /security/users/me/policies
+
+  # Revoke JWT tokens
+  - method: PUT
+    path: /security/user/revoke
+
+  # Enable/Disable run_as
+  - method: PUT
+    path: /security/users/{user_id}/run_as
+
+  # List RBAC actions
+  - method: GET
+    path: /security/actions
+
+  # List RBAC resources
+  - method: GET
+    path: /security/resources
+
+  # List users
+  - method: GET
+    path: /security/users
+
+  # Add users
+  - method: POST
+    path: /security/users
+
+  # Delete users
+  - method: DELETE
+    path: /security/users
+
+  # Update users
+  - method: PUT
+    path: /security/users/{user_id}
+
+  # List roles
+  - method: GET
+    path: /security/roles
+    response:
+      statusCode: 200
+      staticFile: security/security_roles.json
+
+  # Add role
+  - method: POST
+    path: /security/roles
+
+  # Delete roles
+  - method: DELETE
+    path: /security/roles
+
+  # Update role
+  - method: PUT
+    path: /security/roles/{role_id}
+
+  # List security rules
+  - method: GET
+    path: /security/rules
+
+  # Add security rule
+  - method: POST
+    path: /security/rules
+
+  # Delete security rules
+  - method: DELETE
+    path: /security/rules
+
+  # Update security rule
+  - method: PUT
+    path: /security/rules/{rule_id}
+
+  # List policies
+  - method: GET
+    path: /security/policies
+    response:
+      statusCode: 200
+      staticFile: security/security_policies.json
+
+  # Add policy
+  - method: POST
+    path: /security/policies
+
+  # Delete policies
+  - method: DELETE
+    path: /security/policies
+
+  # Update policy
+  - method: PUT
+    path: /security/policies/{policy_id}
+
+  # Add roles to user
+  - method: POST
+    path: /security/users/{user_id}/roles
+
+  # Remove roles from user
+  - method: DELETE
+    path: /security/users/{user_id}/roles
+
+  # Add policies to role
+  - method: POST
+    path: /security/roles/{role_id}/policies
+
+  # Remove policies from role
+  - method: DELETE
+    path: /security/roles/{role_id}/policies
+
+  # Add security rules to role
+  - method: POST
+    path: /security/roles/{role_id}/rules
+
+  # Remove security rules from role
+  - method: DELETE
+    path: /security/roles/{role_id}/rules
+
+  # Get security config
+  - method: GET
+    path: /security/config
+
+  # Update security config
+  - method: PUT
+    path: /security/config
+
+  # Restore default security config
+  - method: DELETE
+    path: /security/config
+
+  # ===================================================== #
+  #   SYSCHECK
+  # ===================================================== #
+
+  # Run scan
+  - method: PUT
+    path: /syscheck
+
+  # Get results
+  - method: GET
+    path: /syscheck/{agent_id}
+
+  # Clearresults
+  - method: DELETE
+    path: /syscheck/{agent_id}
+
+  # Get last scan datetime
+  - method: GET
+    path: /syscheck/{agent_id}/last_scan
+
+  # ===================================================== #
+  #   SYSCOLLECTOR
+  # ===================================================== #
+
+  # Get agent hardware
+  - method: GET
+    path: /syscollector/{agent_id}/hardware
+
+  # Get agent hotfixes
+  - method: GET
+    path: /syscollector/{agent_id}/hotfixes
+
+  # Get agent netaddr
+  - method: GET
+    path: /syscollector/{agent_id}/netaddr
+
+  # Get agent netiface
+  - method: GET
+    path: /syscollector/{agent_id}/netiface
+
+  # Get agent netproto
+  - method: GET
+    path: /syscollector/{agent_id}/netproto
+
+  # Get agent OS
+  - method: GET
+    path: /syscollector/{agent_id}/os
+
+  # Get agent packages
+  - method: GET
+    path: /syscollector/{agent_id}/packages
+
+  # Get agent ports
+  - method: GET
+    path: /syscollector/{agent_id}/ports
+
+  # Get agent processes
+  - method: GET
+    path: /syscollector/{agent_id}/processes
+
+  # ===================================================== #
+  #   TASKS
+  # ===================================================== #
+
+  # List tasks
+  - method: GET
+    path: /tasks/status
+
+  # ===================================================== #
+  #   VULNERABILITY
+  # ===================================================== #
+
+  # Get vulnerabilities
+  - method: GET
+    path: /vulnerability/{agent_id}
+    response:
+      statusCode: 200
+      staticFile: vulnerability/vulnerabilities.json
+
+  # Get last scan datetime
+  - method: GET
+    path: /vulnerability/{agent_id}/last_scan
+
+  # Get agent vulnerabilities' field summary
+  - method: GET
+    path: /vulnerability/{agent_id}/summary/{field}
+    response:
+      statusCode: 200
+      scriptFile: vulnerability/vulnerabilities_summary.js

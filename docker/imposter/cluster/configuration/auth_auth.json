@@ -1,0 +1,35 @@
+{
+    "data": {
+        "affected_items": [
+            {
+                "auth": {
+                    "port": 1515,
+                    "disabled": "no",
+                    "remote_enrollment": "yes",
+                    "use_source_ip": "no",
+                    "purge": "yes",
+                    "use_password": "no",
+                    "ssl_verify_host": "no",
+                    "ssl_auto_negotiate": "no",
+                    "ciphers": "HIGH:!ADH:!EXP:!MD5:!RC4:!3DES:!CAMELLIA:@STRENGTH",
+                    "ssl_manager_cert": "/var/ossec/etc/sslmanagertest.cert",
+                    "ssl_manager_key": "/var/ossec/etc/sslmanagertest.key",
+                    "force": {
+                        "enabled": "yes",
+                        "key_mismatch": "yes",
+                        "disconnected_time": {
+                            "enabled": "yes",
+                            "value": 3600
+                        },
+                        "after_registration_time": 3600
+                    }
+                }
+            }
+        ],
+        "total_affected_items": 1,
+        "total_failed_items": 0,
+        "failed_items": []
+    },
+    "message": "Active configuration was successfully read in specified node",
+    "error": 0
+}

@@ -1,0 +1,7 @@
+server.port: 5601
+server.host: 0.0.0.0
+elasticsearch.hosts: ["https://es01:9200"]
+elasticsearch.username: "wazuh_app"
+elasticsearch.password: "wazuh_app"
+elasticsearch.ssl.certificateAuthorities: [ "/home/node/kbn/config/certs/ca/ca.crt" ]
+xpack.encryptedSavedObjects.encryptionKey: "encryptedSavedObjectsMinimum32Characters"
