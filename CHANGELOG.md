@@ -24,7 +24,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 commands of Start the agent in the deploy new agent section [#4458](https://github.com/wazuh/wazuh-kibana-app/pull/4458)
 - Makes Agents Overview loading icons independent [#4363](https://github.com/wazuh/wazuh-kibana-app/pull/4363)
 - Added cluster's IP and protocol as suggestions in the agent deployment wizard. [#4776](https://github.com/wazuh/wazuh-kibana-app/pull/4776)
-- Show name + number in OS version. [#4851](https://github.com/wazuh/wazuh-kibana-app/pull/4851)
+- Show OS name and OS version in the agent installation wizard. [#4851](https://github.com/wazuh/wazuh-kibana-app/pull/4851)
 
 ### Fixed
 
