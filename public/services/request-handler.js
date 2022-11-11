@@ -22,7 +22,7 @@ export const initializeInterceptor = (core) => {
     });
 }
 
-export const request = async (options = '') => {
+export const request = async (options = {}) => {
     if (!allow) {
         return Promise.reject('Requests are disabled');
     };
