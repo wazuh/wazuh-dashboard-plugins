@@ -1,0 +1,34 @@
+cluster.name: odfe-cluster
+node.name: odfe-node1
+node.master: true
+node.data: true
+node.ingest: true
+network.host: 0.0.0.0
+discovery.zen.minimum_master_nodes: 1
+discovery.type: single-node
+node.max_local_storage_nodes: 1
+
+opendistro_security.allow_default_init_securityindex: true
+opendistro_security.ssl.transport.pemcert_filepath: /usr/share/elasticsearch/config/certs/odfe-node1.pem
+opendistro_security.ssl.transport.pemkey_filepath: /usr/share/elasticsearch/config/certs/odfe-node1.key
+opendistro_security.ssl.transport.pemtrustedcas_filepath: /usr/share/elasticsearch/config/certs/ca.pem
+opendistro_security.ssl.transport.enforce_hostname_verification: false
+opendistro_security.ssl.transport.resolve_hostname: false
+opendistro_security.ssl.http.enabled: true
+opendistro_security.ssl.http.pemcert_filepath: /usr/share/elasticsearch/config/certs/odfe-node1.pem
+opendistro_security.ssl.http.pemkey_filepath: /usr/share/elasticsearch/config/certs/odfe-node1.key
+opendistro_security.ssl.http.pemtrustedcas_filepath: /usr/share/elasticsearch/config/certs/ca.pem
+opendistro_security.nodes_dn:
+- CN=odfe-node1,OU=Wazuh,O=Wazuh,L=California,C=US"
+
+opendistro_security.authcz.admin_dn:
+  - "CN=admin,OU=Wazuh,O=Wazuh,L=California,C=US"
+
+opendistro_security.audit.type: internal_elasticsearch
+opendistro_security.enable_snapshot_restore_privilege: true
+opendistro_security.check_snapshot_restore_write_privileges: true
+opendistro_security.restapi.roles_enabled: ["all_access", "security_rest_api_access"]
+
+
+path.data: /usr/share/elasticsearch/data
+path.logs: /usr/share/elasticsearch/logs

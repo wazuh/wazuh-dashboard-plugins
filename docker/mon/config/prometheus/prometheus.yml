@@ -1,0 +1,46 @@
+# my global config
+global:
+  scrape_interval:     5s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+  evaluation_interval: 5s # Evaluate rules every 15 seconds. The default is every 1 minute.
+  # scrape_timeout is set to the global default (10s).
+
+  # Attach these labels to any time series or alerts when communicating with
+  # external systems (federation, remote storage, Alertmanager).
+  external_labels:
+      monitor: 'monitor'
+
+# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+rule_files:
+  # - "first.rules"
+  # - "second.rules"
+
+# A scrape configuration containing exactly one endpoint to scrape:
+# Here it's Prometheus itself.
+scrape_configs:
+  - job_name: loki
+    static_configs:
+      - targets: ['host.docker.internal:3100']
+
+  - job_name: docker
+    static_configs:
+      - targets: ['host.docker.internal:9323']
+
+  - job_name: cadvisor
+    static_configs:
+      - targets:
+        - cadvisor:8080
+        labels:
+          cadvisor: 0.39.3
+
+  - job_name: imposter
+    metrics_path: /system/metrics
+    file_sd_configs:
+      - files:
+         - /etc/prometheus/targets/imposter-targets.yaml
+
+  - job_name: elastic
+    scheme: http
+    file_sd_configs:
+      - files:
+         - /etc/prometheus/targets/elastic-targets.yaml
+

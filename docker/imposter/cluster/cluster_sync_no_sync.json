@@ -1,0 +1,43 @@
+{
+  "data": {
+    "affected_items": [
+      {
+        "name": "master-node",
+        "synced": true
+      },
+      {
+        "name": "workerWithLonggggname!!!!!!!",
+        "synced": false
+      },
+      {
+        "name": "worker2",
+        "synced": true
+      },
+      {
+        "name": "worker3",
+        "synced": false
+      },
+      {
+        "name": "worker4",
+        "synced": false
+      },
+      {
+        "name": "worker2",
+        "synced": true
+      },
+      {
+        "name": "worker3",
+        "synced": false
+      },
+      {
+        "name": "worker4",
+        "synced": false
+      }
+    ],
+    "total_affected_items": 19,
+    "total_failed_items": 0,
+    "failed_items": []
+  },
+  "message": "All selected nodes healthcheck information was returned",
+  "error": 0
+}
