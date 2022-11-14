@@ -1,0 +1,24 @@
+{
+    "data": {
+        "affected_items": [
+            {
+                "disabled": false,
+                "name": "wazuh1",
+                "node_name": "master",
+                "node_type": "master",
+                "key": "test1234",
+                "port": 1516,
+                "bind_addr": "0.0.0.0",
+                "nodes": [
+                    "0.0.0.0"
+                ],
+                "hidden": "no"
+            }
+        ],
+        "total_affected_items": 1,
+        "total_failed_items": 0,
+        "failed_items": []
+    },
+    "message": "Active configuration was successfully read in specified node",
+    "error": 0
+}
