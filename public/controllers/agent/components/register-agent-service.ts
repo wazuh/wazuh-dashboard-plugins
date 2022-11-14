@@ -83,10 +83,10 @@ async function getConnectionConfig(nodeSelected: ServerAddressOptions, defaultSe
       const remoteConfig = await getRemoteConfiguration(nodeName);
       return { serverAddress: remoteConfig.name, udpProtocol: remoteConfig.isUdp, connectionSecure: remoteConfig.haveSecureConnection };
     }else{
-      return { serverAddress: nodeName, udpProtocol: true, connectionSecure: true };
+      return { serverAddress: nodeName, udpProtocol: false, connectionSecure: true };
     }
   }else{
-    return { serverAddress: defaultServerAddress, udpProtocol: true, connectionSecure: true };
+    return { serverAddress: defaultServerAddress, udpProtocol: false, connectionSecure: true };
   }
 }
 
