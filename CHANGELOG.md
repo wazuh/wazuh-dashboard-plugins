@@ -14,6 +14,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added validation to the plugin settings in the form of `Settings/Configuration` and the endpoint to update the plugin configuration [#4503](https://github.com/wazuh/wazuh-kibana-app/pull/4503)[#4785](https://github.com/wazuh/wazuh-kibana-app/pull/4785)
 - Added new plugin settings to customize the header and footer on the PDF reports [#4505](https://github.com/wazuh/wazuh-kibana-app/pull/4505)[#4798](https://github.com/wazuh/wazuh-kibana-app/pull/4798)[#4805](https://github.com/wazuh/wazuh-kibana-app/pull/4805)
 - Add a new plugin setting to enable or disable the customization [#4507](https://github.com/wazuh/wazuh-kibana-app/pull/4507)
+- Added a centralized service to handle the requests [#4831](https://github.com/wazuh/wazuh-kibana-app/pull/4831)
 
 ### Changed
 
@@ -23,6 +24,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Updated and added operating systems, versions, architectures commands of Install and enroll the agent and
 commands of Start the agent in the deploy new agent section [#4458](https://github.com/wazuh/wazuh-kibana-app/pull/4458)
 - Makes Agents Overview loading icons independent [#4363](https://github.com/wazuh/wazuh-kibana-app/pull/4363)
+- Added cluster's IP and protocol as suggestions in the agent deployment wizard. [#4776](https://github.com/wazuh/wazuh-kibana-app/pull/4776)
+- Show OS name and OS version in the agent installation wizard. [#4851](https://github.com/wazuh/wazuh-kibana-app/pull/4851)
 
 ### Fixed
 
@@ -34,6 +37,8 @@ commands of Start the agent in the deploy new agent section [#4458](https://gith
 - Changed the endpoint that updates the plugin configuration to support multiple settings. [#4501](https://github.com/wazuh/wazuh-kibana-app/pull/4501)
 - Allowed to upload an image for the `customization.logo.*` settings in `Settings/Configuration` [#4504](https://github.com/wazuh/wazuh-kibana-app/pull/4504)
 - Remove trailing hyphen character for OS value in the list of agents [#4828](https://github.com/wazuh/wazuh-kibana-app/pull/4828)
+- Fixed WAZUH_PROTOCOL param suggestion [#4849](https://github.com/wazuh/wazuh-kibana-app/pull/4849)
+
 
 ### Fixed
 
@@ -45,6 +50,7 @@ commands of Start the agent in the deploy new agent section [#4458](https://gith
 - Fixed issue when logging out from Wazuh when SAML is enabled [#4595](https://github.com/wazuh/wazuh-kibana-app/issues/4595)
 - Fixed server errors with code 500 when the Wazuh API is not reachable / up. [#4710](https://github.com/wazuh/wazuh-kibana-app/pull/4710) [#4728](https://github.com/wazuh/wazuh-kibana-app/pull/4728)
 - Fixed pagination to SCA table [#4653](https://github.com/wazuh/wazuh-kibana-app/issues/4653)
+- Added powerPC architecture in redhat7, in the section 'Deploy new agent'. [4833](https://github.com/wazuh/wazuh-kibana-app/pull/4833)
 
 ## Wazuh v4.3.9 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4310
 
