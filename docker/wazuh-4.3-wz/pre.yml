@@ -1,0 +1,212 @@
+# Wazuh App Copyright (C) 2021 Wazuh Inc. (License GPLv2)
+version: '3.9'
+
+x-logging: &logging
+  logging:
+    driver: loki
+    options:
+      loki-url: "http://host.docker.internal:3100/loki/api/v1/push"
+
+services:
+  exporter:
+    image: quay.io/prometheuscommunity/elasticsearch-exporter:latest
+    <<: *logging
+    hostname: "exporter-kbn-${WAZUH_STACK}"
+    networks:
+      - wzd-pre
+      - mon
+    command:
+      - '--es.uri=https://admin:${KIBANA_PASSWORD}@wazuh.indexer:9200'
+      - '--es.ssl-skip-verify'
+      - '--es.all'
+
+  imposter:
+    image: outofcoffee/imposter
+    hostname: "imposter-kbn-${WAZUH_STACK}"
+    networks:
+      - wzd-pre
+      - mon
+    <<: *logging
+    environment:
+      - JAVA_OPTS="-Xmx512m -Xss512k -Dfile.encoding=UTF-8 -XX:MaxRAM=800m -XX:MaxRAMPercentage=95 -XX:MinRAMPercentage=60A"
+      - MALLOC_ARENA_MAX=1
+    volumes:
+      - ./config/imposter:/opt/imposter/config
+
+  generator:
+    image: cfssl/cfssl
+    volumes:
+      - wi_certs:/certs/wi
+      - wd_certs:/certs/wd
+      - wm_certs:/certs/wm
+      - ./config/certs:/conf
+    entrypoint: /bin/bash
+    command: >
+        -c '
+          export certs=/tmp/certs
+          mkdir $$certs
+        	cd $$certs
+
+        	echo "Generating CA"
+        	cfssl gencert -initca /conf/ca.json | cfssljson -bare ca
+
+        	echo "Generating servers certificates"
+        	for i in wazuh.indexer wazuh.dashboard wazuh.manager; do
+        		echo "Generating cert for $$i"
+        		cat /conf/host.json | \
+        		sed "s/HOST/$$i/g" | \
+        		cfssl gencert \
+        			-ca $$certs/ca.pem \
+        			-ca-key $$certs/ca-key.pem \
+        			-config /conf/cfssl.json \
+        			-profile=server - | \
+        		cfssljson -bare $$i
+        		openssl pkcs8 -topk8 -inform pem -in $$i-key.pem -outform pem -nocrypt -out $$i.key
+        	done
+
+        	echo "Generating clients certificates"
+          	for i in admin filebeat; do
+          		echo "Generating cert for $$i"
+        		cat /conf/host.json | \
+        		sed "s/HOST/$$i/g" | \
+        		cfssl gencert \
+        			-ca $$certs/ca.pem \
+        			-ca-key $$certs/ca-key.pem \
+        			-config /conf/cfssl.json \
+        			-profile=client - | \
+        		cfssljson -bare $$i
+        		openssl pkcs8 -topk8 -inform pem -in $$i-key.pem -outform pem -nocrypt -out $$i.key
+        	done
+
+            echo "Setting up permissions"
+
+            rm /certs/wi/* /certs/wd/* /certs/wm/*
+
+            mv $$certs/wazuh.indexer* /certs/wi
+            mv $$certs/admin* /certs/wi
+            mv /certs/wi/admin.key /certs/wi/admin-key.pem
+            cp $$certs/*ca* /certs/wi
+
+            mv $$certs/wazuh.dashboard* /certs/wd
+            cp $$certs/*ca* /certs/wd
+
+            mv $$certs/*.* /certs/wm
+
+            chmod 640 /certs/wi/* /certs/wd/* /certs/wm/*
+            chown -R 1000:1000 /certs/*
+            ls -alR /certs/
+
+            sleep 30
+        '
+    healthcheck:
+      test: ["CMD-SHELL", "[ -r /certs/wm/wazuh.manager.pem ]"]
+      interval: 2s
+      timeout: 5s
+      retries: 10
+
+  filebeat:
+    depends_on:
+      wazuh.indexer:
+        condition: service_healthy
+    image: elastic/filebeat:7.10.2
+    hostname: filebeat
+    user: "0:0"
+    networks:
+      - wzd-pre
+      - mon
+    <<: *logging
+    entrypoint:
+      - '/bin/bash'
+    command: >
+      -c '
+        mkdir -p /etc/filebeat
+        echo admin | filebeat keystore add username --stdin --force
+        echo SecretPassword| filebeat keystore add password --stdin --force
+        curl -so /etc/filebeat/wazuh-template.json https://raw.githubusercontent.com/wazuh/wazuh/4.3/extensions/elasticsearch/7.x/wazuh-template.json
+        curl -s https://packages.wazuh.com/4.x/filebeat/wazuh-filebeat-0.2.tar.gz | tar -xvz -C /usr/share/filebeat/module
+        # copy filebeat to preserve correct permissions without
+        # affecting host filesystem
+        cp /tmp/filebeat.yml /usr/share/filebeat/filebeat.yml
+        chown root.root /usr/share/filebeat/filebeat.yml
+        chmod go-w /usr/share/filebeat/filebeat.yml
+        filebeat setup -e
+        filebeat
+      '
+    volumes:
+      - wm_certs:/etc/ssl/wazuh
+      - ./config/filebeat/filebeat.yml:/tmp/filebeat.yml
+
+
+  wazuh.indexer:
+    depends_on:
+      generator:
+        condition: service_healthy
+    image: wazuh/wazuh-indexer:${WAZUH_STACK}
+    hostname: wazuh.indexer
+    networks:
+      - wzd-pre
+      - mon
+    <<: *logging
+    environment:
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "OPENSEARCH_PATH_CONF=/usr/share/wazuh-indexer/config"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+      - wazuh-indexer-data:/var/lib/wazuh-indexer
+      - wi_certs:/usr/share/wazuh-indexer/config/certs/
+      - ./config/wazuh_indexer/wazuh.indexer.yml:/usr/share/wazuh-indexer/config/opensearch.yml
+      - ./config/wazuh_indexer/internal_users.yml:/usr/share/wazuh-indexer/plugins/opensearch-security/securityconfig/internal_users.yml
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "/usr/share/wazuh-indexer/bin/opensearch-plugin list | grep -q security",
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 120
+
+
+
+  wazuh.dashboard:
+    image: wazuh/wazuh-dashboard:${WAZUH_STACK}
+    hostname: wazuh.dashboard
+    depends_on:
+      wazuh.indexer:
+        condition: service_healthy
+    networks:
+      - wzd-pre
+      - mon
+    <<: *logging
+    ports:
+      - ${KIBANA_PORT}:5601
+    environment:
+      - INDEXER_USERNAME=admin
+      - INDEXER_PASSWORD=SecretPassword
+      - WAZUH_API_URL=http://imposter:8080
+      - API_USERNAME=wazuh-wui
+      - API_PASSWORD=MyS3cr37P450r.*-
+    volumes:
+      - wd_certs:/usr/share/wazuh-dashboard/certs
+      - ./config/wazuh_dashboard/wazuh_dashboards.yml:/usr/share/wazuh-dashboard/config/wazuh_dashboards.yml
+      - ./config/wazuh_dashboard/wazuh.yml:/usr/share/wazuh-dashboard/data/wazuh/config/wazuh.yml
+
+networks:
+  networks:
+  wzd-pre:
+    name: wzd-pre-${WAZUH_STACK}
+    driver: bridge
+  mon:
+    external: true
+
+volumes:
+  wazuh-indexer-data:
+  wi_certs:
+  wd_certs:
+  wm_certs:

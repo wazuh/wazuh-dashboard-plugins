@@ -1,0 +1,1 @@
+"audit-wazuh-w:write\naudit-wazuh-r:read\naudit-wazuh-a:attribute\naudit-wazuh-x:execute\naudit-wazuh-c:command\n"
