@@ -28,9 +28,9 @@ import { AppState } from './react-services/app-state';
 import { setErrorOrchestrator } from './react-services/common-services';
 import { ErrorOrchestratorService } from './react-services/error-orchestrator/error-orchestrator.service';
 import { getThemeAssetURL, getAssetURL } from './utils/assets';
-import { WzRequest } from './react-services/wz-request';
 import store from './redux/store';
 import { updateAppConfig } from './redux/actions/appConfigActions';
+import { initializeInterceptor } from './services/request-handler';
 
 const SIDEBAR_LOGO = 'customization.logo.sidebar';
 const innerAngularName = 'app/wazuh';
@@ -53,6 +53,16 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
       console.error('plugin.ts: Error getting logos configuration', error);
     }
 
+    //Check if user has wazuh disabled and avoid registering the application if not
+    let response={isWazuhDisabled:1};
+    try{
+    response = await core.http.get('/api/check-wazuh');
+    }
+    catch(error){
+      console.error('plugin.ts: Error checking if Wazuh is enabled', error);
+    }
+
+    if (!response.isWazuhDisabled){
     core.application.register({
       id: `wazuh`,
       title: 'Wazuh',
@@ -62,6 +72,7 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
           getThemeAssetURL('icon.svg', UI_THEME)),
       mount: async (params: AppMountParameters) => {
         try {
+          initializeInterceptor(core);
           if (!this.initializeInnerAngular) {
             throw Error('Wazuh plugin method initializeInnerAngular is undefined');
           }
@@ -85,21 +96,11 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
             window.location.reload();
           }
           await this.initializeInnerAngular();
-          //Check is user has Wazuh disabled
-          const response = await WzRequest.genericReq(
-            'GET',
-            `/api/check-wazuh`,
-          )
-
           params.element.classList.add('dscAppWrapper', 'wz-app');
           const unmount = await renderApp(innerAngularName, params.element);
-          //Update if user has Wazuh disabled
           this.stateUpdater.next(() => {
-            if (response.data.isWazuhDisabled) {
-              unmount();
-            }
             return {
-              status: response.data.isWazuhDisabled,
+              status: response.isWazuhDisabled,
               category: {
                 id: 'wazuh',
                 label: 'Wazuh',
@@ -122,6 +123,7 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
       },
       updater$: this.stateUpdater
     });
+  }
     return {};
   }
   public start(core: CoreStart, plugins: AppPluginStartDependencies): WazuhStart {

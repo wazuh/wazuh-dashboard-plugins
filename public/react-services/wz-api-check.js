@@ -10,11 +10,11 @@
  * Find more information about this on the LICENSE file.
  */
 import { WazuhConfig } from './wazuh-config';
-import axios from 'axios';
 import { AppState } from './app-state';
 import { WzMisc } from '../factories/misc';
 import { getHttp } from '../kibana-services';
 import { PLUGIN_PLATFORM_REQUEST_HEADERS } from '../../common/constants';
+import { request } from '../services/request-handler';
 
 export class ApiCheck {
   static async checkStored(data, idChanged = false) {
@@ -40,7 +40,7 @@ export class ApiCheck {
         AppState.setPatternSelector(configuration['ip.selector']);
       }
 
-      const response = await axios(options);
+      const response = await request(options);
 
       if (response.error) {
         return Promise.reject(response);
@@ -79,7 +79,7 @@ export class ApiCheck {
         timeout: timeout || 20000
       };
 
-      const response = await axios(options);
+      const response = await request(options);
 
       if (response.error) {
         return Promise.reject(response);
