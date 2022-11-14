@@ -188,7 +188,7 @@ describe('Register agent service', () => {
       jest.clearAllMocks();
     })
 
-    it('should return UDP when the server address is typed manually (custom)', async () => {
+    it('should return IS NOT UDP when the server address is typed manually (custom)', async () => {
       const nodeSelected: ServerAddressOptions = {
         label: 'node-selected',
         value: 'node-selected',
@@ -225,11 +225,11 @@ describe('Register agent service', () => {
       WzRequest.apiReq = jest.fn().mockResolvedValueOnce(mockedResponse);
       
       const config = await RegisterAgentService.getConnectionConfig(nodeSelected, 'default-dns-address');
-      expect(config.udpProtocol).toEqual(true);
+      expect(config.udpProtocol).toEqual(false);
       expect(config.serverAddress).toBe('default-dns-address');
     })
 
-    it('should return UDP when the server address is received like default server address dns (custom)', async () => {
+    it('should return IS NOT UDP when the server address is received like default server address dns (custom)', async () => {
       const nodeSelected: ServerAddressOptions = {
         label: 'node-selected',
         value: 'node-selected',
@@ -265,8 +265,8 @@ describe('Register agent service', () => {
       };
       WzRequest.apiReq = jest.fn().mockResolvedValueOnce(mockedResponse);
       
-      const config = await RegisterAgentService.getConnectionConfig(nodeSelected);
-      expect(config.udpProtocol).toEqual(true);
+      const config = await RegisterAgentService.getConnectionConfig(nodeSelected, 'custom-server-address');
+      expect(config.udpProtocol).toEqual(false);
     })
   })
 });
