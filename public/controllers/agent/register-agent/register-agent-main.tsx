@@ -256,6 +256,10 @@ export const RegisterAgent = withErrorBoundary(
       this.setState({ showPassword: event.target.checked });
     }
 
+    setStateFieldValue(field: keyof RegisterAgentState, value: any) {
+      this.setState({ [field]: value });
+    }
+
     render() {
       const appVersionMajorDotMinor = this.state.wazuhVersion
         .split('.')
@@ -859,6 +863,8 @@ export const RegisterAgent = withErrorBoundary(
             ]
           : []),
       ];
+
+      console.log('steps', steps);
       return (
         <div>
           <EuiPage restrictWidth='1000px' style={{ background: 'transparent' }}>

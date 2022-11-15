@@ -1,4 +1,4 @@
-interface iButton {
+export interface iButton {
   id: string;
   label: string;
   versionsBtns?: iButton[];
@@ -115,7 +115,7 @@ const orderOSAlphabetically = (a: iButton, b: iButton) => {
   return 0;
 };
 
-const osButtons = [
+const buttonsConfig = [
   {
     id: 'rpm',
     label: 'Red Hat Enterprise Linux',
@@ -394,7 +394,7 @@ const osButtons = [
   {
     id: 'raspbian',
     label: 'Raspbian OS',
-    versionBtns: [
+    versionsBtns: [
       {
         id: 'busterorgreater',
         label: 'Buster or greater',
@@ -405,10 +405,10 @@ const osButtons = [
 ].sort(orderOSAlphabetically);
 
 export {
+  buttonsConfig,
   architectureButtons,
   architecturei386Andx86_64,
-  architectureButtonsWithPPC64LE,
-  osButtons
+  architectureButtonsWithPPC64LE
 };
 
 const codeBlock = {
