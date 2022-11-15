@@ -239,6 +239,9 @@ const versionButtonsMacOS = [
     id: 'monterrey',
     label: 'macOS Monterrey',
   },
+  { id: 'ventura',
+    label: 'macOS Ventura',
+  },
 ];
 
 const versionButtonsOpenSuse = [
