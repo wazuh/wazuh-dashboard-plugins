@@ -36,6 +36,7 @@ commands of Start the agent in the deploy new agent section [#4458](https://gith
 - Changed the endpoint that updates the plugin configuration to support multiple settings. [#4501](https://github.com/wazuh/wazuh-kibana-app/pull/4501)
 - Allowed to upload an image for the `customization.logo.*` settings in `Settings/Configuration` [#4504](https://github.com/wazuh/wazuh-kibana-app/pull/4504)
 - Fixed the agents wizard OS styles and their versions. [#4832](https://github.com/wazuh/wazuh-kibana-app/pull/4832) [#4838](https://github.com/wazuh/wazuh-kibana-app/pull/4838/files)
+- Add macOS version to wizard deploy agent [#4867](https://github.com/wazuh/wazuh-kibana-app/pull/4867)
 
 ### Fixed
 
