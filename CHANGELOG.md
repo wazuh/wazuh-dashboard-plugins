@@ -14,6 +14,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added validation to the plugin settings in the form of `Settings/Configuration` and the endpoint to update the plugin configuration [#4503](https://github.com/wazuh/wazuh-kibana-app/pull/4503)[#4785](https://github.com/wazuh/wazuh-kibana-app/pull/4785)
 - Added new plugin settings to customize the header and footer on the PDF reports [#4505](https://github.com/wazuh/wazuh-kibana-app/pull/4505)[#4798](https://github.com/wazuh/wazuh-kibana-app/pull/4798)[#4805](https://github.com/wazuh/wazuh-kibana-app/pull/4805)
 - Add a new plugin setting to enable or disable the customization [#4507](https://github.com/wazuh/wazuh-kibana-app/pull/4507)
+- Added a centralized service to handle the requests [#4831](https://github.com/wazuh/wazuh-kibana-app/pull/4831)
+- Added data-test-subj create policy [#4873](https://github.com/wazuh/wazuh-kibana-app/pull/4873)
 
 ### Changed
 
@@ -28,7 +30,6 @@ commands of Start the agent in the deploy new agent section [#4458](https://gith
 
 - Improves Agents Overview performance [#4363](https://github.com/wazuh/wazuh-kibana-app/pull/4363)
 - Improved alerts summary performance [#4376](https://github.com/wazuh/wazuh-kibana-app/pull/4376)
-- The endpoint `/agents/summary/status` response was adapted. [#3874](https://github.com/wazuh/wazuh-kibana-app/pull/3874)
 - Made Agents Overview icons load independently [#4363](https://github.com/wazuh/wazuh-kibana-app/pull/4363)
 - Improved the message displayed when there is a versions mismatch between the Wazuh API and the Wazuh APP [#4529](https://github.com/wazuh/wazuh-kibana-app/pull/4529)
 - Allowed to upload an image for the `customization.logo.*` settings in `Settings/Configuration` [#4504](https://github.com/wazuh/wazuh-kibana-app/pull/4504)
