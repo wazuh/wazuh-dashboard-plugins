@@ -39,6 +39,7 @@ commands of Start the agent in the deploy new agent section [#4458](https://gith
 - Allowed to upload an image for the `customization.logo.*` settings in `Settings/Configuration` [#4504](https://github.com/wazuh/wazuh-kibana-app/pull/4504)
 - Fixed WAZUH_PROTOCOL param suggestion [#4849](https://github.com/wazuh/wazuh-kibana-app/pull/4849)
 - Add macOS version to wizard deploy agent [#4867](https://github.com/wazuh/wazuh-kibana-app/pull/4867)
+- Raspbian OS, Ubuntu, Amazon Linux and Amazon Linux 2 commands in the wizard deploy agent now change when selecting a different architecture [#4876](https://github.com/wazuh/wazuh-kibana-app/pull/4876)
 
 ### Fixed
 
