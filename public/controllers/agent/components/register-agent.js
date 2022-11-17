@@ -533,6 +533,7 @@ export const RegisterAgent = withErrorBoundary(
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.x86_64.rpm`;
       }
     }
+    
 
     resolveSOLARISPackage() {
       switch (`${this.state.selectedVersion}-${this.state.selectedArchitecture}`) {
