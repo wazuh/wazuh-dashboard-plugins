@@ -21,8 +21,6 @@ import {
   EuiFlexItem,
   EuiCard,
   EuiStat,
-  EuiText,
-  EuiIcon,
   EuiToolTip,
   euiPaletteColorBlind,
 } from '@elastic/eui';
@@ -36,6 +34,7 @@ import {
 import { ICustomBadges } from '../../wz-search-bar/components';
 import { formatUIDate } from '../../../react-services';
 import { VisualizationBasicWidgetSelector, VisualizationBasicWidget  } from '../../common/charts/visualizations/basic';
+import { WzStat } from '../../wz-stat';
 
 interface Aggregation { title: number, description: string, titleColor: string }
 interface pieStats { id: string, label: string, value: number }
@@ -173,11 +172,11 @@ export class Inventory extends Component {
     </EuiPage>;
   }
 
-  // This method was created because Wazuh API returns 1970-01-01T00:00:00Z dates
+  // This method was created because Wazuh API returns 1970-01-01T00:00:00Z dates or undefined ones
   // when vulnerability module is not configured
   // its meant to render nothing when such date is received
-  beautifyDate(date: string) {
-    return ['', '1970-01-01T00:00:00Z'].includes(date) ? '-' : formatUIDate(date);
+  beautifyDate(date?: string) {
+    return date && !['1970-01-01T00:00:00Z', '-'].includes(date) ? formatUIDate(date) : '-';
   }
 
   buildTitleFilter({ description, title, titleColor }) {
@@ -243,14 +242,20 @@ export class Inventory extends Component {
                   </EuiFlexGroup>
                   <EuiFlexGroup style={{ marginTop: 'auto' }}>
                     <EuiFlexItem>
-                      <EuiText>
-                        <EuiIcon type="calendar" color={'primary'} /> Last full scan: {last_full_scan}
-                      </EuiText>
+                      <WzStat
+                        title={last_full_scan}
+                        description="Last full scan"
+                        textAlign='center'
+                        titleSize='xs'
+                      />
                     </EuiFlexItem>
                     <EuiFlexItem>
-                      <EuiText>
-                        <EuiIcon type="calendar" color={'primary'} /> Last partial scan: {last_partial_scan}
-                      </EuiText>
+                      <WzStat
+                        title={last_partial_scan}
+                        description="Last partial scan"
+                        textAlign='center'
+                        titleSize='xs'
+                      />
                     </EuiFlexItem>
                   </EuiFlexGroup>
                 </EuiFlexItem>

@@ -58,6 +58,10 @@ export const checkIndexPatternObjectService =  async (appConfig, checkLogger: Ch
       listValidIndexPatterns = await SavedObject.getListOfWazuhValidIndexPatterns(defaultIndexPatterns, HEALTH_CHECK);
       checkLogger.info(`Valid index patterns found: ${listValidIndexPatterns.length || 0}`);
       if(!AppState.getCurrentPattern()){
+        // Check the index pattern saved objects can be found using `GET /api/saved_objects/_find` endpoint.
+        // Related issue: https://github.com/wazuh/wazuh-kibana-app/issues/4293
+        await validateIntegritySavedObjects([defaultPatternId], checkLogger);
+
         AppState.setCurrentPattern(defaultPatternId);
         checkLogger.info(`Index pattern set in cookie: [${defaultPatternId}]`);
       }
@@ -72,8 +76,14 @@ export const checkIndexPatternObjectService =  async (appConfig, checkLogger: Ch
   if (AppState.getCurrentPattern() && listValidIndexPatterns.length) {
     const indexPatternToSelect = listValidIndexPatterns.find(item => item.id === AppState.getCurrentPattern());
     if (!indexPatternToSelect){
-      AppState.setCurrentPattern(listValidIndexPatterns[0].id);
-      checkLogger.action(`Set index pattern id in cookie: [${listValidIndexPatterns[0].id}]`);
+      const indexPatternID = listValidIndexPatterns[0].id;
+
+      // Check the index pattern saved objects can be found using `GET /api/saved_objects/_find` endpoint.
+        // Related issue: https://github.com/wazuh/wazuh-kibana-app/issues/4293
+      await validateIntegritySavedObjects([indexPatternID], checkLogger);
+
+      AppState.setCurrentPattern(indexPatternID);
+      checkLogger.action(`Set index pattern id in cookie: [${indexPatternID}]`);
     }
   }
   
@@ -94,6 +104,10 @@ export const checkIndexPatternObjectService =  async (appConfig, checkLogger: Ch
       const indexPatternDefaultFound = listValidIndexPatterns.find((indexPattern) => indexPattern.title === defaultPatternId);
       checkLogger.info(`Index pattern id exists [${defaultPatternId}]: ${indexPatternDefaultFound ? 'yes': 'no'}`);
       if(indexPatternDefaultFound){
+        // Check the index pattern saved objects can be found using `GET /api/saved_objects/_find` endpoint.
+        // Related issue: https://github.com/wazuh/wazuh-kibana-app/issues/4293
+        await validateIntegritySavedObjects([indexPatternDefaultFound.id], checkLogger);
+
         AppState.setCurrentPattern(indexPatternDefaultFound.id);
         checkLogger.action(`Index pattern set in cookie: [${indexPatternDefaultFound.id}]`);
       }
@@ -103,4 +117,12 @@ export const checkIndexPatternObjectService =  async (appConfig, checkLogger: Ch
       checkLogger.error('The selected index-pattern is not present');
     }
   }
+};
+
+// Check the index pattern saved objects can be found using `GET /api/saved_objects/_find` endpoint.
+// Related issue: https://github.com/wazuh/wazuh-kibana-app/issues/4293
+const validateIntegritySavedObjects = async (indexPatternSavedObjectIDs: string[], checkLogger: CheckLogger): Promise<void> => {
+  checkLogger.info(`Checking the integrity of saved objects. Validating ${indexPatternSavedObjectIDs.join(',')} can be found...`);
+  await SavedObject.validateIndexPatternSavedObjectCanBeFound(indexPatternSavedObjectIDs);
+  checkLogger.info('Integrity of saved objects: [ok]');
 };

@@ -1231,7 +1231,7 @@ wz-xml-file-editor {
 }
 
 .list-element-bad {
-  color: #bd3b4d !important;
+  color: #000 !important;
 }
 
 .logtest-side{
@@ -1561,11 +1561,8 @@ div.euiPopover__panel.euiPopover__panel-isOpen.euiPopover__panel--bottom.wz-menu
         overflow: hidden;
       }
     }
-  }
-
-  
+  } 
 }
-
 
 @media (min-width: 1600px) {
   .agents-evolution-visualization{
@@ -1780,3 +1777,14 @@ iframe.width-changed {
     }
   }
 }
+
+.agents-evolutions-dpicker {
+  height: 10%;
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 999999;
+  .euiButtonEmpty__text {
+    font-size: 0.8rem;
+  }
+} 

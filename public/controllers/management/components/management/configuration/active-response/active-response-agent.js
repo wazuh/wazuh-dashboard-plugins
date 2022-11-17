@@ -23,17 +23,16 @@ import { compose } from 'redux';
 import { connect } from 'react-redux';
 
 import { isString, renderValueNoThenEnabled } from '../utils/utils';
+import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
 const helpLinks = [
   {
     text: 'Active response documentation',
-    href:
-      'https://documentation.wazuh.com/current/user-manual/capabilities/active-response/index.html'
+    href: webDocumentationLink('user-manual/capabilities/active-response/index.html')
   },
   {
     text: 'Active response reference',
-    href:
-      'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/active-response.html'
+    href: webDocumentationLink('user-manual/reference/ossec-conf/active-response.html')
   }
 ];
 

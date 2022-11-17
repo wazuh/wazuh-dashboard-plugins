@@ -146,14 +146,14 @@ export class Details extends Component {
         name: 'Published',
         icon: 'clock',
         link: false,
-        transformValue: formatUIDate
+        transformValue: this.beautifyDate
       },
       {
         field: 'updated',
         name: 'Updated',
         icon: 'clock',
         link: false,
-        transformValue: formatUIDate
+        transformValue: this.beautifyDate
       },
       {
         field: 'external_references',
@@ -165,11 +165,11 @@ export class Details extends Component {
     ];
   }
 
-  // This method was created because Wazuh API returns 1970-01-01T00:00:00Z dates
+  // This method was created because Wazuh API returns 1970-01-01T00:00:00Z dates or undefined ones
   // when vulnerability module is not configured
   // its meant to render nothing when such date is received
-  beautifyDate(date: string) {
-    return ['', '1970-01-01T00:00:00Z'].includes(date) ? '-' : formatUIDate(date);
+  beautifyDate(date?: string) {
+    return date && !['1970-01-01T00:00:00Z', '-'].includes(date) ? formatUIDate(date) : '-';
   }
 
   viewInEvents = (ev) => {
@@ -333,7 +333,7 @@ export class Details extends Component {
           </EuiTitle>
         }>
         <EuiListGroup size="xs" flush={true} gutterSize="none" style={{ display: 'grid' }}
-          listItems={references.map(link => ({ label: link, href: link }))
+          listItems={references.map(link => ({ label: link, href: link, target: '_blank' }))
           }
         />
       </EuiAccordion>

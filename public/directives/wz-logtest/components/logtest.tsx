@@ -46,6 +46,7 @@ import {
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { WzFlyout } from '../../../components/common/flyouts';
+import _ from 'lodash';
 
 type LogstestProps = {
   openCloseFlyout: () => {};
@@ -69,41 +70,90 @@ export const Logtest = compose(
     setEvents(e.target.value.split('\n').filter((item) => item));
   };
 
-  const formatResult = (result, alert) => {
-    let returnedDataFormatted =
-      `**Phase 1: Completed pre-decoding. \n    ` +
-      `full event:  ${result.full_log || '-'}  \n    ` +
-      `timestamp: ${(result.predecoder || '').timestamp || '-'} \n    ` +
-      `hostname: ${(result.predecoder || '').hostname || '-'} \n    ` +
-      `program_name: ${(result.predecoder || '').program_name || '-'} \n\n` +
-      `**Phase 2: Completed decoding. \n    ` +
-      `name: ${(result.decoder || '').name || '-'} \n    ` +
-      `${(result.decoder || '').parent ? `parent: ${(result.decoder || '').parent} \n    ` : ''}` +
-      `data: ${JSON.stringify(result.data || '-', null, 6).replace('}', '    }')} \n\n`;
+  // Format the result of the Wazuh API response to an output similar one to the `wazuh-logtest` utility
+  const formatResult = (result, alert, messages) => {
+    // How to the `wazuh-logtest` utility logs the output:
+    // https://github.com/wazuh/wazuh/blob/master/framework/scripts/wazuh-logtest.py#L359-L397
 
-    result.rule &&
-      (returnedDataFormatted +=
-        `**Phase 3: Completed filtering (rules). \n    ` +
-        `id: ${(result.rule || '').id || '-'} \n    ` +
-        `level: ${(result.rule || '').level || '-'} \n    ` +
-        `description: ${(result.rule || '').description || '-'} \n    ` +
-        `groups: ${JSON.stringify((result.rule || '').groups || '-')} \n    ` +
-        `firedtimes: ${(result.rule || '').firedtimes || '-'} \n    ` +
-        `gdpr: ${JSON.stringify((result.rule || '').gdpr || '-')} \n    ` +
-        `gpg13: ${JSON.stringify((result.rule || '').gpg13 || '-')} \n    ` +
-        `hipaa: ${JSON.stringify((result.rule || '').hipaa || '-')} \n    ` +
-        `mail: ${JSON.stringify((result.rule || '').mail || '-')} \n    ` +
-        `mitre.id: ${JSON.stringify((result.rule || '').mitre || ''.id || '-')} \n    ` +
-        `mitre.technique: ${JSON.stringify(
-          (result.rule || '').mitre || ''.technique || '-'
-        )} \n    ` +
-        `nist_800_53: ${JSON.stringify((result.rule || '').nist_800_53 || '-')} \n    ` +
-        `pci_dss: ${JSON.stringify((result.rule || '').pci_dss || '-')} \n    ` +
-        `tsc: ${JSON.stringify((result.rule || '').tsc || '-')} \n`);
 
-    returnedDataFormatted += `${alert ? `**Alert to be generated. \n\n\n` : '\n\n'}`;
-    return returnedDataFormatted;
-  };
+    const logging = [];
+    
+    const showFieldInfo = (item, path, label = '') => {
+      _.has(item, path) && logging.push(
+        `\t${label || path}: '${Array.isArray(_.get(item, path))
+          ? JSON.stringify(_.get(item, path))
+          : _.get(item, path)}'`
+        );
+    };
+
+    const showPhaseInfo = (item, showFirst = [], prefix = '') => {
+      showFirst && showFirst.forEach(field => {
+        showFieldInfo(item, field, prefix+field);
+        _.unset(item, field);
+      });
+      typeof item === 'object' && Object.keys(item).sort().forEach((field) => {
+        if(typeof item[field] === 'object' && !Array.isArray(item[field])){
+          showPhaseInfo(item[field],[], prefix + field + '.');
+        }else{
+          showFieldInfo(item, field, prefix+field);
+        };
+      });
+    }
+
+    // Output messages
+    if (messages) {
+      logging.push('**Messages:');
+      messages.forEach(message => logging.push(`\t${message}`));
+      logging.push('');
+    }
+
+    // Pre-decoding phase
+    logging.push('**Phase 1: Completed pre-decoding.');
+    // Check in case rule has no_full_log attribute
+    if(result.full_log){
+      showFieldInfo(result, 'full_log', 'full event');
+    };
+
+    if(result.predecoder){
+      showPhaseInfo(result.predecoder, ['timestamp', 'hostname', 'program_name']);
+    }
+
+    // Decoding phase
+    logging.push('');
+    logging.push('**Phase 2: Completed decoding.');
+
+    if(result.decoder && Object.keys(result.decoder).length > 0){
+      showPhaseInfo(result.decoder, ['name', 'parent']);
+      if(result.data){
+        showPhaseInfo(result.data, []);
+      };
+    }else{
+      logging.push('\tNo decoder matched.')
+    }
+
+    // Rule phase
+
+    // Rule debugging
+    // The output has data if the utility is ran in verbose mode: `wazuh-logtest -v`.
+    // At this moment, the Wazuh API doesn't let run in verbose mode.
+    if(result.rules_debug){
+      logging.push('');
+      logging.push('**Rule debugging:');
+      result.rules_debug.forEach(debugMessage => logging.push(`${debugMessage[0] === '*' ? '\t\t' : '\t'}${debugMessage}`));
+    };
+    
+    if(result.rule){
+      logging.push('');
+      logging.push('**Phase 3: Completed filtering (rules).');
+      showPhaseInfo(result.rule, ['id', 'level', 'description', 'groups', 'firedtimes']);
+    };
+
+    if(alert){
+      logging.push('**Alert to be generated.');
+    };
+
+    return logging.join('\n');
+  };  
 
   const runAllTests = async () => {
     setTestResult('');
@@ -128,9 +178,9 @@ export const Logtest = compose(
       }
       const testResults = responses.map((response) => {
         return response.data.data.output || ''
-          ? formatResult(response.data.data.output, response.data.data.alert)
-          : `No result found for: ${response.data.data.output.full_log} \n\n\n`;
-      });
+          ? formatResult(response.data.data.output, response.data.data.alert, response.data.data.messages)
+          : `No result found for: ${response.data.data.output.full_log}`;
+      }).join('\n\n');
       setTestResult(testResults);
     } finally {
       setTesting(false);

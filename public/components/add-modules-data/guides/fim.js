@@ -9,13 +9,15 @@
 *
 * Find more information about this on the LICENSE file.
 */
+import { webDocumentationLink } from "../../../../common/services/web_documentation";
+
 export default {
   id: 'fim',
   xml_tag: 'syscheck',
   name: 'Integrity monitoring',
   description: 'Configuration options for file integrity monitoring.',
   category: 'Security information management',
-  documentation_link: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/syscheck.html',
+  documentation_link: webDocumentationLink('user-manual/reference/ossec-conf/syscheck.html'),
   icon: 'filebeatApp',
   avaliable_for_manager: true,
   avaliable_for_agent: true,

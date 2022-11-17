@@ -75,7 +75,7 @@ export class FlyoutDetail extends Component {
       const currentItem = this.props.item;
 
       if (!currentItem) {
-        throw false;
+        throw new Error('Vulnerability not found');
       }
 
       const lastScan = await this.getLastScan();

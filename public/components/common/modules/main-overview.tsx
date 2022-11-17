@@ -50,16 +50,6 @@ export const MainModuleOverview = connect(mapStateToProps)(class MainModuleOverv
     };
   }
 
-  getBadgeColor(agentStatus) {
-    if (agentStatus.toLowerCase() === 'active') {
-      return 'secondary';
-    } else if (agentStatus.toLowerCase() === 'disconnected') {
-      return '#BD271E';
-    } else if (agentStatus.toLowerCase() === 'never connected') {
-      return 'default';
-    }
-  }
-
   setGlobalBreadcrumb() {
     const currentAgent = store.getState().appStateReducers.currentAgentData;
     if (WAZUH_MODULES[this.props.section]) {
@@ -74,15 +64,7 @@ export const MainModuleOverview = connect(mapStateToProps)(class MainModuleOverv
       ];
       if (currentAgent.id) {
         breadcrumb.push({
-          className: "euiLink euiLink--subdued ",
-          onClick: (ev) => { ev.stopPropagation(); AppNavigate.navigateToModule(ev, 'agents', { "tab": "welcome", "agent": currentAgent.id }); this.router.reload(); },
-          id: "breadcrumbNoTitle",
-          truncate: true,
-          text: (
-            <EuiToolTip position="bottom" content={"View agent summary"} display="inlineBlock">
-              <span>{currentAgent.name}</span>
-            </EuiToolTip>
-          ),
+          agent: currentAgent
         })
       }
       breadcrumb.push({

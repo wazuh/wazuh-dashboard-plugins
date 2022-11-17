@@ -91,7 +91,7 @@ export class FlyoutDetail extends Component {
         currentFile = ((((data || {}).data || {}).data || {}).affected_items || [])[0];
       }
       if (!currentFile) {
-        throw false;
+        throw new Error('File not found');
       }
       this.setState({ currentFile, type: currentFile.type, isLoading: false });
     } catch (error) {

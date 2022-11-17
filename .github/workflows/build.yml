@@ -1,0 +1,27 @@
+# This workflow builds a production-ready package from the given Git reference.
+# Any branch, tag or commit SHA existing in the origin can be used.
+#
+# This workflow is based on the `dev-environment` workflow.
+
+name: Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      reference:
+        required: true
+        type: string
+        default: master
+        description: Source code reference (branch, tag or commit SHA)
+
+jobs:
+  # Build an app package from the given source code reference.
+  build:
+    name: Build app package
+    uses: ./.github/workflows/dev-environment.yml
+    with:
+      reference: ${{ github.event.inputs.reference }}
+      command: 'yarn build'
+      artifact_name: 'wazuh-package'
+      artifact_path: './wazuh/build'
+    secrets: inherit

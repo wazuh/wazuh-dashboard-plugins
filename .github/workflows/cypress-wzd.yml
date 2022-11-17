@@ -1,0 +1,110 @@
+# This is a basic workflow that is manually triggered
+
+name: Cypress automation test - [wzd]
+
+# Controls when the action will run. Workflow runs when manually triggered using the UI
+# or API.
+on:
+  workflow_dispatch:
+    # Inputs the workflow accepts.
+    inputs:
+      wazuh-stack-version:
+        description: 'Wazuh Stack Version'
+        default: '4.3.4'
+        required: true
+      ubuntu-cypress-version: 
+        description: 'Ubuntu Cypress Version'
+        default: '3.0.0'
+        required: true
+      url-package:
+        description: 'Package Download Url'
+        required: false 
+        default: 'https://packages-dev.wazuh.com/pre-release/ui/dashboard/wazuh-4.3.4-1.zip'       
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  setup-wazuh-dashboard-app:
+    name: Run setup environment wazuh dashboard app
+    runs-on: ubuntu-latest
+    steps:
+     - name: Step 01 - Set up environment variables
+       run: |
+        echo "PATH_TEMPLATE=$GITHUB_WORKSPACE/wazuh-app-environments/templates_wazuh_prod/" >> $GITHUB_ENV
+
+        echo "Information about the workflow (wzd):
+        wazuh-stack-version: ${{ github.event.inputs.wazuh-stack-version }}
+        ubuntu-cypress-version: ${{ github.event.inputs.ubuntu-cypress-version }}
+        url-package: ${{ github.event.inputs.url-package }}"
+        
+     - name: Step 02 - Download Project wazuh-app-environments 
+       uses: actions/checkout@v2
+       with:
+        repository: matiasmoreno876/wazuh-app-environments
+        ref: 'master'
+        path: wazuh-app-environments
+        token: ${{ secrets.FE_SECRET_TOKEN }}
+     - name: Step 03 - Configuring templates docker environment
+       run: |
+        cd $GITHUB_WORKSPACE/wazuh-app-environments/
+        mkdir packages
+        cd ${{ env.PATH_TEMPLATE }}
+        sed -i -e 's|WAZUH_STACK_VERSION=.*|WAZUH_STACK_VERSION=${{ github.event.inputs.wazuh-stack-version }}|g' ./.env
+        sed -i -e 's|UBUNTU_CYPRESS_VERSION=.*|UBUNTU_CYPRESS_VERSION=${{ github.event.inputs.ubuntu-cypress-version }}|g' ./.env
+        cat .env
+     - name: Step 04 - Starting containers
+       run: |
+        cd ${{ env.PATH_TEMPLATE }}
+        docker-compose up -d
+        echo CONTINUES AFTER 30 SECONDS ...
+        sleep 30s 
+     - name: Step 05 - Remove Wazuh
+       run: |
+        cd ${{ env.PATH_TEMPLATE }}
+        docker exec $(docker-compose ps -q wazuh.dashboard) bin/opensearch-dashboards-plugin remove wazuh
+        docker-compose restart wazuh.dashboard
+        echo CONTINUES AFTER 30 SECONDS ...
+        sleep 30s
+        docker-compose ps 
+     - name: Step 06 - Installing package from url
+       run: |
+        cd ${{ env.PATH_TEMPLATE }}
+        docker exec $(docker-compose ps -q wazuh.dashboard) bin/opensearch-dashboards-plugin install ${{ github.event.inputs.url-package }}
+        docker-compose restart wazuh.dashboard
+        echo CONTINUES AFTER 60 SECONDS ...
+        sleep 60s
+        docker-compose ps
+     - name: Step 07 - Run Cypress tests
+       id: run-cypress-test
+       run: |
+         cd ${{ env.PATH_TEMPLATE }}
+         docker exec $(docker-compose ps -q cypress) bash -c " . /home/automation/nvm/nvm.sh && nvm use && npm run cypress:run-headless:github-actions:wzd" | tee cypress.log
+       continue-on-error: true 
+     - name: Step 08 - Run Cypress reports
+       run: |
+         cd ${{ env.PATH_TEMPLATE }}
+         docker exec $(docker-compose ps -q cypress) bash -c " . /home/automation/nvm/nvm.sh && nvm use && npm run cypress:report"        
+     - name: Step 09 - Archive reports
+       uses: actions/upload-artifact@v2
+       with:
+        name: cypress-reports_WZD_${{ github.event.inputs.wazuh-stack-version }}
+        path: ${{ env.PATH_TEMPLATE }}/report/*
+     - name: Step 10 - Log parsing
+       run: |
+        cd ${{ env.PATH_TEMPLATE }}
+        echo "TEST_SKIPPED=$(grep -E "failed \(|passed" cypress.log | awk ' { print $(NF)}')" >> $GITHUB_ENV
+        echo "TEST_PENDING=$(grep -E "failed \(|passed" cypress.log | awk ' { print $(NF-1)}')" >> $GITHUB_ENV
+        echo "TEST_FAILING=$(grep -E "failed \(|passed" cypress.log | awk ' { print $(NF-2)}')" >> $GITHUB_ENV
+        echo "TEST_PASSING=$(grep -E "failed \(|passed" cypress.log | awk ' { print $(NF-3)}')" >> $GITHUB_ENV
+        echo "TEST_TOTAL=$(grep -E "failed \(|passed" cypress.log | awk ' { print $(NF-4)}')" >> $GITHUB_ENV
+        echo "TEST_TIME=$(grep -E "failed \(|passed" cypress.log | awk ' { print $(NF-5)}')" >> $GITHUB_ENV
+     - name: Step 11 - Post to a Slack channel
+       id: slack
+       uses: slackapi/slack-github-action@v1.19.0
+       with:
+          # Slack channel id, channel name, or user id to post message.
+          # See also: https://api.slack.com/methods/chat.postMessage#channels
+        channel-id: ${{ secrets.SLACK_CHANNEL_ID }}
+          # For posting a simple plain text message
+        slack-message: "The following workflow was executed: ${{ github.workflow }}\nWazuh stack version: ${{ github.event.inputs.wazuh-stack-version }}\nUbuntu Cypress version: ${{ github.event.inputs.ubuntu-cypress-version }}\nPackage used: ${{ github.event.inputs.url-package }}\n\nTest summary:\n\tTotal Test: ${{ env.TEST_TOTAL }}\n\tPassing: ${{ env.TEST_PASSING }}\n\tFailing: ${{ env.TEST_FAILING }}\n\tPending: ${{ env.TEST_PENDING }}\n\tSkipped: ${{ env.TEST_SKIPPED }}\n\tTotal Time: ${{ env.TEST_TIME }}\n\nFor more information visit: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+       env:
+          SLACK_BOT_TOKEN: ${{ secrets.ACTIONS_SLACK_TOKEN }}
