@@ -54,6 +54,12 @@ commands of Start the agent in the deploy new agent section [#4458](https://gith
 - Fixed a bug that caused the flyouts to close when clicking inside them [#4638](https://github.com/wazuh/wazuh-kibana-app/pull/4638)
 - Fixed the agents wizard OS styles and their versions. [#4830](https://github.com/wazuh/wazuh-kibana-app/pull/4830) [#4837](https://github.com/wazuh/wazuh-kibana-app/pull/4837/files)
 
+## Wazuh v4.3.10 - OpenSearch Dashboards 1.2.0 - Revision 4311
+
+### Fixed
+
+- Fixed issue when logging out from Wazuh when SAML is enabled [#4815](https://github.com/wazuh/wazuh-kibana-app/issues/4815)
+
 ## Wazuh v4.3.9 - OpenSearch Dashboards 1.2.0 - Revision 4310
 
 ### Added
