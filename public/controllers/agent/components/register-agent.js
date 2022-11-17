@@ -475,7 +475,7 @@ export const RegisterAgent = withErrorBoundary(
       }
     }
 
-resolveRASPBIANPackage() {
+    resolveRASPBIANPackage() {
       switch (`${this.state.selectedVersion}-${this.state.selectedArchitecture}`) {
         case 'busterorgreater-i386':
           return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_i386.deb`;
