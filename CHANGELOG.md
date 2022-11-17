@@ -41,6 +41,12 @@ commands of Start the agent in the deploy new agent section [#4458](https://gith
 - Fixed the agents wizard OS styles and their versions. [#4832](https://github.com/wazuh/wazuh-kibana-app/pull/4832) [#4838](https://github.com/wazuh/wazuh-kibana-app/pull/4838/files)
 - Add macOS version to wizard deploy agent [#4867](https://github.com/wazuh/wazuh-kibana-app/pull/4867)
 
+## Wazuh v4.3.10 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4311
+
+### Fixed
+
+- Fixed issue when logging out from Wazuh when SAML is enabled [#4815](https://github.com/wazuh/wazuh-kibana-app/issues/4815)
+
 ## Wazuh v4.3.9 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4310
 
 ### Added
