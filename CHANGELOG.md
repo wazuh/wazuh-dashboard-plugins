@@ -15,6 +15,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added new plugin settings to customize the header and footer on the PDF reports [#4505](https://github.com/wazuh/wazuh-kibana-app/pull/4505)[#4798](https://github.com/wazuh/wazuh-kibana-app/pull/4798)[#4805](https://github.com/wazuh/wazuh-kibana-app/pull/4805)
 - Add a new plugin setting to enable or disable the customization [#4507](https://github.com/wazuh/wazuh-kibana-app/pull/4507)
 - Added a centralized service to handle the requests [#4831](https://github.com/wazuh/wazuh-kibana-app/pull/4831)
+- Added data-test-subj create policy [#4873](https://github.com/wazuh/wazuh-kibana-app/pull/4873)
 
 ### Changed
 
@@ -38,6 +39,7 @@ commands of Start the agent in the deploy new agent section [#4458](https://gith
 - Allowed to upload an image for the `customization.logo.*` settings in `Settings/Configuration` [#4504](https://github.com/wazuh/wazuh-kibana-app/pull/4504)
 - Fixed WAZUH_PROTOCOL param suggestion [#4849](https://github.com/wazuh/wazuh-kibana-app/pull/4849)
 - Add macOS version to wizard deploy agent [#4867](https://github.com/wazuh/wazuh-kibana-app/pull/4867)
+- Raspbian OS, Ubuntu, Amazon Linux and Amazon Linux 2 commands in the wizard deploy agent now change when selecting a different architecture [#4876](https://github.com/wazuh/wazuh-kibana-app/pull/4876)
 
 ### Fixed
 
