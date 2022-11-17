@@ -1,0 +1,336 @@
+version: "2.2"
+
+x-logging: &logging
+  logging:
+    driver: loki
+    options:
+      loki-url: "http://host.docker.internal:3100/loki/api/v1/push"
+
+services:
+  exporter:
+    image: quay.io/prometheuscommunity/elasticsearch-exporter:latest
+    <<: *logging
+    hostname: exporter-osd-${OS_VERSION}
+    profiles:
+      - "saml"
+      - "standard"
+    networks:
+      - os-dev
+      - mon
+    command:
+      - "--es.uri=https://admin:${PASSWORD}@os1:9200"
+      - "--es.ssl-skip-verify"
+      - "--es.all"
+
+  imposter:
+    image: outofcoffee/imposter
+    <<: *logging
+    hostname: imposter-osd-${OS_VERSION}
+    networks:
+      - os-dev
+      - mon
+    environment:
+      - JAVA_OPTS="-Xmx512m -Xss512k -Dfile.encoding=UTF-8 -XX:MaxRAM=800m -XX:MaxRAMPercentage=95 -XX:MinRAMPercentage=60A"
+      - MALLOC_ARENA_MAX=1
+    volumes:
+      - ../imposter:/opt/imposter/config
+
+  generator:
+    image: cfssl/cfssl
+    <<: *logging
+    profiles:
+      - "saml"
+      - "standard"
+    volumes:
+      - wi_certs:/certs/wi
+      - wd_certs:/certs/wd
+      - wm_certs:/certs/wm
+      - idp_certs:/certs/idp
+      - ./config/${OSD_MAJOR}/certs:/conf
+      - os_logs:/logs
+      - os_data:/data
+    # Included to avoid docker from creating duplicated networks
+    networks:
+      - os-dev
+    entrypoint: /bin/bash
+    command: >
+      -c '
+        export certs=/tmp/certs
+        mkdir $$certs
+      	cd $$certs
+
+      	echo "Generating CA"
+      	cfssl gencert -initca /conf/ca.json | cfssljson -bare ca
+
+      	echo "Generating servers certificates"
+      	for i in os1 osd imposter; do
+      		echo "Generating cert for $$i"
+      		cat /conf/host.json | \
+      		sed "s/HOST/$$i/g" | \
+      		cfssl gencert \
+      			-ca $$certs/ca.pem \
+      			-ca-key $$certs/ca-key.pem \
+      			-config /conf/cfssl.json \
+      			-profile=server - | \
+      		cfssljson -bare $$i
+      		openssl pkcs8 -topk8 -inform pem -in $$i-key.pem -outform pem -nocrypt -out $$i.key
+      	done
+
+      	echo "Generating clients certificates"
+        	for i in admin filebeat saml; do
+        		echo "Generating cert for $$i"
+      		cat /conf/host.json | \
+      		sed "s/HOST/$$i/g" | \
+      		cfssl gencert \
+      			-ca $$certs/ca.pem \
+      			-ca-key $$certs/ca-key.pem \
+      			-config /conf/cfssl.json \
+      			-profile=client - | \
+      		cfssljson -bare $$i
+      		openssl pkcs8 -topk8 -inform pem -in $$i-key.pem -outform pem -nocrypt -out $$i.key
+      	done
+
+          echo "Setting up permissions"
+
+          rm /certs/wi/* /certs/wd/* /certs/wm/*
+
+          mv $$certs/os1* /certs/wi
+          mv $$certs/admin* /certs/wi
+          mv /certs/wi/admin.key /certs/wi/admin-key.pem
+          cp $$certs/*ca* /certs/wi
+
+          mv $$certs/osd* /certs/wd
+          cp $$certs/*ca* /certs/wd
+
+          mv $$certs/saml* /certs/idp
+          mv /certs/idp/saml.key /certs/idp/saml-key.pem
+          cp $$certs/*ca* /certs/idp
+
+          mv $$certs/*.* /certs/wm
+
+          chmod 640 /certs/wi/* /certs/wd/* /certs/wm/*
+          chown -R 1000:1000 /certs/*
+          ls -alR /certs/
+
+          chown 1000:1000 /data /logs
+          chmod 775 /data /logs
+          sleep 300
+      '
+    healthcheck:
+      test: ["CMD-SHELL", "[ -r /certs/wi/os1.pem ]"]
+      interval: 2s
+      timeout: 5s
+      retries: 10
+
+  os1:
+    depends_on:
+      idpsetup:
+        condition: service_completed_successfully
+    image: opensearchproject/opensearch:${OS_VERSION}
+    <<: *logging
+    profiles:
+      - "saml"
+      - "standard"
+    environment:
+      - cluster.name=os-dev-cluster
+      - node.name=os1
+      - discovery.seed_hosts=os1
+      - cluster.initial_master_nodes=os1
+      - bootstrap.memory_lock=true # along with the memlock settings below, disables swapping
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m" # minimum and maximum Java heap size, recommend setting both to 50% of system RAM
+      - OPENSEARCH_PATH_CONF=/usr/share/opensearch/config/
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536 # maximum number of open files for the OpenSearch user, set to at least 65536 on modern systems
+        hard: 65536
+    volumes:
+      - wi_certs:/usr/share/opensearch/config/certs/
+      - ./config/${OSD_MAJOR}/os/opensearch.yml:/usr/share/opensearch/config/opensearch.yml
+      - ./config/${OSD_MAJOR}/os/internal_users.yml:${SEC_CONFIG_PATH}/internal_users.yml
+      - ${SEC_CONFIG_FILE}:${SEC_CONFIG_PATH}/config.yml
+      - ./config/${OSD_MAJOR}/os/roles_mapping.yml:${SEC_CONFIG_PATH}/roles_mapping.yml
+      - ./config/${OSD_MAJOR}/os/roles.yml:${SEC_CONFIG_PATH}/roles.yml
+
+      - os_logs:/var/log/os1
+      - os_data:/var/lib/os1
+    networks:
+      - os-dev
+      - mon
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -v --cacert config/certs/ca.pem https://os1:9200 2>&1 | grep -q '401 Unauthorized'",
+        ]
+      interval: 1s
+      timeout: 5s
+      retries: 120
+
+  filebeat:
+    depends_on:
+      os1:
+        condition: service_healthy
+    image: elastic/filebeat:7.10.2
+    profiles:
+      - "saml"
+      - "standard"
+    hostname: filebeat
+    user: "0:0"
+    networks:
+      - os-dev
+      - mon
+    <<: *logging
+    # restart: always
+    entrypoint:
+      - "/bin/bash"
+    command: >
+      -c '
+        mkdir -p /etc/filebeat
+        echo admin | filebeat keystore add username --stdin --force
+        echo ${PASSWORD}| filebeat keystore add password --stdin --force
+        curl -so /etc/filebeat/wazuh-template.json https://raw.githubusercontent.com/wazuh/wazuh/4.3/extensions/elasticsearch/7.x/wazuh-template.json
+        curl -s https://packages.wazuh.com/4.x/filebeat/wazuh-filebeat-0.2.tar.gz | tar -xvz -C /usr/share/filebeat/module
+        # copy filebeat to preserve correct permissions without
+        # affecting host filesystem
+        cp /tmp/filebeat.yml /usr/share/filebeat/filebeat.yml
+        chown root.root /usr/share/filebeat/filebeat.yml
+        chmod go-w /usr/share/filebeat/filebeat.yml
+        filebeat setup -e
+        filebeat
+      '
+    volumes:
+      - wm_certs:/etc/ssl/elastic
+      - ./config/${OSD_MAJOR}/filebeat/filebeat.yml:/tmp/filebeat.yml
+
+  osd:
+    depends_on:
+      os1:
+        condition: service_healthy
+    image: quay.io/wazuh/osd-dev:${OSD_VERSION}
+    profiles:
+      - "saml"
+      - "standard"
+    hostname: osd
+    networks:
+      - os-dev
+      - devel
+      - mon
+    user: "1000:1000"
+    <<: *logging
+    ports:
+      - ${OSD_PORT}:5601
+    environment:
+      - "LOGS=/proc/1/fd/1"
+    entrypoint: ["tail", "-f", "/dev/null"]
+    volumes:
+      - osd_cache:/home/node/.cache
+      - "${SRC}:/home/node/kbn/plugins/wazuh"
+      - wd_certs:/home/node/kbn/certs/
+      - ${WAZUH_DASHBOARD_CONF}:/home/node/kbn/config/opensearch_dashboards.yml
+      - ./config/${OSD_MAJOR}/osd/wazuh.yml:/home/node/kbn/data/wazuh/config/wazuh.yml
+
+  idpsec:
+    image: quay.io/keycloak/keycloak:19.0.1
+    depends_on:
+      generator:
+        condition: service_healthy
+    profiles:
+      - "saml"
+    volumes:
+      - wi_certs:/certs/wi
+      - wd_certs:/certs/wd
+      - wm_certs:/certs/wm
+      - idp_certs:/certs/idp
+    # Included to avoid docker from creating duplicated networks
+    networks:
+      - os-dev
+    entrypoint: /bin/bash
+    command: >
+      -c '
+        # trust store
+        for i in /certs/idp/ca.pem /certs/wd/osd.pem /certs/wi/os1.pem
+        do
+          keytool -import -alias $$(basename $$i .pem) -file $$i -keystore /certs/idp/truststore.jks -storepass SecretPassword -trustcacerts -noprompt
+        done
+        sleep 300
+      '
+    healthcheck:
+      test: ["CMD-SHELL", "[ -r /certs/idp/truststore.jks ]"]
+      interval: 2s
+      timeout: 5s
+      retries: 10
+
+  idp:
+    image: quay.io/keycloak/keycloak:19.0.1
+    depends_on:
+      idpsec:
+        condition: service_healthy
+    profiles:
+      - "saml"
+    hostname: idp
+    <<: *logging
+    networks:
+      - os-dev
+      - mon
+    ports:
+      - "8080:8080"
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - KC_SPI_TRUSTSTORE_FILE_PASSWORD=SecretPassword
+      - KC_SPI_TRUSTSTORE_FILE_FILE=/certs/truststore.jks
+    volumes:
+      - keycloak-data:/var/lib/keycloak/data
+      - idp_certs:/certs
+    command: start-dev
+    healthcheck:
+      test: curl -f http://localhost:8080/realms/master || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 6
+
+  idpsetup:
+    image: badouralix/curl-jq
+    depends_on:
+      idp:
+        condition: service_healthy
+    profiles:
+      - "saml"
+    hostname: idpsetup
+    <<: *logging
+    networks:
+      - os-dev
+      - mon
+    volumes:
+      - wi_certs:/certs/wi
+      - ./config/enable_saml.sh:/enable_saml.sh
+    entrypoint: /bin/sh
+    command: >
+      -c '
+       apk add bash
+       bash /enable_saml.sh
+       exit 0
+      '
+
+networks:
+  os-dev:
+    name: os-dev-${OS_VERSION}
+    driver: bridge
+  mon:
+    external: true
+  devel:
+    external: true
+
+volumes:
+  osd_cache:
+  certs:
+  os_logs:
+  os_data:
+  wi_certs:
+  wd_certs:
+  wm_certs:
+  idp_certs:
+  keycloak-data:

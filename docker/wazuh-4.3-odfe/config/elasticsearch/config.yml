@@ -1,0 +1,41 @@
+---
+_meta:
+  type: "config"
+  config_version: 2
+
+config:
+  dynamic:
+    http:
+      anonymous_auth_enabled: false
+    authc:
+      internal_auth:
+        order: 0
+        description: "HTTP basic authentication using the internal user database"
+        http_enabled: true
+        transport_enabled: true
+        http_authenticator:
+          type: basic
+          challenge: false
+        authentication_backend:
+          type: internal
+      saml_auth:
+        order: 1
+        description: "Keycloack SAML provider"
+        http_enabled: true
+        transport_enabled: false
+        http_authenticator:
+          type: saml
+          challenge: true
+          config:
+            idp:
+              metadata_url: http://idp:8080/realms/wazuh/protocol/saml/descriptor
+              entity_id: http://idp:8080/realms/wazuh
+            sp:
+              entity_id: wazuh
+              signature_private_key_filepath: "certs/admin-key.pem"
+              forceAuthn: true
+            kibana_url: https://localhost:5601
+            roles_key: Role
+            exchange_key: 1a2a3a4a5a6a7a8a9a0a1b2b3b4b5b6b
+        authentication_backend:
+          type: noop
