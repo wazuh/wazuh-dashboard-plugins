@@ -1,0 +1,65 @@
+{
+    "data": {
+        "affected_items": [
+            {
+                "command": [
+                    {
+                        "name": "disable-account",
+                        "executable": "disable-account",
+                        "timeout_allowed": 1
+                    },
+                    {
+                        "name": "restart-wazuh",
+                        "executable": "restart-wazuh",
+                        "timeout_allowed": 0
+                    },
+                    {
+                        "name": "firewall-drop",
+                        "executable": "firewall-drop",
+                        "timeout_allowed": 1
+                    },
+                    {
+                        "name": "host-deny",
+                        "executable": "host-deny",
+                        "timeout_allowed": 1
+                    },
+                    {
+                        "name": "route-null",
+                        "executable": "route-null",
+                        "timeout_allowed": 1
+                    },
+                    {
+                        "name": "win_route-null",
+                        "executable": "route-null.exe",
+                        "timeout_allowed": 1
+                    },
+                    {
+                        "name": "netsh",
+                        "executable": "netsh.exe",
+                        "timeout_allowed": 1
+                    },
+                    {
+                        "name": "firewall-drop",
+                        "executable": "firewall-drop",
+                        "timeout_allowed": 1
+                    },
+                    {
+                        "name": "yara",
+                        "executable": "yara.sh",
+                        "timeout_allowed": 0
+                    },
+                    {
+                        "name": "remove-threat",
+                        "executable": "remove-threat.sh",
+                        "timeout_allowed": 0
+                    }
+                ]
+            }
+        ],
+        "total_affected_items": 1,
+        "total_failed_items": 0,
+        "failed_items": []
+    },
+    "message": "Active configuration was successfully read in specified node",
+    "error": 0
+}

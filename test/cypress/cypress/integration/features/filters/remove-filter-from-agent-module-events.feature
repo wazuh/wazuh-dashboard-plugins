@@ -1,7 +1,7 @@
-Feature: Validate that the added filter label is remove after click remove filter option agent modules Dashboard
+Feature: Check that the added filter is removed after click on the removed button - Events
 
   As a Wazuh user
-  I want to set a new filter
+  I want to remove a selected filter
   in order to manage them
   Background:
     Given The wazuh admin user is logged
