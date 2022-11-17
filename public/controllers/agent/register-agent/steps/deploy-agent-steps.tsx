@@ -1,4 +1,41 @@
-import { buttonsConfig, iButton } from '../config';
+import React from 'react';
+import { EuiButtonGroup } from '@elastic/eui';
+import { buttonsConfig, iButton, VersionBtn } from '../config/new-config';
+
+const renderButtonGroup = (
+  buttons: iButton[],
+  legend: string,
+  defaultValue: string,
+  onChange: (id: string) => void,
+) => {
+  return (
+    <EuiButtonGroup
+      color='primary'
+      legend={legend}
+      options={buttons}
+      idSelected={defaultValue}
+      onChange={onChange}
+      className={'osButtonsStyle'}
+    />
+  );
+};
+export interface iButtonContent {
+  buttons: iButton[];
+  afterContent?: () => JSX.Element;
+}
+
+/**
+ * Return the children component from config selected
+ */
+export const renderContent = ({ buttons, afterContent } : iButtonContent) => {
+  return (
+    <>
+      {renderButtonGroup(buttons, 'OS', 'linux', () => {})}
+      {afterContent && afterContent}
+    </>
+  );
+};
+
 
 /**
  *
@@ -6,16 +43,21 @@ import { buttonsConfig, iButton } from '../config';
  * @param version
  * @param architecture
  */
-export const getOSSteṕContent = (
+export const getOSStepContent = (
   OS: string,
   version: string,
   architecture: string,
 ) => {
-  return buttonsConfig.map((button: iButton) => ({
+  const buttons = buttonsConfig.map(button => ({
     id: button.id,
     label: button.label,
   }));
+  return {
+    buttons
+  }
 };
+
+
 
 /**
  *
@@ -27,13 +69,30 @@ export const getVersionStepContent = (
   OS: string,
   version: string,
   architecture: string,
-) => {
+) : iButtonContent | false => {
   if (!OS) {
     // hide step
     return false;
   }
-  return buttonsConfig.find((button: iButton) => button.id === OS)
-    ?.versionsBtns;
+  const buttons = buttonsConfig.find(button => button.id === OS)?.versionsBtns;
+  if(!buttons) {
+    console.error('No buttons found for OS', OS);
+    return false;
+  }
+
+  const versionBtn = buttons?.filter(
+    button => button.id === version,
+  ) as VersionBtn[];
+  if (versionBtn?.length && versionBtn[0].afterContent) {
+    return {
+      buttons,
+      afterContent: versionBtn[0].afterContent,
+    };
+  } else {
+    return {
+      buttons,
+    };
+  }
 };
 
 /**
@@ -51,15 +110,21 @@ export const getArchitectureStepContent = (
     // hide step
     return false;
   }
-
-  return buttonsConfig.find((button: iButton) => button.id === OS)
-    ?.architectureBtns;
+  const buttons = buttonsConfig.find(button => button.id === OS)?.architectureBtns;
+  return {
+    buttons
+  }
 };
 
-const stepsDefinitions = [
+interface iStep {
+  title: string;
+  children: (os: string, version: string, architecture: string) => any;
+}
+
+const stepsBtnsDefinitions: iStep[] = [
   {
     title: 'Choose the operating system',
-    children: getOSSteṕContent,
+    children: getOSStepContent,
   },
   {
     title: 'Choose the version',
@@ -82,19 +147,18 @@ export const getDeployAgentSteps = (
   OSVersionSelected: string,
   OSArchSelected: string,
 ) => {
-  return stepsDefinitions
+  return stepsBtnsDefinitions
     .map(step => {
       const { title, children } = step;
       const stepContent =
-        typeof children === 'function'
-          ? children(OSSelected, OSVersionSelected, OSArchSelected)
-          : children;
-          
+      typeof children === 'function'
+      ? children(OSSelected, OSVersionSelected, OSArchSelected)
+      : children;
       return !stepContent
         ? false
         : {
             title,
-            children: stepContent,
+            children: renderContent({ ...stepContent } as iButtonContent),
           };
     })
     .filter(step => step);

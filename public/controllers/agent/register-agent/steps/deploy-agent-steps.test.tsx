@@ -1,4 +1,4 @@
-import { getArchitectureStepContent, getDeployAgentSteps, getOSSteṕContent, getVersionStepContent } from './deploy-agent-steps'
+import { getArchitectureStepContent, getDeployAgentSteps, getOSStepContent, getVersionStepContent, iButtonContent, renderContent } from './deploy-agent-steps'
 
 describe('Deploy agent steps', () => {
 
@@ -10,12 +10,12 @@ describe('Deploy agent steps', () => {
                 OSArchSelected: ''
             }
             const steps = getDeployAgentSteps(state.OSArchSelected, state.OSVersionSelected, state.OSArchSelected)
-            expect(steps).toEqual([
+            expect(JSON.stringify(steps)).toEqual(JSON.stringify([
                 {
                     title: 'Choose the operating system',
-                    children: getOSSteṕContent(state.OSSelected, state.OSVersionSelected, state.OSArchSelected)
+                    children: renderContent({...getOSStepContent(state.OSSelected, state.OSVersionSelected, state.OSArchSelected)})
                 }
-            ])
+            ]))
         })
 
         it('should return version steps when os is defined and version,architecture is not defined', () => {
@@ -25,16 +25,16 @@ describe('Deploy agent steps', () => {
                 OSArchSelected: ''
             }
             const steps = getDeployAgentSteps(state.OSSelected, state.OSVersionSelected, state.OSArchSelected)
-            expect(steps).toEqual([
+            expect(JSON.stringify(steps)).toEqual(JSON.stringify([
                 {
                     title: 'Choose the operating system',
-                    children: getOSSteṕContent(state.OSSelected, state.OSVersionSelected, state.OSArchSelected)
+                    children: renderContent({...getOSStepContent(state.OSSelected, state.OSVersionSelected, state.OSArchSelected)})
                 },
                 {
                     title: 'Choose the version',
-                    children: getVersionStepContent(state.OSSelected, state.OSVersionSelected, state.OSArchSelected)
+                    children: renderContent({...getVersionStepContent(state.OSSelected, state.OSVersionSelected, state.OSArchSelected)} as iButtonContent)
                 }
-            ])
+            ]))
         })
 
         it('should return all steps when os,version is defined and architecture is not defined', () => {
@@ -44,20 +44,20 @@ describe('Deploy agent steps', () => {
                 OSArchSelected: ''
             }
             const steps = getDeployAgentSteps(state.OSSelected, state.OSVersionSelected, state.OSArchSelected)
-            expect(steps).toEqual([
+            expect(JSON.stringify(steps)).toEqual(JSON.stringify([
                 {
                     title: 'Choose the operating system',
-                    children: getOSSteṕContent(state.OSSelected, state.OSVersionSelected, state.OSArchSelected)
+                    children: renderContent({...getOSStepContent(state.OSSelected, state.OSVersionSelected, state.OSArchSelected)})
                 },
                 {
                     title: 'Choose the version',
-                    children: getVersionStepContent(state.OSSelected, state.OSVersionSelected, state.OSArchSelected)
+                    children: renderContent({...getVersionStepContent(state.OSSelected, state.OSVersionSelected, state.OSArchSelected)} as iButtonContent)
                 },
                 {
                     title: 'Choose the architecture',
-                    children: getArchitectureStepContent(state.OSSelected, state.OSVersionSelected, state.OSArchSelected)
+                    children: renderContent({...getArchitectureStepContent(state.OSSelected, state.OSVersionSelected, state.OSArchSelected)} as iButtonContent)
                 }
-            ])
+            ]))
         })
     })
     
