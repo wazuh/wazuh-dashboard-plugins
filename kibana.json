@@ -1,6 +1,6 @@
 {
   "id": "wazuh",
-  "version": "4.3.9-4310",
+  "version": "4.3.10-4311",
   "kibanaVersion": "kibana",
   "configPath": [
     "wazuh"
