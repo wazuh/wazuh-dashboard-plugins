@@ -15,37 +15,35 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added new plugin settings to customize the header and footer on the PDF reports [#4505](https://github.com/wazuh/wazuh-kibana-app/pull/4505)[#4798](https://github.com/wazuh/wazuh-kibana-app/pull/4798)[#4805](https://github.com/wazuh/wazuh-kibana-app/pull/4805)
 - Add a new plugin setting to enable or disable the customization [#4507](https://github.com/wazuh/wazuh-kibana-app/pull/4507)
 - Added a centralized service to handle the requests [#4831](https://github.com/wazuh/wazuh-kibana-app/pull/4831)
+- Added data-test-subj create policy [#4873](https://github.com/wazuh/wazuh-kibana-app/pull/4873)
+
 
 ### Changed
 
 - Changed the HTTP verb from `GET` to `POST` in the requests to login to the Wazuh API [#4103](https://github.com/wazuh/wazuh-kibana-app/pull/4103)
-- Improve alerts summary performance [#4376](https://github.com/wazuh/wazuh-kibana-app/pull/4376)
-- Endpoint `/agents/summary/status` response was adapted. [#3874](https://github.com/wazuh/wazuh-kibana-app/pull/3874)
+- Improved alerts summary performance [#4376](https://github.com/wazuh/wazuh-kibana-app/pull/4376)
 - Updated and added operating systems, versions, architectures commands of Install and enroll the agent and
 commands of Start the agent in the deploy new agent section [#4458](https://github.com/wazuh/wazuh-kibana-app/pull/4458)
-- Makes Agents Overview loading icons independent [#4363](https://github.com/wazuh/wazuh-kibana-app/pull/4363)
+- Added cluster's IP and protocol as suggestions in the agent deployment wizard. [#4776](https://github.com/wazuh/wazuh-kibana-app/pull/4776)
+- Show OS name and OS version in the agent installation wizard. [#4851](https://github.com/wazuh/wazuh-kibana-app/pull/4851)
 
 ### Fixed
 
 - Improves Agents Overview performance [#4363](https://github.com/wazuh/wazuh-kibana-app/pull/4363)
 - Improved alerts summary performance [#4376](https://github.com/wazuh/wazuh-kibana-app/pull/4376)
-- The endpoint `/agents/summary/status` response was adapted. [#3874](https://github.com/wazuh/wazuh-kibana-app/pull/3874)
-- Changed loading icons of the Agents Overview section to work independently [#4363](https://github.com/wazuh/wazuh-kibana-app/pull/4363)
-- Enhance the message shown when a mismatch between Wazuh API and Wazuh APP occurs [#4544](https://github.com/wazuh/wazuh-kibana-app/pull/4544)
-- Changed breadcrumb styling to support OpenSearch dashboard 2.x. [#4649](https://github.com/wazuh/wazuh-kibana-app/pull/4649)
 - Made Agents Overview icons load independently [#4363](https://github.com/wazuh/wazuh-kibana-app/pull/4363)
 - Improved the message displayed when there is a versions mismatch between the Wazuh API and the Wazuh APP [#4529](https://github.com/wazuh/wazuh-kibana-app/pull/4529)
-- Changed the endpoint that updates the plugin configuration to support multiple settings. [#4501](https://github.com/wazuh/wazuh-kibana-app/pull/4501)
 - Allowed to upload an image for the `customization.logo.*` settings in `Settings/Configuration` [#4504](https://github.com/wazuh/wazuh-kibana-app/pull/4504)
-- Fixed the agents wizard OS styles and their versions. [#4830](https://github.com/wazuh/wazuh-kibana-app/pull/4830) [#4837](https://github.com/wazuh/wazuh-kibana-app/pull/4837/files)
 
 ### Removed
 
 - Removed custom styles from kibana 7.9.0 [#4491](https://github.com/wazuh/wazuh-kibana-app/pull/4491)
+- Fixed WAZUH_PROTOCOL param suggestion [#4849](https://github.com/wazuh/wazuh-kibana-app/pull/4849)
+- Add macOS version to wizard deploy agent [#4867](https://github.com/wazuh/wazuh-kibana-app/pull/4867)
+- Raspbian OS, Ubuntu, Amazon Linux and Amazon Linux 2 commands in the wizard deploy agent now change when selecting a different architecture [#4876](https://github.com/wazuh/wazuh-kibana-app/pull/4876)
 
 ### Fixed
 
-- Improved Agents Overview performance [#4363](https://github.com/wazuh/wazuh-kibana-app/pull/4363)
 - Fixed nested fields filtering in dashboards tables and KPIs [#4425](https://github.com/wazuh/wazuh-kibana-app/pull/4425)
 - Fixed nested field rendering in security alerts table details [#4428](https://github.com/wazuh/wazuh-kibana-app/pull/4428)
 - Fixed a bug where the Wazuh logo was used instead of the custom one [#4539](https://github.com/wazuh/wazuh-kibana-app/pull/4539)
@@ -54,6 +52,7 @@ commands of Start the agent in the deploy new agent section [#4458](https://gith
 - Fixed server errors with code 500 when the Wazuh API is not reachable / up. [#4710](https://github.com/wazuh/wazuh-kibana-app/pull/4710) [#4728](https://github.com/wazuh/wazuh-kibana-app/pull/4728)
 - Fixed pagination to SCA table [#4653](https://github.com/wazuh/wazuh-kibana-app/issues/4653)
 - Fixed a bug that caused the flyouts to close when clicking inside them [#4638](https://github.com/wazuh/wazuh-kibana-app/pull/4638)
+- Fixed the agents wizard OS styles and their versions. [#4830](https://github.com/wazuh/wazuh-kibana-app/pull/4830) [#4837](https://github.com/wazuh/wazuh-kibana-app/pull/4837/files)
 
 ## Wazuh v4.3.9 - OpenSearch Dashboards 1.2.0 - Revision 4310
 

@@ -43,6 +43,8 @@ import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
 import { architectureButtons, architectureButtonsi386, architecturei386Andx86_64, versionButtonsRaspbian, versionButtonsSuse, versionButtonsOracleLinux, versionButtonFedora, architectureButtonsSolaris, architectureButtonsWithPPC64LE, architectureButtonsOpenSuse, architectureButtonsAix, architectureButtonsHpUx, versionButtonAmazonLinux, versionButtonsRedHat, versionButtonsCentos, architectureButtonsMacos, osButtons, versionButtonsDebian, versionButtonsUbuntu, versionButtonsWindows, versionButtonsMacOS, versionButtonsOpenSuse, versionButtonsSolaris, versionButtonsAix, versionButtonsHPUX } from '../wazuh-config'
 import './register-agent.scss' 
+import  ServerAddress  from '../register-agent/steps/server-address';
+import { getConnectionConfig, fetchClusterNodesOptions } from './register-agent-service'
 
 export const RegisterAgent = withErrorBoundary(
 
@@ -65,9 +67,11 @@ export const RegisterAgent = withErrorBoundary(
         wazuhPassword: '',
         groups: [],
         selectedGroup: [],
+        defaultServerAddress: '',
         udpProtocol: false,
         showPassword: false,
         showProtocol: true,
+        connectionSecure: true
       };
       this.restartAgentCommand = {
         rpm: this.systemSelector(),
@@ -84,13 +88,9 @@ export const RegisterAgent = withErrorBoundary(
       try {
         this.setState({ loading: true });
         const wazuhVersion = await this.props.getWazuhVersion();
-        let serverAddress = false;
         let wazuhPassword = '';
         let hidePasswordInput = false;
-        serverAddress = this.configuration['enrollment.dns'] || false;
-        if (!serverAddress) {
-          serverAddress = await this.props.getCurrentApiAddress();
-        }
+        this.getEnrollDNSConfig();
         let authInfo = await this.getAuthInfo();
         const needsPassword = (authInfo.auth || {}).use_password === 'yes';
         if (needsPassword) {
@@ -99,11 +99,8 @@ export const RegisterAgent = withErrorBoundary(
             hidePasswordInput = true;
           }
         }
-
-        const udpProtocol = await this.getRemoteInfo();
         const groups = await this.getGroups();
         this.setState({
-          serverAddress,
           needsPassword,
           hidePasswordInput,
           versionButtonsRedHat,
@@ -143,7 +140,7 @@ export const RegisterAgent = withErrorBoundary(
           context: `${RegisterAgent.name}.componentDidMount`,
           level: UI_LOGGER_LEVELS.ERROR,
           severity: UI_ERROR_SEVERITIES.BUSINESS,
-          display: false,
+          display: true,
           store: false,
           error: {
             error: error,
@@ -155,24 +152,22 @@ export const RegisterAgent = withErrorBoundary(
       }
     }
 
+    getEnrollDNSConfig = () => {
+      let serverAddress = this.configuration['enrollment.dns'] || '';
+      this.setState({ defaultServerAddress: serverAddress });
+      if(serverAddress){
+        this.setState({ udpProtocol: true });
+      }else{
+        this.setState({ udpProtocol: false });
+      }
+    }
+
     async getAuthInfo() {
       try {
         const result = await WzRequest.apiReq('GET', '/agents/000/config/auth/auth', {});
         return (result.data || {}).data || {};
       } catch (error) {
         this.setState({ gotErrorRegistrationServiceInfo: true });
-        throw new Error(error);
-      }
-    }
-
-    async getRemoteInfo() {
-      try {
-        const result = await WzRequest.apiReq('GET', '/agents/000/config/request/remote', {});
-        const remote = ((result.data || {}).data || {}).remote || {};
-        if (remote.length === 2) {
-          this.setState({ udpProtocol: true })
-        }
-      } catch (error) {
         throw new Error(error);
       }
     }
@@ -201,7 +196,7 @@ export const RegisterAgent = withErrorBoundary(
     }
 
     systemSelectorWazuhControlMacos() {
-      if (this.state.selectedVersion == 'sierra' || this.state.selectedVersion == 'highSierra' || this.state.selectedVersion == 'mojave' || this.state.selectedVersion == 'catalina' || this.state.selectedVersion == 'bigSur' || this.state.selectedVersion == 'monterrey') {
+      if (this.state.selectedVersion == 'sierra' || this.state.selectedVersion == 'highSierra' || this.state.selectedVersion == 'mojave' || this.state.selectedVersion == 'catalina' || this.state.selectedVersion == 'bigSur' || this.state.selectedVersion == 'monterrey' || this.state.selectedVersion == 'ventura') {
         return ('/Library/Ossec/bin/wazuh-control start');
       }
     }
@@ -216,8 +211,12 @@ export const RegisterAgent = withErrorBoundary(
       this.setState({ selectedSYS: sys });
     }
 
-    setServerAddress(event) {
-      this.setState({ serverAddress: event.target.value });
+    setServerAddress(serverAddress) {
+      this.setState({ serverAddress });
+    }
+
+    setAgentName(event) {
+      this.setState({ agentName: event.target.value });
     }
 
     setAgentName(event) {
@@ -266,7 +265,9 @@ export const RegisterAgent = withErrorBoundary(
     }
 
     optionalDeploymentVariables() {
-      let deployment = `WAZUH_MANAGER='${this.state.serverAddress}' `;      
+
+      let deployment = this.state.serverAddress && `WAZUH_MANAGER='${this.state.serverAddress}' `;
+      const protocol = false
       if (this.state.selectedOS == 'win') {
         deployment += `WAZUH_REGISTRATION_SERVER='${this.state.serverAddress}' `;
       }
@@ -275,7 +276,7 @@ export const RegisterAgent = withErrorBoundary(
         deployment += `WAZUH_REGISTRATION_PASSWORD='${this.state.wazuhPassword}' `;
       }
 
-      if (!this.state.udpProtocol == true) {
+      if (this.state.udpProtocol) {
         deployment += `WAZUH_PROTOCOL='UDP' `;
       }
 
@@ -295,8 +296,7 @@ export const RegisterAgent = withErrorBoundary(
 
     agentNameVariable() {
       let agentName = `WAZUH_AGENT_NAME='${this.state.agentName}' `;
-
-      if (this.state.selectedArchitecture && this.state.agentName !== '') {
+      if(this.state.selectedArchitecture && this.state.agentName !== '') {
         return agentName;
       } else {
         return '';
@@ -426,25 +426,25 @@ export const RegisterAgent = withErrorBoundary(
 
     resolveAMAZONLPackage() {
       switch (`${this.state.selectedVersion}-${this.state.selectedArchitecture}`) {
-        case '1-i386':
+        case 'amazonlinux1-i386':
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.i386.rpm`;
-        case '1-aarch64':
+        case 'amazonlinux1-aarch64':
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.aarch64.rpm`;
-        case '1-x86_64':
+        case 'amazonlinux1-x86_64':
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.x86_64.rpm`;
-        case '1-armhf':
+        case 'amazonlinux1-armhf':
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.armv7hl.rpm`;
-        case '1-powerpc':
+        case 'amazonlinux1-powerpc':
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.ppc64le.rpm`;
-        case '2-i386':
+        case 'amazonlinux2-i386':
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.i386.rpm`;
-        case '2-aarch64':
+        case 'amazonlinux2-aarch64':
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.aarch64.rpm`;
-        case '2-x86_64':
+        case 'amazonlinux2-x86_64':
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.x86_64.rpm`;
-        case '2-armhf':
+        case 'amazonlinux2-armhf':
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.armv7hl.rpm`;
-        case '2-powerpc':
+        case 'amazonlinux2-powerpc':
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.ppc64le.rpm`;
         case 'amazonlinux2022-i386':
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.i386.rpm`;
@@ -477,7 +477,7 @@ export const RegisterAgent = withErrorBoundary(
     }
 
     resolveRASPBIANPackage() {
-      switch (`${this.state.selectedArchitecture}`) {
+      switch (`${this.state.selectedVersion}-${this.state.selectedArchitecture}`) {
         case 'busterorgreater-i386':
           return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_i386.deb`;
         case 'busterorgreater-aarch64':
@@ -495,14 +495,30 @@ export const RegisterAgent = withErrorBoundary(
 
     resolveUBUNTUPackage() {
       switch (`${this.state.selectedVersion}-${this.state.selectedArchitecture}`) {
-        case 'i386':
+        case 'ubuntu14-i386':
           return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_i386.deb`;
-        case 'aarch64':
-          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_amd64.deb`;
-        case 'armhf':
-          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_armhf.deb`;
-        case 'x86_64':
+        case 'ubuntu14-aarch64':
           return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_arm64.deb`;
+        case 'ubuntu14-armhf':
+          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_armhf.deb`;
+        case 'ubuntu14-x86_64':
+          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_amd64.deb`;
+        case 'ubuntu15-i386':
+          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_i386.deb`;
+        case 'ubuntu15-aarch64':
+          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_arm64.deb`;
+        case 'ubuntu15-armhf':
+          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_armhf.deb`;
+        case 'ubuntu15-x86_64':
+          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_amd64.deb`;
+        case 'ubuntu16-i386':
+          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_i386.deb`;
+        case 'ubuntu16-aarch64':
+          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_arm64.deb`;
+        case 'ubuntu16-armhf':
+          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_armhf.deb`;
+        case 'ubuntu16-x86_64':
+          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_amd64.deb`;
         default:
           return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_amd64.deb`;
       }
@@ -510,9 +526,9 @@ export const RegisterAgent = withErrorBoundary(
 
     resolveOPENSUSEPackage() {
       switch (`${this.state.selectedVersion}-${this.state.selectedArchitecture}`) {
-        case 'leap15-i386':
-          return `https://packages.wazuh.com/4.x/yum/i386/wazuh-agent-${this.state.wazuhVersion}.x86_64.rpm`;
         case 'leap15-x86_64':
+          return `https://packages.wazuh.com/4.x/yum/i386/wazuh-agent-${this.state.wazuhVersion}.x86_64.rpm`;
+        case 'leap15-ARM64':
           return `https://packages.wazuh.com/4.x/yum/x86_64/wazuh-agent-${this.state.wazuhVersion}.armv7hl.rpm`
         default:
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.x86_64.rpm`;
@@ -522,15 +538,15 @@ export const RegisterAgent = withErrorBoundary(
     resolveSOLARISPackage() {
       switch (`${this.state.selectedVersion}-${this.state.selectedArchitecture}`) {
         case 'solaris10-i386':
-          return `https://packages.wazuh.com/4.x/yum/i386/wazuh-agent-${this.state.wazuhVersion}-sol10-i386.pkg`;
-        case 'solaris10-spark':
-          return `https://packages.wazuh.com/4.x/yum/i386/wazuh-agent-${this.state.wazuhVersion}-sol10-sparc.pkg`;
+          return `https://packages.wazuh.com/4.x/solaris/i386/10/wazuh-agent-${this.state.wazuhVersion}-sol10-i386.pkg`;
+        case 'solaris10-sparc':
+          return `https://packages.wazuh.com/4.x/solaris/sparc/10/wazuh-agent-${this.state.wazuhVersion}-sol10-sparc.pkg`;
         case 'solaris11-i386':
-          return `https://packages.wazuh.com/4.x/yum/i386/wazuh-agent-${this.state.wazuhVersion}-sol11-i386.p5p`;
-        case 'solaris11-spark':
-          return `https://packages.wazuh.com/4.x/yum/x86_64/wazuh-agent-${this.state.wazuhVersion}-sol11-sparc.p5p`
+          return `https://packages.wazuh.com/4.x/solaris/i386/11/wazuh-agent-${this.state.wazuhVersion}-sol11-i386.p5p`;
+        case 'solaris11-sparc':
+          return `https://packages.wazuh.com/4.x/solaris/sparc/11/wazuh-agent-${this.state.wazuhVersion}-sol11-sparc.p5p`
         default:
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-sol11-sparc.p5p`;
+          return `https://packages.wazuh.com/4.x/solaris/sparc/11/wazuh-agent-${this.state.wazuhVersion}-sol11-sparc.p5p`;
       }
     }
 
@@ -719,18 +735,7 @@ export const RegisterAgent = withErrorBoundary(
         </p>
       );
       const missingOSSelection = this.checkMissingOSSelection();
-      const ipInput = (
-        <EuiText>
-          <p>
-            This is the address the agent uses to communicate with the Wazuh server. It can be an IP address or a fully qualified domain name (FQDN).
-          </p>
-          <EuiFieldText
-            placeholder="Server address"
-            value={this.state.serverAddress}
-            onChange={(event) => this.setServerAddress(event)}
-          />
-        </EuiText>
-      );
+      
 
       const agentName = (
         <EuiFieldText
@@ -752,24 +757,24 @@ export const RegisterAgent = withErrorBoundary(
           )}
         </>
       );
-
+      
 
 
       const agentGroup = (
-        <EuiText style={{ marginTop: '1.5rem' }}>
-          <p>Select one or more existing groups</p>
-          <EuiComboBox
-            placeholder={!this.state.groups.length ? "Default" : "Select group"}
-            options={this.state.groups}
-            selectedOptions={this.state.selectedGroup}
-            onChange={(group) => {
-              this.setGroupName(group);
-            }}
-            isDisabled={!this.state.groups.length}
-            isClearable={true}
-            data-test-subj="demoComboBox"
-          />
-        </EuiText>
+        <EuiText style={{marginTop: '1.5rem'}}>
+        <p>Select one or more existing groups</p>
+        <EuiComboBox
+          placeholder={!this.state.groups.length ? "Default" : "Select group"}
+          options={this.state.groups}
+          selectedOptions={this.state.selectedGroup}
+          onChange={(group) => {
+            this.setGroupName(group);
+          }}
+          isDisabled={!this.state.groups.length}
+          isClearable={true}
+          data-test-subj="demoComboBox"
+        />
+      </EuiText>
       )
       const passwordInput = (
         <EuiFieldText
@@ -814,6 +819,7 @@ export const RegisterAgent = withErrorBoundary(
       const field = `${this.state.selectedOS}Text`;
       const text = customTexts[field];
       const language = this.getHighlightCodeLanguage(this.state.selectedOS);
+      const warningUpgrade = 'If the installer finds another Wazuh agent in the system, it will upgrade it preserving the configuration.'
       const windowsAdvice = this.state.selectedOS === 'win' && (
         <>
           <EuiCallOut
@@ -850,19 +856,89 @@ export const RegisterAgent = withErrorBoundary(
               title='This section could not be displayed because you do not have permission to get access to the registration service.'
               iconType="iInCircle"
             />
-          ) :
-            this.state.selectedOS && (
+          ) : (this.state.connectionSecure === true && this.state.udpProtocol === false) ? (
+            <EuiText>
+            <p>
+              You can use this command to install and enroll the Wazuh agent in one or more hosts.
+            </p>
+            <EuiCallOut
+              color="warning"
+              title={warningUpgrade}
+              iconType="iInCircle"
+            />
+            <EuiSpacer />
+            {windowsAdvice}
+            <div className="copy-codeblock-wrapper">
+              <EuiCodeBlock style={codeBlock} language={language}>
+                {this.state.wazuhPassword && !this.state.showPassword ? this.obfuscatePassword(text) : text}
+              </EuiCodeBlock>
+              <EuiCopy textToCopy={text}>
+                {(copy) => (
+                  <div className="copy-overlay"  onClick={copy}>
+                    <p><EuiIcon type="copy"/> Copy command</p>
+                  </div>
+                )}
+              </EuiCopy>
+            </div>
+            {this.state.needsPassword && (
+              <EuiSwitch
+                label="Show password"
+                checked={this.state.showPassword}
+                onChange={(active) => this.setShowPassword(active)}
+              />
+            )}
+            <EuiSpacer />
+          </EuiText>) : (this.state.connectionSecure === false) ? 
+          (
+            <EuiText>
+            <p>
+              You can use this command to install and enroll the Wazuh agent in one or more hosts.
+            </p>
+            <EuiCallOut
+              color="warning"
+              title={warningUpgrade}
+              iconType="iInCircle"
+            />
+            <EuiSpacer />
+            <EuiCallOut
+              color="danger"
+              title={
+                <>
+                  Warning: there's no <EuiLink target="_blank" href={webDocumentationLink('user-manual/deployment-variables/deployment-variables.html', appVersionMajorDotMinor)}>secure protocol configured</EuiLink> and agents will not be able to communicate with the manager.
+                </>
+              }
+              iconType="iInCircle"
+            />
+            <EuiSpacer />
+            {windowsAdvice}
+            <div className="copy-codeblock-wrapper">
+              <EuiCodeBlock style={codeBlock} language={language}>
+                {this.state.wazuhPassword && !this.state.showPassword ? this.obfuscatePassword(text) : text}
+              </EuiCodeBlock>
+              <EuiCopy textToCopy={text || ''}>
+                {(copy) => (
+                  <div className="copy-overlay"  onClick={copy}>
+                    <p><EuiIcon type="copy"/> Copy command</p>
+                  </div>
+                )}
+              </EuiCopy>
+            </div>
+            {this.state.needsPassword && (
+              <EuiSwitch
+                label="Show password"
+                checked={this.state.showPassword}
+                onChange={(active) => this.setShowPassword(active)}
+              />
+            )}
+            <EuiSpacer />
+          </EuiText>) : (
               <EuiText>
                 <p>
                   You can use this command to install and enroll the Wazuh agent in one or more hosts.
                 </p>
                 <EuiCallOut
                   color="warning"
-                  title={
-                    <>
-                      If the installer finds another Wazuh agent in the system, it will upgrade it preserving the configuration.
-                    </>
-                  }
+                  title={warningUpgrade}
                   iconType="iInCircle"
                 />
                 <EuiSpacer />
@@ -871,7 +947,7 @@ export const RegisterAgent = withErrorBoundary(
                   <EuiCodeBlock style={codeBlock} language={language}>
                     {this.state.wazuhPassword && !this.state.showPassword ? this.obfuscatePassword(text) : text}
                   </EuiCodeBlock>
-                  <EuiCopy textToCopy={text}>
+                  <EuiCopy textToCopy={text || ''}>
                     {(copy) => (
                       <div className="copy-overlay" onClick={copy}>
                         <p><EuiIcon type="copy" /> Copy command</p>
@@ -1092,6 +1168,47 @@ export const RegisterAgent = withErrorBoundary(
         )
       }
 
+      const onChangeServerAddress = async (selectedNodes) => {
+        if(selectedNodes.length === 0){
+          this.setState({
+            serverAddress: '',
+            udpProtocol: false,
+            connectionSecure: null
+          })
+        }else{
+          const nodeSelected = selectedNodes[0];
+          try {
+            const remoteConfig = await getConnectionConfig(nodeSelected);
+            this.setState({
+              serverAddress: remoteConfig.serverAddress,
+              udpProtocol: remoteConfig.udpProtocol,
+              connectionSecure: remoteConfig.connectionSecure
+            })
+          }catch(error){
+            const options = {
+              context: `${RegisterAgent.name}.onChangeServerAddress`,
+              level: UI_LOGGER_LEVELS.ERROR,
+              severity: UI_ERROR_SEVERITIES.BUSINESS,
+              display: true,
+              store: false,
+              error: {
+                error: error,
+                message: error.message || error,
+                title: error.name || error,
+              },
+            };
+            getErrorOrchestrator().handleError(options);
+            this.setState({
+              serverAddress: nodeSelected.label,
+              udpProtocol: false,
+              connectionSecure: false
+            })
+          }
+        }
+          
+      }
+      
+
       const steps = [
         {
           title: 'Choose the operating system',
@@ -1245,7 +1362,6 @@ export const RegisterAgent = withErrorBoundary(
               title: 'Choose the version',
               children: (
                 this.state.selectedVersion == '11.31' ? buttonGroupWithMessage("Choose the version", versionButtonsHPUX, this.state.selectedVersion, (version) => this.setVersion(version)) : buttonGroup("Choose the version", versionButtonsHPUX, this.state.selectedVersion, (version) => this.setVersion(version))
-
               ),
             },
           ]
@@ -1300,7 +1416,7 @@ export const RegisterAgent = withErrorBoundary(
             },
           ]
           : []),
-        ...(this.state.selectedVersion == 'sierra' || this.state.selectedVersion == 'highSierra' || this.state.selectedVersion == 'mojave' || this.state.selectedVersion == 'catalina' || this.state.selectedVersion == 'bigSur' || this.state.selectedVersion == 'monterrey'
+        ...(this.state.selectedVersion == 'sierra' || this.state.selectedVersion == 'highSierra' || this.state.selectedVersion == 'mojave' || this.state.selectedVersion == 'catalina' || this.state.selectedVersion == 'bigSur' || this.state.selectedVersion == 'monterrey' || this.state.selectedVersion == 'ventura'
           ? [
             {
               title: 'Choose the architecture',
@@ -1342,7 +1458,12 @@ export const RegisterAgent = withErrorBoundary(
           : []),
         {
           title: 'Wazuh server address',
-          children: <Fragment>{ipInput}</Fragment>,
+          children: <Fragment>
+            <ServerAddress
+              defaultValue={this.state.defaultServerAddress}
+              onChange={onChangeServerAddress} 
+              fetchOptions={fetchClusterNodesOptions}/>
+            </Fragment>,
         },
         ...(!(!this.state.needsPassword || this.state.hidePasswordInput)
           ? [
@@ -1384,7 +1505,7 @@ export const RegisterAgent = withErrorBoundary(
                   />
                 ) : (
                   <EuiTabbedContent
-                    tabs={this.state.selectedVersion == 'redhat7' || this.state.selectedVersion == 'amazonlinux2022' || this.state.selectedVersion == 'centos7' || this.state.selectedVersion == 'suse11' || this.state.selectedVersion == 'suse12' || this.state.selectedVersion == 'oraclelinux5' || this.state.selectedVersion == 'amazonlinux2' || this.state.selectedVersion == '22' || this.state.selectedVersion == 'debian8' || this.state.selectedVersion == 'debian10' || this.state.selectedVersion == 'busterorgreater' || this.state.selectedVersion == 'busterorgreater' || this.state.selectedVersion === 'ubuntu15' || this.state.selectedVersion === 'ubuntu16' || this.state.selectedVersion === 'leap15' ? tabSystemD : this.state.selectedVersion == 'windowsxp' || this.state.selectedVersion == 'windows8' ? tabNet : this.state.selectedVersion == 'sierra' || this.state.selectedVersion == 'highSierra' || this.state.selectedVersion == 'mojave' || this.state.selectedVersion == 'catalina' || this.state.selectedVersion == 'bigSur' || this.state.selectedVersion == 'monterrey' ? tabWazuhControlMacos : this.state.selectedVersion == 'solaris10' || this.state.selectedVersion == 'solaris11' || this.state.selectedVersion == '6.1 TL9' || this.state.selectedVersion == '11.31' ? tabWazuhControl : tabSysV}
+                    tabs={this.state.selectedVersion == 'redhat7' || this.state.selectedVersion == 'amazonlinux2022' || this.state.selectedVersion == 'centos7' || this.state.selectedVersion == 'suse11' || this.state.selectedVersion == 'suse12' || this.state.selectedVersion == 'oraclelinux5' || this.state.selectedVersion == 'amazonlinux2' || this.state.selectedVersion == '22' || this.state.selectedVersion == 'debian8' || this.state.selectedVersion == 'debian10' || this.state.selectedVersion == 'busterorgreater' || this.state.selectedVersion == 'busterorgreater' || this.state.selectedVersion === 'ubuntu15' || this.state.selectedVersion === 'ubuntu16' || this.state.selectedVersion === 'leap15' ? tabSystemD : this.state.selectedVersion == 'windowsxp' || this.state.selectedVersion == 'windows8' ? tabNet : this.state.selectedVersion == 'sierra' || this.state.selectedVersion == 'highSierra' || this.state.selectedVersion == 'mojave' || this.state.selectedVersion == 'catalina' || this.state.selectedVersion == 'bigSur' || this.state.selectedVersion == 'monterrey' || this.state.selectedVersion == 'ventura' ? tabWazuhControlMacos : this.state.selectedVersion == 'solaris10' || this.state.selectedVersion == 'solaris11' || this.state.selectedVersion == '6.1 TL9' || this.state.selectedVersion == '11.31' ? tabWazuhControl : tabSysV}
                     selectedTab={this.selectedSYS}
                     onTabClick={onTabClick}
                   />
@@ -1437,6 +1558,7 @@ export const RegisterAgent = withErrorBoundary(
           ]
           : []),
       ];
+
       return (
         <div>
           <EuiPage restrictWidth="1000px" style={{ background: 'transparent' }}>
@@ -1471,7 +1593,7 @@ export const RegisterAgent = withErrorBoundary(
                         )}
                       </EuiFlexItem>
                     </EuiFlexGroup>
-                    <EuiSpacer></EuiSpacer>
+                    <EuiSpacer />
                     {this.state.loading && (
                       <>
                         <EuiFlexItem>

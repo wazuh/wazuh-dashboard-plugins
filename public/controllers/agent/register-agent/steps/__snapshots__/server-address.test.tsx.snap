@@ -1,0 +1,84 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Server Address Combobox should match snapshot 1`] = `
+<div>
+  <div
+    class="euiText euiText--medium"
+  >
+    <p>
+      This is the address the agent uses to communicate with the Wazuh server. It can be an IP address or a fully qualified domain name (FQDN).
+    </p>
+    <div
+      aria-expanded="false"
+      aria-haspopup="listbox"
+      class="euiComboBox"
+      data-test-subj="demoComboBox"
+      role="combobox"
+    >
+      <div
+        class="euiFormControlLayout"
+      >
+        <div
+          class="euiFormControlLayout__childrenWrapper"
+        >
+          <div
+            class="euiComboBox__inputWrap euiComboBox__inputWrap--noWrap euiComboBox__inputWrap-isLoading euiComboBox__inputWrap-isClearable"
+            data-test-subj="comboBoxInput"
+            tabindex="-1"
+          >
+            <p
+              class="euiComboBoxPlaceholder"
+            >
+              Server Address
+            </p>
+            <div
+              class="euiComboBox__input"
+              style="font-size: 14px; display: inline-block;"
+            >
+              <input
+                aria-controls=""
+                data-test-subj="comboBoxSearchInput"
+                role="textbox"
+                style="box-sizing: content-box; width: 2px;"
+                value=""
+              />
+              <div
+                style="position: absolute; top: 0px; left: 0px; visibility: hidden; height: 0px; overflow: scroll; white-space: pre; font-family: -webkit-small-control; letter-spacing: normal; text-transform: none;"
+              />
+            </div>
+          </div>
+          <div
+            class="euiFormControlLayoutIcons euiFormControlLayoutIcons--right"
+          >
+            <span
+              class="euiLoadingSpinner euiLoadingSpinner--medium"
+            />
+            <button
+              aria-label="Open list of options"
+              class="euiFormControlLayoutCustomIcon euiFormControlLayoutCustomIcon--clickable"
+              data-test-subj="comboBoxToggleListButton"
+              type="button"
+            >
+              <svg
+                aria-hidden="true"
+                class="euiIcon euiIcon--medium euiFormControlLayoutCustomIcon__icon"
+                focusable="false"
+                height="16"
+                role="img"
+                viewBox="0 0 16 16"
+                width="16"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M13.069 5.157L8.384 9.768a.546.546 0 01-.768 0L2.93 5.158a.552.552 0 00-.771 0 .53.53 0 000 .759l4.684 4.61c.641.631 1.672.63 2.312 0l4.684-4.61a.53.53 0 000-.76.552.552 0 00-.771 0z"
+                  fill-rule="non-zero"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
