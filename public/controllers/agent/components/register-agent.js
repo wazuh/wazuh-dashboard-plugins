@@ -534,7 +534,6 @@ resolveRASPBIANPackage() {
       }
     }
     
-
     resolveSOLARISPackage() {
       switch (`${this.state.selectedVersion}-${this.state.selectedArchitecture}`) {
         case 'solaris10-i386':
