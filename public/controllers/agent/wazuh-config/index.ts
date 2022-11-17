@@ -173,7 +173,7 @@ const versionButtonsDebian = [
 const versionButtonFedora = [
   {
     id: '22',
-    label: '22 or later'
+    label: 'Fedora 22 or later'
   }
 ]
 
@@ -206,45 +206,48 @@ const versionButtonsWindows = [
 const versionButtonsSuse = [
   {
     id: 'suse11',
-    label: '11',
+    label: 'SUSE 11',
   },
   {
     id: 'suse12',
-    label: '12',
+    label: 'SUSE 12',
   }
 ];
 
 const versionButtonsMacOS = [
   {
     id: 'sierra',
-    label: 'Sierra',
+    label: 'macOS Sierra',
   },
   {
     id: 'highSierra',
-    label: 'High Sierra',
+    label: 'macOS High Sierra',
   },
   {
     id: 'mojave',
-    label: 'Mojave',
+    label: 'macOS Mojave',
   },
   {
     id: 'catalina',
-    label: 'Catalina',
+    label: 'macOS Catalina',
   },
   {
     id: 'bigSur',
-    label: 'Big Sur',
+    label: 'macOS Big Sur',
   },
   {
     id: 'monterrey',
-    label: 'Monterrey',
+    label: 'macOS Monterrey',
+  },
+  { id: 'ventura',
+    label: 'macOS Ventura',
   },
 ];
 
 const versionButtonsOpenSuse = [
   {
     id: 'leap15',
-    label: 'Leap 15 or higher',
+    label: 'OpenSuse Leap 15 or higher',
   }
 ];
 
@@ -262,32 +265,32 @@ const versionButtonsSolaris = [
 const versionButtonsAix = [
   {
     id: '6.1 TL9',
-    label: '6.1 TL9 or higher',
+    label: 'AIX 6.1 TL9 or higher',
   }
 ];
 
 const versionButtonsHPUX = [
   {
     id: '11.31',
-    label: '11.31 or higher',
+    label: 'HP-UX 11.31 or higher',
   }
 ];
 
 const versionButtonsOracleLinux = [
   {
     id: 'oraclelinux5',
-    label: '5',
+    label: 'Oracle Linux 5',
   },
   {
     id: 'oraclelinux6',
-    label: '6 or later',
+    label: 'Oracle Linux 6 or later',
   }
 ];
 
 const versionButtonsRaspbian = [
   {
     id: 'busterorgreater',
-    label: 'Buster or greater',
+    label: 'Raspbian Buster or greater',
   }
 ];
 

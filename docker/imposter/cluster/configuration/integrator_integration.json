@@ -1,0 +1,35 @@
+{
+    "data": {
+        "affected_items": [
+            {
+                "integration": [
+                    {
+                        "name": "test",
+                        "hook_url": "test",
+                        "level": 12,
+                        "max_log": 165,
+                        "alert_format": "json"
+                    },
+                    {
+                        "name": "test2",
+                        "api_key": "test3",
+                        "level": 0,
+                        "max_log": 165,
+                        "rule_id": [
+                            100200,
+                            100201,
+                            100202,
+                            100203
+                        ],
+                        "alert_format": "json"
+                    }
+                ]
+            }
+        ],
+        "total_affected_items": 2,
+        "total_failed_items": 0,
+        "failed_items": []
+    },
+    "message": "Active configuration was successfully read in specified node",
+    "error": 0
+}

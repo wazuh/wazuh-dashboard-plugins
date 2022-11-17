@@ -1,0 +1,26 @@
+{
+  "data": {
+    "affected_items": [
+      {
+        "name": "master-node",
+        "status": "OK"
+      }
+    ],
+    "total_affected_items": 1,
+    "total_failed_items": 1,
+    "failed_items": [
+      {
+        "error": {
+          "code": 1908,
+          "message": "Error validating configuration: (1226): Error reading XML file 'etc/ossec.conf':  (line 0).",
+          "remediation": "Please, fix the corrupted files"
+        },
+        "id": [
+          "worker-node"
+        ]
+      }
+    ]
+  },
+  "message": "Could not check validation in some nodes",
+  "error": 2
+}
