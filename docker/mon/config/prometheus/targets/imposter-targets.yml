@@ -1,0 +1,5 @@
+- targets:
+    - imposter-kbn-7.10.2:8080
+    - imposter-osd-1.2:8080
+
+
