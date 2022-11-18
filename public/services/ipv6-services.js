@@ -1,4 +1,7 @@
 export const compressIPv6 = (ip) => {
+  if (typeof (ip) !== 'string') {
+    return ip;
+  }
   if (ip?.split(':').length !== 8) {
     return ip;
   }

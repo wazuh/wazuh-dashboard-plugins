@@ -13,6 +13,7 @@ describe('[settings] Input validation', () => {
     ${'2202:00FF:0E1E:8329:2202:0000:0000:0000'}        | ${'2202:FF:E1E:8329:2202::'}
     ${'0000:0000:0000:0000:0000:0000:0000:0000'}        | ${'::'}
     ${undefined}                                        | ${undefined}
+    ${234}                                              | ${234}
     `('$value | $expectedValidation', ({ value, expectedValidation }) => {
     expect(
       compressIPv6(value)).toBe(expectedValidation);
