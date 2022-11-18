@@ -18,6 +18,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added macOS version to wizard deploy agent [#4867](https://github.com/wazuh/wazuh-kibana-app/pull/4867)
 - Added powerPC architecture in redhat7, in the section 'Deploy new agent'. [4833](https://github.com/wazuh/wazuh-kibana-app/pull/4833)
 - Added a centralized service to handle the requests [#4831](https://github.com/wazuh/wazuh-kibana-app/pull/4831)
+- Added data-test-subj create policy [#4873](https://github.com/wazuh/wazuh-kibana-app/pull/4873)
 
 ### Changed
 
