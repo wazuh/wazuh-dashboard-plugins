@@ -72,18 +72,6 @@ export function WazuhElasticRoutes(router: IRouter) {
 
   router.get(
     {
-      path: '/elastic/index-patterns/{pattern}',
-      validate: {
-        params: schema.object({
-          pattern: schema.string(),
-        })
-      }
-    },
-    async (context, request, response) => ctrl.checkPattern(context, request, response)
-  );
-
-  router.get(
-    {
       path: '/elastic/top/{mode}/{cluster}/{field}/{pattern}',
       validate: {
         params: schema.object({

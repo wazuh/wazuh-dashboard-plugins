@@ -14,7 +14,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
-- 
+- Fixed references to Elasticsearch in Wazuh-stack plugin [4894](https://github.com/wazuh/wazuh-kibana-app/pull/4894)
 
 ## Wazuh v4.4.0 - OpenSearch Dashboards 2.3.0 - Revision 4400
 

@@ -71,17 +71,5 @@ describe('wazuh-elastic', () => {
       res.body.status.should.be.eql(true);
       res.body.data.should.be.eql(`Template found for ${getSettingDefaultValue('pattern')}`);
     });
-
-    it('GET /elastic/index-patterns/{pattern}', async () => {
-      const res = await needle(
-        'get',
-        `${kibanaServer}:5601/elastic/index-patterns/${getSettingDefaultValue('pattern')}`,
-        {},
-        headers
-      );
-      res.body.statusCode.should.be.eql(200);
-      res.body.status.should.be.eql(true);
-      res.body.data.should.be.eql('Index pattern found');
-    });
   });
 });
