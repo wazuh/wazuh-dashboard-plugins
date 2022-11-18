@@ -11,10 +11,10 @@ name: ESLint
 
 on:
   push:
-    branches: [ "master", "*.*-*.*", "*.*-*.*-wzd" ]
+    branches: [ "master", "*.*-*.*", "*.*-*.*-wzd", "[0-9].[0-9]+" ]
   pull_request:
     # The branches below must be a subset of the branches above
-    branches: [ "*.*-*.*", "*.*-*.*-wzd" ]
+    branches: [ "*.*-*.*", "*.*-*.*-wzd", "[0-9].[0-9]+" ]
 
 jobs:
   eslint:
