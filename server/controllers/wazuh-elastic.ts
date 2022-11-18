@@ -143,41 +143,6 @@ export class WazuhElasticCtrl {
    * @param {Object} response
    * @returns {Object} status obj or ErrorResponse
    */
-  async checkPattern(context: RequestHandlerContext, request: OpenSearchDashboardsRequest<{ pattern: string }>, response: OpenSearchDashboardsResponseFactory) {
-    try {
-      const data = await context.core.savedObjects.client.find<SavedObjectsFindResponse<SavedObject>>({ type: 'index-pattern' });
-
-      const existsIndexPattern = data.saved_objects.find(
-        item => item.attributes.title === request.params.pattern
-      );
-      log(
-        'wazuh-elastic:checkPattern',
-        `Index pattern found: ${existsIndexPattern ? existsIndexPattern.attributes.title : 'no'}`,
-        'debug'
-      );
-      return existsIndexPattern
-        ? response.ok({
-          body: { statusCode: 200, status: true, data: 'Index pattern found' }
-        })
-        : response.ok({
-          body: {
-            statusCode: 500,
-            status: false,
-            error: 10020,
-            message: 'Index pattern not found'
-          }
-        });
-    } catch (error) {
-      log('wazuh-elastic:checkPattern', error.message || error);
-      return ErrorResponse(
-        `Something went wrong retrieving index-patterns from ${WAZUH_INDEXER_NAME} due to ${error.message ||
-        error}`,
-        4003,
-        500,
-        response
-      );
-    }
-  }
 
   /**
    * This get the fields keys
