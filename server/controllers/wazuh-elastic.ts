@@ -26,6 +26,7 @@ import { OpenSearchDashboardsRequest, RequestHandlerContext, OpenSearchDashboard
 import { getCookieValueByName } from '../lib/cookie';
 import { WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS, WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_ALERTS } from '../../common/constants'
 import { getSettingDefaultValue } from '../../common/services/settings';
+import { WAZUH_INDEXER_NAME } from '../../common/constants'
 
 export class WazuhElasticCtrl {
   wzSampleAlertsIndexPrefix: string
@@ -65,7 +66,7 @@ export class WazuhElasticCtrl {
       const templates = data.body;
       if (!templates || typeof templates !== 'string') {
         throw new Error(
-          'An unknown error occurred when fetching templates from Elasticseach'
+          `An unknown error occurred when fetching templates from ${WAZUH_INDEXER_NAME}`
         );
       }
 
@@ -126,7 +127,7 @@ export class WazuhElasticCtrl {
     } catch (error) {
       log('wazuh-elastic:getTemplate', error.message || error);
       return ErrorResponse(
-        `Could not retrieve templates from Elasticsearch due to ${error.message ||
+        `Could not retrieve templates from ${WAZUH_INDEXER_NAME} due to ${error.message ||
         error}`,
         4002,
         500,
@@ -169,7 +170,7 @@ export class WazuhElasticCtrl {
     } catch (error) {
       log('wazuh-elastic:checkPattern', error.message || error);
       return ErrorResponse(
-        `Something went wrong retrieving index-patterns from Elasticsearch due to ${error.message ||
+        `Something went wrong retrieving index-patterns from ${WAZUH_INDEXER_NAME} due to ${error.message ||
         error}`,
         4003,
         500,
