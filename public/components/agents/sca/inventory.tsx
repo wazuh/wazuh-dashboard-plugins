@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Iventory component
+ * Wazuh app - Inventory component
  * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -409,7 +409,7 @@ export class Inventory extends Component {
         });
         const [policyData] = policyResponse.data.data.affected_items;
         // It queries all checks without filters, because the filters are applied in the results
-        // due to the use of EuiInMemoryTable instead EuiTable components and do arequest with each change of filters.
+        // due to the use of EuiInMemoryTable instead EuiTable components and do a request with each change of filters.
         const checksResponse = await WzRequest.apiReq(
           'GET',
           `/sca/${this.props.agent.id}/checks/${policy.policy_id}`,
