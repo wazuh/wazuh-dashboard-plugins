@@ -1,59 +1,50 @@
-import React from 'react';
-import { EuiButtonGroup } from '@elastic/eui';
+import React, { useState } from 'react';
+import { StepButtonGroup } from '../components';
 import { buttonsConfig, iButton, VersionBtn } from '../config/new-config';
 
-const renderButtonGroup = (
-  buttons: iButton[],
-  legend: string,
-  defaultValue: string,
-  onChange: (id: string) => void,
-) => {
-  return (
-    <EuiButtonGroup
-      color='primary'
-      legend={legend}
-      options={buttons}
-      idSelected={defaultValue}
-      onChange={onChange}
-      className={'osButtonsStyle'}
-    />
-  );
-};
+
 export interface iButtonContent {
   buttons: iButton[];
+  title: string;
+  defaultValue: any,
+  onChange: (value: string) => void,
   afterContent?: () => JSX.Element;
 }
 
 /**
  * Return the children component from config selected
  */
-export const renderContent = ({ buttons, afterContent } : iButtonContent) => {
+export const renderContent = ({ buttons, afterContent, title, defaultValue, onChange} : iButtonContent) => {
+
   return (
     <>
-      {renderButtonGroup(buttons, 'OS', 'linux', () => {})}
+      <StepButtonGroup buttons={buttons} legend={title} defaultValue={defaultValue} onChange={onChange}/>
       {afterContent && afterContent}
     </>
   );
 };
 
-
 /**
  *
  * @param OS
  * @param version
  * @param architecture
  */
-export const getOSStepContent = (
-  OS: string,
-  version: string,
-  architecture: string,
-) => {
+export const getOSStepContent = (title: string, state: any, onChange: (field: string, value: string) => void) => {
   const buttons = buttonsConfig.map(button => ({
     id: button.id,
     label: button.label,
   }));
+
+  const handleOnchange = (value: string) => {
+    onChange('os', value);
+  }
+
   return {
-    buttons
+    title,
+    buttons,
+    defaultValue: state.os,
+    onChange: handleOnchange,
   }
 };
 
@@ -65,18 +56,20 @@ export const getOSStepContent = (
  * @param version
  * @param architecture
  */
-export const getVersionStepContent = (
-  OS: string,
-  version: string,
-  architecture: string,
-) : iButtonContent | false => {
-  if (!OS) {
+export const getVersionStepContent = (title: string, state: any, onChange: (field: string, value: string) => void) => {
+  const { os, version } = state;
+  if (!os) {
     // hide step
     return false;
   }
-  const buttons = buttonsConfig.find(button => button.id === OS)?.versionsBtns;
+
+  const handleOnchange = (value: string) => {
+    onChange('version', value);
+  }
+
+  const buttons = buttonsConfig.find(button => button.id === os)?.versionsBtns;
   if(!buttons) {
-    console.error('No buttons found for OS', OS);
+    console.error('No buttons found for OS', os);
     return false;
   }
 
@@ -85,12 +78,18 @@ export const getVersionStepContent = (
   ) as VersionBtn[];
   if (versionBtn?.length && versionBtn[0].afterContent) {
     return {
+      title,
       buttons,
       afterContent: versionBtn[0].afterContent,
+      defaultValue: state.version,
+      onChange: handleOnchange,
     };
   } else {
     return {
+      title,
       buttons,
+      defaultValue: state.version,
+      onChange: handleOnchange
     };
   }
 };
@@ -101,40 +100,32 @@ export const getVersionStepContent = (
  * @param version
  * @param architecture
  */
-export const getArchitectureStepContent = (
-  OS: string,
-  version: string,
-  architecture: string,
-) => {
+export const getArchitectureStepContent = (title: string, state: any, onChange: (field: string, value: string) => void) => {
+  const { os, version } = state;
+  
   if (!version) {
     // hide step
     return false;
   }
-  const buttons = buttonsConfig.find(button => button.id === OS)?.architectureBtns;
+
+  const handleOnchange = (value: string) => {
+    onChange('architecture', value);
+  }
+
+  const buttons = buttonsConfig.find(button => button.id === os)?.architectureBtns;
   return {
-    buttons
+    title,
+    buttons,
+    defaultValue: state.architecture,
+    onChange: handleOnchange,
   }
 };
 
-interface iStep {
+export interface iStep {
   title: string;
   children: (os: string, version: string, architecture: string) => any;
 }
 
-const stepsBtnsDefinitions: iStep[] = [
-  {
-    title: 'Choose the operating system',
-    children: getOSStepContent,
-  },
-  {
-    title: 'Choose the version',
-    children: getVersionStepContent,
-  },
-  {
-    title: 'Choose the architecture',
-    children: getArchitectureStepContent,
-  },
-];
 
 /**
  *
@@ -143,16 +134,16 @@ const stepsBtnsDefinitions: iStep[] = [
  * @param OSArchSelected
  */
 export const getDeployAgentSteps = (
-  OSSelected: string,
-  OSVersionSelected: string,
-  OSArchSelected: string,
+  stepsBtnsDefinitions: iStep[],
+  state: any,
+  onChangeState: (key: string, value: string) => void,
 ) => {
   return stepsBtnsDefinitions
-    .map(step => {
+    .map((step: iStep) => {
       const { title, children } = step;
       const stepContent =
       typeof children === 'function'
-      ? children(OSSelected, OSVersionSelected, OSArchSelected)
+      ? children(title, state, onChangeState)
       : children;
       return !stepContent
         ? false

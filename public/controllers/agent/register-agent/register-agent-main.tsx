@@ -13,83 +13,35 @@ import React, { Component, Fragment } from 'react';
 import { version } from '../../../../package.json';
 import { WazuhConfig } from '../../../react-services/wazuh-config';
 import {
-  EuiSteps,
   EuiFlexGroup,
   EuiFlexItem,
   EuiPanel,
-  EuiButtonGroup,
-  EuiText,
-  EuiCodeBlock,
   EuiTitle,
   EuiButtonEmpty,
-  EuiCopy,
   EuiPage,
   EuiPageBody,
-  EuiCallOut,
   EuiSpacer,
   EuiProgress,
-  EuiIcon,
   EuiFieldText,
-  EuiLink,
-  EuiTabbedContent,
 } from '@elastic/eui';
 import { withErrorBoundary } from '../../../components/common/hocs';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
-import {
-  architectureButtons,
-  architectureButtonsi386,
-  architecturei386Andx86_64,
-  versionButtonsRaspbian,
-  versionButtonsSuse,
-  versionButtonsOracleLinux,
-  versionButtonFedora,
-  architectureButtonsSolaris,
-  architectureButtonsWithPPC64LE,
-  architectureButtonsOpenSuse,
-  architectureButtonsAix,
-  architectureButtonsHpUx,
-  versionButtonAmazonLinux,
-  versionButtonsRedHat,
-  versionButtonsCentos,
-  architectureButtonsMacos,
-  osButtons,
-  versionButtonsDebian,
-  versionButtonsUbuntu,
-  versionButtonsWindows,
-  versionButtonsMacOS,
-  versionButtonsOpenSuse,
-  versionButtonsSolaris,
-  versionButtonsAix,
-  versionButtonsHPUX,
-} from './config';
 
-import {
-  AgentGroup,
-  InstallEnrollAgent,
-  ServerAddress,
-  StartAgentTabs,
-  WazuhPassword,
-} from './steps';
+import { StepsMain } from './steps';
 import {
   getGroups,
   getAuthInfo,
   systemSelector,
-  checkMissingOSSelection,
-  getCommandText,
-  getHighlightCodeLanguage,
-  agentNameVariable,
 } from './services/register-agent-service';
+import { RegisterAgentState } from './types';
 import {
-  OSArchitecture,
-  OSSys,
-  OSSystems,
-  OSVersion,
-  RegisterAgentState,
-} from './types';
-import { ButtonGroupWithMessage, PermissionsAdvice } from './components';
-import { webDocumentationLink } from '../../../../common/services/web_documentation';
+  getArchitectureStepContent,
+  getOSStepContent,
+  getVersionStepContent,
+  iStep,
+} from './steps/deploy-agent-steps';
 
 type Props = {
   hasAgents(): boolean;
@@ -166,29 +118,6 @@ export const RegisterAgent = withErrorBoundary(
           serverAddress,
           needsPassword,
           hidePasswordInput,
-          versionButtonsRedHat,
-          versionButtonsCentos,
-          versionButtonsDebian,
-          versionButtonsUbuntu,
-          versionButtonsWindows,
-          versionButtonsMacOS,
-          versionButtonsOpenSuse,
-          versionButtonsSolaris,
-          versionButtonAmazonLinux,
-          versionButtonsSuse,
-          versionButtonsAix,
-          versionButtonsHPUX,
-          versionButtonsOracleLinux,
-          versionButtonsRaspbian,
-          versionButtonFedora,
-          architectureButtons,
-          architectureButtonsi386,
-          architecturei386Andx86_64,
-          architectureButtonsSolaris,
-          architectureButtonsAix,
-          architectureButtonsHpUx,
-          architectureButtonsMacos,
-          architectureButtonsWithPPC64LE,
           wazuhPassword,
           wazuhVersion,
           groups,
@@ -215,86 +144,11 @@ export const RegisterAgent = withErrorBoundary(
       }
     }
 
-    selectOS(os: OSSystems) {
-      this.setState({
-        selectedOS: os,
-        selectedVersion: '',
-        selectedArchitecture: '',
-        selectedSYS: '',
-      });
-    }
-
-    selectSYS(sys: OSSys) {
-      this.setState({ selectedSYS: sys });
-    }
-
-    setServerAddress = (serverAddress: string) => {
-      this.setState({ serverAddress });
-    };
-
-    setGroupName = (selectedGroup: { label: string; id: string }[]) => {
-      this.setState({ selectedGroup });
-    };
-
-    setArchitecture(selectedArchitecture: OSArchitecture) {
-      this.setState({ selectedArchitecture });
-    }
-
-    setVersion(selectedVersion: OSVersion) {
-      this.setState({ selectedVersion, selectedArchitecture: '' });
-    }
-
-    setWazuhPassword(event: any) {
-      this.setState({ wazuhPassword: event.target.value });
-    }
-
-    setAgentName(event: any) {
-      this.setState({ agentName: event.target.value });
-    }
-
-    setShowPassword(event: any) {
-      this.setState({ showPassword: event.target.checked });
-    }
-
-    setStateFieldValue(field: keyof RegisterAgentState, value: any) {
-      this.setState({ [field]: value });
-    }
-
     render() {
       const appVersionMajorDotMinor = this.state.wazuhVersion
         .split('.')
         .slice(0, 2)
         .join('.');
-      const urlCheckConnectionDocumentation = webDocumentationLink(
-        'user-manual/agents/agent-connection.html',
-        appVersionMajorDotMinor,
-      );
-      const missingOSSelection = checkMissingOSSelection(
-        this.state.selectedOS,
-        this.state.selectedVersion,
-        this.state.selectedArchitecture,
-      );
-      const language = getHighlightCodeLanguage(this.state.selectedOS);
-
-      const Commandtext = getCommandText({
-        ...this.state,
-        agentName: agentNameVariable(
-          this.state.agentName,
-          this.state.selectedArchitecture,
-        ),
-      });
-      const restartAgentCommand = this.restartAgentCommand[
-        this.state.selectedOS
-      ];
-      const onTabClick = (selectedTab: { label: string; id: string }) => {
-        this.selectSYS(selectedTab.id as OSSys);
-      };
-
-      const calloutErrorRegistrationServiceInfo = this.state
-        .gotErrorRegistrationServiceInfo ? (
-        <PermissionsAdvice />
-      ) : null;
-
       const agentName = (
         <EuiFieldText
           placeholder='Name agent'
@@ -303,32 +157,7 @@ export const RegisterAgent = withErrorBoundary(
         />
       );
 
-      const buttonGroup = (legend, options, idSelected, onChange) => {
-        return (
-          <EuiButtonGroup
-            color='primary'
-            legend={legend}
-            options={options}
-            idSelected={idSelected}
-            onChange={onChange}
-            className={'osButtonsStyle'}
-          />
-        );
-      };
-
-      const selectedVersionMac = (legend, options, idSelected, onChange) => {
-        return (
-          <EuiButtonGroup
-            color='primary'
-            legend={legend}
-            options={options}
-            idSelected={idSelected}
-            onChange={onChange}
-            className={'osButtonsStyleMac'}
-          />
-        );
-      };
-
+      /*
       const steps = [
         {
           title: 'Choose the operating system',
@@ -863,8 +692,22 @@ export const RegisterAgent = withErrorBoundary(
             ]
           : []),
       ];
+*/
+      const stepsBtnsDefinitions: iStep[] = [
+        {
+          title: 'Choose the operating system',
+          children: getOSStepContent,
+        },
+        {
+          title: 'Choose the version',
+          children: getVersionStepContent,
+        },
+        {
+          title: 'Choose the architecture',
+          children: getArchitectureStepContent,
+        },
+      ];
 
-      console.log('steps', steps);
       return (
         <div>
           <EuiPage restrictWidth='1000px' style={{ background: 'transparent' }}>
@@ -908,9 +751,17 @@ export const RegisterAgent = withErrorBoundary(
                         <EuiSpacer></EuiSpacer>
                       </>
                     )}
+
                     {!this.state.loading && (
                       <EuiFlexItem>
-                        <EuiSteps steps={steps} />
+                        <StepsMain
+                          stepConfig={stepsBtnsDefinitions}
+                          defaultState={{
+                            os: '',
+                            version: '',
+                            architecture: '',
+                          }}
+                        />
                       </EuiFlexItem>
                     )}
                   </EuiPanel>
