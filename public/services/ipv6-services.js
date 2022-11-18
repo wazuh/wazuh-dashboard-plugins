@@ -1,0 +1,14 @@
+export const compressIPV6 = (ip) => {
+  let output = ip.split(':').map(terms => terms.replace(/\b0+/g, '') || '0').join(":");
+  let zeros = [...output.matchAll(/\b:?(?:0+:?){2,}/g)];
+  if (zeros.length > 0) {
+    let max = '';
+    zeros.forEach(item => {
+      if (item[0].replaceAll(':', '').length > max.replaceAll(':', '').length) {
+        max = item[0];
+      }
+    })
+    output = output.replace(max, '::');
+  }
+  return output;
+}
