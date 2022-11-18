@@ -14,7 +14,3 @@ if(attemptRestart < 5){
         .withStatusCode(200)
         .withFile('cluster/cluster_sync.json')
 }
-
-
-
-
