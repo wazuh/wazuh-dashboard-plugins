@@ -1,4 +1,8 @@
-export const compressIPV6 = (ip) => {
+export const compressIPv6 = (ip) => {
+  if (ip.split(':').length !== 8) {
+    return ip;
+  }
+
   let output = ip.split(':').map(terms => terms.replace(/\b0+/g, '') || '0').join(":");
   let zeros = [...output.matchAll(/\b:?(?:0+:?){2,}/g)];
   if (zeros.length > 0) {
