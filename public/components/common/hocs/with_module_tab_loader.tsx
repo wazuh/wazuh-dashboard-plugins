@@ -1,5 +1,5 @@
 /*
- * Wazuh app - React HOC to show a loader used for Dashboard adn Events module tabs
+ * Wazuh app - React HOC to show a loader used for Dashboard and Events module tabs
  * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
