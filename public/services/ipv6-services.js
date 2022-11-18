@@ -1,5 +1,5 @@
 export const compressIPv6 = (ip) => {
-  if (ip.split(':').length !== 8) {
+  if (ip?.split(':').length !== 8) {
     return ip;
   }
 
@@ -8,7 +8,7 @@ export const compressIPv6 = (ip) => {
   if (zeros.length > 0) {
     let max = '';
     zeros.forEach(item => {
-      if (item[0].replaceAll(':', '').length > max.replaceAll(':', '').length) {
+      if (item[0].replace(/:/g, '').length > max.replace(/:/g, '').length) {
         max = item[0];
       }
     })
