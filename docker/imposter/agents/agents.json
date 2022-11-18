@@ -1,0 +1,92 @@
+{
+    "data": {
+        "affected_items": [
+            {
+                "os": {
+                    "arch": "x86_64",
+                    "major": "2",
+                    "name": "Amazon Linux",
+                    "platform": "amzn",
+                    "uname": "Linux |wazuh-manager-master-0 |4.14.114-105.126.amzn2.x86_64 |#1 SMP Tue May 7 02:26:40 UTC 2019 |x86_64",
+                    "version": "2"
+                },
+                "ip": "127.0.0.1",
+                "id": "000",
+                "registerIP": "127.0.0.1",
+                "dateAdd": "2022-08-25T16:17:46Z",
+                "name": "wazuh-manager-master-0",
+                "status": "active",
+                "manager": "wazuh-manager-master-0",
+                "node_name": "master",
+                "lastKeepAlive": "9999-12-31T23:59:59Z",
+                "version": "Wazuh v4.4.0",
+                "group_config_status": "synced"
+            },{
+                "os": {
+                    "arch": "x86_64",
+                    "major": "2",
+                    "name": "Amazon Linux",
+                    "platform": "amzn",
+                    "uname": "Linux |wazuh-manager-master-0 |4.14.114-105.126.amzn2.x86_64 |#1 SMP Tue May 7 02:26:40 UTC 2019 |x86_64",
+                    "version": "2"
+                },
+                "ip": "127.0.0.1",
+                "id": "001",
+                "registerIP": "127.0.0.1",
+                "dateAdd": "2022-08-25T16:17:46Z",
+                "name": "wazuh-manager-master-0",
+                "status": "active",
+                "manager": "wazuh-manager-master-0",
+                "node_name": "master",
+                "lastKeepAlive": "9999-12-31T23:59:59Z",
+                "version": "Wazuh v4.4.0",
+                "group_config_status": "not synced"
+            },{
+                "os": {
+                    "arch": "x86_64",
+                    "major": "2",
+                    "name": "Amazon Linux",
+                    "platform": "amzn",
+                    "uname": "Linux |wazuh-manager-master-0 |4.14.114-105.126.amzn2.x86_64 |#1 SMP Tue May 7 02:26:40 UTC 2019 |x86_64",
+                    "version": "2"
+                },
+                "ip": "127.0.0.1",
+                "id": "002",
+                "registerIP": "127.0.0.1",
+                "dateAdd": "2022-08-25T16:17:46Z",
+                "name": "wazuh-manager-master-0",
+                "status": "active",
+                "manager": "wazuh-manager-master-0",
+                "node_name": "master",
+                "lastKeepAlive": "9999-12-31T23:59:59Z",
+                "version": "Wazuh v4.4.0",
+                "group_config_status": "synced"
+            },{
+                "os": {
+                    "arch": "x86_64",
+                    "major": "2",
+                    "name": "Amazon Linux",
+                    "platform": "amzn",
+                    "uname": "Linux |wazuh-manager-master-0 |4.14.114-105.126.amzn2.x86_64 |#1 SMP Tue May 7 02:26:40 UTC 2019 |x86_64",
+                    "version": "2"
+                },
+                "ip": "127.0.0.1",
+                "id": "003",
+                "registerIP": "127.0.0.1",
+                "dateAdd": "2022-08-25T16:17:46Z",
+                "name": "wazuh-manager-master-0",
+                "status": "active",
+                "manager": "wazuh-manager-master-0",
+                "node_name": "master",
+                "lastKeepAlive": "9999-12-31T23:59:59Z",
+                "version": "Wazuh v4.4.0",
+                "group_config_status": "not synced"
+            }
+        ],
+        "total_affected_items": 4,
+        "total_failed_items": 0,
+        "failed_items": []
+    },
+    "message": "All selected agents information was returned",
+    "error": 0
+}

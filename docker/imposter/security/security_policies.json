@@ -1,0 +1,659 @@
+{
+    "data": {
+        "affected_items": [
+            {
+                "id": 1,
+                "name": "agents_all_resourceless",
+                "policy": {
+                    "actions": [
+                        "agent:create",
+                        "group:create"
+                    ],
+                    "resources": [
+                        "*:*:*"
+                    ],
+                    "effect": "allow"
+                },
+                "roles": [
+                    1,
+                    5
+                ]
+            },
+            {
+                "id": 2,
+                "name": "agents_all_agents",
+                "policy": {
+                    "actions": [
+                        "agent:read",
+                        "agent:delete",
+                        "agent:modify_group",
+                        "agent:reconnect",
+                        "agent:restart",
+                        "agent:upgrade"
+                    ],
+                    "resources": [
+                        "agent:id:*",
+                        "agent:group:*"
+                    ],
+                    "effect": "allow"
+                },
+                "roles": [
+                    1,
+                    5
+                ]
+            },
+            {
+                "id": 3,
+                "name": "agents_all_groups",
+                "policy": {
+                    "actions": [
+                        "group:read",
+                        "group:delete",
+                        "group:update_config",
+                        "group:modify_assignments"
+                    ],
+                    "resources": [
+                        "group:id:*"
+                    ],
+                    "effect": "allow"
+                },
+                "roles": [
+                    1,
+                    5
+                ]
+            },
+            {
+                "id": 4,
+                "name": "agents_read_agents",
+                "policy": {
+                    "actions": [
+                        "agent:read"
+                    ],
+                    "resources": [
+                        "agent:id:*",
+                        "agent:group:*"
+                    ],
+                    "effect": "allow"
+                },
+                "roles": [
+                    2,
+                    4,
+                    100
+                ]
+            },
+            {
+                "id": 5,
+                "name": "agents_read_groups",
+                "policy": {
+                    "actions": [
+                        "group:read"
+                    ],
+                    "resources": [
+                        "group:id:*"
+                    ],
+                    "effect": "allow"
+                },
+                "roles": [
+                    2,
+                    4,
+                    100
+                ]
+            },
+            {
+                "id": 6,
+                "name": "agents_commands_agents",
+                "policy": {
+                    "actions": [
+                        "active-response:command"
+                    ],
+                    "resources": [
+                        "agent:id:*"
+                    ],
+                    "effect": "allow"
+                },
+                "roles": [
+                    1
+                ]
+            },
+            {
+                "id": 7,
+                "name": "security_all_resourceless",
+                "policy": {
+                    "actions": [
+                        "security:create",
+                        "security:create_user",
+                        "security:read_config",
+                        "security:update_config",
+                        "security:revoke",
+                        "security:edit_run_as"
+                    ],
+                    "resources": [
+                        "*:*:*"
+                    ],
+                    "effect": "allow"
+                },
+                "roles": [
+                    1
+                ]
+            },
+            {
+                "id": 8,
+                "name": "security_all_security",
+                "policy": {
+                    "actions": [
+                        "security:read",
+                        "security:update",
+                        "security:delete"
+                    ],
+                    "resources": [
+                        "role:id:*",
+                        "policy:id:*",
+                        "user:id:*",
+                        "rule:id:*"
+                    ],
+                    "effect": "allow"
+                },
+                "roles": [
+                    1
+                ]
+            },
+            {
+                "id": 9,
+                "name": "users_all_resourceless",
+                "policy": {
+                    "actions": [
+                        "security:create_user",
+                        "security:revoke",
+                        "security:edit_run_as"
+                    ],
+                    "resources": [
+                        "*:*:*"
+                    ],
+                    "effect": "allow"
+                },
+                "roles": [
+                    3
+                ]
+            },
+            {
+                "id": 10,
+                "name": "users_all_users",
+                "policy": {
+                    "actions": [
+                        "security:read",
+                        "security:update",
+                        "security:delete"
+                    ],
+                    "resources": [
+                        "user:id:*"
+                    ],
+                    "effect": "allow"
+                },
+                "roles": [
+                    3
+                ]
+            },
+            {
+                "id": 11,
+                "name": "users_modify_run_as_flag",
+                "policy": {
+                    "actions": [
+                        "security:edit_run_as"
+                    ],
+                    "resources": [
+                        "*:*:*"
+                    ],
+                    "effect": "allow"
+                },
+                "roles": []
+            },
+            {
+                "id": 12,
+                "name": "ciscat_read_ciscat",
+                "policy": {
+                    "actions": [
+                        "ciscat:read"
+                    ],
+                    "resources": [
+                        "agent:id:*"
+                    ],
+                    "effect": "allow"
+                },
+                "roles": [
+                    1,
+                    2,
+                    100
+                ]
+            },
+            {
+                "id": 13,
+                "name": "decoders_read_decoders",
+                "policy": {
+                    "actions": [
+                        "decoders:read"
+                    ],
+                    "resources": [
+                        "decoder:file:*"
+                    ],
+                    "effect": "allow"
+                },
+                "roles": [
+                    2,
+                    100
+                ]
+            },
+            {
+                "id": 14,
+                "name": "decoders_all_files",
+                "policy": {
+                    "actions": [
+                        "decoders:read",
+                        "decoders:delete"
+                    ],
+                    "resources": [
+                        "decoder:file:*"
+                    ],
+                    "effect": "allow"
+                },
+                "roles": [
+                    1
+                ]
+            },
+            {
+                "id": 15,
+                "name": "decoders_all_resourceless",
+                "policy": {
+                    "actions": [
+                        "decoders:update"
+                    ],
+                    "resources": [
+                        "*:*:*"
+                    ],
+                    "effect": "allow"
+                },
+                "roles": [
+                    1
+                ]
+            },
+            {
+                "id": 16,
+                "name": "mitre_read_mitre",
+                "policy": {
+                    "actions": [
+                        "mitre:read"
+                    ],
+                    "resources": [
+                        "*:*:*"
+                    ],
+                    "effect": "allow"
+                },
+                "roles": [
+                    1,
+                    2,
+                    100
+                ]
+            },
+            {
+                "id": 17,
+                "name": "lists_read_rules",
+                "policy": {
+                    "actions": [
+                        "lists:read"
+                    ],
+                    "resources": [
+                        "list:file:*"
+                    ],
+                    "effect": "allow"
+                },
+                "roles": [
+                    2,
+                    100
+                ]
+            },
+            {
+                "id": 18,
+                "name": "lists_all_rules",
+                "policy": {
+                    "actions": [
+                        "lists:read",
+                        "lists:delete"
+                    ],
+                    "resources": [
+                        "list:file:*"
+                    ],
+                    "effect": "allow"
+                },
+                "roles": [
+                    1
+                ]
+            },
+            {
+                "id": 19,
+                "name": "lists_all_resourceless",
+                "policy": {
+                    "actions": [
+                        "lists:update"
+                    ],
+                    "resources": [
+                        "*:*:*"
+                    ],
+                    "effect": "allow"
+                },
+                "roles": [
+                    1
+                ]
+            },
+            {
+                "id": 20,
+                "name": "rootcheck_read_rootcheck",
+                "policy": {
+                    "actions": [
+                        "rootcheck:read"
+                    ],
+                    "resources": [
+                        "agent:id:*"
+                    ],
+                    "effect": "allow"
+                },
+                "roles": [
+                    2,
+                    100
+                ]
+            },
+            {
+                "id": 21,
+                "name": "rootcheck_all_rootcheck",
+                "policy": {
+                    "actions": [
+                        "rootcheck:clear",
+                        "rootcheck:read",
+                        "rootcheck:run"
+                    ],
+                    "resources": [
+                        "agent:id:*"
+                    ],
+                    "effect": "allow"
+                },
+                "roles": [
+                    1
+                ]
+            },
+            {
+                "id": 22,
+                "name": "rules_read_rules",
+                "policy": {
+                    "actions": [
+                        "rules:read"
+                    ],
+                    "resources": [
+                        "rule:file:*"
+                    ],
+                    "effect": "allow"
+                },
+                "roles": [
+                    2,
+                    100
+                ]
+            },
+            {
+                "id": 23,
+                "name": "rules_all_files",
+                "policy": {
+                    "actions": [
+                        "rules:read",
+                        "rules:delete"
+                    ],
+                    "resources": [
+                        "rule:file:*"
+                    ],
+                    "effect": "allow"
+                },
+                "roles": [
+                    1
+                ]
+            },
+            {
+                "id": 24,
+                "name": "rules_all_resourceless",
+                "policy": {
+                    "actions": [
+                        "rules:update"
+                    ],
+                    "resources": [
+                        "*:*:*"
+                    ],
+                    "effect": "allow"
+                },
+                "roles": [
+                    1
+                ]
+            },
+            {
+                "id": 25,
+                "name": "sca_read_sca",
+                "policy": {
+                    "actions": [
+                        "sca:read"
+                    ],
+                    "resources": [
+                        "agent:id:*"
+                    ],
+                    "effect": "allow"
+                },
+                "roles": [
+                    1,
+                    2,
+                    100
+                ]
+            },
+            {
+                "id": 26,
+                "name": "syscheck_read_syscheck",
+                "policy": {
+                    "actions": [
+                        "syscheck:read"
+                    ],
+                    "resources": [
+                        "agent:id:*"
+                    ],
+                    "effect": "allow"
+                },
+                "roles": [
+                    2,
+                    100
+                ]
+            },
+            {
+                "id": 27,
+                "name": "syscheck_all_syscheck",
+                "policy": {
+                    "actions": [
+                        "syscheck:clear",
+                        "syscheck:read",
+                        "syscheck:run"
+                    ],
+                    "resources": [
+                        "agent:id:*"
+                    ],
+                    "effect": "allow"
+                },
+                "roles": [
+                    1
+                ]
+            },
+            {
+                "id": 28,
+                "name": "syscollector_read_syscollector",
+                "policy": {
+                    "actions": [
+                        "syscollector:read"
+                    ],
+                    "resources": [
+                        "agent:id:*"
+                    ],
+                    "effect": "allow"
+                },
+                "roles": [
+                    1,
+                    2,
+                    100
+                ]
+            },
+            {
+                "id": 29,
+                "name": "cluster_all_resourceless",
+                "policy": {
+                    "actions": [
+                        "cluster:status",
+                        "manager:read",
+                        "manager:read_api_config",
+                        "manager:update_config",
+                        "manager:restart"
+                    ],
+                    "resources": [
+                        "*:*:*"
+                    ],
+                    "effect": "allow"
+                },
+                "roles": [
+                    1,
+                    7
+                ]
+            },
+            {
+                "id": 30,
+                "name": "cluster_all_nodes",
+                "policy": {
+                    "actions": [
+                        "cluster:read_api_config",
+                        "cluster:read",
+                        "cluster:restart",
+                        "cluster:update_config"
+                    ],
+                    "resources": [
+                        "node:id:*"
+                    ],
+                    "effect": "allow"
+                },
+                "roles": [
+                    1,
+                    7
+                ]
+            },
+            {
+                "id": 31,
+                "name": "cluster_read_resourceless",
+                "policy": {
+                    "actions": [
+                        "cluster:status",
+                        "manager:read",
+                        "manager:read_api_config"
+                    ],
+                    "resources": [
+                        "*:*:*"
+                    ],
+                    "effect": "allow"
+                },
+                "roles": [
+                    2,
+                    6,
+                    100
+                ]
+            },
+            {
+                "id": 32,
+                "name": "cluster_read_nodes",
+                "policy": {
+                    "actions": [
+                        "cluster:read_api_config",
+                        "cluster:read",
+                        "cluster:read_api_config"
+                    ],
+                    "resources": [
+                        "node:id:*"
+                    ],
+                    "effect": "allow"
+                },
+                "roles": [
+                    2,
+                    6,
+                    100
+                ]
+            },
+            {
+                "id": 33,
+                "name": "logtest_all_logtest",
+                "policy": {
+                    "actions": [
+                        "logtest:run"
+                    ],
+                    "resources": [
+                        "*:*:*"
+                    ],
+                    "effect": "allow"
+                },
+                "roles": [
+                    1,
+                    100
+                ]
+            },
+            {
+                "id": 34,
+                "name": "task_status_task",
+                "policy": {
+                    "actions": [
+                        "task:status"
+                    ],
+                    "resources": [
+                        "*:*:*"
+                    ],
+                    "effect": "allow"
+                },
+                "roles": [
+                    1
+                ]
+            },
+            {
+                "id": 35,
+                "name": "vulnerability_read_vulnerability",
+                "policy": {
+                    "actions": [
+                        "vulnerability:read"
+                    ],
+                    "resources": [
+                        "agent:id:*"
+                    ],
+                    "effect": "allow"
+                },
+                "roles": [
+                    1,
+                    2,
+                    100
+                ]
+            },
+            {
+                "id": 100,
+                "name": "manager_deny_read",
+                "policy": {
+                    "actions": [
+                        "manager:read",
+                        "cluster:read"
+                    ],
+                    "resources": [
+                        "*:*:*",
+                        "node:id:*"
+                    ],
+                    "effect": "deny"
+                },
+                "roles": [
+                    100
+                ]
+            }
+        ],
+        "total_affected_items": 36,
+        "total_failed_items": 0,
+        "failed_items": []
+    },
+    "message": "All specified policies were returned",
+    "error": 0
+}
