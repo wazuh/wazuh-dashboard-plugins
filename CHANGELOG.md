@@ -10,6 +10,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Changed
 
+- 
 
 ### Fixed
 
