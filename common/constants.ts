@@ -341,10 +341,11 @@ export const DOCUMENTATION_WEB_BASE_URL = "https://documentation.wazuh.com";
 // Default Elasticsearch user name context
 export const ELASTIC_NAME = 'elastic';
 
+// Default Wazuh indexer name
+export const WAZUH_INDEXER_NAME = 'Wazuh indexer';
 
 // Customization
 export const CUSTOMIZATION_ENDPOINT_PAYLOAD_UPLOAD_CUSTOM_FILE_MAXIMUM_BYTES = 1048576;
-
 
 // Plugin settings
 export enum SettingCategory {
