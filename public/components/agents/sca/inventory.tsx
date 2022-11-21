@@ -616,7 +616,6 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
                     <EuiFlexItem>
                       <InventoryPolicyChecksTable
                         agent={this.props.agent}
-                        filters={this.state.filters}
                         lookingPolicy={this.state.lookingPolicy}
                       />
                     </EuiFlexItem>
@@ -631,5 +630,5 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
 }
 
 Inventory.defaultProps = {
-  onClickRow: undefined,
-};
+  onClickRow: undefined
+}
