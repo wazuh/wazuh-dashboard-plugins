@@ -8,25 +8,44 @@ import {
   EuiSwitch,
   EuiIcon,
 } from '@elastic/eui';
-import { obfuscatePassword } from '../services/register-agent-service';
+import {
+  agentNameVariable,
+  getCommandText,
+  obfuscatePassword,
+} from '../services/register-agent-service';
 import { PermissionsAdvice, WindowsAdvice } from '../components';
 
 export default function InstallEnrollAgent(props: any) {
   const {
     gotErrorRegistrationServiceInfo,
-    selectedOS,
+    os,
+    version,
+    architecture,
+    wazuhVersion,
+    agentName,
     wazuhPassword,
-    commandText,
     language,
     showPassword,
     needsPassword,
     onSetShowPassword,
+    agentGroup,
   } = props;
+
+  const commandText = getCommandText({
+    os,
+    version,
+    architecture,
+    wazuhVersion,
+    agentGroup,
+    agentName: agentNameVariable(agentName, architecture),
+  });
 
   return (
     <div>
-      {gotErrorRegistrationServiceInfo ? (<PermissionsAdvice />) 
-      : ( selectedOS && (
+      {gotErrorRegistrationServiceInfo ? (
+        <PermissionsAdvice />
+      ) : (
+        os && (
           <EuiText>
             <p>
               You can use this command to install and enroll the Wazuh agent in
@@ -43,7 +62,7 @@ export default function InstallEnrollAgent(props: any) {
               iconType='iInCircle'
             />
             <EuiSpacer />
-            {selectedOS === 'win' && <WindowsAdvice />}
+            {os === 'win' && <WindowsAdvice />}
             <div className='copy-codeblock-wrapper'>
               <EuiCodeBlock language={language}>
                 {wazuhPassword && !showPassword

@@ -18,16 +18,16 @@ import { webDocumentationLink } from '../../../../../common/services/web_documen
 import { OSVersion, OSSystems } from '../types';
 
 interface Props {
-  selectedOS: OSSystems;
-  selectedVersion: OSVersion;
+  os: OSSystems;
+  version: OSVersion;
   wazuhVersion: string;
   onTabClick: (tab: { label: string; id: string }) => void;
 }
 
 const StartAgentTabs = (props: Props) => {
-  const { selectedOS, selectedVersion, wazuhVersion, onTabClick } = props;
+  const { os, version, wazuhVersion, onTabClick } = props;
   const appVersionMajorDotMinor = wazuhVersion.split('.').slice(0, 2).join('.');
-  const language = getHighlightCodeLanguage(selectedOS);
+  const language = getHighlightCodeLanguage(os);
   const urlCheckConnectionDocumentation = webDocumentationLink(
     'user-manual/agents/agent-connection.html',
     appVersionMajorDotMinor,
@@ -78,7 +78,7 @@ const StartAgentTabs = (props: Props) => {
       content: (
         <Fragment>
           <EuiSpacer />
-          <CommandCodeBlock commandText={systemSelector(selectedVersion)} />
+          <CommandCodeBlock commandText={systemSelector(version)} />
         </Fragment>
       ),
     },
@@ -88,7 +88,7 @@ const StartAgentTabs = (props: Props) => {
       content: (
         <Fragment>
           <EuiSpacer />
-          <CommandCodeBlock commandText={systemSelector(selectedVersion)} />
+          <CommandCodeBlock commandText={systemSelector(version)} />
         </Fragment>
       ),
     },
@@ -98,7 +98,7 @@ const StartAgentTabs = (props: Props) => {
       content: (
         <Fragment>
           <EuiSpacer />
-          <CommandCodeBlock commandText={systemSelectorNet(selectedVersion)} />
+          <CommandCodeBlock commandText={systemSelectorNet(version)} />
         </Fragment>
       ),
     },
@@ -109,7 +109,7 @@ const StartAgentTabs = (props: Props) => {
         <Fragment>
           <EuiSpacer />
           <CommandCodeBlock
-            commandText={systemSelectorWazuhControlMacos(selectedVersion)}
+            commandText={systemSelectorWazuhControlMacos(version)}
           />
         </Fragment>
       ),
@@ -121,7 +121,7 @@ const StartAgentTabs = (props: Props) => {
         <Fragment>
           <EuiSpacer />
           <CommandCodeBlock
-            commandText={systemSelectorWazuhControl(selectedVersion)}
+            commandText={systemSelectorWazuhControl(version)}
           />
         </Fragment>
       ),
@@ -177,7 +177,7 @@ const StartAgentTabs = (props: Props) => {
 
   return (
     <EuiTabbedContent
-      tabs={getCurrentTab(selectedVersion)}
+      tabs={getCurrentTab(version)}
       onTabClick={onHandleTabClick}
     />
   );

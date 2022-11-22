@@ -121,7 +121,7 @@ const orderOSAlphabetically = (a: iButton, b: iButton) => {
   return 0;
 };
 
-const buttonsConfig = [
+const buttonsConfig: iButton[] = [
   {
     id: 'rpm',
     label: 'Red Hat Enterprise Linux',

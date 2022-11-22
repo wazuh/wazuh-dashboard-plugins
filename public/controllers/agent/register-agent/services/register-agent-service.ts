@@ -68,15 +68,20 @@ export function obfuscatePassword(text: string) {
  */
 export function optionalDeploymentVariables({
   serverAddress,
-  selectedOS,
+  os,
   udpProtocol,
-  selectedGroup,
+  agentGroup,
   needsPassword,
   wazuhPassword,
 }: RegisterAgentState) {
-  let deployment = `WAZUH_MANAGER='${serverAddress}' `;
 
-  if (selectedOS == 'win') {
+  let deployment = '';
+  
+  if(serverAddress){
+    deployment = `WAZUH_MANAGER='${serverAddress}' `;
+  }
+
+  if (os == 'win') {
     deployment += `WAZUH_REGISTRATION_SERVER='${serverAddress}' `;
   }
 
@@ -88,14 +93,14 @@ export function optionalDeploymentVariables({
     deployment += `WAZUH_PROTOCOL='UDP' `;
   }
 
-  if (selectedGroup.length) {
-    deployment += `WAZUH_AGENT_GROUP='${selectedGroup
+  if (agentGroup.length) {
+    deployment += `WAZUH_AGENT_GROUP='${agentGroup
       .map(item => item.label)
       .join(',')}' `;
   }
 
   // macos doesnt need = param
-  if (selectedOS === 'macos') {
+  if (os === 'macos') {
     return deployment.replace(/=/g, ' ');
   }
 
@@ -104,37 +109,37 @@ export function optionalDeploymentVariables({
 
 /**
  * Returns the command to start an agent depending on the OS and the SYS
- * @param selectedOS
+ * @param os
  * @param selectedSYS
  */
-export function systemSelector(selectedVersion: OSVersion | '') {
+export function systemSelector(version: OSVersion | '') {
   if (
-    selectedVersion === 'redhat7' ||
-    selectedVersion === 'amazonlinux2022' ||
-    selectedVersion === 'centos7' ||
-    selectedVersion === 'suse11' ||
-    selectedVersion === 'suse12' ||
-    selectedVersion === 'oraclelinux5' ||
-    selectedVersion === '22' ||
-    selectedVersion === 'amazonlinux2' ||
-    selectedVersion === 'debian8' ||
-    selectedVersion === 'debian9' ||
-    selectedVersion === 'debian10' ||
-    selectedVersion === 'busterorgreater' ||
-    selectedVersion === 'ubuntu15' ||
-    selectedVersion === 'ubuntu16' ||
-    selectedVersion === 'leap15'
+    version === 'redhat7' ||
+    version === 'amazonlinux2022' ||
+    version === 'centos7' ||
+    version === 'suse11' ||
+    version === 'suse12' ||
+    version === 'oraclelinux5' ||
+    version === '22' ||
+    version === 'amazonlinux2' ||
+    version === 'debian8' ||
+    version === 'debian9' ||
+    version === 'debian10' ||
+    version === 'busterorgreater' ||
+    version === 'ubuntu15' ||
+    version === 'ubuntu16' ||
+    version === 'leap15'
   ) {
     return 'sudo systemctl daemon-reload\nsudo systemctl enable wazuh-agent\nsudo systemctl start wazuh-agent';
   } else if (
-    selectedVersion === 'redhat5' ||
-    selectedVersion === 'redhat6' ||
-    selectedVersion === 'centos5' ||
-    selectedVersion === 'centos6' ||
-    selectedVersion === 'oraclelinux6' ||
-    selectedVersion === 'amazonlinux1' ||
-    selectedVersion === 'debian7' ||
-    selectedVersion === 'ubuntu14'
+    version === 'redhat5' ||
+    version === 'redhat6' ||
+    version === 'centos5' ||
+    version === 'centos6' ||
+    version === 'oraclelinux6' ||
+    version === 'amazonlinux1' ||
+    version === 'debian7' ||
+    version === 'ubuntu14'
   ) {
     return 'service wazuh-agent start';
   }
@@ -142,35 +147,35 @@ export function systemSelector(selectedVersion: OSVersion | '') {
 }
 
 // move to service
-export const systemSelectorNet = (selectedVersion: OSVersion | '') => {
-  if (selectedVersion === 'windowsxp' || selectedVersion === 'windows8') {
+export const systemSelectorNet = (version: OSVersion | '') => {
+  if (version === 'windowsxp' || version === 'windows8') {
     return 'update-rc.d wazuh-agent defaults && service wazuh-agent start';
   }
   return '';
 };
 
 export const systemSelectorWazuhControlMacos = (
-  selectedVersion: OSVersion | '',
+  version: OSVersion | '',
 ) => {
   if (
-    selectedVersion == 'sierra' ||
-    selectedVersion == 'highSierra' ||
-    selectedVersion == 'mojave' ||
-    selectedVersion == 'catalina' ||
-    selectedVersion == 'bigSur' ||
-    selectedVersion == 'monterrey'
+    version == 'sierra' ||
+    version == 'highSierra' ||
+    version == 'mojave' ||
+    version == 'catalina' ||
+    version == 'bigSur' ||
+    version == 'monterrey'
   ) {
     return '/Library/Ossec/bin/wazuh-control start';
   }
   return '';
 };
 
-export const systemSelectorWazuhControl = (selectedVersion: OSVersion | '') => {
+export const systemSelectorWazuhControl = (version: OSVersion | '') => {
   if (
-    selectedVersion === 'solaris10' ||
-    selectedVersion === 'solaris11' ||
-    selectedVersion === '6.1 TL9' ||
-    selectedVersion === '11.31'
+    version === 'solaris10' ||
+    version === 'solaris11' ||
+    version === '6.1 TL9' ||
+    version === '11.31'
   ) {
     return '/var/ossec/bin/wazuh-control start';
   }
@@ -179,124 +184,124 @@ export const systemSelectorWazuhControl = (selectedVersion: OSVersion | '') => {
 
 export const agentNameVariable = (
   agentName: string,
-  selectedArchitecture: OSArchitecture,
+  architecture: OSArchitecture,
 ) => {
   let parsedAgentName = `WAZUH_AGENT_NAME='${agentName}' `;
-  return selectedArchitecture && agentName !== '' ? parsedAgentName : '';
+  return architecture && agentName !== '' ? parsedAgentName : '';
 };
 
 /**
  * Get what is the SO incomplete in the deploy agent screen. Using the SO, Version and Architecture
- * @param selectedOS
- * @param selectedVersion
- * @param selectedArchitecture
+ * @param os
+ * @param version
+ * @param architecture
  */
 export function checkMissingOSSelection(
-  selectedOS: string,
-  selectedVersion: OSVersion,
-  selectedArchitecture: string,
+  os: string,
+  version: OSVersion,
+  architecture: string,
 ) {
-  if (!selectedOS) {
+  if (!os) {
     return ['Operating system'];
   }
-  switch (selectedOS) {
+  switch (os) {
     case 'rpm':
       return [
-        ...(!selectedVersion ? ['OS version'] : []),
-        ...(selectedVersion && !selectedArchitecture
+        ...(!version ? ['OS version'] : []),
+        ...(version && !architecture
           ? ['OS architecture']
           : []),
       ];
     case 'cent':
       return [
-        ...(!selectedVersion ? ['OS version'] : []),
-        ...(selectedVersion && !selectedArchitecture
+        ...(!version ? ['OS version'] : []),
+        ...(version && !architecture
           ? ['OS architecture']
           : []),
       ];
     case 'deb':
-      return [...(!selectedArchitecture ? ['OS architecture'] : [])];
+      return [...(!architecture ? ['OS architecture'] : [])];
     case 'ubu':
       return [
-        ...(!selectedVersion ? ['OS version'] : []),
-        ...(selectedVersion && !selectedArchitecture
+        ...(!version ? ['OS version'] : []),
+        ...(version && !architecture
           ? ['OS architecture']
           : []),
       ];
     case 'win':
       return [
-        ...(!selectedVersion ? ['OS version'] : []),
-        ...(selectedVersion && !selectedArchitecture
+        ...(!version ? ['OS version'] : []),
+        ...(version && !architecture
           ? ['OS architecture']
           : []),
       ];
     case 'macos':
       return [
-        ...(!selectedVersion ? ['OS version'] : []),
-        ...(selectedVersion && !selectedArchitecture
+        ...(!version ? ['OS version'] : []),
+        ...(version && !architecture
           ? ['OS architecture']
           : []),
       ];
     case 'open':
       return [
-        ...(!selectedVersion ? ['OS version'] : []),
-        ...(selectedVersion && !selectedArchitecture
+        ...(!version ? ['OS version'] : []),
+        ...(version && !architecture
           ? ['OS architecture']
           : []),
       ];
     case 'sol':
       return [
-        ...(!selectedVersion ? ['OS version'] : []),
-        ...(selectedVersion && !selectedArchitecture
+        ...(!version ? ['OS version'] : []),
+        ...(version && !architecture
           ? ['OS architecture']
           : []),
       ];
     case 'aix':
       return [
-        ...(!selectedVersion ? ['OS version'] : []),
-        ...(selectedVersion && !selectedArchitecture
+        ...(!version ? ['OS version'] : []),
+        ...(version && !architecture
           ? ['OS architecture']
           : []),
       ];
     case 'hp':
       return [
-        ...(!selectedVersion ? ['OS version'] : []),
-        ...(selectedVersion && !selectedArchitecture
+        ...(!version ? ['OS version'] : []),
+        ...(version && !architecture
           ? ['OS architecture']
           : []),
       ];
     case 'amazonlinux':
       return [
-        ...(!selectedVersion ? ['OS version'] : []),
-        ...(selectedVersion && !selectedArchitecture
+        ...(!version ? ['OS version'] : []),
+        ...(version && !architecture
           ? ['OS architecture']
           : []),
       ];
     case 'fedora':
       return [
-        ...(!selectedVersion ? ['OS version'] : []),
-        ...(selectedVersion && !selectedArchitecture
+        ...(!version ? ['OS version'] : []),
+        ...(version && !architecture
           ? ['OS architecture']
           : []),
       ];
     case 'oraclelinux':
       return [
-        ...(!selectedVersion ? ['OS version'] : []),
-        ...(selectedVersion && !selectedArchitecture
+        ...(!version ? ['OS version'] : []),
+        ...(version && !architecture
           ? ['OS architecture']
           : []),
       ];
     case 'suse':
       return [
-        ...(!selectedVersion ? ['OS version'] : []),
-        ...(selectedVersion && !selectedArchitecture
+        ...(!version ? ['OS version'] : []),
+        ...(version && !architecture
           ? ['OS architecture']
           : []),
       ];
     case 'raspbian':
       return [
-        ...(!selectedVersion ? ['OS version'] : []),
-        ...(selectedVersion && !selectedArchitecture
+        ...(!version ? ['OS version'] : []),
+        ...(version && !architecture
           ? ['OS architecture']
           : []),
       ];
@@ -311,46 +316,46 @@ export function checkMissingOSSelection(
  */
 export function getCommandText(props: RegisterAgentState) {
   const {
-    selectedOS,
-    selectedVersion,
-    selectedArchitecture,
+    os,
+    version,
+    architecture,
     wazuhVersion,
     agentName,
   } = props;
 
-  switch (selectedOS) {
+  switch (os) {
     case 'rpm':
       return `sudo ${optionalDeploymentVariables({
         ...props,
       })}${agentName}yum install -y ${optionalPackages(
-        selectedOS,
-        selectedVersion,
-        selectedArchitecture,
+        os,
+        version,
+        architecture,
         wazuhVersion,
       )}`;
     case 'cent':
       return `sudo ${optionalDeploymentVariables({
         ...props,
       })}${agentName}yum install -y ${optionalPackages(
-        selectedOS,
-        selectedVersion,
-        selectedArchitecture,
+        os,
+        version,
+        architecture,
         wazuhVersion,
       )}`;
     case 'deb':
       return `curl -so wazuh-agent-${wazuhVersion}.deb ${optionalPackages(
-        selectedOS,
-        selectedVersion,
-        selectedArchitecture,
+        os,
+        version,
+        architecture,
         wazuhVersion,
       )} && sudo ${optionalDeploymentVariables({
         ...props,
       })}${agentName}dpkg -i ./wazuh-agent-${wazuhVersion}.deb`;
     case 'ubu':
       return `curl -so wazuh-agent-${wazuhVersion}.deb ${optionalPackages(
-        selectedOS,
-        selectedVersion,
-        selectedArchitecture,
+        os,
+        version,
+        architecture,
         wazuhVersion,
       )} && sudo ${optionalDeploymentVariables({
         ...props,
@@ -367,19 +372,19 @@ export function getCommandText(props: RegisterAgentState) {
       return `sudo rpm --import https://packages.wazuh.com/key/GPG-KEY-WAZUH && sudo ${optionalDeploymentVariables(
         { ...props },
       )}${agentName} zypper install -y ${optionalPackages(
-        selectedOS,
-        selectedVersion,
-        selectedArchitecture,
+        os,
+        version,
+        architecture,
         wazuhVersion,
       )}`;
     case 'sol':
       return `sudo curl -so ${optionalPackages(
-        selectedOS,
-        selectedVersion,
-        selectedArchitecture,
+        os,
+        version,
+        architecture,
         wazuhVersion,
       )} && sudo ${agentName}&& ${
-        selectedVersion == 'solaris11'
+        version == 'solaris11'
           ? 'pkg install -g wazuh-agent.p5p wazuh-agent'
           : 'pkgadd -d wazuh-agent.pkg'
       }`;
@@ -387,59 +392,59 @@ export function getCommandText(props: RegisterAgentState) {
       return `sudo ${optionalDeploymentVariables({
         ...props,
       })}${agentName}rpm -ivh ${optionalPackages(
-        selectedOS,
-        selectedVersion,
-        selectedArchitecture,
+        os,
+        version,
+        architecture,
         wazuhVersion,
       )}`;
     case 'hp':
       return `cd / && sudo curl -so ${optionalPackages(
-        selectedOS,
-        selectedVersion,
-        selectedArchitecture,
+        os,
+        version,
+        architecture,
         wazuhVersion,
       )} && sudo ${agentName}groupadd wazuh && sudo useradd -G wazuh wazuh && sudo tar -xvf wazuh-agent.tar`;
     case 'amazonlinux':
       return `sudo ${optionalDeploymentVariables({
         ...props,
       })}${agentName}yum install -y ${optionalPackages(
-        selectedOS,
-        selectedVersion,
-        selectedArchitecture,
+        os,
+        version,
+        architecture,
         wazuhVersion,
       )}`;
     case 'fedora':
       return `sudo ${optionalDeploymentVariables({
         ...props,
       })}${agentName}yum install -y ${optionalPackages(
-        selectedOS,
-        selectedVersion,
-        selectedArchitecture,
+        os,
+        version,
+        architecture,
         wazuhVersion,
       )}`;
     case 'oraclelinux':
       return `sudo ${optionalDeploymentVariables({
         ...props,
       })}${agentName}yum install -y ${optionalPackages(
-        selectedOS,
-        selectedVersion,
-        selectedArchitecture,
+        os,
+        version,
+        architecture,
         wazuhVersion,
       )}`;
     case 'suse':
       return `sudo ${optionalDeploymentVariables({
         ...props,
       })}${agentName}yum install -y ${optionalPackages(
-        selectedOS,
-        selectedVersion,
-        selectedArchitecture,
+        os,
+        version,
+        architecture,
         wazuhVersion,
       )}`;
     case 'raspbian':
       return `curl -so wazuh-agent-${wazuhVersion}.deb ${optionalPackages(
-        selectedOS,
-        selectedVersion,
-        selectedArchitecture,
+        os,
+        version,
+        architecture,
         wazuhVersion,
       )} && sudo ${optionalDeploymentVariables({
         ...props,

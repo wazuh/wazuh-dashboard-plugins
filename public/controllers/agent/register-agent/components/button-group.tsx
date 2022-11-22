@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { EuiButtonGroup } from '@elastic/eui';
-import { iButton } from '../config/new-config';
+import { iButton } from '../config';
 
 const StepButtonGroup = (
   props : { buttons: iButton[],
