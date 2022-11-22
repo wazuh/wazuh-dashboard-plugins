@@ -181,6 +181,7 @@ const buttonsConfig: iButton[] = [
         // afterContent: (<InfoMessage OS="linux" />)
       },
     ],
+    architectureBtns: (OSVersion: string) => getArchitectureButtons(OSVersion),
   },
   {
     id: 'ubu',
