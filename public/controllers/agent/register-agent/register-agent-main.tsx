@@ -39,7 +39,6 @@ import {
   getInstallEnrollStepContent,
   getStartStepContent,
 } from './steps';
-import { RegisterAgentState } from './types';
 import {
   iStep,
 } from './services/steps-service';
@@ -52,8 +51,14 @@ type Props = {
   getWazuhVersion(): string;
 };
 
+interface RegisterAgentState {
+  wazuhVersion: string;
+  serverAddress: string;
+  loading: boolean;
+}
+
 export const RegisterAgent = withErrorBoundary(
-  class RegisterAgent extends Component<Props, RegisterAgentState> {
+  class RegisterAgent extends Component<Props,RegisterAgentState> {
     wazuhConfig: any;
     configuration: any;
     constructor(props: Props) {

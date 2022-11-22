@@ -95,7 +95,7 @@ export function optionalDeploymentVariables({
 
   if (agentGroup.length) {
     deployment += `WAZUH_AGENT_GROUP='${agentGroup
-      .map(item => item.label)
+      .map((item: { label: string, id:string }) => item.label)
       .join(',')}' `;
   }
 
@@ -146,7 +146,6 @@ export function systemSelector(version: OSVersion | '') {
   return '';
 }
 
-// move to service
 export const systemSelectorNet = (version: OSVersion | '') => {
   if (version === 'windowsxp' || version === 'windows8') {
     return 'update-rc.d wazuh-agent defaults && service wazuh-agent start';

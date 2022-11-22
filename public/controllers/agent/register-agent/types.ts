@@ -61,7 +61,7 @@ export type RegisterAgentState = {
   selectedVersion: OSVersion | '';
   serverAddress: string;
   groups: { label: string; id: string }[];
-  selectedGroup: { label: string; id: string }[];
+  agentGroup: { label: string; id: string }[];
   udpProtocol: boolean;
   showPassword: boolean;
   wazuhVersion: string;
