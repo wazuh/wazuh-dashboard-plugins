@@ -1,7 +1,3 @@
-import { EuiCallOut } from "@elastic/eui";
-import React from 'react';
-import { InfoMessage } from "../components";
-
 export type VersionBtn = iButton & { afterContent?: () => JSX.Element };
 
 export interface iButton {

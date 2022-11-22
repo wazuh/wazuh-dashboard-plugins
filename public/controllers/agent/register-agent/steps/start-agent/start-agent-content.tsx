@@ -9,13 +9,13 @@ export const getStartStepContent = (
     state: any,
     onChange: (field: string, value: string) => void,
   ) => {
-    const { gotErrorRegistrationServiceInfo, language, os, version } = state;
+    const { gotErrorRegistrationServiceInfo, language, os, version, architecture } = state;
     const [restartAgentCommand, setRestartAgentCommand] = useState('');
     const [showTabs, setShowTabs] = useState(false);
   
     useEffect(() => {
       initialize();
-    });
+    });   
   
     const initialize = () => {
       if (os && version) {
@@ -34,6 +34,8 @@ export const getStartStepContent = (
         setRestartAgentCommand(agentCommand);
       }
     };
+
+    if(!os || !version || !architecture) return false;
   
     const isTabCodeBlock = () => {
       if (['rpm','cent','suse','fedora','oraclelinux','amazonlinux','deb','raspbian','ubu','win','macos','open','sol','aix','hp'].includes(os)) {

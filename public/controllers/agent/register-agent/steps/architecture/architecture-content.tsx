@@ -1,4 +1,4 @@
-import { buttonsConfig } from '../../config';
+import { buttonsConfig, iButton } from '../../config';
 import { renderGroupBtnsContent } from '../../services';
 
 /**
@@ -26,9 +26,15 @@ import { renderGroupBtnsContent } from '../../services';
     const buttons = buttonsConfig.find(button => button.id === os)
       ?.architectureBtns || [];
 
+    let architectureBtns = buttons;
+
+    if(typeof buttons === 'function'){
+      architectureBtns = buttons(version) as iButton[];
+    }
+
     return renderGroupBtnsContent({
       title,
-      buttons,
+      buttons: architectureBtns,
       defaultValue: state.architecture,
       onChange: handleOnchange,
     });
