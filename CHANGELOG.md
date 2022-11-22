@@ -15,6 +15,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Fixed
 
 - Fixed trailing hyphen character for OS value in the list of agents [#4828](https://github.com/wazuh/wazuh-kibana-app/pull/4828)
+- Fixed several typos in the code, by @jctello [#4911](https://github.com/wazuh/wazuh-kibana-app/pull/4911)
 
 ## Wazuh v4.4.0 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4400
 

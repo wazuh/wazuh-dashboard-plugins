@@ -22,6 +22,6 @@ jobs:
     with:
       reference: ${{ github.event.inputs.reference }}
       command: 'yarn build'
-      archive_name: 'wazuh-package'
-      archive_path: './wazuh/build'
+      artifact_name: 'wazuh-package'
+      artifact_path: './wazuh/build'
     secrets: inherit
