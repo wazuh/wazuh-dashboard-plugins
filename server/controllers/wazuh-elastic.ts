@@ -660,7 +660,7 @@ export class WazuhElasticCtrl {
           index: sampleAlertsIndex,
         });
       return response.ok({
-        body: { index: sampleAlertsIndex, exists: existsSampleIndex.body }
+        body: { index: sampleAlertsIndex, exists: existsSampleIndex }
       })
     } catch (error) {
       log(
@@ -740,7 +740,7 @@ export class WazuhElasticCtrl {
         await awaitContext.elasticsearch.client.asCurrentUser.indices.exists({
           index: sampleAlertsIndex,
         });
-      if (!existsSampleIndex.body) {
+      if (!existsSampleIndex) {
         // Create wazuh sample alerts index
 
         const configuration = {
@@ -834,7 +834,7 @@ export class WazuhElasticCtrl {
         await contextCore.elasticsearch.client.asCurrentUser.indices.exists({
           index: sampleAlertsIndex,
         });
-      if (existsSampleIndex.body) {
+      if (existsSampleIndex) {
         // Delete Wazuh sample alerts index
         await contextCore.elasticsearch.client.asCurrentUser.indices.delete({
           index: sampleAlertsIndex,
