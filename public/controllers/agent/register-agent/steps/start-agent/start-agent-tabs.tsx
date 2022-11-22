@@ -13,9 +13,9 @@ import {
   systemSelectorNet,
   systemSelectorWazuhControl,
   systemSelectorWazuhControlMacos,
-} from '../services/register-agent-service';
-import { webDocumentationLink } from '../../../../../common/services/web_documentation';
-import { OSVersion, OSSystems } from '../types';
+} from '../../services/register-agent-service';
+import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
+import { OSVersion, OSSystems } from '../../types';
 
 interface Props {
   os: OSSystems;

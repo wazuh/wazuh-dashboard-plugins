@@ -29,23 +29,20 @@ import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 
 import {
-  StepsMain,
+  DeployAgentSteps,
+  getOSStepContent,
+  getVersionStepContent,
+  getArchitectureStepContent,
+  getServerAddressStepContent,
+  getWazuhPasswordStepContent,
+  getAgentNameAndGroupsStepContent,
+  getInstallEnrollStepContent,
+  getStartStepContent,
 } from './steps';
-import {
-  getAuthInfo,
-} from './services/register-agent-service';
 import { RegisterAgentState } from './types';
 import {
-  getAgentNameAndGroupsStepContent,
-  getArchitectureStepContent,
-  getInstallEnrollStepContent,
-  getOSStepContent,
-  getServerAddressStepContent,
-  getVersionStepContent,
-  getWazuhPasswordStepContent,
   iStep,
-  startStepContent,
-} from './steps/deploy-agent-steps';
+} from './services/steps-service';
 
 type Props = {
   hasAgents(): boolean;
@@ -64,20 +61,8 @@ export const RegisterAgent = withErrorBoundary(
       this.wazuhConfig = new WazuhConfig();
       this.configuration = this.wazuhConfig.getConfig();
       this.state = {
-        status: 'incomplete',
-        selectedOS: '',
-        selectedSYS: '',
-        selectedArchitecture: '',
-        selectedVersion: '',
-        version: '',
         wazuhVersion: '',
         serverAddress: '',
-        agentName: '',
-        wazuhPassword: '',
-        groups: [],
-        selectedGroup: [],
-        udpProtocol: false,
-        showPassword: false,
         loading: false,
       };
     }
@@ -86,32 +71,7 @@ export const RegisterAgent = withErrorBoundary(
       try {
         this.setState({ loading: true });
         const wazuhVersion = await this.props.getWazuhVersion();
-        let serverAddress = null;
-        let wazuhPassword = '';
-        let hidePasswordInput = false;
-        serverAddress = this.configuration['enrollment.dns'] || null;
-        if (!serverAddress) {
-          serverAddress = await this.props.getCurrentApiAddress();
-        }
-        let authInfo = await getAuthInfo();
-        if (!authInfo || authInfo?.error) {
-          this.setState({ gotErrorRegistrationServiceInfo: true });
-        }
-        const needsPassword = (authInfo.auth || {}).use_password === 'yes';
-        if (needsPassword) {
-          wazuhPassword =
-            this.configuration['enrollment.password'] ||
-            authInfo['authd.pass'] ||
-            '';
-          if (wazuhPassword) {
-            hidePasswordInput = true;
-          }
-        }
         this.setState({
-          serverAddress,
-          needsPassword,
-          hidePasswordInput,
-          wazuhPassword,
           wazuhVersion,
           loading: false,
         });
@@ -168,7 +128,7 @@ export const RegisterAgent = withErrorBoundary(
         },
         {
           title: 'Start the agent',
-          children: startStepContent,
+          children: getStartStepContent,
         },
       ];
 
@@ -218,7 +178,7 @@ export const RegisterAgent = withErrorBoundary(
 
                     {!this.state.loading && (
                       <EuiFlexItem>
-                        <StepsMain
+                        <DeployAgentSteps
                           currentConfiguration={this.configuration}
                           wazuhVersion={this.state.wazuhVersion}
                           stepConfig={stepsBtnsDefinitions}

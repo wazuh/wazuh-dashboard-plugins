@@ -1,20 +1,20 @@
-import { EuiSteps } from '@elastic/eui';
 import React, { useEffect, useState } from 'react';
+import { EuiSteps } from '@elastic/eui';
 import {
   checkMissingOSSelection,
   getAuthInfo,
   getHighlightCodeLanguage,
 } from '../services/register-agent-service';
-import { getDeployAgentSteps, iStep } from './deploy-agent-steps';
+import { getDeployAgentSteps, iStep } from '../services/steps-service';
 
-interface MainStepsProps {
+interface DeployAgentStepsProps {
   defaultState?: any;
   stepConfig: iStep[];
   wazuhVersion: string;
   currentConfiguration: any;
 }
 
-const StepsMain = (props: MainStepsProps) => {
+const DeployAgentSteps = (props: DeployAgentStepsProps) => {
   const { defaultState, stepConfig, wazuhVersion, currentConfiguration } = props;
 
   const [stepsState, setStepState] = useState(
@@ -108,4 +108,4 @@ const StepsMain = (props: MainStepsProps) => {
   );
 };
 
-export default StepsMain;
+export default DeployAgentSteps;

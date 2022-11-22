@@ -12,8 +12,8 @@ import {
   agentNameVariable,
   getCommandText,
   obfuscatePassword,
-} from '../services/register-agent-service';
-import { PermissionsAdvice, WindowsAdvice } from '../components';
+} from '../../services/register-agent-service';
+import { PermissionsAdvice, WindowsAdvice } from '../../components';
 
 export default function InstallEnrollAgent(props: any) {
   const {

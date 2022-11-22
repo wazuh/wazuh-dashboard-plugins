@@ -1,6 +1,9 @@
-export { default as ServerAddress } from './server-address';
-export { default as AgentGroup } from './agent-group';
-export { default as StartAgentTabs } from './start-agent-tabs';
-export { default as WazuhPassword } from './wazuh-password';
-export { default as InstallEnrollAgent } from './install-enroll-agent'
-export { default as StepsMain } from './main';
+export { default as DeployAgentSteps } from './deploy-agent-wizard';
+export * from './operating-system/operating-system-content';
+export * from './version/version-content';
+export * from './architecture/architecture-content';
+export * from './server-address/server-address-content';
+export * from './wazuh-password/wazuh-password-content';
+export * from './agent-name-groups/agent-name-groups-content';
+export * from './install-enroll-agent/install-enroll-agent-content';
+export * from './start-agent/start-agent-content';

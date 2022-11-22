@@ -1,4 +1,6 @@
-import { getArchitectureStepContent, getDeployAgentSteps, getOSStepContent, getVersionStepContent, iButtonContent, renderContent } from './deploy-agent-steps'
+import { getArchitectureStepContent, getOSStepContent, getVersionStepContent } from '../steps'
+
+import { getDeployAgentSteps, iButtonContent, renderGroupBtnsContent } from '../services'
 
 describe('Deploy agent steps', () => {
 
@@ -13,7 +15,7 @@ describe('Deploy agent steps', () => {
             expect(JSON.stringify(steps)).toEqual(JSON.stringify([
                 {
                     title: 'Choose the operating system',
-                    children: renderContent({...getOSStepContent(state.OSSelected, state.OSVersionSelected, state.OSArchSelected)})
+                    children: renderGroupBtnsContent({...getOSStepContent(state.OSSelected, state.OSVersionSelected, state.OSArchSelected)})
                 }
             ]))
         })
@@ -28,11 +30,11 @@ describe('Deploy agent steps', () => {
             expect(JSON.stringify(steps)).toEqual(JSON.stringify([
                 {
                     title: 'Choose the operating system',
-                    children: renderContent({...getOSStepContent(state.OSSelected, state.OSVersionSelected, state.OSArchSelected)})
+                    children: renderGroupBtnsContent({...getOSStepContent(state.OSSelected, state.OSVersionSelected, state.OSArchSelected)})
                 },
                 {
                     title: 'Choose the version',
-                    children: renderContent({...getVersionStepContent(state.OSSelected, state.OSVersionSelected, state.OSArchSelected)} as iButtonContent)
+                    children: renderGroupBtnsContent({...getVersionStepContent(state.OSSelected, state.OSVersionSelected, state.OSArchSelected)} as iButtonContent)
                 }
             ]))
         })
@@ -47,15 +49,15 @@ describe('Deploy agent steps', () => {
             expect(JSON.stringify(steps)).toEqual(JSON.stringify([
                 {
                     title: 'Choose the operating system',
-                    children: renderContent({...getOSStepContent(state.OSSelected, state.OSVersionSelected, state.OSArchSelected)})
+                    children: renderGroupBtnsContent({...getOSStepContent(state.OSSelected, state.OSVersionSelected, state.OSArchSelected)})
                 },
                 {
                     title: 'Choose the version',
-                    children: renderContent({...getVersionStepContent(state.OSSelected, state.OSVersionSelected, state.OSArchSelected)} as iButtonContent)
+                    children: renderGroupBtnsContent({...getVersionStepContent(state.OSSelected, state.OSVersionSelected, state.OSArchSelected)} as iButtonContent)
                 },
                 {
                     title: 'Choose the architecture',
-                    children: renderContent({...getArchitectureStepContent(state.OSSelected, state.OSVersionSelected, state.OSArchSelected)} as iButtonContent)
+                    children: renderGroupBtnsContent({...getArchitectureStepContent(state.OSSelected, state.OSVersionSelected, state.OSArchSelected)} as iButtonContent)
                 }
             ]))
         })
