@@ -59,7 +59,7 @@ export function CheckResult(props) {
   };
 
   /**
-   * validate if the current check is not started and if the dependentes checks are ready
+   * validate if the current check is not started and if the depending checks are ready
    */
   const awaitForIsReady = () => {
     return !isCheckStarted && (props.awaitFor.length === 0 || props.awaitFor.every((check) => {

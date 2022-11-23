@@ -2,6 +2,20 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.5.0 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4500
+
+### Added
+
+- 
+
+### Changed
+
+- 
+
+### Fixed
+
+- Fixed several typos in the code, by @jctello [#4911](https://github.com/wazuh/wazuh-kibana-app/pull/4911)
+
 ## Wazuh v4.4.0 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4400
 
 ### Added

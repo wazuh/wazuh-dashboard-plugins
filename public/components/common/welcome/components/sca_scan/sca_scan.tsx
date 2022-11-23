@@ -212,7 +212,7 @@ export const ScaScan = compose(
       <Fragment>
         <EuiEmptyPrompt
           iconType="visVega"
-          title={<h4>You dont have SCA scans in this agent.</h4>}
+          title={<h4>You don't have SCA scans in this agent.</h4>}
           body={
             <Fragment>
               <p>
