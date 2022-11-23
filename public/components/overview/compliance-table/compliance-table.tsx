@@ -11,10 +11,7 @@
  */
 import React, { Component } from 'react';
 import { EuiPanel, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
-import {
-  SearchBar,
-  FilterManager,
-} from '../../../../../../src/plugins/data/public/';
+import { FilterManager } from '../../../../../../src/plugins/data/public/';
 
 //@ts-ignore
 import { ComplianceRequirements } from './components/requirements';
@@ -261,7 +258,6 @@ export const ComplianceTable = withAgentSupportModule(
         console.log(data, 'data');
         console.log(aggs, 'aggs');
 
-        // const { buckets } = aggs?.tactics;
         const buckets = data?.aggregations?.tactics?.buckets || [];
         /*if(firstTime){
        this.initTactics(buckets); // top tactics are checked on component mount
