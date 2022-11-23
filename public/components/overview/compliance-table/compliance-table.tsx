@@ -255,8 +255,6 @@ export const ComplianceTable = withAgentSupportModule(
           filterParams,
           aggs,
         );
-        console.log(data, 'data');
-        console.log(aggs, 'aggs');
 
         const buckets = data?.aggregations?.tactics?.buckets || [];
         /*if(firstTime){
