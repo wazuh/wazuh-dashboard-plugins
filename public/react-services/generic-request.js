@@ -88,7 +88,6 @@ export class GenericRequest {
           `Error doing a request to ${tmpUrl}, method: ${method}.`,
         );
       }
-      console.log('dT', data);
 
       return data;
     } catch (err) {
