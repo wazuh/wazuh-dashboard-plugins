@@ -41,6 +41,7 @@ import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { AgentStatus } from '../../../components/agents/agent_status';
 import { AgentSynced } from '../../../components/agents/agent-synced';
+import { compressIPv6 } from '../../../services/ipv6-services';
 
 export const AgentsTable = withErrorBoundary(
   class AgentsTable extends Component {
@@ -284,11 +285,10 @@ export const AgentsTable = withErrorBoundary(
       };
       const agentVersion = agent.version !== undefined ? agent.version.split(' ')[1] : '-';
       const node_name = agent.node_name && agent.node_name !== 'unknown' ? agent.node_name : '-';
-
       return {
         id: agent.id,
         name: agent.name,
-        ip: agent.ip,
+        ip: compressIPv6(agent.ip),
         status: agent.status,
         group_config_status: agent.group_config_status,
         group: checkField(agent.group),
@@ -465,7 +465,7 @@ export const AgentsTable = withErrorBoundary(
         field: 'id',
         name: 'ID',
         sortable: true,
-        width: '6%',
+        width: '4%',
       },
       {
         field: 'name',
@@ -477,14 +477,14 @@ export const AgentsTable = withErrorBoundary(
       {
         field: 'ip',
         name: 'IP',
-        width: '8%',
+        width: '14%',
         truncateText: true,
         sortable: true,
       },
       {
         field: 'group',
         name: 'Group(s)',
-        width: '14%',
+        width: '12%',
         truncateText: true,
         sortable: true,
         render: (groups) => (groups !== '-' ? this.renderGroups(groups) : '-'),
@@ -530,7 +530,7 @@ export const AgentsTable = withErrorBoundary(
         name: 'Status',
         truncateText: true,
         sortable: true,
-        width: '10%',
+        width: '8%',
         render: (status) => <AgentStatus status={status} labelProps={{ className: 'hide-agent-status' }} />,
       },
       {
@@ -539,7 +539,7 @@ export const AgentsTable = withErrorBoundary(
         truncateText: true,
         sortable: true,
         width: '10%',
-        render: (synced) => <AgentSynced synced={synced}/>,
+        render: (synced) => <AgentSynced synced={synced} />,
       },
       {
         align: 'right',
@@ -671,7 +671,7 @@ export const AgentsTable = withErrorBoundary(
         return {
           'data-test-subj': `row-${id}`,
           className: 'customRowClass',
-          onClick: () => {},
+          onClick: () => { },
         };
       };
 
@@ -700,11 +700,11 @@ export const AgentsTable = withErrorBoundary(
       const pagination =
         totalItems > 15
           ? {
-              pageIndex: pageIndex,
-              pageSize: pageSize,
-              totalItemCount: totalItems,
-              pageSizeOptions: [15, 25, 50, 100],
-            }
+            pageIndex: pageIndex,
+            pageSize: pageSize,
+            totalItemCount: totalItems,
+            pageSizeOptions: [15, 25, 50, 100],
+          }
           : false;
       const sorting = {
         sort: {
@@ -739,8 +739,8 @@ export const AgentsTable = withErrorBoundary(
       if (filters.length > 0) {
         !auxFilters.includes(group)
           ? this.setState({
-              filters: [...filters, { field: 'q', value: `group=${group}` }],
-            })
+            filters: [...filters, { field: 'q', value: `group=${group}` }],
+          })
           : false;
       } else {
         this.setState({
