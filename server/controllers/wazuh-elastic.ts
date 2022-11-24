@@ -634,7 +634,6 @@ export class WazuhElasticCtrl {
           }),
         ),
       );
-      console.log(results)
       return response.ok({
         body: { sampleAlertsInstalled: results.some(result => result.body) }
       });
