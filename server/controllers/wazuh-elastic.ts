@@ -252,16 +252,15 @@ export class WazuhElasticCtrl {
           body: payload,
         },
       );
-
-      return data.body.hits.total.value === 0 ||
-        typeof data.body.aggregations['2'].buckets[0] === 'undefined'
+      return data.hits.total.value === 0 ||
+        typeof data.aggregations['2'].buckets[0] === 'undefined'
         ? response.ok({
           body: { statusCode: 200, data: '' }
         })
         : response.ok({
           body: {
             statusCode: 200,
-            data: data.body.aggregations['2'].buckets[0].key
+            data: data.aggregations['2'].buckets[0].key
           }
         });
     } catch (error) {
@@ -635,6 +634,7 @@ export class WazuhElasticCtrl {
           }),
         ),
       );
+      console.log(results)
       return response.ok({
         body: { sampleAlertsInstalled: results.some(result => result.body) }
       });
