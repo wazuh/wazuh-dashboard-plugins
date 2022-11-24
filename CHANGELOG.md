@@ -6,16 +6,17 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Added
 
-- 
+-
 
 ### Changed
 
-- 
+-
 
 ### Fixed
 
 - Fixed an issue that caused incorrect visualization of IPv6 addresses ([#4909](https://github.com/wazuh/wazuh-kibana-app/pull/4909)).
 - Fixed several typos in the code, by @jctello [#4911](https://github.com/wazuh/wazuh-kibana-app/pull/4911)
+- Handling endpoint response was done when there is no data to show [#4918](https://github.com/wazuh/wazuh-kibana-app/pull/4918)
 - Fixed references to Elasticsearch in Wazuh-stack plugin [4894](https://github.com/wazuh/wazuh-kibana-app/pull/4894)
 
 ## Wazuh v4.4.0 - OpenSearch Dashboards 2.3.0 - Revision 4400
