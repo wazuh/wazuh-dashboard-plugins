@@ -19,7 +19,7 @@ export const monitoringKnownFields = [
     searchable: true,
     aggregatable: true,
     readFromDocValues: true,
-    excluded: true
+    excluded: true,
   },
   {
     name: 'timestamp',
@@ -28,7 +28,7 @@ export const monitoringKnownFields = [
     scripted: false,
     searchable: true,
     aggregatable: true,
-    readFromDocValues: true
+    readFromDocValues: true,
   },
   {
     name: '_id',
@@ -37,7 +37,7 @@ export const monitoringKnownFields = [
     scripted: false,
     searchable: true,
     aggregatable: true,
-    readFromDocValues: false
+    readFromDocValues: false,
   },
   {
     name: '_index',
@@ -46,7 +46,7 @@ export const monitoringKnownFields = [
     scripted: false,
     searchable: true,
     aggregatable: true,
-    readFromDocValues: false
+    readFromDocValues: false,
   },
   {
     name: '_score',
@@ -55,7 +55,7 @@ export const monitoringKnownFields = [
     scripted: false,
     searchable: false,
     aggregatable: false,
-    readFromDocValues: false
+    readFromDocValues: false,
   },
   {
     name: '_source',
@@ -64,7 +64,7 @@ export const monitoringKnownFields = [
     scripted: false,
     searchable: false,
     aggregatable: false,
-    readFromDocValues: false
+    readFromDocValues: false,
   },
   {
     name: '_type',
@@ -73,7 +73,7 @@ export const monitoringKnownFields = [
     scripted: false,
     searchable: true,
     aggregatable: true,
-    readFromDocValues: false
+    readFromDocValues: false,
   },
   {
     name: 'dateAdd',
@@ -82,7 +82,7 @@ export const monitoringKnownFields = [
     scripted: false,
     searchable: true,
     aggregatable: false,
-    readFromDocValues: false
+    readFromDocValues: false,
   },
   {
     name: 'group',
@@ -91,7 +91,7 @@ export const monitoringKnownFields = [
     scripted: false,
     searchable: true,
     aggregatable: false,
-    readFromDocValues: false
+    readFromDocValues: false,
   },
   {
     name: 'host',
@@ -100,7 +100,7 @@ export const monitoringKnownFields = [
     scripted: false,
     searchable: true,
     aggregatable: true,
-    readFromDocValues: true
+    readFromDocValues: true,
   },
   {
     name: 'id',
@@ -109,7 +109,7 @@ export const monitoringKnownFields = [
     scripted: false,
     searchable: true,
     aggregatable: true,
-    readFromDocValues: true
+    readFromDocValues: true,
   },
   {
     name: 'ip',
@@ -118,7 +118,7 @@ export const monitoringKnownFields = [
     scripted: false,
     searchable: true,
     aggregatable: true,
-    readFromDocValues: true
+    readFromDocValues: true,
   },
   {
     name: 'lastKeepAlive',
@@ -127,7 +127,7 @@ export const monitoringKnownFields = [
     scripted: false,
     searchable: true,
     aggregatable: false,
-    readFromDocValues: false
+    readFromDocValues: false,
   },
   {
     name: 'cluster.name',
@@ -136,7 +136,7 @@ export const monitoringKnownFields = [
     scripted: false,
     searchable: true,
     aggregatable: false,
-    readFromDocValues: false
+    readFromDocValues: false,
   },
   {
     name: 'mergedSum',
@@ -145,7 +145,7 @@ export const monitoringKnownFields = [
     scripted: false,
     searchable: true,
     aggregatable: false,
-    readFromDocValues: false
+    readFromDocValues: false,
   },
   {
     name: 'configSum',
@@ -154,7 +154,7 @@ export const monitoringKnownFields = [
     scripted: false,
     searchable: true,
     aggregatable: false,
-    readFromDocValues: false
+    readFromDocValues: false,
   },
   {
     name: 'node_name',
@@ -163,7 +163,7 @@ export const monitoringKnownFields = [
     scripted: false,
     searchable: true,
     aggregatable: false,
-    readFromDocValues: false
+    readFromDocValues: false,
   },
   {
     name: 'manager',
@@ -172,7 +172,7 @@ export const monitoringKnownFields = [
     scripted: false,
     searchable: true,
     aggregatable: false,
-    readFromDocValues: false
+    readFromDocValues: false,
   },
   {
     name: 'name',
@@ -181,7 +181,7 @@ export const monitoringKnownFields = [
     scripted: false,
     searchable: true,
     aggregatable: true,
-    readFromDocValues: true
+    readFromDocValues: true,
   },
   {
     name: 'os.arch',
@@ -190,7 +190,7 @@ export const monitoringKnownFields = [
     scripted: false,
     searchable: true,
     aggregatable: false,
-    readFromDocValues: false
+    readFromDocValues: false,
   },
   {
     name: 'os.codename',
@@ -199,7 +199,7 @@ export const monitoringKnownFields = [
     scripted: false,
     searchable: true,
     aggregatable: false,
-    readFromDocValues: false
+    readFromDocValues: false,
   },
   {
     name: 'os.major',
@@ -208,7 +208,7 @@ export const monitoringKnownFields = [
     scripted: false,
     searchable: true,
     aggregatable: false,
-    readFromDocValues: false
+    readFromDocValues: false,
   },
   {
     name: 'os.minor',
@@ -217,7 +217,7 @@ export const monitoringKnownFields = [
     scripted: false,
     searchable: true,
     aggregatable: false,
-    readFromDocValues: false
+    readFromDocValues: false,
   },
   {
     name: 'os.name',
@@ -226,7 +226,7 @@ export const monitoringKnownFields = [
     scripted: false,
     searchable: true,
     aggregatable: false,
-    readFromDocValues: false
+    readFromDocValues: false,
   },
   {
     name: 'os.platform',
@@ -235,7 +235,7 @@ export const monitoringKnownFields = [
     scripted: false,
     searchable: true,
     aggregatable: false,
-    readFromDocValues: false
+    readFromDocValues: false,
   },
   {
     name: 'os.uname',
@@ -244,7 +244,7 @@ export const monitoringKnownFields = [
     scripted: false,
     searchable: true,
     aggregatable: false,
-    readFromDocValues: false
+    readFromDocValues: false,
   },
   {
     name: 'os.version',
@@ -253,7 +253,7 @@ export const monitoringKnownFields = [
     scripted: false,
     searchable: true,
     aggregatable: false,
-    readFromDocValues: false
+    readFromDocValues: false,
   },
   {
     name: 'status',
@@ -262,7 +262,7 @@ export const monitoringKnownFields = [
     scripted: false,
     searchable: true,
     aggregatable: true,
-    readFromDocValues: true
+    readFromDocValues: true,
   },
   {
     name: 'version',
@@ -271,7 +271,7 @@ export const monitoringKnownFields = [
     scripted: false,
     searchable: true,
     aggregatable: false,
-    readFromDocValues: false
+    readFromDocValues: false,
   },
   {
     name: 'registerIP',
@@ -280,6 +280,51 @@ export const monitoringKnownFields = [
     scripted: false,
     searchable: true,
     aggregatable: false,
-    readFromDocValues: false
-  }
+    readFromDocValues: false,
+  },
+  {
+    name: 'active',
+    type: 'number',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true,
+  },
+  {
+    name: 'disconnected',
+    type: 'number',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true,
+  },
+  {
+    name: 'never_connected',
+    type: 'number',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true,
+  },
+  {
+    name: 'pending',
+    type: 'number',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true,
+  },
+  {
+    name: 'total',
+    type: 'number',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true,
+  },
 ];
