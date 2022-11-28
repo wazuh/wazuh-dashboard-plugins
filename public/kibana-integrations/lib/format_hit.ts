@@ -36,8 +36,6 @@ const convert = (
   indexPattern: any,
   type: 'html' | 'text' = 'html'
 ): string => {
-  let format = { convert: () => val };
-
   // Get the field definition by name
   const field = indexPattern.fields.getByName(fieldName);
 
@@ -47,7 +45,7 @@ const convert = (
         .convert(val, type, { field, hit, indexPattern })
       : val;// If the field is not known, just return the value as it is.
   } else {
-    format = indexPattern.getFormatterForField(field);
+    const format = indexPattern.getFormatterForField(field);
     return format.convert(val, type, { field, hit, indexPattern });
   }
 }

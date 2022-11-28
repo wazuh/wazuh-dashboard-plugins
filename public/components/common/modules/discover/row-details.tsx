@@ -281,7 +281,7 @@ export class RowDetails extends Component {
   // Render the row value column supporting nested fields
   renderArrayValue = (value) => {
     if (arrayContainsObjects(value)) {
-      // For compatibility resaons between Kibana 7.10 and 7.16.x we need to normalize the formatHit
+      // For compatibility reasons between Kibana 7.10 and 7.16.x we need to normalize the formatHit
       const formatHitValue = (formatHit({ _index: value }, this.props?.indexPattern, 'html')?._index)
       return trimAngularSpan(String(formatHitValue));
     }
