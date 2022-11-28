@@ -9,11 +9,181 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { UI_COLOR_AGENT_STATUS } from "../../../../common/constants";
+import { UI_COLOR_AGENT_STATUS } from '../../../../common/constants';
 
 export default [
   {
     _id: 'Wazuh-App-Overview-General-Agents-status',
+    _source: {
+      title: 'Agents status',
+      visState: JSON.stringify({
+        title: 'Agents Status',
+        type: 'line',
+        aggs: [
+          {
+            id: '1',
+            enabled: true,
+            type: 'max',
+            params: { field: 'active', customLabel: 'Active' },
+            schema: 'metric',
+          },
+          {
+            id: '2',
+            enabled: true,
+            type: 'date_histogram',
+            params: {
+              field: 'timestamp',
+              timeRange: { from: 'now-30m', to: 'now' },
+              useNormalizedEsInterval: true,
+              scaleMetricValues: false,
+              interval: 'ms',
+              drop_partials: false,
+              min_doc_count: 1,
+              extended_bounds: {},
+            },
+            schema: 'segment',
+          },
+          {
+            id: '3',
+            enabled: true,
+            type: 'max',
+            params: { field: 'disconnected', customLabel: 'Disconnected' },
+            schema: 'metric',
+          },
+          {
+            id: '4',
+            enabled: true,
+            type: 'max',
+            params: {
+              field: 'never_connected',
+              customLabel: 'Never connected',
+            },
+            schema: 'metric',
+          },
+          {
+            id: '5',
+            enabled: true,
+            type: 'max',
+            params: { field: 'pending', customLabel: 'Pending' },
+            schema: 'metric',
+          },
+        ],
+        params: {
+          addLegend: true,
+          addTimeMarker: false,
+          addTooltip: true,
+          categoryAxes: [
+            {
+              id: 'CategoryAxis-1',
+              labels: { filter: true, show: true, truncate: 100 },
+              position: 'bottom',
+              scale: { type: 'linear' },
+              show: true,
+              style: {},
+              title: {},
+              type: 'category',
+            },
+          ],
+          grid: { categoryLines: false, valueAxis: '' },
+          labels: {},
+          legendPosition: 'right',
+          row: true,
+          seriesParams: [
+            {
+              data: { id: '1', label: 'Active' },
+              drawLinesBetweenPoints: true,
+              interpolate: 'linear',
+              lineWidth: 3.5,
+              mode: 'normal',
+              show: true,
+              showCircles: true,
+              type: 'line',
+              valueAxis: 'ValueAxis-1',
+            },
+            {
+              data: { id: '3', label: 'Disconnected' },
+              drawLinesBetweenPoints: true,
+              interpolate: 'linear',
+              lineWidth: 3.5,
+              mode: 'normal',
+              show: true,
+              showCircles: true,
+              type: 'line',
+              valueAxis: 'ValueAxis-1',
+            },
+            {
+              data: { id: '4', label: 'Never connected' },
+              drawLinesBetweenPoints: true,
+              interpolate: 'linear',
+              lineWidth: 3.5,
+              mode: 'normal',
+              show: true,
+              showCircles: true,
+              type: 'line',
+              valueAxis: 'ValueAxis-1',
+            },
+            {
+              data: { id: '5', label: 'Pending' },
+              drawLinesBetweenPoints: true,
+              interpolate: 'linear',
+              lineWidth: 3.5,
+              mode: 'normal',
+              show: true,
+              showCircles: true,
+              type: 'line',
+              valueAxis: 'ValueAxis-1',
+            },
+          ],
+          times: [],
+          type: 'line',
+          valueAxes: [
+            {
+              id: 'ValueAxis-1',
+              labels: {
+                filter: false,
+                rotate: 0,
+                show: true,
+                truncate: 100,
+              },
+              name: 'LeftAxis-1',
+              position: 'left',
+              scale: {
+                mode: 'normal',
+                type: 'linear',
+                defaultYExtents: false,
+              },
+              show: true,
+              style: {},
+              title: { text: 'Count' },
+              type: 'value',
+            },
+          ],
+        },
+      }),
+      uiStateJSON: JSON.stringify({
+        vis: {
+          colors: {
+            Active: UI_COLOR_AGENT_STATUS.active,
+            Disconnected: UI_COLOR_AGENT_STATUS.disconnected,
+            Pending: UI_COLOR_AGENT_STATUS.pending,
+            'Never connected': UI_COLOR_AGENT_STATUS.never_connected,
+          },
+        },
+      }),
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON: JSON.stringify({
+          index: 'wazuh-monitoring',
+          filter: [],
+          query: { query: '', language: 'kuery' },
+        }),
+      },
+    },
+    _type: 'visualization',
+  },
+  {
+    _id: 'Wazuh-App-Overview-General-Agents-sta2tus',
     _source: {
       title: 'Agents status',
       visState: JSON.stringify({
@@ -86,7 +256,12 @@ export default [
             enabled: true,
             type: 'terms',
             schema: 'group',
-            params: { field: 'status', size: 5, order: 'desc', orderBy: '_term' },
+            params: {
+              field: 'status',
+              size: 5,
+              order: 'desc',
+              orderBy: '_term',
+            },
           },
           {
             id: '4',
@@ -98,16 +273,20 @@ export default [
         ],
       }),
       uiStateJSON: JSON.stringify({
-        vis: { colors: { active: UI_COLOR_AGENT_STATUS.active, disconnected: UI_COLOR_AGENT_STATUS.disconnected, pending: UI_COLOR_AGENT_STATUS.pending, never_connected: UI_COLOR_AGENT_STATUS.never_connected } },
+        vis: {
+          colors: {
+            active: UI_COLOR_AGENT_STATUS.active,
+            disconnected: UI_COLOR_AGENT_STATUS.disconnected,
+            pending: UI_COLOR_AGENT_STATUS.pending,
+            never_connected: UI_COLOR_AGENT_STATUS.never_connected,
+          },
+        },
       }),
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
-        searchSourceJSON: JSON.stringify({
-          index: 'wazuh-monitoring',
-          filter: [],
-          query: { query: '', language: 'lucene' },
-        }),
+        searchSourceJSON:
+          '{"index":"wazuh-monitoring","filter":[],"query":{"query":"","language":"kuery"}}',
       },
     },
     _type: 'visualization',
@@ -139,7 +318,12 @@ export default [
             labels: { show: true, color: 'black' },
             scale: { show: false, labels: false, color: '#333', width: 2 },
             type: 'simple',
-            style: { fontSize: 20, bgColor: false, labelColor: false, subText: '' },
+            style: {
+              fontSize: 20,
+              bgColor: false,
+              labelColor: false,
+              subText: '',
+            },
           },
         },
         aggs: [
@@ -152,7 +336,9 @@ export default [
           },
         ],
       }),
-      uiStateJSON: JSON.stringify({ vis: { defaultColors: { '0 - 100': 'rgb(0,104,55)' } } }),
+      uiStateJSON: JSON.stringify({
+        vis: { defaultColors: { '0 - 100': 'rgb(0,104,55)' } },
+      }),
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
@@ -189,7 +375,12 @@ export default [
             labels: { show: true, color: 'black' },
             scale: { show: false, labels: false, color: '#333', width: 2 },
             type: 'simple',
-            style: { fontSize: 20, bgColor: false, labelColor: false, subText: '' },
+            style: {
+              fontSize: 20,
+              bgColor: false,
+              labelColor: false,
+              subText: '',
+            },
           },
         },
         aggs: [
@@ -202,7 +393,9 @@ export default [
           },
         ],
       }),
-      uiStateJSON: JSON.stringify({ vis: { defaultColors: { '0 - 100': 'rgb(0,104,55)' } } }),
+      uiStateJSON: JSON.stringify({
+        vis: { defaultColors: { '0 - 100': 'rgb(0,104,55)' } },
+      }),
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
@@ -267,7 +460,12 @@ export default [
             labels: { show: true, color: 'black' },
             scale: { show: false, labels: false, color: '#333', width: 2 },
             type: 'simple',
-            style: { fontSize: 20, bgColor: false, labelColor: false, subText: '' },
+            style: {
+              fontSize: 20,
+              bgColor: false,
+              labelColor: false,
+              subText: '',
+            },
           },
         },
         aggs: [
@@ -280,7 +478,9 @@ export default [
           },
         ],
       }),
-      uiStateJSON: JSON.stringify({ vis: { defaultColors: { '0 - 100': 'rgb(0,104,55)' } } }),
+      uiStateJSON: JSON.stringify({
+        vis: { defaultColors: { '0 - 100': 'rgb(0,104,55)' } },
+      }),
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
@@ -292,7 +492,8 @@ export default [
                 index: 'wazuh-alerts',
                 type: 'phrases',
                 key: 'rule.groups',
-                value: 'win_authentication_failed, authentication_failed, authentication_failures',
+                value:
+                  'win_authentication_failed, authentication_failed, authentication_failures',
                 params: [
                   'win_authentication_failed',
                   'authentication_failed',
@@ -362,7 +563,12 @@ export default [
             labels: { show: true, color: 'black' },
             scale: { show: false, labels: false, color: '#333', width: 2 },
             type: 'simple',
-            style: { fontSize: 20, bgColor: false, labelColor: false, subText: '' },
+            style: {
+              fontSize: 20,
+              bgColor: false,
+              labelColor: false,
+              subText: '',
+            },
           },
         },
         aggs: [
@@ -375,7 +581,9 @@ export default [
           },
         ],
       }),
-      uiStateJSON: JSON.stringify({ vis: { defaultColors: { '0 - 100': 'rgb(0,104,55)' } } }),
+      uiStateJSON: JSON.stringify({
+        vis: { defaultColors: { '0 - 100': 'rgb(0,104,55)' } },
+      }),
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
@@ -424,7 +632,11 @@ export default [
         type: 'area',
         params: {
           type: 'area',
-          grid: { categoryLines: true, style: { color: '#eee' }, valueAxis: 'ValueAxis-1' },
+          grid: {
+            categoryLines: true,
+            style: { color: '#eee' },
+            valueAxis: 'ValueAxis-1',
+          },
           categoryAxes: [
             {
               id: 'CategoryAxis-1',
@@ -469,7 +681,13 @@ export default [
           addTimeMarker: false,
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,
@@ -525,7 +743,13 @@ export default [
       visState: JSON.stringify({
         type: 'pie',
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,
@@ -549,7 +773,12 @@ export default [
           addLegend: true,
           legendPosition: 'right',
           isDonut: true,
-          labels: { show: false, values: true, last_level: true, truncate: 100 },
+          labels: {
+            show: false,
+            values: true,
+            last_level: true,
+            truncate: 100,
+          },
         },
         title: 'mitre top',
       }),
@@ -579,10 +808,21 @@ export default [
           addLegend: true,
           legendPosition: 'right',
           isDonut: true,
-          labels: { show: false, values: true, last_level: true, truncate: 100 },
+          labels: {
+            show: false,
+            values: true,
+            last_level: true,
+            truncate: 100,
+          },
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,
@@ -621,7 +861,13 @@ export default [
       visState: JSON.stringify({
         type: 'histogram',
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,
@@ -629,7 +875,10 @@ export default [
             schema: 'segment',
             params: {
               field: 'timestamp',
-              timeRange: { from: '2020-07-19T16:18:13.637Z', to: '2020-07-28T13:58:33.357Z' },
+              timeRange: {
+                from: '2020-07-19T16:18:13.637Z',
+                to: '2020-07-28T13:58:33.357Z',
+              },
               useNormalizedEsInterval: true,
               scaleMetricValues: false,
               interval: 'auto',
@@ -701,7 +950,13 @@ export default [
           legendPosition: 'right',
           times: [],
           addTimeMarker: false,
-          thresholdLine: { show: false, value: 10, width: 1, style: 'full', color: '#E7664C' },
+          thresholdLine: {
+            show: false,
+            value: 10,
+            width: 1,
+            style: 'full',
+            color: '#E7664C',
+          },
           labels: {},
         },
         title: 'top 5 agents evolution',
@@ -737,7 +992,13 @@ export default [
           totalFunc: 'sum',
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,
@@ -859,13 +1120,24 @@ export default [
           addTimeMarker: false,
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '3',
             enabled: true,
             type: 'terms',
             schema: 'group',
-            params: { field: 'agent.name', size: 5, order: 'desc', orderBy: '1' },
+            params: {
+              field: 'agent.name',
+              size: 5,
+              order: 'desc',
+              orderBy: '1',
+            },
           },
           {
             id: '2',

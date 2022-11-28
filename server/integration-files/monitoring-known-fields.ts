@@ -318,13 +318,4 @@ export const monitoringKnownFields = [
     aggregatable: true,
     readFromDocValues: true,
   },
-  {
-    name: 'total',
-    type: 'number',
-    count: 0,
-    scripted: false,
-    searchable: true,
-    aggregatable: true,
-    readFromDocValues: true,
-  },
 ];

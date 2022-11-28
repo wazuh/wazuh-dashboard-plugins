@@ -248,9 +248,29 @@ async function insertDataToIndex(
       );
 
       const bodyBulk = `{ "index":  { "_index": "${indexName}" } }\n${JSON.stringify(
-        { ...agentsInfo.data.data, timestamp: new Date().toISOString() },
+        {
+          ...agentsInfo.data.data,
+          ...agents[0],
+          timestamp: new Date().toISOString(),
+          cluster: {
+            name: apiHost.clusterName ? apiHost.clusterName : 'disabled',
+          },
+        },
       )}\n`;
 
+      const bodyBulk2 = agents
+        .map(agent => {
+          const agentInfo = { ...agent, ...agentsInfo.data.data };
+          agentInfo['timestamp'] = new Date(Date.now()).toISOString();
+          agentInfo.host = agent.manager;
+          agentInfo.cluster = {
+            name: apiHost.clusterName ? apiHost.clusterName : 'disabled',
+          };
+          return `{ "index":  { "_index": "${indexName}" } }\n${JSON.stringify(
+            agentInfo,
+          )}\n`;
+        })
+        .join('');
       await context.core.elasticsearch.client.asInternalUser.bulk({
         index: indexName,
         body: bodyBulk,
