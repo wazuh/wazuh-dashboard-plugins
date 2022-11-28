@@ -157,7 +157,7 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
     setHttp(core.http);
     setToasts(core.notifications.toasts);
     setDataPlugin(plugins.data);
-    setUnifiedSearchPlugin(plugins.navigation);
+    setUnifiedSearchPlugin(plugins.unifiedSearch);
     setUiSettings(core.uiSettings);
     setChrome(core.chrome);
     setNavigationPlugin(plugins.navigation);

@@ -15,7 +15,8 @@
     "charts",
     "savedObjects",
     "kibanaReact",
-    "kibanaUtils"
+    "kibanaUtils",
+    "unifiedSearch"
   ],
   "optionalPlugins": [
     "security",
