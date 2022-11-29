@@ -71,12 +71,8 @@ const architectureButtonsSolaris = [
 
 const architectureButtonsMacos = [
   {
-    id: 'intel',
-    label: 'Intel',
-  },
-  {
-    id: 'applesilicon',
-    label: 'Apple Silicon',
+    id: 'intel/applesilicon',
+    label: 'Intel/Apple Silicon',
   },
 ];
 
