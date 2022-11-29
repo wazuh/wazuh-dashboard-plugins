@@ -114,7 +114,7 @@ class KibanaVis extends Component {
       // componentWillUnmount.
       // In the renderComplete() the value of the $rootScope
       // is changed, which affects the entire application.
-      // 
+      //
       // Related issue:
       // https://github.com/wazuh/wazuh-kibana-app/issues/4158
       if (this.deadField) {
@@ -230,30 +230,30 @@ class KibanaVis extends Component {
           : timefilter.getTime();
       let filters = isAgentStatus
         ? [
-            {
-              meta: {
-                index: 'wazuh-monitoring-*',
-                alias: null,
-                negate: false,
-                disabled: false,
-              },
-              query: {
-                bool: {
-                  should: [
-                    {
-                      term:
-                        AppState.getClusterInfo().status === 'enabled'
-                          ? { 'cluster.name': AppState.getClusterInfo().cluster }
-                          : { 'manager.keyword': AppState.getClusterInfo().manager },
-                    },
-                  ],
-                },
-              },
-              $state: {
-                store: 'appState',
+          {
+            meta: {
+              index: 'wazuh-monitoring-*',
+              alias: null,
+              negate: false,
+              disabled: false,
+            },
+            query: {
+              bool: {
+                should: [
+                  {
+                    term:
+                      AppState.getClusterInfo().status === 'enabled'
+                        ? { 'cluster.name': AppState.getClusterInfo().cluster }
+                        : { 'manager.keyword': AppState.getClusterInfo().manager },
+                  },
+                ],
               },
             },
-          ]
+            $state: {
+              store: 'appState',
+            },
+          },
+        ]
         : discoverList[1] || [];
       const query = !isAgentStatus ? discoverList[0] : {};
 
@@ -268,7 +268,7 @@ class KibanaVis extends Component {
           console.warn(`plugin platform-vis exception: ${ex.message || ex}`);
         }
 
-        if (!filters.find((filter) => filter.meta.controlledBy === AUTHORIZED_AGENTS)) {
+        if (!isAgentStatus && !filters.find((filter) => filter.meta.controlledBy === AUTHORIZED_AGENTS)) {
           const agentsFilters = getFilterWithAuthorizedAgents(this.props.allowedAgents, vizPattern);
           filters = agentsFilters ? union(filters, [agentsFilters]) : filters;
         }
@@ -293,7 +293,7 @@ class KibanaVis extends Component {
           const visState = await getVisualizationsPlugin().convertToSerializedVis(
             this.visualization
           );
-          
+
           // In Kibana 7.10.2, there is a bug when creating the visualization with `createVis` method of the Visualization plugin that doesn't pass the `visState` parameter to the `Vis` class constructor.
           // This does the `.params`, `.uiState` and `.id` properties of the visualization are not set correctly in the `Vis` class constructor. This bug causes
           // that the visualization, for example, doesn't use the defined colors in the `.uiStateJSON` property.
@@ -310,7 +310,7 @@ class KibanaVis extends Component {
           vis.params = vis.getParams(visState.params);
           vis.uiState = new PersistedState(visState.uiState);
           vis.id = visState.id;
-          
+
           this.visHandler = await getVisualizationsPlugin().__LEGACY.createVisEmbeddableFromObject(
             vis,
             visInput
@@ -368,11 +368,11 @@ class KibanaVis extends Component {
   destroyAll = () => {
     try {
       this.visualization.destroy();
-    } catch (error) {} // eslint-disable-line
+    } catch (error) { } // eslint-disable-line
     try {
       this.visHandler.destroy();
       this.visHandler = null;
-    } catch (error) {} // eslint-disable-line
+    } catch (error) { } // eslint-disable-line
   };
 
   renderComplete = async () => {
@@ -421,8 +421,8 @@ class KibanaVis extends Component {
     return (
       <EuiFlexItem className="agents-evolutions-dpicker">
         <WzDatePicker
-          condensed={true} 
-          onTimeChange={() => {}} 
+          condensed={true}
+          onTimeChange={() => { }}
         />
       </EuiFlexItem>
     )
@@ -479,50 +479,50 @@ class KibanaVis extends Component {
               <EuiIcon type="iInCircle" />
             </EuiToolTip>
           </div>
-          {   
+          {
             !this.isLoading && this.showDateRangePicker() &&
             this.DateRangePickerComponent()
           }
           <div
             id={this.visID}
             vis-id={this.visID}
-            style={{ 
-              display: isLoading ? 'none' : 'block', 
+            style={{
+              display: isLoading ? 'none' : 'block',
               height: '100%',
-              paddingTop: '2%' 
+              paddingTop: '2%'
             }}
           ></div>
           <div style={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-              }}>
-                {(isLoading && <div><EuiLoadingChart size="xl" /></div>)
-                  || (this.deadField && !isLoading && !this.state.visRefreshingIndex && (
-                    <div>
-                      No results found &nbsp;
-                      <EuiToolTip
-                        position="top"
-                        content={
-                          <span>
-                            No alerts were found with the field: <strong>{this.deadField}</strong>
-                          </span>
-                        }
-                      >
-                        <EuiIcon type="iInCircle" />
-                      </EuiToolTip>
-                    </div>
-                  ))
-                  || (this.state.visRefreshingIndex && (
-                    <EuiFlexGroup justifyContent="center" alignItems="center">
-                      <EuiFlexItem grow={false}>
-                        <EuiLoadingSpinner size="xl" />
-                      </EuiFlexItem>
-                      <EuiFlexItem grow={false}>Refreshing Index Pattern.</EuiFlexItem>
-                    </EuiFlexGroup>
-                  ))
-                }
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+          }}>
+            {(isLoading && <div><EuiLoadingChart size="xl" /></div>)
+              || (this.deadField && !isLoading && !this.state.visRefreshingIndex && (
+                <div>
+                  No results found &nbsp;
+                  <EuiToolTip
+                    position="top"
+                    content={
+                      <span>
+                        No alerts were found with the field: <strong>{this.deadField}</strong>
+                      </span>
+                    }
+                  >
+                    <EuiIcon type="iInCircle" />
+                  </EuiToolTip>
+                </div>
+              ))
+              || (this.state.visRefreshingIndex && (
+                <EuiFlexGroup justifyContent="center" alignItems="center">
+                  <EuiFlexItem grow={false}>
+                    <EuiLoadingSpinner size="xl" />
+                  </EuiFlexItem>
+                  <EuiFlexItem grow={false}>Refreshing Index Pattern.</EuiFlexItem>
+                </EuiFlexGroup>
+              ))
+            }
           </div>
         </span>
       )
