@@ -250,7 +250,6 @@ async function insertDataToIndex(
       const bodyBulk = `{ "index":  { "_index": "${indexName}" } }\n${JSON.stringify(
         {
           ...agentsInfo.data.data,
-          ...agents[0],
           timestamp: new Date().toISOString(),
           cluster: {
             name: apiHost.clusterName ? apiHost.clusterName : 'disabled',
