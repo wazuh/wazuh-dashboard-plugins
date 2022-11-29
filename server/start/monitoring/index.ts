@@ -236,14 +236,14 @@ async function insertMonitoringDataElasticsearch(context, data) {
 async function insertDataToIndex(
   context,
   indexName: string,
-  data: { agents: any[]; apiHost; agentsInfo },
+  data: { apiHost; agentsInfo },
 ) {
-  const { agents, apiHost, agentsInfo } = data;
+  const { apiHost, agentsInfo } = data;
   try {
     if (agentsInfo?.data?.data) {
       log(
         'monitoring:insertDataToIndex',
-        `Bulk data to index ${indexName} for ${agents.length} agents`,
+        `Bulk data to index ${indexName}`,
         'debug',
       );
 
@@ -256,27 +256,13 @@ async function insertDataToIndex(
           },
         },
       )}\n`;
-
-      const bodyBulk2 = agents
-        .map(agent => {
-          const agentInfo = { ...agent, ...agentsInfo.data.data };
-          agentInfo['timestamp'] = new Date(Date.now()).toISOString();
-          agentInfo.host = agent.manager;
-          agentInfo.cluster = {
-            name: apiHost.clusterName ? apiHost.clusterName : 'disabled',
-          };
-          return `{ "index":  { "_index": "${indexName}" } }\n${JSON.stringify(
-            agentInfo,
-          )}\n`;
-        })
-        .join('');
       await context.core.elasticsearch.client.asInternalUser.bulk({
         index: indexName,
         body: bodyBulk,
       });
       log(
         'monitoring:insertDataToIndex',
-        `Bulk data to index ${indexName} for ${agents.length} agents completed`,
+        `Bulk data to index ${indexName} completed`,
         'debug',
       );
     }
@@ -438,13 +424,11 @@ async function cronTask(context) {
     );
     for (let apiHost of apiHostsUnique) {
       try {
-        const {
-          agents,
-          apiHost: host,
-          agentsInfo,
-        } = await getApiInfo(context, apiHost);
+        const { apiHost: host, agentsInfo } = await getApiInfo(
+          context,
+          apiHost,
+        );
         await insertMonitoringDataElasticsearch(context, {
-          agents,
           apiHost: host,
           agentsInfo,
         });
@@ -502,8 +486,7 @@ async function getApiInfo(context, apiHost) {
       apiHost.clusterName =
         responseClusterInfo.data.data.affected_items[0].cluster;
     }
-    const agents = await fetchAllAgentsFromApiHost(context, apiHost);
-    return { agents, apiHost, agentsInfo };
+    return { apiHost, agentsInfo };
   } catch (error) {
     log('monitoring:getApiInfo', error.message || error);
     throw error;

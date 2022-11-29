@@ -17,5 +17,3 @@ hosts:
       username: wazuh-wui
       password: MyS3cr37P450r.*-
       run_as: false
-
-wazuh.monitoring.frequency: 60
