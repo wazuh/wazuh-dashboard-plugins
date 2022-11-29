@@ -269,7 +269,7 @@ export const RegisterAgent = withErrorBoundary(
       if (
         this.state.selectedVersion === 'windowsxp' ||
         this.state.selectedVersion === 'windowsserver2008' ||
-        this.state.selectedVersion === 'windows8'
+        this.state.selectedVersion === 'windows7'
       ) {
         return 'update-rc.d wazuh-agent defaults && service wazuh-agent start';
       }
@@ -1854,7 +1854,7 @@ export const RegisterAgent = withErrorBoundary(
           : []),
         ...(this.state.selectedVersion == 'windowsxp' ||
         this.state.selectedVersion == 'windowsserver2008' ||
-        this.state.selectedVersion == 'windows8'
+        this.state.selectedVersion == 'windows7'
           ? [
               {
                 title: 'Choose the architecture',
@@ -2013,7 +2013,7 @@ export const RegisterAgent = withErrorBoundary(
                         ? tabSystemD
                         : this.state.selectedVersion == 'windowsxp' ||
                           this.state.selectedVersion == 'windowsserver2008' ||
-                          this.state.selectedVersion == 'windows8'
+                          this.state.selectedVersion == 'windows7'
                         ? tabNet
                         : this.state.selectedVersion == 'sierra' ||
                           this.state.selectedVersion == 'highSierra' ||
