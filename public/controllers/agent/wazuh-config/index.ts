@@ -197,8 +197,8 @@ const versionButtonsWindows = [
     label: 'Windows Server 2008',
   },
   {
-    id: 'windows8',
-    label: 'Windows 8 or higher',
+    id: 'windows7',
+    label: 'Windows 7 or higher',
   },
 ];
 
