@@ -48,6 +48,7 @@ export const WzAccordion = ({ children }) => {
       arrowDisplay='right'
       buttonContent={isAccordionOpen ? 'Show less' : 'Show more'}
       onToggle={(isOpen: boolean) => setIsAccordionOpen(isOpen)}
+      className={'action-btn-td'}
     >
       <EuiSpacer size='l' />
       <EuiPanel color='subdued'>{children}</EuiPanel>

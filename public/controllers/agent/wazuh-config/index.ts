@@ -183,11 +183,7 @@ const versionButtonsUbuntu = [
   },
   {
     id: 'ubuntu15',
-    label: 'Ubuntu 15',
-  },
-  {
-    id: 'ubuntu16',
-    label: 'Ubuntu 16 or higher',
+    label: 'Ubuntu 15 or higher',
   },
 ];
 

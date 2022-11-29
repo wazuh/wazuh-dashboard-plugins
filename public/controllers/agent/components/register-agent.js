@@ -34,7 +34,6 @@ import {
   EuiIcon,
   EuiSwitch,
   EuiLink,
-  EuiAccordion,
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
 import { withErrorBoundary } from '../../../components/common/hocs';
@@ -59,7 +58,6 @@ import {
   versionButtonsRedHat,
   versionButtonsCentos,
   architectureButtonsMacos,
-  osButtons,
   osPrincipalButtons,
   versionButtonsDebian,
   versionButtonsUbuntu,
@@ -75,7 +73,7 @@ import {
   getConnectionConfig,
   fetchClusterNodesOptions,
 } from './register-agent-service';
-import { WzAccordion, PrincipalButtonGroup } from './wz-accordion';
+import { PrincipalButtonGroup } from './wz-accordion';
 
 export const RegisterAgent = withErrorBoundary(
   class RegisterAgent extends Component {
@@ -248,7 +246,6 @@ export const RegisterAgent = withErrorBoundary(
         this.state.selectedVersion === 'debian10' ||
         this.state.selectedVersion === 'busterorgreater' ||
         this.state.selectedVersion === 'ubuntu15' ||
-        this.state.selectedVersion === 'ubuntu16' ||
         this.state.selectedVersion === 'leap15'
       ) {
         return 'sudo systemctl daemon-reload\nsudo systemctl enable wazuh-agent\nsudo systemctl start wazuh-agent';
@@ -615,14 +612,6 @@ export const RegisterAgent = withErrorBoundary(
         case 'ubuntu15-armhf':
           return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_armhf.deb`;
         case 'ubuntu15-x86_64':
-          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_amd64.deb`;
-        case 'ubuntu16-i386':
-          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_i386.deb`;
-        case 'ubuntu16-aarch64':
-          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_arm64.deb`;
-        case 'ubuntu16-armhf':
-          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_armhf.deb`;
-        case 'ubuntu16-x86_64':
           return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_amd64.deb`;
         default:
           return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_amd64.deb`;
@@ -1744,6 +1733,21 @@ export const RegisterAgent = withErrorBoundary(
               },
             ]
           : []),
+        ...(this.state.selectedOS == 'alpine'
+          ? [
+              {
+                title: 'Choose the version',
+                children:
+                  this.state.selectedVersion == '11.31' &&
+                  buttonGroup(
+                    'Choose the version',
+                    versionButtonsHPUX,
+                    this.state.selectedVersion,
+                    version => this.setVersion(version),
+                  ),
+              },
+            ]
+          : []),
         ...(this.state.selectedVersion == 'centos5' ||
         this.state.selectedVersion == 'redhat5' ||
         this.state.selectedVersion == 'oraclelinux5' ||
@@ -1781,8 +1785,7 @@ export const RegisterAgent = withErrorBoundary(
         this.state.selectedVersion == 'debian7' ||
         this.state.selectedVersion == 'debian8' ||
         this.state.selectedVersion == 'ubuntu14' ||
-        this.state.selectedVersion == 'ubuntu15' ||
-        this.state.selectedVersion == 'ubuntu16'
+        this.state.selectedVersion == 'ubuntu15'
           ? [
               {
                 title: 'Choose the architecture',
@@ -1970,7 +1973,6 @@ export const RegisterAgent = withErrorBoundary(
                       this.state.selectedVersion == 'busterorgreater' ||
                       this.state.selectedVersion == 'busterorgreater' ||
                       this.state.selectedVersion === 'ubuntu15' ||
-                      this.state.selectedVersion === 'ubuntu16' ||
                       this.state.selectedVersion === 'leap15'
                         ? tabSystemD
                         : this.state.selectedVersion == 'windowsxp' ||
