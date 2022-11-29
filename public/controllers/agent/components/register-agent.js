@@ -67,6 +67,7 @@ import {
   versionButtonsSolaris,
   versionButtonsAix,
   versionButtonsHPUX,
+  versionButtonAlpine,
 } from '../wazuh-config';
 import './register-agent.scss';
 import ServerAddress from '../register-agent/steps/server-address';
@@ -267,6 +268,7 @@ export const RegisterAgent = withErrorBoundary(
     systemSelectorNet() {
       if (
         this.state.selectedVersion === 'windowsxp' ||
+        this.state.selectedVersion === 'windowsserver2008' ||
         this.state.selectedVersion === 'windows8'
       ) {
         return 'update-rc.d wazuh-agent defaults && service wazuh-agent start';
@@ -836,6 +838,21 @@ export const RegisterAgent = withErrorBoundary(
         'user-manual/agents/agent-connection.html',
         appVersionMajorDotMinor,
       );
+      const urlWindowsPackage = `https://packages.wazuh.com/4.x/windows/wazuh-agent-${this.state.wazuhVersion}-1.msi`;
+
+      // winText: `Invoke-WebRequest -Uri https://packages.wazuh.com/4.x/windows/wazuh-agent-${
+      //   this.state.wazuhVersion
+      // }-1.msi -OutFile \${env:tmp}\\wazuh-agent-${
+      //   this.state.wazuhVersion
+      // }.msi; msiexec.exe /i \${env:tmp}\\wazuh-agent-${
+      //   this.state.wazuhVersion
+      // }.msi /q ${this.optionalDeploymentVariables()}${this.agentNameVariable()}`;
+
+      // `https://packages.wazuh.com/${this.state.wazuhVersion}/windows/wazuh-agent-${this.state.wazuhVersion}-1.msi`
+
+      // # Provide MSI package URL and request the user to download the package and run the following command:
+      // msiexec.exe /i wazuh-agent.msi /q WAZUH_MANAGER='172.31.76.147' WAZUH_REGISTRATION_SERVER='172.31.76.147'
+
       const textAndLinkToCheckConnectionDocumentation = (
         <p>
           To verify the connection with the Wazuh server, please follow this{' '}
@@ -915,13 +932,19 @@ export const RegisterAgent = withErrorBoundary(
         }-1.pkg && sudo launchctl setenv ${this.optionalDeploymentVariables()}${this.agentNameVariable()}&& sudo installer -pkg ./wazuh-agent-${
           this.state.wazuhVersion
         }.pkg -target /`,
-        winText: `Invoke-WebRequest -Uri https://packages.wazuh.com/4.x/windows/wazuh-agent-${
-          this.state.wazuhVersion
-        }-1.msi -OutFile \${env:tmp}\\wazuh-agent-${
-          this.state.wazuhVersion
-        }.msi; msiexec.exe /i \${env:tmp}\\wazuh-agent-${
-          this.state.wazuhVersion
-        }.msi /q ${this.optionalDeploymentVariables()}${this.agentNameVariable()}`,
+        winText:
+          this.state.selectedVersion == 'windowsxp' ||
+          this.state.selectedVersion == 'windowsserver2008'
+            ? `msiexec.exe /i wazuh-agent-${
+                this.state.wazuhVersion
+              }-1.msi /q ${this.optionalDeploymentVariables()}`
+            : `Invoke-WebRequest -Uri https://packages.wazuh.com/4.x/windows/wazuh-agent-${
+                this.state.wazuhVersion
+              }-1.msi -OutFile \${env:tmp}\\wazuh-agent-${
+                this.state.wazuhVersion
+              }.msi; msiexec.exe /i \${env:tmp}\\wazuh-agent-${
+                this.state.wazuhVersion
+              }.msi /q ${this.optionalDeploymentVariables()}${this.agentNameVariable()}`,
         openText: `sudo rpm --import https://packages.wazuh.com/key/GPG-KEY-WAZUH && sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()} zypper install -y ${this.optionalPackages()}`,
         solText: `sudo curl -so ${this.optionalPackages()} && sudo ${this.agentNameVariable()}&& ${
           this.state.selectedVersion == 'solaris11'
@@ -946,6 +969,12 @@ export const RegisterAgent = withErrorBoundary(
       const language = this.getHighlightCodeLanguage(this.state.selectedOS);
       const warningUpgrade =
         'If the installer finds another Wazuh agent in the system, it will upgrade it preserving the configuration.';
+      const warningCommand = (
+        <p>
+          Download from this <a href={urlWindowsPackage}>link </a>
+          the package to use with the command.
+        </p>
+      );
       const windowsAdvice = this.state.selectedOS === 'win' && (
         <>
           <EuiCallOut title='Requirements' iconType='iInCircle'>
@@ -1005,6 +1034,17 @@ export const RegisterAgent = withErrorBoundary(
               />
               <EuiSpacer />
               {windowsAdvice}
+              {this.state.selectedVersion == 'windowsxp' ||
+              this.state.selectedVersion == 'windowsserver2008' ? (
+                <EuiCallOut
+                  color='warning'
+                  title={warningCommand}
+                  iconType='iInCircle'
+                />
+              ) : (
+                ''
+              )}
+              <EuiSpacer />
               <div className='copy-codeblock-wrapper'>
                 <EuiCodeBlock style={codeBlock} language={language}>
                   {this.state.wazuhPassword && !this.state.showPassword
@@ -1614,20 +1654,12 @@ export const RegisterAgent = withErrorBoundary(
           ? [
               {
                 title: 'Choose the version',
-                children:
-                  this.state.selectedVersion == 'windowsxp'
-                    ? buttonGroupWithMessage(
-                        'Choose the version',
-                        versionButtonsWindows,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      )
-                    : buttonGroup(
-                        'Choose the version',
-                        versionButtonsWindows,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      ),
+                children: buttonGroup(
+                  'Choose the version',
+                  versionButtonsWindows,
+                  this.state.selectedVersion,
+                  version => this.setVersion(version),
+                ),
               },
             ]
           : []),
@@ -1820,6 +1852,7 @@ export const RegisterAgent = withErrorBoundary(
             ]
           : []),
         ...(this.state.selectedVersion == 'windowsxp' ||
+        this.state.selectedVersion == 'windowsserver2008' ||
         this.state.selectedVersion == 'windows8'
           ? [
               {
@@ -1944,7 +1977,8 @@ export const RegisterAgent = withErrorBoundary(
         this.state.selectedOS == 'open' ||
         this.state.selectedOS == 'sol' ||
         this.state.selectedOS == 'aix' ||
-        this.state.selectedOS == 'hp'
+        this.state.selectedOS == 'hp' ||
+        this.state.selectedOS == 'alpine'
           ? [
               {
                 title: 'Start the agent',
@@ -1977,6 +2011,7 @@ export const RegisterAgent = withErrorBoundary(
                       this.state.selectedVersion === 'leap15'
                         ? tabSystemD
                         : this.state.selectedVersion == 'windowsxp' ||
+                          this.state.selectedVersion == 'windowsserver2008' ||
                           this.state.selectedVersion == 'windows8'
                         ? tabNet
                         : this.state.selectedVersion == 'sierra' ||
@@ -2018,6 +2053,7 @@ export const RegisterAgent = withErrorBoundary(
         this.state.selectedOS !== 'oraclelinux' &&
         this.state.selectedOS !== 'suse' &&
         this.state.selectedOS !== 'raspbian' &&
+        this.state.selectedOS !== 'alpine' &&
         restartAgentCommand
           ? [
               {
