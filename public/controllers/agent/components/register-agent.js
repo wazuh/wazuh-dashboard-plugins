@@ -421,15 +421,15 @@ export const RegisterAgent = withErrorBoundary(
       switch (
         `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
       ) {
-        case 'alpine-i386':
+        case '3.12.12-i386':
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.i386.rpm`;
-        case 'alpine-aarch64':
+        case '3.12.12-aarch64':
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.aarch64.rpm`;
-        case 'alpine-x86_64':
+        case '3.12.12-x86_64':
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`;
-        case 'alpine-armhf':
+        case '3.12.12-armhf':
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.armv7hl.rpm`;
-        case 'alpine-powerpc':
+        case '3.12.12-powerpc':
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.ppc64le.rpm`;
         default:
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`;
