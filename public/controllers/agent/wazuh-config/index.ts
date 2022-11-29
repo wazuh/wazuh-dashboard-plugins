@@ -193,6 +193,10 @@ const versionButtonsWindows = [
     label: 'Windows XP',
   },
   {
+    id: 'windowsserver2008',
+    label: 'Windows Server 2008',
+  },
+  {
     id: 'windows8',
     label: 'Windows 8 or higher',
   },
@@ -255,7 +259,7 @@ const versionButtonsOracleLinux = [
   },
   {
     id: 'oraclelinux6',
-    label: 'Oracle Linux 6 or later',
+    label: 'Oracle Linux 6 or higher',
   },
 ];
 
@@ -263,6 +267,13 @@ const versionButtonsRaspbian = [
   {
     id: 'busterorgreater',
     label: 'Raspbian Buster or greater',
+  },
+];
+
+const versionButtonAlpine = [
+  {
+    id: '3.12.12',
+    label: '3.12.12 or higher',
   },
 ];
 
@@ -362,6 +373,7 @@ export {
   versionButtonFedora,
   versionButtonsRedHat,
   versionButtonsCentos,
+  versionButtonAlpine,
   architectureButtonsMacos,
   osButtons,
   osPrincipalButtons,
