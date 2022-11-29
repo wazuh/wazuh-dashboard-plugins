@@ -45,13 +45,15 @@ export const WzAccordion = ({ children }) => {
   return (
     <EuiAccordion
       id={rightArrowAccordionId}
-      arrowDisplay='right'
+      arrowDisplay='left'
       buttonContent={isAccordionOpen ? 'Show less' : 'Show more'}
       onToggle={(isOpen: boolean) => setIsAccordionOpen(isOpen)}
       className={'action-btn-td'}
     >
       <EuiSpacer size='l' />
-      <EuiPanel color='subdued'>{children}</EuiPanel>
+      <EuiPanel className={'wz-border-none'} color='subdued'>
+        {children}
+      </EuiPanel>
     </EuiAccordion>
   );
 };
