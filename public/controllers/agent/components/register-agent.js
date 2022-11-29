@@ -185,12 +185,6 @@ export const RegisterAgent = withErrorBoundary(
       }
     }
 
-    // componentDidUpdate() {
-    //   if (this.state.selectedOS == 'macos') {
-    //     this.setVersion('sierra');
-    //   }
-    // }
-
     getEnrollDNSConfig = () => {
       let serverAddress = this.configuration['enrollment.dns'] || '';
       this.setState({ defaultServerAddress: serverAddress });
@@ -416,6 +410,25 @@ export const RegisterAgent = withErrorBoundary(
         case 'redhat7-armhf':
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.armv7hl.rpm`;
         case 'redhat7-powerpc':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.ppc64le.rpm`;
+        default:
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`;
+      }
+    }
+
+    resolveAlpinePackage() {
+      switch (
+        `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
+      ) {
+        case 'alpine-i386':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.i386.rpm`;
+        case 'alpine-aarch64':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.aarch64.rpm`;
+        case 'alpine-x86_64':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`;
+        case 'alpine-armhf':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.armv7hl.rpm`;
+        case 'alpine-powerpc':
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.ppc64le.rpm`;
         default:
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`;
@@ -700,6 +713,8 @@ export const RegisterAgent = withErrorBoundary(
           return this.resolveSUSEPackage();
         case 'raspbian':
           return this.resolveRASPBIANPackage();
+        case 'alpine':
+          return this.resolveAlpinePackage();
         default:
           return `https://packages.wazuh.com/4.x/yum/x86_64/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`;
       }
@@ -838,19 +853,6 @@ export const RegisterAgent = withErrorBoundary(
         appVersionMajorDotMinor,
       );
       const urlWindowsPackage = `https://packages.wazuh.com/4.x/windows/wazuh-agent-${this.state.wazuhVersion}-1.msi`;
-
-      // winText: `Invoke-WebRequest -Uri https://packages.wazuh.com/4.x/windows/wazuh-agent-${
-      //   this.state.wazuhVersion
-      // }-1.msi -OutFile \${env:tmp}\\wazuh-agent-${
-      //   this.state.wazuhVersion
-      // }.msi; msiexec.exe /i \${env:tmp}\\wazuh-agent-${
-      //   this.state.wazuhVersion
-      // }.msi /q ${this.optionalDeploymentVariables()}${this.agentNameVariable()}`;
-
-      // `https://packages.wazuh.com/${this.state.wazuhVersion}/windows/wazuh-agent-${this.state.wazuhVersion}-1.msi`
-
-      // # Provide MSI package URL and request the user to download the package and run the following command:
-      // msiexec.exe /i wazuh-agent.msi /q WAZUH_MANAGER='172.31.76.147' WAZUH_REGISTRATION_SERVER='172.31.76.147'
 
       const textAndLinkToCheckConnectionDocumentation = (
         <p>
@@ -1769,14 +1771,12 @@ export const RegisterAgent = withErrorBoundary(
           ? [
               {
                 title: 'Choose the version',
-                children:
-                  this.state.selectedVersion == '11.31' &&
-                  buttonGroup(
-                    'Choose the version',
-                    versionButtonsHPUX,
-                    this.state.selectedVersion,
-                    version => this.setVersion(version),
-                  ),
+                children: buttonGroup(
+                  'Choose the version',
+                  versionButtonAlpine,
+                  this.state.selectedVersion,
+                  version => this.setVersion(version),
+                ),
               },
             ]
           : []),
@@ -1803,6 +1803,19 @@ export const RegisterAgent = withErrorBoundary(
                 children: buttonGroup(
                   'Choose the architecture',
                   architectureButtonsOpenSuse,
+                  this.state.selectedArchitecture,
+                  architecture => this.setArchitecture(architecture),
+                ),
+              },
+            ]
+          : []),
+        ...(this.state.selectedVersion == '3.12.12'
+          ? [
+              {
+                title: 'Choose the architecture',
+                children: buttonGroup(
+                  'Choose the architecture',
+                  architectureButtonsWithPPC64LE,
                   this.state.selectedArchitecture,
                   architecture => this.setArchitecture(architecture),
                 ),
