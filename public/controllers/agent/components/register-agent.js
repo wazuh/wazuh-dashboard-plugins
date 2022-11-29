@@ -421,7 +421,7 @@ export const RegisterAgent = withErrorBoundary(
         `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
       ) {
         case '3.12.12-i386':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.i386.rpm`;
+          return `https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && \echo "https://packages.wazuh.com/trash/alpine/v3.12/main"`;
         case '3.12.12-aarch64':
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.aarch64.rpm`;
         case '3.12.12-x86_64':
@@ -830,6 +830,13 @@ export const RegisterAgent = withErrorBoundary(
               ? ['OS architecture']
               : []),
           ];
+        case 'alpine':
+          return [
+            ...(!this.state.selectedVersion ? ['OS version'] : []),
+            ...(this.state.selectedVersion && !this.state.selectedArchitecture
+              ? ['OS architecture']
+              : []),
+          ];
         default:
           return [];
       }
@@ -913,8 +920,24 @@ export const RegisterAgent = withErrorBoundary(
       const codeBlock = {
         zIndex: '100',
       };
+
       const customTexts = {
         rpmText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
+        alpineText: `wget -O /etc/apk/keys/alpine-devel@wazuh.com-633d7457.rsa.pub ${this.optionalPackages()} >> /etc/apk/repositories && \
+apk update && \
+apk add wazuh-agent`,
+
+        // wget -O /etc/apk/keys/alpine-devel@wazuh.com-633d7457.rsa.pub https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && \
+        // echo "https://packages.wazuh.com/trash/alpine/v3.12/main" >> /etc/apk/repositories && \
+        // apk update && \
+        // apk add wazuh-agent
+
+        // armando comando
+
+        // wget -O /etc/apk/keys/alpine-devel@wazuh.com-633d7457.rsa.pub ${this.optionalPackages()} >> /etc/apk/repositories && \
+        // apk update && \
+        // apk add wazuh-agent
+
         centText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
         debText: `curl -so wazuh-agent-${
           this.state.wazuhVersion
