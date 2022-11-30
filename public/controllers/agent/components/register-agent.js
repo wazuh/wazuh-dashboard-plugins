@@ -210,14 +210,6 @@ export const RegisterAgent = withErrorBoundary(
     }
 
     selectOS(os) {
-      if (os == 'macos') {
-        this.setState({
-          selectedOS: os,
-          selectedVersion: 'sierra',
-          selectedArchitecture: '',
-          selectedSYS: '',
-        });
-      }
       this.setState({
         selectedOS: os,
         selectedVersion: '',
@@ -279,7 +271,8 @@ export const RegisterAgent = withErrorBoundary(
         this.state.selectedVersion === 'solaris10' ||
         this.state.selectedVersion === 'solaris11' ||
         this.state.selectedVersion === '6.1 TL9' ||
-        this.state.selectedVersion === '11.31'
+        this.state.selectedVersion === '11.31' ||
+        this.state.selectedVersion === '3.12.12'
       ) {
         return '/var/ossec/bin/wazuh-control start';
       }
@@ -310,6 +303,7 @@ export const RegisterAgent = withErrorBoundary(
     }
 
     setVersion(selectedVersion) {
+      console.log(selectedVersion, 'sel');
       this.setState({ selectedVersion, selectedArchitecture: '' });
     }
 
@@ -421,17 +415,17 @@ export const RegisterAgent = withErrorBoundary(
         `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
       ) {
         case '3.12.12-i386':
-          return `https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && \echo "https://packages.wazuh.com/trash/alpine/v3.12/main"`;
+          return `https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && \echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"`;
         case '3.12.12-aarch64':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.aarch64.rpm`;
+          return `https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && \echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"`;
         case '3.12.12-x86_64':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`;
+          return `https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && \echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"`;
         case '3.12.12-armhf':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.armv7hl.rpm`;
+          return `https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && \echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"`;
         case '3.12.12-powerpc':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.ppc64le.rpm`;
+          return `https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && \echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"`;
         default:
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`;
+          return `https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && \echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"`;
       }
     }
 
@@ -927,17 +921,6 @@ export const RegisterAgent = withErrorBoundary(
 apk update && \
 apk add wazuh-agent`,
 
-        // wget -O /etc/apk/keys/alpine-devel@wazuh.com-633d7457.rsa.pub https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && \
-        // echo "https://packages.wazuh.com/trash/alpine/v3.12/main" >> /etc/apk/repositories && \
-        // apk update && \
-        // apk add wazuh-agent
-
-        // armando comando
-
-        // wget -O /etc/apk/keys/alpine-devel@wazuh.com-633d7457.rsa.pub ${this.optionalPackages()} >> /etc/apk/repositories && \
-        // apk update && \
-        // apk add wazuh-agent
-
         centText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
         debText: `curl -so wazuh-agent-${
           this.state.wazuhVersion
@@ -995,8 +978,11 @@ apk add wazuh-agent`,
         'If the installer finds another Wazuh agent in the system, it will upgrade it preserving the configuration.';
       const warningCommand = (
         <p>
-          Download from this <a href={urlWindowsPackage}>link </a>
-          the package to use with the command.
+          Please
+          <a href={urlWindowsPackage}> download </a>
+          the package from our repository and copy it to the Windows system
+          where you are going to install it. Then run the following command to
+          perform the installation:
         </p>
       );
       const windowsAdvice = this.state.selectedOS === 'win' && (
@@ -2060,7 +2046,8 @@ apk add wazuh-agent`,
                         : this.state.selectedVersion == 'solaris10' ||
                           this.state.selectedVersion == 'solaris11' ||
                           this.state.selectedVersion == '6.1 TL9' ||
-                          this.state.selectedVersion == '11.31'
+                          this.state.selectedVersion == '11.31' ||
+                          this.state.selectedVersion == '3.12.12'
                         ? tabWazuhControl
                         : tabSysV
                     }
