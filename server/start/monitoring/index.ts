@@ -228,7 +228,7 @@ async function insertMonitoringDataElasticsearch(context, data) {
 }
 
 /**
- * Inserting one document per agent into Elastic. Bulk.
+ * Inserting one document per agent into Elastic.
  * @param {*} context Endpoint
  * @param {String} indexName The name for the index (e.g. daily: wazuh-monitoring-YYYY.MM.DD)
  * @param {*} data
@@ -243,26 +243,24 @@ async function insertDataToIndex(
     if (agentsInfo?.data?.data) {
       log(
         'monitoring:insertDataToIndex',
-        `Bulk data to index ${indexName}`,
+        `Insert data to index ${indexName}`,
         'debug',
       );
 
-      const bodyBulk = `{ "index":  { "_index": "${indexName}" } }\n${JSON.stringify(
-        {
-          ...agentsInfo.data.data,
-          timestamp: new Date().toISOString(),
-          cluster: {
-            name: apiHost.clusterName ? apiHost.clusterName : 'disabled',
-          },
+      const indexBody = JSON.stringify({
+        ...agentsInfo.data.data,
+        timestamp: new Date().toISOString(),
+        cluster: {
+          name: apiHost.clusterName ? apiHost.clusterName : 'disabled',
         },
-      )}\n`;
-      await context.core.elasticsearch.client.asInternalUser.bulk({
+      });
+      await context.core.elasticsearch.client.asInternalUser.index({
         index: indexName,
-        body: bodyBulk,
+        body: indexBody,
       });
       log(
         'monitoring:insertDataToIndex',
-        `Bulk data to index ${indexName} completed`,
+        `Insert data to index ${indexName} completed`,
         'debug',
       );
     }
