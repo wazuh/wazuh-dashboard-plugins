@@ -10,7 +10,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Changed
 
--
+- Improved wazuh-monitoring resources usage[#4924](https://github.com/wazuh/wazuh-kibana-app/pull/4924)
 
 ### Fixed
 
