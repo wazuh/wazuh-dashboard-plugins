@@ -45,7 +45,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed WAZUH_PROTOCOL param suggestion [#4849](https://github.com/wazuh/wazuh-kibana-app/pull/4849)
 - Raspbian OS, Ubuntu, Amazon Linux and Amazon Linux 2 commands in the wizard deploy agent now change when a different architecture is selected [#4876](https://github.com/wazuh/wazuh-kibana-app/pull/4876) [#4880](https://github.com/wazuh/wazuh-kibana-app/pull/4880)
 - Fixed a bug that caused the flyouts to close when clicking inside them [#4638](https://github.com/wazuh/wazuh-kibana-app/pull/4638)
-- Fix the agent graph in opensearch dashboard [#4942] (https://github.com/wazuh/wazuh-kibana-app/pull/4942)
+- Fixed agent graph in opensearch dashboard [#4942] (https://github.com/wazuh/wazuh-kibana-app/pull/4942)
 
 ### Removed
 
