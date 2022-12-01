@@ -271,10 +271,12 @@ export const RegisterAgent = withErrorBoundary(
         this.state.selectedVersion === 'solaris10' ||
         this.state.selectedVersion === 'solaris11' ||
         this.state.selectedVersion === '6.1 TL9' ||
-        this.state.selectedVersion === '11.31' ||
         this.state.selectedVersion === '3.12.12'
       ) {
         return '/var/ossec/bin/wazuh-control start';
+      } else this.state.selectedVersion === '11.31';
+      {
+        return '/sbin/init.d/wazuh-agent start';
       }
     }
 
