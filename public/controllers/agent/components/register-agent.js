@@ -1940,18 +1940,22 @@ apk add wazuh-agent`,
               },
             ]
           : []),
-        {
-          title: 'Wazuh server address',
-          children: (
-            <Fragment>
-              <ServerAddress
-                defaultValue={this.state.defaultServerAddress}
-                onChange={onChangeServerAddress}
-                fetchOptions={fetchClusterNodesOptions}
-              />
-            </Fragment>
-          ),
-        },
+        ...(!(this.state.selectedOS == 'hp' || this.state.selectedOS == 'sol')
+          ? [
+              {
+                title: 'Wazuh server address',
+                children: (
+                  <Fragment>
+                    <ServerAddress
+                      defaultValue={this.state.defaultServerAddress}
+                      onChange={onChangeServerAddress}
+                      fetchOptions={fetchClusterNodesOptions}
+                    />
+                  </Fragment>
+                ),
+              },
+            ]
+          : []),
         ...(!(!this.state.needsPassword || this.state.hidePasswordInput)
           ? [
               {
@@ -1960,16 +1964,20 @@ apk add wazuh-agent`,
               },
             ]
           : []),
-        {
-          title: 'Assign a name and a group to the agent',
-          children: (
-            <Fragment>
-              {agentName}
-              {groupInput}
-              {agentGroup}
-            </Fragment>
-          ),
-        },
+        ...(!(this.state.selectedOS == 'hp' || this.state.selectedOS == 'sol')
+          ? [
+              {
+                title: 'Assign a name and a group to the agent',
+                children: (
+                  <Fragment>
+                    {agentName}
+                    {groupInput}
+                    {agentGroup}
+                  </Fragment>
+                ),
+              },
+            ]
+          : []),
         {
           title: 'Install and enroll the agent',
           children: this.state.gotErrorRegistrationServiceInfo ? (
