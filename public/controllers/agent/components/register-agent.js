@@ -953,13 +953,13 @@ apk add wazuh-agent`,
                 this.state.wazuhVersion
               }.msi /q ${this.optionalDeploymentVariables()}${this.agentNameVariable()}`,
         openText: `sudo rpm --import https://packages.wazuh.com/key/GPG-KEY-WAZUH && sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()} zypper install -y ${this.optionalPackages()}`,
-        solText: `sudo curl -so ${this.optionalPackages()} && sudo ${this.agentNameVariable()}&& ${
+        solText: `sudo curl -so ${this.optionalPackages()} && sudo && ${
           this.state.selectedVersion == 'solaris11'
             ? 'pkg install -g wazuh-agent.p5p wazuh-agent'
             : 'pkgadd -d wazuh-agent.pkg'
         }`,
         aixText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}rpm -ivh ${this.optionalPackages()}`,
-        hpText: `cd / && sudo curl -so ${this.optionalPackages()} && sudo ${this.agentNameVariable()}groupadd wazuh && sudo useradd -G wazuh wazuh && sudo tar -xvf wazuh-agent.tar`,
+        hpText: `cd / && sudo curl -so ${this.optionalPackages()} && sudo groupadd wazuh && sudo useradd -G wazuh wazuh && sudo tar -xvf wazuh-agent.tar`,
         amazonlinuxText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
         fedoraText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
         oraclelinuxText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
