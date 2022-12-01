@@ -885,7 +885,7 @@ export const RegisterAgent = withErrorBoundary(
             error={[`The character${this.state.badCharacters.length <= 1 ? ('') : ('s')}
             ${this.state.badCharacters.map(char => ` "${char}"`)}
             ${this.state.badCharacters.length <= 1 ? ('is') : ('are')}
-            not valid. Valid characters are A-Z, a-z, ".", "-", "_"`]}>
+            not valid. Allowed characters are A-Z, a-z, ".", "-", "_"`]}>
             <EuiFieldText
               isInvalid={this.state.agentNameError}
               placeholder='Name agent'
