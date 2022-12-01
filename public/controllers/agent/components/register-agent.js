@@ -97,6 +97,7 @@ export const RegisterAgent = withErrorBoundary(
         serverAddress: '',
         agentName: '',
         agentNameError: false,
+        badCharacters: [],
         wazuhPassword: '',
         groups: [],
         selectedGroup: [],
@@ -294,8 +295,16 @@ export const RegisterAgent = withErrorBoundary(
       this.setState({ agentName: event.target.value });
       if (/^[a-z0-9-_.]+$/i.test(event.target.value) || event.target.value.length <= 0) {
         this.setState({ agentNameError: false });
+        this.setState({ badCharacters: [] });
       } else {
+        let badCharacters = event.target.value.split('').map(char =>
+          char.replace(/^[a-z0-9-_.]+$/i, '')).join('');
+        badCharacters = badCharacters.split('').map(char =>
+          char.replace(/\s/, 'whitespace'));
+        const characters = [...new Set(badCharacters)];
+        this.setState({ badCharacters: characters });
         this.setState({ agentNameError: true });
+
       }
     }
 
@@ -873,7 +882,10 @@ export const RegisterAgent = withErrorBoundary(
         <EuiForm>
           <EuiFormRow
             isInvalid={this.state.agentNameError}
-            error={['Only A-Z, a-z, 0-9, "-", "_", "." are allowed']}>
+            error={[`The character${this.state.badCharacters.length <= 1 ? ('') : ('s')}
+            ${this.state.badCharacters.map(char => ` "${char}"`)}
+            ${this.state.badCharacters.length <= 1 ? ('is') : ('are')}
+            not valid. Valid characters are A-Z, a-z, ".", "-", "_"`]}>
             <EuiFieldText
               isInvalid={this.state.agentNameError}
               placeholder='Name agent'
