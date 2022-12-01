@@ -1942,7 +1942,11 @@ apk add wazuh-agent`,
               },
             ]
           : []),
-        ...(!(this.state.selectedOS == 'hp' || this.state.selectedOS == 'sol')
+        ...(!(
+          this.state.selectedOS == 'hp' ||
+          this.state.selectedOS == 'sol' ||
+          this.state.selectedOS == 'alpine'
+        )
           ? [
               {
                 title: 'Wazuh server address',
@@ -1966,7 +1970,11 @@ apk add wazuh-agent`,
               },
             ]
           : []),
-        ...(!(this.state.selectedOS == 'hp' || this.state.selectedOS == 'sol')
+        ...(!(
+          this.state.selectedOS == 'hp' ||
+          this.state.selectedOS == 'sol' ||
+          this.state.selectedOS == 'alpine'
+        )
           ? [
               {
                 title: 'Assign a name and a group to the agent',
