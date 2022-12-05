@@ -1972,20 +1972,47 @@ export const RegisterAgent = withErrorBoundary(
               },
             ]
           : []),
-        {
-          title: 'Install and enroll the agent',
-          children: this.state.gotErrorRegistrationServiceInfo ? (
-            calloutErrorRegistrationServiceInfo
-          ) : missingOSSelection.length ? (
-            <EuiCallOut
-              color='warning'
-              title={`Please select the ${missingOSSelection.join(', ')}.`}
-              iconType='iInCircle'
-            />
-          ) : (
-            <div>{guide}</div>
-          ),
-        },
+        ...(!(
+          this.state.selectedOS == 'hp' ||
+          this.state.selectedOS == 'sol' ||
+          this.state.selectedOS == 'alpine'
+        )
+          ? [
+              {
+                title: 'Install and enroll the agent',
+                children: this.state.gotErrorRegistrationServiceInfo ? (
+                  calloutErrorRegistrationServiceInfo
+                ) : missingOSSelection.length ? (
+                  <EuiCallOut
+                    color='warning'
+                    title={`Please select the ${missingOSSelection.join(
+                      ', ',
+                    )}.`}
+                    iconType='iInCircle'
+                  />
+                ) : (
+                  <div>{guide}</div>
+                ),
+              },
+            ]
+          : [
+              {
+                title: 'Install the agent',
+                children: this.state.gotErrorRegistrationServiceInfo ? (
+                  calloutErrorRegistrationServiceInfo
+                ) : missingOSSelection.length ? (
+                  <EuiCallOut
+                    color='warning'
+                    title={`Please select the ${missingOSSelection.join(
+                      ', ',
+                    )}.`}
+                    iconType='iInCircle'
+                  />
+                ) : (
+                  <div>{guide}</div>
+                ),
+              },
+            ]),
         ...(this.state.selectedOS == 'rpm' ||
         this.state.selectedOS == 'cent' ||
         this.state.selectedOS == 'suse' ||
