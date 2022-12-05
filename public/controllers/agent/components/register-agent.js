@@ -839,6 +839,12 @@ export const RegisterAgent = withErrorBoundary(
         'user-manual/agents/agent-connection.html',
         appVersionMajorDotMinor,
       );
+
+      const urlWazuhAgentEnrollment = webDocumentationLink(
+        'user-manual/agent-enrollment/index.html',
+        appVersionMajorDotMinor,
+      );
+
       const urlWindowsPackage = `https://packages.wazuh.com/4.x/windows/wazuh-agent-${this.state.wazuhVersion}-1.msi`;
 
       const missingOSSelection = this.checkMissingOSSelection();
@@ -951,14 +957,26 @@ export const RegisterAgent = withErrorBoundary(
           </a>
         </p>
       );
-      const warningCommand = (
+      const messageExtraSteps = (
         <p>
-          Please
-          <a href={urlWindowsPackage}> download </a>
-          the package from our repository and copy it to the Windows system
-          where you are going to install it. Then run the following command to
-          perform the installation:
+          After installing the agent, you need to enroll it in the Wazuh server.
+          Check the Wazuh agent enrollment{' '}
+          <a href={urlWazuhAgentEnrollment} target='_blank'>
+            Wazuh agent enrollment{' '}
+          </a>
+          section to learn more.
         </p>
+      );
+      const warningCommand = (
+        <>
+          <p>
+            Please
+            <a href={urlWindowsPackage}> download </a>
+            the package from our repository and copy it to the Windows system
+            where you are going to install it. Then run the following command to
+            perform the installation:
+          </p>
+        </>
       );
       const windowsAdvice = this.state.selectedOS === 'win' && (
         <>
@@ -1028,11 +1046,14 @@ export const RegisterAgent = withErrorBoundary(
               {windowsAdvice}
               {this.state.selectedVersion == 'windowsxp' ||
               this.state.selectedVersion == 'windowsserver2008' ? (
-                <EuiCallOut
-                  color='warning'
-                  title={warningCommand}
-                  iconType='iInCircle'
-                />
+                <>
+                  <EuiCallOut
+                    color='warning'
+                    title={warningCommand}
+                    iconType='iInCircle'
+                  />
+                  <EuiSpacer />
+                </>
               ) : (
                 ''
               )}
@@ -1284,6 +1305,9 @@ export const RegisterAgent = withErrorBoundary(
                 </div>
                 <EuiSpacer size='s' />
                 {textAndLinkToCheckConnectionDocumentation}
+                {this.state.selectedOS == 'hp' || this.state.selectedOS == 'sol'
+                  ? messageExtraSteps
+                  : ''}
               </EuiText>
             </Fragment>
           ),
@@ -1314,6 +1338,9 @@ export const RegisterAgent = withErrorBoundary(
                 </div>
                 <EuiSpacer size='s' />
                 {textAndLinkToCheckConnectionDocumentation}
+                {this.state.selectedOS == 'hp' || this.state.selectedOS == 'sol'
+                  ? messageExtraSteps
+                  : ''}
               </EuiText>
             </Fragment>
           ),
@@ -1344,6 +1371,9 @@ export const RegisterAgent = withErrorBoundary(
                 </div>
                 <EuiSpacer size='s' />
                 {textAndLinkToCheckConnectionDocumentation}
+                {this.state.selectedOS == 'hp' || this.state.selectedOS == 'sol'
+                  ? messageExtraSteps
+                  : ''}
               </EuiText>
             </Fragment>
           ),
@@ -1374,6 +1404,9 @@ export const RegisterAgent = withErrorBoundary(
                 </div>
                 <EuiSpacer size='s' />
                 {textAndLinkToCheckConnectionDocumentation}
+                {this.state.selectedOS == 'hp' || this.state.selectedOS == 'sol'
+                  ? messageExtraSteps
+                  : ''}
               </EuiText>
             </Fragment>
           ),
@@ -1404,6 +1437,9 @@ export const RegisterAgent = withErrorBoundary(
                 </div>
                 <EuiSpacer size='s' />
                 {textAndLinkToCheckConnectionDocumentation}
+                {this.state.selectedOS == 'hp' || this.state.selectedOS == 'sol'
+                  ? messageExtraSteps
+                  : ''}
               </EuiText>
             </Fragment>
           ),
@@ -1420,26 +1456,6 @@ export const RegisterAgent = withErrorBoundary(
             onChange={onChange}
             className={'wz-flex'}
           />
-        );
-      };
-
-      const buttonGroupWithMessage = (
-        legend,
-        options,
-        idSelected,
-        onChange,
-      ) => {
-        return (
-          <>
-            <EuiButtonGroup
-              color='primary'
-              legend={legend}
-              options={options}
-              idSelected={idSelected}
-              onChange={onChange}
-              className={'wz-flex'}
-            />
-          </>
         );
       };
 
@@ -1493,6 +1509,7 @@ export const RegisterAgent = withErrorBoundary(
           }
         }
       };
+      console.log(this.state.selectedOS, 'oss');
 
       const steps = [
         {
@@ -1508,21 +1525,12 @@ export const RegisterAgent = withErrorBoundary(
           ? [
               {
                 title: 'Choose the version',
-                children:
-                  this.state.selectedVersion == 'redhat5' ||
-                  this.state.selectedVersion == 'redhat6'
-                    ? buttonGroupWithMessage(
-                        'Choose the version',
-                        versionButtonsRedHat,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      )
-                    : buttonGroup(
-                        'Choose the version',
-                        versionButtonsRedHat,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      ),
+                children: buttonGroup(
+                  'Choose the version',
+                  versionButtonsRedHat,
+                  this.state.selectedVersion,
+                  version => this.setVersion(version),
+                ),
               },
             ]
           : []),
@@ -1569,21 +1577,12 @@ export const RegisterAgent = withErrorBoundary(
           ? [
               {
                 title: 'Choose the version',
-                children:
-                  this.state.selectedVersion == 'centos5' ||
-                  this.state.selectedVersion == 'centos6'
-                    ? buttonGroupWithMessage(
-                        'Choose the version',
-                        versionButtonsCentos,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      )
-                    : buttonGroup(
-                        'Choose the version',
-                        versionButtonsCentos,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      ),
+                children: buttonGroup(
+                  'Choose the version',
+                  versionButtonsCentos,
+                  this.state.selectedVersion,
+                  version => this.setVersion(version),
+                ),
               },
             ]
           : []),
@@ -1604,23 +1603,12 @@ export const RegisterAgent = withErrorBoundary(
           ? [
               {
                 title: 'Choose the version',
-                children:
-                  this.state.selectedVersion == 'debian7' ||
-                  this.state.selectedVersion == 'debian8' ||
-                  this.state.selectedVersion == 'debian9' ||
-                  this.state.selectedVersion == 'debian10'
-                    ? buttonGroupWithMessage(
-                        'Choose the version',
-                        versionButtonsDebian,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      )
-                    : buttonGroup(
-                        'Choose the version',
-                        versionButtonsDebian,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      ),
+                children: buttonGroup(
+                  'Choose the version',
+                  versionButtonsDebian,
+                  this.state.selectedVersion,
+                  version => this.setVersion(version),
+                ),
               },
             ]
           : []),
@@ -1628,20 +1616,12 @@ export const RegisterAgent = withErrorBoundary(
           ? [
               {
                 title: 'Choose the version',
-                children:
-                  this.state.selectedVersion == 'ubuntu14'
-                    ? buttonGroupWithMessage(
-                        'Choose the version',
-                        versionButtonsUbuntu,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      )
-                    : buttonGroup(
-                        'Choose the version',
-                        versionButtonsUbuntu,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      ),
+                children: buttonGroup(
+                  'Choose the version',
+                  versionButtonsUbuntu,
+                  this.state.selectedVersion,
+                  version => this.setVersion(version),
+                ),
               },
             ]
           : []),
@@ -1709,21 +1689,12 @@ export const RegisterAgent = withErrorBoundary(
           ? [
               {
                 title: 'Choose the version',
-                children:
-                  this.state.selectedVersion == 'solaris10' ||
-                  this.state.selectedVersion == 'solaris11'
-                    ? buttonGroupWithMessage(
-                        'Choose the version',
-                        versionButtonsSolaris,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      )
-                    : buttonGroup(
-                        'Choose the version',
-                        versionButtonsSolaris,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      ),
+                children: buttonGroup(
+                  'Choose the version',
+                  versionButtonsSolaris,
+                  this.state.selectedVersion,
+                  version => this.setVersion(version),
+                ),
               },
             ]
           : []),
@@ -1731,20 +1702,12 @@ export const RegisterAgent = withErrorBoundary(
           ? [
               {
                 title: 'Choose the version',
-                children:
-                  this.state.selectedVersion == '6.1 TL9'
-                    ? buttonGroupWithMessage(
-                        'Choose the version',
-                        versionButtonsAix,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      )
-                    : buttonGroup(
-                        'Choose the version',
-                        versionButtonsAix,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      ),
+                children: buttonGroup(
+                  'Choose the version',
+                  versionButtonsAix,
+                  this.state.selectedVersion,
+                  version => this.setVersion(version),
+                ),
               },
             ]
           : []),
@@ -1752,20 +1715,12 @@ export const RegisterAgent = withErrorBoundary(
           ? [
               {
                 title: 'Choose the version',
-                children:
-                  this.state.selectedVersion == '11.31'
-                    ? buttonGroupWithMessage(
-                        'Choose the version',
-                        versionButtonsHPUX,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      )
-                    : buttonGroup(
-                        'Choose the version',
-                        versionButtonsHPUX,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      ),
+                children: buttonGroup(
+                  'Choose the version',
+                  versionButtonsHPUX,
+                  this.state.selectedVersion,
+                  version => this.setVersion(version),
+                ),
               },
             ]
           : []),
@@ -1959,47 +1914,20 @@ export const RegisterAgent = withErrorBoundary(
               },
             ]
           : []),
-        ...(!(
-          this.state.selectedOS == 'hp' ||
-          this.state.selectedOS == 'sol' ||
-          this.state.selectedOS == 'alpine'
-        )
-          ? [
-              {
-                title: 'Install and enroll the agent',
-                children: this.state.gotErrorRegistrationServiceInfo ? (
-                  calloutErrorRegistrationServiceInfo
-                ) : missingOSSelection.length ? (
-                  <EuiCallOut
-                    color='warning'
-                    title={`Please select the ${missingOSSelection.join(
-                      ', ',
-                    )}.`}
-                    iconType='iInCircle'
-                  />
-                ) : (
-                  <div>{guide}</div>
-                ),
-              },
-            ]
-          : [
-              {
-                title: 'Install the agent',
-                children: this.state.gotErrorRegistrationServiceInfo ? (
-                  calloutErrorRegistrationServiceInfo
-                ) : missingOSSelection.length ? (
-                  <EuiCallOut
-                    color='warning'
-                    title={`Please select the ${missingOSSelection.join(
-                      ', ',
-                    )}.`}
-                    iconType='iInCircle'
-                  />
-                ) : (
-                  <div>{guide}</div>
-                ),
-              },
-            ]),
+        {
+          title: 'Install and enroll the agent',
+          children: this.state.gotErrorRegistrationServiceInfo ? (
+            calloutErrorRegistrationServiceInfo
+          ) : missingOSSelection.length ? (
+            <EuiCallOut
+              color='warning'
+              title={`Please select the ${missingOSSelection.join(', ')}.`}
+              iconType='iInCircle'
+            />
+          ) : (
+            <div>{guide}</div>
+          ),
+        },
         ...(this.state.selectedOS == 'rpm' ||
         this.state.selectedOS == 'cent' ||
         this.state.selectedOS == 'suse' ||
