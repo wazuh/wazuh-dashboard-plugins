@@ -20,9 +20,6 @@ require('./utils/dom-to-image.js');
 // EUI React components wrapper
 import './components';
 
-// angular-charts.js
-import 'angular-chart.js';
-
 // pin-wz-menu.js
 import { changeWazuhNavLogo } from './utils/wz-logo-menu';
 
