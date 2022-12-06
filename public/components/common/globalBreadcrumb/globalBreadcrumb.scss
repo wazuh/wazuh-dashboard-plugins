@@ -1,7 +1,3 @@
-nav.euiBreadcrumbs.wz-global-breadcrumb span.euiBreadcrumb[title=""]:first-child{
-  display: none;
-}
-
 .euiBreadcrumbs--truncate .wz-global-breadcrumb .euiBreadcrumb:not(.euiBreadcrumb--collapsed) span.euiToolTipAnchor{
   max-width: 100%;
   overflow: hidden;
@@ -28,4 +24,11 @@ nav.euiBreadcrumbs.wz-global-breadcrumb span.euiBreadcrumb[title=""]:first-child
   .wz-global-breadcrumb #breadcrumbNoTitle {
     height: auto!important;
   }
+}
+
+// styles for opensearch >2.x
+
+.osdHeaderBreadcrumbs,
+.osdHeaderBreadcrumbs--dark {
+  filter: none;
 }
