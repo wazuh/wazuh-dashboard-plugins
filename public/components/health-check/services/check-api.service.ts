@@ -33,11 +33,24 @@ const trySetDefault = async (checkLogger: CheckLogger) => {
             return hosts[i].id;
           }
         } catch (err) {
-          checkLogger.info(`Could not connect to API id [${hosts[i].id}]: ${err.message || err}`);
-          errors.push(`Could not connect to API id [${hosts[i].id}]: ${err.message || err}`);
+          checkLogger.info(
+            `Could not connect to API id [${hosts[i].id}]: ${
+              err.message || err
+            }`,
+          );
+          errors.push(
+            `Could not connect to API id [${hosts[i].id}]: ${
+              err.message || err
+            }`,
+          );
         }
       }
       if (errors.length) {
+        if (errors[0].includes('ERROR3099 - 405: Method Not Allowed')) {
+          return Promise.reject(
+            'No API available to connect. This may be related to a version mismatch between Wazuh Server and Wazuh Kibana plugin. Please check the versions and try again.',
+          );
+        }
         return Promise.reject('No API available to connect');
       }
     }
@@ -48,11 +61,13 @@ const trySetDefault = async (checkLogger: CheckLogger) => {
   }
 };
 
-export const checkApiService = (appInfo: any) => async (checkLogger: CheckLogger) => {
+export const checkApiService = (appInfo: any) => async (
+  checkLogger: CheckLogger,
+) => {
   let apiChanged = false;
   try {
     let currentApi = JSON.parse(AppState.getCurrentAPI() || '{}');
-    if(!currentApi.id){
+    if (!currentApi.id) {
       checkLogger.info(`No current API selected`);
       currentApi.id = await trySetDefault(checkLogger);
       apiChanged = true;
@@ -60,8 +75,12 @@ export const checkApiService = (appInfo: any) => async (checkLogger: CheckLogger
 
     checkLogger.info(`Current API id [${currentApi.id}]`);
     checkLogger.info(`Checking current API id [${currentApi.id}]...`);
-    const data = await ApiCheck.checkStored(currentApi.id).catch(async (err) => {
-      checkLogger.info(`Current API id [${currentApi.id}] has some problem: ${err.message || err}`);
+    const data = await ApiCheck.checkStored(currentApi.id).catch(async err => {
+      checkLogger.info(
+        `Current API id [${currentApi.id}] has some problem: ${
+          err.message || err
+        }`,
+      );
       const newApi = await trySetDefault(checkLogger);
       if (newApi.error) {
         return { error: newApi.error };
@@ -75,7 +94,9 @@ export const checkApiService = (appInfo: any) => async (checkLogger: CheckLogger
       const api = ((data || {}).data || {}).data || {};
       const name = (api.cluster_info || {}).manager || false;
       AppState.setCurrentAPI(JSON.stringify({ name: name, id: api.id }));
-      checkLogger.info(`Set current API in cookie: id [${api.id}], name [${name}]`);
+      checkLogger.info(
+        `Set current API in cookie: id [${api.id}], name [${name}]`,
+      );
       getToasts().add({
         color: 'warning',
         title: 'Selected Wazuh API has been updated',
@@ -93,10 +114,12 @@ export const checkApiService = (appInfo: any) => async (checkLogger: CheckLogger
       checkLogger.error('Wazuh not ready yet');
     } else if (data.data.error || data.data.data.apiIsDown) {
       const errorMessage = data.data.data.apiIsDown
-      ? 'Wazuh API is down'
-      : `Error connecting to the API: ${
-          data.data.error && data.data.error.message ? ` ${data.data.error.message}` : ''
-        }`;
+        ? 'Wazuh API is down'
+        : `Error connecting to the API: ${
+            data.data.error && data.data.error.message
+              ? ` ${data.data.error.message}`
+              : ''
+          }`;
       checkLogger.error(errorMessage);
     }
   } catch (error) {
