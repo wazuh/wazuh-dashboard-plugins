@@ -372,6 +372,14 @@ export const RegisterAgent = withErrorBoundary(
 
     agentNameVariable() {
       let agentName = `WAZUH_AGENT_NAME='${this.state.agentName}' `;
+      if (
+        this.state.selectedOS === 'macos' &&
+        this.state.selectedArchitecture &&
+        this.state.agentName !== ''
+      ) {
+        return agentName.replace(/=/g, ' ');
+      }
+
       if (this.state.selectedArchitecture && this.state.agentName !== '') {
         return agentName;
       } else {
