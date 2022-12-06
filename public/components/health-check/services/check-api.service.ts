@@ -48,7 +48,7 @@ const trySetDefault = async (checkLogger: CheckLogger) => {
       if (errors.length) {
         if (errors[0].includes('ERROR3099 - 405: Method Not Allowed')) {
           return Promise.reject(
-            'No API available to connect. This may be related to a version mismatch between Wazuh Server and Wazuh Kibana plugin. Please check the versions and try again.',
+            'No API available to connect. This may be related to a version mismatch between Wazuh Server and Wazuh Dashboard. Please check the versions and try again.',
           );
         }
         return Promise.reject('No API available to connect');
