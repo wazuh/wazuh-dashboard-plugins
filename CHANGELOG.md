@@ -19,6 +19,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added powerPC architecture in redhat7, in the section 'Deploy new agent'. [4833](https://github.com/wazuh/wazuh-kibana-app/pull/4833)
 - Added a centralized service to handle the requests [#4831](https://github.com/wazuh/wazuh-kibana-app/pull/4831)
 - Added data-test-subj create policy [#4873](https://github.com/wazuh/wazuh-kibana-app/pull/4873)
+- Deploy new agent section: Added extra steps message and new command for windows xp and windows server 2008, added alpine agent with all its steps. [#4979](https://github.com/wazuh/wazuh-kibana-app/pull/4979)
 
 ### Changed
 
@@ -32,7 +33,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added cluster's IP and protocol as suggestions in the agent deployment wizard. [#4776](https://github.com/wazuh/wazuh-kibana-app/pull/4776)
 - Show OS name and OS version in the agent installation wizard. [#4851](https://github.com/wazuh/wazuh-kibana-app/pull/4851)
 - Changed the endpoint that updates the plugin configuration to support multiple settings. [#4501](https://github.com/wazuh/wazuh-kibana-app/pull/4501)
-- Added extra steps message and new command for windows xp and windows server 2008, added alpine agent with all its steps. [#4979](https://github.com/wazuh/wazuh-kibana-app/pull/4979)
 
 ### Fixed
 
@@ -45,7 +45,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed pagination to SCA table [#4653](https://github.com/wazuh/wazuh-kibana-app/issues/4653)
 - Fixed WAZUH_PROTOCOL param suggestion [#4849](https://github.com/wazuh/wazuh-kibana-app/pull/4849)
 - Raspbian OS, Ubuntu, Amazon Linux and Amazon Linux 2 commands in the wizard deploy agent now change when a different architecture is selected [#4876](https://github.com/wazuh/wazuh-kibana-app/pull/4876) [#4880](https://github.com/wazuh/wazuh-kibana-app/pull/4880)
-- Fixed the agents wizard OS styles and their versions. [#4832](https://github.com/wazuh/wazuh-kibana-app/pull/4832) [#4838](https://github.com/wazuh/wazuh-kibana-app/pull/4838)
+- Deploy new agent section: Fixed the agents wizard OS styles and their versions. [#4832](https://github.com/wazuh/wazuh-kibana-app/pull/4832) [#4838](https://github.com/wazuh/wazuh-kibana-app/pull/4838)
 - Fixed the way macos versions and architectures were displayed, fixed the way agents were displayed, fixed the way ubuntu versions were displayed. [#4979](https://github.com/wazuh/wazuh-kibana-app/pull/4979)
 
 ## Wazuh v4.3.10 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4311
