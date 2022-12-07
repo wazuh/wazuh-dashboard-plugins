@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component, Fragment, useState } from 'react';
+import React, { Component, Fragment } from 'react';
 import { version } from '../../../../package.json';
 import { WazuhConfig } from '../../../react-services/wazuh-config';
 import {
@@ -304,7 +304,6 @@ export const RegisterAgent = withErrorBoundary(
     }
 
     setVersion(selectedVersion) {
-      console.log(selectedVersion, 'sel');
       this.setState({ selectedVersion, selectedArchitecture: '' });
     }
 
