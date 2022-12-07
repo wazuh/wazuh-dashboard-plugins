@@ -822,7 +822,7 @@ export class WazuhApiCtrl {
             { params: params },
             { apiHostID: request.body.id }
           );
-          itemsArray.push(...tmpData.dataHTTP_STATUS_CODES.SERVICE_UNAVAILABLE.data.affected_items);
+          itemsArray.push(...tmpData.data.data.affected_items);
         }
       }
 
