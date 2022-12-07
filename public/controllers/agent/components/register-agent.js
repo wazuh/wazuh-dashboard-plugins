@@ -1164,6 +1164,27 @@ apk add wazuh-agent`,
                     </span>
                   }
                 ></EuiCallOut>
+              ) : this.state.selectedVersion == '3.12.12' ? (
+                <EuiCallOut
+                  color='warning'
+                  className='message'
+                  iconType='iInCircle'
+                  title={
+                    <span>
+                      Might require some extra installation{' '}
+                      <EuiLink
+                        target='_blank'
+                        href={webDocumentationLink(
+                          'installation-guide/wazuh-agent/wazuh-agent-package-linux.html',
+                          appVersionMajorDotMinor,
+                        )}
+                      >
+                        steps
+                      </EuiLink>
+                      .
+                    </span>
+                  }
+                ></EuiCallOut>
               ) : this.state.selectedVersion == 'debian7' ||
                 this.state.selectedVersion == 'debian8' ||
                 this.state.selectedVersion == 'debian9' ||
@@ -1985,7 +2006,8 @@ apk add wazuh-agent`,
         this.state.selectedOS == 'sol' ||
         this.state.selectedOS == 'aix' ||
         this.state.selectedOS == 'hp' ||
-        this.state.selectedOS == 'alpine'
+        this.state.selectedOS == 'alpine' ||
+        this.state.selectedOS == ''
           ? [
               {
                 title: 'Start the agent',
