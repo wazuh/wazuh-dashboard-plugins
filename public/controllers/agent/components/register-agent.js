@@ -75,6 +75,7 @@ import {
   getConnectionConfig,
   fetchClusterNodesOptions,
 } from './register-agent-service';
+import './register-agent.scss';
 import { WzAccordion, PrincipalButtonGroup } from './wz-accordion';
 
 export const RegisterAgent = withErrorBoundary(
@@ -1298,7 +1299,8 @@ export const RegisterAgent = withErrorBoundary(
             options={options}
             idSelected={idSelected}
             onChange={onChange}
-            className={'osButtonsStyle'}
+            // className={'osButtonsStyle'}
+            className={'wz-flex'}
           />
         );
       };
