@@ -22,7 +22,7 @@ export const PrincipalButtonGroup = ({
         options={options}
         idSelected={idSelected}
         onChange={onChange}
-        className={'osButtonsStyle'}
+        className={'wz-flex'}
       />
       <EuiSpacer size='l' />
       <WzAccordion>
@@ -32,7 +32,7 @@ export const PrincipalButtonGroup = ({
           options={osButtons}
           idSelected={idSelected}
           onChange={onChange}
-          className={'osButtonsStyle'}
+          className={'wz-flex'}
         />
       </WzAccordion>
     </>

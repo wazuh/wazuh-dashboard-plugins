@@ -1426,6 +1426,27 @@ apk add wazuh-agent`,
                   </span>
                 }
               ></EuiCallOut>
+            ) : this.state.selectedVersion == '3.12.12' ? (
+              <EuiCallOut
+                color='warning'
+                className='message'
+                iconType='iInCircle'
+                title={
+                  <span>
+                    Might require some extra installation{' '}
+                    <EuiLink
+                      target='_blank'
+                      href={webDocumentationLink(
+                        'installation-guide/wazuh-agent/wazuh-agent-package-linux.html',
+                        appVersionMajorDotMinor,
+                      )}
+                    >
+                      steps
+                    </EuiLink>
+                    .
+                  </span>
+                }
+              ></EuiCallOut>
             ) : this.state.selectedVersion == 'debian7' ||
               this.state.selectedVersion == 'debian8' ||
               this.state.selectedVersion == 'debian9' ||
@@ -1465,7 +1486,7 @@ apk add wazuh-agent`,
             options={options}
             idSelected={idSelected}
             onChange={onChange}
-            className={'osButtonsStyleMac'}
+            // className={'osButtonsStyleMac'}
           />
         );
       };
@@ -1782,12 +1803,20 @@ apk add wazuh-agent`,
           ? [
               {
                 title: 'Choose the version',
-                children: buttonGroup(
-                  'Choose the version',
-                  versionButtonAlpine,
-                  this.state.selectedVersion,
-                  version => this.setVersion(version),
-                ),
+                children:
+                  this.state.selectedVersion == '3.12.12'
+                    ? buttonGroupWithMessage(
+                        'Choose the version',
+                        versionButtonAlpine,
+                        this.state.selectedVersion,
+                        version => this.setVersion(version),
+                      )
+                    : buttonGroup(
+                        'Choose the version',
+                        versionButtonAlpine,
+                        this.state.selectedVersion,
+                        version => this.setVersion(version),
+                      ),
               },
             ]
           : []),
