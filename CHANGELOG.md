@@ -2,6 +2,22 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.3.11 - OpenSearch Dashboards 2.4.0 - Revision 4312
+
+### Fixed
+
+- Changed breadcrumb styling to support OpenSearch dashboard 2.x. [8dd590e1528872e3d72158c041ff0d9a059f9969](https://github.com/wazuh/wazuh-kibana-app/commit/8dd590e1528872e3d72158c041ff0d9a059f9969)
+- Fixed a bug that caused the flyouts to close when clicking inside them [373653faae1735247b109391d49f16fc8bf0258a](https://github.com/wazuh/wazuh-kibana-app/commit/373653faae1735247b109391d49f16fc8bf0258a)
+- Fixed server errors with code 500 when the Wazuh API is not reachable / up [2e987e4031b4b4a60e6fc5edcce305da2fd3a642](https://github.com/wazuh/wazuh-kibana-app/commit/2e987e4031b4b4a60e6fc5edcce305da2fd3a642) [8b549603159c8a2adf304865f485af6630001b1b](https://github.com/wazuh/wazuh-kibana-app/commit/8b549603159c8a2adf304865f485af6630001b1b)
+
+### Changed
+- Updated `winston` dependency to 3.5.1 [d12ca53d939ef15534bb44c78753ab1b6d651cae](https://github.com/wazuh/wazuh-kibana-app/commit/d12ca53d939ef15534bb44c78753ab1b6d651cae)
+
+### Removed
+- Removed custom styles from kibana 7.9.0 [19135bbfae31a16c9bb10945c1768b9bb9c1c91e](https://github.com/wazuh/wazuh-kibana-app/commit/19135bbfae31a16c9bb10945c1768b9bb9c1c91e)
+- Removed `angular-chart.js` dependency [a45ad9894649d6a6ed7928199de8af705e751e68](https://github.com/wazuh/wazuh-kibana-app/commit/a45ad9894649d6a6ed7928199de8af705e751e68)
+
+
 ## Wazuh v4.3.10 - OpenSearch Dashboards 1.2.0 - Revision 4311
 
 ### Fixed
