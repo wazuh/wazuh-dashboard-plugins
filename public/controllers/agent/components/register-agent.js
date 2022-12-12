@@ -291,10 +291,6 @@ export const RegisterAgent = withErrorBoundary(
       this.setState({ agentName: event.target.value });
     }
 
-    setAgentName(event) {
-      this.setState({ agentName: event.target.value });
-    }
-
     setGroupName(selectedGroup) {
       this.setState({ selectedGroup });
     }
