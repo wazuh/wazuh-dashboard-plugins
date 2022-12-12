@@ -353,7 +353,7 @@ export const RegisterAgent = withErrorBoundary(
       }
 
       if (this.state.udpProtocol) {
-        deployment += `WAZUH_PROTOCOL='UDP' `;
+        deployment += "WAZUH_PROTOCOL='UDP' ";
       }
 
       if (this.state.selectedGroup.length) {
@@ -415,17 +415,17 @@ export const RegisterAgent = withErrorBoundary(
         `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
       ) {
         case '3.12.12-i386':
-          return `https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && \echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"`;
+          return 'https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"';
         case '3.12.12-aarch64':
-          return `https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && \echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"`;
+          return 'https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"';
         case '3.12.12-x86_64':
-          return `https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && \echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"`;
+          return 'https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"';
         case '3.12.12-armhf':
-          return `https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && \echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"`;
+          return 'https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"';
         case '3.12.12-powerpc':
-          return `https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && \echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"`;
+          return 'https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"';
         default:
-          return `https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && \echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"`;
+          return 'https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"';
       }
     }
 
@@ -858,7 +858,11 @@ export const RegisterAgent = withErrorBoundary(
       const textAndLinkToCheckConnectionDocumentation = (
         <p>
           To verify the connection with the Wazuh server, please follow this{' '}
-          <a href={urlCheckConnectionDocumentation} target='_blank'>
+          <a
+            href={urlCheckConnectionDocumentation}
+            target='_blank'
+            rel='noreferrer'
+          >
             document.
           </a>
         </p>
@@ -988,7 +992,7 @@ apk add wazuh-agent`,
       const windowsAdvice = this.state.selectedOS === 'win' && (
         <>
           <EuiCallOut title='Requirements' iconType='iInCircle'>
-            <ul class='wz-callout-list'>
+            <ul className='wz-callout-list'>
               <li>
                 <span>
                   You will need administrator privileges to perform this
@@ -1338,7 +1342,7 @@ apk add wazuh-agent`,
             options={options}
             idSelected={idSelected}
             onChange={onChange}
-            className={'osButtonsStyle'}
+            className={'wz-flex'}
           />
         );
       };
@@ -1360,8 +1364,8 @@ apk add wazuh-agent`,
               className={'wz-flex'}
             />
 
-            {this.state.selectedVersion == 'solaris10' ||
-            this.state.selectedVersion == 'solaris11' ? (
+            {this.state.selectedVersion === 'solaris10' ||
+            this.state.selectedVersion === 'solaris11' ? (
               <EuiCallOut
                 color='warning'
                 className='message'
@@ -1382,7 +1386,7 @@ apk add wazuh-agent`,
                   </span>
                 }
               ></EuiCallOut>
-            ) : this.state.selectedVersion == '6.1 TL9' ? (
+            ) : this.state.selectedVersion === '6.1 TL9' ? (
               <EuiCallOut
                 color='warning'
                 className='message'
@@ -1424,7 +1428,7 @@ apk add wazuh-agent`,
                   </span>
                 }
               ></EuiCallOut>
-            ) : this.state.selectedVersion == '3.12.12' ? (
+            ) : this.state.selectedVersion === '3.12.12' ? (
               <EuiCallOut
                 color='warning'
                 className='message'
@@ -1484,7 +1488,6 @@ apk add wazuh-agent`,
             options={options}
             idSelected={idSelected}
             onChange={onChange}
-            className={'osButtonsStyleMac'}
           />
         );
       };
@@ -2142,7 +2145,7 @@ apk add wazuh-agent`,
             <EuiPageBody>
               <EuiFlexGroup>
                 <EuiFlexItem>
-                  <EuiPanel>
+                  <EuiPanel style={{ background: 'transparent' }}>
                     <EuiFlexGroup>
                       <EuiFlexItem>
                         <EuiTitle>
