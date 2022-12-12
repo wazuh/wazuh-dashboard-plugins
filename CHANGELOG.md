@@ -32,6 +32,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added cluster's IP and protocol as suggestions in the agent deployment wizard. [#4776](https://github.com/wazuh/wazuh-kibana-app/pull/4776)
 - Show OS name and OS version in the agent installation wizard. [#4851](https://github.com/wazuh/wazuh-kibana-app/pull/4851)
 - Changed the endpoint that updates the plugin configuration to support multiple settings. [#4501](https://github.com/wazuh/wazuh-kibana-app/pull/4501)
+- Added extra steps message and new command for windows xp and windows server 2008, added alpine agent with all its steps. [#4979](https://github.com/wazuh/wazuh-kibana-app/pull/4979)
 
 ### Fixed
 
@@ -45,6 +46,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed WAZUH_PROTOCOL param suggestion [#4849](https://github.com/wazuh/wazuh-kibana-app/pull/4849)
 - Raspbian OS, Ubuntu, Amazon Linux and Amazon Linux 2 commands in the wizard deploy agent now change when a different architecture is selected [#4876](https://github.com/wazuh/wazuh-kibana-app/pull/4876) [#4880](https://github.com/wazuh/wazuh-kibana-app/pull/4880)
 - Fixed the agents wizard OS styles and their versions. [#4832](https://github.com/wazuh/wazuh-kibana-app/pull/4832) [#4838](https://github.com/wazuh/wazuh-kibana-app/pull/4838)
+- Fixed the way macos versions and architectures were displayed, fixed the way agents were displayed, fixed the way ubuntu versions were displayed. [#4979](https://github.com/wazuh/wazuh-kibana-app/pull/4979)
 
 ## Wazuh v4.3.10 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4311
 
@@ -68,7 +70,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
-- Wazuh.yml review: fixed link to web documentation, improved in-file documentation and fixed some grammatical errors. [#4378](https://github.com/wazuh/wazuh-kibana-app/pull/4378) [#4399](https://github.com/wazuh/wazuh-kibana-app/pull/4399) 
+- Wazuh.yml review: fixed link to web documentation, improved in-file documentation and fixed some grammatical errors. [#4378](https://github.com/wazuh/wazuh-kibana-app/pull/4378) [#4399](https://github.com/wazuh/wazuh-kibana-app/pull/4399)
 - Fixed an error during the generation of a group's report, if the request to the Wazuh API fails [#4350](https://github.com/wazuh/wazuh-kibana-app/pull/4350)
 - Fixed a problem with the group's report, when the group has no agents [#4350](https://github.com/wazuh/wazuh-kibana-app/pull/4350)
 - Fixed path in logo customization section [#4352](https://github.com/wazuh/wazuh-kibana-app/pull/4352)
