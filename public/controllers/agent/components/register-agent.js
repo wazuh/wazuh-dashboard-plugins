@@ -304,7 +304,6 @@ export const RegisterAgent = withErrorBoundary(
     }
 
     setVersion(selectedVersion) {
-      console.log(selectedVersion, 'sel');
       this.setState({ selectedVersion, selectedArchitecture: '' });
     }
 
