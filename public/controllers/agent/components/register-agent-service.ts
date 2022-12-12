@@ -18,6 +18,23 @@ type RemoteConfig = {
 };
 
 /**
+ * Get the cluster status
+ */
+export const custerStatusResponse = async (): Promise<boolean> => {
+  const clusterStatus = await WzRequest.apiReq('GET', '/cluster/status', {});
+  if (
+    clusterStatus.data.data.enabled === 'yes' &&
+    clusterStatus.data.data.running === 'yes'
+  ) {
+    // Cluster mode
+    return true;
+  } else {
+    // Manager mode
+    return false;
+  }
+};
+
+/**
  * Get the remote configuration from api
  */
 async function getRemoteConfiguration(
@@ -28,11 +45,21 @@ async function getRemoteConfiguration(
     isUdp: null,
     haveSecureConnection: null,
   };
-  const result = await WzRequest.apiReq(
-    'GET',
-    `/cluster/${nodeName}/configuration/request/remote`,
-    {},
-  );
+  const clusterStatus = await custerStatusResponse();
+  let result;
+  if (clusterStatus) {
+    result = await WzRequest.apiReq(
+      'GET',
+      `/cluster/${nodeName}/configuration/request/remote`,
+      {},
+    );
+  } else {
+    result = await WzRequest.apiReq(
+      'GET',
+      '/manager/configuration/request/remote',
+      {},
+    );
+  }
   const items = ((result.data || {}).data || {}).affected_items || [];
   const remote = items[0]?.remote;
   if (remote) {
@@ -60,7 +87,7 @@ async function getRemoteConfiguration(
 
 /**
  * Get the remote protocol available from list of protocols
- * @param protocols 
+ * @param protocols
  */
 function getRemoteProtocol(protocols: Protocol[]) {
   if (protocols.length === 1) {
@@ -73,8 +100,8 @@ function getRemoteProtocol(protocols: Protocol[]) {
 
 /**
  * Get the remote configuration from nodes registered in the cluster and decide the protocol to setting up in deploy agent param
- * @param nodeSelected 
- * @param defaultServerAddress 
+ * @param nodeSelected
+ * @param defaultServerAddress
  */
 async function getConnectionConfig(nodeSelected: ServerAddressOptions, defaultServerAddress?: string) {
   const nodeName = nodeSelected?.label;
@@ -111,6 +138,15 @@ export const getNodeIPs = async (): Promise<any> => {
   return await WzRequest.apiReq('GET', '/cluster/nodes', {});
 };
 
+export const getManagerNode = async (): Promise<any> => {
+  const managerNode = await WzRequest.apiReq('GET', '/manager/api/config', {});
+  return managerNode.data.data.affected_items.map(item => ({
+    label: item.node_name,
+    value: item.node_api_config.host,
+    nodetype: 'master',
+  }));
+};
+
 /**
  * Parse the nodes list from the API response to a format that can be used by the EuiComboBox
  * @param nodes
@@ -127,16 +163,30 @@ export const parseNodesInOptions = (nodes: NodeResponse): ServerAddressOptions[]
  * Get the list of the cluster nodes from API and parse it into a list of options
  */
 export const fetchClusterNodesOptions = async (): Promise<ServerAddressOptions[]> => {
-  const nodes = await getNodeIPs();
-  return parseNodesInOptions(nodes);
-}
+  const clusterStatus = await custerStatusResponse();
+  if (clusterStatus) {
+    // Cluster mode
+    // Get the cluster nodes
+    const nodes = await getNodeIPs();
+    return parseNodesInOptions(nodes);
+  } else {
+    // Manager mode
+    // Get the manager node
+    return await getManagerNode();
+  }
+};
 
 /**
  * Get the master node data from the list of cluster nodes
  * @param nodeIps
  */
-export const getMasterNode = (nodeIps: ServerAddressOptions[]): ServerAddressOptions[] => {
-  return nodeIps.filter((nodeIp) => nodeIp.nodetype === 'master');
+export const getMasterNode = async (nodeIps: ServerAddressOptions[]): ServerAddressOptions[] => {
+  const clusterStatus = await custerStatusResponse();
+  if (clusterStatus) {
+    return nodeIps.filter((nodeIp) => nodeIp.nodetype === 'master');
+  } else {
+    return nodeIps;
+  }
 };
 
 
