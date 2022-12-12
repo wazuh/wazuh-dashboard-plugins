@@ -734,7 +734,7 @@ export const RegisterAgent = withErrorBoundary(
         </p>
       );
       const missingOSSelection = this.checkMissingOSSelection();
-      
+
 
       const agentName = (
         <EuiFieldText
@@ -756,7 +756,7 @@ export const RegisterAgent = withErrorBoundary(
           )}
         </>
       );
-      
+
 
 
       const agentGroup = (
@@ -887,7 +887,7 @@ export const RegisterAgent = withErrorBoundary(
               />
             )}
             <EuiSpacer />
-          </EuiText>) : (this.state.connectionSecure === false) ? 
+          </EuiText>) : (this.state.connectionSecure === false) ?
           (
             <EuiText>
             <p>
@@ -1204,9 +1204,9 @@ export const RegisterAgent = withErrorBoundary(
             })
           }
         }
-          
+
       }
-      
+
 
       const steps = [
         {
@@ -1460,7 +1460,7 @@ export const RegisterAgent = withErrorBoundary(
           children: <Fragment>
             <ServerAddress
               defaultValue={this.state.defaultServerAddress}
-              onChange={onChangeServerAddress} 
+              onChange={onChangeServerAddress}
               fetchOptions={fetchClusterNodesOptions}/>
             </Fragment>,
         },
