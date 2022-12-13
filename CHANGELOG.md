@@ -19,7 +19,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added powerPC architecture in redhat7, in the section 'Deploy new agent'. [4833](https://github.com/wazuh/wazuh-kibana-app/pull/4833)
 - Added a centralized service to handle the requests [#4831](https://github.com/wazuh/wazuh-kibana-app/pull/4831)
 - Added data-test-subj create policy [#4873](https://github.com/wazuh/wazuh-kibana-app/pull/4873)
-- Added export logs validation when is empty [#4972](https://github.com/wazuh/wazuh-kibana-app/pull/4972)
 
 ### Changed
 
@@ -33,6 +32,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added cluster's IP and protocol as suggestions in the agent deployment wizard. [#4776](https://github.com/wazuh/wazuh-kibana-app/pull/4776)
 - Show OS name and OS version in the agent installation wizard. [#4851](https://github.com/wazuh/wazuh-kibana-app/pull/4851)
 - Changed the endpoint that updates the plugin configuration to support multiple settings. [#4501](https://github.com/wazuh/wazuh-kibana-app/pull/4501)
+- The button to export the app logs is now disabled when there are no results, instead of showing a error toast [#4972](https://github.com/wazuh/wazuh-kibana-app/pull/4972)
 
 ### Fixed
 
