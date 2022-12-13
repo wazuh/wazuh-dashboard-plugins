@@ -109,8 +109,8 @@ export const RegisterAgent = withErrorBoundary(
         deb: this.systemSelector(),
         ubu: this.systemSelector(),
         oraclelinux: this.systemSelector(),
-        macos: 'sudo /Library/Ossec/bin/wazuh-control start',
-        win: 'NET START WazuhSvc',
+        macos: this.systemSelectorWazuhControlMacos(),
+        win: this.systemSelectorNet(),
       };
     }
 
@@ -256,7 +256,7 @@ export const RegisterAgent = withErrorBoundary(
         this.state.selectedVersion === 'windowsserver2008' ||
         this.state.selectedVersion === 'windows7'
       ) {
-        return 'update-rc.d wazuh-agent defaults && service wazuh-agent start';
+        return 'NET START WazuhSvc';
       }
     }
 
@@ -286,10 +286,6 @@ export const RegisterAgent = withErrorBoundary(
 
     setServerAddress(serverAddress) {
       this.setState({ serverAddress });
-    }
-
-    setAgentName(event) {
-      this.setState({ agentName: event.target.value });
     }
 
     setAgentName(event) {
@@ -2065,7 +2061,6 @@ apk add wazuh-agent`,
               },
             ]
           : []),
-
         ...(!missingOSSelection.length &&
         this.state.selectedOS !== 'rpm' &&
         this.state.selectedOS !== 'deb' &&
