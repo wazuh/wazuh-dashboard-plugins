@@ -32,6 +32,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added cluster's IP and protocol as suggestions in the agent deployment wizard. [#4776](https://github.com/wazuh/wazuh-kibana-app/pull/4776)
 - Show OS name and OS version in the agent installation wizard. [#4851](https://github.com/wazuh/wazuh-kibana-app/pull/4851)
 - Changed the endpoint that updates the plugin configuration to support multiple settings. [#4501](https://github.com/wazuh/wazuh-kibana-app/pull/4501)
+- Updated the `winston` dependency to `3.5.1` [#4985](https://github.com/wazuh/wazuh-kibana-app/pull/4985)
 
 ### Fixed
 
@@ -49,6 +50,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Removed
 
 - Removed custom styles from kibana 7.9.0 [#4491](https://github.com/wazuh/wazuh-kibana-app/pull/4491)
+- Removed the `angular-chart.js` dependency [#4985](https://github.com/wazuh/wazuh-kibana-app/pull/4985)
 
 ## Wazuh v4.3.10 - OpenSearch Dashboards 1.2.0 - Revision 4311
 
