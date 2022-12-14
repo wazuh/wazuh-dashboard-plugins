@@ -6,7 +6,7 @@ import React from 'react';
 import { CASES_SEARCHBAR } from './wz-search-bar.test-cases';
 
 const getSuggestionsFilters = async (field, value, filters = {}) => {
-  // here is returned filter to call api and get sugguestions
+  // here is returned filter to call api and get suggestions
   return Promise.resolve([]);
 };
 
@@ -152,7 +152,7 @@ describe('WzSearchBar', () => {
         });
 
         inputs.forEach((filterText, index) => {
-          // check all badgets created
+          // check all badges created
           expect(getByTestId(`${WZ_SEARCH_BADGE_NAME}-${index}`)).toHaveTextContent(filterText);
           expect(getByText(filterText)).toBeInTheDocument();
         });
