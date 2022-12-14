@@ -1,0 +1,51 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+# ESLint is a tool for identifying and reporting on patterns
+# found in ECMAScript/JavaScript code.
+# More details at https://github.com/eslint/eslint
+# and https://eslint.org
+
+name: ESLint
+
+on:
+  push:
+    branches: [ "master", "*.*-*.*", "*.*-*.*-wzd", "[0-9].[0-9]+" ]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [ "*.*-*.*", "*.*-*.*-wzd", "[0-9].[0-9]+" ]
+
+jobs:
+  eslint:
+    name: Run eslint scanning
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+
+    steps:
+
+      # https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # - https://github.com/actions/setup-node/blob/main/docs/advanced-usage.md#node-version-file
+      - name: Install ESLint
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: '.nvmrc'
+      - run: yarn
+
+      - name: Run ESLint
+        run: yarn lint >> eslint-results.log
+        continue-on-error: true
+
+      # https://github.com/marketplace/actions/upload-a-build-artifact
+      - name: Upload analysis results to GitHub
+        uses: actions/upload-artifact@v3
+        with:
+          name: eslint-results
+          path: eslint-results.log
+          retention-days: 5
