@@ -52,7 +52,7 @@ import store from './redux/store';
 import { updateCurrentPlatform } from './redux/actions/appStateActions';
 import { WzAuthentication, loadAppConfig } from './react-services';
 
-import { getAngularModule } from './kibana-services';
+import { getAngularModule, getHttp } from './kibana-services';
 import { addHelpMenuToAppChrome } from './utils';
 
 const app = getAngularModule();
@@ -107,9 +107,6 @@ app.run(['$rootElement', function ($rootElement) {
   // Add plugin help links as extension to plugin platform help menu
   addHelpMenuToAppChrome();
 
-  
-  const urlToLogout = window.location.origin + '/logout';
-
   // Bind deleteExistentToken on Log out component.
   $('.euiHeaderSectionItem__button, .euiHeaderSectionItemButton').on('mouseleave', function () {
     // opendistro
@@ -119,14 +116,14 @@ app.run(['$rootElement', function ($rootElement) {
     // x-pack
     $('a:contains(Log out)').on('click', function (event) {
       // Override href's behaviour and navigate programatically
-      // to '/logout' once the token has been deleted.
+      // to the logout path once the token has been deleted.
       event.preventDefault();
       WzAuthentication.deleteExistentToken()
         .catch((err) => {
           console.error('[ERROR] - User token could not be deprecated - ', err);
         })
         .finally(() => {
-          window.location = urlToLogout;
+          window.location = event.currentTarget.href;        
         });
     });
   });

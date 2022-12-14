@@ -43,8 +43,10 @@ export const ChartDonut = (props : ChartDonutProps) => {
   const TooltipContent = ({ data }) => {
     const borderStyle = { borderLeft: `2px solid ${data.color}` };
     return (
-      <div style={borderStyle}>
-        <p style={{ marginLeft: '5px', fontSize: '0.8rem' }}>{data.label}: {data.value}</p>
+      <div className="echTooltip__list">
+        <div style={borderStyle}>
+          <p style={{ marginLeft: '5px', fontSize: '0.8rem' }}>{data.label}: {data.value}</p>
+        </div>
       </div>
     )
   }
@@ -53,7 +55,7 @@ export const ChartDonut = (props : ChartDonutProps) => {
   const onEnter = () => {
     tooltip = d3.select("body")
       .append("div")
-      .attr("class", "wz-chart-tooltip visTooltip");
+      .attr("class", "wz-chart-tooltip visTooltip echTooltip");
   }
 
   const onMove = (d) => {

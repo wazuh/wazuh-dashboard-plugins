@@ -41,6 +41,7 @@ import { withErrorBoundary } from '../../../components/common/hocs';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
+import { webDocumentationLink } from '../../../../common/services/web_documentation';
 
 const architectureButtons = [
   {
@@ -60,7 +61,7 @@ const architectureButtons = [
     label: 'aarch64',
   },
 ];
-const architectureCentos5 = [
+const architectureCentos5OrRedHat5 = [
   {
     id: 'i386',
     label: 'i386',
@@ -71,7 +72,7 @@ const architectureCentos5 = [
   },
 ];
 
-const versionButtonsCentos = [
+const versionButtonsCentosOrRedHat = [
   {
     id: 'centos5',
     label: 'CentOS5',
@@ -79,6 +80,14 @@ const versionButtonsCentos = [
   {
     id: 'centos6',
     label: 'CentOS6 or higher',
+  },
+  {
+    id: 'redhat5',
+    label: 'Red Hat 5',
+  },
+  {
+    id: 'redhat6',
+    label: 'Red Hat 6 or higher',
   },
 ];
 
@@ -169,9 +178,9 @@ export const RegisterAgent = withErrorBoundary(
           serverAddress,
           needsPassword,
           hidePasswordInput,
-          versionButtonsCentos,
+          versionButtonsCentosOrRedHat,
           architectureButtons,
-          architectureCentos5,
+          architectureCentos5OrRedHat5,
           wazuhPassword,
           udpProtocol,
           wazuhVersion,
@@ -324,6 +333,10 @@ export const RegisterAgent = withErrorBoundary(
           return `https://packages.wazuh.com/4.x/yum5/i386/wazuh-agent-${this.state.wazuhVersion}-1.el5.i386.rpm`;
         case 'centos5-x86_64':
           return `https://packages.wazuh.com/4.x/yum5/x86_64/wazuh-agent-${this.state.wazuhVersion}-1.el5.x86_64.rpm`;
+        case 'redhat5-i386':
+          return `https://packages.wazuh.com/4.x/yum5/i386/wazuh-agent-${this.state.wazuhVersion}-1.el5.i386.rpm`;
+        case 'redhat5-x86_64':
+          return `https://packages.wazuh.com/4.x/yum5/x86_64/wazuh-agent-${this.state.wazuhVersion}-1.el5.x86_64.rpm`;
         case 'centos6-i386':
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.i386.rpm`;
         case 'centos6-aarch64':
@@ -331,6 +344,14 @@ export const RegisterAgent = withErrorBoundary(
         case 'centos6-x86_64':
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`;
         case 'centos6-armhf':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.armv7hl.rpm`;
+        case 'redhat6-i386':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.i386.rpm`;
+        case 'redhat6-aarch64':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.aarch64.rpm`;
+        case 'redhat6-x86_64':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`;
+        case 'redhat6-armhf':
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.armv7hl.rpm`;
         default:
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`;
@@ -392,10 +413,10 @@ export const RegisterAgent = withErrorBoundary(
 
     render() {
       const appVersionMajorDotMinor = this.state.wazuhVersion.split('.').slice(0, 2).join('.');
-      const urlCheckConnectionDocumentation = `https://documentation.wazuh.com/${appVersionMajorDotMinor}/user-manual/agents/agent-connection.html`;
+      const urlCheckConnectionDocumentation = webDocumentationLink('user-manual/agents/agent-connection.html', appVersionMajorDotMinor);
       const textAndLinkToCheckConnectionDocumentation = (
         <p>
-          To verify the connection with the Manager, please follow this{' '}
+          To verify the connection with the Wazuh server, please follow this{' '}
           <a href={urlCheckConnectionDocumentation} target="_blank">
             document.
           </a>
@@ -405,8 +426,7 @@ export const RegisterAgent = withErrorBoundary(
       const ipInput = (
         <EuiText>
           <p>
-            You can predefine the Wazuh server address with the <EuiCode>enrollment.dns</EuiCode>{' '}
-            Wazuh app setting.
+            This is the address the agent uses to communicate with the Wazuh server. It can be an IP address or a fully qualified domain name (FQDN).
           </p>
           <EuiFieldText
             placeholder="Server address"
@@ -466,7 +486,7 @@ export const RegisterAgent = withErrorBoundary(
           }-1.pkg && sudo launchctl setenv ${this.optionalDeploymentVariables()}&& sudo installer -pkg ./wazuh-agent-${this.state.wazuhVersion
           }.pkg -target /`,
         winText: `Invoke-WebRequest -Uri https://packages.wazuh.com/4.x/windows/wazuh-agent-${this.state.wazuhVersion
-          }-1.msi -OutFile wazuh-agent-${this.state.wazuhVersion}.msi; ./wazuh-agent-${this.state.wazuhVersion
+          }-1.msi -OutFile \${env:tmp}\\wazuh-agent-${this.state.wazuhVersion}.msi; msiexec.exe /i \${env:tmp}\\wazuh-agent-${this.state.wazuhVersion
           }.msi /q ${this.optionalDeploymentVariables()}`,
       };
 
@@ -476,11 +496,15 @@ export const RegisterAgent = withErrorBoundary(
       const windowsAdvice = this.state.selectedOS === 'win' && (
         <>
           <EuiCallOut
-            title="You will need administrator privileges to perform this installation."
+            title="Requirements"
             iconType="iInCircle"
-            >
-              <p>Keep in mind you need to run this command in a Windows PowerShell terminal</p>
-            </EuiCallOut>
+          >
+            <ul class="wz-callout-list">
+              <li><span>You will need administrator privileges to perform this installation.</span></li>
+              <li><span>PowerShell 3.0 or greater is required.</span></li>
+            </ul>
+            <p>Keep in mind you need to run this command in a Windows PowerShell terminal.</p>
+          </EuiCallOut>
           <EuiSpacer></EuiSpacer>
         </>
       );
@@ -515,17 +539,13 @@ export const RegisterAgent = withErrorBoundary(
                   color="warning"
                   title={
                     <>
-                      Running this command on a host with an agent already installed upgrades the
-                      agent package without enrolling the agent. To enroll it, see the{' '}
-                      <EuiLink href="https://documentation.wazuh.com/current/user-manual/registering/index.html">
-                        Wazuh documentation
-                      </EuiLink>
-                      .
+                      If the installer finds another Wazuh agent in the system, it will upgrade it preserving the configuration.
                     </>
                   }
                   iconType="iInCircle"
                 />
                 <EuiSpacer />
+                {windowsAdvice}
                 <div className="copy-codeblock-wrapper">
                   <EuiCodeBlock style={codeBlock} language={language}>
                     {this.state.wazuhPassword && !this.state.showPassword ? this.obfuscatePassword(text) : text}
@@ -546,7 +566,6 @@ export const RegisterAgent = withErrorBoundary(
                   />
                 )}
                 <EuiSpacer />
-                {windowsAdvice}
               </EuiText>
             )}
         </div>
@@ -626,7 +645,7 @@ export const RegisterAgent = withErrorBoundary(
                 <EuiButtonGroup
                   color="primary"
                   legend="Choose the version"
-                  options={versionButtonsCentos}
+                  options={versionButtonsCentosOrRedHat}
                   idSelected={this.state.selectedVersion}
                   onChange={(version) => this.setVersion(version)}
                 />
@@ -634,7 +653,7 @@ export const RegisterAgent = withErrorBoundary(
             },
           ]
           : []),
-        ...(this.state.selectedOS == 'rpm' && this.state.selectedVersion == 'centos5'
+        ...(this.state.selectedOS == 'rpm' && this.state.selectedVersion == 'centos5' || this.state.selectedVersion == 'redhat5' 
           ? [
             {
               title: 'Choose the architecture',
@@ -642,7 +661,7 @@ export const RegisterAgent = withErrorBoundary(
                 <EuiButtonGroup
                   color="primary"
                   legend="Choose the architecture"
-                  options={architectureCentos5}
+                  options={architectureCentos5OrRedHat5}
                   idSelected={this.state.selectedArchitecture}
                   onChange={(architecture) => this.setArchitecture(architecture)}
                 />
@@ -651,7 +670,7 @@ export const RegisterAgent = withErrorBoundary(
           ]
           : []),
         ...(this.state.selectedOS == 'deb' ||
-          (this.state.selectedOS == 'rpm' && this.state.selectedVersion == 'centos6')
+          (this.state.selectedOS == 'rpm' && this.state.selectedVersion == 'centos6' || this.state.selectedVersion == 'redhat6')
           ? [
             {
               title: 'Choose the architecture',

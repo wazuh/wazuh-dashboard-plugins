@@ -15,6 +15,7 @@
 // Import required packages
 const fs = require('fs');
 const path = require('path');
+const packageJSON = require('../../package.json');
 
 // Constants
 const WAZUH_API_URL = process.argv[2]; // Wazuh API url is a required argument
@@ -26,7 +27,8 @@ const reEndpointPathArgs = /\{([^}]+)\}/g; // Regular expresion to get the endpo
 const reFormatter = /--full/
 
 const OUTPUT_MODE_FULL = consoleInput.match(reFormatter) && true;
-const WAZUH_DOCUMENTATION_API_REFERENCE_URL = 'https://documentation.wazuh.com/current/user-manual/api/reference.html'
+const PLUGIN_VERSION_SHORT = packageJSON.version.split('.').splice(0,2).join('.');
+const WAZUH_DOCUMENTATION_API_REFERENCE_URL = `https://documentation.wazuh.com/${PLUGIN_VERSION_SHORT}/user-manual/api/reference.html`;
 const OUTPUT_ENDPOINTS_FILENAME = `${(consoleInput.match(reFilename) || [])[1] || 'endpoints'}.json`;
 const OUTPUT_SECURITY_ACTIONS_FILENAME = 'security-actions.json';
 const OUTPUT_DIRECTORY = path.join(__dirname, 'output');

@@ -1,10 +1,10 @@
 {
   "name": "wazuh",
-  "version": "4.3.0",
-  "revision": "4301-1",
-  "code": "4301-1",
+  "version": "4.3.10",
+  "revision": "4311",
+  "code": "4311",
   "pluginPlatform": {
-    "version": "7.17.0"
+    "version": "7.16.0"
   },
   "description": "Wazuh app",
   "keywords": [
@@ -58,6 +58,7 @@
     "jwt-decode": "^2.2.0",
     "loglevel": "^1.7.1",
     "markdown-it-link-attributes": "^3.0.0",
+    "md5": "^2.3.0",
     "needle": "^2.0.1",
     "ngreact": "^0.5.1",
     "node-cron": "^1.1.2",

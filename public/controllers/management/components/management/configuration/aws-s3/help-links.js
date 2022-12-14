@@ -9,15 +9,15 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { webDocumentationLink } from "../../../../../../../common/services/web_documentation";
 
 export default [
   {
     text: 'Using Wazuh to monitor AWS',
-    href: 'https://documentation.wazuh.com/current/amazon/index.html'
+    href: webDocumentationLink('amazon/index.html')
   },
   {
     text: 'Amazon S3 module reference',
-    href:
-      'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-s3.html'
+    href: webDocumentationLink('user-manual/reference/ossec-conf/wodle-s3.html')
   }
 ];

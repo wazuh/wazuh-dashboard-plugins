@@ -24,13 +24,14 @@ import store from '../redux/store';
 import { updateMetric } from '../redux/actions/visualizationsActions';
 import { GenericRequest } from '../react-services/generic-request';
 import { createSavedVisLoader } from './visualizations/saved_visualizations';
+import { WzDatePicker } from '../components/wz-date-picker/wz-date-picker';
 import {
   EuiLoadingChart,
   EuiLoadingSpinner,
   EuiToolTip,
   EuiIcon,
   EuiFlexItem,
-  EuiFlexGroup,
+  EuiFlexGroup
 } from '@elastic/eui';
 import {
   getAngularModule,
@@ -106,7 +107,17 @@ class KibanaVis extends Component {
   componentWillUnmount() {
     if (this._isMounted) {
       this._isMounted = false;
-      this.updateVis();
+      // It would be good to continue investigating if it is
+      // necessary for the renderComplete() to be in the
+      // componentWillUnmount.
+      // In the renderComplete() the value of the $rootScope
+      // is changed, which affects the entire application.
+      // 
+      // Related issue:
+      // https://github.com/wazuh/wazuh-kibana-app/issues/4158
+      if (this.deadField) {
+        return this.renderComplete();
+      }
       this.destroyAll();
     }
   }
@@ -282,10 +293,12 @@ class KibanaVis extends Component {
           const visState = await getVisualizationsPlugin().convertToSerializedVis(
             this.visualization
           );
+          
           const vis = await getVisualizationsPlugin().createVis(
             this.visualization.visState.type,
             visState
           );
+          
           this.visHandler = await getVisualizationsPlugin().__LEGACY.createVisEmbeddableFromObject(
             vis,
             visInput
@@ -386,6 +399,21 @@ class KibanaVis extends Component {
     }
   };
 
+  showDateRangePicker = () => {
+    return !this.deadField && !this.state.visRefreshingIndex && this.visID === 'Wazuh-App-Overview-General-Agents-status'
+  }
+
+  DateRangePickerComponent = () => {
+    return (
+      <EuiFlexItem className="agents-evolutions-dpicker">
+        <WzDatePicker
+          condensed={true} 
+          onTimeChange={() => {}} 
+        />
+      </EuiFlexItem>
+    )
+  }
+
   render() {
     const isLoading = this.props.resultState === 'loading';
     return (
@@ -404,6 +432,7 @@ class KibanaVis extends Component {
                 <EuiLoadingSpinner size="xl" />
               </EuiFlexItem>
               <EuiFlexItem grow={false}>Refreshing Index Pattern.</EuiFlexItem>
+
               <EuiFlexItem></EuiFlexItem>
             </EuiFlexGroup>
           </div>
@@ -436,11 +465,51 @@ class KibanaVis extends Component {
               <EuiIcon type="iInCircle" />
             </EuiToolTip>
           </div>
+          {   
+            !this.isLoading && this.showDateRangePicker() &&
+            this.DateRangePickerComponent()
+          }
           <div
             id={this.visID}
             vis-id={this.visID}
-            style={{ display: isLoading ? 'none' : 'block', height: '100%' }}
+            style={{ 
+              display: isLoading ? 'none' : 'block', 
+              height: '100%',
+              paddingTop: '2%' 
+            }}
           ></div>
+          <div style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+              }}>
+                {(isLoading && <div><EuiLoadingChart size="xl" /></div>)
+                  || (this.deadField && !isLoading && !this.state.visRefreshingIndex && (
+                    <div>
+                      No results found &nbsp;
+                      <EuiToolTip
+                        position="top"
+                        content={
+                          <span>
+                            No alerts were found with the field: <strong>{this.deadField}</strong>
+                          </span>
+                        }
+                      >
+                        <EuiIcon type="iInCircle" />
+                      </EuiToolTip>
+                    </div>
+                  ))
+                  || (this.state.visRefreshingIndex && (
+                    <EuiFlexGroup justifyContent="center" alignItems="center">
+                      <EuiFlexItem grow={false}>
+                        <EuiLoadingSpinner size="xl" />
+                      </EuiFlexItem>
+                      <EuiFlexItem grow={false}>Refreshing Index Pattern.</EuiFlexItem>
+                    </EuiFlexGroup>
+                  ))
+                }
+          </div>
         </span>
       )
     );

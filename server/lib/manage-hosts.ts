@@ -18,6 +18,10 @@ import { WAZUH_DATA_CONFIG_APP_PATH } from '../../common/constants';
 import { createDataDirectoryIfNotExists } from '../lib/filesystem';
 
 export class ManageHosts {
+  busy: boolean;
+  file: string;
+  updateRegistry: UpdateRegistry;
+  initialConfig: string;
   constructor() {
     this.busy = false;
     this.file = WAZUH_DATA_CONFIG_APP_PATH;

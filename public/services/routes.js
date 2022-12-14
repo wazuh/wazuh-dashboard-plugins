@@ -20,7 +20,6 @@ import {
   getSavedSearch,
   getIp,
   getWzConfig,
-  apiCount
 } from './resolves';
 
 // HTML templates
@@ -137,7 +136,7 @@ app.config(['$routeProvider',($routeProvider) => {
   $routeProvider
   .when('/health-check', {
     template: healthCheckTemplate,
-    resolve: { apiCount, wzConfig, ip },
+    resolve: { wzConfig, ip },
     outerAngularWrapperRoute: true
   })
   .when('/agents/:agent?/:tab?/:tabView?', {
@@ -187,7 +186,7 @@ app.config(['$routeProvider',($routeProvider) => {
   })
   .when('/blank-screen', {
     template: blankScreenTemplate,
-    resolve: { enableWzMenu, wzConfig },
+    resolve: { enableWzMenu },
     outerAngularWrapperRoute: true
   })
   .when('/', {

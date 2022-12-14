@@ -32,7 +32,7 @@ import {
   UILogLevel,
   UIErrorSeverity,
 } from '../../../react-services/error-orchestrator/types';
-import { UI_LOGGER_LEVELS } from '../../../../common/constants';
+import { API_NAME_AGENT_STATUS, UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 
 const tableColumns = [
@@ -107,7 +107,7 @@ export const MainAgentStats = compose(
     {action: 'agent:read', resource: `agent:id:${agent.id}`},
     ...(agent.group || []).map(group => ({ action: 'agent:read', resource: `agent:group:${group}` }))
   ]]),
-  withGuard(({agent}) => agent.status !== 'active', PromptNoActiveAgentWithoutSelect),
+  withGuard(({agent}) => agent.status !== API_NAME_AGENT_STATUS.ACTIVE, PromptNoActiveAgentWithoutSelect),
   withGuard(({agent}) => {
     const [major, minor, patch] = agent.version.replace('Wazuh v','').split('.').map(value => parseInt(value));
     return !(major >= 4 && minor >= 2 && patch >= 0)

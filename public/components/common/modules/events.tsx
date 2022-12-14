@@ -39,20 +39,20 @@ export const Events = compose(
   class Events extends Component {
     intervalCheckExistsDiscoverTableTime: number = 200;
     isMount: boolean;
+    hasRefreshedKnownFields: boolean;
+    isRefreshing: boolean;
     state: {
       flyout: false | { component: any; props: any };
       discoverRowsData: any[];
-      hasRefreshedKnownFields: boolean;
-      isRefreshing: boolean;
     };
     constructor(props) {
       super(props);
       this.isMount = true;
+      this.hasRefreshedKnownFields = false;
+      this.isRefreshing = false;
       this.state = {
         flyout: false,
         discoverRowsData: [],
-        hasRefreshedKnownFields: false,
-        isRefreshing: false,
       };
     }
 
@@ -172,9 +172,12 @@ export const Events = compose(
       const discoverTableRows = document.querySelectorAll(`.kbn-table tbody tr.kbnDocTable__row`);
       const rowIndex = Array.from(discoverTableRows).indexOf(rowTable);
       const rowDetailsFields = mutation.addedNodes[0].querySelectorAll('.kbnDocViewer__field');
+      let hasUnknownFields = false;
       if (rowDetailsFields) {
-        rowDetailsFields.forEach((rowDetailField) => {
-          this.checkUnknownFields(rowDetailField);
+        rowDetailsFields.forEach(async (rowDetailField, i) => {
+          //check for unknown fields until 1 unknown field is found
+          if (!hasUnknownFields && this.checkUnknownFields(rowDetailField))
+            hasUnknownFields = true;
           const fieldName = rowDetailField.childNodes[0].childNodes[1].textContent || '';
           const fieldCell =
             rowDetailField.parentNode.childNodes &&
@@ -190,31 +193,34 @@ export const Events = compose(
             options
           );
         });
+        if (hasUnknownFields) {
+          this.refreshKnownFields();
+        }
       }
     }
-
+  
     checkUnknownFields(rowDetailField) {
       const fieldCell =
         rowDetailField.parentNode.childNodes && rowDetailField.parentNode.childNodes[2];
-      if (fieldCell.querySelector('svg[data-test-subj="noMappingWarning"]')) {
-        this.refreshKnownFields();
-      }
+      return (fieldCell.querySelector('svg[data-test-subj="noMappingWarning"]'))
     }
 
     refreshKnownFields = async () => {
-      if (!this.state.hasRefreshedKnownFields) {
+      if (!this.hasRefreshedKnownFields) {
         try {
-          this.setState({ hasRefreshedKnownFields: true, isRefreshing: true });
+          this.hasRefreshedKnownFields = true;
+          this.isRefreshing = true;
+          
           if (satisfyPluginPlatformVersion('<7.11')) {
             await PatternHandler.refreshIndexPattern();
           }
-          this.setState({ isRefreshing: false });
+          this.isRefreshing = false;
           this.reloadToast();
         } catch (error) {
-          this.setState({ isRefreshing: false });
+          this.isRefreshing = false;
           throw error;
         }
-      } else if (this.state.isRefreshing) {
+      } else if (this.isRefreshing) {
         await new Promise((r) => setTimeout(r, 150));
         await this.refreshKnownFields();
       }

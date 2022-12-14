@@ -26,6 +26,7 @@
 // import { ErrorHandler } from '../../../react-services/error-handler';
 // import { getToasts }  from '../../../kibana-services';
 // import _ from 'lodash';
+// import { webDocumentationLink } from "../../../../common/services/web_documentation";
 
 // export function DevTools({ initialTextValue }) {
 //   const editorRef = useRef(null);
@@ -597,9 +598,7 @@
 //             content="API reference">
 //             <EuiButtonIcon
 //               color={'subdued'}
-//               onClick={() => window.open(
-//                 'https://documentation.wazuh.com/current/user-manual/api/reference.html'
-//               )}
+//               onClick={() => window.open(webDocumentationLink('user-manual/api/reference.html'))}
 //               iconType="questionInCircle"
 //               aria-label="Reference"
 //             />

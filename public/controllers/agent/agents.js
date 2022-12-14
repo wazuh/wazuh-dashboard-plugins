@@ -28,7 +28,7 @@ import { ErrorHandler } from '../../react-services/error-handler';
 import { GroupHandler } from '../../react-services/group-handler';
 import store from '../../redux/store';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
-import { WAZUH_ALERTS_PATTERN } from '../../../common/constants';
+import { API_NAME_AGENT_STATUS, WAZUH_ALERTS_PATTERN } from '../../../common/constants';
 import { getDataPlugin } from '../../kibana-services';
 import { hasAgentSupportModule } from '../../react-services/wz-agents';
 import { UI_LOGGER_LEVELS } from '../../../common/constants';
@@ -162,12 +162,6 @@ export class AgentsController {
     this.changeAgent = false;
 
     this.$scope.switchTab = (tab, force = false) => this.switchTab(tab, force);
-
-    this.$scope.getAgentStatusClass = (agentStatus) => (agentStatus === 'active' ? 'teal' : 'red');
-
-    this.$scope.formatAgentStatus = (agentStatus) => {
-      return ['active', 'disconnected'].includes(agentStatus) ? agentStatus : 'never connected';
-    };
     this.$scope.getAgent = async (newAgentId) => this.getAgent(newAgentId);
     this.$scope.goGroups = (agent, group) => this.goGroups(agent, group);
     this.$scope.downloadCsv = async (path, fileName, filters = []) =>
@@ -713,14 +707,6 @@ export class AgentsController {
     }
   }
 
-  checkStatusAgent() {
-    if (this.$scope.agent.status !== 'Active') {
-      return false;
-    } else if (this.$scope.agent.status === 'Active') {
-      return true;
-    }
-  }
-
   // Agent data
 
   /**
@@ -949,7 +935,7 @@ export class AgentsController {
 
   async launchRootcheckScan() {
     try {
-      const isActive = ((this.$scope.agent || {}).status || '') === 'active';
+      const isActive = ((this.$scope.agent || {}).status || '') === API_NAME_AGENT_STATUS.ACTIVE;
       if (!isActive) {
         throw new Error('Agent is not active');
       }
@@ -975,7 +961,7 @@ export class AgentsController {
 
   async launchSyscheckScan() {
     try {
-      const isActive = ((this.$scope.agent || {}).status || '') === 'active';
+      const isActive = ((this.$scope.agent || {}).status || '') === API_NAME_AGENT_STATUS.ACTIVE;
       if (!isActive) {
         throw new Error('Agent is not active');
       }

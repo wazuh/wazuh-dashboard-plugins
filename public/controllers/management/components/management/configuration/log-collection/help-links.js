@@ -10,15 +10,15 @@
  * Find more information about this on the LICENSE file.
  */
 
+import { webDocumentationLink } from "../../../../../../../common/services/web_documentation";
+
 export default [
   {
     text: 'Log data collection documentation',
-    href:
-      'https://documentation.wazuh.com/current/user-manual/capabilities/log-data-collection/index.html'
+    href: webDocumentationLink('user-manual/capabilities/log-data-collection/index.html')
   },
   {
     text: 'Localfile reference',
-    href:
-      'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/localfile.html'
+    href: webDocumentationLink('user-manual/reference/ossec-conf/localfile.html')
   }
 ];

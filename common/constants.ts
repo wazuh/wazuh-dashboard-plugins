@@ -10,15 +10,16 @@
  * Find more information about this on the LICENSE file.
  */
 import path from 'path';
+import { version } from '../package.json';
+
+// Plugin
+export const PLUGIN_VERSION = version;
+export const PLUGIN_VERSION_SHORT = version.split('.').splice(0,2).join('.');
 
 // Index patterns - Wazuh alerts
 export const WAZUH_INDEX_TYPE_ALERTS = 'alerts';
 export const WAZUH_ALERTS_PREFIX = 'wazuh-alerts-';
 export const WAZUH_ALERTS_PATTERN = 'wazuh-alerts-*';
-
-// Default number of shards and replicas for indices
-export const WAZUH_INDEX_SHARDS = 2;
-export const WAZUH_INDEX_REPLICAS = 0;
 
 // Job - Wazuh monitoring
 export const WAZUH_INDEX_TYPE_MONITORING = "monitoring";
@@ -26,6 +27,7 @@ export const WAZUH_MONITORING_PREFIX = "wazuh-monitoring-";
 export const WAZUH_MONITORING_PATTERN = "wazuh-monitoring-*";
 export const WAZUH_MONITORING_TEMPLATE_NAME = "wazuh-agent";
 export const WAZUH_MONITORING_DEFAULT_INDICES_SHARDS = 1;
+export const WAZUH_MONITORING_DEFAULT_INDICES_REPLICAS = 0;
 export const WAZUH_MONITORING_DEFAULT_CREATION = 'w';
 export const WAZUH_MONITORING_DEFAULT_ENABLED = true;
 export const WAZUH_MONITORING_DEFAULT_FREQUENCY = 900;
@@ -37,15 +39,14 @@ export const WAZUH_STATISTICS_DEFAULT_PREFIX = "wazuh";
 export const WAZUH_STATISTICS_DEFAULT_NAME = "statistics";
 export const WAZUH_STATISTICS_PATTERN = `${WAZUH_STATISTICS_DEFAULT_PREFIX}-${WAZUH_STATISTICS_DEFAULT_NAME}-*`;
 export const WAZUH_STATISTICS_TEMPLATE_NAME = `${WAZUH_STATISTICS_DEFAULT_PREFIX}-${WAZUH_STATISTICS_DEFAULT_NAME}`;
-export const WAZUH_STATISTICS_DEFAULT_INDICES_SHARDS = WAZUH_INDEX_SHARDS;
+export const WAZUH_STATISTICS_DEFAULT_INDICES_SHARDS = 1;
+export const WAZUH_STATISTICS_DEFAULT_INDICES_REPLICAS = 0;
 export const WAZUH_STATISTICS_DEFAULT_CREATION = 'w';
 export const WAZUH_STATISTICS_DEFAULT_STATUS = true;
 export const WAZUH_STATISTICS_DEFAULT_FREQUENCY = 900;
 export const WAZUH_STATISTICS_DEFAULT_CRON_FREQ = '0 */5 * * * *';
 
 // Job - Wazuh initialize
-export const WAZUH_INDEX = '.wazuh';
-export const WAZUH_VERSION_INDEX = '.wazuh-version';
 export const WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME = 'wazuh-kibana';
 
 // Permissions
@@ -208,7 +209,7 @@ export const WAZUH_DEFAULT_APP_CONFIG = {
   'wazuh.monitoring.enabled': WAZUH_MONITORING_DEFAULT_ENABLED,
   'wazuh.monitoring.frequency': WAZUH_MONITORING_DEFAULT_FREQUENCY,
   'wazuh.monitoring.shards': WAZUH_MONITORING_DEFAULT_INDICES_SHARDS,
-  'wazuh.monitoring.replicas': WAZUH_INDEX_REPLICAS,
+  'wazuh.monitoring.replicas': WAZUH_MONITORING_DEFAULT_INDICES_REPLICAS,
   'wazuh.monitoring.creation': WAZUH_MONITORING_DEFAULT_CREATION,
   'wazuh.monitoring.pattern': WAZUH_MONITORING_PATTERN,
   'cron.prefix': WAZUH_STATISTICS_DEFAULT_PREFIX,
@@ -217,12 +218,13 @@ export const WAZUH_DEFAULT_APP_CONFIG = {
   'cron.statistics.interval': WAZUH_STATISTICS_DEFAULT_CRON_FREQ,
   'cron.statistics.index.name': WAZUH_STATISTICS_DEFAULT_NAME,
   'cron.statistics.index.creation': WAZUH_STATISTICS_DEFAULT_CREATION,
-  'cron.statistics.index.shards': WAZUH_INDEX_SHARDS,
-  'cron.statistics.index.replicas': WAZUH_INDEX_REPLICAS,
+  'cron.statistics.index.shards': WAZUH_STATISTICS_DEFAULT_INDICES_SHARDS,
+  'cron.statistics.index.replicas': WAZUH_STATISTICS_DEFAULT_INDICES_REPLICAS,
   'alerts.sample.prefix': WAZUH_SAMPLE_ALERT_PREFIX,
   hideManagerAlerts: false,
   'logs.level': 'info',
   'enrollment.dns': '',
+  'enrollment.password': '',
   'customization.logo.app': '',
   'customization.logo.sidebar': '',
   'customization.logo.healthcheck':'',
@@ -308,7 +310,6 @@ export enum WAZUH_MENU_SETTINGS_SECTIONS_ID {
 export const AUTHORIZED_AGENTS = 'authorized-agents';
 
 // Wazuh links
-export const WAZUH_LINK_DOCUMENTATION = 'https://documentation.wazuh.com';
 export const WAZUH_LINK_GITHUB = 'https://github.com/wazuh';
 export const WAZUH_LINK_GOOGLE_GROUPS = 'https://groups.google.com/forum/#!forum/wazuh';
 export const WAZUH_LINK_SLACK = 'https://wazuh.com/community/join-us-on-slack';
@@ -349,6 +350,7 @@ export const UI_TOAST_COLOR = {
 
 // Assets
 export const ASSETS_BASE_URL_PREFIX = '/plugins/wazuh/assets/';
+export const ASSETS_PUBLIC_URL = '/plugins/wazuh/public/assets/';
 
 // Reports
 export const REPORTS_LOGO_IMAGE_ASSETS_RELATIVE_PATH = 'images/logo_reports.png';
@@ -361,11 +363,48 @@ export const PLUGIN_PLATFORM_NAME = 'Kibana';
 export const PLUGIN_PLATFORM_BASE_INSTALLATION_PATH = '/usr/share/kibana/data/wazuh/';
 export const PLUGIN_PLATFORM_INSTALLATION_USER = 'kibana';
 export const PLUGIN_PLATFORM_INSTALLATION_USER_GROUP = 'kibana';
-export const PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_UPGRADE_PLATFORM = 'https://documentation.wazuh.com/current/upgrade-guide/';
-export const PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_TROUBLESHOOTING = 'https://documentation.wazuh.com/current/user-manual/kibana-app/troubleshooting.html';
-export const PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_APP_CONFIGURATION = 'https://documentation.wazuh.com/current/user-manual/kibana-app/reference/config-file.html';
+export const PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_UPGRADE_PLATFORM = 'upgrade-guide';
+export const PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_TROUBLESHOOTING = 'user-manual/elasticsearch/troubleshooting.html';
+export const PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_APP_CONFIGURATION = 'user-manual/wazuh-dashboard/config-file.html';
 export const PLUGIN_PLATFORM_URL_GUIDE = 'https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html';
 export const PLUGIN_PLATFORM_URL_GUIDE_TITLE = 'Elastic guide';
 export const PLUGIN_PLATFORM_REQUEST_HEADERS = {
   'kbn-xsrf': 'kibana'
 };
+
+// UI
+export const API_NAME_AGENT_STATUS = {
+  ACTIVE: 'active',
+  DISCONNECTED: 'disconnected',
+  PENDING: 'pending',
+  NEVER_CONNECTED: 'never_connected',
+} as const;
+
+export const UI_COLOR_AGENT_STATUS = {
+  [API_NAME_AGENT_STATUS.ACTIVE]: '#007871',
+  [API_NAME_AGENT_STATUS.DISCONNECTED]: '#BD271E',
+  [API_NAME_AGENT_STATUS.PENDING]: '#FEC514',
+  [API_NAME_AGENT_STATUS.NEVER_CONNECTED]: '#646A77',
+  default: '#000000'
+} as const;
+
+export const UI_LABEL_NAME_AGENT_STATUS = {
+  [API_NAME_AGENT_STATUS.ACTIVE]: 'Active',
+  [API_NAME_AGENT_STATUS.DISCONNECTED]: 'Disconnected',
+  [API_NAME_AGENT_STATUS.PENDING]: 'Pending',
+  [API_NAME_AGENT_STATUS.NEVER_CONNECTED]: 'Never connected',
+  default: 'Unknown'
+} as const;
+
+export const UI_ORDER_AGENT_STATUS = [
+  API_NAME_AGENT_STATUS.ACTIVE,
+  API_NAME_AGENT_STATUS.DISCONNECTED,
+  API_NAME_AGENT_STATUS.PENDING,
+  API_NAME_AGENT_STATUS.NEVER_CONNECTED  
+];
+
+// Documentation
+export const DOCUMENTATION_WEB_BASE_URL = "https://documentation.wazuh.com";
+
+// Default Elasticsearch user name context
+export const ELASTIC_NAME = 'elastic';
