@@ -142,7 +142,9 @@ resources:
   # Summarize agents status
   - method: GET
     path: /agents/summary/status
-
+    response:
+      statusCode: 200
+      staticFile: agents/summary_status.json
   # ===================================================== #
   #   CISCAT
   # ===================================================== #
