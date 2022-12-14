@@ -111,7 +111,6 @@ app.run(function ($rootElement) {
   // Add plugin help links as extension to plugin platform help menu
   addHelpMenuToAppChrome();
 
-
   // Bind deleteExistentToken on Log out component.
   $('.euiHeaderSectionItem__button, .euiHeaderSectionItemButton').on('mouseleave', function () {
     // opendistro
