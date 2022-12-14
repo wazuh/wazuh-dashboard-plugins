@@ -20,7 +20,7 @@ type RemoteConfig = {
 /**
  * Get the cluster status
  */
-export const custerStatusResponse = async (): Promise<boolean> => {
+export const clusterStatusResponse = async (): Promise<boolean> => {
   const clusterStatus = await WzRequest.apiReq('GET', '/cluster/status', {});
   if (
     clusterStatus.data.data.enabled === 'yes' &&
@@ -37,15 +37,13 @@ export const custerStatusResponse = async (): Promise<boolean> => {
 /**
  * Get the remote configuration from api
  */
-async function getRemoteConfiguration(
-  nodeName: string,
-): Promise<RemoteConfig>{
+async function getRemoteConfiguration(nodeName: string): Promise<RemoteConfig> {
   let config: RemoteConfig = {
     name: nodeName,
     isUdp: null,
     haveSecureConnection: null,
   };
-  const clusterStatus = await custerStatusResponse();
+  const clusterStatus = await clusterStatusResponse();
   let result;
   if (clusterStatus) {
     result = await WzRequest.apiReq(
@@ -83,7 +81,7 @@ async function getRemoteConfiguration(
       getRemoteProtocol(protocolsAvailable) === 'UDP' ? true : false;
   }
   return config;
-};
+}
 
 /**
  * Get the remote protocol available from list of protocols
@@ -95,25 +93,39 @@ function getRemoteProtocol(protocols: Protocol[]) {
   } else {
     return !protocols.includes('TCP') ? 'UDP' : 'TCP';
   }
-};
-
+}
 
 /**
  * Get the remote configuration from nodes registered in the cluster and decide the protocol to setting up in deploy agent param
  * @param nodeSelected
  * @param defaultServerAddress
  */
-async function getConnectionConfig(nodeSelected: ServerAddressOptions, defaultServerAddress?: string) {
+async function getConnectionConfig(
+  nodeSelected: ServerAddressOptions,
+  defaultServerAddress?: string,
+) {
   const nodeName = nodeSelected?.label;
-  if(!defaultServerAddress){
-    if(nodeSelected.nodetype !== 'custom'){
+  if (!defaultServerAddress) {
+    if (nodeSelected.nodetype !== 'custom') {
       const remoteConfig = await getRemoteConfiguration(nodeName);
-      return { serverAddress: remoteConfig.name, udpProtocol: remoteConfig.isUdp, connectionSecure: remoteConfig.haveSecureConnection };
-    }else{
-      return { serverAddress: nodeName, udpProtocol: false, connectionSecure: true };
+      return {
+        serverAddress: remoteConfig.name,
+        udpProtocol: remoteConfig.isUdp,
+        connectionSecure: remoteConfig.haveSecureConnection,
+      };
+    } else {
+      return {
+        serverAddress: nodeName,
+        udpProtocol: false,
+        connectionSecure: true,
+      };
     }
-  }else{
-    return { serverAddress: defaultServerAddress, udpProtocol: false, connectionSecure: true };
+  } else {
+    return {
+      serverAddress: defaultServerAddress,
+      udpProtocol: false,
+      connectionSecure: true,
+    };
   }
 }
 
@@ -121,15 +133,15 @@ type NodeItem = {
   name: string;
   ip: string;
   type: string;
-}
+};
 
 type NodeResponse = {
   data: {
     data: {
       affected_items: NodeItem[];
-    }
-  }
-}
+    };
+  };
+};
 
 /**
  * Get the list of the cluster nodes and parse it into a list of options
@@ -151,7 +163,9 @@ export const getManagerNode = async (): Promise<any> => {
  * Parse the nodes list from the API response to a format that can be used by the EuiComboBox
  * @param nodes
  */
-export const parseNodesInOptions = (nodes: NodeResponse): ServerAddressOptions[] => {
+export const parseNodesInOptions = (
+  nodes: NodeResponse,
+): ServerAddressOptions[] => {
   return nodes.data.data.affected_items.map((item: NodeItem) => ({
     label: item.name,
     value: item.ip,
@@ -162,8 +176,10 @@ export const parseNodesInOptions = (nodes: NodeResponse): ServerAddressOptions[]
 /**
  * Get the list of the cluster nodes from API and parse it into a list of options
  */
-export const fetchClusterNodesOptions = async (): Promise<ServerAddressOptions[]> => {
-  const clusterStatus = await custerStatusResponse();
+export const fetchClusterNodesOptions = async (): Promise<
+  ServerAddressOptions[]
+> => {
+  const clusterStatus = await clusterStatusResponse();
   if (clusterStatus) {
     // Cluster mode
     // Get the cluster nodes
@@ -180,18 +196,15 @@ export const fetchClusterNodesOptions = async (): Promise<ServerAddressOptions[]
  * Get the master node data from the list of cluster nodes
  * @param nodeIps
  */
-export const getMasterNode = async (nodeIps: ServerAddressOptions[]): ServerAddressOptions[] => {
-  const clusterStatus = await custerStatusResponse();
+export const getMasterNode = async (
+  nodeIps: ServerAddressOptions[],
+): ServerAddressOptions[] => {
+  const clusterStatus = await clusterStatusResponse();
   if (clusterStatus) {
-    return nodeIps.filter((nodeIp) => nodeIp.nodetype === 'master');
+    return nodeIps.filter(nodeIp => nodeIp.nodetype === 'master');
   } else {
     return nodeIps;
   }
 };
 
-
-
-export {
-  getConnectionConfig,
-  getRemoteConfiguration,
-}
+export { getConnectionConfig, getRemoteConfiguration };
