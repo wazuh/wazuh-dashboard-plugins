@@ -50,7 +50,7 @@ UI and then execute:
 
 - For `CentOS/8` images:
   ```bash
-  docker run --name wz-rel-agent-4.3.8 --rm --network wz-rel-438 -d centos:8 bash -c '
+  docker run --name wz-rel-agent-4.3.8 --rm --network wz-rel-438 --label com.docker.compose.project=wz-rel-438 -d centos:8 bash -c '
     sed -i -e "s|mirrorlist=|#mirrorlist=|g" /etc/yum.repos.d/CentOS-*
     sed -i -e "s|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g" /etc/yum.repos.d/CentOS-*
 
