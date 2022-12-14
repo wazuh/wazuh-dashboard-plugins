@@ -44,10 +44,12 @@ version.
 
 `OpenSearch` supported versions:
 - 1.2.4
+- 2.3.0
 - 2.4.0
 
 `OpenSearch Dashboards` supported versions:
 - 1.2.0
+- 2.3.0
 - 2.4.0
 
 We must use official `Wazuh Indexer` and `Wazuh Dashboard` images for
