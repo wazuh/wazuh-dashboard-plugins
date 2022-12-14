@@ -170,8 +170,6 @@ export const AgentsPreview = compose(
     }
 
     render() {
-      const evolutionIsReady = this.props.resultState !== 'loading';
-
       return (
         <EuiPage className="flex-column">
           <EuiFlexItem>
