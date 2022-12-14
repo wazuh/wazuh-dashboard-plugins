@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Mitre Att&ck resouces.
+ * Wazuh app - Mitre Att&ck resources.
  *
  * Copyright (C) 2015-2022 Wazuh, Inc.
  *
