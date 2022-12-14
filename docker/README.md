@@ -19,14 +19,6 @@ In general, the environment consist of:
 
 ## Pre-requisites
 
-> IMPORTANT: as this folder is inside a development branch, you will need to have
-2 clones of the Wazuh Kibana App repository, one containing this folder with the
-new Docker environments and another one containing the plugin source code in the
-required branch (4.x-7.16, 4.x-wzd, ...). My recommendation is:
-> 
->  - wazuh-kibana-docker (repo set to this branch, feature/3872-environments-docker)
->  - wazuh-kibana-app    (repo with the source code, set to the desired branch)
-
  1. Create the `devel` network:
 
     ```bash

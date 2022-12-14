@@ -2,6 +2,23 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.5.0 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4500
+
+### Added
+
+-
+
+### Changed
+
+-
+
+### Fixed
+
+- Fixed an issue that caused incorrect visualization of IPv6 addresses ([#4909](https://github.com/wazuh/wazuh-kibana-app/pull/4909)).
+- Fixed several typos in the code, by @jctello [#4911](https://github.com/wazuh/wazuh-kibana-app/pull/4911)
+- Fixed the display of more than one protocol in the Global configuration section [#4917](https://github.com/wazuh/wazuh-kibana-app/pull/4917)
+- Handling endpoint response was done when there is no data to show [#4918]https://github.com/wazuh/wazuh-kibana-app/pull/4918
+
 ## Wazuh v4.4.0 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4400
 
 ### Added
@@ -67,7 +84,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
-- Wazuh.yml review: fixed link to web documentation, improved in-file documentation and fixed some grammatical errors. [#4378](https://github.com/wazuh/wazuh-kibana-app/pull/4378) [#4399](https://github.com/wazuh/wazuh-kibana-app/pull/4399) 
+- Wazuh.yml review: fixed link to web documentation, improved in-file documentation and fixed some grammatical errors. [#4378](https://github.com/wazuh/wazuh-kibana-app/pull/4378) [#4399](https://github.com/wazuh/wazuh-kibana-app/pull/4399)
 - Fixed an error during the generation of a group's report, if the request to the Wazuh API fails [#4350](https://github.com/wazuh/wazuh-kibana-app/pull/4350)
 - Fixed a problem with the group's report, when the group has no agents [#4350](https://github.com/wazuh/wazuh-kibana-app/pull/4350)
 - Fixed path in logo customization section [#4352](https://github.com/wazuh/wazuh-kibana-app/pull/4352)
