@@ -72,7 +72,7 @@ export const MainPanel = ({ sidePanelChildren, tab = 'general', moduleConfig = {
   }, [viewId]);
 
   /**
-   * When a filter is toggled applies de selection
+   * When a filter is toggled applies the selection
    */
   const applyFilter = (clearOnly = false) => {
     const newFilters = [
