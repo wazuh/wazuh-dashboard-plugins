@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Iventory component
+ * Wazuh app - Inventory component
  * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -578,7 +578,7 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
                     <EuiFlexItem>
                       <InventoryPolicyChecksTable
                         agent={this.props.agent}
-                        lookingPolicy={this.state.lookingPolicy}              
+                        lookingPolicy={this.state.lookingPolicy}
                       />
                     </EuiFlexItem>
                   </EuiFlexGroup>
@@ -593,4 +593,4 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
 
 Inventory.defaultProps = {
   onClickRow: undefined
-}  
+}
