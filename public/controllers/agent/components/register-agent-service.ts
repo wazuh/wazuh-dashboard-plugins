@@ -196,15 +196,10 @@ export const fetchClusterNodesOptions = async (): Promise<
  * Get the master node data from the list of cluster nodes
  * @param nodeIps
  */
-export const getMasterNode = async (
+export const getMasterNode = (
   nodeIps: ServerAddressOptions[],
 ): ServerAddressOptions[] => {
-  const clusterStatus = await clusterStatusResponse();
-  if (clusterStatus) {
     return nodeIps.filter(nodeIp => nodeIp.nodetype === 'master');
-  } else {
-    return nodeIps;
-  }
 };
 
 export { getConnectionConfig, getRemoteConfiguration };
