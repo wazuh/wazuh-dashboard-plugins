@@ -544,7 +544,7 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
                       <EuiStat
                         title={this.buttonStat(
                           this.state.lookingPolicy.invalid,
-                          'result',
+                          'status',
                           'not applicable'
                         )}
                         description="Not applicable"
