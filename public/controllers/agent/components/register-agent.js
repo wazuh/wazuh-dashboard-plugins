@@ -369,6 +369,14 @@ export const RegisterAgent = withErrorBoundary(
 
     agentNameVariable() {
       let agentName = `WAZUH_AGENT_NAME='${this.state.agentName}' `;
+      if (
+        this.state.selectedOS === 'macos' &&
+        this.state.selectedArchitecture &&
+        this.state.agentName !== ''
+      ) {
+        return agentName.replace(/=/g, ' ');
+      }
+
       if (this.state.selectedArchitecture && this.state.agentName !== '') {
         return agentName;
       } else {
@@ -642,15 +650,15 @@ export const RegisterAgent = withErrorBoundary(
         `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
       ) {
         case 'solaris10-i386':
-          return `https://packages.wazuh.com/4.x/solaris/i386/10/wazuh-agent-${this.state.wazuhVersion}-sol10-i386.pkg`;
+          return `https://packages.wazuh.com/4.x/solaris/i386/10/wazuh-agent_v${this.state.wazuhVersion}-sol10-i386.pkg`;
         case 'solaris10-sparc':
-          return `https://packages.wazuh.com/4.x/solaris/sparc/10/wazuh-agent-${this.state.wazuhVersion}-sol10-sparc.pkg`;
+          return `https://packages.wazuh.com/4.x/solaris/sparc/10/wazuh-agent_v${this.state.wazuhVersion}-sol10-sparc.pkg`;
         case 'solaris11-i386':
-          return `https://packages.wazuh.com/4.x/solaris/i386/11/wazuh-agent-${this.state.wazuhVersion}-sol11-i386.p5p`;
+          return `https://packages.wazuh.com/4.x/solaris/i386/11/wazuh-agent_v${this.state.wazuhVersion}-sol11-i386.p5p`;
         case 'solaris11-sparc':
-          return `https://packages.wazuh.com/4.x/solaris/sparc/11/wazuh-agent-${this.state.wazuhVersion}-sol11-sparc.p5p`;
+          return `https://packages.wazuh.com/4.x/solaris/sparc/11/wazuh-agent_v${this.state.wazuhVersion}-sol11-sparc.p5p`;
         default:
-          return `https://packages.wazuh.com/4.x/solaris/sparc/11/wazuh-agent-${this.state.wazuhVersion}-sol11-sparc.p5p`;
+          return `https://packages.wazuh.com/4.x/solaris/sparc/11/wazuh-agent_v${this.state.wazuhVersion}-sol11-sparc.p5p`;
       }
     }
 
@@ -948,7 +956,7 @@ apk add wazuh-agent`,
                 this.state.wazuhVersion
               }.msi /q ${this.optionalDeploymentVariables()}${this.agentNameVariable()}`,
         openText: `sudo rpm --import https://packages.wazuh.com/key/GPG-KEY-WAZUH && sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()} zypper install -y ${this.optionalPackages()}`,
-        solText: `sudo curl -so ${this.optionalPackages()} && sudo && ${
+        solText: `sudo curl -so wazuh-agent.p5p ${this.optionalPackages()}/wazuh-agent.p5p ${this.agentNameVariable()}&& ${
           this.state.selectedVersion == 'solaris11'
             ? 'pkg install -g wazuh-agent.p5p wazuh-agent'
             : 'pkgadd -d wazuh-agent.pkg'
