@@ -20,6 +20,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added a centralized service to handle the requests [#4831](https://github.com/wazuh/wazuh-kibana-app/pull/4831)
 - Added data-test-subj create policy [#4873](https://github.com/wazuh/wazuh-kibana-app/pull/4873)
 - Deploy new agent section: Added extra steps message and new command for windows xp and windows server 2008, added alpine agent with all its steps. [#4933](https://github.com/wazuh/wazuh-kibana-app/pull/4933)
+- Added file saving conditions in File Editor [#4970](https://github.com/wazuh/wazuh-kibana-app/pull/4970)
 
 ### Changed
 
@@ -42,12 +43,14 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed a bug where the Wazuh logo was used instead of the custom one [#4539](https://github.com/wazuh/wazuh-kibana-app/pull/4539)
 - Fixed rendering problems of the `Agent Overview` section in low resolutions [#4516](https://github.com/wazuh/wazuh-kibana-app/pull/4516)
 - Fixed issue when logging out from Wazuh when SAML is enabled [#4595](https://github.com/wazuh/wazuh-kibana-app/issues/4595)
-- Fixed server errors with code 500 when the Wazuh API is not reachable / up. [#4710](https://github.com/wazuh/wazuh-kibana-app/pull/4710) [#4728](https://github.com/wazuh/wazuh-kibana-app/pull/4728)
+- Fixed server errors with code 500 when the Wazuh API is not reachable / up. [#4710](https://github.com/wazuh/wazuh-kibana-app/pull/4710) [#4728](https://github.com/wazuh/wazuh-kibana-app/pull/4728) [#4997](https://github.com/wazuh/wazuh-kibana-app/pull/4997)
 - Fixed pagination to SCA table [#4653](https://github.com/wazuh/wazuh-kibana-app/issues/4653)
 - Fixed WAZUH_PROTOCOL param suggestion [#4849](https://github.com/wazuh/wazuh-kibana-app/pull/4849)
 - Raspbian OS, Ubuntu, Amazon Linux and Amazon Linux 2 commands in the wizard deploy agent now change when a different architecture is selected [#4876](https://github.com/wazuh/wazuh-kibana-app/pull/4876) [#4880](https://github.com/wazuh/wazuh-kibana-app/pull/4880)
 - Deploy new agent section: Fixed the agents wizard OS styles and their versions. [#4832](https://github.com/wazuh/wazuh-kibana-app/pull/4832) [#4838](https://github.com/wazuh/wazuh-kibana-app/pull/4838)
 - Fixed the way macos versions and architectures were displayed, fixed the way agents were displayed, fixed the way ubuntu versions were displayed. [#4933](https://github.com/wazuh/wazuh-kibana-app/pull/4933)
+- Fixed the agents wizard OS styles and their versions. [#4832](https://github.com/wazuh/wazuh-kibana-app/pull/4832) [#4838](https://github.com/wazuh/wazuh-kibana-app/pull/4838)
+- Fixed vulnerabilities default last scan date formatter [#4975](https://github.com/wazuh/wazuh-kibana-app/pull/4975)
 
 ## Wazuh v4.3.10 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4311
 
