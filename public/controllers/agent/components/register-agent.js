@@ -73,6 +73,7 @@ import {
   getConnectionConfig,
   fetchClusterNodesOptions,
 } from './register-agent-service';
+import './register-agent.scss';
 
 export const RegisterAgent = withErrorBoundary(
   class RegisterAgent extends Component {
@@ -1301,7 +1302,7 @@ export const RegisterAgent = withErrorBoundary(
             options={options}
             idSelected={idSelected}
             onChange={onChange}
-            className={'osButtonsStyle'}
+            className={'wz-flex'}
           />
         );
       };
@@ -1425,7 +1426,6 @@ export const RegisterAgent = withErrorBoundary(
             options={options}
             idSelected={idSelected}
             onChange={onChange}
-            className={'osButtonsStyleMac'}
           />
         );
       };
