@@ -855,7 +855,7 @@ export class WazuhElasticCtrl {
   async existMonitoringIndices(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
     try {
       const config = getConfiguration();
-      const monitoringIndexPattern = config['wazuh.monitoring.pattern'] || WAZUH_MONITORING_PATTERN;
+      const monitoringIndexPattern = config['wazuh.monitoring.pattern'] || getSettingDefaultValue('wazuh.monitoring.pattern');
       const existIndex = await context.core.elasticsearch.client.asCurrentUser.indices.exists({
         index: monitoringIndexPattern,
         allow_no_indices: false
