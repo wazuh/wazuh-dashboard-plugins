@@ -34,7 +34,6 @@ import {
   EuiIcon,
   EuiSwitch,
   EuiLink,
-  EuiLink,
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
 import { withErrorBoundary } from '../../../components/common/hocs';
