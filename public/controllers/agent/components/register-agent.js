@@ -68,6 +68,7 @@ import {
   versionButtonsAix,
   versionButtonsHPUX,
 } from '../wazuh-config';
+import './register-agent.scss';
 import ServerAddress from '../register-agent/steps/server-address';
 import {
   getConnectionConfig,
@@ -357,7 +358,7 @@ export const RegisterAgent = withErrorBoundary(
       }
 
       if (this.state.udpProtocol) {
-        deployment += `WAZUH_PROTOCOL='UDP' `;
+        deployment += "WAZUH_PROTOCOL='UDP' ";
       }
 
       if (this.state.selectedGroup.length) {
@@ -419,17 +420,17 @@ export const RegisterAgent = withErrorBoundary(
         `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
       ) {
         case '3.12.12-i386':
-          return `https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && \echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"`;
+          return 'https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"';
         case '3.12.12-aarch64':
-          return `https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && \echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"`;
+          return 'https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"';
         case '3.12.12-x86_64':
-          return `https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && \echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"`;
+          return 'https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"';
         case '3.12.12-armhf':
-          return `https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && \echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"`;
+          return 'https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"';
         case '3.12.12-powerpc':
-          return `https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && \echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"`;
+          return 'https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"';
         default:
-          return `https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && \echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"`;
+          return 'https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"';
       }
     }
 
@@ -852,7 +853,11 @@ export const RegisterAgent = withErrorBoundary(
       const textAndLinkToCheckConnectionDocumentation = (
         <p>
           To verify the connection with the Wazuh server, please follow this{' '}
-          <a href={urlCheckConnectionDocumentation} target='_blank'>
+          <a
+            href={urlCheckConnectionDocumentation}
+            target='_blank'
+            rel='noreferrer'
+          >
             document.
           </a>
         </p>
@@ -962,7 +967,7 @@ export const RegisterAgent = withErrorBoundary(
       const windowsAdvice = this.state.selectedOS === 'win' && (
         <>
           <EuiCallOut title='Requirements' iconType='iInCircle'>
-            <ul class='wz-callout-list'>
+            <ul className='wz-callout-list'>
               <li>
                 <span>
                   You will need administrator privileges to perform this
@@ -1301,7 +1306,7 @@ export const RegisterAgent = withErrorBoundary(
             options={options}
             idSelected={idSelected}
             onChange={onChange}
-            className={'osButtonsStyle'}
+            className={'wz-flex'}
           />
         );
       };
@@ -1425,7 +1430,7 @@ export const RegisterAgent = withErrorBoundary(
             options={options}
             idSelected={idSelected}
             onChange={onChange}
-            className={'osButtonsStyleMac'}
+            // className={'osButtonsStyleMac'}
           />
         );
       };
