@@ -32,7 +32,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Independently load each dashboard from the `Agents Overview` page [#4363](https://github.com/wazuh/wazuh-kibana-app/pull/4363)
 - The endpoint `/agents/summary/status` handler was adapted to the new interface. [#3874](https://github.com/wazuh/wazuh-kibana-app/pull/3874)
 - Updated and added operating systems, versions, architectures commands of Install and enroll the agent and commands of Start the agent in the deploy new agent section [#4458](https://github.com/wazuh/wazuh-kibana-app/pull/4458)
-- Added cluster's IP and protocol as suggestions in the agent deployment wizard. [#4776](https://github.com/wazuh/wazuh-kibana-app/pull/4776)
+- Added cluster's IP and protocol as suggestions in the agent deployment wizard. [#4776](https://github.com/wazuh/wazuh-kibana-app/pull/4776) [#4954](https://github.com/wazuh/wazuh-kibana-app/pull/4954)
 - Show OS name and OS version in the agent installation wizard. [#4851](https://github.com/wazuh/wazuh-kibana-app/pull/4851)
 - Changed the endpoint that updates the plugin configuration to support multiple settings. [#4501](https://github.com/wazuh/wazuh-kibana-app/pull/4501)
 - The button to export the app logs is now disabled when there are no results, instead of showing an error toast [#4972](https://github.com/wazuh/wazuh-kibana-app/pull/4972)
@@ -51,6 +51,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed agent installation command for macOS in the deploy new agent section. [#4968](https://github.com/wazuh/wazuh-kibana-app/pull/4968)
 - Deploy new agent section: Fixed the way macos versions and architectures were displayed, fixed the way agents were displayed, fixed the way ubuntu versions were displayed. [#4933](https://github.com/wazuh/wazuh-kibana-app/pull/4933)
 - Fixed agent deployment instructions for HP-UX and Solaris. [#4943](https://github.com/wazuh/wazuh-kibana-app/pull/4943)
+- Fixed Inventory checks table filters by stats [#4999](https://github.com/wazuh/wazuh-kibana-app/pull/4999)
 - Fixed vulnerabilities default last scan date formatter [#4975](https://github.com/wazuh/wazuh-kibana-app/pull/4975)
 
 ## Wazuh v4.3.10 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4311
