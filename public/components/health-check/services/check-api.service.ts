@@ -15,6 +15,7 @@
 import { getToasts } from '../../../kibana-services';
 import { ApiCheck, AppState, GenericRequest } from '../../../react-services';
 import { CheckLogger } from '../types/check_logger';
+import { PLUGIN_PLATFORM_NAME } from '../../../../common/constants';
 
 const trySetDefault = async (checkLogger: CheckLogger) => {
   try {
@@ -46,10 +47,12 @@ const trySetDefault = async (checkLogger: CheckLogger) => {
         }
       }
       if (errors.length) {
-        if (errors[0].includes('ERROR3099 - 405: Method Not Allowed')) {
-          return Promise.reject(
-            'No API available to connect. This may be related to a version mismatch between Wazuh Server and Wazuh Dashboard. Please check the versions and try again.',
-          );
+        for (var j = 0; j < errors.length; j++) {
+          if (errors[j].includes('ERROR3099 - 405: Method Not Allowed')) {
+            return Promise.reject(
+              `No API available to connect. This may be related to a version mismatch between Wazuh Server and ${PLUGIN_PLATFORM_NAME}. Please check the versions and try again.`,
+            );
+          }
         }
         return Promise.reject('No API available to connect');
       }
@@ -61,70 +64,71 @@ const trySetDefault = async (checkLogger: CheckLogger) => {
   }
 };
 
-export const checkApiService = (appInfo: any) => async (
-  checkLogger: CheckLogger,
-) => {
-  let apiChanged = false;
-  try {
-    let currentApi = JSON.parse(AppState.getCurrentAPI() || '{}');
-    if (!currentApi.id) {
-      checkLogger.info(`No current API selected`);
-      currentApi.id = await trySetDefault(checkLogger);
-      apiChanged = true;
-    }
-
-    checkLogger.info(`Current API id [${currentApi.id}]`);
-    checkLogger.info(`Checking current API id [${currentApi.id}]...`);
-    const data = await ApiCheck.checkStored(currentApi.id).catch(async err => {
-      checkLogger.info(
-        `Current API id [${currentApi.id}] has some problem: ${
-          err.message || err
-        }`,
-      );
-      const newApi = await trySetDefault(checkLogger);
-      if (newApi.error) {
-        return { error: newApi.error };
+export const checkApiService =
+  (appInfo: any) => async (checkLogger: CheckLogger) => {
+    let apiChanged = false;
+    try {
+      let currentApi = JSON.parse(AppState.getCurrentAPI() || '{}');
+      if (!currentApi.id) {
+        checkLogger.info(`No current API selected`);
+        currentApi.id = await trySetDefault(checkLogger);
+        apiChanged = true;
       }
-      apiChanged = true;
-      checkLogger.info(`API host id [${newApi}] available`);
-      return await ApiCheck.checkStored(newApi, true);
-    });
 
-    if (apiChanged) {
-      const api = ((data || {}).data || {}).data || {};
-      const name = (api.cluster_info || {}).manager || false;
-      AppState.setCurrentAPI(JSON.stringify({ name: name, id: api.id }));
-      checkLogger.info(
-        `Set current API in cookie: id [${api.id}], name [${name}]`,
+      checkLogger.info(`Current API id [${currentApi.id}]`);
+      checkLogger.info(`Checking current API id [${currentApi.id}]...`);
+      const data = await ApiCheck.checkStored(currentApi.id).catch(
+        async err => {
+          checkLogger.info(
+            `Current API id [${currentApi.id}] has some problem: ${
+              err.message || err
+            }`,
+          );
+          const newApi = await trySetDefault(checkLogger);
+          if (newApi.error) {
+            return { error: newApi.error };
+          }
+          apiChanged = true;
+          checkLogger.info(`API host id [${newApi}] available`);
+          return await ApiCheck.checkStored(newApi, true);
+        },
       );
-      getToasts().add({
-        color: 'warning',
-        title: 'Selected Wazuh API has been updated',
-        text: '',
-        toastLifeTimeMs: 3000,
-      });
+
+      if (apiChanged) {
+        const api = ((data || {}).data || {}).data || {};
+        const name = (api.cluster_info || {}).manager || false;
+        AppState.setCurrentAPI(JSON.stringify({ name: name, id: api.id }));
+        checkLogger.info(
+          `Set current API in cookie: id [${api.id}], name [${name}]`,
+        );
+        getToasts().add({
+          color: 'warning',
+          title: 'Selected Wazuh API has been updated',
+          text: '',
+          toastLifeTimeMs: 3000,
+        });
+      }
+      //update cluster info
+      const cluster_info = (((data || {}).data || {}).data || {}).cluster_info;
+      if (cluster_info) {
+        AppState.setClusterInfo(cluster_info);
+        checkLogger.info(`Set cluster info in cookie`);
+      }
+      if (data === 3099) {
+        checkLogger.error('Wazuh not ready yet');
+      } else if (data.data.error || data.data.data.apiIsDown) {
+        const errorMessage = data.data.data.apiIsDown
+          ? 'Wazuh API is down'
+          : `Error connecting to the API: ${
+              data.data.error && data.data.error.message
+                ? ` ${data.data.error.message}`
+                : ''
+            }`;
+        checkLogger.error(errorMessage);
+      }
+    } catch (error) {
+      AppState.removeNavigation();
+      checkLogger.info('Removed [navigate] cookie');
+      throw error;
     }
-    //update cluster info
-    const cluster_info = (((data || {}).data || {}).data || {}).cluster_info;
-    if (cluster_info) {
-      AppState.setClusterInfo(cluster_info);
-      checkLogger.info(`Set cluster info in cookie`);
-    }
-    if (data === 3099) {
-      checkLogger.error('Wazuh not ready yet');
-    } else if (data.data.error || data.data.data.apiIsDown) {
-      const errorMessage = data.data.data.apiIsDown
-        ? 'Wazuh API is down'
-        : `Error connecting to the API: ${
-            data.data.error && data.data.error.message
-              ? ` ${data.data.error.message}`
-              : ''
-          }`;
-      checkLogger.error(errorMessage);
-    }
-  } catch (error) {
-    AppState.removeNavigation();
-    checkLogger.info('Removed [navigate] cookie');
-    throw error;
-  }
-};
+  };
