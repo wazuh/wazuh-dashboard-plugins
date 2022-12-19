@@ -34,6 +34,7 @@ import {
   EuiIcon,
   EuiSwitch,
   EuiLink,
+  EuiLink,
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
 import { withErrorBoundary } from '../../../components/common/hocs';
@@ -349,7 +350,7 @@ export const RegisterAgent = withErrorBoundary(
       }
 
       if (this.state.udpProtocol) {
-        deployment += `WAZUH_PROTOCOL='UDP' `;
+        deployment += "WAZUH_PROTOCOL='UDP' ";
       }
 
       if (this.state.selectedGroup.length) {
