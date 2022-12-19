@@ -1335,7 +1335,6 @@ apk add wazuh-agent`,
             options={options}
             idSelected={idSelected}
             onChange={onChange}
-            // className={'osButtonsStyle'}
             className={'wz-flex'}
           />
         );
@@ -1482,7 +1481,6 @@ apk add wazuh-agent`,
             options={options}
             idSelected={idSelected}
             onChange={onChange}
-            // className={'osButtonsStyleMac'}
           />
         );
       };
