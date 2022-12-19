@@ -273,7 +273,7 @@ export const RegisterAgent = withErrorBoundary(
         this.state.selectedVersion === 'solaris10' ||
         this.state.selectedVersion === 'solaris11' ||
         this.state.selectedVersion === '6.1 TL9' ||
-        this.state.selectedVersion === '11.31'
+        this.state.selectedVersion === '3.12.12'
       ) {
         return '/var/ossec/bin/wazuh-control start';
       } else this.state.selectedVersion === '11.31';
@@ -1077,15 +1077,17 @@ apk add wazuh-agent`,
               {windowsAdvice}
               {this.state.selectedVersion == 'windowsxp' ||
               this.state.selectedVersion == 'windowsserver2008' ? (
-                <EuiCallOut
-                  color='warning'
-                  title={warningCommand}
-                  iconType='iInCircle'
-                />
+                <>
+                  <EuiCallOut
+                    color='warning'
+                    title={warningCommand}
+                    iconType='iInCircle'
+                  />
+                  <EuiSpacer />
+                </>
               ) : (
                 ''
               )}
-              <EuiSpacer />
               <div className='copy-codeblock-wrapper'>
                 <EuiCodeBlock style={codeBlock} language={language}>
                   {this.state.wazuhPassword && !this.state.showPassword
@@ -1214,6 +1216,14 @@ apk add wazuh-agent`,
               ) : (
                 ''
               )}
+              {/* 
+              {
+                <EuiCallOut
+                  color='warning'
+                  title={extraInstallationText}
+                  iconType='iInCircle'
+                />
+              } */}
               {this.state.needsPassword && (
                 <EuiSwitch
                   label='Show password'
@@ -1449,6 +1459,9 @@ apk add wazuh-agent`,
                 {this.state.selectedOS == 'hp' || this.state.selectedOS == 'sol'
                   ? messageExtraSteps
                   : ''}
+                {this.state.selectedOS == 'hp' || this.state.selectedOS == 'sol'
+                  ? messageExtraSteps
+                  : ''}
               </EuiText>
             </Fragment>
           ),
@@ -1551,6 +1564,7 @@ apk add wazuh-agent`,
           }
         }
       };
+      console.log(this.state.selectedOS, 'oss');
 
       const steps = [
         {
@@ -1998,7 +2012,8 @@ apk add wazuh-agent`,
         this.state.selectedOS == 'sol' ||
         this.state.selectedOS == 'aix' ||
         this.state.selectedOS == 'hp' ||
-        this.state.selectedOS == 'alpine'
+        this.state.selectedOS == 'alpine' ||
+        this.state.selectedOS == ''
           ? [
               {
                 title: 'Start the agent',
