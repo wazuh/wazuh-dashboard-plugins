@@ -46,6 +46,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed pagination to SCA table [#4653](https://github.com/wazuh/wazuh-kibana-app/issues/4653)
 - Fixed WAZUH_PROTOCOL param suggestion [#4849](https://github.com/wazuh/wazuh-kibana-app/pull/4849)
 - Raspbian OS, Ubuntu, Amazon Linux and Amazon Linux 2 commands in the wizard deploy agent now change when a different architecture is selected [#4876](https://github.com/wazuh/wazuh-kibana-app/pull/4876) [#4880](https://github.com/wazuh/wazuh-kibana-app/pull/4880)
+- Disabled unmapped fields filter in Security Events alerts table [#4929](https://github.com/wazuh/wazuh-kibana-app/pull/4929)
 - Fixed a bug that caused the flyouts to close when clicking inside them [#4638](https://github.com/wazuh/wazuh-kibana-app/pull/4638)
 - Fixed agent installation command for macOS in the deploy new agent section. [#4968](https://github.com/wazuh/wazuh-kibana-app/pull/4968)
 - Fixed vulnerabilities default last scan date formatter [#4975](https://github.com/wazuh/wazuh-kibana-app/pull/4975)
