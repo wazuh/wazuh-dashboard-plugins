@@ -272,10 +272,12 @@ export const RegisterAgent = withErrorBoundary(
         this.state.selectedVersion === 'solaris10' ||
         this.state.selectedVersion === 'solaris11' ||
         this.state.selectedVersion === '6.1 TL9' ||
-        this.state.selectedVersion === '11.31' ||
         this.state.selectedVersion === '3.12.12'
       ) {
         return '/var/ossec/bin/wazuh-control start';
+      } else this.state.selectedVersion === '11.31';
+      {
+        return '/sbin/init.d/wazuh-agent start';
       }
     }
 
@@ -857,16 +859,14 @@ export const RegisterAgent = withErrorBoundary(
         'user-manual/agents/agent-connection.html',
         appVersionMajorDotMinor,
       );
+
+      const urlWazuhAgentEnrollment = webDocumentationLink(
+        'user-manual/agent-enrollment/index.html',
+        appVersionMajorDotMinor,
+      );
+
       const urlWindowsPackage = `https://packages.wazuh.com/4.x/windows/wazuh-agent-${this.state.wazuhVersion}-1.msi`;
 
-      const textAndLinkToCheckConnectionDocumentation = (
-        <p>
-          To verify the connection with the Wazuh server, please follow this{' '}
-          <a href={urlCheckConnectionDocumentation} target='_blank'>
-            document.
-          </a>
-        </p>
-      );
       const missingOSSelection = this.checkMissingOSSelection();
 
       const agentName = (
@@ -963,7 +963,7 @@ apk add wazuh-agent`,
             : 'pkgadd -d wazuh-agent.pkg'
         }`,
         aixText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}rpm -ivh ${this.optionalPackages()}`,
-        hpText: `cd / && sudo curl -so ${this.optionalPackages()} && sudo ${this.agentNameVariable()}groupadd wazuh && sudo useradd -G wazuh wazuh && sudo tar -xvf wazuh-agent.tar`,
+        hpText: `cd / && sudo curl -so ${this.optionalPackages()} && sudo groupadd wazuh && sudo useradd -G wazuh wazuh && sudo tar -xvf wazuh-agent.tar`,
         amazonlinuxText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
         fedoraText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
         oraclelinuxText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
@@ -980,14 +980,34 @@ apk add wazuh-agent`,
       const language = this.getHighlightCodeLanguage(this.state.selectedOS);
       const warningUpgrade =
         'If the installer finds another Wazuh agent in the system, it will upgrade it preserving the configuration.';
-      const warningCommand = (
+      const textAndLinkToCheckConnectionDocumentation = (
         <p>
-          Please
-          <a href={urlWindowsPackage}> download </a>
-          the package from our repository and copy it to the Windows system
-          where you are going to install it. Then run the following command to
-          perform the installation:
+          To verify the connection with the Wazuh server, please follow this{' '}
+          <a href={urlCheckConnectionDocumentation} target='_blank'>
+            document.
+          </a>
         </p>
+      );
+      const messageExtraSteps = (
+        <p>
+          After installing the agent, you need to enroll it in the Wazuh server.
+          Check the Wazuh agent enrollment{' '}
+          <a href={urlWazuhAgentEnrollment} target='_blank'>
+            Wazuh agent enrollment{' '}
+          </a>
+          section to learn more.
+        </p>
+      );
+      const warningCommand = (
+        <>
+          <p>
+            Please
+            <a href={urlWindowsPackage}> download </a>
+            the package from our repository and copy it to the Windows system
+            where you are going to install it. Then run the following command to
+            perform the installation:
+          </p>
+        </>
       );
       const windowsAdvice = this.state.selectedOS === 'win' && (
         <>
@@ -1037,10 +1057,17 @@ apk add wazuh-agent`,
           ) : this.state.connectionSecure === true &&
             this.state.udpProtocol === false ? (
             <EuiText>
-              <p>
-                You can use this command to install and enroll the Wazuh agent
-                in one or more hosts.
-              </p>
+              {this.state.agentName.length > 0 ? (
+                <p>
+                  You can use this command to install and enroll the Wazuh
+                  agent.
+                </p>
+              ) : (
+                <p>
+                  You can use this command to install and enroll the Wazuh agent
+                  in one or more hosts.
+                </p>
+              )}
               <EuiCallOut
                 color='warning'
                 title={warningUpgrade}
@@ -1050,15 +1077,17 @@ apk add wazuh-agent`,
               {windowsAdvice}
               {this.state.selectedVersion == 'windowsxp' ||
               this.state.selectedVersion == 'windowsserver2008' ? (
-                <EuiCallOut
-                  color='warning'
-                  title={warningCommand}
-                  iconType='iInCircle'
-                />
+                <>
+                  <EuiCallOut
+                    color='warning'
+                    title={warningCommand}
+                    iconType='iInCircle'
+                  />
+                  <EuiSpacer />
+                </>
               ) : (
                 ''
               )}
-              <EuiSpacer />
               <div className='copy-codeblock-wrapper'>
                 <EuiCodeBlock style={codeBlock} language={language}>
                   {this.state.wazuhPassword && !this.state.showPassword
@@ -1075,6 +1104,126 @@ apk add wazuh-agent`,
                   )}
                 </EuiCopy>
               </div>
+              {this.state.selectedVersion == 'solaris10' ||
+              this.state.selectedVersion == 'solaris11' ? (
+                <EuiCallOut
+                  color='warning'
+                  className='message'
+                  iconType='iInCircle'
+                  title={
+                    <span>
+                      Might require some extra installation{' '}
+                      <EuiLink
+                        target='_blank'
+                        href={webDocumentationLink(
+                          'installation-guide/wazuh-agent/wazuh-agent-package-solaris.html',
+                          appVersionMajorDotMinor,
+                        )}
+                      >
+                        steps
+                      </EuiLink>
+                      .
+                    </span>
+                  }
+                ></EuiCallOut>
+              ) : this.state.selectedVersion == '6.1 TL9' ? (
+                <EuiCallOut
+                  color='warning'
+                  className='message'
+                  iconType='iInCircle'
+                  title={
+                    <span>
+                      Might require some extra installation{' '}
+                      <EuiLink
+                        target='_blank'
+                        href={webDocumentationLink(
+                          'installation-guide/wazuh-agent/wazuh-agent-package-aix.html',
+                          appVersionMajorDotMinor,
+                        )}
+                      >
+                        steps
+                      </EuiLink>
+                      .
+                    </span>
+                  }
+                ></EuiCallOut>
+              ) : this.state.selectedVersion == '11.31' ? (
+                <EuiCallOut
+                  color='warning'
+                  className='message'
+                  iconType='iInCircle'
+                  title={
+                    <span>
+                      Might require some extra installation{' '}
+                      <EuiLink
+                        target='_blank'
+                        href={webDocumentationLink(
+                          'installation-guide/wazuh-agent/wazuh-agent-package-hpux.html',
+                          appVersionMajorDotMinor,
+                        )}
+                      >
+                        steps
+                      </EuiLink>
+                      .
+                    </span>
+                  }
+                ></EuiCallOut>
+              ) : this.state.selectedVersion == '3.12.12' ? (
+                <EuiCallOut
+                  color='warning'
+                  className='message'
+                  iconType='iInCircle'
+                  title={
+                    <span>
+                      Might require some extra installation{' '}
+                      <EuiLink
+                        target='_blank'
+                        href={webDocumentationLink(
+                          'installation-guide/wazuh-agent/wazuh-agent-package-linux.html',
+                          appVersionMajorDotMinor,
+                        )}
+                      >
+                        steps
+                      </EuiLink>
+                      .
+                    </span>
+                  }
+                ></EuiCallOut>
+              ) : this.state.selectedVersion == 'debian7' ||
+                this.state.selectedVersion == 'debian8' ||
+                this.state.selectedVersion == 'debian9' ||
+                this.state.selectedVersion == 'debian10' ? (
+                <EuiCallOut
+                  color='warning'
+                  className='message'
+                  iconType='iInCircle'
+                  title={
+                    <span>
+                      Might require some extra installation{' '}
+                      <EuiLink
+                        target='_blank'
+                        href={webDocumentationLink(
+                          'installation-guide/wazuh-agent/wazuh-agent-package-linux.html',
+                          appVersionMajorDotMinor,
+                        )}
+                      >
+                        steps
+                      </EuiLink>
+                      .
+                    </span>
+                  }
+                ></EuiCallOut>
+              ) : (
+                ''
+              )}
+              {/* 
+              {
+                <EuiCallOut
+                  color='warning'
+                  title={extraInstallationText}
+                  iconType='iInCircle'
+                />
+              } */}
               {this.state.needsPassword && (
                 <EuiSwitch
                   label='Show password'
@@ -1208,6 +1357,9 @@ apk add wazuh-agent`,
                 </div>
                 <EuiSpacer size='s' />
                 {textAndLinkToCheckConnectionDocumentation}
+                {this.state.selectedOS == 'hp' || this.state.selectedOS == 'sol'
+                  ? messageExtraSteps
+                  : ''}
               </EuiText>
             </Fragment>
           ),
@@ -1238,6 +1390,9 @@ apk add wazuh-agent`,
                 </div>
                 <EuiSpacer size='s' />
                 {textAndLinkToCheckConnectionDocumentation}
+                {this.state.selectedOS == 'hp' || this.state.selectedOS == 'sol'
+                  ? messageExtraSteps
+                  : ''}
               </EuiText>
             </Fragment>
           ),
@@ -1268,6 +1423,9 @@ apk add wazuh-agent`,
                 </div>
                 <EuiSpacer size='s' />
                 {textAndLinkToCheckConnectionDocumentation}
+                {this.state.selectedOS == 'hp' || this.state.selectedOS == 'sol'
+                  ? messageExtraSteps
+                  : ''}
               </EuiText>
             </Fragment>
           ),
@@ -1298,6 +1456,9 @@ apk add wazuh-agent`,
                 </div>
                 <EuiSpacer size='s' />
                 {textAndLinkToCheckConnectionDocumentation}
+                {this.state.selectedOS == 'hp' || this.state.selectedOS == 'sol'
+                  ? messageExtraSteps
+                  : ''}
               </EuiText>
             </Fragment>
           ),
@@ -1328,6 +1489,9 @@ apk add wazuh-agent`,
                 </div>
                 <EuiSpacer size='s' />
                 {textAndLinkToCheckConnectionDocumentation}
+                {this.state.selectedOS == 'hp' || this.state.selectedOS == 'sol'
+                  ? messageExtraSteps
+                  : ''}
               </EuiText>
             </Fragment>
           ),
@@ -1530,6 +1694,7 @@ apk add wazuh-agent`,
           }
         }
       };
+      console.log(this.state.selectedOS, 'oss');
 
       const steps = [
         {
@@ -1547,21 +1712,12 @@ apk add wazuh-agent`,
           ? [
               {
                 title: 'Choose the version',
-                children:
-                  this.state.selectedVersion == 'redhat5' ||
-                  this.state.selectedVersion == 'redhat6'
-                    ? buttonGroupWithMessage(
-                        'Choose the version',
-                        versionButtonsRedHat,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      )
-                    : buttonGroup(
-                        'Choose the version',
-                        versionButtonsRedHat,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      ),
+                children: buttonGroup(
+                  'Choose the version',
+                  versionButtonsRedHat,
+                  this.state.selectedVersion,
+                  version => this.setVersion(version),
+                ),
               },
             ]
           : []),
@@ -1608,21 +1764,12 @@ apk add wazuh-agent`,
           ? [
               {
                 title: 'Choose the version',
-                children:
-                  this.state.selectedVersion == 'centos5' ||
-                  this.state.selectedVersion == 'centos6'
-                    ? buttonGroupWithMessage(
-                        'Choose the version',
-                        versionButtonsCentos,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      )
-                    : buttonGroup(
-                        'Choose the version',
-                        versionButtonsCentos,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      ),
+                children: buttonGroup(
+                  'Choose the version',
+                  versionButtonsCentos,
+                  this.state.selectedVersion,
+                  version => this.setVersion(version),
+                ),
               },
             ]
           : []),
@@ -1643,23 +1790,12 @@ apk add wazuh-agent`,
           ? [
               {
                 title: 'Choose the version',
-                children:
-                  this.state.selectedVersion == 'debian7' ||
-                  this.state.selectedVersion == 'debian8' ||
-                  this.state.selectedVersion == 'debian9' ||
-                  this.state.selectedVersion == 'debian10'
-                    ? buttonGroupWithMessage(
-                        'Choose the version',
-                        versionButtonsDebian,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      )
-                    : buttonGroup(
-                        'Choose the version',
-                        versionButtonsDebian,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      ),
+                children: buttonGroup(
+                  'Choose the version',
+                  versionButtonsDebian,
+                  this.state.selectedVersion,
+                  version => this.setVersion(version),
+                ),
               },
             ]
           : []),
@@ -1667,20 +1803,12 @@ apk add wazuh-agent`,
           ? [
               {
                 title: 'Choose the version',
-                children:
-                  this.state.selectedVersion == 'ubuntu14'
-                    ? buttonGroupWithMessage(
-                        'Choose the version',
-                        versionButtonsUbuntu,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      )
-                    : buttonGroup(
-                        'Choose the version',
-                        versionButtonsUbuntu,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      ),
+                children: buttonGroup(
+                  'Choose the version',
+                  versionButtonsUbuntu,
+                  this.state.selectedVersion,
+                  version => this.setVersion(version),
+                ),
               },
             ]
           : []),
@@ -1740,21 +1868,12 @@ apk add wazuh-agent`,
           ? [
               {
                 title: 'Choose the version',
-                children:
-                  this.state.selectedVersion == 'solaris10' ||
-                  this.state.selectedVersion == 'solaris11'
-                    ? buttonGroupWithMessage(
-                        'Choose the version',
-                        versionButtonsSolaris,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      )
-                    : buttonGroup(
-                        'Choose the version',
-                        versionButtonsSolaris,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      ),
+                children: buttonGroup(
+                  'Choose the version',
+                  versionButtonsSolaris,
+                  this.state.selectedVersion,
+                  version => this.setVersion(version),
+                ),
               },
             ]
           : []),
@@ -1762,20 +1881,12 @@ apk add wazuh-agent`,
           ? [
               {
                 title: 'Choose the version',
-                children:
-                  this.state.selectedVersion == '6.1 TL9'
-                    ? buttonGroupWithMessage(
-                        'Choose the version',
-                        versionButtonsAix,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      )
-                    : buttonGroup(
-                        'Choose the version',
-                        versionButtonsAix,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      ),
+                children: buttonGroup(
+                  'Choose the version',
+                  versionButtonsAix,
+                  this.state.selectedVersion,
+                  version => this.setVersion(version),
+                ),
               },
             ]
           : []),
@@ -1783,20 +1894,12 @@ apk add wazuh-agent`,
           ? [
               {
                 title: 'Choose the version',
-                children:
-                  this.state.selectedVersion == '11.31'
-                    ? buttonGroupWithMessage(
-                        'Choose the version',
-                        versionButtonsHPUX,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      )
-                    : buttonGroup(
-                        'Choose the version',
-                        versionButtonsHPUX,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      ),
+                children: buttonGroup(
+                  'Choose the version',
+                  versionButtonsHPUX,
+                  this.state.selectedVersion,
+                  version => this.setVersion(version),
+                ),
               },
             ]
           : []),
@@ -1804,20 +1907,12 @@ apk add wazuh-agent`,
           ? [
               {
                 title: 'Choose the version',
-                children:
-                  this.state.selectedVersion == '3.12.12'
-                    ? buttonGroupWithMessage(
-                        'Choose the version',
-                        versionButtonAlpine,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      )
-                    : buttonGroup(
-                        'Choose the version',
-                        versionButtonAlpine,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      ),
+                children: buttonGroup(
+                  'Choose the version',
+                  versionButtonAlpine,
+                  this.state.selectedVersion,
+                  version => this.setVersion(version),
+                ),
               },
             ]
           : []),
@@ -1972,18 +2067,26 @@ apk add wazuh-agent`,
               },
             ]
           : []),
-        {
-          title: 'Wazuh server address',
-          children: (
-            <Fragment>
-              <ServerAddress
-                defaultValue={this.state.defaultServerAddress}
-                onChange={onChangeServerAddress}
-                fetchOptions={fetchClusterNodesOptions}
-              />
-            </Fragment>
-          ),
-        },
+        ...(!(
+          this.state.selectedOS == 'hp' ||
+          this.state.selectedOS == 'sol' ||
+          this.state.selectedOS == 'alpine'
+        )
+          ? [
+              {
+                title: 'Wazuh server address',
+                children: (
+                  <Fragment>
+                    <ServerAddress
+                      defaultValue={this.state.defaultServerAddress}
+                      onChange={onChangeServerAddress}
+                      fetchOptions={fetchClusterNodesOptions}
+                    />
+                  </Fragment>
+                ),
+              },
+            ]
+          : []),
         ...(!(!this.state.needsPassword || this.state.hidePasswordInput)
           ? [
               {
@@ -1992,16 +2095,24 @@ apk add wazuh-agent`,
               },
             ]
           : []),
-        {
-          title: 'Assign a name and a group to the agent',
-          children: (
-            <Fragment>
-              {agentName}
-              {groupInput}
-              {agentGroup}
-            </Fragment>
-          ),
-        },
+        ...(!(
+          this.state.selectedOS == 'hp' ||
+          this.state.selectedOS == 'sol' ||
+          this.state.selectedOS == 'alpine'
+        )
+          ? [
+              {
+                title: 'Assign a name and a group to the agent',
+                children: (
+                  <Fragment>
+                    {agentName}
+                    {groupInput}
+                    {agentGroup}
+                  </Fragment>
+                ),
+              },
+            ]
+          : []),
         {
           title: 'Install and enroll the agent',
           children: this.state.gotErrorRegistrationServiceInfo ? (
@@ -2031,7 +2142,8 @@ apk add wazuh-agent`,
         this.state.selectedOS == 'sol' ||
         this.state.selectedOS == 'aix' ||
         this.state.selectedOS == 'hp' ||
-        this.state.selectedOS == 'alpine'
+        this.state.selectedOS == 'alpine' ||
+        this.state.selectedOS == ''
           ? [
               {
                 title: 'Start the agent',
