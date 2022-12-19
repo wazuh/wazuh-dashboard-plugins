@@ -8,6 +8,7 @@ import { getFilterValues } from './lib';
 type Props = {
   agent: { [key: string]: any };
   lookingPolicy: { [key: string]: any };
+  filters: any[];
 };
 
 type State = {
@@ -24,12 +25,12 @@ export class InventoryPolicyChecksTable extends Component<Props, State> {
   columnsChecks: any;
   constructor(props) {
     super(props);
-    const { agent, lookingPolicy } = this.props;
+    const { agent, lookingPolicy, filters } = this.props;
     this.state = {
       agent,
       lookingPolicy,
       itemIdToExpandedRowMap: {},
-      filters: [],
+      filters: filters || [],
       pageTableChecks: { pageIndex: 0 },
     };
     this.suggestions = [
@@ -208,7 +209,12 @@ export class InventoryPolicyChecksTable extends Component<Props, State> {
 
   async componentDidMount() {}
 
-  async componentDidUpdate(prevProps, prevState) {}
+  async componentDidUpdate(prevProps) {
+    const { filters } =  this.props
+    if (filters !== prevProps.filters) {
+      this.setState({ filters: filters });
+    }
+  }
 
   componentWillUnmount() {
     this._isMount = false;
