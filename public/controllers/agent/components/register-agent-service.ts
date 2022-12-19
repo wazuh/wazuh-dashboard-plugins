@@ -105,20 +105,13 @@ async function getConnectionConfig(
   defaultServerAddress?: string,
 ) {
   const nodeName = nodeSelected?.label;
-  if (!defaultServerAddress) {
-    if (nodeSelected.nodetype !== 'custom') {
+  const nodeIp = nodeSelected?.value;
+  if(!defaultServerAddress){
+    if(nodeSelected.nodetype !== 'custom'){
       const remoteConfig = await getRemoteConfiguration(nodeName);
-      return {
-        serverAddress: remoteConfig.name,
-        udpProtocol: remoteConfig.isUdp,
-        connectionSecure: remoteConfig.haveSecureConnection,
-      };
-    } else {
-      return {
-        serverAddress: nodeName,
-        udpProtocol: false,
-        connectionSecure: true,
-      };
+      return { serverAddress: nodeIp, udpProtocol: remoteConfig.isUdp, connectionSecure: remoteConfig.haveSecureConnection };
+    }else{
+      return { serverAddress: nodeName, udpProtocol: false, connectionSecure: true };
     }
   } else {
     return {
