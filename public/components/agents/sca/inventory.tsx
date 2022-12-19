@@ -544,7 +544,7 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
                       <EuiStat
                         title={this.buttonStat(
                           this.state.lookingPolicy.invalid,
-                          'result',
+                          'status',
                           'not applicable'
                         )}
                         description="Not applicable"
@@ -578,6 +578,7 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
                     <EuiFlexItem>
                       <InventoryPolicyChecksTable
                         agent={this.props.agent}
+                        filters={this.state.filters}
                         lookingPolicy={this.state.lookingPolicy}
                       />
                     </EuiFlexItem>
