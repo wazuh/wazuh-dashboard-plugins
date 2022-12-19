@@ -15,7 +15,11 @@
 import { getToasts } from '../../../kibana-services';
 import { ApiCheck, AppState, GenericRequest } from '../../../react-services';
 import { CheckLogger } from '../types/check_logger';
-import { PLUGIN_PLATFORM_NAME } from '../../../../common/constants';
+import {
+  PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_TROUBLESHOOTING,
+  PLUGIN_APP_NAME,
+} from '../../../../common/constants';
+import { webDocumentationLink } from '../../../../common/services/web_documentation';
 
 const trySetDefault = async (checkLogger: CheckLogger) => {
   try {
@@ -50,7 +54,9 @@ const trySetDefault = async (checkLogger: CheckLogger) => {
         for (var j = 0; j < errors.length; j++) {
           if (errors[j].includes('ERROR3099 - 405: Method Not Allowed')) {
             return Promise.reject(
-              `No API available to connect. This may be related to a version mismatch between Wazuh Server and ${PLUGIN_PLATFORM_NAME}. Please check the versions and try again.`,
+              `No API available to connect. This may be related to a version mismatch between Wazuh Server and ${PLUGIN_APP_NAME}. Please check the versions and try again. Read more about this in our troubleshooting guide: ${webDocumentationLink(
+                PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_TROUBLESHOOTING,
+              )}.`,
             );
           }
         }
