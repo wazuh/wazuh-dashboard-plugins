@@ -49,6 +49,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed the agents wizard OS styles and their versions. [#4832](https://github.com/wazuh/wazuh-kibana-app/pull/4832) [#4838](https://github.com/wazuh/wazuh-kibana-app/pull/4838)
 - Fixed the manager option in the agent deployment section [#4981](https://github.com/wazuh/wazuh-kibana-app/pull/4981)
 - Fixed agent installation command for macOS in the deploy new agent section. [#4983](https://github.com/wazuh/wazuh-kibana-app/pull/4983)
+- Fixed commands in the deploy new agent section(most of the commands are missing '-1') [#4962](https://github.com/wazuh/wazuh-kibana-app/pull/4962)
 - Fixed vulnerabilities default last scan date formatter [#4975](https://github.com/wazuh/wazuh-kibana-app/pull/4975)
 
 ## Wazuh v4.3.10 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4311
