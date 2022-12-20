@@ -1220,14 +1220,6 @@ apk add wazuh-agent`,
               ) : (
                 ''
               )}
-              {/* 
-              {
-                <EuiCallOut
-                  color='warning'
-                  title={extraInstallationText}
-                  iconType='iInCircle'
-                />
-              } */}
               {this.state.needsPassword && (
                 <EuiSwitch
                   label='Show password'
@@ -1568,7 +1560,6 @@ apk add wazuh-agent`,
           }
         }
       };
-      console.log(this.state.selectedOS, 'oss');
 
       const steps = [
         {
