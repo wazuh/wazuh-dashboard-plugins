@@ -31,7 +31,6 @@ import {
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
 import { formatUIDate } from '../../../react-services/time-service';
-import exportCsv from '../../../react-services/wz-csv';
 import { getToasts } from '../../../kibana-services';
 import _ from 'lodash';
 import {
@@ -325,32 +324,6 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
     });
   };
 
-  /**
-   *
-   */
-  async downloadCsv() {
-    try {
-      this.showToast('success', 'Your download should begin automatically...', 3000);
-      await exportCsv(
-        '/sca/' + this.props.agent.id + '/checks/' + this.state.lookingPolicy.policy_id,
-        [],
-        this.state.lookingPolicy.policy_id
-      );
-    } catch (error) {
-      const options: UIErrorLog = {
-        context: `${Inventory.name}.downloadCsv`,
-        level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
-        severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: error.name,
-        },
-      };
-      getErrorOrchestrator().handleError(options);
-    }
-  }
-
   buttonStat(text, field, value) {
     return <button onClick={() => this.setState({ filters: [{ field, value }] })}>{text}</button>;
   }
@@ -503,22 +476,6 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
                         </h2>
                       </EuiTitle>
                     </EuiFlexItem>
-                    <EuiFlexItem grow={false}>
-                      <EuiButtonEmpty
-                        iconType="importAction"
-                        onClick={async () => await this.downloadCsv()}
-                      >
-                        Export formatted
-                      </EuiButtonEmpty>
-                    </EuiFlexItem>
-                    <EuiFlexItem grow={false}>
-                      <EuiButtonEmpty
-                        iconType="refresh"
-                        onClick={() => this.loadScaPolicy(this.state.lookingPolicy.policy_id)}
-                      >
-                        Refresh
-                      </EuiButtonEmpty>
-                    </EuiFlexItem>
                   </EuiFlexGroup>
                   <EuiSpacer size="m" />
                   <EuiFlexGroup>
@@ -544,7 +501,7 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
                       <EuiStat
                         title={this.buttonStat(
                           this.state.lookingPolicy.invalid,
-                          'result',
+                          'status',
                           'not applicable'
                         )}
                         description="Not applicable"
@@ -578,6 +535,7 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
                     <EuiFlexItem>
                       <InventoryPolicyChecksTable
                         agent={this.props.agent}
+                        filters={this.state.filters}
                         lookingPolicy={this.state.lookingPolicy}
                       />
                     </EuiFlexItem>

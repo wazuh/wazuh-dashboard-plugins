@@ -19,6 +19,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added powerPC architecture in redhat7, in the section 'Deploy new agent'. [#4833](https://github.com/wazuh/wazuh-kibana-app/pull/4833)
 - Added a centralized service to handle the requests [#4831](https://github.com/wazuh/wazuh-kibana-app/pull/4831)
 - Added data-test-subj create policy [#4873](https://github.com/wazuh/wazuh-kibana-app/pull/4873)
+- Added file saving conditions in File Editor [#4970](https://github.com/wazuh/wazuh-kibana-app/pull/4970)
 
 ### Changed
 
@@ -29,10 +30,11 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Independently load each dashboard from the `Agents Overview` page [#4363](https://github.com/wazuh/wazuh-kibana-app/pull/4363)
 - The endpoint `/agents/summary/status` handler was adapted to the new interface. [#3874](https://github.com/wazuh/wazuh-kibana-app/pull/3874)
 - Updated and added operating systems, versions, architectures commands of Install and enroll the agent and commands of Start the agent in the deploy new agent section [#4458](https://github.com/wazuh/wazuh-kibana-app/pull/4458)
-- Added cluster's IP and protocol as suggestions in the agent deployment wizard. [#4776](https://github.com/wazuh/wazuh-kibana-app/pull/4776)
+- Added cluster's IP and protocol as suggestions in the agent deployment wizard. [#4776](https://github.com/wazuh/wazuh-kibana-app/pull/4776) [#4954](https://github.com/wazuh/wazuh-kibana-app/pull/4954)
 - Show OS name and OS version in the agent installation wizard. [#4851](https://github.com/wazuh/wazuh-kibana-app/pull/4851)
 - Changed the endpoint that updates the plugin configuration to support multiple settings. [#4501](https://github.com/wazuh/wazuh-kibana-app/pull/4501)
 - The button to export the app logs is now disabled when there are no results, instead of showing an error toast [#4972](https://github.com/wazuh/wazuh-kibana-app/pull/4972)
+- Updated the `winston` dependency to `3.5.1` [#5014](https://github.com/wazuh/wazuh-kibana-app/pull/5014)
 
 ### Fixed
 
@@ -41,10 +43,17 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed a bug where the Wazuh logo was used instead of the custom one [#4539](https://github.com/wazuh/wazuh-kibana-app/pull/4539)
 - Fixed rendering problems of the `Agent Overview` section in low resolutions [#4516](https://github.com/wazuh/wazuh-kibana-app/pull/4516)
 - Fixed issue when logging out from Wazuh when SAML is enabled [#4595](https://github.com/wazuh/wazuh-kibana-app/issues/4595)
-- Fixed server errors with code 500 when the Wazuh API is not reachable / up. [#4710](https://github.com/wazuh/wazuh-kibana-app/pull/4710) [#4728](https://github.com/wazuh/wazuh-kibana-app/pull/4728)
-- Fixed pagination to SCA table [#4653](https://github.com/wazuh/wazuh-kibana-app/issues/4653)
+- Fixed server errors with code 500 when the Wazuh API is not reachable / up. [#4710](https://github.com/wazuh/wazuh-kibana-app/pull/4710) [#4728](https://github.com/wazuh/wazuh-kibana-app/pull/4728) [#4971](https://github.com/wazuh/wazuh-kibana-app/pull/4971)
+- Fixed pagination to SCA table [#4653](https://github.com/wazuh/wazuh-kibana-app/issues/4653) [#5010](https://github.com/wazuh/wazuh-kibana-app/pull/5010)
 - Fixed WAZUH_PROTOCOL param suggestion [#4849](https://github.com/wazuh/wazuh-kibana-app/pull/4849)
 - Raspbian OS, Ubuntu, Amazon Linux and Amazon Linux 2 commands in the wizard deploy agent now change when a different architecture is selected [#4876](https://github.com/wazuh/wazuh-kibana-app/pull/4876) [#4880](https://github.com/wazuh/wazuh-kibana-app/pull/4880)
+- Fixed commands in the deploy new agent section(most of the commands are missing '-1') [#4962](https://github.com/wazuh/wazuh-kibana-app/pull/4962)
+- Fixed Inventory checks table filters by stats [#4999](https://github.com/wazuh/wazuh-kibana-app/pull/4999)
+- Fixed vulnerabilities default last scan date formatter [#4975](https://github.com/wazuh/wazuh-kibana-app/pull/4975)
+
+### Removed
+
+- Removed the `angular-chart.js` dependency [#5014](https://github.com/wazuh/wazuh-kibana-app/pull/5014)
 
 ## Wazuh v4.3.10 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4311
 
