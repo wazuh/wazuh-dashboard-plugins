@@ -34,7 +34,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Show OS name and OS version in the agent installation wizard. [#4851](https://github.com/wazuh/wazuh-kibana-app/pull/4851)
 - Changed the endpoint that updates the plugin configuration to support multiple settings. [#4501](https://github.com/wazuh/wazuh-kibana-app/pull/4501)
 - The button to export the app logs is now disabled when there are no results, instead of showing an error toast [#4972](https://github.com/wazuh/wazuh-kibana-app/pull/4972)
-- Updated the `winston` dependency to `3.5.1` [#4985](https://github.com/wazuh/wazuh-kibana-app/pull/4985)
+- Updated the `winston` dependency to `3.5.1` [#5014](https://github.com/wazuh/wazuh-kibana-app/pull/5014)
 
 ### Fixed
 
@@ -53,7 +53,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Removed
 
-- Removed the `angular-chart.js` dependency [#4985](https://github.com/wazuh/wazuh-kibana-app/pull/4985)
+- Removed the `angular-chart.js` dependency [#5014](https://github.com/wazuh/wazuh-kibana-app/pull/5014)
 
 ## Wazuh v4.3.10 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4311
 
