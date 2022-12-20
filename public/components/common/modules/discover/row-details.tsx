@@ -37,6 +37,7 @@ import './discover.scss';
 import { EuiFlexItem } from '@elastic/eui';
 import { WzRequest } from '../../../../react-services/wz-request';
 import WzTextWithTooltipTruncated from '../../../../components/common/wz-text-with-tooltip-if-truncated';
+import { formatHit } from '../../../../kibana-integrations/lib/format_hit';
 
 const capitalize = str => str[0].toUpperCase() + str.slice(1);
 
@@ -247,7 +248,7 @@ export class RowDetails extends Component {
             className={valueClassName}
             style={{ borderTop: 0, borderBottom: 0, padding: 0, margin: 0 }}
             key={key + "2"}>
-            { showCollapseButton && (
+            {showCollapseButton && (
               <DocViewTableRowBtnCollapse onClick={this.onToggleCollapse} isCollapsed={this.state.isCollapsed} />
             )}
             <div
@@ -283,8 +284,9 @@ export class RowDetails extends Component {
   // Render the row value column supporting nested fields
   renderArrayValue = (value) => {
     if (arrayContainsObjects(value)) {
-      const formatted = this.props?.indexPattern?.formatHit({ _index: value }, 'html')?._index;
-      return trimAngularSpan(String(formatted));
+      // For compatibility reasons between Kibana 7.10 and 7.16.x we need to normalize the formatHit
+      const formatHitValue = (formatHit({ _index: value }, this.props?.indexPattern, 'html')?._index)
+      return trimAngularSpan(String(formatHitValue));
     }
     else {
       return value.join(', ')
@@ -545,7 +547,7 @@ export class RowDetails extends Component {
               extraAction={
                 <a href={`#/manager/rules?tab=rules&redirectRule=${id}`} target="_blank" style={{ paddingTop: 5 }}>
                   <EuiIcon type="popout" color='primary' />&nbsp;
-                    View in Rules
+                  View in Rules
                 </a>
               }
               paddingSize="none"
