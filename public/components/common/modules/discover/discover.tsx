@@ -44,7 +44,7 @@ import {
   EuiToolTip,
 } from '@elastic/eui';
 import {
-  IIndexPattern,
+  DataView,
   TimeRange,
   Query,
   buildPhraseFilter,
@@ -96,7 +96,7 @@ export const Discover = compose(
       columns: string[];
       hover: string;
     };
-    indexPattern!: IIndexPattern;
+    indexPattern!: DataView;
     props!: {
       implicitFilters: object[];
       initialFilters: object[];
@@ -261,23 +261,7 @@ export const Discover = compose(
     }
 
     async getIndexPattern() {
-      this.indexPattern = {
-        ...(await this.PluginPlatformServices.indexPatterns.get(AppState.getCurrentPattern())),
-      };
-      const fields: IFieldType[] = [];
-      Object.keys(this.indexPattern.fields).forEach((item) => {
-        if (isNaN(item)) {
-          fields.push(this.indexPattern.fields[item]);
-        } else if (
-          this.props.includeFilters &&
-          this.indexPattern.fields[item].name.includes(this.props.includeFilters)
-        ) {
-          fields.unshift(this.indexPattern.fields[item]);
-        } else {
-          fields.push(this.indexPattern.fields[item]);
-        }
-      });
-      this.indexPattern.fields = fields;
+      this.indexPattern = await this.PluginPlatformServices.indexPatterns.get(AppState.getCurrentPattern());
     }
 
     hideCreateCustomLabel = () => {

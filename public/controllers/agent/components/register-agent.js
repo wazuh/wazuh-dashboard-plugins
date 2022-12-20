@@ -69,12 +69,12 @@ import {
   versionButtonsHPUX,
   versionButtonAlpine,
 } from '../wazuh-config';
-import './register-agent.scss';
 import ServerAddress from '../register-agent/steps/server-address';
 import {
   getConnectionConfig,
   fetchClusterNodesOptions,
 } from './register-agent-service';
+import './register-agent.scss';
 import { PrincipalButtonGroup } from './wz-accordion';
 
 export const RegisterAgent = withErrorBoundary(
@@ -83,6 +83,7 @@ export const RegisterAgent = withErrorBoundary(
       super(props);
       this.wazuhConfig = new WazuhConfig();
       this.configuration = this.wazuhConfig.getConfig();
+      this.addToVersion = '-1';
       this.state = {
         status: 'incomplete',
         selectedOS: '',
@@ -272,10 +273,12 @@ export const RegisterAgent = withErrorBoundary(
         this.state.selectedVersion === 'solaris10' ||
         this.state.selectedVersion === 'solaris11' ||
         this.state.selectedVersion === '6.1 TL9' ||
-        this.state.selectedVersion === '11.31' ||
-        this.state.selectedVersion === '3.12.12'
+        this.state.selectedVersion === '11.31'
       ) {
         return '/var/ossec/bin/wazuh-control start';
+      } else this.state.selectedVersion === '11.31';
+      {
+        return '/sbin/init.d/wazuh-agent start';
       }
     }
 
@@ -368,6 +371,13 @@ export const RegisterAgent = withErrorBoundary(
 
     agentNameVariable() {
       let agentName = `WAZUH_AGENT_NAME='${this.state.agentName}' `;
+      if (
+        this.state.selectedOS === 'macos' &&
+        this.state.selectedArchitecture &&
+        this.state.agentName !== ''
+      ) {
+        return agentName.replace(/=/g, ' ');
+      }
       if (this.state.selectedArchitecture && this.state.agentName !== '') {
         return agentName;
       } else {
@@ -380,29 +390,29 @@ export const RegisterAgent = withErrorBoundary(
         `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
       ) {
         case 'redhat5-i386':
-          return `https://packages.wazuh.com/4.x/yum5/i386/wazuh-agent-${this.state.wazuhVersion}-1.el5.i386.rpm`;
+          return `https://packages.wazuh.com/4.x/yum5/i386/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.el5.i386.rpm`;
         case 'redhat5-x86_64':
-          return `https://packages.wazuh.com/4.x/yum5/x86_64/wazuh-agent-${this.state.wazuhVersion}-1.el5.x86_64.rpm`;
+          return `https://packages.wazuh.com/4.x/yum5/x86_64/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.el5.x86_64.rpm`;
         case 'redhat6-i386':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.i386.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.i386.rpm`;
         case 'redhat6-aarch64':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.aarch64.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.aarch64.rpm`;
         case 'redhat6-x86_64':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.x86_64.rpm`;
         case 'redhat6-armhf':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.armv7hl.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.armv7hl.rpm`;
         case 'redhat7-i386':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.i386.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.i386.rpm`;
         case 'redhat7-aarch64':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.aarch64.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.aarch64.rpm`;
         case 'redhat7-x86_64':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.x86_64.rpm`;
         case 'redhat7-armhf':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.armv7hl.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.armv7hl.rpm`;
         case 'redhat7-powerpc':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.ppc64le.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.ppc64le.rpm`;
         default:
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.x86_64.rpm`;
       }
     }
 
@@ -411,17 +421,17 @@ export const RegisterAgent = withErrorBoundary(
         `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
       ) {
         case '3.12.12-i386':
-          return 'https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"';
+          return `https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && \echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"`;
         case '3.12.12-aarch64':
-          return 'https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"';
+          return `https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && \echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"`;
         case '3.12.12-x86_64':
-          return 'https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"';
+          return `https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && \echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"`;
         case '3.12.12-armhf':
-          return 'https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"';
+          return `https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && \echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"`;
         case '3.12.12-powerpc':
-          return 'https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"';
+          return `https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && \echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"`;
         default:
-          return 'https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"';
+          return `https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && \echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"`;
       }
     }
 
@@ -430,25 +440,25 @@ export const RegisterAgent = withErrorBoundary(
         `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
       ) {
         case 'oraclelinux5-i386':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.i386.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.i386.rpm`;
         case 'oraclelinux5-aarch64':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.aarch64.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.aarch64.rpm`;
         case 'oraclelinux5-x86_64':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.x86_64.rpm`;
         case 'oraclelinux5-armhf':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.armv7hl.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.armv7hl.rpm`;
         case 'oraclelinux5-powerpc':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.ppc64le.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.ppc64le.rpm`;
         case 'oraclelinux6-i386':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.i386.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.i386.rpm`;
         case 'oraclelinux6-aarch64':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.aarch64.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.aarch64.rpm`;
         case 'oraclelinux6-x86_64':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.x86_64.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.x86_64.rpm`;
         case 'oraclelinux6-armhf':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.armv7hl.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.armv7hl.rpm`;
         default:
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.x86_64.rpm`;
       }
     }
 
@@ -457,29 +467,29 @@ export const RegisterAgent = withErrorBoundary(
         `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
       ) {
         case 'centos5-i386':
-          return `https://packages.wazuh.com/4.x/yum/i386/wazuh-agent-${this.state.wazuhVersion}.el5.i386.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/i386/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.el5.i386.rpm`;
         case 'centos5-x86_64':
-          return `https://packages.wazuh.com/4.x/yum/x86_64/wazuh-agent-${this.state.wazuhVersion}.el5.x86_64.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/x86_64/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.el5.x86_64.rpm`;
         case 'centos6-i386':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.i386.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.i386.rpm`;
         case 'centos6-aarch64':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.aarch64.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.aarch64.rpm`;
         case 'centos6-x86_64':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.x86_64.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.x86_64.rpm`;
         case 'centos6-armhf':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.armv7hl.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.armv7hl.rpm`;
         case 'centos7-i386':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.i386.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.i386.rpm`;
         case 'centos7-aarch64':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.aarch64.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.aarch64.rpm`;
         case 'centos7-x86_64':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.x86_64.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.x86_64.rpm`;
         case 'centos7-armhf':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.armv7hl.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.armv7hl.rpm`;
         case 'centos7-powerpc':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.ppc64le.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.ppc64le.rpm`;
         default:
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.x86_64.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.x86_64.rpm`;
       }
     }
 
@@ -488,21 +498,21 @@ export const RegisterAgent = withErrorBoundary(
         `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
       ) {
         case 'suse11-i386':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.i386.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.i386.rpm`;
         case 'suse11-x86_64':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.x86_64.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.x86_64.rpm`;
         case 'suse12-i386':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.i386.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.i386.rpm`;
         case 'suse12-aarch64':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.aarch64.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.aarch64.rpm`;
         case 'suse12-x86_64':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.x86_64.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.x86_64.rpm`;
         case 'suse12-armhf':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.armv7hl.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.armv7hl.rpm`;
         case 'suse12-powerpc':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.ppc64le.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.ppc64le.rpm`;
         default:
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.x86_64.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.x86_64.rpm`;
       }
     }
 
@@ -511,17 +521,17 @@ export const RegisterAgent = withErrorBoundary(
         `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
       ) {
         case '22-i386':
-          return `https://packages.wazuh.com/4.x/yum/i386/wazuh-agent-${this.state.wazuhVersion}-1.el5.i386.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/i386/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.el5.i386.rpm`;
         case '22-aarch64':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.aarch64.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.aarch64.rpm`;
         case '22-x86_64':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.x86_64.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.x86_64.rpm`;
         case '22-armhf':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.armv7hl.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.armv7hl.rpm`;
         case '22-powerpc':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.ppc64le.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.ppc64le.rpm`;
         default:
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.x86_64.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.x86_64.rpm`;
       }
     }
 
@@ -530,52 +540,52 @@ export const RegisterAgent = withErrorBoundary(
         `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
       ) {
         case 'amazonlinux1-i386':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.i386.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.i386.rpm`;
         case 'amazonlinux1-aarch64':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.aarch64.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.aarch64.rpm`;
         case 'amazonlinux1-x86_64':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.x86_64.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.x86_64.rpm`;
         case 'amazonlinux1-armhf':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.armv7hl.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.armv7hl.rpm`;
         case 'amazonlinux1-powerpc':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.ppc64le.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.ppc64le.rpm`;
         case 'amazonlinux2-i386':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.i386.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.i386.rpm`;
         case 'amazonlinux2-aarch64':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.aarch64.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.aarch64.rpm`;
         case 'amazonlinux2-x86_64':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.x86_64.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.x86_64.rpm`;
         case 'amazonlinux2-armhf':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.armv7hl.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.armv7hl.rpm`;
         case 'amazonlinux2-powerpc':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.ppc64le.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.ppc64le.rpm`;
         case 'amazonlinux2022-i386':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.i386.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.i386.rpm`;
         case 'amazonlinux2022-aarch64':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.aarch64.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.aarch64.rpm`;
         case 'amazonlinux2022-x86_64':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.x86_64.rpm`;
         case 'amazonlinux2022-armhf':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.armv7hl.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.armv7hl.rpm`;
         default:
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.x86_64.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.x86_64.rpm`;
       }
     }
 
     resolveDEBPackage() {
       switch (`${this.state.selectedArchitecture}`) {
         case 'i386':
-          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_i386.deb`;
+          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}${this.addToVersion}_i386.deb`;
         case 'aarch64':
-          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_arm64.deb`;
+          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}${this.addToVersion}_arm64.deb`;
         case 'armhf':
-          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_armhf.deb`;
+          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}${this.addToVersion}_armhf.deb`;
         case 'x86_64':
-          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_amd64.deb`;
+          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}${this.addToVersion}_amd64.deb`;
         case 'powerpc':
-          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}.ppc64el.deb`;
+          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}${this.addToVersion}.ppc64el.deb`;
         default:
-          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_amd64.deb`;
+          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}${this.addToVersion}_amd64.deb`;
       }
     }
 
@@ -584,17 +594,17 @@ export const RegisterAgent = withErrorBoundary(
         `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
       ) {
         case 'busterorgreater-i386':
-          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_i386.deb`;
+          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}${this.addToVersion}_i386.deb`;
         case 'busterorgreater-aarch64':
-          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_arm64.deb`;
+          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}${this.addToVersion}_arm64.deb`;
         case 'busterorgreater-armhf':
-          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_armhf.deb`;
+          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}${this.addToVersion}_armhf.deb`;
         case 'busterorgreater-x86_64':
-          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_amd64.deb`;
+          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}${this.addToVersion}_amd64.deb`;
         case 'busterorgreater-powerpc':
-          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}.ppc64el.deb`;
+          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}${this.addToVersion}.ppc64el.deb`;
         default:
-          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_amd64.deb`;
+          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}${this.addToVersion}_amd64.deb`;
       }
     }
 
@@ -603,23 +613,23 @@ export const RegisterAgent = withErrorBoundary(
         `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
       ) {
         case 'ubuntu14-i386':
-          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_i386.deb`;
+          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}${this.addToVersion}_i386.deb`;
         case 'ubuntu14-aarch64':
-          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_arm64.deb`;
+          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}${this.addToVersion}_arm64.deb`;
         case 'ubuntu14-armhf':
-          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_armhf.deb`;
+          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}${this.addToVersion}_armhf.deb`;
         case 'ubuntu14-x86_64':
-          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_amd64.deb`;
+          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}${this.addToVersion}_amd64.deb`;
         case 'ubuntu15-i386':
-          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_i386.deb`;
+          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}${this.addToVersion}_i386.deb`;
         case 'ubuntu15-aarch64':
-          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_arm64.deb`;
+          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}${this.addToVersion}_arm64.deb`;
         case 'ubuntu15-armhf':
-          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_armhf.deb`;
+          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}${this.addToVersion}_armhf.deb`;
         case 'ubuntu15-x86_64':
-          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_amd64.deb`;
+          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}${this.addToVersion}_amd64.deb`;
         default:
-          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_amd64.deb`;
+          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}${this.addToVersion}_amd64.deb`;
       }
     }
 
@@ -628,11 +638,11 @@ export const RegisterAgent = withErrorBoundary(
         `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
       ) {
         case 'leap15-x86_64':
-          return `https://packages.wazuh.com/4.x/yum/i386/wazuh-agent-${this.state.wazuhVersion}.x86_64.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/i386/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.x86_64.rpm`;
         case 'leap15-ARM64':
-          return `https://packages.wazuh.com/4.x/yum/x86_64/wazuh-agent-${this.state.wazuhVersion}.armv7hl.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/x86_64/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.armv7hl.rpm`;
         default:
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.x86_64.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.x86_64.rpm`;
       }
     }
 
@@ -658,9 +668,9 @@ export const RegisterAgent = withErrorBoundary(
         `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
       ) {
         case '6.1 TL9-powerpc':
-          return `https://packages.wazuh.com/4.x/yum/i386/wazuh-agent-${this.state.wazuhVersion}.aix.ppc.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/i386/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.aix.ppc.rpm`;
         default:
-          return `https://packages.wazuh.com/4.x/yum/i386/wazuh-agent-${this.state.wazuhVersion}.aix.ppc.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/i386/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.aix.ppc.rpm`;
       }
     }
 
@@ -669,9 +679,9 @@ export const RegisterAgent = withErrorBoundary(
         `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
       ) {
         case '11.31-itanium2':
-          return `https://packages.wazuh.com/4.x/yum/i386/wazuh-agent-${this.state.wazuhVersion}-hpux-11v3-ia64.tar`;
+          return `https://packages.wazuh.com/4.x/yum/i386/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}-hpux-11v3-ia64.tar`;
         default:
-          return `https://packages.wazuh.com/4.x/yum/i386/wazuh-agent-${this.state.wazuhVersion}-hpux-11v3-ia64.tar`;
+          return `https://packages.wazuh.com/4.x/yum/i386/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}-hpux-11v3-ia64.tar`;
       }
     }
 
@@ -706,7 +716,7 @@ export const RegisterAgent = withErrorBoundary(
         case 'alpine':
           return this.resolveAlpinePackage();
         default:
-          return `https://packages.wazuh.com/4.x/yum/x86_64/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/x86_64/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.x86_64.rpm`;
       }
     }
 
@@ -849,20 +859,14 @@ export const RegisterAgent = withErrorBoundary(
         'user-manual/agents/agent-connection.html',
         appVersionMajorDotMinor,
       );
+
+      const urlWazuhAgentEnrollment = webDocumentationLink(
+        'user-manual/agent-enrollment/index.html',
+        appVersionMajorDotMinor,
+      );
+
       const urlWindowsPackage = `https://packages.wazuh.com/4.x/windows/wazuh-agent-${this.state.wazuhVersion}-1.msi`;
 
-      const textAndLinkToCheckConnectionDocumentation = (
-        <p>
-          To verify the connection with the Wazuh server, please follow this{' '}
-          <a
-            href={urlCheckConnectionDocumentation}
-            target='_blank'
-            rel='noreferrer'
-          >
-            document.
-          </a>
-        </p>
-      );
       const missingOSSelection = this.checkMissingOSSelection();
 
       const agentName = (
@@ -959,7 +963,7 @@ apk add wazuh-agent`,
             : 'pkgadd -d wazuh-agent.pkg'
         }`,
         aixText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}rpm -ivh ${this.optionalPackages()}`,
-        hpText: `cd / && sudo curl -so ${this.optionalPackages()} && sudo ${this.agentNameVariable()}groupadd wazuh && sudo useradd -G wazuh wazuh && sudo tar -xvf wazuh-agent.tar`,
+        hpText: `cd / && sudo curl -so ${this.optionalPackages()} && sudo groupadd wazuh && sudo useradd -G wazuh wazuh && sudo tar -xvf wazuh-agent.tar`,
         amazonlinuxText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
         fedoraText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
         oraclelinuxText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
@@ -976,14 +980,34 @@ apk add wazuh-agent`,
       const language = this.getHighlightCodeLanguage(this.state.selectedOS);
       const warningUpgrade =
         'If the installer finds another Wazuh agent in the system, it will upgrade it preserving the configuration.';
-      const warningCommand = (
+      const textAndLinkToCheckConnectionDocumentation = (
         <p>
-          Please
-          <a href={urlWindowsPackage}> download </a>
-          the package from our repository and copy it to the Windows system
-          where you are going to install it. Then run the following command to
-          perform the installation:
+          To verify the connection with the Wazuh server, please follow this{' '}
+          <a href={urlCheckConnectionDocumentation} target='_blank'>
+            document.
+          </a>
         </p>
+      );
+      const messageExtraSteps = (
+        <p>
+          After installing the agent, you need to enroll it in the Wazuh server.
+          Check the Wazuh agent enrollment{' '}
+          <a href={urlWazuhAgentEnrollment} target='_blank'>
+            Wazuh agent enrollment{' '}
+          </a>
+          section to learn more.
+        </p>
+      );
+      const warningCommand = (
+        <>
+          <p>
+            Please
+            <a href={urlWindowsPackage}> download </a>
+            the package from our repository and copy it to the Windows system
+            where you are going to install it. Then run the following command to
+            perform the installation:
+          </p>
+        </>
       );
       const windowsAdvice = this.state.selectedOS === 'win' && (
         <>
@@ -1033,10 +1057,17 @@ apk add wazuh-agent`,
           ) : this.state.connectionSecure === true &&
             this.state.udpProtocol === false ? (
             <EuiText>
-              <p>
-                You can use this command to install and enroll the Wazuh agent
-                in one or more hosts.
-              </p>
+              {this.state.agentName.length > 0 ? (
+                <p>
+                  You can use this command to install and enroll the Wazuh
+                  agent.
+                </p>
+              ) : (
+                <p>
+                  You can use this command to install and enroll the Wazuh agent
+                  in one or more hosts.
+                </p>
+              )}
               <EuiCallOut
                 color='warning'
                 title={warningUpgrade}
@@ -1071,6 +1102,126 @@ apk add wazuh-agent`,
                   )}
                 </EuiCopy>
               </div>
+              {this.state.selectedVersion == 'solaris10' ||
+              this.state.selectedVersion == 'solaris11' ? (
+                <EuiCallOut
+                  color='warning'
+                  className='message'
+                  iconType='iInCircle'
+                  title={
+                    <span>
+                      Might require some extra installation{' '}
+                      <EuiLink
+                        target='_blank'
+                        href={webDocumentationLink(
+                          'installation-guide/wazuh-agent/wazuh-agent-package-solaris.html',
+                          appVersionMajorDotMinor,
+                        )}
+                      >
+                        steps
+                      </EuiLink>
+                      .
+                    </span>
+                  }
+                ></EuiCallOut>
+              ) : this.state.selectedVersion == '6.1 TL9' ? (
+                <EuiCallOut
+                  color='warning'
+                  className='message'
+                  iconType='iInCircle'
+                  title={
+                    <span>
+                      Might require some extra installation{' '}
+                      <EuiLink
+                        target='_blank'
+                        href={webDocumentationLink(
+                          'installation-guide/wazuh-agent/wazuh-agent-package-aix.html',
+                          appVersionMajorDotMinor,
+                        )}
+                      >
+                        steps
+                      </EuiLink>
+                      .
+                    </span>
+                  }
+                ></EuiCallOut>
+              ) : this.state.selectedVersion == '11.31' ? (
+                <EuiCallOut
+                  color='warning'
+                  className='message'
+                  iconType='iInCircle'
+                  title={
+                    <span>
+                      Might require some extra installation{' '}
+                      <EuiLink
+                        target='_blank'
+                        href={webDocumentationLink(
+                          'installation-guide/wazuh-agent/wazuh-agent-package-hpux.html',
+                          appVersionMajorDotMinor,
+                        )}
+                      >
+                        steps
+                      </EuiLink>
+                      .
+                    </span>
+                  }
+                ></EuiCallOut>
+              ) : this.state.selectedVersion == '3.12.12' ? (
+                <EuiCallOut
+                  color='warning'
+                  className='message'
+                  iconType='iInCircle'
+                  title={
+                    <span>
+                      Might require some extra installation{' '}
+                      <EuiLink
+                        target='_blank'
+                        href={webDocumentationLink(
+                          'installation-guide/wazuh-agent/wazuh-agent-package-linux.html',
+                          appVersionMajorDotMinor,
+                        )}
+                      >
+                        steps
+                      </EuiLink>
+                      .
+                    </span>
+                  }
+                ></EuiCallOut>
+              ) : this.state.selectedVersion == 'debian7' ||
+                this.state.selectedVersion == 'debian8' ||
+                this.state.selectedVersion == 'debian9' ||
+                this.state.selectedVersion == 'debian10' ? (
+                <EuiCallOut
+                  color='warning'
+                  className='message'
+                  iconType='iInCircle'
+                  title={
+                    <span>
+                      Might require some extra installation{' '}
+                      <EuiLink
+                        target='_blank'
+                        href={webDocumentationLink(
+                          'installation-guide/wazuh-agent/wazuh-agent-package-linux.html',
+                          appVersionMajorDotMinor,
+                        )}
+                      >
+                        steps
+                      </EuiLink>
+                      .
+                    </span>
+                  }
+                ></EuiCallOut>
+              ) : (
+                ''
+              )}
+              {/* 
+              {
+                <EuiCallOut
+                  color='warning'
+                  title={extraInstallationText}
+                  iconType='iInCircle'
+                />
+              } */}
               {this.state.needsPassword && (
                 <EuiSwitch
                   label='Show password'
@@ -1204,6 +1355,9 @@ apk add wazuh-agent`,
                 </div>
                 <EuiSpacer size='s' />
                 {textAndLinkToCheckConnectionDocumentation}
+                {this.state.selectedOS == 'hp' || this.state.selectedOS == 'sol'
+                  ? messageExtraSteps
+                  : ''}
               </EuiText>
             </Fragment>
           ),
@@ -1234,6 +1388,9 @@ apk add wazuh-agent`,
                 </div>
                 <EuiSpacer size='s' />
                 {textAndLinkToCheckConnectionDocumentation}
+                {this.state.selectedOS == 'hp' || this.state.selectedOS == 'sol'
+                  ? messageExtraSteps
+                  : ''}
               </EuiText>
             </Fragment>
           ),
@@ -1264,6 +1421,9 @@ apk add wazuh-agent`,
                 </div>
                 <EuiSpacer size='s' />
                 {textAndLinkToCheckConnectionDocumentation}
+                {this.state.selectedOS == 'hp' || this.state.selectedOS == 'sol'
+                  ? messageExtraSteps
+                  : ''}
               </EuiText>
             </Fragment>
           ),
@@ -1294,6 +1454,9 @@ apk add wazuh-agent`,
                 </div>
                 <EuiSpacer size='s' />
                 {textAndLinkToCheckConnectionDocumentation}
+                {this.state.selectedOS == 'hp' || this.state.selectedOS == 'sol'
+                  ? messageExtraSteps
+                  : ''}
               </EuiText>
             </Fragment>
           ),
@@ -1324,6 +1487,9 @@ apk add wazuh-agent`,
                 </div>
                 <EuiSpacer size='s' />
                 {textAndLinkToCheckConnectionDocumentation}
+                {this.state.selectedOS == 'hp' || this.state.selectedOS == 'sol'
+                  ? messageExtraSteps
+                  : ''}
               </EuiText>
             </Fragment>
           ),
@@ -1340,139 +1506,6 @@ apk add wazuh-agent`,
             onChange={onChange}
             className={'wz-flex'}
           />
-        );
-      };
-
-      const buttonGroupWithMessage = (
-        legend,
-        options,
-        idSelected,
-        onChange,
-      ) => {
-        return (
-          <>
-            <EuiButtonGroup
-              color='primary'
-              legend={legend}
-              options={options}
-              idSelected={idSelected}
-              onChange={onChange}
-              className={'wz-flex'}
-            />
-
-            {this.state.selectedVersion === 'solaris10' ||
-            this.state.selectedVersion === 'solaris11' ? (
-              <EuiCallOut
-                color='warning'
-                className='message'
-                iconType='iInCircle'
-                title={
-                  <span>
-                    Might require some extra installation{' '}
-                    <EuiLink
-                      target='_blank'
-                      href={webDocumentationLink(
-                        'installation-guide/wazuh-agent/wazuh-agent-package-solaris.html',
-                        appVersionMajorDotMinor,
-                      )}
-                    >
-                      steps
-                    </EuiLink>
-                    .
-                  </span>
-                }
-              ></EuiCallOut>
-            ) : this.state.selectedVersion === '6.1 TL9' ? (
-              <EuiCallOut
-                color='warning'
-                className='message'
-                iconType='iInCircle'
-                title={
-                  <span>
-                    Might require some extra installation{' '}
-                    <EuiLink
-                      target='_blank'
-                      href={webDocumentationLink(
-                        'installation-guide/wazuh-agent/wazuh-agent-package-aix.html',
-                        appVersionMajorDotMinor,
-                      )}
-                    >
-                      steps
-                    </EuiLink>
-                    .
-                  </span>
-                }
-              ></EuiCallOut>
-            ) : this.state.selectedVersion == '11.31' ? (
-              <EuiCallOut
-                color='warning'
-                className='message'
-                iconType='iInCircle'
-                title={
-                  <span>
-                    Might require some extra installation{' '}
-                    <EuiLink
-                      target='_blank'
-                      href={webDocumentationLink(
-                        'installation-guide/wazuh-agent/wazuh-agent-package-hpux.html',
-                        appVersionMajorDotMinor,
-                      )}
-                    >
-                      steps
-                    </EuiLink>
-                    .
-                  </span>
-                }
-              ></EuiCallOut>
-            ) : this.state.selectedVersion === '3.12.12' ? (
-              <EuiCallOut
-                color='warning'
-                className='message'
-                iconType='iInCircle'
-                title={
-                  <span>
-                    Might require some extra installation{' '}
-                    <EuiLink
-                      target='_blank'
-                      href={webDocumentationLink(
-                        'installation-guide/wazuh-agent/wazuh-agent-package-linux.html',
-                        appVersionMajorDotMinor,
-                      )}
-                    >
-                      steps
-                    </EuiLink>
-                    .
-                  </span>
-                }
-              ></EuiCallOut>
-            ) : this.state.selectedVersion == 'debian7' ||
-              this.state.selectedVersion == 'debian8' ||
-              this.state.selectedVersion == 'debian9' ||
-              this.state.selectedVersion == 'debian10' ? (
-              <EuiCallOut
-                color='warning'
-                className='message'
-                iconType='iInCircle'
-                title={
-                  <span>
-                    Might require some extra installation{' '}
-                    <EuiLink
-                      target='_blank'
-                      href={webDocumentationLink(
-                        'installation-guide/wazuh-agent/wazuh-agent-package-linux.html',
-                        appVersionMajorDotMinor,
-                      )}
-                    >
-                      steps
-                    </EuiLink>
-                    .
-                  </span>
-                }
-              ></EuiCallOut>
-            ) : (
-              ''
-            )}
-          </>
         );
       };
 
@@ -1526,6 +1559,7 @@ apk add wazuh-agent`,
           }
         }
       };
+      console.log(this.state.selectedOS, 'oss');
 
       const steps = [
         {
@@ -1543,21 +1577,12 @@ apk add wazuh-agent`,
           ? [
               {
                 title: 'Choose the version',
-                children:
-                  this.state.selectedVersion == 'redhat5' ||
-                  this.state.selectedVersion == 'redhat6'
-                    ? buttonGroupWithMessage(
-                        'Choose the version',
-                        versionButtonsRedHat,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      )
-                    : buttonGroup(
-                        'Choose the version',
-                        versionButtonsRedHat,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      ),
+                children: buttonGroup(
+                  'Choose the version',
+                  versionButtonsRedHat,
+                  this.state.selectedVersion,
+                  version => this.setVersion(version),
+                ),
               },
             ]
           : []),
@@ -1604,21 +1629,12 @@ apk add wazuh-agent`,
           ? [
               {
                 title: 'Choose the version',
-                children:
-                  this.state.selectedVersion == 'centos5' ||
-                  this.state.selectedVersion == 'centos6'
-                    ? buttonGroupWithMessage(
-                        'Choose the version',
-                        versionButtonsCentos,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      )
-                    : buttonGroup(
-                        'Choose the version',
-                        versionButtonsCentos,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      ),
+                children: buttonGroup(
+                  'Choose the version',
+                  versionButtonsCentos,
+                  this.state.selectedVersion,
+                  version => this.setVersion(version),
+                ),
               },
             ]
           : []),
@@ -1639,23 +1655,12 @@ apk add wazuh-agent`,
           ? [
               {
                 title: 'Choose the version',
-                children:
-                  this.state.selectedVersion == 'debian7' ||
-                  this.state.selectedVersion == 'debian8' ||
-                  this.state.selectedVersion == 'debian9' ||
-                  this.state.selectedVersion == 'debian10'
-                    ? buttonGroupWithMessage(
-                        'Choose the version',
-                        versionButtonsDebian,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      )
-                    : buttonGroup(
-                        'Choose the version',
-                        versionButtonsDebian,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      ),
+                children: buttonGroup(
+                  'Choose the version',
+                  versionButtonsDebian,
+                  this.state.selectedVersion,
+                  version => this.setVersion(version),
+                ),
               },
             ]
           : []),
@@ -1663,20 +1668,12 @@ apk add wazuh-agent`,
           ? [
               {
                 title: 'Choose the version',
-                children:
-                  this.state.selectedVersion == 'ubuntu14'
-                    ? buttonGroupWithMessage(
-                        'Choose the version',
-                        versionButtonsUbuntu,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      )
-                    : buttonGroup(
-                        'Choose the version',
-                        versionButtonsUbuntu,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      ),
+                children: buttonGroup(
+                  'Choose the version',
+                  versionButtonsUbuntu,
+                  this.state.selectedVersion,
+                  version => this.setVersion(version),
+                ),
               },
             ]
           : []),
@@ -1736,21 +1733,12 @@ apk add wazuh-agent`,
           ? [
               {
                 title: 'Choose the version',
-                children:
-                  this.state.selectedVersion == 'solaris10' ||
-                  this.state.selectedVersion == 'solaris11'
-                    ? buttonGroupWithMessage(
-                        'Choose the version',
-                        versionButtonsSolaris,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      )
-                    : buttonGroup(
-                        'Choose the version',
-                        versionButtonsSolaris,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      ),
+                children: buttonGroup(
+                  'Choose the version',
+                  versionButtonsSolaris,
+                  this.state.selectedVersion,
+                  version => this.setVersion(version),
+                ),
               },
             ]
           : []),
@@ -1758,20 +1746,12 @@ apk add wazuh-agent`,
           ? [
               {
                 title: 'Choose the version',
-                children:
-                  this.state.selectedVersion == '6.1 TL9'
-                    ? buttonGroupWithMessage(
-                        'Choose the version',
-                        versionButtonsAix,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      )
-                    : buttonGroup(
-                        'Choose the version',
-                        versionButtonsAix,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      ),
+                children: buttonGroup(
+                  'Choose the version',
+                  versionButtonsAix,
+                  this.state.selectedVersion,
+                  version => this.setVersion(version),
+                ),
               },
             ]
           : []),
@@ -1779,20 +1759,12 @@ apk add wazuh-agent`,
           ? [
               {
                 title: 'Choose the version',
-                children:
-                  this.state.selectedVersion == '11.31'
-                    ? buttonGroupWithMessage(
-                        'Choose the version',
-                        versionButtonsHPUX,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      )
-                    : buttonGroup(
-                        'Choose the version',
-                        versionButtonsHPUX,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      ),
+                children: buttonGroup(
+                  'Choose the version',
+                  versionButtonsHPUX,
+                  this.state.selectedVersion,
+                  version => this.setVersion(version),
+                ),
               },
             ]
           : []),
@@ -1800,20 +1772,12 @@ apk add wazuh-agent`,
           ? [
               {
                 title: 'Choose the version',
-                children:
-                  this.state.selectedVersion == '3.12.12'
-                    ? buttonGroupWithMessage(
-                        'Choose the version',
-                        versionButtonAlpine,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      )
-                    : buttonGroup(
-                        'Choose the version',
-                        versionButtonAlpine,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      ),
+                children: buttonGroup(
+                  'Choose the version',
+                  versionButtonAlpine,
+                  this.state.selectedVersion,
+                  version => this.setVersion(version),
+                ),
               },
             ]
           : []),
@@ -1968,18 +1932,26 @@ apk add wazuh-agent`,
               },
             ]
           : []),
-        {
-          title: 'Wazuh server address',
-          children: (
-            <Fragment>
-              <ServerAddress
-                defaultValue={this.state.defaultServerAddress}
-                onChange={onChangeServerAddress}
-                fetchOptions={fetchClusterNodesOptions}
-              />
-            </Fragment>
-          ),
-        },
+        ...(!(
+          this.state.selectedOS == 'hp' ||
+          this.state.selectedOS == 'sol' ||
+          this.state.selectedOS == 'alpine'
+        )
+          ? [
+              {
+                title: 'Wazuh server address',
+                children: (
+                  <Fragment>
+                    <ServerAddress
+                      defaultValue={this.state.defaultServerAddress}
+                      onChange={onChangeServerAddress}
+                      fetchOptions={fetchClusterNodesOptions}
+                    />
+                  </Fragment>
+                ),
+              },
+            ]
+          : []),
         ...(!(!this.state.needsPassword || this.state.hidePasswordInput)
           ? [
               {
@@ -1988,16 +1960,24 @@ apk add wazuh-agent`,
               },
             ]
           : []),
-        {
-          title: 'Assign a name and a group to the agent',
-          children: (
-            <Fragment>
-              {agentName}
-              {groupInput}
-              {agentGroup}
-            </Fragment>
-          ),
-        },
+        ...(!(
+          this.state.selectedOS == 'hp' ||
+          this.state.selectedOS == 'sol' ||
+          this.state.selectedOS == 'alpine'
+        )
+          ? [
+              {
+                title: 'Assign a name and a group to the agent',
+                children: (
+                  <Fragment>
+                    {agentName}
+                    {groupInput}
+                    {agentGroup}
+                  </Fragment>
+                ),
+              },
+            ]
+          : []),
         {
           title: 'Install and enroll the agent',
           children: this.state.gotErrorRegistrationServiceInfo ? (
