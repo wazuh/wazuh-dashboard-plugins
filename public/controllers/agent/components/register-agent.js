@@ -723,7 +723,7 @@ export const RegisterAgent = withErrorBoundary(
         case 'alpine':
           return this.resolveAlpinePackage();
         default:
-          return `https://packages.wazuh.com/4.x/yum/x86_64/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.x86_64.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/x86_64/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.x86_64.rpm${this.wazuhRpmVariable}`;
       }
     }
 
@@ -931,25 +931,20 @@ export const RegisterAgent = withErrorBoundary(
         alpineText: `wget -O /etc/apk/keys/alpine-devel@wazuh.com-633d7457.rsa.pub ${this.optionalPackages()} >> /etc/apk/repositories && \
 apk update && \
 apk add wazuh-agent`,
-
         centText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
-        debText: `curl -so wazuh-agent-${
+        debText: `curl -so wazuh-agent.deb ${this.optionalPackages()} && sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}dpkg -i .${
+          this.wazuhDebVariable
+        }`,
+        ubuText: `curl -so wazuh-agent.deb ${this.optionalPackages()} && sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}dpkg -i .${
+          this.wazuhDebVariable
+        }`,
+        macosText: `curl -so wazuh-agent.pkg https://packages.wazuh.com/4.x/macos/wazuh-agent-${
           this.state.wazuhVersion
-        }.deb ${this.optionalPackages()} && sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}dpkg -i ./wazuh-agent-${
-          this.state.wazuhVersion
-        }.deb`,
-        ubuText: `curl -so wazuh-agent-${
-          this.state.wazuhVersion
-        }.deb ${this.optionalPackages()} && sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}dpkg -i ./wazuh-agent-${
-          this.state.wazuhVersion
-        }.deb`,
-        macosText: `curl -so wazuh-agent-${
-          this.state.wazuhVersion
-        }.pkg https://packages.wazuh.com/4.x/macos/wazuh-agent-${
-          this.state.wazuhVersion
-        }-1.pkg && sudo launchctl setenv ${this.optionalDeploymentVariables()}${this.agentNameVariable()}&& sudo installer -pkg ./wazuh-agent-${
-          this.state.wazuhVersion
-        }.pkg -target /`,
+        }-1.pkg${
+          this.wazuhPkgVariable
+        } && sudo launchctl setenv ${this.optionalDeploymentVariables()}${this.agentNameVariable()}&& sudo installer -pkg .${
+          this.wazuhPkgVariable
+        } -target /`,
         winText:
           this.state.selectedVersion == 'windowsxp' ||
           this.state.selectedVersion == 'windowsserver2008'
@@ -961,23 +956,27 @@ apk add wazuh-agent`,
               }-1.msi${
                 this.wazuhMsiVariable
               } -OutFile \${env:tmp}\\wazuh-agent.msi; msiexec.exe /i \${env:tmp}\\wazuh-agent.msi /q ${this.optionalDeploymentVariables()}${this.agentNameVariable()}`,
-        openText: `sudo rpm --import https://packages.wazuh.com/key/GPG-KEY-WAZUH && sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()} zypper install -y ${this.optionalPackages()}`,
-        solText: `sudo curl -so wazuh-agent.p5p ${this.optionalPackages()}/wazuh-agent.p5p ${this.agentNameVariable()}&& ${
+        openText: `sudo rpm --import https://packages.wazuh.com/key/GPG-KEY-WAZUH && sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}zypper install -y ${this.optionalPackages()}`,
+        solText: `sudo curl -so ${
+          this.state.selectedVersion == 'solaris11'
+            ? 'wazuh-agent.p5p'
+            : 'wazuh-agent.pkg'
+        } ${this.optionalPackages()}${this.agentNameVariable()} && ${
           this.state.selectedVersion == 'solaris11'
             ? 'pkg install -g wazuh-agent.p5p wazuh-agent'
             : 'pkgadd -d wazuh-agent.pkg'
         }`,
         aixText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}rpm -ivh ${this.optionalPackages()}`,
-        hpText: `cd / && sudo curl -so ${this.optionalPackages()} && sudo groupadd wazuh && sudo useradd -G wazuh wazuh && sudo tar -xvf wazuh-agent.tar`,
+        hpText: `cd / && sudo curl -so wazuh-agent.tar ${this.optionalPackages()} && sudo groupadd wazuh && sudo useradd -G wazuh wazuh && sudo tar -xvf wazuh-agent.tar`,
         amazonlinuxText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
         fedoraText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
-        oraclelinuxText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
+        oraclelinuxText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}${
+          this.wazuhRpmVariable
+        }`,
         suseText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
-        raspbianText: `curl -so wazuh-agent-${
-          this.state.wazuhVersion
-        }.deb ${this.optionalPackages()} && sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}dpkg -i ./wazuh-agent-${
-          this.state.wazuhVersion
-        }.deb`,
+        raspbianText: `curl -so wazuh-agent.deb ${this.optionalPackages()} && sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}dpkg -i .${
+          this.wazuhDebVariable
+        }`,
       };
 
       const field = `${this.state.selectedOS}Text`;
