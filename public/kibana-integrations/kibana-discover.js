@@ -17,7 +17,6 @@
  * under the License.
  */
 
-import discoverTemplate from '../templates/discover/discover.html';
 import store from '../redux/store';
 import { updateVis } from '../redux/actions/visualizationsActions';
 import { getAngularModule, getCore, getDiscoverModule, getPlugins, getToasts } from '../kibana-services';
@@ -40,7 +39,7 @@ getAngularModule().directive('kbnDis', [
     return {
       restrict: 'E',
       scope: {},
-      template: indexTemplateLegacy//discoverTemplate,
+      template: indexTemplateLegacy
     };
   }
 ]);
