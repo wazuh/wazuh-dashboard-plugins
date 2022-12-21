@@ -872,7 +872,6 @@ export const RegisterAgent = withErrorBoundary(
         </p>
       );
       const missingOSSelection = this.checkMissingOSSelection();
-
       const agentName = (
         <EuiForm>
           <EuiFormRow
@@ -2128,5 +2127,5 @@ export const RegisterAgent = withErrorBoundary(
         </div>
       );
     }
-  },
+  }
 );
