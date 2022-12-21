@@ -309,6 +309,7 @@ export const RegisterAgent = withErrorBoundary(
           agentNameError: false,
           badCharacters: []
         });
+
       } else {
         let badCharacters = event.target.value.split('').map(char =>
           char.replace(validation, '')).join('');
@@ -320,6 +321,7 @@ export const RegisterAgent = withErrorBoundary(
           badCharacters: characters,
           agentNameError: true
         });
+
       }
     }
 
@@ -882,13 +884,13 @@ export const RegisterAgent = withErrorBoundary(
       const urlWindowsPackage = `https://packages.wazuh.com/4.x/windows/wazuh-agent-${this.state.wazuhVersion}-1.msi`;
 
       const missingOSSelection = this.checkMissingOSSelection();
-
       const agentName = (
         <EuiForm>
           <EuiFormRow
             isInvalid={this.state.agentNameError}
             error={[this.state.badCharacters.length < 1 ? 'The minimum length is 2 characters.' :
               `The character${this.state.badCharacters.length <= 1 ? ('') : ('s')}
+
             ${this.state.badCharacters.map(char => ` "${char}"`)}
             ${this.state.badCharacters.length <= 1 ? ('is') : ('are')}
             not valid. Allowed characters are A-Z, a-z, ".", "-", "_"`]}>
@@ -1561,7 +1563,6 @@ export const RegisterAgent = withErrorBoundary(
           }
         }
       };
-      console.log(this.state.selectedOS, 'oss');
 
       const steps = [
         {
@@ -2181,5 +2182,5 @@ export const RegisterAgent = withErrorBoundary(
         </div>
       );
     }
-  },
+  }
 );

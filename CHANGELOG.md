@@ -22,6 +22,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added file saving conditions in File Editor [#4970](https://github.com/wazuh/wazuh-kibana-app/pull/4970)
 - Added character validation to avoid invalid agent names in the section 'Deploy new agent'. [#5021](https://github.com/wazuh/wazuh-kibana-app/pull/5021)[#5028](https://github.com/wazuh/wazuh-kibana-app/pull/5028)
 
+
 ### Changed
 
 - Changed the HTTP verb from `GET` to `POST` in the requests to login to the Wazuh API [#4103](https://github.com/wazuh/wazuh-kibana-app/pull/4103)
@@ -51,6 +52,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed WAZUH_PROTOCOL param suggestion [#4849](https://github.com/wazuh/wazuh-kibana-app/pull/4849)
 - Raspbian OS, Ubuntu, Amazon Linux and Amazon Linux 2 commands in the wizard deploy agent now change when a different architecture is selected [#4876](https://github.com/wazuh/wazuh-kibana-app/pull/4876) [#4880](https://github.com/wazuh/wazuh-kibana-app/pull/4880)
 - Fixed the agents wizard OS styles and their versions. [#4832](https://github.com/wazuh/wazuh-kibana-app/pull/4832) [#4838](https://github.com/wazuh/wazuh-kibana-app/pull/4838)
+- Fixed the manager option in the agent deployment section [#4981](https://github.com/wazuh/wazuh-kibana-app/pull/4981)
 - Fixed agent installation command for macOS in the deploy new agent section. [#4968](https://github.com/wazuh/wazuh-kibana-app/pull/4968)
 - Deploy new agent section: Fixed the way macos versions and architectures were displayed, fixed the way agents were displayed, fixed the way ubuntu versions were displayed. [#4933](https://github.com/wazuh/wazuh-kibana-app/pull/4933)
 - Fixed agent deployment instructions for HP-UX and Solaris. [#4943](https://github.com/wazuh/wazuh-kibana-app/pull/4943)
