@@ -1582,7 +1582,6 @@ export const RegisterAgent = withErrorBoundary(
           }
         }
       };
-      console.log(this.state.selectedOS, 'oss');
 
       const steps = [
         {
