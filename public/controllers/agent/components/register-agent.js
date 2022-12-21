@@ -298,18 +298,15 @@ export const RegisterAgent = withErrorBoundary(
 
     setAgentName(event) {
       const validation = /^[a-z0-9-_.]+$/i;
-      this.setState({ agentName: event.target.value });
       if (validation.test(event.target.value) || event.target.value.length <= 0) {
-        this.setState({ agentNameError: false });
-        this.setState({ badCharacters: [] });
+        this.setState({ agentName: event.target.value, agentNameError: false, badCharacters: [] });
       } else {
         let badCharacters = event.target.value.split('').map(char =>
           char.replace(validation, '')).join('');
         badCharacters = badCharacters.split('').map(char =>
           char.replace(/\s/, 'whitespace'));
         const characters = [...new Set(badCharacters)];
-        this.setState({ badCharacters: characters });
-        this.setState({ agentNameError: true });
+        this.setState({ agentName: event.target.value, badCharacters: characters, agentNameError: true });
       }
     }
 
