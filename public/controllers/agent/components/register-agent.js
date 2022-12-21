@@ -34,6 +34,9 @@ import {
   EuiIcon,
   EuiSwitch,
   EuiLink,
+  EuiFormRow,
+  EuiFormControlLayout,
+  EuiForm,
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
 import { withErrorBoundary } from '../../../components/common/hocs';
@@ -93,6 +96,8 @@ export const RegisterAgent = withErrorBoundary(
         wazuhVersion: '',
         serverAddress: '',
         agentName: '',
+        agentNameError: false,
+        badCharacters: [],
         wazuhPassword: '',
         groups: [],
         selectedGroup: [],
@@ -281,7 +286,9 @@ export const RegisterAgent = withErrorBoundary(
         this.state.selectedVersion === '3.12.12'
       ) {
         return '/var/ossec/bin/wazuh-control start';
-      } else this.state.selectedVersion === '11.31';
+      } else {
+        this.state.selectedVersion === '11.31';
+      }
       {
         return '/sbin/init.d/wazuh-agent start';
       }
@@ -296,7 +303,26 @@ export const RegisterAgent = withErrorBoundary(
     }
 
     setAgentName(event) {
+      const validation = /^[a-z0-9-_.]+$/i;
       this.setState({ agentName: event.target.value });
+      if (
+        validation.test(event.target.value) ||
+        event.target.value.length <= 0
+      ) {
+        this.setState({ agentNameError: false });
+        this.setState({ badCharacters: [] });
+      } else {
+        let badCharacters = event.target.value
+          .split('')
+          .map(char => char.replace(validation, ''))
+          .join('');
+        badCharacters = badCharacters
+          .split('')
+          .map(char => char.replace(/\s/, 'whitespace'));
+        const characters = [...new Set(badCharacters)];
+        this.setState({ badCharacters: characters });
+        this.setState({ agentNameError: true });
+      }
     }
 
     setGroupName(selectedGroup) {
@@ -867,11 +893,24 @@ export const RegisterAgent = withErrorBoundary(
       const missingOSSelection = this.checkMissingOSSelection();
 
       const agentName = (
-        <EuiFieldText
-          placeholder='Name agent'
-          value={this.state.agentName}
-          onChange={event => this.setAgentName(event)}
-        />
+        <EuiForm>
+          <EuiFormRow
+            isInvalid={this.state.agentNameError}
+            error={[
+              `The character${this.state.badCharacters.length <= 1 ? '' : 's'}
+            ${this.state.badCharacters.map(char => ` "${char}"`)}
+            ${this.state.badCharacters.length <= 1 ? 'is' : 'are'}
+            not valid. Allowed characters are A-Z, a-z, ".", "-", "_"`,
+            ]}
+          >
+            <EuiFieldText
+              isInvalid={this.state.agentNameError}
+              placeholder='Name agent'
+              value={this.state.agentName}
+              onChange={event => this.setAgentName(event)}
+            />
+          </EuiFormRow>
+        </EuiForm>
       );
       const groupInput = (
         <>
@@ -969,7 +1008,11 @@ export const RegisterAgent = withErrorBoundary(
       const textAndLinkToCheckConnectionDocumentation = (
         <p>
           To verify the connection with the Wazuh server, please follow this{' '}
-          <a href={urlCheckConnectionDocumentation} target='_blank'>
+          <a
+            href={urlCheckConnectionDocumentation}
+            target='_blank'
+            rel='noreferrer'
+          >
             document.
           </a>
         </p>
@@ -978,7 +1021,7 @@ export const RegisterAgent = withErrorBoundary(
         <p>
           After installing the agent, you need to enroll it in the Wazuh server.
           Check the Wazuh agent enrollment{' '}
-          <a href={urlWazuhAgentEnrollment} target='_blank'>
+          <a href={urlWazuhAgentEnrollment} target='_blank' rel='noreferrer'>
             Wazuh agent enrollment{' '}
           </a>
           section to learn more.
@@ -998,7 +1041,7 @@ export const RegisterAgent = withErrorBoundary(
       const windowsAdvice = this.state.selectedOS === 'win' && (
         <>
           <EuiCallOut title='Requirements' iconType='iInCircle'>
-            <ul class='wz-callout-list'>
+            <ul className='wz-callout-list'>
               <li>
                 <span>
                   You will need administrator privileges to perform this
@@ -1202,7 +1245,7 @@ export const RegisterAgent = withErrorBoundary(
               ) : (
                 ''
               )}
-              {/* 
+              {/*
               {
                 <EuiCallOut
                   color='warning'
@@ -2031,6 +2074,12 @@ export const RegisterAgent = withErrorBoundary(
                 title: 'Start the agent',
                 children: this.state.gotErrorRegistrationServiceInfo ? (
                   calloutErrorRegistrationServiceInfo
+                ) : this.state.agentNameError ? (
+                  <EuiCallOut
+                    color='danger'
+                    title={'There are fields with errors. Please verify them.'}
+                    iconType='alert'
+                  />
                 ) : missingOSSelection.length ? (
                   <EuiCallOut
                     color='warning'
