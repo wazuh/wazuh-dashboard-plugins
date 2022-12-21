@@ -398,7 +398,6 @@ export const RegisterAgent = withErrorBoundary(
 
       return deployment;
     }
-
     agentNameVariable() {
       let agentName = `WAZUH_AGENT_NAME='${this.state.agentName}' `;
       if (
@@ -1548,139 +1547,6 @@ apk add wazuh-agent`,
         );
       };
 
-      const buttonGroupWithMessage = (
-        legend,
-        options,
-        idSelected,
-        onChange,
-      ) => {
-        return (
-          <>
-            <EuiButtonGroup
-              color='primary'
-              legend={legend}
-              options={options}
-              idSelected={idSelected}
-              onChange={onChange}
-              className={'wz-flex'}
-            />
-
-            {this.state.selectedVersion == 'solaris10' ||
-            this.state.selectedVersion == 'solaris11' ? (
-              <EuiCallOut
-                color='warning'
-                className='message'
-                iconType='iInCircle'
-                title={
-                  <span>
-                    Might require some extra installation{' '}
-                    <EuiLink
-                      target='_blank'
-                      href={webDocumentationLink(
-                        'installation-guide/wazuh-agent/wazuh-agent-package-solaris.html',
-                        appVersionMajorDotMinor,
-                      )}
-                    >
-                      steps
-                    </EuiLink>
-                    .
-                  </span>
-                }
-              ></EuiCallOut>
-            ) : this.state.selectedVersion == '6.1 TL9' ? (
-              <EuiCallOut
-                color='warning'
-                className='message'
-                iconType='iInCircle'
-                title={
-                  <span>
-                    Might require some extra installation{' '}
-                    <EuiLink
-                      target='_blank'
-                      href={webDocumentationLink(
-                        'installation-guide/wazuh-agent/wazuh-agent-package-aix.html',
-                        appVersionMajorDotMinor,
-                      )}
-                    >
-                      steps
-                    </EuiLink>
-                    .
-                  </span>
-                }
-              ></EuiCallOut>
-            ) : this.state.selectedVersion == '11.31' ? (
-              <EuiCallOut
-                color='warning'
-                className='message'
-                iconType='iInCircle'
-                title={
-                  <span>
-                    Might require some extra installation{' '}
-                    <EuiLink
-                      target='_blank'
-                      href={webDocumentationLink(
-                        'installation-guide/wazuh-agent/wazuh-agent-package-hpux.html',
-                        appVersionMajorDotMinor,
-                      )}
-                    >
-                      steps
-                    </EuiLink>
-                    .
-                  </span>
-                }
-              ></EuiCallOut>
-            ) : this.state.selectedVersion == '3.12.12' ? (
-              <EuiCallOut
-                color='warning'
-                className='message'
-                iconType='iInCircle'
-                title={
-                  <span>
-                    Might require some extra installation{' '}
-                    <EuiLink
-                      target='_blank'
-                      href={webDocumentationLink(
-                        'installation-guide/wazuh-agent/wazuh-agent-package-linux.html',
-                        appVersionMajorDotMinor,
-                      )}
-                    >
-                      steps
-                    </EuiLink>
-                    .
-                  </span>
-                }
-              ></EuiCallOut>
-            ) : this.state.selectedVersion == 'debian7' ||
-              this.state.selectedVersion == 'debian8' ||
-              this.state.selectedVersion == 'debian9' ||
-              this.state.selectedVersion == 'debian10' ? (
-              <EuiCallOut
-                color='warning'
-                className='message'
-                iconType='iInCircle'
-                title={
-                  <span>
-                    Might require some extra installation{' '}
-                    <EuiLink
-                      target='_blank'
-                      href={webDocumentationLink(
-                        'installation-guide/wazuh-agent/wazuh-agent-package-linux.html',
-                        appVersionMajorDotMinor,
-                      )}
-                    >
-                      steps
-                    </EuiLink>
-                    .
-                  </span>
-                }
-              ></EuiCallOut>
-            ) : (
-              ''
-            )}
-          </>
-        );
-      };
-
       const selectedVersionMac = (legend, options, idSelected, onChange) => {
         return (
           <EuiButtonGroup
@@ -1689,7 +1555,6 @@ apk add wazuh-agent`,
             options={options}
             idSelected={idSelected}
             onChange={onChange}
-            // className={'osButtonsStyleMac'}
           />
         );
       };
