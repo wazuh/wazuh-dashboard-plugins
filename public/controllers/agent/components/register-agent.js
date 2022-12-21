@@ -891,7 +891,6 @@ export const RegisterAgent = withErrorBoundary(
       const urlWindowsPackage = `https://packages.wazuh.com/4.x/windows/wazuh-agent-${this.state.wazuhVersion}-1.msi`;
 
       const missingOSSelection = this.checkMissingOSSelection();
-
       const agentName = (
         <EuiForm>
           <EuiFormRow
@@ -2226,5 +2225,5 @@ export const RegisterAgent = withErrorBoundary(
         </div>
       );
     }
-  },
+  }
 );
