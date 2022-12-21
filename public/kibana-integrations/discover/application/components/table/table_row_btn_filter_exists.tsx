@@ -60,7 +60,7 @@ export function DocViewTableRowBtnFilterExists({
         onClick={onClick}
         className="kbnDocViewer__actionButton"
         data-test-subj="addExistsFilterButton"
-        disabled={disabled}
+        isDisabled={disabled}
         iconType={'indexOpen'}
         iconSize={'s'}
       />
