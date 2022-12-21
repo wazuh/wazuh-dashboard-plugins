@@ -429,17 +429,17 @@ export const RegisterAgent = withErrorBoundary(
         `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
       ) {
         case '3.12.12-i386':
-          return `https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && \echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"`;
+          return `https://packages.wazuh.com/key/cicd%40wazuh.com-633d7457.rsa.pub && \echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"`;
         case '3.12.12-aarch64':
-          return `https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && \echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"`;
+          return `https://packages.wazuh.com/key/cicd%40wazuh.com-633d7457.rsa.pub && \echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"`;
         case '3.12.12-x86_64':
-          return `https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && \echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"`;
+          return `https://packages.wazuh.com/key/cicd%40wazuh.com-633d7457.rsa.pub && \echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"`;
         case '3.12.12-armhf':
-          return `https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && \echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"`;
+          return `https://packages.wazuh.com/key/cicd%40wazuh.com-633d7457.rsa.pub && \echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"`;
         case '3.12.12-powerpc':
-          return `https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && \echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"`;
+          return `https://packages.wazuh.com/key/cicd%40wazuh.com-633d7457.rsa.pub && \echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"`;
         default:
-          return `https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && \echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"`;
+          return `https://packages.wazuh.com/key/cicd%40wazuh.com-633d7457.rsa.pub && \echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"`;
       }
     }
 
@@ -929,7 +929,7 @@ export const RegisterAgent = withErrorBoundary(
 
       const customTexts = {
         rpmText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
-        alpineText: `wget -O /etc/apk/keys/alpine-devel@wazuh.com-633d7457.rsa.pub ${this.optionalPackages()} >> /etc/apk/repositories && \
+        alpineText: `wget -O /etc/apk/keys/cicd@wazuh.com-633d7457.rsa.pub ${this.optionalPackages()} >> /etc/apk/repositories && \
 apk update && \
 apk add wazuh-agent`,
         centText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
