@@ -288,8 +288,7 @@ export const RegisterAgent = withErrorBoundary(
         this.state.selectedVersion === '3.12.12'
       ) {
         return '/var/ossec/bin/wazuh-control start';
-      } else this.state.selectedVersion === '11.31';
-      {
+      } else {
         return '/sbin/init.d/wazuh-agent start';
       }
     }
@@ -453,17 +452,17 @@ export const RegisterAgent = withErrorBoundary(
         `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
       ) {
         case '3.12.12-i386':
-          return `https://packages.wazuh.com/key/cicd%40wazuh.com-633d7457.rsa.pub && \echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"`;
+          return 'https://packages.wazuh.com/key/cicd%40wazuh.com-633d7457.rsa.pub && echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"';
         case '3.12.12-aarch64':
-          return `https://packages.wazuh.com/key/cicd%40wazuh.com-633d7457.rsa.pub && \echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"`;
+          return 'https://packages.wazuh.com/key/cicd%40wazuh.com-633d7457.rsa.pub && echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"';
         case '3.12.12-x86_64':
-          return `https://packages.wazuh.com/key/cicd%40wazuh.com-633d7457.rsa.pub && \echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"`;
+          return 'https://packages.wazuh.com/key/cicd%40wazuh.com-633d7457.rsa.pub && echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"';
         case '3.12.12-armhf':
-          return `https://packages.wazuh.com/key/cicd%40wazuh.com-633d7457.rsa.pub && \echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"`;
+          return 'https://packages.wazuh.com/key/cicd%40wazuh.com-633d7457.rsa.pub && echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"';
         case '3.12.12-powerpc':
-          return `https://packages.wazuh.com/key/cicd%40wazuh.com-633d7457.rsa.pub && \echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"`;
+          return 'https://packages.wazuh.com/key/cicd%40wazuh.com-633d7457.rsa.pub && echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"';
         default:
-          return `https://packages.wazuh.com/key/cicd%40wazuh.com-633d7457.rsa.pub && \echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"`;
+          return 'https://packages.wazuh.com/key/cicd%40wazuh.com-633d7457.rsa.pub && echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"';
       }
     }
 
@@ -1025,7 +1024,11 @@ apk add wazuh-agent`,
       const textAndLinkToCheckConnectionDocumentation = (
         <p>
           To verify the connection with the Wazuh server, please follow this{' '}
-          <a href={urlCheckConnectionDocumentation} target='_blank'>
+          <a
+            href={urlCheckConnectionDocumentation}
+            target='_blank'
+            rel='noreferrer'
+          >
             document.
           </a>
         </p>
@@ -1034,7 +1037,7 @@ apk add wazuh-agent`,
         <p>
           After installing the agent, you need to enroll it in the Wazuh server.
           Check the Wazuh agent enrollment{' '}
-          <a href={urlWazuhAgentEnrollment} target='_blank'>
+          <a href={urlWazuhAgentEnrollment} target='_blank' rel='noreferrer'>
             Wazuh agent enrollment{' '}
           </a>
           section to learn more.
@@ -1054,7 +1057,7 @@ apk add wazuh-agent`,
       const windowsAdvice = this.state.selectedOS === 'win' && (
         <>
           <EuiCallOut title='Requirements' iconType='iInCircle'>
-            <ul class='wz-callout-list'>
+            <ul className='wz-callout-list'>
               <li>
                 <span>
                   You will need administrator privileges to perform this
@@ -2154,7 +2157,7 @@ apk add wazuh-agent`,
           ) : this.state.agentNameError ? (
             <EuiCallOut
               color='danger'
-              title={`There are fields with errors. Please verify them.`}
+              title={'There are fields with errors. Please verify them.'}
               iconType='alert'
             />
           ) : missingOSSelection.length ? (
@@ -2192,7 +2195,7 @@ apk add wazuh-agent`,
                 ) : this.state.agentNameError ? (
                   <EuiCallOut
                     color='danger'
-                    title={`There are fields with errors. Please verify them.`}
+                    title={'There are fields with errors. Please verify them.'}
                     iconType='alert'
                   />
                 ) : missingOSSelection.length ? (
