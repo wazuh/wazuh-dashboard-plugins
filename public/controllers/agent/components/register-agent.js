@@ -591,7 +591,7 @@ export const RegisterAgent = withErrorBoundary(
         case 'x86_64':
           return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}${this.addToVersion}_amd64.deb${this.wazuhDebVariable}`;
         case 'powerpc':
-          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}.ppc64el.deb${this.wazuhDebVariable}`;
+          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}${this.addToVersion}_ppc64el.deb${this.wazuhDebVariable}`;
         default:
           return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}${this.addToVersion}_amd64.deb${this.wazuhDebVariable}`;
       }
@@ -610,7 +610,7 @@ export const RegisterAgent = withErrorBoundary(
         case 'busterorgreater-x86_64':
           return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}${this.addToVersion}_amd64.deb${this.wazuhDebVariable}`;
         case 'busterorgreater-powerpc':
-          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}.ppc64el.deb${this.wazuhDebVariable}`;
+          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_ppc64el.deb${this.wazuhDebVariable}`;
         default:
           return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}${this.addToVersion}_amd64.deb${this.wazuhDebVariable}`;
       }
@@ -635,7 +635,7 @@ export const RegisterAgent = withErrorBoundary(
         case 'ubuntu15-armhf':
           return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}${this.addToVersion}_armhf.deb${this.wazuhDebVariable}`;
         case 'ubuntu15-x86_64':
-          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_amd64.deb${this.wazuhDebVariable}`;
+          return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}${this.addToVersion}_amd64.deb${this.wazuhDebVariable}`;
         default:
           return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}${this.addToVersion}_amd64.deb${this.wazuhDebVariable}`;
       }
