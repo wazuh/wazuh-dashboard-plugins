@@ -20,9 +20,6 @@ require('./utils/dom-to-image.js');
 // EUI React components wrapper
 import './components';
 
-// angular-charts.js
-import 'angular-chart.js';
-
 // pin-wz-menu.js
 import { changeWazuhNavLogo } from './utils/wz-logo-menu';
 
@@ -110,7 +107,6 @@ app.run(function ($rootElement) {
 
   // Add plugin help links as extension to plugin platform help menu
   addHelpMenuToAppChrome();
-
 
   // Bind deleteExistentToken on Log out component.
   $('.euiHeaderSectionItem__button, .euiHeaderSectionItemButton').on('mouseleave', function () {
