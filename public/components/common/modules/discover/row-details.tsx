@@ -189,7 +189,7 @@ export class RowDetails extends Component {
                 <EuiFlexItem grow={false} style={{ marginRight: 0, marginTop: 8 }}>
                   <EuiToolTip position="top" content={hasFieldMapping ? 'Filter for value' : 'Unindexed fields can not be searched'}>
                     <EuiButtonIcon
-                      disabled={!hasFieldMapping}
+                      isDisabled={!hasFieldMapping}
                       onClick={() => this.props.addFilter(filter)}
                       iconType="magnifyWithPlus"
                       aria-label="Filter"
@@ -200,7 +200,7 @@ export class RowDetails extends Component {
                 <EuiFlexItem grow={false} style={{ marginRight: 0, marginLeft: 0, marginTop: 8 }}>
                   <EuiToolTip position="top" content={hasFieldMapping ? 'Filter for value' : 'Unindexed fields can not be searched'}>
                     <EuiButtonIcon
-                      disabled={!hasFieldMapping}
+                      isDisabled={!hasFieldMapping}
                       onClick={() => this.props.addFilterOut(filter)}
                       iconType="magnifyWithMinus"
                       aria-label="Filter"
