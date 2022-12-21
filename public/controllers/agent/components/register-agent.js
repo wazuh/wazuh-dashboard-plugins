@@ -297,13 +297,14 @@ export const RegisterAgent = withErrorBoundary(
     }
 
     setAgentName(event) {
+      const validation = /^[a-z0-9-_.]+$/i;
       this.setState({ agentName: event.target.value });
-      if (/^[a-z0-9-_.]+$/i.test(event.target.value) || event.target.value.length <= 0) {
+      if (validation.test(event.target.value) || event.target.value.length <= 0) {
         this.setState({ agentNameError: false });
         this.setState({ badCharacters: [] });
       } else {
         let badCharacters = event.target.value.split('').map(char =>
-          char.replace(/^[a-z0-9-_.]+$/i, '')).join('');
+          char.replace(validation, '')).join('');
         badCharacters = badCharacters.split('').map(char =>
           char.replace(/\s/, 'whitespace'));
         const characters = [...new Set(badCharacters)];
