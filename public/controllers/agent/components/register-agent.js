@@ -1245,14 +1245,6 @@ export const RegisterAgent = withErrorBoundary(
               ) : (
                 ''
               )}
-              {/*
-              {
-                <EuiCallOut
-                  color='warning'
-                  title={extraInstallationText}
-                  iconType='iInCircle'
-                />
-              } */}
               {this.state.needsPassword && (
                 <EuiSwitch
                   label='Show password'
