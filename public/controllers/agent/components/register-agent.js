@@ -1388,14 +1388,6 @@ apk add wazuh-agent`,
                   <EuiSpacer />
                 </>
               )}
-              <>
-                <EuiCallOut
-                  color='warning'
-                  title={warningCommand}
-                  iconType='iInCircle'
-                />
-                <EuiSpacer />
-              </>
               <div className='copy-codeblock-wrapper'>
                 <EuiCodeBlock style={codeBlock} language={language}>
                   {this.state.wazuhPassword && !this.state.showPassword
