@@ -34,6 +34,9 @@ import {
   EuiIcon,
   EuiSwitch,
   EuiLink,
+  EuiFormRow,
+  EuiFormControlLayout,
+  EuiForm,
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
 import { withErrorBoundary } from '../../../components/common/hocs';
@@ -101,6 +104,8 @@ export const RegisterAgent = withErrorBoundary(
         wazuhVersion: '',
         serverAddress: '',
         agentName: '',
+        agentNameError: false,
+        badCharacters: [],
         wazuhPassword: '',
         groups: [],
         selectedGroup: [],
@@ -297,7 +302,26 @@ export const RegisterAgent = withErrorBoundary(
     }
 
     setAgentName(event) {
+      const validation = /^[a-z0-9-_.]+$/i;
       this.setState({ agentName: event.target.value });
+      if (
+        validation.test(event.target.value) ||
+        event.target.value.length <= 0
+      ) {
+        this.setState({ agentNameError: false });
+        this.setState({ badCharacters: [] });
+      } else {
+        let badCharacters = event.target.value
+          .split('')
+          .map(char => char.replace(validation, ''))
+          .join('');
+        badCharacters = badCharacters
+          .split('')
+          .map(char => char.replace(/\s/, 'whitespace'));
+        const characters = [...new Set(badCharacters)];
+        this.setState({ badCharacters: characters });
+        this.setState({ agentNameError: true });
+      }
     }
 
     setGroupName(selectedGroup) {
@@ -875,13 +899,25 @@ export const RegisterAgent = withErrorBoundary(
       const urlWindowsPackage = `https://packages.wazuh.com/4.x/windows/wazuh-agent-${this.state.wazuhVersion}-1.msi`;
 
       const missingOSSelection = this.checkMissingOSSelection();
-
       const agentName = (
-        <EuiFieldText
-          placeholder='Name agent'
-          value={this.state.agentName}
-          onChange={event => this.setAgentName(event)}
-        />
+        <EuiForm>
+          <EuiFormRow
+            isInvalid={this.state.agentNameError}
+            error={[
+              `The character${this.state.badCharacters.length <= 1 ? '' : 's'}
+            ${this.state.badCharacters.map(char => ` "${char}"`)}
+            ${this.state.badCharacters.length <= 1 ? 'is' : 'are'}
+            not valid. Allowed characters are A-Z, a-z, ".", "-", "_"`,
+            ]}
+          >
+            <EuiFieldText
+              isInvalid={this.state.agentNameError}
+              placeholder='Name agent'
+              value={this.state.agentName}
+              onChange={event => this.setAgentName(event)}
+            />
+          </EuiFormRow>
+        </EuiForm>
       );
       const groupInput = (
         <>
@@ -1980,6 +2016,12 @@ apk add wazuh-agent`,
           title: 'Install and enroll the agent',
           children: this.state.gotErrorRegistrationServiceInfo ? (
             calloutErrorRegistrationServiceInfo
+          ) : this.state.agentNameError ? (
+            <EuiCallOut
+              color='danger'
+              title={`There are fields with errors. Please verify them.`}
+              iconType='alert'
+            />
           ) : missingOSSelection.length ? (
             <EuiCallOut
               color='warning'
@@ -2012,6 +2054,12 @@ apk add wazuh-agent`,
                 title: 'Start the agent',
                 children: this.state.gotErrorRegistrationServiceInfo ? (
                   calloutErrorRegistrationServiceInfo
+                ) : this.state.agentNameError ? (
+                  <EuiCallOut
+                    color='danger'
+                    title={`There are fields with errors. Please verify them.`}
+                    iconType='alert'
+                  />
                 ) : missingOSSelection.length ? (
                   <EuiCallOut
                     color='warning'
