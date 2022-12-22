@@ -304,13 +304,13 @@ export const RegisterAgent = withErrorBoundary(
 
     setAgentName(event) {
       const validation = /^[a-z0-9-_.]+$/i;
-      this.setState({ agentName: event.target.value });
-      if (
-        validation.test(event.target.value) ||
-        event.target.value.length <= 0
-      ) {
-        this.setState({ agentNameError: false });
-        this.setState({ badCharacters: [] });
+      if ((validation.test(event.target.value) && event.target.value.length >= 2)
+        || event.target.value.length <= 0) {
+        this.setState({
+          agentName: event.target.value,
+          agentNameError: false,
+          badCharacters: []
+        });
       } else {
         let badCharacters = event.target.value
           .split('')
@@ -320,8 +320,11 @@ export const RegisterAgent = withErrorBoundary(
           .split('')
           .map(char => char.replace(/\s/, 'whitespace'));
         const characters = [...new Set(badCharacters)];
-        this.setState({ badCharacters: characters });
-        this.setState({ agentNameError: true });
+        this.setState({
+          agentName: event.target.value,
+          badCharacters: characters,
+          agentNameError: true
+        });
       }
     }
 
@@ -895,8 +898,8 @@ export const RegisterAgent = withErrorBoundary(
         <EuiForm>
           <EuiFormRow
             isInvalid={this.state.agentNameError}
-            error={[
-              `The character${this.state.badCharacters.length <= 1 ? '' : 's'}
+            error={[this.state.badCharacters.length < 1 ? 'The minimum length is 2 characters.' :
+              `The character${this.state.badCharacters.length <= 1 ? ('') : ('s')}
             ${this.state.badCharacters.map(char => ` "${char}"`)}
             ${this.state.badCharacters.length <= 1 ? 'is' : 'are'}
             not valid. Allowed characters are A-Z, a-z, ".", "-", "_"`,
