@@ -715,7 +715,7 @@ export const RegisterAgent = withErrorBoundary(
 
     resolveHPPackage() {
       switch (
-        `${this.state.selectedVersion}-${this.state.selectedArchitecture}``${this.state.selectedVersion}-${this.state.selectedArchitecture}`
+        `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
       ) {
         case '11.31-itanium2':
           return `https://packages.wazuh.com/4.x/yum/i386/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}-hpux-11v3-ia64.tar${this.wazuhTarVariable}`;
