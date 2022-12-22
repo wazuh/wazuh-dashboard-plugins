@@ -22,7 +22,6 @@ export const PrincipalButtonGroup = ({
         options={options}
         idSelected={idSelected}
         onChange={onChange}
-        className={'osButtonsStyle'}
       />
       <EuiSpacer size='l' />
       <WzAccordion>
@@ -32,7 +31,6 @@ export const PrincipalButtonGroup = ({
           options={osButtons}
           idSelected={idSelected}
           onChange={onChange}
-          className={'osButtonsStyle'}
         />
       </WzAccordion>
     </>
@@ -51,7 +49,7 @@ export const WzAccordion = ({ children }) => {
       className={'action-btn-td'}
     >
       <EuiSpacer size='l' />
-      <EuiPanel className={'wz-border-none'} color='subdued'>
+      <EuiPanel className={'wz-border-none'} color='transparent'>
         {children}
       </EuiPanel>
     </EuiAccordion>

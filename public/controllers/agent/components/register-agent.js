@@ -30,7 +30,7 @@ import {
   EuiPageBody,
   EuiCallOut,
   EuiSpacer,
-  EuiProgress,
+  EuiProgress, 
   EuiIcon,
   EuiSwitch,
   EuiLink,
@@ -79,6 +79,7 @@ import {
 } from './register-agent-service';
 import './register-agent.scss';
 import { PrincipalButtonGroup } from './wz-accordion';
+import '../../../styles/common.scss'
 
 export const RegisterAgent = withErrorBoundary(
   class RegisterAgent extends Component {
@@ -108,6 +109,8 @@ export const RegisterAgent = withErrorBoundary(
         wazuhPassword: '',
         groups: [],
         selectedGroup: [],
+        agentNameError: false,
+        badCharacters: [],
         defaultServerAddress: '',
         udpProtocol: false,
         showPassword: false,
