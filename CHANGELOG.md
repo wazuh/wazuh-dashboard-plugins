@@ -58,6 +58,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed agent deployment instructions for HP-UX and Solaris. [#4943](https://github.com/wazuh/wazuh-kibana-app/pull/4943)
 - Fixed Inventory checks table filters by stats [#4999](https://github.com/wazuh/wazuh-kibana-app/pull/4999)
 - Fixed vulnerabilities default last scan date formatter [#4975](https://github.com/wazuh/wazuh-kibana-app/pull/4975)
+- A solaris command has been fixed [5035](https://github.com/wazuh/wazuh-kibana-app/pull/5035)
 
 ### Removed
 
