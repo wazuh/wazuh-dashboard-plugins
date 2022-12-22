@@ -63,6 +63,7 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
     }
 
     if (!response.isWazuhDisabled) {
+
       core.application.register({
         id: `wazuh`,
         title: 'Wazuh',
