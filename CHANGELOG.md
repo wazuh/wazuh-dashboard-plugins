@@ -16,12 +16,14 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added a new plugin setting to enable or disable the customization [#4507](https://github.com/wazuh/wazuh-kibana-app/pull/4507)
 - Added the ability to upload an image for the `customization.logo.*` settings in `Settings/Configuration` [#4504](https://github.com/wazuh/wazuh-kibana-app/pull/4504)
 - Added macOS version to wizard deploy agent [#4867](https://github.com/wazuh/wazuh-kibana-app/pull/4867)
-- Added powerPC architecture in redhat7, in the section 'Deploy new agent'. [4833](https://github.com/wazuh/wazuh-kibana-app/pull/4833)
+- Added powerPC architecture in redhat7, in the section 'Deploy new agent'. [#4833](https://github.com/wazuh/wazuh-kibana-app/pull/4833)
 - Added a centralized service to handle the requests [#4831](https://github.com/wazuh/wazuh-kibana-app/pull/4831)
 - Added data-test-subj create policy [#4873](https://github.com/wazuh/wazuh-kibana-app/pull/4873)
 - Added extra steps message and new command for windows xp and windows server 2008, added alpine agent with all its steps. [#4933](https://github.com/wazuh/wazuh-kibana-app/pull/4933)
 - Deploy new agent section: Added link for additional steps to alpine os. [#4933](https://github.com/wazuh/wazuh-kibana-app/pull/4933)
 - Added file saving conditions in File Editor [#4970](https://github.com/wazuh/wazuh-kibana-app/pull/4970)
+- Added character validation to avoid invalid agent names in the section 'Deploy new agent'. [#5021](https://github.com/wazuh/wazuh-kibana-app/pull/5021)[#5028](https://github.com/wazuh/wazuh-kibana-app/pull/5028)
+
 
 ### Changed
 
@@ -47,8 +49,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed a bug where the Wazuh logo was used instead of the custom one [#4539](https://github.com/wazuh/wazuh-kibana-app/pull/4539)
 - Fixed rendering problems of the `Agent Overview` section in low resolutions [#4516](https://github.com/wazuh/wazuh-kibana-app/pull/4516)
 - Fixed issue when logging out from Wazuh when SAML is enabled [#4595](https://github.com/wazuh/wazuh-kibana-app/issues/4595)
-- Fixed server errors with code 500 when the Wazuh API is not reachable / up. [#4710](https://github.com/wazuh/wazuh-kibana-app/pull/4710) [#4728](https://github.com/wazuh/wazuh-kibana-app/pull/4728) [#4997](https://github.com/wazuh/wazuh-kibana-app/pull/4997)
-- Fixed pagination to SCA table [#4653](https://github.com/wazuh/wazuh-kibana-app/issues/4653)
+- Fixed server errors with code 500 when the Wazuh API is not reachable / up. [#4710](https://github.com/wazuh/wazuh-kibana-app/pull/4710) [#4728](https://github.com/wazuh/wazuh-kibana-app/pull/4728) [#4971](https://github.com/wazuh/wazuh-kibana-app/pull/4971)
+- Fixed pagination to SCA table [#4653](https://github.com/wazuh/wazuh-kibana-app/issues/4653) [#5010](https://github.com/wazuh/wazuh-kibana-app/pull/5010)
 - Fixed WAZUH_PROTOCOL param suggestion [#4849](https://github.com/wazuh/wazuh-kibana-app/pull/4849)
 - Raspbian OS, Ubuntu, Amazon Linux and Amazon Linux 2 commands in the wizard deploy agent now change when a different architecture is selected [#4876](https://github.com/wazuh/wazuh-kibana-app/pull/4876) [#4880](https://github.com/wazuh/wazuh-kibana-app/pull/4880)
 - Fixed the agents wizard OS styles and their versions. [#4832](https://github.com/wazuh/wazuh-kibana-app/pull/4832) [#4838](https://github.com/wazuh/wazuh-kibana-app/pull/4838)
