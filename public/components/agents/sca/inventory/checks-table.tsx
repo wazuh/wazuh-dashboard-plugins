@@ -285,7 +285,7 @@ export class InventoryPolicyChecksTable extends Component<Props, State> {
 
     return (
       <EuiHealth color={color(result)} style={{ textTransform: 'capitalize' }}>
-        {result || 'Not applicable'}
+        {result}
       </EuiHealth>
     );
   }
