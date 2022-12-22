@@ -34,6 +34,9 @@ import {
   EuiIcon,
   EuiSwitch,
   EuiLink,
+  EuiFormRow,
+  EuiFormControlLayout,
+  EuiForm,
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
 import { withErrorBoundary } from '../../../components/common/hocs';
@@ -93,6 +96,8 @@ export const RegisterAgent = withErrorBoundary(
         wazuhVersion: '',
         serverAddress: '',
         agentName: '',
+        agentNameError: false,
+        badCharacters: [],
         wazuhPassword: '',
         groups: [],
         selectedGroup: [],
@@ -108,8 +113,8 @@ export const RegisterAgent = withErrorBoundary(
         deb: this.systemSelector(),
         ubu: this.systemSelector(),
         oraclelinux: this.systemSelector(),
-        macos: 'sudo /Library/Ossec/bin/wazuh-control start',
-        win: 'NET START WazuhSvc',
+        macos: this.systemSelectorWazuhControlMacos(),
+        win: this.systemSelectorNet(),
       };
     }
 
@@ -255,7 +260,7 @@ export const RegisterAgent = withErrorBoundary(
         this.state.selectedVersion === 'windowsxp' ||
         this.state.selectedVersion === 'windows8'
       ) {
-        return 'update-rc.d wazuh-agent defaults && service wazuh-agent start';
+        return 'NET START WazuhSvc';
       }
     }
 
@@ -278,9 +283,14 @@ export const RegisterAgent = withErrorBoundary(
         this.state.selectedVersion === 'solaris10' ||
         this.state.selectedVersion === 'solaris11' ||
         this.state.selectedVersion === '6.1 TL9' ||
-        this.state.selectedVersion === '11.31'
+        this.state.selectedVersion === '3.12.12'
       ) {
         return '/var/ossec/bin/wazuh-control start';
+      } else {
+        this.state.selectedVersion === '11.31';
+      }
+      {
+        return '/sbin/init.d/wazuh-agent start';
       }
     }
 
@@ -293,11 +303,29 @@ export const RegisterAgent = withErrorBoundary(
     }
 
     setAgentName(event) {
-      this.setState({ agentName: event.target.value });
-    }
-
-    setAgentName(event) {
-      this.setState({ agentName: event.target.value });
+      const validation = /^[a-z0-9-_.]+$/i;
+      if ((validation.test(event.target.value) && event.target.value.length >= 2)
+        || event.target.value.length <= 0) {
+        this.setState({
+          agentName: event.target.value,
+          agentNameError: false,
+          badCharacters: []
+        });
+      } else {
+        let badCharacters = event.target.value
+          .split('')
+          .map(char => char.replace(validation, ''))
+          .join('');
+        badCharacters = badCharacters
+          .split('')
+          .map(char => char.replace(/\s/, 'whitespace'));
+        const characters = [...new Set(badCharacters)];
+        this.setState({
+          agentName: event.target.value,
+          badCharacters: characters,
+          agentNameError: true
+        });
+      }
     }
 
     setGroupName(selectedGroup) {
@@ -377,6 +405,13 @@ export const RegisterAgent = withErrorBoundary(
 
     agentNameVariable() {
       let agentName = `WAZUH_AGENT_NAME='${this.state.agentName}' `;
+      if (
+        this.state.selectedOS === 'macos' &&
+        this.state.selectedArchitecture &&
+        this.state.agentName !== ''
+      ) {
+        return agentName.replace(/=/g, ' ');
+      }
       if (this.state.selectedArchitecture && this.state.agentName !== '') {
         return agentName;
       } else {
@@ -650,15 +685,15 @@ export const RegisterAgent = withErrorBoundary(
         `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
       ) {
         case 'solaris10-i386':
-          return `https://packages.wazuh.com/4.x/solaris/i386/10/wazuh-agent-${this.state.wazuhVersion}-sol10-i386.pkg`;
+          return `https://packages.wazuh.com/4.x/solaris/i386/10/wazuh-agent_v${this.state.wazuhVersion}-sol10-i386.pkg`;
         case 'solaris10-sparc':
-          return `https://packages.wazuh.com/4.x/solaris/sparc/10/wazuh-agent-${this.state.wazuhVersion}-sol10-sparc.pkg`;
+          return `https://packages.wazuh.com/4.x/solaris/sparc/10/wazuh-agent_v${this.state.wazuhVersion}-sol10-sparc.pkg`;
         case 'solaris11-i386':
-          return `https://packages.wazuh.com/4.x/solaris/i386/11/wazuh-agent-${this.state.wazuhVersion}-sol11-i386.p5p`;
+          return `https://packages.wazuh.com/4.x/solaris/i386/11/wazuh-agent_v${this.state.wazuhVersion}-sol11-i386.p5p`;
         case 'solaris11-sparc':
-          return `https://packages.wazuh.com/4.x/solaris/sparc/11/wazuh-agent-${this.state.wazuhVersion}-sol11-sparc.p5p`;
+          return `https://packages.wazuh.com/4.x/solaris/sparc/11/wazuh-agent_v${this.state.wazuhVersion}-sol11-sparc.p5p`;
         default:
-          return `https://packages.wazuh.com/4.x/solaris/sparc/11/wazuh-agent-${this.state.wazuhVersion}-sol11-sparc.p5p`;
+          return `https://packages.wazuh.com/4.x/solaris/sparc/11/wazuh-agent_v${this.state.wazuhVersion}-sol11-sparc.p5p`;
       }
     }
 
@@ -850,26 +885,34 @@ export const RegisterAgent = withErrorBoundary(
         'user-manual/agents/agent-connection.html',
         appVersionMajorDotMinor,
       );
-      const textAndLinkToCheckConnectionDocumentation = (
-        <p>
-          To verify the connection with the Wazuh server, please follow this{' '}
-          <a
-            href={urlCheckConnectionDocumentation}
-            target='_blank'
-            rel='noreferrer'
-          >
-            document.
-          </a>
-        </p>
-      );
-      const missingOSSelection = this.checkMissingOSSelection();
 
+      const urlWazuhAgentEnrollment = webDocumentationLink(
+        'user-manual/agent-enrollment/index.html',
+        appVersionMajorDotMinor,
+      );
+
+      const urlWindowsPackage = `https://packages.wazuh.com/4.x/windows/wazuh-agent-${this.state.wazuhVersion}-1.msi`;
+
+      const missingOSSelection = this.checkMissingOSSelection();
       const agentName = (
-        <EuiFieldText
-          placeholder='Name agent'
-          value={this.state.agentName}
-          onChange={event => this.setAgentName(event)}
-        />
+        <EuiForm>
+          <EuiFormRow
+            isInvalid={this.state.agentNameError}
+            error={[this.state.badCharacters.length < 1 ? 'The minimum length is 2 characters.' :
+              `The character${this.state.badCharacters.length <= 1 ? ('') : ('s')}
+            ${this.state.badCharacters.map(char => ` "${char}"`)}
+            ${this.state.badCharacters.length <= 1 ? 'is' : 'are'}
+            not valid. Allowed characters are A-Z, a-z, ".", "-", "_"`,
+            ]}
+          >
+            <EuiFieldText
+              isInvalid={this.state.agentNameError}
+              placeholder='Name agent'
+              value={this.state.agentName}
+              onChange={event => this.setAgentName(event)}
+            />
+          </EuiFormRow>
+        </EuiForm>
       );
       const groupInput = (
         <>
@@ -941,13 +984,13 @@ export const RegisterAgent = withErrorBoundary(
           this.state.wazuhVersion
         }.msi /q ${this.optionalDeploymentVariables()}${this.agentNameVariable()}`,
         openText: `sudo rpm --import https://packages.wazuh.com/key/GPG-KEY-WAZUH && sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()} zypper install -y ${this.optionalPackages()}`,
-        solText: `sudo curl -so ${this.optionalPackages()} && sudo ${this.agentNameVariable()}&& ${
+        solText: `sudo curl -so wazuh-agent.p5p ${this.optionalPackages()}/wazuh-agent.p5p ${this.agentNameVariable()}&& ${
           this.state.selectedVersion == 'solaris11'
             ? 'pkg install -g wazuh-agent.p5p wazuh-agent'
             : 'pkgadd -d wazuh-agent.pkg'
         }`,
         aixText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}rpm -ivh ${this.optionalPackages()}`,
-        hpText: `cd / && sudo curl -so ${this.optionalPackages()} && sudo ${this.agentNameVariable()}groupadd wazuh && sudo useradd -G wazuh wazuh && sudo tar -xvf wazuh-agent.tar`,
+        hpText: `cd / && sudo curl -so ${this.optionalPackages()} && sudo groupadd wazuh && sudo useradd -G wazuh wazuh && sudo tar -xvf wazuh-agent.tar`,
         amazonlinuxText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
         fedoraText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
         oraclelinuxText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
@@ -964,6 +1007,39 @@ export const RegisterAgent = withErrorBoundary(
       const language = this.getHighlightCodeLanguage(this.state.selectedOS);
       const warningUpgrade =
         'If the installer finds another Wazuh agent in the system, it will upgrade it preserving the configuration.';
+      const textAndLinkToCheckConnectionDocumentation = (
+        <p>
+          To verify the connection with the Wazuh server, please follow this{' '}
+          <a
+            href={urlCheckConnectionDocumentation}
+            target='_blank'
+            rel='noreferrer'
+          >
+            document.
+          </a>
+        </p>
+      );
+      const messageExtraSteps = (
+        <p>
+          After installing the agent, you need to enroll it in the Wazuh server.
+          Check the Wazuh agent enrollment{' '}
+          <a href={urlWazuhAgentEnrollment} target='_blank' rel='noreferrer'>
+            Wazuh agent enrollment{' '}
+          </a>
+          section to learn more.
+        </p>
+      );
+      const warningCommand = (
+        <>
+          <p>
+            Please
+            <a href={urlWindowsPackage}> download </a>
+            the package from our repository and copy it to the Windows system
+            where you are going to install it. Then run the following command to
+            perform the installation:
+          </p>
+        </>
+      );
       const windowsAdvice = this.state.selectedOS === 'win' && (
         <>
           <EuiCallOut title='Requirements' iconType='iInCircle'>
@@ -1012,10 +1088,17 @@ export const RegisterAgent = withErrorBoundary(
           ) : this.state.connectionSecure === true &&
             this.state.udpProtocol === false ? (
             <EuiText>
-              <p>
-                You can use this command to install and enroll the Wazuh agent
-                in one or more hosts.
-              </p>
+              {this.state.agentName.length > 0 ? (
+                <p>
+                  You can use this command to install and enroll the Wazuh
+                  agent.
+                </p>
+              ) : (
+                <p>
+                  You can use this command to install and enroll the Wazuh agent
+                  in one or more hosts.
+                </p>
+              )}
               <EuiCallOut
                 color='warning'
                 title={warningUpgrade}
@@ -1023,6 +1106,19 @@ export const RegisterAgent = withErrorBoundary(
               />
               <EuiSpacer />
               {windowsAdvice}
+              {this.state.selectedVersion == 'windowsxp' ||
+              this.state.selectedVersion == 'windowsserver2008' ? (
+                <>
+                  <EuiCallOut
+                    color='warning'
+                    title={warningCommand}
+                    iconType='iInCircle'
+                  />
+                  <EuiSpacer />
+                </>
+              ) : (
+                ''
+              )}
               <div className='copy-codeblock-wrapper'>
                 <EuiCodeBlock style={codeBlock} language={language}>
                   {this.state.wazuhPassword && !this.state.showPassword
@@ -1039,6 +1135,118 @@ export const RegisterAgent = withErrorBoundary(
                   )}
                 </EuiCopy>
               </div>
+              {this.state.selectedVersion == 'solaris10' ||
+              this.state.selectedVersion == 'solaris11' ? (
+                <EuiCallOut
+                  color='warning'
+                  className='message'
+                  iconType='iInCircle'
+                  title={
+                    <span>
+                      Might require some extra installation{' '}
+                      <EuiLink
+                        target='_blank'
+                        href={webDocumentationLink(
+                          'installation-guide/wazuh-agent/wazuh-agent-package-solaris.html',
+                          appVersionMajorDotMinor,
+                        )}
+                      >
+                        steps
+                      </EuiLink>
+                      .
+                    </span>
+                  }
+                ></EuiCallOut>
+              ) : this.state.selectedVersion == '6.1 TL9' ? (
+                <EuiCallOut
+                  color='warning'
+                  className='message'
+                  iconType='iInCircle'
+                  title={
+                    <span>
+                      Might require some extra installation{' '}
+                      <EuiLink
+                        target='_blank'
+                        href={webDocumentationLink(
+                          'installation-guide/wazuh-agent/wazuh-agent-package-aix.html',
+                          appVersionMajorDotMinor,
+                        )}
+                      >
+                        steps
+                      </EuiLink>
+                      .
+                    </span>
+                  }
+                ></EuiCallOut>
+              ) : this.state.selectedVersion == '11.31' ? (
+                <EuiCallOut
+                  color='warning'
+                  className='message'
+                  iconType='iInCircle'
+                  title={
+                    <span>
+                      Might require some extra installation{' '}
+                      <EuiLink
+                        target='_blank'
+                        href={webDocumentationLink(
+                          'installation-guide/wazuh-agent/wazuh-agent-package-hpux.html',
+                          appVersionMajorDotMinor,
+                        )}
+                      >
+                        steps
+                      </EuiLink>
+                      .
+                    </span>
+                  }
+                ></EuiCallOut>
+              ) : this.state.selectedVersion == '3.12.12' ? (
+                <EuiCallOut
+                  color='warning'
+                  className='message'
+                  iconType='iInCircle'
+                  title={
+                    <span>
+                      Might require some extra installation{' '}
+                      <EuiLink
+                        target='_blank'
+                        href={webDocumentationLink(
+                          'installation-guide/wazuh-agent/wazuh-agent-package-linux.html',
+                          appVersionMajorDotMinor,
+                        )}
+                      >
+                        steps
+                      </EuiLink>
+                      .
+                    </span>
+                  }
+                ></EuiCallOut>
+              ) : this.state.selectedVersion == 'debian7' ||
+                this.state.selectedVersion == 'debian8' ||
+                this.state.selectedVersion == 'debian9' ||
+                this.state.selectedVersion == 'debian10' ? (
+                <EuiCallOut
+                  color='warning'
+                  className='message'
+                  iconType='iInCircle'
+                  title={
+                    <span>
+                      Might require some extra installation{' '}
+                      <EuiLink
+                        target='_blank'
+                        href={webDocumentationLink(
+                          'installation-guide/wazuh-agent/wazuh-agent-package-linux.html',
+                          appVersionMajorDotMinor,
+                        )}
+                      >
+                        steps
+                      </EuiLink>
+                      .
+                    </span>
+                  }
+                ></EuiCallOut>
+              ) : (
+                ''
+              )}
               {this.state.needsPassword && (
                 <EuiSwitch
                   label='Show password'
@@ -1172,6 +1380,9 @@ export const RegisterAgent = withErrorBoundary(
                 </div>
                 <EuiSpacer size='s' />
                 {textAndLinkToCheckConnectionDocumentation}
+                {this.state.selectedOS == 'hp' || this.state.selectedOS == 'sol'
+                  ? messageExtraSteps
+                  : ''}
               </EuiText>
             </Fragment>
           ),
@@ -1202,6 +1413,9 @@ export const RegisterAgent = withErrorBoundary(
                 </div>
                 <EuiSpacer size='s' />
                 {textAndLinkToCheckConnectionDocumentation}
+                {this.state.selectedOS == 'hp' || this.state.selectedOS == 'sol'
+                  ? messageExtraSteps
+                  : ''}
               </EuiText>
             </Fragment>
           ),
@@ -1232,6 +1446,9 @@ export const RegisterAgent = withErrorBoundary(
                 </div>
                 <EuiSpacer size='s' />
                 {textAndLinkToCheckConnectionDocumentation}
+                {this.state.selectedOS == 'hp' || this.state.selectedOS == 'sol'
+                  ? messageExtraSteps
+                  : ''}
               </EuiText>
             </Fragment>
           ),
@@ -1262,6 +1479,9 @@ export const RegisterAgent = withErrorBoundary(
                 </div>
                 <EuiSpacer size='s' />
                 {textAndLinkToCheckConnectionDocumentation}
+                {this.state.selectedOS == 'hp' || this.state.selectedOS == 'sol'
+                  ? messageExtraSteps
+                  : ''}
               </EuiText>
             </Fragment>
           ),
@@ -1292,6 +1512,9 @@ export const RegisterAgent = withErrorBoundary(
                 </div>
                 <EuiSpacer size='s' />
                 {textAndLinkToCheckConnectionDocumentation}
+                {this.state.selectedOS == 'hp' || this.state.selectedOS == 'sol'
+                  ? messageExtraSteps
+                  : ''}
               </EuiText>
             </Fragment>
           ),
@@ -1311,117 +1534,6 @@ export const RegisterAgent = withErrorBoundary(
         );
       };
 
-      const buttonGroupWithMessage = (
-        legend,
-        options,
-        idSelected,
-        onChange,
-      ) => {
-        return (
-          <>
-            <EuiButtonGroup
-              color='primary'
-              legend={legend}
-              options={options}
-              idSelected={idSelected}
-              onChange={onChange}
-              className={'wz-flex'}
-            />
-            {this.state.selectedVersion == 'solaris10' ||
-            this.state.selectedVersion == 'solaris11' ? (
-              <EuiCallOut
-                color='warning'
-                className='message'
-                iconType='iInCircle'
-                title={
-                  <span>
-                    Might require some extra installation{' '}
-                    <EuiLink
-                      target='_blank'
-                      href={webDocumentationLink(
-                        'installation-guide/wazuh-agent/wazuh-agent-package-solaris.html',
-                        appVersionMajorDotMinor,
-                      )}
-                    >
-                      steps
-                    </EuiLink>
-                    .
-                  </span>
-                }
-              ></EuiCallOut>
-            ) : this.state.selectedVersion == '6.1 TL9' ? (
-              <EuiCallOut
-                color='warning'
-                className='message'
-                iconType='iInCircle'
-                title={
-                  <span>
-                    Might require some extra installation{' '}
-                    <EuiLink
-                      target='_blank'
-                      href={webDocumentationLink(
-                        'installation-guide/wazuh-agent/wazuh-agent-package-aix.html',
-                        appVersionMajorDotMinor,
-                      )}
-                    >
-                      steps
-                    </EuiLink>
-                    .
-                  </span>
-                }
-              ></EuiCallOut>
-            ) : this.state.selectedVersion == '11.31' ? (
-              <EuiCallOut
-                color='warning'
-                className='message'
-                iconType='iInCircle'
-                title={
-                  <span>
-                    Might require some extra installation{' '}
-                    <EuiLink
-                      target='_blank'
-                      href={webDocumentationLink(
-                        'installation-guide/wazuh-agent/wazuh-agent-package-hpux.html',
-                        appVersionMajorDotMinor,
-                      )}
-                    >
-                      steps
-                    </EuiLink>
-                    .
-                  </span>
-                }
-              ></EuiCallOut>
-            ) : this.state.selectedVersion == 'debian7' ||
-              this.state.selectedVersion == 'debian8' ||
-              this.state.selectedVersion == 'debian9' ||
-              this.state.selectedVersion == 'debian10' ? (
-              <EuiCallOut
-                color='warning'
-                className='message'
-                iconType='iInCircle'
-                title={
-                  <span>
-                    Might require some extra installation{' '}
-                    <EuiLink
-                      target='_blank'
-                      href={webDocumentationLink(
-                        'installation-guide/wazuh-agent/wazuh-agent-package-linux.html',
-                        appVersionMajorDotMinor,
-                      )}
-                    >
-                      steps
-                    </EuiLink>
-                    .
-                  </span>
-                }
-              ></EuiCallOut>
-            ) : (
-              ''
-            )}
-          </>
-        );
-      };
-
       const selectedVersionMac = (legend, options, idSelected, onChange) => {
         return (
           <EuiButtonGroup
@@ -1430,7 +1542,6 @@ export const RegisterAgent = withErrorBoundary(
             options={options}
             idSelected={idSelected}
             onChange={onChange}
-            // className={'osButtonsStyleMac'}
           />
         );
       };
@@ -1488,21 +1599,12 @@ export const RegisterAgent = withErrorBoundary(
           ? [
               {
                 title: 'Choose the version',
-                children:
-                  this.state.selectedVersion == 'redhat5' ||
-                  this.state.selectedVersion == 'redhat6'
-                    ? buttonGroupWithMessage(
-                        'Choose the version',
-                        versionButtonsRedHat,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      )
-                    : buttonGroup(
-                        'Choose the version',
-                        versionButtonsRedHat,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      ),
+                children: buttonGroup(
+                  'Choose the version',
+                  versionButtonsRedHat,
+                  this.state.selectedVersion,
+                  version => this.setVersion(version),
+                ),
               },
             ]
           : []),
@@ -1549,21 +1651,12 @@ export const RegisterAgent = withErrorBoundary(
           ? [
               {
                 title: 'Choose the version',
-                children:
-                  this.state.selectedVersion == 'centos5' ||
-                  this.state.selectedVersion == 'centos6'
-                    ? buttonGroupWithMessage(
-                        'Choose the version',
-                        versionButtonsCentos,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      )
-                    : buttonGroup(
-                        'Choose the version',
-                        versionButtonsCentos,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      ),
+                children: buttonGroup(
+                  'Choose the version',
+                  versionButtonsCentos,
+                  this.state.selectedVersion,
+                  version => this.setVersion(version),
+                ),
               },
             ]
           : []),
@@ -1584,23 +1677,12 @@ export const RegisterAgent = withErrorBoundary(
           ? [
               {
                 title: 'Choose the version',
-                children:
-                  this.state.selectedVersion == 'debian7' ||
-                  this.state.selectedVersion == 'debian8' ||
-                  this.state.selectedVersion == 'debian9' ||
-                  this.state.selectedVersion == 'debian10'
-                    ? buttonGroupWithMessage(
-                        'Choose the version',
-                        versionButtonsDebian,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      )
-                    : buttonGroup(
-                        'Choose the version',
-                        versionButtonsDebian,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      ),
+                children: buttonGroup(
+                  'Choose the version',
+                  versionButtonsDebian,
+                  this.state.selectedVersion,
+                  version => this.setVersion(version),
+                ),
               },
             ]
           : []),
@@ -1608,20 +1690,12 @@ export const RegisterAgent = withErrorBoundary(
           ? [
               {
                 title: 'Choose the version',
-                children:
-                  this.state.selectedVersion == 'ubuntu14'
-                    ? buttonGroupWithMessage(
-                        'Choose the version',
-                        versionButtonsUbuntu,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      )
-                    : buttonGroup(
-                        'Choose the version',
-                        versionButtonsUbuntu,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      ),
+                children: buttonGroup(
+                  'Choose the version',
+                  versionButtonsUbuntu,
+                  this.state.selectedVersion,
+                  version => this.setVersion(version),
+                ),
               },
             ]
           : []),
@@ -1689,21 +1763,12 @@ export const RegisterAgent = withErrorBoundary(
           ? [
               {
                 title: 'Choose the version',
-                children:
-                  this.state.selectedVersion == 'solaris10' ||
-                  this.state.selectedVersion == 'solaris11'
-                    ? buttonGroupWithMessage(
-                        'Choose the version',
-                        versionButtonsSolaris,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      )
-                    : buttonGroup(
-                        'Choose the version',
-                        versionButtonsSolaris,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      ),
+                children: buttonGroup(
+                  'Choose the version',
+                  versionButtonsSolaris,
+                  this.state.selectedVersion,
+                  version => this.setVersion(version),
+                ),
               },
             ]
           : []),
@@ -1711,20 +1776,12 @@ export const RegisterAgent = withErrorBoundary(
           ? [
               {
                 title: 'Choose the version',
-                children:
-                  this.state.selectedVersion == '6.1 TL9'
-                    ? buttonGroupWithMessage(
-                        'Choose the version',
-                        versionButtonsAix,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      )
-                    : buttonGroup(
-                        'Choose the version',
-                        versionButtonsAix,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      ),
+                children: buttonGroup(
+                  'Choose the version',
+                  versionButtonsAix,
+                  this.state.selectedVersion,
+                  version => this.setVersion(version),
+                ),
               },
             ]
           : []),
@@ -1732,20 +1789,28 @@ export const RegisterAgent = withErrorBoundary(
           ? [
               {
                 title: 'Choose the version',
-                children:
-                  this.state.selectedVersion == '11.31'
-                    ? buttonGroupWithMessage(
-                        'Choose the version',
-                        versionButtonsHPUX,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      )
-                    : buttonGroup(
-                        'Choose the version',
-                        versionButtonsHPUX,
-                        this.state.selectedVersion,
-                        version => this.setVersion(version),
-                      ),
+                children: buttonGroup(
+                  'Choose the version',
+                  versionButtonsHPUX,
+                  this.state.selectedVersion,
+                  version => this.setVersion(version),
+                ),
+              },
+            ]
+          : []),
+        ...(this.state.selectedVersion == 'centos5' ||
+        this.state.selectedVersion == 'redhat5' ||
+        this.state.selectedVersion == 'oraclelinux5' ||
+        this.state.selectedVersion == 'suse11'
+          ? [
+              {
+                title: 'Choose the version',
+                children: buttonGroup(
+                  'Choose the version',
+                  versionButtonAlpine,
+                  this.state.selectedVersion,
+                  version => this.setVersion(version),
+                ),
               },
             ]
           : []),
@@ -1893,18 +1958,26 @@ export const RegisterAgent = withErrorBoundary(
               },
             ]
           : []),
-        {
-          title: 'Wazuh server address',
-          children: (
-            <Fragment>
-              <ServerAddress
-                defaultValue={this.state.defaultServerAddress}
-                onChange={onChangeServerAddress}
-                fetchOptions={fetchClusterNodesOptions}
-              />
-            </Fragment>
-          ),
-        },
+        ...(!(
+          this.state.selectedOS == 'hp' ||
+          this.state.selectedOS == 'sol' ||
+          this.state.selectedOS == 'alpine'
+        )
+          ? [
+              {
+                title: 'Wazuh server address',
+                children: (
+                  <Fragment>
+                    <ServerAddress
+                      defaultValue={this.state.defaultServerAddress}
+                      onChange={onChangeServerAddress}
+                      fetchOptions={fetchClusterNodesOptions}
+                    />
+                  </Fragment>
+                ),
+              },
+            ]
+          : []),
         ...(!(!this.state.needsPassword || this.state.hidePasswordInput)
           ? [
               {
@@ -1913,30 +1986,65 @@ export const RegisterAgent = withErrorBoundary(
               },
             ]
           : []),
-        {
-          title: 'Assign a name and a group to the agent',
-          children: (
-            <Fragment>
-              {agentName}
-              {groupInput}
-              {agentGroup}
-            </Fragment>
-          ),
-        },
-        {
-          title: 'Install and enroll the agent',
-          children: this.state.gotErrorRegistrationServiceInfo ? (
-            calloutErrorRegistrationServiceInfo
-          ) : missingOSSelection.length ? (
-            <EuiCallOut
-              color='warning'
-              title={`Please select the ${missingOSSelection.join(', ')}.`}
-              iconType='iInCircle'
-            />
-          ) : (
-            <div>{guide}</div>
-          ),
-        },
+        ...(!(
+          this.state.selectedOS == 'hp' ||
+          this.state.selectedOS == 'sol' ||
+          this.state.selectedOS == 'alpine'
+        )
+          ? [
+              {
+                title: 'Assign a name and a group to the agent',
+                children: (
+                  <Fragment>
+                    {agentName}
+                    {groupInput}
+                    {agentGroup}
+                  </Fragment>
+                ),
+              },
+            ]
+          : []),
+        ...(!(
+          this.state.selectedOS == 'hp' ||
+          this.state.selectedOS == 'sol' ||
+          this.state.selectedOS == 'alpine'
+        )
+          ? [
+              {
+                title: 'Install and enroll the agent',
+                children: this.state.gotErrorRegistrationServiceInfo ? (
+                  calloutErrorRegistrationServiceInfo
+                ) : missingOSSelection.length ? (
+                  <EuiCallOut
+                    color='warning'
+                    title={`Please select the ${missingOSSelection.join(
+                      ', ',
+                    )}.`}
+                    iconType='iInCircle'
+                  />
+                ) : (
+                  <div>{guide}</div>
+                ),
+              },
+            ]
+          : [
+              {
+                title: 'Install the agent',
+                children: this.state.gotErrorRegistrationServiceInfo ? (
+                  calloutErrorRegistrationServiceInfo
+                ) : missingOSSelection.length ? (
+                  <EuiCallOut
+                    color='warning'
+                    title={`Please select the ${missingOSSelection.join(
+                      ', ',
+                    )}.`}
+                    iconType='iInCircle'
+                  />
+                ) : (
+                  <div>{guide}</div>
+                ),
+              },
+            ]),
         ...(this.state.selectedOS == 'rpm' ||
         this.state.selectedOS == 'cent' ||
         this.state.selectedOS == 'suse' ||
@@ -1951,12 +2059,20 @@ export const RegisterAgent = withErrorBoundary(
         this.state.selectedOS == 'open' ||
         this.state.selectedOS == 'sol' ||
         this.state.selectedOS == 'aix' ||
-        this.state.selectedOS == 'hp'
+        this.state.selectedOS == 'hp' ||
+        this.state.selectedOS == 'alpine' ||
+        this.state.selectedOS == ''
           ? [
               {
                 title: 'Start the agent',
                 children: this.state.gotErrorRegistrationServiceInfo ? (
                   calloutErrorRegistrationServiceInfo
+                ) : this.state.agentNameError ? (
+                  <EuiCallOut
+                    color='danger'
+                    title={'There are fields with errors. Please verify them.'}
+                    iconType='alert'
+                  />
                 ) : missingOSSelection.length ? (
                   <EuiCallOut
                     color='warning'
@@ -2009,7 +2125,6 @@ export const RegisterAgent = withErrorBoundary(
               },
             ]
           : []),
-
         ...(!missingOSSelection.length &&
         this.state.selectedOS !== 'rpm' &&
         this.state.selectedOS !== 'deb' &&
@@ -2113,5 +2228,5 @@ export const RegisterAgent = withErrorBoundary(
         </div>
       );
     }
-  },
+  }
 );
