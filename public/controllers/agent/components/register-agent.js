@@ -305,14 +305,16 @@ export const RegisterAgent = withErrorBoundary(
 
     setAgentName(event) {
       const validation = /^[a-z0-9-_.]+$/i;
-      if ((validation.test(event.target.value) && event.target.value.length >= 2)
-        || event.target.value.length <= 0) {
+      if (
+        (validation.test(event.target.value) &&
+          event.target.value.length >= 2) ||
+        event.target.value.length <= 0
+      ) {
         this.setState({
           agentName: event.target.value,
           agentNameError: false,
-          badCharacters: []
+          badCharacters: [],
         });
-
       } else {
         let badCharacters = event.target.value
           .split('')
@@ -325,7 +327,7 @@ export const RegisterAgent = withErrorBoundary(
         this.setState({
           agentName: event.target.value,
           badCharacters: characters,
-          agentNameError: true
+          agentNameError: true,
         });
       }
     }
@@ -909,8 +911,12 @@ export const RegisterAgent = withErrorBoundary(
         <EuiForm>
           <EuiFormRow
             isInvalid={this.state.agentNameError}
-            error={[this.state.badCharacters.length < 1 ? 'The minimum length is 2 characters.' :
-              `The character${this.state.badCharacters.length <= 1 ? ('') : ('s')}
+            error={[
+              this.state.badCharacters.length < 1
+                ? 'The minimum length is 2 characters.'
+                : `The character${
+                    this.state.badCharacters.length <= 1 ? '' : 's'
+                  }
             ${this.state.badCharacters.map(char => ` "${char}"`)}
             ${this.state.badCharacters.length <= 1 ? 'is' : 'are'}
             not valid. Allowed characters are A-Z, a-z, ".", "-", "_"`,
@@ -1003,7 +1009,7 @@ apk add wazuh-agent`,
           this.state.selectedVersion == 'solaris11'
             ? 'wazuh-agent.p5p'
             : 'wazuh-agent.pkg'
-        } ${this.optionalPackages()}${this.agentNameVariable()} && ${
+        } ${this.optionalPackages()} && ${
           this.state.selectedVersion == 'solaris11'
             ? 'pkg install -g wazuh-agent.p5p wazuh-agent'
             : 'pkgadd -d wazuh-agent.pkg'
