@@ -1012,7 +1012,7 @@ apk add wazuh-agent`,
           this.state.selectedVersion == 'solaris11'
             ? 'wazuh-agent.p5p'
             : 'wazuh-agent.pkg'
-        } ${this.optionalPackages()}${this.agentNameVariable()} && ${
+        } ${this.optionalPackages()} && ${
           this.state.selectedVersion == 'solaris11'
             ? 'pkg install -g wazuh-agent.p5p wazuh-agent'
             : 'pkgadd -d wazuh-agent.pkg'
