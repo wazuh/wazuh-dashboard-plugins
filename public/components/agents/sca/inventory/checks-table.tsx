@@ -73,14 +73,6 @@ export class InventoryPolicyChecksTable extends Component<Props, State> {
       },
       {
         type: 'params',
-        label: 'status',
-        description: 'Filter by check status',
-        operators: ['=', '!='],
-        values: (value) =>
-          getFilterValues('status', value, this.props.agent.id, this.props.lookingPolicy.policy_id),
-      },
-      {
-        type: 'params',
         label: 'rationale',
         description: 'Filter by check rationale',
         operators: ['=', '!='],
