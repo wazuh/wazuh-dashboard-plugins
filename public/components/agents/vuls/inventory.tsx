@@ -33,7 +33,7 @@ import {
   VisualizationBasicWidget,
 } from '../../common/charts/visualizations/basic';
 import { WzStat } from '../../wz-stat';
-import { formatUIDate } from '../../../react-services/time-service';
+import { beautifyDate } from './inventory/lib';
 
 interface Aggregation {
   title: number;
@@ -84,9 +84,17 @@ export class Inventory extends Component {
       customBadges: [],
       filters: [],
       stats: [
-        { title: 0, description: 'Critical', titleColor: this.titleColors.Critical },
+        {
+          title: 0,
+          description: 'Critical',
+          titleColor: this.titleColors.Critical,
+        },
         { title: 0, description: 'High', titleColor: this.titleColors.High },
-        { title: 0, description: 'Medium', titleColor: this.titleColors.Medium },
+        {
+          title: 0,
+          description: 'Medium',
+          titleColor: this.titleColors.Medium,
+        },
         { title: 0, description: 'Low', titleColor: this.titleColors.Low },
       ],
       severityPieStats: [],
@@ -95,19 +103,11 @@ export class Inventory extends Component {
         last_partial_scan: '',
       },
     };
-    this.fetchVisualizationVulnerabilitiesSummaryData = this.fetchVisualizationVulnerabilitiesSummaryData.bind(
-      this
-    );
-    this.fetchVisualizationVulnerabilitiesSeverityData = this.fetchVisualizationVulnerabilitiesSeverityData.bind(
-      this
-    );
+    this.fetchVisualizationVulnerabilitiesSummaryData =
+      this.fetchVisualizationVulnerabilitiesSummaryData.bind(this);
+    this.fetchVisualizationVulnerabilitiesSeverityData =
+      this.fetchVisualizationVulnerabilitiesSeverityData.bind(this);
     this.colorsVisualizationVulnerabilitiesSummaryData = euiPaletteColorBlind();
-  }
-
-  // when vulnerability module is not configured
-  // its meant to render nothing when such date is received
-  beautifyDate(date?: string) {
-    return date && !['1970-01-01T00:00:00Z', '-'].includes(date) ? formatUIDate(date) : '-';
   }
 
   async componentDidMount() {
@@ -128,7 +128,10 @@ export class Inventory extends Component {
         color: this.colorsVisualizationVulnerabilitiesSummaryData[index],
         onClick: () => this.onFiltersChange(this.buildFilterQuery(field, key)),
       }))
-      .sort((firstElement, secondElement) => secondElement.value - firstElement.value);
+      .sort(
+        (firstElement, secondElement) =>
+          secondElement.value - firstElement.value,
+      );
   }
 
   async fetchVisualizationVulnerabilitiesSeverityData() {
@@ -140,7 +143,7 @@ export class Inventory extends Component {
     const vulnerabilityLastScan = await getLastScan(id);
     const { severity } = await getAggregation(id, FIELD);
 
-    const severityStats = SEVERITY_KEYS.map((key) => ({
+    const severityStats = SEVERITY_KEYS.map(key => ({
       titleColor: this.titleColors[key],
       description: key,
       title: severity[key] ? severity[key] : 0,
@@ -153,11 +156,12 @@ export class Inventory extends Component {
     });
 
     return Object.keys(severity).length
-      ? SEVERITY_KEYS.map((key) => ({
+      ? SEVERITY_KEYS.map(key => ({
           label: key,
           value: severity[key] ? severity[key] : 0,
           color: this.titleColors[key],
-          onClick: () => this.onFiltersChange(this.buildFilterQuery(FIELD, key)),
+          onClick: () =>
+            this.onFiltersChange(this.buildFilterQuery(FIELD, key)),
         }))
       : [];
   }
@@ -179,7 +183,7 @@ export class Inventory extends Component {
     }
   }
 
-  onFiltersChange = (filters) => {
+  onFiltersChange = filters => {
     this.setState({ filters });
   };
 
@@ -187,7 +191,11 @@ export class Inventory extends Component {
     const { filters } = this.state;
     return (
       <div>
-        <InventoryTable {...this.props} filters={filters} onFiltersChange={this.onFiltersChange} />
+        <InventoryTable
+          {...this.props}
+          filters={filters}
+          onFiltersChange={this.onFiltersChange}
+        />
       </div>
     );
   }
@@ -197,7 +205,7 @@ export class Inventory extends Component {
       <EuiPage>
         <EuiFlexGroup>
           <EuiFlexItem>
-            <EuiProgress size="xs" color="primary" />
+            <EuiProgress size='xs' color='primary' />
           </EuiFlexItem>
         </EuiFlexGroup>
       </EuiPage>
@@ -209,14 +217,18 @@ export class Inventory extends Component {
     return (
       <EuiFlexItem key={`module_vulnerabilities_inventory_stat_${description}`}>
         <EuiStat
-          textAlign="center"
+          textAlign='center'
           isLoading={isLoadingStats}
           title={
-            <EuiToolTip position="top" content={`Filter by Severity`}>
+            <EuiToolTip position='top' content={`Filter by Severity`}>
               <span
                 className={'statWithLink wz-user-select-none'}
                 style={{ cursor: 'pointer', fontSize: '2.25rem' }}
-                onClick={() => this.onFiltersChange(this.buildFilterQuery('severity', description))}
+                onClick={() =>
+                  this.onFiltersChange(
+                    this.buildFilterQuery('severity', description),
+                  )
+                }
               >
                 {title}
               </span>
@@ -234,8 +246,10 @@ export class Inventory extends Component {
     if (isLoading) {
       return this.loadingInventory();
     }
-    const last_full_scan = this.beautifyDate(vulnerabilityLastScan.last_full_scan);
-    const last_partial_scan = this.beautifyDate(vulnerabilityLastScan.last_partial_scan);
+    const last_full_scan = beautifyDate(vulnerabilityLastScan.last_full_scan);
+    const last_partial_scan = beautifyDate(
+      vulnerabilityLastScan.last_partial_scan,
+    );
 
     const table = this.renderTable();
     return (
@@ -243,42 +257,53 @@ export class Inventory extends Component {
         <EuiPageBody>
           <EuiFlexGroup wrap>
             <EuiFlexItem>
-              <EuiCard title description betaBadgeLabel="Severity" className="wz-euiCard-no-title">
-                <div style={{ display: 'flex', alignItems: 'flex-end', height: '100%' }}>
+              <EuiCard
+                title
+                description
+                betaBadgeLabel='Severity'
+                className='wz-euiCard-no-title'
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'flex-end',
+                    height: '100%',
+                  }}
+                >
                   <VisualizationBasicWidget
-                    type="donut"
+                    type='donut'
                     size={{ width: '100%', height: '150px' }}
                     showLegend
                     onFetch={this.fetchVisualizationVulnerabilitiesSeverityData}
                     onFetchDependencies={[this.props.agent.id]}
-                    noDataTitle="No results"
-                    noDataMessage="No results were found."
+                    noDataTitle='No results'
+                    noDataMessage='No results were found.'
                   />
                 </div>
               </EuiCard>
             </EuiFlexItem>
             <EuiFlexItem>
-              <EuiCard title description betaBadgeLabel="Details">
-                <EuiFlexGroup alignItems="center" className={'height-full'}>
+              <EuiCard title description betaBadgeLabel='Details'>
+                <EuiFlexGroup alignItems='center' className={'height-full'}>
                   <EuiFlexItem>
-                    <EuiFlexGroup alignItems="center">
-                      {stats.map((stat) => this.buildTitleFilter(stat))}
+                    <EuiFlexGroup alignItems='center'>
+                      {stats.map(stat => this.buildTitleFilter(stat))}
                     </EuiFlexGroup>
                     <EuiFlexGroup style={{ marginTop: 'auto' }}>
                       <EuiFlexItem>
                         <WzStat
                           title={last_full_scan}
-                          description="Last full scan"
-                          textAlign="center"
-                          titleSize="xs"
+                          description='Last full scan'
+                          textAlign='center'
+                          titleSize='xs'
                         />
                       </EuiFlexItem>
                       <EuiFlexItem>
                         <WzStat
                           title={last_partial_scan}
-                          description="Last partial scan"
-                          textAlign="center"
-                          titleSize="xs"
+                          description='Last partial scan'
+                          textAlign='center'
+                          titleSize='xs'
                         />
                       </EuiFlexItem>
                     </EuiFlexGroup>
@@ -287,9 +312,14 @@ export class Inventory extends Component {
               </EuiCard>
             </EuiFlexItem>
             <EuiFlexItem>
-              <EuiCard title description betaBadgeLabel="Summary" className="wz-euiCard-no-title">
+              <EuiCard
+                title
+                description
+                betaBadgeLabel='Summary'
+                className='wz-euiCard-no-title'
+              >
                 <VisualizationBasicWidgetSelector
-                  type="donut"
+                  type='donut'
                   size={{ width: '100%', height: '150px' }}
                   showLegend
                   selectorOptions={[
@@ -301,7 +331,7 @@ export class Inventory extends Component {
                   ]}
                   onFetch={this.fetchVisualizationVulnerabilitiesSummaryData}
                   onFetchExtraDependencies={[this.props.agent.id]}
-                  noDataTitle="No results"
+                  noDataTitle='No results'
                   noDataMessage={(_, optionRequirement) =>
                     `No ${optionRequirement.text} results were found.`
                   }
