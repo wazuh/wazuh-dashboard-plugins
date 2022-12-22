@@ -38,6 +38,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Updated the `winston` dependency to `3.5.1` [#4985](https://github.com/wazuh/wazuh-kibana-app/pull/4985)
 - Updated the `pdfmake` dependency to `0.2.6` [#4985](https://github.com/wazuh/wazuh-kibana-app/pull/4985)
 - The button to export the app logs is now disabled when there are no results, instead of showing an error toast [#4992](https://github.com/wazuh/wazuh-kibana-app/pull/4992)
+- Unify the SCA check result label name [#5031](https://github.com/wazuh/wazuh-kibana-app/pull/5031)
 
 ### Fixed
 
