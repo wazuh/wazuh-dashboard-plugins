@@ -36,7 +36,7 @@ export function DocViewTableRowBtnToggleColumn({ onClick, active, disabled = fal
         })}
         className="kbnDocViewer__actionButton"
         data-test-subj="toggleColumnButton"
-        disabled
+        isDisabled={disabled}
         iconType={'tableOfContents'}
         iconSize={'s'}
       />
