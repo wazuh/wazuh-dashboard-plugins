@@ -5,6 +5,31 @@ import { act } from 'react-dom/test-utils';
 import ServerAddress from './server-address';
 import * as registerAgentsUtils from '../../components/register-agent-service';
 
+jest.mock('../../../../kibana-services', () => ({
+  ...(jest.requireActual('../../../../kibana-services') as object),
+  getHttp: jest.fn().mockReturnValue({
+    basePath: {
+      get: () => {
+        return 'http://localhost:5601';
+      },
+      prepend: url => {
+        return `http://localhost:5601${url}`;
+      },
+    },
+  }),
+  getCookies: jest.fn().mockReturnValue({
+    set: (name, value, options) => {
+      return true;
+    },
+    get: () => {
+      return '{}';
+    },
+    remove: () => {
+      return;
+    },
+  }),
+}));
+
 const mockedNodesIps = [
   {
     name: 'master-node',
@@ -84,7 +109,7 @@ describe('Server Address Combobox', () => {
       await promiseFetchOptions;
       expect(onChangeMocked).toBeCalledTimes(1);
       expect(onChangeMocked).toBeCalledWith([
-        { label: 'default-dns', value: 'default-dns', nodetype: 'custom' }
+        { label: 'default-dns', value: 'default-dns', nodetype: 'custom' },
       ]);
       expect(getByText('default-dns')).toBeInTheDocument();
       expect(getByRole('textbox')).toHaveAttribute('disabled');
@@ -116,12 +141,11 @@ describe('Server Address Combobox', () => {
       await findByText(`${mockedNodesIps[1].name}:${mockedNodesIps[1].ip}`);
       await findByText(`${mockedNodesIps[2].name}:${mockedNodesIps[2].ip}`);
     });
-    
   });
 
   it('should allow only single selection', async () => {
     const onChangeMocked = jest.fn();
-    const { getByRole, getByText,findByText } = render(
+    const { getByRole, getByText, findByText } = render(
       <ServerAddress
         onChange={onChangeMocked}
         fetchOptions={mockedFetchOptions}
@@ -135,7 +159,9 @@ describe('Server Address Combobox', () => {
       fireEvent.keyDown(serverAddresInput, { key: 'Enter', code: 'Enter' });
       fireEvent.change(serverAddresInput, { target: { value: 'last-typed' } });
       fireEvent.keyDown(serverAddresInput, { key: 'Enter', code: 'Enter' });
-      expect(onChangeMocked).toHaveBeenLastCalledWith([{ label: 'last-typed', value: 'last-typed', nodetype: 'custom' }]);
+      expect(onChangeMocked).toHaveBeenLastCalledWith([
+        { label: 'last-typed', value: 'last-typed', nodetype: 'custom' },
+      ]);
       expect(getByText('last-typed')).toBeInTheDocument();
     });
   });
@@ -173,7 +199,9 @@ describe('Server Address Combobox', () => {
       });
       fireEvent.keyDown(getByRole('textbox'), { key: 'Enter', code: 'Enter' });
       expect(onChangeMocked).toBeCalledTimes(2);
-      expect(onChangeMocked).toHaveBeenNthCalledWith(2,[{ label: 'custom-ip-dns', value: 'custom-ip-dns', nodetype: 'custom' }]);
+      expect(onChangeMocked).toHaveBeenNthCalledWith(2, [
+        { label: 'custom-ip-dns', value: 'custom-ip-dns', nodetype: 'custom' },
+      ]);
     });
   });
 
@@ -187,9 +215,7 @@ describe('Server Address Combobox', () => {
     });
 
     mockedNodesIps.forEach(nodeItem => {
-      expect(
-        getByText(`${nodeItem.name}:${nodeItem.ip}`),
-      ).toBeInTheDocument();
+      expect(getByText(`${nodeItem.name}:${nodeItem.ip}`)).toBeInTheDocument();
     });
   });
 });
