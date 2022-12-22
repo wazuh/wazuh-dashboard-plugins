@@ -35,6 +35,7 @@ import { getAngularModule } from '../../../../../kibana-services';
 import { withReduxProvider, withUserAuthorizationPrompt } from "../../../hocs";
 import { compose } from 'redux';
 import SCAPoliciesTable from '../../../../agents/sca/inventory/agent-policies-table';
+import { MODULE_SCA_CHECK_RESULT_LABEL } from '../../../../../../common/constants';
 
 type Props = {
   agent: { [key in string]: any };
@@ -144,17 +145,17 @@ export const ScaScan = compose(
       },
       {
         field: 'pass',
-        name: 'Pass',
+        name: MODULE_SCA_CHECK_RESULT_LABEL.passed,
         width: '10%',
       },
       {
         field: 'fail',
-        name: 'Fail',
+        name: MODULE_SCA_CHECK_RESULT_LABEL.failed,
         width: '10%',
       },
       {
         field: 'invalid',
-        name: 'Not applicable',
+        name: MODULE_SCA_CHECK_RESULT_LABEL['not applicable'],
         width: '10%',
       },
       {

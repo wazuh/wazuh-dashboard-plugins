@@ -1,5 +1,6 @@
 import { EuiButtonIcon, EuiDescriptionList, EuiHealth } from '@elastic/eui';
 import React, { Component } from 'react';
+import { MODULE_SCA_CHECK_RESULT_LABEL } from '../../../../../common/constants';
 import { TableWzAPI } from '../../../common/tables';
 import { IWzSuggestItem } from '../../../wz-search-bar';
 import { ComplianceText, RuleText } from '../components';
@@ -272,8 +273,8 @@ export class InventoryPolicyChecksTable extends Component<Props, State> {
    * @param result
    * @returns
    */
-  addHealthResultRender(result) {
-    const color = (result) => {
+  addHealthResultRender(result: keyof typeof MODULE_SCA_CHECK_RESULT_LABEL) {
+    const color = (result: keyof typeof MODULE_SCA_CHECK_RESULT_LABEL) => {
       if (result.toLowerCase() === 'passed') {
         return 'success';
       } else if (result.toLowerCase() === 'failed') {
@@ -284,8 +285,8 @@ export class InventoryPolicyChecksTable extends Component<Props, State> {
     };
 
     return (
-      <EuiHealth color={color(result)} style={{ textTransform: 'capitalize' }}>
-        {result}
+      <EuiHealth color={color(result)}>
+        {MODULE_SCA_CHECK_RESULT_LABEL[result]}
       </EuiHealth>
     );
   }
