@@ -687,7 +687,7 @@ export const RegisterAgent = withErrorBoundary(
 
     resolveSOLARISPackage() {
       switch (
-        `${this.state.selectedVersion}-${this.state.selectedArchitecture}``${this.state.selectedVersion}-${this.state.selectedArchitecture}`
+        `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
       ) {
         case 'solaris10-i386':
           return `https://packages.wazuh.com/4.x/solaris/i386/10/wazuh-agent_v${this.state.wazuhVersion}-sol10-i386.pkg${this.wazuhPkgVariable}`;
@@ -1009,7 +1009,7 @@ apk add wazuh-agent`,
           this.state.selectedVersion == 'solaris11'
             ? 'wazuh-agent.p5p'
             : 'wazuh-agent.pkg'
-        } ${this.optionalPackages()}${this.agentNameVariable()} && ${
+        } ${this.optionalPackages()} && ${
           this.state.selectedVersion == 'solaris11'
             ? 'pkg install -g wazuh-agent.p5p wazuh-agent'
             : 'pkgadd -d wazuh-agent.pkg'
@@ -1583,9 +1583,6 @@ apk add wazuh-agent`,
                 </div>
                 <EuiSpacer size='s' />
                 {textAndLinkToCheckConnectionDocumentation}
-                {this.state.selectedOS == 'hp' || this.state.selectedOS == 'sol'
-                  ? messageExtraSteps
-                  : ''}
                 {this.state.selectedOS == 'hp' || this.state.selectedOS == 'sol'
                   ? messageExtraSteps
                   : ''}
