@@ -19,7 +19,15 @@ import { PanelSplit } from './panel_split';
 
 describe('PanelSplit container', () => {
   test('should render the component', () => {
-    const component = shallow(<PanelSplit side={<div>Side panel</div>} content={<div>Content panel</div>}/>);
+    const component = shallow(<PanelSplit side={<div>{
+              i18n.translate('components.common.panels.sidePanal', {
+                defaultMessage: 'Side panel',
+              })
+            }</div>} content={<div>{
+              i18n.translate('components.common.panels.contentPanal', {
+                defaultMessage: 'Content panel',
+              })
+  }</div>}/>);
 
     expect(component).toMatchSnapshot();
   });
