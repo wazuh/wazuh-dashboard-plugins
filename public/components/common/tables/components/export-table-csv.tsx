@@ -61,7 +61,7 @@ export function ExportTableCsv({endpoint,totalItems,filters,title}){
   
   return <EuiFlexItem grow={false}>
   <EuiButtonEmpty isDisabled={(totalItems == 0)} iconType="importAction" onClick={() => downloadCsv()}>
-    Export formatted
+    { i18n.translate('components.common.tables.exportFormatted', { defaultMessage: 'Export formatted', })}
   </EuiButtonEmpty>
     </EuiFlexItem>
 }

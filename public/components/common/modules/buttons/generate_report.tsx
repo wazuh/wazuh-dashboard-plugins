@@ -55,8 +55,8 @@ export const ButtonModuleGenerateReport = ({agent, moduleID, disabledReport}) =>
       onClick={action.run}
       isDisabled={disabledReport}
       tooltip={disabledReport ? {position: 'top', content: 'No results match for this search criteria.'} : undefined}
-    >
-      Generate report
+    >{ i18n.translate('components.common.modules.button.gernateReport', { defaultMessage: 'Generate report', })}
+      
     </WzButton>
   )
 }

@@ -498,13 +498,13 @@ export class RowDetails extends Component {
               id="Info"
               buttonContent={
                 <EuiTitle size="s" style={{ fontWeight: 400 }}>
-                  <h3>Information</h3>
+                  <h3>{ i18n.translate('components.common.modules.discover.information', { defaultMessage: 'Information', })}</h3>
                 </EuiTitle>
               }
               extraAction={
                 <a href={`#/manager/rules?tab=rules&redirectRule=${id}`} target="_blank" style={{ paddingTop: 5 }}>
                   <EuiIcon type="popout" color='primary' />&nbsp;
-                    View in Rules
+                    { i18n.translate('components.common.modules.discover.viewInRules', { defaultMessage: 'View in Rules', })}
                 </a>
               }
               paddingSize="none"
@@ -522,7 +522,7 @@ export class RowDetails extends Component {
               id="Details"
               buttonContent={
                 <EuiTitle size="s">
-                  <h3>Details</h3>
+                  <h3>{ i18n.translate('components.common.modules.discover.details', { defaultMessage: 'Details', })}</h3>
                 </EuiTitle>
               }
               paddingSize="none"
@@ -540,7 +540,7 @@ export class RowDetails extends Component {
               id="Compliance"
               buttonContent={
                 <EuiTitle size="s">
-                  <h3>Compliance</h3>
+                  <h3>{ i18n.translate('components.common.modules.discover.complince', { defaultMessage: 'Compliance', })}</h3>
                 </EuiTitle>
               }
               paddingSize="none"

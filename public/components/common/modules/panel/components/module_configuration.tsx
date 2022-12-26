@@ -105,7 +105,7 @@ export const PanelModuleConfiguration : FunctionalComponent<{h: string}> = conne
             <h4 className='module-panel-configuration-title'>{moduleTitle}</h4>
           </EuiTitle>
           <EuiTitle size='xs'>
-            <h5 className='module-panel-configuration-subtitle'>Module configuration</h5>
+            <h5 className='module-panel-configuration-subtitle'>{ i18n.translate('components.common.modules.panel.components.moduleConfi', { defaultMessage: 'Module configuration', })}</h5>
           </EuiTitle>
         </EuiFlexItem>
       </EuiFlexGroup>

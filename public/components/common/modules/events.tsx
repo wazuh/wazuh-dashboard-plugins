@@ -335,13 +335,13 @@ export const Events = compose(
           title: 'Found unknown fields in the index pattern.',
           text: toMountPoint(
             <EuiFlexGroup justifyContent="flexEnd" gutterSize="s">
-              <EuiFlexItem grow={false}>
-                There are some unknown fields for the current index pattern. You need to refresh the
-                page to update the fields.
+              <EuiFlexItem grow={false}>{ i18n.translate('components.common.modules.event.unkownFields', { defaultMessage: 'There are some unknown fields for the current index pattern. You need to refresh the page to update the fields.', })}
+                
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
                 <EuiButton onClick={() => window.location.reload()} size="s">
-                  Reload page
+                  { i18n.translate('components.common.modules.event.reloadPage', { defaultMessage: 'Reload page', })}
+                  
                 </EuiButton>
               </EuiFlexItem>
             </EuiFlexGroup>

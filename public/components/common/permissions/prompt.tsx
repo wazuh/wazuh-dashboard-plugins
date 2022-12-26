@@ -32,7 +32,7 @@ export const WzEmptyPromptNoPermissions = withErrorBoundary(
     return (
       <EuiEmptyPrompt
         iconType="securityApp"
-        title={<h2>You have no permissions</h2>}
+        title={<h2>{ i18n.translate('components.common.premissions.haveNoPermission', { defaultMessage: 'You have no permissions', })}</h2>}
         body={
           <Fragment>
             {permissions && (
@@ -44,7 +44,7 @@ export const WzEmptyPromptNoPermissions = withErrorBoundary(
             {permissions && roles && <EuiSpacer />}
             {roles && (
               <div>
-                This section requires{' '}
+                { i18n.translate('components.common.premissions.sectionRequires', { defaultMessage: 'This section requires', })}{' '}
                 {roles
                   .map((role) => <strong key={`empty-prompt-no-roles-${role}`}>{role}</strong>)
                   .reduce((accum, cur) => [accum, ', ', cur])}{' '}
