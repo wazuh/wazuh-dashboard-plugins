@@ -10,9 +10,9 @@
  * Find more information about this on the LICENSE file.
  */
 
- import React, { Component, Fragment } from 'react';
+import React, { Component, Fragment } from 'react';
 
- // Eui components
+// Eui components
 import {
   EuiFlexGroup,
   EuiFlexItem,
@@ -28,6 +28,7 @@ import { getToasts }  from '../../kibana-services';
 import { updateWazuhNotReadyYet } from '../../redux/actions/appStateActions';
 import { clusterReq, restartClusterOrManager } from '../../controllers/management/components/management/configuration/utils/wz-fetch';
 import { connect } from 'react-redux';
+import { i18n } from '@kbn/i18n';
 
 interface IWzRestartClusterManagerCalloutProps{
   updateWazuhNotReadyYet: (wazuhNotReadyYet) => void
@@ -63,24 +64,36 @@ class WzRestartClusterManagerCallout extends Component<IWzRestartClusterManagerC
   }
   restartClusterOrManager = async () => {
     try{
-      this.setState({ warningRestarting: true, warningRestartModalVisible: false});
+      this.setState({ warningRestarting: true,
+        warningRestartModalVisible: false});
       const data = await restartClusterOrManager(this.props.updateWazuhNotReadyYet);
       this.props.onRestarted();
-      this.showToast('success', `${data.restarted} was restarted`);
+      const restartedText = i18n.translate(
+        'components.welcome.restartCluster.restartedText',
+        { defaultMessage: 'was restarted' },
+      );
+      this.showToast('success', `${data.restarted} ${restartedText}`);
     }catch(error){
       this.setState({ warningRestarting: false });
       this.props.updateWazuhNotReadyYet(false);
       this.props.onRestartedError();
-      this.showToast('danger', 'Error', error.message || error );
+      this.showToast(
+        'danger',
+        i18n.translate('components.welcome.restartCluster.errorText', {
+          defaultMessage: 'Error',
+        }),
+        error.message || error,
+      );
     }
   };
   async componentDidMount(){
     try{
       const clusterStatus = await clusterReq();
-      this.setState( { isCluster: clusterStatus.data.data.enabled === 'yes' && clusterStatus.data.data.running === 'yes' });
+      this.setState( { isCluster: clusterStatus.data.data.enabled === 'yes' &&
+          clusterStatus.data.data.running === 'yes' });
     }catch(error){}
   }
-  render(){
+  render() {
     const { warningRestarting, warningRestartModalVisible } = this.state;
     return (
       <Fragment>
@@ -89,8 +102,17 @@ class WzRestartClusterManagerCallout extends Component<IWzRestartClusterManagerC
             <EuiFlexGroup justifyContent='spaceBetween' alignItems='center'>
               <EuiFlexItem style={{ marginTop: '0', marginBottom: '0'}}>
                 <EuiText style={{color: 'rgb(0, 107, 180)'}} >
-                  <EuiIcon type='iInCircle' color='primary' style={{marginBottom: '7px', marginRight: '6px'}}/>
-                  <span>Changes will not take effect until a restart is performed.</span>
+                  <EuiIcon type='iInCircle'
+                    color='primary' style={{marginBottom: '7px', marginRight: '6px'}}/>
+                  <span>
+                    {i18n.translate(
+                      'components.welcome.restartCluster.message',
+                      {
+                        defaultMessage:
+                          'Changes will not take effect until a restart is performed.',
+                      },
+                    )}
+                  </span>
                 </EuiText>
               </EuiFlexItem>
               <EuiFlexItem grow={false} style={{ marginTop: '0', marginBottom: '0'}}>
@@ -98,7 +120,12 @@ class WzRestartClusterManagerCallout extends Component<IWzRestartClusterManagerC
                   iconType="refresh"
                   onClick={() => this.toggleWarningRestartModalVisible()}
                 >
-                  {'Restart'}
+                  {i18n.translate(
+                    'components.welcome.restartCluster.restartLabel',
+                    {
+                      defaultMessage: 'Restart',
+                    },
+                  )}
                 </EuiButton>
               </EuiFlexItem>
             </EuiFlexGroup>
@@ -107,17 +134,34 @@ class WzRestartClusterManagerCallout extends Component<IWzRestartClusterManagerC
         {warningRestartModalVisible && (
           <EuiOverlayMask>
             <EuiConfirmModal
-              title={`${this.state.isCluster ? 'Cluster' : 'Manager'} will be restarted`}
+              title={`${
+                this.state.isCluster ? 'Cluster' : 'Manager'
+              } will be restarted`}
               onCancel={() => this.toggleWarningRestartModalVisible()}
               onConfirm={() => this.restartClusterOrManager()}
-              cancelButtonText="Cancel"
-              confirmButtonText="Confirm"
-              defaultFocusedButton="cancel"
+              cancelButtonText={i18n.translate(
+                'components.welcome.restartCluster.cancelButtonText',
+                {
+                  defaultMessage: 'Cancel',
+                },
+              )}
+              confirmButtonText={i18n.translate(
+                'components.welcome.restartCluster.confirmButtonText',
+                {
+                  defaultMessage: 'Confirm',
+                },
+              )}
+              defaultFocusedButton={i18n.translate(
+                'components.welcome.restartCluster.defaultFocusButtonText',
+                {
+                  defaultMessage: 'cancel',
+                },
+              )}
             ></EuiConfirmModal>
           </EuiOverlayMask>
         )}
       </Fragment>
-      )
+    )
   }
 }
 
