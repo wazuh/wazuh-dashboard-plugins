@@ -19,6 +19,13 @@ import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrat
 import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
 import { i18n } from '@kbn/i18n';
+
+const sucessMsg = i18n.translate('components.common.table.components.sucessMsg', {
+  defaultMessage: 'success', 'Your download should begin automatically...',
+});
+const errorMsg = i18n.translate('components.common.table.components.errorMsg', {
+  defaultMessage: 'Error downloading csv',
+});
 export function ExportTableCsv({ endpoint, totalItems, filters, title }) {
   const showToast = (color, title, time) => {
     getToasts().add({
@@ -35,7 +42,7 @@ export function ExportTableCsv({ endpoint, totalItems, filters, title }) {
         name: key,
         value: filtersObject[key],
       }));
-      showToast('success', 'Your download should begin automatically...', 3000);
+      showToast('success', sucessMsg, 3000);
       await exportCsv(
         endpoint,
         [...formatedFilters],
@@ -49,7 +56,7 @@ export function ExportTableCsv({ endpoint, totalItems, filters, title }) {
         error: {
           error: error,
           message: error.message || error,
-          title: `${error.name}: Error downloading csv`,
+          title: `${error.name}: ${errorMsg}`,
         },
       };
       getErrorOrchestrator().handleError(options);
