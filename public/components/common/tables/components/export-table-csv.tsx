@@ -11,19 +11,15 @@
  */
 
 import React from 'react';
-import {
-  EuiFlexItem,
-  EuiButtonEmpty
-} from '@elastic/eui';
+import { EuiFlexItem, EuiButtonEmpty } from '@elastic/eui';
 import { filtersToObject } from '../../../wz-search-bar/';
 import exportCsv from '../../../../react-services/wz-csv';
-import { getToasts }  from '../../../../kibana-services';
+import { getToasts } from '../../../../kibana-services';
 import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
-
-export function ExportTableCsv({endpoint,totalItems,filters,title}){
-
+import { i18n } from '@kbn/i18n';
+export function ExportTableCsv({ endpoint, totalItems, filters, title }) {
   const showToast = (color, title, time) => {
     getToasts().add({
       color: color,
@@ -35,14 +31,15 @@ export function ExportTableCsv({endpoint,totalItems,filters,title}){
   const downloadCsv = async () => {
     try {
       const filtersObject = filtersToObject(filters);
-      const formatedFilters = Object.keys(filtersObject).map(key => ({name: key, value: filtersObject[key]}));
+      const formatedFilters = Object.keys(filtersObject).map(key => ({
+        name: key,
+        value: filtersObject[key],
+      }));
       showToast('success', 'Your download should begin automatically...', 3000);
       await exportCsv(
         endpoint,
-        [
-          ...formatedFilters
-        ],
-        `vuls-${(title).toLowerCase()}`
+        [...formatedFilters],
+        `vuls-${title.toLowerCase()}`,
       );
     } catch (error) {
       const options = {
@@ -57,19 +54,27 @@ export function ExportTableCsv({endpoint,totalItems,filters,title}){
       };
       getErrorOrchestrator().handleError(options);
     }
-  }
-  
-  return <EuiFlexItem grow={false}>
-  <EuiButtonEmpty isDisabled={(totalItems == 0)} iconType="importAction" onClick={() => downloadCsv()}>
-    { i18n.translate('components.common.tables.exportFormatted', { defaultMessage: 'Export formatted', })}
-  </EuiButtonEmpty>
+  };
+
+  return (
+    <EuiFlexItem grow={false}>
+      <EuiButtonEmpty
+        isDisabled={totalItems == 0}
+        iconType='importAction'
+        onClick={() => downloadCsv()}
+      >
+        {i18n.translate('components.common.tables.exportFormatted', {
+          defaultMessage: 'Export formatted',
+        })}
+      </EuiButtonEmpty>
     </EuiFlexItem>
+  );
 }
 
 // Set default props
 ExportTableCsv.defaultProps = {
-    endpoint:'/',
-    totalItems:0,
-    filters: [],
-    title:""
-  };
+  endpoint: '/',
+  totalItems: 0,
+  filters: [],
+  title: '',
+};

@@ -11,7 +11,7 @@
  * Find more information about this on the LICENSE file.
  *
  */
-
+import { i18n } from '@kbn/i18n';
 import {
   EuiButton,
   EuiCallOut,
@@ -51,40 +51,49 @@ import { getDataPlugin } from '../../../kibana-services';
 import { CheckLogger } from '../types/check_logger';
 import { compose } from 'redux';
 import { getThemeAssetURL, getAssetURL } from '../../../utils/assets';
-
+const apiTitle =  i18n.translate('components.healthCheck.apiTitile', { defaultMessage: 'Check Wazuh API connection', })
+const apiLabel =  i18n.translate('components.healthCheck.apiTitile', { defaultMessage: 'API connection', })
+const setupTitle =  i18n.translate('components.healthCheck.apiTitile', { defaultMessage: 'Check Wazuh API version', })
+const setupLabel =  i18n.translate('components.healthCheck.apiTitile', { defaultMessage: 'API version', })
+const patternTitle =  i18n.translate('components.healthCheck.apiTitile', { defaultMessage: 'Check alerts index pattern', })
+const patternLabel =  i18n.translate('components.healthCheck.apiTitile', { defaultMessage: 'Alerts index pattern', })
+const patternMonitoringTitle =  i18n.translate('components.healthCheck.apiTitile', { defaultMessage: 'Check monitoring index pattern', })
+const patternMonitoringLabel =  i18n.translate('components.healthCheck.apiTitile', { defaultMessage: 'Monitoring index pattern', })
+const patternStatisticsTitle =  i18n.translate('components.healthCheck.apiTitile', { defaultMessage: 'Check statistics index pattern', })
+const patternStatisticsLabel =  i18n.translate('components.healthCheck.apiTitile', { defaultMessage: 'Statistics index pattern', })
 const checks = {
   api: {    
-    title: 'Check Wazuh API connection',
-    label: 'API connection',
+    title: apiTitle,
+    label: apiLabel,
     validator: checkApiService,
     awaitFor: [],
     canRetry: true,
   },
   setup: {
-    title: 'Check Wazuh API version',
-    label: 'API version',
+    title: setupTitle,
+    label: setupLabel,
     validator: checkSetupService,
     awaitFor: ["api"],
   },
   pattern: {
-    title: 'Check alerts index pattern',
-    label: 'Alerts index pattern',
+    title: patternTitle,
+    label: patternLabel,
     validator: checkIndexPatternService,
     awaitFor: [],
     shouldCheck: true,
     canRetry: true,
   },
   patternMonitoring: {
-    title: 'Check monitoring index pattern',
-    label: 'Monitoring index pattern',
+    title: patternMonitoringTitle,
+    label: patternMonitoringLabel,
     validator: (appConfig) => checkPatternSupportService(appConfig.data['wazuh.monitoring.pattern'], WAZUH_INDEX_TYPE_MONITORING),
     awaitFor: [],
     shouldCheck: true,
     canRetry: true,
   },
   patternStatistics: {
-    title: 'Check statistics index pattern',
-    label: 'Statistics index pattern',
+    title: patternStatisticsTitle,
+    label: patternStatisticsLabel,
     validator: (appConfig) => checkPatternSupportService(`${appConfig.data['cron.prefix']}-${appConfig.data['cron.statistics.index.name']}-*`, WAZUH_INDEX_TYPE_STATISTICS),
     awaitFor: [],
     shouldCheck: true,

@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-
+import { i18n } from '@kbn/i18n';
 import React, { useEffect, useState } from 'react';
 import {
   EuiFieldSearch,
