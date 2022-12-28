@@ -44,7 +44,7 @@ const officeAlertsSummary = {
   ]
 }
 
-const pcidssAlertsSummary = {
+const pciAlertsSummary = {
   title: 'Alerts summary',
   aggs: [
     AggregationFields['agent.name'],
@@ -160,6 +160,26 @@ const oscapAlertsSummary = {
   ]
 }
 
+// 'Wazuh-App-Overview-OSCAP-Last-alerts'
+const oscapLastAlerts = {
+  title: 'Alerts summary',
+  aggs: [
+    AggregationFields[''],
+    AggregationFields[''],
+    AggregationFields[''],
+  ]
+}
+
+// 'Wazuh-App-Overview-Audit-Last-alerts'
+const auditLastAlerts = {
+  title: 'Alerts summary',
+  aggs: [
+    AggregationFields[''],
+    AggregationFields[''],
+    AggregationFields[''],
+  ]
+}
+
 export default {
   awsAlertsSummary,
   ciscatAlertsSummary,
@@ -175,7 +195,7 @@ export default {
   officeAlertsSummary,
   oscapAlertsSummary,
   osqueryAlertsSummary,
-  pcidssAlertsSummary,
+  pciAlertsSummary,
   pmAlertsSummary,
   tscAlertsSummary,
   virustotalAlertsSummary,
