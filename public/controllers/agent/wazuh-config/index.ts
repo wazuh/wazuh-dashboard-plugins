@@ -76,17 +76,6 @@ const architectureButtonsMacos = [
   },
 ];
 
-const architectureButtonsOpenSuse = [
-  {
-    id: 'x86_64',
-    label: 'x86_64',
-  },
-  {
-    id: 'ARM64',
-    label: 'ARM64',
-  },
-];
-
 const architectureButtonsAix = [
   {
     id: 'powerpc',
@@ -386,5 +375,4 @@ export {
   architectureButtonsSolaris,
   architectureButtonsAix,
   architectureButtonsHpUx,
-  architectureButtonsOpenSuse,
 };

@@ -35,7 +35,6 @@ import {
   EuiSwitch,
   EuiLink,
   EuiFormRow,
-  EuiFormControlLayout,
   EuiForm,
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
@@ -54,7 +53,6 @@ import {
   versionButtonFedora,
   architectureButtonsSolaris,
   architectureButtonsWithPPC64LE,
-  architectureButtonsOpenSuse,
   architectureButtonsAix,
   architectureButtonsHpUx,
   versionButtonAmazonLinux,
@@ -402,12 +400,6 @@ export const RegisterAgent = withErrorBoundary(
       return deployment;
     }
 
-    // OSWithoutDevelopmentVariable() {
-    //   this.setState({
-    //     agentName: '',
-    //   });
-    // }
-
     agentNameVariable() {
       let agentName = `WAZUH_AGENT_NAME='${this.state.agentName}' `;
       if (
@@ -418,15 +410,6 @@ export const RegisterAgent = withErrorBoundary(
         return agentName.replace(/=/g, ' ');
       }
 
-      // if (
-      //   this.state.selectedOS === 'hp' ||
-      //   this.state.selectedOS === 'alpine' ||
-      //   this.state.selectedOS === 'sol'
-      // ) {
-      //   this.setState({
-      //     agentName: '',
-      //   });
-      // }
       if (this.state.selectedArchitecture && this.state.agentName !== '') {
         return agentName;
       } else {
@@ -470,17 +453,17 @@ export const RegisterAgent = withErrorBoundary(
         `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
       ) {
         case '3.12.12-i386':
-          return 'https://packages.wazuh.com/key/cicd%40wazuh.com-633d7457.rsa.pub && echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"';
+          return 'https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"';
         case '3.12.12-aarch64':
-          return 'https://packages.wazuh.com/key/cicd%40wazuh.com-633d7457.rsa.pub && echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"';
+          return 'https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"';
         case '3.12.12-x86_64':
-          return 'https://packages.wazuh.com/key/cicd%40wazuh.com-633d7457.rsa.pub && echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"';
+          return 'https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"';
         case '3.12.12-armhf':
-          return 'https://packages.wazuh.com/key/cicd%40wazuh.com-633d7457.rsa.pub && echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"';
+          return 'https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"';
         case '3.12.12-powerpc':
-          return 'https://packages.wazuh.com/key/cicd%40wazuh.com-633d7457.rsa.pub && echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"';
+          return 'https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"';
         default:
-          return 'https://packages.wazuh.com/key/cicd%40wazuh.com-633d7457.rsa.pub && echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"';
+          return 'https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"';
       }
     }
 
@@ -541,9 +524,9 @@ export const RegisterAgent = withErrorBoundary(
         `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
       ) {
         case 'suse11-i386':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.i386.rpm`;
+          return `https://packages.wazuh.com/4.x/yum5/i386/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.el5.i386.rpm`;
         case 'suse11-x86_64':
-          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.x86_64.rpm`;
+          return `https://packages.wazuh.com/4.x/yum5/x86_64/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.el5.x86_64.rpm`;
         case 'suse12-i386':
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.i386.rpm`;
         case 'suse12-aarch64':
@@ -564,7 +547,7 @@ export const RegisterAgent = withErrorBoundary(
         `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
       ) {
         case '22-i386':
-          return `https://packages.wazuh.com/4.x/yum/i386/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.el5.i386.rpm`;
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.i386.rpm`;
         case '22-aarch64':
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.aarch64.rpm`;
         case '22-x86_64':
@@ -676,10 +659,16 @@ export const RegisterAgent = withErrorBoundary(
       switch (
         `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
       ) {
+        case 'leap15-i386':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.i386.rpm`;
+        case 'leap15-aarch64':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.aarch64.rpm`;
         case 'leap15-x86_64':
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.x86_64.rpm`;
-        case 'leap15-ARM64':
+        case 'leap15-armhf':
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.armv7hl.rpm`;
+        case 'leap15-powerpc':
+          return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.ppc64le.rpm`;
         default:
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.x86_64.rpm`;
       }
@@ -718,9 +707,9 @@ export const RegisterAgent = withErrorBoundary(
         `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
       ) {
         case '11.31-itanium2':
-          return `https://packages.wazuh.com/4.x/yum/i386/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}-hpux-11v3-ia64.tar`;
+          return `https://packages.wazuh.com/4.x/hp-ux/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}-hpux-11v3-ia64.tar`;
         default:
-          return `https://packages.wazuh.com/4.x/yum/i386/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}-hpux-11v3-ia64.tar`;
+          return `https://packages.wazuh.com/4.x/hp-ux/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}-hpux-11v3-ia64.tar`;
       }
     }
 
@@ -976,9 +965,9 @@ export const RegisterAgent = withErrorBoundary(
 
       const customTexts = {
         rpmText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
-        alpineText: `wget -O /etc/apk/keys/cicd@wazuh.com-633d7457.rsa.pub ${this.optionalPackages()} >> /etc/apk/repositories && \
+        alpineText: `wget -O /etc/apk/keys/alpine-devel@wazuh.com-633d7457.rsa.pub ${this.optionalPackages()} >> /etc/apk/repositories && \
 apk update && \
-apk add wazuh-agent`,
+apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
         centText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
         debText: `curl -so wazuh-agent.deb ${this.optionalPackages()} && sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}dpkg -i .${
           this.wazuhDebVariable
@@ -1931,7 +1920,7 @@ apk add wazuh-agent`,
                 title: 'Choose the architecture',
                 children: buttonGroup(
                   'Choose the architecture',
-                  architectureButtonsOpenSuse,
+                  architectureButtonsWithPPC64LE,
                   this.state.selectedArchitecture,
                   architecture => this.setArchitecture(architecture),
                 ),
@@ -2110,7 +2099,8 @@ apk add wazuh-agent`,
           title: 'Install and enroll the agent',
           children: this.state.gotErrorRegistrationServiceInfo ? (
             calloutErrorRegistrationServiceInfo
-          ) : this.state.agentNameError ? (
+          ) : this.state.agentNameError &&
+            !['hp', 'sol', 'alpine'].includes(this.state.selectedOS) ? (
             <EuiCallOut
               color='danger'
               title={'There are fields with errors. Please verify them.'}
@@ -2148,7 +2138,8 @@ apk add wazuh-agent`,
                 title: 'Start the agent',
                 children: this.state.gotErrorRegistrationServiceInfo ? (
                   calloutErrorRegistrationServiceInfo
-                ) : this.state.agentNameError ? (
+                ) : this.state.agentNameError &&
+                  !['hp', 'sol', 'alpine'].includes(this.state.selectedOS) ? (
                   <EuiCallOut
                     color='danger'
                     title={'There are fields with errors. Please verify them.'}
