@@ -11,9 +11,7 @@
  */
 import { i18n } from '@kbn/i18n';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
-const auditId = i18n.translate('components.addModule.guide.auditId', {
-  defaultMessage: 'audit',
-});
+
 const auditName = i18n.translate('components.addModule.guide.auditName', {
   defaultMessage: 'System auditing',
 });
@@ -163,7 +161,7 @@ const excPlace = i18n.translate('components.addModule.guide.excPlace', {
   defaultMessage: 'Any log file or wildcard',
 });
 export default {
-  id: auditId,
+  id: 'audit',
   name: auditName,
   xml_tag: auditTag,
   description: auditDescp,

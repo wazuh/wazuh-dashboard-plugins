@@ -11,9 +11,7 @@
  */
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
 import { i18n } from '@kbn/i18n';
-const awsId = i18n.translate('components.addModule.guide.awsId', {
-  defaultMessage: 'aws',
-});
+
 const awsName = i18n.translate('components.addModule.guide.awsName', {
   defaultMessage: 'Amazon AWS services',
 });
@@ -272,7 +270,7 @@ const awsOrgPlace = i18n.translate('components.addModule.guide.awsOrgPlace', {
   defaultMessage: 'Valid AWS organization name',
 });
 export default {
-  id: awsId,
+  id: 'aws',
   name: awsName,
   wodle_name: awsWodleName,
   description: awsDescp,

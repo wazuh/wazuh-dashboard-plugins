@@ -17,5 +17,5 @@ export default {
   osquery,
   virustotal,
   fim,
-  vuls
-}
+  vuls,
+};
