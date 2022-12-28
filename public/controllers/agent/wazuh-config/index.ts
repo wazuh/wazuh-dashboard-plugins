@@ -116,7 +116,7 @@ const versionButtonsRedHat = [
   },
   {
     id: 'redhat7',
-    label: 'Red Hat 7 or higher',
+    label: 'Red Hat 7 +',
   },
 ];
 
@@ -131,7 +131,7 @@ const versionButtonsCentos = [
   },
   {
     id: 'centos7',
-    label: 'Centos 7 or higher',
+    label: 'Centos 7 +',
   },
 ];
 
@@ -150,14 +150,14 @@ const versionButtonsDebian = [
   },
   {
     id: 'debian10',
-    label: 'Debian 10 or higher',
+    label: 'Debian 10 +',
   },
 ];
 
 const versionButtonFedora = [
   {
     id: '22',
-    label: 'Fedora 22 or higher',
+    label: 'Fedora 22 +',
   },
 ];
 
@@ -168,7 +168,7 @@ const versionButtonsUbuntu = [
   },
   {
     id: 'ubuntu15',
-    label: 'Ubuntu 15 or higher',
+    label: 'Ubuntu 15 +',
   },
 ];
 
@@ -183,7 +183,7 @@ const versionButtonsWindows = [
   },
   {
     id: 'windows7',
-    label: 'Windows 7 or higher',
+    label: 'Windows 7 +',
   },
 ];
 
@@ -201,14 +201,14 @@ const versionButtonsSuse = [
 const versionButtonsMacOS = [
   {
     id: 'sierra',
-    label: 'macOS Sierra or higher',
+    label: 'macOS Sierra +',
   },
 ];
 
 const versionButtonsOpenSuse = [
   {
     id: 'leap15',
-    label: 'OpenSuse Leap 15 or higher',
+    label: 'OpenSuse Leap 15 +',
   },
 ];
 
@@ -226,14 +226,14 @@ const versionButtonsSolaris = [
 const versionButtonsAix = [
   {
     id: '6.1 TL9',
-    label: 'AIX 6.1 TL9 or higher',
+    label: 'AIX 6.1 TL9 +',
   },
 ];
 
 const versionButtonsHPUX = [
   {
     id: '11.31',
-    label: 'HP-UX 11.31 or higher',
+    label: 'HP-UX 11.31 +',
   },
 ];
 
@@ -244,7 +244,7 @@ const versionButtonsOracleLinux = [
   },
   {
     id: 'oraclelinux6',
-    label: 'Oracle Linux 6 or higher',
+    label: 'Oracle Linux 6 +',
   },
 ];
 
@@ -258,7 +258,7 @@ const versionButtonsRaspbian = [
 const versionButtonAlpine = [
   {
     id: '3.12.12',
-    label: '3.12.12 or higher',
+    label: '3.12.12 +',
   },
 ];
 
