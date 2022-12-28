@@ -61,7 +61,9 @@ export const ButtonModuleGenerateReport = ({
         disabledReport
           ? {
               position: 'top',
-              content: 'No results match for this search criteria.',
+              content: i18n.translate('components.common.modules.noResultsMatch', {
+                defaultMessage: 'No results match for this search criteria.',
+              })
             }
           : undefined
       }

@@ -52,11 +52,11 @@ const toggleContent = i18n.translate(
 );
 const filterRule = i18n.translate(
   'components.common.modules.discover.filterRule',
-  { defaultMessage: `Filter by this rule ID: ${id}` },
+  { defaultMessage: 'Filter by this rule ID: ' },
 );
 const filterLevel = i18n.translate(
   'components.common.modules.discover.filterLevel',
-  { defaultMessage: `Filter by this level: ${level}` },
+  { defaultMessage: 'Filter by this level: ' },
 );
 export class RowDetails extends Component {
   _isMount = false;
@@ -96,12 +96,12 @@ export class RowDetails extends Component {
     };
 
     this.complianceEquivalences = {
-      pci: 'PCI DSS',
-      gdpr: 'GDPR',
-      gpg13: 'GPG 13',
-      hipaa: 'HIPAA',
-      mitre: 'MITRE',
-      'nist-800-53': 'NIST-800-53',
+      pci: i18n.translate('components.common.modules.discover.pci',{ defaultMessage: 'PCI DSS' }),
+      gdpr: i18n.translate('components.common.modules.discover.gdpr',{ defaultMessage: 'GDPR' }),
+      gpg13: i18n.translate('components.common.modules.discover.gpg_13',{ defaultMessage: 'GPG 13' }),
+      hipaa: i18n.translate('components.common.modules.discover.hipaa',{ defaultMessage: 'HIPAA' }),
+      mitre: i18n.translate('components.common.modules.discover.mitre',{ defaultMessage: 'MITRE' }),
+      'nist-800-53': i18n.translate('components.common.modules.discover.nist_800',{ defaultMessage: 'NIST-800-53' })
     };
   }
 
@@ -164,8 +164,9 @@ export class RowDetails extends Component {
   getFilterLink = (key, value) => {
     const filter = {};
     filter[key] = value;
+    const filterByText = i18n.translate('components.common.modules.discover.filter_by',{ defaultMessage: 'Filter By' });
     return (
-      <EuiToolTip position='top' content={`Filter by ${key}:${value}`}>
+      <EuiToolTip position='top' content={`${filterByText} ${key}:${value}`}>
         <EuiLink onClick={async () => this.props.addFilter(filter)}>
           &nbsp;{value}
         </EuiLink>
@@ -374,8 +375,8 @@ export class RowDetails extends Component {
     return (
       <EuiFlexGrid columns={4}>
         <EuiFlexItem key='id' grow={1}>
-          <b style={{ paddingBottom: 6 }}>ID</b>
-          <EuiToolTip position='top' content={filterRule}>
+          <b style={{ paddingBottom: 6 }}>{i18n.translate('components.common.modules.discover.id',{ defaultMessage: 'ID' })}</b>
+          <EuiToolTip position='top' content={filterRule + `${id}`}>
             <EuiLink
               onClick={async () => this.props.addFilter({ 'rule.id': id })}
             >
@@ -384,8 +385,8 @@ export class RowDetails extends Component {
           </EuiToolTip>
         </EuiFlexItem>
         <EuiFlexItem key='level' grow={1}>
-          <b style={{ paddingBottom: 6 }}>Level</b>
-          <EuiToolTip position='top' content={filterLevel}>
+          <b style={{ paddingBottom: 6 }}>{i18n.translate('components.common.modules.discover.level',{ defaultMessage: 'Level' })}</b>
+          <EuiToolTip position='top' content={filterLevel + `${level}`}>
             <EuiLink
               onClick={async () =>
                 this.props.addFilter({ 'rule.level': level })
@@ -396,15 +397,15 @@ export class RowDetails extends Component {
           </EuiToolTip>
         </EuiFlexItem>
         <EuiFlexItem key='file' grow={1}>
-          <b style={{ paddingBottom: 6 }}>File</b>
+          <b style={{ paddingBottom: 6 }}>{i18n.translate('components.common.modules.discover.file',{ defaultMessage: 'File' })}</b>
           {file}
         </EuiFlexItem>
         <EuiFlexItem key='path' grow={1}>
-          <b style={{ paddingBottom: 6 }}>Path</b>
+          <b style={{ paddingBottom: 6 }}>{i18n.translate('components.common.modules.discover.path',{ defaultMessage: 'Path' })}</b>
           {path}
         </EuiFlexItem>
         <EuiFlexItem key='Groups' grow={1}>
-          <b style={{ paddingBottom: 6 }}>Groups</b>
+          <b style={{ paddingBottom: 6 }}>{i18n.translate('components.common.modules.discover.groups',{ defaultMessage: 'Groups' })}</b>
           {this.renderGroups(groups)}
         </EuiFlexItem>
         <EuiSpacer size='s' />
@@ -414,6 +415,9 @@ export class RowDetails extends Component {
 
   renderGroups(groups) {
     const listGroups: any = [];
+    const filterByGroup = i18n.translate('components.common.modules.discover.filterByGroups',
+      { defaultMessage: 'Filter by this group:'},
+    )
     groups.forEach((group, index) => {
       listGroups.push(
         <span key={group}>
@@ -422,7 +426,7 @@ export class RowDetails extends Component {
           >
             <EuiToolTip
               position='top'
-              content={`Filter by this group: ${group}`}
+              content={`${filterByGroup} ${group}`}
             >
               <span>{group}</span>
             </EuiToolTip>
@@ -516,6 +520,9 @@ export class RowDetails extends Component {
 
   renderCompliance(compliance) {
     const styleTitle = { fontSize: '14px', fontWeight: 500 };
+    const filterByCompliance = i18n.translate('components.common.modules.discover.filterByCompliance',
+      { defaultMessage: 'Filter by this compliance' },
+    );
     return (
       <EuiFlexGrid columns={4}>
         {Object.keys(compliance)
@@ -540,7 +547,7 @@ export class RowDetails extends Component {
                             Math.random() * (index - 0) + index
                           }`}
                           position='top'
-                          content={`Filter by this compliance`}
+                          content={`${filterByCompliance}`}
                         >
                           <EuiBadge
                             color='hollow'
@@ -669,17 +676,17 @@ export class RowDetails extends Component {
     const tabs = [
       {
         id: 'table',
-        name: 'Table',
+        name: i18n.translate('components.common.modules.discover.tab.table',{ defaultMessage: 'Table' }),
         disabled: false,
       },
       {
         id: 'json',
-        name: 'JSON',
+        name: i18n.translate('components.common.modules.discover.tab.json',{ defaultMessage: 'JSON' }),
         disabled: false,
       },
       {
         id: 'rule',
-        name: 'Rule',
+        name: i18n.translate('components.common.modules.discover.tab.rule',{ defaultMessage: 'Rule' }),
         disabled: false,
       },
     ];
@@ -700,6 +707,9 @@ export class RowDetails extends Component {
   }
 
   render() {
+    const errorLoadingRuleID = i18n.translate('components.common.modules.discover.errorLoadingRuleID',{
+     defaultMessage: 'There was an error loading rule ID: ' }
+    );
     return (
       <div>
         {this.getTabs()}
@@ -712,7 +722,7 @@ export class RowDetails extends Component {
               this.getRule()) ||
               (this.state.selectedTabId === 'rule' && (
                 <span>
-                  There was an error loading rule ID: {this.props.item.rule.id}
+                  {errorLoadingRuleID} {this.props.item.rule.id}
                 </span>
               ))}
           </EuiFlexItem>
