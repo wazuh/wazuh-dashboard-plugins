@@ -281,10 +281,11 @@ export const RegisterAgent = withErrorBoundary(
         this.state.selectedVersion === '3.12.12'
       ) {
         return '/var/ossec/bin/wazuh-control start';
-      } else {
-        this.state.selectedVersion === '11.31';
       }
-      {
+    }
+
+    systemSelectorInitD() {
+      if (this.state.selectedVersion === '11.31') {
         return '/sbin/init.d/wazuh-agent start';
       }
     }
@@ -1588,9 +1589,41 @@ apk add wazuh-agent`,
                 </div>
                 <EuiSpacer size='s' />
                 {textAndLinkToCheckConnectionDocumentation}
-                {this.state.selectedOS == 'hp' || this.state.selectedOS == 'sol'
+                {this.state.selectedOS == 'sol' ||
+                this.state.selectedOS == 'alpine'
                   ? messageExtraSteps
                   : ''}
+              </EuiText>
+            </Fragment>
+          ),
+        },
+      ];
+
+      const tabInitD = [
+        {
+          id: 'Init.d',
+          name: 'Init.d',
+          content: (
+            <Fragment>
+              <EuiSpacer />
+              <EuiText>
+                <div className='copy-codeblock-wrapper'>
+                  <EuiCodeBlock style={codeBlock} language={language}>
+                    {this.systemSelectorInitD()}
+                  </EuiCodeBlock>
+                  <EuiCopy textToCopy={this.systemSelectorInitD()}>
+                    {copy => (
+                      <div className='copy-overlay' onClick={copy}>
+                        <p>
+                          <EuiIcon type='copy' /> Copy command
+                        </p>
+                      </div>
+                    )}
+                  </EuiCopy>
+                </div>
+                <EuiSpacer size='s' />
+                {textAndLinkToCheckConnectionDocumentation}
+                {this.state.selectedOS == 'hp' ? messageExtraSteps : ''}
               </EuiText>
             </Fragment>
           ),
@@ -2168,9 +2201,10 @@ apk add wazuh-agent`,
                         : this.state.selectedVersion == 'solaris10' ||
                           this.state.selectedVersion == 'solaris11' ||
                           this.state.selectedVersion == '6.1 TL9' ||
-                          this.state.selectedVersion == '11.31' ||
                           this.state.selectedVersion == '3.12.12'
                         ? tabWazuhControl
+                        : this.state.selectedVersion == '11.31'
+                        ? tabInitD
                         : tabSysV
                     }
                     selectedTab={this.selectedSYS}
