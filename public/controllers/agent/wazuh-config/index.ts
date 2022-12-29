@@ -308,7 +308,7 @@ const osButtons = [
   },
   {
     id: 'open',
-    label: 'OpenSuse',
+    label: 'OpenSUSE',
   },
   {
     id: 'sol',

@@ -969,19 +969,11 @@ export const RegisterAgent = withErrorBoundary(
 apk update && \
 apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
         centText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
-        debText: `curl -so wazuh-agent.deb ${this.optionalPackages()} && sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}dpkg -i .${
-          this.wazuhDebVariable
-        }`,
-        ubuText: `curl -so wazuh-agent.deb ${this.optionalPackages()} && sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}dpkg -i .${
-          this.wazuhDebVariable
-        }`,
+        debText: `curl -so wazuh-agent.deb ${this.optionalPackages()} && sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}dpkg -i ./wazuh-agent.deb`,
+        ubuText: `curl -so wazuh-agent.deb ${this.optionalPackages()} && sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}dpkg -i ./wazuh-agent.deb`,
         macosText: `curl -so wazuh-agent.pkg https://packages.wazuh.com/4.x/macos/wazuh-agent-${
           this.state.wazuhVersion
-        }-1.pkg${
-          this.wazuhPkgVariable
-        } && sudo launchctl setenv ${this.optionalDeploymentVariables()}${this.agentNameVariable()}&& sudo installer -pkg .${
-          this.wazuhPkgVariable
-        } -target /`,
+        }-1.pkg && sudo launchctl setenv ${this.optionalDeploymentVariables()}${this.agentNameVariable()}&& sudo installer -pkg ./wazuh-agent.pkg -target /`,
         winText:
           this.state.selectedVersion == 'windowsxp' ||
           this.state.selectedVersion == 'windowsserver2008'
@@ -990,9 +982,7 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
               }-1.msi /q ${this.optionalDeploymentVariables()}${this.agentNameVariable()}`
             : `Invoke-WebRequest -Uri https://packages.wazuh.com/4.x/windows/wazuh-agent-${
                 this.state.wazuhVersion
-              }-1.msi${
-                this.wazuhMsiVariable
-              } -OutFile \${env:tmp}\\wazuh-agent.msi; msiexec.exe /i \${env:tmp}\\wazuh-agent.msi /q ${this.optionalDeploymentVariables()}${this.agentNameVariable()}`,
+              }-1.msi -OutFile \${env:tmp}\\wazuh-agent.msi; msiexec.exe /i \${env:tmp}\\wazuh-agent.msi /q ${this.optionalDeploymentVariables()}${this.agentNameVariable()}`,
         openText: `sudo rpm --import https://packages.wazuh.com/key/GPG-KEY-WAZUH && sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}zypper install -y ${this.optionalPackages()}`,
         solText: `sudo curl -so ${
           this.state.selectedVersion == 'solaris11'
@@ -1009,9 +999,7 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
         fedoraText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
         oraclelinuxText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
         suseText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
-        raspbianText: `curl -so wazuh-agent.deb ${this.optionalPackages()} && sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}dpkg -i .${
-          this.wazuhDebVariable
-        }`,
+        raspbianText: `curl -so wazuh-agent.deb ${this.optionalPackages()} && sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}dpkg -i ./wazuh-agent.deb`,
       };
 
       const field = `${this.state.selectedOS}Text`;
