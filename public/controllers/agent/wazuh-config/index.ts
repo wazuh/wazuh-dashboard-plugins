@@ -69,8 +69,8 @@ const architectureButtonsWithPPC64LEAlpine = [
 
 const architectureButtonsi386 = [
   {
-    id: 'i386',
-    label: 'i386',
+    id: 'i386/x86_64',
+    label: 'i386/x86_64',
   },
 ];
 
