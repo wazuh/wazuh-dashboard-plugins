@@ -40,6 +40,33 @@ const architectureButtonsWithPPC64LE = [
   },
 ];
 
+const architectureButtonsWithPPC64LEAlpine = [
+  {
+    id: 'i386',
+    label: 'i386',
+  },
+  {
+    id: 'x86',
+    label: 'x86',
+  },
+  {
+    id: 'x86_64',
+    label: 'x86_64',
+  },
+  {
+    id: 'armhf',
+    label: 'armhf',
+  },
+  {
+    id: 'aarch64',
+    label: 'aarch64',
+  },
+  {
+    id: 'powerpc',
+    label: 'PowerPC',
+  },
+];
+
 const architectureButtonsi386 = [
   {
     id: 'i386',
@@ -208,7 +235,7 @@ const versionButtonsMacOS = [
 const versionButtonsOpenSuse = [
   {
     id: 'leap15',
-    label: 'OpenSuse Leap 15 +',
+    label: 'openSUSE Leap 15 +',
   },
 ];
 
@@ -308,7 +335,7 @@ const osButtons = [
   },
   {
     id: 'open',
-    label: 'OpenSUSE',
+    label: 'openSUSE',
   },
   {
     id: 'sol',
@@ -375,4 +402,5 @@ export {
   architectureButtonsSolaris,
   architectureButtonsAix,
   architectureButtonsHpUx,
+  architectureButtonsWithPPC64LEAlpine,
 };

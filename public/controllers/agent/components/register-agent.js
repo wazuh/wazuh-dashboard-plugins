@@ -69,6 +69,7 @@ import {
   versionButtonsAix,
   versionButtonsHPUX,
   versionButtonAlpine,
+  architectureButtonsWithPPC64LEAlpine,
 } from '../wazuh-config';
 import ServerAddress from '../register-agent/steps/server-address';
 import {
@@ -457,6 +458,8 @@ export const RegisterAgent = withErrorBoundary(
         case '3.12.12-aarch64':
           return 'https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"';
         case '3.12.12-x86_64':
+          return 'https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"';
+        case '3.12.12-x86':
           return 'https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"';
         case '3.12.12-armhf':
           return 'https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"';
@@ -1921,7 +1924,7 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
                 title: 'Choose the architecture',
                 children: buttonGroup(
                   'Choose the architecture',
-                  architectureButtonsWithPPC64LE,
+                  architectureButtonsWithPPC64LEAlpine,
                   this.state.selectedArchitecture,
                   architecture => this.setArchitecture(architecture),
                 ),
