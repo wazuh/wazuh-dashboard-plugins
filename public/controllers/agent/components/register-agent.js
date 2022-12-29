@@ -696,9 +696,9 @@ export const RegisterAgent = withErrorBoundary(
         `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
       ) {
         case '6.1 TL9-powerpc':
-          return `https://packages.wazuh.com/4.x/aix/i386/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.aix.ppc.rpm`;
+          return `https://packages.wazuh.com/4.x/aix/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.aix.ppc.rpm`;
         default:
-          return `https://packages.wazuh.com/4.x/aix/i386/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.aix.ppc.rpm`;
+          return `https://packages.wazuh.com/4.x/aix/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.aix.ppc.rpm`;
       }
     }
 
