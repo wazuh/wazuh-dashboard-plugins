@@ -1,0 +1,10 @@
+{
+  "data": {
+    "affected_items": [],
+    "total_affected_items": 0,
+    "failed_items": [],
+    "total_failed_items": 0
+  },
+  "message": "Logs read successfully in specified node",
+  "error": 0
+}
