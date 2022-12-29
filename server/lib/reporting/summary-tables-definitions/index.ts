@@ -1,6 +1,6 @@
-import agentsSummary from './agents';
-import overviewSummary from './overview';
+import agents from './agents';
+import overview from './overview';
 export default {
-    agentsSummary,
-    overviewSummary
+  agents,
+  overview
 }

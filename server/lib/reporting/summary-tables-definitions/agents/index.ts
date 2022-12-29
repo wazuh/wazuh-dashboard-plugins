@@ -105,30 +105,11 @@ const githubAlertsSummary = {
   ]
 }
 
-const hipaaAlertsSummary = {
-  title: 'Alerts summary',
-  aggs: [
-    AggregationFields['rule.hipaa'],
-    AggregationFields['rule.level'],
-    AggregationFields['rule.description'],
-  ]
-}
-
-const nistAlertsSummary = {
-  title: 'Alerts summary',
-  aggs: [
-    AggregationFields['rule.nist_800_53'],
-    AggregationFields['rule.level'],
-    AggregationFields['rule.description'],
-  ]
-}
-
 // 'Wazuh-App-Agents-GDPR-Last-alerts'
-const gdprAlertsSummary = {
-  title: 'Alerts summary',
+const gdprLastAlerts = {
+  title: 'Last alerts',
   aggs: [
-    AggregationFields['rule.nist_800_53'],
-    AggregationFields['rule.level'],
+    AggregationFields['rule.gdpr'],
     AggregationFields['rule.description'],
   ]
 
@@ -136,57 +117,68 @@ const gdprAlertsSummary = {
 
 // 'Wazuh-App-Agents-PCI-Last-alerts'
 const pciLastAlerts = {
-  title: 'Alerts summary',
+  title: 'Last alerts',
   aggs: [
-    AggregationFields[''],
+    AggregationFields['rule.pci_dss'],
+    AggregationFields['rule.description'],
   ]
 }
 
 // 'Wazuh-App-Agents-NIST-Last-alerts'
 const nistLastAlerts = {
-  title: 'Alerts summary',
+  title: 'Last alerts',
   aggs: [
-    AggregationFields[''],
+    AggregationFields['rule.nist_800_53'],
+    AggregationFields['rule.level'],
+    AggregationFields['rule.description'],
   ]
 }
 
 // 'Wazuh-App-Agents-HIPAA-Last-alerts'
 const hipaaLastAlerts = {
-  title: 'Alerts summary',
+  title: 'Last alerts',
   aggs: [
-    AggregationFields[''],
+    AggregationFields['rule.hipaa'],
+    AggregationFields['rule.level'],
+    AggregationFields['rule.description'],
   ]
 }
 
 // 'Wazuh-App-Agents-OSCAP-Last-alerts'
 const oscapLastAlerts = {
-  title: 'Alerts summary',
+  title: 'Last alerts',
   aggs: [
-    AggregationFields[''],
+    AggregationFields['data.oscap.check.title'],
+    AggregationFields['data.oscap.scan.profile.title'],
   ]
 }
 
 // 'Wazuh-App-Agents-Audit-Last-alerts'
 const auditLastAlerts = {
-  title: 'Alerts summary',
+  title: 'Last alerts',
   aggs: [
-    AggregationFields[''],
+    AggregationFields['rule.description'],
+    AggregationFields['data.audit.exe'],
+    AggregationFields['data.audit.type'],
   ]
 }
 
 export default {
-  generalAlertsSummary,
-  generalGroupsSummary,
-  awsAlertsSummary,
-  fimAlertsSummary,
-  githubAlertsSummary,
-  hipaaAlertsSummary,
-  nistAlertsSummary,
-  gcpAlertsSummary,
-  tscAlertsSummary,
-  virustotalAlertsSummary,
-  osqueryAlertsSummary,
-  mitreAlertsSummary,
-  ciscatAlertsSummary,
-  pmAlertsSummary,
+  general: [generalAlertsSummary, generalGroupsSummary],
+  aws: [awsAlertsSummary],
+  fim: [fimAlertsSummary],
+  github: [githubAlertsSummary],
+  hipaa: [hipaaLastAlerts],
+  nist: [nistLastAlerts],
+  gcp: [gcpAlertsSummary],
+  tsc: [tscAlertsSummary],
+  virustotal: [virustotalAlertsSummary],
+  osquery: [osqueryAlertsSummary],
+  mitre: [mitreAlertsSummary],
+  ciscat: [ciscatAlertsSummary],
+  pm: [pmAlertsSummary],
+  audit: [auditLastAlerts],
+  oscap: [oscapLastAlerts],
+  gdpr: [gdprLastAlerts],
+  pci: [pciLastAlerts],
 }

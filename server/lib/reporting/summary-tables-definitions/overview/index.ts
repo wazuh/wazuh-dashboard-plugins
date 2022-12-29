@@ -151,52 +151,44 @@ const githubAlertsSummary = {
   ]
 }
 
-const oscapAlertsSummary = {
-  title: 'Alerts summary',
-  aggs: [
-    AggregationFields['agent.name'],
-    AggregationFields['data.github.org'],
-    AggregationFields['rule.description'],
-  ]
-}
-
 // 'Wazuh-App-Overview-OSCAP-Last-alerts'
 const oscapLastAlerts = {
-  title: 'Alerts summary',
+  title: 'Last alerts',
   aggs: [
-    AggregationFields[''],
-    AggregationFields[''],
-    AggregationFields[''],
+    AggregationFields['agent.name'],
+    AggregationFields['data.oscap.check.title'],
+    AggregationFields['data.oscap.scan.profile.title'],
   ]
 }
 
 // 'Wazuh-App-Overview-Audit-Last-alerts'
 const auditLastAlerts = {
-  title: 'Alerts summary',
+  title: 'Last alerts',
   aggs: [
-    AggregationFields[''],
-    AggregationFields[''],
-    AggregationFields[''],
+    AggregationFields['agent.name'],
+    AggregationFields['rule.description'],
+    AggregationFields['data.audit.exe'],
   ]
 }
 
 export default {
-  awsAlertsSummary,
-  ciscatAlertsSummary,
-  dockerAlertsSummary,
-  fimAlertsSummary,
-  gcpAlertsSummary,
-  gdprAlertsSummary,
-  generalAlertsSummary,
-  githubAlertsSummary,
-  hipaaAlertsSummary,
-  mitreAlertsSummary,
-  nistAlertsSummary,
-  officeAlertsSummary,
-  oscapAlertsSummary,
-  osqueryAlertsSummary,
-  pciAlertsSummary,
-  pmAlertsSummary,
-  tscAlertsSummary,
-  virustotalAlertsSummary,
+  aws: [awsAlertsSummary],
+  ciscat: [ciscatAlertsSummary],
+  docker: [dockerAlertsSummary],
+  fim: [fimAlertsSummary],
+  gcp: [gcpAlertsSummary],
+  gdpr: [gdprAlertsSummary],
+  general: [generalAlertsSummary],
+  github: [githubAlertsSummary],
+  hipaa: [hipaaAlertsSummary],
+  mitre: [mitreAlertsSummary],
+  nist: [nistAlertsSummary],
+  office: [officeAlertsSummary],
+  oscap: [oscapLastAlerts],
+  osquery: [osqueryAlertsSummary],
+  pci: [pciAlertsSummary],
+  pm: [pmAlertsSummary],
+  tsc: [tscAlertsSummary],
+  virustotal: [virustotalAlertsSummary],
+  audit: [auditLastAlerts],
 }
