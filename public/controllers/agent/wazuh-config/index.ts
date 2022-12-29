@@ -173,11 +173,7 @@ const versionButtonsDebian = [
   },
   {
     id: 'debian9',
-    label: 'Debian 9',
-  },
-  {
-    id: 'debian10',
-    label: 'Debian 10 +',
+    label: 'Debian 9 +',
   },
 ];
 

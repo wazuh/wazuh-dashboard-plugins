@@ -1986,7 +1986,6 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
         this.state.selectedVersion == 'suse12' ||
         this.state.selectedVersion == '22' ||
         this.state.selectedVersion == 'debian9' ||
-        this.state.selectedVersion == 'debian10' ||
         this.state.selectedVersion == 'busterorgreater'
           ? [
               {
