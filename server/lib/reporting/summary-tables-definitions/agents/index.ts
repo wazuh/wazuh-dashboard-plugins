@@ -62,7 +62,7 @@ const osqueryAlertsSummary = {
 }
 
 const mitreAlertsSummary = {
-  itle: 'Alerts summary',
+  title: 'Alerts summary',
   aggs: [
     AggregationFields['rule.id'],
     AggregationFields['rule.description'],
@@ -163,6 +163,15 @@ const auditLastAlerts = {
   ]
 }
 
+const dockerAlertsSummary = {
+  title: 'Alerts summary',
+  aggs: [
+    AggregationFields['data.docker.Actor.Attributes.name'],
+    AggregationFields['data.docker.Action'],
+    AggregationFields['timestamp'],
+  ]
+}
+
 export default {
   general: [generalAlertsSummary, generalGroupsSummary],
   aws: [awsAlertsSummary],
@@ -181,4 +190,5 @@ export default {
   oscap: [oscapLastAlerts],
   gdpr: [gdprLastAlerts],
   pci: [pciLastAlerts],
+  docker: [dockerAlertsSummary],
 }

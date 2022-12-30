@@ -138,7 +138,7 @@ const dockerAlertsSummary = {
   aggs: [
     AggregationFields['data.docker.Actor.Attributes.name'],
     AggregationFields['data.docker.Action'],
-    AggregationFields['data.docker.timestamp'],
+    AggregationFields['timestamp'],
   ]
 }
 

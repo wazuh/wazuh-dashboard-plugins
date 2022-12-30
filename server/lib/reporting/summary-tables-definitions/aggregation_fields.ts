@@ -85,10 +85,6 @@ export const AggregationFields = {
   },
   'data.audit.exe': {
     field: 'data.audit.exe',
-    otherBucket: false,
-    otherBucketLabel: 'Other',
-    missingBucket: false,
-    missingBucketLabel: 'Missing',
     size: 10,
     order: 'desc',
     orderBy: '1',
@@ -96,10 +92,6 @@ export const AggregationFields = {
   },
   'data.audit.type': {
     field: 'data.audit.type',
-    otherBucket: false,
-    otherBucketLabel: 'Other',
-    missingBucket: false,
-    missingBucketLabel: 'Missing',
     size: 5,
     order: 'desc',
     orderBy: '1',
