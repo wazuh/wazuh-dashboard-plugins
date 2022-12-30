@@ -12,12 +12,19 @@
 
 import React from 'react';
 import { EuiEmptyPrompt } from '@elastic/eui';
-
-export const PromptAgentFeatureVersion = ({ version = '' }: { version: string }) => {
+import { i18n } from '@kbn/i18n';
+const agentDescp = i18n.translate('components.addModule.guide.agentDescp', {
+  defaultMessage: "Agent doesn't support this feature",
+});
+export const PromptAgentFeatureVersion = ({
+  version = '',
+}: {
+  version: string;
+}) => {
   return (
     <EuiEmptyPrompt
-      iconType="watchesApp"
-      title={<h2>{`Agent doesn't support this feature`}</h2>}
+      iconType='watchesApp'
+      title={<h2>{agentDescp}</h2>}
       body={`This feature is only available for agents with ${version}.`}
     />
   );

@@ -37,6 +37,8 @@ import { TruncateHorizontalComponents } from '../../../common/util';
 import { getDataPlugin, getUiSettings } from '../../../../kibana-services';
 import { FilterManager } from '../../../../../../../src/plugins/data/public/';
 import { formatUIDate } from '../../../../react-services/time-service';
+import { i18n } from "@kbn/i18n";
+
 export class Details extends Component {
   props!: {
     currentItem: {
@@ -324,7 +326,11 @@ export class Details extends Component {
         buttonContent={
           <EuiTitle size="xs">
             <EuiToolTip position="top" content="View external references">
-              <p className="detail-value" style={{ margin: 0 }}>View external references <EuiIcon
+              <p className="detail-value" style={{ margin: 0 }}>{
+  i18n.translate("components.agent.fim.ivv.lib.view", {
+    defaultMessage: "View external references ",
+  });
+}<EuiIcon
                 className="euiButtonIcon euiButtonIcon--primary"
                 type="inspect"
                 aria-label="show"
@@ -399,7 +405,11 @@ export class Details extends Component {
           id={id === undefined ? Math.random().toString() : `${id}_details`}
           buttonContent={
             <EuiTitle size="s">
-              <h3>Details</h3>
+              <h3>{
+  i18n.translate("components.agent.fim.ivv.lib.Details", {
+    defaultMessage: "Details",
+  });
+}</h3>
             </EuiTitle>
           }
           paddingSize="none"
@@ -413,13 +423,21 @@ export class Details extends Component {
           className="events-accordion"
           extraAction={
             <div style={{ marginBottom: 5 }}>
-              <strong>{this.state.totalHits || 0}</strong> hits
+              <strong>{this.state.totalHits || 0}</strong> {
+  i18n.translate("components.agent.fim.ivv.lib.hits", {
+    defaultMessage: "hits",
+  });
+}
             </div>
           }
           buttonContent={
             <EuiTitle size="s">
-              <h3>
-                Recent events
+              <h3>{
+  i18n.translate("components.agent.fim.ivv.lib.recevents", {
+    defaultMessage: "Recent events",
+  });
+}
+                
                 {view !== 'events' && (
                   <span style={{ marginLeft: 16 }}>
                     <EuiToolTip position="top" content={inspectButtonText}>

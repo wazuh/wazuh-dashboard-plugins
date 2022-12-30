@@ -13,22 +13,25 @@
 import React from 'react';
 import { PromptSelectAgent } from './';
 import { EuiEmptyPrompt } from '@elastic/eui';
+import { i18n } from '@kbn/i18n';
 
 export const PromptNoActiveAgent = () => {
   return (
     <PromptSelectAgent
-      title="Agent is not active"
-      body="This section is only available for active agents."
+      title='Agent is not active'
+      body='This section is only available for active agents.'
     />
   );
 };
-
+const moduleTitle = i18n.translate('components.addModule.guide.moduleTitle', {
+  defaultMessage: 'Agent is not active',
+});
 export const PromptNoActiveAgentWithoutSelect = () => {
   return (
     <EuiEmptyPrompt
-      iconType="watchesApp"
-      title={<h2>{`Agent is not active`}</h2>}
-      body="This section is only available for active agents."
+      iconType='watchesApp'
+      title={<h2>{moduleTitle}</h2>}
+      body='This section is only available for active agents.'
     />
   );
 };

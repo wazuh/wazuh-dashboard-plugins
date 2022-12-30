@@ -12,10 +12,72 @@
 
 import React, { Component } from 'react';
 import { getFilterValues } from './lib';
-import { IFilter, IWzSuggestItem, WzSearchBar } from '../../../../components/wz-search-bar';
+import {
+  IFilter,
+  IWzSuggestItem,
+  WzSearchBar,
+} from '../../../../components/wz-search-bar';
 import { ICustomBadges } from '../../../wz-search-bar/components';
 import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import { formatUIDate } from '../../../../react-services/time-service';
+import { i18n } from '@kbn/i18n';
+const fileDescp = i18n.translate('components.addModule.guide.fileDescp', {
+  defaultMessage: 'Name of the file',
+});
+const prefileDescp = i18n.translate('components.addModule.guide.prefileDescp', {
+  defaultMessage: 'Permissions of the file',
+});
+const datefileDescp = i18n.translate(
+  'components.addModule.guide.datefileDescp',
+  {
+    defaultMessage: 'Date the file was modified',
+  },
+);
+const regdatefileDescp = i18n.translate(
+  'components.addModule.guide.regdatefileDescp',
+  {
+    defaultMessage: 'Date of registration of the event',
+  },
+);
+const ownerfileDescp = i18n.translate(
+  'components.addModule.guide.ownerfileDescp',
+  {
+    defaultMessage: 'Id of the owner file',
+  },
+);
+const owneridfileDescp = i18n.translate(
+  'components.addModule.guide.owneridfileDescp',
+  {
+    defaultMessage: 'Name of the group owner file',
+  },
+);
+const groupownerfileDescp = i18n.translate(
+  'components.addModule.guide.groupownerfileDescp',
+  {
+    defaultMessage: 'Id of the group owner',
+  },
+);
+const md5Descp = i18n.translate('components.addModule.guide.md5Descp', {
+  defaultMessage: 'md5 hash',
+});
+const sha1Descp = i18n.translate('components.addModule.guide.sha1Descp', {
+  defaultMessage: 'sha1 hash',
+});
+const sha256Descp = i18n.translate('components.addModule.guide.sha256Descp', {
+  defaultMessage: 'sha256 hash',
+});
+const inodeDescp = i18n.translate('components.addModule.guide.inodeDescp', {
+  defaultMessage: 'Inode of the file',
+});
+const sizeDescp = i18n.translate('components.addModule.guide.sizeDescp', {
+  defaultMessage: 'Size of the file in Bytes',
+});
+const regkeyDescp = i18n.translate('components.addModule.guide.regkeyDescp', {
+  defaultMessage: 'Name of the registry_key',
+});
+const filePlace = i18n.translate('components.addModule.guide.filePlace', {
+  defaultMessage: 'Filter or search file',
+});
 
 export class FilterBar extends Component {
   // TODO: Change the type
@@ -24,9 +86,9 @@ export class FilterBar extends Component {
       {
         type: 'q',
         label: 'file',
-        description: 'Name of the file',
+        description: fileDescp,
         operators: ['=', '!=', '~'],
-        values: async (value) =>
+        values: async value =>
           getFilterValues('file', value, this.props.agent.id, { type: 'file' }),
       },
       ...(((this.props.agent || {}).os || {}).platform !== 'windows'
@@ -34,50 +96,60 @@ export class FilterBar extends Component {
             {
               type: 'q',
               label: 'perm',
-              description: 'Permissions of the file',
+              description: prefileDescp,
               operators: ['=', '!=', '~'],
-              values: async (value) => getFilterValues('perm', value, this.props.agent.id),
+              values: async value =>
+                getFilterValues('perm', value, this.props.agent.id),
             },
           ]
         : []),
       {
         type: 'q',
         label: 'mtime',
-        description: 'Date the file was modified',
+        description: datefileDescp,
         operators: ['=', '!=', '>', '<'],
-        values: async (value) =>
-          getFilterValues('mtime', value, this.props.agent.id, {}, formatUIDate),
+        values: async value =>
+          getFilterValues(
+            'mtime',
+            value,
+            this.props.agent.id,
+            {},
+            formatUIDate,
+          ),
       },
       {
         type: 'q',
         label: 'date',
-        description: 'Date of registration of the event',
+        description: regdatefileDescp,
         operators: ['=', '!=', '>', '<'],
-        values: async (value) =>
+        values: async value =>
           getFilterValues('date', value, this.props.agent.id, {}, formatUIDate),
       },
       {
         type: 'q',
         label: 'uname',
-        description: 'Owner of the file',
+        description: ownerfileDescp,
         operators: ['=', '!=', '~'],
-        values: async (value) => getFilterValues('uname', value, this.props.agent.id),
+        values: async value =>
+          getFilterValues('uname', value, this.props.agent.id),
       },
       {
         type: 'q',
         label: 'uid',
-        description: 'Id of the owner file',
+        description: owneridfileDescp,
         operators: ['=', '!=', '~'],
-        values: async (value) => getFilterValues('uid', value, this.props.agent.id),
+        values: async value =>
+          getFilterValues('uid', value, this.props.agent.id),
       },
       ...(((this.props.agent || {}).os || {}).platform !== 'windows'
         ? [
             {
               type: 'q',
               label: 'gname',
-              description: 'Name of the group owner file',
+              description: groupownerfileDescp,
               operators: ['=', '!=', '~'],
-              values: async (value) => getFilterValues('gname', value, this.props.agent.id),
+              values: async value =>
+                getFilterValues('gname', value, this.props.agent.id),
             },
           ]
         : []),
@@ -86,59 +158,67 @@ export class FilterBar extends Component {
             {
               type: 'q',
               label: 'gid',
-              description: 'Id of the group owner',
+              description: md5Descp,
               operators: ['=', '!=', '~'],
-              values: async (value) => getFilterValues('gid', value, this.props.agent.id),
+              values: async value =>
+                getFilterValues('gid', value, this.props.agent.id),
             },
           ]
         : []),
       {
         type: 'q',
         label: 'md5',
-        description: 'md5 hash',
+        description: md5Descp,
         operators: ['=', '!=', '~'],
-        values: async (value) => getFilterValues('md5', value, this.props.agent.id),
+        values: async value =>
+          getFilterValues('md5', value, this.props.agent.id),
       },
       {
         type: 'q',
         label: 'sha1',
-        description: 'sha1 hash',
+        description: sha1Descp,
         operators: ['=', '!=', '~'],
-        values: async (value) => getFilterValues('sha1', value, this.props.agent.id),
+        values: async value =>
+          getFilterValues('sha1', value, this.props.agent.id),
       },
       {
         type: 'q',
         label: 'sha256',
-        description: 'sha256 hash',
+        description: sha256Descp,
         operators: ['=', '!=', '~'],
-        values: async (value) => getFilterValues('sha256', value, this.props.agent.id),
+        values: async value =>
+          getFilterValues('sha256', value, this.props.agent.id),
       },
       ...(((this.props.agent || {}).os || {}).platform !== 'windows'
         ? [
             {
               type: 'q',
               label: 'inode',
-              description: 'Inode of the file',
+              description: inodeDescp,
               operators: ['=', '!=', '~'],
-              values: async (value) => getFilterValues('inode', value, this.props.agent.id),
+              values: async value =>
+                getFilterValues('inode', value, this.props.agent.id),
             },
           ]
         : []),
       {
         type: 'q',
         label: 'size',
-        description: 'Size of the file in Bytes',
-        values: async (value) => getFilterValues('size', value, this.props.agent.id),
+        description: sizeDescp,
+        values: async value =>
+          getFilterValues('size', value, this.props.agent.id),
       },
     ],
     registry: [
       {
         type: 'q',
         label: 'file',
-        description: 'Name of the registry_key',
+        description: regkeyDescp,
         operators: ['=', '!=', '~'],
-        values: async (value) =>
-          getFilterValues('file', value, this.props.agent.id, { q: 'type=registry_key' }),
+        values: async value =>
+          getFilterValues('file', value, this.props.agent.id, {
+            q: 'type=registry_key',
+          }),
       },
     ],
   };
@@ -162,7 +242,7 @@ export class FilterBar extends Component {
             filters={filters}
             onFiltersChange={onFiltersChange}
             suggestions={this.suggestions[selectView]}
-            placeholder="Filter or search file"
+            placeholder={filePlace}
           />
         </EuiFlexItem>
       </EuiFlexGroup>

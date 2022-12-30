@@ -12,7 +12,10 @@
 
 import React from 'react';
 import { PromptSelectAgent } from './';
-
+import { i18n } from '@kbn/i18n';
+const moduleTitle = i18n.translate('components.addModule.guide.moduleTitle', {
+  defaultMessage: 'No agent is selected',
+});
 export const PromptNoSelectedAgent = ({ body }) => {
-  return <PromptSelectAgent body={body} title="No agent is selected" />;
+  return <PromptSelectAgent body={body} title={moduleTitle} />;
 };

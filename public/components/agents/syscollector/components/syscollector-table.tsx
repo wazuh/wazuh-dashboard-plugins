@@ -3,6 +3,7 @@ import { EuiPanel, EuiFlexGroup, EuiButtonEmpty, EuiFlexItem, EuiText, EuiLoadin
 import { useApiRequest } from '../../../common/hooks/useApiRequest';
 import { KeyEquivalence } from '../../../../../common/csv-key-equivalence';
 import { AppState } from '../../../../react-services/app-state';
+import { i18n } from "@kbn/i18n";
 
 
 export function SyscollectorTable({ tableParams }) {
@@ -130,8 +131,12 @@ export function SyscollectorTable({ tableParams }) {
             <EuiButtonEmpty
               onClick={downloadCsv}
               iconType="importAction"
-            >
-              Download CSV
+            >{
+  i18n.translate("components.agent.fim.ivv.lib.csv", {
+    defaultMessage: "Download CSV",
+  });
+}
+              
             </EuiButtonEmpty>
           </EuiFlexItem>
         </EuiFlexGroup>
