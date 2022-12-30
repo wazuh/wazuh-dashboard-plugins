@@ -29,6 +29,8 @@ import {
   EuiLoadingSpinner,
 } from '@elastic/eui';
 import { AppNavigate } from '../../../../../react-services/app-navigate';
+import { i18n } from '@kbn/i18n';
+
 import { AppState } from '../../../../../react-services/app-state';
 import { RequirementFlyout } from '../requirement-flyout/requirement-flyout';
 import { WAZUH_ALERTS_PATTERN } from '../../../../../../common/constants';
@@ -291,7 +293,11 @@ export class ComplianceSubrequirements extends Component {
         <EuiFlexGroup>
           <EuiFlexItem grow={true}>
             <EuiTitle size="m">
-              <h1>Requirements</h1>
+              <h1>{
+  i18n.translate("components.subre.req", {
+    defaultMessage: "Requirements",
+  });
+}</h1>
             </EuiTitle>
           </EuiFlexItem>
 
@@ -299,7 +305,11 @@ export class ComplianceSubrequirements extends Component {
             <EuiFlexGroup>
               <EuiFlexItem grow={false}>
                 <EuiText grow={false}>
-                  <span>Hide requirements with no alerts </span> &nbsp;
+                  <span>{
+  i18n.translate("components.subre.reqAlert", {
+    defaultMessage: "Hide requirements with no alerts ",
+  });
+}</span> &nbsp;
                   <EuiSwitch
                     label=""
                     checked={this.state.hideAlerts}

@@ -32,6 +32,8 @@ import {
   checkPatternSupportService,
   checkSetupService,
 } from '../services';
+import { i18n } from "@kbn/i18n";
+
 import { CheckResult } from '../components/check-result';
 import { withErrorBoundary, withReduxProvider } from '../../common/hocs';
 import { getHttp } from '../../../kibana-services';
@@ -242,15 +244,23 @@ function HealthCheckComponent() {
           <EuiFlexGroup justifyContent='center'>
             {thereAreErrors && (
               <EuiFlexItem grow={false}>
-                <EuiButton fill href={getHttp().basePath.prepend('/app/wazuh#/settings')}>
-                  Go to Settings
+                <EuiButton fill href={getHttp().basePath.prepend('/app/wazuh#/settings')}>{
+  i18n.translate("components.health.continer.Setting", {
+    defaultMessage: "Go to Settings",
+  });
+}
+                  
                 </EuiButton>
               </EuiFlexItem>
             )}
             {isDebugMode && Object.keys(checks).every(check => checksReady[check]) && (
               <EuiFlexItem grow={false}>
                 <EuiButton fill onClick={redirectionPassHealthcheck}>
-                  Continue
+                  {
+  i18n.translate("components.health.continer.Continue", {
+    defaultMessage: "Continue",
+  });
+}
                 </EuiButton>
               </EuiFlexItem>
             )}

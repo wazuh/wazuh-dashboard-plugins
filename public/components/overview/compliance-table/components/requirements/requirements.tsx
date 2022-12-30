@@ -23,7 +23,25 @@ import {
   EuiToolTip
 } from '@elastic/eui';
 import { requirementsName } from '../../requirement-name';
-
+import { i18n } from '@kbn/i18n';
+const title1 = i18n.translate("components.addModule.guide.title1", {
+  defaultMessage: "Options",
+});
+const title2 = i18n.translate("components.addModule.guide.title2", {
+  defaultMessage: "GDPR",
+});
+const title3 = i18n.translate("components.addModule.guide.title3", {
+  defaultMessage: "PCI DSS",
+});
+const title4 = i18n.translate("components.addModule.guide.title4", {
+  defaultMessage: "HIPAA",
+});
+const title5 = i18n.translate("components.addModule.guide.title5", {
+  defaultMessage: "NIST 800-53",
+});
+const title6 = i18n.translate("components.addModule.guide.title6", {
+  defaultMessage: "TSC",
+});
 export class ComplianceRequirements extends Component {
   _isMount = false;
   state: {
@@ -93,8 +111,12 @@ export class ComplianceRequirements extends Component {
                     overflow: "hidden",
                     whiteSpace: "nowrap",
                     textOverflow: "ellipsis"
-                  }}>
-                    Requirement {facet.label}
+                  }}>{
+  i18n.translate("components.over.req.Requirement ", {
+    defaultMessage: "Requirement ",
+  });
+}
+                    {facet.label}
                   </span>
                 </EuiToolTip>
             
@@ -128,7 +150,7 @@ export class ComplianceRequirements extends Component {
     const panels = [
       {
         id: 0,
-        title: 'Options',
+        title: title1,
         items: [
           {
             name: 'Select all',
@@ -150,22 +172,22 @@ export class ComplianceRequirements extends Component {
       }
     ]
     let sectionStyle = {}
-    let title = "";
+    let title = '';
     if(this.props.section === "gdpr"){
       sectionStyle["height"] = 300;
-      title = "GDPR"
+      title = title2
     }
     if(this.props.section === "pci"){
-      title = "PCI DSS"
+      title = title3
     }
     if(this.props.section === "hipaa"){
-      title = "HIPAA"
+      title = title4
     }
     if(this.props.section === "nist"){
-      title = "NIST 800-53"
+      title = title5
     }
     if(this.props.section === "tsc"){
-      title = "TSC";
+      title = title6;
       sectionStyle["height"] = 350;
     }
     return (

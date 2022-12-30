@@ -30,6 +30,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { updateToastNotificationsModal } from '../../redux/actions/appStateActions';
 import { withReduxProvider, withErrorBoundary } from '../common/hocs';
 import { compose } from 'redux';
+import { i18n } from "@kbn/i18n";
 
 export const ToastNotificationsModal = compose (withErrorBoundary, withReduxProvider)(() => {
   const [isOpen, setIsOpen] = useState(false);
@@ -79,7 +80,11 @@ export const ToastNotificationsModal = compose (withErrorBoundary, withReduxProv
           </EuiModalBody>
           <EuiModalFooter>
             <EuiCopy textToCopy={copyMessage}>
-              {copy => <EuiButton fill onClick={copy}>Copy error</EuiButton>}
+              {copy => <EuiButton fill onClick={copy}>{
+  i18n.translate("components.notfi.modal.error, {
+    defaultMessage: "Copy error",
+  });
+}</EuiButton>}
             </EuiCopy>
           </EuiModalFooter>
         </EuiModal>

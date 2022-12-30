@@ -33,6 +33,7 @@ import { requirementGoal } from '../../requirement-goal';
 import { getUiSettings } from '../../../../../kibana-services';
 import { FilterManager } from '../../../../../../../../src/plugins/data/public/';
 import { WzFlyout } from '../../../../../components/common/flyouts';
+import { i18n } from '@kbn/i18n';
 
 export class RequirementFlyout extends Component {
   _isMount = false;
@@ -62,7 +63,11 @@ export class RequirementFlyout extends Component {
           </div>
         )) || (
           <EuiTitle size="m">
-            <h2 id="flyoutSmallTitle">Requirement {currentRequirement}</h2>
+            <h2 id="flyoutSmallTitle">{
+  i18n.translate("components.overview.Requirement", {
+    defaultMessage: "Requirement",
+  });
+} {currentRequirement}</h2>
           </EuiTitle>
         )}
       </EuiFlyoutHeader>
@@ -96,7 +101,11 @@ export class RequirementFlyout extends Component {
           id={'details'}
           buttonContent={
             <EuiTitle size="s">
-              <h3>Details</h3>
+              <h3>{
+  i18n.translate("components.overview.Details", {
+    defaultMessage: "Details",
+  });
+}</h3>
             </EuiTitle>
           }
           paddingSize="xs"
@@ -111,7 +120,11 @@ export class RequirementFlyout extends Component {
                 </EuiFlexItem>
                 <EuiFlexItem style={{ marginLeft: 2 }} grow={true}>
                   <EuiText style={{ marginLeft: 8, fontSize: 14 }}>
-                    <p style={{ fontWeight: 500, marginBottom: 2 }}>Goals</p>
+                    <p style={{ fontWeight: 500, marginBottom: 2 }}>{
+  i18n.translate("components.overview.Goals", {
+    defaultMessage: "Goals",
+  });
+}</p>
 
                     <p>{requirementGoal[currentReq]}</p>
                   </EuiText>
@@ -125,7 +138,11 @@ export class RequirementFlyout extends Component {
               </EuiFlexItem>
               <EuiFlexItem style={{ marginLeft: 2 }} grow={true}>
                 <EuiText style={{ marginLeft: 8, fontSize: 14 }}>
-                  <p style={{ fontWeight: 500, marginBottom: 2 }}>Requirement description</p>
+                  <p style={{ fontWeight: 500, marginBottom: 2 }}>{
+  i18n.translate("components.overview.Requirementdescription", {
+    defaultMessage: "Requirement description",
+  });
+}</p>
 
                   <p>{this.props.description}</p>
                 </EuiText>
@@ -142,13 +159,21 @@ export class RequirementFlyout extends Component {
           className="events-accordion"
           extraAction={
             <div style={{ marginBottom: 5 }}>
-              <strong>{this.state.totalHits || 0}</strong> hits
+              <strong>{this.state.totalHits || 0}</strong> {
+  i18n.translate("components.overview.hits", {
+    defaultMessage: "hits",
+  });
+}
             </div>
           }
           buttonContent={
             <EuiTitle size="s">
-              <h3>
-                Recent events
+              <h3>{
+  i18n.translate("components.overview.Recentevents", {
+    defaultMessage: "Recent events",
+  });
+}
+                
                 {this.props.view !== 'events' && (
                   <span style={{ marginLeft: 16 }}>
                     <span>

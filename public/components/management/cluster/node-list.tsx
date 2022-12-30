@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { EuiPanel, EuiFlexGroup, EuiFlexItem, EuiToolTip, EuiButtonIcon, EuiTitle, EuiInMemoryTable, EuiFieldSearch } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
 import { withErrorBoundary } from '../../common/hocs';
+import { i18n } from "@kbn/i18n";
 
 export const NodeList = withErrorBoundary (class NodeList extends Component {
     constructor(props) {
@@ -79,7 +80,11 @@ export const NodeList = withErrorBoundary (class NodeList extends Component {
                             </EuiFlexItem>
                             <EuiFlexItem grow={false}>
                                 <EuiTitle>
-                                    <h1>Nodes</h1>
+                                    <h1>{
+  i18n.translate("components.management.cluster.nodes", {
+    defaultMessage: "Nodes",
+  });
+}</h1>
                                 </EuiTitle>
                             </EuiFlexItem>
                         </EuiFlexGroup>
