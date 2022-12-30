@@ -12,7 +12,11 @@
 
 import React from 'react';
 import { PromptSelectAgent } from './';
+import { i18n } from '@kbn/i18n';
 
+const moduleTitle = i18n.translate('components.addModule.guide.moduleTitle', {
+  defaultMessage: 'Module not supported by the agent',
+});
 export const PromptAgentNoSupportModule = () => {
-  return <PromptSelectAgent title="Module not supported by the agent" />;
+  return <PromptSelectAgent title={moduleTitle} />;
 };

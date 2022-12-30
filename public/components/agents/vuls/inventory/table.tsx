@@ -13,11 +13,39 @@
 import React, { Component } from 'react';
 import { Direction } from '@elastic/eui';
 import { FlyoutDetail } from './flyout';
-import { filtersToObject, IFilter, IWzSuggestItem } from '../../../wz-search-bar';
+import {
+  filtersToObject,
+  IFilter,
+  IWzSuggestItem,
+} from '../../../wz-search-bar';
 import { TableWzAPI } from '../../../../components/common/tables';
 import { getFilterValues } from './lib';
 import { formatUIDate } from '../../../../react-services/time-service';
-
+import { i18n } from '@kbn/i18n';
+const Descp1 = i18n.translate('components.addModule.guide.Descp1', {
+  defaultMessage: 'Filter by package ID',
+});
+const Descp2 = i18n.translate('components.addModule.guide.Descp2', {
+  defaultMessage: 'Filter by CVE ID',
+});
+const Descp3 = i18n.translate('components.addModule.guide.Descp3', {
+  defaultMessage: 'Filter by CVE version',
+});
+const Descp4 = i18n.translate('components.addModule.guide.Descp4', {
+  defaultMessage: 'Filter by architecture',
+});
+const Descp5 = i18n.translate('components.addModule.guide.Descp5', {
+  defaultMessage: 'Filter by Severity',
+});
+const Descp6 = i18n.translate('components.addModule.guide.Descp6', {
+  defaultMessage: 'Filter by CVSS2',
+});
+const Descp7 = i18n.translate('components.addModule.guide.Descp7', {
+  defaultMessage: 'Filter by CVSS3',
+});
+const Descp8 = i18n.translate('components.addModule.guide.Descp8', {
+  defaultMessage: 'Filter by Detection Time',
+});
 export class InventoryTable extends Component {
   state: {
     error?: string;
@@ -34,58 +62,65 @@ export class InventoryTable extends Component {
     {
       type: 'q',
       label: 'name',
-      description: 'Filter by package ID',
+      description: Descp1,
       operators: ['=', '!=', '~'],
-      values: async (value) => getFilterValues('name', value, this.props.agent.id),
+      values: async value =>
+        getFilterValues('name', value, this.props.agent.id),
     },
     {
       type: 'q',
       label: 'cve',
-      description: 'Filter by CVE ID',
+      description: Descp2,
       operators: ['=', '!=', '~'],
-      values: async (value) => getFilterValues('cve', value, this.props.agent.id),
+      values: async value => getFilterValues('cve', value, this.props.agent.id),
     },
     {
       type: 'q',
       label: 'version',
-      description: 'Filter by CVE version',
+      description: Descp3,
       operators: ['=', '!=', '~'],
-      values: async (value) => getFilterValues('version', value, this.props.agent.id),
+      values: async value =>
+        getFilterValues('version', value, this.props.agent.id),
     },
     {
       type: 'q',
       label: 'architecture',
-      description: 'Filter by architecture',
+      description: Descp4,
       operators: ['=', '!=', '~'],
-      values: async (value) => getFilterValues('architecture', value, this.props.agent.id),
+      values: async value =>
+        getFilterValues('architecture', value, this.props.agent.id),
     },
     {
       type: 'q',
       label: 'severity',
-      description: 'Filter by Severity',
+      description: Descp5,
       operators: ['=', '!=', '~'],
-      values: async (value) => getFilterValues('severity', value, this.props.agent.id),
+      values: async value =>
+        getFilterValues('severity', value, this.props.agent.id),
     },
     {
       type: 'q',
       label: 'cvss2_score',
-      description: 'Filter by CVSS2',
+      description: Descp6,
       operators: ['=', '!=', '~'],
-      values: async (value) => getFilterValues('cvss2_score', value, this.props.agent.id),
+      values: async value =>
+        getFilterValues('cvss2_score', value, this.props.agent.id),
     },
     {
       type: 'q',
       label: 'cvss3_score',
-      description: 'Filter by CVSS3',
+      description: Descp7,
       operators: ['=', '!=', '~'],
-      values: async (value) => getFilterValues('cvss3_score', value, this.props.agent.id),
+      values: async value =>
+        getFilterValues('cvss3_score', value, this.props.agent.id),
     },
     {
       type: 'q',
       label: 'detection_time',
-      description: 'Filter by Detection Time',
+      description: Descp8,
       operators: ['=', '!=', '~'],
-      values: async (value) => getFilterValues('detection_time', value, this.props.agent.id),
+      values: async value =>
+        getFilterValues('detection_time', value, this.props.agent.id),
     },
   ];
 
@@ -117,7 +152,7 @@ export class InventoryTable extends Component {
   async showFlyout(item, redirect = false) {
     //if a flyout is opened, we close it and open a new one, so the components are correctly updated on start.
     this.setState({ isFlyoutVisible: false }, () =>
-      this.setState({ isFlyoutVisible: true, currentItem: item })
+      this.setState({ isFlyoutVisible: true, currentItem: item }),
     );
   }
 
@@ -208,7 +243,7 @@ export class InventoryTable extends Component {
   }
 
   renderTable() {
-    const getRowProps = (item) => {
+    const getRowProps = item => {
       const id = `${item.name}-${item.cve}-${item.architecture}-${item.version}-${item.severity}-${item.cvss2_score}-${item.cvss3_score}-${item.detection_time}`;
       return {
         'data-test-subj': `row-${id}`,
@@ -232,14 +267,14 @@ export class InventoryTable extends Component {
       'condition',
       'updated',
       'published',
-      'external_references'
+      'external_references',
     ].join(',')}`;
 
     return (
       <TableWzAPI
-        title="Vulnerabilities"
+        title='Vulnerabilities'
         tableColumns={columns}
-        tableInitialSortingField="name"
+        tableInitialSortingField='name'
         searchTable={true}
         searchBarSuggestions={this.suggestions}
         endpoint={`/vulnerability/${this.props.agent.id}?${selectFields}`}
@@ -257,7 +292,7 @@ export class InventoryTable extends Component {
   render() {
     const table = this.renderTable();
     return (
-      <div className="wz-inventory">
+      <div className='wz-inventory'>
         {table}
         {this.state.isFlyoutVisible && (
           <FlyoutDetail
@@ -265,8 +300,8 @@ export class InventoryTable extends Component {
             agentId={this.props.agent.id}
             item={this.state.currentItem}
             closeFlyout={() => this.closeFlyout()}
-            type="vulnerability"
-            view="inventory"
+            type='vulnerability'
+            view='inventory'
             showViewInEvents={true}
             outsideClickCloses={true}
             {...this.props}

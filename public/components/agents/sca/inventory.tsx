@@ -39,6 +39,8 @@ import exportCsv from '../../../react-services/wz-csv';
 import { getToasts } from '../../../kibana-services';
 import { WzSearchBar } from '../../../components/wz-search-bar';
 import { RuleText, ComplianceText } from './components';
+import { i18n } from '@kbn/i18n';
+
 import _ from 'lodash';
 import {
   UI_ERROR_SEVERITIES,
@@ -49,7 +51,36 @@ import {
 import { API_NAME_AGENT_STATUS, UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { VisualizationBasic } from '../../common/charts/visualizations/basic';
-
+const Descp1 = i18n.translate("components.addModule.guide.Descp1", {
+  defaultMessage: "Filter by check condition",
+});
+const Descp2 = i18n.translate("components.addModule.guide.Descp2", {
+  defaultMessage: "Filter by check file",
+});
+const Descp3 = i18n.translate("components.addModule.guide.Descp3", {
+  defaultMessage: "Filter by check title",
+});
+const Descp4 = i18n.translate("components.addModule.guide.Descp4", {
+  defaultMessage: "Filter by check result",
+});
+const Descp5 = i18n.translate("components.addModule.guide.Descp5", {
+  defaultMessage: "Filter by check status",
+});
+const Descp6 = i18n.translate("components.addModule.guide.Descp6", {
+  defaultMessage: "Filter by check rationale",
+});
+const Descp7 = i18n.translate("components.addModule.guide.Descp7", {
+  defaultMessage: "Filter by check registry",
+});
+const Descp8 = i18n.translate("components.addModule.guide.Descp8", {
+  defaultMessage: "Filter by check description",
+});
+const Descp9 = i18n.translate("components.addModule.guide.Descp9", {
+  defaultMessage: "Filter by check remediation",
+});
+const Descp10 = i18n.translate("components.addModule.guide.regkeyDescp", {
+  defaultMessage: "Filter by check reason",
+});
 export class Inventory extends Component {
   _isMount = false;
   constructor(props) {
@@ -126,23 +157,43 @@ export class Inventory extends Component {
           <div>
             {item.file ? (
               <span>
-                <b>File:</b> {item.file}
+                <b>{
+  i18n.translate("components.agent.fim.ivv.lib.File", {
+    defaultMessage: "File:",
+  });
+}</b> {item.file}
               </span>
             ) : item.directory ? (
               <span>
-                <b>Directory:</b> {item.directory}
+                <b>{
+  i18n.translate("components.agent.fim.ivv.lib.Directory", {
+    defaultMessage: "Directory:",
+  });
+}</b> {item.directory}
               </span>
             ) : item.process ? (
               <span>
-                <b>Process: </b> {item.process}
+                <b>{
+  i18n.translate("components.agent.fim.ivv.lib.Process", {
+    defaultMessage: "Process:",
+  });
+} </b> {item.process}
               </span>
             ) : item.command ? (
               <span>
-                <b>Command: </b> {item.command}
+                <b>{
+  i18n.translate("components.agent.fim.ivv.lib.Command", {
+    defaultMessage: "Command:",
+  });
+} </b> {item.command}
               </span>
             ) : item.registry ? (
               <span>
-                <b>Registry: </b> {item.registry}
+                <b>{
+  i18n.translate("components.agent.fim.ivv.lib.Registry", {
+    defaultMessage: "Registry:",
+  });
+} </b> {item.registry}
               </span>
             ) : (
               '-'
@@ -288,70 +339,70 @@ export class Inventory extends Component {
         {
           type: 'params',
           label: 'condition',
-          description: 'Filter by check condition',
+          description: Descp1,
           operators: ['=', '!='],
           values: (value) => getSuggestionsValues(value, 'condition'),
         },
         {
           type: 'params',
           label: 'file',
-          description: 'Filter by check file',
+          description: Descp2,
           operators: ['=', '!='],
           values: (value) => getSuggestionsValues(value, 'file'),
         },
         {
           type: 'params',
           label: 'title',
-          description: 'Filter by check title',
+          description: Descp3,
           operators: ['=', '!='],
           values: (value) => getSuggestionsValues(value, 'title'),
         },
         {
           type: 'params',
           label: 'result',
-          description: 'Filter by check result',
+          description: Descp4,
           operators: ['=', '!='],
           values: (value) => getSuggestionsValues(value, 'result'),
         },
         {
           type: 'params',
           label: 'status',
-          description: 'Filter by check status',
+          description: Descp5,
           operators: ['=', '!='],
           values: (value) => getSuggestionsValues(value, 'status'),
         },
         {
           type: 'params',
           label: 'rationale',
-          description: 'Filter by check rationale',
+          description: Descp6,
           operators: ['=', '!='],
           values: (value) => getSuggestionsValues(value, 'rationale'),
         },
         {
           type: 'params',
           label: 'registry',
-          description: 'Filter by check registry',
+          description: Descp7,
           operators: ['=', '!='],
           values: (value) => getSuggestionsValues(value, 'registry'),
         },
         {
           type: 'params',
           label: 'description',
-          description: 'Filter by check description',
+          description: Descp8,
           operators: ['=', '!='],
           values: (value) => getSuggestionsValues(value, 'description'),
         },
         {
           type: 'params',
           label: 'remediation',
-          description: 'Filter by check remediation',
+          description: Descp9,
           operators: ['=', '!='],
           values: (value) => getSuggestionsValues(value, 'remediation'),
         },
         {
           type: 'params',
           label: 'reason',
-          description: 'Filter by check reason',
+          description: Descp10,
           operators: ['=', '!='],
           values: (value) => getSuggestionsValues(value, 'reason'),
         },
@@ -694,9 +745,17 @@ export class Inventory extends Component {
                               <EuiFlexItem style={{ width: 700 }}>
                                 <EuiSpacer size="s" />
                                 <EuiText>
-                                  <b>Policy description:</b> {this.state.lookingPolicy.description}
+                                  <b>{
+  i18n.translate("components.agent.fim.ivv.lib.Policydescription", {
+    defaultMessage: "Policy description:",
+  });
+}</b> {this.state.lookingPolicy.description}
                                   <br></br>
-                                  <b>Policy checksum:</b> {this.state.lookingPolicy.hash_file}
+                                  <b>{
+  i18n.translate("components.agent.fim.ivv.lib.Policychecksum:", {
+    defaultMessage: "Policy checksum:",
+  });
+}</b> {this.state.lookingPolicy.hash_file}
                                 </EuiText>
                               </EuiFlexItem>
                             </EuiPopover>
@@ -708,16 +767,24 @@ export class Inventory extends Component {
                       <EuiButtonEmpty
                         iconType="importAction"
                         onClick={async () => await this.downloadCsv()}
-                      >
-                        Export formatted
+                      >{
+  i18n.translate("components.agent.fim.ivv.lib.Exportformatted", {
+    defaultMessage: "Export formatted",
+  });
+}
+                        
                       </EuiButtonEmpty>
                     </EuiFlexItem>
                     <EuiFlexItem grow={false}>
                       <EuiButtonEmpty
                         iconType="refresh"
                         onClick={() => this.loadScaPolicy(this.state.lookingPolicy)}
-                      >
-                        Refresh
+                      >{
+  i18n.translate("components.agent.fim.ivv.lib.emptyRefresh", {
+    defaultMessage: "Refresh",
+  });
+}
+                        
                       </EuiButtonEmpty>
                     </EuiFlexItem>
                   </EuiFlexGroup>
