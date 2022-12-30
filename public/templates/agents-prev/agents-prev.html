@@ -13,17 +13,21 @@
         <md-card-content class="wz-text-center">
           <span
             class="embPanel__header embPanel__title embPanel__dragger layout-row wz-headline-title"
+            i18n-id="templates.agent.agentPrev.errorFetchingAgent"
+            i18n-default-message="Error fetching agents"
           >
-            <react-component name="EuiIcon" props="{type: 'help'}"></react-component> Error fetching
-            agents
+            <react-component name="EuiIcon" props="{type: 'help'}"></react-component>
           </span>
           <md-divider class="wz-margin-top-10"></md-divider>
           <div layout="row" class="wz-margin-top-10 layout-align-center-center">
             <p class="wz-text-gray">{{ ctrl.errorInit || 'Internal error' }}</p>
           </div>
           <div layout="row" class="wz-margin-top-10 layout-align-center-center">
-            <button class="kuiButton kuiButton--secondary height-35" ng-click="ctrl.load()">
-              <react-component name="EuiIcon" props="{type: 'refresh'}"></react-component> Refresh
+            <button class="kuiButton kuiButton--secondary height-35" ng-click="ctrl.load()"
+              i18n-id="templates.agent.agentPrev.refresh"
+              i18n-default-message="Refresh"
+            >
+              <react-component name="EuiIcon" props="{type: 'refresh'}"></react-component>
             </button>
           </div>
         </md-card-content>

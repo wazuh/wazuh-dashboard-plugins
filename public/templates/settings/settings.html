@@ -86,8 +86,11 @@
                   class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
                 >
                   <div class="euiFlexItem">
-                    <h2 class="euiTitle euiTitle--medium">
-                      Welcome to the Wazuh app for {{ctrl.pluginPlatformName}} {{ctrl.pluginPlatformVersion}}
+                    <h2 class="euiTitle euiTitle--medium"
+                      i18n-id="templates.settings.welcomeMessage"
+                      i18n-default-message="Welcome to the Wazuh app for "
+                    >
+                      {{ctrl.pluginPlatformName}} {{ctrl.pluginPlatformVersion}}
                     </h2>
                   </div>
                 </div>
@@ -114,14 +117,20 @@
                   class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
                 >
                   <div class="euiFlexItem">
-                    <h2 class="euiTitle euiTitle--medium">Community</h2>
+                    <h2 class="euiTitle euiTitle--medium"
+                      i18n-id="templates.settings.community"
+                      i18n-default-message="Community"
+                    ></h2>
                   </div>
                 </div>
               </div>
             </div>
             <div class="euiSpacer euiSpacer--m"></div>
             <div class="euiText euiText--medium">
-              <p>Enjoy your Wazuh experience and please don't hesitate to give us your feedback.</p>
+              <p
+                i18n-id="templates.settings.feedback"
+                i18n-default-message="Enjoy your Wazuh experience and please don't hesitate to give us your feedback."
+              ></p>
             </div>
             <div class="euiSpacer euiSpacer--l"></div>
             <div layout="row" class="layout-align-center-center" flex>
