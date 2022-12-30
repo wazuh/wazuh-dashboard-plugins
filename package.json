@@ -3,6 +3,7 @@
   "version": "4.4.0",
   "revision": "00",
   "stage": "alpha",
+  "commit": "f4f8345",
   "pluginPlatform": {
     "version": "2.4.0"
   },
