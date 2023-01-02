@@ -11,11 +11,12 @@
  */
 
 import React from 'react';
+import { i18n } from '@kbn/i18n';
 import {
   EuiIcon,
 } from '@elastic/eui';
 import { getChrome, getHttp} from '../kibana-services';
-import { 
+import {
   WAZUH_LINK_GITHUB,
   WAZUH_LINK_GOOGLE_GROUPS,
   WAZUH_LINK_SLACK
@@ -30,23 +31,57 @@ export function addHelpMenuToAppChrome(){
       {
         linkType: 'custom',
         href: webDocumentationLink(''),
-        content: <span><EuiIcon type={getHttp().basePath.prepend(getThemeAssetURL('icon.svg'))}></EuiIcon> Documentation</span>
+        content: (
+          <span>
+            <EuiIcon
+              type={getHttp().basePath.prepend(getThemeAssetURL('icon.svg'))}
+            ></EuiIcon>
+            {i18n.translate('utils.helpMenu.documentation', {
+              defaultMessage: 'Documentation',
+            })}
+          </span>
+        ),
       },
       {
         linkType: 'custom',
         href: WAZUH_LINK_SLACK,
-        content: <span><EuiIcon type='logoSlack'></EuiIcon> Slack channel</span>
+        content: (
+          <span>
+            <EuiIcon type='logoSlack'></EuiIcon>
+            {i18n.translate('utils.helpMenu.slack_channel', {
+              defaultMessage: 'Slack channel',
+            })}
+          </span>
+        ),
       },
       {
         linkType: 'custom',
         href: WAZUH_LINK_GITHUB,
-        content: <span><EuiIcon type='logoGithub'></EuiIcon> Projects on Github</span>
+        content: (
+          <span>
+            <EuiIcon type='logoGithub'></EuiIcon>
+            {i18n.translate('utils.helpMenu.projectOnGithub', {
+              defaultMessage: 'Projects on Github',
+            })}
+          </span>
+        ),
       },
       {
         linkType: 'custom',
         href: WAZUH_LINK_GOOGLE_GROUPS,
-        content: <span><EuiIcon type={getHttp().basePath.prepend(getAssetURL('images/icons/google_groups.svg'))}></EuiIcon> Google Group</span>
-      }
-    ]
+        content: (
+          <span>
+            <EuiIcon
+              type={getHttp().basePath.prepend(
+                getAssetURL('images/icons/google_groups.svg'),
+              )}
+            ></EuiIcon>{' '}
+            { i18n.translate('utils.helpMenu.googleGroup', {
+              defaultMessage: 'Google Group',
+            })}
+          </span>
+        ),
+      },
+    ],
   });
 }

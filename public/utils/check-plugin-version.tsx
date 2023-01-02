@@ -19,6 +19,7 @@ import React from 'react';
 import { ReactNode } from 'x-pack/node_modules/@types/react';
 import { PLUGIN_PLATFORM_NAME } from '../../common/constants';
 import { webDocumentationLink } from '../../common/services/web_documentation';
+import { i18n } from '@kbn/i18n';
 
 type TAppInfo = {
   revision: string;
@@ -45,10 +46,22 @@ export const checkPluginVersion = async () => {
 
 const checkClientAppVersion = (appInfo: TAppInfo) => {
   if (appInfo['app-version'] !== appVersion || appInfo.revision !== appRevision) {
+    const wazuhVersionErrorDescription = i18n.translate(
+      'utils.checkPlugin.wazuhAppConflictDescription',
+      {
+        defaultMessage:
+          'The version of the Wazuh app in your browser does not correspond with the app version installed in . Please, clear your browser cache. For more info check the full error.',
+      },
+    );
     const toastOptions: ErrorToastOptions = {
-      title: 'Conflict with the Wazuh app version',
+      title: i18n.translate('utils.checkPlugin.wazuhAppConflictTitle', {
+        defaultMessage: 'Conflict with the Wazuh app version',
+      }),
       toastLifeTimeMs: 50000,
-      toastMessage: `The version of the Wazuh app in your browser does not correspond with the app version installed in ${PLUGIN_PLATFORM_NAME}. Please, clear your browser cache. For more info check the full error.`,
+      toastMessage: i18n.translate('utils.checkPlugin.wazuhAppConflictDescription', {
+        defaultMessage:
+          `The version of the Wazuh app in your browser does not correspond with the app version installed in ${PLUGIN_PLATFORM_NAME}. Please, clear your browser cache. For more info check the full error.`,
+      }),
     };
 
     const troubleshootingUrl = webDocumentationLink('user-manual/elasticsearch/troubleshooting.html');
@@ -56,22 +69,42 @@ const checkClientAppVersion = (appInfo: TAppInfo) => {
     const message: ReactNode = (
       <>
         <p>
-          The version of the Wazuh app in your browser{' '}
+          {' '}
+          {i18n.translate('utils.checkPlugin.wazuhAppVersion', {
+            defaultMessage: 'The version of the Wazuh app in your browser',
+          })}{' '}
           <b>
             {appVersion} - {appRevision}
           </b>{' '}
-          does not correspond with the app version installed in {PLUGIN_PLATFORM_NAME}{' '}
+          {i18n.translate('utils.checkPlugin.appVersionError', {
+            defaultMessage: `does not correspond with the app version installed in
+              ${PLUGIN_PLATFORM_NAME}`,
+          })}{' '}
           <b>
             {appInfo['app-version']} - {appInfo.revision}
           </b>
           .
         </p>
-        <p>Please, clear your browser cache following these steps.</p>
-        <p>If the error persists, restart {PLUGIN_PLATFORM_NAME} as well.</p>
         <p>
-          For more information check our troubleshooting section{' '}
-          <a href={troubleshootingUrl} target="_blank">
-            here.
+          {i18n.translate('utils.checkPlugin.cacheClearMsg', {
+            defaultMessage:
+              'Please, clear your browser cache following these steps.',
+          })}
+        </p>
+        <p>
+          {i18n.translate('utils.checkPlugin.restartPlugin', {
+            defaultMessage: `If the error persists, restart ${PLUGIN_PLATFORM_NAME} as well.`,
+          })}
+        </p>
+        <p>
+          {i18n.translate('utils.checkPlugin.troubleshootSection', {
+            defaultMessage:
+              'For more information check our troubleshooting section',
+          })}{' '}
+          <a href={troubleshootingUrl} target='_blank'>
+            { i18n.translate('utils.checkPlugin.troubleshootSectionLink', {
+              defaultMessage: 'here.',
+            })}
           </a>
         </p>
       </>
@@ -80,28 +113,32 @@ const checkClientAppVersion = (appInfo: TAppInfo) => {
     const error: Error = {
       name: '',
       message,
-      stack: ` Steps to clear cache:
+      stack: i18n.translate('utils.checkPlugin.stepsToClearCache', {
+        defaultMessage: ` Steps to clear cache:
 
-      1 - Open the Dev tools of your browser (Press F12).
-      2 - Go to the "Network" tab.
-      3 - Check the "Disable cache" option.
-      4 - Reload the page (Press F5).
+                1 - Open the Dev tools of your browser (Press F12).
+                2 - Go to the "Network" tab.
+                3 - Check the "Disable cache" option.
+                4 - Reload the page (Press F5).
 
-This message should not be displayed again.`,
+          This message should not be displayed again.`,
+      })
     };
 
-    const stackSafari = ` Steps to clear cache:
+    const stackSafari = i18n.translate('utils.checkPlugin.stepToClearCacheInSafari', {
+      defaultMessage: ` Steps to clear cache:
 
-      1 - Select the "Safari” menu, then choose "Preferences".
-      2 - Select the "Advanced” tab and check the "Show Develop menu in menu bar” option.
-      3 - Close the Preferences window.
-      4 - If you don’t have the Menu Bar enabled, select the settings gear, then choose "Show Menu Bar".
-      5 - Open "Develop" > "Show Web Inspector".
-      6 - Go to the "Network" tab.
-      7 - Check the "Ignore cache when loading resources" option.
-      8 - Reload the page.
+            1 - Select the "Safari” menu, then choose "Preferences".
+            2 - Select the "Advanced” tab and check the "Show Develop menu in menu bar” option.
+            3 - Close the Preferences window.
+            4 - If you don’t have the Menu Bar enabled, select the settings gear, then choose "Show Menu Bar".
+            5 - Open "Develop" > "Show Web Inspector".
+            6 - Go to the "Network" tab.
+            7 - Check the "Ignore cache when loading resources" option.
+            8 - Reload the page.
 
-This message should not be displayed again.`;
+      This message should not be displayed again.`,
+    })
 
     const isSafari =
       navigator.vendor &&
