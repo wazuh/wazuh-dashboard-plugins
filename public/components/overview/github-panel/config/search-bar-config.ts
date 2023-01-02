@@ -12,26 +12,39 @@
  *   express or implied. See the License for the specific language governing
  *   permissions and limitations under the License.
  */
+import { i18n } from '@kbn/i18n';
 
+const title1 = i18n.translate('components.addModule.guide.title1', {
+  defaultMessage: 'Actor',
+});
+const title2 = i18n.translate('components.addModule.guide.title2', {
+  defaultMessage: 'Organization',
+});
+const title3 = i18n.translate('components.addModule.guide.title3', {
+  defaultMessage: 'Repository',
+});
+const title4 = i18n.translate('components.addModule.guide.title4', {
+  defaultMessage: 'Action',
+});
 export const filtersValues = [
   {
     type: 'multiSelect',
     key: 'data.github.actor',
-    placeholder: 'Actor',
+    placeholder: title1,
   },
   {
     type: 'multiSelect',
     key: 'data.github.org',
-    placeholder: 'Organization',
+    placeholder: title2,
   },
   {
     type: 'multiSelect',
     key: 'data.github.repo',
-    placeholder: 'Repository',
+    placeholder: title3,
   },
   {
     type: 'multiSelect',
     key: 'data.github.action',
-    placeholder: 'Action',
+    placeholder: title4,
   },
 ];

@@ -27,7 +27,15 @@ import { getToasts }  from '../../../../../kibana-services';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
+import { i18n } from "@kbn/i18n";
 
+
+const Title1 = i18n.translate("components.addModule.guide.Title1", {
+  defaultMessage: "Mitre alerts could not be fetched",
+});
+const Title2 = i18n.translate("components.addModule.guide.Title2", {
+  defaultMessage: "Options",
+});
 export class Tactics extends Component {
   _isMount = false;
   state: {
@@ -141,7 +149,7 @@ export class Tactics extends Component {
         error: {
           error: error,
           message: error.message || error,
-          title: `Mitre alerts could not be fetched`,
+          title: Title1,
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -243,7 +251,7 @@ export class Tactics extends Component {
     const panels = [
       {
         id: 0,
-        title: 'Options',
+        title: Title2,
         items: [
           {
             name: 'Select all',
@@ -269,7 +277,11 @@ export class Tactics extends Component {
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiTitle size="m">
-              <h1>Tactics</h1>
+              <h1>{
+  i18n.translate("components.agent.fim.ivv.lib.Tactics", {
+    defaultMessage: "Tactics",
+  });
+}</h1>
             </EuiTitle>
           </EuiFlexItem>
 

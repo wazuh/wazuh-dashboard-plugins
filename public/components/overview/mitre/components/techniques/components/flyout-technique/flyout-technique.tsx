@@ -45,7 +45,22 @@ import { UI_LOGGER_LEVELS } from '../../../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../../../react-services/common-services';
 import { WzFlyout } from '../../../../../../../components/common/flyouts';
+import { i18n } from "@kbn/i18n";
 
+
+
+const Title1 = i18n.translate("components.addModule.guide.Title1", {
+  defaultMessage: "Error obtaining the requested technique",
+});
+const Title2 = i18n.translate("components.addModule.guide.Title2", {
+  defaultMessage: "ID",
+});
+const Title3 = i18n.translate("components.addModule.guide.Title3", {
+  defaultMessage: "Tactics",
+});
+const Title4 = i18n.translate("components.addModule.guide.Title4", {
+  defaultMessage: "Version",
+});
 export class FlyoutTechnique extends Component {
   _isMount = false;
   clusterFilter: object;
@@ -156,7 +171,7 @@ export class FlyoutTechnique extends Component {
         error: {
           error: error,
           message: error.message || error,
-          title: `Error obtaining the requested technique`,
+          title: Title1,
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -200,7 +215,7 @@ export class FlyoutTechnique extends Component {
     );
     const data = [
       {
-        title: 'ID',
+        title: Title2,
         description: (
           <EuiToolTip
             position="top"
@@ -218,7 +233,7 @@ export class FlyoutTechnique extends Component {
         ),
       },
       {
-        title: 'Tactics',
+        title: Title3,
         description: techniqueData.tactics
           ? techniqueData.tactics.map((tactic) => {
               return (
@@ -243,7 +258,7 @@ export class FlyoutTechnique extends Component {
           : '',
       },
       {
-        title: 'Version',
+        title: Title4,
         description: techniqueData.mitre_version,
       },
     ];
@@ -253,7 +268,11 @@ export class FlyoutTechnique extends Component {
           id={'details'}
           buttonContent={
             <EuiTitle size="s">
-              <h3>Technique details</h3>
+              <h3>{
+  i18n.translate("components.agent.fim.ivv.lib.Techniquedetails", {
+    defaultMessage: "Technique details",
+  });
+}</h3>
             </EuiTitle>
           }
           paddingSize="none"
@@ -280,13 +299,21 @@ export class FlyoutTechnique extends Component {
           className="events-accordion"
           extraAction={
             <div style={{ marginBottom: 5 }}>
-              <strong>{this.state.totalHits || 0}</strong> hits
+              <strong>{this.state.totalHits || 0}</strong> {
+  i18n.translate("components.agent.fim.ivv.lib.hits", {
+    defaultMessage: "hits",
+  });
+}
             </div>
           }
           buttonContent={
             <EuiTitle size="s">
-              <h3>
-                Recent events
+              <h3>{
+  i18n.translate("components.agent.fim.ivv.lib.Recentevents", {
+    defaultMessage: "Recent events",
+  });
+}
+                
                 {this.props.view !== 'events' && (
                   <span style={{ marginLeft: 16 }}>
                     <span>

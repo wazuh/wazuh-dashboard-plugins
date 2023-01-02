@@ -23,11 +23,14 @@ import {
 } from '@elastic/eui';
 
 import { withGuard } from '../../../components/common/hocs';
+import { i18n } from '@kbn/i18n';
 
 const LoadingProgress = () => (
   <EuiProgress color='primary' size='s'/>
 );
-
+const Title1 = i18n.translate("components.addModule.guide.title1", {
+  defaultMessage: "No results found",
+});
 export const ModuleMitreAttackIntelligenceAllResourcesSearchResults = withGuard(({loading}) => loading, LoadingProgress)(({ results, onSelectResource }) => {
   const thereAreResults = results && results.length > 0;
   return thereAreResults
@@ -39,8 +42,12 @@ export const ModuleMitreAttackIntelligenceAllResourcesSearchResults = withGuard(
       extraAction={item.loadMoreResults ? <EuiButton
         onClick={item.loadMoreResults}
         size='s'
-      >
-        See more results
+      >{
+  i18n.translate("components.overview.mitre.Seemoreresults", {
+    defaultMessage: "See more results",
+  });
+}
+        
       </EuiButton> : undefined}
       buttonContent={<span>{item.name} ({item.totalResults})</span>}
       paddingSize='none'
@@ -57,7 +64,7 @@ export const ModuleMitreAttackIntelligenceAllResourcesSearchResults = withGuard(
     </EuiAccordion>
   ), []).reduce((accum, cur) => [accum, <EuiSpacer size='m'/>, cur])
   :  <EuiCallOut
-        title='No results found'
+        title={Title1}
         color='warning'
       />
 });

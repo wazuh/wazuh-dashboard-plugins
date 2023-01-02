@@ -24,6 +24,7 @@ import { PoliciesTable } from './policies-table';
 import { WzRequest } from '../../../react-services/wz-request';
 import { EditPolicyFlyout } from './edit-policy';
 import { CreatePolicyFlyout } from './create-policy';
+import { i18n } from '@kbn/i18n';
 
 
 export const Policies = () => {
@@ -164,7 +165,11 @@ export const Policies = () => {
       <EuiPageContentHeader>
         <EuiPageContentHeaderSection>
           <EuiTitle>
-            <h2>Policies</h2>
+            <h2>{
+  i18n.translate("components.overview.mitre.Policies", {
+    defaultMessage: "Policies",
+  });
+}</h2>
           </EuiTitle>
         </EuiPageContentHeaderSection>
         <EuiPageContentHeaderSection>
@@ -174,7 +179,12 @@ export const Policies = () => {
           <div>
             <EuiButton
               onClick={() => setIsCreatingPolicy(true)}>
-              Create policy
+                {
+  i18n.translate("components.overview.mitre.Createpolicy", {
+    defaultMessage: "Create policy",
+  });
+}
+              
             </EuiButton>
             {flyout}
             {editFlyout}

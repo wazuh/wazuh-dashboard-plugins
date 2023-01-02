@@ -37,10 +37,31 @@ import { WzFieldSearchDelay } from '../../../../common/search';
 import { getDataPlugin, getToasts } from '../../../../../kibana-services';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
+import { i18n } from "@kbn/i18n";
+
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 
 const MITRE_ATTACK = 'mitre-attack';
+const Title1 = i18n.translate("components.addModule.guide.title1", {
+  defaultMessage: "Actions",
+});
+const Title2 = i18n.translate("components.addModule.guide.title2", {
+  defaultMessage: "Mitre techniques could not be fetched",
+});
+const Title3 = i18n.translate("components.addModule.guide.title3", {
+  defaultMessage: "There are no results.",
+});
 
+
+const Name1 = i18n.translate("components.addModule.guide.Name1", {
+  defaultMessage: "Filter for value",
+});
+const Name2 = i18n.translate("components.addModule.guide.Name2", {
+  defaultMessage: "Filter out value",
+});
+const Name3 = i18n.translate("components.addModule.guide.Name3", {
+  defaultMessage: "View technique details",
+});
 export const Techniques = withWindowSize(
   class Techniques extends Component {
     _isMount = false;
@@ -159,27 +180,35 @@ export const Techniques = withWindowSize(
       return [
         {
           id: 0,
-          title: 'Actions',
+          title: Title1,
           items: [
             {
-              name: 'Filter for value',
-              icon: <EuiIcon type="magnifyWithPlus" size="m" />,
+              name: Name1,
+              icon: <EuiIcon type='magnifyWithPlus' size='m' />,
               onClick: () => {
                 this.closeActionsMenu();
-                this.addFilter({ key: 'rule.mitre.id', value: techniqueID, negate: false });
+                this.addFilter({
+                  key: 'rule.mitre.id',
+                  value: techniqueID,
+                  negate: false,
+                });
               },
             },
             {
-              name: 'Filter out value',
-              icon: <EuiIcon type="magnifyWithMinus" size="m" />,
+              name: Name2,
+              icon: <EuiIcon type='magnifyWithMinus' size='m' />,
               onClick: () => {
                 this.closeActionsMenu();
-                this.addFilter({ key: 'rule.mitre.id', value: techniqueID, negate: true });
+                this.addFilter({
+                  key: 'rule.mitre.id',
+                  value: techniqueID,
+                  negate: true,
+                });
               },
             },
             {
-              name: 'View technique details',
-              icon: <EuiIcon type="filebeatApp" size="m" />,
+              name: Name3,
+              icon: <EuiIcon type='filebeatApp' size='m' />,
               onClick: () => {
                 this.closeActionsMenu();
                 this.showFlyout(techniqueID);
@@ -211,7 +240,7 @@ export const Techniques = withWindowSize(
           error: {
             error: error,
             message: error.message || error,
-            title: `Mitre techniques could not be fetched`,
+            title: Title2,
           },
         };
         getErrorOrchestrator().handleError(options);
@@ -400,7 +429,7 @@ export const Techniques = withWindowSize(
         );
       } else {
         return (
-          <EuiCallOut title="There are no results." iconType="help" color="warning"></EuiCallOut>
+          <EuiCallOut title={Title3} iconType="help" color="warning"></EuiCallOut>
         );
       }
     }
@@ -508,7 +537,11 @@ export const Techniques = withWindowSize(
           <EuiFlexGroup>
             <EuiFlexItem grow={true}>
               <EuiTitle size="m">
-                <h1>Techniques</h1>
+                <h1>{
+  i18n.translate("components.overview.Techniques", {
+    defaultMessage: "Techniques",
+  });
+}</h1>
               </EuiTitle>
             </EuiFlexItem>
 
@@ -516,7 +549,11 @@ export const Techniques = withWindowSize(
               <EuiFlexGroup>
                 <EuiFlexItem grow={false}>
                   <EuiText grow={false}>
-                    <span>Hide techniques with no alerts </span> &nbsp;
+                    <span>{
+  i18n.translate("components.overview.Hidetechniques.alerts", {
+    defaultMessage: "Hide techniques with no alerts",
+  });
+} </span> &nbsp;
                     <EuiSwitch
                       label=""
                       checked={this.state.hideAlerts}

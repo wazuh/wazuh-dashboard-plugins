@@ -25,7 +25,16 @@ import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { WzFlyout } from '../../common/flyouts';
-
+import { i18n } from '@kbn/i18n';
+const Descp1 = i18n.translate("components.addModule.guide.Descp1", {
+  defaultMessage: "At least one policy must be selected.",
+});
+const Descp2 = i18n.translate("components.addModule.guide.Descp2", {
+  defaultMessage: "Assign policies to the role.",
+});
+const Descp3 = i18n.translate("components.addModule.guide.Descp3", {
+  defaultMessage: "Select policies",
+});
 const reservedRoles = [
   'administrator',
   'readonly',
@@ -149,7 +158,11 @@ export const EditRole = ({ role, closeFlyout }) => {
           confirmButtonText="Yes, do it"
         >
           <p style={{ textAlign: 'center' }}>
-            There are unsaved changes. Are you sure you want to proceed?
+            {
+  i18n.translate("components.overview.role.sure", {
+    defaultMessage: "There are unsaved changes. Are you sure you want to proceed?",
+  });
+}
           </p>
         </EuiConfirmModal>
       </EuiOverlayMask>
@@ -168,8 +181,20 @@ export const EditRole = ({ role, closeFlyout }) => {
         <EuiFlyoutHeader hasBorder={false}>
           <EuiTitle size="m">
             <h2>
-              Edit {role.name} role &nbsp;
-              {isReserved && <EuiBadge color="primary">Reserved</EuiBadge>}
+              {
+  i18n.translate("components.overview.role.Edit", {
+    defaultMessage: "Edit",
+  });
+} {role.name} {
+  i18n.translate("components.overview.rolerole", {
+    defaultMessage: "role",
+  });
+} &nbsp;
+              {isReserved && <EuiBadge color="primary">{
+  i18n.translate("components.overview.rolerole.Reserved", {
+    defaultMessage: "Reserved",
+  });
+}</EuiBadge>}
             </h2>
           </EuiTitle>
         </EuiFlyoutHeader>
@@ -180,11 +205,11 @@ export const EditRole = ({ role, closeFlyout }) => {
                 <EuiFormRow
                   label="Policies"
                   isInvalid={selectedPoliciesError}
-                  error={'At least one policy must be selected.'}
-                  helpText="Assign policies to the role."
+                  error={ Descp1}
+                  helpText={Descp2}
                 >
                   <EuiComboBox
-                    placeholder="Select policies"
+                    placeholder={Descp3}
                     options={policies}
                     isDisabled={isReserved}
                     selectedOptions={selectedPolicies}
@@ -201,7 +226,11 @@ export const EditRole = ({ role, closeFlyout }) => {
                   fill
                   onClick={addPolicy}
                 >
-                  Add policy
+                  {
+  i18n.translate("components.overview.role.Addpolicy", {
+    defaultMessage: "Add policy",
+  });
+}
                 </EuiButton>
               </EuiFlexItem>
             </EuiFlexGroup>

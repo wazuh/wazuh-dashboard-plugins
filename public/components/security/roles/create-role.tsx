@@ -19,7 +19,24 @@ import { WzRequest } from '../../../react-services/wz-request';
 import { ErrorHandler } from '../../../react-services/error-handler';
 import { WzOverlayMask } from '../../common/util';
 import { WzFlyout } from '../../common/flyouts';
+import { i18n } from "@kbn/i18n";
 
+
+const Error1 = i18n.translate("components.addModule.guide.Error1", {
+  defaultMessage: "Please provide a role name",
+});
+const Error2 = i18n.translate("components.addModule.guide.Error2", {
+  defaultMessage: "At least one policy must be selected.",
+});
+const helpText1 = i18n.translate("components.addModule.guide.helpText1", {
+  defaultMessage: "Introduce a name for this new role.",
+});
+const helpText2 = i18n.translate("components.addModule.guide.helpText2", {
+  defaultMessage: "Assign policies to the role.",
+});
+const Descp1 = i18n.translate("components.addModule.guide.Descp1", {
+  defaultMessage: "Select policies",
+});
 export const CreateRole = ({ closeFlyout }) => {
   const [policies, setPolicies] = useState([]);
   const [roleName, setRoleName] = useState('');
@@ -115,7 +132,11 @@ export const CreateRole = ({ closeFlyout }) => {
           confirmButtonText="Yes, do it"
         >
           <p style={{ textAlign: 'center' }}>
-            There are unsaved changes. Are you sure you want to proceed?
+            {
+  i18n.translate("components.overview.unsaved", {
+    defaultMessage: "There are unsaved changes. Are you sure you want to proceed?",
+  });
+}
           </p>
         </EuiConfirmModal>
       </EuiOverlayMask>
@@ -139,7 +160,11 @@ export const CreateRole = ({ closeFlyout }) => {
       <WzFlyout flyoutProps={{ className: 'wzApp' }} onClose={onClose}>
         <EuiFlyoutHeader hasBorder={false}>
           <EuiTitle size="m">
-            <h2>New role</h2>
+            <h2>{
+  i18n.translate("components.overview.Newrole", {
+    defaultMessage: "New role",
+  });
+}</h2>
           </EuiTitle>
         </EuiFlyoutHeader>
         <EuiFlyoutBody>
@@ -147,8 +172,8 @@ export const CreateRole = ({ closeFlyout }) => {
             <EuiFormRow
               label="Role name"
               isInvalid={roleNameError}
-              error={'Please provide a role name'}
-              helpText="Introduce a name for this new role."
+              error={Error1}
+              helpText={helpText1}
             >
               <EuiFieldText
                 placeholder=""
@@ -160,11 +185,11 @@ export const CreateRole = ({ closeFlyout }) => {
             <EuiFormRow
               label="Policies"
               isInvalid={selectedPoliciesError}
-              error={'At least one policy must be selected.'}
-              helpText="Assign policies to the role."
+              error={Error2}
+              helpText={helpText2}
             >
               <EuiComboBox
-                placeholder="Select policies"
+                placeholder={Descp1}
                 options={policies}
                 selectedOptions={selectedPolicies}
                 onChange={onChangePolicies}
@@ -174,7 +199,11 @@ export const CreateRole = ({ closeFlyout }) => {
             </EuiFormRow>
             <EuiSpacer />
             <EuiButton fill onClick={createUser}>
-              Create role
+              {
+  i18n.translate("components.overview.Createrole", {
+    defaultMessage: "Create role",
+  });
+}
             </EuiButton>
           </EuiForm>
         </EuiFlyoutBody>

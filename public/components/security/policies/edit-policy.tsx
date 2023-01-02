@@ -26,8 +26,24 @@ import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import _ from 'lodash';
-import { WzFlyout } from '../../common/flyouts';
+import { i18n } from "@kbn/i18n";
 
+import { WzFlyout } from '../../common/flyouts';
+const Title1 = i18n.translate("components.addModule.guide.Title1", {
+  defaultMessage: "Remove",
+});
+const Title2 = i18n.translate("components.addModule.guide.Title2", {
+  defaultMessage: "Resources",
+});
+const Title3 = i18n.translate("components.addModule.guide.Title3", {
+  defaultMessage: "Unsubmitted changes",
+});
+const Descp1 = i18n.translate("components.addModule.guide.Descp1", {
+  defaultMessage: "Remove this action",
+});
+const Descp2 = i18n.translate("components.addModule.guide.Descp2", {
+  defaultMessage: "Remove this resource",
+});
 export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
   const isReserved = WzAPIUtils.isReservedID(policy.id);
   const [actionValue, setActionValue] = useState('');
@@ -202,8 +218,8 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
       name: '',
       actions: [
         {
-          name: 'Remove',
-          description: 'Remove this action',
+          name: Title1,
+          description: Descp1,
           type: 'icon',
           enabled: () => !isReserved,
           color: 'danger',
@@ -217,7 +233,7 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
   const resources_columns = [
     {
       field: 'resource',
-      name: 'Resources',
+      name: Title2,
       sortable: true,
       truncateText: true,
     },
@@ -225,13 +241,13 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
       name: '',
       actions: [
         {
-          name: 'Remove',
-          description: 'Remove this resource',
+          name: Title1,
+          description: Descp2,
           type: 'icon',
           color: 'danger',
           enabled: () => !isReserved,
           icon: 'trash',
-          onClick: (resource) => removeResource(resource),
+          onClick: resource => removeResource(resource),
         },
       ],
     },
@@ -273,7 +289,7 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
     modal = (
       <EuiOverlayMask>
         <EuiConfirmModal
-          title="Unsubmitted changes"
+          title={Title3}
           onConfirm={() => {
             setIsModalVisible(false);
             closeFlyout(false);
@@ -282,8 +298,12 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
           cancelButtonText="No, don't do it"
           confirmButtonText="Yes, do it"
         >
-          <p style={{ textAlign: 'center' }}>
-            There are unsaved changes. Are you sure you want to proceed?
+          <p style={{ textAlign: 'center' }}>{
+  i18n.translate("components.overview.edit.proceed", {
+    defaultMessage: "There are unsaved changes. Are you sure you want to proceed?",
+  });
+}
+            
           </p>
         </EuiConfirmModal>
       </EuiOverlayMask>
@@ -312,7 +332,11 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
       <WzFlyout flyoutProps={{ className: 'wzApp' }} onClose={onClose}>
         <EuiFlyoutHeader hasBorder={false}>
           <EuiTitle size="m">
-            <h2>
+            <h2>{
+  i18n.translate("components.overview.edit.Editpolicy", {
+    defaultMessage: "Edit policy",
+  });
+}
               Edit policy {policy.name}&nbsp;&nbsp;
               {isReserved && <EuiBadge color="primary">Reserved</EuiBadge>}
             </h2>
@@ -354,8 +378,12 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
                     onClick={() => addAction()}
                     iconType="plusInCircle"
                     disabled={!actionValue || isReserved}
-                  >
-                    Add
+                  >{
+  i18n.translate("components.overview.edit.proceed.Add", {
+    defaultMessage: "Add",
+  });
+}
+                    
                   </EuiButton>
                 </EuiFormRow>
               </EuiFlexItem>
@@ -406,8 +434,12 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
                     onClick={() => addResource()}
                     iconType="plusInCircle"
                     disabled={!resourceIdentifierValue || isReserved}
-                  >
-                    Add
+                  >{
+  i18n.translate("components.overview.edit.Add", {
+    defaultMessage: "Add",
+  });
+}
+                    
                   </EuiButton>
                 </EuiFormRow>
               </EuiFlexItem>
@@ -432,7 +464,11 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
             </EuiFormRow>
             <EuiSpacer />
             <EuiButton disabled={isReserved} onClick={updatePolicy} fill>
-              Apply
+             {
+  i18n.translate("components.overview.edit.Apply", {
+    defaultMessage: "Apply",
+  });
+} 
             </EuiButton>
           </EuiForm>
         </EuiFlyoutBody>

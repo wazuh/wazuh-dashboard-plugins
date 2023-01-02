@@ -12,67 +12,86 @@
 
 import React from 'react';
 import { AggTable } from '../../../common/modules/panel';
-import {
-  EuiFlexItem 
-} from '@elastic/eui';
+import { EuiFlexItem } from '@elastic/eui';
+import { i18n } from '@kbn/i18n';
 
+const title1 = i18n.translate('components.addModule.guide.title1', {
+  defaultMessage: 'Actors',
+});
+const title2 = i18n.translate('components.addModule.guide.title2', {
+  defaultMessage: 'Organizations',
+});
+const title3 = i18n.translate('components.addModule.guide.title3', {
+  defaultMessage: 'Repositories',
+});
+const title4 = i18n.translate('components.addModule.guide.title4', {
+  defaultMessage: 'Actions',
+});
 export const MainViewConfig = {
   rows: [
     {
       columns: [
         {
           width: 50,
-          component: (props) => (
+          component: props => (
             <EuiFlexItem grow={props.width}>
               <AggTable
-                tableTitle='Actors'
+                tableTitle={title1}
                 aggTerm='data.github.actor'
                 aggLabel='Actor'
-                maxRows={5} 
-                onRowClick={props.onRowClick} />
-            </EuiFlexItem>)
+                maxRows={5}
+                onRowClick={props.onRowClick}
+              />
+            </EuiFlexItem>
+          ),
         },
         {
           width: 50,
-          component: (props) => (
+          component: props => (
             <EuiFlexItem grow={props.width}>
               <AggTable
-                tableTitle='Organizations'
+                tableTitle={title2}
                 aggTerm='data.github.org'
                 aggLabel='Organization'
-                maxRows={5} 
-                onRowClick={props.onRowClick} />
-            </EuiFlexItem>)
-        }
-      ]
+                maxRows={5}
+                onRowClick={props.onRowClick}
+              />
+            </EuiFlexItem>
+          ),
+        },
+      ],
     },
     {
       columns: [
         {
           width: 50,
-          component: (props) => (
+          component: props => (
             <EuiFlexItem grow={props.width}>
               <AggTable
-                tableTitle='Repositories'
+                tableTitle={title3}
                 aggTerm='data.github.repo'
                 aggLabel='Repository'
-                maxRows={5} 
-                onRowClick={props.onRowClick} />
-            </EuiFlexItem>)
+                maxRows={5}
+                onRowClick={props.onRowClick}
+              />
+            </EuiFlexItem>
+          ),
         },
         {
           width: 50,
-          component: (props) => (
+          component: props => (
             <EuiFlexItem grow={props.width}>
               <AggTable
-                tableTitle='Actions'
+                tableTitle={title4}
                 aggTerm='data.github.action'
                 aggLabel='Action'
-                maxRows={5} 
-                onRowClick={props.onRowClick} />
-            </EuiFlexItem>)
-        } 
-      ]
-    }
-  ]
+                maxRows={5}
+                onRowClick={props.onRowClick}
+              />
+            </EuiFlexItem>
+          ),
+        },
+      ],
+    },
+  ],
 };

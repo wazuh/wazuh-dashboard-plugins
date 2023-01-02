@@ -86,7 +86,12 @@ const renderOSIcon = os => (
     aria-hidden='true'
   />
 );
-
+const title1 = i18n.translate('components.addModule.guide.title1', {
+  defaultMessage: 'The guide was restarted',
+});
+const title2 = i18n.translate('components.addModule.guide.title2', {
+  defaultMessage: 'Warning',
+});
 class WzModuleGuide extends Component {
   constructor(props) {
     super(props);
@@ -197,7 +202,7 @@ class WzModuleGuide extends Component {
   resetGuideWithNotification = () => {
     this.resetGuide(true);
     this.addToast({
-      title: 'The guide was restarted',
+      title: title1,
       color: 'success',
     });
   };
@@ -1124,7 +1129,7 @@ class WzModuleGuide extends Component {
                   <EuiFlexGroup>
                     <EuiFlexItem>
                       <EuiCallOut
-                        title='Warning'
+                        title={title2}
                         color='warning'
                         iconType='alert'
                       >
