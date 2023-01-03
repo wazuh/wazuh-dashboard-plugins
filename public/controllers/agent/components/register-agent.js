@@ -1634,57 +1634,6 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
         },
       ];
 
-      const buttonGroupArchitectures =  (legend, options, idSelected, onChange) => {
-        console.log('architecthure: ', this.state.architecture, options, idSelected);
-
-
-        if(options.length === 1){
-          idSelected = options[0].id
-        }
-          
-        const handleOnChange = (value) => {
-          console.log('on change', value);
-          onChange(value)
-        }
-
-        return (
-          <EuiButtonGroup
-            color='primary'
-            legend={legend}
-            options={options}
-            idSelected={idSelected}
-            onChange={handleOnChange}
-            className={'wz-flex'}
-          />
-        );
-      }
-
-      const buttonGroup = (legend, options, idSelected, onChange) => {
-        return (
-          <EuiButtonGroup
-            color='primary'
-            legend={legend}
-            options={options}
-            idSelected={idSelected}
-            onChange={onChange}
-            className={'osButtonsStyle'}
-          />
-        );
-      };
-
-      const selectedVersionMac = (legend, options, idSelected, onChange) => {
-        return (
-          <EuiButtonGroup
-            color='primary'
-            legend={legend}
-            options={options}
-            idSelected={idSelected}
-            onChange={onChange}
-            className={'osButtonsStyleMac'}
-          />
-        );
-      };
-
       const onChangeServerAddress = async selectedNodes => {
         if (selectedNodes.length === 0) {
           this.setState({
