@@ -158,42 +158,42 @@ export class Inventory extends Component {
             {item.file ? (
               <span>
                 <b>{
-  i18n.translate("components.agent.fim.ivv.lib.File", {
-    defaultMessage: "File:",
-  });
-}</b> {item.file}
+                  i18n.translate("components.agent.fim.ivv.lib.File", {
+                    defaultMessage: "File:",
+                  })}
+                  </b> {item.file}
               </span>
             ) : item.directory ? (
               <span>
                 <b>{
-  i18n.translate("components.agent.fim.ivv.lib.Directory", {
-    defaultMessage: "Directory:",
-  });
-}</b> {item.directory}
+                  i18n.translate("components.agent.fim.ivv.lib.Directory", {
+                    defaultMessage: "Directory:",
+                  })}
+                </b> {item.directory}
               </span>
             ) : item.process ? (
               <span>
                 <b>{
-  i18n.translate("components.agent.fim.ivv.lib.Process", {
-    defaultMessage: "Process:",
-  });
-} </b> {item.process}
+                  i18n.translate("components.agent.fim.ivv.lib.Process", {
+                    defaultMessage: "Process:",
+                  })}
+                </b> {item.process}
               </span>
             ) : item.command ? (
               <span>
                 <b>{
-  i18n.translate("components.agent.fim.ivv.lib.Command", {
-    defaultMessage: "Command:",
-  });
-} </b> {item.command}
+                  i18n.translate("components.agent.fim.ivv.lib.Command", {
+                    defaultMessage: "Command:",
+                  })}
+                </b> {item.command}
               </span>
             ) : item.registry ? (
               <span>
                 <b>{
-  i18n.translate("components.agent.fim.ivv.lib.Registry", {
-    defaultMessage: "Registry:",
-  });
-} </b> {item.registry}
+                  i18n.translate("components.agent.fim.ivv.lib.Registry", {
+                    defaultMessage: "Registry:",
+                  })}
+                </b> {item.registry}
               </span>
             ) : (
               '-'
@@ -772,7 +772,7 @@ export class Inventory extends Component {
     defaultMessage: "Export formatted",
   });
 }
-                        
+
                       </EuiButtonEmpty>
                     </EuiFlexItem>
                     <EuiFlexItem grow={false}>
@@ -784,7 +784,7 @@ export class Inventory extends Component {
     defaultMessage: "Refresh",
   });
 }
-                        
+
                       </EuiButtonEmpty>
                     </EuiFlexItem>
                   </EuiFlexGroup>

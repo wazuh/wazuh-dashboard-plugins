@@ -12,7 +12,7 @@
  */
 
 import React, {useCallback, useState} from 'react';
-import { 
+import {
   EuiTitle,
   EuiSpacer
 } from '@elastic/eui';
@@ -34,12 +34,11 @@ export const ModuleMitreAttackIntelligenceAllResources = ({ results, loading }) 
   return (
     <>
       <EuiTitle><h1>{
-  i18n.translate("components.overview.mitre.Searchresults", {
-    defaultMessage: "Search results",
-  });
-}</h1></EuiTitle>
+        i18n.translate("components.overview.mitre.Searchresults", {
+          defaultMessage: "Search results",
+        })}</h1></EuiTitle>
       <EuiSpacer />
-      <ModuleMitreAttackIntelligenceAllResourcesSearchResults results={results} loading={loading} onSelectResource={selectResource}/> 
+      <ModuleMitreAttackIntelligenceAllResourcesSearchResults results={results} loading={loading} onSelectResource={selectResource}/>
 
       {details && (
         <ModuleMitreAttackIntelligenceFlyout

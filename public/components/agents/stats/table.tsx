@@ -44,15 +44,13 @@ export function AgentStatTable({ columns, title, start, end, loading, items, exp
         <EuiFlexItem grow={false}>
           <EuiText>
             <EuiIcon type="calendar" /> {
-  i18n.translate("components.agent.fim.ivv.lib.Start", {
-    defaultMessage: "Start:",
-  });
-}{' '}
+              i18n.translate("components.agent.fim.ivv.lib.Start", {
+                defaultMessage: "Start:",
+              })}{' '}
             {loading ? <EuiLoadingSpinner size="s" /> : start ? formatUIDate(start) : '-'} - {
-  i18n.translate("components.agent.fim.ivv.lib.End", {
-    defaultMessage: "End:",
-  });
-}{' '}
+              i18n.translate("components.agent.fim.ivv.lib.End", {
+                defaultMessage: "End:",
+              })}{' '}
             {loading ? <EuiLoadingSpinner size="s" /> : end ? formatUIDate(end) : '-'}
           </EuiText>
         </EuiFlexItem>
@@ -67,11 +65,10 @@ export function AgentStatTable({ columns, title, start, end, loading, items, exp
             iconType="importAction"
             isDisabled={loading}
           >{
-  i18n.translate("components.agent.fim.ivv.lib.DownloadCSV", {
-    defaultMessage: "Download CSV",
-  });
-}
-            
+            i18n.translate("components.agent.fim.ivv.lib.DownloadCSV", {
+              defaultMessage: "Download CSV",
+            })}
+
           </EuiButtonEmpty>
         </EuiFlexItem>
       </EuiFlexGroup>

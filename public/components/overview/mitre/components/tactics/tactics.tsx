@@ -278,10 +278,10 @@ export class Tactics extends Component {
           <EuiFlexItem>
             <EuiTitle size="m">
               <h1>{
-  i18n.translate("components.agent.fim.ivv.lib.Tactics", {
-    defaultMessage: "Tactics",
-  });
-}</h1>
+                i18n.translate("components.agent.fim.ivv.lib.Tactics", {
+                  defaultMessage: "Tactics",
+                })}
+              </h1>
             </EuiTitle>
           </EuiFlexItem>
 

@@ -140,7 +140,7 @@ export const Policies = () => {
     setIsEditingPolicy(false);
     await getPolicies();
   };
-  
+
   const closeCreatingFlyout = async () => {
     setIsCreatingPolicy(false);
     await getPolicies();
@@ -166,29 +166,28 @@ export const Policies = () => {
         <EuiPageContentHeaderSection>
           <EuiTitle>
             <h2>{
-  i18n.translate("components.overview.mitre.Policies", {
-    defaultMessage: "Policies",
-  });
-}</h2>
+              i18n.translate("components.overview.mitre.Policies", {
+                defaultMessage: "Policies",
+              })}
+            </h2>
           </EuiTitle>
         </EuiPageContentHeaderSection>
         <EuiPageContentHeaderSection>
-         { 
+         {
           !loading
           &&
           <div>
             <EuiButton
               onClick={() => setIsCreatingPolicy(true)}>
                 {
-  i18n.translate("components.overview.mitre.Createpolicy", {
-    defaultMessage: "Create policy",
-  });
-}
-              
+                  i18n.translate("components.overview.mitre.Createpolicy", {
+                    defaultMessage: "Create policy",
+                  })
+                }
             </EuiButton>
             {flyout}
             {editFlyout}
-          </div>          
+          </div>
         }
         </EuiPageContentHeaderSection>
       </EuiPageContentHeader>

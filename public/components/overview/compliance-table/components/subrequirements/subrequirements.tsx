@@ -294,10 +294,10 @@ export class ComplianceSubrequirements extends Component {
           <EuiFlexItem grow={true}>
             <EuiTitle size="m">
               <h1>{
-  i18n.translate("components.subre.req", {
-    defaultMessage: "Requirements",
-  });
-}</h1>
+                i18n.translate("components.subre.req", {
+                  defaultMessage: "Requirements",
+                })}
+              </h1>
             </EuiTitle>
           </EuiFlexItem>
 
@@ -306,10 +306,9 @@ export class ComplianceSubrequirements extends Component {
               <EuiFlexItem grow={false}>
                 <EuiText grow={false}>
                   <span>{
-  i18n.translate("components.subre.reqAlert", {
-    defaultMessage: "Hide requirements with no alerts ",
-  });
-}</span> &nbsp;
+                    i18n.translate("components.subre.reqAlert", {
+                      defaultMessage: "Hide requirements with no alerts ",
+                    })}</span> &nbsp;
                   <EuiSwitch
                     label=""
                     checked={this.state.hideAlerts}

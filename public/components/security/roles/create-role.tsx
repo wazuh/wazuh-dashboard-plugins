@@ -133,10 +133,10 @@ export const CreateRole = ({ closeFlyout }) => {
         >
           <p style={{ textAlign: 'center' }}>
             {
-  i18n.translate("components.overview.unsaved", {
-    defaultMessage: "There are unsaved changes. Are you sure you want to proceed?",
-  });
-}
+              i18n.translate("components.overview.unsaved", {
+                defaultMessage: "There are unsaved changes. Are you sure you want to proceed?",
+              })
+            }
           </p>
         </EuiConfirmModal>
       </EuiOverlayMask>
@@ -161,10 +161,10 @@ export const CreateRole = ({ closeFlyout }) => {
         <EuiFlyoutHeader hasBorder={false}>
           <EuiTitle size="m">
             <h2>{
-  i18n.translate("components.overview.Newrole", {
-    defaultMessage: "New role",
-  });
-}</h2>
+              i18n.translate("components.overview.Newrole", {
+                defaultMessage: "New role",
+              })}
+            </h2>
           </EuiTitle>
         </EuiFlyoutHeader>
         <EuiFlyoutBody>
@@ -200,10 +200,10 @@ export const CreateRole = ({ closeFlyout }) => {
             <EuiSpacer />
             <EuiButton fill onClick={createUser}>
               {
-  i18n.translate("components.overview.Createrole", {
-    defaultMessage: "Create role",
-  });
-}
+                i18n.translate("components.overview.Createrole", {
+                  defaultMessage: "Create role",
+                })
+              }
             </EuiButton>
           </EuiForm>
         </EuiFlyoutBody>

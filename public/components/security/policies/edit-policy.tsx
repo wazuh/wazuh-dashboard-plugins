@@ -299,11 +299,9 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
           confirmButtonText="Yes, do it"
         >
           <p style={{ textAlign: 'center' }}>{
-  i18n.translate("components.overview.edit.proceed", {
-    defaultMessage: "There are unsaved changes. Are you sure you want to proceed?",
-  });
-}
-            
+            i18n.translate("components.overview.edit.proceed", {
+              defaultMessage: "There are unsaved changes. Are you sure you want to proceed?",
+            })}
           </p>
         </EuiConfirmModal>
       </EuiOverlayMask>
@@ -333,12 +331,14 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
         <EuiFlyoutHeader hasBorder={false}>
           <EuiTitle size="m">
             <h2>{
-  i18n.translate("components.overview.edit.Editpolicy", {
-    defaultMessage: "Edit policy",
-  });
-}
-              Edit policy {policy.name}&nbsp;&nbsp;
-              {isReserved && <EuiBadge color="primary">Reserved</EuiBadge>}
+              i18n.translate("components.overview.edit.Editpolicy", {
+                defaultMessage: "Edit policy",
+              })} {policy.name}&nbsp;&nbsp;
+              {isReserved && <EuiBadge color="primary">
+                {i18n.translate("components.overview.edit.reserveKeyword", {
+                  defaultMessage: "Reserved",
+                })}
+              </EuiBadge>}
             </h2>
           </EuiTitle>
         </EuiFlyoutHeader>
@@ -379,11 +379,10 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
                     iconType="plusInCircle"
                     disabled={!actionValue || isReserved}
                   >{
-  i18n.translate("components.overview.edit.proceed.Add", {
-    defaultMessage: "Add",
-  });
-}
-                    
+                    i18n.translate("components.overview.edit.proceed.Add", {
+                      defaultMessage: "Add",
+                    })}
+
                   </EuiButton>
                 </EuiFormRow>
               </EuiFlexItem>
@@ -435,11 +434,9 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
                     iconType="plusInCircle"
                     disabled={!resourceIdentifierValue || isReserved}
                   >{
-  i18n.translate("components.overview.edit.Add", {
-    defaultMessage: "Add",
-  });
-}
-                    
+                    i18n.translate("components.overview.edit.Add", {
+                      defaultMessage: "Add",
+                    })}
                   </EuiButton>
                 </EuiFormRow>
               </EuiFlexItem>
@@ -465,10 +462,9 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
             <EuiSpacer />
             <EuiButton disabled={isReserved} onClick={updatePolicy} fill>
              {
-  i18n.translate("components.overview.edit.Apply", {
-    defaultMessage: "Apply",
-  });
-} 
+              i18n.translate("components.overview.edit.Apply", {
+                defaultMessage: "Apply",
+              })}
             </EuiButton>
           </EuiForm>
         </EuiFlyoutBody>

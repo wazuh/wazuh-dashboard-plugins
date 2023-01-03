@@ -58,7 +58,7 @@ export class ComplianceRequirements extends Component {
     }
   }
 
- 
+
 
   facetClicked(id){
     const { selectedRequirements: oldSelected, onChangeSelectedRequirements } = this.props;
@@ -87,7 +87,7 @@ export class ComplianceRequirements extends Component {
         onClick: (id) => this.facetClicked(id),
       }}
     );
-    
+
     return (
       <>
       {requirementList.sort((a, b) => b.quantity - a.quantity).map(facet => {
@@ -112,26 +112,25 @@ export class ComplianceRequirements extends Component {
                     whiteSpace: "nowrap",
                     textOverflow: "ellipsis"
                   }}>{
-  i18n.translate("components.over.req.Requirement ", {
-    defaultMessage: "Requirement ",
-  });
-}
+                      i18n.translate("components.over.req.Requirement ", {
+                        defaultMessage: "Requirement ",
+                      })}
                     {facet.label}
                   </span>
                 </EuiToolTip>
-            
+
           </EuiFacetButton>
         );
       })}
       </>
     );
-    
+
   }
 
   onGearButtonClick(){
     this.setState({isPopoverOpen: !this.state.isPopoverOpen});
   }
-  
+
 
   closePopover(){
     this.setState({isPopoverOpen: false});
@@ -199,7 +198,7 @@ export class ComplianceRequirements extends Component {
             </EuiTitle>
           </EuiFlexItem>
 
-          <EuiFlexItem grow={false} style={{marginTop:'15px', marginRight:8}}> 
+          <EuiFlexItem grow={false} style={{marginTop:'15px', marginRight:8}}>
              <EuiPopover
               button={(<EuiButtonIcon iconType="gear" onClick={() => this.onGearButtonClick()}></EuiButtonIcon>)}
               isOpen={this.state.isPopoverOpen}

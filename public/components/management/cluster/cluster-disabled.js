@@ -22,7 +22,7 @@ export const ClusterDisabled = withErrorBoundary (class ClusterDisabled extends 
         title={
           <h2>
             {!this.props.enabled
-              ? 
+              ?
               : !this.props.running
               ? Descp1
               : Descp2}
@@ -32,27 +32,25 @@ export const ClusterDisabled = withErrorBoundary (class ClusterDisabled extends 
           <Fragment>
             {!this.props.enabled && (
               <p>{
-  i18n.translate("components.manage.cluster.visit on", {
-    defaultMessage: "Visit the documentation on",
-  });
-}
+                i18n.translate("components.manage.cluster.visit on", {
+                  defaultMessage: "Visit the documentation on",
+                })}
                 {' '}
                 <a href={webDocumentationLink('user-manual/configuring-cluster/index.html')}>
                   this link
                 </a>{' '}{
-  i18n.translate("components.manage.cluster.enableit", {
-    defaultMessage: "to learn about how to enable it.",
-  });
-}
-                
+                i18n.translate("components.manage.cluster.enableit", {
+                  defaultMessage: "to learn about how to enable it.",
+                })}
+
               </p>
             )}
             {!this.props.running && (
               <p>{
-  i18n.translate("components.manage.cluster.running", {
-    defaultMessage: "The cluster is enabled but it is not running.",
-  });
-}</p>
+                i18n.translate("components.manage.cluster.running", {
+                  defaultMessage: "The cluster is enabled but it is not running.",
+                })}
+              </p>
             )}
           </Fragment>
         }

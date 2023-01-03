@@ -98,7 +98,7 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
     setIsLogicalPopoverOpen(isLogicalPopoverOpen => !isLogicalPopoverOpen);
   const closeLogicalPopover = () => setIsLogicalPopoverOpen(false);
 
-  const selectOperator = op => {  
+  const selectOperator = op => {
     setLogicalOperator(op);
     closeLogicalPopover();
   };
@@ -126,7 +126,7 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
     rulesTmp.splice(id, 1);
     setRules(rulesTmp);
   };
-  
+
   const getRulesFromJson = (jsonRule) => {
     if (jsonRule !== '{}' && jsonRule !== '') {
       // empty json is valid
@@ -218,9 +218,9 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
     setRules(rulesTmp);
   };
 
-  const openJsonEditor = () => {  
+  const openJsonEditor = () => {
     const ruleObject = getJsonFromRule(internalUserRules, rules, logicalOperator);
-    
+
     setRuleJson(JSON.stringify(ruleObject, undefined, 2));
     setIsJsonEditor(true);
   };
@@ -242,12 +242,9 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
             color="primary"
             isDisabled={hasWrongFormat}
             onClick={() => openVisualEditor()}
-          >{
-  i18n.translate("components.overview.rule.switch", {
-    defaultMessage: "Switch to visual editor",
-  });
-}
-            
+          >{ i18n.translate("components.overview.rule.switch", {
+              defaultMessage: "Switch to visual editor",
+            })}
           </EuiButtonEmpty>
         </EuiToolTip>
       );
@@ -255,10 +252,10 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
       return (
         <EuiButtonEmpty color="primary" onClick={() => openVisualEditor()}>
           {
-  i18n.translate("components.overview.rule.visual", {
-    defaultMessage: "Switch to visual editor",
-  });
-}
+            i18n.translate("components.overview.rule.visual", {
+              defaultMessage: "Switch to visual editor",
+            })
+          }
         </EuiButtonEmpty>
       );
     }
@@ -267,7 +264,7 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
   const saveRule = () => {
     if (isJsonEditor) {
       // if json editor is empty
-      if (ruleJson === '') {       
+      if (ruleJson === '') {
         setRuleJson('{}');
       }
       save(JSON.parse(ruleJson));
@@ -302,30 +299,31 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
       <EuiPanel>
         <EuiTitle>
           <h1>{
-  i18n.translate("components.overview.mitre.Mappingrules", {
-    defaultMessage: "Mapping rules",
-  });
-}</h1>
+              i18n.translate("components.overview.mitre.Mappingrules", {
+                defaultMessage: "Mapping rules",
+              })
+            }
+          </h1>
         </EuiTitle>
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiText>
               <span>{
-  i18n.translate("components.overview.mitre.assign", {
-    defaultMessage: "Assign roles to users who match these rules.",
-  });
-} </span>
+                i18n.translate("components.overview.mitre.assign", {
+                  defaultMessage: "Assign roles to users who match these rules.",
+                })}
+              </span>
               <EuiLink
                 href={webDocumentationLink('user-manual/api/rbac/auth-context.html')}
                 external
                 target="_blank"
               >
                 {
-  i18n.translate("components.overview.mapint.Learnmore", {
-    defaultMessage: "Learn more",
-  });
-}
-                
+                  i18n.translate("components.overview.mapint.Learnmore", {
+                    defaultMessage: "Learn more",
+                  })
+                }
+
               </EuiLink>
             </EuiText>
           </EuiFlexItem>
@@ -349,10 +347,10 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
                   <Fragment>
                     <EuiTitle size="s">
                       <h2>{
-  i18n.translate("components.overview.mapint", {
-    defaultMessage: "Map internal users",
-  });
-}</h2>
+                        i18n.translate("components.overview.mapint", {
+                          defaultMessage: "Map internal users",
+                        })}
+                      </h2>
                     </EuiTitle>
                     <EuiFormRow
                       label="Internal users"
@@ -371,10 +369,10 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
                     <EuiSpacer />
                     <EuiTitle size="s">
                       <h2>{
-  i18n.translate("components.overview.mitre.Customrules", {
-    defaultMessage: "Custom rules",
-  });
-}</h2>
+                        i18n.translate("components.overview.mitre.Customrules", {
+                          defaultMessage: "Custom rules",
+                        })}
+                      </h2>
                     </EuiTitle>
                     <EuiPopover
                       ownFocus
@@ -401,10 +399,9 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
                               onClick={() => selectOperator('AND')}
                             >
                               {logicalOperator === 'AND' && <EuiIcon type="check" />}{
-  i18n.translate("components.overview.allTrue", {
-    defaultMessage: "All are true",
-  });
-}
+                              i18n.translate("components.overview.allTrue", {
+                                defaultMessage: "All are true",
+                              })}
                           </EuiButtonEmpty>
                           </EuiFlexItem>
                         </EuiFlexGroup>
@@ -416,10 +413,9 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
                               onClick={() => selectOperator('OR')}
                             >
                               {logicalOperator === 'OR' && <EuiIcon type="check" />}{
-  i18n.translate("components.overview.anytrue", {
-    defaultMessage: "Any are true",
-  });
-}
+                                i18n.translate("components.overview.anytrue", {
+                                  defaultMessage: "Any are true",
+                                })}
                           </EuiButtonEmpty>
                           </EuiFlexItem>
                         </EuiFlexGroup>
@@ -433,10 +429,9 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
                       onClick={() => addNewRule()}
                     >
                       {
-  i18n.translate("components.overview.mitre.Emptyfield", {
-    defaultMessage: "Empty field",
-  });
-}
+                      i18n.translate("components.overview.mitre.Emptyfield", {
+                        defaultMessage: "Empty field",
+                      })}
                   </EuiButtonEmpty>
                   </Fragment>
                 )}
@@ -448,10 +443,9 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
             {(isJsonEditor && getSwitchVisualButton()) || (
               <EuiButtonEmpty color="primary" onClick={() => openJsonEditor()}>
                {
-  i18n.translate("components.overview.mitre.Joson", {
-    defaultMessage: "Switch to JSON editor",
-  });
-} 
+                i18n.translate("components.overview.mitre.Joson", {
+                  defaultMessage: "Switch to JSON editor",
+                })}
               </EuiButtonEmpty>
             )}
           </EuiFlexItem>
@@ -462,10 +456,9 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
         <EuiFlexItem grow={false}>
           <EuiButton disabled={isReserved} isLoading={isLoading} fill onClick={() => saveRule()}>
             {
-  i18n.translate("components.overview.mitre.savemap", {
-    defaultMessage: "Save role mapping",
-  });
-}
+              i18n.translate("components.overview.mitre.savemap", {
+                defaultMessage: "Save role mapping",
+              })}
           </EuiButton>
         </EuiFlexItem>
       </EuiFlexGroup>

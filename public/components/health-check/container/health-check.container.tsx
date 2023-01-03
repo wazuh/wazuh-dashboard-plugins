@@ -32,7 +32,6 @@ import {
   checkPatternSupportService,
   checkSetupService,
 } from '../services';
-import { i18n } from "@kbn/i18n";
 
 import { CheckResult } from '../components/check-result';
 import { withErrorBoundary, withReduxProvider } from '../../common/hocs';
@@ -64,7 +63,7 @@ const patternMonitoringLabel =  i18n.translate('components.healthCheck.apiTitile
 const patternStatisticsTitle =  i18n.translate('components.healthCheck.apiTitile', { defaultMessage: 'Check statistics index pattern', })
 const patternStatisticsLabel =  i18n.translate('components.healthCheck.apiTitile', { defaultMessage: 'Statistics index pattern', })
 const checks = {
-  api: {    
+  api: {
     title: apiTitle,
     label: apiLabel,
     validator: checkApiService,
@@ -176,7 +175,7 @@ function HealthCheckComponent() {
     setCheckErrors({...checkErrors});
   }
 
-  const handleCheckReady = (checkID, isReady) => {    
+  const handleCheckReady = (checkID, isReady) => {
     setChecksReady(prev =>  ({...prev, [checkID]: isReady}));
   }
 
@@ -208,7 +207,7 @@ function HealthCheckComponent() {
   };
 
   const renderErrors = () => {
-    return Object.keys(checkErrors).map((checkID) => 
+    return Object.keys(checkErrors).map((checkID) =>
       checkErrors[checkID].map((error, index) => (
         <Fragment key={index}>
           <EuiCallOut
@@ -221,7 +220,7 @@ function HealthCheckComponent() {
           <EuiSpacer size="xs" />
         </Fragment>
       ))
-    ) 
+    )
   };
 
   return (
@@ -249,7 +248,7 @@ function HealthCheckComponent() {
     defaultMessage: "Go to Settings",
   });
 }
-                  
+
                 </EuiButton>
               </EuiFlexItem>
             )}

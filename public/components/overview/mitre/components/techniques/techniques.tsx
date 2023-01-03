@@ -538,10 +538,10 @@ export const Techniques = withWindowSize(
             <EuiFlexItem grow={true}>
               <EuiTitle size="m">
                 <h1>{
-  i18n.translate("components.overview.Techniques", {
-    defaultMessage: "Techniques",
-  });
-}</h1>
+                  i18n.translate("components.overview.Techniques", {
+                    defaultMessage: "Techniques",
+                  })}
+                </h1>
               </EuiTitle>
             </EuiFlexItem>
 
@@ -550,10 +550,9 @@ export const Techniques = withWindowSize(
                 <EuiFlexItem grow={false}>
                   <EuiText grow={false}>
                     <span>{
-  i18n.translate("components.overview.Hidetechniques.alerts", {
-    defaultMessage: "Hide techniques with no alerts",
-  });
-} </span> &nbsp;
+                      i18n.translate("components.overview.Hidetechniques.alerts", {
+                        defaultMessage: "Hide techniques with no alerts",
+                      })} </span> &nbsp;
                     <EuiSwitch
                       label=""
                       checked={this.state.hideAlerts}

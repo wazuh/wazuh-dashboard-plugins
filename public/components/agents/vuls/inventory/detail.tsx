@@ -329,7 +329,7 @@ export class Details extends Component {
               <p className="detail-value" style={{ margin: 0 }}>{
   i18n.translate("components.agent.fim.ivv.lib.view", {
     defaultMessage: "View external references ",
-  });
+  })
 }<EuiIcon
                 className="euiButtonIcon euiButtonIcon--primary"
                 type="inspect"
@@ -437,7 +437,7 @@ export class Details extends Component {
     defaultMessage: "Recent events",
   });
 }
-                
+
                 {view !== 'events' && (
                   <span style={{ marginLeft: 16 }}>
                     <EuiToolTip position="top" content={inspectButtonText}>

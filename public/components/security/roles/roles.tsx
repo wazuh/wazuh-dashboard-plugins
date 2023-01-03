@@ -72,7 +72,7 @@ export const Roles = () => {
   let editFlyout;
   if (isEditFlyoutVisible) {
     editFlyout = (
-        <EditRole role={editingRole} 
+        <EditRole role={editingRole}
         closeFlyout={async (isVisible) => {
           setIsEditFlyoutVisible(isVisible);
           await getData();
@@ -86,10 +86,10 @@ export const Roles = () => {
         <EuiPageContentHeaderSection>
           <EuiTitle>
             <h2>{
-  i18n.translate("components.overview.Roles", {
-    defaultMessage: "Roles",
-  });
-}</h2>
+              i18n.translate("components.overview.Roles", {
+                defaultMessage: "Roles",
+              })}
+            </h2>
           </EuiTitle>
         </EuiPageContentHeaderSection>
         <EuiPageContentHeaderSection>
@@ -100,11 +100,10 @@ export const Roles = () => {
             <EuiButton
               onClick={() => setIsFlyoutVisible(true)}>
               {
-  i18n.translate("components.overview.Createrole", {
-    defaultMessage: "Create role",
-  });
-}
-                        </EuiButton>
+                i18n.translate("components.overview.Createrole", {
+                  defaultMessage: "Create role",
+                })}
+            </EuiButton>
             {flyout}
             {editFlyout}
           </div>

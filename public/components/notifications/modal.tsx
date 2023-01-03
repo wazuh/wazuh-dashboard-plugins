@@ -80,11 +80,7 @@ export const ToastNotificationsModal = compose (withErrorBoundary, withReduxProv
           </EuiModalBody>
           <EuiModalFooter>
             <EuiCopy textToCopy={copyMessage}>
-              {copy => <EuiButton fill onClick={copy}>{
-  i18n.translate("components.notfi.modal.error, {
-    defaultMessage: "Copy error",
-  });
-}</EuiButton>}
+              {copy => <EuiButton fill onClick={copy}>Copy Error</EuiButton>}
             </EuiCopy>
           </EuiModalFooter>
         </EuiModal>

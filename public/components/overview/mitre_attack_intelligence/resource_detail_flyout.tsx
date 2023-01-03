@@ -49,10 +49,10 @@ export const ModuleMitreAttackIntelligenceFlyout = ({
       <EuiFlyoutHeader hasBorder>
         <EuiTitle size="m">
           <h2 id="flyoutTitle">{
-  i18n.translate("components.overview.mitre.Details", {
-    defaultMessage: "Details",
-  });
-}</h2>
+            i18n.translate("components.overview.mitre.Details", {
+              defaultMessage: "Details",
+            })}
+          </h2>
         </EuiTitle>
       </EuiFlyoutHeader>
       <EuiFlyoutBody>
@@ -78,10 +78,10 @@ export const ModuleMitreAttackIntelligenceFlyout = ({
           <EuiFlexItem>
             <div>
               <strong>{
-  i18n.translate("components.overview.mitre.Description", {
-    defaultMessage: "Description",
-  });
-}</strong>
+                i18n.translate("components.overview.mitre.Description", {
+                  defaultMessage: "Description",
+                })}
+              </strong>
             </div>
             <EuiText color="subdued">
               {details.description ? <Markdown markdown={details.description} /> : ''}

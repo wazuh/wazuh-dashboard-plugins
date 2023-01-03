@@ -52,36 +52,33 @@ export function SyscollectorInventory({ agent }) {
         iconType="securitySignalDetected"
         style={{ marginTop: 20 }}
         title={<h2>{
-  i18n.translate("components.agent.fim.ivv.lib.nevercon", {
-    defaultMessage: "Agent has never connected.",
-  });
-}</h2>}
+          i18n.translate("components.agent.fim.ivv.lib.nevercon", {
+            defaultMessage: "Agent has never connected.",
+          })}</h2>}
         body={
           <Fragment>
             <p>{
-  i18n.translate("components.agent.fim.ivv.lib.agent", {
-    defaultMessage: "The agent has been registered but has not yet connected to the manager.",
-  });
-}</p>
+              i18n.translate("components.agent.fim.ivv.lib.agent", {
+                defaultMessage: "The agent has been registered but has not yet connected to the manager.",
+              })}
+            </p>
             <a
               href={webDocumentationLink('user-manual/agents/agent-connection.html')}
               target="_blank"
             >
               {
-  i18n.translate("components.agent.fim.ivv.lib.wazuhServer", {
-    defaultMessage: "Checking connection with the Wazuh server",
-  });
-}
+                i18n.translate("components.agent.fim.ivv.lib.wazuhServer", {
+                  defaultMessage: "Checking connection with the Wazuh server",
+                })}
             </a>
           </Fragment>
         }
         actions={
           <EuiButton href="#/agents-preview?" color="primary" fill>
             {
-  i18n.translate("components.agent.fim.ivv.lib.Back", {
-    defaultMessage: "Back",
-  });
-}
+              i18n.translate("components.agent.fim.ivv.lib.Back", {
+                defaultMessage: "Back",
+              })}
           </EuiButton>
         }
       />

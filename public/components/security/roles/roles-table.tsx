@@ -96,24 +96,24 @@ export const RolesTable = ({ roles, policiesData, loading, editRole, updateRoles
                         content={
                           <div>
                             <b>{
-  i18n.translate("components.overview.Actions", {
-    defaultMessage: "Actions",
-  });
-}</b>
+                              i18n.translate("components.overview.Actions", {
+                                defaultMessage: "Actions",
+                              })}
+                            </b>
                             <p>{((data.policy || {}).actions || []).join(', ')}</p>
                             <EuiSpacer size="s" />
                             <b>{
-  i18n.translate("components.overview.Resources", {
-    defaultMessage: "Resources",
-  });
-}</b>
+                              i18n.translate("components.overview.Resources", {
+                                defaultMessage: "Resources",
+                              })}
+                            </b>
                             <p>{((data.policy || {}).resources || []).join(', ')}</p>
                             <EuiSpacer size="s" />
                             <b>{
-  i18n.translate("components.overview.Effect", {
-    defaultMessage: "Effect",
-  });
-}</b>
+                              i18n.translate("components.overview.Effect", {
+                                defaultMessage: "Effect",
+                              })}
+                            </b>
                             <p>{(data.policy || {}).effect}</p>
                           </div>
                         }
@@ -142,10 +142,9 @@ export const RolesTable = ({ roles, policiesData, loading, editRole, updateRoles
       name: 'Status',
       render: (item) => {
         return WzAPIUtils.isReservedID(item) && <EuiBadge color="primary">{
-  i18n.translate("components.overview.Reserved", {
-    defaultMessage: "Reserved",
-  });
-}</EuiBadge>;
+          i18n.translate("components.overview.Reserved", {
+            defaultMessage: "Reserved",
+          })}</EuiBadge>;
       },
       width: 150,
       sortable: false,

@@ -43,11 +43,10 @@ export const ModuleMitreAttackIntelligenceAllResourcesSearchResults = withGuard(
         onClick={item.loadMoreResults}
         size='s'
       >{
-  i18n.translate("components.overview.mitre.Seemoreresults", {
-    defaultMessage: "See more results",
-  });
-}
-        
+        i18n.translate("components.overview.mitre.Seemoreresults", {
+          defaultMessage: "See more results",
+        })}
+
       </EuiButton> : undefined}
       buttonContent={<span>{item.name} ({item.totalResults})</span>}
       paddingSize='none'
