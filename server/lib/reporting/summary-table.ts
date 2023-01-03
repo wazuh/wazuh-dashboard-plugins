@@ -67,7 +67,7 @@ export default class SummaryTable {
    * @param key
    */
   _parseAggregation(baseAggRef: any, agg: any, key: string) {
-    const { field, size, order } = agg;
+    const { field, size, order, missing } = agg;
 
     baseAggRef[`${key + 2}`] = {
       terms: {
@@ -76,9 +76,11 @@ export default class SummaryTable {
           _count: order
         },
         size,
-        missing: '-',
       }
     };
+    if (missing) {
+      baseAggRef[`${key + 2}`].terms.missing = missing;
+    }
   }
 
   /**
