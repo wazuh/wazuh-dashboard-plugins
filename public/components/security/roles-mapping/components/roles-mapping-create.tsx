@@ -23,6 +23,7 @@ import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
 import { WzFlyout } from '../../../common/flyouts';
+import { i18n } from "@kbn/i18n";
 
 export const RolesMappingCreate = ({
   closeFlyout,
@@ -95,7 +96,12 @@ export const RolesMappingCreate = ({
           confirmButtonText="Yes, do it"
         >
           <p style={{ textAlign: 'center' }}>
-            There are unsaved changes. Are you sure you want to proceed?
+            {
+  i18n.translate("components.overview.unsaved", {
+    defaultMessage: "There are unsaved changes. Are you sure you want to proceed?",
+  });
+}
+            
           </p>
         </EuiConfirmModal>
       </EuiOverlayMask>
@@ -123,7 +129,11 @@ export const RolesMappingCreate = ({
       <WzFlyout flyoutProps={{ className: 'wzApp' }} onClose={onClose}>
         <EuiFlyoutHeader hasBorder={false}>
           <EuiTitle size="m">
-            <h2>Create new role mapping &nbsp;</h2>
+            <h2>{
+  i18n.translate("components.overview.mitre.mapping", {
+    defaultMessage: "Create new role mapping",
+  });
+} &nbsp;</h2>
           </EuiTitle>
         </EuiFlyoutHeader>
         <EuiFlyoutBody>

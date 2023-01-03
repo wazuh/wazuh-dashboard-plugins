@@ -12,8 +12,13 @@
 import React, { Component } from 'react';
 import { EuiButton, EuiSpacer } from '@elastic/eui';
 import { ErrorComponentPrompt } from '../common/error-boundary-prompt/error-boundary-prompt';
-import { PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_TROUBLESHOOTING, PLUGIN_PLATFORM_URL_GUIDE, PLUGIN_PLATFORM_URL_GUIDE_TITLE } from '../../../common/constants';
+import {
+  PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_TROUBLESHOOTING,
+  PLUGIN_PLATFORM_URL_GUIDE,
+  PLUGIN_PLATFORM_URL_GUIDE_TITLE,
+} from '../../../common/constants';
 import { webDocumentationLink } from '../../../common/services/web_documentation';
+import { i18n } from '@kbn/i18n';
 
 export class WzBlankScreen extends Component {
   constructor(props) {
@@ -29,15 +34,27 @@ export class WzBlankScreen extends Component {
         action={
           <>
             <p>
-              <a href={PLUGIN_PLATFORM_URL_GUIDE}>{PLUGIN_PLATFORM_URL_GUIDE_TITLE}</a>
+              <a href={PLUGIN_PLATFORM_URL_GUIDE}>
+                {PLUGIN_PLATFORM_URL_GUIDE_TITLE}
+              </a>
               <br />
               <br />
-              <a href={webDocumentationLink(PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_TROUBLESHOOTING)}>Wazuh installation guide</a>
+              <a
+                href={webDocumentationLink(
+                  PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_TROUBLESHOOTING,
+                )}
+              >
+                {i18n.translate('components.wz.blank.guide', {
+                  defaultMessage: 'Wazuh installation guide',
+                })}
+              </a>
             </p>
             <EuiSpacer />
 
-            <EuiButton onClick={this.props.goToOverview} color="primary" fill>
-              Refresh
+            <EuiButton onClick={this.props.goToOverview} color='primary' fill>
+              {i18n.translate('components.wz.blank.Refresh', {
+                defaultMessage: 'Refresh',
+              })}
             </EuiButton>
           </>
         }

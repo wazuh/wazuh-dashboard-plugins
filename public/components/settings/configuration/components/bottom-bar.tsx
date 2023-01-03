@@ -40,7 +40,22 @@ interface IBottomBarProps {
   setLoading(loading: boolean): void
   config: ISetting[]
 }
+import { i18n } from "@kbn/i18n";
 
+const Title1 = i18n.translate("components.addModule.guide.Title1", {
+  defaultMessage: "The configuration has been successfully updated",
+});
+const Title2 = i18n.translate("components.addModule.guide.Title2", {
+  defaultMessage:
+    "You must execute the health check for the changes to take effect",
+});
+const Title3 = i18n.translate("components.addModule.guide.Title3", {
+  defaultMessage:
+    "This settings require you to reload the page to take effect.",
+});
+const Title4 = i18n.translate("components.addModule.guide.title4", {
+  defaultMessage: "Error saving the configuration:",
+});
 export const BottomBar: React.FunctionComponent<IBottomBarProps> = ({ updatedConfig, setUpdateConfig, setLoading, config }) => {
   return (!!Object.keys(updatedConfig).length
     ? <EuiBottomBar paddingSize="m">
@@ -73,13 +88,17 @@ const CancelButton = ({ setUpdateConfig }) => (
       size='s'
       iconSide='left'
       iconType='cross'
-      color="ghost"
-      className="mgtAdvancedSettingsForm__button"
-      onClick={() => setUpdateConfig({})}>
-      Cancel changes
+      color='ghost'
+      className='mgtAdvancedSettingsForm__button'
+      onClick={() => setUpdateConfig({})}
+    >
+      {i18n.translate('components.setting.confi.comp.bottom.cancel', {
+        defaultMessage: 'Cancel changes',
+      })}
+      
     </EuiButtonEmpty>
   </EuiFlexItem>
-)
+);
 
 const SaveButton = ({ updatedConfig, setUpdateConfig, setLoading, config }) => (
   <EuiFlexItem grow={false}>
@@ -89,12 +108,18 @@ const SaveButton = ({ updatedConfig, setUpdateConfig, setLoading, config }) => (
       iconSide='left'
       iconType='check'
       color='secondary'
-      className="mgtAdvancedSettingsForm__button"
-      onClick={() => saveSettings(updatedConfig, setUpdateConfig, setLoading, config)} >
-      Save changes
-      </EuiButton>
+      className='mgtAdvancedSettingsForm__button'
+      onClick={() =>
+        saveSettings(updatedConfig, setUpdateConfig, setLoading, config)
+      }
+    >
+      {i18n.translate('components.setting.confi.comp.bottom.save', {
+        defaultMessage: 'Save changes',
+      })}
+      
+    </EuiButton>
   </EuiFlexItem>
-)
+);
 
 const saveSettings = async (updatedConfig: {}, setUpdateConfig: Function, setLoading: Function, config: ISetting[]) => {
   setLoading(true);
@@ -111,7 +136,7 @@ const saveSettings = async (updatedConfig: {}, setUpdateConfig: Function, setLoa
       error: {
         error: error,
         message: error.message || error,
-        title: `Error saving the configuration: ${error.message || error}`,
+        title:  Title4 + ${error.message || error},
       },
     };
 
@@ -143,29 +168,43 @@ const saveSetting = async (setting, updatedConfig, config: ISetting[]) => {
 const reloadToast = () => {
   getToasts().add({
     color: 'success',
-    title: 'This settings require you to reload the page to take effect.',
-    text: <EuiFlexGroup justifyContent="flexEnd" gutterSize="s">
-      <EuiFlexItem grow={false}>
-        <EuiButton onClick={() => window.location.reload()} size="s">Reload page</EuiButton>
-      </EuiFlexItem>
-    </EuiFlexGroup>
-  })
+    title: { Title3 },
+    text: (
+      <EuiFlexGroup justifyContent='flexEnd' gutterSize='s'>
+        <EuiFlexItem grow={false}>
+          <EuiButton onClick={() => window.location.reload()} size='s'>
+            {i18n.translate('components.setting.confi.comp.bottom.reload', {
+              defaultMessage: 'Reload page',
+            })}
+          </EuiButton>
+        </EuiFlexItem>
+      </EuiFlexGroup>
+    ),
+  });
 }
 
 const executeHealtCheck = () => {
   const toast = getToasts().add({
     color: 'warning',
-    title: 'You must execute the health check for the changes to take effect',
+    title: { Title2 },
     toastLifeTimeMs: 5000,
-    text:
-      <EuiFlexGroup alignItems="center" gutterSize="s">
-        <EuiFlexItem grow={false} >
-          <EuiButton onClick={() => {
-            getToasts().remove(toast);
-            window.location.href = '#/health-check';
-          }} size="s">Execute health check</EuiButton>
+    text: (
+      <EuiFlexGroup alignItems='center' gutterSize='s'>
+        <EuiFlexItem grow={false}>
+          <EuiButton
+            onClick={() => {
+              getToasts().remove(toast);
+              window.location.href = '#/health-check';
+            }}
+            size='s'
+          >
+            {i18n.translate('components.setting.confi.comp.bottom.check', {
+              defaultMessage: 'Execute health check',
+            })}
+          </EuiButton>
         </EuiFlexItem>
       </EuiFlexGroup>
+    ),
   });
 }
 
@@ -179,7 +218,7 @@ const restartToast = () => {
 const successToast = () => {
   getToasts().add({
     color: 'success',
-    title: 'The configuration has been successfully updated',
+    title: { Title1 },
   });
 }
 

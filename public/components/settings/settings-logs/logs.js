@@ -29,6 +29,7 @@ import store from '../../../redux/store';
 import { updateSelectedSettingsSection } from '../../../redux/actions/appStateActions';
 import { withErrorBoundary } from '../../common/hocs';
 import { getPluginDataPath } from '../../../../common/plugin';
+import { i18n } from '@kbn/i18n';
 
 class SettingsLogs extends Component {
   constructor(props) {
@@ -63,50 +64,75 @@ class SettingsLogs extends Component {
   }
 
   formatDate(date) {
-    return formatUIDate(date).replace('-', '/').replace('T', ' ').replace('Z', '').split('.')[0];
+    return formatUIDate(date)
+      .replace('-', '/')
+      .replace('T', ' ')
+      .replace('Z', '')
+      .split('.')[0];
   }
 
   getMessage(log) {
     const data = log.data || log.message;
-    return typeof data === 'object' ? data.message || JSON.stringify(data) : data.toString();
+    return typeof data === 'object'
+      ? data.message || JSON.stringify(data)
+      : data.toString();
   }
 
   render() {
     let text = '';
-    (this.state.logs || []).forEach((x) => {
+    (this.state.logs || []).forEach(x => {
       text =
         text +
-        (this.formatDate(x.date) + '  ' + x.level.toUpperCase() + '  ' + this.getMessage(x) + '\n');
+        (this.formatDate(x.date) +
+          '  ' +
+          x.level.toUpperCase() +
+          '  ' +
+          this.getMessage(x) +
+          '\n');
     });
     return (
       <EuiPage>
-        <EuiPanel paddingSize="l">
+        <EuiPanel paddingSize='l'>
           <EuiFlexGroup>
             <EuiFlexItem>
               <EuiFlexGroup>
                 <EuiFlexItem>
                   <EuiTitle>
-                    <h2>App log messages</h2>
+                    <h2>
+                      {i18n.translate('components.setting.log.mess', {
+                        defaultMessage: 'App log messages',
+                      })}
+                    </h2>
                   </EuiTitle>
                 </EuiFlexItem>
               </EuiFlexGroup>
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
-              <EuiButtonEmpty iconType="refresh" onClick={async () => await this.refresh()}>
-                Refresh
+              <EuiButtonEmpty
+                iconType='refresh'
+                onClick={async () => await this.refresh()}
+              >
+                {i18n.translate('components.setting.log.Refresh', {
+                  defaultMessage: 'Refresh',
+                })}
               </EuiButtonEmpty>
             </EuiFlexItem>
           </EuiFlexGroup>
-          <EuiText color="subdued" style={{ paddingBottom: '15px' }}>
-            Log file located at {getPluginDataPath('logs/wazuhapp.log')}
+          <EuiText color='subdued' style={{ paddingBottom: '15px' }}>
+            {i18n.translate('components.setting.log.file', {
+              defaultMessage: 'Log file located at',
+            })}
+            {getPluginDataPath('logs/wazuhapp.log')}
           </EuiText>
-          {this.state.refreshingEntries && <EuiProgress size="xs" color="primary" />}
+          {this.state.refreshingEntries && (
+            <EuiProgress size='xs' color='primary' />
+          )}
           {!this.state.refreshingEntries && (
-            <div className="code-block-log-viewer-container">
+            <div className='code-block-log-viewer-container'>
               <EuiCodeBlock
-                fontSize="s"
-                paddingSize="m"
-                color="dark"
+                fontSize='s'
+                paddingSize='m'
+                color='dark'
                 overflowHeight={`calc(100vh - ${this.HEIGHT_WITHOUT_CODE_EDITOR}px)`}
               >
                 {text}
