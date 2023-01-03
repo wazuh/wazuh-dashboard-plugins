@@ -15,15 +15,20 @@ import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import React, { useState, useEffect } from 'react';
 import { WzRequest } from '../../../react-services';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
+import { i18n } from '@kbn/i18n';
 
+const Title1 = i18n.translate('components.addModule.guide.Title1', {
+  defaultMessage: 'This dashboard contains sample data',
+});
 export const SampleDataWarning = ({ ...props }) => {
   const [isSampleData, setIsSampleData] = useState(false);
 
   useEffect(() => {
     (async () => {
       try {
-        const result = (await WzRequest.genericReq('GET', '/elastic/samplealerts')).data
-          .sampleAlertsInstalled;
+        const result = (
+          await WzRequest.genericReq('GET', '/elastic/samplealerts')
+        ).data.sampleAlertsInstalled;
         setIsSampleData(result);
       } catch (error) {
         const options = {
@@ -50,16 +55,19 @@ export const SampleDataWarning = ({ ...props }) => {
   if (isSampleData) {
     return (
       <EuiCallOut
-        title="This dashboard contains sample data"
-        color="warning"
-        iconType="alert"
+        title={Title1}
+        color='warning'
+        iconType='alert'
         style={{ margin: '0 8px 16px 8px' }}
-        data-test-subject="sample-data-callout"
+        data-test-subject='sample-data-callout'
         {...props}
       >
         <p>
           {'The data displayed may contain sample alerts. Go '}
-          <EuiLink href="#/settings?tab=sample_data" aria-label="go to configure sample data">
+          <EuiLink
+            href='#/settings?tab=sample_data'
+            aria-label='go to configure sample data'
+          >
             {'here '}
           </EuiLink>
           {'to configure the sample data.'}

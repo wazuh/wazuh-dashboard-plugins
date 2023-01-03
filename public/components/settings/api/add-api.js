@@ -30,7 +30,16 @@ import { UI_LOGGER_LEVELS, PLUGIN_PLATFORM_NAME } from '../../../../common/const
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { getPluginDataPath } from '../../../../common/plugin';
-
+import { i18n } from '@kbn/i18n';
+const Title1 = i18n.translate("components.settings.api.Title1", {
+  defaultMessage: "Wazuh API not reachable, please review your configuration:",
+});
+const Title2 = i18n.translate("components.settings.api.Title2", {
+  defaultMessage: "Edit the configuration",
+});
+const Title3 = i18n.translate("components.settings.api.Title3", {
+  defaultMessage: "Test the configuration",
+});
 export const AddApi = withErrorBoundary (class AddApi extends Component {
   constructor(props) {
     super(props);
@@ -106,7 +115,7 @@ export const AddApi = withErrorBoundary (class AddApi extends Component {
         error: {
           error: error,
           message: error.message || error,
-          title: `Wazuh API not reachable, please review your configuration: ${error.message || error}`,
+          title: Title1 + ${error.message || error},
         },
       };
 
@@ -136,19 +145,35 @@ export const AddApi = withErrorBoundary (class AddApi extends Component {
         {(this.state.status === 'warning' ||
           this.state.status === 'danger') && <EuiSpacer />}
         <EuiText>
-          Check that the {PLUGIN_PLATFORM_NAME} server can reach the configured Wazuh API(s).
+          {
+  i18n.translate("components.settings.api.check", {
+    defaultMessage: "Check that the",
+  })
+} {PLUGIN_PLATFORM_NAME} {
+  i18n.translate("components.settings.api.server", {
+    defaultMessage: "server can reach the configured Wazuh API",
+  })
+}(s).
         </EuiText>
         <EuiSpacer />
         <EuiButton
           onClick={async () => await this.checkConnection()}
           isLoading={this.state.fetchingData}
-        >
-          Check connection
+        >{
+  i18n.translate("components.settings.api.connection", {
+    defaultMessage: "Check connection",
+  })
+}
+          
         </EuiButton>
         {(this.state.closedEnabled || this.state.enableClose) &&
           !this.state.blockClose && (
             <EuiButtonEmpty onClick={() => this.props.closeAddApi()}>
-              Close
+             {
+  i18n.translate("components.settings.api", {
+    defaultMessage: "Empty field",
+  })
+} Close
             </EuiButtonEmpty>
           )}
       </div>
@@ -157,32 +182,63 @@ export const AddApi = withErrorBoundary (class AddApi extends Component {
     const editConfigChildren = (
       <div>
         <EuiText>
-          Modify{' '}
+          {
+  i18n.translate("components.settings.api.Modify", {
+    defaultMessage: "Modify",
+  })
+}{' '}
           <EuiCode>{getPluginDataPath('config/wazuh.yml')}</EuiCode>{' '}
-          to set the connection information.
+          {
+  i18n.translate("components.settings.api.information", {
+    defaultMessage: "to set the connection information.",
+  })
+}
         </EuiText>
         <EuiSpacer />
         <EuiCodeBlock language="yaml">{apiExample}</EuiCodeBlock>
         <EuiSpacer />
         <EuiText>
-          Where <EuiCode>{'<id>'}</EuiCode> is an arbitrary ID,{' '}
-          <EuiCode>{'<api_url>'}</EuiCode> is the URL of the Wazuh API,{' '}
-          <EuiCode>{'<api_port>'}</EuiCode> is the port,{' '}
+          {
+  i18n.translate("components.settings.api.Where", {
+    defaultMessage: "Where",
+  })
+} <EuiCode>{'<id>'}</EuiCode> {
+  i18n.translate("components.settings.api.id", {
+    defaultMessage: "is an arbitrary ID,",
+  })
+}{' '}
+          <EuiCode>{'<api_url>'}</EuiCode> {
+  i18n.translate("components.settings.api.url", {
+    defaultMessage: "is the URL of the Wazuh API,",
+  })
+}{' '}
+          <EuiCode>{'<api_port>'}</EuiCode> {
+  i18n.translate("components.settings.api.port", {
+    defaultMessage: "is the port,",
+  })
+}{' '}
           <EuiCode>{'<api_username>'}</EuiCode> and{' '}
-          <EuiCode>{'<api_password>'}</EuiCode> are the credentials to
-          authenticate,{' '}
-          <EuiCode>{'<run_as>'}</EuiCode> defines if the app user's permissions depends on the authentication context (<EuiCode>{'true'}</EuiCode> / <EuiCode>{'false'}</EuiCode>).
+          <EuiCode>{'<api_password>'}</EuiCode> are {
+  i18n.translate("components.settings.api.auth", {
+    defaultMessage: "the credentials to authenticate,",
+  })
+}{' '}
+          <EuiCode>{'<run_as>'}</EuiCode> {
+  i18n.translate("components.settings.api.context", {
+    defaultMessage: "defines if the app user's permissions depends on the authentication context ",
+  })
+}(<EuiCode>{'true'}</EuiCode> / <EuiCode>{'false'}</EuiCode>).
         </EuiText>
       </div>
     );
 
     const steps = [
       {
-        title: 'Edit the configuration',
+        title: Title2,
         children: editConfigChildren
       },
       {
-        title: 'Test the configuration',
+        title: Title3,
         children: checkConnectionChildren,
         status: this.state.status
       }
@@ -196,7 +252,11 @@ export const AddApi = withErrorBoundary (class AddApi extends Component {
             <EuiFlexGroup>
               <EuiFlexItem grow={false}>
                 <EuiText>
-                  <h2>Getting started</h2>
+                  <h2>{
+  i18n.translate("components.settings.api.getting", {
+    defaultMessage: "Getting started",
+  })
+}</h2>
                 </EuiText>
               </EuiFlexItem>
               <EuiFlexItem />

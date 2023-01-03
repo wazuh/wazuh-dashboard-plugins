@@ -10,19 +10,27 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import { EuiFlexItem, EuiFlexGroup, EuiSideNav, EuiIcon, EuiButtonEmpty, EuiToolTip } from '@elastic/eui';
+import {
+  EuiFlexItem,
+  EuiFlexGroup,
+  EuiSideNav,
+  EuiIcon,
+  EuiButtonEmpty,
+  EuiToolTip,
+} from '@elastic/eui';
 import { WzRequest } from '../../react-services/wz-request';
 import { connect } from 'react-redux';
-import { AppNavigate } from '../../react-services/app-navigate'
+import { AppNavigate } from '../../react-services/app-navigate';
 import { WAZUH_MENU_MANAGEMENT_SECTIONS_ID } from '../../../common/constants';
 import { WAZUH_MENU_MANAGEMENT_SECTIONS_CY_TEST_ID } from '../../../common/wazu-menu/wz-menu-management.cy';
+import { i18n } from '@kbn/i18n';
 
 class WzMenuManagement extends Component {
   constructor(props) {
     super(props);
     this.state = {
       // TODO: Fix the selected section
-      selectedItemName: null
+      selectedItemName: null,
     };
 
     this.managementSections = {
@@ -101,7 +109,7 @@ class WzMenuManagement extends Component {
     this.paths = {
       rules: '/rules',
       decoders: '/decoders',
-      lists: '/lists/files'
+      lists: '/lists/files',
     };
 
     this.wzReq = WzRequest;
@@ -116,7 +124,7 @@ class WzMenuManagement extends Component {
 
   clickMenuItem = (ev, section) => {
     this.props.closePopover();
-    AppNavigate.navigateToModule(ev, 'manager', { tab: section })
+    AppNavigate.navigateToModule(ev, 'manager', { tab: section });
   };
 
   createItem = (item, data = {}) => {
@@ -127,8 +135,8 @@ class WzMenuManagement extends Component {
       name: item.text,
       'data-test-subj': item.cyTestId,
       isSelected: this.props.state.section === item.id,
-      onClick: () => { },
-      onMouseDown: (ev) => this.clickMenuItem(ev, item.id)
+      onClick: () => {},
+      onMouseDown: ev => this.clickMenuItem(ev, item.id),
     };
   };
 
@@ -139,7 +147,7 @@ class WzMenuManagement extends Component {
         id: this.managementSections.administration.id,
         id: 0,
         disabled: true,
-        icon: <EuiIcon type="managementApp" color="primary" />,
+        icon: <EuiIcon type='managementApp' color='primary' />,
         items: [
           this.createItem(this.managementSections.rules),
           this.createItem(this.managementSections.decoders),
@@ -147,7 +155,7 @@ class WzMenuManagement extends Component {
           this.createItem(this.managementSections.groups),
           this.createItem(this.managementSections.configuration),
         ],
-      }
+      },
     ];
 
     const sideNavStatus = [
@@ -155,28 +163,32 @@ class WzMenuManagement extends Component {
         name: this.managementSections.statusReports.text,
         id: this.managementSections.statusReports.id,
         disabled: true,
-        icon: <EuiIcon type="reportingApp" color="primary" />,
+        icon: <EuiIcon type='reportingApp' color='primary' />,
         items: [
           this.createItem(this.managementSections.status),
           this.createItem(this.managementSections.cluster),
           this.createItem(this.managementSections.statistics),
           this.createItem(this.managementSections.logs),
-          this.createItem(this.managementSections.reporting)
-        ]
-      }
+          this.createItem(this.managementSections.reporting),
+        ],
+      },
     ];
 
     return (
-      <div className="WzManagementSideMenu">
+      <div className='WzManagementSideMenu'>
         <EuiFlexGroup>
           <EuiFlexItem grow={false} style={{ marginLeft: 14 }}>
-            <EuiButtonEmpty iconType="apps"
+            <EuiButtonEmpty
+              iconType='apps'
               onClick={() => {
                 this.props.closePopover();
                 window.location.href = '#/manager';
-              }}>
-              Management directory
-              </EuiButtonEmpty>
+              }}
+            >
+              {i18n.translate('components.wz.menu.Managementdirectory', {
+                defaultMessage: 'Management directory',
+              })}
+            </EuiButtonEmpty>
           </EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup responsive={false}>
@@ -198,6 +210,4 @@ const mapStateToProps = state => {
   };
 };
 
-export default connect(
-  mapStateToProps,
-)(WzMenuManagement);
+export default connect(mapStateToProps)(WzMenuManagement);

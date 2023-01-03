@@ -29,6 +29,7 @@ import { useSelector } from 'react-redux';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
+import { i18n } from "@kbn/i18n";
 
 export const RolesMapping = () => {
   const [isEditingRule, setIsEditingRule] = useState(false);
@@ -161,7 +162,11 @@ export const RolesMapping = () => {
       <EuiPageContentHeader>
         <EuiPageContentHeaderSection>
           <EuiTitle>
-            <h2>Role mapping</h2>
+            <h2>{
+  i18n.translate("components.overview.role.mapping", {
+    defaultMessage: "Role mapping",
+  });
+}</h2>
           </EuiTitle>
         </EuiPageContentHeaderSection>
         <EuiPageContentHeaderSection>
@@ -171,8 +176,12 @@ export const RolesMapping = () => {
                 onClick={() => {
                   setIsCreatingRule(true);
                 }}
-              >
-                Create Role mapping
+              >{
+  i18n.translate("components.overview.role.createRole", {
+    defaultMessage: "Create Role mapping",
+  });
+}
+                
               </EuiButton>
               {createFlyout}
               {editFlyout}

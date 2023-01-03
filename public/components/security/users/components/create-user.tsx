@@ -18,6 +18,7 @@ import {
   EuiPanel,
   EuiConfirmModal,
 } from '@elastic/eui';
+import { i18n } from "@kbn/i18n";
 
 import { useApiService } from '../../../common/hooks/useApiService';
 import { Role } from '../../roles/types/role.type';
@@ -220,8 +221,12 @@ export const CreateUser = ({ closeFlyout }) => {
           cancelButtonText="No, don't do it"
           confirmButtonText="Yes, do it"
         >
-          <p style={{ textAlign: 'center' }}>
-            There are unsaved changes. Are you sure you want to proceed?
+          <p style={{ textAlign: 'center' }}>{
+  i18n.translate("components.security.user.create.changes", {
+    defaultMessage: "There are unsaved changes. Are you sure you want to proceed?",
+  });
+}
+            
           </p>
         </EuiConfirmModal>
       </EuiOverlayMask>
@@ -251,14 +256,22 @@ export const CreateUser = ({ closeFlyout }) => {
       <WzFlyout onClose={onClose} flyoutProps={{ className: 'wzApp' }}>
         <EuiFlyoutHeader hasBorder={false}>
           <EuiTitle size="m">
-            <h2>Create new user</h2>
+            <h2>{
+  i18n.translate("components.security.user.createCreatenewuser", {
+    defaultMessage: "Create new user",
+  });
+}</h2>
           </EuiTitle>
         </EuiFlyoutHeader>
         <EuiFlyoutBody>
           <EuiForm component="form" style={{ padding: 24 }}>
             <EuiPanel>
               <EuiTitle size="s">
-                <h2>User data</h2>
+                <h2>{
+  i18n.translate("components.security.user.create.Userdata", {
+    defaultMessage: "User data",
+  });
+}</h2>
               </EuiTitle>
               <EuiSpacer />
               <EuiFormRow
@@ -318,7 +331,11 @@ export const CreateUser = ({ closeFlyout }) => {
             <EuiSpacer />
             <EuiPanel>
               <EuiTitle size="s">
-                <h2>User roles</h2>
+                <h2>{
+  i18n.translate("components.security.user.create.Userroles", {
+    defaultMessage: "User roles",
+  });
+}</h2>
               </EuiTitle>
               <EuiFormRow label="" helpText="Assign roles to the selected user">
                 <EuiComboBox
@@ -336,7 +353,11 @@ export const CreateUser = ({ closeFlyout }) => {
             <EuiFlexGroup>
               <EuiFlexItem grow={false}>
                 <EuiButton fill isLoading={isLoading} onClick={editUser} isDisabled={!showApply}>
-                  Apply
+                  {
+  i18n.translate("components.security.user.create.Apply", {
+    defaultMessage: "Apply",
+  });
+}
                 </EuiButton>
               </EuiFlexItem>
             </EuiFlexGroup>

@@ -20,6 +20,7 @@ import { Role } from '../roles/types/role.type';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
+import { i18n } from "@kbn/i18n";
 
 export const Users = () => {
   const [isEditFlyoutVisible, setIsEditFlyoutVisible] = useState(false);
@@ -84,8 +85,16 @@ export const Users = () => {
     return (
       <EuiEmptyPrompt
         iconType="securityApp"
-        title={<h2>You need permission to manage users</h2>}
-        body={<p>Contact your system administrator.</p>}
+        title={<h2>{
+  i18n.translate("components.security.user.create.manage", {
+    defaultMessage: "You need permission to manage users",
+  });
+}</h2>}
+        body={<p>{
+  i18n.translate("components.security.user.create.system", {
+    defaultMessage: "Contact your system administrator.",
+  });
+}</p>}
       />
     );
   }
@@ -115,7 +124,11 @@ export const Users = () => {
       <EuiPageContentHeader>
         <EuiPageContentHeaderSection>
           <EuiTitle>
-            <h2>Users</h2>
+            <h2>{
+  i18n.translate("components.security.user.user", {
+    defaultMessage: "Users",
+  });
+}</h2>
           </EuiTitle>
         </EuiPageContentHeaderSection>
         <EuiPageContentHeaderSection>
@@ -123,7 +136,11 @@ export const Users = () => {
             !rolesLoading
             &&
             <div>
-              <EuiButton onClick={() => setIsCreateFlyoutVisible(true)}>Create user</EuiButton>
+              <EuiButton onClick={() => setIsCreateFlyoutVisible(true)}>{
+  i18n.translate("components.security.user.createuser", {
+    defaultMessage: "Create user",
+  });
+}</EuiButton>
               {createFlyout}
             </div>
           }

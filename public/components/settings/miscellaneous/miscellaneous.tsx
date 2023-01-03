@@ -26,64 +26,79 @@ import {
   EuiText,
   EuiTitle,
 } from '@elastic/eui';
+import { i18n } from '@kbn/i18n';
+
 import { getHttp } from '../../../kibana-services';
-
+const Title1 = i18n.translate('components.addModule.guide.Title1', {
+  defaultMessage: 'Execute in debug mode',
+});
+const Title2 = i18n.translate('components.addModule.guide.Title2', {
+  defaultMessage: 'Health check',
+});
+const Descp1 = i18n.translate('components.addModule.guide.Descp1', {
+  defaultMessage: 'Run health check and no redirect when all checks are ready',
+});
 export const SettingsMiscellaneous = () => {
-
   const redirectHealthCheckDebugMode = useCallback(() => {
-    window.location.href = getHttp().basePath.prepend('/app/wazuh#/health-check?debug');
+    window.location.href = getHttp().basePath.prepend(
+      '/app/wazuh#/health-check?debug',
+    );
   }, []);
 
   return (
     <EuiPage>
-      <EuiPanel paddingSize="l">
+      <EuiPanel paddingSize='l'>
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiTitle>
-              <h2>Miscellaneous</h2>
+              <h2>
+                {i18n.translate('components.setting.miscell.Miscellaneous', {
+                  defaultMessage: 'Miscellaneous',
+                })}
+              </h2>
             </EuiTitle>
-            <EuiText color="subdued">
-              App utils
+            <EuiText color='subdued'>
+              {i18n.translate('components.setting.miscell.apputils', {
+                defaultMessage: 'App utils',
+              })}
             </EuiText>
           </EuiFlexItem>
         </EuiFlexGroup>
         <EuiSpacer />
-        <SettingsMiscellaneousCategory 
-          title='Health check'
+        <SettingsMiscellaneousCategory
+          title={Title2}
           actions={[
             {
-              title: 'Execute in debug mode',
-              description: 'Run health check and no redirect when all checks are ready',
+              title: { Title1 },
+              description: { Descp1 },
               render: (
                 <EuiFormRow>
-                  <EuiButton
-                      fill
-                      onClick={redirectHealthCheckDebugMode}
-                    >
-                      Run
+                  <EuiButton fill onClick={redirectHealthCheckDebugMode}>
+                    {i18n.translate('components.setting.miscell.Run', {
+                      defaultMessage: 'Run',
+                    })}
                   </EuiButton>
                 </EuiFormRow>
-              )
-            }
+              ),
+            },
           ]}
         />
       </EuiPanel>
     </EuiPage>
-  )
+  );
 };
 
-
-const SettingsMiscellaneousCategory = ({title, description = '', actions}) => (
+const SettingsMiscellaneousCategory = ({
+  title,
+  description = '',
+  actions,
+}) => (
   <EuiPanel>
     <>
       <EuiTitle>
         <h2>{title}</h2>
       </EuiTitle>
-      {description && (
-        <EuiText color='subdued'>
-          {description}
-        </EuiText>
-      )}
+      {description && <EuiText color='subdued'>{description}</EuiText>}
       <EuiSpacer size='xs' />
       {actions.map(action => (
         <Fragment key={`settins-miscellaneous-category-action-${action.title}`}>
@@ -98,4 +113,4 @@ const SettingsMiscellaneousCategory = ({title, description = '', actions}) => (
       ))}
     </>
   </EuiPanel>
-)
+);
