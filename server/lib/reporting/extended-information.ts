@@ -85,14 +85,16 @@ export async function buildAgentsTable(context, printer: ReportPrinter, agentIDs
           { id: 'dateAdd', label: 'Registration date' },
           { id: 'lastKeepAlive', label: 'Last keep alive' },
         ],
-        items: agentsData.map((agent) => {
-          return {
-            ...agent,
-            os: (agent.os && agent.os.name && agent.os.version) ? `${agent.os.name} ${agent.os.version}` : '',
-            lastKeepAlive: moment(agent.lastKeepAlive).format(dateFormat),
-            dateAdd: moment(agent.dateAdd).format(dateFormat)
-          }
-        }),
+        items: agentsData
+          .filter(agent => agent) // Remove undefined agents when Wazuh API no longer finds and agentID
+          .map((agent) => {
+            return {
+              ...agent,
+              os: (agent.os && agent.os.name && agent.os.version) ? `${agent.os.name} ${agent.os.version}` : '',
+              lastKeepAlive: moment(agent.lastKeepAlive).format(dateFormat),
+              dateAdd: moment(agent.dateAdd).format(dateFormat)
+            }
+          }),
       });
     } else if (!agentsData.length && groupID) {
       // For group reports when there is no agents in the group
