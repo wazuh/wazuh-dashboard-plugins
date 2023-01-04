@@ -54,7 +54,7 @@ const Title3 = i18n.translate("components.addModule.guide.Title3", {
     "This settings require you to reload the page to take effect.",
 });
 const Title4 = i18n.translate("components.addModule.guide.title4", {
-  defaultMessage: "Error saving the configuration:",
+  defaultMessage: "Error saving the configuration: ",
 });
 export const BottomBar: React.FunctionComponent<IBottomBarProps> = ({ updatedConfig, setUpdateConfig, setLoading, config }) => {
   return (!!Object.keys(updatedConfig).length
@@ -95,7 +95,7 @@ const CancelButton = ({ setUpdateConfig }) => (
       {i18n.translate('components.setting.confi.comp.bottom.cancel', {
         defaultMessage: 'Cancel changes',
       })}
-      
+
     </EuiButtonEmpty>
   </EuiFlexItem>
 );
@@ -116,7 +116,7 @@ const SaveButton = ({ updatedConfig, setUpdateConfig, setLoading, config }) => (
       {i18n.translate('components.setting.confi.comp.bottom.save', {
         defaultMessage: 'Save changes',
       })}
-      
+
     </EuiButton>
   </EuiFlexItem>
 );
@@ -136,7 +136,7 @@ const saveSettings = async (updatedConfig: {}, setUpdateConfig: Function, setLoa
       error: {
         error: error,
         message: error.message || error,
-        title:  Title4 + ${error.message || error},
+        title:  `${Title4} ${error.message || error}`,
       },
     };
 

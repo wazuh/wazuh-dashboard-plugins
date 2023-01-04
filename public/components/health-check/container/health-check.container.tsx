@@ -244,10 +244,9 @@ function HealthCheckComponent() {
             {thereAreErrors && (
               <EuiFlexItem grow={false}>
                 <EuiButton fill href={getHttp().basePath.prepend('/app/wazuh#/settings')}>{
-  i18n.translate("components.health.continer.Setting", {
-    defaultMessage: "Go to Settings",
-  });
-}
+                  i18n.translate("components.health.continer.Setting", {
+                    defaultMessage: "Go to Settings",
+                  })}
 
                 </EuiButton>
               </EuiFlexItem>
@@ -256,10 +255,10 @@ function HealthCheckComponent() {
               <EuiFlexItem grow={false}>
                 <EuiButton fill onClick={redirectionPassHealthcheck}>
                   {
-  i18n.translate("components.health.continer.Continue", {
-    defaultMessage: "Continue",
-  });
-}
+                    i18n.translate("components.health.continer.Continue", {
+                      defaultMessage: "Continue",
+                    })
+                  }
                 </EuiButton>
               </EuiFlexItem>
             )}

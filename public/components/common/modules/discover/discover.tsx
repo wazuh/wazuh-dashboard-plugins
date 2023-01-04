@@ -28,7 +28,7 @@ import _ from 'lodash';
 import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
-
+import { i18n } from '@kbn/i18n'
 import {
   EuiBasicTable,
   EuiLoadingContent,
@@ -443,7 +443,10 @@ export const Discover = compose(
 
     removeColumn(id) {
       if (this.state.columns.length < 2) {
-        this.showToast('warning', 'At least one column must be selected', 3000);
+        const title1 = i18n.translate('components.common.modules.oneColumnMustBeSelected', {
+          defaultMessage: 'At least one column must be selected',
+        });
+        this.showToast('warning', title1, 3000);
         return;
       }
       const columns = this.state.columns;
@@ -456,7 +459,10 @@ export const Discover = compose(
 
     addColumn(id) {
       if (this.state.columns.length > 11) {
-        this.showToast('warning', 'The maximum number of columns is 10', 3000);
+        const maxNumberOfColumn = i18n.translate('components.common.modules.maxNumberOfColumn', {
+          defaultMessage: 'The maximum number of columns is 10',
+        });
+        this.showToast('warning', maxNumberOfColumn, 3000);
         return;
       }
       if (this.state.columns.find((element) => element === id)) {
@@ -748,7 +754,9 @@ export const Discover = compose(
         totalItemCount: this.state.total > 10000 ? 10000 : this.state.total,
         pageSizeOptions: [10, 25, 50],
       };
-      const noResultsText = `No results match for this search criteria`;
+      const noResultsText = i18n.translate('components.common.modules.noResultsMatch', {
+        defaultMessage: 'No results match for this search criteria.',
+      })
       return (
         <div className="wz-discover hide-filter-control wz-inventory">
           {this.props.kbnSearchBar && (

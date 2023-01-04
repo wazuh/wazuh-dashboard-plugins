@@ -86,15 +86,15 @@ export const Users = () => {
       <EuiEmptyPrompt
         iconType="securityApp"
         title={<h2>{
-  i18n.translate("components.security.user.create.manage", {
-    defaultMessage: "You need permission to manage users",
-  });
-}</h2>}
+          i18n.translate("components.security.user.create.manage", {
+            defaultMessage: "You need permission to manage users",
+          })}
+        </h2>}
         body={<p>{
-  i18n.translate("components.security.user.create.system", {
-    defaultMessage: "Contact your system administrator.",
-  });
-}</p>}
+          i18n.translate("components.security.user.create.system", {
+            defaultMessage: "Contact your system administrator.",
+          })}
+        </p>}
       />
     );
   }
@@ -125,10 +125,10 @@ export const Users = () => {
         <EuiPageContentHeaderSection>
           <EuiTitle>
             <h2>{
-  i18n.translate("components.security.user.user", {
-    defaultMessage: "Users",
-  });
-}</h2>
+              i18n.translate("components.security.user.user", {
+                defaultMessage: "Users",
+              })}
+            </h2>
           </EuiTitle>
         </EuiPageContentHeaderSection>
         <EuiPageContentHeaderSection>
@@ -137,10 +137,10 @@ export const Users = () => {
             &&
             <div>
               <EuiButton onClick={() => setIsCreateFlyoutVisible(true)}>{
-  i18n.translate("components.security.user.createuser", {
-    defaultMessage: "Create user",
-  });
-}</EuiButton>
+                i18n.translate("components.security.user.createuser", {
+                  defaultMessage: "Create user",
+                })}
+              </EuiButton>
               {createFlyout}
             </div>
           }

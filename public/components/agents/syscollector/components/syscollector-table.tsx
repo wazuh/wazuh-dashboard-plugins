@@ -132,11 +132,10 @@ export function SyscollectorTable({ tableParams }) {
               onClick={downloadCsv}
               iconType="importAction"
             >{
-  i18n.translate("components.agent.fim.ivv.lib.csv", {
-    defaultMessage: "Download CSV",
-  });
-}
-              
+              i18n.translate("components.agent.fim.ivv.lib.csv", {
+                defaultMessage: "Download CSV",
+              })}
+
             </EuiButtonEmpty>
           </EuiFlexItem>
         </EuiFlexGroup>

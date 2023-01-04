@@ -115,7 +115,7 @@ export const AddApi = withErrorBoundary (class AddApi extends Component {
         error: {
           error: error,
           message: error.message || error,
-          title: Title1 + ${error.message || error},
+          title: Title1 + (error.message || error),
         },
       };
 
@@ -146,14 +146,14 @@ export const AddApi = withErrorBoundary (class AddApi extends Component {
           this.state.status === 'danger') && <EuiSpacer />}
         <EuiText>
           {
-  i18n.translate("components.settings.api.check", {
-    defaultMessage: "Check that the",
-  })
-} {PLUGIN_PLATFORM_NAME} {
-  i18n.translate("components.settings.api.server", {
-    defaultMessage: "server can reach the configured Wazuh API",
-  })
-}(s).
+            i18n.translate("components.settings.api.check", {
+              defaultMessage: "Check that the",
+            })
+          } {PLUGIN_PLATFORM_NAME} {
+            i18n.translate("components.settings.api.server", {
+              defaultMessage: "server can reach the configured Wazuh API",
+            })
+          }(s).
         </EuiText>
         <EuiSpacer />
         <EuiButton
@@ -164,7 +164,7 @@ export const AddApi = withErrorBoundary (class AddApi extends Component {
     defaultMessage: "Check connection",
   })
 }
-          
+
         </EuiButton>
         {(this.state.closedEnabled || this.state.enableClose) &&
           !this.state.blockClose && (

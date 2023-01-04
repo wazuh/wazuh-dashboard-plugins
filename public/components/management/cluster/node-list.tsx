@@ -81,10 +81,10 @@ export const NodeList = withErrorBoundary (class NodeList extends Component {
                             <EuiFlexItem grow={false}>
                                 <EuiTitle>
                                     <h1>{
-  i18n.translate("components.management.cluster.nodes", {
-    defaultMessage: "Nodes",
-  });
-}</h1>
+                                      i18n.translate("components.management.cluster.nodes", {
+                                        defaultMessage: "Nodes",
+                                      })
+                                    }</h1>
                                 </EuiTitle>
                             </EuiFlexItem>
                         </EuiFlexGroup>

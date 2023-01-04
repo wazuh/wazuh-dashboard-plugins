@@ -746,16 +746,14 @@ export class Inventory extends Component {
                                 <EuiSpacer size="s" />
                                 <EuiText>
                                   <b>{
-  i18n.translate("components.agent.fim.ivv.lib.Policydescription", {
-    defaultMessage: "Policy description:",
-  });
-}</b> {this.state.lookingPolicy.description}
+                                    i18n.translate("components.agent.fim.ivv.lib.Policydescription", {
+                                      defaultMessage: "Policy description:",
+                                    })}</b> {this.state.lookingPolicy.description}
                                   <br></br>
                                   <b>{
-  i18n.translate("components.agent.fim.ivv.lib.Policychecksum:", {
-    defaultMessage: "Policy checksum:",
-  });
-}</b> {this.state.lookingPolicy.hash_file}
+                                    i18n.translate("components.agent.fim.ivv.lib.Policychecksum:", {
+                                      defaultMessage: "Policy checksum:",
+                                    })}</b> {this.state.lookingPolicy.hash_file}
                                 </EuiText>
                               </EuiFlexItem>
                             </EuiPopover>
@@ -768,10 +766,9 @@ export class Inventory extends Component {
                         iconType="importAction"
                         onClick={async () => await this.downloadCsv()}
                       >{
-  i18n.translate("components.agent.fim.ivv.lib.Exportformatted", {
-    defaultMessage: "Export formatted",
-  });
-}
+                        i18n.translate("components.agent.fim.ivv.lib.Exportformatted", {
+                          defaultMessage: "Export formatted",
+                        })}
 
                       </EuiButtonEmpty>
                     </EuiFlexItem>
@@ -780,10 +777,9 @@ export class Inventory extends Component {
                         iconType="refresh"
                         onClick={() => this.loadScaPolicy(this.state.lookingPolicy)}
                       >{
-  i18n.translate("components.agent.fim.ivv.lib.emptyRefresh", {
-    defaultMessage: "Refresh",
-  });
-}
+                        i18n.translate("components.agent.fim.ivv.lib.emptyRefresh", {
+                          defaultMessage: "Refresh",
+                        })}
 
                       </EuiButtonEmpty>
                     </EuiFlexItem>

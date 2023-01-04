@@ -518,10 +518,9 @@ export const MultipleAgentSelector = withErrorBoundary(
                             <EuiFlexItem grow={false}>
                               <EuiTitle size="m">
                                 <h1>{
-  i18n.translate("components.manage.group.agentsGroup", {
-    defaultMessage: "Manage agents of group",
-  });
-} {this.props.currentGroup.name}</h1>
+                                  i18n.translate("components.manage.group.agentsGroup", {
+                                    defaultMessage: "Manage agents of group",
+                                  })} {this.props.currentGroup.name}</h1>
                               </EuiTitle>
                             </EuiFlexItem>
                           </EuiFlexGroup>

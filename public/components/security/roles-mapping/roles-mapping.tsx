@@ -58,7 +58,7 @@ export const RolesMapping = () => {
       ErrorHandler.handle('There was an error loading roles');
     }
   }, [rolesLoading]);
-  
+
   const getInternalUsers = async () => {
     try {
       const wazuhSecurity = new WazuhSecurity();
@@ -123,7 +123,7 @@ export const RolesMapping = () => {
   const updateRoles = async () => {
     await getRules();
   };
-  
+
   let editFlyout;
   if (isEditingRule) {
     editFlyout = (
@@ -163,10 +163,9 @@ export const RolesMapping = () => {
         <EuiPageContentHeaderSection>
           <EuiTitle>
             <h2>{
-  i18n.translate("components.overview.role.mapping", {
-    defaultMessage: "Role mapping",
-  });
-}</h2>
+              i18n.translate("components.overview.role.mapping", {
+                defaultMessage: "Role mapping",
+              })}</h2>
           </EuiTitle>
         </EuiPageContentHeaderSection>
         <EuiPageContentHeaderSection>
@@ -177,11 +176,10 @@ export const RolesMapping = () => {
                   setIsCreatingRule(true);
                 }}
               >{
-  i18n.translate("components.overview.role.createRole", {
-    defaultMessage: "Create Role mapping",
-  });
-}
-                
+                i18n.translate("components.overview.role.createRole", {
+                  defaultMessage: "Create Role mapping",
+                })}
+
               </EuiButton>
               {createFlyout}
               {editFlyout}

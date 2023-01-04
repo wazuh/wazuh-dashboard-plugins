@@ -9,6 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { i18n } from '@kbn/i18n'
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {
@@ -155,7 +156,11 @@ class OverviewActions extends Component {
               initialFocus="[name=popswitch]"
             >
               <EuiModalHeader>
-                <EuiModalHeaderTitle>Explore agent</EuiModalHeaderTitle>
+                <EuiModalHeaderTitle>
+                  { i18n.translate('controller.overview.component.exploreAgent', {  defaultMessage: 'Explore agent'})
+                  }
+
+                </EuiModalHeaderTitle>
               </EuiModalHeader>
 
               <EuiModalBody>
@@ -195,23 +200,47 @@ class OverviewActions extends Component {
 
     buttonExploreAgent = (
       <WzButton
-        buttonType="empty"
+        buttonType='empty'
         isLoading={this.state.loadingReport}
-        color="primary"
+        color='primary'
         isDisabled={!avaliableForAgent}
         tooltip={{
           position: 'bottom',
           content: !avaliableForAgent
-            ? 'This module is not supported for agents.'
+            ? i18n.translate(
+                'controller.overview.component.notSupportedModuleForAgents',
+                { defaultMessage: 'This module is not supported for agents.' },
+              )
             : thereAgentSelected
-            ? 'Change agent selected'
-            : 'Select an agent to explore its modules',
+            ? i18n.translate('controller.overview.component.changeAgent', {
+                defaultMessage: 'Change agent selected',
+              })
+            : i18n.translate(
+                'controller.overview.component.selectAgentToExplore',
+                {
+                  defaultMessage: 'Select an agent to explore its modules',
+                },
+              ),
         }}
-        style={thereAgentSelected ? { background: 'rgba(0, 107, 180, 0.1)' } : undefined}
-        iconType="watchesApp"
+        style={
+          thereAgentSelected
+            ? { background: 'rgba(0, 107, 180, 0.1)' }
+            : undefined
+        }
+        iconType='watchesApp'
         onClick={() => this.showAgentModal()}
       >
-        {thereAgentSelected ? `${this.props.agent.name} (${this.props.agent.id})` : 'Explore agent'}
+        {
+          (thereAgentSelected
+            ? `${this.props.agent.name} (${this.props.agent.id})`
+            : i18n.translate(
+                'controller.overview.component.exploreAgent',
+                {
+                  defaultMessage: 'Explore agent',
+                }
+              )
+          )
+        }
       </WzButton>
     );
 

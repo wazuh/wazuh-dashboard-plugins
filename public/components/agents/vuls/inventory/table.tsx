@@ -22,28 +22,28 @@ import { TableWzAPI } from '../../../../components/common/tables';
 import { getFilterValues } from './lib';
 import { formatUIDate } from '../../../../react-services/time-service';
 import { i18n } from '@kbn/i18n';
-const Descp1 = i18n.translate('components.addModule.guide.Descp1', {
+const Descp1 = i18n.translate('components.addModule.inventory.Descp1', {
   defaultMessage: 'Filter by package ID',
 });
-const Descp2 = i18n.translate('components.addModule.guide.Descp2', {
+const Descp2 = i18n.translate('components.addModule.inventory.Descp2', {
   defaultMessage: 'Filter by CVE ID',
 });
-const Descp3 = i18n.translate('components.addModule.guide.Descp3', {
+const Descp3 = i18n.translate('components.addModule.inventory.Descp3', {
   defaultMessage: 'Filter by CVE version',
 });
-const Descp4 = i18n.translate('components.addModule.guide.Descp4', {
+const Descp4 = i18n.translate('components.addModule.inventory.Descp4', {
   defaultMessage: 'Filter by architecture',
 });
-const Descp5 = i18n.translate('components.addModule.guide.Descp5', {
+const Descp5 = i18n.translate('components.addModule.inventory.Descp5', {
   defaultMessage: 'Filter by Severity',
 });
-const Descp6 = i18n.translate('components.addModule.guide.Descp6', {
+const Descp6 = i18n.translate('components.addModule.inventory.Descp6', {
   defaultMessage: 'Filter by CVSS2',
 });
-const Descp7 = i18n.translate('components.addModule.guide.Descp7', {
+const Descp7 = i18n.translate('components.addModule.inventory.Descp7', {
   defaultMessage: 'Filter by CVSS3',
 });
-const Descp8 = i18n.translate('components.addModule.guide.Descp8', {
+const Descp8 = i18n.translate('components.addModule.inventory.Descp8', {
   defaultMessage: 'Filter by Detection Time',
 });
 export class InventoryTable extends Component {

@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-
+import { i18n } from '@kbn/i18n';
 import React, { Component, Fragment } from 'react';
 import { WzButtonPermissions } from '../../components/common/permissions/button';
 
@@ -23,7 +23,6 @@ import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { getErrorOrchestrator } from '../../react-services/common-services';
-
 export default class WzSampleData extends Component {
   categories: {
     title: string;
@@ -44,22 +43,50 @@ export default class WzSampleData extends Component {
     this.generateAlertsParams = {}; // extra params to add to generateAlerts function in server
     this.categories = [
       {
-        title: 'Sample security information',
-        description: 'Sample data, visualizations and dashboards for security information (integrity monitoring, Amazon AWS services, Office 365, Google Cloud Platform, GitHub, authorization, ssh, web).',
+        title: i18n.translate('components.addModulesData.sampleSecurityTitle', {
+          defaultMessage: 'Sample security information',
+        }),
+        description: i18n.translate(
+          'components.addModulesData.sampleSecurityDescription',
+          {
+            defaultMessage:
+              'Sample data, visualizations and dashboards for security information (integrity monitoring, Amazon AWS services, Office 365, Google Cloud Platform, GitHub, authorization, ssh, web).',
+          },
+        ),
         image: '',
         categorySampleAlertsIndex: 'security',
       },
       {
-        title: 'Sample auditing and policy monitoring',
-        description:
-          'Sample data, visualizations and dashboards for events of auditing and policy monitoring (policy monitoring, system auditing, OpenSCAP, CIS-CAT).',
+        title: i18n.translate(
+          'components.addModulesData.sampleAuditingPolicyTitle',
+          {
+            defaultMessage: 'Sample auditing and policy monitoring',
+          },
+        ),
+        description: i18n.translate(
+          'components.addModulesData.sampleAuditingPolicyDescription',
+          {
+            defaultMessage:
+              'Sample data, visualizations and dashboards for events of auditing and policy monitoring (policy monitoring, system auditing, OpenSCAP, CIS-CAT).',
+          },
+        ),
         image: '',
         categorySampleAlertsIndex: 'auditing-policy-monitoring',
       },
       {
-        title: 'Sample threat detection and response',
-        description:
-          'Sample data, visualizations and dashboards for threat events of detection and response (vulnerabilities, VirusTotal, Osquery, Docker listener, MITRE).',
+        title: i18n.translate(
+          'components.addModulesData.sampleThreatDetectionTitle',
+          {
+            defaultMessage: 'Sample threat detection and response',
+          },
+        ),
+        description: i18n.translate(
+          'components.addModulesData.sampleThreatDetectionDescription',
+          {
+            defaultMessage:
+              'Sample data, visualizations and dashboards for threat events of detection and response (vulnerabilities, VirusTotal, Osquery, Docker listener, MITRE).',
+          },
+        ),
         image: '',
         categorySampleAlertsIndex: 'threat-detection',
       },
@@ -153,13 +180,18 @@ export default class WzSampleData extends Component {
       await WzRequest.genericReq(
         'POST',
         `/elastic/samplealerts/${category.categorySampleAlertsIndex}`,
-        { params: this.generateAlertsParams }
+        { params: this.generateAlertsParams },
       );
+      const alertAdded = i18n.translate('components.addModulesData.alertAdded', {
+        defaultMessage: 'Sample security information'
+      });
       this.showToast(
         'success',
-        `${category.title} alerts added`,
-        'Date range for sample data is now-7 days ago',
-        5000
+        `${category.title} ${alertAdded}`,
+        i18n.translate('components.addModulesData.alertForDateRange', {
+          defaultMessage: 'Date range for sample data is now-7 days ago',
+        }),
+        5000,
       );
       this.setState({
         [category.categorySampleAlertsIndex]: {
@@ -176,7 +208,9 @@ export default class WzSampleData extends Component {
         error: {
           error: error,
           message: error.message || error,
-          title: `Error trying to add sample data`,
+          title: i18n.translate('components.addModulesData.errorAddSampleData', {
+            defaultMessage: 'Error trying to add sample data',
+          }),
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -198,7 +232,7 @@ export default class WzSampleData extends Component {
       });
       await WzRequest.genericReq(
         'DELETE',
-        `/elastic/samplealerts/${category.categorySampleAlertsIndex}`
+        `/elastic/samplealerts/${category.categorySampleAlertsIndex}`,
       );
       this.setState({
         [category.categorySampleAlertsIndex]: {
@@ -207,7 +241,13 @@ export default class WzSampleData extends Component {
           removeDataLoading: false,
         },
       });
-      this.showToast('success', `${category.title} alerts removed`);
+      const alertRemove = i18n.translate(
+        'components.addModulesData.alertRemove',
+        {
+          defaultMessage: 'alerts removed',
+        },
+      );
+      this.showToast('success', `${category.title} ${alertRemove}`);
     } catch (error) {
       const options = {
         context: `${WzSampleData.name}.removeSampleData`,
@@ -216,7 +256,9 @@ export default class WzSampleData extends Component {
         error: {
           error: error,
           message: error.message || error,
-          title: `Error trying to delete sample data`,
+          title: i18n.translate('components.addModulesData.errorDeleteSampleData', {
+            defaultMessage: 'Error trying to delete sample data',
+          }),
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -270,7 +312,9 @@ export default class WzSampleData extends Component {
     return (
       <>
         <EuiCallOut
-            title="These actions require permissions on the managed indices."
+            title={ i18n.translate('components.addModulesData.permissionRequireForAction', {
+              defaultMessage: 'These actions require permissions on the managed indices.',
+            })}
             iconType="iInCircle"
         />
         <EuiSpacer />

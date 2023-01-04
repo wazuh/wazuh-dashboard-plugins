@@ -406,10 +406,9 @@ export class Details extends Component {
           buttonContent={
             <EuiTitle size="s">
               <h3>{
-  i18n.translate("components.agent.fim.ivv.lib.Details", {
-    defaultMessage: "Details",
-  });
-}</h3>
+                i18n.translate("components.agent.fim.ivv.lib.Details", {
+                  defaultMessage: "Details",
+                })}</h3>
             </EuiTitle>
           }
           paddingSize="none"
@@ -424,19 +423,17 @@ export class Details extends Component {
           extraAction={
             <div style={{ marginBottom: 5 }}>
               <strong>{this.state.totalHits || 0}</strong> {
-  i18n.translate("components.agent.fim.ivv.lib.hits", {
-    defaultMessage: "hits",
-  });
-}
+                i18n.translate("components.agent.fim.ivv.lib.hits", {
+                  defaultMessage: "hits",
+                })}
             </div>
           }
           buttonContent={
             <EuiTitle size="s">
               <h3>{
-  i18n.translate("components.agent.fim.ivv.lib.recevents", {
-    defaultMessage: "Recent events",
-  });
-}
+                i18n.translate("components.agent.fim.ivv.lib.recevents", {
+                  defaultMessage: "Recent events",
+                })}
 
                 {view !== 'events' && (
                   <span style={{ marginLeft: 16 }}>

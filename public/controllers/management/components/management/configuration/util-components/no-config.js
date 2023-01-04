@@ -47,14 +47,14 @@ class WzNoConfig extends Component {
                   {i18n.translate('controllers.manage.confi.util.section', {
                     defaultMessage: 'This section is not present on the configuration file.',
                   })}
-                  
+
                 </p>
               )) || (
                 <span>
                   {i18n.translate('controllers.manage.confi.util.exist', {
-                    defaultMessage: 'There was a problem while fetching the configuration for this section. It may be a server problem or the configuration doesn't exist.',
+                    defaultMessage: "There was a problem while fetching the configuration for this section. It may be a server problem or the configuration doesn't exist."
                   })}
-                  
+
                 </span>
               )}
               <EuiSpacer size='s' />

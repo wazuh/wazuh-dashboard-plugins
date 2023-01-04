@@ -22,15 +22,14 @@ import { resultsPreset } from '../types/result-icons-presets';
 import { i18n } from '@kbn/i18n';
 
 const ResultIcons = ({ result, children, initCheck }) => {
-  
+
 
   return (
     <>{
       resultsPreset[result].disabled ? <>{
-  i18n.translate("components.agent..health.components.disable", {
-    defaultMessage: "Disabled",
-  });
-}</> : <>
+        i18n.translate("components.agent..health.components.disable", {
+          defaultMessage: "Disabled",
+        })}</> : <>
         <EuiToolTip
           position='top'
           content={resultsPreset[result].tooltipText}>
