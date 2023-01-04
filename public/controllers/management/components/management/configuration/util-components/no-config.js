@@ -12,6 +12,7 @@
 
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { i18n } from "@kbn/i18n";
 
 import {
   EuiIcon,
@@ -35,24 +36,38 @@ class WzNoConfig extends Component {
         <EuiFlexGroup>
           <EuiFlexItem>
             <div style={{ textAlign: 'center' }}>
-              <EuiIcon type="help" style={{ marginRight: '4px' }} />
-                <span>Configuration not available</span>
+              <EuiIcon type='help' style={{ marginRight: '4px' }} />
+              <span>{i18n.translate('controllers.manage.confi.util.avail', {
+                    defaultMessage: 'Configuration not available',
+                  })}</span>
               {help && <WzHelpButtonPopover links={help} />}
-              <EuiHorizontalRule margin="s" />
+              <EuiHorizontalRule margin='s' />
               {(error === 'not-present' && (
-                <p>This section is not present on the configuration file.</p>
+                <p>
+                  {i18n.translate('controllers.manage.confi.util.section', {
+                    defaultMessage: 'This section is not present on the configuration file.',
+                  })}
+                  
+                </p>
               )) || (
                 <span>
-                  There was a problem while fetching the configuration for this
-                  section. It may be a server problem or the configuration doesn't exist.
+                  {i18n.translate('controllers.manage.confi.util.exist', {
+                    defaultMessage: 'There was a problem while fetching the configuration for this section. It may be a server problem or the configuration doesn't exist.',
+                  })}
+                  
                 </span>
               )}
-              <EuiSpacer size="s" />
+              <EuiSpacer size='s' />
               <div>
                 <p>
-                  Click on the <EuiIcon type="questionInCircle" /> icon for
-                  help. Check the documentation links to learn more about how to
-                  configure it.
+                  {i18n.translate('controllers.manage.confi.util.click', {
+                    defaultMessage: 'Click on the',
+                  })}
+                  <EuiIcon type='questionInCircle' />{' '}
+                  {i18n.translate('controllers.manage.confi.util.doc', {
+                    defaultMessage:
+                      'icon for help. Check the documentation links to learn more about how to configure it.',
+                  })}
                 </p>
               </div>
             </div>

@@ -9,6 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { i18n } from '@kbn/i18n';
 
 import $ from 'jquery';
 import moment from 'moment';
@@ -23,7 +24,9 @@ import { UI_LOGGER_LEVELS } from '../../common/constants';
 import { UI_ERROR_SEVERITIES } from './error-orchestrator/types';
 import { getErrorOrchestrator } from './common-services';
 const app = getAngularModule();
-
+const Title1 = i18n.translate('kibana-int.vis.error', {
+  defaultMessage: 'Error configuring report',
+});
 export class ReportingService {
   constructor() {
     this.$rootScope = app.$injector.get('$rootScope');
@@ -48,9 +51,10 @@ export class ReportingService {
   }
 
   removeAgentStatusVis(idArray) {
-    const monitoringEnabled = this.wazuhConfig.getConfig()['wazuh.monitoring.enabled'];
+    const monitoringEnabled =
+      this.wazuhConfig.getConfig()['wazuh.monitoring.enabled'];
     if (!monitoringEnabled) {
-      const visArray = idArray.filter((vis) => {
+      const visArray = idArray.filter(vis => {
         return vis !== 'Wazuh-App-Overview-General-Agents-status';
       });
       return visArray;
@@ -70,25 +74,31 @@ export class ReportingService {
 
       this.vis2png.clear();
 
-      const rawVisualizations = this.rawVisualizations.getList().filter(this.removeTableVis);
+      const rawVisualizations = this.rawVisualizations
+        .getList()
+        .filter(this.removeTableVis);
 
       let idArray = [];
       if (tab === 'general') {
-        idArray = this.removeAgentStatusVis(rawVisualizations.map((item) => item.id));
+        idArray = this.removeAgentStatusVis(
+          rawVisualizations.map(item => item.id),
+        );
       } else {
-        idArray = rawVisualizations.map((item) => item.id);
+        idArray = rawVisualizations.map(item => item.id);
       }
 
       const visualizationIDList = [];
       for (const item of idArray) {
         const tmpHTMLElement = $(`#${item}`);
-        if(tmpHTMLElement[0]){
+        if (tmpHTMLElement[0]) {
           this.vis2png.assignHTMLItem(item, tmpHTMLElement);
           visualizationIDList.push(item);
         }
       }
 
-      const appliedFilters = await this.visHandlers.getAppliedFilters(syscollectorFilters);
+      const appliedFilters = await this.visHandlers.getAppliedFilters(
+        syscollectorFilters,
+      );
 
       const array = await this.vis2png.checkArray(visualizationIDList);
 
@@ -104,12 +114,16 @@ export class ReportingService {
         section: agents ? 'agents' : 'overview',
         agents,
         browserTimezone,
-        indexPatternTitle: (await getDataPlugin().indexPatterns.get(AppState.getCurrentPattern())).title,
-        apiId: JSON.parse(AppState.getCurrentAPI()).id
+        indexPatternTitle: (
+          await getDataPlugin().indexPatterns.get(AppState.getCurrentPattern())
+        ).title,
+        apiId: JSON.parse(AppState.getCurrentAPI()).id,
       };
 
       const apiEndpoint =
-        tab === 'syscollector' ? `/reports/agents/${agents}/inventory` : `/reports/modules/${tab}`;
+        tab === 'syscollector'
+          ? `/reports/agents/${agents}/inventory`
+          : `/reports/modules/${tab}`;
       await WzRequest.genericReq('POST', apiEndpoint, data);
 
       this.$rootScope.reportBusy = false;
@@ -119,7 +133,7 @@ export class ReportingService {
         'success',
         'Created report',
         'Success. Go to Wazuh > Management > Reporting',
-        4000
+        4000,
       );
       return;
     } catch (error) {
@@ -150,13 +164,17 @@ export class ReportingService {
       const browserTimezone = moment.tz.guess(true);
 
       const data = {
-        filters: [type === 'agentConfig' ? { agent: obj.id } : { group: obj.name }],
+        filters: [
+          type === 'agentConfig' ? { agent: obj.id } : { group: obj.name },
+        ],
         browserTimezone,
         components,
-        apiId: JSON.parse(AppState.getCurrentAPI()).id
+        apiId: JSON.parse(AppState.getCurrentAPI()).id,
       };
       const apiEndpoint =
-        type === 'agentConfig' ? `/reports/agents/${obj.id}` : `/reports/groups/${obj.name}`;
+        type === 'agentConfig'
+          ? `/reports/agents/${obj.id}`
+          : `/reports/groups/${obj.name}`;
       await WzRequest.genericReq('POST', apiEndpoint, data);
 
       this.$rootScope.reportBusy = false;
@@ -166,7 +184,7 @@ export class ReportingService {
         'success',
         'Created report',
         'Success. Go to Wazuh > Management > Reporting',
-        4000
+        4000,
       );
       return;
     } catch (error) {
@@ -181,7 +199,7 @@ export class ReportingService {
         error: {
           error: error,
           message: error.message || error,
-          title: `Error configuring report`,
+          title: Title1,
         },
       };
       this.$rootScope.$applyAsync();

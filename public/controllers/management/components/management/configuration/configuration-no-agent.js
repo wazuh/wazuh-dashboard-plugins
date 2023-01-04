@@ -13,27 +13,44 @@
 import React, { Fragment } from 'react';
 import { EuiEmptyPrompt, EuiButton } from '@elastic/eui';
 import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
+import { i18n } from '@kbn/i18n';
 
-const documentationLink = webDocumentationLink('user-manual/agents/agent-connection.html');
+const documentationLink = webDocumentationLink(
+  'user-manual/agents/agent-connection.html',
+);
 
 export const WzAgentNeverConnectedPrompt = () => (
   <EuiEmptyPrompt
-    iconType="securitySignalDetected"
+    iconType='securitySignalDetected'
     style={{ marginTop: 20 }}
-    title={<h2>Agent has never connected.</h2>}
+    title={
+      <h2>
+        {i18n.translate('controllers.manage.confi.util.con', {
+          defaultMessage: 'Agent has never connected.',
+        })}
+      </h2>
+    }
     body={
       <Fragment>
         <p>
-          The agent has been registered but has not yet connected to the manager.
+          {i18n.translate('controllers.manage.confi.util.reg', {
+            defaultMessage:
+              'The agent has been registered but has not yet connected to the manager.',
+          })}
         </p>
-        <a href={documentationLink} target="_blank">
-          Checking connection with the Wazuh server
+        <a href={documentationLink} target='_blank'>
+          {i18n.translate('controllers.manage.confi.util.check', {
+            defaultMessage: 'Checking connection with the Wazuh server',
+          })}
         </a>
       </Fragment>
     }
     actions={
-      <EuiButton href='#/agents-preview?' color="primary" fill>
-        Back
+      <EuiButton href='#/agents-preview?' color='primary' fill>
+        {i18n.translate('controllers.manage.confi.util.Back', {
+          defaultMessage: 'Back',
+        })}
       </EuiButton>
-  }
-  />)
+    }
+  />
+);

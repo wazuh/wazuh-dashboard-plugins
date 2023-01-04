@@ -10,31 +10,40 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React from "react";
-import WzReduxProvider from "../../../../../redux/wz-redux-provider";
-import KibanaVis from "../../../../../kibana-integrations/kibana-vis";
-import { EuiFlexGroup, EuiFlexItem, EuiPanel } from "@elastic/eui";
+import React from 'react';
+import WzReduxProvider from '../../../../../redux/wz-redux-provider';
+import KibanaVis from '../../../../../kibana-integrations/kibana-vis';
+import { EuiFlexGroup, EuiFlexItem, EuiPanel } from '@elastic/eui';
 import { useBuildStatisticsVisualizations } from './hooks';
+import { i18n } from '@kbn/i18n';
 
-export function WzStatisticsRemoted({clusterNodeSelected,  refreshVisualizations}) {
+export function WzStatisticsRemoted({
+  clusterNodeSelected,
+  refreshVisualizations,
+}) {
   useBuildStatisticsVisualizations(clusterNodeSelected, refreshVisualizations);
   return (
     <div>
       <EuiFlexGroup>
         <EuiFlexItem>
-          <EuiPanel style={{ height: "400px" }}>
+          <EuiPanel style={{ height: '400px' }}>
             <EuiFlexGroup>
-              <EuiFlexItem>Total number of bytes received</EuiFlexItem>
+              <EuiFlexItem>
+                {i18n.translate(
+                  'controllers.mnage.comp.confi.groups.static.recived',
+                  {
+                    defaultMessage: 'Total number of bytes received',
+                  },
+                )}
+              </EuiFlexItem>
             </EuiFlexGroup>
             <EuiFlexGroup>
               <EuiFlexItem>
-                <div style={{ height: "365px" }}>
+                <div style={{ height: '365px' }}>
                   <WzReduxProvider>
                     <KibanaVis
-                      visID={
-                        "Wazuh-App-Statistics-remoted-Recv-bytes"
-                      }
-                      tab={"statistics"}
+                      visID={'Wazuh-App-Statistics-remoted-Recv-bytes'}
+                      tab={'statistics'}
                     ></KibanaVis>
                   </WzReduxProvider>
                 </div>
@@ -43,19 +52,24 @@ export function WzStatisticsRemoted({clusterNodeSelected,  refreshVisualizations
           </EuiPanel>
         </EuiFlexItem>
         <EuiFlexItem>
-          <EuiPanel style={{ height: "400px" }}>
+          <EuiPanel style={{ height: '400px' }}>
             <EuiFlexGroup>
-              <EuiFlexItem>Events sent to Analysisd</EuiFlexItem>
+              <EuiFlexItem>
+                {i18n.translate(
+                  'controllers.mnage.comp.confi.groups.static.event',
+                  {
+                    defaultMessage: 'Events sent to Analysisd',
+                  },
+                )}
+              </EuiFlexItem>
             </EuiFlexGroup>
             <EuiFlexGroup>
               <EuiFlexItem>
-                <div style={{ height: "365px" }}>
+                <div style={{ height: '365px' }}>
                   <WzReduxProvider>
                     <KibanaVis
-                      visID={
-                        "Wazuh-App-Statistics-remoted-event-count"
-                      }
-                      tab={"statistics"}
+                      visID={'Wazuh-App-Statistics-remoted-event-count'}
+                      tab={'statistics'}
                     ></KibanaVis>
                   </WzReduxProvider>
                 </div>
@@ -67,19 +81,24 @@ export function WzStatisticsRemoted({clusterNodeSelected,  refreshVisualizations
 
       <EuiFlexGroup>
         <EuiFlexItem>
-          <EuiPanel style={{ height: "400px" }}>
+          <EuiPanel style={{ height: '400px' }}>
             <EuiFlexGroup>
-              <EuiFlexItem>Messages statistics</EuiFlexItem>
+              <EuiFlexItem>
+                {i18n.translate(
+                  'controllers.mnage.comp.confi.groups.static.Messagesstatistics',
+                  {
+                    defaultMessage: 'Messages statistics',
+                  },
+                )}
+              </EuiFlexItem>
             </EuiFlexGroup>
             <EuiFlexGroup>
               <EuiFlexItem>
-                <div style={{ height: "365px" }}>
+                <div style={{ height: '365px' }}>
                   <WzReduxProvider>
                     <KibanaVis
-                      visID={
-                        "Wazuh-App-Statistics-remoted-messages"
-                      }
-                      tab={"statistics"}
+                      visID={'Wazuh-App-Statistics-remoted-messages'}
+                      tab={'statistics'}
                     ></KibanaVis>
                   </WzReduxProvider>
                 </div>
@@ -88,19 +107,24 @@ export function WzStatisticsRemoted({clusterNodeSelected,  refreshVisualizations
           </EuiPanel>
         </EuiFlexItem>
         <EuiFlexItem>
-          <EuiPanel style={{ height: "400px" }}>
+          <EuiPanel style={{ height: '400px' }}>
             <EuiFlexGroup>
-              <EuiFlexItem>TCP sessions</EuiFlexItem>
+              <EuiFlexItem>
+                {i18n.translate(
+                  'controllers.mnage.comp.confi.groups.static.TCPsessions',
+                  {
+                    defaultMessage: 'TCP sessions',
+                  },
+                )}
+              </EuiFlexItem>
             </EuiFlexGroup>
             <EuiFlexGroup>
               <EuiFlexItem>
-                <div style={{ height: "365px" }}>
+                <div style={{ height: '365px' }}>
                   <WzReduxProvider>
                     <KibanaVis
-                      visID={
-                        "Wazuh-App-Statistics-remoted-tcp-sessions"
-                      }
-                      tab={"statistics"}
+                      visID={'Wazuh-App-Statistics-remoted-tcp-sessions'}
+                      tab={'statistics'}
                     ></KibanaVis>
                   </WzReduxProvider>
                 </div>

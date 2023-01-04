@@ -10,6 +10,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { i18n } from '@kbn/i18n';
 
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
@@ -38,15 +39,63 @@ import { WzRequest } from '../../../react-services/wz-request';
 import { ActionAgents } from '../../../react-services/action-agents';
 import { AppNavigate } from '../../../react-services/app-navigate';
 import { GroupTruncate } from '../../../components/common/util';
-import { WzSearchBar, filtersToObject } from '../../../components/wz-search-bar';
+import {
+  WzSearchBar,
+  filtersToObject,
+} from '../../../components/wz-search-bar';
 import { getAgentFilterValues } from '../../../controllers/management/components/management/groups/get-agents-filters-values';
 import { WzButtonPermissions } from '../../../components/common/permissions/button';
 import { formatUIDate } from '../../../react-services/time-service';
 import { withErrorBoundary } from '../../../components/common/hocs';
-import { API_NAME_AGENT_STATUS, UI_LOGGER_LEVELS, UI_ORDER_AGENT_STATUS } from '../../../../common/constants';
+import {
+  API_NAME_AGENT_STATUS,
+  UI_LOGGER_LEVELS,
+  UI_ORDER_AGENT_STATUS,
+} from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { AgentStatus } from '../../../components/agents/agent_status';
+
+const Descp1 = i18n.translate('controllers.agent.comp.table.Descp1', {
+  defaultMessage: 'Filter by agent connection status',
+});
+const Descp2 = i18n.translate('controllers.agent.comp.table.Descp2', {
+  defaultMessage: 'Filter by OS platform',
+});
+const Descp3 = i18n.translate('controllers.agent.comp.table.Descp3', {
+  defaultMessage: 'Filter by agent IP',
+});
+const Descp4 = i18n.translate('controllers.agent.comp.table.Descp4', {
+  defaultMessage: 'Filter by agent name',
+});
+const Descp5 = i18n.translate('controllers.agent.comp.table.Descp5', {
+  defaultMessage: 'Filter by agent id',
+});
+const Descp6 = i18n.translate('controllers.agent.comp.table.Descp6', {
+  defaultMessage: 'Filter by agent group',
+});
+const Descp7 = i18n.translate('controllers.agent.comp.table.Descp7', {
+  defaultMessage: 'Filter by node name',
+});
+const Descp8 = i18n.translate('controllers.agent.comp.table.Descp8', {
+  defaultMessage: 'Filter by manager',
+});
+const Descp9 = i18n.translate('controllers.agent.comp.table.Descp9', {
+  defaultMessage: 'Filter by agent version',
+});
+const Descp10 = i18n.translate('controllers.agent.comp.table.regkeyDescp', {
+  defaultMessage: 'Filter by check reason',
+});
+const Descp11 = i18n.translate('controllers.agent.comp.table.regkeyDescp11', {
+  defaultMessage: 'Filter by agent config sum',
+});
+const Descp12 = i18n.translate('controllers.agent.comp.table.regkeyDescp12', {
+  defaultMessage: 'Filter by agent merged sum',
+});
+
+const Descp13 = i18n.translate('controllers.agent.comp.table.regkeyDescp13', {
+  defaultMessage: 'Filter by last keep alive',
+});
 
 export const AgentsTable = withErrorBoundary(
   class AgentsTable extends Component {
@@ -66,100 +115,114 @@ export const AgentsTable = withErrorBoundary(
         purgeModal: false,
         isFilterColumnOpen: false,
         filters: sessionStorage.getItem('agents_preview_selected_options')
-          ? JSON.parse(sessionStorage.getItem('agents_preview_selected_options'))
+          ? JSON.parse(
+              sessionStorage.getItem('agents_preview_selected_options'),
+            )
           : [],
       };
       this.suggestions = [
         {
           type: 'q',
           label: 'status',
-          description: 'Filter by agent connection status',
+          description: Descp1,
           operators: ['=', '!='],
           values: UI_ORDER_AGENT_STATUS,
         },
         {
           type: 'q',
           label: 'os.platform',
-          description: 'Filter by OS platform',
+          description: Descp2,
           operators: ['=', '!='],
-          values: async (value) => getAgentFilterValues('os.platform', value, { q: 'id!=000' }),
+          values: async value =>
+            getAgentFilterValues('os.platform', value, { q: 'id!=000' }),
         },
         {
           type: 'q',
           label: 'ip',
-          description: 'Filter by agent IP',
+          description: Descp3,
           operators: ['=', '!='],
-          values: async (value) => getAgentFilterValues('ip', value, { q: 'id!=000' }),
+          values: async value =>
+            getAgentFilterValues('ip', value, { q: 'id!=000' }),
         },
         {
           type: 'q',
           label: 'name',
-          description: 'Filter by agent name',
+          description: Descp4,
           operators: ['=', '!='],
-          values: async (value) => getAgentFilterValues('name', value, { q: 'id!=000' }),
+          values: async value =>
+            getAgentFilterValues('name', value, { q: 'id!=000' }),
         },
         {
           type: 'q',
           label: 'id',
-          description: 'Filter by agent id',
+          description: Descp5,
           operators: ['=', '!='],
-          values: async (value) => getAgentFilterValues('id', value, { q: 'id!=000' }),
+          values: async value =>
+            getAgentFilterValues('id', value, { q: 'id!=000' }),
         },
         {
           type: 'q',
           label: 'group',
-          description: 'Filter by agent group',
+          description: Descp6,
           operators: ['=', '!='],
-          values: async (value) => getAgentFilterValues('group', value, { q: 'id!=000' }),
+          values: async value =>
+            getAgentFilterValues('group', value, { q: 'id!=000' }),
         },
         {
           type: 'q',
           label: 'node_name',
-          description: 'Filter by node name',
+          description: Descp7,
           operators: ['=', '!='],
-          values: async (value) => getAgentFilterValues('node_name', value, { q: 'id!=000' }),
+          values: async value =>
+            getAgentFilterValues('node_name', value, { q: 'id!=000' }),
         },
         {
           type: 'q',
           label: 'manager',
-          description: 'Filter by manager',
+          description: Descp8,
           operators: ['=', '!='],
-          values: async (value) => getAgentFilterValues('manager', value, { q: 'id!=000' }),
+          values: async value =>
+            getAgentFilterValues('manager', value, { q: 'id!=000' }),
         },
         {
           type: 'q',
           label: 'version',
-          description: 'Filter by agent version',
+          description: Descp9,
           operators: ['=', '!='],
-          values: async (value) => getAgentFilterValues('version', value, { q: 'id!=000' }),
+          values: async value =>
+            getAgentFilterValues('version', value, { q: 'id!=000' }),
         },
         {
           type: 'q',
           label: 'configSum',
-          description: 'Filter by agent config sum',
+          description: Descp10,
           operators: ['=', '!='],
-          values: async (value) => getAgentFilterValues('configSum', value, { q: 'id!=000' }),
+          values: async value =>
+            getAgentFilterValues('configSum', value, { q: 'id!=000' }),
         },
         {
           type: 'q',
           label: 'mergedSum',
-          description: 'Filter by agent merged sum',
+          description: Descp11,
           operators: ['=', '!='],
-          values: async (value) => getAgentFilterValues('mergedSum', value, { q: 'id!=000' }),
+          values: async value =>
+            getAgentFilterValues('mergedSum', value, { q: 'id!=000' }),
         },
         {
           type: 'q',
           label: 'dateAdd',
-          description: 'Filter by add date',
+          description: Descp12,
           operators: ['=', '!='],
-          values: async (value) => getAgentFilterValues('dateAdd', value, { q: 'id!=000' }),
+          values: async value =>
+            getAgentFilterValues('dateAdd', value, { q: 'id!=000' }),
         },
         {
           type: 'q',
           label: 'lastKeepAlive',
-          description: 'Filter by last keep alive',
+          description: Descp13,
           operators: ['=', '!='],
-          values: async (value) => getAgentFilterValues('lastKeepAlive', value, { q: 'id!=000' }),
+          values: async value =>
+            getAgentFilterValues('lastKeepAlive', value, { q: 'id!=000' }),
         },
       ];
       this.downloadCsv.bind(this);
@@ -168,13 +231,17 @@ export const AgentsTable = withErrorBoundary(
     async UNSAFE_componentWillMount() {
       const managerVersion = await WzRequest.apiReq('GET', '/', {});
       const totalAgent = await WzRequest.apiReq('GET', '/agents', {});
-      const agentActive = await WzRequest.apiReq('GET', '/agents/summary/status', {});
+      const agentActive = await WzRequest.apiReq(
+        'GET',
+        '/agents/summary/status',
+        {},
+      );
 
-      
       this.setState({
         managerVersion: managerVersion.data.data.api_version,
         avaibleAgents: totalAgent.data.data.affected_items,
-        agentActive: agentActive.data.data.active + agentActive.data.data.disconnected,
+        agentActive:
+          agentActive.data.data.active + agentActive.data.data.disconnected,
       });
     }
 
@@ -229,16 +296,19 @@ export const AgentsTable = withErrorBoundary(
     async getItems() {
       try {
         this._isMount && this.setState({ isLoading: true });
-        const rawAgents = await this.props.wzReq('GET', '/agents', { params: this.buildFilter() });
+        const rawAgents = await this.props.wzReq('GET', '/agents', {
+          params: this.buildFilter(),
+        });
 
-        const formatedAgents = (((rawAgents || {}).data || {}).data || {}).affected_items.map(
-          this.formatAgent.bind(this)
-        );
+        const formatedAgents = (
+          ((rawAgents || {}).data || {}).data || {}
+        ).affected_items.map(this.formatAgent.bind(this));
 
         this._isMount &&
           this.setState({
             agents: formatedAgents,
-            totalItems: (((rawAgents || {}).data || {}).data || {}).total_affected_items,
+            totalItems: (((rawAgents || {}).data || {}).data || {})
+              .total_affected_items,
             isLoading: false,
           });
       } catch (error) {
@@ -274,13 +344,15 @@ export const AgentsTable = withErrorBoundary(
 
       const rawAgents = await this.props.wzReq('GET', '/agents', filterTable);
 
-      const agentsFiltered = await this.props.wzReq('GET', '/agents', filterAll).then(() => {
-        this._isMount && this.setState({ loadingAllItem: false });
-      });
+      const agentsFiltered = await this.props
+        .wzReq('GET', '/agents', filterAll)
+        .then(() => {
+          this._isMount && this.setState({ loadingAllItem: false });
+        });
 
-      const formatedAgents = (((rawAgents || {}).data || {}).data || {}).items.map(
-        this.formatAgent.bind(this)
-      );
+      const formatedAgents = (
+        ((rawAgents || {}).data || {}).data || {}
+      ).items.map(this.formatAgent.bind(this));
       this._isMount &&
         this.setState({
           agents: formatedAgents,
@@ -319,11 +391,15 @@ export const AgentsTable = withErrorBoundary(
     }
 
     formatAgent(agent) {
-      const checkField = (field) => {
+      const checkField = field => {
         return field !== undefined ? field : '-';
       };
-      const agentVersion = agent.version !== undefined ? agent.version.split(' ')[1] : '-';
-      const node_name = agent.node_name && agent.node_name !== 'unknown' ? agent.node_name : '-';
+      const agentVersion =
+        agent.version !== undefined ? agent.version.split(' ')[1] : '-';
+      const node_name =
+        agent.node_name && agent.node_name !== 'unknown'
+          ? agent.node_name
+          : '-';
 
       return {
         id: agent.id,
@@ -335,7 +411,9 @@ export const AgentsTable = withErrorBoundary(
         version: agentVersion,
         node_name: node_name,
         dateAdd: agent.dateAdd ? formatUIDate(agent.dateAdd) : '-',
-        lastKeepAlive: agent.lastKeepAlive ? formatUIDate(agent.lastKeepAlive) : '-',
+        lastKeepAlive: agent.lastKeepAlive
+          ? formatUIDate(agent.lastKeepAlive)
+          : '-',
         actions: agent,
         upgrading: false,
       };
@@ -344,28 +422,34 @@ export const AgentsTable = withErrorBoundary(
     actionButtonsRender(agent) {
       return (
         <div className={'icon-box-action'}>
-          <EuiToolTip content="Open summary panel for this agent" position="left">
+          <EuiToolTip
+            content='Open summary panel for this agent'
+            position='left'
+          >
             <EuiButtonIcon
-              onClick={(ev) => {
+              onClick={ev => {
                 ev.stopPropagation();
                 this.props.clickAction(agent, 'default');
               }}
-              iconType="eye"
+              iconType='eye'
               color={'primary'}
-              aria-label="Open summary panel for this agent"
+              aria-label='Open summary panel for this agent'
             />
           </EuiToolTip>
           &nbsp;
           {agent.status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED && (
-            <EuiToolTip content="Open configuration for this agent" position="left">
+            <EuiToolTip
+              content='Open configuration for this agent'
+              position='left'
+            >
               <EuiButtonIcon
-                onClick={(ev) => {
+                onClick={ev => {
                   ev.stopPropagation();
                   this.props.clickAction(agent, 'configuration');
                 }}
                 color={'primary'}
-                iconType="wrench"
-                aria-label="Open configuration for this agent"
+                iconType='wrench'
+                aria-label='Open configuration for this agent'
               />
             </EuiToolTip>
           )}
@@ -375,7 +459,7 @@ export const AgentsTable = withErrorBoundary(
 
     addIconPlatformRender(agent) {
       let icon = false;
-      const checkField = (field) => {
+      const checkField = field => {
         return field !== undefined ? field : '-';
       };
       const os = (agent || {}).os;
@@ -393,10 +477,10 @@ export const AgentsTable = withErrorBoundary(
         checkField(((agent || {}).os || {}).version);
 
       return (
-        <span className="euiTableCellContent__text euiTableCellContent--truncateText">
+        <span className='euiTableCellContent__text euiTableCellContent--truncateText'>
           <i
             className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`}
-            aria-hidden="true"
+            aria-hidden='true'
           ></i>{' '}
           {os_name === '- -' ? '-' : os_name}
         </span>
@@ -426,8 +510,8 @@ export const AgentsTable = withErrorBoundary(
     downloadCsv = () => {
       const filters = this.buildFilter();
       const formatedFilters = Object.keys(filters)
-        .filter((field) => !['limit', 'offset', 'sort'].includes(field))
-        .map((field) => ({ name: field, value: filters[field] }));
+        .filter(field => !['limit', 'offset', 'sort'].includes(field))
+        .map(field => ({ name: field, value: filters[field] }));
       this.props.downloadCsv(formatedFilters);
     };
 
@@ -441,14 +525,16 @@ export const AgentsTable = withErrorBoundary(
       return (
         <>
           <EuiFlexItem grow={false}>
-            <EuiButtonEmpty iconType="importAction" onClick={this.downloadCsv}>
-              Export formatted
+            <EuiButtonEmpty iconType='importAction' onClick={this.downloadCsv}>
+              {i18n.translate('controllers.sgent.components.Exportformatted', {
+                defaultMessage: 'Export formatted',
+              })}
             </EuiButtonEmpty>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
-            <EuiToolTip content="Select columns table" position="left">
+            <EuiToolTip content='Select columns table' position='left'>
               <EuiButtonEmpty onClick={this.openColumnsFilter}>
-                <EuiIcon type="managementApp" color="primary" />
+                <EuiIcon type='managementApp' color='primary' />
               </EuiButtonEmpty>
             </EuiToolTip>
           </EuiFlexItem>
@@ -466,10 +552,10 @@ export const AgentsTable = withErrorBoundary(
     };
 
     /* MULTISELECT TABLE */
-    onSelectionChange = (selectedItems) => {
+    onSelectionChange = selectedItems => {
       const { managerVersion, pageSize } = this.state;
 
-      selectedItems.forEach((item) => {
+      selectedItems.forEach(item => {
         if (managerVersion > item.version && item.version !== '.') {
           item.outdated = true;
         }
@@ -487,24 +573,47 @@ export const AgentsTable = withErrorBoundary(
 
       if (
         selectedItems.length === 0 ||
-        (selectedItems.length > 0 && selectedItems.filter((item) => item.outdated).length === 0) ||
-        (selectedItems.length > 0 && selectedItems.filter((item) => item.upgrading).length > 0) ||
         (selectedItems.length > 0 &&
-          selectedItems.filter((item) => item.status === API_NAME_AGENT_STATUS.ACTIVE).length === 0) ||
+          selectedItems.filter(item => item.outdated).length === 0) ||
         (selectedItems.length > 0 &&
-          selectedItems.filter((item) => item.status === API_NAME_AGENT_STATUS.ACTIVE).length === 0 &&
-          selectedItems.filter((item) => item.status === API_NAME_AGENT_STATUS.DISCONNECTED).length > 0) ||
-        selectedItems.filter((item) => item.outdated && item.status === API_NAME_AGENT_STATUS.ACTIVE).length === 0
+          selectedItems.filter(item => item.upgrading).length > 0) ||
+        (selectedItems.length > 0 &&
+          selectedItems.filter(
+            item => item.status === API_NAME_AGENT_STATUS.ACTIVE,
+          ).length === 0) ||
+        (selectedItems.length > 0 &&
+          selectedItems.filter(
+            item => item.status === API_NAME_AGENT_STATUS.ACTIVE,
+          ).length === 0 &&
+          selectedItems.filter(
+            item => item.status === API_NAME_AGENT_STATUS.DISCONNECTED,
+          ).length > 0) ||
+        selectedItems.filter(
+          item => item.outdated && item.status === API_NAME_AGENT_STATUS.ACTIVE,
+        ).length === 0
       ) {
         return;
       }
 
       return (
         <EuiFlexItem grow={false}>
-          <EuiButton color="secondary" iconType="sortUp" onClick={this.onClickUpgrade}>
-            Upgrade{' '}
-            {selectedItems.filter((item) => item.outdated && item.status === API_NAME_AGENT_STATUS.ACTIVE).length}{' '}
-            agents
+          <EuiButton
+            color='secondary'
+            iconType='sortUp'
+            onClick={this.onClickUpgrade}
+          >
+            {i18n.translate('controllers.sgent.components.Upgrades', {
+              defaultMessage: 'Upgrade',
+            })}{' '}
+            {
+              selectedItems.filter(
+                item =>
+                  item.outdated && item.status === API_NAME_AGENT_STATUS.ACTIVE,
+              ).length
+            }{' '}
+            {i18n.translate('controllers.sgent.components.agents', {
+              defaultMessage: 'agents',
+            })}
           </EuiButton>
         </EuiFlexItem>
       );
@@ -516,7 +625,9 @@ export const AgentsTable = withErrorBoundary(
       if (
         selectedItems.length > 0 &&
         avaibleAgents.filter(
-          (agent) => agent.version !== 'Wazuh ' + managerVersion && agent.status === API_NAME_AGENT_STATUS.ACTIVE
+          agent =>
+            agent.version !== 'Wazuh ' + managerVersion &&
+            agent.status === API_NAME_AGENT_STATUS.ACTIVE,
         ).length === 0
       ) {
         return;
@@ -524,8 +635,14 @@ export const AgentsTable = withErrorBoundary(
 
       return (
         <EuiFlexItem grow={false}>
-          <EuiButton color="secondary" iconType="sortUp" onClick={this.onClickUpgradeAll}>
-            Upgrade all agents
+          <EuiButton
+            color='secondary'
+            iconType='sortUp'
+            onClick={this.onClickUpgradeAll}
+          >
+            {i18n.translate('controllers.sgent.components.Upgrade', {
+              defaultMessage: 'Upgrade all agents',
+            })}
           </EuiButton>
         </EuiFlexItem>
       );
@@ -536,15 +653,31 @@ export const AgentsTable = withErrorBoundary(
 
       if (
         selectedItems.length === 0 ||
-        selectedItems.filter((item) => item.status === API_NAME_AGENT_STATUS.ACTIVE).length === 0
+        selectedItems.filter(
+          item => item.status === API_NAME_AGENT_STATUS.ACTIVE,
+        ).length === 0
       ) {
         return;
       }
 
       return (
         <EuiFlexItem grow={false}>
-          <EuiButton color="primary" iconType="refresh" onClick={this.onClickRestart}>
-            Restart {selectedItems.filter((item) => item.status === API_NAME_AGENT_STATUS.ACTIVE).length} agents
+          <EuiButton
+            color='primary'
+            iconType='refresh'
+            onClick={this.onClickRestart}
+          >
+            {i18n.translate('controllers.sgent.components.Restart', {
+              defaultMessage: 'Restart',
+            })}{' '}
+            {
+              selectedItems.filter(
+                item => item.status === API_NAME_AGENT_STATUS.ACTIVE,
+              ).length
+            }{' '}
+            {i18n.translate('controllers.sgent.components.agents', {
+              defaultMessage: 'agents',
+            })}
           </EuiButton>
         </EuiFlexItem>
       );
@@ -555,7 +688,9 @@ export const AgentsTable = withErrorBoundary(
 
       if (
         (selectedItems.length > 0 &&
-          avaibleAgents.filter((item) => item.status === API_NAME_AGENT_STATUS.ACTIVE).length === 0 &&
+          avaibleAgents.filter(
+            item => item.status === API_NAME_AGENT_STATUS.ACTIVE,
+          ).length === 0 &&
           selectedItems.length === 0) ||
         agentActive === 0
       ) {
@@ -564,8 +699,14 @@ export const AgentsTable = withErrorBoundary(
 
       return (
         <EuiFlexItem grow={false}>
-          <EuiButton color="primary" iconType="refresh" onClick={this.onClickRestartAll}>
-            Restart all agents
+          <EuiButton
+            color='primary'
+            iconType='refresh'
+            onClick={this.onClickRestartAll}
+          >
+            {i18n.translate('controllers.sgent.components.restartAll', {
+              defaultMessage: 'Restart all agents',
+            })}
           </EuiButton>
         </EuiFlexItem>
       );
@@ -581,13 +722,16 @@ export const AgentsTable = withErrorBoundary(
       return (
         <EuiFlexItem grow={false}>
           <EuiButton
-            iconType="trash"
-            color="danger"
+            iconType='trash'
+            color='danger'
             onClick={() => {
               this.setState({ purgeModal: true });
             }}
           >
-            Delete {selectedItems.length} agents
+            Delete {selectedItems.length}{' '}
+            {i18n.translate('controllers.sgent.components.agents', {
+              defaultMessage: 'agents',
+            })}
           </EuiButton>
         </EuiFlexItem>
       );
@@ -603,13 +747,15 @@ export const AgentsTable = withErrorBoundary(
       return (
         <EuiFlexItem grow={false}>
           <EuiButton
-            iconType="trash"
-            color="danger"
+            iconType='trash'
+            color='danger'
             onClick={() => {
               this._isMount && this.setState({ purgeModal: true });
             }}
           >
-            Delete all agents
+            {i18n.translate('controllers.sgent.components.delAll', {
+              defaultMessage: 'Delete all agents',
+            })}
           </EuiButton>
         </EuiFlexItem>
       );
@@ -623,11 +769,13 @@ export const AgentsTable = withErrorBoundary(
       } else if (selectedItems.length === pageSize) {
         return (
           <div>
-            <EuiSpacer size="m" />
+            <EuiSpacer size='m' />
             <EuiCallOut
-              size="s"
+              size='s'
               title={
-                !allSelected ? `The ${selectedItems.length} agents on this page are selected` : ''
+                !allSelected
+                  ? `The ${selectedItems.length} agents on this page are selected`
+                  : ''
               }
             >
               <EuiFlexGroup>
@@ -635,7 +783,7 @@ export const AgentsTable = withErrorBoundary(
                   <EuiButton
                     onClick={() => {
                       this._isMount &&
-                        this.setState((prevState) => ({
+                        this.setState(prevState => ({
                           allSelected: !prevState.allSelected,
                         }));
                     }}
@@ -647,32 +795,40 @@ export const AgentsTable = withErrorBoundary(
                 </EuiFlexItem>
               </EuiFlexGroup>
             </EuiCallOut>
-            <EuiSpacer size="s" />
+            <EuiSpacer size='s' />
           </div>
         );
       }
     }
 
     getTableColumnsSelected() {
-      return JSON.parse(window.localStorage.getItem('columnsSelectedTableAgent')) || [];
+      return (
+        JSON.parse(window.localStorage.getItem('columnsSelectedTableAgent')) ||
+        []
+      );
     }
 
     setTableColumnsSelected(data) {
-      window.localStorage.setItem('columnsSelectedTableAgent', JSON.stringify(data));
+      window.localStorage.setItem(
+        'columnsSelectedTableAgent',
+        JSON.stringify(data),
+      );
     }
 
     setUpgradingState(agentID) {
       const { agents } = this.state;
-      agents.forEach((element) => {
+      agents.forEach(element => {
         element.id === agentID ? (element.upgrading = true) : false;
       });
       this._isMount && this.setState({ agents });
     }
 
-    changeUpgradingState = (agentID) => {
+    changeUpgradingState = agentID => {
       const { agents } = this.state;
-      agents.forEach((element) => {
-        element.id === agentID && element.upgrading === true ? (element.upgrading = false) : false;
+      agents.forEach(element => {
+        element.id === agentID && element.upgrading === true
+          ? (element.upgrading = false)
+          : false;
       });
       this._isMount && this.setState(() => ({ agents }));
     };
@@ -702,10 +858,10 @@ export const AgentsTable = withErrorBoundary(
     onClickPurge = async () => {
       const { selectedItems } = this.state;
       const auxAgents = selectedItems
-        .map((agent) => {
+        .map(agent => {
           return agent.id !== '000' ? agent.id : null;
         })
-        .filter((agent) => agent !== null);
+        .filter(agent => agent !== null);
       try {
         const response = await WzRequest.apiReq('DELETE', `/agents`, {
           purge: true,
@@ -713,8 +869,18 @@ export const AgentsTable = withErrorBoundary(
           older_than: '1s',
         });
         response.status === 200
-          ? this.showToast('success', `Selected agents were successfully deleted`, '', 5000)
-          : this.showToast('warning', `Failed to delete selected agents`, '', 5000);
+          ? this.showToast(
+              'success',
+              `Selected agents were successfully deleted`,
+              '',
+              5000,
+            )
+          : this.showToast(
+              'warning',
+              `Failed to delete selected agents`,
+              '',
+              5000,
+            );
       } catch (error) {
         const options = {
           context: `${AgentsTable.name}.onClickPurge`,
@@ -737,10 +903,10 @@ export const AgentsTable = withErrorBoundary(
     onClickPurgeAll = () => {
       const { avaibleAgents } = this.state;
       const auxAgents = avaibleAgents
-        .map((agent) => {
+        .map(agent => {
           return agent.id !== '000' ? agent.id : null;
         })
-        .filter((agent) => agent !== null);
+        .filter(agent => agent !== null);
       try {
         const response = WzRequest.apiReq('DELETE', `/agents`, {
           purge: true,
@@ -748,7 +914,12 @@ export const AgentsTable = withErrorBoundary(
           older_than: '1s',
         });
         response.status === 200
-          ? this.showToast('success', `All agents have been successfully deleted`, '', 5000)
+          ? this.showToast(
+              'success',
+              `All agents have been successfully deleted`,
+              '',
+              5000,
+            )
           : this.showToast('warning', `Failed to delete all agents`, '', 5000);
       } catch (error) {
         const options = {
@@ -798,7 +969,7 @@ export const AgentsTable = withErrorBoundary(
           width: '20%',
           truncateText: true,
           sortable: true,
-          render: (groups) => (groups !== '-' ? this.renderGroups(groups) : '-'),
+          render: groups => (groups !== '-' ? this.renderGroups(groups) : '-'),
         },
         {
           field: 'os_name',
@@ -843,28 +1014,35 @@ export const AgentsTable = withErrorBoundary(
           truncateText: true,
           sortable: true,
           width: '15%',
-          render: (status) => <AgentStatus status={status} labelProps={{className: 'hide-agent-status' }}/>,
+          render: status => (
+            <AgentStatus
+              status={status}
+              labelProps={{ className: 'hide-agent-status' }}
+            />
+          ),
         },
         {
           align: 'right',
           width: '5%',
           field: 'actions',
           name: 'Actions',
-          render: (agent) => this.actionButtonsRender(agent),
+          render: agent => this.actionButtonsRender(agent),
         },
       ];
 
       if (selectedColumns.length != 0) {
         const newSelectedColumns = [];
-        selectedColumns.forEach((item) => {
+        selectedColumns.forEach(item => {
           if (item.show) {
-            const column = defaultColumns.find((column) => column.field === item.field);
+            const column = defaultColumns.find(
+              column => column.field === item.field,
+            );
             newSelectedColumns.push(column);
           }
         });
         return newSelectedColumns;
       } else {
-        const fieldColumns = defaultColumns.map((item) => {
+        const fieldColumns = defaultColumns.map(item => {
           return {
             field: item.field,
             name: item.name,
@@ -886,7 +1064,15 @@ export const AgentsTable = withErrorBoundary(
                 <EuiFlexItem>
                   {!!this.state.totalItems && (
                     <EuiTitle size={'s'} style={{ padding: '6px 0px' }}>
-                      <h2>Agents ({this.state.totalItems})</h2>
+                      <h2>
+                        {i18n.translate(
+                          'controllers.sgent.components.Agents ',
+                          {
+                            defaultMessage: 'Agents ',
+                          },
+                        )}
+                        ({this.state.totalItems})
+                      </h2>
                     </EuiTitle>
                   )}
                 </EuiFlexItem>
@@ -894,17 +1080,19 @@ export const AgentsTable = withErrorBoundary(
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
               <WzButtonPermissions
-                buttonType="empty"
+                buttonType='empty'
                 permissions={[{ action: 'agent:create', resource: '*:*:*' }]}
-                iconType="plusInCircle"
+                iconType='plusInCircle'
                 onClick={() => this.props.addingNewAgent()}
               >
-                Deploy new agent
+                {i18n.translate('controllers.sgent.components.newagent', {
+                  defaultMessage: 'Deploy new agent',
+                })}
               </WzButtonPermissions>
             </EuiFlexItem>
             {formattedButton}
           </EuiFlexGroup>
-          <EuiSpacer size="xs" />
+          <EuiSpacer size='xs' />
         </div>
       );
     }
@@ -917,13 +1105,21 @@ export const AgentsTable = withErrorBoundary(
               noDeleteFiltersOnUpdateSuggests
               filters={this.state.filters}
               suggestions={this.suggestions}
-              onFiltersChange={(filters) => this.setState({ filters, pageIndex: 0 })}
-              placeholder="Filter or search agent"
+              onFiltersChange={filters =>
+                this.setState({ filters, pageIndex: 0 })
+              }
+              placeholder='Filter or search agent'
             />
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
-            <EuiButton iconType="refresh" fill={true} onClick={() => this.reloadAgents()}>
-              Refresh
+            <EuiButton
+              iconType='refresh'
+              fill={true}
+              onClick={() => this.reloadAgents()}
+            >
+              {i18n.translate('controllers.sgent.components.Refresh', {
+                defaultMessage: 'Refresh',
+              })}{' '}
             </EuiButton>
           </EuiFlexItem>
         </EuiFlexGroup>
@@ -933,15 +1129,15 @@ export const AgentsTable = withErrorBoundary(
     selectColumnsRender() {
       const columnsSelected = this.getTableColumnsSelected();
 
-      const onChange = (optionId) => {
-        let item = columnsSelected.find((item) => item.field === optionId);
+      const onChange = optionId => {
+        let item = columnsSelected.find(item => item.field === optionId);
         item.show = !item.show;
         this.setTableColumnsSelected(columnsSelected);
         this.forceUpdate();
       };
 
       const options = () => {
-        return columnsSelected.map((item) => {
+        return columnsSelected.map(item => {
           return {
             id: item.field,
             label: item.name,
@@ -956,7 +1152,7 @@ export const AgentsTable = withErrorBoundary(
             <EuiCheckboxGroup
               options={options()}
               onChange={onChange}
-              className="columnsSelectedCheckboxs"
+              className='columnsSelectedCheckboxs'
               idToSelectedMap={{}}
             />
           </EuiFlexItem>
@@ -967,7 +1163,7 @@ export const AgentsTable = withErrorBoundary(
     }
 
     tableRender() {
-      const getRowProps = (item) => {
+      const getRowProps = item => {
         const { id } = item;
         return {
           'data-test-subj': `row-${id}`,
@@ -981,8 +1177,11 @@ export const AgentsTable = withErrorBoundary(
           return;
         }
         return {
-          onMouseDown: (ev) => {
-            AppNavigate.navigateToModule(ev, 'agents', { tab: 'welcome', agent: item.id });
+          onMouseDown: ev => {
+            AppNavigate.navigateToModule(ev, 'agents', {
+              tab: 'welcome',
+              agent: item.id,
+            });
             ev.stopPropagation();
           },
         };
@@ -1015,7 +1214,7 @@ export const AgentsTable = withErrorBoundary(
       };
 
       const selection = {
-        selectable: (agent) => agent.id,
+        selectable: agent => agent.id,
         /* onSelectionChange: this.onSelectionChange */
       };
 
@@ -1024,7 +1223,7 @@ export const AgentsTable = withErrorBoundary(
           <EuiFlexItem>
             <EuiBasicTable
               items={agents}
-              itemId="id"
+              itemId='id'
               columns={columns}
               onChange={this.onTableChange}
               sorting={sorting}
@@ -1033,7 +1232,7 @@ export const AgentsTable = withErrorBoundary(
               cellProps={getCellProps}
               /*             isSelectable={false}
                         selection={selection} */
-              noItemsMessage="No agents found"
+              noItemsMessage='No agents found'
               {...(pagination && { pagination })}
             />
           </EuiFlexItem>
@@ -1041,9 +1240,11 @@ export const AgentsTable = withErrorBoundary(
       );
     }
 
-    filterGroupBadge = (group) => {
+    filterGroupBadge = group => {
       const { filters } = this.state;
-      let auxFilters = filters.map((filter) => filter.value.match(/group=(.*S?)/)[1]);
+      let auxFilters = filters.map(
+        filter => filter.value.match(/group=(.*S?)/)[1],
+      );
       if (filters.length > 0) {
         !auxFilters.includes(group)
           ? this.setState({
@@ -1071,7 +1272,8 @@ export const AgentsTable = withErrorBoundary(
     }
 
     render() {
-      const { allSelected, purgeModal, selectedItems, loadingAllItem } = this.state;
+      const { allSelected, purgeModal, selectedItems, loadingAllItem } =
+        this.state;
       const title = this.headRender();
       const filter = this.filterBarRender();
       const selectColumnsRender = this.selectColumnsRender();
@@ -1088,17 +1290,25 @@ export const AgentsTable = withErrorBoundary(
         renderPurgeModal = (
           <EuiOverlayMask>
             <EuiConfirmModal
-              title={allSelected ? 'Delete all agents' : `Delete ${selectedItems.length} agents`}
+              title={
+                allSelected
+                  ? 'Delete all agents'
+                  : `Delete ${selectedItems.length} agents`
+              }
               onCancel={() => {
                 this.setState({ purgeModal: false });
               }}
               onConfirm={allSelected ? this.onClickPurgeAll : this.onClickPurge}
               cancelButtonText="No, don't do it"
-              confirmButtonText="Yes, delete agents"
-              defaultFocusedButton="confirm"
-              buttonColor="danger"
+              confirmButtonText='Yes, delete agents'
+              defaultFocusedButton='confirm'
+              buttonColor='danger'
             >
-              <p>Are you sure you want to do this?</p>
+              <p>
+                {i18n.translate('controllers.sgent.components.sure', {
+                  defaultMessage: 'Are you sure you want to do this?',
+                })}
+              </p>
             </EuiConfirmModal>
           </EuiOverlayMask>
         );
@@ -1108,7 +1318,7 @@ export const AgentsTable = withErrorBoundary(
         barButtons = (
           <EuiFlexGroup>
             <EuiFlexItem>
-              <EuiLoadingSpinner size="l" />
+              <EuiLoadingSpinner size='l' />
             </EuiFlexItem>
           </EuiFlexGroup>
         );
@@ -1125,8 +1335,8 @@ export const AgentsTable = withErrorBoundary(
       return (
         <div>
           {filter}
-          <EuiSpacer size="m" />
-          <EuiPanel paddingSize="m">
+          <EuiSpacer size='m' />
+          <EuiPanel paddingSize='m'>
             {title}
             {loadItems}
             {selectedItems.length > 0 && barButtons}
@@ -1138,7 +1348,7 @@ export const AgentsTable = withErrorBoundary(
         </div>
       );
     }
-  }
+  },
 );
 
 AgentsTable.propTypes = {

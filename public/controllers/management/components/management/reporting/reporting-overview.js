@@ -17,8 +17,9 @@ import {
   EuiPanel,
   EuiTitle,
   EuiPage,
-  EuiText
+  EuiText,
 } from '@elastic/eui';
+import { i18n } from '@kbn/i18n';
 
 // Wazuh components
 import WzReportingTable from './reporting-table';
@@ -50,7 +51,14 @@ export class WzReportingOverview extends Component {
               <EuiFlexGroup>
                 <EuiFlexItem>
                   <EuiTitle>
-                    <h2>Reporting</h2>
+                    <h2>
+                      {i18n.translate(
+                        'controllers.mnage.comp.confi.groups.reports.Reporting',
+                        {
+                          defaultMessage: ' Reporting',
+                        },
+                      )}
+                    </h2>
                   </EuiTitle>
                 </EuiFlexItem>
               </EuiFlexGroup>
@@ -59,8 +67,13 @@ export class WzReportingOverview extends Component {
           </EuiFlexGroup>
           <EuiFlexGroup>
             <EuiFlexItem>
-              <EuiText color="subdued" style={{ paddingBottom: '15px' }}>
-                From here you can check all your reports.
+              <EuiText color='subdued' style={{ paddingBottom: '15px' }}>
+                {i18n.translate(
+                  'controllers.mnage.comp.confi.groups.reports.check',
+                  {
+                    defaultMessage: 'From here you can check all your reports.',
+                  },
+                )}
               </EuiText>
             </EuiFlexItem>
           </EuiFlexGroup>

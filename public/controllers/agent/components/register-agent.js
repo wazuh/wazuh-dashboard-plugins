@@ -34,7 +34,7 @@ import {
   EuiCode,
   EuiLink,
   EuiIcon,
-  EuiSwitch
+  EuiSwitch,
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
 import { withErrorBoundary } from '../../../components/common/hocs';
@@ -42,6 +42,7 @@ import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
+import { i18n } from '@kbn/i18n';
 
 const architectureButtons = [
   {
@@ -122,7 +123,6 @@ const sysButtons = [
 ];
 
 export const RegisterAgent = withErrorBoundary(
-
   class RegisterAgent extends Component {
     constructor(props) {
       super(props);
@@ -148,7 +148,7 @@ export const RegisterAgent = withErrorBoundary(
         rpm: this.systemSelector(),
         deb: this.systemSelector(),
         macos: 'sudo /Library/Ossec/bin/wazuh-control start',
-        win: 'NET START WazuhSvc'
+        win: 'NET START WazuhSvc',
       };
     }
 
@@ -166,7 +166,10 @@ export const RegisterAgent = withErrorBoundary(
         let authInfo = await this.getAuthInfo();
         const needsPassword = (authInfo.auth || {}).use_password === 'yes';
         if (needsPassword) {
-          wazuhPassword = this.configuration['enrollment.password'] || authInfo['authd.pass'] || '';
+          wazuhPassword =
+            this.configuration['enrollment.password'] ||
+            authInfo['authd.pass'] ||
+            '';
           if (wazuhPassword) {
             hidePasswordInput = true;
           }
@@ -210,7 +213,11 @@ export const RegisterAgent = withErrorBoundary(
 
     async getAuthInfo() {
       try {
-        const result = await WzRequest.apiReq('GET', '/agents/000/config/auth/auth', {});
+        const result = await WzRequest.apiReq(
+          'GET',
+          '/agents/000/config/auth/auth',
+          {},
+        );
         return (result.data || {}).data || {};
       } catch (error) {
         this.setState({ gotErrorRegistrationServiceInfo: true });
@@ -220,9 +227,16 @@ export const RegisterAgent = withErrorBoundary(
 
     async getRemoteInfo() {
       try {
-        const result = await WzRequest.apiReq('GET', '/agents/000/config/request/remote', {});
+        const result = await WzRequest.apiReq(
+          'GET',
+          '/agents/000/config/request/remote',
+          {},
+        );
         const remote = ((result.data || {}).data || {}).remote || {};
-        return (remote[0] || {}).protocol !== 'tcp' && (remote[0] || {}).protocol[0] !== 'TCP';
+        return (
+          (remote[0] || {}).protocol !== 'tcp' &&
+          (remote[0] || {}).protocol[0] !== 'TCP'
+        );
       } catch (error) {
         throw new Error(error);
       }
@@ -241,11 +255,13 @@ export const RegisterAgent = withErrorBoundary(
       if (this.state.selectedOS === 'rpm') {
         if (this.state.selectedSYS === 'systemd') {
           return 'sudo systemctl daemon-reload\nsudo systemctl enable wazuh-agent\nsudo systemctl start wazuh-agent';
-        } else return 'sudo chkconfig --add wazuh-agent\nsudo service wazuh-agent start';
+        } else
+          return 'sudo chkconfig --add wazuh-agent\nsudo service wazuh-agent start';
       } else if (this.state.selectedOS === 'deb') {
         if (this.state.selectedSYS === 'systemd') {
           return 'sudo systemctl daemon-reload\nsudo systemctl enable wazuh-agent\nsudo systemctl start wazuh-agent';
-        } else return 'sudo update-rc.d wazuh-agent defaults 95 10\nsudo service wazuh-agent start';
+        } else
+          return 'sudo update-rc.d wazuh-agent defaults 95 10\nsudo service wazuh-agent start';
       } else return '';
     }
 
@@ -292,7 +308,10 @@ export const RegisterAgent = withErrorBoundary(
     async getGroups() {
       try {
         const result = await WzRequest.apiReq('GET', '/groups', {});
-        return result.data.data.affected_items.map((item) => ({ label: item.name, id: item.name }));
+        return result.data.data.affected_items.map(item => ({
+          label: item.name,
+          id: item.name,
+        }));
       } catch (error) {
         throw new Error(error);
       }
@@ -315,7 +334,7 @@ export const RegisterAgent = withErrorBoundary(
 
       if (this.state.selectedGroup.length) {
         deployment += `WAZUH_AGENT_GROUP='${this.state.selectedGroup
-          .map((item) => item.label)
+          .map(item => item.label)
           .join(',')}' `;
       }
 
@@ -328,7 +347,9 @@ export const RegisterAgent = withErrorBoundary(
     }
 
     resolveRPMPackage() {
-      switch (`${this.state.selectedVersion}-${this.state.selectedArchitecture}`) {
+      switch (
+        `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
+      ) {
         case 'centos5-i386':
           return `https://packages.wazuh.com/4.x/yum5/i386/wazuh-agent-${this.state.wazuhVersion}-1.el5.i386.rpm`;
         case 'centos5-x86_64':
@@ -397,7 +418,9 @@ export const RegisterAgent = withErrorBoundary(
               : []),
           ];
         case 'deb':
-          return [...(!this.state.selectedArchitecture ? ['OS architecture'] : [])];
+          return [
+            ...(!this.state.selectedArchitecture ? ['OS architecture'] : []),
+          ];
         default:
           return [];
       }
@@ -412,13 +435,24 @@ export const RegisterAgent = withErrorBoundary(
     }
 
     render() {
-      const appVersionMajorDotMinor = this.state.wazuhVersion.split('.').slice(0, 2).join('.');
-      const urlCheckConnectionDocumentation = webDocumentationLink('user-manual/agents/agent-connection.html', appVersionMajorDotMinor);
+      const appVersionMajorDotMinor = this.state.wazuhVersion
+        .split('.')
+        .slice(0, 2)
+        .join('.');
+      const urlCheckConnectionDocumentation = webDocumentationLink(
+        'user-manual/agents/agent-connection.html',
+        appVersionMajorDotMinor,
+      );
       const textAndLinkToCheckConnectionDocumentation = (
         <p>
-          To verify the connection with the Wazuh server, please follow this{' '}
-          <a href={urlCheckConnectionDocumentation} target="_blank">
-            document.
+          {i18n.translate('controllers.sgent.components.server', {
+            defaultMessage:
+              'To verify the connection with the Wazuh server, please follow this',
+          })}{' '}
+          <a href={urlCheckConnectionDocumentation} target='_blank'>
+            {i18n.translate('controllers.sgent.componentsfqdn.', {
+              defaultMessage: 'document.',
+            })}
           </a>
         </p>
       );
@@ -426,12 +460,15 @@ export const RegisterAgent = withErrorBoundary(
       const ipInput = (
         <EuiText>
           <p>
-            This is the address the agent uses to communicate with the Wazuh server. It can be an IP address or a fully qualified domain name (FQDN).
+            {i18n.translate('controllers.sgent.components.fqdn', {
+              defaultMessage:
+                'This is the address the agent uses to communicate with the Wazuhserver. It can be an IP address or a fully qualified domain name(FQDN).',
+            })}
           </p>
           <EuiFieldText
-            placeholder="Server address"
+            placeholder='Server address'
             value={this.state.serverAddress}
-            onChange={(event) => this.setServerAddress(event)}
+            onChange={event => this.setServerAddress(event)}
           />
         </EuiText>
       );
@@ -441,25 +478,31 @@ export const RegisterAgent = withErrorBoundary(
           {!this.state.groups.length && (
             <>
               <EuiCallOut
-                color="warning"
+                color='warning'
                 title='This section could not be configured because you do not have permission to read groups.'
-                iconType="iInCircle"
+                iconType='iInCircle'
               />
               <EuiSpacer />
             </>
           )}
           <EuiText>
-            <p>Select one or more existing groups</p>
+            <p>
+              {i18n.translate('controllers.sgent.components.select', {
+                defaultMessage: 'Select one or more existing groups',
+              })}
+            </p>
             <EuiComboBox
-              placeholder={!this.state.groups.length ? "Default" : "Select group"}
+              placeholder={
+                !this.state.groups.length ? 'Default' : 'Select group'
+              }
               options={this.state.groups}
               selectedOptions={this.state.selectedGroup}
-              onChange={(group) => {
+              onChange={group => {
                 this.setGroupName(group);
               }}
               isDisabled={!this.state.groups.length}
               isClearable={true}
-              data-test-subj="demoComboBox"
+              data-test-subj='demoComboBox'
             />
           </EuiText>
         </>
@@ -467,9 +510,9 @@ export const RegisterAgent = withErrorBoundary(
 
       const passwordInput = (
         <EuiFieldText
-          placeholder="Wazuh password"
+          placeholder='Wazuh password'
           value={this.state.wazuhPassword}
-          onChange={(event) => this.setWazuhPassword(event)}
+          onChange={event => this.setWazuhPassword(event)}
         />
       );
 
@@ -478,16 +521,25 @@ export const RegisterAgent = withErrorBoundary(
       };
       const customTexts = {
         rpmText: `sudo ${this.optionalDeploymentVariables()}yum install ${this.optionalPackages()}`,
-        debText: `curl -so wazuh-agent-${this.state.wazuhVersion
-          }.deb ${this.optionalPackages()} && sudo ${this.optionalDeploymentVariables()}dpkg -i ./wazuh-agent-${this.state.wazuhVersion
-          }.deb`,
-        macosText: `curl -so wazuh-agent-${this.state.wazuhVersion
-          }.pkg https://packages.wazuh.com/4.x/macos/wazuh-agent-${this.state.wazuhVersion
-          }-1.pkg && sudo launchctl setenv ${this.optionalDeploymentVariables()}&& sudo installer -pkg ./wazuh-agent-${this.state.wazuhVersion
-          }.pkg -target /`,
-        winText: `Invoke-WebRequest -Uri https://packages.wazuh.com/4.x/windows/wazuh-agent-${this.state.wazuhVersion
-          }-1.msi -OutFile \${env:tmp}\\wazuh-agent-${this.state.wazuhVersion}.msi; msiexec.exe /i \${env:tmp}\\wazuh-agent-${this.state.wazuhVersion
-          }.msi /q ${this.optionalDeploymentVariables()}`,
+        debText: `curl -so wazuh-agent-${
+          this.state.wazuhVersion
+        }.deb ${this.optionalPackages()} && sudo ${this.optionalDeploymentVariables()}dpkg -i ./wazuh-agent-${
+          this.state.wazuhVersion
+        }.deb`,
+        macosText: `curl -so wazuh-agent-${
+          this.state.wazuhVersion
+        }.pkg https://packages.wazuh.com/4.x/macos/wazuh-agent-${
+          this.state.wazuhVersion
+        }-1.pkg && sudo launchctl setenv ${this.optionalDeploymentVariables()}&& sudo installer -pkg ./wazuh-agent-${
+          this.state.wazuhVersion
+        }.pkg -target /`,
+        winText: `Invoke-WebRequest -Uri https://packages.wazuh.com/4.x/windows/wazuh-agent-${
+          this.state.wazuhVersion
+        }-1.msi -OutFile \${env:tmp}\\wazuh-agent-${
+          this.state.wazuhVersion
+        }.msi; msiexec.exe /i \${env:tmp}\\wazuh-agent-${
+          this.state.wazuhVersion
+        }.msi /q ${this.optionalDeploymentVariables()}`,
       };
 
       const field = `${this.state.selectedOS}Text`;
@@ -495,79 +547,117 @@ export const RegisterAgent = withErrorBoundary(
       const language = this.getHighlightCodeLanguage(this.state.selectedOS);
       const windowsAdvice = this.state.selectedOS === 'win' && (
         <>
-          <EuiCallOut
-            title="Requirements"
-            iconType="iInCircle"
-          >
-            <ul class="wz-callout-list">
-              <li><span>You will need administrator privileges to perform this installation.</span></li>
-              <li><span>PowerShell 3.0 or greater is required.</span></li>
+          <EuiCallOut title='Requirements' iconType='iInCircle'>
+            <ul class='wz-callout-list'>
+              <li>
+                <span>
+                  {i18n.translate('controllers.sgent.components.admin', {
+                    defaultMessage:
+                      'You will need administrator privileges to perform this installation.',
+                  })}
+                </span>
+              </li>
+              <li>
+                <span>
+                  {i18n.translate('controllers.sgent.components.powershell', {
+                    defaultMessage: 'PowerShell 3.0 or greater is required',
+                  })}
+                  .
+                </span>
+              </li>
             </ul>
-            <p>Keep in mind you need to run this command in a Windows PowerShell terminal.</p>
+            <p>
+              {i18n.translate('controllers.sgent.components.terminal', {
+                defaultMessage:
+                  'Keep in mind you need to run this command in a Windows PowerShell terminal.',
+              })}
+            </p>
           </EuiCallOut>
           <EuiSpacer></EuiSpacer>
         </>
       );
-      const restartAgentCommand = this.restartAgentCommand[this.state.selectedOS];
-      const onTabClick = (selectedTab) => {
+      const restartAgentCommand =
+        this.restartAgentCommand[this.state.selectedOS];
+      const onTabClick = selectedTab => {
         this.selectSYS(selectedTab.id);
       };
 
-      const calloutErrorRegistrationServiceInfo = this.state.gotErrorRegistrationServiceInfo ? (
+      const calloutErrorRegistrationServiceInfo = this.state
+        .gotErrorRegistrationServiceInfo ? (
         <EuiCallOut
-          color="danger"
+          color='danger'
           title='This section could not be displayed because you do not have permission to get access to the registration service.'
-          iconType="iInCircle"
+          iconType='iInCircle'
         />
       ) : null;
 
       const guide = (
         <div>
-          {(this.state.gotErrorRegistrationServiceInfo) ? (
+          {this.state.gotErrorRegistrationServiceInfo ? (
             <EuiCallOut
-              color="danger"
+              color='danger'
               title='This section could not be displayed because you do not have permission to get access to the registration service.'
-              iconType="iInCircle"
+              iconType='iInCircle'
             />
-          ) :
+          ) : (
             this.state.selectedOS && (
               <EuiText>
                 <p>
-                  You can use this command to install and enroll the Wazuh agent in one or more hosts.
+                  {i18n.translate('controllers.sgent.components.hosts', {
+                    defaultMessage:
+                      'You can use this command to install and enroll the Wazuh agent in one or more hosts.',
+                  })}
                 </p>
                 <EuiCallOut
-                  color="warning"
+                  color='warning'
                   title={
                     <>
-                      If the installer finds another Wazuh agent in the system, it will upgrade it preserving the configuration.
+                      {i18n.translate(
+                        'controllers.sgent.components.installer',
+                        {
+                          defaultMessage:
+                            'If the installer finds another Wazuh agent in the system,it will upgrade it preserving the configuration.',
+                        },
+                      )}
                     </>
                   }
-                  iconType="iInCircle"
+                  iconType='iInCircle'
                 />
                 <EuiSpacer />
                 {windowsAdvice}
-                <div className="copy-codeblock-wrapper">
+                <div className='copy-codeblock-wrapper'>
                   <EuiCodeBlock style={codeBlock} language={language}>
-                    {this.state.wazuhPassword && !this.state.showPassword ? this.obfuscatePassword(text) : text}
+                    {this.state.wazuhPassword && !this.state.showPassword
+                      ? this.obfuscatePassword(text)
+                      : text}
                   </EuiCodeBlock>
                   <EuiCopy textToCopy={text}>
-                    {(copy) => (
-                      <div className="copy-overlay"  onClick={copy}>
-                        <p><EuiIcon type="copy"/> Copy command</p>
+                    {copy => (
+                      <div className='copy-overlay' onClick={copy}>
+                        <p>
+                          <EuiIcon type='copy' />{' '}
+                          {i18n.translate(
+                            'controllers.sgent.components.Copycommand',
+                            {
+                              defaultMessage: 'Copy command',
+                            },
+                          )}
+                        </p>
                       </div>
                     )}
                   </EuiCopy>
                 </div>
                 {this.state.needsPassword && (
                   <EuiSwitch
-                    label="Show password"
+                    label='Show password'
                     checked={this.state.showPassword}
-                    onChange={(active) => this.setShowPassword(active)}
+                    onChange={active => this.setShowPassword(active)}
                   />
                 )}
                 <EuiSpacer />
               </EuiText>
-            )}
+            )
+          )}
         </div>
       );
 
@@ -579,19 +669,27 @@ export const RegisterAgent = withErrorBoundary(
             <Fragment>
               <EuiSpacer />
               <EuiText>
-                <div className="copy-codeblock-wrapper">
+                <div className='copy-codeblock-wrapper'>
                   <EuiCodeBlock style={codeBlock} language={language}>
                     {this.systemSelector()}
                   </EuiCodeBlock>
                   <EuiCopy textToCopy={this.systemSelector()}>
-                    {(copy) => (
-                      <div className="copy-overlay" onClick={copy}>
-                        <p><EuiIcon type="copy" /> Copy command</p>
+                    {copy => (
+                      <div className='copy-overlay' onClick={copy}>
+                        <p>
+                          <EuiIcon type='copy' />{' '}
+                          {i18n.translate(
+                            'controllers.sgent.components.Copycommand',
+                            {
+                              defaultMessage: 'Copy command',
+                            },
+                          )}
+                        </p>
                       </div>
                     )}
                   </EuiCopy>
                 </div>
-                <EuiSpacer size='s'/>
+                <EuiSpacer size='s' />
                 {textAndLinkToCheckConnectionDocumentation}
               </EuiText>
             </Fragment>
@@ -604,19 +702,27 @@ export const RegisterAgent = withErrorBoundary(
             <Fragment>
               <EuiSpacer />
               <EuiText>
-                <div className="copy-codeblock-wrapper">
+                <div className='copy-codeblock-wrapper'>
                   <EuiCodeBlock style={codeBlock} language={language}>
                     {this.systemSelector()}
                   </EuiCodeBlock>
                   <EuiCopy textToCopy={this.systemSelector()}>
-                    {(copy) => (
-                      <div className="copy-overlay" onClick={copy}>
-                        <p><EuiIcon type="copy" /> Copy command</p>
+                    {copy => (
+                      <div className='copy-overlay' onClick={copy}>
+                        <p>
+                          <EuiIcon type='copy' />{' '}
+                          {i18n.translate(
+                            'controllers.sgent.components.Copycommand',
+                            {
+                              defaultMessage: 'Copy command',
+                            },
+                          )}
+                        </p>
                       </div>
                     )}
                   </EuiCopy>
                 </div>
-                <EuiSpacer size='s'/>
+                <EuiSpacer size='s' />
                 {textAndLinkToCheckConnectionDocumentation}
               </EuiText>
             </Fragment>
@@ -629,62 +735,70 @@ export const RegisterAgent = withErrorBoundary(
           title: 'Choose the Operating system',
           children: (
             <EuiButtonGroup
-              color="primary"
-              legend="Choose the Operating system"
+              color='primary'
+              legend='Choose the Operating system'
               options={osButtons}
               idSelected={this.state.selectedOS}
-              onChange={(os) => this.selectOS(os)}
+              onChange={os => this.selectOS(os)}
             />
           ),
         },
         ...(this.state.selectedOS == 'rpm'
           ? [
-            {
-              title: 'Choose the version',
-              children: (
-                <EuiButtonGroup
-                  color="primary"
-                  legend="Choose the version"
-                  options={versionButtonsCentosOrRedHat}
-                  idSelected={this.state.selectedVersion}
-                  onChange={(version) => this.setVersion(version)}
-                />
-              ),
-            },
-          ]
+              {
+                title: 'Choose the version',
+                children: (
+                  <EuiButtonGroup
+                    color='primary'
+                    legend='Choose the version'
+                    options={versionButtonsCentosOrRedHat}
+                    idSelected={this.state.selectedVersion}
+                    onChange={version => this.setVersion(version)}
+                  />
+                ),
+              },
+            ]
           : []),
-        ...(this.state.selectedOS == 'rpm' && this.state.selectedVersion == 'centos5' || this.state.selectedVersion == 'redhat5' 
+        ...((this.state.selectedOS == 'rpm' &&
+          this.state.selectedVersion == 'centos5') ||
+        this.state.selectedVersion == 'redhat5'
           ? [
-            {
-              title: 'Choose the architecture',
-              children: (
-                <EuiButtonGroup
-                  color="primary"
-                  legend="Choose the architecture"
-                  options={architectureCentos5OrRedHat5}
-                  idSelected={this.state.selectedArchitecture}
-                  onChange={(architecture) => this.setArchitecture(architecture)}
-                />
-              ),
-            },
-          ]
+              {
+                title: 'Choose the architecture',
+                children: (
+                  <EuiButtonGroup
+                    color='primary'
+                    legend='Choose the architecture'
+                    options={architectureCentos5OrRedHat5}
+                    idSelected={this.state.selectedArchitecture}
+                    onChange={architecture =>
+                      this.setArchitecture(architecture)
+                    }
+                  />
+                ),
+              },
+            ]
           : []),
         ...(this.state.selectedOS == 'deb' ||
-          (this.state.selectedOS == 'rpm' && this.state.selectedVersion == 'centos6' || this.state.selectedVersion == 'redhat6')
+        (this.state.selectedOS == 'rpm' &&
+          this.state.selectedVersion == 'centos6') ||
+        this.state.selectedVersion == 'redhat6'
           ? [
-            {
-              title: 'Choose the architecture',
-              children: (
-                <EuiButtonGroup
-                  color="primary"
-                  legend="Choose the architecture"
-                  options={architectureButtons}
-                  idSelected={this.state.selectedArchitecture}
-                  onChange={(architecture) => this.setArchitecture(architecture)}
-                />
-              ),
-            },
-          ]
+              {
+                title: 'Choose the architecture',
+                children: (
+                  <EuiButtonGroup
+                    color='primary'
+                    legend='Choose the architecture'
+                    options={architectureButtons}
+                    idSelected={this.state.selectedArchitecture}
+                    onChange={architecture =>
+                      this.setArchitecture(architecture)
+                    }
+                  />
+                ),
+              },
+            ]
           : []),
         {
           title: 'Wazuh server address',
@@ -692,11 +806,11 @@ export const RegisterAgent = withErrorBoundary(
         },
         ...(!(!this.state.needsPassword || this.state.hidePasswordInput)
           ? [
-            {
-              title: 'Wazuh password',
-              children: <Fragment>{passwordInput}</Fragment>,
-            },
-          ]
+              {
+                title: 'Wazuh password',
+                children: <Fragment>{passwordInput}</Fragment>,
+              },
+            ]
           : []),
         {
           title: 'Assign the agent to a group',
@@ -704,29 +818,31 @@ export const RegisterAgent = withErrorBoundary(
         },
         {
           title: 'Install and enroll the agent',
-          children: this.state.gotErrorRegistrationServiceInfo ?
+          children: this.state.gotErrorRegistrationServiceInfo ? (
             calloutErrorRegistrationServiceInfo
-            : missingOSSelection.length ? (
-              <EuiCallOut
-                color="warning"
-                title={`Please select the ${missingOSSelection.join(', ')}.`}
-                iconType="iInCircle"
-              />
-            ) : (
-              <div>{guide}</div>
-            ),
+          ) : missingOSSelection.length ? (
+            <EuiCallOut
+              color='warning'
+              title={`Please select the ${missingOSSelection.join(', ')}.`}
+              iconType='iInCircle'
+            />
+          ) : (
+            <div>{guide}</div>
+          ),
         },
         ...(this.state.selectedOS == 'rpm' || this.state.selectedOS == 'deb'
           ? [
-            {
-              title: 'Start the agent',
-              children: this.state.gotErrorRegistrationServiceInfo ?
-                calloutErrorRegistrationServiceInfo
-                : missingOSSelection.length ? (
+              {
+                title: 'Start the agent',
+                children: this.state.gotErrorRegistrationServiceInfo ? (
+                  calloutErrorRegistrationServiceInfo
+                ) : missingOSSelection.length ? (
                   <EuiCallOut
-                    color="warning"
-                    title={`Please select the ${missingOSSelection.join(', ')}.`}
-                    iconType="iInCircle"
+                    color='warning'
+                    title={`Please select the ${missingOSSelection.join(
+                      ', ',
+                    )}.`}
+                    iconType='iInCircle'
                   />
                 ) : (
                   <EuiTabbedContent
@@ -735,30 +851,38 @@ export const RegisterAgent = withErrorBoundary(
                     onTabClick={onTabClick}
                   />
                 ),
-            },
-          ]
+              },
+            ]
           : []),
 
         ...(!missingOSSelection.length &&
-          this.state.selectedOS !== 'rpm' &&
-          this.state.selectedOS !== 'deb' &&
-          restartAgentCommand
+        this.state.selectedOS !== 'rpm' &&
+        this.state.selectedOS !== 'deb' &&
+        restartAgentCommand
           ? [
-            {
-              title: 'Start the agent',
-              children: this.state.gotErrorRegistrationServiceInfo ?
-                calloutErrorRegistrationServiceInfo
-                : (
-                  <EuiFlexGroup direction="column">
+              {
+                title: 'Start the agent',
+                children: this.state.gotErrorRegistrationServiceInfo ? (
+                  calloutErrorRegistrationServiceInfo
+                ) : (
+                  <EuiFlexGroup direction='column'>
                     <EuiText>
-                      <div className="copy-codeblock-wrapper">
+                      <div className='copy-codeblock-wrapper'>
                         <EuiCodeBlock style={codeBlock} language={language}>
                           {restartAgentCommand}
                         </EuiCodeBlock>
                         <EuiCopy textToCopy={restartAgentCommand}>
-                          {(copy) => (
-                            <div className="copy-overlay" onClick={copy}>
-                              <p><EuiIcon type="copy" /> Copy command</p>
+                          {copy => (
+                            <div className='copy-overlay' onClick={copy}>
+                              <p>
+                                <EuiIcon type='copy' />{' '}
+                                {i18n.translate(
+                                  'controllers.sgent.components.Copycommand',
+                                  {
+                                    defaultMessage: 'Copy command',
+                                  },
+                                )}
+                              </p>
                             </div>
                           )}
                         </EuiCopy>
@@ -766,13 +890,13 @@ export const RegisterAgent = withErrorBoundary(
                     </EuiText>
                   </EuiFlexGroup>
                 ),
-            },
-          ]
+              },
+            ]
           : []),
       ];
       return (
         <div>
-          <EuiPage restrictWidth="1000px" style={{ background: 'transparent' }}>
+          <EuiPage restrictWidth='1000px' style={{ background: 'transparent' }}>
             <EuiPageBody>
               <EuiFlexGroup>
                 <EuiFlexItem>
@@ -780,26 +904,43 @@ export const RegisterAgent = withErrorBoundary(
                     <EuiFlexGroup>
                       <EuiFlexItem>
                         <EuiTitle>
-                          <h2>Deploy a new agent</h2>
+                          <h2>
+                            {i18n.translate(
+                              'controllers.sgent.components.deploy',
+                              {
+                                defaultMessage: 'Deploy a new agent',
+                              },
+                            )}
+                          </h2>
                         </EuiTitle>
                       </EuiFlexItem>
                       <EuiFlexItem grow={false}>
                         {this.props.hasAgents && (
                           <EuiButtonEmpty
-                            size="s"
+                            size='s'
                             onClick={() => this.props.addNewAgent(false)}
-                            iconType="cross"
+                            iconType='cross'
                           >
-                            Close
+                            {i18n.translate(
+                              'controllers.sgent.components.Close',
+                              {
+                                defaultMessage: 'Close',
+                              },
+                            )}{' '}
                           </EuiButtonEmpty>
                         )}
                         {!this.props.hasAgents && (
                           <EuiButtonEmpty
-                            size="s"
+                            size='s'
                             onClick={() => this.props.reload()}
-                            iconType="refresh"
+                            iconType='refresh'
                           >
-                            Refresh
+                            {i18n.translate(
+                              'controllers.sgent.components.Refresh',
+                              {
+                                defaultMessage: 'Refresh',
+                              },
+                            )}{' '}
                           </EuiButtonEmpty>
                         )}
                       </EuiFlexItem>
@@ -808,7 +949,7 @@ export const RegisterAgent = withErrorBoundary(
                     {this.state.loading && (
                       <>
                         <EuiFlexItem>
-                          <EuiProgress size="xs" color="primary" />
+                          <EuiProgress size='xs' color='primary' />
                         </EuiFlexItem>
                         <EuiSpacer></EuiSpacer>
                       </>
@@ -826,5 +967,5 @@ export const RegisterAgent = withErrorBoundary(
         </div>
       );
     }
-  }
+  },
 );

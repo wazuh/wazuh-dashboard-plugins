@@ -25,12 +25,16 @@ import {
   EuiSpacer,
   EuiPopover,
   EuiSwitch,
-  EuiFlexGroup
+  EuiFlexGroup,
 } from '@elastic/eui';
+import { i18n } from '@kbn/i18n';
 
-import { getToasts }  from '../../../kibana-services';
+import { getToasts } from '../../../kibana-services';
 import { WzButtonPermissions } from '../../../components/common/permissions/button';
-import { resourceDictionary, RulesetResources } from './management/ruleset/utils/ruleset-handler';
+import {
+  resourceDictionary,
+  RulesetResources,
+} from './management/ruleset/utils/ruleset-handler';
 export class UploadFiles extends Component {
   constructor(props) {
     super(props);
@@ -40,7 +44,7 @@ export class UploadFiles extends Component {
       isPopoverOpen: false,
       uploadErrors: false,
       errorPopover: false,
-      overwrite: false
+      overwrite: false,
     };
     this.maxSize = 10485760; // 10Mb
 
@@ -49,20 +53,20 @@ export class UploadFiles extends Component {
     this.closePopover = this.closePopover.bind(this);
     this.startUpload = this.startUpload.bind(this);
   }
-  
+
   setOverwrite(e) {
     this.setState({ overwrite: e.target.checked });
   }
 
   onChange = files => {
     this.setState({
-      files: files
+      files: files,
     });
   };
 
   onButtonClick() {
     this.setState({
-      isPopoverOpen: !this.state.isPopoverOpen
+      isPopoverOpen: !this.state.isPopoverOpen,
     });
   }
 
@@ -71,7 +75,7 @@ export class UploadFiles extends Component {
       errorPopover: false,
       isPopoverOpen: false,
       files: {},
-      uploadErrors: false
+      uploadErrors: false,
     });
   }
 
@@ -90,7 +94,7 @@ export class UploadFiles extends Component {
           if (reader.readyState === 2) {
             files.push({
               file: file.name,
-              content: reader.result
+              content: reader.result,
             });
             clearInterval(interval);
             if (files.length === this.state.files.length) {
@@ -99,7 +103,7 @@ export class UploadFiles extends Component {
                 const data = await this.props.upload(
                   files,
                   this.props.resource,
-                  this.state.overwrite
+                  this.state.overwrite,
                 );
                 this.props.onSuccess && this.props.onSuccess(files);
                 for (const index in data) {
@@ -111,9 +115,16 @@ export class UploadFiles extends Component {
                     'success',
                     'Success',
                     <Fragment>
-                      <div>Successfully imported</div>
+                      <div>
+                        {i18n.translate(
+                          'controllers.mnage.comp.confi.upload.file.Successfullyimported',
+                          {
+                            defaultMessage: 'Successfully imported',
+                          },
+                        )}
+                      </div>
                       <ul>
-                        {data.map((f) => (
+                        {data.map(f => (
                           <li
                             key={`ruleset-imported-file-${f.file}`}
                             style={{ listStyle: 'circle' }}
@@ -122,7 +133,7 @@ export class UploadFiles extends Component {
                           </li>
                         ))}
                       </ul>
-                    </Fragment>
+                    </Fragment>,
                   );
                 } else {
                   this.setState({ uploadErrors: data });
@@ -135,7 +146,7 @@ export class UploadFiles extends Component {
         }, 100);
       }
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
   }
 
@@ -145,7 +156,7 @@ export class UploadFiles extends Component {
    */
   renderWarning(title) {
     return (
-      <EuiCallOut size="s" title={title} color="warning" iconType="iInCircle" />
+      <EuiCallOut size='s' title={title} color='warning' iconType='iInCircle' />
     );
   }
 
@@ -157,25 +168,30 @@ export class UploadFiles extends Component {
       <Fragment>
         {(!result.uploaded && (
           <EuiCallOut
-            size="s"
+            size='s'
             title={result.file}
-            color="warning"
-            iconType="alert"
+            color='warning'
+            iconType='alert'
           >
-            <EuiText className="list-element-bad" size="s">
+            <EuiText className='list-element-bad' size='s'>
               {result.error.message}
             </EuiText>
           </EuiCallOut>
         )) || (
           <EuiCallOut
-            size="s"
+            size='s'
             title={result.file}
-            color="success"
-            iconType="check"
+            color='success'
+            iconType='check'
           >
-            <EuiText className="list-element-ok" size="s">
+            <EuiText className='list-element-ok' size='s'>
               {' '}
-              File upload successfully
+              {i18n.translate(
+                'controllers.mnage.comp.confi.upload.file.Fileuploadsuccessfully',
+                {
+                  defaultMessage: 'File upload successfully',
+                },
+              )}
             </EuiText>
           </EuiCallOut>
         )}
@@ -198,7 +214,9 @@ export class UploadFiles extends Component {
    */
   checkValidFileExtensions() {
     const resource = this.props.resource;
-    if ([RulesetResources.RULES, RulesetResources.DECODERS].includes(resource)) {
+    if (
+      [RulesetResources.RULES, RulesetResources.DECODERS].includes(resource)
+    ) {
       const result = Object.keys(this.state.files).filter(item => {
         const file = this.state.files[item].name;
         return file.substr(file.length - 4) !== '.xml';
@@ -212,7 +230,7 @@ export class UploadFiles extends Component {
    * Validates the files size
    */
 
-   checkValidFileSize() {
+  checkValidFileSize() {
     const result = Object.keys(this.state.files).filter(item => {
       return this.state.files[item].size === 0;
     });
@@ -225,12 +243,14 @@ export class UploadFiles extends Component {
   renderFiles() {
     return (
       <Fragment>
-        <EuiListGroup flush={true} className="list-of-files">
+        <EuiListGroup flush={true} className='list-of-files'>
           {Object.keys(this.state.files).map(index => (
             <EuiListGroupItem
               id={index}
               key={index}
-              label={`${this.state.files[index].name} (${this.formatBytes(this.state.files[index].size)})`}
+              label={`${this.state.files[index].name} (${this.formatBytes(
+                this.state.files[index].size,
+              )})`}
               isActive
             />
           ))}
@@ -242,7 +262,16 @@ export class UploadFiles extends Component {
   /**
    * Format Bytes size to largest unit
    */
-  formatBytes(a, b = 2) { if (0 === a) return "0 Bytes"; const c = 0 > b ? 0 : b, d = Math.floor(Math.log(a) / Math.log(1024)); return parseFloat((a / Math.pow(1024, d)).toFixed(c)) + " " + ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"][d] }
+  formatBytes(a, b = 2) {
+    if (0 === a) return '0 Bytes';
+    const c = 0 > b ? 0 : b,
+      d = Math.floor(Math.log(a) / Math.log(1024));
+    return (
+      parseFloat((a / Math.pow(1024, d)).toFixed(c)) +
+      ' ' +
+      ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'][d]
+    );
+  }
 
   /**
    * Renders the errors when trying to upload files
@@ -250,14 +279,14 @@ export class UploadFiles extends Component {
   renderErrors() {
     return (
       <Fragment>
-        <EuiListGroup flush={true} className="list-of-files-fail">
+        <EuiListGroup flush={true} className='list-of-files-fail'>
           {this.state.uploadErrors.map((error, idx) => {
             // We first show the files that were successfully uploaded
             if (error.uploaded) {
               return (
                 <EuiFlexItem key={idx} id={error.index}>
                   {this.renderResult(error)}
-                  <EuiSpacer size="s" />
+                  <EuiSpacer size='s' />
                 </EuiFlexItem>
               );
             }
@@ -268,7 +297,7 @@ export class UploadFiles extends Component {
               return (
                 <EuiFlexItem key={idx} id={error.index}>
                   {this.renderResult(error)}
-                  <EuiSpacer size="s" />
+                  <EuiSpacer size='s' />
                 </EuiFlexItem>
               );
             }
@@ -283,7 +312,7 @@ export class UploadFiles extends Component {
       color: color,
       title: title,
       text: text,
-      toastLifeTimeMs: time
+      toastLifeTimeMs: time,
     });
   }
   render() {
@@ -291,17 +320,18 @@ export class UploadFiles extends Component {
       return [
         {
           action: `${this.props.resource}:update`,
-          resource: resourceDictionary[this.props.resource].permissionResource('*'),
+          resource:
+            resourceDictionary[this.props.resource].permissionResource('*'),
         },
       ];
     };
 
     const button = (
       <WzButtonPermissions
-        buttonType="empty"
+        buttonType='empty'
         permissions={getPermissionsImportFiles()}
-        iconType="importAction"
-        iconSide="left"
+        iconType='importAction'
+        iconSide='left'
         onClick={this.onButtonClick}
       >
         Import files
@@ -309,20 +339,20 @@ export class UploadFiles extends Component {
     );
     return (
       <EuiPopover
-        id="popover"
+        id='popover'
         button={button}
         isOpen={this.state.isPopoverOpen}
-        anchorPosition="downRight"
+        anchorPosition='downRight'
         closePopover={this.closePopover}
       >
         <div style={{ width: '300px' }}>
-          <EuiTitle size="m">
+          <EuiTitle size='m'>
             <h1>{`Upload ${this.props.resource}`}</h1>
           </EuiTitle>
           <EuiSwitch
             className='wz-margin-top-10 wz-margin-bottom-10'
-            id="overwrite"
-            label="Overwrite"
+            id='overwrite'
+            label='Overwrite'
             checked={this.state.overwrite}
             onChange={this.setOverwrite}
             compressed
@@ -330,7 +360,7 @@ export class UploadFiles extends Component {
           <EuiFlexItem>
             {!this.state.uploadErrors && (
               <EuiFilePicker
-                id="filePicker"
+                id='filePicker'
                 multiple
                 compressed={false}
                 initialPromptText={`Select or drag and drop your ${this.props.resource} files here`}
@@ -352,31 +382,46 @@ export class UploadFiles extends Component {
                 <EuiFlexItem grow={false}>
                   {(!this.state.uploadErrors && (
                     <EuiButton
-                      className="upload-files-button"
+                      className='upload-files-button'
                       fill
-                      iconType="sortUp"
+                      iconType='sortUp'
                       onClick={this.startUpload}
                     >
-                      Upload
+                      {i18n.translate(
+                        'controllers.mnage.comp.confi.upload.file.Upload',
+                        {
+                          defaultMessage: 'Upload',
+                        },
+                      )}
                     </EuiButton>
                   )) || (
-                    <EuiFlexGroup gutterSize="s" alignItems="center">
+                    <EuiFlexGroup gutterSize='s' alignItems='center'>
                       <EuiFlexItem>
                         <EuiButtonEmpty
-                          className="upload-files-button"
+                          className='upload-files-button'
                           onClick={this.closePopover}
                         >
-                          Close
+                          {i18n.translate(
+                            'controllers.mnage.comp.confi.upload.file.Close',
+                            {
+                              defaultMessage: 'Close',
+                            },
+                          )}
                         </EuiButtonEmpty>
                       </EuiFlexItem>
                       <EuiFlexItem grow={false}>
                         <EuiButton
-                          className="upload-files-button"
+                          className='upload-files-button'
                           fill
-                          iconType="sortUp"
+                          iconType='sortUp'
                           onClick={this.startUpload}
                         >
-                          Upload
+                          {i18n.translate(
+                            'controllers.mnage.comp.confi.upload.file.Upload',
+                            {
+                              defaultMessage: 'Upload',
+                            },
+                          )}
                         </EuiButton>
                       </EuiFlexItem>
                     </EuiFlexGroup>
@@ -388,7 +433,7 @@ export class UploadFiles extends Component {
           {this.state.files.length > 5 && (
             <Fragment>
               {this.renderWarning(
-                'The max number of concurrent files uploads is 5.'
+                'The max number of concurrent files uploads is 5.',
               )}
             </Fragment>
           )}
@@ -396,7 +441,9 @@ export class UploadFiles extends Component {
           {this.checkOverSize() > 0 && (
             <Fragment>
               {this.renderWarning(
-                `The max size per file allowed is ${this.maxSize / (1024*1024)} MB`
+                `The max size per file allowed is ${
+                  this.maxSize / (1024 * 1024)
+                } MB`,
               )}
             </Fragment>
           )}
@@ -409,9 +456,7 @@ export class UploadFiles extends Component {
 
           {this.checkValidFileSize() > 0 && (
             <Fragment>
-              {this.renderWarning(
-                `Can't upload empty files`
-              )}
+              {this.renderWarning(`Can't upload empty files`)}
             </Fragment>
           )}
         </div>
@@ -422,5 +467,5 @@ export class UploadFiles extends Component {
 
 UploadFiles.propTypes = {
   resource: PropTypes.string,
-  upload: PropTypes.func
+  upload: PropTypes.func,
 };

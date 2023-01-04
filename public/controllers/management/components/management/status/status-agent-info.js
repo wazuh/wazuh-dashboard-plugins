@@ -16,12 +16,13 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiTitle,
-  EuiIcon
+  EuiIcon,
 } from '@elastic/eui';
 import { formatUIDate } from '../../../../../react-services/time-service';
 import { connect } from 'react-redux';
 import { API_NAME_AGENT_STATUS } from '../../../../../../common/constants';
 import { agentStatusLabelByAgentStatus } from '../../../../../../common/services/wz_agent_status';
+import { i18n } from '@kbn/i18n';
 
 export class WzStatusAgentInfo extends Component {
   _isMounted = false;
@@ -51,7 +52,7 @@ export class WzStatusAgentInfo extends Component {
     }
 
     const greyStyle = {
-      color: 'grey'
+      color: 'grey',
     };
 
     return (
@@ -60,47 +61,116 @@ export class WzStatusAgentInfo extends Component {
           <EuiFlexItem>
             <EuiFlexGroup>
               <EuiFlexItem>
-                <EuiTitle size="m">
-                  <h2>Last registered agent</h2>
+                <EuiTitle size='m'>
+                  <h2>
+                    {i18n.translate(
+                      'controllers.mnage.comp.confi.groups.status.agent.agent',
+                      {
+                        defaultMessage: 'Last registered agent',
+                      },
+                    )}
+                  </h2>
                 </EuiTitle>
               </EuiFlexItem>
             </EuiFlexGroup>
           </EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup>
-          <EuiFlexItem>Name</EuiFlexItem>
+          <EuiFlexItem>
+            {i18n.translate(
+              'controllers.mnage.comp.confi.groups.status.agent.Name',
+              {
+                defaultMessage: 'Name',
+              },
+            )}
+          </EuiFlexItem>
           <EuiFlexItem style={greyStyle}>{agentInfo.name}</EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup>
-          <EuiFlexItem>ID</EuiFlexItem>
+          <EuiFlexItem>
+            {i18n.translate(
+              'controllers.mnage.comp.confi.groups.status.agent.ID',
+              {
+                defaultMessage: 'ID',
+              },
+            )}
+          </EuiFlexItem>
           <EuiFlexItem style={greyStyle}>{agentInfo.id}</EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup>
-          <EuiFlexItem>Status</EuiFlexItem>
-          <EuiFlexItem style={{...greyStyle}}>{agentStatusLabelByAgentStatus(agentInfo.status)}</EuiFlexItem>
+          <EuiFlexItem>
+            {i18n.translate(
+              'controllers.mnage.comp.confi.groups.status.agent.Status',
+              {
+                defaultMessage: 'Status',
+              },
+            )}
+          </EuiFlexItem>
+          <EuiFlexItem style={{ ...greyStyle }}>
+            {agentStatusLabelByAgentStatus(agentInfo.status)}
+          </EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup>
-          <EuiFlexItem>IP Address</EuiFlexItem>
+          <EuiFlexItem>
+            {i18n.translate(
+              'controllers.mnage.comp.confi.groups.status.agent.IPAddress',
+              {
+                defaultMessage: 'IP Address',
+              },
+            )}
+          </EuiFlexItem>
           <EuiFlexItem style={greyStyle}>{agentInfo.ip}</EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup>
-          <EuiFlexItem>Date added</EuiFlexItem>
-          <EuiFlexItem style={greyStyle}>{formatUIDate(agentInfo.dateAdd)}</EuiFlexItem>
+          <EuiFlexItem>
+            {i18n.translate(
+              'controllers.mnage.comp.confi.groups.status.agent.Dateadded',
+              {
+                defaultMessage: 'Date added',
+              },
+            )}
+          </EuiFlexItem>
+          <EuiFlexItem style={greyStyle}>
+            {formatUIDate(agentInfo.dateAdd)}
+          </EuiFlexItem>
         </EuiFlexGroup>
         {status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED && (
           <div>
             <EuiFlexGroup>
-              <EuiFlexItem>Version</EuiFlexItem>
-              <EuiFlexItem style={greyStyle}>{agentInfo.version || '-'}</EuiFlexItem>
+              <EuiFlexItem>
+                {i18n.translate(
+                  'controllers.mnage.comp.confi.groups.status.agent.Version',
+                  {
+                    defaultMessage: 'Version',
+                  },
+                )}
+              </EuiFlexItem>
+              <EuiFlexItem style={greyStyle}>
+                {agentInfo.version || '-'}
+              </EuiFlexItem>
             </EuiFlexGroup>
             <EuiFlexGroup>
-              <EuiFlexItem>Last keep alive</EuiFlexItem>
+              <EuiFlexItem>
+                {i18n.translate(
+                  'controllers.mnage.comp.confi.groups.status.agent.alive',
+                  {
+                    defaultMessage: 'Last keep alive',
+                  },
+                )}
+              </EuiFlexItem>
               <EuiFlexItem style={greyStyle}>
                 {formatUIDate(agentInfo.lastKeepAlive)}
               </EuiFlexItem>
             </EuiFlexGroup>
             <EuiFlexGroup>
-              <EuiFlexItem>Operating system</EuiFlexItem>
+              <EuiFlexItem>
+                {i18n.translate(
+                  'controllers.mnage.comp.confi.groups.status.agent.Operatingsystem',
+                  {
+                    defaultMessage: 'Operating system',
+                  },
+                )}
+              </EuiFlexItem>
               <EuiFlexItem style={greyStyle}>
                 {operatingSystem || '-'}
               </EuiFlexItem>
@@ -114,7 +184,7 @@ export class WzStatusAgentInfo extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.statusReducers
+    state: state.statusReducers,
   };
 };
 
