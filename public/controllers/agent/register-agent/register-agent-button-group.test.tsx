@@ -1,9 +1,7 @@
 import React from 'react';
 import '@testing-library/jest-dom';
-import { findAllByRole, render, waitFor } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import RegisterAgentButtonGroup from './register-agent-button-group';
-import { act } from 'react-dom/test-utils';
-import { debug } from 'console';
 
 describe('RegisterAgentButtonGroup', () => {
   it('should render correctly', () => {
