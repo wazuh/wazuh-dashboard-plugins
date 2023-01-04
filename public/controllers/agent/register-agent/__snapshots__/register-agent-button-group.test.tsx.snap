@@ -6,7 +6,7 @@ Object {
   "baseElement": <body>
     <div>
       <fieldset
-        class="euiButtonGroup__fieldset"
+        class="euiButtonGroup euiButtonGroup--small euiButtonGroup--primary wz-flex"
       >
         <legend
           class="euiScreenReaderOnly"
@@ -14,42 +14,39 @@ Object {
           Test legend
         </legend>
         <div
-          class="euiButtonGroup euiButtonGroup--s wz-flex"
+          class="euiButtonGroup__buttons"
         >
-          <div
-            class="euiToggle euiButtonToggle__wrapper euiButtonGroup__toggle"
+          <label
+            class="euiButtonGroupButton euiButtonGroupButton--primary euiButtonGroupButton--small"
+            for="iaf2a4a11-8c50-11ed-b738-376033fa9b7f"
           >
-            <input
-              aria-label="test"
-              class="euiToggle__input euiButtonToggle__input"
-              title="test"
-              type="radio"
-              value=""
-            />
-            <button
-              class="euiButton euiButton--primary euiButton--small euiButtonToggle euiButtonGroup__button"
-              id="test"
-              tabindex="-1"
-              type="button"
+            <span
+              class="euiButtonContent euiButton__content"
             >
               <span
-                class="euiButtonContent euiButton__content"
+                class="euiButton__text euiButtonGroupButton__textShift"
+                data-text="test"
+                title="test"
               >
-                <span
-                  class="euiButton__text"
-                >
-                  test
-                </span>
+                <input
+                  class="euiScreenReaderOnly"
+                  data-test-subj="test"
+                  id="iaf2a4a11-8c50-11ed-b738-376033fa9b7f"
+                  name="iaf29d4e1-8c50-11ed-b738-376033fa9b7f"
+                  type="radio"
+                  value=""
+                />
+                test
               </span>
-            </button>
-          </div>
+            </span>
+          </label>
         </div>
       </fieldset>
     </div>
   </body>,
   "container": <div>
     <fieldset
-      class="euiButtonGroup__fieldset"
+      class="euiButtonGroup euiButtonGroup--small euiButtonGroup--primary wz-flex"
     >
       <legend
         class="euiScreenReaderOnly"
@@ -57,35 +54,32 @@ Object {
         Test legend
       </legend>
       <div
-        class="euiButtonGroup euiButtonGroup--s wz-flex"
+        class="euiButtonGroup__buttons"
       >
-        <div
-          class="euiToggle euiButtonToggle__wrapper euiButtonGroup__toggle"
+        <label
+          class="euiButtonGroupButton euiButtonGroupButton--primary euiButtonGroupButton--small"
+          for="iaf2a4a11-8c50-11ed-b738-376033fa9b7f"
         >
-          <input
-            aria-label="test"
-            class="euiToggle__input euiButtonToggle__input"
-            title="test"
-            type="radio"
-            value=""
-          />
-          <button
-            class="euiButton euiButton--primary euiButton--small euiButtonToggle euiButtonGroup__button"
-            id="test"
-            tabindex="-1"
-            type="button"
+          <span
+            class="euiButtonContent euiButton__content"
           >
             <span
-              class="euiButtonContent euiButton__content"
+              class="euiButton__text euiButtonGroupButton__textShift"
+              data-text="test"
+              title="test"
             >
-              <span
-                class="euiButton__text"
-              >
-                test
-              </span>
+              <input
+                class="euiScreenReaderOnly"
+                data-test-subj="test"
+                id="iaf2a4a11-8c50-11ed-b738-376033fa9b7f"
+                name="iaf29d4e1-8c50-11ed-b738-376033fa9b7f"
+                type="radio"
+                value=""
+              />
+              test
             </span>
-          </button>
-        </div>
+          </span>
+        </label>
       </div>
     </fieldset>
   </div>,
