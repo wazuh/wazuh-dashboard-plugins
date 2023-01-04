@@ -40,10 +40,37 @@ const architectureButtonsWithPPC64LE = [
   },
 ];
 
-const architectureButtonsi386 = [
+const architectureButtonsWithPPC64LEAlpine = [
   {
     id: 'i386',
     label: 'i386',
+  },
+  {
+    id: 'x86',
+    label: 'x86',
+  },
+  {
+    id: 'x86_64',
+    label: 'x86_64',
+  },
+  {
+    id: 'armhf',
+    label: 'armhf',
+  },
+  {
+    id: 'aarch64',
+    label: 'aarch64',
+  },
+  {
+    id: 'powerpc',
+    label: 'PowerPC',
+  },
+];
+
+const architectureButtonsi386 = [
+  {
+    id: 'i386/x86_64',
+    label: 'i386/x86_64',
   },
 ];
 
@@ -73,17 +100,6 @@ const architectureButtonsMacos = [
   {
     id: 'intel/applesilicon',
     label: 'Intel/Apple Silicon',
-  },
-];
-
-const architectureButtonsOpenSuse = [
-  {
-    id: 'x86_64',
-    label: 'x86_64',
-  },
-  {
-    id: 'ARM64',
-    label: 'ARM64',
   },
 ];
 
@@ -127,7 +143,7 @@ const versionButtonsRedHat = [
   },
   {
     id: 'redhat7',
-    label: 'Red Hat 7 or higher',
+    label: 'Red Hat 7 +',
   },
 ];
 
@@ -142,7 +158,7 @@ const versionButtonsCentos = [
   },
   {
     id: 'centos7',
-    label: 'Centos 7 or higher',
+    label: 'Centos 7 +',
   },
 ];
 
@@ -157,18 +173,14 @@ const versionButtonsDebian = [
   },
   {
     id: 'debian9',
-    label: 'Debian 9',
-  },
-  {
-    id: 'debian10',
-    label: 'Debian 10 or higher',
+    label: 'Debian 9 +',
   },
 ];
 
 const versionButtonFedora = [
   {
     id: '22',
-    label: 'Fedora 22 or higher',
+    label: 'Fedora 22 +',
   },
 ];
 
@@ -179,7 +191,7 @@ const versionButtonsUbuntu = [
   },
   {
     id: 'ubuntu15',
-    label: 'Ubuntu 15 or higher',
+    label: 'Ubuntu 15 +',
   },
 ];
 
@@ -194,7 +206,7 @@ const versionButtonsWindows = [
   },
   {
     id: 'windows7',
-    label: 'Windows 7 or higher',
+    label: 'Windows 7 +',
   },
 ];
 
@@ -212,14 +224,14 @@ const versionButtonsSuse = [
 const versionButtonsMacOS = [
   {
     id: 'sierra',
-    label: 'macOS Sierra or higher',
+    label: 'macOS Sierra +',
   },
 ];
 
 const versionButtonsOpenSuse = [
   {
     id: 'leap15',
-    label: 'OpenSuse Leap 15 or higher',
+    label: 'openSUSE Leap 15 +',
   },
 ];
 
@@ -237,14 +249,14 @@ const versionButtonsSolaris = [
 const versionButtonsAix = [
   {
     id: '6.1 TL9',
-    label: 'AIX 6.1 TL9 or higher',
+    label: 'AIX 6.1 TL9 +',
   },
 ];
 
 const versionButtonsHPUX = [
   {
     id: '11.31',
-    label: 'HP-UX 11.31 or higher',
+    label: 'HP-UX 11.31 +',
   },
 ];
 
@@ -255,7 +267,7 @@ const versionButtonsOracleLinux = [
   },
   {
     id: 'oraclelinux6',
-    label: 'Oracle Linux 6 or higher',
+    label: 'Oracle Linux 6 +',
   },
 ];
 
@@ -269,7 +281,7 @@ const versionButtonsRaspbian = [
 const versionButtonAlpine = [
   {
     id: '3.12.12',
-    label: '3.12.12 or higher',
+    label: '3.12.12 +',
   },
 ];
 
@@ -319,7 +331,7 @@ const osButtons = [
   },
   {
     id: 'open',
-    label: 'OpenSuse',
+    label: 'openSUSE',
   },
   {
     id: 'sol',
@@ -386,5 +398,5 @@ export {
   architectureButtonsSolaris,
   architectureButtonsAix,
   architectureButtonsHpUx,
-  architectureButtonsOpenSuse,
+  architectureButtonsWithPPC64LEAlpine,
 };

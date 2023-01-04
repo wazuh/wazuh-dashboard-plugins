@@ -69,6 +69,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed agent installation command for macOS in the deploy new agent section. [#4968](https://github.com/wazuh/wazuh-kibana-app/pull/4968)
 - Fixed commands in the deploy new agent section(most of the commands are missing '-1') [#4984](https://github.com/wazuh/wazuh-kibana-app/pull/4984)
 - Fixed vulnerabilities default last scan date formatter [#4975](https://github.com/wazuh/wazuh-kibana-app/pull/4975)
+- A solaris command has been fixed [5035](https://github.com/wazuh/wazuh-kibana-app/pull/5035)
+- Fixed commands: Aix, OpenSUSE, Alpine, Suse11, Fedora, HP, Oracle Linux 5, Amazon Linux 2, Centos5. Changed the word 'or higher' in buttons to '+'.Fixed validations for Hp, Solaris and Alpine. [5045](https://github.com/wazuh/wazuh-kibana-app/pull/5045)
 
 ### Removed
 
