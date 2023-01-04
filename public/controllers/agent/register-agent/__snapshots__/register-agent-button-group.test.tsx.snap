@@ -18,7 +18,7 @@ Object {
         >
           <label
             class="euiButtonGroupButton euiButtonGroupButton--primary euiButtonGroupButton--small"
-            for="iaf2a4a11-8c50-11ed-b738-376033fa9b7f"
+            for="htmlId"
           >
             <span
               class="euiButtonContent euiButton__content"
@@ -31,8 +31,8 @@ Object {
                 <input
                   class="euiScreenReaderOnly"
                   data-test-subj="test"
-                  id="iaf2a4a11-8c50-11ed-b738-376033fa9b7f"
-                  name="iaf29d4e1-8c50-11ed-b738-376033fa9b7f"
+                  id="htmlId"
+                  name="htmlId"
                   type="radio"
                   value=""
                 />
@@ -58,7 +58,7 @@ Object {
       >
         <label
           class="euiButtonGroupButton euiButtonGroupButton--primary euiButtonGroupButton--small"
-          for="iaf2a4a11-8c50-11ed-b738-376033fa9b7f"
+          for="htmlId"
         >
           <span
             class="euiButtonContent euiButton__content"
@@ -71,8 +71,8 @@ Object {
               <input
                 class="euiScreenReaderOnly"
                 data-test-subj="test"
-                id="iaf2a4a11-8c50-11ed-b738-376033fa9b7f"
-                name="iaf29d4e1-8c50-11ed-b738-376033fa9b7f"
+                id="htmlId"
+                name="htmlId"
                 type="radio"
                 value=""
               />

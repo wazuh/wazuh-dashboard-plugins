@@ -3,6 +3,14 @@ import '@testing-library/jest-dom';
 import { render } from '@testing-library/react';
 import RegisterAgentButtonGroup from './register-agent-button-group';
 
+jest.mock(
+  '../../../../../../node_modules/@elastic/eui/lib/services/accessibility/html_id_generator',
+  () => ({
+    htmlIdGenerator: () => () => 'htmlId',
+  })
+);
+
+
 describe('RegisterAgentButtonGroup', () => {
   it('should render correctly', () => {
     const buttonsOpts = [{ id: 'test', label: 'test' }];
