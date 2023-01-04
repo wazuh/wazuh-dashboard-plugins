@@ -134,7 +134,7 @@ const pmAlertsSummary = {
 }
 
 const dockerAlertsSummary = {
-  title: 'Alerts summary',
+  title: 'Events summary',
   aggs: [
     AggregationFields['data.docker.Actor.Attributes.name'],
     AggregationFields['data.docker.Action'],

@@ -57,7 +57,7 @@ export const getAgentSections = (menuAgent) => {
     github: {
       id: WAZUH_MODULES_ID.GITHUB,
       text: 'GitHub',
-      isPin: menuAgent.github ? this.menuAgent.github : false
+      isPin: menuAgent.github ? menuAgent.github : false
     },
     pm: {
       id: WAZUH_MODULES_ID.POLICY_MONITORING,

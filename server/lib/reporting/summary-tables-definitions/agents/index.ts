@@ -10,7 +10,7 @@ const generalAlertsSummary = {
 }
 
 const generalGroupsSummary = {
-  title: 'Alerts summary',
+  title: 'Groups summary',
   aggs: [
     AggregationFields['rule.groups'],
   ]
@@ -126,7 +126,7 @@ const pciLastAlerts = {
 
 // 'Wazuh-App-Agents-NIST-Last-alerts'
 const nistLastAlerts = {
-  title: 'Last alerts',
+  title: 'Alerts summary',
   aggs: [
     AggregationFields['rule.nist_800_53'],
     AggregationFields['rule.level'],
@@ -136,7 +136,7 @@ const nistLastAlerts = {
 
 // 'Wazuh-App-Agents-HIPAA-Last-alerts'
 const hipaaLastAlerts = {
-  title: 'Last alerts',
+  title: 'Alerts summary',
   aggs: [
     AggregationFields['rule.hipaa'],
     AggregationFields['rule.level'],
@@ -164,7 +164,7 @@ const auditLastAlerts = {
 }
 
 const dockerAlertsSummary = {
-  title: 'Alerts summary',
+  title: 'Events summary',
   aggs: [
     AggregationFields['data.docker.Actor.Attributes.name'],
     AggregationFields['data.docker.Action'],
