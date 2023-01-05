@@ -225,10 +225,10 @@ export const WzSecurity = compose(
         <EuiFlexItem>
           <EuiTabs>{renderTabs()}</EuiTabs>
           <EuiSpacer size="m"></EuiSpacer>
-          {selectedTabId === ${descp9} && <Users></Users>}
-          {selectedTabId === ${descp10} && <Roles></Roles>}
-          {selectedTabId === ${descp11} && <Policies></Policies>}
-          {selectedTabId === ${descp12} && (
+          {selectedTabId === descp9 && <Users></Users>}
+          {selectedTabId === descp10 && <Roles></Roles>}
+          {selectedTabId === descp11 && <Policies></Policies>}
+          {selectedTabId === descp12 && (
             <>
               {allowRunAs !== undefined &&
                 allowRunAs !== API_USER_STATUS_RUN_AS.ENABLED &&

@@ -100,7 +100,7 @@ const systemComponents = i18n.translate(
   },
 );
 
-const vulnerabilities = i18n.translate(
+const vulnerabilities1 = i18n.translate(
   'complianceRequirements.pci.vulnerabilities',
   {
     defaultMessage:
@@ -249,7 +249,7 @@ export const pciRequirementsFile = {
   '5.1': antiVirusSoftwares,
   '5.2': antiVirusMechanisms,
   '6.2': systemComponents,
-  '6.5': vulnerabilities,
+  '6.5': vulnerabilities1,
   '6.5.1': injectionFlaws,
   '6.5.2': bufferOverflow,
   '6.5.5': improperErrorHandling,
