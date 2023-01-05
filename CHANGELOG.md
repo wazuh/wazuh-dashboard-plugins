@@ -34,8 +34,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added cluster's IP and protocol as suggestions in the agent deployment wizard. [#4776](https://github.com/wazuh/wazuh-kibana-app/pull/4776) [#4954](https://github.com/wazuh/wazuh-kibana-app/pull/4954)
 - Show OS name and OS version in the agent installation wizard. [#4851](https://github.com/wazuh/wazuh-kibana-app/pull/4851)
 - Changed the endpoint that updates the plugin configuration to support multiple settings. [#4501](https://github.com/wazuh/wazuh-kibana-app/pull/4501)
-- The button to export the app logs is now disabled when there are no results, instead of showing an error toast [#4972](https://github.com/wazuh/wazuh-kibana-app/pull/4972)
-- Updated the `winston` dependency to `3.5.1` [#5014](https://github.com/wazuh/wazuh-kibana-app/pull/5014)
+- Updated the `winston` dependency to `3.5.1` [#4985](https://github.com/wazuh/wazuh-kibana-app/pull/4985)
+- Updated the `pdfmake` dependency to `0.2.6` [#4985](https://github.com/wazuh/wazuh-kibana-app/pull/4985)
+- The button to export the app logs is now disabled when there are no results, instead of showing an error toast [#4992](https://github.com/wazuh/wazuh-kibana-app/pull/4992)
+- Updated `pdfmake, mocha and json5` dependencies [#5062](https://github.com/wazuh/wazuh-kibana-app/pull/5062)
 
 ### Fixed
 
