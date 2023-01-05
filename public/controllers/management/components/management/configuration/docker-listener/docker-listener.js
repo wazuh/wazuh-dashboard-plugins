@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component, Fragment } from 'react';
+import { i18n } from '@kbn/i18n';
 
 import WzNoConfig from '../util-components/no-config';
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
@@ -18,45 +19,60 @@ import {
   isString,
   renderValueOrDefault,
   renderValueNoThenEnabled,
-  renderValueOrYes
+  renderValueOrYes,
 } from '../utils/utils';
 
 import withWzConfig from '../util-hocs/wz-config';
 import { wodleBuilder } from '../utils/builders';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
-
+const title1 = i18n.translate('controller.manage.comp.confi.docker.title1', {
+  defaultMessage: 'Main settings',
+});
+const descp1 = i18n.translate('controller.manage.comp.confi.docker.descp1', {
+  defaultMessage: 'General Docker listener settings',
+});
+const text1 = i18n.translate('controller.manage.comp.confi.docker.text1', {
+  defaultMessage: 'Monitoring containers activity',
+});
+const text2 = i18n.translate('controller.manage.comp.confi.docker.text2', {
+  defaultMessage: 'Docker listener module reference',
+});
 const helpLinks = [
   {
-    text: 'Monitoring containers activity',
-    href: webDocumentationLink('container-security/docker-monitor/monitoring-containers-activity.html')
+    text: text1,
+    href: webDocumentationLink(
+      'container-security/docker-monitor/monitoring-containers-activity.html',
+    ),
   },
   {
-    text: 'Docker listener module reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/wodle-docker.html')
-  }
+    text: text2,
+    href: webDocumentationLink(
+      'user-manual/reference/ossec-conf/wodle-docker.html',
+    ),
+  },
 ];
 
 const mainSettings = [
   {
     field: 'disabled',
     label: 'Docker listener status',
-    render: renderValueNoThenEnabled
+    render: renderValueNoThenEnabled,
   },
   {
     field: 'attempts',
     label: 'Number of attempts to execute the listener',
-    render: renderValueOrDefault('5')
+    render: renderValueOrDefault('5'),
   },
   {
     field: 'interval',
     label: 'Waiting time to rerun the listener in case it fails',
-    render: renderValueOrDefault('10m')
+    render: renderValueOrDefault('10m'),
   },
   {
     field: 'run_on_start',
     label: 'Run the listener immediately when service is started',
-    render: renderValueOrYes
-  }
+    render: renderValueOrYes,
+  },
 ];
 
 class WzConfigurationDockerListener extends Component {
@@ -64,7 +80,7 @@ class WzConfigurationDockerListener extends Component {
     super(props);
     this.wodleConfig = wodleBuilder(
       this.props.currentConfig,
-      'docker-listener'
+      'docker-listener',
     );
   }
   componentDidMount() {
@@ -91,12 +107,12 @@ class WzConfigurationDockerListener extends Component {
         {currentConfig &&
           !this.wodleConfig['docker-listener'] &&
           !isString(currentConfig['wmodules-wmodules']) && (
-            <WzNoConfig error="not-present" help={helpLinks} />
+            <WzNoConfig error='not-present' help={helpLinks} />
           )}
         {currentConfig && this.wodleConfig['docker-listener'] && (
           <WzConfigurationSettingsTabSelector
-            title="Main settings"
-            description="General Docker listener settings"
+            title={title1}
+            description={descp1}
             currentConfig={this.wodleConfig}
             minusHeight={this.props.agent.id === '000' ? 240 : 355}
             helpLinks={helpLinks}

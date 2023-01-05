@@ -19,12 +19,20 @@ import withWzConfig from '../util-hocs/wz-config';
 import { isString, renderValueNoThenEnabled } from '../utils/utils';
 import { settingsListBuilder } from '../utils/builders';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
-
+import { i18n } from '@kbn/i18n';
+const title1 = i18n.translate('controller.manage.comp.confi.commands.title1', {
+  defaultMessage: 'Command definitions',
+});
+const descp1 = i18n.translate('controller.manage.comp.confi.commands.descp1', {
+  defaultMessage: 'Find here all the currently defined commands',
+});
 const helpLinks = [
   {
     text: 'Command module reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/wodle-command.html')
-  }
+    href: webDocumentationLink(
+      'user-manual/reference/ossec-conf/wodle-command.html',
+    ),
+  },
 ];
 
 const mainSettings = [
@@ -38,7 +46,7 @@ const mainSettings = [
   { field: 'verify_md5', label: 'Verify MD5 sum' },
   { field: 'verify_sha1', label: 'Verify SHA1 sum' },
   { field: 'verify_sha256', label: 'Verify SHA256 sum' },
-  { field: 'skip_verification', label: 'Ignore checksum verification' }
+  { field: 'skip_verification', label: 'Ignore checksum verification' },
 ];
 
 class WzConfigurationCommands extends Component {
@@ -48,7 +56,7 @@ class WzConfigurationCommands extends Component {
       this.props.currentConfig &&
       !isString(this.props.currentConfig['wmodules-wmodules'])
         ? this.props.currentConfig['wmodules-wmodules'].wmodules.filter(
-            item => item['command']
+            item => item['command'],
           )
         : [];
   }
@@ -56,7 +64,10 @@ class WzConfigurationCommands extends Component {
     const { currentConfig } = this.props;
     const items =
       this.wodleConfig && this.wodleConfig.length
-        ? settingsListBuilder(this.wodleConfig.map(item => item.command), ['tag','command'])
+        ? settingsListBuilder(
+            this.wodleConfig.map(item => item.command),
+            ['tag', 'command'],
+          )
         : false;
     return (
       <Fragment>
@@ -70,14 +81,14 @@ class WzConfigurationCommands extends Component {
         {currentConfig &&
           !items &&
           !isString(currentConfig['wmodules-wmodules']) && (
-            <WzNoConfig error="not-present" help={helpLinks} />
+            <WzNoConfig error='not-present' help={helpLinks} />
           )}
         {currentConfig &&
         items &&
         !isString(currentConfig['wmodules-wmodules']) ? (
           <WzConfigurationSettingsTabSelector
-            title="Command definitions"
-            description="Find here all the currently defined commands"
+            title={title1}
+            description={descp1}
             currentConfig={currentConfig}
             minusHeight={this.props.agent.id === '000' ? 260 : 355}
             helpLinks={helpLinks}

@@ -17,74 +17,134 @@ import WzConfigurationSettingsTabSelector from '../util-components/configuration
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import WzConfigurationSettingsListSelector from '../util-components/configuration-settings-list-selector';
 import WzTabSelector, {
-  WzTabSelectorTab
+  WzTabSelectorTab,
 } from '../util-components/tab-selector';
+import { i18n } from '@kbn/i18n';
+
 import WzNoConfig from '../util-components/no-config';
 import { isString, renderValueYesThenEnabled } from '../utils/utils';
 import { wodleBuilder, settingsListBuilder } from '../utils/builders';
 import { withGuard } from '../../../../../../components/common/hocs';
 import withWzConfig from '../util-hocs/wz-config';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
+const text1 = i18n.translate('controller.manage.comp.confi.github.text1', {
+  defaultMessage: 'Using Wazuh to monitor GitHub',
+});
+const text2 = i18n.translate('controller.manage.comp.confi.github.text2', {
+  defaultMessage: 'GitHub module reference',
+});
+const title1 = i18n.translate('controller.manage.comp.confi.github.title1', {
+  defaultMessage: 'Main settings',
+});
+const title2 = i18n.translate('controller.manage.comp.confi.github.title2', {
+  defaultMessage: 'List of organizations to auditing',
+});
 
+const descp1 = i18n.translate('controller.manage.comp.confi.github.descp1', {
+  defaultMessage: 'Configuration for the GitHub module',
+});
 const sections = [{ component: 'wmodules', configuration: 'wmodules' }];
 
 const mainSettings = [
-  { field: 'enabled', label: 'Service status', render: renderValueYesThenEnabled },
-  { field: 'only_future_events', label: 'Collect events generated since Wazuh agent was started' },
-  { field: 'time_delay', label: 'Time in seconds that each scan will monitor until that delay backwards' },
-  { field: 'curl_max_size', label: 'Maximum size allowed for the GitHub API response' },
-  { field: 'interval', label: 'Interval between GitHub wodle executions in seconds' },
+  {
+    field: 'enabled',
+    label: 'Service status',
+    render: renderValueYesThenEnabled,
+  },
+  {
+    field: 'only_future_events',
+    label: 'Collect events generated since Wazuh agent was started',
+  },
+  {
+    field: 'time_delay',
+    label:
+      'Time in seconds that each scan will monitor until that delay backwards',
+  },
+  {
+    field: 'curl_max_size',
+    label: 'Maximum size allowed for the GitHub API response',
+  },
+  {
+    field: 'interval',
+    label: 'Interval between GitHub wodle executions in seconds',
+  },
   { field: 'event_type', label: 'Event type' },
 ];
 
 const columns = [
   { field: 'org_name', label: 'Organization' },
-  { field: 'api_token', label: 'Token' }
+  { field: 'api_token', label: 'Token' },
 ];
 
 const helpLinks = [
   {
-    text: 'Using Wazuh to monitor GitHub',
-    href: webDocumentationLink('github/index.html')
+    text: text1,
+    href: webDocumentationLink('github/index.html'),
   },
   {
-    text: 'GitHub module reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/github-module.html')
-  }
+    text: text2,
+    href: webDocumentationLink(
+      'user-manual/reference/ossec-conf/github-module.html',
+    ),
+  },
 ];
 
-export const WzConfigurationGitHub = withWzConfig(sections)(({currentConfig, updateBadge, ...rest }) => {
-  const wodleConfiguration = useMemo(() => wodleBuilder(currentConfig, 'github'), [currentConfig]);
-  
-  useEffect(() => {
-    updateBadge(currentConfig &&
-      wodleConfiguration &&
-      wodleConfiguration['github'] &&
-      wodleConfiguration['github'].enabled === 'yes');
-  }, [currentConfig]);
+export const WzConfigurationGitHub = withWzConfig(sections)(
+  ({ currentConfig, updateBadge, ...rest }) => {
+    const wodleConfiguration = useMemo(
+      () => wodleBuilder(currentConfig, 'github'),
+      [currentConfig],
+    );
 
-  return (
-    <WzTabSelector>
-      <WzTabSelectorTab label="General">
-        <GeneralTab wodleConfiguration={wodleConfiguration} currentConfig={currentConfig} {...rest}/>
-      </WzTabSelectorTab>
-      <WzTabSelectorTab label="Credentials">
-        <CredentialsTab wodleConfiguration={wodleConfiguration} currentConfig={currentConfig} {...rest}/>
-      </WzTabSelectorTab>
-    </WzTabSelector>
-  )
-});
+    useEffect(() => {
+      updateBadge(
+        currentConfig &&
+          wodleConfiguration &&
+          wodleConfiguration['github'] &&
+          wodleConfiguration['github'].enabled === 'yes',
+      );
+    }, [currentConfig]);
 
-
-const tabWrapper = compose(
-  withGuard(({currentConfig}) => currentConfig['wmodules-wmodules'] && isString(currentConfig['wmodules-wmodules']), ({currentConfig}) => <WzNoConfig error={currentConfig['wmodules-wmodules']} help={helpLinks}/>),
-  withGuard(({wodleConfiguration}) => !wodleConfiguration['github'], (props) => <WzNoConfig error='not-present' help={helpLinks}/>),
+    return (
+      <WzTabSelector>
+        <WzTabSelectorTab label='General'>
+          <GeneralTab
+            wodleConfiguration={wodleConfiguration}
+            currentConfig={currentConfig}
+            {...rest}
+          />
+        </WzTabSelectorTab>
+        <WzTabSelectorTab label='Credentials'>
+          <CredentialsTab
+            wodleConfiguration={wodleConfiguration}
+            currentConfig={currentConfig}
+            {...rest}
+          />
+        </WzTabSelectorTab>
+      </WzTabSelector>
+    );
+  },
 );
 
-const GeneralTab = tabWrapper(({agent, wodleConfiguration}) => (
+const tabWrapper = compose(
+  withGuard(
+    ({ currentConfig }) =>
+      currentConfig['wmodules-wmodules'] &&
+      isString(currentConfig['wmodules-wmodules']),
+    ({ currentConfig }) => (
+      <WzNoConfig error={currentConfig['wmodules-wmodules']} help={helpLinks} />
+    ),
+  ),
+  withGuard(
+    ({ wodleConfiguration }) => !wodleConfiguration['github'],
+    props => <WzNoConfig error='not-present' help={helpLinks} />,
+  ),
+);
+
+const GeneralTab = tabWrapper(({ agent, wodleConfiguration }) => (
   <WzConfigurationSettingsTabSelector
-    title="Main settings"
-    description="Configuration for the GitHub module"
+    title={title1}
+    description={descp1}
     currentConfig={wodleConfiguration}
     minusHeight={agent.id === '000' ? 370 : 420} //TODO: Review the minusHeight for the agent case
     helpLinks={helpLinks}
@@ -92,20 +152,19 @@ const GeneralTab = tabWrapper(({agent, wodleConfiguration}) => (
     <WzConfigurationSettingsGroup
       config={wodleConfiguration['github']}
       items={mainSettings}
-    />           
+    />
   </WzConfigurationSettingsTabSelector>
 ));
 
-
-
-const CredentialsTab = tabWrapper(({agent, wodleConfiguration}) => {
-  const credentials = useMemo(() => settingsListBuilder(
-    wodleConfiguration['github'].api_auth,
-    'org_name'
-  ), [wodleConfiguration]);
+const CredentialsTab = tabWrapper(({ agent, wodleConfiguration }) => {
+  const credentials = useMemo(
+    () =>
+      settingsListBuilder(wodleConfiguration['github'].api_auth, 'org_name'),
+    [wodleConfiguration],
+  );
   return (
     <WzConfigurationSettingsTabSelector
-      title="List of organizations to auditing"
+      title={title2}
       currentConfig={wodleConfiguration}
       minusHeight={agent.id === '000' ? 370 : 420} //TODO: Review the minusHeight for the agent case
       helpLinks={helpLinks}
@@ -115,5 +174,5 @@ const CredentialsTab = tabWrapper(({agent, wodleConfiguration}) => {
         settings={columns}
       />
     </WzConfigurationSettingsTabSelector>
-  )  
+  );
 });
