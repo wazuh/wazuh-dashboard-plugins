@@ -124,50 +124,130 @@ const Title5 = i18n.translate('controller.manage.comp.confi.setting.title5', {
 const Title6 = i18n.translate('controller.manage.comp.confi.setting.title6', {
   defaultMessage: 'Cloud security monitoring',
 });
-
+const name1 = i18n.translate('controllers.manage.confi.setting.name1', {
+  defaultMessage: 'Global Configuration',
+});
+const name2 = i18n.translate('controllers.manage.confi.setting.name2', {
+  defaultMessage: 'Cluster',
+});
+const name3 = i18n.translate('controllers.manage.confi.setting.name3', {
+  defaultMessage: 'Registration Service',
+});
+const name4 = i18n.translate('controllers.manage.confi.setting.name4', {
+  defaultMessage: 'Global Configuration',
+});
+const name5 = i18n.translate('controllers.manage.confi.setting.name5', {
+  defaultMessage: ' Communication',
+});
+const name6 = i18n.translate('controllers.manage.confi.setting.name6', {
+  defaultMessage: 'Anti-flooding settings',
+});
+const name7 = i18n.translate('controllers.manage.confi.setting.name7', {
+  defaultMessage: 'Labels',
+});
+const name8 = i18n.translate('controllers.manage.confi.setting.name8', {
+  defaultMessage: 'Alerts',
+});
+const name9 = i18n.translate('controllers.manage.confi.setting.name9', {
+  defaultMessage: 'Integrations',
+});
+const name10 = i18n.translate('controllers.manage.confi.setting..name10', {
+  defaultMessage: 'Policy monitoring',
+});
+const name11 = i18n.translate('controllers.manage.confi.setting..name11', {
+  defaultMessage: 'OpenSCAP',
+});
+const name12 = i18n.translate('controllers.manage.confi.setting..name12', {
+  defaultMessage: 'CIS-CAT',
+});
+const name13 = i18n.translate('controllers.manage.confi.setting..name13', {
+  defaultMessage: 'Vulnerabilities',
+});
+const name14 = i18n.translate('controllers.manage.confi.setting..name14', {
+  defaultMessage: 'Osquery',
+});
+const name15 = i18n.translate('controllers.manage.confi.setting..name15', {
+  defaultMessage: 'Inventory data',
+});
+const name16 = i18n.translate('controllers.manage.confi.setting..name16', {
+  defaultMessage: 'Active Response',
+});
+const name17 = i18n.translate('controllers.manage.confi.setting..name17', {
+  defaultMessage: 'Active response',
+});
+const name18 = i18n.translate('controllers.manage.confi.setting..name18', {
+  defaultMessage: 'Commands',
+});
+const name19 = i18n.translate('controllers.manage.confi.setting..name19', {
+  defaultMessage: 'Docker listener',
+});
+const name20 = i18n.translate('controllers.manage.confi.setting..name20', {
+  defaultMessage: 'Log collection',
+});
+const name21 = i18n.translate('controllers.manage.confi.setting..name21', {
+  defaultMessage: 'Integrity monitoring',
+});
+const name22 = i18n.translate('controllers.manage.confi.setting..name22', {
+  defaultMessage: 'Agentless',
+});
+const name23 = i18n.translate('controllers.manage.confi.setting..name23', {
+  defaultMessage: 'Amazon S3',
+});
+const name24 = i18n.translate('controllers.manage.confi.setting..name24', {
+  defaultMessage: 'Azure Logs',
+});
+const name25 = i18n.translate('controllers.manage.confi.setting..name25', {
+  defaultMessage: 'Google Cloud Pub/Sub',
+});
+const name26 = i18n.translate('controllers.manage.confi.setting..name26', {
+  defaultMessage: 'GitHub',
+});
+const name27 = i18n.translate('controllers.manage.confi.setting..name27', {
+  defaultMessage: 'Office 365',
+});
 export default [
   {
     title: Title1,
     description: '',
     settings: [
       {
-        name: 'Global Configuration',
+        name: name1,
         description: descp1,
         goto: 'global-configuration',
         when: 'manager',
       },
       {
-        name: 'Cluster',
+        name: name2,
         description: descp2,
         goto: 'cluster',
         when: 'manager',
       },
       {
-        name: 'Registration Service',
+        name: name3,
         description: descp3,
         goto: 'registration-service',
         when: 'manager',
       },
       {
-        name: 'Global Configuration',
+        name: name4,
         description: descp4,
         goto: 'global-configuration-agent',
         when: 'agent',
       },
       {
-        name: 'Communication',
+        name: name5,
         description: descp5,
         goto: 'client',
         when: 'agent',
       },
       {
-        name: 'Anti-flooding settings',
+        name: name6,
         description: descp6,
         goto: 'client-buffer',
         when: 'agent',
       },
       {
-        name: 'Labels',
+        name: name7,
         description: descp7,
         goto: 'alerts-agent',
         when: 'agent',
@@ -185,13 +265,13 @@ export default [
     description: '',
     settings: [
       {
-        name: 'Alerts',
+        name: name8,
         description: descp8,
         goto: 'alerts',
         when: 'manager',
       },
       {
-        name: 'Integrations',
+        name: name9,
         description: descp9,
         goto: 'integrations',
         when: 'manager',
@@ -203,18 +283,18 @@ export default [
     description: '',
     settings: [
       {
-        name: 'Policy monitoring',
+        name: name10,
         description: descp10,
         goto: 'policy-monitoring',
       },
       {
-        name: 'OpenSCAP',
+        name: name11,
         description: descp11,
         goto: 'open-scap',
         when: agent => hasAgentSupportModule(agent, WAZUH_MODULES_ID.OPEN_SCAP),
       },
       {
-        name: 'CIS-CAT',
+        name: name12,
         description: descp12,
         goto: 'cis-cat',
       },
@@ -225,40 +305,40 @@ export default [
     description: '',
     settings: [
       {
-        name: 'Vulnerabilities',
+        name: name13,
         description: descp13,
         goto: 'vulnerabilities',
         when: 'manager',
       },
       {
-        name: 'Osquery',
+        name: name14,
         description: descp14,
         goto: 'osquery',
       },
       {
-        name: 'Inventory data',
+        name: name15,
         description: descp15,
         goto: 'inventory',
       },
       {
-        name: 'Active Response',
+        name: name16,
         description: descp16,
         goto: 'active-response',
         when: 'manager',
       },
       {
-        name: 'Active response',
+        name: name17,
         description: descp17,
         goto: 'active-response-agent',
         when: 'agent',
       },
       {
-        name: 'Commands',
+        name: name18,
         description: descp27,
         goto: 'commands',
       },
       {
-        name: 'Docker listener',
+        name: name19,
         description: descp18,
         goto: 'docker-listener',
         when: agent => hasAgentSupportModule(agent, WAZUH_MODULES_ID.DOCKER),
@@ -270,17 +350,17 @@ export default [
     description: '',
     settings: [
       {
-        name: 'Log collection',
+        name: name20,
         description: descp19,
         goto: 'log-collection',
       },
       {
-        name: 'Integrity monitoring',
+        name: name21,
         description: descp20,
         goto: 'integrity-monitoring',
       },
       {
-        name: 'Agentless',
+        name: name22,
         description: descp21,
         goto: 'agentless',
         when: 'manager',
@@ -292,28 +372,28 @@ export default [
     description: '',
     settings: [
       {
-        name: 'Amazon S3',
+        name: name23,
         description: descp22,
         goto: 'aws-s3',
       },
       {
-        name: 'Azure Logs',
+        name: name24,
         description: descp23,
         goto: 'azure-logs',
         when: 'manager',
       },
       {
-        name: 'Google Cloud Pub/Sub',
+        name: name25,
         description: descp24,
         goto: 'gcp-pubsub',
       },
       {
-        name: 'GitHub',
+        name: name26,
         description: descp25,
         goto: 'github',
       },
       {
-        name: 'Office 365',
+        name: name27,
         description: descp27,
         goto: 'office365',
         when: 'manager',

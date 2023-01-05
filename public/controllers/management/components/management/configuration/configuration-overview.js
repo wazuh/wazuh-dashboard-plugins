@@ -35,29 +35,67 @@ import { isString, isFunction } from './utils/utils';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 import { API_NAME_AGENT_STATUS } from '../../../../../../common/constants';
 import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
-
+const name1 = i18n.translate('controllers.manage.confi.overview.name1', {
+  defaultMessage: 'Name',
+});
+const name2 = i18n.translate('controllers.manage.confi.overview.name2', {
+  defaultMessage: 'Description',
+});
+const text1 = i18n.translate('controllers.manage.confi.overview.text1', {
+  defaultMessage: 'Wazuh server administration',
+});
+const text2 = i18n.translate('controllers.manage.confi.overview.text2', {
+  defaultMessage: 'Wazuh capabilities',
+});
+const text3 = i18n.translate('controllers.manage.confi.overview.text3', {
+  defaultMessage: 'Local configuration reference',
+});
+const action1 = i18n.translate('controllers.manage.confi.overview.action1', {
+  defaultMessage: 'cluster:status',
+});
+const action2 = i18n.translate('controllers.manage.confi.overview.action2', {
+  defaultMessage: 'cluster:update_config',
+});
+const action3 = i18n.translate('controllers.manage.confi.overview.action3', {
+  defaultMessage: 'manager:update_config',
+});
+const action4 = i18n.translate('controllers.manage.confi.overview.action4', {
+  defaultMessage: 'edit-configuration',
+});
+const action5 = i18n.translate('controllers.manage.confi.overview.action5', {
+  defaultMessage: ' Cluster',
+});
+const action6 = i18n.translate('controllers.manage.confi.overview.action6', {
+  defaultMessage: 'Manager',
+});
+const action7 = i18n.translate('controllers.manage.confi.overview.action7', {
+  defaultMessage: 'Cron prefix',
+});
+const action8 = i18n.translate('controllers.manage.confi.overview.action8', {
+  defaultMessage: 'configuration',
+});
 const columns = [
   {
     field: 'name',
-    name: 'Name',
+    name: name1,
   },
   {
     field: 'description',
-    name: 'Description',
+    name: name2,
   },
 ];
 
 const helpLinks = [
   {
-    text: 'Wazuh server administration',
+    text: text1,
     href: webDocumentationLink('user-manual/manager/index.html'),
   },
   {
-    text: 'Wazuh capabilities',
+    text: text2,
     href: webDocumentationLink('user-manual/capabilities/index.html'),
   },
   {
-    text: 'Local configuration reference',
+    text: text3,
     href: webDocumentationLink('user-manual/reference/ossec-conf/index.html'),
   },
 ];
@@ -124,14 +162,14 @@ class WzConfigurationOverview extends Component {
                   <WzButtonPermissions
                     buttonType='empty'
                     permissions={[
-                      { action: 'cluster:status', resource: '*:*:*' },
+                      { action: action1, resource: '*:*:*' },
                       this.props.clusterNodeSelected
                         ? {
-                            action: 'cluster:update_config',
+                            action: action2,
                             resource: `node:id:${this.props.clusterNodeSelected}`,
                           }
                         : {
-                            action: 'manager:update_config',
+                            action: action3,
                             resource: '*:*:*',
                           },
                     ]}
@@ -139,12 +177,12 @@ class WzConfigurationOverview extends Component {
                     iconType='pencil'
                     onClick={() =>
                       this.updateConfigurationSection(
-                        'edit-configuration',
+                        action4,
                         `${
-                          this.props.clusterNodeSelected ? 'Cluster' : 'Manager'
-                        } configuration`,
+                          this.props.clusterNodeSelected ? action5 : action6
+                        } ${action7}`,
                         '',
-                        'Edit configuration',
+                        action8,
                       )
                     }
                   >

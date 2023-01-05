@@ -49,7 +49,22 @@ import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { WzFlyout } from '../../../components/common/flyouts';
 import _ from 'lodash';
-
+const descp1 = i18n.translate('controllers.agent.comp.table.Descp1', {
+  defaultMessage: 'Error trying to delete logtest token due to:',
+});
+const place2 = i18n.translate('controllers.agent.comp.table.place2', {
+  defaultMessage: 'Type one log per line...',
+});
+const descp3 = i18n.translate('controllers.agent.comp.table.Descp3', {
+  defaultMessage: 'Clear current session',
+});
+const descp4 = i18n.translate('controllers.agent.comp.table.Descp4', {
+  defaultMessage: 'Do you want to clear current session?',
+});
+const descp5 = i18n.translate('controllers.agent.comp.table.Descp5', {
+  defaultMessage:
+    'Clearing the session means the logs execution history is removed. This affects to rules that fire an alert when similar logs are executed in a specific range of time.',
+});
 type LogstestProps = {
   openCloseFlyout: () => {};
   showClose: boolean;
@@ -241,9 +256,7 @@ export const Logtest = compose(
         severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
         error: {
           error: error,
-          message: `Error trying to delete logtest token due to: ${
-            error.message || error
-          }`,
+          message: `${descp1} ${error.message || error}`,
           title: error.name,
         },
       };
@@ -255,7 +268,7 @@ export const Logtest = compose(
     return (
       <Fragment>
         <EuiTextArea
-          placeholder='Type one log per line...'
+          placeholder={place2}
           fullWidth={true}
           aria-label=''
           rows={props.showClose ? 10 : 4}
@@ -273,13 +286,15 @@ export const Logtest = compose(
               fill
               onClick={runAllTests}
             >
-              Test
+              {i18n.translate('driectives.wzlog.comp.logtext.session.Test', {
+                defaultMessage: 'Test',
+              })}
             </EuiButton>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
             <WzButtonPermissionsModalConfirm
               style={{ maxWidth: '150px' }}
-              tooltip={{ position: 'top', content: 'Clear current session' }}
+              tooltip={{ position: 'top', content: { descp3 } }}
               fill
               isDisabled={sessionToken === '' ? true : false}
               aria-label='Clear current session'
@@ -288,14 +303,15 @@ export const Logtest = compose(
                 deleteToken();
               }}
               color='danger'
-              modalTitle={`Do you want to clear current session?`}
+              modalTitle={descp4}
               modalProps={{
                 buttonColor: 'danger',
-                children:
-                  'Clearing the session means the logs execution history is removed. This affects to rules that fire an alert when similar logs are executed in a specific range of time.',
+                children: descp5,
               }}
             >
-              Clear session
+              {i18n.translate('driectives.wzlog.comp.logtext.session', {
+                defaultMessage: 'Clear session',
+              })}
             </WzButtonPermissionsModalConfirm>
           </EuiFlexItem>
         </EuiFlexGroup>
@@ -310,7 +326,10 @@ export const Logtest = compose(
           }
           isCopyable={!!testResult}
         >
-          {testResult || 'The test result will appear here.'}
+          {testResult ||
+            i18n.translate('directives.wz.comp.logtest.result.', {
+              defaultMessage: "'The test result will appear here.'",
+            })}
         </EuiCodeBlock>
       </Fragment>
     );
