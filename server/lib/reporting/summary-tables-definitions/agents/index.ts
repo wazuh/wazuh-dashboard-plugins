@@ -10,7 +10,7 @@ const generalAlertsSummary = {
 }
 
 const generalGroupsSummary = {
-  title: 'Alerts summary',
+  title: 'Groups summary',
   aggs: [
     AggregationFields['rule.groups'],
   ]
@@ -62,7 +62,7 @@ const osqueryAlertsSummary = {
 }
 
 const mitreAlertsSummary = {
-  itle: 'Alerts summary',
+  title: 'Alerts summary',
   aggs: [
     AggregationFields['rule.id'],
     AggregationFields['rule.description'],
@@ -105,16 +105,27 @@ const githubAlertsSummary = {
   ]
 }
 
-const hipaaAlertsSummary = {
-  title: 'Alerts summary',
+// 'Wazuh-App-Agents-GDPR-Last-alerts'
+const gdprLastAlerts = {
+  title: 'Last alerts',
   aggs: [
-    AggregationFields['rule.hipaa'],
-    AggregationFields['rule.level'],
+    AggregationFields['rule.gdpr'],
+    AggregationFields['rule.description'],
+  ]
+
+}
+
+// 'Wazuh-App-Agents-PCI-Last-alerts'
+const pciLastAlerts = {
+  title: 'Last alerts',
+  aggs: [
+    AggregationFields['rule.pci_dss'],
     AggregationFields['rule.description'],
   ]
 }
 
-const nistAlertsSummary = {
+// 'Wazuh-App-Agents-NIST-Last-alerts'
+const nistLastAlerts = {
   title: 'Alerts summary',
   aggs: [
     AggregationFields['rule.nist_800_53'],
@@ -123,19 +134,61 @@ const nistAlertsSummary = {
   ]
 }
 
+// 'Wazuh-App-Agents-HIPAA-Last-alerts'
+const hipaaLastAlerts = {
+  title: 'Alerts summary',
+  aggs: [
+    AggregationFields['rule.hipaa'],
+    AggregationFields['rule.level'],
+    AggregationFields['rule.description'],
+  ]
+}
+
+// 'Wazuh-App-Agents-OSCAP-Last-alerts'
+const oscapLastAlerts = {
+  title: 'Last alerts',
+  aggs: [
+    AggregationFields['data.oscap.check.title'],
+    AggregationFields['data.oscap.scan.profile.title'],
+  ]
+}
+
+// 'Wazuh-App-Agents-Audit-Last-alerts'
+const auditLastAlerts = {
+  title: 'Last alerts',
+  aggs: [
+    AggregationFields['rule.description'],
+    AggregationFields['data.audit.exe'],
+    AggregationFields['data.audit.type'],
+  ]
+}
+
+const dockerAlertsSummary = {
+  title: 'Events summary',
+  aggs: [
+    AggregationFields['data.docker.Actor.Attributes.name'],
+    AggregationFields['data.docker.Action'],
+    AggregationFields['timestamp'],
+  ]
+}
+
 export default {
-  generalAlertsSummary,
-  generalGroupsSummary,
-  awsAlertsSummary,
-  fimAlertsSummary,
-  githubAlertsSummary,
-  hipaaAlertsSummary,
-  nistAlertsSummary,
-  gcpAlertsSummary,
-  tscAlertsSummary,
-  virustotalAlertsSummary,
-  osqueryAlertsSummary,
-  mitreAlertsSummary,
-  ciscatAlertsSummary,
-  pmAlertsSummary,
+  general: [generalAlertsSummary, generalGroupsSummary],
+  aws: [awsAlertsSummary],
+  fim: [fimAlertsSummary],
+  github: [githubAlertsSummary],
+  hipaa: [hipaaLastAlerts],
+  nist: [nistLastAlerts],
+  gcp: [gcpAlertsSummary],
+  tsc: [tscAlertsSummary],
+  virustotal: [virustotalAlertsSummary],
+  osquery: [osqueryAlertsSummary],
+  mitre: [mitreAlertsSummary],
+  ciscat: [ciscatAlertsSummary],
+  pm: [pmAlertsSummary],
+  audit: [auditLastAlerts],
+  oscap: [oscapLastAlerts],
+  gdpr: [gdprLastAlerts],
+  pci: [pciLastAlerts],
+  docker: [dockerAlertsSummary],
 }
