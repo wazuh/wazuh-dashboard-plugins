@@ -11,6 +11,8 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component, Fragment } from 'react';
+import { i18n } from '@kbn/i18n';
+
 import PropTypes from 'prop-types';
 import {
   EuiCodeEditor,
@@ -19,12 +21,14 @@ import {
   EuiPanel,
   EuiFlexItem,
   EuiButton,
-  EuiFlexGroup
+  EuiFlexGroup,
 } from '@elastic/eui';
 import { DynamicHeight } from '../../../utils/dynamic-height';
 import 'brace/theme/textmate';
-import "brace/ext/searchbox";
-
+import 'brace/ext/searchbox';
+const title1 = i18n.translate('controller.dev.tool.comp.valid', {
+  defaultMessage: 'The configuration is valid!',
+});
 export class TestConfiguration extends Component {
   constructor(props) {
     super(props);
@@ -32,7 +36,7 @@ export class TestConfiguration extends Component {
     this.state = {
       configuration: '',
       validating: false,
-      result: false
+      result: false,
     };
   }
 
@@ -42,19 +46,19 @@ export class TestConfiguration extends Component {
 
   validate = async () => {
     this.setState({
-      validating: true
+      validating: true,
     });
     const result = await this.props.clickAction(this.state.configuration);
     this.setState({
       validating: false,
-      result: result
+      result: result,
     });
   };
 
   dynamicHeight = () =>
     DynamicHeight.dynamicHeightStatic(
       '.euiCodeEditorWrapper',
-      this.state.result ? 110 : 110
+      this.state.result ? 110 : 110,
     );
 
   render() {
@@ -62,36 +66,36 @@ export class TestConfiguration extends Component {
     return (
       <div>
         <Fragment>
-          <EuiSpacer size="m" />
-          <EuiPanel paddingSize="l">
+          <EuiSpacer size='m' />
+          <EuiPanel paddingSize='l'>
             {this.state.result && (
               <div>
                 <EuiCallOut
-                  title="The configuration is valid!"
-                  color="success"
-                  iconType="check"
+                  title={title1}
+                  color='success'
+                  iconType='check'
                 ></EuiCallOut>
-                <EuiSpacer size="m" />
+                <EuiSpacer size='m' />
               </div>
             )}
-            <div className="codeEditorWrapper">
+            <div className='codeEditorWrapper'>
               <EuiCodeEditor
-                theme="textmate"
-                width="100%"
+                theme='textmate'
+                width='100%'
                 value={this.state.configuration}
-                height="720px"
+                height='720px'
                 onChange={this.onChange}
                 setOptions={{
                   fontSize: '14px',
                   enableBasicAutocompletion: true,
                   enableSnippets: true,
-                  enableLiveAutocompletion: true
+                  enableLiveAutocompletion: true,
                 }}
               ></EuiCodeEditor>
             </div>
           </EuiPanel>
-          <EuiSpacer size="m" />
-          <EuiFlexGroup justifyContent="spaceBetween">
+          <EuiSpacer size='m' />
+          <EuiFlexGroup justifyContent='spaceBetween'>
             <EuiFlexItem grow={false}></EuiFlexItem>
             <EuiFlexItem grow={false}>
               <EuiButton
@@ -102,7 +106,9 @@ export class TestConfiguration extends Component {
                   this.validate();
                 }}
               >
-                Validate
+                {i18n.translate('controller.dev.tool.comp.validate', {
+                  defaultMessage: 'Validate',
+                })}
               </EuiButton>
             </EuiFlexItem>
           </EuiFlexGroup>

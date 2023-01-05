@@ -12,6 +12,7 @@
 
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { i18n } from '@kbn/i18n';
 
 import { EuiBasicTable } from '@elastic/eui';
 
@@ -21,21 +22,28 @@ import {
   isString,
   renderValueOrAll,
   renderValueOrNo,
-  renderValueOrDefault
+  renderValueOrDefault,
 } from '../utils/utils';
 
 import { connect } from 'react-redux';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
-
+const descp1 = i18n.translate('controller.manage.comp.confi.setting.Descp1', {
+  defaultMessage: 'Output alerts to a syslog server',
+});
+const title1 = i18n.translate('ccontroller.manage.comp.confi.setting.title1', {
+  defaultMessage: 'Main settings',
+});
 const helpLinks = [
   {
     text: 'Configuring syslog output',
-    href: webDocumentationLink('user-manual/manager/manual-syslog-output.html')
+    href: webDocumentationLink('user-manual/manager/manual-syslog-output.html'),
   },
   {
     text: 'Syslog output reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/syslog-output.html')
-  }
+    href: webDocumentationLink(
+      'user-manual/reference/ossec-conf/syslog-output.html',
+    ),
+  },
 ];
 
 const columns = [
@@ -46,7 +54,7 @@ const columns = [
   { field: 'use_fqdn', name: 'FQDN', render: renderValueOrNo },
   { field: 'rule_id', name: 'Rule ID', render: renderValueOrAll },
   { field: 'group', name: 'Group', render: renderValueOrAll },
-  { field: 'location', name: 'Location', render: renderValueOrAll }
+  { field: 'location', name: 'Location', render: renderValueOrAll },
 ];
 class WzConfigurationAlertsReports extends Component {
   constructor(props) {
@@ -67,19 +75,19 @@ class WzConfigurationAlertsReports extends Component {
           !isString(currentConfig['csyslog-csyslog']) &&
           (!currentConfig['csyslog-csyslog'].syslog_output ||
             !currentConfig['csyslog-csyslog'].syslog_output.length) && (
-            <WzNoConfig error="not-present" help={helpLinks} />
+            <WzNoConfig error='not-present' help={helpLinks} />
           )}
         {wazuhNotReadyYet &&
           (!currentConfig || !currentConfig['csyslog-csyslog']) && (
-            <WzNoConfig error="Wazuh not ready yet" help={helpLinks} />
+            <WzNoConfig error='Wazuh not ready yet' help={helpLinks} />
           )}
         {currentConfig['csyslog-csyslog'] &&
           !isString(currentConfig['csyslog-csyslog']) &&
           currentConfig['csyslog-csyslog'].syslog_output &&
           currentConfig['csyslog-csyslog'].syslog_output.length && (
             <WzConfigurationSettingsTabSelector
-              title="Main settings"
-              description="Output alerts to a syslog server"
+              title={title1}
+              description={descp1}
               currentConfig={currentConfig}
               minusHeight={320}
               helpLinks={helpLinks}
@@ -96,12 +104,12 @@ class WzConfigurationAlertsReports extends Component {
 }
 
 const mapStateToProps = state => ({
-  wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet
+  wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet,
 });
 
 WzConfigurationAlertsReports.propTypes = {
   // currentConfig: PropTypes.object.isRequired,
-  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string])
+  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
 };
 
 export default connect(mapStateToProps)(WzConfigurationAlertsReports);

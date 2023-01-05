@@ -12,6 +12,7 @@
 
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { i18n } from '@kbn/i18n';
 
 import WzNoConfig from '../util-components/no-config';
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
@@ -22,12 +23,20 @@ import { connect } from 'react-redux';
 import { compose } from 'redux';
 import withWzConfig from '../util-hocs/wz-config';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
-
+const name2 = i18n.translate('controller.manage.comp.confi.active.name2', {
+  defaultMessage: 'Active response documentation',
+});
+const name3 = i18n.translate('controller.manage.comp.confi.active.name3', {
+  defaultMessage: 'Active response reference',
+});
+const title1 = i18n.translate('controller.manage.comp.confi.active.title1', {
+  defaultMessage: 'Active response definitions',
+});
 const mainSettings = [
   {
     field: 'disabled',
     label: 'Status of this active response',
-    render: renderValueNoThenEnabled
+    render: renderValueNoThenEnabled,
   },
   { field: 'command', label: 'Command to execute' },
   { field: 'location', label: 'Execute the command on this location' },
@@ -35,18 +44,22 @@ const mainSettings = [
   { field: 'level', label: 'Match to this severity level or above' },
   { field: 'rules_group', label: 'Match to one of these groups' },
   { field: 'rules_id', label: 'Match to one of these rule IDs' },
-  { field: 'timeout', label: 'Timeout (in seconds) before reverting' }
+  { field: 'timeout', label: 'Timeout (in seconds) before reverting' },
 ];
 
 const helpLinks = [
   {
-    text: 'Active response documentation',
-    href: webDocumentationLink('user-manual/capabilities/active-response/index.html')
+    text: name2,
+    href: webDocumentationLink(
+      'user-manual/capabilities/active-response/index.html',
+    ),
   },
   {
-    text: 'Active response reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/active-response.html')
-  }
+    text: name3,
+    href: webDocumentationLink(
+      'user-manual/reference/ossec-conf/active-response.html',
+    ),
+  },
 ];
 
 class WzConfigurationActiveResponseActiveResponse extends Component {
@@ -61,7 +74,7 @@ class WzConfigurationActiveResponseActiveResponse extends Component {
       currentConfig['analysis-active_response']['active-response'].length
         ? settingsListBuilder(
             currentConfig['analysis-active_response']['active-response'],
-            'command'
+            'command',
           )
         : [];
     return (
@@ -77,17 +90,17 @@ class WzConfigurationActiveResponseActiveResponse extends Component {
           !isString(currentConfig['analysis-active_response']) &&
           currentConfig['analysis-active_response']['active-response'] &&
           !currentConfig['analysis-active_response']['active-response']
-            .length && <WzNoConfig error="not-present" help={helpLinks} />}
+            .length && <WzNoConfig error='not-present' help={helpLinks} />}
         {wazuhNotReadyYet &&
           (!currentConfig || !currentConfig['analysis-active_response']) && (
-            <WzNoConfig error="Wazuh not ready yet" help={helpLinks} />
+            <WzNoConfig error='Wazuh not ready yet' help={helpLinks} />
           )}
         {currentConfig['analysis-active_response'] &&
         !isString(currentConfig['analysis-active_response']) &&
         currentConfig['analysis-active_response']['active-response'].length ? (
           <WzConfigurationSettingsTabSelector
-            title="Active response definitions"
-            description="Find here all the currently defined Active responses"
+            title={title1}
+            description='Find here all the currently defined Active responses'
             currentConfig={currentConfig['analysis-active_response']}
             minusHeight={320}
             helpLinks={helpLinks}
@@ -105,25 +118,25 @@ class WzConfigurationActiveResponseActiveResponse extends Component {
 
 WzConfigurationActiveResponseActiveResponse.propTypes = {
   // currentConfig: PropTypes.object.isRequired,
-  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string])
+  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
 };
 
 const mapStateToProps = state => ({
-  wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet
+  wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet,
 });
 
 export default connect(mapStateToProps)(
-  WzConfigurationActiveResponseActiveResponse
+  WzConfigurationActiveResponseActiveResponse,
 );
 
 const sectionsAgent = [{ component: 'com', configuration: 'active-response' }];
 
 export const WzConfigurationActiveResponseActiveResponseAgent = compose(
   connect(mapStateToProps),
-  withWzConfig(sectionsAgent)
+  withWzConfig(sectionsAgent),
 )(WzConfigurationActiveResponseActiveResponse);
 
 WzConfigurationActiveResponseActiveResponseAgent.propTypes = {
   // currentConfig: PropTypes.object.isRequired,
-  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string])
+  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
 };

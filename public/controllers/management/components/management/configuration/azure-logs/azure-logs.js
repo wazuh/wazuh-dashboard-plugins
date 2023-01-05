@@ -19,16 +19,31 @@ import withWzConfig from '../util-hocs/wz-config';
 import { isString, renderValueNoThenEnabled } from '../utils/utils';
 import { wodleBuilder } from '../utils/builders';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
+import { i18n } from '@kbn/i18n';
 
+const text1 = i18n.translate(
+  'controller.manage.comp.confi.Using.Wazuh.Azure.text1',
+  {
+    defaultMessage: 'Using Wazuh to monitor Azure',
+  },
+);
+const text2 = i18n.translate(
+  'controller.manage.comp.confi.Azurereference.text2',
+  {
+    defaultMessage: 'Azure reference',
+  },
+);
 const helpLinks = [
   {
-    text: 'Using Wazuh to monitor Azure',
-    href: webDocumentationLink('azure/index.html')
+    text: text1,
+    href: webDocumentationLink('azure/index.html'),
   },
   {
-    text: 'Azure reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/wodle-azure-logs.html')
-  }
+    text: text2,
+    href: webDocumentationLink(
+      'user-manual/reference/ossec-conf/wodle-azure-logs.html',
+    ),
+  },
 ];
 
 const mainSettings = [
@@ -40,8 +55,8 @@ const mainSettings = [
   { field: 'interval', label: 'Interval between Azure-Logs executions' },
   {
     field: 'run_on_start',
-    label: 'Run evaluation immediately when service is started'
-  }
+    label: 'Run evaluation immediately when service is started',
+  },
 ];
 
 const contentSettings = [
@@ -54,8 +69,8 @@ const contentSettings = [
   {
     field: 'auth_path',
     label:
-      'Path of the file that contains the application identifier and the application key'
-  }
+      'Path of the file that contains the application identifier and the application key',
+  },
 ];
 
 class WzConfigurationAzure extends Component {
@@ -87,12 +102,12 @@ class WzConfigurationAzure extends Component {
         {currentConfig &&
           !this.wodleConfig['azure-logs'] &&
           !isString(currentConfig['wmodules-wmodules']) && (
-            <WzNoConfig error="not-present" help={helpLinks} />
+            <WzNoConfig error='not-present' help={helpLinks} />
           )}
         {currentConfig && this.wodleConfig['azure-logs'] && (
           <WzConfigurationSettingsTabSelector
-            title="Main settings"
-            description="Configuration for the Azure logs wodle"
+            title='Main settings'
+            description='Configuration for the Azure logs wodle'
             currentConfig={this.wodleConfig}
             minusHeight={260}
             helpLinks={helpLinks}
@@ -115,7 +130,7 @@ class WzConfigurationAzure extends Component {
                         />
                       )}
                     </Fragment>
-                  )
+                  ),
                 )}
               </Fragment>
             ) : null}

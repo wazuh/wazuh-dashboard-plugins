@@ -9,6 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { i18n } from '@kbn/i18n';
 
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
@@ -24,33 +25,51 @@ import { connect } from 'react-redux';
 
 import { isString, renderValueNoThenEnabled } from '../utils/utils';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
-
+const text2 = i18n.translate(
+  'controller.manage.comp.confi.setting.active.text2',
+  {
+    defaultMessage: 'Active response documentation',
+  },
+);
+const text3 = i18n.translate(
+  'controller.manage.comp.confi.setting.active.text3',
+  {
+    defaultMessage: 'Active response reference',
+  },
+);
 const helpLinks = [
   {
-    text: 'Active response documentation',
-    href: webDocumentationLink('user-manual/capabilities/active-response/index.html')
+    text: text2,
+    href: webDocumentationLink(
+      'user-manual/capabilities/active-response/index.html',
+    ),
   },
   {
-    text: 'Active response reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/active-response.html')
-  }
+    text: text3,
+    href: webDocumentationLink(
+      'user-manual/reference/ossec-conf/active-response.html',
+    ),
+  },
 ];
 
 const mainSettings = [
   {
     field: 'disabled',
     label: 'Active response status',
-    render: renderValueNoThenEnabled
+    render: renderValueNoThenEnabled,
   },
   {
     field: 'repeated_offenders',
-    label: 'List of timeouts (in minutes) for repeated offenders'
+    label: 'List of timeouts (in minutes) for repeated offenders',
   },
   {
     field: 'ca_store',
-    label: 'Use the following list of root CA certificates'
+    label: 'Use the following list of root CA certificates',
   },
-  { field: 'ca_verification', label: 'Validate WPKs using root CA certificate' }
+  {
+    field: 'ca_verification',
+    label: 'Validate WPKs using root CA certificate',
+  },
 ];
 
 class WzConfigurationActiveResponseAgent extends Component {
@@ -71,18 +90,18 @@ class WzConfigurationActiveResponseAgent extends Component {
         {currentConfig['com-active-response'] &&
           !isString(currentConfig['com-active-response']) &&
           !currentConfig['com-active-response']['active-response'] && (
-            <WzNoConfig error="not-present" help={helpLinks} />
+            <WzNoConfig error='not-present' help={helpLinks} />
           )}
         {wazuhNotReadyYet &&
           (!currentConfig || !currentConfig['com-active-response']) && (
-            <WzNoConfig error="Wazuh not ready yet" help={helpLinks} />
+            <WzNoConfig error='Wazuh not ready yet' help={helpLinks} />
           )}
         {currentConfig['com-active-response'] &&
           !isString(currentConfig['com-active-response']) &&
           currentConfig['com-active-response']['active-response'] && (
             <WzConfigurationSettingsTabSelector
-              title="Active response settings"
-              description="Find here all the Active response settings for this agent"
+              title='Active response settings'
+              description='Find here all the Active response settings for this agent'
               currentConfig={currentConfig}
               minusHeight={this.props.agent.id === '000' ? 280 : 355}
               helpLinks={helpLinks}
@@ -99,17 +118,17 @@ class WzConfigurationActiveResponseAgent extends Component {
 }
 
 const mapStateToProps = state => ({
-  wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet
+  wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet,
 });
 
 const sectionsAgent = [{ component: 'com', configuration: 'active-response' }];
 
 WzConfigurationActiveResponseAgent.propTypes = {
   // currentConfig: PropTypes.object.isRequired,
-  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string])
+  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
 };
 
 export default compose(
   connect(mapStateToProps),
-  withWzConfig(sectionsAgent)
+  withWzConfig(sectionsAgent),
 )(WzConfigurationActiveResponseAgent);
