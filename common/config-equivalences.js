@@ -513,17 +513,242 @@ const hide21 = i18n.translate('common.config.equivalence.hide21', {
 const hide22 = i18n.translate('common.config.equivalence.hide22', {
   defaultMessage: 'Sample alerts prefix',
 });
+const patternGernal1 = i18n.translate(
+  'common.config.equivalence.patternGernal1',
+  {
+    defaultMessage: 'customization.logo.app',
+  },
+);
+const patternGernal2 = i18n.translate(
+  'common.config.equivalence.patternGernal2',
+  {
+    defaultMessage: 'customization.logo.sidebar',
+  },
+);
+const patternGernal3 = i18n.translate(
+  'common.config.equivalence.patternGernal3',
+  {
+    defaultMessage: 'customization.logo.healthcheck',
+  },
+);
+const patternGernal4 = i18n.translate(
+  'common.config.equivalence.patternGernal4',
+  {
+    defaultMessage: 'customization.logo.reports',
+  },
+);
+const patternGernal5 = i18n.translate(
+  'common.config.equivalence.patternGernal5',
+  {
+    defaultMessage: 'checks.pattern',
+  },
+);
+const patternGernal6 = i18n.translate(
+  'common.config.equivalence.patternGernal6',
+  {
+    defaultMessage: 'checks.template',
+  },
+);
+const patternGernal7 = i18n.translate(
+  'common.config.equivalence.patternGernal7',
+  {
+    defaultMessage: 'checks.api',
+  },
+);
+const patternGernal8 = i18n.translate(
+  'common.config.equivalence.patternGernal8',
+  {
+    defaultMessage: 'checks.setup',
+  },
+);
+const patternGernal9 = i18n.translate(
+  'common.config.equivalence.patternGernal9',
+  {
+    defaultMessage: 'checks.fields',
+  },
+);
+const patternGernal10 = i18n.translate(
+  'common.config.equivalence.patternGernal10',
+  {
+    defaultMessage: 'checks.metaFields',
+  },
+);
+const patternGernal11 = i18n.translate(
+  'common.config.equivalence.patternGernal11',
+  {
+    defaultMessage: 'checks.timeFilter',
+  },
+);
+const patternGernal12 = i18n.translate(
+  'common.config.equivalence.patternGernal12',
+  {
+    defaultMessage: 'checks.maxBuckets',
+  },
+);
+const timeOutGernal1 = i18n.translate(
+  "common.config.equivalence.timeOutGernal1",
+  {
+    defaultMessage: "ip.selector",
+  }
+);
+const timeOutGernal2 = i18n.translate(
+  "common.config.equivalence.timeOutGernal2",
+  {
+    defaultMessage: "ip.ignore",
+  }
+);
+const timeOutGernal3 = i18n.translate(
+  "common.config.equivalence.timeOutGernal3",
+  {
+    defaultMessage: "wazuh.monitoring.enabled",
+  }
+);
+const timeOutGernal4 = i18n.translate(
+  "common.config.equivalence.timeOutGernal4",
+  {
+    defaultMessage: "wazuh.monitoring.frequency",
+  }
+);
+const timeOutGernal5 = i18n.translate(
+  "common.config.equivalence.timeOutGernal5",
+  {
+    defaultMessage: "wazuh.monitoring.shards",
+  }
+);
+const timeOutGernal6 = i18n.translate(
+  "common.config.equivalence.timeOutGernal6",
+  {
+    defaultMessage: "wazuh.monitoring.replicas",
+  }
+);
+const timeOutGernal7 = i18n.translate(
+  "common.config.equivalence.timeOutGernal7",
+  {
+    defaultMessage: "wazuh.monitoring.creation",
+  }
+);
+const timeOutGernal8 = i18n.translate(
+  "common.config.equivalence.timeOutGernal8",
+  {
+    defaultMessage: "wazuh.monitoring.pattern",
+  }
+);
+const hideGernal1 = i18n.translate("common.config.equivalence.hideGernal1", {
+  defaultMessage: "logs.level",
+});
+const hideGernal2 = i18n.translate("common.config.equivalence.hideGernal2", {
+  defaultMessage: "enrollment.dns",
+});
+const hideGernal3 = i18n.translate("common.config.equivalence.hideGernal3", {
+  defaultMessage: "cron.prefix",
+});
+const hideGernal4 = i18n.translate("common.config.equivalence.hideGernal4", {
+  defaultMessage: "cron.statistics.status",
+});
+const hideGernal5 = i18n.translate("common.config.equivalence.hideGernal5", {
+  defaultMessage: "cron.statistics.apis",
+});
+const hideGernal6 = i18n.translate('common.config.equivalence.hideGernal6', {
+  defaultMessage: 'cron.statistics.interval,
+});
+const hideGernal7 = i18n.translate('common.config.equivalence.hideGernal7', {
+  defaultMessage: 'cron.statistics.index.name',
+});
+const hideGernal8 = i18n.translate('common.config.equivalence.hideGernal8', {
+  defaultMessage: 'cron.statistics.index.creation',
+});
+const hideGernal9 = i18n.translate('common.config.equivalence.hideGernal9', {
+  defaultMessage: 'cron.statistics.index.shards',
+});
+const hideGernal10 = i18n.translate('common.config.equivalence.hideGernal10', {
+  defaultMessage: 'cron.statistics.index.replicas',
+});
+const hideGernal11 = i18n.translate('common.config.equivalence.hideGernal11', {
+  defaultMessage: 'alerts.sample.prefix',
+});
+const hourly = i18n.translate(
+  "common.config.equivalence.Hourly",
+  {
+    defaultMessage: "Hourly",
+  }
+);
+const daily = i18n.translate(
+  "common.config.equivalence.Daily",
+  {
+    defaultMessage: "Daily",
+  }
+);
+const weekly = i18n.translate(
+  "common.config.equivalence.Weekly",
+  {
+    defaultMessage: "Weekly",
+  }
+);
+const monthly = i18n.translate(
+  "common.config.equivalence.Monthly",
+  {
+    defaultMessage: "Monthly",
+  }
+);
+const textinfo1 = i18n.translate(
+  "common.config.equivalence.textinfo1",
+  {
+    defaultMessage: "Info",
+  }
+);
+const textdebug2 = i18n.translate(
+  "common.config.equivalence.textdebug2",
+  {
+    defaultMessage: "Debug",
+  }
+);
+const text1 = i18n.translate(
+  "common.config.equivalence.text1",
+  {
+    defaultMessage: "text",
+  }
+);
+const text2 = i18n.translate(
+  "common.config.equivalence.text2",
+  {
+    defaultMessage: "number",
+  }
+);
+const text3 = i18n.translate(
+  "common.config.equivalence.text3",
+  {
+    defaultMessage: "list",
+  }
+);
+const text4 = i18n.translate(
+  "common.config.equivalence.text4",
+  {
+    defaultMessage: "boolean'",
+  }
+);
+const text5 = i18n.translate(
+  "common.config.equivalence.text5",
+  {
+    defaultMessage: "array",
+  }
+);
+const text6 = i18n.translate(
+  "common.config.equivalence.text6",
+  {
+    defaultMessage: "interval",
+  }
+);
 export const configEquivalences = {
   pattern: descp1,
   descp2: `${descp3} ${ASSETS_PUBLIC_URL}`,
   descp4: ` ${descp5} ${ASSETS_PUBLIC_URL}`,
   descp6: `${descp7} ${ASSETS_PUBLIC_URL}`,
   descp8: `${descp9} ${ASSETS_PUBLIC_URL}`,
-  descp10: { descp10 },
-  descp11: { descp12 },
-  descp13: { descp14 },
-  descp15: { descp16 },
-  descp17: { descp18 },
+  descp10:  descp10 ,
+  descp11:  descp12 ,
+  descp13:  descp14 ,
+  descp15:  descp16 ,
+  descp17:  descp18 ,
   descp19: `${descp20} ${PLUGIN_PLATFORM_NAME} ${descp21}`,
   descp22: ` ${descp23} ${PLUGIN_PLATFORM_NAME} ${descp24}`,
   descp25: ` ${descp26} ${PLUGIN_PLATFORM_NAME} ${descp27}`,
@@ -636,110 +861,110 @@ export const categoriesNames = [
 
 export const categoriesEquivalence = {
   pattern: GENERAL,
-  'customization.logo.app': CUSTOMIZATION,
-  'customization.logo.sidebar': CUSTOMIZATION,
-  'customization.logo.healthcheck': CUSTOMIZATION,
-  'customization.logo.reports': CUSTOMIZATION,
-  'checks.pattern': HEALTH_CHECK,
-  'checks.template': HEALTH_CHECK,
-  'checks.api': HEALTH_CHECK,
-  'checks.setup': HEALTH_CHECK,
-  'checks.fields': HEALTH_CHECK,
-  'checks.metaFields': HEALTH_CHECK,
-  'checks.timeFilter': HEALTH_CHECK,
-  'checks.maxBuckets': HEALTH_CHECK,
+  patternGernal1 : CUSTOMIZATION,
+  patternGernal2 : CUSTOMIZATION,
+  patternGernal3 : CUSTOMIZATION,
+  patternGernal4 : CUSTOMIZATION,
+  patternGernal5 : HEALTH_CHECK,
+  patternGernal6 : HEALTH_CHECK,
+  patternGernal7 : HEALTH_CHECK,
+  patternGernal8 : HEALTH_CHECK,
+  patternGernal9 : HEALTH_CHECK,
+  patternGernal10 : HEALTH_CHECK,
+  patternGernal11 : HEALTH_CHECK,
+  patternGernal12 : HEALTH_CHECK,
   timeout: GENERAL,
-  'ip.selector': GENERAL,
-  'ip.ignore': GENERAL,
-  'wazuh.monitoring.enabled': MONITORING,
-  'wazuh.monitoring.frequency': MONITORING,
-  'wazuh.monitoring.shards': MONITORING,
-  'wazuh.monitoring.replicas': MONITORING,
-  'wazuh.monitoring.creation': MONITORING,
-  'wazuh.monitoring.pattern': MONITORING,
+  timeOutGernal1 : GENERAL,
+  timeOutGernal2 : GENERAL,
+  timeOutGernal3 : MONITORING,
+  timeOutGernal4 : MONITORING,
+  timeOutGernal5 : MONITORING,
+  timeOutGernal6 : MONITORING,
+  timeOutGernal7 : MONITORING,
+  timeOutGernal8 : MONITORING,
   hideManagerAlerts: GENERAL,
-  'logs.level': GENERAL,
-  'enrollment.dns': GENERAL,
-  'cron.prefix': GENERAL,
-  'cron.statistics.status': STATISTICS,
-  'cron.statistics.apis': STATISTICS,
-  'cron.statistics.interval': STATISTICS,
-  'cron.statistics.index.name': STATISTICS,
-  'cron.statistics.index.creation': STATISTICS,
-  'cron.statistics.index.shards': STATISTICS,
-  'cron.statistics.index.replicas': STATISTICS,
-  'alerts.sample.prefix': GENERAL,
+  hideGernal1 : GENERAL,
+  hideGernal2 : GENERAL,
+  hideGernal3 : GENERAL,
+  hideGernal4 : STATISTICS,
+  hideGernal5 : STATISTICS,
+  hideGernal6 : STATISTICS,
+  hideGernal7 : STATISTICS,
+  hideGernal8 : STATISTICS,
+  hideGernal9 : STATISTICS,
+  hideGernal10 : STATISTICS,
+  hideGernal11 : GENERAL,
 };
 
-const TEXT = 'text';
-const NUMBER = 'number';
-const LIST = 'list';
-const BOOLEAN = 'boolean';
-const ARRAY = 'array';
-const INTERVAL = 'interval';
+const TEXT = text1;
+const NUMBER = text2;
+const LIST = text3;
+const BOOLEAN = text4;
+const ARRAY = text5;
+const INTERVAL = text6;
 
 export const formEquivalence = {
   pattern: { type: TEXT },
-  'customization.logo.app': { type: TEXT },
-  'customization.logo.sidebar': { type: TEXT },
-  'customization.logo.healthcheck': { type: TEXT },
-  'customization.logo.reports': { type: TEXT },
-  'checks.pattern': { type: BOOLEAN },
-  'checks.template': { type: BOOLEAN },
-  'checks.api': { type: BOOLEAN },
-  'checks.setup': { type: BOOLEAN },
-  'checks.fields': { type: BOOLEAN },
-  'checks.metaFields': { type: BOOLEAN },
-  'checks.timeFilter': { type: BOOLEAN },
-  'checks.maxBuckets': { type: BOOLEAN },
+  patternGernal1: { type: TEXT },
+  patternGernal2: { type: TEXT },
+  patternGernal3: { type: TEXT },
+  patternGernal4: { type: TEXT },
+  patternGernal5: { type: BOOLEAN },
+  patternGernal6: { type: BOOLEAN },
+  patternGernal7: { type: BOOLEAN },
+  patternGernal8: { type: BOOLEAN },
+  patternGernal9: { type: BOOLEAN },
+  patternGernal10: { type: BOOLEAN },
+  patternGernal11: { type: BOOLEAN },
+  patternGernal12: { type: BOOLEAN },
   timeout: { type: NUMBER },
-  'ip.selector': { type: BOOLEAN },
-  'ip.ignore': { type: ARRAY },
-  'xpack.rbac.enabled': { type: BOOLEAN },
-  'wazuh.monitoring.enabled': { type: BOOLEAN },
-  'wazuh.monitoring.frequency': { type: NUMBER },
-  'wazuh.monitoring.shards': { type: NUMBER },
-  'wazuh.monitoring.replicas': { type: NUMBER },
-  'wazuh.monitoring.creation': {
+  timeOutGernal1: { type: BOOLEAN },
+  timeOutGernal2: { type: ARRAY },
+  timeOutGernal3: { type: BOOLEAN },
+  timeOutGernal4: { type: BOOLEAN },
+  timeOutGernal5: { type: NUMBER },
+  timmeoutGernal6: { type: NUMBER },
+  timeOutGernal7: { type: NUMBER },
+  timeOutGernal8: {
     type: LIST,
     params: {
       options: [
-        { text: 'Hourly', value: 'h' },
-        { text: 'Daily', value: 'd' },
-        { text: 'Weekly', value: 'w' },
-        { text: 'Monthly', value: 'm' },
+        { text: hourly, value: 'h' },
+        { text: daily , value: 'd' },
+        { text: weekly, value: 'w' },
+        { text: monthly, value: 'm' },
       ],
     },
   },
-  'wazuh.monitoring.pattern': { type: TEXT },
+  timeOutGernal8: { type: TEXT },
   hideManagerAlerts: { type: BOOLEAN },
-  'logs.level': {
+  hideGernal1: {
     type: LIST,
     params: {
       options: [
-        { text: 'Info', value: 'info' },
-        { text: 'Debug', value: 'debug' },
+        { text: textinfo1, value: 'info' },
+        { text: textdebug2, value: 'debug' },
       ],
     },
   },
-  'enrollment.dns': { type: TEXT },
-  'cron.prefix': { type: TEXT },
-  'cron.statistics.status': { type: BOOLEAN },
-  'cron.statistics.apis': { type: ARRAY },
-  'cron.statistics.interval': { type: INTERVAL },
-  'cron.statistics.index.name': { type: TEXT },
-  'cron.statistics.index.creation': {
+  hideGernal2: { type: TEXT },
+  hideGernal3: { type: TEXT },
+  hideGernal4: { type: BOOLEAN },
+  hide10: { type: ARRAY },
+  hideGernal6: { type: INTERVAL },
+  hideGernal7: { type: TEXT },
+  hideGernal8: {
     type: LIST,
     params: {
       options: [
-        { text: 'Hourly', value: 'h' },
-        { text: 'Daily', value: 'd' },
-        { text: 'Weekly', value: 'w' },
-        { text: 'Monthly', value: 'm' },
+        { text: hourly, value: 'h' },
+        { text: daily, value: 'd' },
+        { text: weekly, value: 'w' },
+        { text: monthly, value: 'm' },
       ],
     },
   },
-  'cron.statistics.index.shards': { type: NUMBER },
-  'cron.statistics.index.replicas': { type: NUMBER },
-  'alerts.sample.prefix': { type: TEXT },
+  hideGernal9: { type: NUMBER },
+  hideGernal10: { type: NUMBER },
+  hideGernal11: { type: TEXT },
 };
