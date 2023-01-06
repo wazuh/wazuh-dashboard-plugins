@@ -9,6 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { i18n } from "@kbn/i18n"
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 const text1 = i18n.translate('controller.manage.comp.confi.cis.cat.text1', {
   defaultMessage: 'CIS-CAT module documentation',

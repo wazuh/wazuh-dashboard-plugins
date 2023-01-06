@@ -12,7 +12,7 @@
 
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
-
+import { i18n } from "@kbn/i18n";
 import withWzConfig from '../util-hocs/wz-config';
 import WzNoConfig from '../util-components/no-config';
 import WzConfigurationListSelector from '../util-components/configuration-settings-list-selector';

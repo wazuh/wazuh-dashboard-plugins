@@ -12,7 +12,7 @@
 import React, { Component, Fragment } from 'react';
 // Redux
 import store from '../../../../redux/store';
-
+import { i18n } from '@kbn/i18n';
 import { updateRulesetSection } from '../../../../redux/actions/rulesetActions';
 import WzRuleset from './ruleset/main-ruleset';
 import WzGroups from './groups/groups-main';

@@ -11,7 +11,7 @@
  */
 
 import React, { Component, Fragment } from 'react';
-
+import { i18n } from '@kbn/i18n';
 import WzConfigurationOverview from './configuration-overview';
 import {
   WzConfigurationGlobalConfigurationManager,
