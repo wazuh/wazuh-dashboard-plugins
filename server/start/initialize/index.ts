@@ -15,20 +15,10 @@ import { pluginPlatformTemplate } from '../../integration-files/kibana-template'
 import { getConfiguration } from '../../lib/get-configuration';
 import { totalmem } from 'os';
 import fs from 'fs';
-
-import {
-  WAZUH_ALERTS_PATTERN,
-  WAZUH_DATA_CONFIG_REGISTRY_PATH,
-  WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME,
-  WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH,
-  PLUGIN_PLATFORM_NAME,
-  PLUGIN_PLATFORM_INSTALLATION_USER_GROUP,
-  PLUGIN_PLATFORM_INSTALLATION_USER,
-  WAZUH_DEFAULT_APP_CONFIG,
-  PLUGIN_APP_NAME,
-} from '../../../common/constants';
+import { WAZUH_DATA_CONFIG_REGISTRY_PATH, WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME, WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH, PLUGIN_PLATFORM_NAME, PLUGIN_PLATFORM_INSTALLATION_USER_GROUP, PLUGIN_PLATFORM_INSTALLATION_USER, WAZUH_DEFAULT_APP_CONFIG, PLUGIN_APP_NAME } from '../../../common/constants';
 import { createDataDirectoryIfNotExists } from '../../lib/filesystem';
 import _ from 'lodash';
+import { getSettingDefaultValue, getSettingsDefault } from '../../../common/services/settings';
 
 
 export function jobInitializeRun(context) {
@@ -45,7 +35,7 @@ export function jobInitializeRun(context) {
     pattern =
       configurationFile && typeof configurationFile.pattern !== 'undefined'
         ? configurationFile.pattern
-        : WAZUH_ALERTS_PATTERN;
+        : getSettingDefaultValue('pattern');
   } catch (error) {
     log('initialize', error.message || error);
     context.wazuh.logger.error(
@@ -118,7 +108,7 @@ export function jobInitializeRun(context) {
       'debug'
     );
 
-    if(!fs.existsSync(WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH)){
+    if (!fs.existsSync(WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH)) {
       throw new Error(`The data directory is missing in the ${PLUGIN_PLATFORM_NAME} root instalation. Create the directory in ${WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH} and give it the required permissions (sudo mkdir ${WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH};sudo chown -R ${PLUGIN_PLATFORM_INSTALLATION_USER}:${PLUGIN_PLATFORM_INSTALLATION_USER_GROUP} ${WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH}). After restart the ${PLUGIN_PLATFORM_NAME} service.`);
     };
 
@@ -139,7 +129,7 @@ export function jobInitializeRun(context) {
       const isUpgradedApp = packageJSON.revision !== source.revision || packageJSON.version !== source['app-version'];
 
       // Rebuild the registry file if revision or version fields are differents
-      if (isUpgradedApp) { 
+      if (isUpgradedApp) {
         log(
           'initialize:checkwazuhRegistry',
           'Wazuh app revision or version changed, regenerating wazuh-registry.json.',
@@ -149,11 +139,11 @@ export function jobInitializeRun(context) {
         // Rebuild the registry file `wazuh-registry.json`
 
         // Get the supported extensions for the installed plugin
-        const supportedDefaultExtensionsConfiguration = Object.entries(WAZUH_DEFAULT_APP_CONFIG)
+        const supportedDefaultExtensionsConfiguration = Object.entries(getSettingsDefault())
           .filter(([setting]) => setting.startsWith('extensions.'))
           .map(([setting, settingValue]) => {
             return [setting.split('.')[1], settingValue];
-        });
+          });
 
         // Get the supported extensions by ID
         const supportedDefaultExtensionsNames = supportedDefaultExtensionsConfiguration.map(([setting]) => setting);
@@ -164,7 +154,7 @@ export function jobInitializeRun(context) {
         // Remove the unsupported extensions for the installed plugin
         const registryHostsData = Object.entries(source.hosts).reduce((accum, [hostID, hostData]) => {
           accum[hostID] = hostData;
-          if(accum[hostID].extensions){
+          if (accum[hostID].extensions) {
             // Migrate extensions to those supported by the installed plugin
             const defaultHostExtentionsConfiguration = Object.fromEntries(supportedDefaultExtensionsConfiguration);
             // Select of current configuration the extension IDs that are supported in the installed plugin
@@ -235,8 +225,7 @@ export function jobInitializeRun(context) {
     } catch (error) {
       return Promise.reject(
         new Error(
-          `Error creating ${
-          PLUGIN_PLATFORM_INDEX
+          `Error creating ${PLUGIN_PLATFORM_INDEX
           } index due to ${error.message || error}`
         )
       );
@@ -255,8 +244,7 @@ export function jobInitializeRun(context) {
     } catch (error) {
       return Promise.reject(
         new Error(
-          `Error creating template for ${
-          PLUGIN_PLATFORM_INDEX
+          `Error creating template for ${PLUGIN_PLATFORM_INDEX
           } due to ${error.message || error}`
         )
       );

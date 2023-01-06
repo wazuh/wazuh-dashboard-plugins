@@ -17,9 +17,9 @@ import { EuiFlexGroup, EuiFlexItem, EuiStat } from '@elastic/eui';
 import { connect } from 'react-redux';
 import { buildPhrasesFilter, buildRangeFilter } from '../../../../../../src/plugins/data/common';
 import { getIndexPattern } from '../../../../public/components/overview/mitre/lib';
-import { WAZUH_ALERTS_PATTERN } from '../../../../common/constants';
 import { AppState } from '../../../react-services/app-state';
 import { getDataPlugin } from '../../../kibana-services';
+import { getSettingDefaultValue } from '../../../../common/services/settings';
 
 
 class AlertsStats extends Component {
@@ -90,7 +90,7 @@ class AlertsStats extends Component {
         "params": { "query": filter.value },
         "type": "phrase",
         "negate": filter.negate || false,
-        "index": AppState.getCurrentPattern() || WAZUH_ALERTS_PATTERN
+        "index": AppState.getCurrentPattern() || getSettingDefaultValue('pattern')
       },
       "query": { "match_phrase": matchPhrase },
       "$state": { "store": "appState" }

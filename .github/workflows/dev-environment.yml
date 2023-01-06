@@ -1,0 +1,102 @@
+# This workflow downloads the source code at the given git reference
+# (branch, tag or commit), an sets up an environment (Kibana or OpenSearch)
+# to run this code and a command (build, test, ...).
+#
+# This workflow is used as a base for other workflows.
+
+name: Base workflow - Environment
+
+on:
+  workflow_call:
+    inputs:
+      reference:
+        required: true
+        type: string
+        default: master
+        description: Source code reference (branch, tag or commit SHA).
+      command:
+        required: true
+        type: string
+        default: 'yarn build'
+        description: Command to run in the environment
+      docker_run_extra_args:
+        type: string
+        default: ''
+        description: Additional paramaters for the docker run command.
+        required: false
+      artifact_name:
+        type: string
+        default: ''
+        description: Artifact name (will be automatically suffixed with .zip)
+        required: false
+      artifact_path:
+        type: string
+        default: ''
+        description: Folder to include in the archive.
+        required: false
+      notify_jest_coverage_summary:
+        type: boolean
+        default: false
+        required: false
+
+jobs:
+  # Deploy the plugin in a development environment and run a command
+  # using a pre-built Docker image, hosted in Quay.io.
+  deploy_and_run_command:
+    name: Deploy and run command
+    runs-on: ubuntu-latest
+    steps:
+      - name: Step 01 - Download the plugin's source code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.reference }}
+          path: wazuh
+
+      # Fix source code ownership so the internal user of the Docker
+      # container is also owner.
+      - name: Step 02 - Change code ownership
+        run: sudo chown 1000:1000 -R wazuh;
+
+      - name: Step 03 - Set up the environment and run the command
+        run: |
+          # Detect which platform to use from source code
+          platform=kbn;
+          echo "Detecting platform [kbn, osd]...";
+          find wazuh/opensearch_dashboards.json && { platform=osd; };
+          echo "Platform is $platform";
+
+          # Read the platform version from the package.json file
+          echo "Reading the platform version from the package.json...";
+          # Support plugins whose version is defined under pluginPlatform or Kibana properties
+          platform_version=$(jq -r '.pluginPlatform.version, .kibana.version | select(. != null)' wazuh/package.json);
+          echo "Plugin platform version: $platform_version";
+
+          # Set the environment variable to the correct platform
+          [ "$platform" = "kbn" ] && { docker_env_plugin_platform="KIBANA_VERSION"; };
+          [ "$platform" = "osd" ] && { docker_env_plugin_platform="OPENSEARCH_DASHBOARDS_VERSION"; };
+
+          # Up the environment and run the command
+          docker run -t --rm \
+            -e ${docker_env_plugin_platform}=${platform_version} \
+            -v `pwd`/wazuh:/home/node/kbn/plugins/wazuh \
+            ${{ inputs.docker_run_extra_args }} \
+            quay.io/wazuh/${platform}-dev:${platform_version} \
+            bash -c '
+              yarn config set registry https://registry.yarnpkg.com;
+              cd /home/node/kbn/plugins/wazuh && yarn && ${{ inputs.command }};
+            '
+
+      - name: Step 04 - Upload artifact to GitHub
+        if: ${{ inputs.artifact_name && inputs.artifact_path }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ inputs.artifact_name }}
+          path: ${{ inputs.artifact_path }}
+
+      - name: Step 05 - Upload coverage results to GitHub
+        if: ${{ inputs.notify_jest_coverage_summary && github.event_name == 'pull_request' }}
+        uses: AthleticNet/comment-test-coverage@1.2.2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: ./wazuh/target/test-coverage/coverage-summary.json
+          title: "Code coverage (Jest)"

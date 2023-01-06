@@ -4,7 +4,7 @@ Feature: Should Displayes a message to restart the cluster after saves
   i want to edit a custom decoder
   in order to check if the save message it's displayed
 
-@decoders
+@decoders @actions
   Scenario: Validate creation message is displayed after creating a new decoder
     Given The wazuh admin user is logged
     When The user navigates to decoders

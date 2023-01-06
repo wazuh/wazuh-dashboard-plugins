@@ -4,7 +4,7 @@ Feature: Wazuh version information
   I want to check the about information
   in order to see information about the system
 
-  @about
+  @about @actions
   Scenario: Check Wazuh version information
     Given The wazuh admin user is logged
     When The user navigates to About settings

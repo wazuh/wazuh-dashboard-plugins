@@ -20,9 +20,6 @@ require('./utils/dom-to-image.js');
 // EUI React components wrapper
 import './components';
 
-// angular-charts.js
-import 'angular-chart.js';
-
 // pin-wz-menu.js
 import { changeWazuhNavLogo } from './utils/wz-logo-menu';
 
@@ -111,9 +108,6 @@ app.run(function ($rootElement) {
   // Add plugin help links as extension to plugin platform help menu
   addHelpMenuToAppChrome();
 
-  
-  const urlToLogout = getHttp().basePath.prepend('/logout');
-
   // Bind deleteExistentToken on Log out component.
   $('.euiHeaderSectionItem__button, .euiHeaderSectionItemButton').on('mouseleave', function () {
     // opendistro
@@ -123,14 +117,14 @@ app.run(function ($rootElement) {
     // x-pack
     $('a:contains(Log out)').on('click', function (event) {
       // Override href's behaviour and navigate programatically
-      // to '/logout' once the token has been deleted.
+      // to the logout path once the token has been deleted.
       event.preventDefault();
       WzAuthentication.deleteExistentToken()
         .catch((err) => {
           console.error('[ERROR] - User token could not be deprecated - ', err);
         })
         .finally(() => {
-          window.location = urlToLogout;
+          window.location = event.currentTarget.href;
         });
     });
   });

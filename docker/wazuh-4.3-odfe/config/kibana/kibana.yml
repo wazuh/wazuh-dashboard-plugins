@@ -1,0 +1,15 @@
+server.host: kibana
+elasticsearch.hosts: https://odfe-node1:9200
+server.port: 443
+elasticsearch.ssl.verificationMode: certificate
+elasticsearch.username: kibanaserver
+elasticsearch.password: kibanaserver
+elasticsearch.requestHeadersWhitelist: ["securitytenant","Authorization"]
+opendistro_security.multitenancy.enabled: true
+opendistro_security.readonly_mode.roles: ["kibana_read_only"]
+server.ssl.enabled: true
+server.ssl.key: "/usr/share/kibana/config/certs/kibana-key.pem"
+server.ssl.certificate: "/usr/share/kibana/config/certs/kibana.pem"
+elasticsearch.ssl.certificateAuthorities: ["/usr/share/kibana/config/certs/ca.pem"]
+server.defaultRoute: /app/wazuh?security_tenant=global
+telemetry.banner: false

@@ -8,7 +8,7 @@ Feature: Validate that the pinned filter label is displayed - from event page
     And The user navigates to the agent page
     And The user navigates to the agent dashboard
 
-  @filter
+  @filter @actions
   Scenario Outline: The user add and pin filter - Check across the modules - from event page - <Module Name>
     When The user navigates to agentModule <Module Name>
     And The user moves to events page

@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import { Base } from './base-query';
-import { WAZUH_ALERTS_PATTERN } from '../../../common/constants';
+import { getSettingDefaultValue } from '../../../common/services/settings';
 
 /**
  * Returns top 5 rootkits found along all agents
@@ -25,7 +25,7 @@ export const top5RootkitsDetected = async (
   gte,
   lte,
   filters,
-  pattern = WAZUH_ALERTS_PATTERN,
+  pattern = getSettingDefaultValue('pattern'),
   size = 5
 ) => {
   try {
@@ -80,7 +80,7 @@ export const agentsWithHiddenPids = async (
   gte,
   lte,
   filters,
-  pattern = WAZUH_ALERTS_PATTERN
+  pattern = getSettingDefaultValue('pattern')
 ) => {
   try {
     const base = {};
@@ -129,7 +129,7 @@ export const agentsWithHiddenPorts = async(
   gte,
   lte,
   filters,
-  pattern = WAZUH_ALERTS_PATTERN
+  pattern = getSettingDefaultValue('pattern')
 ) => {
   try {
     const base = {};

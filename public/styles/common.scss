@@ -1846,4 +1846,14 @@ iframe.width-changed {
   .euiButtonEmpty__text {
     font-size: 0.8rem;
   }
-} 
+}
+
+.wz-flex {
+    display: flex;
+}
+
+.wz-callout-message {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: row;
+}

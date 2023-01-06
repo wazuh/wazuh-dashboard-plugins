@@ -96,7 +96,7 @@ export const EditRolesTable = ({ policies, role, onChange, isDisabled, loading})
                         setIsLoading(false);
                         return;
                     }
-                    ErrorHandler.info(`Policy was successfull removed from role ${role.name}`);
+                    ErrorHandler.info(`Policy was successfully removed from role ${role.name}`);
                     await onChange();
                   }catch(err){ }
                   setIsLoading(false);

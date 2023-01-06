@@ -10,10 +10,10 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { WAZUH_DEFAULT_APP_CONFIG } from '../../../common/constants';
+import { getSettingsDefault } from '../../../common/services/settings';
 
 export async function getWzConfig($q, genericReq, wazuhConfig) {
-  const defaultConfig = { ...WAZUH_DEFAULT_APP_CONFIG };
+  const defaultConfig = getSettingsDefault();
 
   try {
     const config = await genericReq.request('GET', '/utils/configuration', {});

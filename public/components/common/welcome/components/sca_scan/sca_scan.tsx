@@ -20,13 +20,11 @@ import {
   EuiText,
   EuiLink,
   EuiBadge,
-  EuiStat,
   EuiSpacer,
   EuiLoadingChart,
   EuiButtonIcon,
   EuiToolTip,
   EuiEmptyPrompt,
-  EuiIcon
 } from '@elastic/eui';
 import moment from 'moment-timezone';
 import store from '../../../../../redux/store';
@@ -36,6 +34,12 @@ import { formatUIDate } from '../../../../../react-services/time-service';
 import { getAngularModule } from '../../../../../kibana-services';
 import { withReduxProvider, withUserAuthorizationPrompt } from "../../../hocs";
 import { compose } from 'redux';
+import SCAPoliciesTable from '../../../../agents/sca/inventory/agent-policies-table';
+
+type Props = {
+  agent: { [key in string]: any };
+  router: any; // its angular router
+}
 
 export const ScaScan = compose(
   withReduxProvider,
@@ -49,16 +53,16 @@ export const ScaScan = compose(
       {action: 'sca:read', resource: 'agent:group:*'}
     ]
   ])
-)(class ScaScan extends Component {
+)(class ScaScan extends Component<Props> {
   _isMount = false;
-  props!: {
-    [key: string]: any
-  }
+  router;
   state: {
     lastScan: {
       [key: string]: any
     },
     isLoading: Boolean,
+    firstTable: Boolean,
+    policies: any[],
   }
 
   constructor(props) {
@@ -66,8 +70,11 @@ export const ScaScan = compose(
     this.state = {
       lastScan: {},
       isLoading: true,
+      firstTable: true,
+      policies: [],
     };
   }
+
 
   async componentDidMount() {
     this._isMount = true;
@@ -112,21 +119,72 @@ export const ScaScan = compose(
     }
   }
 
+  onClickRow = (policy) => {
+    window.location.href = `#/overview?tab=sca&redirectPolicyTable=${policy.policy_id}`;
+    store.dispatch(updateCurrentAgentData(this.props.agent));
+    this.router.reload();                  
+  }
+
   renderScanDetails() {
     const { isLoading, lastScan } = this.state;
     if (isLoading || lastScan === undefined) return;
+
+    const columnsPolicies = [
+      {
+        field: 'name',
+        name: 'Policy',
+        width: '40%',
+      },
+      {
+        field: 'end_scan',
+        name: 'End scan',
+        dataType: 'date',
+        render: formatUIDate,
+        width: '20%',
+      },
+      {
+        field: 'pass',
+        name: 'Pass',
+        width: '10%',
+      },
+      {
+        field: 'fail',
+        name: 'Fail',
+        width: '10%',
+      },
+      {
+        field: 'invalid',
+        name: 'Not applicable',
+        width: '10%',
+      },
+      {
+        field: 'score',
+        name: 'Score',
+        width: '10%',
+        render: (score) => {
+          return `${score}%`;
+        }
+      },
+    ];
+
+    const tableProps = {
+      tablePageSizeOptions: [4],
+      hidePerPageOptions: true
+    }
+ 
     return (
       <Fragment>
         <EuiFlexGroup>
           <EuiFlexItem grow={false}>
             <EuiTitle size="xs">
               <EuiLink onClick={() => {
-                  window.location.href = `#/overview?tab=sca&redirectPolicy=${lastScan.policy_id}`;
+                  window.location.href = `#/overview?tab=sca&redirectPolicyTable=${lastScan.policy_id}`;
                   store.dispatch(updateCurrentAgentData(this.props.agent));
                   this.router.reload();
                 }
               }>
                 <h4>{lastScan.name}</h4>
+                <EuiSpacer size="m" />
               </EuiLink>
             </EuiTitle>
           </EuiFlexItem>
@@ -134,63 +192,14 @@ export const ScaScan = compose(
             <EuiBadge color="secondary">{lastScan.policy_id}</EuiBadge>
           </EuiFlexItem>
         </EuiFlexGroup>
-        <EuiFlexGroup>
-          <EuiFlexItem>
-            <EuiText size={'s'}>
-              <p>{lastScan.description}</p>
-            </EuiText>
-          </EuiFlexItem>
-        </EuiFlexGroup>
-        <EuiSpacer size="l" />
-        <EuiFlexGroup>
-          <EuiFlexItem>
-            <EuiStat
-              title={lastScan.pass}
-              titleSize="m"
-              textAlign="center"
-              description="Pass"
-              titleColor="secondary"
-            />
-          </EuiFlexItem>
-          <EuiFlexItem>
-            <EuiStat
-              title={lastScan.fail}
-              titleSize="m"
-              textAlign="center"
-              description="Fail"
-              titleColor="danger"
-            />
-          </EuiFlexItem>
-          <EuiFlexItem>
-            <EuiStat
-              title={lastScan.total_checks}
-              titleSize="m"
-              textAlign="center"
-              description="Total checks"
-            />
-          </EuiFlexItem>
-          <EuiFlexItem>
-            <EuiStat
-              title={`${lastScan.score}%`}
-              titleSize="m"
-              textAlign="center"
-              description="Score"
-            />
-          </EuiFlexItem>
-        </EuiFlexGroup>
-        <EuiSpacer size={'l'}/>
-        <EuiFlexGroup>
-          <EuiFlexItem grow={false} style={{ marginTop: 15 }}>
-            <EuiText>
-              <EuiIcon type="calendar" color={'primary'}/> Start time: {formatUIDate(lastScan.start_scan)}
-            </EuiText>
-          </EuiFlexItem>
-          <EuiFlexItem grow={false} style={{ marginTop: 15 }}>
-            <EuiText>
-              <EuiIcon type="clock" color={'primary'}/> Duration: {this.durationScan()}
-            </EuiText>
-          </EuiFlexItem>
-        </EuiFlexGroup>
+        <EuiPanel>
+        <SCAPoliciesTable 
+          agent={this.props.agent}
+          columns={columnsPolicies}
+          rowProps={this.onClickRow}
+          tableProps={tableProps}
+          />
+        </EuiPanel>
       </Fragment>
     )
   }
@@ -203,7 +212,7 @@ export const ScaScan = compose(
       <Fragment>
         <EuiEmptyPrompt
           iconType="visVega"
-          title={<h4>You dont have SCA scans in this agent.</h4>}
+          title={<h4>You don't have SCA scans in this agent.</h4>}
           body={
             <Fragment>
               <p>
@@ -225,20 +234,30 @@ export const ScaScan = compose(
       <EuiFlexItem>
         <EuiPanel paddingSize="m">
           <EuiText size="xs">
-            <EuiFlexGroup>
-              <EuiFlexItem>
-                <h2>SCA: Last scan</h2>
-              </EuiFlexItem>
+            <EuiFlexGroup className="wz-section-sca-euiFlexGroup">
+            <EuiFlexItem grow={false}>
+            <EuiTitle size="xs">
+              <EuiLink className="agents-link-item" onClick={() => {
+                  window.location.href = `#/overview?tab=sca&redirectPolicy=${lastScan.policy_id}`;
+                  store.dispatch(updateCurrentAgentData(this.props.agent));
+                  this.router.reload();
+                }
+              }>
+               <h2>SCA: Lastest scans</h2>
+              </EuiLink>
+            </EuiTitle>
+          </EuiFlexItem>
               <EuiFlexItem grow={false}>
                 <EuiToolTip position="top" content="Open SCA Scans">
                   <EuiButtonIcon
                     iconType="popout"
                     color="primary"
+                    className='EuiButtonIcon'
                     onClick={() => {
-                      window.location.href = `#/overview?tab=sca`;
-                      store.dispatch(updateCurrentAgentData(this.props.agent));
-                      this.router.reload();
-                    }
+                        window.location.href = `#/overview?tab=sca`;
+                        store.dispatch(updateCurrentAgentData(this.props.agent));
+                        this.router.reload();
+                      }
                     }
                     aria-label="Open SCA Scans" />
                 </EuiToolTip>

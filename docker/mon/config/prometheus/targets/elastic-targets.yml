@@ -1,0 +1,5 @@
+- targets:
+    - exporter-kbn-7.10.2:9114
+    - exporter-osd-1.2:9114
+
+

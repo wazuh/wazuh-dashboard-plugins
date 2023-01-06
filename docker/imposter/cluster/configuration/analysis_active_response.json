@@ -1,0 +1,36 @@
+{
+    "data": {
+        "affected_items": [
+            {
+                "active-response": [
+                    {
+                        "command": "firewall-drop",
+                        "rules_id": "100100",
+                        "timeout": 60,
+                        "level": 0,
+                        "location": "REMOTE_AGENT"
+                    },
+                    {
+                        "command": "yara",
+                        "rules_id": "100300,100301",
+                        "timeout": 0,
+                        "level": 0,
+                        "location": "REMOTE_AGENT"
+                    },
+                    {
+                        "command": "remove-threat",
+                        "rules_id": "87105",
+                        "timeout": 0,
+                        "level": 0,
+                        "location": "REMOTE_AGENT"
+                    }
+                ]
+            }
+        ],
+        "total_affected_items": 1,
+        "total_failed_items": 0,
+        "failed_items": []
+    },
+    "message": "Active configuration was successfully read in specified node",
+    "error": 0
+}

@@ -91,6 +91,12 @@ class WzFileEditor extends Component {
     this._isMounted = true;
   }
 
+  /**
+   * Check if the file content has changed and is not empty
+   */
+  contentHasChanged() {
+    return !!this.state.content.trim() && (this.state.content.trim() !== this.state.initContent.trim());
+  } 
 
   /**
    * Save the new content
@@ -129,7 +135,7 @@ class WzFileEditor extends Component {
 
         let toastMessage;
 
-        if (this.props.state.addingFile != false) {
+        if (this.props.addingFile != false) {
           //remove current invalid file if the file is new.
           await this.resourcesHandler.deleteFile(name);
           toastMessage = 'The new file was deleted.';
@@ -243,7 +249,7 @@ class WzFileEditor extends Component {
           fill
           iconType={isEditable && xmlError ? 'alert' : 'save'}
           isLoading={this.state.isSaving}
-          isDisabled={nameForSaving.length <= 4 || !!(isEditable && xmlError)}
+          isDisabled={nameForSaving.length <= 4 || !!(isEditable && xmlError) || !this.contentHasChanged()}
           onClick={() => this.save(nameForSaving, overwrite)}
         >
           {isEditable && xmlError ? 'XML format error' : 'Save'}

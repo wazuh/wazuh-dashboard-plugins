@@ -18,16 +18,11 @@ import { indexDate } from '../../lib/index-date';
 import { buildIndexSettings } from '../../lib/build-index-settings';
 import { WazuhHostsCtrl } from '../../controllers/wazuh-hosts';
 import {
-  WAZUH_MONITORING_PATTERN,
   WAZUH_MONITORING_TEMPLATE_NAME,
-  WAZUH_MONITORING_DEFAULT_CREATION,
-  WAZUH_MONITORING_DEFAULT_ENABLED,
-  WAZUH_MONITORING_DEFAULT_FREQUENCY,
-  WAZUH_MONITORING_DEFAULT_INDICES_SHARDS,
-  WAZUH_MONITORING_DEFAULT_INDICES_REPLICAS,
 } from '../../../common/constants';
 import { tryCatchForIndexPermissionError } from '../tryCatchForIndexPermissionError';
 import { delayAsPromise } from '../../../common/utils';
+import { getSettingDefaultValue } from '../../../common/services/settings';
 
 const blueWazuh = '\u001b[34mwazuh\u001b[39m';
 const monitoringErrorLogColors = [blueWazuh, 'monitoring', 'error'];
@@ -42,7 +37,7 @@ let MONITORING_ENABLED, MONITORING_FREQUENCY, MONITORING_CRON_FREQ, MONITORING_C
  * @param configuration
  * @param defaultValue
  */
-function getAppConfigurationSetting(setting: string, configuration: any, defaultValue: any){
+function getAppConfigurationSetting(setting: string, configuration: any, defaultValue: any) {
   return typeof configuration[setting] !== 'undefined' ? configuration[setting] : defaultValue;
 };
 
@@ -50,23 +45,23 @@ function getAppConfigurationSetting(setting: string, configuration: any, default
  * Set the monitoring variables
  * @param context
  */
-function initMonitoringConfiguration(context){
-  try{
+function initMonitoringConfiguration(context) {
+  try {
     const appConfig = getConfiguration();
     MONITORING_ENABLED = appConfig && typeof appConfig['wazuh.monitoring.enabled'] !== 'undefined'
       ? appConfig['wazuh.monitoring.enabled'] &&
-        appConfig['wazuh.monitoring.enabled'] !== 'worker'
-      : WAZUH_MONITORING_DEFAULT_ENABLED;
-    MONITORING_FREQUENCY = getAppConfigurationSetting('wazuh.monitoring.frequency', appConfig, WAZUH_MONITORING_DEFAULT_FREQUENCY);
+      appConfig['wazuh.monitoring.enabled'] !== 'worker'
+      : getSettingDefaultValue('wazuh.monitoring.enabled');
+    MONITORING_FREQUENCY = getAppConfigurationSetting('wazuh.monitoring.frequency', appConfig, getSettingDefaultValue('wazuh.monitoring.frequency'));
     MONITORING_CRON_FREQ = parseCron(MONITORING_FREQUENCY);
-    MONITORING_CREATION = getAppConfigurationSetting('wazuh.monitoring.creation', appConfig, WAZUH_MONITORING_DEFAULT_CREATION);
+    MONITORING_CREATION = getAppConfigurationSetting('wazuh.monitoring.creation', appConfig, getSettingDefaultValue('wazuh.monitoring.creation'));
 
-    MONITORING_INDEX_PATTERN = getAppConfigurationSetting('wazuh.monitoring.pattern', appConfig, WAZUH_MONITORING_PATTERN);
+    MONITORING_INDEX_PATTERN = getAppConfigurationSetting('wazuh.monitoring.pattern', appConfig, getSettingDefaultValue('wazuh.monitoring.pattern'));
     const lastCharIndexPattern = MONITORING_INDEX_PATTERN[MONITORING_INDEX_PATTERN.length - 1];
     if (lastCharIndexPattern !== '*') {
       MONITORING_INDEX_PATTERN += '*';
     };
-    MONITORING_INDEX_PREFIX = MONITORING_INDEX_PATTERN.slice(0,MONITORING_INDEX_PATTERN.length - 1);
+    MONITORING_INDEX_PREFIX = MONITORING_INDEX_PATTERN.slice(0, MONITORING_INDEX_PATTERN.length - 1);
 
     log(
       'monitoring:initMonitoringConfiguration',
@@ -85,7 +80,7 @@ function initMonitoringConfiguration(context){
       `wazuh.monitoring.pattern: ${MONITORING_INDEX_PATTERN} (index prefix: ${MONITORING_INDEX_PREFIX})`,
       'debug'
     );
-  }catch(error){
+  } catch (error) {
     const errorMessage = error.message || error;
     log(
       'monitoring:initMonitoringConfiguration',
@@ -129,9 +124,9 @@ async function checkTemplate(context) {
       });
       // Copy already created index patterns
       monitoringTemplate.index_patterns = currentTemplate.body[WAZUH_MONITORING_TEMPLATE_NAME].index_patterns;
-    }catch (error) {
+    } catch (error) {
       // Init with the default index pattern
-      monitoringTemplate.index_patterns = [WAZUH_MONITORING_PATTERN];
+      monitoringTemplate.index_patterns = [getSettingDefaultValue('wazuh.monitoring.pattern')];
     }
 
     // Check if the user is using a custom pattern and add it to the template if it does
@@ -167,39 +162,39 @@ async function checkTemplate(context) {
  */
 async function insertMonitoringDataElasticsearch(context, data) {
   const monitoringIndexName = MONITORING_INDEX_PREFIX + indexDate(MONITORING_CREATION);
-    if (!MONITORING_ENABLED){
-      return;
-    };
-    try {
-      await tryCatchForIndexPermissionError(monitoringIndexName) (async() => {
-        const exists = await context.core.opensearch.client.asInternalUser.indices.exists({index: monitoringIndexName});
-        if(!exists.body){
-          await createIndex(context, monitoringIndexName);
-        };
+  if (!MONITORING_ENABLED) {
+    return;
+  };
+  try {
+    await tryCatchForIndexPermissionError(monitoringIndexName)(async () => {
+      const exists = await context.core.opensearch.client.asInternalUser.indices.exists({ index: monitoringIndexName });
+      if (!exists.body) {
+        await createIndex(context, monitoringIndexName);
+      };
 
-        // Update the index configuration
-        const appConfig = getConfiguration();
-        const indexConfiguration = buildIndexSettings(
-          appConfig,
-          'wazuh.monitoring',
-          WAZUH_MONITORING_DEFAULT_INDICES_SHARDS
-        );
+      // Update the index configuration
+      const appConfig = getConfiguration();
+      const indexConfiguration = buildIndexSettings(
+        appConfig,
+        'wazuh.monitoring',
+        getSettingDefaultValue('wazuh.monitoring.shards')
+      );
 
-        // To update the index settings with this client is required close the index, update the settings and open it
-        // Number of shards is not dynamic so delete that setting if it's given
-        delete indexConfiguration.settings.index.number_of_shards;
-        await context.core.opensearch.client.asInternalUser.indices.putSettings({
-          index: monitoringIndexName,
-          body: indexConfiguration
-        });
+      // To update the index settings with this client is required close the index, update the settings and open it
+      // Number of shards is not dynamic so delete that setting if it's given
+      delete indexConfiguration.settings.index.number_of_shards;
+      await context.core.opensearch.client.asInternalUser.indices.putSettings({
+        index: monitoringIndexName,
+        body: indexConfiguration
+      });
 
-        // Insert data to the monitoring index
-        await insertDataToIndex(context, monitoringIndexName, data);
-      })();
-    }catch(error){
-      log('monitoring:insertMonitoringDataElasticsearch', error.message || error);
-      context.wazuh.logger.error(error.message);
-    }
+      // Insert data to the monitoring index
+      await insertDataToIndex(context, monitoringIndexName, data);
+    })();
+  } catch (error) {
+    log('monitoring:insertMonitoringDataElasticsearch', error.message || error);
+    context.wazuh.logger.error(error.message);
+  }
 }
 
 /**
@@ -208,7 +203,7 @@ async function insertMonitoringDataElasticsearch(context, data) {
  * @param {String} indexName The name for the index (e.g. daily: wazuh-monitoring-YYYY.MM.DD)
  * @param {*} data
  */
-async function insertDataToIndex(context, indexName: string, data: {agents: any[], apiHost}) {
+async function insertDataToIndex(context, indexName: string, data: { agents: any[], apiHost }) {
   const { agents, apiHost } = data;
   try {
     if (agents.length > 0) {
@@ -219,7 +214,7 @@ async function insertDataToIndex(context, indexName: string, data: {agents: any[
       );
 
       const bodyBulk = agents.map(agent => {
-        const agentInfo = {...agent};
+        const agentInfo = { ...agent };
         agentInfo['timestamp'] = new Date(Date.now()).toISOString();
         agentInfo.host = agent.manager;
         agentInfo.cluster = { name: apiHost.clusterName ? apiHost.clusterName : 'disabled' };
@@ -240,7 +235,7 @@ async function insertDataToIndex(context, indexName: string, data: {agents: any[
     log(
       'monitoring:insertDataToIndex',
       `Error inserting agent data into elasticsearch. Bulk request failed due to ${error.message ||
-        error}`
+      error}`
     );
   }
 }
@@ -258,8 +253,8 @@ async function createIndex(context, indexName: string) {
     const IndexConfiguration = {
       settings: {
         index: {
-          number_of_shards: getAppConfigurationSetting('wazuh.monitoring.shards', appConfig, WAZUH_MONITORING_DEFAULT_INDICES_SHARDS),
-          number_of_replicas: getAppConfigurationSetting('wazuh.monitoring.replicas', appConfig, WAZUH_MONITORING_DEFAULT_INDICES_REPLICAS)
+          number_of_shards: getAppConfigurationSetting('wazuh.monitoring.shards', appConfig, getSettingDefaultValue('wazuh.monitoring.shards')),
+          number_of_replicas: getAppConfigurationSetting('wazuh.monitoring.replicas', appConfig, getSettingDefaultValue('wazuh.monitoring.replicas'))
         }
       }
     };
@@ -288,26 +283,26 @@ async function createIndex(context, indexName: string) {
 * Wait until Kibana server is ready
 */
 async function checkPluginPlatformStatus(context) {
- try {
+  try {
     log(
       'monitoring:checkPluginPlatformStatus',
       'Waiting for Kibana and Elasticsearch servers to be ready...',
       'debug'
     );
 
-   await checkElasticsearchServer(context);
-   await init(context);
-   return;
- } catch (error) {
+    await checkElasticsearchServer(context);
+    await init(context);
+    return;
+  } catch (error) {
     log(
       'monitoring:checkPluginPlatformStatus',
-      error.mesage ||error
+      error.mesage || error
     );
-    try{
+    try {
       await delayAsPromise(3000);
       await checkPluginPlatformStatus(context);
-    }catch(error){};
- }
+    } catch (error) { };
+  }
 }
 
 
@@ -370,7 +365,7 @@ async function getHostsConfiguration() {
    */
 async function cronTask(context) {
   try {
-    const templateMonitoring = await context.core.opensearch.client.asInternalUser.indices.getTemplate({name: WAZUH_MONITORING_TEMPLATE_NAME});
+    const templateMonitoring = await context.core.opensearch.client.asInternalUser.indices.getTemplate({ name: WAZUH_MONITORING_TEMPLATE_NAME });
 
     const apiHosts = await getHostsConfiguration();
     const apiHostsUnique = (apiHosts || []).filter(
@@ -384,11 +379,11 @@ async function cronTask(context) {
             t.port === apiHost.port
         )
     );
-    for(let apiHost of apiHostsUnique){
-      try{
-        const { agents, apiHost: host} = await getApiInfo(context, apiHost);
-        await insertMonitoringDataElasticsearch(context, {agents, apiHost: host});
-      }catch(error){
+    for (let apiHost of apiHostsUnique) {
+      try {
+        const { agents, apiHost: host } = await getApiInfo(context, apiHost);
+        await insertMonitoringDataElasticsearch(context, { agents, apiHost: host });
+      } catch (error) {
 
       };
     }
@@ -415,18 +410,18 @@ async function cronTask(context) {
  * @param context
  * @param apiHost
  */
-async function getApiInfo(context, apiHost){
-  try{
+async function getApiInfo(context, apiHost) {
+  try {
     log('monitoring:getApiInfo', `Getting API info for ${apiHost.id}`, 'debug');
     const responseIsCluster = await context.wazuh.api.client.asInternalUser.request('GET', '/cluster/status', {}, { apiHostID: apiHost.id });
     const isCluster = (((responseIsCluster || {}).data || {}).data || {}).enabled === 'yes';
-    if(isCluster){
-      const responseClusterInfo = await context.wazuh.api.client.asInternalUser.request('GET', `/cluster/local/info`, {},  { apiHostID: apiHost.id });
+    if (isCluster) {
+      const responseClusterInfo = await context.wazuh.api.client.asInternalUser.request('GET', `/cluster/local/info`, {}, { apiHostID: apiHost.id });
       apiHost.clusterName = responseClusterInfo.data.data.affected_items[0].cluster;
     };
     const agents = await fetchAllAgentsFromApiHost(context, apiHost);
     return { agents, apiHost };
-  }catch(error){
+  } catch (error) {
     log('monitoring:getApiInfo', error.message || error);
     throw error;
   }
@@ -437,9 +432,9 @@ async function getApiInfo(context, apiHost){
  * @param context
  * @param apiHost
  */
-async function fetchAllAgentsFromApiHost(context, apiHost){
+async function fetchAllAgentsFromApiHost(context, apiHost) {
   let agents = [];
-  try{
+  try {
     log('monitoring:fetchAllAgentsFromApiHost', `Getting all agents from ApiID: ${apiHost.id}`, 'debug');
     const responseAgentsCount = await context.wazuh.api.client.asInternalUser.request(
       'GET',
@@ -450,7 +445,7 @@ async function fetchAllAgentsFromApiHost(context, apiHost){
           limit: 1,
           q: 'id!=000'
         }
-      }, {apiHostID: apiHost.id});
+      }, { apiHostID: apiHost.id });
 
     const agentsCount = responseAgentsCount.data.data.total_affected_items;
     log('monitoring:fetchAllAgentsFromApiHost', `ApiID: ${apiHost.id}, Agent count: ${agentsCount}`, 'debug');
@@ -462,7 +457,7 @@ async function fetchAllAgentsFromApiHost(context, apiHost){
     };
 
     while (agents.length < agentsCount && payload.offset < agentsCount) {
-      try{
+      try {
         /*
         TODO: Improve the performance of request with:
           - Reduce the number of requests to the Wazuh API
@@ -480,17 +475,17 @@ async function fetchAllAgentsFromApiHost(context, apiHost){
         const responseAgents = await context.wazuh.api.client.asInternalUser.request(
           'GET',
           `/agents`,
-          {params: payload},
-          {apiHostID: apiHost.id}
+          { params: payload },
+          { apiHostID: apiHost.id }
         );
         agents = [...agents, ...responseAgents.data.data.affected_items];
         payload.offset += payload.limit;
-      }catch(error){
+      } catch (error) {
         log('monitoring:fetchAllAgentsFromApiHost', `ApiID: ${apiHost.id}, Error request with offset/limit ${payload.offset}/${payload.limit}: ${error.message || error}`);
       }
     }
     return agents;
-  }catch(error){
+  } catch (error) {
     log('monitoring:fetchAllAgentsFromApiHost', `ApiID: ${apiHost.id}. Error: ${error.message || error}`);
     throw error;
   }

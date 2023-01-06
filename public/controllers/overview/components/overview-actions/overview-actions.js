@@ -27,9 +27,9 @@ import {
 import { WzButton } from '../../../../components/common/buttons';
 import './agents-selector.scss';
 import { AgentSelectionTable } from './agents-selection-table';
-import { WAZUH_ALERTS_PATTERN } from '../../../../../common/constants';
 import { AppState } from '../../../../react-services/app-state';
 import { getDataPlugin } from '../../../../kibana-services';
+import { getSettingDefaultValue } from '../../../../../common/services/settings';
 
 class OverviewActions extends Component {
   constructor(props) {
@@ -110,7 +110,7 @@ class OverviewActions extends Component {
             negate: false,
             params: { query: agentIdList[0] },
             type: 'phrase',
-            index: AppState.getCurrentPattern() || WAZUH_ALERTS_PATTERN,
+            index: AppState.getCurrentPattern() || getSettingDefaultValue('pattern'),
           },
           query: {
             match: {

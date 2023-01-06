@@ -1,5 +1,5 @@
 /*
- * Wazuh app - React HOC to add open modal/flyout logic to othe component
+ * Wazuh app - React HOC to add open modal/flyout logic to other component
  * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify

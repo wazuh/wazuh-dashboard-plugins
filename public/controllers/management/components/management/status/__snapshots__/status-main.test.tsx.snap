@@ -6,11 +6,11 @@ exports[`Status component renders correctly to match the snapshot 1`] = `
     <Provider
       store={
         Object {
+          "@@observable": [Function],
           "dispatch": [Function],
           "getState": [Function],
           "replaceReducer": [Function],
           "subscribe": [Function],
-          Symbol(observable): [Function],
         }
       }
     >
@@ -54,6 +54,7 @@ exports[`Status component renders correctly to match the snapshot 1`] = `
             >
               <div
                 className="euiProgress euiProgress--indeterminate euiProgress--xs euiProgress--primary withUserLogged-loader"
+                style={null}
               />
             </EuiProgress>
           </div>

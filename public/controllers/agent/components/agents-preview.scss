@@ -32,9 +32,6 @@
   padding-bottom: 12px;
 }
 
-.p-30 {
-}
-
 .loading-chart-xl {
   display: block;
   text-align: center;
@@ -65,7 +62,7 @@
     justify-content: center;
     align-items: center;
     background-color: rgba(255, 255, 255, 0.75);
-    
+
     &:hover {
       opacity: 1;
     }
@@ -99,7 +96,7 @@
 }
 
 .agents-status-pie {
-  .euiListGroupItem__label{
-    white-space: normal;
+  .euiListGroupItem__label {
+    white-space: nowrap;
   }
 }

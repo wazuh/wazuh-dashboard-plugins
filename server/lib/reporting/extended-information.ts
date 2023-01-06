@@ -12,9 +12,9 @@ import * as SyscheckRequest from './syscheck-request';
 import PCI from '../../integration-files/pci-requirements-pdfmake';
 import GDPR from '../../integration-files/gdpr-requirements-pdfmake';
 import TSC from '../../integration-files/tsc-requirements-pdfmake';
-import { WAZUH_ALERTS_PATTERN } from '../../../common/constants';
 import { ReportPrinter } from './printer';
 import moment from 'moment';
+import { getSettingDefaultValue } from '../../../common/services/settings';
 
 
 
@@ -131,7 +131,7 @@ export async function extendedInformation(
   from,
   to,
   filters,
-  pattern = WAZUH_ALERTS_PATTERN,
+  pattern = getSettingDefaultValue('pattern'),
   agent = null
 ) {
   try {

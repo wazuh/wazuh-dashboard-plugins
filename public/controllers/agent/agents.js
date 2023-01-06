@@ -28,12 +28,13 @@ import { ErrorHandler } from '../../react-services/error-handler';
 import { GroupHandler } from '../../react-services/group-handler';
 import store from '../../redux/store';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
-import { API_NAME_AGENT_STATUS, WAZUH_ALERTS_PATTERN } from '../../../common/constants';
+import { API_NAME_AGENT_STATUS } from '../../../common/constants';
 import { getDataPlugin } from '../../kibana-services';
 import { hasAgentSupportModule } from '../../react-services/wz-agents';
 import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
+import { getSettingDefaultValue } from '../../../common/services/settings';
 
 export class AgentsController {
   /**
@@ -618,7 +619,7 @@ export class AgentsController {
    */
   addMitrefilter(id) {
     const filter = `{"meta":{"index": ${
-      AppState.getCurrentPattern() || WAZUH_ALERTS_PATTERN
+      AppState.getCurrentPattern() || getSettingDefaultValue('pattern')
     }},"query":{"match":{"rule.mitre.id":{"query":"${id}","type":"phrase"}}}}`;
     this.$rootScope.$emit('addNewKibanaFilter', {
       filter: JSON.parse(filter),

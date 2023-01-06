@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import { Base } from './base-query';
-import { WAZUH_ALERTS_PATTERN } from '../../../common/constants';
+import { getSettingDefaultValue } from '../../../common/services/settings';
 
 
   /**
@@ -26,7 +26,7 @@ export const top3agents = async (
   gte,
   lte,
   filters,
-  pattern = WAZUH_ALERTS_PATTERN
+  pattern = getSettingDefaultValue('pattern')
 ) => {
   try {
     const base = {};
@@ -78,7 +78,7 @@ export const top3Rules = async (
   gte,
   lte,
   filters,
-  pattern = WAZUH_ALERTS_PATTERN
+  pattern = getSettingDefaultValue('pattern')
 ) => {
   try {
     const base = {};
@@ -137,7 +137,7 @@ export const lastTenDeletedFiles = async (
   gte,
   lte,
   filters,
-  pattern = WAZUH_ALERTS_PATTERN
+  pattern = getSettingDefaultValue('pattern')
 ) => {
   try {
     const base = {};
@@ -190,7 +190,7 @@ export const lastTenModifiedFiles = async (
   gte,
   lte,
   filters,
-  pattern = WAZUH_ALERTS_PATTERN
+  pattern = getSettingDefaultValue('pattern')
 ) => {
   try {
     const base = {};

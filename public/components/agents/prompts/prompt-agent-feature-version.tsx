@@ -18,7 +18,7 @@ export const PromptAgentFeatureVersion = ({ version = '' }: { version: string })
     <EuiEmptyPrompt
       iconType="watchesApp"
       title={<h2>{`Agent doesn't support this feature`}</h2>}
-      body={`This feature is only avaliable for agents with ${version}.`}
+      body={`This feature is only available for agents with ${version}.`}
     />
   );
 };

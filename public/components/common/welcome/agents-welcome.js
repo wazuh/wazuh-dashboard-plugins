@@ -493,7 +493,7 @@ class AgentsWelcome extends Component {
             </EuiFlexItem>
           </EuiFlexGroup>
           <EuiSpacer size="s" />
-          <div style={{ height: this.props.resultState !== 'loading' ? '225px' : 0 }}>
+          <div style={{ height: this.props.resultState !== 'loading' ? '350px' : 0 }}>
             <WzReduxProvider>
               <KibanaVis
                 visID={'Wazuh-App-Agents-Welcome-Events-Evolution'}

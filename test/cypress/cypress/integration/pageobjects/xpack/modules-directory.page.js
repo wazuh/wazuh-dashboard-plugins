@@ -10,4 +10,5 @@ export const MODULES_DIRECTORY_PAGE = {
   hIPAACard: '[data-test-subj="overviewWelcomeHipaa"]',
   tSCCard: '[data-test-subj="overviewWelcomeTsc"]',
   gitHubCard: '[data-test-subj="overviewWelcomeGithub"]',
+  userLoginCard: '[data-test-subj="userMenuAvatar"]',
 };

@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import { Base } from './base-query';
-import { WAZUH_ALERTS_PATTERN } from '../../../common/constants';
+import { getSettingDefaultValue } from '../../../common/services/settings';
 
 /**
  * Returns top 3 agents with level 15 alerts
@@ -20,7 +20,7 @@ import { WAZUH_ALERTS_PATTERN } from '../../../common/constants';
  * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
  * @returns {Array<String>} E.g:['000','130','300']
  */
-export const topLevel15 = async (context, gte, lte, filters, pattern = WAZUH_ALERTS_PATTERN) => {
+export const topLevel15 = async (context, gte, lte, filters, pattern = getSettingDefaultValue('pattern')) => {
   try {
     const base = {};
 

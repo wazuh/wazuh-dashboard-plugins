@@ -66,7 +66,7 @@ export class FilterBar extends Component {
       {
         type: 'q',
         label: 'uid',
-        description: 'Id of the onwner file',
+        description: 'Id of the owner file',
         operators: ['=', '!=', '~'],
         values: async (value) => getFilterValues('uid', value, this.props.agent.id),
       },

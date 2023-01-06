@@ -10,21 +10,34 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { Component, Fragment } from 'react';
-import { EuiFlyout, EuiOverlayMask, EuiOutsideClickDetector } from '@elastic/eui';
+import React from 'react';
+import { EuiFlyout, EuiOutsideClickDetector } from '@elastic/eui';
 
-export const WzFlyout = ({children, flyoutProps = {}, overlayMaskProps = {}, outsideClickDetectorProps = {}, onClose}) => (
-  <EuiOverlayMask headerZindexLocation="below" {...overlayMaskProps}>
-    <EuiOutsideClickDetector
-      onOutsideClick={onClose}
-      {...outsideClickDetectorProps}
-    >
-      <EuiFlyout
-        onClose={onClose}
-        {...flyoutProps}
-      >
+export const WzFlyout = ({ children, flyoutProps = {}, onClose }) => {
+  const closeFlyout = (ev) => {
+    // Clicking on the flyout or on the flyout selector should not close the flyout.
+    if (
+      ev &&
+      ev.path.some(
+        (element) =>
+          element.classList?.contains('euiFlyout') || element.classList?.contains('euiPanel')
+      )
+    ) {
+      return;
+    }
+    onClose();
+  };
+
+  return (
+    <EuiOutsideClickDetector onOutsideClick={closeFlyout}>
+      {/*
+        As the version of Elastic EUI (v34.6.0) has a bug in the EuiOverlayMask component,
+        maskProps is added to avoid the closing of the overlay by the native function, as it contains the bug
+        This bug is fixed in the Elastic EUI version 36.0.0
+      */}
+      <EuiFlyout onClose={onClose} maskProps={{ onClick: () => {} }} {...flyoutProps}>
         {children}
       </EuiFlyout>
     </EuiOutsideClickDetector>
-  </EuiOverlayMask>
-);
+  );
+};

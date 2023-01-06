@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import { Base } from './base-query';
-import { WAZUH_ALERTS_PATTERN } from '../../../common/constants';
+import { getSettingDefaultValue } from '../../../common/services/settings';
 
 /**
  * Returns top 5 GDPR requirements
@@ -25,7 +25,7 @@ export const topGDPRRequirements = async (
   gte,
   lte,
   filters,
-  pattern = WAZUH_ALERTS_PATTERN
+  pattern = getSettingDefaultValue('pattern')
 ) => {
   if (filters.includes('rule.gdpr: exists')) {
     const [head, tail] = filters.split('AND rule.gdpr: exists');
@@ -76,13 +76,13 @@ export const topGDPRRequirements = async (
  * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
  * @returns {Array<String>}
  */
-export const getRulesByRequirement= async (
+export const getRulesByRequirement = async (
   context,
   gte,
   lte,
   filters,
   requirement,
-  pattern = WAZUH_ALERTS_PATTERN
+  pattern = getSettingDefaultValue('pattern')
 ) => {
   if (filters.includes('rule.gdpr: exists')) {
     const [head, tail] = filters.split('AND rule.gdpr: exists');
@@ -136,7 +136,7 @@ export const getRulesByRequirement= async (
       ) {
         return accum;
       };
-      accum.push({ruleID: bucket['3'].buckets[0].key, ruleDescription: bucket.key});
+      accum.push({ ruleID: bucket['3'].buckets[0].key, ruleDescription: bucket.key });
       return accum;
     }, []);
   } catch (error) {

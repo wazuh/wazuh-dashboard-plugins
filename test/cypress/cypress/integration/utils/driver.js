@@ -65,7 +65,7 @@ export const fillField = (selector, text) => {
 };
 
 export const getElement = (selector) => {
-  return cy.get(selector, { timeout: 8000 });
+  return cy.get(selector, { timeout: 18000 });
 };
 
 export const getSelector = (name, page) => {
@@ -148,4 +148,21 @@ export const xpathCheckInformationElement=  (webLocator, optionsNames, optionLen
       expect(paragraphs, 'has ' + optionLength + ' paragraphs').to.have.length(optionLength)
       expect(optionsNames, 'has expected [' + optionsNames + '] text in each paragraph [' + paragraphs + ']').to.contains(paragraphs)
     })
+}
+
+
+export const getCookiesFromBrowser = (values) => {
+  return values.filter(item=>['wz-token', 'wz-user', 'wz-api', 'security_authentication'].includes(item.name))
+  .map(item=>{
+      return `${item.name}:${item.value}`
+  }).join(';');
+}
+
+export const retrieveInformation = (url,method,headers,bodyPost) => {
+  return cy.request({
+    method: method,
+    url: url,
+    headers: headers,
+    body: bodyPost
+  }).as('response');
 }

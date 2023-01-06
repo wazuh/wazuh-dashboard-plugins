@@ -153,6 +153,7 @@ exports[`Table WZ API component renders correctly to match the snapshot 1`] = `
       onChange={[Function]}
       pagination={
         Object {
+          "hidePerPageOptions": false,
           "pageIndex": 0,
           "pageSize": 15,
           "pageSizeOptions": Array [
@@ -264,89 +265,81 @@ exports[`Table WZ API component renders correctly to match the snapshot 1`] = `
                             ownFocus={true}
                             panelPaddingSize="none"
                           >
-                            <EuiOutsideClickDetector
-                              isDisabled={true}
-                              onOutsideClick={[Function]}
+                            <div
+                              className="euiPopover euiPopover--anchorDownRight"
                             >
                               <div
-                                className="euiPopover euiPopover--anchorDownRight"
-                                onKeyDown={[Function]}
-                                onMouseDown={[Function]}
-                                onMouseUp={[Function]}
-                                onTouchEnd={[Function]}
-                                onTouchStart={[Function]}
+                                className="euiPopover__anchor"
                               >
-                                <div
-                                  className="euiPopover__anchor"
+                                <EuiButtonEmpty
+                                  flush="right"
+                                  iconSide="right"
+                                  iconType="arrowDown"
+                                  onClick={[Function]}
+                                  size="xs"
                                 >
-                                  <EuiButtonEmpty
-                                    flush="right"
-                                    iconSide="right"
-                                    iconType="arrowDown"
+                                  <button
+                                    className="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--xSmall euiButtonEmpty--flushRight"
+                                    disabled={false}
                                     onClick={[Function]}
-                                    size="xs"
+                                    type="button"
                                   >
-                                    <button
-                                      className="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--xSmall euiButtonEmpty--flushRight"
-                                      disabled={false}
-                                      onClick={[Function]}
-                                      type="button"
-                                    >
-                                      <EuiButtonContent
-                                        className="euiButtonEmpty__content"
-                                        iconSide="right"
-                                        iconType="arrowDown"
-                                        textProps={
-                                          Object {
-                                            "className": "euiButtonEmpty__text",
-                                          }
+                                    <EuiButtonContent
+                                      className="euiButtonEmpty__content"
+                                      iconSide="right"
+                                      iconSize="s"
+                                      iconType="arrowDown"
+                                      textProps={
+                                        Object {
+                                          "className": "euiButtonEmpty__text",
                                         }
+                                      }
+                                    >
+                                      <span
+                                        className="euiButtonContent euiButtonContent--iconRight euiButtonEmpty__content"
                                       >
-                                        <span
-                                          className="euiButtonContent euiButtonContent--iconRight euiButtonEmpty__content"
+                                        <EuiIcon
+                                          className="euiButtonContent__icon"
+                                          color="inherit"
+                                          size="s"
+                                          type="arrowDown"
                                         >
-                                          <EuiIcon
-                                            className="euiButtonContent__icon"
-                                            size="m"
-                                            type="arrowDown"
+                                          <EuiIconEmpty
+                                            aria-hidden={true}
+                                            className="euiIcon euiIcon--small euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
+                                            focusable="false"
+                                            role="img"
+                                            style={null}
                                           >
-                                            <EuiIconEmpty
+                                            <svg
                                               aria-hidden={true}
-                                              className="euiIcon euiIcon--medium euiIcon-isLoading euiButtonContent__icon"
+                                              className="euiIcon euiIcon--small euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
                                               focusable="false"
+                                              height={16}
                                               role="img"
                                               style={null}
-                                            >
-                                              <svg
-                                                aria-hidden={true}
-                                                className="euiIcon euiIcon--medium euiIcon-isLoading euiButtonContent__icon"
-                                                focusable="false"
-                                                height={16}
-                                                role="img"
-                                                style={null}
-                                                viewBox="0 0 16 16"
-                                                width={16}
-                                                xmlns="http://www.w3.org/2000/svg"
-                                              />
-                                            </EuiIconEmpty>
-                                          </EuiIcon>
-                                          <span
-                                            className="euiButtonEmpty__text"
+                                              viewBox="0 0 16 16"
+                                              width={16}
+                                              xmlns="http://www.w3.org/2000/svg"
+                                            />
+                                          </EuiIconEmpty>
+                                        </EuiIcon>
+                                        <span
+                                          className="euiButtonEmpty__text"
+                                        >
+                                          <EuiI18n
+                                            default="Sorting"
+                                            token="euiTableSortMobile.sorting"
                                           >
-                                            <EuiI18n
-                                              default="Sorting"
-                                              token="euiTableSortMobile.sorting"
-                                            >
-                                              Sorting
-                                            </EuiI18n>
-                                          </span>
+                                            Sorting
+                                          </EuiI18n>
                                         </span>
-                                      </EuiButtonContent>
-                                    </button>
-                                  </EuiButtonEmpty>
-                                </div>
+                                      </span>
+                                    </EuiButtonContent>
+                                  </button>
+                                </EuiButtonEmpty>
                               </div>
-                            </EuiOutsideClickDetector>
+                            </div>
                           </EuiPopover>
                         </div>
                       </EuiTableSortMobile>
@@ -404,41 +397,35 @@ exports[`Table WZ API component renders correctly to match the snapshot 1`] = `
                           onClick={[Function]}
                           type="button"
                         >
-                          <span
+                          <CellContents
                             className="euiTableCellContent"
+                            isSorted={false}
+                            showSortMsg={true}
                           >
-                            <EuiInnerText>
-                              <EuiI18n
-                                default="{innerText}; Sorted in {ariaSortValue} order"
-                                token="euiTableHeaderCell.titleTextWithSort"
-                                values={
-                                  Object {
-                                    "ariaSortValue": "none",
-                                    "innerText": "Version",
-                                  }
-                                }
-                              >
-                                <span
-                                  className="euiTableCellContent__text"
-                                  title="Version"
-                                >
-                                  Version
-                                </span>
-                              </EuiI18n>
-                            </EuiInnerText>
-                            <EuiScreenReaderOnly>
-                              <span
-                                className="euiScreenReaderOnly"
-                              >
+                            <span
+                              className="euiTableCellContent"
+                            >
+                              <EuiInnerText>
                                 <EuiI18n
-                                  default="Click to sort in ascending order"
-                                  token="euiTableHeaderCell.clickForAscending"
+                                  default="{innerText}; {description}"
+                                  token="euiTableHeaderCell.titleTextWithDesc"
+                                  values={
+                                    Object {
+                                      "description": undefined,
+                                      "innerText": "Version",
+                                    }
+                                  }
                                 >
-                                  Click to sort in ascending order
+                                  <span
+                                    className="euiTableCellContent__text"
+                                    title="Version"
+                                  >
+                                    Version
+                                  </span>
                                 </EuiI18n>
-                              </span>
-                            </EuiScreenReaderOnly>
-                          </span>
+                              </EuiInnerText>
+                            </span>
+                          </CellContents>
                         </button>
                       </th>
                     </EuiTableHeaderCell>
@@ -468,41 +455,35 @@ exports[`Table WZ API component renders correctly to match the snapshot 1`] = `
                           onClick={[Function]}
                           type="button"
                         >
-                          <span
+                          <CellContents
                             className="euiTableCellContent"
+                            isSorted={false}
+                            showSortMsg={true}
                           >
-                            <EuiInnerText>
-                              <EuiI18n
-                                default="{innerText}; Sorted in {ariaSortValue} order"
-                                token="euiTableHeaderCell.titleTextWithSort"
-                                values={
-                                  Object {
-                                    "ariaSortValue": "none",
-                                    "innerText": "Architecture",
-                                  }
-                                }
-                              >
-                                <span
-                                  className="euiTableCellContent__text"
-                                  title="Architecture"
-                                >
-                                  Architecture
-                                </span>
-                              </EuiI18n>
-                            </EuiInnerText>
-                            <EuiScreenReaderOnly>
-                              <span
-                                className="euiScreenReaderOnly"
-                              >
+                            <span
+                              className="euiTableCellContent"
+                            >
+                              <EuiInnerText>
                                 <EuiI18n
-                                  default="Click to sort in ascending order"
-                                  token="euiTableHeaderCell.clickForAscending"
+                                  default="{innerText}; {description}"
+                                  token="euiTableHeaderCell.titleTextWithDesc"
+                                  values={
+                                    Object {
+                                      "description": undefined,
+                                      "innerText": "Architecture",
+                                    }
+                                  }
                                 >
-                                  Click to sort in ascending order
+                                  <span
+                                    className="euiTableCellContent__text"
+                                    title="Architecture"
+                                  >
+                                    Architecture
+                                  </span>
                                 </EuiI18n>
-                              </span>
-                            </EuiScreenReaderOnly>
-                          </span>
+                              </EuiInnerText>
+                            </span>
+                          </CellContents>
                         </button>
                       </th>
                     </EuiTableHeaderCell>
@@ -532,41 +513,35 @@ exports[`Table WZ API component renders correctly to match the snapshot 1`] = `
                           onClick={[Function]}
                           type="button"
                         >
-                          <span
+                          <CellContents
                             className="euiTableCellContent"
+                            isSorted={false}
+                            showSortMsg={true}
                           >
-                            <EuiInnerText>
-                              <EuiI18n
-                                default="{innerText}; Sorted in {ariaSortValue} order"
-                                token="euiTableHeaderCell.titleTextWithSort"
-                                values={
-                                  Object {
-                                    "ariaSortValue": "none",
-                                    "innerText": "CVE",
-                                  }
-                                }
-                              >
-                                <span
-                                  className="euiTableCellContent__text"
-                                  title="CVE"
-                                >
-                                  CVE
-                                </span>
-                              </EuiI18n>
-                            </EuiInnerText>
-                            <EuiScreenReaderOnly>
-                              <span
-                                className="euiScreenReaderOnly"
-                              >
+                            <span
+                              className="euiTableCellContent"
+                            >
+                              <EuiInnerText>
                                 <EuiI18n
-                                  default="Click to sort in ascending order"
-                                  token="euiTableHeaderCell.clickForAscending"
+                                  default="{innerText}; {description}"
+                                  token="euiTableHeaderCell.titleTextWithDesc"
+                                  values={
+                                    Object {
+                                      "description": undefined,
+                                      "innerText": "CVE",
+                                    }
+                                  }
                                 >
-                                  Click to sort in ascending order
+                                  <span
+                                    className="euiTableCellContent__text"
+                                    title="CVE"
+                                  >
+                                    CVE
+                                  </span>
                                 </EuiI18n>
-                              </span>
-                            </EuiScreenReaderOnly>
-                          </span>
+                              </EuiInnerText>
+                            </span>
+                          </CellContents>
                         </button>
                       </th>
                     </EuiTableHeaderCell>
@@ -596,41 +571,35 @@ exports[`Table WZ API component renders correctly to match the snapshot 1`] = `
                           onClick={[Function]}
                           type="button"
                         >
-                          <span
+                          <CellContents
                             className="euiTableCellContent"
+                            isSorted={false}
+                            showSortMsg={true}
                           >
-                            <EuiInnerText>
-                              <EuiI18n
-                                default="{innerText}; Sorted in {ariaSortValue} order"
-                                token="euiTableHeaderCell.titleTextWithSort"
-                                values={
-                                  Object {
-                                    "ariaSortValue": "none",
-                                    "innerText": "Name",
-                                  }
-                                }
-                              >
-                                <span
-                                  className="euiTableCellContent__text"
-                                  title="Name"
-                                >
-                                  Name
-                                </span>
-                              </EuiI18n>
-                            </EuiInnerText>
-                            <EuiScreenReaderOnly>
-                              <span
-                                className="euiScreenReaderOnly"
-                              >
+                            <span
+                              className="euiTableCellContent"
+                            >
+                              <EuiInnerText>
                                 <EuiI18n
-                                  default="Click to sort in ascending order"
-                                  token="euiTableHeaderCell.clickForAscending"
+                                  default="{innerText}; {description}"
+                                  token="euiTableHeaderCell.titleTextWithDesc"
+                                  values={
+                                    Object {
+                                      "description": undefined,
+                                      "innerText": "Name",
+                                    }
+                                  }
                                 >
-                                  Click to sort in ascending order
+                                  <span
+                                    className="euiTableCellContent__text"
+                                    title="Name"
+                                  >
+                                    Name
+                                  </span>
                                 </EuiI18n>
-                              </span>
-                            </EuiScreenReaderOnly>
-                          </span>
+                              </EuiInnerText>
+                            </span>
+                          </CellContents>
                         </button>
                       </th>
                     </EuiTableHeaderCell>

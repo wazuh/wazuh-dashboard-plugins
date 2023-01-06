@@ -22,10 +22,11 @@ import { updateCurrentTab, updateCurrentAgentData } from '../../redux/actions/ap
 import { VisFactoryHandler } from '../../react-services/vis-factory-handler';
 import { RawVisualizations } from '../../factories/raw-visualizations';
 import store from '../../redux/store';
-import { UI_LOGGER_LEVELS, WAZUH_ALERTS_PATTERN } from '../../../common/constants';
+import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { getDataPlugin } from '../../kibana-services';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
+import { getSettingDefaultValue } from '../../../common/services/settings';
 
 export class OverviewController {
   /**
@@ -358,7 +359,7 @@ export class OverviewController {
    * @param {*} id
    */
   addMitrefilter(id) {
-    const filter = `{"meta":{ "index": ${AppState.getCurrentPattern() || WAZUH_ALERTS_PATTERN}},"query":{"match":{"rule.mitre.id":{"query":"${id}","type":"phrase"}}}}`;
+    const filter = `{"meta":{ "index": ${AppState.getCurrentPattern() || getSettingDefaultValue('pattern')}},"query":{"match":{"rule.mitre.id":{"query":"${id}","type":"phrase"}}}}`;
     this.$rootScope.$emit('addNewKibanaFilter', { filter: JSON.parse(filter) });
   }
 

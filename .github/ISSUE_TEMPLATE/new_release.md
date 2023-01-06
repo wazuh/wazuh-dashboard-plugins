@@ -10,7 +10,7 @@ assignees: ''
 ## Description
 
 Example:
-> Wazuh 4.3.8 will be released shortly. Our Wazuh-dashboard and Kibana needs to support this new version. From our side, no changes will be included, so we only need to bump the version.
+> Wazuh 4.3.8 will be released shortly. Our Wazuh Dashboard and Kibana apps need to support this new version. From our side, no changes will be included, so we only need to bump the version.
 
 
 ## Tasks
@@ -18,7 +18,7 @@ Example:
 ### Pre-release
 - [ ] Add support for Wazuh 4.x.x (bump).
 - [ ] Generate the required tags.
-- [ ] Generate packages.
+- [ ] Generate the packages.
 - [ ] Test the packages, to verify they install, and the app works as expected.
 - [ ] [Optional] Run Regression Testing (#issue) 
 - [ ] Generate draft releases.

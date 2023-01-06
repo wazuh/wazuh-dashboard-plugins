@@ -1,0 +1,90 @@
+{
+    "data": {
+        "affected_items": [
+            {
+                "localfile": [
+                    {
+                        "logformat": "command",
+                        "command": "df -P",
+                        "alias": "df -P",
+                        "ignore_binaries": "no",
+                        "target": [
+                            "agent"
+                        ],
+                        "frequency": 360
+                    },
+                    {
+                        "logformat": "full_command",
+                        "command": "netstat -tulpn | sed 's/\\([[:alnum:]]\\+\\)\\ \\+[[:digit:]]\\+\\ \\+[[:digit:]]\\+\\ \\+\\(.*\\):\\([[:digit:]]*\\)\\ \\+\\([0-9\\.\\:\\*]\\+\\).\\+\\ \\([[:digit:]]*\\/[[:alnum:]\\-]*\\).*/\\1 \\2 == \\3 == \\4 \\5/' | sort -k 4 -g | sed 's/ == \\(.*\\) ==/:\\1/' | sed 1,2d",
+                        "alias": "netstat listening ports",
+                        "ignore_binaries": "no",
+                        "target": [
+                            "agent"
+                        ],
+                        "frequency": 360
+                    },
+                    {
+                        "logformat": "full_command",
+                        "command": "last -n 20",
+                        "alias": "last -n 20",
+                        "ignore_binaries": "no",
+                        "target": [
+                            "agent"
+                        ],
+                        "frequency": 360
+                    },
+                    {
+                        "file": "/var/ossec/logs/active-responses.log",
+                        "logformat": "syslog",
+                        "ignore_binaries": "no",
+                        "only-future-events": "yes",
+                        "target": [
+                            "agent"
+                        ]
+                    },
+                    {
+                        "file": "/var/log/messages",
+                        "logformat": "syslog",
+                        "ignore_binaries": "no",
+                        "only-future-events": "yes",
+                        "target": [
+                            "agent"
+                        ]
+                    },
+                    {
+                        "file": "/var/log/secure",
+                        "logformat": "syslog",
+                        "ignore_binaries": "no",
+                        "only-future-events": "yes",
+                        "target": [
+                            "agent"
+                        ]
+                    },
+                    {
+                        "file": "/var/log/maillog",
+                        "logformat": "syslog",
+                        "ignore_binaries": "no",
+                        "only-future-events": "yes",
+                        "target": [
+                            "agent"
+                        ]
+                    },
+                    {
+                        "file": "/var/log/audit/audit.log",
+                        "logformat": "audit",
+                        "ignore_binaries": "no",
+                        "only-future-events": "yes",
+                        "target": [
+                            "agent"
+                        ]
+                    }
+                ]
+            }
+        ],
+        "total_affected_items": 1,
+        "total_failed_items": 0,
+        "failed_items": []
+    },
+    "message": "Active configuration was successfully read in specified node",
+    "error": 0
+}

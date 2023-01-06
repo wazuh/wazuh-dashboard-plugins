@@ -1,0 +1,42 @@
+# This workflow run the unit tests of the app using Jest.
+# Any branch, tag or commit SHA existing in the origin can be used.
+#
+# This workflow is based on the `dev-environment` workflow.
+#
+# Jest is a third-party software https://jestjs.io/
+
+
+name: Run unit test
+
+on:
+  workflow_dispatch:
+    inputs:
+      reference:
+        required: true
+        type: string
+        default: master
+        description: Source code reference (branch, tag or commit SHA)
+      command:
+        required: true
+        type: choice
+        default: 'yarn test:jest'
+        description: Select the type of test to run.
+        options:
+        - 'yarn test:jest'
+  pull_request:
+    branches:
+      - 'master'
+      - '*.*-*.*'
+      - '*.*-*.*-wzd'
+      - '[0-9].[0-9]+'
+
+jobs:
+  # Run unit tests with Jest
+  test:
+    name: Run unit tests
+    uses: ./.github/workflows/dev-environment.yml
+    with:
+      reference: ${{ github.event.inputs.reference }}
+      command: ${{ github.event.inputs.command || 'yarn test:jest' }}
+      notify_jest_coverage_summary: true
+    secrets: inherit

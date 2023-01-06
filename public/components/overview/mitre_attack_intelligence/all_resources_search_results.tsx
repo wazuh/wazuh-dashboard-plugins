@@ -1,5 +1,5 @@
 /*
- * Wazuh app - React component that shows the searching resutls of Mitre Att&ck resources
+ * Wazuh app - React component that shows the searching results of Mitre Att&ck resources
  *
  * Copyright (C) 2015-2022 Wazuh, Inc.
  *

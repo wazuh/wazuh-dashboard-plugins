@@ -16,7 +16,7 @@ type TBreadcrumbSection = {text: string, href?: string} | { agent: any };
 type TBreadcrumb = TBreadcrumbSection[];
 type TBreadcrumbParameter = TBreadcrumb | ((props: any) => TBreadcrumb);
 
-// It retuns user permissions
+// It returns user permissions
 export const withGlobalBreadcrumb = (breadcrumb : TBreadcrumbParameter) => WrappedComponent => props => {
   useGlobalBreadcrumb(typeof breadcrumb === 'function' ? breadcrumb(props) : breadcrumb);
   return <WrappedComponent {...props} />

@@ -1,0 +1,20 @@
+{
+  // See http://go.microsoft.com/fwlink/?LinkId=827846
+  // for the documentation about the extensions.json format
+  "recommendations": [
+    // ESLint support.
+    "dbaeumer.vscode-eslint",
+    // Prettier support.
+    "esbenp.prettier-vscode",
+    // JS/TS language support
+    "ms-vscode.vscode-typescript-next",
+    // VSCode Remote Dev Containers
+    "ms-vscode-remote.remote-containers",
+    // Docker extension for VSCode
+    "ms-azuretools.vscode-docker",
+    // GitLens — Git supercharged
+    "eamodio.gitlens",
+    // EditorConfig for VS Code
+    "editorconfig.editorconfig",
+  ]
+}

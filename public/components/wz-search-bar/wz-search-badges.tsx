@@ -72,7 +72,7 @@ export class WzSearchBadges extends Component {
           color="hollow"
           iconOnClick={() => this.onDeleteFilter(filter)}>
           <EuiButtonEmpty color='text' size="xs">
-            {`${filter.field}: ${filter.value} puto`}
+            {`${filter.field}: ${filter.value}`}
           </EuiButtonEmpty>
         </EuiBadge>
       </EuiFlexItem>

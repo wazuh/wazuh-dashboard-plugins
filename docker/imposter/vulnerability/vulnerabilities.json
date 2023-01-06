@@ -1,0 +1,108 @@
+{
+	"data": {
+		"affected_items": [
+			{
+				"title": "CVE-2021-31179 affects Microsoft Office Home and Business 2016 - en-us",
+				"external_references": [
+					"https://portal.msrc.microsoft.com/en-US/security-guidance/advisory/CVE-2021-31179",
+					"https://nvd.nist.gov/vuln/detail/CVE-2021-31179"
+				],
+				"name": "Microsoft Office Home and Business 2016 - en-us",
+				"cvss3_score": 7.8,
+				"severity": "High",
+				"updated": "2021-05-17",
+				"cvss2_score": 6.8,
+				"architecture": "x64",
+				"version": "16.0.15225.20288",
+				"published": "2021-05-11",
+				"detection_time": "2022-06-24T16:09:34Z",
+				"condition": "KB5001923 patch is not installed",
+				"cve": "CVE-2021-31179"
+			},
+			{
+				"title": "CVE-2020-27350 affects apt",
+				"external_references": [
+					"https://usn.ubuntu.com/usn/usn-4667-1",
+					"https://bugs.launchpad.net/bugs/1899193",
+					"https://www.debian.org/security/2020/dsa-4808",
+					"https://security.netapp.com/advisory/ntap-20210108-0005/",
+					"https://nvd.nist.gov/vuln/detail/CVE-2020-27350",
+					"https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-27350"
+				],
+				"name": "apt",
+				"cvss3_score": 5.7,
+				"severity": "Medium",
+				"updated": "2021-01-08",
+				"cvss2_score": 4.6,
+				"architecture": "amd64",
+				"version": "1.4.9",
+				"published": "2020-12-10",
+				"detection_time": "2022-06-24T18:29:53Z",
+				"condition": "Package less than 1.4.11",
+				"cve": "CVE-2020-27350"
+			},
+			{
+				"title": "CVE-2021-29953 affects Mozilla Firefox 53.0 (x64 en-US)",
+				"external_references": [
+					"https://www.mozilla.org/security/advisories/mfsa2021-20/",
+					"https://bugzilla.mozilla.org/show_bug.cgi?id=1701684",
+					"https://nvd.nist.gov/vuln/detail/CVE-2021-29953"
+				],
+				"name": "Mozilla Firefox 53.0 (x64 en-US)",
+				"cvss3_score": 6.1,
+				"severity": "Medium",
+				"updated": "2021-06-30",
+				"cvss2_score": 4.3,
+				"architecture": "x64",
+				"version": "53.0",
+				"published": "2021-06-24",
+				"detection_time": "2022-06-24T16:09:26Z",
+				"condition": "less than 88.0.1",
+				"cve": "CVE-2021-29953"
+			},
+			{
+				"title": "CVE-2021-29953 affects Mozilla Firefox 53.0 (x64 en-US)",
+				"external_references": [
+					"https://www.mozilla.org/security/advisories/mfsa2021-20/",
+					"https://bugzilla.mozilla.org/show_bug.cgi?id=1701684",
+					"https://nvd.nist.gov/vuln/detail/CVE-2021-29953"
+				],
+				"name": "Mozilla Firefox 53.0 (x64 en-US)",
+				"cvss3_score": 6.1,
+				"severity": "Medium",
+				"updated": "2021-06-30",
+				"cvss2_score": 4.3,
+				"architecture": "x64",
+				"version": "53.0",
+				"published": "2021-06-24",
+				"detection_time": "2022-06-24T16:09:26Z",
+				"condition": "less than 88.0.1",
+				"cve": "CVE-2021-29953"
+			},
+			{
+				"title": "CVE-2022-0809 affects Google Chrome",
+				"external_references": [
+					"https://chromereleases.googleblog.com/2022/03/stable-channel-update-for-desktop.html",
+					"https://crbug.com/1293428",
+					"https://nvd.nist.gov/vuln/detail/CVE-2022-0809"
+				],
+				"name": "Google Chrome",
+				"cvss3_score": 8.8,
+				"severity": "High",
+				"updated": "2022-04-12",
+				"cvss2_score": 6.8,
+				"architecture": " ",
+				"version": "80.0.3987.87",
+				"published": "2022-04-05",
+				"detection_time": "2022-06-27T15:03:49Z",
+				"condition": "less than 99.0.4844.51",
+				"cve": "CVE-2022-0809"
+			}
+		],
+		"total_affected_items": 1378,
+		"total_failed_items": 0,
+		"failed_items": []
+	},
+	"message": "All selected vulnerabilities were returned",
+	"error": 0
+}

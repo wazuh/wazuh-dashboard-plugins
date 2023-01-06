@@ -4,7 +4,7 @@ Feature: Should Displayes a warning modal - Management - edit groups
   i want to edit a custom rule
   in order to check if the warning no saving toast is displayed.
 
-@rules
+@rules @actions
   Scenario: Validate confirmation when closing modal without saving - Management - edit groups
     Given The wazuh admin user is logged
     When The user navigates to groups page

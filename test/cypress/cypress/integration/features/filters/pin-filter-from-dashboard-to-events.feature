@@ -6,7 +6,7 @@ Feature: Pin filter - from dashboard to event page
   Background:
     Given The wazuh admin user is logged
 
-  @filter
+  @filter @actions
   Scenario Outline: The user add and pin new filer - across the modules - from dashboard to event page <Module Name>
     When The user goes to <Module Name>
     And The user adds a new filter
@@ -27,4 +27,3 @@ Feature: Pin filter - from dashboard to event page
       | TSC                  |
       | Policy Monitoring    |
       | PCIDSS               |
-      

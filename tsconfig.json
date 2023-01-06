@@ -1,30 +1,28 @@
 {
-  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "jsx": "react",
-    "esModuleInterop": true,
-    "outDir": "./target",
-    "allowUnusedLabels": true,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
+    "target": "es5",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
     "skipLibCheck": true,
-    "alwaysStrict": false,
-    "noImplicitUseStrict": false,
-    "noImplicitAny": false,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx"
   },
   "include": [
-    "index.ts",
-    "server/**/*",
-    "public/**/*",
-    "common/**/*"
-  ],
-  "exclude": [
-    "public/**/*.test.ts",
-    "public/**/*.test.tsx",
-    "server/**/*.test.ts",
-    "common/**/*.test.ts",
-    "../../src/**/*",
-    "**/request.ts",
-    "src/**/*"
-  ],
+    "public",
+    "server",
+    "common"
+  ]
 }

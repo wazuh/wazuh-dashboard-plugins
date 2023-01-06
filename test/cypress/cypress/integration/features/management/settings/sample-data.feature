@@ -4,7 +4,7 @@ Feature: Add/Delete Sample data to modules
   I want to add sample data indices
   in order to check modules
 
-  @sampleData
+  @sampleData @actions
   Scenario: Add all sample data
     Given The wazuh admin user is logged
     When The user navigates to Sample data settings
@@ -15,7 +15,7 @@ Feature: Add/Delete Sample data to modules
       | threat detection and response   |
     Then The add data success toasts are displayed
 
-  @sampleData
+  @sampleData @actions
   Scenario: Delete all sample data
       Given The wazuh admin user is logged
       When The user navigates to Sample data settings

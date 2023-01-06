@@ -4,7 +4,7 @@
   "revision": "4400",
   "code": "4400",
   "pluginPlatform": {
-    "version": "1.2.0"
+    "version": "2.4.0"
   },
   "description": "Wazuh dashboard",
   "keywords": [
@@ -24,9 +24,12 @@
   },
   "homepage": "https://www.wazuh.com/",
   "scripts": {
-    "pretty": "prettier --single-quote \"{,!(node_modules)/**/}*.js\" --write",
-    "tslint": "tslint -c .tslint.yml server/**/*.ts server/**/*.tsx public/**/*.ts public/**/*.tsx",
-    "lint": "eslint . --ext .js -c .eslintrc.json --color",
+    "lint": "eslint {public,server,common}/**/*.{js,jsx,ts,tsx,json}",
+    "lint:public": "eslint public/**/*.{js,jsx,ts,tsx,json}",
+    "lint:server": "eslint server/**/*.{js,jsx,ts,tsx,json}",
+    "lint:common": "eslint common/**/*.{js,jsx,ts,tsx,json}",
+    "lint:fix": "eslint --fix '{public,server,common}/**/*.{js,jsx,ts,tsx,json}'",
+    "format": "prettier --write '{public,server,common}/**/*.{js,jsx,ts,tsx,css,md,json}' --config ./.prettierrc",
     "kbn": "node ../../scripts/kbn",
     "es": "node ../../scripts/es",
     "start": "plugin-helpers start",
@@ -41,7 +44,6 @@
   },
   "dependencies": {
     "angular-animate": "1.7.8",
-    "angular-chart.js": "1.1.1",
     "angular-material": "1.1.18",
     "axios": "^0.21.1",
     "install": "^0.10.1",
@@ -53,19 +55,31 @@
     "md5": "^2.3.0",
     "needle": "^2.0.1",
     "node-cron": "^1.1.2",
-    "pdfmake": "0.1.65",
+    "pdfmake": "0.2.6",
     "pug-loader": "^2.4.0",
     "querystring-browser": "1.0.4",
     "react-codemirror": "^1.0.0",
     "react-cookie": "^4.0.3",
     "read-last-lines": "^1.7.2",
     "timsort": "^0.3.0",
-    "winston": "3.0.0"
+    "typescript": "^4.4.2",
+    "winston": "3.5.1"
   },
   "devDependencies": {
-    "@types/jest": "^29.0.0",
     "@types/node-cron": "^2.0.3",
+    "@typescript-eslint/eslint-plugin": "^5.38.1",
+    "@typescript-eslint/parser": "^5.38.1",
+    "eslint": "^8.24.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-import-resolver-typescript": "2.7.1",
     "eslint-plugin-async-await": "^0.0.0",
+    "eslint-plugin-cypress": "^2.12.1",
+    "eslint-plugin-filenames-simple": "^0.7.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-react": "^7.31.8",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "prettier": "^2.7.1",
     "redux-mock-store": "^1.5.4",
     "tslint": "^5.11.0",
     "typescript-eslint-parser": "^18.0.0"

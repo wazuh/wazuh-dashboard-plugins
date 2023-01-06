@@ -19,12 +19,13 @@ import {
 } from '../integration-files/visualizations';
 
 import { generateAlerts } from '../lib/generate-alerts/generate-alerts-script';
-import { WAZUH_MONITORING_PATTERN, WAZUH_SAMPLE_ALERT_PREFIX, WAZUH_ROLE_ADMINISTRATOR_ID, WAZUH_SAMPLE_ALERTS_INDEX_SHARDS, WAZUH_SAMPLE_ALERTS_INDEX_REPLICAS } from '../../common/constants';
+import { WAZUH_ROLE_ADMINISTRATOR_ID, WAZUH_SAMPLE_ALERTS_INDEX_SHARDS, WAZUH_SAMPLE_ALERTS_INDEX_REPLICAS } from '../../common/constants';
 import jwtDecode from 'jwt-decode';
 import { ManageHosts } from '../lib/manage-hosts';
 import { OpenSearchDashboardsRequest, RequestHandlerContext, OpenSearchDashboardsResponseFactory, SavedObject, SavedObjectsFindResponse } from 'src/core/server';
 import { getCookieValueByName } from '../lib/cookie';
 import { WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS, WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_ALERTS } from '../../common/constants'
+import { getSettingDefaultValue } from '../../common/services/settings';
 
 export class WazuhElasticCtrl {
   wzSampleAlertsIndexPrefix: string
@@ -47,7 +48,7 @@ export class WazuhElasticCtrl {
    */
   getSampleAlertPrefix(): string {
     const config = getConfiguration();
-    return config['alerts.sample.prefix'] || WAZUH_SAMPLE_ALERT_PREFIX;
+    return config['alerts.sample.prefix'] || getSettingDefaultValue('alerts.sample.prefix');
   }
 
   /**
@@ -345,7 +346,7 @@ export class WazuhElasticCtrl {
     try {
       const config = getConfiguration();
       let monitoringPattern =
-        (config || {})['wazuh.monitoring.pattern'] || WAZUH_MONITORING_PATTERN;
+        (config || {})['wazuh.monitoring.pattern'] || getSettingDefaultValue('wazuh.monitoring.pattern');
       log(
         'wazuh-elastic:buildVisualizationsRaw',
         `Building ${app_objects.length} visualizations`,

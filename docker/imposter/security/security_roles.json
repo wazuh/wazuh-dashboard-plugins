@@ -1,0 +1,122 @@
+{
+    "data": {
+        "affected_items": [
+            {
+                "id": 1,
+                "name": "administrator",
+                "policies": [
+                    1,
+                    2,
+                    3,
+                    6,
+                    7,
+                    8,
+                    29,
+                    30,
+                    12,
+                    14,
+                    15,
+                    18,
+                    19,
+                    21,
+                    23,
+                    24,
+                    16,
+                    25,
+                    27,
+                    28,
+                    33,
+                    34,
+                    35
+                ],
+                "users": [
+                    1,
+                    2
+                ],
+                "rules": [
+                    1,
+                    2,
+                    100
+                ]
+            },
+            {
+                "id": 2,
+                "name": "readonly",
+                "policies": [
+                    4,
+                    5,
+                    12,
+                    31,
+                    32,
+                    13,
+                    17,
+                    20,
+                    22,
+                    16,
+                    25,
+                    26,
+                    28,
+                    35
+                ],
+                "users": [],
+                "rules": []
+            },
+            {
+                "id": 3,
+                "name": "users_admin",
+                "policies": [
+                    9,
+                    10
+                ],
+                "users": [],
+                "rules": []
+            },
+            {
+                "id": 4,
+                "name": "agents_readonly",
+                "policies": [
+                    4,
+                    5
+                ],
+                "users": [],
+                "rules": []
+            },
+            {
+                "id": 5,
+                "name": "agents_admin",
+                "policies": [
+                    1,
+                    2,
+                    3
+                ],
+                "users": [],
+                "rules": []
+            },
+            {
+                "id": 6,
+                "name": "cluster_readonly",
+                "policies": [
+                    31,
+                    32
+                ],
+                "users": [],
+                "rules": []
+            },
+            {
+                "id": 7,
+                "name": "cluster_admin",
+                "policies": [
+                    29,
+                    30
+                ],
+                "users": [],
+                "rules": []
+            }
+        ],
+        "total_affected_items": 8,
+        "total_failed_items": 0,
+        "failed_items": []
+    },
+    "message": "All specified roles were returned",
+    "error": 0
+}

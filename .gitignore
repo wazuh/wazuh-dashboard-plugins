@@ -37,7 +37,15 @@ node_modules/
 jspm_packages/
 
 # Visual Studio Code directory
-.vscode/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+
+# Ignore code-workspaces
+*.code-workspace
 
 # Typescript v1 declaration files
 typings/
@@ -71,3 +79,6 @@ cypress/.idea/
 cypress/cypress.env.json
 cypress/report/
 cypress/cookies.json
+
+# Customization plugin assets
+public/assets/custom/*
