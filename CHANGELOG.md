@@ -41,6 +41,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Updated the `winston` dependency to `3.5.1` [#4985](https://github.com/wazuh/wazuh-kibana-app/pull/4985)
 - Updated the `pdfmake` dependency to `0.2.6` [#4985](https://github.com/wazuh/wazuh-kibana-app/pull/4985)
 - The button to export the app logs is now disabled when there are no results, instead of showing an error toast [#4992](https://github.com/wazuh/wazuh-kibana-app/pull/4992)
+- Unify the SCA check result label name [#5031](https://github.com/wazuh/wazuh-kibana-app/pull/5031)
 
 ### Fixed
 
@@ -56,6 +57,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Disabled unmapped fields filter in Security Events alerts table [#4929](https://github.com/wazuh/wazuh-kibana-app/pull/4929)
 - Fixed the agents wizard OS styles and their versions. [#4832](https://github.com/wazuh/wazuh-kibana-app/pull/4832) [#4838](https://github.com/wazuh/wazuh-kibana-app/pull/4838)
 - Fixed the manager option in the agent deployment section [#4981](https://github.com/wazuh/wazuh-kibana-app/pull/4981)
+- Fixed Inventory checks table filters by stats [#4999](https://github.com/wazuh/wazuh-kibana-app/pull/4999) [#5031](https://github.com/wazuh/wazuh-kibana-app/pull/5031)
 - Fixed commands in the deploy new agent section(most of the commands are missing '-1') [#4962](https://github.com/wazuh/wazuh-kibana-app/pull/4962)
 - Fixed agent installation command for macOS in the deploy new agent section. [#4968](https://github.com/wazuh/wazuh-kibana-app/pull/4968)
 - Deploy new agent section: Fixed the way macos versions and architectures were displayed, fixed the way agents were displayed, fixed the way ubuntu versions were displayed. [#4933](https://github.com/wazuh/wazuh-kibana-app/pull/4933)
