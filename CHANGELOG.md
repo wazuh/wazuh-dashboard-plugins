@@ -23,7 +23,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Deploy new agent section: Added link for additional steps to alpine os. [#4933](https://github.com/wazuh/wazuh-kibana-app/pull/4933)
 - Added file saving conditions in File Editor [#4970](https://github.com/wazuh/wazuh-kibana-app/pull/4970)
 - Added character validation to avoid invalid agent names in the section 'Deploy new agent'. [#5021](https://github.com/wazuh/wazuh-kibana-app/pull/5021) [#5028](https://github.com/wazuh/wazuh-kibana-app/pull/5028)
-- Deploy new agent section: Added link for additional steps to alpine os. [#4933](https://github.com/wazuh/wazuh-kibana-app/pull/4933)
+- Added default selected options in Deploy Agent page [#5063](https://github.com/wazuh/wazuh-kibana-app/pull/5063)
 
 ### Changed
 
@@ -41,6 +41,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Updated the `pdfmake` dependency to `0.2.6` [#4985](https://github.com/wazuh/wazuh-kibana-app/pull/4985)
 - The button to export the app logs is now disabled when there are no results, instead of showing an error toast [#4992](https://github.com/wazuh/wazuh-kibana-app/pull/4992)
 - Unify the SCA check result label name [#5031](https://github.com/wazuh/wazuh-kibana-app/pull/5031)
+- Updated `pdfmake, mocha and json5` dependencies [#5062](https://github.com/wazuh/wazuh-kibana-app/pull/5062)
+
 
 ### Fixed
 
