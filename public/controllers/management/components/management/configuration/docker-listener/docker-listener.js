@@ -37,6 +37,30 @@ const text1 = i18n.translate('wazuh.controller.manage.comp.confi.docker.text1', 
 const text2 = i18n.translate('wazuh.controller.manage.comp.confi.docker.text2', {
   defaultMessage: 'Docker listener module reference',
 });
+const label1 = i18n.translate(
+  'wazuh.controller.manage.comp.confi.docker.label1',
+  {
+    defaultMessage: 'Docker listener status',
+  },
+);
+const label2 = i18n.translate(
+  'wazuh.controller.manage.comp.confi.docker.label2',
+  {
+    defaultMessage: 'Number of attempts to execute the listener',
+  },
+);
+const label3 = i18n.translate(
+  'wazuh.controller.manage.comp.confi.docker.label3',
+  {
+    defaultMessage: 'Waiting time to rerun the listener in case it fails',
+  },
+);
+const label4 = i18n.translate(
+  'wazuh.controller.manage.comp.confi.docker.label4',
+  {
+    defaultMessage: 'Run the listener immediately when service is started',
+  },
+);
 const helpLinks = [
   {
     text: text1,
@@ -55,22 +79,22 @@ const helpLinks = [
 const mainSettings = [
   {
     field: 'disabled',
-    label: 'Docker listener status',
+    label: label1,
     render: renderValueNoThenEnabled,
   },
   {
     field: 'attempts',
-    label: 'Number of attempts to execute the listener',
+    label: label2,
     render: renderValueOrDefault('5'),
   },
   {
     field: 'interval',
-    label: 'Waiting time to rerun the listener in case it fails',
+    label: label3,
     render: renderValueOrDefault('10m'),
   },
   {
     field: 'run_on_start',
-    label: 'Run the listener immediately when service is started',
+    label: label4,
     render: renderValueOrYes,
   },
 ];
