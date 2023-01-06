@@ -25,30 +25,54 @@ import {
 import withWzConfig from '../util-hocs/wz-config';
 import { wodleBuilder } from '../utils/builders';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
-const title1 = i18n.translate('controller.manage.comp.confi.docker.title1', {
-  defaultMessage: 'Main settings',
-});
-const descp1 = i18n.translate('controller.manage.comp.confi.docker.descp1', {
-  defaultMessage: 'General Docker listener settings',
-});
-const text1 = i18n.translate('controller.manage.comp.confi.docker.text1', {
-  defaultMessage: 'Monitoring containers activity',
-});
-const text2 = i18n.translate('controller.manage.comp.confi.docker.text2', {
-  defaultMessage: 'Docker listener module reference',
-});
-const label1 = i18n.translate('controller.manage.comp.confi.docker.label1', {
-  defaultMessage: 'Docker listener status',
-});
-const label2 = i18n.translate('controller.manage.comp.confi.docker.label2', {
-  defaultMessage: 'Number of attempts to execute the listener',
-});
-const label3 = i18n.translate('controller.manage.comp.confi.docker.label3', {
-  defaultMessage: 'Waiting time to rerun the listener in case it fails',
-});
-const label4 = i18n.translate('controller.manage.comp.confi.docker.label4', {
-  defaultMessage: 'Run the listener immediately when service is started',
-});
+const title1 = i18n.translate(
+  'wazuh.controller.manage.comp.confi.docker.title1',
+  {
+    defaultMessage: 'Main settings',
+  },
+);
+const descp1 = i18n.translate(
+  'wazuh.controller.manage.comp.confi.docker.descp1',
+  {
+    defaultMessage: 'General Docker listener settings',
+  },
+);
+const text1 = i18n.translate(
+  'wazuh.controller.manage.comp.confi.docker.text1',
+  {
+    defaultMessage: 'Monitoring containers activity',
+  },
+);
+const text2 = i18n.translate(
+  'wazuh.controller.manage.comp.confi.docker.text2',
+  {
+    defaultMessage: 'Docker listener module reference',
+  },
+);
+const label1 = i18n.translate(
+  'wazuh.controller.manage.comp.confi.docker.label1',
+  {
+    defaultMessage: 'Docker listener status',
+  },
+);
+const label2 = i18n.translate(
+  'wazuh.controller.manage.comp.confi.docker.label2',
+  {
+    defaultMessage: 'Number of attempts to execute the listener',
+  },
+);
+const label3 = i18n.translate(
+  'wazuh.controller.manage.comp.confi.docker.label3',
+  {
+    defaultMessage: 'Waiting time to rerun the listener in case it fails',
+  },
+);
+const label4 = i18n.translate(
+  'wazuh.controller.manage.comp.confi.docker.label4',
+  {
+    defaultMessage: 'Run the listener immediately when service is started',
+  },
+);
 const helpLinks = [
   {
     text: text1,
