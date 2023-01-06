@@ -1,8 +1,9 @@
 {
   "name": "wazuh",
   "version": "4.4.0",
-  "revision": "4400",
-  "code": "4400",
+  "revision": "00",
+  "stage": "alpha",
+  "commit": "f4f8345",
   "pluginPlatform": {
     "version": "2.4.0"
   },
@@ -55,8 +56,7 @@
     "md5": "^2.3.0",
     "needle": "^2.0.1",
     "node-cron": "^1.1.2",
-    "pdfmake": "0.2.6",
-    "pug-loader": "^2.4.0",
+    "pdfmake": "0.2.7",
     "querystring-browser": "1.0.4",
     "react-codemirror": "^1.0.0",
     "react-cookie": "^4.0.3",
