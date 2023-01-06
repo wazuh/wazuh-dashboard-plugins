@@ -41,6 +41,7 @@ import {
 } from '../../../react-services/error-orchestrator/types';
 import {
   API_NAME_AGENT_STATUS,
+  MODULE_SCA_CHECK_RESULT_LABEL,
   UI_LOGGER_LEVELS,
 } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
@@ -113,19 +114,19 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
       },
       {
         field: 'pass',
-        name: 'Pass',
+        name: MODULE_SCA_CHECK_RESULT_LABEL.passed,
         width: '100px',
         sortable: true,
       },
       {
         field: 'fail',
-        name: 'Fail',
+        name: MODULE_SCA_CHECK_RESULT_LABEL.failed,
         width: '100px',
         sortable: true,
       },
       {
         field: 'invalid',
-        name: 'Not applicable',
+        name: MODULE_SCA_CHECK_RESULT_LABEL['not applicable'],
         width: '100px',
         sortable: true,
       },
@@ -458,17 +459,17 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
                             size={{ width: '100%', height: '150px' }}
                             data={[
                               {
-                                label: 'Pass',
+                                label: MODULE_SCA_CHECK_RESULT_LABEL.passed,
                                 value: policy.pass,
                                 color: '#00a69b',
                               },
                               {
-                                label: 'Fail',
+                                label: MODULE_SCA_CHECK_RESULT_LABEL.failed,
                                 value: policy.fail,
                                 color: '#ff645c',
                               },
                               {
-                                label: 'Not applicable',
+                                label: MODULE_SCA_CHECK_RESULT_LABEL['not applicable'],
                                 value: policy.invalid,
                                 color: '#5c6773',
                               },
@@ -558,7 +559,7 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
                           'result',
                           'passed',
                         )}
-                        description='Pass'
+                        description={MODULE_SCA_CHECK_RESULT_LABEL.passed}
                         titleColor='secondary'
                         titleSize='m'
                         textAlign='center'
@@ -571,7 +572,7 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
                           'result',
                           'failed',
                         )}
-                        description='Fail'
+                        description={MODULE_SCA_CHECK_RESULT_LABEL.failed}
                         titleColor='danger'
                         titleSize='m'
                         textAlign='center'
@@ -581,10 +582,10 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
                       <EuiStat
                         title={this.buttonStat(
                           this.state.lookingPolicy.invalid,
-                          'status',
+                          'result',
                           'not applicable',
                         )}
-                        description='Not applicable'
+                        description={MODULE_SCA_CHECK_RESULT_LABEL['not applicable']}
                         titleColor='subdued'
                         titleSize='m'
                         textAlign='center'
