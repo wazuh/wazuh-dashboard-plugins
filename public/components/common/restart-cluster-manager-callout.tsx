@@ -70,32 +70,35 @@ class WzRestartClusterManagerCallout extends Component<
     });
   }
   restartClusterOrManager = async () => {
-    try {
-      this.setState({
-        warningRestarting: true,
-        warningRestartModalVisible: false,
-      });
-      const data = await restartClusterOrManager(
-        this.props.updateWazuhNotReadyYet,
-      );
+    try{
+      this.setState({ warningRestarting: true,
+        warningRestartModalVisible: false});
+      const data = await restartClusterOrManager(this.props.updateWazuhNotReadyYet);
       this.props.onRestarted();
-      this.showToast('success', `${data.restarted} was restarted`);
-    } catch (error) {
+      const restartedText = i18n.translate(
+        'wazuh.components.welcome.restartCluster.restartedText',
+        { defaultMessage: 'was restarted' },
+      );
+      this.showToast('success', `${data.restarted} ${restartedText}`);
+    }catch(error){
       this.setState({ warningRestarting: false });
       this.props.updateWazuhNotReadyYet(false);
       this.props.onRestartedError();
-      this.showToast('danger', 'Error', error.message || error);
+      this.showToast(
+        'danger',
+        i18n.translate('wazuh.components.welcome.restartCluster.errorText', {
+          defaultMessage: 'Error',
+        }),
+        error.message || error,
+      );
     }
   };
   async componentDidMount() {
     try {
       const clusterStatus = await clusterReq();
-      this.setState({
-        isCluster:
-          clusterStatus.data.data.enabled === 'yes' &&
-          clusterStatus.data.data.running === 'yes',
-      });
-    } catch (error) {}
+      this.setState( { isCluster: clusterStatus.data.data.enabled === 'yes' &&
+          clusterStatus.data.data.running === 'yes' });
+    }catch(error){}
   }
   render() {
     const { warningRestarting, warningRestartModalVisible } = this.state;
@@ -104,18 +107,18 @@ class WzRestartClusterManagerCallout extends Component<
         {!warningRestarting && (
           <EuiCallOut>
             <EuiFlexGroup justifyContent='spaceBetween' alignItems='center'>
-              <EuiFlexItem style={{ marginTop: '0', marginBottom: '0' }}>
-                <EuiText style={{ color: 'rgb(0, 107, 180)' }}>
-                  <EuiIcon
-                    type='iInCircle'
-                    color='primary'
-                    style={{ marginBottom: '7px', marginRight: '6px' }}
-                  />
+              <EuiFlexItem style={{ marginTop: '0', marginBottom: '0'}}>
+                <EuiText style={{color: 'rgb(0, 107, 180)'}} >
+                  <EuiIcon type='iInCircle'
+                    color='primary' style={{marginBottom: '7px', marginRight: '6px'}}/>
                   <span>
-                    {i18n.translate('wazuh.components.common.restartPerformed', {
-                      defaultMessage:
-                        'Changes will not take effect until a restart is performed.',
-                    })}
+                    {i18n.translate(
+                      'wazuh.components.welcome.restartCluster.message',
+                      {
+                        defaultMessage:
+                          'Changes will not take effect until a restart is performed.',
+                      },
+                    )}
                   </span>
                 </EuiText>
               </EuiFlexItem>
@@ -127,7 +130,12 @@ class WzRestartClusterManagerCallout extends Component<
                   iconType='refresh'
                   onClick={() => this.toggleWarningRestartModalVisible()}
                 >
-                  {'Restart'}
+                  {i18n.translate(
+                    'components.welcome.restartCluster.restartLabel',
+                    {
+                      defaultMessage: 'Restart',
+                    },
+                  )}
                 </EuiButton>
               </EuiFlexItem>
             </EuiFlexGroup>
@@ -141,14 +149,29 @@ class WzRestartClusterManagerCallout extends Component<
               } will be restarted`}
               onCancel={() => this.toggleWarningRestartModalVisible()}
               onConfirm={() => this.restartClusterOrManager()}
-              cancelButtonText='Cancel'
-              confirmButtonText='Confirm'
-              defaultFocusedButton='cancel'
+              cancelButtonText={i18n.translate(
+                'wazuh.components.welcome.restartCluster.cancelButtonText',
+                {
+                  defaultMessage: 'Cancel',
+                },
+              )}
+              confirmButtonText={i18n.translate(
+                'wazuh.components.welcome.restartCluster.confirmButtonText',
+                {
+                  defaultMessage: 'Confirm',
+                },
+              )}
+              defaultFocusedButton={i18n.translate(
+                'wazuh.components.welcome.restartCluster.defaultFocusButtonText',
+                {
+                  defaultMessage: 'cancel',
+                },
+              )}
             ></EuiConfirmModal>
           </EuiOverlayMask>
         )}
       </Fragment>
-    );
+    )
   }
 }
 

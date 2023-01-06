@@ -25,6 +25,7 @@ import WzTextWithTooltipIfTruncated from '../wz-text-with-tooltip-if-truncated';
 import { WzStat } from '../../wz-stat';
 import { GroupTruncate } from '../util/agent-group-truncate'
 import { AgentStatus } from '../../agents/agent_status';
+import { i18n } from '@/kbn/i18n'
 
 export class AgentInfo extends Component {
   constructor(props) {
@@ -33,7 +34,7 @@ export class AgentInfo extends Component {
     this.state = {};
   }
 
-  
+
   async componentDidMount() {
     const managerVersion = await WzRequest.apiReq('GET', '/', {});
     this.setState({
@@ -99,7 +100,7 @@ export class AgentInfo extends Component {
     )
   }
 
-  buildStats(items) {    
+  buildStats(items) {
     const checkField = field => {
       return field !== undefined || field ? field : '-';
     };
@@ -110,7 +111,7 @@ export class AgentInfo extends Component {
         <EuiFlexItem key={item.description} style={item.style || null}>
           <WzStat
             title={
-              item.description === 'Groups' ? (
+              item.description === i18n.translate('wazuh.components.welcome.agentInfo.itemDescription.groups', { defaultMessage: 'Groups' }) ? (
                 <GroupTruncate
                   agent={this.props.agent}
                   groups={this.props.agent.group}
@@ -119,9 +120,9 @@ export class AgentInfo extends Component {
                   action={'redirect'}
                   agent={this.props.agent}
                   {...this.props} />
-              ) : item.description === 'Operating system' ? (
+              ) : item.description === i18n.translate('wazuh.components.welcome.agentInfo.itemDescription.operatingSystem', { defaultMessage: 'Operating system' }) ? (
                 this.addTextPlatformRender(this.props.agent, item.style)
-              ) : item.description === 'Status' ? (
+              ) : item.description === i18n.translate('wazuh.components.welcome.agentInfo.itemDescription.status', { defaultMessage: 'Status' }) ? (
                 <AgentStatus status={this.props.agent.status} style={{...item.style, fontSize: '12px'}} />
               ) : (
                 <WzTextWithTooltipIfTruncated position='bottom' tooltipProps={tooltipProps} elementStyle={{ maxWidth: item.style.maxWidth, fontSize: 12 }}>
@@ -141,12 +142,26 @@ export class AgentInfo extends Component {
   render() {
     const { agent } = this.props;
     let arrayStats;
+    const id = i18n.translate('wazuh.components.welcome.agentInfo.stats.id',{
+      defaultMessage: 'ID'
+    })
+    const status = i18n.translate('wazuh.components.welcome.agentInfo.stats.status',{
+      defaultMessage: 'Status'
+    })
+    const version = i18n.translate('wazuh.components.welcome.agentInfo.stats.version',{
+      defaultMessage: 'Version'
+    })
+    const ip = i18n.translate('wazuh.components.welcome.agentInfo.stats.ip',{
+      defaultMessage: 'IP'
+    })
 
+    const groups = i18n.translate('wazuh.components.welcome.agentInfo.stats.groups', {           defaultMessage: 'Groups'
+    })
     if (this.props.isCondensed) {
       arrayStats = [
-        { title: agent.id, description: 'ID', style: { maxWidth: 100 } },
-        { title: agent.status, description: 'Status', style: { maxWidth: 150 } },
-        { title: agent.version, description: 'Version', style: { maxWidth: 150 } },
+        { title: agent.id, description: id, style: { maxWidth: 100 } },
+        { title: agent.status, description: status, style: { maxWidth: 150 } },
+        { title: agent.version, description: version, style: { maxWidth: 150 } },
         {
           title: agent.name,
           description: 'Operating system',
@@ -155,10 +170,10 @@ export class AgentInfo extends Component {
       ];
     } else {
       arrayStats = [
-        { title: agent.id, description: 'ID', style: { minWidth: 30 } },
-        { title: agent.status, description: 'Status', style: { minWidth: 130 } },
-        { title: agent.ip, description: 'IP', style: { minWidth: 80 } },
-        { title: agent.version, description: 'Version', style: { minWidth: 100 } },
+        { title: agent.id, description: id, style: { minWidth: 30 } },
+        { title: agent.status, description: status, style: { minWidth: 130 } },
+        { title: agent.ip, description: ip, style: { minWidth: 80 } },
+        { title: agent.version, description: version, style: { minWidth: 100 } },
         { title: agent.group, description: 'Groups', style: { minWidth: 150 } },
         { title: agent.name, description: 'Operating system', style: { minWidth: 150 } },
         { title: agent.node_name && agent.node_name !== 'unknown' ? agent.node_name : '-', description: 'Cluster node', style: { minWidth: 120 } },
