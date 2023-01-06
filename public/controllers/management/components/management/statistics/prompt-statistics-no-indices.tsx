@@ -35,7 +35,7 @@ export const PromptStatisticsNoIndices = () => {
         <h2>
           {indexName}{' '}
           {i18n.translate(
-            'controllers.mnage.comp.confi.groups.ruleset.indicate',
+            'wazuh.controllers..mnage.comp.confi.groups.ruleset.indicate',
             {
               defaultMessage: 'indices were not found.',
             },

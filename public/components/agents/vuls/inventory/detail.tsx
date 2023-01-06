@@ -327,7 +327,7 @@ export class Details extends Component {
           <EuiTitle size="xs">
             <EuiToolTip position="top" content="View external references">
               <p className="detail-value" style={{ margin: 0 }}>{
-  i18n.translate("components.agent.fim.ivv.lib.view", {
+  i18n.translate("wazuh.components.agent.fim.ivv.lib.view", {
     defaultMessage: "View external references ",
   })
 }<EuiIcon
@@ -406,7 +406,7 @@ export class Details extends Component {
           buttonContent={
             <EuiTitle size="s">
               <h3>{
-                i18n.translate("components.agent.fim.ivv.lib.Details", {
+                i18n.translate("wazuh.components.agent.fim.ivv.lib.Details", {
                   defaultMessage: "Details",
                 })}</h3>
             </EuiTitle>
@@ -423,7 +423,7 @@ export class Details extends Component {
           extraAction={
             <div style={{ marginBottom: 5 }}>
               <strong>{this.state.totalHits || 0}</strong> {
-                i18n.translate("components.agent.fim.ivv.lib.hits", {
+                i18n.translate("wazuh.components.agent.fim.ivv.lib.hits", {
                   defaultMessage: "hits",
                 })}
             </div>
@@ -431,7 +431,7 @@ export class Details extends Component {
           buttonContent={
             <EuiTitle size="s">
               <h3>{
-                i18n.translate("components.agent.fim.ivv.lib.recevents", {
+                i18n.translate("wazuh.components.agent.fim.ivv.lib.recevents", {
                   defaultMessage: "Recent events",
                 })}
 

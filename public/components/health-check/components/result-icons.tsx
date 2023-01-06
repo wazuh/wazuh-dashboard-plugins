@@ -27,7 +27,7 @@ const ResultIcons = ({ result, children, initCheck }) => {
   return (
     <>{
       resultsPreset[result].disabled ? <>{
-        i18n.translate("components.agent..health.components.disable", {
+        i18n.translate("wazuh.components.agent..health.components.disable", {
           defaultMessage: "Disabled",
         })}</> : <>
         <EuiToolTip

@@ -29,13 +29,13 @@ import {
 import { i18n } from '@kbn/i18n';
 
 import { getHttp } from '../../../kibana-services';
-const Title1 = i18n.translate('components.addModule.guide.Title1', {
+const Title1 = i18n.translate('wazuh.components.settings.miscellaneous.executeDebugMode', {
   defaultMessage: 'Execute in debug mode',
 });
-const Title2 = i18n.translate('components.addModule.guide.Title2', {
+const Title2 = i18n.translate('wazuh.components.settings.miscellaneous.Title2', {
   defaultMessage: 'Health check',
 });
-const Descp1 = i18n.translate('components.addModule.guide.Descp1', {
+const Descp1 = i18n.translate('wazuh.components.settings.miscellaneous.Descp1', {
   defaultMessage: 'Run health check and no redirect when all checks are ready',
 });
 export const SettingsMiscellaneous = () => {
@@ -52,13 +52,13 @@ export const SettingsMiscellaneous = () => {
           <EuiFlexItem>
             <EuiTitle>
               <h2>
-                {i18n.translate('components.setting.miscell.Miscellaneous', {
+                {i18n.translate('wazuh.components.setting.miscell.Miscellaneous', {
                   defaultMessage: 'Miscellaneous',
                 })}
               </h2>
             </EuiTitle>
             <EuiText color='subdued'>
-              {i18n.translate('components.setting.miscell.apputils', {
+              {i18n.translate('wazuh.components.setting.miscell.apputils', {
                 defaultMessage: 'App utils',
               })}
             </EuiText>
@@ -74,7 +74,7 @@ export const SettingsMiscellaneous = () => {
               render: (
                 <EuiFormRow>
                   <EuiButton fill onClick={redirectHealthCheckDebugMode}>
-                    {i18n.translate('components.setting.miscell.Run', {
+                    {i18n.translate('wazuh.components.setting.miscell.Run', {
                       defaultMessage: 'Run',
                     })}
                   </EuiButton>

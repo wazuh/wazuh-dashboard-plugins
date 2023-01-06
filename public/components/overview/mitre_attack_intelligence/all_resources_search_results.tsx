@@ -28,7 +28,7 @@ import { i18n } from '@kbn/i18n';
 const LoadingProgress = () => (
   <EuiProgress color='primary' size='s'/>
 );
-const Title1 = i18n.translate("components.addModule.guide.title1", {
+const Title1 = i18n.translate("wazuh.components.addModule.guide.noResult", {
   defaultMessage: "No results found",
 });
 export const ModuleMitreAttackIntelligenceAllResourcesSearchResults = withGuard(({loading}) => loading, LoadingProgress)(({ results, onSelectResource }) => {
@@ -43,7 +43,7 @@ export const ModuleMitreAttackIntelligenceAllResourcesSearchResults = withGuard(
         onClick={item.loadMoreResults}
         size='s'
       >{
-        i18n.translate("components.overview.mitre.Seemoreresults", {
+        i18n.translate("wazuh.components.overview.mitre.Seemoreresults", {
           defaultMessage: "See more results",
         })}
 

@@ -182,12 +182,12 @@ export const ScaScan = compose(
         <EuiFlexGroup>
           <EuiFlexItem grow={false} style={{ marginTop: 15 }}>
             <EuiText>
-              <EuiIcon type="calendar" color={'primary'}/> { i18n.translate('components.common.welcome.components.mitreTop.startTime', { defaultMessage: 'Start time:', })} {formatUIDate(lastScan.start_scan)}
+              <EuiIcon type="calendar" color={'primary'}/> { i18n.translate('wazuh.components.common.welcome.components.mitreTop.startTime', { defaultMessage: 'Start time:', })} {formatUIDate(lastScan.start_scan)}
             </EuiText>
           </EuiFlexItem>
           <EuiFlexItem grow={false} style={{ marginTop: 15 }}>
             <EuiText>
-              <EuiIcon type="clock" color={'primary'}/> { i18n.translate('components.common.welcome.components.mitreTop.duration', { defaultMessage: 'Duration:', })} {this.durationScan()}
+              <EuiIcon type="clock" color={'primary'}/> { i18n.translate('wazuh.components.common.welcome.components.mitreTop.duration', { defaultMessage: 'Duration:', })} {this.durationScan()}
             </EuiText>
           </EuiFlexItem>
         </EuiFlexGroup>
@@ -203,11 +203,11 @@ export const ScaScan = compose(
       <Fragment>
         <EuiEmptyPrompt
           iconType="visVega"
-          title={<h4>{ i18n.translate('components.common.welcome.components.mitreTop.SCAScans', { defaultMessage: "You don't have SCA scans in this agent.", })}</h4>}
+          title={<h4>{ i18n.translate('wazuh.components.common.welcome.components.mitreTop.SCAScans', { defaultMessage: "You don't have SCA scans in this agent.", })}</h4>}
           body={
             <Fragment>
               <p>
-                { i18n.translate('components.common.welcome.components.mitreTop.agentSettings', { defaultMessage: "Check your agent settings to generate scans.", })}
+                { i18n.translate('wazuh.components.common.welcome.components.mitreTop.agentSettings', { defaultMessage: "Check your agent settings to generate scans.", })}
               </p>
             </Fragment>
           }
@@ -227,7 +227,7 @@ export const ScaScan = compose(
           <EuiText size="xs">
             <EuiFlexGroup>
               <EuiFlexItem>
-                <h2>{ i18n.translate('components.common.welcome.components.mitreTop.lastScan', { defaultMessage: 'SCA: Last scan', })}</h2>
+                <h2>{ i18n.translate('wazuh.components.common.welcome.components.mitreTop.lastScan', { defaultMessage: 'SCA: Last scan', })}</h2>
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
                 <EuiToolTip position="top" content="Open SCA Scans">

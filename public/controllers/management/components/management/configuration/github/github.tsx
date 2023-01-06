@@ -27,20 +27,20 @@ import { wodleBuilder, settingsListBuilder } from '../utils/builders';
 import { withGuard } from '../../../../../../components/common/hocs';
 import withWzConfig from '../util-hocs/wz-config';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
-const text1 = i18n.translate('controller.manage.comp.confi.github.text1', {
+const text1 = i18n.translate('wazuh.controller.manage.comp.confi.github.text1', {
   defaultMessage: 'Using Wazuh to monitor GitHub',
 });
-const text2 = i18n.translate('controller.manage.comp.confi.github.text2', {
+const text2 = i18n.translate('wazuh.controller.manage.comp.confi.github.text2', {
   defaultMessage: 'GitHub module reference',
 });
-const title1 = i18n.translate('controller.manage.comp.confi.github.title1', {
+const title1 = i18n.translate('wazuh.controller.manage.comp.confi.github.title1', {
   defaultMessage: 'Main settings',
 });
-const title2 = i18n.translate('controller.manage.comp.confi.github.title2', {
+const title2 = i18n.translate('wazuh.controller.manage.comp.confi.github.title2', {
   defaultMessage: 'List of organizations to auditing',
 });
 
-const descp1 = i18n.translate('controller.manage.comp.confi.github.descp1', {
+const descp1 = i18n.translate('wazuh.controller.manage.comp.confi.github.descp1', {
   defaultMessage: 'Configuration for the GitHub module',
 });
 const sections = [{ component: 'wmodules', configuration: 'wmodules' }];

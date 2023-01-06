@@ -97,7 +97,7 @@ export const RolesMappingCreate = ({
         >
           <p style={{ textAlign: 'center' }}>
             {
-              i18n.translate("components.overview.unsaved", {
+              i18n.translate("wazuh.components.overview.unsaved", {
                 defaultMessage: "There are unsaved changes. Are you sure you want to proceed?",
               })
             }
@@ -130,7 +130,7 @@ export const RolesMappingCreate = ({
         <EuiFlyoutHeader hasBorder={false}>
           <EuiTitle size="m">
             <h2>{
-              i18n.translate("components.overview.mitre.mapping", {
+              i18n.translate("wazuh.components.overview.mitre.mapping", {
                 defaultMessage: "Create new role mapping",
               })} &nbsp;</h2>
           </EuiTitle>

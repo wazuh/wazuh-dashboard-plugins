@@ -207,7 +207,7 @@ export class WzStatusOverview extends Component {
                   <EuiTitle>
                     <h2>
                       {i18n.translate(
-                        'controllers.mnage.comp.confi.groups.status.agent.Status',
+                        'wazuh.controllers..mnage.comp.confi.groups.status.agent.Status',
                         {
                           defaultMessage: 'Status',
                         },

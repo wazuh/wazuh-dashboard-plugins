@@ -25,16 +25,16 @@ import {
 import withWzConfig from '../util-hocs/wz-config';
 import { wodleBuilder } from '../utils/builders';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
-const title1 = i18n.translate('controller.manage.comp.confi.docker.title1', {
+const title1 = i18n.translate('wazuh.controller.manage.comp.confi.docker.title1', {
   defaultMessage: 'Main settings',
 });
-const descp1 = i18n.translate('controller.manage.comp.confi.docker.descp1', {
+const descp1 = i18n.translate('wazuh.controller.manage.comp.confi.docker.descp1', {
   defaultMessage: 'General Docker listener settings',
 });
-const text1 = i18n.translate('controller.manage.comp.confi.docker.text1', {
+const text1 = i18n.translate('wazuh.controller.manage.comp.confi.docker.text1', {
   defaultMessage: 'Monitoring containers activity',
 });
-const text2 = i18n.translate('controller.manage.comp.confi.docker.text2', {
+const text2 = i18n.translate('wazuh.controller.manage.comp.confi.docker.text2', {
   defaultMessage: 'Docker listener module reference',
 });
 const helpLinks = [

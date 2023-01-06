@@ -336,7 +336,7 @@ class WzDecoderInfo extends Component {
                       <EuiTitle size='s'>
                         <h3>
                           {i18n.translate(
-                            'controllers.mnage.comp.confi.groups.ruleset.Information',
+                            'wazuh.controllers..mnage.comp.confi.groups.ruleset.Information',
                             {
                               defaultMessage: 'Information',
                             },
@@ -361,7 +361,7 @@ class WzDecoderInfo extends Component {
                       <EuiTitle size='s'>
                         <h3>
                           {i18n.translate(
-                            'controllers.mnage.comp.confi.groups.ruleset.Details',
+                            'wazuh.controllers..mnage.comp.confi.groups.ruleset.Details',
                             {
                               defaultMessage: 'Details',
                             },
@@ -387,7 +387,7 @@ class WzDecoderInfo extends Component {
                       <EuiTitle size='s'>
                         <h3>
                           {i18n.translate(
-                            'controllers.mnage.comp.confi.groups.ruleset.dec',
+                            'wazuh.controllers..mnage.comp.confi.groups.ruleset.dec',
                             {
                               defaultMessage: 'Related decoders',
                             },

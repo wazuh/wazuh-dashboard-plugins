@@ -73,12 +73,12 @@ export function DiscoverField({
   selected,
   useShortDots,
 }: DiscoverFieldProps) {
-  const addLabelAria = i18n.translate('discover.fieldChooser.discoverField.addButtonAriaLabel', {
+  const addLabelAria = i18n.translate('wazuh.discover.fieldChooser.discoverField.addButtonAriaLabel', {
     defaultMessage: 'Add {field} to table',
     values: { field: field.name },
   });
   const removeLabelAria = i18n.translate(
-    'discover.fieldChooser.discoverField.removeButtonAriaLabel',
+    'wazuh.discover.fieldChooser.discoverField.removeButtonAriaLabel',
     {
       defaultMessage: 'Remove {field} from table',
       values: { field: field.name },
@@ -125,7 +125,7 @@ export function DiscoverField({
     actionButton = (
       <EuiToolTip
         delay="long"
-        content={i18n.translate('discover.fieldChooser.discoverField.addFieldTooltip', {
+        content={i18n.translate('wazuh.discover.fieldChooser.discoverField.addFieldTooltip', {
           defaultMessage: 'Add field as column',
         })}
       >
@@ -149,7 +149,7 @@ export function DiscoverField({
     actionButton = (
       <EuiToolTip
         delay="long"
-        content={i18n.translate('discover.fieldChooser.discoverField.removeFieldTooltip', {
+        content={i18n.translate('wazuh.discover.fieldChooser.discoverField.removeFieldTooltip', {
           defaultMessage: 'Remove field from table',
         })}
       >
@@ -210,7 +210,7 @@ export function DiscoverField({
     >
       <EuiPopoverTitle>
         {' '}
-        {i18n.translate('discover.fieldChooser.discoverField.fieldTopValuesLabel', {
+        {i18n.translate('wazuh.discover.fieldChooser.discoverField.fieldTopValuesLabel', {
           defaultMessage: 'Top 5 values',
         })}
       </EuiPopoverTitle>

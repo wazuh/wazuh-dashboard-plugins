@@ -12,17 +12,17 @@
 
 import React, { Component } from 'react';
 import {
-  EuiPanel,
-  EuiPage,
-  EuiPageBody,
-  EuiSpacer,
-  EuiProgress,
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiCard,
-  EuiStat,
-  EuiToolTip,
-  euiPaletteColorBlind,
+	EuiPanel,
+	EuiPage,
+	EuiPageBody,
+	EuiSpacer,
+	EuiProgress,
+	EuiFlexGroup,
+	EuiFlexItem,
+	EuiCard,
+	EuiStat,
+	EuiToolTip,
+	euiPaletteColorBlind,
 } from '@elastic/eui';
 import { EuiPalette } from '@elastic/eui/src/services/color/eui_palettes';
 import { InventoryTable } from './inventory/';
@@ -30,345 +30,345 @@ import { getLastScan, getAggregation } from './inventory/lib';
 import { ICustomBadges } from '../../wz-search-bar/components';
 import { formatUIDate } from '../../../react-services';
 import {
-  VisualizationBasicWidgetSelector,
-  VisualizationBasicWidget,
+	VisualizationBasicWidgetSelector,
+	VisualizationBasicWidget,
 } from '../../common/charts/visualizations/basic';
 import { WzStat } from '../../wz-stat';
 import { i18n } from '@kbn/i18n';
-const text1 = i18n.translate('components.addModule.guide.text1', {
-  defaultMessage: 'Name',
+const text1 = i18n.translate('wazuh.components.agent.vuls.inventory.name', {
+	defaultMessage: 'Name',
 });
-const text2 = i18n.translate('components.addModule.guide.text2', {
-  defaultMessage: 'CVE',
+const text2 = i18n.translate('wazuh.components.addModule.guide.inventory.cve', {
+	defaultMessage: 'CVE',
 });
-const text3 = i18n.translate('components.addModule.guide.text3', {
-  defaultMessage: 'Version',
+const text3 = i18n.translate('wazuh.components.addModule.guide.vuls.version', {
+	defaultMessage: 'Version',
 });
-const text4 = i18n.translate('components.addModule.guide.text4', {
-  defaultMessage: 'CVSS2 Score',
+const text4 = i18n.translate('wazuh.components.addModule.guide.vuls.cvs', {
+	defaultMessage: 'CVSS2 Score',
 });
-const text5 = i18n.translate('components.addModule.guide.text5', {
-  defaultMessage: 'CVSS3 Score',
+const text5 = i18n.translate('wazuh.components.addModule.guide.vuls.cvs3', {
+	defaultMessage: 'CVSS3 Score',
 });
 interface Aggregation {
-  title: number;
-  description: string;
-  titleColor: string;
+	title: number;
+	description: string;
+	titleColor: string;
 }
 interface pieStats {
-  id: string;
-  label: string;
-  value: number;
+	id: string;
+	label: string;
+	value: number;
 }
 interface LastScan {
-  last_full_scan: string;
-  last_partial_scan: string;
+	last_full_scan: string;
+	last_partial_scan: string;
 }
 interface TitleColors {
-  Critical: string;
-  High: string;
-  Medium: string;
-  Low: string;
+	Critical: string;
+	High: string;
+	Medium: string;
+	Low: string;
 }
 
 export class Inventory extends Component {
-  _isMount = false;
-  state: {
-    filters: [];
-    isLoading: boolean;
-    isLoadingStats: boolean;
-    customBadges: ICustomBadges[];
-    stats: Aggregation[];
-    severityPieStats: pieStats[];
-    vulnerabilityLastScan: LastScan;
-  };
-  props: any;
-  colorsVisualizationVulnerabilitiesSummaryData: EuiPalette;
-  titleColors: TitleColors = {
-    Critical: '#BD271E',
-    High: '#d5a612',
-    Medium: '#006BB4',
-    Low: '#6a717d',
-  };
+	_isMount = false;
+	state: {
+		filters: [];
+		isLoading: boolean;
+		isLoadingStats: boolean;
+		customBadges: ICustomBadges[];
+		stats: Aggregation[];
+		severityPieStats: pieStats[];
+		vulnerabilityLastScan: LastScan;
+	};
+	props: any;
+	colorsVisualizationVulnerabilitiesSummaryData: EuiPalette;
+	titleColors: TitleColors = {
+		Critical: '#BD271E',
+		High: '#d5a612',
+		Medium: '#006BB4',
+		Low: '#6a717d',
+	};
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      isLoading: true,
-      isLoadingStats: true,
-      customBadges: [],
-      filters: [],
-      stats: [
-        {
-          title: 0,
-          description: 'Critical',
-          titleColor: this.titleColors.Critical,
-        },
-        { title: 0, description: 'High', titleColor: this.titleColors.High },
-        {
-          title: 0,
-          description: 'Medium',
-          titleColor: this.titleColors.Medium,
-        },
-        { title: 0, description: 'Low', titleColor: this.titleColors.Low },
-      ],
-      severityPieStats: [],
-      vulnerabilityLastScan: {
-        last_full_scan: '',
-        last_partial_scan: '',
-      },
-    };
-    this.fetchVisualizationVulnerabilitiesSummaryData =
-      this.fetchVisualizationVulnerabilitiesSummaryData.bind(this);
-    this.fetchVisualizationVulnerabilitiesSeverityData =
-      this.fetchVisualizationVulnerabilitiesSeverityData.bind(this);
-    this.colorsVisualizationVulnerabilitiesSummaryData = euiPaletteColorBlind();
-  }
+	constructor(props) {
+		super(props);
+		this.state = {
+			isLoading: true,
+			isLoadingStats: true,
+			customBadges: [],
+			filters: [],
+			stats: [
+				{
+					title: 0,
+					description: 'Critical',
+					titleColor: this.titleColors.Critical,
+				},
+				{ title: 0, description: 'High', titleColor: this.titleColors.High },
+				{
+					title: 0,
+					description: 'Medium',
+					titleColor: this.titleColors.Medium,
+				},
+				{ title: 0, description: 'Low', titleColor: this.titleColors.Low },
+			],
+			severityPieStats: [],
+			vulnerabilityLastScan: {
+				last_full_scan: '',
+				last_partial_scan: '',
+			},
+		};
+		this.fetchVisualizationVulnerabilitiesSummaryData =
+			this.fetchVisualizationVulnerabilitiesSummaryData.bind(this);
+		this.fetchVisualizationVulnerabilitiesSeverityData =
+			this.fetchVisualizationVulnerabilitiesSeverityData.bind(this);
+		this.colorsVisualizationVulnerabilitiesSummaryData = euiPaletteColorBlind();
+	}
 
-  async componentDidMount() {
-    this._isMount = true;
-    await this.loadAgent();
-  }
+	async componentDidMount() {
+		this._isMount = true;
+		await this.loadAgent();
+	}
 
-  componentWillUnmount() {
-    this._isMount = false;
-  }
+	componentWillUnmount() {
+		this._isMount = false;
+	}
 
-  async fetchVisualizationVulnerabilitiesSummaryData(field, agentID) {
-    const results = await getAggregation(agentID, field, 4);
-    return Object.entries(results[field])
-      .map(([key, value], index) => ({
-        label: key,
-        value,
-        color: this.colorsVisualizationVulnerabilitiesSummaryData[index],
-        onClick: () => this.onFiltersChange(this.buildFilterQuery(field, key)),
-      }))
-      .sort(
-        (firstElement, secondElement) =>
-          secondElement.value - firstElement.value,
-      );
-  }
+	async fetchVisualizationVulnerabilitiesSummaryData(field, agentID) {
+		const results = await getAggregation(agentID, field, 4);
+		return Object.entries(results[field])
+			.map(([key, value], index) => ({
+				label: key,
+				value,
+				color: this.colorsVisualizationVulnerabilitiesSummaryData[index],
+				onClick: () => this.onFiltersChange(this.buildFilterQuery(field, key)),
+			}))
+			.sort(
+				(firstElement, secondElement) =>
+					secondElement.value - firstElement.value,
+			);
+	}
 
-  async fetchVisualizationVulnerabilitiesSeverityData() {
-    const { id } = this.props.agent;
-    const FIELD = 'severity';
-    const SEVERITY_KEYS = ['Critical', 'High', 'Medium', 'Low'];
-    this.setState({ isLoadingStats: true });
+	async fetchVisualizationVulnerabilitiesSeverityData() {
+		const { id } = this.props.agent;
+		const FIELD = 'severity';
+		const SEVERITY_KEYS = ['Critical', 'High', 'Medium', 'Low'];
+		this.setState({ isLoadingStats: true });
 
-    const vulnerabilityLastScan = await getLastScan(id);
-    const { severity } = await getAggregation(id, FIELD);
+		const vulnerabilityLastScan = await getLastScan(id);
+		const { severity } = await getAggregation(id, FIELD);
 
-    const severityStats = SEVERITY_KEYS.map(key => ({
-      titleColor: this.titleColors[key],
-      description: key,
-      title: severity[key] ? severity[key] : 0,
-    }));
+		const severityStats = SEVERITY_KEYS.map(key => ({
+			titleColor: this.titleColors[key],
+			description: key,
+			title: severity[key] ? severity[key] : 0,
+		}));
 
-    this.setState({
-      stats: severityStats,
-      isLoadingStats: false,
-      vulnerabilityLastScan,
-    });
+		this.setState({
+			stats: severityStats,
+			isLoadingStats: false,
+			vulnerabilityLastScan,
+		});
 
-    return Object.keys(severity).length
-      ? SEVERITY_KEYS.map(key => ({
-          label: key,
-          value: severity[key] ? severity[key] : 0,
-          color: this.titleColors[key],
-          onClick: () =>
-            this.onFiltersChange(this.buildFilterQuery(FIELD, key)),
-        }))
-      : [];
-  }
+		return Object.keys(severity).length
+			? SEVERITY_KEYS.map(key => ({
+					label: key,
+					value: severity[key] ? severity[key] : 0,
+					color: this.titleColors[key],
+					onClick: () =>
+						this.onFiltersChange(this.buildFilterQuery(FIELD, key)),
+				}))
+			: [];
+	}
 
-  buildFilterQuery(field = '', selectedItem = '') {
-    return [
-      {
-        field: 'q',
-        value: `${field}=${selectedItem}`,
-      },
-    ];
-  }
+	buildFilterQuery(field = '', selectedItem = '') {
+		return [
+			{
+				field: 'q',
+				value: `${field}=${selectedItem}`,
+			},
+		];
+	}
 
-  async loadAgent() {
-    if (this._isMount) {
-      this.setState({
-        isLoading: false,
-      });
-    }
-  }
+	async loadAgent() {
+		if (this._isMount) {
+			this.setState({
+				isLoading: false,
+			});
+		}
+	}
 
-  onFiltersChange = filters => {
-    this.setState({ filters });
-  };
+	onFiltersChange = filters => {
+		this.setState({ filters });
+	};
 
-  renderTable() {
-    const { filters } = this.state;
-    return (
-      <div>
-        <InventoryTable
-          {...this.props}
-          filters={filters}
-          onFiltersChange={this.onFiltersChange}
-        />
-      </div>
-    );
-  }
+	renderTable() {
+		const { filters } = this.state;
+		return (
+			<div>
+				<InventoryTable
+					{...this.props}
+					filters={filters}
+					onFiltersChange={this.onFiltersChange}
+				/>
+			</div>
+		);
+	}
 
-  loadingInventory() {
-    return (
-      <EuiPage>
-        <EuiFlexGroup>
-          <EuiFlexItem>
-            <EuiProgress size='xs' color='primary' />
-          </EuiFlexItem>
-        </EuiFlexGroup>
-      </EuiPage>
-    );
-  }
+	loadingInventory() {
+		return (
+			<EuiPage>
+				<EuiFlexGroup>
+					<EuiFlexItem>
+						<EuiProgress size='xs' color='primary' />
+					</EuiFlexItem>
+				</EuiFlexGroup>
+			</EuiPage>
+		);
+	}
 
-  // This method was created because Wazuh API returns 1970-01-01T00:00:00Z dates or undefined ones
-  // when vulnerability module is not configured
-  // its meant to render nothing when such date is received
-  beautifyDate(date?: string) {
-    return date && !['1970-01-01T00:00:00Z', '-'].includes(date)
-      ? formatUIDate(date)
-      : '-';
-  }
+	// This method was created because Wazuh API returns 1970-01-01T00:00:00Z dates or undefined ones
+	// when vulnerability module is not configured
+	// its meant to render nothing when such date is received
+	beautifyDate(date?: string) {
+		return date && !['1970-01-01T00:00:00Z', '-'].includes(date)
+			? formatUIDate(date)
+			: '-';
+	}
 
-  buildTitleFilter({ description, title, titleColor }) {
-    const { isLoadingStats } = this.state;
-    return (
-      <EuiFlexItem key={`module_vulnerabilities_inventory_stat_${description}`}>
-        <EuiStat
-          textAlign='center'
-          isLoading={isLoadingStats}
-          title={
-            <EuiToolTip position='top' content={`Filter by Severity`}>
-              <span
-                className={'statWithLink wz-user-select-none'}
-                style={{ cursor: 'pointer', fontSize: '2.25rem' }}
-                onClick={() =>
-                  this.onFiltersChange(
-                    this.buildFilterQuery('severity', description),
-                  )
-                }
-              >
-                {title}
-              </span>
-            </EuiToolTip>
-          }
-          description={description}
-          titleColor={titleColor}
-        />
-      </EuiFlexItem>
-    );
-  }
+	buildTitleFilter({ description, title, titleColor }) {
+		const { isLoadingStats } = this.state;
+		return (
+			<EuiFlexItem key={`module_vulnerabilities_inventory_stat_${description}`}>
+				<EuiStat
+					textAlign='center'
+					isLoading={isLoadingStats}
+					title={
+						<EuiToolTip position='top' content={`Filter by Severity`}>
+							<span
+								className={'statWithLink wz-user-select-none'}
+								style={{ cursor: 'pointer', fontSize: '2.25rem' }}
+								onClick={() =>
+									this.onFiltersChange(
+										this.buildFilterQuery('severity', description),
+									)
+								}
+							>
+								{title}
+							</span>
+						</EuiToolTip>
+					}
+					description={description}
+					titleColor={titleColor}
+				/>
+			</EuiFlexItem>
+		);
+	}
 
-  render() {
-    const { isLoading, stats, vulnerabilityLastScan } = this.state;
-    if (isLoading) {
-      return this.loadingInventory();
-    }
-    const last_full_scan = this.beautifyDate(
-      vulnerabilityLastScan.last_full_scan,
-    );
-    const last_partial_scan = this.beautifyDate(
-      vulnerabilityLastScan.last_partial_scan,
-    );
+	render() {
+		const { isLoading, stats, vulnerabilityLastScan } = this.state;
+		if (isLoading) {
+			return this.loadingInventory();
+		}
+		const last_full_scan = this.beautifyDate(
+			vulnerabilityLastScan.last_full_scan,
+		);
+		const last_partial_scan = this.beautifyDate(
+			vulnerabilityLastScan.last_partial_scan,
+		);
 
-    const table = this.renderTable();
-    return (
-      <EuiPage>
-        <EuiPageBody>
-          <EuiFlexGroup wrap>
-            <EuiFlexItem>
-              <EuiCard
-                title
-                description
-                betaBadgeLabel='Severity'
-                className='wz-euiCard-no-title'
-              >
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'flex-end',
-                    height: '100%',
-                  }}
-                >
-                  <VisualizationBasicWidget
-                    type='donut'
-                    size={{ width: '100%', height: '150px' }}
-                    showLegend
-                    onFetch={this.fetchVisualizationVulnerabilitiesSeverityData}
-                    onFetchDependencies={[this.props.agent.id]}
-                    noDataTitle='No results'
-                    noDataMessage='No results were found.'
-                  />
-                </div>
-              </EuiCard>
-            </EuiFlexItem>
-            <EuiFlexItem>
-              <EuiCard title description betaBadgeLabel='Details'>
-                <EuiFlexGroup alignItems='center' className={'height-full'}>
-                  <EuiFlexItem>
-                    <EuiFlexGroup alignItems='center'>
-                      {stats.map(stat => this.buildTitleFilter(stat))}
-                    </EuiFlexGroup>
-                    <EuiFlexGroup style={{ marginTop: 'auto' }}>
-                      <EuiFlexItem>
-                        <WzStat
-                          title={last_full_scan}
-                          description='Last full scan'
-                          textAlign='center'
-                          titleSize='xs'
-                        />
-                      </EuiFlexItem>
-                      <EuiFlexItem>
-                        <WzStat
-                          title={last_partial_scan}
-                          description='Last partial scan'
-                          textAlign='center'
-                          titleSize='xs'
-                        />
-                      </EuiFlexItem>
-                    </EuiFlexGroup>
-                  </EuiFlexItem>
-                </EuiFlexGroup>
-              </EuiCard>
-            </EuiFlexItem>
-            <EuiFlexItem>
-              <EuiCard
-                title
-                description
-                betaBadgeLabel='Summary'
-                className='wz-euiCard-no-title'
-              >
-                <VisualizationBasicWidgetSelector
-                  type='donut'
-                  size={{ width: '100%', height: '150px' }}
-                  showLegend
-                  selectorOptions={[
-                    { value: 'name', text: text1 },
-                    { value: 'cve', text: text2 },
-                    { value: 'version', text: text3 },
-                    { value: 'cvss2_score', text: text4 },
-                    { value: 'cvss3_score', text: text5 },
-                  ]}
-                  onFetch={this.fetchVisualizationVulnerabilitiesSummaryData}
-                  onFetchExtraDependencies={[this.props.agent.id]}
-                  noDataTitle='No results'
-                  noDataMessage={(_, optionRequirement) =>
-                    `No ${optionRequirement.text} results were found.`
-                  }
-                />
-              </EuiCard>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-          <EuiSpacer />
-          <EuiPanel>{table}</EuiPanel>
-        </EuiPageBody>
-      </EuiPage>
-    );
-  }
+		const table = this.renderTable();
+		return (
+			<EuiPage>
+				<EuiPageBody>
+					<EuiFlexGroup wrap>
+						<EuiFlexItem>
+							<EuiCard
+								title
+								description
+								betaBadgeLabel='Severity'
+								className='wz-euiCard-no-title'
+							>
+								<div
+									style={{
+										display: 'flex',
+										alignItems: 'flex-end',
+										height: '100%',
+									}}
+								>
+									<VisualizationBasicWidget
+										type='donut'
+										size={{ width: '100%', height: '150px' }}
+										showLegend
+										onFetch={this.fetchVisualizationVulnerabilitiesSeverityData}
+										onFetchDependencies={[this.props.agent.id]}
+										noDataTitle='No results'
+										noDataMessage='No results were found.'
+									/>
+								</div>
+							</EuiCard>
+						</EuiFlexItem>
+						<EuiFlexItem>
+							<EuiCard title description betaBadgeLabel='Details'>
+								<EuiFlexGroup alignItems='center' className={'height-full'}>
+									<EuiFlexItem>
+										<EuiFlexGroup alignItems='center'>
+											{stats.map(stat => this.buildTitleFilter(stat))}
+										</EuiFlexGroup>
+										<EuiFlexGroup style={{ marginTop: 'auto' }}>
+											<EuiFlexItem>
+												<WzStat
+													title={last_full_scan}
+													description='Last full scan'
+													textAlign='center'
+													titleSize='xs'
+												/>
+											</EuiFlexItem>
+											<EuiFlexItem>
+												<WzStat
+													title={last_partial_scan}
+													description='Last partial scan'
+													textAlign='center'
+													titleSize='xs'
+												/>
+											</EuiFlexItem>
+										</EuiFlexGroup>
+									</EuiFlexItem>
+								</EuiFlexGroup>
+							</EuiCard>
+						</EuiFlexItem>
+						<EuiFlexItem>
+							<EuiCard
+								title
+								description
+								betaBadgeLabel='Summary'
+								className='wz-euiCard-no-title'
+							>
+								<VisualizationBasicWidgetSelector
+									type='donut'
+									size={{ width: '100%', height: '150px' }}
+									showLegend
+									selectorOptions={[
+										{ value: 'name', text: text1 },
+										{ value: 'cve', text: text2 },
+										{ value: 'version', text: text3 },
+										{ value: 'cvss2_score', text: text4 },
+										{ value: 'cvss3_score', text: text5 },
+									]}
+									onFetch={this.fetchVisualizationVulnerabilitiesSummaryData}
+									onFetchExtraDependencies={[this.props.agent.id]}
+									noDataTitle='No results'
+									noDataMessage={(_, optionRequirement) =>
+										`No ${optionRequirement.text} results were found.`
+									}
+								/>
+							</EuiCard>
+						</EuiFlexItem>
+					</EuiFlexGroup>
+					<EuiSpacer />
+					<EuiPanel>{table}</EuiPanel>
+				</EuiPageBody>
+			</EuiPage>
+		);
+	}
 }

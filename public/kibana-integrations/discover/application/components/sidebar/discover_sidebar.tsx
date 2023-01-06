@@ -144,7 +144,7 @@ export function DiscoverSidebar({
     <I18nProvider>
       <section
         className="sidebar-list"
-        aria-label={i18n.translate('discover.fieldChooser.filter.indexAndFieldsSectionAriaLabel', {
+        aria-label={i18n.translate('wazuh.discover.fieldChooser.filter.indexAndFieldsSectionAriaLabel', {
           defaultMessage: 'Index and fields',
         })}
       >
@@ -168,7 +168,7 @@ export function DiscoverSidebar({
               <EuiTitle size="xxxs" id="selected_fields">
                 <h3>
                   <FormattedMessage
-                    id="discover.fieldChooser.filter.selectedFieldsTitle"
+                    id="wazuh.discover.fieldChooser.filter.selectedFieldsTitle"
                     defaultMessage="Selected fields"
                   />
                 </h3>
@@ -204,7 +204,7 @@ export function DiscoverSidebar({
                 <EuiTitle size="xxxs" id="available_fields" className="euiFlexItem">
                   <h3>
                     <FormattedMessage
-                      id="discover.fieldChooser.filter.availableFieldsTitle"
+                      id="wazuh.discover.fieldChooser.filter.availableFieldsTitle"
                       defaultMessage="Available fields"
                     />
                   </h3>
@@ -217,13 +217,13 @@ export function DiscoverSidebar({
                     aria-label={
                       showFields
                         ? i18n.translate(
-                            'discover.fieldChooser.filter.indexAndFieldsSectionHideAriaLabel',
+                            'wazuh.discover.fieldChooser.filter.indexAndFieldsSectionHideAriaLabel',
                             {
                               defaultMessage: 'Hide fields',
                             }
                           )
                         : i18n.translate(
-                            'discover.fieldChooser.filter.indexAndFieldsSectionShowAriaLabel',
+                            'wazuh.discover.fieldChooser.filter.indexAndFieldsSectionShowAriaLabel',
                             {
                               defaultMessage: 'Show fields',
                             }
@@ -242,7 +242,7 @@ export function DiscoverSidebar({
               >
                 <h4 style={{ fontWeight: 'normal' }} id="available_fields_popular">
                   <FormattedMessage
-                    id="discover.fieldChooser.filter.popularTitle"
+                    id="wazuh.discover.fieldChooser.filter.popularTitle"
                     defaultMessage="Popular"
                   />
                 </h4>

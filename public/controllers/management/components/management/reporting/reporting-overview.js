@@ -53,7 +53,7 @@ export class WzReportingOverview extends Component {
                   <EuiTitle>
                     <h2>
                       {i18n.translate(
-                        'controllers.mnage.comp.confi.groups.reports.Reporting',
+                        'wazuh.controllers..mnage.comp.confi.groups.reports.Reporting',
                         {
                           defaultMessage: ' Reporting',
                         },
@@ -69,7 +69,7 @@ export class WzReportingOverview extends Component {
             <EuiFlexItem>
               <EuiText color='subdued' style={{ paddingBottom: '15px' }}>
                 {i18n.translate(
-                  'controllers.mnage.comp.confi.groups.reports.check',
+                  'wazuh.controllers..mnage.comp.confi.groups.reports.check',
                   {
                     defaultMessage: 'From here you can check all your reports.',
                   },

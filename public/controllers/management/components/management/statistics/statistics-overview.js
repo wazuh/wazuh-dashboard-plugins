@@ -167,7 +167,7 @@ export class WzStatisticsOverview extends Component {
                   <EuiTitle>
                     <h2>
                       {i18n.translate(
-                        'controllers.mnage.comp.confi.groups.static.Statistics',
+                        'wazuh.controllers..mnage.comp.confi.groups.static.Statistics',
                         {
                           defaultMessage: 'Statistics',
                         },
@@ -183,7 +183,7 @@ export class WzStatisticsOverview extends Component {
                 onClick={this.refreshVisualizations}
               >
                 {i18n.translate(
-                  'controllers.mnage.comp.confi.groups.static.Refresh',
+                  'wazuh.controllers..mnage.comp.confi.groups.static.Refresh',
                   {
                     defaultMessage: 'Refresh',
                   },
@@ -220,7 +220,7 @@ export class WzStatisticsOverview extends Component {
                 iconSide='left'
               >
                 {i18n.translate(
-                  'controllers.mnage.comp.confi.groups.static.Settings',
+                  'wazuh.controllers..mnage.comp.confi.groups.static.Settings',
                   {
                     defaultMessage: 'Settings',
                   },
@@ -232,7 +232,7 @@ export class WzStatisticsOverview extends Component {
             <EuiFlexItem>
               <EuiText color='subdued'>
                 {i18n.translate(
-                  'controllers.mnage.comp.confi.groups.static.daemon',
+                  'wazuh.controllers..mnage.comp.confi.groups.static.daemon',
                   {
                     defaultMessage: 'From here you can see daemon statistics.',
                   },

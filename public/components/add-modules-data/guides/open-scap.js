@@ -12,188 +12,188 @@
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
 import { i18n } from '@kbn/i18n';
 
-const openName = i18n.translate('components.addModule.guide.openName', {
+const openName = i18n.translate('wazuh.components.addModule.guide.openName', {
   defaultMessage: 'OpenSCAP',
 });
 const openWodleName = i18n.translate(
-  'components.addModule.guide.openWodleName',
+  'wazuh.components.addModule.guide.openWodleName',
   {
     defaultMessage: 'open-scap',
   },
 );
-const openDescp = i18n.translate('components.addModule.guide.openDescp', {
+const openDescp = i18n.translate('wazuh.components.addModule.guide.openDescp', {
   defaultMessage: 'Configuration options of the OpenSCAP wodle.',
 });
-const openCate = i18n.translate('components.addModule.guide.openCate', {
+const openCate = i18n.translate('wazuh.components.addModule.guide.openCate', {
   defaultMessage: 'Auditing and policy monitoring',
 });
-const title = i18n.translate('components.addModule.guide.title', {
+const title = i18n.translate('wazuh.components.addModule.guide.titleSetting', {
   defaultMessage: 'Settings',
 });
-const disName = i18n.translate('components.addModule.guide.disName', {
+const disName = i18n.translate('wazuh.components.addModule.guide.disName', {
   defaultMessage: 'disabled',
 });
-const disDescp = i18n.translate('components.addModule.guide.disDescp', {
+const disDescp = i18n.translate('wazuh.components.addModule.guide.disable.oscap', {
   defaultMessage: 'Disables the OpenSCAP wodle.',
 });
 
-const timeName = i18n.translate('components.addModule.guide.timeName', {
+const timeName = i18n.translate('wazuh.components.addModule.guide.timeName', {
   defaultMessage: 'timeout',
 });
-const timeDescp = i18n.translate('components.addModule.guide.timeDescp', {
+const timeDescp = i18n.translate('wazuh.components.addModule.guide.timeDescp', {
   defaultMessage: 'Timeout for each evaluation in seconds',
 });
-const timePlace = i18n.translate('components.addModule.guide.timePlace', {
+const timePlace = i18n.translate('wazuh.components.addModule.guide.timePlace', {
   defaultMessage: 'Time in seconds',
 });
-const timeError = i18n.translate('components.addModule.guide.timeError', {
+const timeError = i18n.translate('wazuh.components.addModule.guide.timeError', {
   defaultMessage: 'A positive number (seconds)',
 });
 
-const intervalName = i18n.translate('components.addModule.guide.intervalName', {
+const intervalName = i18n.translate('wazuh.components.addModule.guide.intervalName', {
   defaultMessage: 'interval',
 });
 const intervalDescp = i18n.translate(
-  'components.addModule.guide.intervalDescp',
+  'wazuh.components.addModule.guide.intervalDescp.openScap',
   {
     defaultMessage: 'Interval between OpenSCAP executions.',
   },
 );
 const intervalPlace = i18n.translate(
-  'components.addModule.guide.intervalPlace',
+  'wazuh.components.addModule.guide.intervalPlace1',
   {
     defaultMessage: 'Time in format <number><time unit suffix>, e.g.: 1d',
   },
 );
 const intervalError = i18n.translate(
-  'components.addModule.guide.intervalError',
+  'wazuh.components.addModule.guide.oscap.intervalError',
   {
     defaultMessage:
       'A positive number that should contain a suffix character indicating a time unit, such as, s (seconds), m (minutes), h (hours), d (days).',
   },
 );
 const intervalDefault = i18n.translate(
-  'components.addModule.guide.intervalDefault',
+  'wazuh.components.addModule.guide.intervalDefault',
   {
     defaultMessage: '1d',
   },
 );
-const scanName = i18n.translate('components.addModule.guide.scanName', {
+const scanName = i18n.translate('wazuh.components.addModule.guide.scanName', {
   defaultMessage: 'scan-on-start',
 });
-const scanDescp = i18n.translate('components.addModule.guide.scanDescp', {
+const scanDescp = i18n.translate('wazuh.components.addModule.guide.scanDescp', {
   defaultMessage: 'Run evaluation immediately when service is started.',
 });
-const title1 = i18n.translate('components.addModule.guide.title1', {
+const title1 = i18n.translate('wazuh.components.addModule.guide.title.content', {
   defaultMessage: 'Content',
 });
-const title1Descp = i18n.translate('components.addModule.guide.title1Descp', {
+const title1Descp = i18n.translate('wazuh.components.addModule.guide.defineEvaluation', {
   defaultMessage: 'Define evaluation.',
 });
 const contentFileName = i18n.translate(
-  'components.addModule.guide.contentFileName',
+  'wazuh.components.addModule.guide.contentFileName',
   {
     defaultMessage: 'content',
   },
 );
 const contentFileDescp = i18n.translate(
-  'components.addModule.guide.contentFileDescp',
+  'wazuh.components.addModule.guide.contentFileDescp.defineEvaluation',
   {
     defaultMessage: 'Define an evaluation.',
   },
 );
 const contentFileError = i18n.translate(
-  'components.addModule.guide.contentFileError',
+  'wazuh.components.addModule.guide.contentFileError',
   {
     defaultMessage: 'Any directory or file name.',
   },
 );
-const typeName = i18n.translate('components.addModule.guide.typeName', {
+const typeName = i18n.translate('wazuh.components.addModule.guide.typeName', {
   defaultMessage: 'type',
 });
-const typeDescp = i18n.translate('components.addModule.guide.typeDescp', {
+const typeDescp = i18n.translate('wazuh.components.addModule.guide.typeDescp', {
   defaultMessage: 'Select content type: xccdf or oval.',
 });
-const text1 = i18n.translate('components.addModule.guide.text1', {
+const text1 = i18n.translate('wazuh.components.addModule.guide.oscap', {
   defaultMessage: 'xccdf',
 });
-const text2 = i18n.translate('components.addModule.guide.text2', {
+const text2 = i18n.translate('wazuh.components.addModule.guide.oscap.oval', {
   defaultMessage: 'oval',
 });
-const pathName = i18n.translate('components.addModule.guide.pathName', {
+const pathName = i18n.translate('wazuh.components.addModule.guide.pathName', {
   defaultMessage: 'path',
 });
-const pathDescp = i18n.translate('components.addModule.guide.pathDescp', {
+const pathDescp = i18n.translate('wazuh.components.addModule.guide.pathDescp.oscap', {
   defaultMessage: 'Use the specified policy file (DataStream, XCCDF or OVAL).',
 });
-const pathPlace = i18n.translate('components.addModule.guide.pathPlace', {
+const pathPlace = i18n.translate('wazuh.components.addModule.guide.policyFile', {
   defaultMessage: 'Policy file',
 });
-const pathError = i18n.translate('components.addModule.guide.pathError', {
+const pathError = i18n.translate('wazuh.components.addModule.guide.pathError', {
   defaultMessage: 'Use the specified policy file',
 });
-const evaTimeName = i18n.translate('components.addModule.guide.evaTimeName', {
+const evaTimeName = i18n.translate('wazuh.components.addModule.guide.evaTimeName', {
   defaultMessage: 'timeout',
 });
-const evaTimeDescp = i18n.translate('components.addModule.guide.evaTimeDescp', {
+const evaTimeDescp = i18n.translate('wazuh.components.addModule.guide.evaTimeDescp', {
   defaultMessage:
     'Timeout for the evaluation (in seconds).Use of this attribute overwrites the generic timeout.',
 });
-const evaTimePlace = i18n.translate('components.addModule.guide.evaTimePlace', {
+const evaTimePlace = i18n.translate('wazuh.components.addModule.guide.evaTimePlace', {
   defaultMessage: 'Time in seconds',
 });
-const evaTimeError = i18n.translate('components.addModule.guide.evaTimeError', {
+const evaTimeError = i18n.translate('wazuh.components.addModule.guide.oscap.evaTimeError', {
   defaultMessage: 'A positive number',
 });
-const xccName = i18n.translate('components.addModule.guide.xccName', {
+const xccName = i18n.translate('wazuh.components.addModule.guide.xccName', {
   defaultMessage: 'xccdf-id',
 });
-const xccDescp = i18n.translate('components.addModule.guide.xccDescp', {
+const xccDescp = i18n.translate('wazuh.components.addModule.guide.xccDescp', {
   defaultMessage: 'XCCDF id.',
 });
-const xccPlace = i18n.translate('components.addModule.guide.xccPlace', {
+const xccPlace = i18n.translate('wazuh.components.addModule.guide.xccPlace', {
   defaultMessage: 'XCCDF id',
 });
-const ovalName = i18n.translate('components.addModule.guide.ovalName', {
+const ovalName = i18n.translate('wazuh.components.addModule.guide.ovalName', {
   defaultMessage: 'oval-id',
 });
-const ovalDescp = i18n.translate('components.addModule.guide.ovalDescp', {
+const ovalDescp = i18n.translate('wazuh.components.addModule.guide.ovalDescp', {
   defaultMessage: 'OVAL id.',
 });
-const ovalPlace = i18n.translate('components.addModule.guide.ovalPlace', {
+const ovalPlace = i18n.translate('wazuh.components.addModule.guide.ovalPlace', {
   defaultMessage: 'OVAL id',
 });
-const dataName = i18n.translate('components.addModule.guide.dataName', {
+const dataName = i18n.translate('wazuh.components.addModule.guide.dataName', {
   defaultMessage: 'datastream-id',
 });
-const dataDescp = i18n.translate('components.addModule.guide.dataDescp', {
+const dataDescp = i18n.translate('wazuh.components.addModule.guide.dataDescp', {
   defaultMessage: 'Datastream id.',
 });
-const dataPlace = i18n.translate('components.addModule.guide.dataPlace', {
+const dataPlace = i18n.translate('wazuh.components.addModule.guide.dataPlace', {
   defaultMessage: 'Datastream id',
 });
-const cpeName = i18n.translate('components.addModule.guide.cpeName', {
+const cpeName = i18n.translate('wazuh.components.addModule.guide.cpeName', {
   defaultMessage: 'cpe',
 });
-const cpeDescp = i18n.translate('components.addModule.guide.cpeDescp', {
+const cpeDescp = i18n.translate('wazuh.components.addModule.guide.cpeDescp', {
   defaultMessage: 'CPE dictionary file.',
 });
-const cpePlace = i18n.translate('components.addModule.guide.cpePlace', {
+const cpePlace = i18n.translate('wazuh.components.addModule.guide.cpePlace', {
   defaultMessage: '/var/ossec/wodles/oscap/content',
 });
-const cpeError = i18n.translate('components.addModule.guide.cpeError', {
+const cpeError = i18n.translate('wazuh.components.addModule.guide.cpeError', {
   defaultMessage: 'CPE dictionary file.',
 });
-const cpeDefault = i18n.translate('components.addModule.guide.cpeDefault', {
+const cpeDefault = i18n.translate('wazuh.components.addModule.guide.cpeDefault', {
   defaultMessage: '/var/ossec/wodles/oscap/content',
 });
-const profileName = i18n.translate('components.addModule.guide.profileName', {
+const profileName = i18n.translate('wazuh.components.addModule.guide.profileName', {
   defaultMessage: 'profile',
 });
-const profileDescp = i18n.translate('components.addModule.guide.profileDescp', {
+const profileDescp = i18n.translate('wazuh.components.addModule.guide.profileDescp', {
   defaultMessage: 'Select profile.',
 });
-const profilePlace = i18n.translate('components.addModule.guide.profilePlace', {
+const profilePlace = i18n.translate('wazuh.components.addModule.guide.profilePlace', {
   defaultMessage: 'Profile',
 });
 export default {

@@ -18,16 +18,16 @@ import { LogoOffice365 } from '../../../common/logos';
 import { renderValueYesThenEnabled } from '../../../../controllers/management/components/management/configuration/utils/utils';
 import { i18n } from '@kbn/i18n';
 
-const Title1 = i18n.translate('components.addModule.guide.Title1', {
+const Title1 = i18n.translate('wazuh.components.overview.officePanel.tenantId', {
   defaultMessage: 'Tenant ID',
 });
-const Title2 = i18n.translate('components.addModule.guide.Title2', {
+const Title2 = i18n.translate('wazuh.components.overview.officePanel.Title2', {
   defaultMessage: 'Client ID',
 });
-const Title3 = i18n.translate('components.addModule.guide.Title3', {
+const Title3 = i18n.translate('wazuh.components.overview.officePanel.Title3', {
   defaultMessage: 'Client secret',
 });
-const Title4 = i18n.translate('components.addModule.guide.title4', {
+const Title4 = i18n.translate('wazuh.components.overview.officePanel.title4', {
   defaultMessage: 'Path file of client secret',
 });
 const settings = [

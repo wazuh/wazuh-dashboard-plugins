@@ -42,24 +42,24 @@ import { i18n } from "@kbn/i18n";
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 
 const MITRE_ATTACK = 'mitre-attack';
-const Title1 = i18n.translate("components.addModule.guide.title1", {
+const Title1 = i18n.translate("wazuh.components.overview.mitre.title.action", {
   defaultMessage: "Actions",
 });
-const Title2 = i18n.translate("components.addModule.guide.title2", {
+const Title2 = i18n.translate("wazuh.components.overview.mitre.title2", {
   defaultMessage: "Mitre techniques could not be fetched",
 });
-const Title3 = i18n.translate("components.addModule.guide.title3", {
+const Title3 = i18n.translate("wazuh.components.overview.mitre.title3", {
   defaultMessage: "There are no results.",
 });
 
 
-const Name1 = i18n.translate("components.addModule.guide.Name1", {
+const Name1 = i18n.translate("wazuh.components.overview.mitre.Name1", {
   defaultMessage: "Filter for value",
 });
-const Name2 = i18n.translate("components.addModule.guide.Name2", {
+const Name2 = i18n.translate("wazuh.components.overview.mitre.Name2", {
   defaultMessage: "Filter out value",
 });
-const Name3 = i18n.translate("components.addModule.guide.Name3", {
+const Name3 = i18n.translate("wazuh.components.overview.mitre.Name3", {
   defaultMessage: "View technique details",
 });
 export const Techniques = withWindowSize(
@@ -538,7 +538,7 @@ export const Techniques = withWindowSize(
             <EuiFlexItem grow={true}>
               <EuiTitle size="m">
                 <h1>{
-                  i18n.translate("components.overview.Techniques", {
+                  i18n.translate("wazuh.components.overview.Techniques", {
                     defaultMessage: "Techniques",
                   })}
                 </h1>
@@ -550,7 +550,7 @@ export const Techniques = withWindowSize(
                 <EuiFlexItem grow={false}>
                   <EuiText grow={false}>
                     <span>{
-                      i18n.translate("components.overview.Hidetechniques.alerts", {
+                      i18n.translate("wazuh.components.overview.Hidetechniques.alerts", {
                         defaultMessage: "Hide techniques with no alerts",
                       })} </span> &nbsp;
                     <EuiSwitch

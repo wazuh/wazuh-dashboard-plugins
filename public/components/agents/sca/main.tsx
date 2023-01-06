@@ -41,7 +41,7 @@ export const MainSca = compose(
       !(props.currentAgentData && props.currentAgentData.id && props.agent),
     () => (
       <PromptNoSelectedAgent
-        body={i18n.translate('components.agent.main.agentSelect', {
+        body={i18n.translate('wazuh.components.agent.main.agentSelect', {
           defaultMessage:
             'You need to select an agent to see Security Configuration Assessment inventory.',
         })}
@@ -56,10 +56,10 @@ export const MainSca = compose(
     },
     () => (
       <PromptSelectAgent
-        title={i18n.translate('components.agent.main.agentNeverConnectTitle', {
+        title={i18n.translate('wazuh.components.agent.main.agentNeverConnectTitle', {
           defaultMessage: 'Agent has never connected',
         })}
-        body={i18n.translate('components.agent.main.agentNeverConnectBody', {
+        body={i18n.translate('wazuh.components.agent.main.agentNeverConnectBody', {
           defaultMessage:
             'The agent has never been connected please select another',
         })}

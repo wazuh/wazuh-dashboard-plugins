@@ -445,12 +445,12 @@ export const RegisterAgent = withErrorBoundary(
       );
       const textAndLinkToCheckConnectionDocumentation = (
         <p>
-          {i18n.translate('controllers.sgent.components.server', {
+          {i18n.translate('wazuh.controllers.sgent.components.server', {
             defaultMessage:
               'To verify the connection with the Wazuh server, please follow this',
           })}{' '}
           <a href={urlCheckConnectionDocumentation} target='_blank'>
-            {i18n.translate('controllers.sgent.componentsfqdn.', {
+            {i18n.translate('wazuh.controllers.sgent.componentsfqdn.', {
               defaultMessage: 'document.',
             })}
           </a>
@@ -460,7 +460,7 @@ export const RegisterAgent = withErrorBoundary(
       const ipInput = (
         <EuiText>
           <p>
-            {i18n.translate('controllers.sgent.components.fqdn', {
+            {i18n.translate('wazuh.controllers.sgent.components.fqdn', {
               defaultMessage:
                 'This is the address the agent uses to communicate with the Wazuhserver. It can be an IP address or a fully qualified domain name(FQDN).',
             })}
@@ -487,7 +487,7 @@ export const RegisterAgent = withErrorBoundary(
           )}
           <EuiText>
             <p>
-              {i18n.translate('controllers.sgent.components.select', {
+              {i18n.translate('wazuh.controllers.sgent.components.select', {
                 defaultMessage: 'Select one or more existing groups',
               })}
             </p>
@@ -551,7 +551,7 @@ export const RegisterAgent = withErrorBoundary(
             <ul class='wz-callout-list'>
               <li>
                 <span>
-                  {i18n.translate('controllers.sgent.components.admin', {
+                  {i18n.translate('wazuh.controllers.sgent.components.admin', {
                     defaultMessage:
                       'You will need administrator privileges to perform this installation.',
                   })}
@@ -559,7 +559,7 @@ export const RegisterAgent = withErrorBoundary(
               </li>
               <li>
                 <span>
-                  {i18n.translate('controllers.sgent.components.powershell', {
+                  {i18n.translate('wazuh.controllers.sgent.components.powershell', {
                     defaultMessage: 'PowerShell 3.0 or greater is required',
                   })}
                   .
@@ -567,7 +567,7 @@ export const RegisterAgent = withErrorBoundary(
               </li>
             </ul>
             <p>
-              {i18n.translate('controllers.sgent.components.terminal', {
+              {i18n.translate('wazuh.controllers.sgent.components.terminal', {
                 defaultMessage:
                   'Keep in mind you need to run this command in a Windows PowerShell terminal.',
               })}
@@ -603,7 +603,7 @@ export const RegisterAgent = withErrorBoundary(
             this.state.selectedOS && (
               <EuiText>
                 <p>
-                  {i18n.translate('controllers.sgent.components.hosts', {
+                  {i18n.translate('wazuh.controllers.sgent.components.hosts', {
                     defaultMessage:
                       'You can use this command to install and enroll the Wazuh agent in one or more hosts.',
                   })}
@@ -613,7 +613,7 @@ export const RegisterAgent = withErrorBoundary(
                   title={
                     <>
                       {i18n.translate(
-                        'controllers.sgent.components.installer',
+                        'wazuh.controllers..sgent.components.installer',
                         {
                           defaultMessage:
                             'If the installer finds another Wazuh agent in the system,it will upgrade it preserving the configuration.',
@@ -637,7 +637,7 @@ export const RegisterAgent = withErrorBoundary(
                         <p>
                           <EuiIcon type='copy' />{' '}
                           {i18n.translate(
-                            'controllers.sgent.components.Copycommand',
+                            'wazuh.controllers..sgent.components.Copycommand',
                             {
                               defaultMessage: 'Copy command',
                             },
@@ -679,7 +679,7 @@ export const RegisterAgent = withErrorBoundary(
                         <p>
                           <EuiIcon type='copy' />{' '}
                           {i18n.translate(
-                            'controllers.sgent.components.Copycommand',
+                            'wazuh.controllers..sgent.components.Copycommand',
                             {
                               defaultMessage: 'Copy command',
                             },
@@ -712,7 +712,7 @@ export const RegisterAgent = withErrorBoundary(
                         <p>
                           <EuiIcon type='copy' />{' '}
                           {i18n.translate(
-                            'controllers.sgent.components.Copycommand',
+                            'wazuh.controllers..sgent.components.Copycommand',
                             {
                               defaultMessage: 'Copy command',
                             },
@@ -877,7 +877,7 @@ export const RegisterAgent = withErrorBoundary(
                               <p>
                                 <EuiIcon type='copy' />{' '}
                                 {i18n.translate(
-                                  'controllers.sgent.components.Copycommand',
+                                  'wazuh.controllers..sgent.components.Copycommand',
                                   {
                                     defaultMessage: 'Copy command',
                                   },
@@ -906,7 +906,7 @@ export const RegisterAgent = withErrorBoundary(
                         <EuiTitle>
                           <h2>
                             {i18n.translate(
-                              'controllers.sgent.components.deploy',
+                              'wazuh.controllers..sgent.components.deploy',
                               {
                                 defaultMessage: 'Deploy a new agent',
                               },
@@ -922,7 +922,7 @@ export const RegisterAgent = withErrorBoundary(
                             iconType='cross'
                           >
                             {i18n.translate(
-                              'controllers.sgent.components.Close',
+                              'wazuh.controllers..sgent.components.Close',
                               {
                                 defaultMessage: 'Close',
                               },
@@ -936,7 +936,7 @@ export const RegisterAgent = withErrorBoundary(
                             iconType='refresh'
                           >
                             {i18n.translate(
-                              'controllers.sgent.components.Refresh',
+                              'wazuh.controllers..sgent.components.Refresh',
                               {
                                 defaultMessage: 'Refresh',
                               },

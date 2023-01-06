@@ -26,13 +26,13 @@ import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { WzFlyout } from '../../common/flyouts';
 import { i18n } from '@kbn/i18n';
-const Descp1 = i18n.translate("components.addModule.guide.Descp1", {
+const Descp1 = i18n.translate("wazuh.components.security.roles.Descp1", {
   defaultMessage: "At least one policy must be selected.",
 });
-const Descp2 = i18n.translate("components.addModule.guide.Descp2", {
+const Descp2 = i18n.translate("wazuh.components.security.roles.Descp2", {
   defaultMessage: "Assign policies to the role.",
 });
-const Descp3 = i18n.translate("components.addModule.guide.Descp3", {
+const Descp3 = i18n.translate("wazuh.components.security.roles.Descp3", {
   defaultMessage: "Select policies",
 });
 const reservedRoles = [
@@ -159,7 +159,7 @@ export const EditRole = ({ role, closeFlyout }) => {
         >
           <p style={{ textAlign: 'center' }}>
             {
-              i18n.translate("components.overview.role.sure", {
+              i18n.translate("wazuh.components.overview.role.sure", {
                 defaultMessage: "There are unsaved changes. Are you sure you want to proceed?",
               })
             }
@@ -182,14 +182,14 @@ export const EditRole = ({ role, closeFlyout }) => {
           <EuiTitle size="m">
             <h2>
               {
-                i18n.translate("components.overview.role.Edit", {
+                i18n.translate("wazuh.components.overview.role.Edit", {
                   defaultMessage: "Edit",
                 })} {role.name} {
-                i18n.translate("components.overview.rolerole", {
+                i18n.translate("wazuh.components.overview.rolerole", {
                   defaultMessage: "role",
                 })} &nbsp;
                             {isReserved && <EuiBadge color="primary">{
-                i18n.translate("components.overview.rolerole.Reserved", {
+                i18n.translate("wazuh.components.overview.rolerole.Reserved", {
                   defaultMessage: "Reserved",
                 })}</EuiBadge>}
             </h2>
@@ -224,7 +224,7 @@ export const EditRole = ({ role, closeFlyout }) => {
                   onClick={addPolicy}
                 >
                   {
-                    i18n.translate("components.overview.role.Addpolicy", {
+                    i18n.translate("wazuh.components.overview.role.Addpolicy", {
                       defaultMessage: "Add policy",
                     })
                   }

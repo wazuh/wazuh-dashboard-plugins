@@ -447,7 +447,7 @@ export default compose(
             <EuiFlexItem>
               <EuiTitle size={'m'}>
                 <h2>
-                  {i18n.translate('controllers.mnage.comp.confi.groups.Logs', {
+                  {i18n.translate('wazuh.controllers.mnage.comp.confi.groups.Logs', {
                     defaultMessage: 'Logs',
                   })}
                 </h2>
@@ -462,7 +462,7 @@ export default compose(
                     isLoading={this.state.generatingCsv}
                   >
                     {i18n.translate(
-                      'controllers.mnage.comp.confi.groups.export',
+                      'wazuh.controllers..mnage.comp.confi.groups.export',
                       {
                         defaultMessage: 'Export formatted',
                       },
@@ -476,7 +476,7 @@ export default compose(
             <EuiFlexItem>
               <EuiTextColor color='subdued'>
                 <p>
-                  {i18n.translate('controllers.mnage.comp.confi.groups.list', {
+                  {i18n.translate('wazuh.controllers.mnage.comp.confi.groups.list', {
                     defaultMessage: 'List and filter Wazuh logs.',
                   })}
                 </p>

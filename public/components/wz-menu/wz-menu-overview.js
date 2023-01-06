@@ -308,7 +308,7 @@ class WzMenuOverview extends Component {
                       window.location.href = '#/overview';
                     }}
                   >
-                    {i18n.translate('components.wz.menu.Modulesdirectory', {
+                    {i18n.translate('wazuh.components.wz.menu.Modulesdirectory', {
                       defaultMessage: 'Modules directory',
                     })}
                   </EuiButtonEmpty>

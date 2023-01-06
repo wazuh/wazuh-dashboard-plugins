@@ -24,10 +24,10 @@ import { isString } from '../utils/utils';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
-const text1 = i18n.translate('controller.manage.comp.cluster.text1', {
+const text1 = i18n.translate('wazuh.controller.manage.comp.cluster.text1', {
   defaultMessage: 'Configuring a Wazuh cluster',
 });
-const text2 = i18n.translate('controller.manage.comp.cluster.text2', {
+const text2 = i18n.translate('wazuh.controller.manage.comp.cluster.text2', {
   defaultMessage: 'Wazuh cluster reference',
 });
 const mainSettings = [

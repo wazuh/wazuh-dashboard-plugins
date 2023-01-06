@@ -40,7 +40,7 @@ import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { getPluginDataPath } from '../../../../common/plugin';
 import { i18n } from '@kbn/i18n';
 
-const Title1 = i18n.translate('components.addModule.guide.Title1', {
+const Title1 = i18n.translate('wazuh.components.addModule.guide.wazuhApiServiceStatus', {
   defaultMessage: 'Check the Wazuh API service status',
 });
 export const ApiIsDown = withErrorBoundary(
@@ -149,11 +149,11 @@ hosts:
       const checkConnectionChildren = (
         <div>
           <EuiText>
-            {i18n.translate('components.setting.api.down.that', {
+            {i18n.translate('wazuh.components.setting.api.down.that', {
               defaultMessage: 'Check that the ',
             })}
             {PLUGIN_PLATFORM_NAME}{' '}
-            {i18n.translate('components.setting.api.down.wazuhapi', {
+            {i18n.translate('wazuh.components.setting.api.down.wazuhapi', {
               defaultMessage: 'server can reach the configured Wazuh API',
             })}
             (s).
@@ -163,7 +163,7 @@ hosts:
             onClick={async () => await this.checkConnection()}
             isLoading={this.state.fetchingData}
           >
-            {i18n.translate('components.setting.api.down.check', {
+            {i18n.translate('wazuh.components.setting.api.down.check', {
               defaultMessage: 'Check connection',
             })}
           </EuiButton>
@@ -175,7 +175,7 @@ hosts:
             )}
           <EuiSpacer />
           <EuiText>
-            {i18n.translate('components.setting.api.down.already', {
+            {i18n.translate('wazuh.components.setting.api.down.already', {
               defaultMessage: 'Already configured Wazuh API',
             })}
             (s)
@@ -196,7 +196,7 @@ hosts:
                     if (item) {
                       return item === 'online' ? (
                         <EuiHealth color='success'>
-                          {i18n.translate('components.setting.api.down.', {
+                          {i18n.translate('wazuh.components.setting.api.down.', {
                             defaultMessage: 'Empty field',
                           })}
                           Online
@@ -205,7 +205,7 @@ hosts:
                         <span>
                           <EuiHealth color='warning'>
                             {i18n.translate(
-                              'components.setting.api.down.Warning',
+                              'wazuh.component.setting.api.down.Warning',
                               {
                                 defaultMessage: 'Warning',
                               },
@@ -227,7 +227,7 @@ hosts:
                         <span>
                           <EuiHealth color='danger'>
                             {i18n.translate(
-                              'components.setting.api.down.Offline',
+                              'wazuh.component.setting.api.down.Offline',
                               {
                                 defaultMessage: 'Offline',
                               },
@@ -274,25 +274,25 @@ hosts:
           children: (
             <div>
               <EuiText>
-                {i18n.translate('components.setting.api.down.systemd', {
+                {i18n.translate('wazuh.components.setting.api.down.systemd', {
                   defaultMessage: 'For Systemd',
                 })}
               </EuiText>
               <EuiSpacer />
               <EuiCode>
-                {i18n.translate('components.setting.api.down.manager', {
+                {i18n.translate('wazuh.components.setting.api.down.manager', {
                   defaultMessage: '$ sudo systemctl status wazuh-manager',
                 })}
               </EuiCode>
               <EuiSpacer />
               <EuiText>
-                {i18n.translate('components.setting.api.down.sysv', {
+                {i18n.translate('wazuh.components.setting.api.down.sysv', {
                   defaultMessage: 'For SysV Init',
                 })}
               </EuiText>
               <EuiSpacer />
               <EuiCode>
-                {i18n.translate('components.setting.api.down.sudo', {
+                {i18n.translate('wazuh.components.setting.api.down.sudo', {
                   defaultMessage: '$ sudo service wazuh-manager status',
                 })}
               </EuiCode>
@@ -304,11 +304,11 @@ hosts:
           children: (
             <div>
               <EuiText>
-                {i18n.translate('components.setting.api.down.reviewset', {
+                {i18n.translate('wazuh.components.setting.api.down.reviewset', {
                   defaultMessage: 'Review the settings in the',
                 })}{' '}
                 <EuiCode>{getPluginDataPath('config/wazuh.yml')}</EuiCode>{' '}
-                {i18n.translate('components.setting.api.down.', {
+                {i18n.translate('wazuh.components.setting.api.down.', {
                   defaultMessage: 'Empty field',
                 })}
                 file.
@@ -331,7 +331,7 @@ hosts:
             <EuiPanel>
               <EuiText>
                 <h2>
-                  {i18n.translate('components.setting.api.down.wazuh', {
+                  {i18n.translate('wazuh.components.setting.api.down.wazuh', {
                     defaultMessage: ' Wazuh API seems to be down',
                   })}
                 </h2>

@@ -16,70 +16,70 @@ import { getToasts } from '../../../kibana-services';
 import { ApiCheck, AppState, GenericRequest } from '../../../react-services';
 import { CheckLogger } from '../types/check_logger';
 import { i18n } from '@kbn/i18n';
-const descp1 = i18n.translate('components.addModule.guide.descp1', {
+const descp1 = i18n.translate('wazuh.components.healthCheck.descp1', {
   defaultMessage: 'Getting API hosts...',
 });
-const descp2 = i18n.translate('components.addModule.guide.descp2', {
+const descp2 = i18n.translate('wazuh.components.healthCheck.descp2', {
   defaultMessage: 'API hosts found:',
 });
-const descp3 = i18n.translate('components.addModule.guide.descp3', {
+const descp3 = i18n.translate('wazuh.components.healthCheck.descp3', {
   defaultMessage: 'Checking API host id',
 });
-const descp4 = i18n.translate('components.addModule.guide.descp4', {
+const descp4 = i18n.translate('wazuh.components.healthCheck.descp4', {
   defaultMessage: 'Could not connect to API id',
 });
-const descp5 = i18n.translate('components.addModule.guide.descp5', {
+const descp5 = i18n.translate('wazuh.components.healthCheck.descp5', {
   defaultMessage: 'No API available to connect',
 });
-const descp6 = i18n.translate('components.addModule.guide.descp6', {
+const descp6 = i18n.translate('wazuh.components.healthCheck.descp6', {
   defaultMessage: 'No API configuration found',
 });
-const descp7 = i18n.translate('components.addModule.guide.descp7', {
+const descp7 = i18n.translate('wazuh.components.healthCheck.descp7', {
   defaultMessage: 'Error connecting to API:',
 });
-const descp8 = i18n.translate('components.addModule.guide.descp8', {
+const descp8 = i18n.translate('wazuh.components.healthCheck.descp8', {
   defaultMessage: 'No current API selected',
 });
-const descp9 = i18n.translate('components.addModule.guide.descp9', {
+const descp9 = i18n.translate('wazuh.components.healthCheck.descp9', {
   defaultMessage: 'Current API id',
 });
-const descp10 = i18n.translate('components.addModule.guide.regkeydescp', {
+const descp10 = i18n.translate('wazuh.components.healthCheck.regkeydescp', {
   defaultMessage: 'Filter by check reason',
 });
-const descp11 = i18n.translate('components.addModule.guide.regkeydescp11', {
+const descp11 = i18n.translate('wazuh.components.healthCheck.regkeydescp11', {
   defaultMessage: 'Checking current API id',
 });
-const descp12 = i18n.translate('components.addModule.guide.regkeydescp12', {
+const descp12 = i18n.translate('wazuh.components.healthCheck.regkeydescp12', {
   defaultMessage: 'have some problem',
 });
-const descp13 = i18n.translate('components.addModule.guide.regkeydescp13', {
+const descp13 = i18n.translate('wazuh.components.healthCheck.regkeydescp13', {
   defaultMessage: 'API host id',
 });
-const descp14 = i18n.translate('components.addModule.guide.regkeydescp14', {
+const descp14 = i18n.translate('wazuh.components.healthCheck.regkeydescp14', {
   defaultMessage: 'available',
 });
-const descp15 = i18n.translate('components.addModule.guide.regkeydescp15', {
+const descp15 = i18n.translate('wazuh.components.healthCheck.regkeydescp15', {
   defaultMessage: 'Set current API in cookie: id',
 });
-const descp16 = i18n.translate('components.addModule.guide.regkeydescp16', {
+const descp16 = i18n.translate('wazuh.components.healthCheck.regkeydescp16', {
   defaultMessage: 'name',
 });
-const descp17 = i18n.translate('components.addModule.guide.regkeydescp17', {
+const descp17 = i18n.translate('wazuh.components.healthCheck.regkeydescp17', {
   defaultMessage: 'Selected Wazuh API has been updated',
 });
-const descp18 = i18n.translate('components.addModule.guide.regkeydescp18', {
+const descp18 = i18n.translate('wazuh.components.healthCheck.regkeydescp18', {
   defaultMessage: 'Set cluster info in cookie',
 });
-const descp19 = i18n.translate('components.addModule.guide.regkeydescp19', {
+const descp19 = i18n.translate('wazuh.components.healthCheck.regkeydescp19', {
   defaultMessage: 'Wazuh not ready yet',
 });
-const descp20 = i18n.translate('components.addModule.guide.regkeydescp20', {
+const descp20 = i18n.translate('wazuh.components.healthCheck.regkeydescp20', {
   defaultMessage: 'Wazuh API is down',
 });
-const descp21 = i18n.translate('components.addModule.guide.regkeydescp21', {
+const descp21 = i18n.translate('wazuh.components.healthCheck.regkeydescp21', {
   defaultMessage: 'Error connecting to the API:',
 });
-const descp22 = i18n.translate('components.addModule.guide.regkeydescp22', {
+const descp22 = i18n.translate('wazuh.components.healthCheck.regkeydescp22', {
   defaultMessage: 'Removed [navigate] cookie',
 });
 const trySetDefault = async (checkLogger: CheckLogger) => {

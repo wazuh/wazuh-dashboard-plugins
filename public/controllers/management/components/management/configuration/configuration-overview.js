@@ -35,43 +35,43 @@ import { isString, isFunction } from './utils/utils';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 import { API_NAME_AGENT_STATUS } from '../../../../../../common/constants';
 import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
-const name1 = i18n.translate('controllers.manage.confi.overview.name1', {
+const name1 = i18n.translate('wazuh.controllers.manage.confi.overview.name1', {
   defaultMessage: 'Name',
 });
-const name2 = i18n.translate('controllers.manage.confi.overview.name2', {
+const name2 = i18n.translate('wazuh.controllers.manage.confi.overview.name2', {
   defaultMessage: 'Description',
 });
-const text1 = i18n.translate('controllers.manage.confi.overview.text1', {
+const text1 = i18n.translate('wazuh.controllers.manage.confi.overview.text1', {
   defaultMessage: 'Wazuh server administration',
 });
-const text2 = i18n.translate('controllers.manage.confi.overview.text2', {
+const text2 = i18n.translate('wazuh.controllers.manage.confi.overview.text2', {
   defaultMessage: 'Wazuh capabilities',
 });
-const text3 = i18n.translate('controllers.manage.confi.overview.text3', {
+const text3 = i18n.translate('wazuh.controllers.manage.confi.overview.text3', {
   defaultMessage: 'Local configuration reference',
 });
-const action1 = i18n.translate('controllers.manage.confi.overview.action1', {
+const action1 = i18n.translate('wazuh.controllers.manage.confi.overview.action1', {
   defaultMessage: 'cluster:status',
 });
-const action2 = i18n.translate('controllers.manage.confi.overview.action2', {
+const action2 = i18n.translate('wazuh.controllers.manage.confi.overview.action2', {
   defaultMessage: 'cluster:update_config',
 });
-const action3 = i18n.translate('controllers.manage.confi.overview.action3', {
+const action3 = i18n.translate('wazuh.controllers.manage.confi.overview.action3', {
   defaultMessage: 'manager:update_config',
 });
-const action4 = i18n.translate('controllers.manage.confi.overview.action4', {
+const action4 = i18n.translate('wazuh.controllers.manage.confi.overview.action4', {
   defaultMessage: 'edit-configuration',
 });
-const action5 = i18n.translate('controllers.manage.confi.overview.action5', {
+const action5 = i18n.translate('wazuh.controllers.manage.confi.overview.action5', {
   defaultMessage: ' Cluster',
 });
-const action6 = i18n.translate('controllers.manage.confi.overview.action6', {
+const action6 = i18n.translate('wazuh.controllers.manage.confi.overview.action6', {
   defaultMessage: 'Manager',
 });
-const action7 = i18n.translate('controllers.manage.confi.overview.action7', {
+const action7 = i18n.translate('wazuh.controllers.manage.confi.overview.action7', {
   defaultMessage: 'Cron prefix',
 });
-const action8 = i18n.translate('controllers.manage.confi.overview.action8', {
+const action8 = i18n.translate('wazuh.controllers.manage.confi.overview.action8', {
   defaultMessage: 'configuration',
 });
 const columns = [
@@ -141,7 +141,7 @@ class WzConfigurationOverview extends Component {
           <EuiFlexItem>
             <EuiTitle>
               <span>
-                {i18n.translate('controllers.mnage.comp.confi.Configuration', {
+                {i18n.translate('wazuh.controllers.mnage.comp.confi.Configuration', {
                   defaultMessage: 'Configuration',
                 })}{' '}
                 {this.props.agent.id !== '000' && (
@@ -187,7 +187,7 @@ class WzConfigurationOverview extends Component {
                     }
                   >
                     {i18n.translate(
-                      'controllers.mnage.comp.confi.Editconfiguration',
+                      'wazuh.controllers..mnage.comp.confi.Editconfiguration',
                       {
                         defaultMessage: 'Edit configuration',
                       },

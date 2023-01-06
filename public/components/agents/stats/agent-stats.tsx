@@ -47,25 +47,25 @@ import {
   UI_LOGGER_LEVELS,
 } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
-const title1 = i18n.translate('components.addModule.guide.title1', {
+const title1 = i18n.translate('wazuh.components.addModule.guide.statusText', {
   defaultMessage: 'Status',
 });
-const title2 = i18n.translate('components.addModule.guide.title2', {
+const title2 = i18n.translate('wazuh.components.agents.stats.title2', {
   defaultMessage: 'Buffer',
 });
-const title3 = i18n.translate('components.addModule.guide.title3', {
+const title3 = i18n.translate('wazuh.components.agents.stats.title3', {
   defaultMessage: 'Message buffer',
 });
-const title4 = i18n.translate('components.addModule.guide.title4', {
+const title4 = i18n.translate('wazuh.components.agents.stats.title4', {
   defaultMessage: 'Messages count',
 });
-const title5 = i18n.translate('components.addModule.guide.title5', {
+const title5 = i18n.translate('wazuh.components.agents.stats.title5', {
   defaultMessage: 'Messages sent',
 });
-const title6 = i18n.translate('components.addModule.guide.title6', {
+const title6 = i18n.translate('wazuh.components.agents.stats.title6', {
   defaultMessage: 'Last ack',
 });
-const title7 = i18n.translate('components.addModule.guide.title7', {
+const title7 = i18n.translate('wazuh.components.agents.stats.title7', {
   defaultMessage: 'Last keep alive',
 });
 const tableColumns = [

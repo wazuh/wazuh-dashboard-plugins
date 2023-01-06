@@ -289,7 +289,7 @@ class WzRulesetEditor extends Component {
           >
             <p style={{ textAlign: 'center' }}>
               {i18n.translate(
-                'controllers.mnage.comp.confi.groups.ruleset.proceed',
+                'wazuh.controllers..mnage.comp.confi.groups.ruleset.proceed',
                 {
                   defaultMessage:
                     'There are unsaved changes. Are you sure you want to proceed?',

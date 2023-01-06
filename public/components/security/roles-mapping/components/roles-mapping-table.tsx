@@ -93,7 +93,7 @@ export const RolesMappingTable = ({ rolesEquivalences, rules, loading, editRule,
             return(
               <EuiFlexGroup>
               <EuiBadge color="primary">{
-                i18n.translate("components.overview.mitre.Reserved", {
+                i18n.translate("wazuh.components.overview.mitre.Reserved", {
                   defaultMessage: "Reserved",
                 })}
                 </EuiBadge>
@@ -105,7 +105,7 @@ export const RolesMappingTable = ({ rolesEquivalences, rules, loading, editRule,
           }
           else
             return <EuiBadge color="primary">{
-              i18n.translate("components.overview.mitre.Reserved1", {
+              i18n.translate("wazuh.components.overview.mitre.Reserved1", {
                 defaultMessage: "Reserved",
               })}</EuiBadge>;
         }

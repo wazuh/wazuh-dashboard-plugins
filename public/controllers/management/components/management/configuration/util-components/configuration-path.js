@@ -68,7 +68,7 @@ class WzConfigurationPath extends Component {
             confirmButtonText='Yes, do it'
           >
             <p style={{ textAlign: 'center' }}>
-              {i18n.translate('controllers.sgent.components.proceed', {
+              {i18n.translate('wazuh.controllers.sgent.components.proceed', {
                 defaultMessage:
                   'There are unsaved changes. Are you sure you want to proceed?',
               })}

@@ -86,7 +86,7 @@ export const Roles = () => {
         <EuiPageContentHeaderSection>
           <EuiTitle>
             <h2>{
-              i18n.translate("components.overview.Roles", {
+              i18n.translate("wazuh.components.overview.Roles", {
                 defaultMessage: "Roles",
               })}
             </h2>
@@ -100,7 +100,7 @@ export const Roles = () => {
             <EuiButton
               onClick={() => setIsFlyoutVisible(true)}>
               {
-                i18n.translate("components.overview.Createrole", {
+                i18n.translate("wazuh.components.overview.Createrole", {
                   defaultMessage: "Create role",
                 })}
             </EuiButton>

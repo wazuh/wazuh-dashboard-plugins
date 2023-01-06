@@ -14,16 +14,16 @@
  */
 import { i18n } from '@kbn/i18n';
 
-const title1 = i18n.translate('components.addModule.guide.title1', {
+const title1 = i18n.translate('wazuh.components.overview.githubPanel.config.actor', {
   defaultMessage: 'Actor',
 });
-const title2 = i18n.translate('components.addModule.guide.title2', {
+const title2 = i18n.translate('wazuh.components.overview.githubPanel.config.title2', {
   defaultMessage: 'Organization',
 });
-const title3 = i18n.translate('components.addModule.guide.title3', {
+const title3 = i18n.translate('wazuh.components.overview.githubPanel.config.title3', {
   defaultMessage: 'Repository',
 });
-const title4 = i18n.translate('components.addModule.guide.title4', {
+const title4 = i18n.translate('wazuh.components.overview.githubPanel.config.title4', {
   defaultMessage: 'Action',
 });
 export const filtersValues = [

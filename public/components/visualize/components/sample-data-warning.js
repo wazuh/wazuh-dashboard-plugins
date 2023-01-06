@@ -17,7 +17,7 @@ import { WzRequest } from '../../../react-services';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { i18n } from '@kbn/i18n';
 
-const Title1 = i18n.translate('components.addModule.guide.Title1', {
+const Title1 = i18n.translate('wazuh.components.addModule.guide.dashboardSampleData', {
   defaultMessage: 'This dashboard contains sample data',
 });
 export const SampleDataWarning = ({ ...props }) => {

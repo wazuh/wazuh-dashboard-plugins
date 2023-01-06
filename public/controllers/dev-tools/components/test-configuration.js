@@ -26,7 +26,7 @@ import {
 import { DynamicHeight } from '../../../utils/dynamic-height';
 import 'brace/theme/textmate';
 import 'brace/ext/searchbox';
-const title1 = i18n.translate('controller.dev.tool.comp.valid', {
+const title1 = i18n.translate('wazuh.controller.dev.tool.comp.valid', {
   defaultMessage: 'The configuration is valid!',
 });
 export class TestConfiguration extends Component {
@@ -106,7 +106,7 @@ export class TestConfiguration extends Component {
                   this.validate();
                 }}
               >
-                {i18n.translate('controller.dev.tool.comp.validate', {
+                {i18n.translate('wazuh.controller.dev.tool.comp.validate', {
                   defaultMessage: 'Validate',
                 })}
               </EuiButton>

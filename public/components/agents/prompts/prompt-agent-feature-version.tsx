@@ -13,7 +13,7 @@
 import React from 'react';
 import { EuiEmptyPrompt } from '@elastic/eui';
 import { i18n } from '@kbn/i18n';
-const agentDescp = i18n.translate('components.addModule.guide.agentDescp', {
+const agentDescp = i18n.translate('wazuh.components.addModule.guide.agentDescp', {
   defaultMessage: "Agent doesn't support this feature",
 });
 export const PromptAgentFeatureVersion = ({

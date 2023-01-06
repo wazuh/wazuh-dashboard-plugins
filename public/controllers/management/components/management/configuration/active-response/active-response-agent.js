@@ -26,13 +26,13 @@ import { connect } from 'react-redux';
 import { isString, renderValueNoThenEnabled } from '../utils/utils';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 const text2 = i18n.translate(
-  'controller.manage.comp.confi.setting.active.text2',
+  'wazuh.controller.manage.comp.confi.setting.active.text2',
   {
     defaultMessage: 'Active response documentation',
   },
 );
 const text3 = i18n.translate(
-  'controller.manage.comp.confi.setting.active.text3',
+  'wazuh.controller.manage.comp.confi.setting.active.text3',
   {
     defaultMessage: 'Active response reference',
   },

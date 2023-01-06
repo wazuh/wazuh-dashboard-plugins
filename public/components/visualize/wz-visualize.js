@@ -43,13 +43,13 @@ import { satisfyPluginPlatformVersion } from '../../../common/semver';
 import { webDocumentationLink } from '../../../common/services/web_documentation';
 import { i18n } from '@kbn/i18n';
 
-const Title1 = i18n.translate('components.addModule.guide.Title1', {
+const Title1 = i18n.translate('wazuh.components.visualize.moreInfo', {
   defaultMessage: 'More information in Wazuh documentation',
 });
-const Title2 = i18n.translate('components.addModule.guide.Title2', {
+const Title2 = i18n.translate('wazuh.components.visualize.Title2', {
   defaultMessage: 'Found unknown fields in the index pattern.',
 });
-const Title3 = i18n.translate('components.addModule.guide.Title3', {
+const Title3 = i18n.translate('wazuh.components.visualize.Title3', {
   defaultMessage: 'More information in Wazuh documentation',
 });
 const visHandler = new VisHandlers();
@@ -174,7 +174,7 @@ export const WzVisualize = compose(
           text: toMountPoint(
             <EuiFlexGroup justifyContent='flexEnd' gutterSize='s'>
               <EuiFlexItem grow={false}>
-                {i18n.translate('components.visualize.wz.unkown', {
+                {i18n.translate('wazuh.components.visualize.wz.unkown', {
                   defaultMessage:
                     'There were some unknown fields for the current index pattern.You need to refresh the page to apply the changes.',
                 })}
@@ -186,14 +186,14 @@ export const WzVisualize = compose(
                   )}
                   target='documentation'
                 >
-                  {i18n.translate('components.visualize.wz.Troubleshooting', {
+                  {i18n.translate('wazuh.components.visualize.wz.Troubleshooting', {
                     defaultMessage: 'Troubleshooting',
                   })}
                 </a>
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
                 <EuiButton onClick={() => window.location.reload()} size='s'>
-                  {i18n.translate('components.visualize.wz.Reloadpage', {
+                  {i18n.translate('wazuh.components.visualize.wz.Reloadpage', {
                     defaultMessage: 'Reload page',
                   })}
                 </EuiButton>
@@ -209,7 +209,7 @@ export const WzVisualize = compose(
           text: toMountPoint(
             <EuiFlexGroup justifyContent='flexEnd' gutterSize='s'>
               <EuiFlexItem grow={false}>
-                {i18n.translate('components.visualize.wz.pattern', {
+                {i18n.translate('wazuh.components.visualize.wz.pattern', {
                   defaultMessage:
                     'There are some unknown fields for the current index pattern. You need to refresh the page to update the fields.',
                 })}
@@ -219,14 +219,14 @@ export const WzVisualize = compose(
                   href={urlTroubleShootingDocs}
                   target='documentation'
                 >
-                  {i18n.translate('components.visualize.wz.Troubleshooting', {
+                  {i18n.translate('wazuh.components.visualize.wz.Troubleshooting', {
                     defaultMessage: 'Troubleshooting',
                   })}{' '}
                 </a>
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
                 <EuiButton onClick={() => window.location.reload()} size='s'>
-                  {i18n.translate('components.visualize.wz.Reloadpage', {
+                  {i18n.translate('wazuh.components.visualize.wz.Reloadpage', {
                     defaultMessage: 'Reload page',
                   })}
                 </EuiButton>
@@ -380,7 +380,7 @@ export const WzVisualize = compose(
                       >
                         <h2 className='embPanel__title wz-headline-title'>
                           {i18n.translate(
-                            'components.visualize.wz.SecurityAlerts',
+                            'wazuh.component.visualize.wz.SecurityAlerts',
                             {
                               defaultMessage: 'Security Alerts',
                             },

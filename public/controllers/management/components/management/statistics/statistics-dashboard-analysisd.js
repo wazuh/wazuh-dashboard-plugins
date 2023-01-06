@@ -31,7 +31,7 @@ export function WzStatisticsAnalysisd({
             <EuiFlexGroup>
               <EuiFlexItem>
                 {i18n.translate(
-                  'controllers.mnage.comp.confi.groups.ruleset.Eventsprocessed',
+                  'wazuh.controllers..mnage.comp.confi.groups.ruleset.Eventsprocessed',
                   {
                     defaultMessage: 'Events processed',
                   },
@@ -57,7 +57,7 @@ export function WzStatisticsAnalysisd({
             <EuiFlexGroup>
               <EuiFlexItem>
                 {i18n.translate(
-                  'controllers.mnage.comp.confi.groups.ruleset.EventsDropped',
+                  'wazuh.controllers..mnage.comp.confi.groups.ruleset.EventsDropped',
                   {
                     defaultMessage: 'Events Dropped',
                   },
@@ -88,7 +88,7 @@ export function WzStatisticsAnalysisd({
             <EuiFlexGroup>
               <EuiFlexItem>
                 {i18n.translate(
-                  'controllers.mnage.comp.confi.groups.ruleset.Queue Usage',
+                  'wazuh.controllers..mnage.comp.confi.groups.ruleset.Queue Usage',
                   {
                     defaultMessage: 'Queue Usage',
                   },
@@ -117,7 +117,7 @@ export function WzStatisticsAnalysisd({
             <EuiFlexGroup>
               <EuiFlexItem>
                 {i18n.translate(
-                  'controllers.mnage.comp.confi.groups.ruleset.EventsDecodedsummary',
+                  'wazuh.controllers..mnage.comp.confi.groups.ruleset.EventsDecodedsummary',
                   {
                     defaultMessage: 'Events Decoded summary',
                   },
@@ -148,7 +148,7 @@ export function WzStatisticsAnalysisd({
             <EuiFlexGroup>
               <EuiFlexItem>
                 {i18n.translate(
-                  'controllers.mnage.comp.confi.groups.ruleset.Syscheck',
+                  'wazuh.controllers..mnage.comp.confi.groups.ruleset.Syscheck',
                   {
                     defaultMessage: 'Syscheck',
                   },
@@ -173,10 +173,9 @@ export function WzStatisticsAnalysisd({
           <EuiPanel style={{ height: '400px' }}>
             <EuiFlexGroup>
               <EuiFlexItem>
-                {i18n.translate('controllers.mnage.comp.confi.groups.ruleset', {
-                  defaultMessage: '',
+                {i18n.translate('wazuh.controllers.mnage.comp.confi.groups.ruleset', {
+                  defaultMessage: 'Syscollector',
                 })}
-                Syscollector
               </EuiFlexItem>
             </EuiFlexGroup>
             <EuiFlexGroup>
@@ -201,7 +200,7 @@ export function WzStatisticsAnalysisd({
             <EuiFlexGroup>
               <EuiFlexItem>
                 {i18n.translate(
-                  'controllers.mnage.comp.confi.groups.ruleset.Rootcheck',
+                  'wazuh.controllers..mnage.comp.confi.groups.ruleset.Rootcheck',
                   {
                     defaultMessage: 'Rootcheck',
                   },
@@ -227,7 +226,7 @@ export function WzStatisticsAnalysisd({
             <EuiFlexGroup>
               <EuiFlexItem>
                 {i18n.translate(
-                  'controllers.mnage.comp.confi.groups.ruleset.SCA',
+                  'wazuh.controllers..mnage.comp.confi.groups.ruleset.SCA',
                   {
                     defaultMessage: 'SCA',
                   },
@@ -256,7 +255,7 @@ export function WzStatisticsAnalysisd({
             <EuiFlexGroup>
               <EuiFlexItem>
                 {i18n.translate(
-                  'controllers.mnage.comp.confi.groups.ruleset.HostInfo',
+                  'wazuh.controllers..mnage.comp.confi.groups.ruleset.HostInfo',
                   {
                     defaultMessage: 'Host Info',
                   },
@@ -282,7 +281,7 @@ export function WzStatisticsAnalysisd({
             <EuiFlexGroup>
               <EuiFlexItem>
                 {i18n.translate(
-                  'controllers.mnage.comp.confi.groups.ruleset.Other',
+                  'wazuh.controllers..mnage.comp.confi.groups.ruleset.Other',
                   {
                     defaultMessage: 'Other',
                   },

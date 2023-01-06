@@ -29,12 +29,12 @@ export interface Props {
 export function DocViewTableRowBtnFilterRemove({ onClick, disabled = false }: Props) {
   const tooltipContent = disabled ? (
     <FormattedMessage
-      id="discover.docViews.table.unindexedFieldsCanNotBeSearchedTooltip"
+      id="wazuh.discover.docViews.table.unindexedFieldsCanNotBeSearchedTooltip"
       defaultMessage="Unindexed fields can not be searched"
     />
   ) : (
     <FormattedMessage
-      id="discover.docViews.table.filterOutValueButtonTooltip"
+      id="wazuh.discover.docViews.table.filterOutValueButtonTooltip"
       defaultMessage="Filter out value"
     />
   );
@@ -42,7 +42,7 @@ export function DocViewTableRowBtnFilterRemove({ onClick, disabled = false }: Pr
   return (
     <EuiToolTip content={tooltipContent}>
       <EuiButtonIcon
-        aria-label={i18n.translate('discover.docViews.table.filterOutValueButtonAriaLabel', {
+        aria-label={i18n.translate('wazuh.discover.docViews.table.filterOutValueButtonAriaLabel', {
           defaultMessage: 'Filter out value',
         })}
         className="kbnDocViewer__actionButton"

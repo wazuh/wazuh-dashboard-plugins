@@ -81,7 +81,7 @@ export const NodeList = withErrorBoundary (class NodeList extends Component {
                             <EuiFlexItem grow={false}>
                                 <EuiTitle>
                                     <h1>{
-                                      i18n.translate("components.management.cluster.nodes", {
+                                      i18n.translate("wazuh.components.management.cluster.nodes", {
                                         defaultMessage: "Nodes",
                                       })
                                     }</h1>

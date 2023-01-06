@@ -23,13 +23,13 @@ import { connect } from 'react-redux';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 import { i18n } from '@kbn/i18n';
 const text2 = i18n.translate(
-  'controller.manage.comp.confi.setting.response.active.text2',
+  'wazuh.controller.manage.comp.confi.setting.response.active.text2',
   {
     defaultMessage: 'Active response documentation',
   },
 );
 const text3 = i18n.translate(
-  'controller.manage.comp.confi.setting.response.active.text3',
+  'wazuh.controller.manage.comp.confi.setting.response.active.text3',
   {
     defaultMessage: 'Commands reference',
   },

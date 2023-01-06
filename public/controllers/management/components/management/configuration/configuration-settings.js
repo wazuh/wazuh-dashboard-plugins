@@ -13,196 +13,196 @@
 import { hasAgentSupportModule } from '../../../../../react-services/wz-agents';
 import { WAZUH_MODULES_ID } from '../../../../../../common/constants';
 import { i18n } from '@kbn/i18n';
-const descp1 = i18n.translate('controller.manage.comp.confi.setting.descp1', {
+const descp1 = i18n.translate('wazuh.controller.manage.comp.confi.setting.descp1', {
   defaultMessage: 'Global and remote settings',
 });
-const descp2 = i18n.translate('controller.manage.comp.confi.setting.descp2', {
+const descp2 = i18n.translate('wazuh.controller.manage.comp.confi.setting.descp2', {
   defaultMessage: 'Master node configuration',
 });
-const descp3 = i18n.translate('controller.manage.comp.confi.setting.descp3', {
+const descp3 = i18n.translate('wazuh.controller.manage.comp.confi.setting.descp3', {
   defaultMessage: 'Automatic agent registration service',
 });
-const descp4 = i18n.translate('controller.manage.comp.confi.setting.descp4', {
+const descp4 = i18n.translate('wazuh.controller.manage.comp.confi.setting.descp4', {
   defaultMessage: 'Logging settings that apply to the agent',
 });
-const descp5 = i18n.translate('controller.manage.comp.confi.setting.descp5', {
+const descp5 = i18n.translate('wazuh.controller.manage.comp.confi.setting.descp5', {
   defaultMessage: 'Settings related to the connection with the manager',
 });
-const descp6 = i18n.translate('controller.manage.comp.confi.setting.descp6', {
+const descp6 = i18n.translate('wazuh.controller.manage.comp.confi.setting.descp6', {
   defaultMessage: 'Agent bucket parameters to avoid event flooding',
 });
-const descp7 = i18n.translate('controller.manage.comp.confi.setting.descp7', {
+const descp7 = i18n.translate('wazuh.controller.manage.comp.confi.setting.descp7', {
   defaultMessage: 'User-defined information about the agent included in alerts',
 });
-const descp8 = i18n.translate('controller.manage.comp.confi.setting.descp8', {
+const descp8 = i18n.translate('wazuh.controller.manage.comp.confi.setting.descp8', {
   defaultMessage: 'Settings related to the alerts and their format',
 });
-const descp9 = i18n.translate('controller.manage.comp.confi.setting.descp9', {
+const descp9 = i18n.translate('wazuh.controller.manage.comp.confi.setting.descp9', {
   defaultMessage:
     'Slack, VirusTotal and PagerDuty integrations with external APIs',
 });
-const descp10 = i18n.translate('controller.manage.comp.confi.setting.descp', {
+const descp10 = i18n.translate('wazuh.controller.manage.comp.confi.setting.descp', {
   defaultMessage:
     'Configuration to ensure compliance with security policies, standards and hardening guides',
 });
-const descp11 = i18n.translate('controller.manage.comp.confi.setting.descp11', {
+const descp11 = i18n.translate('wazuh.controller.manage.comp.confi.setting.descp11', {
   defaultMessage:
     'Configuration assessment and automation of compliance monitoring using SCAP checks',
 });
-const descp12 = i18n.translate('controller.manage.comp.confi.setting.descp12', {
+const descp12 = i18n.translate('wazuh.controller.manage.comp.confi.setting.descp12', {
   defaultMessage: 'Configuration assessment using CIS scanner and SCAP checks',
 });
-const descp13 = i18n.translate('controller.manage.comp.confi.setting.descp13', {
+const descp13 = i18n.translate('wazuh.controller.manage.comp.confi.setting.descp13', {
   defaultMessage:
     'Discover what applications are affected by well-known vulnerabilities',
 });
-const descp14 = i18n.translate('controller.manage.comp.confi.setting.descp14', {
+const descp14 = i18n.translate('wazuh.controller.manage.comp.confi.setting.descp14', {
   defaultMessage:
     'Expose an operating system as a high-performance relational database',
 });
-const descp15 = i18n.translate('controller.manage.comp.confi.setting.descp15', {
+const descp15 = i18n.translate('wazuh.controller.manage.comp.confi.setting.descp15', {
   defaultMessage:
     'Gather relevant information about system OS, hardware, networking and packages',
 });
-const descp16 = i18n.translate('controller.manage.comp.confi.setting.descp16', {
+const descp16 = i18n.translate('wazuh.controller.manage.comp.confi.setting.descp16', {
   defaultMessage: 'Active threat addressing by immediate response',
 });
-const descp17 = i18n.translate('controller.manage.comp.confi.setting.descp17', {
+const descp17 = i18n.translate('wazuh.controller.manage.comp.confi.setting.descp17', {
   defaultMessage: 'Active threat addressing by immediate response',
 });
-const descp18 = i18n.translate('controller.manage.comp.confi.setting.descp18', {
+const descp18 = i18n.translate('wazuh.controller.manage.comp.confi.setting.descp18', {
   defaultMessage:
     'Monitor and collect the activity from Docker containers such as creation, running, starting, stopping or pausing events',
 });
-const descp19 = i18n.translate('controller.manage.comp.confi.setting.descp19', {
+const descp19 = i18n.translate('wazuh.controller.manage.comp.confi.setting.descp19', {
   defaultMessage:
     "Log analysis from text files, Windows events or syslog outputs'",
 });
-const descp20 = i18n.translate('controller.manage.comp.confi.setting.descp20', {
+const descp20 = i18n.translate('wazuh.controller.manage.comp.confi.setting.descp20', {
   defaultMessage:
     'Identify changes in content, permissions, ownership, and attributes of files',
 });
-const descp21 = i18n.translate('controller.manage.comp.confi.setting.descp21', {
+const descp21 = i18n.translate('wazuh.controller.manage.comp.confi.setting.descp21', {
   defaultMessage:
     'Run integrity checks on devices such as routers, firewalls and switches',
 });
-const descp22 = i18n.translate('controller.manage.comp.confi.setting.descp22', {
+const descp22 = i18n.translate('wazuh.controller.manage.comp.confi.setting.descp22', {
   defaultMessage:
     'Security events related to Amazon AWS services, collected directly via AWS API',
 });
-const descp23 = i18n.translate('controller.manage.comp.confi.setting.descp23', {
+const descp23 = i18n.translate('wazuh.controller.manage.comp.confi.setting.descp23', {
   defaultMessage: 'Configuration options of the Azure Logs wodle',
 });
-const descp24 = i18n.translate('controller.manage.comp.confi.setting.descp24', {
+const descp24 = i18n.translate('wazuh.controller.manage.comp.confi.setting.descp24', {
   defaultMessage: 'Configuration options of the Google Cloud Pub/Sub module',
 });
-const descp25 = i18n.translate('controller.manage.comp.confi.setting.descp25', {
+const descp25 = i18n.translate('wazuh.controller.manage.comp.confi.setting.descp25', {
   defaultMessage: 'Detect threats targeting GitHub organizations',
 });
-const descp26 = i18n.translate('controller.manage.comp.confi.setting.descp26', {
+const descp26 = i18n.translate('wazuh.controller.manage.comp.confi.setting.descp26', {
   defaultMessage: 'Configuration options of the Office 365 module',
 });
-const descp27 = i18n.translate('controller.manage.comp.confi.setting.descp27', {
+const descp27 = i18n.translate('wazuh.controller.manage.comp.confi.setting.descp27', {
   defaultMessage: 'Configuration options of the Command wodle',
 });
 
-const Title1 = i18n.translate('controller.manage.comp.confi.setting.Title1', {
+const Title1 = i18n.translate('wazuh.controller.manage.comp.confi.setting.Title1', {
   defaultMessage: 'Main configurations',
 });
-const Title2 = i18n.translate('controller.manage.comp.confi.setting.Title2', {
+const Title2 = i18n.translate('wazuh.controller.manage.comp.confi.setting.Title2', {
   defaultMessage: 'Alerts and output management',
 });
-const Title3 = i18n.translate('controller.manage.comp.confi.setting.Title3', {
+const Title3 = i18n.translate('wazuh.controller.manage.comp.confi.setting.Title3', {
   defaultMessage: 'Auditing and policy monitoring',
 });
-const Title4 = i18n.translate('controller.manage.comp.confi.setting.title4', {
+const Title4 = i18n.translate('wazuh.controller.manage.comp.confi.setting.title4', {
   defaultMessage: 'System threats and incident response',
 });
-const Title5 = i18n.translate('controller.manage.comp.confi.setting.title5', {
+const Title5 = i18n.translate('wazuh.controller.manage.comp.confi.setting.title5', {
   defaultMessage: 'Log data analysis',
 });
-const Title6 = i18n.translate('controller.manage.comp.confi.setting.title6', {
+const Title6 = i18n.translate('wazuh.controller.manage.comp.confi.setting.title6', {
   defaultMessage: 'Cloud security monitoring',
 });
-const name1 = i18n.translate('controllers.manage.confi.setting.name1', {
+const name1 = i18n.translate('wazuh.controllers.manage.confi.setting.name1', {
   defaultMessage: 'Global Configuration',
 });
-const name2 = i18n.translate('controllers.manage.confi.setting.name2', {
+const name2 = i18n.translate('wazuh.controllers.manage.confi.setting.name2', {
   defaultMessage: 'Cluster',
 });
-const name3 = i18n.translate('controllers.manage.confi.setting.name3', {
+const name3 = i18n.translate('wazuh.controllers.manage.confi.setting.name3', {
   defaultMessage: 'Registration Service',
 });
-const name4 = i18n.translate('controllers.manage.confi.setting.name4', {
+const name4 = i18n.translate('wazuh.controllers.manage.confi.setting.name4', {
   defaultMessage: 'Global Configuration',
 });
-const name5 = i18n.translate('controllers.manage.confi.setting.name5', {
+const name5 = i18n.translate('wazuh.controllers.manage.confi.setting.name5', {
   defaultMessage: ' Communication',
 });
-const name6 = i18n.translate('controllers.manage.confi.setting.name6', {
+const name6 = i18n.translate('wazuh.controllers.manage.confi.setting.name6', {
   defaultMessage: 'Anti-flooding settings',
 });
-const name7 = i18n.translate('controllers.manage.confi.setting.name7', {
+const name7 = i18n.translate('wazuh.controllers.manage.confi.setting.name7', {
   defaultMessage: 'Labels',
 });
-const name8 = i18n.translate('controllers.manage.confi.setting.name8', {
+const name8 = i18n.translate('wazuh.controllers.manage.confi.setting.name8', {
   defaultMessage: 'Alerts',
 });
-const name9 = i18n.translate('controllers.manage.confi.setting.name9', {
+const name9 = i18n.translate('wazuh.controllers.manage.confi.setting.name9', {
   defaultMessage: 'Integrations',
 });
-const name10 = i18n.translate('controllers.manage.confi.setting..name10', {
+const name10 = i18n.translate('wazuh.controllers.manage.confi.setting..name10', {
   defaultMessage: 'Policy monitoring',
 });
-const name11 = i18n.translate('controllers.manage.confi.setting..name11', {
+const name11 = i18n.translate('wazuh.controllers.manage.confi.setting..name11', {
   defaultMessage: 'OpenSCAP',
 });
-const name12 = i18n.translate('controllers.manage.confi.setting..name12', {
+const name12 = i18n.translate('wazuh.controllers.manage.confi.setting..name12', {
   defaultMessage: 'CIS-CAT',
 });
-const name13 = i18n.translate('controllers.manage.confi.setting..name13', {
+const name13 = i18n.translate('wazuh.controllers.manage.confi.setting..name13', {
   defaultMessage: 'Vulnerabilities',
 });
-const name14 = i18n.translate('controllers.manage.confi.setting..name14', {
+const name14 = i18n.translate('wazuh.controllers.manage.confi.setting..name14', {
   defaultMessage: 'Osquery',
 });
-const name15 = i18n.translate('controllers.manage.confi.setting..name15', {
+const name15 = i18n.translate('wazuh.controllers.manage.confi.setting..name15', {
   defaultMessage: 'Inventory data',
 });
-const name16 = i18n.translate('controllers.manage.confi.setting..name16', {
+const name16 = i18n.translate('wazuh.controllers.manage.confi.setting..name16', {
   defaultMessage: 'Active Response',
 });
-const name17 = i18n.translate('controllers.manage.confi.setting..name17', {
+const name17 = i18n.translate('wazuh.controllers.manage.confi.setting..name17', {
   defaultMessage: 'Active response',
 });
-const name18 = i18n.translate('controllers.manage.confi.setting..name18', {
+const name18 = i18n.translate('wazuh.controllers.manage.confi.setting..name18', {
   defaultMessage: 'Commands',
 });
-const name19 = i18n.translate('controllers.manage.confi.setting..name19', {
+const name19 = i18n.translate('wazuh.controllers.manage.confi.setting..name19', {
   defaultMessage: 'Docker listener',
 });
-const name20 = i18n.translate('controllers.manage.confi.setting..name20', {
+const name20 = i18n.translate('wazuh.controllers.manage.confi.setting..name20', {
   defaultMessage: 'Log collection',
 });
-const name21 = i18n.translate('controllers.manage.confi.setting..name21', {
+const name21 = i18n.translate('wazuh.controllers.manage.confi.setting..name21', {
   defaultMessage: 'Integrity monitoring',
 });
-const name22 = i18n.translate('controllers.manage.confi.setting..name22', {
+const name22 = i18n.translate('wazuh.controllers.manage.confi.setting..name22', {
   defaultMessage: 'Agentless',
 });
-const name23 = i18n.translate('controllers.manage.confi.setting..name23', {
+const name23 = i18n.translate('wazuh.controllers.manage.confi.setting..name23', {
   defaultMessage: 'Amazon S3',
 });
-const name24 = i18n.translate('controllers.manage.confi.setting..name24', {
+const name24 = i18n.translate('wazuh.controllers.manage.confi.setting..name24', {
   defaultMessage: 'Azure Logs',
 });
-const name25 = i18n.translate('controllers.manage.confi.setting..name25', {
+const name25 = i18n.translate('wazuh.controllers.manage.confi.setting..name25', {
   defaultMessage: 'Google Cloud Pub/Sub',
 });
-const name26 = i18n.translate('controllers.manage.confi.setting..name26', {
+const name26 = i18n.translate('wazuh.controllers.manage.confi.setting..name26', {
   defaultMessage: 'GitHub',
 });
-const name27 = i18n.translate('controllers.manage.confi.setting..name27', {
+const name27 = i18n.translate('wazuh.controllers.manage.confi.setting..name27', {
   defaultMessage: 'Office 365',
 });
 export default [

@@ -12,261 +12,261 @@
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
 import { i18n } from '@kbn/i18n';
 
-const awsName = i18n.translate('components.addModule.guide.awsName', {
+const awsName = i18n.translate('wazuh.components.addModule.guide.awsName', {
   defaultMessage: 'Amazon AWS services',
 });
-const awsWodleName = i18n.translate('components.addModule.guide.awsWodleName', {
+const awsWodleName = i18n.translate('wazuh.components.addModule.guide.awsWodleName', {
   defaultMessage: 'aws-s3',
 });
-const awsDescp = i18n.translate('components.addModule.guide.awsDescp', {
+const awsDescp = i18n.translate('wazuh.components.addModule.guide.awsDescp', {
   defaultMessage: 'TConfiguration options of the AWS-S3 wodle.',
 });
-const awsCate = i18n.translate('components.addModule.guide.tarDefault', {
+const awsCate = i18n.translate('wazuh.components.addModule.guide.tarDefault.securityInfo', {
   defaultMessage: 'Security information management',
 });
-const title = i18n.translate('components.addModule.guide.title', {
+const title = i18n.translate('wazuh.components.addModule.guide.requiredSetting', {
   defaultMessage: 'Required settings',
 });
-const disName = i18n.translate('components.addModule.guide.disName', {
+const disName = i18n.translate('wazuh.components.addModule.guide.disName', {
   defaultMessage: 'disabled',
 });
-const disDescp = i18n.translate('components.addModule.guide.disDescp', {
+const disDescp = i18n.translate('wazuh.components.addModule.guide.disableAws', {
   defaultMessage: 'Disables the AWS-S3 wodle.',
 });
-const interName = i18n.translate('components.addModule.guide.interName', {
+const interName = i18n.translate('wazuh.components.addModule.guide.interName', {
   defaultMessage: 'interval',
 });
-const interDescp = i18n.translate('components.addModule.guide.interDescp', {
+const interDescp = i18n.translate('wazuh.components.addModule.guide.interDescp', {
   defaultMessage: 'Frequency for reading from the S3 bucket.',
 });
-const interPlace = i18n.translate('components.addModule.guide.interPlace', {
+const interPlace = i18n.translate('wazuh.components.addModule.guide.interPlace', {
   defaultMessage:
     "Positive number with suffix character indicating a time unit'",
 });
-const interDefault = i18n.translate('components.addModule.guide.interDefault', {
+const interDefault = i18n.translate('wazuh.components.addModule.guide.interDefault', {
   defaultMessage: '10m',
 });
-const interError = i18n.translate('components.addModule.guide.interError', {
+const interError = i18n.translate('wazuh.components.addModule.guide.interError', {
   defaultMessage:
     'A positive number that should contain a suffix character indicating a time unit, such as, s (seconds), m (minutes), h (hours), d (days). e.g. 10m',
 });
-const runName = i18n.translate('components.addModule.guide.runName', {
+const runName = i18n.translate('wazuh.components.addModule.guide.runName', {
   defaultMessage: 'run_on_start',
 });
-const runDescp = i18n.translate('components.addModule.guide.runDescp', {
+const runDescp = i18n.translate('wazuh.components.addModule.guide.runDescp', {
   defaultMessage: 'Run evaluation immediately when service is started.',
 });
-const title2 = i18n.translate('components.addModule.guide.title2', {
+const title2 = i18n.translate('wazuh.components.addModule.guide.optionalSettings', {
   defaultMessage: 'Optional settings',
 });
-const bucketName = i18n.translate('components.addModule.guide.bucketName', {
+const bucketName = i18n.translate('wazuh.components.addModule.guide.bucketName', {
   defaultMessage: 'remove_from_bucket',
 });
-const bucketDescp = i18n.translate('components.addModule.guide.bucketDescp', {
+const bucketDescp = i18n.translate('wazuh.components.addModule.guide.bucketDescp', {
   defaultMessage:
     'Define if you want to remove logs from your S3 bucket after they are read by the wodle.',
 });
-const errorName = i18n.translate('components.addModule.guide.errorName', {
+const errorName = i18n.translate('wazuh.components.addModule.guide.errorName', {
   defaultMessage: 'skip_on_error',
 });
-const errorDescp = i18n.translate('components.addModule.guide.errorDescp', {
+const errorDescp = i18n.translate('wazuh.components.addModule.guide.errorDescp', {
   defaultMessage:
     'When unable to process and parse a CloudTrail log, skip the log and continue processing',
 });
-const title3Descp = i18n.translate('components.addModule.guide.title3Descp', {
+const title3Descp = i18n.translate('wazuh.components.addModule.guide.aws.bucket', {
   defaultMessage: 'Defines one or more buckets to process.',
 });
-const title3 = i18n.translate('components.addModule.guide.title3', {
+const title3 = i18n.translate('wazuh.components.addModule.guide.aws.buckets', {
   defaultMessage: 'Buckets',
 });
-const bucket2Name = i18n.translate('components.addModule.guide.bucket2Name', {
+const bucket2Name = i18n.translate('wazuh.components.addModule.guide.bucket2Name', {
   defaultMessage: 'bucket',
 });
-const bucket2Descp = i18n.translate('components.addModule.guide.bucket2Descp', {
+const bucket2Descp = i18n.translate('wazuh.components.addModule.guide.bucket2Descp', {
   defaultMessage: 'Defines a bucket to process.',
 });
-const valError = i18n.translate('components.addModule.guide.valError', {
+const valError = i18n.translate('wazuh.components.addModule.guide.valError', {
   defaultMessage: 'Any directory or file name.',
 });
-const valName = i18n.translate('components.addModule.guide.valName', {
+const valName = i18n.translate('wazuh.components.addModule.guide.valName', {
   defaultMessage: 'type',
 });
-const valDescp = i18n.translate('components.addModule.guide.valDescp', {
+const valDescp = i18n.translate('wazuh.components.addModule.guide.valDescp', {
   defaultMessage: 'Specifies type of bucket.',
 });
-const valInfo = i18n.translate('components.addModule.guide.valInfo', {
+const valInfo = i18n.translate('wazuh.components.addModule.guide.valInfo', {
   defaultMessage: 'Different configurations as macie has custom type.',
 });
-const valText = i18n.translate('components.addModule.guide.valText', {
+const valText = i18n.translate('wazuh.components.addModule.guide.valText', {
   defaultMessage: 'cloudtrail',
 });
-const valText1 = i18n.translate('components.addModule.guide.valText1', {
+const valText1 = i18n.translate('wazuh.components.addModule.guide.valText1', {
   defaultMessage: 'tyguarddutype',
 });
-const valText2 = i18n.translate('components.addModule.guide.valText2', {
+const valText2 = i18n.translate('wazuh.components.addModule.guide.valText2', {
   defaultMessage: 'vpcflow',
 });
-const valText3 = i18n.translate('components.addModule.guide.valText3', {
+const valText3 = i18n.translate('wazuh.components.addModule.guide.valText3', {
   defaultMessage: 'config',
 });
-const valText4 = i18n.translate('components.addModule.guide.valText4', {
+const valText4 = i18n.translate('wazuh.components.addModule.guide.valText4', {
   defaultMessage: 'custom',
 });
-const valDefault = i18n.translate('components.addModule.guide.valDefault', {
+const valDefault = i18n.translate('wazuh.components.addModule.guide.valDefault', {
   defaultMessage: 'cloudtrail',
 });
-const s3Name = i18n.translate('components.addModule.guide.s3Name', {
+const s3Name = i18n.translate('wazuh.components.addModule.guide.s3Name', {
   defaultMessage: 'name',
 });
-const s3Descp = i18n.translate('components.addModule.guide.s3Descp', {
+const s3Descp = i18n.translate('wazuh.components.addModule.guide.s3Descp', {
   defaultMessage: 'Name of the S3 bucket from where logs are read.',
 });
-const s3Place = i18n.translate('components.addModule.guide.s3Place', {
+const s3Place = i18n.translate('wazuh.components.addModule.guide.s3Place', {
   defaultMessage: 'Name of the S3 bucket',
 });
-const awsAccName = i18n.translate('components.addModule.guide.awsAccName', {
+const awsAccName = i18n.translate('wazuh.components.addModule.guide.awsAccName', {
   defaultMessage: 'aws_account_id',
 });
-const awsAccDescp = i18n.translate('components.addModule.guide.awsAccDescp', {
+const awsAccDescp = i18n.translate('wazuh.components.addModule.guide.awsAccDescp', {
   defaultMessage:
     'The AWS Account ID for the bucket logs. Only works with CloudTrail buckets.',
 });
-const awsAccPlace = i18n.translate('components.addModule.guide.awsAccPlace', {
+const awsAccPlace = i18n.translate('wazuh.components.addModule.guide.awsAccPlace', {
   defaultMessage: 'Comma list of 12 digit AWS Account ID',
 });
 const awsAccAliasName = i18n.translate(
-  'components.addModule.guide.awsAccAliasName',
+  'wazuh.components.addModule.guide.awsAccAliasName',
   {
     defaultMessage: 'aws_account_alias',
   },
 );
 const awsAccAliasDescp = i18n.translate(
-  'components.addModule.guide.awsAccAliasDescp',
+  'wazuh.components.addModule.guide.awsAccAliasDescp',
   {
     defaultMessage: 'A user-friendly name for the AWS account.',
   },
 );
 const awsAccAliasPlace = i18n.translate(
-  'components.addModule.guide.awsAccAliasPlace',
+  'wazuh.components.addModule.guide.awsAccAliasPlace',
   {
     defaultMessage: 'AWS account user-friendly name',
   },
 );
 const accesskeyName = i18n.translate(
-  'components.addModule.guide.accesskeyName',
+  'wazuh.components.addModule.guide.accesskeyName',
   {
     defaultMessage: 'access_key',
   },
 );
 const accesskeyDescp = i18n.translate(
-  'components.addModule.guide.accesskeyDescp',
+  'wazuh.components.addModule.guide.accesskeyDescp',
   {
     defaultMessage:
       'The access key ID for the IAM user with the permission to read logs from the bucket.',
   },
 );
 const accesskeyPlace = i18n.translate(
-  'components.addModule.guide.accesskeyPlace',
+  'wazuh.components.addModule.guide.accesskeyPlace',
   {
     defaultMessage: 'Any alphanumerical key.',
   },
 );
 const secretKeyName = i18n.translate(
-  'components.addModule.guide.secretKeyName',
+  'wazuh.components.addModule.guide.secretKeyName',
   {
     defaultMessage: 'secret_key',
   },
 );
 const secretKeyDescp = i18n.translate(
-  'components.addModule.guide.secretKeyDescp',
+  'wazuh.components.addModule.guide.secretKeyDescp',
   {
     defaultMessage:
       'The secret key created for the IAM user with the permission to read logs from the bucket.',
   },
 );
 const secretKeyPlace = i18n.translate(
-  'components.addModule.guide.secretKeyPlace',
+  'wazuh.components.addModule.guide.secretKeyPlace',
   {
     defaultMessage: 'Any alphanumerical key.',
   },
 );
 const awsProfileName = i18n.translate(
-  'components.addModule.guide.awsProfileName',
+  'wazuh.components.addModule.guide.awsProfileName',
   {
     defaultMessage: 'aws_profile',
   },
 );
 const awsProfileDescp = i18n.translate(
-  'components.addModule.guide.awsProfileDescp',
+  'wazuh.components.addModule.guide.awsProfileDescp',
   {
     defaultMessage:
       'A valid profile name from a Shared Credential File or AWS Config File with the permission to read logs from the bucket.',
   },
 );
 const awsProfilePlace = i18n.translate(
-  'components.addModule.guide.awsProfilePlace',
+  'wazuh.components.addModule.guide.awsProfilePlace',
   {
     defaultMessage: 'Valid profile name',
   },
 );
-const roleArnName = i18n.translate('components.addModule.guide.roleArnName', {
+const roleArnName = i18n.translate('wazuh.components.addModule.guide.roleArnName', {
   defaultMessage: 'iam_role_arn',
 });
-const roleArnDescp = i18n.translate('components.addModule.guide.roleArnDescp', {
+const roleArnDescp = i18n.translate('wazuh.components.addModule.guide.roleArnDescp', {
   defaultMessage:
     'A valid role arn with permission to read logs from the bucket.Valid role arn',
 });
-const roleArnPlace = i18n.translate('components.addModule.guide.roleArnPlace', {
+const roleArnPlace = i18n.translate('wazuh.components.addModule.guide.roleArnPlace', {
   defaultMessage: 'Valid role arn',
 });
-const pathName = i18n.translate('components.addModule.guide.pathName', {
+const pathName = i18n.translate('wazuh.components.addModule.guide.pathName', {
   defaultMessage: 'path',
 });
-const pathDescp = i18n.translate('components.addModule.guide.pathDescp', {
+const pathDescp = i18n.translate('wazuh.components.addModule.guide.pathDescp.aws', {
   defaultMessage: 'If defined, the path or prefix for the bucket.',
 });
-const pathPlace = i18n.translate('components.addModule.guide.pathPlace', {
+const pathPlace = i18n.translate('wazuh.components.addModule.guide.aws.pathPlace', {
   defaultMessage: 'Path or prefix for the bucket.',
 });
-const logName = i18n.translate('components.addModule.guide.logName', {
+const logName = i18n.translate('wazuh.components.addModule.guide.logName', {
   defaultMessage: 'only_logs_after',
 });
-const logDescp = i18n.translate('components.addModule.guide.logDescp', {
+const logDescp = i18n.translate('wazuh.components.addModule.guide.logDescp', {
   defaultMessage:
     'A valid date, in YYYY-MMM-DD format, that only logs from after that date will be parsed. All logs from before that date will be skipped.',
 });
-const logPlace = i18n.translate('components.addModule.guide.logPlace', {
+const logPlace = i18n.translate('wazuh.components.addModule.guide.logPlace', {
   defaultMessage: 'Date, e.g.: 2020-APR-02',
 });
-const logError = i18n.translate('components.addModule.guide.logError', {
+const logError = i18n.translate('wazuh.components.addModule.guide.logError', {
   defaultMessage: 'A valid date, in YYYY-MMM-DD format',
 });
 
-const regionName = i18n.translate('components.addModule.guide.regionName', {
+const regionName = i18n.translate('wazuh.components.addModule.guide.regionName', {
   defaultMessage: 'regions',
 });
 const regionDefault = i18n.translate(
-  'components.addModule.guide.regionDefault',
+  'wazuh.components.addModule.guide.regionDefault',
   {
     defaultMessage: 'All regions',
   },
 );
-const regionDescp = i18n.translate('components.addModule.guide.regionDescp', {
+const regionDescp = i18n.translate('wazuh.components.addModule.guide.regionDescp', {
   defaultMessage:
     'A comma-delimited list of regions to limit parsing of logs. Only works with CloudTrail buckets.',
 });
-const regionPlace = i18n.translate('components.addModule.guide.regionPlace', {
+const regionPlace = i18n.translate('wazuh.components.addModule.guide.regionPlace', {
   defaultMessage: 'Comma-delimited list of valid regions',
 });
 
-const awsOrgName = i18n.translate('components.addModule.guide.awsOrgName', {
+const awsOrgName = i18n.translate('wazuh.components.addModule.guide.awsOrgName', {
   defaultMessage: 'aws_organization_id',
 });
-const awsOrgDescp = i18n.translate('components.addModule.guide.awsOrgDescp', {
+const awsOrgDescp = i18n.translate('wazuh.components.addModule.guide.awsOrgDescp', {
   defaultMessage:
     'Name of AWS organization. Only works with CloudTrail buckets.',
 });
-const awsOrgPlace = i18n.translate('components.addModule.guide.awsOrgPlace', {
+const awsOrgPlace = i18n.translate('wazuh.components.addModule.guide.awsOrgPlace', {
   defaultMessage: 'Valid AWS organization name',
 });
 export default {

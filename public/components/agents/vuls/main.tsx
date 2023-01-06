@@ -17,7 +17,7 @@ export const MainVuls = compose(
   withGuard(
     (props) => !((props.currentAgentData && props.currentAgentData.id) && props.agent),
     () => (
-      <PromptNoSelectedAgent body={i18n.translate('components.agent.main.agentSelectVulnerability', {
+      <PromptNoSelectedAgent body={i18n.translate('wazuh.components.agent.main.agentSelectVulnerability', {
           defaultMessage:
             "You need to select an agent to see it's vulnerabilities.",
         })} />

@@ -24,22 +24,22 @@ import {
 } from '@elastic/eui';
 import { requirementsName } from '../../requirement-name';
 import { i18n } from '@kbn/i18n';
-const title1 = i18n.translate("components.addModule.guide.title1", {
+const title1 = i18n.translate("wazuh.components.overview.complianceTable.options", {
   defaultMessage: "Options",
 });
-const title2 = i18n.translate("components.addModule.guide.title2", {
+const title2 = i18n.translate("wazuh.components.overview.complianceTable.title2", {
   defaultMessage: "GDPR",
 });
-const title3 = i18n.translate("components.addModule.guide.title3", {
+const title3 = i18n.translate("wazuh.components.overview.complianceTable.title3", {
   defaultMessage: "PCI DSS",
 });
-const title4 = i18n.translate("components.addModule.guide.title4", {
+const title4 = i18n.translate("wazuh.components.overview.complianceTable.title4", {
   defaultMessage: "HIPAA",
 });
-const title5 = i18n.translate("components.addModule.guide.title5", {
+const title5 = i18n.translate("wazuh.components.overview.complianceTable.title5", {
   defaultMessage: "NIST 800-53",
 });
-const title6 = i18n.translate("components.addModule.guide.title6", {
+const title6 = i18n.translate("wazuh.components.overview.complianceTable.title6", {
   defaultMessage: "TSC",
 });
 export class ComplianceRequirements extends Component {
@@ -112,7 +112,7 @@ export class ComplianceRequirements extends Component {
                     whiteSpace: "nowrap",
                     textOverflow: "ellipsis"
                   }}>{
-                      i18n.translate("components.over.req.Requirement ", {
+                      i18n.translate("wazuh.components.over.req.Requirement ", {
                         defaultMessage: "Requirement ",
                       })}
                     {facet.label}

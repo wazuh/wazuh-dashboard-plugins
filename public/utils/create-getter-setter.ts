@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { i18n } from '@kbn/i18n';
+
 export type Get<T> = () => T;
 export type Set<T> = (value: T) => void;
 
@@ -17,11 +17,7 @@ export const createGetterSetter = <T extends object>(name: string): [Get<T>, Set
   let value: T;
 
   const get: Get<T> = () => {
-    if (!value) {
-      throw new Error(i18n.translate('utils.getterSetterErrorMsg', {
-          defaultMessage: `${name} was not set.`,
-      }));
-    }
+    if (!value) throw new Error(`${name} was not set.`);
     return value;
   };
 

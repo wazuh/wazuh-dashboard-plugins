@@ -169,14 +169,14 @@ function discoverController(
     this.docViewsRegistry = new DocViewsRegistry();
     setDocViewsRegistry(this.docViewsRegistry);
     this.docViewsRegistry.addDocView({
-      title: i18n.translate('discover.docViews.table.tableTitle', {
+      title: i18n.translate('wazuh.discover.docViews.table.tableTitle', {
         defaultMessage: 'Table',
       }),
       order: 10,
       component: DocViewTable,
     });
     this.docViewsRegistry.addDocView({
-      title: i18n.translate('discover.docViews.json.jsonTitle', {
+      title: i18n.translate('wazuh.discover.docViews.json.jsonTitle', {
         defaultMessage: 'JSON',
       }),
       order: 20,
@@ -383,7 +383,7 @@ function discoverController(
 
   const pageTitleSuffix = savedSearch.id && savedSearch.title ? `: ${savedSearch.title}` : '';
   chrome.docTitle.change(`Wazuh${pageTitleSuffix}`);
-  const discoverBreadcrumbsTitle = i18n.translate('discover.discoverBreadcrumbTitle', {
+  const discoverBreadcrumbsTitle = i18n.translate('wazuh.discover.discoverBreadcrumbTitle', {
     defaultMessage: 'Wazuh',
   });
 
@@ -805,10 +805,10 @@ function discoverController(
 
   async function logInspectorRequest() {
     inspectorAdapters.requests.reset();
-    const title = i18n.translate('discover.inspectorRequestDataTitle', {
+    const title = i18n.translate('wazuh.discover.inspectorRequestDataTitle', {
       defaultMessage: 'data',
     });
-    const description = i18n.translate('discover.inspectorRequestDescription', {
+    const description = i18n.translate('wazuh.discover.inspectorRequestDescription', {
       defaultMessage: 'This request queries Elasticsearch to fetch the data for the search.',
     });
     inspectorRequest = inspectorAdapters.requests.start(title, { description });
@@ -1013,7 +1013,7 @@ function discoverController(
   }
 
   function getIndexPatternWarning(index) {
-    return i18n.translate('discover.valueIsNotConfiguredIndexPatternIDWarningTitle', {
+    return i18n.translate('wazuh.discover.valueIsNotConfiguredIndexPatternIDWarningTitle', {
       defaultMessage: '{stateVal} is not a configured index pattern ID',
       values: {
         stateVal: `"${index}"`,
@@ -1040,7 +1040,7 @@ function discoverController(
       if (ownIndexPattern) {
         getToasts().addWarning({
           title: warningTitle,
-          text: i18n.translate('discover.showingSavedIndexPatternWarningDescription', {
+          text: i18n.translate('wazuh.discover.showingSavedIndexPatternWarningDescription', {
             defaultMessage:
               'Showing the saved index pattern: "{ownIndexPatternTitle}" ({ownIndexPatternId})',
             values: {
@@ -1054,7 +1054,7 @@ function discoverController(
 
       getToasts().addWarning({
         title: warningTitle,
-        text: i18n.translate('discover.showingDefaultIndexPatternWarningDescription', {
+        text: i18n.translate('wazuh.discover.showingDefaultIndexPatternWarningDescription', {
           defaultMessage:
             'Showing the default index pattern: "{loadedIndexPatternTitle}" ({loadedIndexPatternId})',
           values: {

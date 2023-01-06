@@ -126,7 +126,7 @@ export const ExportConfiguration = withErrorBoundary(
           style={{ marginTop: '4px' }}
           onClick={this.exportClick.bind(this)}
         >
-          {i18n.translate('controllers.sgent.components.ExportPDF', {
+          {i18n.translate('wazuh.controllers.sgent.components.ExportPDF', {
             defaultMessage: 'Export PDF',
           })}{' '}
         </EuiButtonEmpty>
@@ -150,13 +150,13 @@ export const ExportConfiguration = withErrorBoundary(
           {this.options.length > 3 && (
             <>
               <EuiButtonEmpty size='xs' onClick={() => this.selectAll(true)}>
-                {i18n.translate('controllers.sgent.components.Selectall', {
+                {i18n.translate('wazuh.controllers.sgent.components.Selectall', {
                   defaultMessage: 'Select all',
                 })}
               </EuiButtonEmpty>
               <EuiSpacer size='s' />
               <EuiButtonEmpty size='xs' onClick={() => this.selectAll(false)}>
-                {i18n.translate('controllers.sgent.components.Unselectall', {
+                {i18n.translate('wazuh.controllers.sgent.components.Unselectall', {
                   defaultMessage: 'Unselect all',
                 })}
               </EuiButtonEmpty>
@@ -173,7 +173,7 @@ export const ExportConfiguration = withErrorBoundary(
             }}
             fill
           >
-            {i18n.translate('controllers.sgent.components.Generate', {
+            {i18n.translate('wazuh.controllers.sgent.components.Generate', {
               defaultMessage: 'Generate PDF report',
             })}
           </EuiButton>

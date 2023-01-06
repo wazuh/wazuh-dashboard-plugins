@@ -23,7 +23,7 @@ export const PromptNoActiveAgent = () => {
     />
   );
 };
-const moduleTitle = i18n.translate('components.addModule.guide.moduleTitle', {
+const moduleTitle = i18n.translate('wazuh.components.agent.prompt.notActive', {
   defaultMessage: 'Agent is not active',
 });
 export const PromptNoActiveAgentWithoutSelect = () => {

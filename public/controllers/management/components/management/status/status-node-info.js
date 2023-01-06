@@ -64,7 +64,7 @@ export class WzStatusNodeInfo extends Component {
         <EuiFlexGroup>
           <EuiFlexItem>
             {i18n.translate(
-              'controllers.mnage.comp.confi.groups.status.agent.Version',
+              'wazuh.controllers.mnage.comp.confi.groups.status.agent.Version',
               {
                 defaultMessage: 'Version',
               },
@@ -75,7 +75,7 @@ export class WzStatusNodeInfo extends Component {
         <EuiFlexGroup>
           <EuiFlexItem>
             {i18n.translate(
-              'controllers.mnage.comp.confi.groups.status.agent.Compilationdate',
+              'wazuh.controllers.mnage.comp.confi.groups.status.agent.Compilationdate',
               {
                 defaultMessage: 'Compilation date',
               },
@@ -88,7 +88,7 @@ export class WzStatusNodeInfo extends Component {
         <EuiFlexGroup>
           <EuiFlexItem>
             {i18n.translate(
-              'controllers.mnage.comp.confi.groups.status.agent.',
+              'wazuh.controllers.mnage.comp.confi.groups.status.agent.',
               {
                 defaultMessage: 'Installationpath',
               },
@@ -99,7 +99,7 @@ export class WzStatusNodeInfo extends Component {
         <EuiFlexGroup>
           <EuiFlexItem>
             {i18n.translate(
-              'controllers.mnage.comp.confi.groups.status.agent.Installationtype',
+              'wazuh.controllers.mnage.comp.confi.groups.status.agent.Installationtype',
               {
                 defaultMessage: 'Installation type',
               },
@@ -110,7 +110,7 @@ export class WzStatusNodeInfo extends Component {
         <EuiFlexGroup>
           <EuiFlexItem>
             {i18n.translate(
-              'controllers.mnage.comp.confi.groups.status.agent',
+              'wazuh.controllers.mnage.comp.confi.groups.status.agent',
               {
                 defaultMessage: 'Agents',
               },

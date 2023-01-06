@@ -24,19 +24,19 @@ import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 const text2 = i18n.translate(
-  'controller.manage.comp.confi.setting.response.Agentlabels.text2',
+  'wazuh.controller.manage.comp.confi.setting.response.Agentlabels.text2',
   {
     defaultMessage: 'Agent labels',
   },
 );
 const text3 = i18n.translate(
-  'controller.manage.comp.confi.setting.response.Labelsreference.text3',
+  'wazuh.controller.manage.comp.confi.setting.response.Labelsreference.text3',
   {
     defaultMessage: 'Labels reference',
   },
 );
 const title1 = i18n.translate(
-  'controller.manage.comp.confi.setting.response.definedlabel',
+  'wazuh.controller.manage.comp.confi.setting.response.definedlabel',
   {
     defaultMessage: 'Defined labels',
   },

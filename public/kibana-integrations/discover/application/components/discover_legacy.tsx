@@ -87,7 +87,7 @@ export interface DiscoverLegacyProps {
   updateQuery: (payload: { dateRange: TimeRange; query?: Query }, isUpdate?: boolean) => void;
   updateSavedQueryId: (savedQueryId?: string) => void;
   vis?: Vis;
-  showMain?: Boolean; 
+  showMain?: Boolean;
 }
 
 export function DiscoverLegacy({
@@ -241,7 +241,7 @@ export function DiscoverLegacy({
 
                   {opts.timefield && (
                     <section
-                      aria-label={i18n.translate('discover.histogramOfFoundDocumentsAriaLabel', {
+                      aria-label={i18n.translate('wazuh.discover.histogramOfFoundDocumentsAriaLabel', {
                         defaultMessage: 'Histogram of found documents',
                       })}
                       className="dscTimechart"
@@ -265,7 +265,7 @@ export function DiscoverLegacy({
                     >
                       <h2 className="euiScreenReaderOnly" id="documentsAriaLabel">
                         <FormattedMessage
-                          id="discover.documentsAriaLabel"
+                          id="wazuh.discover.documentsAriaLabel"
                           defaultMessage="Documents"
                         />
                       </h2>
@@ -294,7 +294,7 @@ export function DiscoverLegacy({
                               data-test-subj="discoverDocTableFooter"
                             >
                               <FormattedMessage
-                                id="discover.howToSeeOtherMatchingDocumentsDescription"
+                                id="wazuh.discover.kibanaIntegration.howToSeeOtherMatchingDocumentsDescription"
                                 defaultMessage="These are the first {sampleSize} documents matching
                   your search, refine your search to see others."
                                 values={{ sampleSize: opts.sampleSize }}
@@ -302,7 +302,7 @@ export function DiscoverLegacy({
 
                               <EuiButtonEmpty onClick={() => window.scrollTo(0, 0)}>
                                 <FormattedMessage
-                                  id="discover.backToTopLinkText"
+                                  id="wazuh.discover.backToTopLinkText"
                                   defaultMessage="Back to top."
                                 />
                               </EuiButtonEmpty>

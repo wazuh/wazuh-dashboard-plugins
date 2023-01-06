@@ -23,17 +23,15 @@ export const PromptAgentNoSupportModule = () => {
     <EuiEmptyPrompt
       iconType="watchesApp"
       title={<h2>{
-  i18n.translate("components.agent.fim.ivv.lib.agent", {
-    defaultMessage: "Module not supported by the agent",
-  });
-}</h2>}
+        i18n.translate("wazuh.components.agent.fim.ivv.lib.agent.notSupported", {
+          defaultMessage: "Module not supported by the agent",
+        })}</h2>}
       actions={
         <EuiButton color="primary" fill onClick={openAgentSelector}>
           {
-  i18n.translate("components.agent.fim.ivv.lib.seagent", {
-    defaultMessage: "Select agent",
-  });
-}
+            i18n.translate("wazuh.components.agent.fim.ivv.lib.seagent", {
+              defaultMessage: "Select agent",
+            })}
         </EuiButton>
       }
     />

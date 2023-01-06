@@ -185,7 +185,7 @@ class WzMenuManagement extends Component {
                 window.location.href = '#/manager';
               }}
             >
-              {i18n.translate('components.wz.menu.Managementdirectory', {
+              {i18n.translate('wazuh.components.wz.menu.Managementdirectory', {
                 defaultMessage: 'Management directory',
               })}
             </EuiButtonEmpty>

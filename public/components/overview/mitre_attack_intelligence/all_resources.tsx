@@ -34,7 +34,7 @@ export const ModuleMitreAttackIntelligenceAllResources = ({ results, loading }) 
   return (
     <>
       <EuiTitle><h1>{
-        i18n.translate("components.overview.mitre.Searchresults", {
+        i18n.translate("wazuh.components.overview.mitre.Searchresults", {
           defaultMessage: "Search results",
         })}</h1></EuiTitle>
       <EuiSpacer />

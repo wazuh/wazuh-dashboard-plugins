@@ -448,7 +448,7 @@ export class FileDetails extends Component {
           buttonContent={
             <EuiTitle size='s'>
               <h3>
-                {i18n.translate('components.agent.fim.ivv.file.detail', {
+                {i18n.translate('wazuh.components.agent.fim.ivv.file.detail', {
                   defaultMessage: ' Details',
                 })}
               </h3>
@@ -473,7 +473,7 @@ export class FileDetails extends Component {
                   <h3>
                     {' '}
                     {i18n.translate(
-                      'components.agent.fim.ivv.file.detail.regVal',
+                      'wazuh.component.agent.fim.ivv.file.detail.regVal',
                       {
                         defaultMessage: ' Registry values',
                       },
@@ -507,7 +507,7 @@ export class FileDetails extends Component {
           extraAction={
             <div style={{ marginBottom: 5 }}>
               <strong>{this.state.totalHits || 0}</strong>{' '}
-              {i18n.translate('components.agent.fim.ivv.file.detail.hits', {
+              {i18n.translate('wazuh.components.agent.fim.ivv.file.detail.hits', {
                 defaultMessage: ' hits',
               })}
             </div>
@@ -517,7 +517,7 @@ export class FileDetails extends Component {
               <h3>
                 {' '}
                 {i18n.translate(
-                  'components.agent.fim.ivv.file.detail.recevents',
+                  'wazuh.components.agent.fim.ivv.file.detail.recevents',
                   {
                     defaultMessage: ' Recent events',
                   },

@@ -54,14 +54,14 @@ export class DiscoverNoResults extends Component {
           <EuiText>
             <h2 data-test-subj='discoverNoResultsTimefilter'>
               <FormattedMessage
-                id='discover.noResults.expandYourTimeRangeTitle'
+                id='wazuh.discover.noResults.expandYourTimeRangeTitle'
                 defaultMessage='Expand your time range'
               />
             </h2>
 
             <p>
               <FormattedMessage
-                id='discover.noResults.queryMayNotMatchTitle'
+                id='wazuh.discover.noResults.queryMayNotMatchTitle'
                 defaultMessage='One or more of the indices you&rsquo;re looking at contains a date field. Your query may
                   not match anything in the current time range, or there may not be any data at all in
                   the currently selected time range. You can try changing the time range to one which contains data.'
@@ -82,7 +82,7 @@ export class DiscoverNoResults extends Component {
             <EuiText>
               <strong>
                 <FormattedMessage
-                  id='discover.noResults.searchExamples.anyField200StatusCodeExampleTitle'
+                  id='wazuh.discover.noResults.searchExamples.anyField200StatusCodeExampleTitle'
                   defaultMessage='Find requests that contain the number 200, in any field'
                 />
               </strong>
@@ -93,7 +93,7 @@ export class DiscoverNoResults extends Component {
           description: (
             <EuiCode>
               {i18n.translate(
-                'kibana-int.discover.app.angular.noresults.status4',
+                'wazuh.kibana-int.discover.app.angular.noresults.status4',
                 {
                   defaultMessage: 'status:200',
                 },
@@ -104,7 +104,7 @@ export class DiscoverNoResults extends Component {
             <EuiText>
               <strong>
                 <FormattedMessage
-                  id='discover.noResults.searchExamples.statusField200StatusCodeExampleTitle'
+                  id='wazuh.discover.noResults.searchExamples.statusField200StatusCodeExampleTitle'
                   defaultMessage='Find 200 in the status field'
                 />
               </strong>
@@ -115,7 +115,7 @@ export class DiscoverNoResults extends Component {
           description: (
             <EuiCode>
               {i18n.translate(
-                'kibana-int.discover.app.angular.noresults.status3',
+                'wazuh.kibana-int.discover.app.angular.noresults.status3',
                 {
                   defaultMessage: 'status:[400 TO 499]',
                 },
@@ -126,7 +126,7 @@ export class DiscoverNoResults extends Component {
             <EuiText>
               <strong>
                 <FormattedMessage
-                  id='discover.noResults.searchExamples.400to499StatusCodeExampleTitle'
+                  id='wazuh.discover.noResults.searchExamples.400to499StatusCodeExampleTitle'
                   defaultMessage='Find all status codes between 400-499'
                 />
               </strong>
@@ -137,7 +137,7 @@ export class DiscoverNoResults extends Component {
           description: (
             <EuiCode>
               {i18n.translate(
-                'kibana-int.discover.app.angular.noresults.status2',
+                'wazuh.kibana-int.discover.app.angular.noresults.status2',
                 {
                   defaultMessage: 'status:[400 TO 499] AND extension:PHP',
                 },
@@ -148,7 +148,7 @@ export class DiscoverNoResults extends Component {
             <EuiText>
               <strong>
                 <FormattedMessage
-                  id='discover.noResults.searchExamples.400to499StatusCodeWithPhpExtensionExampleTitle'
+                  id='wazuh.discover.noResults.searchExamples.400to499StatusCodeWithPhpExtensionExampleTitle'
                   defaultMessage='Find status codes 400-499 with the extension php'
                 />
               </strong>
@@ -159,7 +159,7 @@ export class DiscoverNoResults extends Component {
           description: (
             <EuiCode>
               {i18n.translate(
-                'kibana-int.discover.app.angular.noresults.status1',
+                'wazuh.kibana-int.discover.app.angular.noresults.status1',
                 {
                   defaultMessage:
                     'status:[400 TO 499] AND (extension:php OR extension:html)',
@@ -171,7 +171,7 @@ export class DiscoverNoResults extends Component {
             <EuiText>
               <strong>
                 <FormattedMessage
-                  id='discover.noResults.searchExamples.400to499StatusCodeWithPhpOrHtmlExtensionExampleTitle'
+                  id='wazuh.discover.noResults.searchExamples.400to499StatusCodeWithPhpOrHtmlExtensionExampleTitle'
                   defaultMessage='Find status codes 400-499 with the extension php or html'
                 />
               </strong>
@@ -187,14 +187,14 @@ export class DiscoverNoResults extends Component {
           <EuiText>
             <h3>
               <FormattedMessage
-                id='discover.noResults.searchExamples.refineYourQueryTitle'
+                id='wazuh.discover.noResults.searchExamples.refineYourQueryTitle'
                 defaultMessage='Refine your query'
               />
             </h3>
 
             <p>
               <FormattedMessage
-                id='discover.noResults.searchExamples.howTosearchForWebServerLogsDescription'
+                id='wazuh.discover.noResults.searchExamples.howTosearchForWebServerLogsDescription'
                 defaultMessage='The search bar at the top uses Elasticsearch&rsquo;s support for Lucene {queryStringSyntaxLink}.
                 Here are some examples of how you can search for web server logs that have been parsed into a few fields.'
                 values={{
@@ -206,7 +206,7 @@ export class DiscoverNoResults extends Component {
                       }
                     >
                       <FormattedMessage
-                        id='discover.noResults.searchExamples.queryStringSyntaxLinkText'
+                        id='wazuh.discover.noResults.searchExamples.queryStringSyntaxLinkText'
                         defaultMessage='Query String syntax'
                       />
                     </EuiLink>
@@ -235,7 +235,7 @@ export class DiscoverNoResults extends Component {
               <EuiCallOut
                 title={
                   <FormattedMessage
-                    id='discover.noResults.searchExamples.noResultsMatchSearchCriteriaTitle'
+                    id='wazuh.discover.noResults.searchExamples.noResultsMatchSearchCriteriaTitle'
                     defaultMessage='No results match your search criteria'
                   />
                 }

@@ -49,7 +49,7 @@ export function OpenSearchPanel(props) {
         <EuiTitle size="m">
           <h2>
             <FormattedMessage
-              id="discover.topNav.openSearchPanel.openSearchTitle"
+              id="wazuh.discover.topNav.openSearchPanel.openSearchTitle"
               defaultMessage="Open search"
             />
           </h2>
@@ -59,7 +59,7 @@ export function OpenSearchPanel(props) {
         <SavedObjectFinderUi
           noItemsMessage={
             <FormattedMessage
-              id="discover.topNav.openSearchPanel.noSearchesFoundDescription"
+              id="wazuh.discover.topNav.openSearchPanel.noSearchesFoundDescription"
               defaultMessage="No matching searches found."
             />
           }
@@ -67,7 +67,7 @@ export function OpenSearchPanel(props) {
             {
               type: SEARCH_OBJECT_TYPE,
               getIconForSavedObject: () => 'search',
-              name: i18n.translate('discover.savedSearch.savedObjectName', {
+              name: i18n.translate('wazuh.discover.savedSearch.savedObjectName', {
                 defaultMessage: 'Saved search',
               }),
             },
@@ -92,7 +92,7 @@ export function OpenSearchPanel(props) {
               )}
             >
               <FormattedMessage
-                id="discover.topNav.openSearchPanel.manageSearchesButtonLabel"
+                id="wazuh.discover.topNav.openSearchPanel.manageSearchesButtonLabel"
                 defaultMessage="Manage searches"
               />
             </EuiButton>

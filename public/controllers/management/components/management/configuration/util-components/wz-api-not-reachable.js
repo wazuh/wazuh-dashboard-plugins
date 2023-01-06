@@ -59,13 +59,13 @@ class WzWazuhAPINotReachable extends Component {
             <div style={{ textAlign: 'center' }}>
               <EuiIcon type='alert' style={{ marginRight: '4px' }} />
               <span>
-                {i18n.translate('controllers.manage.confi.util.api', {
+                {i18n.translate('wazuh.controllers.manage.confi.util.api', {
                   defaultMessage: 'Wazuh API not reachable',
                 })}
               </span>
               <EuiHorizontalRule margin='s' />
               <EuiButton iconType='refresh' onClick={this.onClickRefresh}>
-                {i18n.translate('controllers.manage.confi.utilRefresh', {
+                {i18n.translate('wazuh.controllers.manage.confi.utilRefresh', {
                   defaultMessage: ' Refresh',
                 })}{' '}
               </EuiButton>

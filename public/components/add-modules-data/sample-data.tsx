@@ -43,11 +43,11 @@ export default class WzSampleData extends Component {
     this.generateAlertsParams = {}; // extra params to add to generateAlerts function in server
     this.categories = [
       {
-        title: i18n.translate('components.addModulesData.sampleSecurityTitle', {
+        title: i18n.translate('wazuh.components.addModulesData.sampleSecurityTitle', {
           defaultMessage: 'Sample security information',
         }),
         description: i18n.translate(
-          'components.addModulesData.sampleSecurityDescription',
+          'wazuh.component.addModulesData.sampleSecurityDescription',
           {
             defaultMessage:
               'Sample data, visualizations and dashboards for security information (integrity monitoring, Amazon AWS services, Office 365, Google Cloud Platform, GitHub, authorization, ssh, web).',
@@ -58,13 +58,13 @@ export default class WzSampleData extends Component {
       },
       {
         title: i18n.translate(
-          'components.addModulesData.sampleAuditingPolicyTitle',
+          'wazuh.component.addModulesData.sampleAuditingPolicyTitle',
           {
             defaultMessage: 'Sample auditing and policy monitoring',
           },
         ),
         description: i18n.translate(
-          'components.addModulesData.sampleAuditingPolicyDescription',
+          'wazuh.component.addModulesData.sampleAuditingPolicyDescription',
           {
             defaultMessage:
               'Sample data, visualizations and dashboards for events of auditing and policy monitoring (policy monitoring, system auditing, OpenSCAP, CIS-CAT).',
@@ -75,13 +75,13 @@ export default class WzSampleData extends Component {
       },
       {
         title: i18n.translate(
-          'components.addModulesData.sampleThreatDetectionTitle',
+          'wazuh.component.addModulesData.sampleThreatDetectionTitle',
           {
             defaultMessage: 'Sample threat detection and response',
           },
         ),
         description: i18n.translate(
-          'components.addModulesData.sampleThreatDetectionDescription',
+          'wazuh.component.addModulesData.sampleThreatDetectionDescription',
           {
             defaultMessage:
               'Sample data, visualizations and dashboards for threat events of detection and response (vulnerabilities, VirusTotal, Osquery, Docker listener, MITRE).',
@@ -182,13 +182,13 @@ export default class WzSampleData extends Component {
         `/elastic/samplealerts/${category.categorySampleAlertsIndex}`,
         { params: this.generateAlertsParams },
       );
-      const alertAdded = i18n.translate('components.addModulesData.alertAdded', {
+      const alertAdded = i18n.translate('wazuh.components.addModulesData.alertAdded', {
         defaultMessage: 'Sample security information'
       });
       this.showToast(
         'success',
         `${category.title} ${alertAdded}`,
-        i18n.translate('components.addModulesData.alertForDateRange', {
+        i18n.translate('wazuh.components.addModulesData.alertForDateRange', {
           defaultMessage: 'Date range for sample data is now-7 days ago',
         }),
         5000,
@@ -208,7 +208,7 @@ export default class WzSampleData extends Component {
         error: {
           error: error,
           message: error.message || error,
-          title: i18n.translate('components.addModulesData.errorAddSampleData', {
+          title: i18n.translate('wazuh.components.addModulesData.errorAddSampleData', {
             defaultMessage: 'Error trying to add sample data',
           }),
         },
@@ -242,7 +242,7 @@ export default class WzSampleData extends Component {
         },
       });
       const alertRemove = i18n.translate(
-        'components.addModulesData.alertRemove',
+        'wazuh.component.addModulesData.alertRemove',
         {
           defaultMessage: 'alerts removed',
         },
@@ -256,7 +256,7 @@ export default class WzSampleData extends Component {
         error: {
           error: error,
           message: error.message || error,
-          title: i18n.translate('components.addModulesData.errorDeleteSampleData', {
+          title: i18n.translate('wazuh.components.addModulesData.errorDeleteSampleData', {
             defaultMessage: 'Error trying to delete sample data',
           }),
         },
@@ -312,7 +312,7 @@ export default class WzSampleData extends Component {
     return (
       <>
         <EuiCallOut
-            title={ i18n.translate('components.addModulesData.permissionRequireForAction', {
+            title={ i18n.translate('wazuh.components.addModulesData.permissionRequireForAction', {
               defaultMessage: 'These actions require permissions on the managed indices.',
             })}
             iconType="iInCircle"

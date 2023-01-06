@@ -30,31 +30,31 @@ import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { i18n } from '@kbn/i18n';
 
-const Name1 = i18n.translate('components.addModule.guide.Name1', {
+const Name1 = i18n.translate('wazuh.components.addModule.guide.Name1', {
   defaultMessage: 'Level 12 or above alerts',
 });
-const Name2 = i18n.translate('components.addModule.guide.Name2', {
+const Name2 = i18n.translate('wazuh.components.addModule.guide.Name2', {
   defaultMessage: 'Authentication failure',
 });
-const Name3 = i18n.translate('components.addModule.guide.Name3', {
+const Name3 = i18n.translate('wazuh.components.addModule.guide.Name3', {
   defaultMessage: 'Authentication success',
 });
-const Name4 = i18n.translate('components.addModule.guide.Name4', {
+const Name4 = i18n.translate('wazuh.components.addModule.guide.Name4', {
   defaultMessage: 'Critical Severity Alerts',
 });
-const Name5 = i18n.translate('components.addModule.guide.Name5', {
+const Name5 = i18n.translate('wazuh.components.addModule.guide.Name5', {
   defaultMessage: 'High Severity Alerts',
 });
-const Name6 = i18n.translate('components.addModule.guide.Name6', {
+const Name6 = i18n.translate('wazuh.components.addModule.guide.Name6', {
   defaultMessage: 'Medium Severity Alerts',
 });
-const Name7 = i18n.translate('components.addModule.guide.Name7', {
+const Name7 = i18n.translate('wazuh.components.addModule.guide.Name7', {
   defaultMessage: 'Low Severity Alerts',
 });
-const Name8 = i18n.translate('components.addModule.guide.Name8', {
+const Name8 = i18n.translate('wazuh.components.addModule.guide.Name8', {
   defaultMessage: 'Total malicious',
 });
-const Name9 = i18n.translate('components.addModule.guide.Name9', {
+const Name9 = i18n.translate('wazuh.components.addModule.guide.Name9', {
   defaultMessage: 'Total positives',
 });
 export const Metrics = withAllowedAgents(

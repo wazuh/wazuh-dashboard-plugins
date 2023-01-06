@@ -165,7 +165,7 @@ export const PanelModuleConfiguration: FunctionalComponent<{ h: string }> =
               <EuiTitle size='xs'>
                 <h5 className='module-panel-configuration-subtitle'>
                   {i18n.translate(
-                    'components.common.modules.panel.components.moduleConfi',
+                    'wazuh.component.common.modules.panel.components.moduleConfi',
                     { defaultMessage: 'Module configuration' },
                   )}
                 </h5>
@@ -187,11 +187,11 @@ export const PanelModuleConfiguration: FunctionalComponent<{ h: string }> =
     },
   );
 const errorTitle = i18n.translate(
-  'components.common.modules.panel.errorTitle',
+  'wazuh.components.common.modules.panel.errorTitle',
   { defaultMessage: 'Error fetching the module configuration' },
 );
 const moduleTitle = i18n.translate(
-  'components.common.modules.panel.moduleTitle',
+  'wazuh.components.common.modules.panel.moduleTitle',
   { defaultMessage: 'Module configuration unavailable' },
 );
 const ConfigurationWrapper = compose(

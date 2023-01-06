@@ -29,19 +29,19 @@ import _ from 'lodash';
 import { i18n } from "@kbn/i18n";
 
 import { WzFlyout } from '../../common/flyouts';
-const Title1 = i18n.translate("components.addModule.guide.Title1", {
+const Title1 = i18n.translate("wazuh.components.security,policy.Title.remove", {
   defaultMessage: "Remove",
 });
-const Title2 = i18n.translate("components.addModule.guide.Title2", {
+const Title2 = i18n.translate("wazuh.components.security,policy.Title2", {
   defaultMessage: "Resources",
 });
-const Title3 = i18n.translate("components.addModule.guide.Title3", {
+const Title3 = i18n.translate("wazuh.components.security,policy.Title3", {
   defaultMessage: "Unsubmitted changes",
 });
-const Descp1 = i18n.translate("components.addModule.guide.Descp1", {
+const Descp1 = i18n.translate("wazuh.components.security,policy.Descp1", {
   defaultMessage: "Remove this action",
 });
-const Descp2 = i18n.translate("components.addModule.guide.Descp2", {
+const Descp2 = i18n.translate("wazuh.components.security,policy.Descp2", {
   defaultMessage: "Remove this resource",
 });
 export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
@@ -299,7 +299,7 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
           confirmButtonText="Yes, do it"
         >
           <p style={{ textAlign: 'center' }}>{
-            i18n.translate("components.overview.edit.proceed", {
+            i18n.translate("wazuh.components.overview.edit.proceed", {
               defaultMessage: "There are unsaved changes. Are you sure you want to proceed?",
             })}
           </p>
@@ -331,11 +331,11 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
         <EuiFlyoutHeader hasBorder={false}>
           <EuiTitle size="m">
             <h2>{
-              i18n.translate("components.overview.edit.Editpolicy", {
+              i18n.translate("wazuh.components.overview.edit.Editpolicy", {
                 defaultMessage: "Edit policy",
               })} {policy.name}&nbsp;&nbsp;
               {isReserved && <EuiBadge color="primary">
-                {i18n.translate("components.overview.edit.reserveKeyword", {
+                {i18n.translate("wazuh.components.overview.edit.reserveKeyword", {
                   defaultMessage: "Reserved",
                 })}
               </EuiBadge>}
@@ -379,7 +379,7 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
                     iconType="plusInCircle"
                     disabled={!actionValue || isReserved}
                   >{
-                    i18n.translate("components.overview.edit.proceed.Add", {
+                    i18n.translate("wazuh.components.overview.edit.proceed.Add", {
                       defaultMessage: "Add",
                     })}
 
@@ -434,7 +434,7 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
                     iconType="plusInCircle"
                     disabled={!resourceIdentifierValue || isReserved}
                   >{
-                    i18n.translate("components.overview.edit.Add", {
+                    i18n.translate("wazuh.components.overview.edit.Add", {
                       defaultMessage: "Add",
                     })}
                   </EuiButton>
@@ -462,7 +462,7 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
             <EuiSpacer />
             <EuiButton disabled={isReserved} onClick={updatePolicy} fill>
              {
-              i18n.translate("components.overview.edit.Apply", {
+              i18n.translate("wazuh.components.overview.edit.Apply", {
                 defaultMessage: "Apply",
               })}
             </EuiButton>

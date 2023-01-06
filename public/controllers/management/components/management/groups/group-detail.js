@@ -88,7 +88,7 @@ class WzGroupDetail extends Component {
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiText color='subdued' style={{ paddingBottom: '15px' }}>
-              {i18n.translate('controllers.mnage.comp.confi.groups.mange', {
+              {i18n.translate('wazuh.controllers.mnage.comp.confi.groups.mange', {
                 defaultMessage: 'From here you can list and manage your agents',
               })}{' '}
             </EuiText>
@@ -109,7 +109,7 @@ class WzGroupDetail extends Component {
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiText color='subdued' style={{ paddingBottom: '15px' }}>
-              {i18n.translate('controllers.mnage.comp.confi.groups.files', {
+              {i18n.translate('wazuh.controllers.mnage.comp.confi.groups.files', {
                 defaultMessage:
                   'From here you can list and see your group files, also, you can edit the group configuration',
               })}

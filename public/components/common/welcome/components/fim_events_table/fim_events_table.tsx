@@ -42,7 +42,7 @@ export function FimEventsTable({ agent, router }) {
           <EuiFlexGroup>
             <EuiFlexItem>
               <EuiText size="xs">
-                <h2>{ i18n.translate('components.common.welcome.components.recentEvent', { defaultMessage: 'FIM: Recent events', })}</h2>
+                <h2>{ i18n.translate('wazuh.components.common.welcome.components.recentEvent', { defaultMessage: 'FIM: Recent events', })}</h2>
               </EuiText>
             </EuiFlexItem>
             <EuiFlexItem grow={false}>

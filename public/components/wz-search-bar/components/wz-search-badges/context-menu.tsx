@@ -168,7 +168,7 @@ function EditFilterSaveButton(
               props.setIsOpen(false);
             }}
           >
-            {i18n.translate('components.context.menu.Save', {
+            {i18n.translate('wazuh.components.context.menu.Save', {
               defaultMessage: 'Save',
             })}
           </EuiButton>
@@ -179,7 +179,7 @@ function EditFilterSaveButton(
               props.setIsOpen(false);
             }}
           >
-            {i18n.translate('components.context.menu.Cancel', {
+            {i18n.translate('wazuh.components.context.menu.Cancel', {
               defaultMessage: 'ECancel',
             })}
           </EuiButton>

@@ -38,10 +38,10 @@ import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
 import { i18n } from '@kbn/i18n';
-const title1 = i18n.translate('controller.agent.restarting', {
+const title1 = i18n.translate('wazuh.controller.agent.restarting', {
   defaultMessage: 'Error restarting the agent:',
 });
-const title2 = i18n.translate('controller.agent.getting', {
+const title2 = i18n.translate('wazuh.controller.agent.getting', {
   defaultMessage: 'Error getting the agent:',
 });
 

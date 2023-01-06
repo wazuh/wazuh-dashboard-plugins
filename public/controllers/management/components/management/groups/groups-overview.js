@@ -44,7 +44,7 @@ export class WzGroupsOverview extends Component {
                 <EuiFlexItem>
                   <EuiTitle>
                     <h2>
-                      {i18n.translate('controllers.mnage.comp.confi.groups', {
+                      {i18n.translate('wazuh.controllers.mnage.comp.confi.groups', {
                         defaultMessage: 'Groups',
                       })}
                     </h2>
@@ -58,7 +58,7 @@ export class WzGroupsOverview extends Component {
             <EuiFlexItem>
               <EuiText color='subdued' style={{ paddingBottom: '15px' }}>
                 {i18n.translate(
-                  'controllers.mnage.comp.confi.groups.itsagent',
+                  'wazuh.controllers..mnage.comp.confi.groups.itsagent',
                   {
                     defaultMessage:
                       'From here you can list and check your groups, its agents and files.',

@@ -103,7 +103,7 @@ export function TimechartHeader({
       <EuiFlexGroup gutterSize="s" responsive justifyContent="center" alignItems="center">
         <EuiFlexItem grow={false}>
           <EuiToolTip
-            content={i18n.translate('discover.howToChangeTheTimeTooltip', {
+            content={i18n.translate('wazuh.discover.howToChangeTheTimeTooltip', {
               defaultMessage: 'To change the time, use the global time filter above',
             })}
             delay="long"
@@ -111,7 +111,7 @@ export function TimechartHeader({
             <EuiText data-test-subj="discoverIntervalDateRange" size="s">
               {`${toMoment(timeRange.from)} - ${toMoment(timeRange.to)} ${
                 interval !== 'auto'
-                  ? i18n.translate('discover.timechartHeader.timeIntervalSelect.per', {
+                  ? i18n.translate('wazuh.discover.timechartHeader.timeIntervalSelect.per', {
                       defaultMessage: 'per',
                     })
                   : ''
@@ -121,7 +121,7 @@ export function TimechartHeader({
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
           <EuiSelect
-            aria-label={i18n.translate('discover.timechartHeader.timeIntervalSelect.ariaLabel', {
+            aria-label={i18n.translate('wazuh.discover.timechartHeader.timeIntervalSelect.ariaLabel', {
               defaultMessage: 'Time interval',
             })}
             compressed
@@ -142,16 +142,16 @@ export function TimechartHeader({
               bucketInterval.scaled ? (
                 <EuiIconTip
                   id="discoverIntervalIconTip"
-                  content={i18n.translate('discover.bucketIntervalTooltip', {
+                  content={i18n.translate('wazuh.discover.bucketIntervalTooltip', {
                     defaultMessage:
                       'This interval creates {bucketsDescription} to show in the selected time range, so it has been scaled to {bucketIntervalDescription}.',
                     values: {
                       bucketsDescription:
                         bucketInterval!.scale && bucketInterval!.scale > 1
-                          ? i18n.translate('discover.bucketIntervalTooltip.tooLargeBucketsText', {
+                          ? i18n.translate('wazuh.discover.bucketIntervalTooltip.tooLargeBucketsText', {
                               defaultMessage: 'buckets that are too large',
                             })
-                          : i18n.translate('discover.bucketIntervalTooltip.tooManyBucketsText', {
+                          : i18n.translate('wazuh.discover.bucketIntervalTooltip.tooManyBucketsText', {
                               defaultMessage: 'too many buckets',
                             }),
                       bucketIntervalDescription: bucketInterval.description,

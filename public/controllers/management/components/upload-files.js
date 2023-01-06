@@ -117,7 +117,7 @@ export class UploadFiles extends Component {
                     <Fragment>
                       <div>
                         {i18n.translate(
-                          'controllers.mnage.comp.confi.upload.file.Successfullyimported',
+                          'wazuh.controllers..mnage.comp.confi.upload.file.Successfullyimported',
                           {
                             defaultMessage: 'Successfully imported',
                           },
@@ -187,7 +187,7 @@ export class UploadFiles extends Component {
             <EuiText className='list-element-ok' size='s'>
               {' '}
               {i18n.translate(
-                'controllers.mnage.comp.confi.upload.file.Fileuploadsuccessfully',
+                'wazuh.controllers..mnage.comp.confi.upload.file.Fileuploadsuccessfully',
                 {
                   defaultMessage: 'File upload successfully',
                 },
@@ -388,7 +388,7 @@ export class UploadFiles extends Component {
                       onClick={this.startUpload}
                     >
                       {i18n.translate(
-                        'controllers.mnage.comp.confi.upload.file.Upload',
+                        'wazuh.controllers..mnage.comp.confi.upload.file.Upload',
                         {
                           defaultMessage: 'Upload',
                         },
@@ -402,7 +402,7 @@ export class UploadFiles extends Component {
                           onClick={this.closePopover}
                         >
                           {i18n.translate(
-                            'controllers.mnage.comp.confi.upload.file.Close',
+                            'wazuh.controllers..mnage.comp.confi.upload.file.Close',
                             {
                               defaultMessage: 'Close',
                             },
@@ -417,7 +417,7 @@ export class UploadFiles extends Component {
                           onClick={this.startUpload}
                         >
                           {i18n.translate(
-                            'controllers.mnage.comp.confi.upload.file.Upload',
+                            'wazuh.controllers..mnage.comp.confi.upload.file.Upload',
                             {
                               defaultMessage: 'Upload',
                             },

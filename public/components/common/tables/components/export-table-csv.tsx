@@ -20,10 +20,10 @@ import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
 import { i18n } from '@kbn/i18n';
 
-const successMsg = i18n.translate('components.common.table.components.sucessMsg', {
+const successMsg = i18n.translate('wazuh.components.common.table.components.sucessMsg', {
   defaultMessage: 'Your download should begin automatically...',
 });
-const errorMsg = i18n.translate('components.common.table.components.errorMsg', {
+const errorMsg = i18n.translate('wazuh.components.common.table.components.errorMsg', {
   defaultMessage: 'Error downloading csv',
 });
 export function ExportTableCsv({ endpoint, totalItems, filters, title }) {
@@ -70,7 +70,7 @@ export function ExportTableCsv({ endpoint, totalItems, filters, title }) {
         iconType='importAction'
         onClick={() => downloadCsv()}
       >
-        {i18n.translate('components.common.tables.exportFormatted', {
+        {i18n.translate('wazuh.components.common.tables.exportFormatted', {
           defaultMessage: 'Export formatted',
         })}
       </EuiButtonEmpty>

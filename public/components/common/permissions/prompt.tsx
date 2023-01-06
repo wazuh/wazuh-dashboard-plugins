@@ -37,7 +37,7 @@ export const WzEmptyPromptNoPermissions = withErrorBoundary(
         iconType='securityApp'
         title={
           <h2>
-            {i18n.translate('components.common.premissions.haveNoPermission', {
+            {i18n.translate('wazuh.components.common.premissions.haveNoPermission', {
               defaultMessage: 'You have no permissions',
             })}
           </h2>
@@ -55,7 +55,7 @@ export const WzEmptyPromptNoPermissions = withErrorBoundary(
             {roles && (
               <div>
                 {i18n.translate(
-                  'components.common.premissions.sectionRequires',
+                  'wazuh.components.common.premissions.sectionRequires',
                   { defaultMessage: 'This section requires' },
                 )}{' '}
                 {roles

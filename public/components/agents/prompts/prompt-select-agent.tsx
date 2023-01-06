@@ -31,7 +31,7 @@ export const PromptSelectAgent = ({ body, title }: PromptSelectAgentProps) => {
       body={body && <p>{body}</p>}
       actions={
         <EuiButton color='primary' fill onClick={openAgentSelector}>
-          {i18n.translate('components.agent.fim.ivv.lib.emptyField', {
+          {i18n.translate('wazuh.components.agent.fim.ivv.lib.selectAgent', {
             defaultMessage: 'Select agent',
           })}
         </EuiButton>

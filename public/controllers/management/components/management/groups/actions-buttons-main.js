@@ -311,7 +311,7 @@ class WzGroupsActionButtons extends Component {
                     await this.createGroup();
                   }}
                 >
-                  {i18n.translate('controllers.mnage.comp.confi.groups.save', {
+                  {i18n.translate('wazuh.controllers.mnage.comp.confi.groups.save', {
                     defaultMessage: 'Save new group',
                   })}
                 </WzButtonPermissions>

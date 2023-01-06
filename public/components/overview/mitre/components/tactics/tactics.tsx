@@ -30,10 +30,10 @@ import { getErrorOrchestrator } from '../../../../../react-services/common-servi
 import { i18n } from "@kbn/i18n";
 
 
-const Title1 = i18n.translate("components.addModule.guide.Title1", {
+const Title1 = i18n.translate("wazuh.components.overview.mitre.tactics.mitreAlert", {
   defaultMessage: "Mitre alerts could not be fetched",
 });
-const Title2 = i18n.translate("components.addModule.guide.Title2", {
+const Title2 = i18n.translate("wazuh.components.overview.mitre.tactics.Title2", {
   defaultMessage: "Options",
 });
 export class Tactics extends Component {
@@ -278,7 +278,7 @@ export class Tactics extends Component {
           <EuiFlexItem>
             <EuiTitle size="m">
               <h1>{
-                i18n.translate("components.agent.fim.ivv.lib.Tactics", {
+                i18n.translate("wazuh.components.agent.fim.ivv.lib.Tactics", {
                   defaultMessage: "Tactics",
                 })}
               </h1>

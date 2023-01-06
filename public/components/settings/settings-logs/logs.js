@@ -99,7 +99,7 @@ class SettingsLogs extends Component {
                 <EuiFlexItem>
                   <EuiTitle>
                     <h2>
-                      {i18n.translate('components.setting.log.mess', {
+                      {i18n.translate('wazuh.components.setting.log.mess', {
                         defaultMessage: 'App log messages',
                       })}
                     </h2>
@@ -112,14 +112,14 @@ class SettingsLogs extends Component {
                 iconType='refresh'
                 onClick={async () => await this.refresh()}
               >
-                {i18n.translate('components.setting.log.Refresh', {
+                {i18n.translate('wazuh.components.setting.log.Refresh', {
                   defaultMessage: 'Refresh',
                 })}
               </EuiButtonEmpty>
             </EuiFlexItem>
           </EuiFlexGroup>
           <EuiText color='subdued' style={{ paddingBottom: '15px' }}>
-            {i18n.translate('components.setting.log.file', {
+            {i18n.translate('wazuh.components.setting.log.file', {
               defaultMessage: 'Log file located at',
             })}
             {getPluginDataPath('logs/wazuhapp.log')}

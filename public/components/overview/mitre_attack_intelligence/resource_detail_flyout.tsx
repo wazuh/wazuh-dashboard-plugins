@@ -49,7 +49,7 @@ export const ModuleMitreAttackIntelligenceFlyout = ({
       <EuiFlyoutHeader hasBorder>
         <EuiTitle size="m">
           <h2 id="flyoutTitle">{
-            i18n.translate("components.overview.mitre.Details", {
+            i18n.translate("wazuh.components.overview.mitre.Details", {
               defaultMessage: "Details",
             })}
           </h2>
@@ -78,7 +78,7 @@ export const ModuleMitreAttackIntelligenceFlyout = ({
           <EuiFlexItem>
             <div>
               <strong>{
-                i18n.translate("components.overview.mitre.Description", {
+                i18n.translate("wazuh.components.overview.mitre.Description", {
                   defaultMessage: "Description",
                 })}
               </strong>

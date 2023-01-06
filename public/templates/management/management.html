@@ -97,7 +97,7 @@
       <div class="euiFlexItem">
         <div class="euiPanel euiPanel--paddingMedium">
           <span class="euiTitle euiTitle--small euiCard__title"
-            i18n-id="templates.management.details"
+            i18n-id="wazuh.templates.management.details"
             i18n-default-message="Details"
             >&nbsp;
             <button
@@ -108,7 +108,7 @@
               <span class="euiButtonEmpty__content"
                 ><i class="fa fa-fw fa-pie-chart"></i
                 ><span class="euiButtonEmpty__text"
-                  i18n-id="templates.management.viewOverview"
+                  i18n-id="wazuh.templates.management.viewOverview"
                   i18n-default-message="View Overview"
                 ></span>
               </span>
@@ -121,14 +121,14 @@
           </div>
           <div layout="row" class="wz-padding-top-10">
             <span flex="25"
-              i18n-id="templates.management.running"
+              i18n-id="wazuh.templates.management.running"
               i18n-default-message="Running"
             ></span>
             <span class="color-grey">{{ status || 'no' }}</span>
           </div>
           <div layout="row" class="wz-padding-top-10">
             <span flex="25"
-              i18n-id="templates.management.version"
+              i18n-id="wazuh.templates.management.version"
               i18n-default-message="Version"
             ></span>
             <span class="color-grey">{{version}}</span>
@@ -141,7 +141,7 @@
       <div class="euiFlexItem">
         <div class="euiPanel euiPanel--paddingMedium">
           <span class="euiTitle euiTitle--small euiCard__title"
-            i18n-id="templates.management.information"
+            i18n-id="wazuh.templates.management.information"
             i18n-default-message="Information"
           ></span>
           <div class="euiSpacer euiSpacer--m"></div>
@@ -152,7 +152,7 @@
               class="wz-text-link"
               tooltip="Click to open the list of nodes"
               tooltip-placement="left"
-              i18n-id="templates.management.nodes"
+              i18n-id="wazuh.templates.management.nodes"
               i18n-default-message="Nodes"
               ></span
             >
@@ -170,7 +170,7 @@
               class="wz-text-link"
               tooltip="Click to open the list of agents"
               tooltip-placement="left"
-              i18n-id="templates.management.agents"
+              i18n-id="wazuh.templates.management.agents"
               i18n-default-message="Agents"
               ></span
             >
@@ -199,7 +199,7 @@
             props="{type:'help',className:'euiCallOutHeader__title'}"
           ></react-component>
           <span class="euiCallOutHeader__title"
-            i18n-id="templates.management.noResultForSelectedTimeRange"
+            i18n-id="wazuh.templates.management.noResultForSelectedTimeRange"
             i18n-default-message="There are no results for selected time range. Try another one."
           ></span
           >
@@ -224,7 +224,7 @@
     <div ng-show="showConfig">
       <div class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--responsive">
         <div class="euiFlexItem euiFlexItem--flexGrowZero">
-          <h2 class="euiTitle euiTitle--medium" i18n-id="templates.management.overview"
+          <h2 class="euiTitle euiTitle--medium" i18n-id="wazuh.templates.management.overview"
           i18n-default-message="Overview">
             <md-button
               class="md-icon-button md-icon-button-back wz-padding-right-16 btn btn-info"
@@ -253,8 +253,8 @@
           >
             <span
               class="embPanel__header embPanel__title embPanel__dragger layout-row wz-headline-title"
-              i18n-id="templates.management.topNodes"
-              i18n-default-message="Top 5 nodes "
+              i18n-id="wazuh.templates.management.topNodes"
+              i18n-default-message="Top 5 nodes"
               ></span
             >
             <react-component
@@ -263,7 +263,7 @@
               props="{visId: 'Wazuh-App-Cluster-monitoring-Overview-Node-Pie', tab: 'monitoring'}"
             ></react-component>
             <span class="wz-padding-top-10 wz-text-center" ng-show="!rendered"
-              i18n-id="templates.management.noResultForSelectedTimeRange"
+              i18n-id="wazuh.templates.management.noResultForSelectedTimeRange"
               i18n-default-message="There are no results for selected time range. Try another one."
               ></span
             >
@@ -276,42 +276,42 @@
             <div class="euiSpacer euiSpacer--m"></div>
             <!-- Configuration options -->
             <div layout="row" class="wz-padding-top-10">
-              <span flex="25" i18n-id="templates.management.disabled"
+              <span flex="25" i18n-id="wazuh.templates.management.disabled"
                 i18n-default-message="Disabled"></span>
               <span class="color-grey">{{configuration.disabled}}</span>
             </div>
             <div layout="row" class="wz-padding-top-10">
-              <span flex="25" i18n-id="templates.management.hidden"
+              <span flex="25" i18n-id="wazuh.templates.management.hidden"
                 i18n-default-message="Hidden"></span>
               <span class="color-grey">{{configuration.hidden}}</span>
             </div>
             <div layout="row" class="wz-padding-top-10">
-              <span flex="25" i18n-id="templates.management.nanme"
+              <span flex="25" i18n-id="wazuh.templates.management.nanme"
                 i18n-default-message="Name"></span>
               <span class="color-grey">{{configuration.name}}</span>
             </div>
             <div layout="row" class="wz-padding-top-10">
-              <span flex="25" i18n-id="templates.management.nodeName"
+              <span flex="25" i18n-id="wazuh.templates.management.nodeName"
                 i18n-default-message="Node name"></span>
               <span class="color-grey">{{configuration.node_name}}</span>
             </div>
             <div layout="row" class="wz-padding-top-10">
-              <span flex="25" i18n-id="templates.management.nodeType"
+              <span flex="25" i18n-id="wazuh.templates.management.nodeType"
                 i18n-default-message="Node type"></span>
               <span class="color-grey">{{configuration.node_type}}</span>
             </div>
             <div layout="row" class="wz-padding-top-10">
-              <span flex="25" i18n-id="templates.management.bind_addr"
+              <span flex="25" i18n-id="wazuh.templates.management.bind_addr"
                 i18n-default-message="Bind address"></span>
               <span class="color-grey">{{configuration.bind_addr}}</span>
             </div>
             <div layout="row" class="wz-padding-top-10">
-              <span flex="25" i18n-id="templates.management.ip"
+              <span flex="25" i18n-id="wazuh.templates.management.ip"
                 i18n-default-message="IP"></span>
               <span class="color-grey">{{configuration.nodes[0] || '-'}}</span>
             </div>
             <div layout="row" class="wz-padding-top-10">
-              <span flex="25" i18n-id="templates.management.port"
+              <span flex="25" i18n-id="wazuh.templates.management.port"
                 i18n-default-message="Port"></span>
               <span class="color-grey">{{configuration.port}}</span>
             </div>
@@ -331,7 +331,7 @@
       <!-- Back button -->
       <div class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--responsive">
         <div class="euiFlexItem euiFlexItem--flexGrowZero">
-          <h2 class="euiTitle euiTitle--medium" i18n-id="templates.management.node"
+          <h2 class="euiTitle euiTitle--medium" i18n-id="wazuh.templates.management.node"
                 i18n-default-message="Node">
             <md-button
               class="md-icon-button md-icon-button-back wz-padding-right-16 btn btn-info"
@@ -355,9 +355,7 @@
           <md-card-content class="wazuh-column">
             <span
               class="embPanel__header embPanel__title embPanel__dragger layout-row wz-headline-title"
-               i18n-id="templates.management.alertSummary"
-               i18n-default-message="{ currentNode.name } alerts summary"
-              ></span
+              >{{ currentNode.name }} alerts summary</span
             >
             <react-component
               style="height: 100%"
@@ -381,31 +379,31 @@
         >
           <div class="euiPanel euiPanel--paddingMedium">
             <span class="euiTitle euiTitle--small euiCard__title"
-              i18n-id="templates.management.nodeInformation"
+              i18n-id="wazuh.templates.management.nodeInformation"
               i18n-default-message="Node information"></span>
             <div class="euiSpacer euiSpacer--m"></div>
             <div layout="row" class="wz-padding-top-10">
-              <span flex="30" i18n-id="templates.management.ip"
+              <span flex="30" i18n-id="wazuh.templates.management.ip"
                 i18n-default-message="IP"></span>
               <span class="color-grey">{{currentNode.healthCheck.info.ip}}</span>
             </div>
             <div layout="row" class="wz-padding-top-10">
-              <span flex="30" i18n-id="templates.management.version"
+              <span flex="30" i18n-id="wazuh.templates.management.version"
                 i18n-default-message="Version"></span>
               <span class="color-grey">{{currentNode.healthCheck.info.version}}</span>
             </div>
             <div layout="row" class="wz-padding-top-10">
-              <span flex="30" i18n-id="templates.management.type"
+              <span flex="30" i18n-id="wazuh.templates.management.type"
                 i18n-default-message="Type"></span>
               <span class="color-grey">{{currentNode.healthCheck.info.type}}</span>
             </div>
             <div layout="row" class="wz-padding-top-10">
-              <span flex="30" i18n-id="templates.management.name"
+              <span flex="30" i18n-id="wazuh.templates.management.name"
                 i18n-default-message="Name"></span>
               <span class="color-grey">{{currentNode.healthCheck.info.name}}</span>
             </div>
             <div layout="row" class="wz-padding-top-10">
-              <span flex="30" i18n-id="templates.management.activeAgents"
+              <span flex="30" i18n-id="wazuh.templates.management.activeAgents"
                 i18n-default-message="Active agents"></span>
               <span class="color-grey">{{ currentNode.healthCheck.info.n_active_agents }}</span>
             </div>
@@ -419,14 +417,14 @@
         >
           <div class="euiPanel euiPanel--paddingMedium">
             <span class="euiTitle euiTitle--small euiCard__title"
-              i18n-id="templates.management.lastFileIntegritySync"
+              i18n-id="wazuh.templates.management.lastFileIntegritySync"
               i18n-default-message="Last files integrity synchronization"
               ></span
             >
             <div class="euiSpacer euiSpacer--m"></div>
             <div layout="row" class="wz-padding-top-10">
               <span flex="30"
-                i18n-id="templates.management.lastSync"
+                i18n-id="wazuh.templates.management.lastSync"
                 i18n-default-message="Last sync"
               ></span>
               <span class="color-grey"
@@ -434,35 +432,35 @@
               >
             </div>
             <div layout="row" class="wz-padding-top-10">
-              <span flex="30" i18n-id="templates.management.duration"
+              <span flex="30" i18n-id="wazuh.templates.management.duration"
                 i18n-default-message="Duration"></span>
               <span class="color-grey"
                 >{{currentNode.healthCheck.status.last_sync_integrity.duration}}</span
               >
             </div>
             <div layout="row" class="wz-padding-top-10">
-              <span flex="30" i18n-id="templates.management.totalSharedFiles"
+              <span flex="30" i18n-id="wazuh.templates.management.totalSharedFiles"
                 i18n-default-message="Total shared files"></span>
               <span class="color-grey"
                 >{{currentNode.healthCheck.status.last_sync_integrity.total_files.shared}}</span
               >
             </div>
             <div layout="row" class="wz-padding-top-10">
-              <span flex="30"  i18n-id="templates.management.totalMissingFiles"
+              <span flex="30"  i18n-id="wazuh.templates.management.totalMissingFiles"
                 i18n-default-message="Total missing files"></span>
               <span class="color-grey"
                 >{{currentNode.healthCheck.status.last_sync_integrity.total_files.missing}}</span
               >
             </div>
             <div layout="row" class="wz-padding-top-10">
-              <span flex="30" i18n-id="templates.management.extraValidFiles"
+              <span flex="30" i18n-id="wazuh.templates.management.extraValidFiles"
                 i18n-default-message="Total extra but valid files"></span>
               <span class="color-grey"
                 >{{currentNode.healthCheck.status.last_sync_integrity.total_files.extra_valid}}</span
               >
             </div>
             <div layout="row" class="wz-padding-top-10">
-              <span flex="30" i18n-id="templates.management.extraFiles"
+              <span flex="30" i18n-id="wazuh.templates.management.extraFiles"
                 i18n-default-message="Total extra files"></span>
               <span class="color-grey"
                 >{{currentNode.healthCheck.status.last_sync_integrity.total_files.extra}}</span
@@ -482,13 +480,13 @@
         <div class="euiFlexItem">
           <div class="euiPanel euiPanel--paddingMedium">
             <span class="euiTitle euiTitle--small euiCard__title"
-              i18n-id="templates.management.lastAgentInfoSync"
+              i18n-id="wazuh.templates.management.lastAgentInfoSync"
               i18n-default-message="Last agents information synchronization"
             ></span>
             <div class="euiSpacer euiSpacer--m"></div>
             <div layout="row" class="wz-padding-top-10">
               <span flex="30"
-                i18n-id="templates.management.lastSync"
+                i18n-id="wazuh.templates.management.lastSync"
                 i18n-default-message="Last sync"
               ></span>
               <span class="color-grey"
@@ -497,7 +495,7 @@
             </div>
             <div layout="row" class="wz-padding-top-10">
               <span flex="30"
-                i18n-id="templates.management.duration"
+                i18n-id="wazuh.templates.management.duration"
                 i18n-default-message="Duration"
               ></span>
               <span class="color-grey"
@@ -506,7 +504,7 @@
             </div>
             <div layout="row" class="wz-padding-top-10">
               <span flex="30"
-                i18n-id="templates.management.totalAgentInfo"
+                i18n-id="wazuh.templates.management.totalAgentInfo"
                 i18n-default-message="Total agent info"
               >
               </span>
@@ -521,14 +519,14 @@
         <div class="euiFlexItem">
           <div class="euiPanel euiPanel--paddingMedium">
             <span class="euiTitle euiTitle--small euiCard__title"
-              i18n-id="templates.management.lastAgentGroupSync"
+              i18n-id="wazuh.templates.management.lastAgentGroupSync"
               i18n-default-message="Last agents groups synchronization"
               ></span
             >
             <div class="euiSpacer euiSpacer--m"></div>
             <div layout="row" class="wz-padding-top-10">
               <span flex="30"
-                i18n-id="templates.management.lastSync"
+                i18n-id="wazuh.templates.management.lastSync"
                 i18n-default-message="Last sync"
               ></span>
               <span class="color-grey"
@@ -537,7 +535,7 @@
             </div>
             <div layout="row" class="wz-padding-top-10">
               <span flex="30"
-                i18n-id="templates.management.duration"
+                i18n-id="wazuh.templates.management.duration"
                 i18n-default-message="Duration"
               ></span>
               <span class="color-grey"
@@ -546,7 +544,7 @@
             </div>
             <div layout="row" class="wz-padding-top-10">
               <span flex="30"
-                i18n-id="templates.management.totalAgentInfo"
+                i18n-id="wazuh.templates.management.totalAgentInfo"
                 i18n-default-message="Total agent info"
               ></span>
               <span class="color-grey"

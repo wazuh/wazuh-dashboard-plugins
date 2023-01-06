@@ -15,16 +15,16 @@ import { AggTable } from '../../../common/modules/panel';
 import { EuiFlexItem } from '@elastic/eui';
 import { i18n } from '@kbn/i18n';
 
-const title1 = i18n.translate('components.addModule.guide.title1', {
+const title1 = i18n.translate('wazuh.components.overview.githubPanel.actors', {
   defaultMessage: 'Actors',
 });
-const title2 = i18n.translate('components.addModule.guide.title2', {
+const title2 = i18n.translate('wazuh.components.overview.githubPanel.organization', {
   defaultMessage: 'Organizations',
 });
-const title3 = i18n.translate('components.addModule.guide.title3', {
+const title3 = i18n.translate('wazuh.components.overview.githubPanel.repository', {
   defaultMessage: 'Repositories',
 });
-const title4 = i18n.translate('components.addModule.guide.title4', {
+const title4 = i18n.translate('wazuh.components.overview.githubPanel.title4', {
   defaultMessage: 'Actions',
 });
 export const MainViewConfig = {

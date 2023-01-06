@@ -14,7 +14,7 @@ import React from 'react';
 import { PromptSelectAgent } from './';
 import { i18n } from '@kbn/i18n';
 
-const moduleTitle = i18n.translate('components.addModule.guide.moduleTitle', {
+const moduleTitle = i18n.translate('wazuh.components.agents.prompts.moduleTitle', {
   defaultMessage: 'Module not supported by the agent',
 });
 export const PromptAgentNoSupportModule = () => {

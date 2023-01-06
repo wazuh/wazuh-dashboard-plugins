@@ -27,10 +27,10 @@ import {
 
 import { connect } from 'react-redux';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
-const descp1 = i18n.translate('controller.manage.comp.confi.setting.Descp1', {
+const descp1 = i18n.translate('wazuh.controller.manage.comp.confi.setting.Descp1', {
   defaultMessage: 'Output alerts to a syslog server',
 });
-const title1 = i18n.translate('ccontroller.manage.comp.confi.setting.title1', {
+const title1 = i18n.translate('wazuh.ccontroller.manage.comp.confi.setting.title1', {
   defaultMessage: 'Main settings',
 });
 const helpLinks = [

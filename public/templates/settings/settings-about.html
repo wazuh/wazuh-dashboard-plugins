@@ -4,18 +4,18 @@
     <div ng-if="!ctrl.load">
             <div class="euiCallOut euiCallOut--primary" style="display: flex">
                 <div class="wz-text-truncatable" flex
-                  i18n-id="templates.settings.appVersion"
+                  i18n-id="wazuh.templates.settings.appVersion"
                   i18n-default-message="App version: "
                 >
                   <span class="wz-text-bold">{{ctrl.appInfo["app-version"]}}</span>
                 </div>
                 <div class="wz-text-truncatable" flex
-                  i18n-id="templates.settings.appVersion"
+                  i18n-id="wazuh.templates.settings.appVersion"
                   i18n-default-message="App version: "
                 ><span
                         class="wz-text-bold">{{ctrl.appInfo["revision"]}}</span></div>
                 <div class="wz-text-truncatable" flex
-                  i18n-id="templates.settings.installDate"
+                  i18n-id="wazuh.templates.settings.installDate"
                   i18n-default-message="Install date: "
                 ><span
                         class="wz-text-bold">{{ctrl.appInfo["installationDate"] | date : "medium"}}</span></div>
@@ -31,7 +31,7 @@
                             <div class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive">
                                 <div class="euiFlexItem">
                                     <h2 class="euiTitle euiTitle--medium"
-                                      i18n-id="templates.settings.welcomeMsg"
+                                      i18n-id="wazuh.templates.settings.welcomeMsg"
                                       i18n-default-message="Welcome to the Wazuh app for Kibana "
                                     > {{ctrl.pluginPlatformVersion}}</h2>
                                 </div>
@@ -41,7 +41,7 @@
                 <div class="euiSpacer euiSpacer--l"></div>
                 <div class="euiText euiText--medium">
                     <p
-                      i18n-id="templates.settings.description"
+                      i18n-id="wazuh.templates.settings.description"
                       i18n-default-message="Wazuh Kibana plugin provides management and monitoring capabilities, giving users control
                     over the Wazuh infrastructure. Using this plugin you can monitor your agents status and
                     configuration, query and visualize your alert data and monitor manager rules and
@@ -58,7 +58,7 @@
                                 <div class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive">
                                     <div class="euiFlexItem">
                                         <h2 class="euiTitle euiTitle--medium"
-                                          i18n-id="templates.settings.community"
+                                          i18n-id="wazuh.templates.settings.community"
                                           i18n-default-message="Community"
                                         ></h2>
                                     </div>
@@ -68,7 +68,7 @@
                     <div class="euiSpacer euiSpacer--m"></div>
                 <div class="euiText euiText--medium">
                         <p
-                          i18n-id="templates.settings.feedback"
+                          i18n-id="wazuh.templates.settings.feedback"
                           i18n-default-message="Enjoy your Wazuh experience and please don't hesitate to give us your feedback."
                         >
                     </p>

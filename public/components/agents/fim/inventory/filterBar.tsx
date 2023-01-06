@@ -21,61 +21,61 @@ import { ICustomBadges } from '../../../wz-search-bar/components';
 import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import { formatUIDate } from '../../../../react-services/time-service';
 import { i18n } from '@kbn/i18n';
-const fileDescp = i18n.translate('components.addModule.guide.fileDescp', {
+const fileDescp = i18n.translate('wazuh.components.addModule.guide.fileDescp', {
   defaultMessage: 'Name of the file',
 });
-const prefileDescp = i18n.translate('components.addModule.guide.prefileDescp', {
+const prefileDescp = i18n.translate('wazuh.components.addModule.guide.prefileDescp', {
   defaultMessage: 'Permissions of the file',
 });
 const datefileDescp = i18n.translate(
-  'components.addModule.guide.datefileDescp',
+  'wazuh.components.addModule.guide.datefileDescp',
   {
     defaultMessage: 'Date the file was modified',
   },
 );
 const regdatefileDescp = i18n.translate(
-  'components.addModule.guide.regdatefileDescp',
+  'wazuh.components.addModule.guide.regdatefileDescp',
   {
     defaultMessage: 'Date of registration of the event',
   },
 );
 const ownerfileDescp = i18n.translate(
-  'components.addModule.guide.ownerfileDescp',
+  'wazuh.components.addModule.guide.ownerfileDescp',
   {
     defaultMessage: 'Id of the owner file',
   },
 );
 const owneridfileDescp = i18n.translate(
-  'components.addModule.guide.owneridfileDescp',
+  'wazuh.components.addModule.guide.owneridfileDescp',
   {
     defaultMessage: 'Name of the group owner file',
   },
 );
 const groupownerfileDescp = i18n.translate(
-  'components.addModule.guide.groupownerfileDescp',
+  'wazuh.components.addModule.guide.groupownerfileDescp',
   {
     defaultMessage: 'Id of the group owner',
   },
 );
-const md5Descp = i18n.translate('components.addModule.guide.md5Descp', {
+const md5Descp = i18n.translate('wazuh.components.addModule.guide.md5Descp', {
   defaultMessage: 'md5 hash',
 });
-const sha1Descp = i18n.translate('components.addModule.guide.sha1Descp', {
+const sha1Descp = i18n.translate('wazuh.components.addModule.guide.sha1Descp', {
   defaultMessage: 'sha1 hash',
 });
-const sha256Descp = i18n.translate('components.addModule.guide.sha256Descp', {
+const sha256Descp = i18n.translate('wazuh.components.addModule.guide.sha256Descp', {
   defaultMessage: 'sha256 hash',
 });
-const inodeDescp = i18n.translate('components.addModule.guide.inodeDescp', {
+const inodeDescp = i18n.translate('wazuh.components.addModule.guide.inodeDescp', {
   defaultMessage: 'Inode of the file',
 });
-const sizeDescp = i18n.translate('components.addModule.guide.sizeDescp', {
+const sizeDescp = i18n.translate('wazuh.components.addModule.guide.sizeDescp', {
   defaultMessage: 'Size of the file in Bytes',
 });
-const regkeyDescp = i18n.translate('components.addModule.guide.regkeyDescp', {
+const regkeyDescp = i18n.translate('wazuh.components.addModule.guide.regkeyDescp', {
   defaultMessage: 'Name of the registry_key',
 });
-const filePlace = i18n.translate('components.addModule.guide.filePlace', {
+const filePlace = i18n.translate('wazuh.components.addModule.guide.filePlace', {
   defaultMessage: 'Filter or search file',
 });
 

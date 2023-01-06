@@ -157,7 +157,7 @@ export function DevToolsHistory({ localStorage, closeHistory, addRequest }) {
         <EuiFlexItem>
           <EuiTitle size='s'>
             <h3>
-              {i18n.translate('components.tools.devtools.History', {
+              {i18n.translate('wazuh.components.tools.devtools.History', {
                 defaultMessage: 'History',
               })}
             </h3>
@@ -174,7 +174,7 @@ export function DevToolsHistory({ localStorage, closeHistory, addRequest }) {
       <EuiFlexGroup>
         <EuiFlexItem grow={false}>
           <EuiButtonEmpty color='danger' onClick={() => removeHistory()}>
-            {i18n.translate('components.tools.devtools.Clearhistory', {
+            {i18n.translate('wazuh.components.tools.devtools.Clearhistory', {
               defaultMessage: 'Clear history',
             })}
           </EuiButtonEmpty>
@@ -182,7 +182,7 @@ export function DevToolsHistory({ localStorage, closeHistory, addRequest }) {
         <EuiFlexItem></EuiFlexItem>
         <EuiFlexItem grow={false}>
           <EuiButtonEmpty onClick={() => closeHistory()}>
-            {i18n.translate('components.tools.devtools.Close', {
+            {i18n.translate('wazuh.components.tools.devtools.Close', {
               defaultMessage: 'Close',
             })}
           </EuiButtonEmpty>
@@ -193,7 +193,7 @@ export function DevToolsHistory({ localStorage, closeHistory, addRequest }) {
             fill
             onClick={() => addRequest(JSON.parse(selectedRequest))}
           >
-            {i18n.translate('components.tools.devtools.Apply', {
+            {i18n.translate('wazuh.components.tools.devtools.Apply', {
               defaultMessage: 'Apply',
             })}
           </EuiButton>

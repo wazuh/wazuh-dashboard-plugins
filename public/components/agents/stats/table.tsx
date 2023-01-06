@@ -44,11 +44,11 @@ export function AgentStatTable({ columns, title, start, end, loading, items, exp
         <EuiFlexItem grow={false}>
           <EuiText>
             <EuiIcon type="calendar" /> {
-              i18n.translate("components.agent.fim.ivv.lib.Start", {
+              i18n.translate("wazuh.components.agent.fim.ivv.lib.Start", {
                 defaultMessage: "Start:",
               })}{' '}
             {loading ? <EuiLoadingSpinner size="s" /> : start ? formatUIDate(start) : '-'} - {
-              i18n.translate("components.agent.fim.ivv.lib.End", {
+              i18n.translate("wazuh.components.agent.fim.ivv.lib.End", {
                 defaultMessage: "End:",
               })}{' '}
             {loading ? <EuiLoadingSpinner size="s" /> : end ? formatUIDate(end) : '-'}
@@ -65,7 +65,7 @@ export function AgentStatTable({ columns, title, start, end, loading, items, exp
             iconType="importAction"
             isDisabled={loading}
           >{
-            i18n.translate("components.agent.fim.ivv.lib.DownloadCSV", {
+            i18n.translate("wazuh.components.agent.fim.ivv.lib.DownloadCSV", {
               defaultMessage: "Download CSV",
             })}
 

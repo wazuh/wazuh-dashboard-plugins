@@ -11,116 +11,116 @@
  */
 import { i18n } from '@kbn/i18n';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
-const virusName = i18n.translate('components.addModule.guide.virusName', {
+const virusName = i18n.translate('wazuh.components.addModule.guide.virusName', {
   defaultMessage: 'VirusTotal',
 });
-const virusTag = i18n.translate('components.addModule.guide.virusTag', {
+const virusTag = i18n.translate('wazuh.components.addModule.guide.virusTag', {
   defaultMessage: 'integration',
 });
-const virusDescp = i18n.translate('components.addModule.guide.virusDescp', {
+const virusDescp = i18n.translate('wazuh.components.addModule.guide.virusDescp', {
   defaultMessage: 'Configuration options of the VirusTotal integration.',
 });
-const virusCate = i18n.translate('components.addModule.guide.virusCate', {
+const virusCate = i18n.translate('wazuh.components.addModule.guide.virusCate', {
   defaultMessage: 'Threat detection and response',
 });
 
-const title = i18n.translate('components.addModule.guide.title', {
+const title = i18n.translate('wazuh.components.addModule.guide.requiredSetting', {
   defaultMessage: 'Required settings',
 });
-const serviceName = i18n.translate('components.addModule.guide.serviceName', {
+const serviceName = i18n.translate('wazuh.components.addModule.guide.serviceName', {
   defaultMessage: 'name',
 });
-const serviceDescp = i18n.translate('components.addModule.guide.serviceDescp', {
+const serviceDescp = i18n.translate('wazuh.components.addModule.guide.serviceDescp', {
   defaultMessage: 'This indicates the service to integrate with.',
 });
 const serviceDefault = i18n.translate(
-  'components.addModule.guide.serviceDefault',
+  'wazuh.components.addModule.guide.serviceDefault',
   {
     defaultMessage: 'virustotal',
   },
 );
-const apiKeyName = i18n.translate('components.addModule.guide.apiKeyName', {
+const apiKeyName = i18n.translate('wazuh.components.addModule.guide.apiKeyName', {
   defaultMessage: 'api_key',
 });
-const apiKeyDescp = i18n.translate('components.addModule.guide.apiKeyDescp', {
+const apiKeyDescp = i18n.translate('wazuh.components.addModule.guide.apiKeyDescp', {
   defaultMessage:
     'This is the key that you would have retrieved from the VirusTotal API.',
 });
-const apiKeyPlace = i18n.translate('components.addModule.guide.apiKeyPlace', {
+const apiKeyPlace = i18n.translate('wazuh.components.addModule.guide.apiKeyPlace', {
   defaultMessage: 'VirusTotal Api key',
 });
-const title1 = i18n.translate('components.addModule.guide.title1', {
+const title1 = i18n.translate('wazuh.components.addModule.guide.optionalSetting', {
   defaultMessage: 'Optional settings',
 });
-const levelName = i18n.translate('components.addModule.guide.levelName', {
+const levelName = i18n.translate('wazuh.components.addModule.guide.levelName', {
   defaultMessage: 'level',
 });
-const levelDescp = i18n.translate('components.addModule.guide.levelDescp', {
+const levelDescp = i18n.translate('wazuh.components.addModule.guide.levelDescp', {
   defaultMessage:
     'This filters alerts by rule level so that only alerts with the specified level or above are pushed.',
 });
-const levelPlace = i18n.translate('components.addModule.guide.levelPlace', {
+const levelPlace = i18n.translate('wazuh.components.addModule.guide.levelPlace', {
   defaultMessage: 'Any alert level from 0 to 16',
 });
-const levelError = i18n.translate('components.addModule.guide.levelError', {
+const levelError = i18n.translate('wazuh.components.addModule.guide.levelError', {
   defaultMessage: 'Any alert level from 0 to 16',
 });
-const ruleIdName = i18n.translate('components.addModule.guide.ruleIdName', {
+const ruleIdName = i18n.translate('wazuh.components.addModule.guide.ruleIdName', {
   defaultMessage: 'rule_id',
 });
-const ruleIdDescp = i18n.translate('components.addModule.guide.ruleIdDescp', {
+const ruleIdDescp = i18n.translate('wazuh.components.addModule.guide.ruleIdDescp', {
   defaultMessage: 'This filters alerts by rule ID.',
 });
-const ruleIdPlace = i18n.translate('components.addModule.guide.ruleIdPlace', {
+const ruleIdPlace = i18n.translate('wazuh.components.addModule.guide.ruleIdPlace', {
   defaultMessage: 'Comma-separated rule IDs',
 });
-const ruleIdError = i18n.translate('components.addModule.guide.ruleIdError', {
+const ruleIdError = i18n.translate('wazuh.components.addModule.guide.ruleIdError', {
   defaultMessage: 'Comma-separated rule IDs',
 });
-const groupName = i18n.translate('components.addModule.guide.groupName', {
+const groupName = i18n.translate('wazuh.components.addModule.guide.groupName', {
   defaultMessage: 'group',
 });
-const groupDescp = i18n.translate('components.addModule.guide.groupDescp', {
+const groupDescp = i18n.translate('wazuh.components.addModule.guide.groupDescp', {
   defaultMessage:
     'TThis filters alerts by rule group. For the VirusTotal integration, only rules from the syscheck group are available.',
 });
-const groupPlace = i18n.translate('components.addModule.guide.groupPlace', {
+const groupPlace = i18n.translate('wazuh.components.addModule.guide.groupPlace', {
   defaultMessage: 'Any rule group or comma-separated rule groups.',
 });
-const eventName = i18n.translate('components.addModule.guide.eventName', {
+const eventName = i18n.translate('wazuh.components.addModule.guide.eventName', {
   defaultMessage: 'event_location',
 });
-const eventDescp = i18n.translate('components.addModule.guide.eventDescp', {
+const eventDescp = i18n.translate('wazuh.components.addModule.guide.eventDescp', {
   defaultMessage:
     "This filters alerts by where the event originated. Follows the OS_Regex Syntax.'",
 });
-const eventPlace = i18n.translate('components.addModule.guide.eventPlace', {
+const eventPlace = i18n.translate('wazuh.components.addModule.guide.eventPlace', {
   defaultMessage: 'Any single log file.',
 });
-const alertName = i18n.translate('components.addModule.guide.alertName', {
+const alertName = i18n.translate('wazuh.components.addModule.guide.alertName', {
   defaultMessage: 'alert_format',
 });
-const alertDescp = i18n.translate('components.addModule.guide.alertDescp', {
+const alertDescp = i18n.translate('wazuh.components.addModule.guide.alertDescp', {
   defaultMessage:
     'This writes the alert file in the JSON format. The Integrator makes use this file to fetch fields values.',
 });
-const alertPlace = i18n.translate('components.addModule.guide.alertPlace', {
+const alertPlace = i18n.translate('wazuh.components.addModule.guide.alertPlace', {
   defaultMessage: 'json',
 });
-const alertError = i18n.translate('components.addModule.guide.alertError', {
+const alertError = i18n.translate('wazuh.components.addModule.guide.alertError', {
   defaultMessage: 'json',
 });
-const maxLogName = i18n.translate('components.addModule.guide.maxLogName', {
+const maxLogName = i18n.translate('wazuh.components.addModule.guide.maxLogName', {
   defaultMessage: 'max_log',
 });
-const maxLogDescp = i18n.translate('components.addModule.guide.maxLogDescp', {
+const maxLogDescp = i18n.translate('wazuh.components.addModule.guide.maxLogDescp', {
   defaultMessage:
     'The maximum length of an alert snippet that will be sent to the Integrator. Longer strings will be truncated with ...',
 });
-const maxLogPlace = i18n.translate('components.addModule.guide.maxLogPlace', {
+const maxLogPlace = i18n.translate('wazuh.components.addModule.guide.maxLogPlace', {
   defaultMessage: 'Any integer from 165 to 1024 inclusive.',
 });
-const maxLogError = i18n.translate('components.addModule.guide.maxLogError', {
+const maxLogError = i18n.translate('wazuh.components.addModule.guide.maxLogError', {
   defaultMessage: 'Any integer from 165 to 1024 inclusive.',
 });
 export default {

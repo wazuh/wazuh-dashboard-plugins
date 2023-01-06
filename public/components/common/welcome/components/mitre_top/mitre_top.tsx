@@ -122,7 +122,7 @@ export class MitreTopTactics extends Component {
           <EuiText size="xs">
             <EuiFlexGroup>
               <EuiFlexItem style={{ margin: 0, padding: '12px 0px 0px 10px' }}>
-                <h3>{ i18n.translate('components.common.welcome.components.mitreTop.topTactics', { defaultMessage: 'Top Tactics', })}</h3>
+                <h3>{ i18n.translate('wazuh.components.common.welcome.components.mitreTop.topTactics', { defaultMessage: 'Top Tactics', })}</h3>
               </EuiFlexItem>
             </EuiFlexGroup>
           </EuiText>
@@ -199,10 +199,10 @@ export class MitreTopTactics extends Component {
     return (
       <EuiEmptyPrompt
         iconType="stats"
-        title={<h4>{ i18n.translate('components.common.welcome.components.mitreTop.noResult', { defaultMessage: 'No results', })}</h4>}
+        title={<h4>{ i18n.translate('wazuh.components.common.welcome.components.mitreTop.noResult', { defaultMessage: 'No results', })}</h4>}
         body={
           <Fragment>
-            <p>{ i18n.translate('components.common.welcome.components.mitreTop.mitreResult', { defaultMessage: 'No Mitre results were found in the selected time range.', })}</p>
+            <p>{ i18n.translate('wazuh.components.common.welcome.components.mitreTop.mitreResult', { defaultMessage: 'No Mitre results were found in the selected time range.', })}</p>
           </Fragment>
         }
       />

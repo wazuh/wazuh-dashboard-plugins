@@ -39,11 +39,11 @@ import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { i18n } from '@kbn/i18n';
 
-const Title1 = i18n.translate('components.addModule.guide.Title1', {
+const Title1 = i18n.translate('wazuh.components.settings.api.configureApi', {
   defaultMessage:
     'The configured API user is not allowed to use run_as. Give it permissions or set run_as with false value in the host configuration.',
 });
-const Title2 = i18n.translate('components.addModule.guide.Title2', {
+const Title2 = i18n.translate('wazuh.components.settings.api.apiTable.context', {
   defaultMessage: 'The configured API user uses the authentication context.',
 });
 
@@ -223,14 +223,14 @@ export const ApiTable = compose(
             if (item) {
               return item === 'online' ? (
                 <EuiHealth color='success'>
-                  {i18n.translate('components.setting.api.table.Online', {
+                  {i18n.translate('wazuh.components.setting.api.table.Online', {
                     defaultMessage: 'Online',
                   })}
                 </EuiHealth>
               ) : item.status === 'down' ? (
                 <span>
                   <EuiHealth color='warning'>
-                    {i18n.translate('components.setting.api.table.Warning', {
+                    {i18n.translate('wazuh.components.setting.api.table.Warning', {
                       defaultMessage: 'Warning',
                     })}
                   </EuiHealth>
@@ -249,7 +249,7 @@ export const ApiTable = compose(
               ) : (
                 <span>
                   <EuiHealth color='danger'>
-                    {i18n.translate('components.setting.api.table.Offline', {
+                    {i18n.translate('wazuh.components.setting.api.table.Offline', {
                       defaultMessage: 'Offline',
                     })}
                   </EuiHealth>
@@ -272,7 +272,7 @@ export const ApiTable = compose(
                   <EuiLoadingSpinner size='s' />
                   <span>
                     &nbsp;&nbsp;
-                    {i18n.translate('components.setting.api.table.Checking', {
+                    {i18n.translate('wazuh.components.setting.api.table.Checking', {
                       defaultMessage: 'Checking',
                     })}
                   </span>
@@ -314,7 +314,7 @@ export const ApiTable = compose(
                     content: (
                       <p>
                         {i18n.translate(
-                          'components.setting.api.table.default',
+                          'wazuh.component.setting.api.table.default',
                           {
                             defaultMessage: 'Set as default',
                           },
@@ -342,7 +342,7 @@ export const ApiTable = compose(
                   content={
                     <p>
                       {i18n.translate(
-                        'components.setting.api.table.connection',
+                        'wazuh.component.setting.api.table.connection',
                         {
                           defaultMessage: 'Check connection',
                         },
@@ -379,7 +379,7 @@ export const ApiTable = compose(
                   <EuiFlexItem>
                     <EuiTitle>
                       <h2>
-                        {i18n.translate('components.setting.api.table.confi', {
+                        {i18n.translate('wazuh.components.setting.api.table.confi', {
                           defaultMessage: 'Wazuh API configuration',
                         })}
                       </h2>
@@ -402,7 +402,7 @@ export const ApiTable = compose(
                   iconType='refresh'
                   onClick={async () => await this.refresh()}
                 >
-                  {i18n.translate('components.setting.api.table.Refresh', {
+                  {i18n.translate('wazuh.components.setting.api.table.Refresh', {
                     defaultMessage: 'Refresh',
                   })}
                 </EuiButtonEmpty>
@@ -411,7 +411,7 @@ export const ApiTable = compose(
             <EuiFlexGroup>
               <EuiFlexItem>
                 <EuiText color='subdued' style={{ paddingBottom: '15px' }}>
-                  {i18n.translate('components.setting.api.table.status', {
+                  {i18n.translate('wazuh.components.setting.api.table.status', {
                     defaultMessage:
                       ' From here you can manage and configure the API entries. You can also check their connection and status.',
                   })}

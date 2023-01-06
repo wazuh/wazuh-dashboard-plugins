@@ -166,7 +166,7 @@ export const Policies = () => {
         <EuiPageContentHeaderSection>
           <EuiTitle>
             <h2>{
-              i18n.translate("components.overview.mitre.Policies", {
+              i18n.translate("wazuh.components.overview.mitre.Policies", {
                 defaultMessage: "Policies",
               })}
             </h2>
@@ -180,7 +180,7 @@ export const Policies = () => {
             <EuiButton
               onClick={() => setIsCreatingPolicy(true)}>
                 {
-                  i18n.translate("components.overview.mitre.Createpolicy", {
+                  i18n.translate("wazuh.components.overview.mitre.Createpolicy", {
                     defaultMessage: "Create policy",
                   })
                 }

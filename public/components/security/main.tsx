@@ -33,55 +33,55 @@ import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/typ
 import { getErrorOrchestrator } from '../../react-services/common-services';
 import { getPluginDataPath } from '../../../common/plugin';
 import { i18n } from '@kbn/i18n';
-const name2 = i18n.translate('controller.manage.comp.confi.setting.name2', {
+const name2 = i18n.translate('wazuh.controller.manage.comp.confi.setting.name2', {
   defaultMessage: 'Users',
 });
-const name3 = i18n.translate('controller.manage.comp.confi.setting.name3', {
+const name3 = i18n.translate('wazuh.controller.manage.comp.confi.setting.name3', {
   defaultMessage: 'Roles',
 });
-const name4 = i18n.translate('controller.manage.comp.confi.setting.name4', {
+const name4 = i18n.translate('wazuh.controller.manage.comp.confi.setting.name4', {
   defaultMessage: 'Policies',
 });
-const name5 = i18n.translate('controller.manage.comp.confi.setting.name5', {
+const name5 = i18n.translate('wazuh.controller.manage.comp.confi.setting.name5', {
   defaultMessage: 'Roles mapping',
 });
-const descp1 = i18n.translate('components.security.main.wz.mapping.Descp1', {
+const descp1 = i18n.translate('wazuh.components.security.main.wz.mapping.Descp1', {
   defaultMessage: 'For the role mapping to take effect, enable run_as in',
 });
-const descp2 = i18n.translate('components.security.main.wz.restart.descp2', {
+const descp2 = i18n.translate('wazuh.components.security.main.wz.restart.descp2', {
   defaultMessage: 'Tconfiguration file, restart the',
 });
-const descp3 = i18n.translate('components.security.main.wz.clear.Descp3', {
+const descp3 = i18n.translate('wazuh.components.security.main.wz.clear.Descp3', {
   defaultMessage: 'service and clear your browser cache and cookies.',
 });
-const descp4 = i18n.translate('components.security.main.wz.api.Descp4', {
+const descp4 = i18n.translate('wazuh.components.security.main.wz.api.Descp4', {
   defaultMessage:
     'The role mapping has no effect because the current Wazuh API user has allow_run_as disabled.',
 });
-const descp5 = i18n.translate('components.security.main.wz.run.Descp5', {
+const descp5 = i18n.translate('wazuh.components.security.main.wz.run.Descp5', {
   defaultMessage: 'For the role mapping to take effect, enable run_as in',
 });
-const descp6 = i18n.translate('components.security.main.wz.file.Descp6', {
+const descp6 = i18n.translate('wazuh.components.security.main.wz.file.Descp6', {
   defaultMessage:
     'configuration file and set the current Wazuh API user allow_run_as to true. Restart the',
 });
-const descp7 = i18n.translate('components.security.main.wz.chase.Descp7', {
+const descp7 = i18n.translate('wazuh.components.security.main.wz.chase.Descp7', {
   defaultMessage: 'service and clear your browser cache and cookies.',
 });
-const descp8 = i18n.translate('components.security.main.wz.role.Descp8', {
+const descp8 = i18n.translate('wazuh.components.security.main.wz.role.Descp8', {
   defaultMessage:
     'The role mapping has no effect because the current Wazuh API user has run_as disabled.',
 });
-const descp9 = i18n.translate("components.security.main.wz..descp9", {
+const descp9 = i18n.translate("wazuh.components.security.main.wz..descp9", {
   defaultMessage: "users",
 });
-const descp10 = i18n.translate("components.security.main.wz.role.descp10", {
+const descp10 = i18n.translate("wazuh.components.security.main.wz.role.descp10", {
   defaultMessage: "roles",
 });
-const descp11 = i18n.translate("components.security.main.wz.role.descp11", {
+const descp11 = i18n.translate("wazuh.components.security.main.wz.role.descp11", {
   defaultMessage: "policies",
 });
-const descp12 = i18n.translate("components.security.main.wz.role.descp12", {
+const descp12 = i18n.translate("wazuh.components.security.main.wz.role.descp12", {
   defaultMessage: "roleMapping",
 });
 const tabs = [

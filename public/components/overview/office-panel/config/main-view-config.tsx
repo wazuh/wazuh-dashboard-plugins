@@ -17,16 +17,16 @@ import { EuiFlexItem } from '@elastic/eui';
 import { SecurityAlerts } from '../../../visualize/components';
 import { i18n } from '@kbn/i18n';
 
-const Title1 = i18n.translate('components.addModule.guide.title1', {
+const Title1 = i18n.translate('wazuh.components.overview.officePanel.config.topUser', {
   defaultMessage: 'Top users',
 });
-const Title2 = i18n.translate('components.addModule.guide.title2', {
+const Title2 = i18n.translate('wazuh.components.overview.officePanel.config.title2', {
   defaultMessage: 'Top client IP',
 });
-const Title3 = i18n.translate('components.addModule.guide.title3', {
+const Title3 = i18n.translate('wazuh.components.overview.officePanel.config.title3', {
   defaultMessage: 'Top rules',
 });
-const Title4 = i18n.translate('components.addModule.guide.title4', {
+const Title4 = i18n.translate('wazuh.components.overview.officePanel.config.title4', {
   defaultMessage: 'Top operations',
 });
 export const MainViewConfig = {

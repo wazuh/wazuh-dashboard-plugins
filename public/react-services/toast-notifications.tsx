@@ -55,7 +55,7 @@ export class ToastNotifications {
               }
               size='s'
             >
-              {i18n.translate('kibana-int.vis.Seethefullerror', {
+              {i18n.translate('wazuh.kibana-int.vis.Seethefullerror', {
                 defaultMessage: 'See the full error',
               })}
             </EuiButton>

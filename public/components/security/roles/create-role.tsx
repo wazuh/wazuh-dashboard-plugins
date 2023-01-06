@@ -22,19 +22,19 @@ import { WzFlyout } from '../../common/flyouts';
 import { i18n } from "@kbn/i18n";
 
 
-const Error1 = i18n.translate("components.addModule.guide.Error1", {
+const Error1 = i18n.translate("wazuh.components.security.roles.createRoles.Error1", {
   defaultMessage: "Please provide a role name",
 });
-const Error2 = i18n.translate("components.addModule.guide.Error2", {
+const Error2 = i18n.translate("wazuh.components.security.roles.createRoles.Error2", {
   defaultMessage: "At least one policy must be selected.",
 });
-const helpText1 = i18n.translate("components.addModule.guide.helpText1", {
+const helpText1 = i18n.translate("wazuh.components.security.roles.createRoles.helpText1", {
   defaultMessage: "Introduce a name for this new role.",
 });
-const helpText2 = i18n.translate("components.addModule.guide.helpText2", {
+const helpText2 = i18n.translate("wazuh.components.security.roles.createRoles.helpText2", {
   defaultMessage: "Assign policies to the role.",
 });
-const Descp1 = i18n.translate("components.addModule.guide.Descp1", {
+const Descp1 = i18n.translate("wazuh.components.security.roles.createRoles.Descp1", {
   defaultMessage: "Select policies",
 });
 export const CreateRole = ({ closeFlyout }) => {
@@ -133,7 +133,7 @@ export const CreateRole = ({ closeFlyout }) => {
         >
           <p style={{ textAlign: 'center' }}>
             {
-              i18n.translate("components.overview.unsaved", {
+              i18n.translate("wazuh.components.overview.unsaved", {
                 defaultMessage: "There are unsaved changes. Are you sure you want to proceed?",
               })
             }
@@ -161,7 +161,7 @@ export const CreateRole = ({ closeFlyout }) => {
         <EuiFlyoutHeader hasBorder={false}>
           <EuiTitle size="m">
             <h2>{
-              i18n.translate("components.overview.Newrole", {
+              i18n.translate("wazuh.components.overview.Newrole", {
                 defaultMessage: "New role",
               })}
             </h2>
@@ -200,7 +200,7 @@ export const CreateRole = ({ closeFlyout }) => {
             <EuiSpacer />
             <EuiButton fill onClick={createUser}>
               {
-                i18n.translate("components.overview.Createrole", {
+                i18n.translate("wazuh.components.overview.Createrole", {
                   defaultMessage: "Create role",
                 })
               }

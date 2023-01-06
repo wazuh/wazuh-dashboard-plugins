@@ -18,10 +18,10 @@ import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { i18n } from "@kbn/i18n";
 
-const Title1 = i18n.translate("components.addModule.guide.Title1", {
+const Title1 = i18n.translate("wazuh.components.security,roles.rolesTable.name", {
   defaultMessage: "Name",
 });
-const Title2 = i18n.translate("components.addModule.guide.Title2", {
+const Title2 = i18n.translate("wazuh.components.security,roles.rolesTable.Title2", {
   defaultMessage: "Policies",
 });
 export const RolesTable = ({ roles, policiesData, loading, editRole, updateRoles }) => {
@@ -96,21 +96,21 @@ export const RolesTable = ({ roles, policiesData, loading, editRole, updateRoles
                         content={
                           <div>
                             <b>{
-                              i18n.translate("components.overview.Actions", {
+                              i18n.translate("wazuh.components.overview.Actions", {
                                 defaultMessage: "Actions",
                               })}
                             </b>
                             <p>{((data.policy || {}).actions || []).join(', ')}</p>
                             <EuiSpacer size="s" />
                             <b>{
-                              i18n.translate("components.overview.Resources", {
+                              i18n.translate("wazuh.components.overview.Resources", {
                                 defaultMessage: "Resources",
                               })}
                             </b>
                             <p>{((data.policy || {}).resources || []).join(', ')}</p>
                             <EuiSpacer size="s" />
                             <b>{
-                              i18n.translate("components.overview.Effect", {
+                              i18n.translate("wazuh.components.overview.Effect", {
                                 defaultMessage: "Effect",
                               })}
                             </b>
@@ -142,7 +142,7 @@ export const RolesTable = ({ roles, policiesData, loading, editRole, updateRoles
       name: 'Status',
       render: (item) => {
         return WzAPIUtils.isReservedID(item) && <EuiBadge color="primary">{
-          i18n.translate("components.overview.Reserved", {
+          i18n.translate("wazuh.components.overview.Reserved", {
             defaultMessage: "Reserved",
           })}</EuiBadge>;
       },

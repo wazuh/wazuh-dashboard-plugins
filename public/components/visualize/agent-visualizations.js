@@ -12,319 +12,319 @@
 
 import { i18n } from '@kbn/i18n';
 
-const title1 = i18n.translate('components.visualize.agent.title1', {
+const title1 = i18n.translate('wazuh.components.visualize.agent.title1', {
   defaultMessage: 'Alert groups evolution',
 });
-const title2 = i18n.translate('components.visualize.agent.title2', {
+const title2 = i18n.translate('wazuh.components.visualize.agent.title2', {
   defaultMessage: 'Alerts',
 });
-const title3 = i18n.translate('components.visualize.agent.title3', {
+const title3 = i18n.translate('wazuh.components.visualize.agent.title3', {
   defaultMessage: 'Select policies',
 });
-const title4 = i18n.translate('components.visualize.agent.title4', {
+const title4 = i18n.translate('wazuh.components.visualize.agent.title4', {
   defaultMessage: 'Top 5 alerts',
 });
-const title5 = i18n.translate('components.visualize.agent.title5', {
+const title5 = i18n.translate('wazuh.components.visualize.agent.title5', {
   defaultMessage: 'Top 5 rule groups',
 });
-const title6 = i18n.translate('components.visualize.agent.title6', {
+const title6 = i18n.translate('wazuh.components.visualize.agent.title6', {
   defaultMessage: 'Medium Severity Alerts',
 });
-const title7 = i18n.translate('components.visualize.agent.title7', {
+const title7 = i18n.translate('wazuh.components.visualize.agent.title7', {
   defaultMessage: 'Alerts summary',
 });
-const title8 = i18n.translate('components.visualize.agent.title8', {
+const title8 = i18n.translate('wazuh.components.visualize.agent.title8', {
   defaultMessage: 'Groups summary',
 });
-const title9 = i18n.translate('components.visualize.agent.title9', {
+const title9 = i18n.translate('wazuh.components.visualize.agent.title9', {
   defaultMessage: 'Sources',
 });
-const title10 = i18n.translate('components.visualize.agent.regkeytitle', {
+const title10 = i18n.translate('wazuh.components.visualize.agent.regkeytitle', {
   defaultMessage: 'Accounts',
 });
-const title11 = i18n.translate('components.visualize.agent.regkeytitle11', {
+const title11 = i18n.translate('wazuh.components.visualize.agent.regkeytitle11', {
   defaultMessage: 'S3 buckets',
 });
-const title12 = i18n.translate('components.visualize.agent.regkeytitle12', {
+const title12 = i18n.translate('wazuh.components.visualize.agent.regkeytitle12', {
   defaultMessage: 'Regions',
 });
-const title13 = i18n.translate('components.visualize.agent.regkeytitle13', {
+const title13 = i18n.translate('wazuh.components.visualize.agent.regkeytitle13', {
   defaultMessage: 'Events by source over time',
 });
-const title14 = i18n.translate('components.visualize.agent.regkeytitle14', {
+const title14 = i18n.translate('wazuh.components.visualize.agent.regkeytitle14', {
   defaultMessage: 'Events by S3 bucket over time',
 });
-const title15 = i18n.translate('components.visualize.agent.regkeytitle15', {
+const title15 = i18n.translate('wazuh.components.visualize.agent.regkeytitle15', {
   defaultMessage: 'Geolocation map',
 });
-const title16 = i18n.translate('components.visualize.agent.regkeytitle16', {
+const title16 = i18n.translate('wazuh.components.visualize.agent.regkeytitle16', {
   defaultMessage: 'Alerts summary',
 });
-const title17 = i18n.translate('components.visualize.agent.regkeytitle17', {
+const title17 = i18n.translate('wazuh.components.visualize.agent.regkeytitle17', {
   defaultMessage: 'Most active users',
 });
-const title18 = i18n.translate('components.visualize.agent.regkeytitle18', {
+const title18 = i18n.translate('wazuh.components.visualize.agent.regkeytitle18', {
   defaultMessage: 'Actions',
 });
-const title19 = i18n.translate('components.visualize.agent.regkeytitle19', {
+const title19 = i18n.translate('wazuh.components.visualize.agent.regkeytitle19', {
   defaultMessage: "Events'",
 });
-const title20 = i18n.translate('components.visualize.agent.regkeytitle20', {
+const title20 = i18n.translate('wazuh.components.visualize.agent.regkeytitle20', {
   defaultMessage: 'Files added',
 });
-const title21 = i18n.translate('components.visualize.agent.regkeytitle21', {
+const title21 = i18n.translate('wazuh.components.visualize.agent.regkeytitle21', {
   defaultMessage: 'Files modified',
 });
-const title22 = i18n.translate('components.visualize.agent.regkeytitle22', {
+const title22 = i18n.translate('wazuh.components.visualize.agent.regkeytitle22', {
   defaultMessage: 'Files deleted',
 });
-const title23 = i18n.translate('components.visualize.agent.regkeytitle23', {
+const title23 = i18n.translate('wazuh.components.visualize.agent.regkeytitle23', {
   defaultMessage: 'Alerts summary',
 });
-const title24 = i18n.translate('components.visualize.agent.regkeytitle24', {
+const title24 = i18n.translate('wazuh.components.visualize.agent.regkeytitle24', {
   defaultMessage: 'Top 5 rules',
 });
-const title25 = i18n.translate('components.visualize.agent.regkeytitle25', {
+const title25 = i18n.translate('wazuh.components.visualize.agent.regkeytitle25', {
   defaultMessage: 'Top query events',
 });
-const title26 = i18n.translate('components.visualize.agent.regkeytitle26', {
+const title26 = i18n.translate('wazuh.components.visualize.agent.regkeytitle26', {
   defaultMessage: 'Top 5 instances',
 });
-const title27 = i18n.translate('components.visualize.agent.regkeytitle27', {
+const title27 = i18n.translate('wazuh.components.visualize.agent.regkeytitle27', {
   defaultMessage: 'Top project id by sourcetype',
 });
-const title28 = i18n.translate('components.visualize.agent.regkeytitle28', {
+const title28 = i18n.translate('wazuh.components.visualize.agent.regkeytitle28', {
   defaultMessage: 'GCP alerts evolution',
 });
-const title29 = i18n.translate('components.visualize.agent.regkeytitle29', {
+const title29 = i18n.translate('wazuh.components.visualize.agent.regkeytitle29', {
   defaultMessage: 'Auth answer count',
 });
-const title30 = i18n.translate('components.visualize.agent.regkeytitle30', {
+const title30 = i18n.translate('wazuh.components.visualize.agent.regkeytitle30', {
   defaultMessage: 'Resource type by project id',
 });
-const title31 = i18n.translate('components.visualize.agent.regkeytitle31', {
+const title31 = i18n.translate('wazuh.components.visualize.agent.regkeytitle31', {
   defaultMessage: 'Alerts summary',
 });
-const title32 = i18n.translate('components.visualize.agent.regkeytitle32', {
+const title32 = i18n.translate('wazuh.components.visualize.agent.regkeytitle32', {
   defaultMessage: 'Top 5 rule groups',
 });
-const title33 = i18n.translate('components.visualize.agent.regkeytitle33', {
+const title33 = i18n.translate('wazuh.components.visualize.agent.regkeytitle33', {
   defaultMessage: 'Top 5 rules',
 });
-const title34 = i18n.translate('components.visualize.agent.regkeytitle34', {
+const title34 = i18n.translate('wazuh.components.visualize.agent.regkeytitle34', {
   defaultMessage: 'Top 5 PCI DSS requirements',
 });
-const title35 = i18n.translate('components.visualize.agent.regkeytitle35', {
+const title35 = i18n.translate('wazuh.components.visualize.agent.regkeytitle35', {
   defaultMessage: 'PCI Requirements',
 });
-const title36 = i18n.translate('components.visualize.agent.regkeytitle36', {
+const title36 = i18n.translate('wazuh.components.visualize.agent.regkeytitle36', {
   defaultMessage: 'Rule level distribution',
 });
-const title37 = i18n.translate('components.visualize.agent.regkeytitle37', {
+const title37 = i18n.translate('wazuh.components.visualize.agent.regkeytitle37', {
   defaultMessage: 'Alerts summary',
 });
-const title38 = i18n.translate('components.visualize.agent.regkeytitle38', {
+const title38 = i18n.translate('wazuh.components.visualize.agent.regkeytitle38', {
   defaultMessage: 'Top 5 rule groups',
 });
-const title39 = i18n.translate('components.visualize.agent.regkeytitle39', {
+const title39 = i18n.translate('wazuh.components.visualize.agent.regkeytitle39', {
   defaultMessage: 'Top 5 rules',
 });
-const title40 = i18n.translate('components.visualize.agent.regkeytitle40', {
+const title40 = i18n.translate('wazuh.components.visualize.agent.regkeytitle40', {
   defaultMessage: 'Top 5 GDPR requirements',
 });
-const title401 = i18n.translate('components.visualize.agent.regkeytitle401', {
+const title401 = i18n.translate('wazuh.components.visualize.agent.regkeytitle401', {
   defaultMessage: 'GDPR Requirements',
 });
-const title41 = i18n.translate('components.visualize.agent.regkeytitle41', {
+const title41 = i18n.translate('wazuh.components.visualize.agent.regkeytitle41', {
   defaultMessage: 'Rule level distribution',
 });
-const title42 = i18n.translate('components.visualize.agent.regkeytitle42', {
+const title42 = i18n.translate('wazuh.components.visualize.agent.regkeytitle42', {
   defaultMessage: 'Alerts summary',
 });
-const title43 = i18n.translate('components.visualize.agent.regkeytitle43', {
+const title43 = i18n.translate('wazuh.components.visualize.agent.regkeytitle43', {
   defaultMessage: 'Stats',
 });
-const title44 = i18n.translate('components.visualize.agent.regkeytitle44', {
+const title44 = i18n.translate('wazuh.components.visualize.agent.regkeytitle44', {
   defaultMessage: 'Top 10 requirements',
 });
-const title45 = i18n.translate('components.visualize.agent.regkeytitle45', {
+const title45 = i18n.translate('wazuh.components.visualize.agent.regkeytitle45', {
   defaultMessage: 'Requirements distributed by level',
 });
-const title46 = i18n.translate('components.visualize.agent.regkeytitle46', {
+const title46 = i18n.translate('wazuh.components.visualize.agent.regkeytitle46', {
   defaultMessage: 'Requirements over time',
 });
-const title47 = i18n.translate('components.visualize.agent.regkeytitle47', {
+const title47 = i18n.translate('wazuh.components.visualize.agent.regkeytitle47', {
   defaultMessage: 'Alerts summary',
 });
-const title48 = i18n.translate('components.visualize.agent.regkeytitle48', {
+const title48 = i18n.translate('wazuh.components.visualize.agent.regkeytitle48', {
   defaultMessage: 'Top 5 rule groups',
 });
-const title49 = i18n.translate('components.visualize.agent.regkeytitle49', {
+const title49 = i18n.translate('wazuh.components.visualize.agent.regkeytitle49', {
   defaultMessage: 'Top 5 rules',
 });
-const title50 = i18n.translate('components.visualize.agent.regkeytitle50', {
+const title50 = i18n.translate('wazuh.components.visualize.agent.regkeytitle50', {
   defaultMessage: 'Top 5 TSC requirements',
 });
-const title51 = i18n.translate('components.visualize.agent.regkeytitle51', {
+const title51 = i18n.translate('wazuh.components.visualize.agent.regkeytitle51', {
   defaultMessage: 'TSC Requirements',
 });
-const title52 = i18n.translate('components.visualize.agent.regkeytitle52', {
+const title52 = i18n.translate('wazuh.components.visualize.agent.regkeytitle52', {
   defaultMessage: 'Rule level distribution',
 });
-const title53 = i18n.translate('components.visualize.agent.regkeytitle53', {
+const title53 = i18n.translate('wazuh.components.visualize.agent.regkeytitle53', {
   defaultMessage: 'Alerts summary',
 });
-const title54 = i18n.translate('components.visualize.agent.regkeytitle54', {
+const title54 = i18n.translate('wazuh.components.visualize.agent.regkeytitle54', {
   defaultMessage: 'Requirements over time',
 });
-const title55 = i18n.translate('components.visualize.agent.regkeytitle55', {
+const title55 = i18n.translate('wazuh.components.visualize.agent.regkeytitle55', {
   defaultMessage: 'Top 10 requirements',
 });
-const title56 = i18n.translate('components.visualize.agent.regkeytitle56', {
+const title56 = i18n.translate('wazuh.components.visualize.agent.regkeytitle56', {
   defaultMessage: 'HIPAA requirements',
 });
-const title57 = i18n.translate('components.visualize.agent.regkeytitle57', {
+const title57 = i18n.translate('wazuh.components.visualize.agent.regkeytitle57', {
   defaultMessage: 'Requirements distribution by level',
 });
-const title58 = i18n.translate('components.visualize.agent.regkeytitle58', {
+const title58 = i18n.translate('wazuh.components.visualize.agent.regkeytitle58', {
   defaultMessage: 'Most common alerts',
 });
-const title59 = i18n.translate('components.visualize.agent.regkeytitle59', {
+const title59 = i18n.translate('wazuh.components.visualize.agent.regkeytitle59', {
   defaultMessage: 'Alerts summary',
 });
-const title60 = i18n.translate('components.visualize.agent.regkeytitle60', {
+const title60 = i18n.translate('wazuh.components.visualize.agent.regkeytitle60', {
   defaultMessage: 'Last scanned files',
 });
-const title61 = i18n.translate('components.visualize.agent.regkeytitle61', {
+const title61 = i18n.translate('wazuh.components.visualize.agent.regkeytitle61', {
   defaultMessage: 'Malicious files alerts Evolution',
 });
-const title62 = i18n.translate('components.visualize.agent.regkeytitle62', {
+const title62 = i18n.translate('wazuh.components.visualize.agent.regkeytitle62', {
   defaultMessage: 'Last files',
 });
-const title63 = i18n.translate('components.visualize.agent.regkeytitle63', {
+const title63 = i18n.translate('wazuh.components.visualize.agent.regkeytitle63', {
   defaultMessage: 'Alerts summary',
 });
-const title64 = i18n.translate('components.visualize.agent.regkeytitle64', {
+const title64 = i18n.translate('wazuh.components.visualize.agent.regkeytitle64', {
   defaultMessage: 'Most common Osquery actions',
 });
-const title65 = i18n.translate('components.visualize.agent.regkeytitle65', {
+const title65 = i18n.translate('wazuh.components.visualize.agent.regkeytitle65', {
   defaultMessage: 'Evolution of Osquery events per pack over time',
 });
-const title66 = i18n.translate('components.visualize.agent.regkeytitle66', {
+const title66 = i18n.translate('wazuh.components.visualize.agent.regkeytitle66', {
   defaultMessage: 'Most common Osquery packs being used',
 });
-const title67 = i18n.translate('components.visualize.agent.regkeytitle67', {
+const title67 = i18n.translate('wazuh.components.visualize.agent.regkeytitle67', {
   defaultMessage: 'Most common rules',
 });
-const title68 = i18n.translate('components.visualize.agent.regkeytitle68', {
+const title68 = i18n.translate('wazuh.components.visualize.agentVisualization.regkeytitle68', {
   defaultMessage: 'Alerts summary',
 });
-const title681 = i18n.translate('components.visualize.agent.regkeytitle68', {
+const title681 = i18n.translate('wazuh.components.visualize.agent.regkeytitle68', {
   defaultMessage: 'Alerts evolution over time',
 });
-const title69 = i18n.translate('components.visualize.agent.regkeytitle69', {
+const title69 = i18n.translate('wazuh.components.visualize.agent.regkeytitle69', {
   defaultMessage: 'Top tactics',
 });
-const title70 = i18n.translate('components.visualize.agent.regkeytitle70', {
+const title70 = i18n.translate('wazuh.components.visualize.agent.regkeytitle70', {
   defaultMessage: 'Rule level by attack',
 });
-const title71 = i18n.translate('components.visualize.agent.regkeytitle71', {
+const title71 = i18n.translate('wazuh.components.visualize.agent.regkeytitle71', {
   defaultMessage: 'MITRE attacks by tactic',
 });
-const title72 = i18n.translate('components.visualize.agent.regkeytitle72', {
+const title72 = i18n.translate('wazuh.components.visualize.agent.regkeytitle72', {
   defaultMessage: 'Rule level by tactic',
 });
-const title73 = i18n.translate('components.visualize.agent.regkeytitle73', {
+const title73 = i18n.translate('wazuh.components.visualize.agent.regkeytitle73', {
   defaultMessage: 'Alerts summary',
 });
-const title74 = i18n.translate('components.visualize.agent.regkeytitle74', {
+const title74 = i18n.translate('wazuh.components.visualize.agent.regkeytitle74', {
   defaultMessage: 'Top 5 images',
 });
-const title75 = i18n.translate('components.visualize.agent.regkeytitle75', {
+const title75 = i18n.translate('wazuh.components.visualize.agent.regkeytitle75', {
   defaultMessage: 'Top 5 events',
 });
-const title76 = i18n.translate('components.visualize.agent.regkeytitle76', {
+const title76 = i18n.translate('wazuh.components.visualize.agent.regkeytitle76', {
   defaultMessage: 'Resources usage over time',
 });
-const title77 = i18n.translate('components.visualize.agent.regkeytitle77', {
+const title77 = i18n.translate('wazuh.components.visualize.agent.regkeytitle77', {
   defaultMessage: 'Events occurred evolution',
 });
-const title78 = i18n.translate('components.visualize.agent.regkeytitle78', {
+const title78 = i18n.translate('wazuh.components.visualize.agent.regkeytitle78', {
   defaultMessage: 'Alerts summary',
 });
-const title79 = i18n.translate('components.visualize.agent.regkeytitle79', {
+const title79 = i18n.translate('wazuh.components.visualize.agent.regkeytitle79', {
   defaultMessage: 'Top 5 Scans',
 });
-const title80 = i18n.translate('components.visualize.agent.regkeytitle80', {
+const title80 = i18n.translate('wazuh.components.visualize.agent.regkeytitle80', {
   defaultMessage: 'Top 5 Profiles',
 });
-const title81 = i18n.translate('components.visualize.agent.regkeytitle81', {
+const title81 = i18n.translate('wazuh.components.visualize.agent.regkeytitle81', {
   defaultMessage: 'Top 5 Content',
 });
-const title82 = i18n.translate('components.visualize.agent.regkeytitle82', {
+const title82 = i18n.translate('wazuh.components.visualize.agent.regkeytitle82', {
   defaultMessage: 'Top 5 Severity',
 });
-const title83 = i18n.translate('components.visualize.agent.regkeytitle83', {
+const title83 = i18n.translate('wazuh.components.visualize.agent.regkeytitle83', {
   defaultMessage: 'Daily scans evolution',
 });
-const title84 = i18n.translate('components.visualize.agent.regkeytitle84', {
+const title84 = i18n.translate('wazuh.components.visualize.agent.regkeytitle84', {
   defaultMessage: 'Top 5 - Alerts',
 });
-const title85 = i18n.translate('components.visualize.agent.regkeytitle85', {
+const title85 = i18n.translate('wazuh.components.visualize.agent.regkeytitle85', {
   defaultMessage: 'Top 5 - High risk alerts',
 });
-const title86 = i18n.translate('components.visualize.agent.regkeytitle86', {
+const title86 = i18n.translate('wazuh.components.visualize.agent.regkeytitle86', {
   defaultMessage: 'Alerts summary',
 });
-const title87 = i18n.translate('components.visualize.agent.regkeytitle87', {
+const title87 = i18n.translate('wazuh.components.visualize.agent.regkeytitle87', {
   defaultMessage: 'Top 5 CIS-CAT groups',
 });
-const title88 = i18n.translate('components.visualize.agent.regkeytitle88', {
+const title88 = i18n.translate('wazuh.components.visualize.agent.regkeytitle88', {
   defaultMessage: 'Scan result evolution',
 });
-const title89 = i18n.translate('components.visualize.agent.regkeytitle89', {
+const title89 = i18n.translate('wazuh.components.visualize.agent.regkeytitle89', {
   defaultMessage: 'Alerts summary',
 });
-const title90 = i18n.translate('components.visualize.agent.regkeytitle90', {
+const title90 = i18n.translate('wazuh.components.visualize.agent.regkeytitle90', {
   defaultMessage: 'Alerts over time',
 });
-const title91 = i18n.translate('components.visualize.agent.regkeytitle91', {
+const title91 = i18n.translate('wazuh.components.visualize.agent.regkeytitle91', {
   defaultMessage: 'Rule distribution',
 });
-const title92 = i18n.translate('components.visualize.agent.regkeytitle92', {
+const title92 = i18n.translate('wazuh.components.visualize.agent.regkeytitle92', {
   defaultMessage: 'Events per control type evolution',
 });
-const title93 = i18n.translate('components.visualize.agent.regkeytitle93', {
+const title93 = i18n.translate('wazuh.components.visualize.agent.regkeytitle93', {
   defaultMessage: 'Alerts summary',
 });
-const title94 = i18n.translate('components.visualize.agent.regkeytitle94', {
+const title94 = i18n.translate('wazuh.components.visualize.agent.regkeytitle94', {
   defaultMessage: 'Groups',
 });
-const title95 = i18n.translate('components.visualize.agent.regkeytitle95', {
+const title95 = i18n.translate('wazuh.components.visualize.agent.regkeytitle95', {
   defaultMessage: 'Commands',
 });
-const title96 = i18n.translate('components.visualize.agent.regkeytitle96', {
+const title96 = i18n.translate('wazuh.components.visualize.agent.regkeytitle96', {
   defaultMessage: 'Files',
 });
-const title97 = i18n.translate('components.visualize.agent.regkeytitle97', {
+const title97 = i18n.translate('wazuh.components.visualize.agent.regkeytitle97', {
   defaultMessage: 'Alerts over time',
 });
-const title98 = i18n.translate('components.visualize.agent.regkeytitle98', {
+const title98 = i18n.translate('wazuh.components.visualize.agent.regkeytitle98', {
   defaultMessage: 'Alerts summary',
 });
-const title99 = i18n.translate('components.visualize.agent.regkeytitle99', {
+const title99 = i18n.translate('wazuh.components.visualize.agent.regkeytitle99', {
   defaultMessage: 'Alerts evolution by organization',
 });
-const title100 = i18n.translate('components.visualize.agent.regkeytitle100', {
+const title100 = i18n.translate('wazuh.components.visualize.agent.regkeytitle100', {
   defaultMessage: 'Top 5 organizations by alerts',
 });
-const title101 = i18n.translate('components.visualize.agent.regkeytitle101', {
+const title101 = i18n.translate('wazuh.components.visualize.agent.regkeytitle101', {
   defaultMessage: 'Top alerts by action type and organization',
 });
-const title102 = i18n.translate('components.visualize.agent.regkeytitle102', {
+const title102 = i18n.translate('wazuh.components.visualize.agent.regkeytitle102', {
   defaultMessage: 'Users with more alerts',
 });
-const title103 = i18n.translate('components.visualize.agent.regkeytitle103', {
+const title103 = i18n.translate('wazuh.components.visualize.agent.regkeytitle103', {
   defaultMessage: 'Alerts summary',
 });
 

@@ -30,7 +30,7 @@ export function WzStatisticsRemoted({
             <EuiFlexGroup>
               <EuiFlexItem>
                 {i18n.translate(
-                  'controllers.mnage.comp.confi.groups.static.recived',
+                  'wazuh.controllers..mnage.comp.confi.groups.static.recived',
                   {
                     defaultMessage: 'Total number of bytes received',
                   },
@@ -56,7 +56,7 @@ export function WzStatisticsRemoted({
             <EuiFlexGroup>
               <EuiFlexItem>
                 {i18n.translate(
-                  'controllers.mnage.comp.confi.groups.static.event',
+                  'wazuh.controllers..mnage.comp.confi.groups.static.event',
                   {
                     defaultMessage: 'Events sent to Analysisd',
                   },
@@ -85,7 +85,7 @@ export function WzStatisticsRemoted({
             <EuiFlexGroup>
               <EuiFlexItem>
                 {i18n.translate(
-                  'controllers.mnage.comp.confi.groups.static.Messagesstatistics',
+                  'wazuh.controllers.mnage.comp.confi.groups.static.Messagesstatistics',
                   {
                     defaultMessage: 'Messages statistics',
                   },
@@ -111,7 +111,7 @@ export function WzStatisticsRemoted({
             <EuiFlexGroup>
               <EuiFlexItem>
                 {i18n.translate(
-                  'controllers.mnage.comp.confi.groups.static.TCPsessions',
+                  'wazuh.controllers..mnage.comp.confi.groups.static.TCPsessions',
                   {
                     defaultMessage: 'TCP sessions',
                   },

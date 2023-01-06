@@ -35,7 +35,7 @@ import { AgentInfo } from '../../common/welcome/agents-info';
 import { getAngularModule } from '../../../kibana-services';
 import { i18n } from '@kbn/i18n';
 const agentConnected = i18n.translate(
-  'components.common.modules.main.agentConnected',
+  'wazuh.components.common.modules.main.agentConnected',
   { defaultMessage: 'This agent has never connected' },
 );
 export class MainModuleAgent extends Component {

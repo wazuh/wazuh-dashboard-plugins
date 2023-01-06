@@ -36,7 +36,7 @@ export function addHelpMenuToAppChrome(){
             <EuiIcon
               type={getHttp().basePath.prepend(getThemeAssetURL('icon.svg'))}
             ></EuiIcon>
-            {i18n.translate('utils.helpMenu.documentation', {
+            {i18n.translate('wazuh.utils.helpMenu.documentation', {
               defaultMessage: 'Documentation',
             })}
           </span>
@@ -48,7 +48,7 @@ export function addHelpMenuToAppChrome(){
         content: (
           <span>
             <EuiIcon type='logoSlack'></EuiIcon>
-            {i18n.translate('utils.helpMenu.slack_channel', {
+            {i18n.translate('wazuh.utils.helpMenu.slack_channel', {
               defaultMessage: 'Slack channel',
             })}
           </span>
@@ -60,7 +60,7 @@ export function addHelpMenuToAppChrome(){
         content: (
           <span>
             <EuiIcon type='logoGithub'></EuiIcon>
-            {i18n.translate('utils.helpMenu.projectOnGithub', {
+            {i18n.translate('wazuh.utils.helpMenu.projectOnGithub', {
               defaultMessage: 'Projects on Github',
             })}
           </span>
@@ -76,7 +76,7 @@ export function addHelpMenuToAppChrome(){
                 getAssetURL('images/icons/google_groups.svg'),
               )}
             ></EuiIcon>{' '}
-            { i18n.translate('utils.helpMenu.googleGroup', {
+            { i18n.translate('wazuh.utils.helpMenu.googleGroup', {
               defaultMessage: 'Google Group',
             })}
           </span>

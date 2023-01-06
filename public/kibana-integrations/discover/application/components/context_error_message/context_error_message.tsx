@@ -42,7 +42,7 @@ export function ContextErrorMessage({ status, reason }: ContextErrorMessageProps
       <EuiCallOut
         title={
           <FormattedMessage
-            id="discover.context.failedToLoadAnchorDocumentDescription"
+            id="wazuh.discover.context.failedToLoadAnchorDocumentDescription"
             defaultMessage="Failed to load the anchor document"
           />
         }
@@ -53,7 +53,7 @@ export function ContextErrorMessage({ status, reason }: ContextErrorMessageProps
         <EuiText data-test-subj="contextErrorMessageBody">
           {reason === FAILURE_REASONS.UNKNOWN && (
             <FormattedMessage
-              id="discover.context.reloadPageDescription.reloadOrVisitTextMessage"
+              id="wazuh.discover.context.reloadPageDescription.reloadOrVisitTextMessage"
               defaultMessage="Please reload or go back to the document list to select a valid anchor document."
             />
           )}

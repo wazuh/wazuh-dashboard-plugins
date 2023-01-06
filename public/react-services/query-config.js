@@ -17,7 +17,7 @@ import { UI_LOGGER_LEVELS } from '../../common/constants';
 import { UI_ERROR_SEVERITIES } from './error-orchestrator/types';
 import { i18n } from '@kbn/i18n';
 
-const Title1 = i18n.translate('kibana-int.vis.', {
+const Title1 = i18n.translate('wazuh.kibana-int.vis.', {
   defaultMessage: 'Error getting the query config',
 });
 export const queryConfig = async (agentId, sections, node = false) => {

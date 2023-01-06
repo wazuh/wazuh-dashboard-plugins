@@ -31,13 +31,13 @@ import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { getPluginDataPath } from '../../../../common/plugin';
 import { i18n } from '@kbn/i18n';
-const Title1 = i18n.translate("components.settings.api.Title1", {
+const Title1 = i18n.translate("wazuh.components.settings.api.Title1", {
   defaultMessage: "Wazuh API not reachable, please review your configuration:",
 });
-const Title2 = i18n.translate("components.settings.api.Title2", {
+const Title2 = i18n.translate("wazuh.components.settings.api.Title2", {
   defaultMessage: "Edit the configuration",
 });
-const Title3 = i18n.translate("components.settings.api.Title3", {
+const Title3 = i18n.translate("wazuh.components.settings.api.Title3", {
   defaultMessage: "Test the configuration",
 });
 export const AddApi = withErrorBoundary (class AddApi extends Component {
@@ -146,11 +146,11 @@ export const AddApi = withErrorBoundary (class AddApi extends Component {
           this.state.status === 'danger') && <EuiSpacer />}
         <EuiText>
           {
-            i18n.translate("components.settings.api.check", {
+            i18n.translate("wazuh.components.settings.api.check", {
               defaultMessage: "Check that the",
             })
           } {PLUGIN_PLATFORM_NAME} {
-            i18n.translate("components.settings.api.server", {
+            i18n.translate("wazuh.components.settings.api.server", {
               defaultMessage: "server can reach the configured Wazuh API",
             })
           }(s).
@@ -160,7 +160,7 @@ export const AddApi = withErrorBoundary (class AddApi extends Component {
           onClick={async () => await this.checkConnection()}
           isLoading={this.state.fetchingData}
         >{
-  i18n.translate("components.settings.api.connection", {
+  i18n.translate("wazuh.components.settings.api.connection", {
     defaultMessage: "Check connection",
   })
 }
@@ -170,7 +170,7 @@ export const AddApi = withErrorBoundary (class AddApi extends Component {
           !this.state.blockClose && (
             <EuiButtonEmpty onClick={() => this.props.closeAddApi()}>
              {
-  i18n.translate("components.settings.api", {
+  i18n.translate("wazuh.components.settings.api", {
     defaultMessage: "Empty field",
   })
 } Close
@@ -183,13 +183,13 @@ export const AddApi = withErrorBoundary (class AddApi extends Component {
       <div>
         <EuiText>
           {
-  i18n.translate("components.settings.api.Modify", {
+  i18n.translate("wazuh.components.settings.api.Modify", {
     defaultMessage: "Modify",
   })
 }{' '}
           <EuiCode>{getPluginDataPath('config/wazuh.yml')}</EuiCode>{' '}
           {
-  i18n.translate("components.settings.api.information", {
+  i18n.translate("wazuh.components.settings.api.information", {
     defaultMessage: "to set the connection information.",
   })
 }
@@ -199,32 +199,32 @@ export const AddApi = withErrorBoundary (class AddApi extends Component {
         <EuiSpacer />
         <EuiText>
           {
-  i18n.translate("components.settings.api.Where", {
+  i18n.translate("wazuh.components.settings.api.Where", {
     defaultMessage: "Where",
   })
 } <EuiCode>{'<id>'}</EuiCode> {
-  i18n.translate("components.settings.api.id", {
+  i18n.translate("wazuh.components.settings.api.id", {
     defaultMessage: "is an arbitrary ID,",
   })
 }{' '}
           <EuiCode>{'<api_url>'}</EuiCode> {
-  i18n.translate("components.settings.api.url", {
+  i18n.translate("wazuh.components.settings.api.url", {
     defaultMessage: "is the URL of the Wazuh API,",
   })
 }{' '}
           <EuiCode>{'<api_port>'}</EuiCode> {
-  i18n.translate("components.settings.api.port", {
+  i18n.translate("wazuh.components.settings.api.port", {
     defaultMessage: "is the port,",
   })
 }{' '}
           <EuiCode>{'<api_username>'}</EuiCode> and{' '}
           <EuiCode>{'<api_password>'}</EuiCode> are {
-  i18n.translate("components.settings.api.auth", {
+  i18n.translate("wazuh.components.settings.api.auth", {
     defaultMessage: "the credentials to authenticate,",
   })
 }{' '}
           <EuiCode>{'<run_as>'}</EuiCode> {
-  i18n.translate("components.settings.api.context", {
+  i18n.translate("wazuh.components.settings.api.context", {
     defaultMessage: "defines if the app user's permissions depends on the authentication context ",
   })
 }(<EuiCode>{'true'}</EuiCode> / <EuiCode>{'false'}</EuiCode>).
@@ -253,7 +253,7 @@ export const AddApi = withErrorBoundary (class AddApi extends Component {
               <EuiFlexItem grow={false}>
                 <EuiText>
                   <h2>{
-  i18n.translate("components.settings.api.getting", {
+  i18n.translate("wazuh.components.settings.api.getting", {
     defaultMessage: "Getting started",
   })
 }</h2>

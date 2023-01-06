@@ -20,10 +20,10 @@ import { isString, renderValueNoThenEnabled } from '../utils/utils';
 import { settingsListBuilder } from '../utils/builders';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 import { i18n } from '@kbn/i18n';
-const title1 = i18n.translate('controller.manage.comp.confi.commands.title1', {
+const title1 = i18n.translate('wazuh.controller.manage.comp.confi.commands.title1', {
   defaultMessage: 'Command definitions',
 });
-const descp1 = i18n.translate('controller.manage.comp.confi.commands.descp1', {
+const descp1 = i18n.translate('wazuh.controller.manage.comp.confi.commands.descp1', {
   defaultMessage: 'Find here all the currently defined commands',
 });
 const helpLinks = [

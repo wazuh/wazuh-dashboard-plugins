@@ -77,12 +77,12 @@ export const OverviewWelcome = withErrorBoundary(class OverviewWelcome extends C
           <EuiFlexItem >
 
             <EuiCallOut title={<>{
-              i18n.translate('components.welcome.overviewWelcome.noAgentAdded', {
+              i18n.translate('wazuh.components.welcome.overviewWelcome.noAgentAdded', {
                 defaultMessage: 'No agents were added to this manager.',
               })
             }
             <EuiButtonEmpty href='#/agents-preview?'>{
-              i18n.translate('components.welcome.overviewWelcome.addAgent', {
+              i18n.translate('wazuh.components.welcome.overviewWelcome.addAgent', {
                 defaultMessage: 'Add agent',
               })
             }
@@ -105,7 +105,7 @@ export const OverviewWelcome = withErrorBoundary(class OverviewWelcome extends C
               <EuiFlexGroup>
                 <EuiFlexItem>
                   <EuiCard title description betaBadgeLabel={
-                    i18n.translate('components.welcome.overviewWelcome.securityInformationManagement', {
+                    i18n.translate('wazuh.components.welcome.overviewWelcome.securityInformationManagement', {
                       defaultMessage: "Security Information Management"
                     })
                   }
@@ -127,7 +127,7 @@ export const OverviewWelcome = withErrorBoundary(class OverviewWelcome extends C
                 </EuiFlexItem>
                 <EuiFlexItem>
                   <EuiCard title description betaBadgeLabel={
-                    i18n.translate('components.welcome.overviewWelcome.auditingAndPolicyMonitoring', {
+                    i18n.translate('wazuh.components.welcome.overviewWelcome.auditingAndPolicyMonitoring', {
                       defaultMessage: "Auditing and Policy Monitoring"
                     })
                   }
@@ -151,7 +151,7 @@ export const OverviewWelcome = withErrorBoundary(class OverviewWelcome extends C
               <EuiFlexGroup>
                 <EuiFlexItem>
                   <EuiCard title description betaBadgeLabel={
-                    i18n.translate('components.welcome.overviewWelcome.threatDetectionAndResponse', {
+                    i18n.translate('wazuh.components.welcome.overviewWelcome.threatDetectionAndResponse', {
                       defaultMessage: "Threat Detection and Response"
                     })
                   }
@@ -173,7 +173,7 @@ export const OverviewWelcome = withErrorBoundary(class OverviewWelcome extends C
 
                 <EuiFlexItem>
                   <EuiCard title description betaBadgeLabel={
-                    i18n.translate('components.welcome.overviewWelcome.regulatoryCompliance', {
+                    i18n.translate('wazuh.components.welcome.overviewWelcome.regulatoryCompliance', {
                       defaultMessage: "Regulatory Compliance"
                     })
                   }

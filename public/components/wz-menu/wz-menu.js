@@ -467,7 +467,7 @@ export const WzMenu = withWindowSize(
                   className='WzNotReadyButton'
                 >
                   <span>
-                    {i18n.translate('components.wz.menu.Reload', {
+                    {i18n.translate('wazuh.components.wz.menu.Reload', {
                       defaultMessage: ' Reload',
                     })}{' '}
                   </span>

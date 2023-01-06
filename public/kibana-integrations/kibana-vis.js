@@ -486,7 +486,7 @@ class KibanaVis extends Component {
                 <EuiLoadingSpinner size='xl' />
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
-                {i18n.translate('kibana-int.vis.pattern', {
+                {i18n.translate('wazuh.kibana-int.vis.pattern', {
                   defaultMessage: 'Refreshing Index Pattern.',
                 })}
               </EuiFlexItem>
@@ -514,7 +514,7 @@ class KibanaVis extends Component {
               paddingTop: 100,
             }}
           >
-            {i18n.translate('kibana-int.vis.nofound', {
+            {i18n.translate('wazuh.kibana-int.vis.nofound', {
               defaultMessage: 'No results found ',
             })}
             &nbsp;
@@ -522,7 +522,7 @@ class KibanaVis extends Component {
               position='top'
               content={
                 <span>
-                  {i18n.translate('kibana-int.vis.field', {
+                  {i18n.translate('wazuh.kibana-int.vis.field', {
                     defaultMessage: 'No alerts were found with the field:',
                   })}{' '}
                   <strong>{this.deadField}</strong>
@@ -561,7 +561,7 @@ class KibanaVis extends Component {
                 !isLoading &&
                 !this.state.visRefreshingIndex && (
                   <div>
-                    {i18n.translate('kibana-int.vis.nofound', {
+                    {i18n.translate('wazuh.kibana-int.vis.nofound', {
                       defaultMessage: 'No results found ',
                     })}{' '}
                     &nbsp;
@@ -569,7 +569,7 @@ class KibanaVis extends Component {
                       position='top'
                       content={
                         <span>
-                          {i18n.translate('kibana-int.vis.field', {
+                          {i18n.translate('wazuh.kibana-int.vis.field', {
                             defaultMessage:
                               'No alerts were found with the field:',
                           })}{' '}
@@ -587,7 +587,7 @@ class KibanaVis extends Component {
                     <EuiLoadingSpinner size='xl' />
                   </EuiFlexItem>
                   <EuiFlexItem grow={false}>
-                    {i18n.translate('kibana-int.vis.pattern', {
+                    {i18n.translate('wazuh.kibana-int.vis.pattern', {
                       defaultMessage: 'Refreshing Index Pattern.',
                     })}
                   </EuiFlexItem>

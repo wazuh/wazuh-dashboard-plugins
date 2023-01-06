@@ -11,124 +11,124 @@
  */
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
 import { i18n } from '@kbn/i18n';
-const disName = i18n.translate('components.addModule.guide.disName', {
+const disName = i18n.translate('wazuh.components.addModule.guide.disName', {
   defaultMessage: 'disabled',
 });
-const disDescp = i18n.translate('components.addModule.guide.disDescp', {
+const disDescp = i18n.translate('wazuh.components.addModule.guide.disable.osquery', {
   defaultMessage: 'Disable the  wodle.',
 });
-const osqueryName = i18n.translate('components.addModule.guide.osqueryName', {
+const osqueryName = i18n.translate('wazuh.components.addModule.guide.osqueryName', {
   defaultMessage: 'Osquery',
 });
 const osqueryWodleName = i18n.translate(
-  'components.addModule.guide.osqueryWodleName',
+  'wazuh.components.addModule.guide.osqueryWodleName',
   {
     defaultMessage: 'osquery',
   },
 );
-const osqueryDescp = i18n.translate('components.addModule.guide.osqueryDescp', {
+const osqueryDescp = i18n.translate('wazuh.components.addModule.guide.osqueryDescp', {
   defaultMessage: 'Configuration options of the osquery wodle.',
 });
-const osqueryCate = i18n.translate('components.addModule.guide.osqueryCate', {
+const osqueryCate = i18n.translate('wazuh.components.addModule.guide.osqueryCate', {
   defaultMessage: 'Threat detection and response',
 });
-const callOutWar = i18n.translate('components.addModule.guide.callOutWar', {
+const callOutWar = i18n.translate('wazuh.components.addModule.guide.osquery.callOutWar', {
   defaultMessage:
     'Osquery is not installed by default. It is an open source software that you have to obtain for using this module.',
 });
-const title = i18n.translate('components.addModule.guide.title', {
+const title = i18n.translate('wazuh.components.addModule.guide.titleSetting', {
   defaultMessage: 'Settings',
 });
-const daemonName = i18n.translate('components.addModule.guide.daemonName', {
+const daemonName = i18n.translate('wazuh.components.addModule.guide.daemonName', {
   defaultMessage: 'run_daemon',
 });
-const daemonDescp = i18n.translate('components.addModule.guide.daemonDescp', {
+const daemonDescp = i18n.translate('wazuh.components.addModule.guide.daemonDescp', {
   defaultMessage:
     'Makes the module run osqueryd as a subprocess or lets the module monitor the results log without running Osquery.',
 });
-const binPathName = i18n.translate('components.addModule.guide.binPathName', {
+const binPathName = i18n.translate('wazuh.components.addModule.guide.binPathName', {
   defaultMessage: 'bin_path',
 });
-const binPathDescp = i18n.translate('components.addModule.guide.binPathDescp', {
+const binPathDescp = i18n.translate('wazuh.components.addModule.guide.binPathDescp', {
   defaultMessage:
     'Full path to the folder that contains the osqueryd executable.',
 });
-const binPathPlace = i18n.translate('components.addModule.guide.binPathPlace', {
+const binPathPlace = i18n.translate('wazuh.components.addModule.guide.binPathPlace', {
   defaultMessage: 'Any valid path.',
 });
-const logPathName = i18n.translate('components.addModule.guide.logPathName', {
+const logPathName = i18n.translate('wazuh.components.addModule.guide.logPathName', {
   defaultMessage: 'log_path',
 });
-const logPathDescp = i18n.translate('components.addModule.guide.logPathDescp', {
+const logPathDescp = i18n.translate('wazuh.components.addModule.guide.logPathDescp', {
   defaultMessage: 'Full path to the results log written by Osquery.',
 });
-const logPathPlace = i18n.translate('components.addModule.guide.logPathPlace', {
+const logPathPlace = i18n.translate('wazuh.components.addModule.guide.logPathPlace', {
   defaultMessage: 'Any valid path.',
 });
-const logPathError = i18n.translate('components.addModule.guide.logPathError', {
+const logPathError = i18n.translate('wazuh.components.addModule.guide.logPathError', {
   defaultMessage: 'Any valid path.',
 });
 const configPathName = i18n.translate(
-  'components.addModule.guide.configPathName',
+  'wazuh.components.addModule.guide.configPathName',
   {
     defaultMessage: 'config_path',
   },
 );
 const configPathDescp = i18n.translate(
-  'components.addModule.guide.configPathDescp',
+  'wazuh.components.addModule.guide.configPathDescp',
   {
     defaultMessage:
       'Path to the Osquery configuration file. This path can be relative to the folder where the Wazuh agent is running.',
   },
 );
 const configPathPlace = i18n.translate(
-  'components.addModule.guide.configPathPlace',
+  'wazuh.components.addModule.guide.configPathPlace',
   {
     defaultMessage: 'Path to the Osquery configuration file',
   },
 );
-const labelName = i18n.translate('components.addModule.guide.labelName', {
+const labelName = i18n.translate('wazuh.components.addModule.guide.labelName', {
   defaultMessage: 'add_labels',
 });
-const labelDescp = i18n.translate('components.addModule.guide.labelDescp', {
+const labelDescp = i18n.translate('wazuh.components.addModule.guide.labelDescp', {
   defaultMessage: 'Add the agent labels defined as decorators.',
 });
-const title1 = i18n.translate('components.addModule.guide.title1', {
+const title1 = i18n.translate('wazuh.components.addModule.guide.packs', {
   defaultMessage: 'Packs',
 });
-const title1Descp = i18n.translate('components.addModule.guide.title1Descp', {
+const title1Descp = i18n.translate('wazuh.components.addModule.guide.queryPack', {
   defaultMessage:
     'Add a query pack to the configuration. This option can be defined multiple times.',
 });
-const packName = i18n.translate('components.addModule.guide.packName', {
+const packName = i18n.translate('wazuh.components.addModule.guide.packName', {
   defaultMessage: 'pack',
 });
-const packDescp = i18n.translate('components.addModule.guide.packDescp', {
+const packDescp = i18n.translate('wazuh.components.addModule.guide.packDescp', {
   defaultMessage: 'Add a query pack to the configuration.',
 });
-const packPlace = i18n.translate('components.addModule.guide.packPlace', {
+const packPlace = i18n.translate('wazuh.components.addModule.guide.packPlace', {
   defaultMessage: 'Path to pack configuration file',
 });
-const packError = i18n.translate('components.addModule.guide.packError', {
+const packError = i18n.translate('wazuh.components.addModule.guide.packError', {
   defaultMessage: 'Path to pack configuration file',
 });
-const namePackName = i18n.translate('components.addModule.guide.namePackName', {
+const namePackName = i18n.translate('wazuh.components.addModule.guide.namePackName', {
   defaultMessage: 'name',
 });
 const namePackDescp = i18n.translate(
-  'components.addModule.guide.namePackDescp',
+  'wazuh.components.addModule.guide.namePackDescp',
   {
     defaultMessage: 'Full path to the results log written by Osquery.',
   },
 );
 const namePackPlace = i18n.translate(
-  'components.addModule.guide.namePackPlace',
+  'wazuh.components.addModule.guide.namePackPlace',
   {
     defaultMessage: 'Name for this pack',
   },
 );
 const namePackError = i18n.translate(
-  'components.addModule.guide.namePackError',
+  'wazuh.components.addModule.guide.namePackError',
   {
     defaultMessage: 'Name for this pack',
   },

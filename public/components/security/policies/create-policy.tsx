@@ -26,25 +26,25 @@ import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { WzFlyout } from '../../common/flyouts';
 import { i18n } from '@kbn/i18n';
 
-const Name1 = i18n.translate('components.addModule.guide.Name1', {
+const Name1 = i18n.translate('wazuh.components.security.policies.Name1', {
   defaultMessage: 'Actions',
 });
-const Name2 = i18n.translate('components.addModule.guide.Name2', {
+const Name2 = i18n.translate('wazuh.components.security.policies.Name2', {
   defaultMessage: 'Remove',
 });
-const Name3 = i18n.translate('components.addModule.guide.Name3', {
+const Name3 = i18n.translate('wazuh.components.security.policies.Name3', {
   defaultMessage: 'Resources',
 });
-const Name4 = i18n.translate('components.addModule.guide.Name4', {
+const Name4 = i18n.translate('wazuh.components.security.policies.Name4', {
   defaultMessage: 'Resources',
 });
-const Name5 = i18n.translate('components.addModule.guide.Name5', {
+const Name5 = i18n.translate('wazuh.components.security.policies.Name5', {
   defaultMessage: 'Remove',
 });
-const Descp1 = i18n.translate('components.addModule.guide.Descp1', {
+const Descp1 = i18n.translate('wazuh.components.security.policies.Descp1', {
   defaultMessage: 'Remove this action',
 });
-const Descp2 = i18n.translate('components.addModule.guide.Descp2', {
+const Descp2 = i18n.translate('wazuh.components.security.policies.Descp2', {
   defaultMessage: 'Remove this resource',
 });
 export const CreatePolicyFlyout = ({ closeFlyout }) => {

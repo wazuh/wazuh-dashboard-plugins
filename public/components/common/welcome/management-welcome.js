@@ -58,7 +58,7 @@ class ManagementWelcome extends Component {
                 title
                 description
                 betaBadgeLabel={i18n.translate(
-                  'components.welcome.managementWelcome.title',
+                  'wazuh.components.welcome.managementWelcome.title',
                   {
                     defaultMessage: 'Administration',
                   },
@@ -77,12 +77,12 @@ class ManagementWelcome extends Component {
                           color='primary'
                         />
                       }
-                      title={i18n.translate('components.welcome.rules.title', {
+                      title={i18n.translate('wazuh.components.welcome.rules.title', {
                         defaultMessage: 'Rules',
                       })}
                       onClick={() => this.switchSection('rules')}
                       description={i18n.translate(
-                        'components.welcome.rules.description',
+                        'wazuh.component.welcome.rules.description',
                         {
                           defaultMessage: 'Manage your Wazuh cluster rules.',
                         },
@@ -101,14 +101,14 @@ class ManagementWelcome extends Component {
                         />
                       }
                       title={i18n.translate(
-                        'components.welcome.decoders.title',
+                        'wazuh.component.welcome.decoders.title',
                         {
                           defaultMessage: 'Decoders',
                         },
                       )}
                       onClick={() => this.switchSection('decoders')}
                       description={i18n.translate(
-                        'components.welcome.decoder.description',
+                        'wazuh.component.welcome.decoder.description',
                         {
                           defaultMessage: 'Manage your Wazuh cluster decoders.',
                         },
@@ -128,12 +128,12 @@ class ManagementWelcome extends Component {
                           color='primary'
                         />
                       }
-                      title={i18n.translate('components.welcome.cdb.title', {
+                      title={i18n.translate('wazuh.components.welcome.cdb.title', {
                         defaultMessage: 'CDB lists',
                       })}
                       onClick={() => this.switchSection('lists')}
                       description={i18n.translate(
-                        'components.welcome.cdb.description',
+                        'wazuh.component.welcome.cdb.description',
                         {
                           defaultMessage:
                             'Manage your Wazuh cluster CDB lists.',
@@ -152,12 +152,12 @@ class ManagementWelcome extends Component {
                           color='primary'
                         />
                       }
-                      title={i18n.translate('components.welcome.groups.title', {
+                      title={i18n.translate('wazuh.components.welcome.groups.title', {
                         defaultMessage: 'Groups',
                       })}
                       onClick={() => this.switchSection('groups')}
                       description={i18n.translate(
-                        'components.welcome.groups.description',
+                        'wazuh.component.welcome.groups.description',
                         {
                           defaultMessage: 'Manage your agent groups.',
                         },
@@ -174,14 +174,14 @@ class ManagementWelcome extends Component {
                         <EuiIcon size='xl' type='devToolsApp' color='primary' />
                       }
                       title={i18n.translate(
-                        'components.welcome.configuration.title',
+                        'wazuh.component.welcome.configuration.title',
                         {
                           defaultMessage: 'Configuration',
                         },
                       )}
                       onClick={() => this.switchSection('configuration')}
                       description={i18n.translate(
-                        'components.welcome.configuration.description',
+                        'wazuh.component.welcome.configuration.description',
                         {
                           defaultMessage:
                             'Manage your Wazuh cluster configuration.',
@@ -198,7 +198,7 @@ class ManagementWelcome extends Component {
                 title
                 description
                 betaBadgeLabel={i18n.translate(
-                  'components.welcome.statusAndReportsLabel',
+                  'wazuh.components.welcome.statusAndReportsLabel',
                   {
                     defaultMessage: 'Status and reports',
                   },
@@ -213,12 +213,12 @@ class ManagementWelcome extends Component {
                       icon={
                         <EuiIcon size='xl' type='uptimeApp' color='primary' />
                       }
-                      title={i18n.translate('components.welcome.status.title', {
+                      title={i18n.translate('wazuh.components.welcome.status.title', {
                         defaultMessage: 'Status',
                       })}
                       onClick={() => this.switchSection('status')}
                       description={i18n.translate(
-                        'components.welcome.status.description',
+                        'wazuh.component.welcome.status.description',
                         {
                           defaultMessage: 'Manage your Wazuh cluster status.',
                         },
@@ -237,14 +237,14 @@ class ManagementWelcome extends Component {
                         />
                       }
                       title={i18n.translate(
-                        'components.welcome.cluster.title',
+                        'wazuh.component.welcome.cluster.title',
                         {
                           defaultMessage: 'Cluster',
                         },
                       )}
                       onClick={() => this.switchSection('monitoring')}
                       description={i18n.translate(
-                        'components.welcome.cluster.description',
+                        'wazuh.component.welcome.cluster.description',
                         {
                           defaultMessage: 'Visualize your Wazuh cluster.',
                         },
@@ -260,12 +260,12 @@ class ManagementWelcome extends Component {
                       icon={
                         <EuiIcon size='xl' type='filebeatApp' color='primary' />
                       }
-                      title={i18n.translate('components.welcome.logs.title', {
+                      title={i18n.translate('wazuh.components.welcome.logs.title', {
                         defaultMessage: 'Logs',
                       })}
                       onClick={() => this.switchSection('logs')}
                       description={i18n.translate(
-                        'components.welcome.logs.description',
+                        'wazuh.component.welcome.logs.description',
                         {
                           defaultMessage: 'Logs from your Wazuh cluster.',
                         },
@@ -284,14 +284,14 @@ class ManagementWelcome extends Component {
                         />
                       }
                       title={i18n.translate(
-                        'components.welcome.reports.title',
+                        'wazuh.component.welcome.reports.title',
                         {
                           defaultMessage: 'Reporting',
                         },
                       )}
                       onClick={() => this.switchSection('reporting')}
                       description={i18n.translate(
-                        'components.welcome.reports.description',
+                        'wazuh.component.welcome.reports.description',
                         {
                           defaultMessage: 'Check your stored Wazuh reports.',
                         },
@@ -312,14 +312,14 @@ class ManagementWelcome extends Component {
                         />
                       }
                       title={i18n.translate(
-                        'components.welcome.statistics.title',
+                        'wazuh.component.welcome.statistics.title',
                         {
                           defaultMessage: 'Statistics',
                         },
                       )}
                       onClick={() => this.switchSection('statistics')}
                       description={i18n.translate(
-                        'components.welcome.statistics.description',
+                        'wazuh.component.welcome.statistics.description',
                         {
                           defaultMessage:
                             'Information about the Wazuh environment',

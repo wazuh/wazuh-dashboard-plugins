@@ -61,14 +61,14 @@ export const ButtonModuleGenerateReport = ({
         disabledReport
           ? {
               position: 'top',
-              content: i18n.translate('components.common.modules.noResultsMatch', {
+              content: i18n.translate('wazuh.components.common.modules.noResultsMatch', {
                 defaultMessage: 'No results match for this search criteria.',
               })
             }
           : undefined
       }
     >
-      {i18n.translate('components.common.modules.button.gernateReport', {
+      {i18n.translate('wazuh.components.common.modules.button.gernateReport', {
         defaultMessage: 'Generate report',
       })}
     </WzButton>

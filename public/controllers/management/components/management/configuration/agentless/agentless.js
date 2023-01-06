@@ -31,13 +31,13 @@ const mainSettings = [
   { field: 'arguments', label: 'Pass these arguments to check' },
 ];
 const text2 = i18n.translate(
-  'controller.manage.comp.confi.setting.response.agentless.text2',
+  'wazuh.controller.manage.comp.confi.setting.response.agentless.text2',
   {
     defaultMessage: 'How to monitor agentless devices',
   },
 );
 const text3 = i18n.translate(
-  'controller.manage.comp.confi.setting.response.agentless.text3',
+  'wazuh.controller.manage.comp.confi.setting.response.agentless.text3',
   {
     defaultMessage: 'Agentless reference',
   },

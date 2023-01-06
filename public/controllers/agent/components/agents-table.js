@@ -56,44 +56,44 @@ import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { AgentStatus } from '../../../components/agents/agent_status';
 
-const Descp1 = i18n.translate('controllers.agent.comp.table.Descp1', {
+const Descp1 = i18n.translate('wazuh.controllers.agent.comp.table.Descp1', {
   defaultMessage: 'Filter by agent connection status',
 });
-const Descp2 = i18n.translate('controllers.agent.comp.table.Descp2', {
+const Descp2 = i18n.translate('wazuh.controllers.agent.comp.table.Descp2', {
   defaultMessage: 'Filter by OS platform',
 });
-const Descp3 = i18n.translate('controllers.agent.comp.table.Descp3', {
+const Descp3 = i18n.translate('wazuh.controllers.agent.comp.table.fiterByAgentIP', {
   defaultMessage: 'Filter by agent IP',
 });
-const Descp4 = i18n.translate('controllers.agent.comp.table.Descp4', {
+const Descp4 = i18n.translate('wazuh.controllers.agent.comp.table.filterByAgentName', {
   defaultMessage: 'Filter by agent name',
 });
-const Descp5 = i18n.translate('controllers.agent.comp.table.Descp5', {
+const Descp5 = i18n.translate('wazuh.controllers.agent.comp.table.filterByAgentId', {
   defaultMessage: 'Filter by agent id',
 });
-const Descp6 = i18n.translate('controllers.agent.comp.table.Descp6', {
+const Descp6 = i18n.translate('wazuh.controllers.agent.comp.table.Descp6', {
   defaultMessage: 'Filter by agent group',
 });
-const Descp7 = i18n.translate('controllers.agent.comp.table.Descp7', {
+const Descp7 = i18n.translate('wazuh.controllers.agent.comp.table.Descp7', {
   defaultMessage: 'Filter by node name',
 });
-const Descp8 = i18n.translate('controllers.agent.comp.table.Descp8', {
+const Descp8 = i18n.translate('wazuh.controllers.agent.comp.table.Descp8', {
   defaultMessage: 'Filter by manager',
 });
-const Descp9 = i18n.translate('controllers.agent.comp.table.Descp9', {
+const Descp9 = i18n.translate('wazuh.controllers.agent.comp.table.Descp9', {
   defaultMessage: 'Filter by agent version',
 });
-const Descp10 = i18n.translate('controllers.agent.comp.table.regkeyDescp', {
+const Descp10 = i18n.translate('wazuh.controllers.agent.comp.table.regkeyDescp', {
   defaultMessage: 'Filter by check reason',
 });
-const Descp11 = i18n.translate('controllers.agent.comp.table.regkeyDescp11', {
+const Descp11 = i18n.translate('wazuh.controllers.agent.comp.table.regkeyDescp11', {
   defaultMessage: 'Filter by agent config sum',
 });
-const Descp12 = i18n.translate('controllers.agent.comp.table.regkeyDescp12', {
+const Descp12 = i18n.translate('wazuh.controllers.agent.comp.table.regkeyDescp12', {
   defaultMessage: 'Filter by agent merged sum',
 });
 
-const Descp13 = i18n.translate('controllers.agent.comp.table.regkeyDescp13', {
+const Descp13 = i18n.translate('wazuh.controllers.agent.comp.table.regkeyDescp13', {
   defaultMessage: 'Filter by last keep alive',
 });
 
@@ -526,7 +526,7 @@ export const AgentsTable = withErrorBoundary(
         <>
           <EuiFlexItem grow={false}>
             <EuiButtonEmpty iconType='importAction' onClick={this.downloadCsv}>
-              {i18n.translate('controllers.sgent.components.Exportformatted', {
+              {i18n.translate('wazuh.controllers.sgent.components.Exportformatted', {
                 defaultMessage: 'Export formatted',
               })}
             </EuiButtonEmpty>
@@ -602,7 +602,7 @@ export const AgentsTable = withErrorBoundary(
             iconType='sortUp'
             onClick={this.onClickUpgrade}
           >
-            {i18n.translate('controllers.sgent.components.Upgrades', {
+            {i18n.translate('wazuh.controllers.sgent.components.Upgrades', {
               defaultMessage: 'Upgrade',
             })}{' '}
             {
@@ -611,7 +611,7 @@ export const AgentsTable = withErrorBoundary(
                   item.outdated && item.status === API_NAME_AGENT_STATUS.ACTIVE,
               ).length
             }{' '}
-            {i18n.translate('controllers.sgent.components.agents', {
+            {i18n.translate('wazuh.controllers.sgent.components.agents', {
               defaultMessage: 'agents',
             })}
           </EuiButton>
@@ -640,7 +640,7 @@ export const AgentsTable = withErrorBoundary(
             iconType='sortUp'
             onClick={this.onClickUpgradeAll}
           >
-            {i18n.translate('controllers.sgent.components.Upgrade', {
+            {i18n.translate('wazuh.controllers.sgent.components.Upgrade', {
               defaultMessage: 'Upgrade all agents',
             })}
           </EuiButton>
@@ -667,7 +667,7 @@ export const AgentsTable = withErrorBoundary(
             iconType='refresh'
             onClick={this.onClickRestart}
           >
-            {i18n.translate('controllers.sgent.components.Restart', {
+            {i18n.translate('wazuh.controllers.sgent.components.Restart', {
               defaultMessage: 'Restart',
             })}{' '}
             {
@@ -675,7 +675,7 @@ export const AgentsTable = withErrorBoundary(
                 item => item.status === API_NAME_AGENT_STATUS.ACTIVE,
               ).length
             }{' '}
-            {i18n.translate('controllers.sgent.components.agents', {
+            {i18n.translate('wazuh.controllers.sgent.components.agents', {
               defaultMessage: 'agents',
             })}
           </EuiButton>
@@ -704,7 +704,7 @@ export const AgentsTable = withErrorBoundary(
             iconType='refresh'
             onClick={this.onClickRestartAll}
           >
-            {i18n.translate('controllers.sgent.components.restartAll', {
+            {i18n.translate('wazuh.controllers.sgent.components.restartAll', {
               defaultMessage: 'Restart all agents',
             })}
           </EuiButton>
@@ -729,7 +729,7 @@ export const AgentsTable = withErrorBoundary(
             }}
           >
             Delete {selectedItems.length}{' '}
-            {i18n.translate('controllers.sgent.components.agents', {
+            {i18n.translate('wazuh.controllers.sgent.components.agents', {
               defaultMessage: 'agents',
             })}
           </EuiButton>
@@ -753,7 +753,7 @@ export const AgentsTable = withErrorBoundary(
               this._isMount && this.setState({ purgeModal: true });
             }}
           >
-            {i18n.translate('controllers.sgent.components.delAll', {
+            {i18n.translate('wazuh.controllers.sgent.components.delAll', {
               defaultMessage: 'Delete all agents',
             })}
           </EuiButton>
@@ -1066,7 +1066,7 @@ export const AgentsTable = withErrorBoundary(
                     <EuiTitle size={'s'} style={{ padding: '6px 0px' }}>
                       <h2>
                         {i18n.translate(
-                          'controllers.sgent.components.Agents ',
+                          'wazuh.controllers..sgent.components.Agents ',
                           {
                             defaultMessage: 'Agents ',
                           },
@@ -1085,7 +1085,7 @@ export const AgentsTable = withErrorBoundary(
                 iconType='plusInCircle'
                 onClick={() => this.props.addingNewAgent()}
               >
-                {i18n.translate('controllers.sgent.components.newagent', {
+                {i18n.translate('wazuh.controllers.sgent.components.newagent', {
                   defaultMessage: 'Deploy new agent',
                 })}
               </WzButtonPermissions>
@@ -1117,7 +1117,7 @@ export const AgentsTable = withErrorBoundary(
               fill={true}
               onClick={() => this.reloadAgents()}
             >
-              {i18n.translate('controllers.sgent.components.Refresh', {
+              {i18n.translate('wazuh.controllers.sgent.components.Refresh', {
                 defaultMessage: 'Refresh',
               })}{' '}
             </EuiButton>
@@ -1305,7 +1305,7 @@ export const AgentsTable = withErrorBoundary(
               buttonColor='danger'
             >
               <p>
-                {i18n.translate('controllers.sgent.components.sure', {
+                {i18n.translate('wazuh.controllers.sgent.components.sure', {
                   defaultMessage: 'Are you sure you want to do this?',
                 })}
               </p>

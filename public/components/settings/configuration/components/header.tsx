@@ -52,7 +52,7 @@ const Title = () => {
     <EuiFlexItem>
       <EuiTitle>
         <h2>
-          {i18n.translate('components.setting.confi.comp.header.settings', {
+          {i18n.translate('wazuh.components.setting.confi.comp.header.settings', {
             defaultMessage: 'App current settings',
           })}
           &nbsp;
@@ -77,7 +77,7 @@ const SubTitle = () => {
   return (
     <EuiFlexItem>
       <EuiText color='subdued' style={{ paddingBottom: '15px' }}>
-        {i18n.translate('components.setting.confi.comp.header.located', {
+        {i18n.translate('wazuh.components.setting.confi.comp.header.located', {
           defaultMessage: 'Configuration file located at ',
         })}
         {getPluginDataPath('config/wazuh.yml')}

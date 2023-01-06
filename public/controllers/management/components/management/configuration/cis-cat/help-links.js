@@ -11,10 +11,10 @@
  */
 import { i18n } from "@kbn/i18n"
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
-const text1 = i18n.translate('controller.manage.comp.confi.cis.cat.text1', {
+const text1 = i18n.translate('wazuh.controller.manage.comp.confi.cis.cat.text1', {
   defaultMessage: 'CIS-CAT module documentation',
 });
-const text2 = i18n.translate('controller.manage.comp.confi.cis.cat.text2', {
+const text2 = i18n.translate('wazuh.controller.manage.comp.confi.cis.cat.text2', {
   defaultMessage: 'CIS-CAT module reference',
 });
 export default [

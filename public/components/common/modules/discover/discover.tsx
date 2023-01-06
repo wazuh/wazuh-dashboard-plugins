@@ -443,7 +443,7 @@ export const Discover = compose(
 
     removeColumn(id) {
       if (this.state.columns.length < 2) {
-        const title1 = i18n.translate('components.common.modules.oneColumnMustBeSelected', {
+        const title1 = i18n.translate('wazuh.components.common.modules.oneColumnMustBeSelected', {
           defaultMessage: 'At least one column must be selected',
         });
         this.showToast('warning', title1, 3000);
@@ -459,7 +459,7 @@ export const Discover = compose(
 
     addColumn(id) {
       if (this.state.columns.length > 11) {
-        const maxNumberOfColumn = i18n.translate('components.common.modules.maxNumberOfColumn', {
+        const maxNumberOfColumn = i18n.translate('wazuh.components.common.modules.maxNumberOfColumn', {
           defaultMessage: 'The maximum number of columns is 10',
         });
         this.showToast('warning', maxNumberOfColumn, 3000);
@@ -754,7 +754,7 @@ export const Discover = compose(
         totalItemCount: this.state.total > 10000 ? 10000 : this.state.total,
         pageSizeOptions: [10, 25, 50],
       };
-      const noResultsText = i18n.translate('components.common.modules.noResultsMatch', {
+      const noResultsText = i18n.translate('wazuh.components.common.modules.noResultsMatch', {
         defaultMessage: 'No results match for this search criteria.',
       })
       return (

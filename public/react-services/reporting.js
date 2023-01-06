@@ -24,7 +24,7 @@ import { UI_LOGGER_LEVELS } from '../../common/constants';
 import { UI_ERROR_SEVERITIES } from './error-orchestrator/types';
 import { getErrorOrchestrator } from './common-services';
 const app = getAngularModule();
-const Title1 = i18n.translate('kibana-int.vis.error', {
+const Title1 = i18n.translate('wazuh.kibana-int.vis.error', {
   defaultMessage: 'Error configuring report',
 });
 export class ReportingService {

@@ -22,13 +22,13 @@ import { webDocumentationLink } from '../../../../../../../common/services/web_d
 import { i18n } from '@kbn/i18n';
 
 const text1 = i18n.translate(
-  'controller.manage.comp.confi.Using.Wazuh.Azure.text1',
+  'wazuh.controller.manage.comp.confi.Using.Wazuh.Azure.text1',
   {
     defaultMessage: 'Using Wazuh to monitor Azure',
   },
 );
 const text2 = i18n.translate(
-  'controller.manage.comp.confi.Azurereference.text2',
+  'wazuh.controller.manage.comp.confi.Azurereference.text2',
   {
     defaultMessage: 'Azure reference',
   },

@@ -163,7 +163,7 @@ export const RolesMapping = () => {
         <EuiPageContentHeaderSection>
           <EuiTitle>
             <h2>{
-              i18n.translate("components.overview.role.mapping", {
+              i18n.translate("wazuh.components.overview.role.mapping", {
                 defaultMessage: "Role mapping",
               })}</h2>
           </EuiTitle>
@@ -176,7 +176,7 @@ export const RolesMapping = () => {
                   setIsCreatingRule(true);
                 }}
               >{
-                i18n.translate("components.overview.role.createRole", {
+                i18n.translate("wazuh.components.overview.role.createRole", {
                   defaultMessage: "Create Role mapping",
                 })}
 

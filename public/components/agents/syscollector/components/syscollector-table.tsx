@@ -132,7 +132,7 @@ export function SyscollectorTable({ tableParams }) {
               onClick={downloadCsv}
               iconType="importAction"
             >{
-              i18n.translate("components.agent.fim.ivv.lib.csv", {
+              i18n.translate("wazuh.components.agent.fim.ivv.lib.csv", {
                 defaultMessage: "Download CSV",
               })}
 

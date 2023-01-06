@@ -51,7 +51,7 @@ export class ToolsWelcomeCards extends Component {
       <div>
         <EuiTitle size='m'>
           <h1>
-            {i18n.translate('controllers.sgent.components.Wazuhtools', {
+            {i18n.translate('wazuh.controllers.sgent.components.Wazuhtools', {
               defaultMessage: 'Wazuh tools',
             })}
           </h1>

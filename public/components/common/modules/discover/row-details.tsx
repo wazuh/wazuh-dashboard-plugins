@@ -39,23 +39,23 @@ import { i18n } from '@kbn/i18n';
 const capitalize = str => str[0].toUpperCase() + str.slice(1);
 const filter = {};
 const filterOutContent = i18n.translate(
-  'components.common.modules.discover.filterOutContent',
+  'wazuh.components.common.modules.discover.filterOutContent',
   { defaultMessage: 'Filter out value' },
 );
 const filterOutLabel = i18n.translate(
-  'components.common.modules.discover.filterOutLabel',
+  'wazuh.components.common.modules.discover.filterOutLabel',
   { defaultMessage: 'Filter' },
 );
 const toggleContent = i18n.translate(
-  'components.common.modules.discover.toggleContent',
+  'wazuh.components.common.modules.discover.toggleContent',
   { defaultMessage: 'Toggle column' },
 );
 const filterRule = i18n.translate(
-  'components.common.modules.discover.filterRule',
+  'wazuh.components.common.modules.discover.filterRule',
   { defaultMessage: 'Filter by this rule ID: ' },
 );
 const filterLevel = i18n.translate(
-  'components.common.modules.discover.filterLevel',
+  'wazuh.components.common.modules.discover.filterLevel',
   { defaultMessage: 'Filter by this level: ' },
 );
 export class RowDetails extends Component {
@@ -96,12 +96,12 @@ export class RowDetails extends Component {
     };
 
     this.complianceEquivalences = {
-      pci: i18n.translate('components.common.modules.discover.pci',{ defaultMessage: 'PCI DSS' }),
-      gdpr: i18n.translate('components.common.modules.discover.gdpr',{ defaultMessage: 'GDPR' }),
-      gpg13: i18n.translate('components.common.modules.discover.gpg_13',{ defaultMessage: 'GPG 13' }),
-      hipaa: i18n.translate('components.common.modules.discover.hipaa',{ defaultMessage: 'HIPAA' }),
-      mitre: i18n.translate('components.common.modules.discover.mitre',{ defaultMessage: 'MITRE' }),
-      'nist-800-53': i18n.translate('components.common.modules.discover.nist_800',{ defaultMessage: 'NIST-800-53' })
+      pci: i18n.translate('wazuh.components.common.modules.discover.pci',{ defaultMessage: 'PCI DSS' }),
+      gdpr: i18n.translate('wazuh.components.common.modules.discover.gdpr',{ defaultMessage: 'GDPR' }),
+      gpg13: i18n.translate('wazuh.components.common.modules.discover.gpg_13',{ defaultMessage: 'GPG 13' }),
+      hipaa: i18n.translate('wazuh.components.common.modules.discover.hipaa',{ defaultMessage: 'HIPAA' }),
+      mitre: i18n.translate('wazuh.components.common.modules.discover.mitre',{ defaultMessage: 'MITRE' }),
+      'nist-800-53': i18n.translate('wazuh.components.common.modules.discover.nist_800',{ defaultMessage: 'NIST-800-53' })
     };
   }
 
@@ -164,7 +164,7 @@ export class RowDetails extends Component {
   getFilterLink = (key, value) => {
     const filter = {};
     filter[key] = value;
-    const filterByText = i18n.translate('components.common.modules.discover.filter_by',{ defaultMessage: 'Filter By' });
+    const filterByText = i18n.translate('wazuh.components.common.modules.discover.filter_by',{ defaultMessage: 'Filter By' });
     return (
       <EuiToolTip position='top' content={`${filterByText} ${key}:${value}`}>
         <EuiLink onClick={async () => this.props.addFilter(filter)}>
@@ -375,7 +375,7 @@ export class RowDetails extends Component {
     return (
       <EuiFlexGrid columns={4}>
         <EuiFlexItem key='id' grow={1}>
-          <b style={{ paddingBottom: 6 }}>{i18n.translate('components.common.modules.discover.id',{ defaultMessage: 'ID' })}</b>
+          <b style={{ paddingBottom: 6 }}>{i18n.translate('wazuh.components.common.modules.discover.id',{ defaultMessage: 'ID' })}</b>
           <EuiToolTip position='top' content={filterRule + `${id}`}>
             <EuiLink
               onClick={async () => this.props.addFilter({ 'rule.id': id })}
@@ -385,7 +385,7 @@ export class RowDetails extends Component {
           </EuiToolTip>
         </EuiFlexItem>
         <EuiFlexItem key='level' grow={1}>
-          <b style={{ paddingBottom: 6 }}>{i18n.translate('components.common.modules.discover.level',{ defaultMessage: 'Level' })}</b>
+          <b style={{ paddingBottom: 6 }}>{i18n.translate('wazuh.components.common.modules.discover.level',{ defaultMessage: 'Level' })}</b>
           <EuiToolTip position='top' content={filterLevel + `${level}`}>
             <EuiLink
               onClick={async () =>
@@ -397,15 +397,15 @@ export class RowDetails extends Component {
           </EuiToolTip>
         </EuiFlexItem>
         <EuiFlexItem key='file' grow={1}>
-          <b style={{ paddingBottom: 6 }}>{i18n.translate('components.common.modules.discover.file',{ defaultMessage: 'File' })}</b>
+          <b style={{ paddingBottom: 6 }}>{i18n.translate('wazuh.components.common.modules.discover.file',{ defaultMessage: 'File' })}</b>
           {file}
         </EuiFlexItem>
         <EuiFlexItem key='path' grow={1}>
-          <b style={{ paddingBottom: 6 }}>{i18n.translate('components.common.modules.discover.path',{ defaultMessage: 'Path' })}</b>
+          <b style={{ paddingBottom: 6 }}>{i18n.translate('wazuh.components.common.modules.discover.path',{ defaultMessage: 'Path' })}</b>
           {path}
         </EuiFlexItem>
         <EuiFlexItem key='Groups' grow={1}>
-          <b style={{ paddingBottom: 6 }}>{i18n.translate('components.common.modules.discover.groups',{ defaultMessage: 'Groups' })}</b>
+          <b style={{ paddingBottom: 6 }}>{i18n.translate('wazuh.components.common.modules.discover.groups',{ defaultMessage: 'Groups' })}</b>
           {this.renderGroups(groups)}
         </EuiFlexItem>
         <EuiSpacer size='s' />
@@ -415,7 +415,7 @@ export class RowDetails extends Component {
 
   renderGroups(groups) {
     const listGroups: any = [];
-    const filterByGroup = i18n.translate('components.common.modules.discover.filterByGroups',
+    const filterByGroup = i18n.translate('wazuh.components.common.modules.discover.filterByGroups',
       { defaultMessage: 'Filter by this group:'},
     )
     groups.forEach((group, index) => {
@@ -520,7 +520,7 @@ export class RowDetails extends Component {
 
   renderCompliance(compliance) {
     const styleTitle = { fontSize: '14px', fontWeight: 500 };
-    const filterByCompliance = i18n.translate('components.common.modules.discover.filterByCompliance',
+    const filterByCompliance = i18n.translate('wazuh.components.common.modules.discover.filterByCompliance',
       { defaultMessage: 'Filter by this compliance' },
     );
     return (
@@ -584,7 +584,7 @@ export class RowDetails extends Component {
                 <EuiTitle size='s' style={{ fontWeight: 400 }}>
                   <h3>
                     {i18n.translate(
-                      'components.common.modules.discover.information',
+                      'wazuh.component.common.modules.discover.information',
                       { defaultMessage: 'Information' },
                     )}
                   </h3>
@@ -599,7 +599,7 @@ export class RowDetails extends Component {
                   <EuiIcon type='popout' color='primary' />
                   &nbsp;
                   {i18n.translate(
-                    'components.common.modules.discover.viewInRules',
+                    'wazuh.component.common.modules.discover.viewInRules',
                     { defaultMessage: 'View in Rules' },
                   )}
                 </a>
@@ -622,7 +622,7 @@ export class RowDetails extends Component {
                 <EuiTitle size='s'>
                   <h3>
                     {i18n.translate(
-                      'components.common.modules.discover.details',
+                      'wazuh.component.common.modules.discover.details',
                       { defaultMessage: 'Details' },
                     )}
                   </h3>
@@ -646,7 +646,7 @@ export class RowDetails extends Component {
                 <EuiTitle size='s'>
                   <h3>
                     {i18n.translate(
-                      'components.common.modules.discover.complince',
+                      'wazuh.component.common.modules.discover.complince',
                       { defaultMessage: 'Compliance' },
                     )}
                   </h3>
@@ -676,17 +676,17 @@ export class RowDetails extends Component {
     const tabs = [
       {
         id: 'table',
-        name: i18n.translate('components.common.modules.discover.tab.table',{ defaultMessage: 'Table' }),
+        name: i18n.translate('wazuh.components.common.modules.discover.tab.table',{ defaultMessage: 'Table' }),
         disabled: false,
       },
       {
         id: 'json',
-        name: i18n.translate('components.common.modules.discover.tab.json',{ defaultMessage: 'JSON' }),
+        name: i18n.translate('wazuh.components.common.modules.discover.tab.json',{ defaultMessage: 'JSON' }),
         disabled: false,
       },
       {
         id: 'rule',
-        name: i18n.translate('components.common.modules.discover.tab.rule',{ defaultMessage: 'Rule' }),
+        name: i18n.translate('wazuh.components.common.modules.discover.tab.rule',{ defaultMessage: 'Rule' }),
         disabled: false,
       },
     ];
@@ -707,7 +707,7 @@ export class RowDetails extends Component {
   }
 
   render() {
-    const errorLoadingRuleID = i18n.translate('components.common.modules.discover.errorLoadingRuleID',{
+    const errorLoadingRuleID = i18n.translate('wazuh.components.common.modules.discover.errorLoadingRuleID',{
      defaultMessage: 'There was an error loading rule ID: ' }
     );
     return (

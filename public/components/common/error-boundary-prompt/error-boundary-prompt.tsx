@@ -34,7 +34,7 @@ export const ErrorComponentPrompt = (props: {
   return (
     <EuiEmptyPrompt
       iconType="faceSad"
-      title={<h2>{ i18n.translate('components.common.errorBoundary.somethingWrong', { defaultMessage: 'Something went wrong.', })}</h2>}
+      title={<h2>{ i18n.translate('wazuh.components.common.errorBoundary.somethingWrong', { defaultMessage: 'Something went wrong.', })}</h2>}
       body={
         <div style={props.style || styles.error}>
           <details className="wz-error-boundary__details">

@@ -71,7 +71,7 @@ export class VisualizeTopMenu extends Component {
           >
             <EuiModalHeader>
               <EuiModalHeaderTitle>
-                {i18n.translate('components.visualize.top.select', {
+                {i18n.translate('wazuh.components.visualize.top.select', {
                   defaultMessage: 'Select an agent',
                 })}
               </EuiModalHeaderTitle>
@@ -85,7 +85,7 @@ export class VisualizeTopMenu extends Component {
                     this.closeAgentModal();
                   }}
                 >
-                  {i18n.translate('components.visualize.top.agent', {
+                  {i18n.translate('wazuh.components.visualize.top.agent', {
                     defaultMessage: 'agent',
                   })}{' '}
                 </button>

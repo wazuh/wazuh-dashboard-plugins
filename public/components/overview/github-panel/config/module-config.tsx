@@ -20,16 +20,16 @@ import {
 } from './';
 import { i18n } from '@kbn/i18n';
 
-const title1 = i18n.translate('components.addModule.guide.title1', {
+const title1 = i18n.translate('wazuh.components.addModule.guide.actorActivity', {
   defaultMessage: 'Actor Activity',
 });
-const title2 = i18n.translate('components.addModule.guide.title2', {
+const title2 = i18n.translate('wazuh.components.addModule.guide.organizationActivity', {
   defaultMessage: 'Organization Activity',
 });
-const title3 = i18n.translate('components.addModule.guide.title3', {
+const title3 = i18n.translate('wazuh.components.addModule.guide.repositoryActive', {
   defaultMessage: 'Repository Activity',
 });
-const title4 = i18n.translate('components.addModule.guide.title4', {
+const title4 = i18n.translate('wazuh.components.overview.githubPanel.config.action', {
   defaultMessage: 'Action Activity',
 });
 export const ModuleConfig = {

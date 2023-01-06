@@ -33,15 +33,15 @@ import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { satisfyPluginPlatformVersion } from '../../../../common/semver';
 import { i18n } from '@kbn/i18n';
 const foundIndexPattern = i18n.translate(
-  'components.common.modules.event.foundIndexPatttern',
+  'wazuh.components.common.modules.event.foundIndexPatttern',
   { defaultMessage: 'Found unknown fields in the index pattern.' },
 );
 const indexPattern = i18n.translate(
-  'components.common.modules.event.indexPatttern',
+  'wazuh.components.common.modules.event.indexPatttern',
   { defaultMessage: 'The index pattern could not be refreshed.' },
 );
 const indexPatternText = i18n.translate(
-  'components.common.modules.event.indexPattternText',
+  'wazuh.components.common.modules.event.indexPattternText',
   {
     defaultMessage:
       'There are some unknown fields for the current index pattern. The index pattern fields need to be refreshed.',
@@ -428,7 +428,7 @@ export const Events = compose(
             <EuiFlexGroup justifyContent='flexEnd' gutterSize='s'>
               <EuiFlexItem grow={false}>
                 {i18n.translate(
-                  'components.common.modules.event.unkownFields',
+                  'wazuh.components.common.modules.event.unkownFields',
                   {
                     defaultMessage:
                       'There are some unknown fields for the current index pattern. You need to refresh the page to update the fields.',
@@ -438,7 +438,7 @@ export const Events = compose(
               <EuiFlexItem grow={false}>
                 <EuiButton onClick={() => window.location.reload()} size='s'>
                   {i18n.translate(
-                    'components.common.modules.event.reloadPage',
+                    'wazuh.component.common.modules.event.reloadPage',
                     { defaultMessage: 'Reload page' },
                   )}
                 </EuiButton>

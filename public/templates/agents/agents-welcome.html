@@ -6,18 +6,18 @@
                     <div layout="row" layout-padding>
                         <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i> <span
                             class="embPanel__header embPanel__title embPanel__dragger layout-row wz-headline-title"
-                            i18n-id="templates.agentWelcome.errorAgentData"
+                            i18n-id="wazuh.templates.agentWelcome.errorAgentData"
                             i18n-default-message="Could
                             not fetch data for this agent.">
                             <span ng-if="emptyAgent"
-                              i18n-id="templates.agentWelcome.reason"
+                              i18n-id="wazuh.templates.agentWelcome.reason"
                               i18n-default-message="Reason: "
                             >
                             {{emptyAgent}}</span></span>
                     </div>
                     <div layout="row" layout-padding ng-if="emptyAgent">
                         <span class="cursor-pointer" ng-click="getAgent()"
-                          i18n-id="templates.agentWelcome.tryAgain"
+                          i18n-id="wazuh.templates.agentWelcome.tryAgain"
                           i18n-default-message="Try again">
                           <i class="fa fa-fw fa-refresh"
                                 aria-hidden="true"></i>

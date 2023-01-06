@@ -150,7 +150,7 @@ export class FilesInGroupTable extends Component {
               onClick={() => this.props.editConfig()}
             >
               {i18n.translate(
-                'controllers.mnage.comp.confi.groups.status.agent.Refresh.export.edit',
+                'wazuh.controllers..mnage.comp.confi.groups.status.agent.Refresh.export.edit',
                 {
                   defaultMessage: 'Edit group configuration',
                 },
@@ -177,7 +177,7 @@ export class FilesInGroupTable extends Component {
               }
             >
               {i18n.translate(
-                'controllers.mnage.comp.confi.groups.status.agent.Refresh.export',
+                'wazuh.controllers..mnage.comp.confi.groups.status.agent.Refresh.export',
                 {
                   defaultMessage: 'Export formatted',
                 },
@@ -187,7 +187,7 @@ export class FilesInGroupTable extends Component {
           <EuiFlexItem grow={false}>
             <EuiButtonEmpty iconType='refresh' onClick={() => this.refresh()}>
               {i18n.translate(
-                'controllers.mnage.comp.confi.groups.status.agent.Refresh',
+                'wazuh.controllers..mnage.comp.confi.groups.status.agent.Refresh',
                 {
                   defaultMessage: 'Refresh',
                 },
@@ -199,7 +199,7 @@ export class FilesInGroupTable extends Component {
           <EuiFlexItem>
             <EuiText color='subdued' style={{ paddingBottom: '15px' }}>
               {i18n.translate(
-                'controllers.mnage.comp.confi.groups.status.agent.configuration',
+                'wazuh.controllers..mnage.comp.confi.groups.status.agent.configuration',
                 {
                   defaultMessage:
                     'From here you can list and see your group files, also, you can edit the group configuration',

@@ -49,7 +49,7 @@ export const PromptModuleNotForAgent = ({
       body={body && <p>{body}</p>}
       actions={
         <EuiButton color='primary' fill onClick={unpinAgent}>
-          {i18n.translate('components.agent.fim.ivv.lib.emptyField', {
+          {i18n.translate('wazuh.components.agent.fim.ivv.lib.unpinAgent', {
             defaultMessage: 'Unpin agent',
           })}
         </EuiButton>

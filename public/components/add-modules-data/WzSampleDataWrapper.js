@@ -55,7 +55,7 @@ export class WzSampleDataProvider extends Component {
                 <EuiTitle>
                   <h2>
                     {i18n.translate(
-                      'components.add.modulesdata.moduleguidesample',
+                      'wazuh.component.add.modulesdata.moduleguidesample',
                       {
                         defaultMessage: ' Sample data',
                       },
@@ -64,7 +64,7 @@ export class WzSampleDataProvider extends Component {
                 </EuiTitle>
                 <EuiText color='subdued'>
                   {i18n.translate(
-                    'components.add.modulesdata.moduleguide.sampledata',
+                    'wazuh.component.add.modulesdata.moduleguide.sampledata',
                     {
                       defaultMessage:
                         'Add sample data with events to the modules',

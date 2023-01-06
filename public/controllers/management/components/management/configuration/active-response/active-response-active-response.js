@@ -23,13 +23,13 @@ import { connect } from 'react-redux';
 import { compose } from 'redux';
 import withWzConfig from '../util-hocs/wz-config';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
-const name2 = i18n.translate('controller.manage.comp.confi.active.name2', {
+const name2 = i18n.translate('wazuh.controller.manage.comp.confi.active.name2', {
   defaultMessage: 'Active response documentation',
 });
-const name3 = i18n.translate('controller.manage.comp.confi.active.name3', {
+const name3 = i18n.translate('wazuh.controller.manage.comp.confi.active.name3', {
   defaultMessage: 'Active response reference',
 });
-const title1 = i18n.translate('controller.manage.comp.confi.active.title1', {
+const title1 = i18n.translate('wazuh.controller.manage.comp.confi.active.title1', {
   defaultMessage: 'Active response definitions',
 });
 const mainSettings = [

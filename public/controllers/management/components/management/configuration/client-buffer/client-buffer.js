@@ -18,16 +18,16 @@ import WzConfigurationSettingsTabSelector from '../util-components/configuration
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 
 import withWzConfig from '../util-hocs/wz-config';
-const text1 = i18n.translate('controller.manage.comp.confi.client.text1', {
+const text1 = i18n.translate('wazuh.controller.manage.comp.confi.client.text1', {
   defaultMessage: 'Anti-flooding mechanism',
 });
-const text2 = i18n.translate('controller.manage.comp.confi.client.text2', {
+const text2 = i18n.translate('wazuh.controller.manage.comp.confi.client.text2', {
   defaultMessage: 'Client buffer reference',
 });
-const title1 = i18n.translate('controller.manage.comp.confi.client.title1', {
+const title1 = i18n.translate('wazuh.controller.manage.comp.confi.client.title1', {
   defaultMessage: 'Main settings',
 });
-const descp1 = i18n.translate('controller.manage.comp.confi.client.Descp1', {
+const descp1 = i18n.translate('wazuh.controller.manage.comp.confi.client.Descp1', {
   defaultMessage:
     'These settings determine the event processing rate for the agent',
 });

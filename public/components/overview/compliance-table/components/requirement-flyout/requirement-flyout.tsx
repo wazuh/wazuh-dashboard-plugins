@@ -64,7 +64,7 @@ export class RequirementFlyout extends Component {
         )) || (
           <EuiTitle size="m">
             <h2 id="flyoutSmallTitle">{
-              i18n.translate("components.overview.Requirement", {
+              i18n.translate("wazuh.components.overview.Requirement", {
                 defaultMessage: "Requirement",
               })} {currentRequirement}
             </h2>
@@ -102,7 +102,7 @@ export class RequirementFlyout extends Component {
           buttonContent={
             <EuiTitle size="s">
               <h3>{
-                i18n.translate("components.overview.Details", {
+                i18n.translate("wazuh.components.overview.Details", {
                   defaultMessage: "Details",
                 })}
               </h3>
@@ -121,7 +121,7 @@ export class RequirementFlyout extends Component {
                 <EuiFlexItem style={{ marginLeft: 2 }} grow={true}>
                   <EuiText style={{ marginLeft: 8, fontSize: 14 }}>
                     <p style={{ fontWeight: 500, marginBottom: 2 }}>{
-                      i18n.translate("components.overview.Goals", {
+                      i18n.translate("wazuh.components.overview.Goals", {
                         defaultMessage: "Goals",
                       })}
                     </p>
@@ -139,7 +139,7 @@ export class RequirementFlyout extends Component {
               <EuiFlexItem style={{ marginLeft: 2 }} grow={true}>
                 <EuiText style={{ marginLeft: 8, fontSize: 14 }}>
                   <p style={{ fontWeight: 500, marginBottom: 2 }}>{
-                    i18n.translate("components.overview.Requirementdescription", {
+                    i18n.translate("wazuh.components.overview.Requirementdescription", {
                       defaultMessage: "Requirement description",
                     })}
                   </p>
@@ -160,7 +160,7 @@ export class RequirementFlyout extends Component {
           extraAction={
             <div style={{ marginBottom: 5 }}>
               <strong>{this.state.totalHits || 0}</strong> {
-              i18n.translate("components.overview.hits", {
+              i18n.translate("wazuh.components.overview.hits", {
                 defaultMessage: "hits",
               })}
             </div>
@@ -168,7 +168,7 @@ export class RequirementFlyout extends Component {
           buttonContent={
             <EuiTitle size="s">
               <h3>{
-                i18n.translate("components.overview.Recentevents", {
+                i18n.translate("wazuh.components.overview.Recentevents", {
                   defaultMessage: "Recent events",
                 })}
 

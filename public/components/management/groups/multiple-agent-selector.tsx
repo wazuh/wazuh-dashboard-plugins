@@ -518,7 +518,7 @@ export const MultipleAgentSelector = withErrorBoundary(
                             <EuiFlexItem grow={false}>
                               <EuiTitle size="m">
                                 <h1>{
-                                  i18n.translate("components.manage.group.agentsGroup", {
+                                  i18n.translate("wazuh.components.manage.group.agentsGroup", {
                                     defaultMessage: "Manage agents of group",
                                   })} {this.props.currentGroup.name}</h1>
                               </EuiTitle>
@@ -537,7 +537,7 @@ export const MultipleAgentSelector = withErrorBoundary(
                                 (this.state.currentDeleting === 0 && this.state.currentAdding === 0)
                               }
                             >{
-                              i18n.translate("components.manage.group.agentsGroupApply", {
+                              i18n.translate("wazuh.components.manage.group.agentsGroupApply", {
                                 defaultMessage: "Apply changes",
                               })}
 
@@ -547,7 +547,7 @@ export const MultipleAgentSelector = withErrorBoundary(
                             <span className="error-msg">
                               <i className="fa fa-exclamation-triangle"></i>
                               &nbsp;{
-                                i18n.translate("components.manage.group.agentsGroupRemoval", {
+                                i18n.translate("wazuh.components.manage.group.agentsGroupRemoval", {
                                   defaultMessage: "Changes cannot be applied with more than 500 additions or removals",
                                 })}
                             </span>
@@ -563,7 +563,7 @@ export const MultipleAgentSelector = withErrorBoundary(
                                   <EuiFlexItem>
                                     <EuiTitle size="s">
                                       <h4>{
-                                        i18n.translate("components.manage.group.agentsGroupRemoval", {
+                                        i18n.translate("wazuh.components.manage.group.availableAgents", {
                                           defaultMessage: "Available agents",
                                         })}
                                       </h4>
@@ -658,7 +658,7 @@ export const MultipleAgentSelector = withErrorBoundary(
                                       >
                                         {' '}
                                         <EuiIcon type="refresh" /> &nbsp; {
-                                          i18n.translate("components.manage.group.more", {
+                                          i18n.translate("wazuh.components.manage.group.more", {
                                             defaultMessage: "Click here to load more agent ",
                                           })}
                                       </p>
@@ -670,7 +670,7 @@ export const MultipleAgentSelector = withErrorBoundary(
                                       <p className="wz-load-extra">
                                         {' '}
                                         <EuiLoadingSpinner size="m" /> &nbsp; {
-                                          i18n.translate("components.manage.group.more.load", {
+                                          i18n.translate("wazuh.components.manage.group.more.load", {
                                             defaultMessage: "Loading...",
                                           })}
                                       </p>
@@ -774,7 +774,7 @@ export const MultipleAgentSelector = withErrorBoundary(
                                   <EuiFlexItem>
                                     <EuiTitle size="s">
                                       <h4>{
-                                        i18n.translate("components.manage.group.more.group", {
+                                        i18n.translate("wazuh.components.manage.group.more.group", {
                                           defaultMessage: "Current agents in the group",
                                         })}
                                          (

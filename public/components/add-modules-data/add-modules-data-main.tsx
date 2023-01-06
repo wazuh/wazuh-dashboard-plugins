@@ -176,13 +176,13 @@ export default class WzAddModulesData extends Component<
             <EuiFlexItem>
               <EuiTitle size='l'>
                 <span>
-                  {i18n.translate('components.addmodules.sampledata1', {
+                  {i18n.translate('wazuh.components.addmodules.sampledata1', {
                     defaultMessage: ' Sample data',
                   })}
                 </span>
               </EuiTitle>
               <EuiText color='subdued'>
-                {i18n.translate('components.addmodules.sampledata', {
+                {i18n.translate('wazuh.components.addmodules.sampledata', {
                   defaultMessage: 'Add sample data to modules.',
                 })}
               </EuiText>

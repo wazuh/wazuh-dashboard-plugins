@@ -64,7 +64,7 @@ export class WzStatusAgentInfo extends Component {
                 <EuiTitle size='m'>
                   <h2>
                     {i18n.translate(
-                      'controllers.mnage.comp.confi.groups.status.agent.agent',
+                      'wazuh.controllers..mnage.comp.confi.groups.status.agent.agent',
                       {
                         defaultMessage: 'Last registered agent',
                       },
@@ -78,7 +78,7 @@ export class WzStatusAgentInfo extends Component {
         <EuiFlexGroup>
           <EuiFlexItem>
             {i18n.translate(
-              'controllers.mnage.comp.confi.groups.status.agent.Name',
+              'wazuh.controllers.mnage.comp.confi.groups.status.agent.Name',
               {
                 defaultMessage: 'Name',
               },
@@ -89,7 +89,7 @@ export class WzStatusAgentInfo extends Component {
         <EuiFlexGroup>
           <EuiFlexItem>
             {i18n.translate(
-              'controllers.mnage.comp.confi.groups.status.agent.ID',
+              'wazuh.controllers.mnage.comp.confi.groups.status.agent.ID',
               {
                 defaultMessage: 'ID',
               },
@@ -100,7 +100,7 @@ export class WzStatusAgentInfo extends Component {
         <EuiFlexGroup>
           <EuiFlexItem>
             {i18n.translate(
-              'controllers.mnage.comp.confi.groups.status.agent.Status',
+              'wazuh.controllers.mnage.comp.confi.groups.status.agent.Status',
               {
                 defaultMessage: 'Status',
               },
@@ -113,7 +113,7 @@ export class WzStatusAgentInfo extends Component {
         <EuiFlexGroup>
           <EuiFlexItem>
             {i18n.translate(
-              'controllers.mnage.comp.confi.groups.status.agent.IPAddress',
+              'wazuh.controllers.mnage.comp.confi.groups.status.agent.IPAddress',
               {
                 defaultMessage: 'IP Address',
               },
@@ -124,7 +124,7 @@ export class WzStatusAgentInfo extends Component {
         <EuiFlexGroup>
           <EuiFlexItem>
             {i18n.translate(
-              'controllers.mnage.comp.confi.groups.status.agent.Dateadded',
+              'wazuh.controllers.mnage.comp.confi.groups.status.agent.Dateadded',
               {
                 defaultMessage: 'Date added',
               },
@@ -139,7 +139,7 @@ export class WzStatusAgentInfo extends Component {
             <EuiFlexGroup>
               <EuiFlexItem>
                 {i18n.translate(
-                  'controllers.mnage.comp.confi.groups.status.agent.Version',
+                  'wazuh.controllers..mnage.comp.confi.groups.status.agent.Version',
                   {
                     defaultMessage: 'Version',
                   },
@@ -152,7 +152,7 @@ export class WzStatusAgentInfo extends Component {
             <EuiFlexGroup>
               <EuiFlexItem>
                 {i18n.translate(
-                  'controllers.mnage.comp.confi.groups.status.agent.alive',
+                  'wazuh.controllers..mnage.comp.confi.groups.status.agent.alive',
                   {
                     defaultMessage: 'Last keep alive',
                   },
@@ -165,7 +165,7 @@ export class WzStatusAgentInfo extends Component {
             <EuiFlexGroup>
               <EuiFlexItem>
                 {i18n.translate(
-                  'controllers.mnage.comp.confi.groups.status.agent.Operatingsystem',
+                  'wazuh.controllers..mnage.comp.confi.groups.status.agent.Operatingsystem',
                   {
                     defaultMessage: 'Operating system',
                   },

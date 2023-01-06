@@ -242,7 +242,7 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
             color="primary"
             isDisabled={hasWrongFormat}
             onClick={() => openVisualEditor()}
-          >{ i18n.translate("components.overview.rule.switch", {
+          >{ i18n.translate("wazuh.components.overview.rule.switch", {
               defaultMessage: "Switch to visual editor",
             })}
           </EuiButtonEmpty>
@@ -252,7 +252,7 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
       return (
         <EuiButtonEmpty color="primary" onClick={() => openVisualEditor()}>
           {
-            i18n.translate("components.overview.rule.visual", {
+            i18n.translate("wazuh.components.overview.rule.visual", {
               defaultMessage: "Switch to visual editor",
             })
           }
@@ -299,7 +299,7 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
       <EuiPanel>
         <EuiTitle>
           <h1>{
-              i18n.translate("components.overview.mitre.Mappingrules", {
+              i18n.translate("wazuh.components.overview.mitre.Mappingrules", {
                 defaultMessage: "Mapping rules",
               })
             }
@@ -309,7 +309,7 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
           <EuiFlexItem>
             <EuiText>
               <span>{
-                i18n.translate("components.overview.mitre.assign", {
+                i18n.translate("wazuh.components.overview.mitre.assign", {
                   defaultMessage: "Assign roles to users who match these rules.",
                 })}
               </span>
@@ -319,7 +319,7 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
                 target="_blank"
               >
                 {
-                  i18n.translate("components.overview.mapint.Learnmore", {
+                  i18n.translate("wazuh.components.overview.mapint.Learnmore", {
                     defaultMessage: "Learn more",
                   })
                 }
@@ -347,7 +347,7 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
                   <Fragment>
                     <EuiTitle size="s">
                       <h2>{
-                        i18n.translate("components.overview.mapint", {
+                        i18n.translate("wazuh.components.overview.mapint", {
                           defaultMessage: "Map internal users",
                         })}
                       </h2>
@@ -369,7 +369,7 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
                     <EuiSpacer />
                     <EuiTitle size="s">
                       <h2>{
-                        i18n.translate("components.overview.mitre.Customrules", {
+                        i18n.translate("wazuh.components.overview.mitre.Customrules", {
                           defaultMessage: "Custom rules",
                         })}
                       </h2>
@@ -399,7 +399,7 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
                               onClick={() => selectOperator('AND')}
                             >
                               {logicalOperator === 'AND' && <EuiIcon type="check" />}{
-                              i18n.translate("components.overview.allTrue", {
+                              i18n.translate("wazuh.components.overview.allTrue", {
                                 defaultMessage: "All are true",
                               })}
                           </EuiButtonEmpty>
@@ -413,7 +413,7 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
                               onClick={() => selectOperator('OR')}
                             >
                               {logicalOperator === 'OR' && <EuiIcon type="check" />}{
-                                i18n.translate("components.overview.anytrue", {
+                                i18n.translate("wazuh.components.overview.anytrue", {
                                   defaultMessage: "Any are true",
                                 })}
                           </EuiButtonEmpty>
@@ -429,7 +429,7 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
                       onClick={() => addNewRule()}
                     >
                       {
-                      i18n.translate("components.overview.mitre.Emptyfield", {
+                      i18n.translate("wazuh.components.overview.mitre.Emptyfield", {
                         defaultMessage: "Empty field",
                       })}
                   </EuiButtonEmpty>
@@ -443,7 +443,7 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
             {(isJsonEditor && getSwitchVisualButton()) || (
               <EuiButtonEmpty color="primary" onClick={() => openJsonEditor()}>
                {
-                i18n.translate("components.overview.mitre.Joson", {
+                i18n.translate("wazuh.components.overview.mitre.Joson", {
                   defaultMessage: "Switch to JSON editor",
                 })}
               </EuiButtonEmpty>
@@ -456,7 +456,7 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
         <EuiFlexItem grow={false}>
           <EuiButton disabled={isReserved} isLoading={isLoading} fill onClick={() => saveRule()}>
             {
-              i18n.translate("components.overview.mitre.savemap", {
+              i18n.translate("wazuh.components.overview.mitre.savemap", {
                 defaultMessage: "Save role mapping",
               })}
           </EuiButton>

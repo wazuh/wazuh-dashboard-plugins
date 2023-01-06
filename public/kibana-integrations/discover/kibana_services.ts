@@ -118,20 +118,20 @@ export function getRequestInspectorStats(searchSource: ISearchSource) {
 
   if (index) {
     stats.indexPattern = {
-      label: i18n.translate('data.search.searchSource.indexPatternLabel', {
+      label: i18n.translate('wazuh.data.search.searchSource.indexPatternLabel', {
         defaultMessage: 'Index pattern',
       }),
       value: index.title,
-      description: i18n.translate('data.search.searchSource.indexPatternDescription', {
+      description: i18n.translate('wazuh.data.search.searchSource.indexPatternDescription', {
         defaultMessage: 'The index pattern that connected to the Elasticsearch indices.',
       }),
     };
     stats.indexPatternId = {
-      label: i18n.translate('data.search.searchSource.indexPatternIdLabel', {
+      label: i18n.translate('wazuh.data.search.searchSource.indexPatternIdLabel', {
         defaultMessage: 'Index pattern ID',
       }),
       value: index.id!,
-      description: i18n.translate('data.search.searchSource.indexPatternIdDescription', {
+      description: i18n.translate('wazuh.data.search.searchSource.indexPatternIdDescription', {
         defaultMessage: 'The ID in the {kibanaIndexPattern} index.',
         values: { kibanaIndexPattern: '.kibana' },
       }),
@@ -139,4 +139,4 @@ export function getRequestInspectorStats(searchSource: ISearchSource) {
   }
 
   return stats;
-} 
+}

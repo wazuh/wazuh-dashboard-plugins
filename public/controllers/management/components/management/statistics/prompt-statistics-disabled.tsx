@@ -29,7 +29,7 @@ export const PromptStatisticsDisabled = () => {
       title={
         <h2>
           {i18n.translate(
-            'controllers.mnage.comp.confi.groups.ruleset.Statisticsdisabled',
+            'wazuh.controllers..mnage.comp.confi.groups.ruleset.Statisticsdisabled',
             {
               defaultMessage: 'Statistics is disabled',
             },

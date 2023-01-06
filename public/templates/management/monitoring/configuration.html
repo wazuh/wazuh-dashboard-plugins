@@ -3,7 +3,7 @@
     <div class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--responsive">
         <div class="euiFlexItem euiFlexItem--flexGrowZero">
             <h2 class="euiTitle euiTitle--medium"
-               i18n-id="templates.management.overview"
+               i18n-id="wazuh.templates.management.overview"
                i18n-default-message="Overview"
             >
                 <md-button class="md-icon-button md-icon-button-back wz-padding-right-16 btn btn-info" aria-label="Back"
@@ -19,12 +19,12 @@
             <md-card-content class="wazuh-column"
                 ng-class="{'no-opacity-overview-monitoring': resultState !== 'ready' || !rendered}">
                 <span class="embPanel__header embPanel__title embPanel__dragger layout-row wz-headline-title"
-                 i18n-id="templates.management.topNodes"
+                 i18n-id="wazuh.templates.management.topNodes"
                   i18n-default-message="Top 5 nodes"
                 ></span>
                     <react-component style="height: 100%;"name="KibanaVisualization" props="{visId: 'Wazuh-App-Cluster-monitoring-Overview-Node-Pie', tab: 'monitoring'}"></react-component>
                 <span class="wz-padding-top-10 wz-text-center" ng-show="!rendered"
-                  i18n-id="templates.management.noResultForSelectedTimeRange"
+                  i18n-id="wazuh.templates.management.noResultForSelectedTimeRange"
                   i18n-default-message="There are no results for selected time range. Try another one."
                 ></span>
             </md-card-content>
@@ -33,63 +33,63 @@
         <div class="euiFlexItem">
             <div class="euiPanel euiPanel--paddingMedium">
                 <span class="euiTitle euiTitle--small euiCard__title"
-                  i18n-id="templates.management.configuration"
+                  i18n-id="wazuh.templates.management.configuration"
                   i18n-default-message="Configuration"
                 ></span>
                 <div class="euiSpacer euiSpacer--m"></div>
                 <!-- Configuration options -->
                 <div layout="row" class="wz-padding-top-10">
                     <span flex="25"
-                      i18n-id="templates.management.disabled"
+                      i18n-id="wazuh.templates.management.disabled"
                       i18n-default-message="Disabled"
                     ></span>
                     <span class="color-grey">{{configuration.disabled}}</span>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
                     <span flex="25"
-                      i18n-id="templates.management.hidden"
+                      i18n-id="wazuh.templates.management.hidden"
                       i18n-default-message="Hidden"
                     ></span>
                     <span class="color-grey">{{configuration.hidden}}</span>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
                     <span flex="25"
-                      i18n-id="templates.management.name"
+                      i18n-id="wazuh.templates.management.name"
                       i18n-default-message="Name"
                     ></span>
                     <span class="color-grey">{{configuration.name}}</span>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
                     <span flex="25"
-                      i18n-id="templates.management.nodeName"
+                      i18n-id="wazuh.templates.management.nodeName"
                       i18n-default-message="Node name"
                     ></span>
                     <span class="color-grey">{{configuration.node_name}}</span>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
                     <span flex="25"
-                      i18n-id="templates.management.nodeType"
+                      i18n-id="wazuh.templates.management.nodeType"
                       i18n-default-message="Node type"
                     ></span>
                     <span class="color-grey">{{configuration.node_type}}</span>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
                     <span flex="25"
-                      i18n-id="templates.management.bind_addr"
+                      i18n-id="wazuh.templates.management.bind_addr"
                       i18n-default-message="Bind address"
                     ></span>
                     <span class="color-grey">{{configuration.bind_addr}}</span>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
                     <span flex="25"
-                      i18n-id="templates.management.ip"
+                      i18n-id="wazuh.templates.management.ip"
                       i18n-default-message="IP"
                     ></span>
                     <span class="color-grey">{{configuration.nodes[0] || '-'}}</span>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
                     <span flex="25"
-                      i18n-id="templates.management.port"
+                      i18n-id="wazuh.templates.management.port"
                       i18n-default-message="Port"
                     ></span>
                     <span class="color-grey">{{configuration.port}}</span>

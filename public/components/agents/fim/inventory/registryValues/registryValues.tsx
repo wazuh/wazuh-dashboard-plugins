@@ -29,26 +29,26 @@ import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { i18n } from '@kbn/i18n';
 
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
-const dateName = i18n.translate('components.addModule.guide.dateName', {
+const dateName = i18n.translate('wazuh.components.addModule.guide.dateName', {
   defaultMessage: 'Date',
 });
-const dateField = i18n.translate('components.addModule.guide.dateField', {
+const dateField = i18n.translate('wazuh.components.addModule.guide.dateField', {
   defaultMessage: 'date',
 });
-const valueName = i18n.translate('components.addModule.guide.valueName', {
+const valueName = i18n.translate('wazuh.components.addModule.guide.valueName', {
   defaultMessage: 'Value name',
 });
-const valueField = i18n.translate('components.addModule.guide.valueField', {
+const valueField = i18n.translate('wazuh.components.addModule.guide.valueField', {
   defaultMessage: 'value',
 });
 const valueTypeName = i18n.translate(
-  'components.addModule.guide.valueTypeName',
+  'wazuh.components.addModule.guide.valueTypeName',
   {
     defaultMessage: 'Value type',
   },
 );
 
-const sha1Name = i18n.translate('components.addModule.guide.sha1Name', {
+const sha1Name = i18n.translate('wazuh.components.addModule.guide.sha1Name', {
   defaultMessage: 'sha1',
 });
 

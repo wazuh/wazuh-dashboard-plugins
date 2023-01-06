@@ -44,7 +44,7 @@ export class WzBlankScreen extends Component {
                   PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_TROUBLESHOOTING,
                 )}
               >
-                {i18n.translate('components.wz.blank.guide', {
+                {i18n.translate('wazuh.components.wz.blank.guide', {
                   defaultMessage: 'Wazuh installation guide',
                 })}
               </a>
@@ -52,7 +52,7 @@ export class WzBlankScreen extends Component {
             <EuiSpacer />
 
             <EuiButton onClick={this.props.goToOverview} color='primary' fill>
-              {i18n.translate('components.wz.blank.Refresh', {
+              {i18n.translate('wazuh.components.wz.blank.Refresh', {
                 defaultMessage: 'Refresh',
               })}
             </EuiButton>

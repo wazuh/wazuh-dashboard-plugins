@@ -33,10 +33,10 @@ import { i18n } from '@kbn/i18n';
 
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
 import { WzFlyout } from '../../../common/flyouts';
-const dataError = i18n.translate('components.addModule.guide.dataError', {
+const dataError = i18n.translate('wazuh.components.addModule.guide.dataError', {
   defaultMessage: 'Data could not be fetched for ',
 });
-const fileError = i18n.translate('components.addModule.guide.fileError', {
+const fileError = i18n.translate('wazuh.components.addModule.guide.fileError', {
   defaultMessage: 'File not found',
 });
 export class FlyoutDetail extends Component {

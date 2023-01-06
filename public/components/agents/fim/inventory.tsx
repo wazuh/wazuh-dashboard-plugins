@@ -245,7 +245,7 @@ export class Inventory extends Component {
                 iconType='importAction'
                 onClick={() => this.downloadCsv()}
               >
-                {i18n.translate('components.agent.fim.ivv.ep', {
+                {i18n.translate('wazuh.components.agent.fim.ivv.ep', {
                   defaultMessage: 'Export formatted',
                 })}
               </EuiButtonEmpty>
@@ -270,7 +270,7 @@ export class Inventory extends Component {
               iconType='importAction'
               onClick={() => this.downloadCsv()}
             >
-              {i18n.translate('components.agent.fim.ivv.ep1', {
+              {i18n.translate('wazuh.components.agent.fim.ivv.ep1', {
                 defaultMessage: 'Export formatted',
               })}
             </EuiButtonEmpty>
@@ -375,7 +375,7 @@ export class Inventory extends Component {
         iconType='filebeatApp'
         title={
           <h2>
-            {i18n.translate('components.agent.fim.ivv.ep.agent', {
+            {i18n.translate('wazuh.components.agent.fim.ivv.ep.agent', {
               defaultMessage:
                 'Integrity monitoring is not configured for this agent',
             })}
@@ -389,7 +389,7 @@ export class Inventory extends Component {
             target='_blank'
             style={{ textAlign: 'center' }}
           >
-            {i18n.translate('components.agent.fim.ivv.ep.module', {
+            {i18n.translate('wazuh.components.agent.fim.ivv.ep.module', {
               defaultMessage: 'How to configure the module',
             })}
           </EuiLink>

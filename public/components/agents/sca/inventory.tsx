@@ -51,34 +51,34 @@ import {
 import { API_NAME_AGENT_STATUS, UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { VisualizationBasic } from '../../common/charts/visualizations/basic';
-const Descp1 = i18n.translate("components.addModule.guide.Descp1", {
+const Descp1 = i18n.translate("wazuh.components.agents.sca.Descp1", {
   defaultMessage: "Filter by check condition",
 });
-const Descp2 = i18n.translate("components.addModule.guide.Descp2", {
+const Descp2 = i18n.translate("wazuh.components.agents.sca.Descp2", {
   defaultMessage: "Filter by check file",
 });
-const Descp3 = i18n.translate("components.addModule.guide.Descp3", {
+const Descp3 = i18n.translate("wazuh.components.agents.sca.agent.sca.filter", {
   defaultMessage: "Filter by check title",
 });
-const Descp4 = i18n.translate("components.addModule.guide.Descp4", {
+const Descp4 = i18n.translate("wazuh.components.agents.sca.Descp4", {
   defaultMessage: "Filter by check result",
 });
-const Descp5 = i18n.translate("components.addModule.guide.Descp5", {
+const Descp5 = i18n.translate("wazuh.components.agents.sca.Descp5", {
   defaultMessage: "Filter by check status",
 });
-const Descp6 = i18n.translate("components.addModule.guide.Descp6", {
+const Descp6 = i18n.translate("wazuh.components.agents.sca.Descp6", {
   defaultMessage: "Filter by check rationale",
 });
-const Descp7 = i18n.translate("components.addModule.guide.Descp7", {
+const Descp7 = i18n.translate("wazuh.components.agents.sca.Descp7", {
   defaultMessage: "Filter by check registry",
 });
-const Descp8 = i18n.translate("components.addModule.guide.Descp8", {
+const Descp8 = i18n.translate("wazuh.components.agents.sca.Descp8", {
   defaultMessage: "Filter by check description",
 });
-const Descp9 = i18n.translate("components.addModule.guide.Descp9", {
+const Descp9 = i18n.translate("wazuh.components.agents.sca.Descp9", {
   defaultMessage: "Filter by check remediation",
 });
-const Descp10 = i18n.translate("components.addModule.guide.regkeyDescp", {
+const Descp10 = i18n.translate("wazuh.components.agents.sca.regkeyDescp", {
   defaultMessage: "Filter by check reason",
 });
 export class Inventory extends Component {
@@ -158,7 +158,7 @@ export class Inventory extends Component {
             {item.file ? (
               <span>
                 <b>{
-                  i18n.translate("components.agent.fim.ivv.lib.File", {
+                  i18n.translate("wazuh.components.agent.fim.ivv.lib.File", {
                     defaultMessage: "File:",
                   })}
                   </b> {item.file}
@@ -166,7 +166,7 @@ export class Inventory extends Component {
             ) : item.directory ? (
               <span>
                 <b>{
-                  i18n.translate("components.agent.fim.ivv.lib.Directory", {
+                  i18n.translate("wazuh.components.agent.fim.ivv.lib.Directory", {
                     defaultMessage: "Directory:",
                   })}
                 </b> {item.directory}
@@ -174,7 +174,7 @@ export class Inventory extends Component {
             ) : item.process ? (
               <span>
                 <b>{
-                  i18n.translate("components.agent.fim.ivv.lib.Process", {
+                  i18n.translate("wazuh.components.agent.fim.ivv.lib.Process", {
                     defaultMessage: "Process:",
                   })}
                 </b> {item.process}
@@ -182,7 +182,7 @@ export class Inventory extends Component {
             ) : item.command ? (
               <span>
                 <b>{
-                  i18n.translate("components.agent.fim.ivv.lib.Command", {
+                  i18n.translate("wazuh.components.agent.fim.ivv.lib.Command", {
                     defaultMessage: "Command:",
                   })}
                 </b> {item.command}
@@ -190,7 +190,7 @@ export class Inventory extends Component {
             ) : item.registry ? (
               <span>
                 <b>{
-                  i18n.translate("components.agent.fim.ivv.lib.Registry", {
+                  i18n.translate("wazuh.components.agent.fim.ivv.lib.Registry", {
                     defaultMessage: "Registry:",
                   })}
                 </b> {item.registry}
@@ -746,12 +746,12 @@ export class Inventory extends Component {
                                 <EuiSpacer size="s" />
                                 <EuiText>
                                   <b>{
-                                    i18n.translate("components.agent.fim.ivv.lib.Policydescription", {
+                                    i18n.translate("wazuh.components.agent.fim.ivv.lib.Policydescription", {
                                       defaultMessage: "Policy description:",
                                     })}</b> {this.state.lookingPolicy.description}
                                   <br></br>
                                   <b>{
-                                    i18n.translate("components.agent.fim.ivv.lib.Policychecksum:", {
+                                    i18n.translate("wazuh.components.agent.fim.ivv.lib.Policychecksum:", {
                                       defaultMessage: "Policy checksum:",
                                     })}</b> {this.state.lookingPolicy.hash_file}
                                 </EuiText>
@@ -766,7 +766,7 @@ export class Inventory extends Component {
                         iconType="importAction"
                         onClick={async () => await this.downloadCsv()}
                       >{
-                        i18n.translate("components.agent.fim.ivv.lib.Exportformatted", {
+                        i18n.translate("wazuh.components.agent.fim.ivv.lib.Exportformatted", {
                           defaultMessage: "Export formatted",
                         })}
 
@@ -777,7 +777,7 @@ export class Inventory extends Component {
                         iconType="refresh"
                         onClick={() => this.loadScaPolicy(this.state.lookingPolicy)}
                       >{
-                        i18n.translate("components.agent.fim.ivv.lib.emptyRefresh", {
+                        i18n.translate("wazuh.components.agent.fim.ivv.lib.emptyRefresh", {
                           defaultMessage: "Refresh",
                         })}
 

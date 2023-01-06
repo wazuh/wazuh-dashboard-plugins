@@ -14,13 +14,13 @@
 import { getCustomValueSuggestion } from './helpers/helper-value-suggestion';
 import { i18n } from '@kbn/i18n';
 
-const Place1 = i18n.translate('components.addModule.guide.Place1', {
+const Place1 = i18n.translate('wazuh.components.addModule.guide.Place1', {
   defaultMessage: 'Subscription',
 });
-const Place2 = i18n.translate('components.addModule.guide.Place2', {
+const Place2 = i18n.translate('wazuh.components.addModule.guide.Place2', {
   defaultMessage: 'User Type',
 });
-const Place3 = i18n.translate('components.addModule.guide.Place3', {
+const Place3 = i18n.translate('wazuh.components.addModule.guide.Place3', {
   defaultMessage: 'Result Status',
 });
 export const filtersValues: {

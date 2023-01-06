@@ -91,7 +91,7 @@ class WzRefreshClusterInfoButton extends Component {
         onClick={() => this.checkIfClusterOrManager()}
         isDisabled={this.state.isLoading}
       >
-        {i18n.translate('controllers.manage.confi.util.Refresh', {
+        {i18n.translate('wazuh.controllers.manage.confi.util.Refresh', {
           defaultMessage: 'Refresh',
         })}
       </EuiButtonEmpty>

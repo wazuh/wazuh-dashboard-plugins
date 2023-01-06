@@ -112,7 +112,7 @@ class WzRestartClusterManagerCallout extends Component<
                     style={{ marginBottom: '7px', marginRight: '6px' }}
                   />
                   <span>
-                    {i18n.translate('components.common.restartPerformed', {
+                    {i18n.translate('wazuh.components.common.restartPerformed', {
                       defaultMessage:
                         'Changes will not take effect until a restart is performed.',
                     })}

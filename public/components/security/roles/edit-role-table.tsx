@@ -5,16 +5,16 @@ import { WzRequest } from '../../../react-services/wz-request';
 import { ErrorHandler } from '../../../react-services/error-handler';
 import { i18n } from '@kbn/i18n';
 
-const Descp5 = i18n.translate('components.addModule.editRole.descp5', {
+const Descp5 = i18n.translate('wazuh.components.security.editRole.descp5', {
   defaultMessage: 'Remove',
 });
-const Title1 = i18n.translate('components.addModule.guide.title1', {
+const Title1 = i18n.translate('wazuh.components.security,rules.title.actions', {
   defaultMessage: 'Actions',
 });
-const Title2 = i18n.translate('components.addModule.guide.title2', {
+const Title2 = i18n.translate('wazuh.components.security,rules.title2', {
   defaultMessage: 'Resources',
 });
-const Title3 = i18n.translate('components.addModule.editRole.title3', {
+const Title3 = i18n.translate('wazuh.components.addModule.editRole.title3', {
   defaultMessage: 'Effect',
 });
 

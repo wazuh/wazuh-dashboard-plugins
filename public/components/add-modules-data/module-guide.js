@@ -86,10 +86,10 @@ const renderOSIcon = os => (
     aria-hidden='true'
   />
 );
-const title1 = i18n.translate('components.addModule.guide.title1', {
+const title1 = i18n.translate('wazuh.components.addModule.guide.restartGuide', {
   defaultMessage: 'The guide was restarted',
 });
-const title2 = i18n.translate('components.addModule.guide.title2', {
+const title2 = i18n.translate('wazuh.components.addModule.guide.warning', {
   defaultMessage: 'Warning',
 });
 class WzModuleGuide extends Component {
@@ -434,7 +434,7 @@ class WzModuleGuide extends Component {
                   <Fragment>
                     <EuiText>
                       {i18n.translate(
-                        'components.add.modulesdata.moduleguide.go',
+                        'wazuh.component.add.modulesdata.moduleguide.go',
                         {
                           defaultMessage:
                             '  When you finish of configure the module, copy above XMLconfiguration. Go to',
@@ -442,26 +442,26 @@ class WzModuleGuide extends Component {
                       )}{' '}
                       <EuiCode>
                         {i18n.translate(
-                          'components.add.modulesdata.moduleguide.Management',
+                          'wazuh.components.add.modulesdata.moduleguide.Management',
                           { defaultMessage: ' Management' },
                         )}
                       </EuiCode>{' '}
                       {'>'}{' '}
                       <EuiCode>
                         {i18n.translate(
-                          'components.add.modulesdata.moduleguide.Configuration',
+                          'wazuh.component.add.modulesdata.moduleguide.Configuration',
                           { defaultMessage: 'Configuration' },
                         )}
                       </EuiCode>{' '}
                       {'>'}{' '}
                       <EuiCode>
                         {i18n.translate(
-                          'components.add.modulesdata.moduleguide.Editconfiguration',
+                          'wazuh.component.add.modulesdata.moduleguide.Editconfiguration',
                           { defaultMessage: 'Edit configuration' },
                         )}
                       </EuiCode>
                       {i18n.translate(
-                        'components.add.modulesdata.moduleguide.node',
+                        'wazuh.component.add.modulesdata.moduleguide.node',
                         {
                           defaultMessage:
                             ', paste configuration, save and restart manager or node.',
@@ -472,7 +472,7 @@ class WzModuleGuide extends Component {
                 ) : this.state.agentOSSelected === 'linux' ? (
                   <EuiText>
                     {i18n.translate(
-                      'components.add.modulesdata.moduleguide.copy',
+                      'wazuh.component.add.modulesdata.moduleguide.copy',
                       {
                         defaultMessage:
                           'When you finish of configure the module, copy above XML configuration. Go to',
@@ -480,14 +480,14 @@ class WzModuleGuide extends Component {
                     )}
                     <EuiCode>
                       {i18n.translate(
-                        'components.add.modulesdata.moduleguide.etc',
+                        'wazuh.component.add.modulesdata.moduleguide.etc',
                         {
                           defaultMessage: '/var/ossec/etc',
                         },
                       )}
                     </EuiCode>{' '}
                     {i18n.translate(
-                      'components.add.modulesdata.moduleguide.coin',
+                      'wazuh.component.add.modulesdata.moduleguide.coin',
                       {
                         defaultMessage:
                           'in Linux agent, include the above configuration in',
@@ -495,12 +495,12 @@ class WzModuleGuide extends Component {
                     )}{' '}
                     <EuiCode>
                       {i18n.translate(
-                        'components.add.modulesdata.moduleguideossec.conf',
+                        'wazuh.component.add.modulesdata.moduleguideossec.conf',
                         { defaultMessage: 'ossec.conf' },
                       )}
                     </EuiCode>{' '}
                     {i18n.translate(
-                      'components.add.modulesdata.moduleguide.agent',
+                      'wazuh.component.add.modulesdata.moduleguide.agent',
                       {
                         defaultMessage: 'and restart the agent.',
                       },
@@ -509,7 +509,7 @@ class WzModuleGuide extends Component {
                 ) : (
                   <EuiText>
                     {i18n.translate(
-                      'components.add.modulesdata.moduleguide.to',
+                      'wazuh.components.add.modulesdata.moduleguide.to',
                       {
                         defaultMessage:
                           'When you finish of configure the module, copy above XML configuration. Go to',
@@ -517,12 +517,12 @@ class WzModuleGuide extends Component {
                     )}{' '}
                     <EuiCode>
                       {i18n.translate(
-                        'components.add.modulesdata.moduleguide.x86',
+                        'wazuh.component.add.modulesdata.moduleguide.x86',
                         { defaultMessage: 'C:Program Files (x86)ossec-agent' },
                       )}
                     </EuiCode>{' '}
                     {i18n.translate(
-                      'components.add.modulesdata.moduleguide.win',
+                      'wazuh.component.add.modulesdata.moduleguide.win',
                       {
                         defaultMessage:
                           'in Windows agent, include the above configuration in',
@@ -530,12 +530,12 @@ class WzModuleGuide extends Component {
                     )}{' '}
                     <EuiCode>
                       {i18n.translate(
-                        'components.add.modulesdata.moduleguideossec.conf',
+                        'wazuh.component.add.modulesdata.moduleguideossec.conf',
                         { defaultMessage: 'ossec.conf' },
                       )}
                     </EuiCode>{' '}
                     {i18n.translate(
-                      'components.add.modulesdata.moduleguide.restart',
+                      'wazuh.component.add.modulesdata.moduleguide.restart',
                       {
                         defaultMessage: 'and restart the agent.',
                       },
@@ -545,14 +545,14 @@ class WzModuleGuide extends Component {
                 <EuiSpacer size='s' />
                 <EuiText>
                   {i18n.translate(
-                    'components.add.modulesdata.moduleguide.top',
+                    'wazuh.components.add.modulesdata.moduleguide.top',
                     {
                       defaultMessage:
                         'The above section must be located within the top-level',
                     },
                   )}{' '}
                   <EuiCode>{`<ossec_config>`}</EuiCode>{' '}
-                  {i18n.translate('components.add.modulesdata.moduleguide', {
+                  {i18n.translate('wazuh.components.add.modulesdata.moduleguide', {
                     defaultMessage: 'Add agent',
                   })}
                   tag.
@@ -561,7 +561,7 @@ class WzModuleGuide extends Component {
             ) : (
               <EuiText color='danger'>
                 {i18n.translate(
-                  'components.add.modulesdata.moduleguide.error',
+                  'wazuh.components.add.modulesdata.moduleguide.error',
                   {
                     defaultMessage:
                       'There is an error in the configuration, please check fields that have errors.',

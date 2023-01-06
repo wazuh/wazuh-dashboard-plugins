@@ -245,7 +245,7 @@ class WzMenuAgent extends Component {
                         window.location.href = '#/agents-preview';
                       }}
                     >
-                      {i18n.translate('components.wz.menu.welcome', {
+                      {i18n.translate('wazuh.components.wz.menu.welcome', {
                         defaultMessage: 'Go to Agent welcome',
                       })}
                     </EuiButtonEmpty>
@@ -296,7 +296,7 @@ class WzMenuAgent extends Component {
                     iconType='inspect'
                   >
                     <span>
-                      {i18n.translate('components.wz.menu.Inventory data', {
+                      {i18n.translate('wazuh.components.wz.menu.Inventory data', {
                         defaultMessage: 'Inventory data',
                       })}
                     </span>
@@ -308,7 +308,7 @@ class WzMenuAgent extends Component {
                     iconType='gear'
                   >
                     <span>
-                      {i18n.translate('components.wz.menu.Configuration', {
+                      {i18n.translate('wazuh.components.wz.menu.Configuration', {
                         defaultMessage: 'Configuration',
                       })}
                     </span>

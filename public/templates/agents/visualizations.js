@@ -18,7 +18,7 @@ export const visualizations = {
         vis: [
           {
             title: i18n.translate(
-              'templates.agents.rows.general.alertGroupTitle',
+              'wazuh.templates.agents.rows.general.alertGroupTitle',
               {
                 defaultMessage: 'Alert groups evolution',
               },
@@ -28,7 +28,7 @@ export const visualizations = {
           },
           {
             title: i18n.translate(
-              'templates.agents.rows.general.agentGeneralAlertTitle',
+              'wazuh.templates.agents.rows.general.agentGeneralAlertTitle',
               {
                 defaultMessage: 'Alerts',
               },
@@ -42,7 +42,7 @@ export const visualizations = {
         height: 300,
         vis: [
           {
-            title: i18n.translate('templates.agents.rows.general.top5Agents', {
+            title: i18n.translate('wazuh.templates.agents.rows.general.top5Agents', {
               defaultMessage: 'Top 5 agents',
             }),
             id: 'Wazuh-App-Agents-General-Top-5-alerts',
@@ -50,7 +50,7 @@ export const visualizations = {
           },
           {
             title: i18n.translate(
-              'templates.agents.rows.general.top5RuleGroups',
+              'wazuh.templates.agents.rows.general.top5RuleGroups',
               {
                 defaultMessage: 'Top 5 rule groups',
               },
@@ -60,7 +60,7 @@ export const visualizations = {
           },
           {
             title: i18n.translate(
-              'templates.agents.rows.general.topRequirements',
+              'wazuh.templates.agents.rows.general.topRequirements',
               {
                 defaultMessage: 'Top 5 PCI DSS Requirements',
               },
@@ -75,7 +75,7 @@ export const visualizations = {
         vis: [
           {
             title: i18n.translate(
-              'templates.agents.rows.general.alertSummary',
+              'wazuh.templates.agents.rows.general.alertSummary',
               {
                 defaultMessage: 'Alerts summary',
               },
@@ -85,7 +85,7 @@ export const visualizations = {
           },
           {
             title: i18n.translate(
-              'templates.agents.rows.general.groupSummary',
+              'wazuh.templates.agents.rows.general.groupSummary',
               {
                 defaultMessage: 'Groups summary',
               },
@@ -103,21 +103,21 @@ export const visualizations = {
         height: 300,
         vis: [
           {
-            title: i18n.translate('templates.agents.rows.fim.activeUsers', {
+            title: i18n.translate('wazuh.templates.agents.rows.fim.activeUsers', {
               defaultMessage: 'Most active users',
             }),
             id: 'Wazuh-App-Agents-FIM-Users',
             width: 30,
           },
           {
-            title: i18n.translate('templates.agents.rows.fim.actions', {
+            title: i18n.translate('wazuh.templates.agents.rows.fim.actions', {
               defaultMessage: 'Actions',
             }),
             id: 'Wazuh-App-Agents-FIM-Actions',
             width: 30,
           },
           {
-            title: i18n.translate('templates.agents.rows.fim.events', {
+            title: i18n.translate('wazuh.templates.agents.rows.fim.events', {
               defaultMessage: 'Events',
             }),
             id: 'Wazuh-App-Agents-FIM-Events',
@@ -129,21 +129,21 @@ export const visualizations = {
         height: 230,
         vis: [
           {
-            title: i18n.translate('templates.agents.rows.fim.fileAdded', {
+            title: i18n.translate('wazuh.templates.agents.rows.fim.fileAdded', {
               defaultMessage: 'Files added',
             }),
             id: 'Wazuh-App-Agents-FIM-Files-added',
             width: 33,
           },
           {
-            title: i18n.translate('templates.agents.rows.fim.filesModified', {
+            title: i18n.translate('wazuh.templates.agents.rows.fim.filesModified', {
               defaultMessage: 'Files modified',
             }),
             id: 'Wazuh-App-Agents-FIM-Files-modified',
             width: 33,
           },
           {
-            title: i18n.translate('templates.agents.rows.fim.filesDeleted', {
+            title: i18n.translate('wazuh.templates.agents.rows.fim.filesDeleted', {
               defaultMessage: 'Files deleted',
             }),
             id: 'Wazuh-App-Agents-FIM-Files-deleted',
@@ -155,7 +155,7 @@ export const visualizations = {
         hide: true,
         vis: [
           {
-            title: i18n.translate('templates.agents.rows.fim.alertSummary', {
+            title: i18n.translate('wazuh.templates.agents.rows.fim.alertSummary', {
               defaultMessage: 'Alerts summary',
             }),
             id: 'Wazuh-App-Agents-FIM-Alerts-summary',
@@ -170,21 +170,21 @@ export const visualizations = {
         height: 300,
         vis: [
           {
-            title: i18n.translate('templates.agents.rows.pci.topRuleGroups', {
+            title: i18n.translate('wazuh.templates.agents.rows.pci.topRuleGroups', {
               defaultMessage: 'Top 5 rule groups',
             }),
             id: 'Wazuh-App-Agents-PCI-Groups',
             width: 33,
           },
           {
-            title: i18n.translate('templates.agents.rows.pci.topRules', {
+            title: i18n.translate('wazuh.templates.agents.rows.pci.topRules', {
               defaultMessage: 'Top 5 rules',
             }),
             id: 'Wazuh-App-Agents-PCI-Rule',
             width: 33,
           },
           {
-            title: i18n.translate('templates.agents.rows.pci.topRequirements', {
+            title: i18n.translate('wazuh.templates.agents.rows.pci.topRequirements', {
               defaultMessage: 'Top 5 PCI DSS requirements',
             }),
             id: 'Wazuh-App-Agents-PCI-Requirement',
@@ -196,14 +196,14 @@ export const visualizations = {
         height: 300,
         vis: [
           {
-            title: i18n.translate('templates.agents.rows.pci.requirements', {
+            title: i18n.translate('wazuh.templates.agents.rows.pci.requirements', {
               defaultMessage: 'PCI Requirements',
             }),
             id: 'Wazuh-App-Agents-PCI-Requirements',
             width: 70,
           },
           {
-            title: i18n.translate('templates.agents.rows.pci.distribution', {
+            title: i18n.translate('wazuh.templates.agents.rows.pci.distribution', {
               defaultMessage: 'Rule level distribution',
             }),
             id: 'Wazuh-App-Agents-PCI-Rule-level-distribution',
@@ -215,7 +215,7 @@ export const visualizations = {
         hide: true,
         vis: [
           {
-            title: i18n.translate('templates.agents.rows.pci.alertSummary', {
+            title: i18n.translate('wazuh.templates.agents.rows.pci.alertSummary', {
               defaultMessage: 'Alerts summary',
             }),
             id: 'Wazuh-App-Agents-PCI-Last-alerts',
@@ -230,14 +230,14 @@ export const visualizations = {
         height: 300,
         vis: [
           {
-            title: i18n.translate('templates.agents.rows.gdpr.topRuleGroups', {
+            title: i18n.translate('wazuh.templates.agents.rows.gdpr.topRuleGroups', {
               defaultMessage: 'Top 5 rule groups',
             }),
             id: 'Wazuh-App-Agents-GDPR-Groups',
             width: 33,
           },
           {
-            title: i18n.translate('templates.agents.rows.gdpr.topRules', {
+            title: i18n.translate('wazuh.templates.agents.rows.gdpr.topRules', {
               defaultMessage: 'Top 5 rules',
             }),
             id: 'Wazuh-App-Agents-GDPR-Rule',
@@ -245,7 +245,7 @@ export const visualizations = {
           },
           {
             title: i18n.translate(
-              'templates.agents.rows.gdpr.topRequirements',
+              'wazuh.templates.agents.rows.gdpr.topRequirements',
               {
                 defaultMessage: 'Top 5 GDPR requirements',
               },
@@ -259,14 +259,14 @@ export const visualizations = {
         height: 300,
         vis: [
           {
-            title: i18n.translate('templates.agents.rows.gdpr.requirements', {
+            title: i18n.translate('wazuh.templates.agents.rows.gdpr.requirements', {
               defaultMessage: 'GDPR Requirements',
             }),
             id: 'Wazuh-App-Agents-GDPR-Requirements',
             width: 70,
           },
           {
-            title: i18n.translate('templates.agents.rows.gdpr.distribution', {
+            title: i18n.translate('wazuh.templates.agents.rows.gdpr.distribution', {
               defaultMessage: 'Rule level distribution',
             }),
             id: 'Wazuh-App-Agents-GDPR-Rule-level-distribution',
@@ -278,7 +278,7 @@ export const visualizations = {
         hide: true,
         vis: [
           {
-            title: i18n.translate('templates.agents.rows.gdpr.alertSummary', {
+            title: i18n.translate('wazuh.templates.agents.rows.gdpr.alertSummary', {
               defaultMessage: 'Alerts summary',
             }),
             id: 'Wazuh-App-Agents-GDPR-Last-alerts',
@@ -293,7 +293,7 @@ export const visualizations = {
         height: 300,
         vis: [
           {
-            title: i18n.translate('templates.agents.rows.nist.stats', {
+            title: i18n.translate('wazuh.templates.agents.rows.nist.stats', {
               defaultMessage: 'Stats',
             }),
             id: 'Wazuh-App-Agents-NIST-Stats',
@@ -301,7 +301,7 @@ export const visualizations = {
           },
           {
             title: i18n.translate(
-              'templates.agents.rows.nist.topRequirements',
+              'wazuh.templates.agents.rows.nist.topRequirements',
               {
                 defaultMessage: 'Top 10 requirements',
               },
@@ -310,7 +310,7 @@ export const visualizations = {
             width: 25,
           },
           {
-            title: i18n.translate('templates.agents.rows.nist.distribution', {
+            title: i18n.translate('wazuh.templates.agents.rows.nist.distribution', {
               defaultMessage: 'Requirements distributed by level',
             }),
             id: 'Wazuh-App-Agents-NIST-Requirement-by-level',
@@ -322,7 +322,7 @@ export const visualizations = {
         height: 300,
         vis: [
           {
-            title: i18n.translate('templates.agents.rows.nist.requirements', {
+            title: i18n.translate('wazuh.templates.agents.rows.nist.requirements', {
               defaultMessage: 'Requirements over time',
             }),
             id: 'Wazuh-App-Agents-NIST-Requirements-stacked-overtime',
@@ -333,7 +333,7 @@ export const visualizations = {
         hide: true,
         vis: [
           {
-            title: i18n.translate('templates.agents.rows.nist.alertSummary', {
+            title: i18n.translate('wazuh.templates.agents.rows.nist.alertSummary', {
               defaultMessage: 'Alerts summary',
             }),
             id: 'Wazuh-App-Agents-NIST-Last-alerts',
@@ -348,14 +348,14 @@ export const visualizations = {
         height: 400,
         vis: [
           {
-            title: i18n.translate('templates.agents.rows.tsc.requirements', {
+            title: i18n.translate('wazuh.templates.agents.rows.tsc.requirements', {
               defaultMessage: 'TSC requirements',
             }),
             id: 'Wazuh-App-Overview-TSC-requirements',
             width: 50,
           },
           {
-            title: i18n.translate('templates.agents.rows.tsc.topAgents', {
+            title: i18n.translate('wazuh.templates.agents.rows.tsc.topAgents', {
               defaultMessage: 'Top 10 agents by alerts number',
             }),
             id: 'Wazuh-App-Overview-TSC-Agents',
@@ -367,7 +367,7 @@ export const visualizations = {
         height: 300,
         vis: [
           {
-            title: i18n.translate('templates.agents.rows.tsc.topRequirements', {
+            title: i18n.translate('wazuh.templates.agents.rows.tsc.topRequirements', {
               defaultMessage: 'Top requirements over time',
             }),
             id: 'Wazuh-App-Overview-TSC-Requirements-over-time',
@@ -378,7 +378,7 @@ export const visualizations = {
         height: 530,
         vis: [
           {
-            title: i18n.translate('templates.agents.rows.tsc.lastAlert', {
+            title: i18n.translate('wazuh.templates.agents.rows.tsc.lastAlert', {
               defaultMessage: 'Last alerts',
             }),
             id: 'Wazuh-App-Overview-TSC-Requirements-Agents-heatmap',
@@ -390,7 +390,7 @@ export const visualizations = {
         vis: [
           {
             title: i18n.translate(
-              'templates.agents.rows.tsc.agentRequirement',
+              'wazuh.templates.agents.rows.tsc.agentRequirement',
               {
                 defaultMessage: 'Requirements by agent',
               },
@@ -403,7 +403,7 @@ export const visualizations = {
         hide: true,
         vis: [
           {
-            title: i18n.translate('templates.agents.rows.tsc.alertSummary', {
+            title: i18n.translate('wazuh.templates.agents.rows.tsc.alertSummary', {
               defaultMessage: 'Alerts summary',
             }),
             id: 'Wazuh-App-Overview-TSC-Alerts-summary',
@@ -419,7 +419,7 @@ export const visualizations = {
         vis: [
           {
             title: i18n.translate(
-              'templates.agents.rows.hipaa.requirementsOverTime',
+              'wazuh.templates.agents.rows.hipaa.requirementsOverTime',
               {
                 defaultMessage: 'Requirements over time',
               },
@@ -429,7 +429,7 @@ export const visualizations = {
           },
           {
             title: i18n.translate(
-              'templates.agents.rows.hipaa.topRequirements',
+              'wazuh.templates.agents.rows.hipaa.topRequirements',
               {
                 defaultMessage: 'Top 10 requirements',
               },
@@ -443,21 +443,21 @@ export const visualizations = {
         height: 300,
         vis: [
           {
-            title: i18n.translate('templates.agents.rows.hipaa.requirements', {
+            title: i18n.translate('wazuh.templates.agents.rows.hipaa.requirements', {
               defaultMessage: 'HIPAA requirements',
             }),
             id: 'Wazuh-App-Agents-HIPAA-Burbles',
             width: 45,
           },
           {
-            title: i18n.translate('templates.agents.rows.hipaa.distribution', {
+            title: i18n.translate('wazuh.templates.agents.rows.hipaa.distribution', {
               defaultMessage: 'Requirements distribution by level',
             }),
             id: 'Wazuh-App-Agents-HIPAA-Distributed-By-Level',
             width: 30,
           },
           {
-            title: i18n.translate('templates.agents.rows.hipaa.commonAlert', {
+            title: i18n.translate('wazuh.templates.agents.rows.hipaa.commonAlert', {
               defaultMessage: 'Most common alerts',
             }),
             id: 'Wazuh-App-Agents-HIPAA-Most-Common',
@@ -469,7 +469,7 @@ export const visualizations = {
         hide: true,
         vis: [
           {
-            title: i18n.translate('templates.agents.rows.hipaa.alertSummary', {
+            title: i18n.translate('wazuh.templates.agents.rows.hipaa.alertSummary', {
               defaultMessage: 'Alerts summary',
             }),
             id: 'Wazuh-App-Agents-HIPAA-Last-alerts',
@@ -484,7 +484,7 @@ export const visualizations = {
         height: 250,
         vis: [
           {
-            title: i18n.translate('templates.agents.rows.virus.scannedFiles', {
+            title: i18n.translate('wazuh.templates.agents.rows.virus.scannedFiles', {
               defaultMessage: 'Last scanned files',
             }),
             id: 'Wazuh-App-Agents-Virustotal-Last-Files-Pie',
@@ -492,7 +492,7 @@ export const visualizations = {
           },
           {
             title: i18n.translate(
-              'templates.agents.rows.virus.maliciousFiles',
+              'wazuh.templates.agents.rows.virus.maliciousFiles',
               {
                 defaultMessage: 'Malicious files alerts Evolution',
               },
@@ -506,7 +506,7 @@ export const visualizations = {
         height: 570,
         vis: [
           {
-            title: i18n.translate('templates.agents.rows.virus.lastFiles', {
+            title: i18n.translate('wazuh.templates.agents.rows.virus.lastFiles', {
               defaultMessage: 'Last files',
             }),
             id: 'Wazuh-App-Agents-Virustotal-Files-Table',
@@ -517,7 +517,7 @@ export const visualizations = {
         hide: true,
         vis: [
           {
-            title: i18n.translate('templates.agents.rows.virus.alertSummary', {
+            title: i18n.translate('wazuh.templates.agents.rows.virus.alertSummary', {
               defaultMessage: 'Alerts summary',
             }),
             id: 'Wazuh-App-Agents-Virustotal-Alerts-summary',
@@ -532,14 +532,14 @@ export const visualizations = {
         height: 300,
         vis: [
           {
-            title: i18n.translate('templates.agents.rows.osquery.actions', {
+            title: i18n.translate('wazuh.templates.agents.rows.osquery.actions', {
               defaultMessage: 'Most common Osquery actions',
             }),
             id: 'Wazuh-App-Agents-Osquery-most-common-osquery-actions',
             width: 30,
           },
           {
-            title: i18n.translate('templates.agents.rows.osquery.evolution', {
+            title: i18n.translate('wazuh.templates.agents.rows.osquery.evolution', {
               defaultMessage: 'Evolution of Osquery events per pack over time',
             }),
             id: 'Wazuh-App-Agents-Osquery-Evolution',
@@ -551,14 +551,14 @@ export const visualizations = {
         height: 300,
         vis: [
           {
-            title: i18n.translate('templates.agents.rows.osquery.packs', {
+            title: i18n.translate('wazuh.templates.agents.rows.osquery.packs', {
               defaultMessage: 'Most common Osquery packs being used',
             }),
             id: 'Wazuh-App-Agents-Osquery-top-5-packs-being-used',
             width: 30,
           },
           {
-            title: i18n.translate('templates.agents.rows.osquery.rules', {
+            title: i18n.translate('wazuh.templates.agents.rows.osquery.rules', {
               defaultMessage: 'Most common rules',
             }),
             id: 'Wazuh-App-Agents-Osquery-monst-common-rules-being-fired',
@@ -571,7 +571,7 @@ export const visualizations = {
         vis: [
           {
             title: i18n.translate(
-              'templates.agents.rows.osquery.alertSummary',
+              'wazuh.templates.agents.rows.osquery.alertSummary',
               {
                 defaultMessage: 'Alerts summary',
               },
@@ -588,21 +588,21 @@ export const visualizations = {
         height: 300,
         vis: [
           {
-            title: i18n.translate('templates.agents.rows.docker.images', {
+            title: i18n.translate('wazuh.templates.agents.rows.docker.images', {
               defaultMessage: 'Top 5 images',
             }),
             id: 'Wazuh-App-Agents-Docker-top-5-images',
             width: 25,
           },
           {
-            title: i18n.translate('templates.agents.rows.docker.events', {
+            title: i18n.translate('wazuh.templates.agents.rows.docker.events', {
               defaultMessage: 'Top 5 events',
             }),
             id: 'Wazuh-App-Agents-Docker-top-5-actions',
             width: 25,
           },
           {
-            title: i18n.translate('templates.agents.rows.docker.resources', {
+            title: i18n.translate('wazuh.templates.agents.rows.docker.resources', {
               defaultMessage: 'Resources usage over time',
             }),
             id: 'Wazuh-App-Agents-Docker-Types-over-time',
@@ -614,7 +614,7 @@ export const visualizations = {
         height: 300,
         vis: [
           {
-            title: i18n.translate('templates.agents.rows.docker.evolution', {
+            title: i18n.translate('wazuh.templates.agents.rows.docker.evolution', {
               defaultMessage: 'Events occurred evolution',
             }),
             id: 'Wazuh-App-Agents-Docker-Actions-over-time',
@@ -625,7 +625,7 @@ export const visualizations = {
         hide: true,
         vis: [
           {
-            title: i18n.translate('templates.agents.rows.docker.alertSummary', {
+            title: i18n.translate('wazuh.templates.agents.rows.docker.alertSummary', {
               defaultMessage: 'Alerts summary',
             }),
             id: 'Wazuh-App-Agents-Docker-Events-summary',
@@ -640,28 +640,28 @@ export const visualizations = {
         height: 230,
         vis: [
           {
-            title: i18n.translate('templates.agents.rows.oscap.scans', {
+            title: i18n.translate('wazuh.templates.agents.rows.oscap.scans', {
               defaultMessage: 'Top 5 Scans',
             }),
             id: 'Wazuh-App-Agents-OSCAP-Scans',
             width: 25,
           },
           {
-            title: i18n.translate('templates.agents.rows.oscap.profile', {
+            title: i18n.translate('wazuh.templates.agents.rows.oscap.profile', {
               defaultMessage: 'Top 5 Profiles',
             }),
             id: 'Wazuh-App-Agents-OSCAP-Profiles',
             width: 25,
           },
           {
-            title: i18n.translate('templates.agents.rows.oscap.content', {
+            title: i18n.translate('wazuh.templates.agents.rows.oscap.content', {
               defaultMessage: 'Top 5 Content',
             }),
             id: 'Wazuh-App-Agents-OSCAP-Content',
             width: 25,
           },
           {
-            title: i18n.translate('templates.agents.rows.oscap.severity', {
+            title: i18n.translate('wazuh.templates.agents.rows.oscap.severity', {
               defaultMessage: 'Top 5 Severity',
             }),
             id: 'Wazuh-App-Agents-OSCAP-Severity',
@@ -673,7 +673,7 @@ export const visualizations = {
         height: 230,
         vis: [
           {
-            title: i18n.translate('templates.agents.rows.oscap.evolution', {
+            title: i18n.translate('wazuh.templates.agents.rows.oscap.evolution', {
               defaultMessage: 'Daily scans evolution',
             }),
             id: 'Wazuh-App-Agents-OSCAP-Daily-scans-evolution',
@@ -684,14 +684,14 @@ export const visualizations = {
         height: 250,
         vis: [
           {
-            title: i18n.translate('templates.agents.rows.oscap.alerts', {
+            title: i18n.translate('wazuh.templates.agents.rows.oscap.alerts', {
               defaultMessage: 'Top 5 - Alerts',
             }),
             id: 'Wazuh-App-Agents-OSCAP-Top-5-Alerts',
             width: 50,
           },
           {
-            title: i18n.translate('templates.agents.rows.oscap.highRisk', {
+            title: i18n.translate('wazuh.templates.agents.rows.oscap.highRisk', {
               defaultMessage: 'Top 5 - High risk alerts',
             }),
             id: 'Wazuh-App-Agents-OSCAP-Top-5-High-risk-alerts',
@@ -703,7 +703,7 @@ export const visualizations = {
         hide: true,
         vis: [
           {
-            title: i18n.translate('templates.agents.rows.oscap.alertSummary', {
+            title: i18n.translate('wazuh.templates.agents.rows.oscap.alertSummary', {
               defaultMessage: 'Alerts summary',
             }),
             id: 'Wazuh-App-Agents-OSCAP-Last-alerts',
@@ -718,14 +718,14 @@ export const visualizations = {
         height: 320,
         vis: [
           {
-            title: i18n.translate('templates.agents.rows.ciscat.groups', {
+            title: i18n.translate('wazuh.templates.agents.rows.ciscat.groups', {
               defaultMessage: 'Top 5 CIS-CAT groups',
             }),
             id: 'Wazuh-app-Agents-CISCAT-top-5-groups',
             width: 60,
           },
           {
-            title: i18n.translate('templates.agents.rows.ciscat.evolution', {
+            title: i18n.translate('wazuh.templates.agents.rows.ciscat.evolution', {
               defaultMessage: 'Scan result evolution',
             }),
             id: 'Wazuh-app-Agents-CISCAT-scan-result-evolution',
@@ -737,7 +737,7 @@ export const visualizations = {
         hide: true,
         vis: [
           {
-            title: i18n.translate('templates.agents.rows.ciscap.alertSummary', {
+            title: i18n.translate('wazuh.templates.agents.rows.ciscap.alertSummary', {
               defaultMessage: 'Alerts summary',
             }),
             id: 'Wazuh-app-Agents-CISCAT-alerts-summary',
@@ -752,14 +752,14 @@ export const visualizations = {
         height: 290,
         vis: [
           {
-            title: i18n.translate('templates.agents.rows.pm.alert', {
+            title: i18n.translate('wazuh.templates.agents.rows.pm.alert', {
               defaultMessage: 'Alerts over time',
             }),
             id: 'Wazuh-App-Agents-PM-Events-over-time',
             width: 50,
           },
           {
-            title: i18n.translate('templates.agents.rows.pm.distribution', {
+            title: i18n.translate('wazuh.templates.agents.rows.pm.distribution', {
               defaultMessage: 'Rule distribution',
             }),
             id: 'Wazuh-App-Agents-PM-Top-5-rules',
@@ -771,7 +771,7 @@ export const visualizations = {
         height: 240,
         vis: [
           {
-            title: i18n.translate('templates.agents.rows.pm.evolution', {
+            title: i18n.translate('wazuh.templates.agents.rows.pm.evolution', {
               defaultMessage: 'Events per control type evolution',
             }),
             id: 'Wazuh-App-Agents-PM-Events-per-agent-evolution',
@@ -782,7 +782,7 @@ export const visualizations = {
         hide: true,
         vis: [
           {
-            title: i18n.translate('templates.agents.rows.pm.alertSummary', {
+            title: i18n.translate('wazuh.templates.agents.rows.pm.alertSummary', {
               defaultMessage: 'Alerts summary',
             }),
             id: 'Wazuh-App-Agents-PM-Alerts-summary',
@@ -797,21 +797,21 @@ export const visualizations = {
         height: 250,
         vis: [
           {
-            title: i18n.translate('templates.agents.rows.audit.groups', {
+            title: i18n.translate('wazuh.templates.agents.rows.audit.groups', {
               defaultMessage: 'Groups',
             }),
             id: 'Wazuh-App-Agents-Audit-Groups',
             width: 33,
           },
           {
-            title: i18n.translate('templates.agents.rows.audit.commands', {
+            title: i18n.translate('wazuh.templates.agents.rows.audit.commands', {
               defaultMessage: 'Commands',
             }),
             id: 'Wazuh-App-Agents-Audit-Commands',
             width: 33,
           },
           {
-            title: i18n.translate('templates.agents.rows.audit.files', {
+            title: i18n.translate('wazuh.templates.agents.rows.audit.files', {
               defaultMessage: 'Files',
             }),
             id: 'Wazuh-App-Agents-Audit-Files',
@@ -823,7 +823,7 @@ export const visualizations = {
         height: 310,
         vis: [
           {
-            title: i18n.translate('templates.agents.rows.audit.alert', {
+            title: i18n.translate('wazuh.templates.agents.rows.audit.alert', {
               defaultMessage: 'Alerts over time',
             }),
             id: 'Wazuh-App-Agents-Audit-Alerts-over-time',
@@ -834,7 +834,7 @@ export const visualizations = {
         hide: true,
         vis: [
           {
-            title: i18n.translate('templates.agents.rows.audit.alertSummary', {
+            title: i18n.translate('wazuh.templates.agents.rows.audit.alertSummary', {
               defaultMessage: 'Alerts summary',
             }),
             id: 'Wazuh-App-Agents-Audit-Last-alerts',

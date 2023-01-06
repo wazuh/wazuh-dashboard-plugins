@@ -49,19 +49,19 @@ import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { WzFlyout } from '../../../components/common/flyouts';
 import _ from 'lodash';
-const descp1 = i18n.translate('controllers.agent.comp.table.Descp1', {
+const descp1 = i18n.translate('wazuh.controllers.agent.comp.table.error', {
   defaultMessage: 'Error trying to delete logtest token due to:',
 });
-const place2 = i18n.translate('controllers.agent.comp.table.place2', {
+const place2 = i18n.translate('wazuh.controllers.agent.comp.table.place2', {
   defaultMessage: 'Type one log per line...',
 });
-const descp3 = i18n.translate('controllers.agent.comp.table.Descp3', {
+const descp3 = i18n.translate('wazuh.controllers.agent.comp.table.Descp3', {
   defaultMessage: 'Clear current session',
 });
-const descp4 = i18n.translate('controllers.agent.comp.table.Descp4', {
+const descp4 = i18n.translate('wazuh.controllers.agent.comp.table.clearCurrentSession', {
   defaultMessage: 'Do you want to clear current session?',
 });
-const descp5 = i18n.translate('controllers.agent.comp.table.Descp5', {
+const descp5 = i18n.translate('wazuh.controllers.agent.comp.table.Descp5', {
   defaultMessage:
     'Clearing the session means the logs execution history is removed. This affects to rules that fire an alert when similar logs are executed in a specific range of time.',
 });
@@ -286,7 +286,7 @@ export const Logtest = compose(
               fill
               onClick={runAllTests}
             >
-              {i18n.translate('driectives.wzlog.comp.logtext.session.Test', {
+              {i18n.translate('wazuh.driectives.wzlog.comp.logtext.session.Test', {
                 defaultMessage: 'Test',
               })}
             </EuiButton>
@@ -309,7 +309,7 @@ export const Logtest = compose(
                 children: descp5,
               }}
             >
-              {i18n.translate('driectives.wzlog.comp.logtext.session', {
+              {i18n.translate('wazuh.driectives.wzlog.comp.logtext.session', {
                 defaultMessage: 'Clear session',
               })}
             </WzButtonPermissionsModalConfirm>
@@ -327,7 +327,7 @@ export const Logtest = compose(
           isCopyable={!!testResult}
         >
           {testResult ||
-            i18n.translate('directives.wz.comp.logtest.result.', {
+            i18n.translate('wazuh.directives.wz.comp.logtest.result.', {
               defaultMessage: "'The test result will appear here.'",
             })}
         </EuiCodeBlock>
@@ -356,7 +356,7 @@ export const Logtest = compose(
                       <EuiTitle size='m'>
                         <h2>
                           {i18n.translate(
-                            'drivitaves.wz.comp.log.RulesetTest',
+                            'wazuh.drivitaves.wz.comp.log.RulesetTest',
                             {
                               defaultMessage: 'Ruleset Test',
                             },
@@ -382,13 +382,13 @@ export const Logtest = compose(
             <EuiTitle size='m'>
               {props.isRuleset.includes('rules') ? (
                 <h2>
-                  {i18n.translate('drivitaves.wz.comp.log.RulesetTest', {
+                  {i18n.translate('wazuh.drivitaves.wz.comp.log.RulesetTest', {
                     defaultMessage: 'Ruleset Test',
                   })}
                 </h2>
               ) : (
                 <h2>
-                  {i18n.translate('drivitaves.wz.comp.log.DecodersTest', {
+                  {i18n.translate('wazuh.drivitaves.wz.comp.log.DecodersTest', {
                     defaultMessage: 'Decoders Test',
                   })}
                 </h2>

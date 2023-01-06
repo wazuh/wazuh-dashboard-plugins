@@ -157,7 +157,7 @@ class OverviewActions extends Component {
             >
               <EuiModalHeader>
                 <EuiModalHeaderTitle>
-                  { i18n.translate('controller.overview.component.exploreAgent', {  defaultMessage: 'Explore agent'})
+                  { i18n.translate('wazuh.controller.overview.component.exploreAgent', {  defaultMessage: 'Explore agent'})
                   }
 
                 </EuiModalHeaderTitle>
@@ -208,15 +208,15 @@ class OverviewActions extends Component {
           position: 'bottom',
           content: !avaliableForAgent
             ? i18n.translate(
-                'controller.overview.component.notSupportedModuleForAgents',
+                'wazuh.controller.overview.component.notSupportedModuleForAgents',
                 { defaultMessage: 'This module is not supported for agents.' },
               )
             : thereAgentSelected
-            ? i18n.translate('controller.overview.component.changeAgent', {
+            ? i18n.translate('wazuh.controller.overview.component.changeAgent', {
                 defaultMessage: 'Change agent selected',
               })
             : i18n.translate(
-                'controller.overview.component.selectAgentToExplore',
+                'wazuh.controller.overview.component.selectAgentToExplore',
                 {
                   defaultMessage: 'Select an agent to explore its modules',
                 },
@@ -234,7 +234,7 @@ class OverviewActions extends Component {
           (thereAgentSelected
             ? `${this.props.agent.name} (${this.props.agent.id})`
             : i18n.translate(
-                'controller.overview.component.exploreAgent',
+                'wazuh.controller.overview.component.exploreAgent',
                 {
                   defaultMessage: 'Explore agent',
                 }

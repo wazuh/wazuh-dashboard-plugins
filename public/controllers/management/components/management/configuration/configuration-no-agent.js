@@ -25,7 +25,7 @@ export const WzAgentNeverConnectedPrompt = () => (
     style={{ marginTop: 20 }}
     title={
       <h2>
-        {i18n.translate('controllers.manage.confi.util.con', {
+        {i18n.translate('wazuh.controllers.manage.confi.util.con', {
           defaultMessage: 'Agent has never connected.',
         })}
       </h2>
@@ -33,13 +33,13 @@ export const WzAgentNeverConnectedPrompt = () => (
     body={
       <Fragment>
         <p>
-          {i18n.translate('controllers.manage.confi.util.reg', {
+          {i18n.translate('wazuh.controllers.manage.confi.util.reg', {
             defaultMessage:
               'The agent has been registered but has not yet connected to the manager.',
           })}
         </p>
         <a href={documentationLink} target='_blank'>
-          {i18n.translate('controllers.manage.confi.util.check', {
+          {i18n.translate('wazuh.controllers.manage.confi.util.check', {
             defaultMessage: 'Checking connection with the Wazuh server',
           })}
         </a>
@@ -47,7 +47,7 @@ export const WzAgentNeverConnectedPrompt = () => (
     }
     actions={
       <EuiButton href='#/agents-preview?' color='primary' fill>
-        {i18n.translate('controllers.manage.confi.util.Back', {
+        {i18n.translate('wazuh.controllers.manage.confi.util.Back', {
           defaultMessage: 'Back',
         })}
       </EuiButton>

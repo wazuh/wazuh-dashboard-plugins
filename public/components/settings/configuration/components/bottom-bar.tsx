@@ -42,18 +42,18 @@ interface IBottomBarProps {
 }
 import { i18n } from "@kbn/i18n";
 
-const Title1 = i18n.translate("components.addModule.guide.Title1", {
+const Title1 = i18n.translate("wazuh.components.settings.configuration.configurationUpdate", {
   defaultMessage: "The configuration has been successfully updated",
 });
-const Title2 = i18n.translate("components.addModule.guide.Title2", {
+const Title2 = i18n.translate("wazuh.components.settings.configuration.Title2", {
   defaultMessage:
     "You must execute the health check for the changes to take effect",
 });
-const Title3 = i18n.translate("components.addModule.guide.Title3", {
+const Title3 = i18n.translate("wazuh.components.settings.configuration.Title3", {
   defaultMessage:
     "This settings require you to reload the page to take effect.",
 });
-const Title4 = i18n.translate("components.addModule.guide.title4", {
+const Title4 = i18n.translate("wazuh.components.settings.configuration.title4", {
   defaultMessage: "Error saving the configuration: ",
 });
 export const BottomBar: React.FunctionComponent<IBottomBarProps> = ({ updatedConfig, setUpdateConfig, setLoading, config }) => {
@@ -92,7 +92,7 @@ const CancelButton = ({ setUpdateConfig }) => (
       className='mgtAdvancedSettingsForm__button'
       onClick={() => setUpdateConfig({})}
     >
-      {i18n.translate('components.setting.confi.comp.bottom.cancel', {
+      {i18n.translate('wazuh.components.setting.confi.comp.bottom.cancel', {
         defaultMessage: 'Cancel changes',
       })}
 
@@ -113,7 +113,7 @@ const SaveButton = ({ updatedConfig, setUpdateConfig, setLoading, config }) => (
         saveSettings(updatedConfig, setUpdateConfig, setLoading, config)
       }
     >
-      {i18n.translate('components.setting.confi.comp.bottom.save', {
+      {i18n.translate('wazuh.components.setting.confi.comp.bottom.save', {
         defaultMessage: 'Save changes',
       })}
 
@@ -173,7 +173,7 @@ const reloadToast = () => {
       <EuiFlexGroup justifyContent='flexEnd' gutterSize='s'>
         <EuiFlexItem grow={false}>
           <EuiButton onClick={() => window.location.reload()} size='s'>
-            {i18n.translate('components.setting.confi.comp.bottom.reload', {
+            {i18n.translate('wazuh.components.setting.confi.comp.bottom.reload', {
               defaultMessage: 'Reload page',
             })}
           </EuiButton>
@@ -198,7 +198,7 @@ const executeHealtCheck = () => {
             }}
             size='s'
           >
-            {i18n.translate('components.setting.confi.comp.bottom.check', {
+            {i18n.translate('wazuh.components.setting.confi.comp.bottom.check', {
               defaultMessage: 'Execute health check',
             })}
           </EuiButton>

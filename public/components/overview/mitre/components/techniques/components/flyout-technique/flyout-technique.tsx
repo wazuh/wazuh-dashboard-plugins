@@ -49,16 +49,16 @@ import { i18n } from "@kbn/i18n";
 
 
 
-const Title1 = i18n.translate("components.addModule.guide.Title1", {
+const Title1 = i18n.translate("wazuh.components.overview.mitre.techninques.errorRequest", {
   defaultMessage: "Error obtaining the requested technique",
 });
-const Title2 = i18n.translate("components.addModule.guide.Title2", {
+const Title2 = i18n.translate("wazuh.components.overview.mitre.techninques.Title2", {
   defaultMessage: "ID",
 });
-const Title3 = i18n.translate("components.addModule.guide.Title3", {
+const Title3 = i18n.translate("wazuh.components.overview.mitre.techninques.Title3", {
   defaultMessage: "Tactics",
 });
-const Title4 = i18n.translate("components.addModule.guide.Title4", {
+const Title4 = i18n.translate("wazuh.components.overview.mitre.techninques.Title4", {
   defaultMessage: "Version",
 });
 export class FlyoutTechnique extends Component {
@@ -269,7 +269,7 @@ export class FlyoutTechnique extends Component {
           buttonContent={
             <EuiTitle size="s">
               <h3>{
-                i18n.translate("components.agent.fim.ivv.lib.Techniquedetails", {
+                i18n.translate("wazuh.components.agent.fim.ivv.lib.Techniquedetails", {
                   defaultMessage: "Technique details",
                 })}
               </h3>
@@ -300,7 +300,7 @@ export class FlyoutTechnique extends Component {
           extraAction={
             <div style={{ marginBottom: 5 }}>
               <strong>{this.state.totalHits || 0}</strong> {
-                i18n.translate("components.agent.fim.ivv.lib.hits", {
+                i18n.translate("wazuh.components.agent.fim.ivv.lib.hits", {
                   defaultMessage: "hits",
                 })}
             </div>
@@ -308,7 +308,7 @@ export class FlyoutTechnique extends Component {
           buttonContent={
             <EuiTitle size="s">
               <h3>{
-                i18n.translate("components.agent.fim.ivv.lib.Recentevents", {
+                i18n.translate("wazuh.components.agent.fim.ivv.lib.Recentevents", {
                   defaultMessage: "Recent events",
                 })}
 

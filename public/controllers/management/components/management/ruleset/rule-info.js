@@ -284,7 +284,7 @@ class WzRuleInfo extends Component {
         <EuiFlexItem key='level' grow={1}>
           <b style={{ paddingBottom: 6 }}>
             {i18n.translate(
-              'controllers.mnage.comp.confi.groups.ruleset.Level',
+              'wazuh.controllers.mnage.comp.confi.groups.ruleset.Level',
               {
                 defaultMessage: 'Level',
               },
@@ -308,7 +308,7 @@ class WzRuleInfo extends Component {
         <EuiFlexItem key='file' grow={1}>
           <b style={{ paddingBottom: 6 }}>
             {i18n.translate(
-              'controllers.mnage.comp.confi.groups.ruleset.File',
+              'wazuh.controllers.mnage.comp.confi.groups.ruleset.File',
               {
                 defaultMessage: 'File',
               },
@@ -331,7 +331,7 @@ class WzRuleInfo extends Component {
         <EuiFlexItem key='path' grow={1}>
           <b style={{ paddingBottom: 6 }}>
             {i18n.translate(
-              'controllers.mnage.comp.confi.groups.ruleset.Path',
+              'wazuh.controllers.mnage.comp.confi.groups.ruleset.Path',
               {
                 defaultMessage: 'Path',
               },
@@ -354,7 +354,7 @@ class WzRuleInfo extends Component {
         <EuiFlexItem key='Groups' grow={1}>
           <b style={{ paddingBottom: 6 }}>
             {i18n.translate(
-              'controllers.mnage.comp.confi.groups.ruleset.Groups',
+              'wazuh.controllers.mnage.comp.confi.groups.ruleset.Groups',
               {
                 defaultMessage: 'Groups',
               },
@@ -761,7 +761,7 @@ class WzRuleInfo extends Component {
                   target='blank'
                 >
                   {i18n.translate(
-                    'controllers.mnage.comp.confi.groups.ruleset.Information.rule',
+                    'wazuh.controllers..mnage.comp.confi.groups.ruleset.Information.rule',
                     {
                       defaultMessage: 'View alerts of this Rule',
                     },
@@ -782,7 +782,7 @@ class WzRuleInfo extends Component {
                       <EuiTitle size='s'>
                         <h3>
                           {i18n.translate(
-                            'controllers.mnage.comp.confi.groups.ruleset.Information',
+                            'wazuh.controllers..mnage.comp.confi.groups.ruleset.Information',
                             {
                               defaultMessage: 'Information',
                             },
@@ -814,7 +814,7 @@ class WzRuleInfo extends Component {
                       <EuiTitle size='s'>
                         <h3>
                           {i18n.translate(
-                            'controllers.mnage.comp.confi.groups.ruleset.Details',
+                            'wazuh.controllers..mnage.comp.confi.groups.ruleset.Details',
                             {
                               defaultMessage: 'Details',
                             },
@@ -841,7 +841,7 @@ class WzRuleInfo extends Component {
                         <EuiTitle size='s'>
                           <h3>
                             {i18n.translate(
-                              'controllers.mnage.comp.confi.groups.ruleset.Compliance',
+                              'wazuh.controllers..mnage.comp.confi.groups.ruleset.Compliance',
                               {
                                 defaultMessage: 'Compliance',
                               },
@@ -868,7 +868,7 @@ class WzRuleInfo extends Component {
                       <EuiTitle size='s'>
                         <h3>
                           {i18n.translate(
-                            'controllers.mnage.comp.confi.groups.ruleset.Relatedrules',
+                            'wazuh.controllers..mnage.comp.confi.groups.ruleset.Relatedrules',
                             {
                               defaultMessage: 'Related rules',
                             },

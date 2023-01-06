@@ -19,30 +19,26 @@ import { processColumns, portsColumns, packagesColumns } from './columns';
 import { API_NAME_AGENT_STATUS } from '../../../../common/constants';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
 
-
-
-
-
-const title1 = i18n.translate("components.addModule.guide.title1", {
+const title1 = i18n.translate("wazuh.components.agents.syscollector.inventory.disconnectedAgent", {
   defaultMessage:
     "This agent is currently disconnected, the data may be outdated.",
 });
-const title2 = i18n.translate("components.addModule.guide.title2", {
+const title2 = i18n.translate("wazuh.components.agents.syscollector.inventory.title2", {
   defaultMessage: "Network interfaces",
 });
-const title3 = i18n.translate("components.addModule.guide.title3", {
+const title3 = i18n.translate("wazuh.components.agents.syscollector.inventory.title3", {
   defaultMessage: "Network ports",
 });
-const title4 = i18n.translate("components.addModule.guide.title4", {
+const title4 = i18n.translate("wazuh.components.agents.syscollector.inventory.title4", {
   defaultMessage: "Network settings",
 });
-const title5 = i18n.translate("components.addModule.guide.title5", {
+const title5 = i18n.translate("wazuh.components.agents.syscollector.inventory.title5", {
   defaultMessage: "Windows updates",
 });
-const title6 = i18n.translate("components.addModule.guide.title6", {
+const title6 = i18n.translate("wazuh.components.agents.syscollector.inventory.title6", {
   defaultMessage: "Packages",
 });
-const title7 = i18n.translate("components.addModule.guide.title7", {
+const title7 = i18n.translate("wazuh.components.agents.syscollector.inventory.title7", {
   defaultMessage: "Processes",
 });
 export function SyscollectorInventory({ agent }) {
@@ -52,13 +48,13 @@ export function SyscollectorInventory({ agent }) {
         iconType="securitySignalDetected"
         style={{ marginTop: 20 }}
         title={<h2>{
-          i18n.translate("components.agent.fim.ivv.lib.nevercon", {
+          i18n.translate("wazuh.components.agent.fim.ivv.lib.nevercon", {
             defaultMessage: "Agent has never connected.",
           })}</h2>}
         body={
           <Fragment>
             <p>{
-              i18n.translate("components.agent.fim.ivv.lib.agent", {
+              i18n.translate("wazuh.components.agent.fim.ivv.lib.agent", {
                 defaultMessage: "The agent has been registered but has not yet connected to the manager.",
               })}
             </p>
@@ -67,7 +63,7 @@ export function SyscollectorInventory({ agent }) {
               target="_blank"
             >
               {
-                i18n.translate("components.agent.fim.ivv.lib.wazuhServer", {
+                i18n.translate("wazuh.components.agent.fim.ivv.lib.wazuhServer", {
                   defaultMessage: "Checking connection with the Wazuh server",
                 })}
             </a>
@@ -76,7 +72,7 @@ export function SyscollectorInventory({ agent }) {
         actions={
           <EuiButton href="#/agents-preview?" color="primary" fill>
             {
-              i18n.translate("components.agent.fim.ivv.lib.Back", {
+              i18n.translate("wazuh.components.agent.fim.ivv.lib.Back", {
                 defaultMessage: "Back",
               })}
           </EuiButton>

@@ -317,7 +317,7 @@ class WzGroupsActionButtonsFiles extends Component {
         iconType='documentEdit'
         onClick={() => this.showGroupConfiguration()}
       >
-        {i18n.translate('controllers.mnage.comp.confi.groups.editgroup', {
+        {i18n.translate('wazuh.controllers.mnage.comp.confi.groups.editgroup', {
           defaultMessage: 'Edit group configuration',
         })}
       </WzButtonPermissions>
@@ -343,7 +343,7 @@ class WzGroupsActionButtonsFiles extends Component {
         onClick={async () => await this.generateCsv()}
         isLoading={this.state.generatingCsv}
       >
-        {i18n.translate('controllers.mnage.comp.confi.groups.Exportformatted', {
+        {i18n.translate('wazuh.controllers.mnage.comp.confi.groups.Exportformatted', {
           defaultMessage: 'Export formatted',
         })}
       </EuiButtonEmpty>
@@ -355,7 +355,7 @@ class WzGroupsActionButtonsFiles extends Component {
         iconType='refresh'
         onClick={async () => await this.refresh()}
       >
-        {i18n.translate('controllers.mnage.comp.confi.groups.Refresh', {
+        {i18n.translate('wazuh.controllers.mnage.comp.confi.groups.Refresh', {
           defaultMessage: 'Refresh',
         })}{' '}
       </EuiButtonEmpty>

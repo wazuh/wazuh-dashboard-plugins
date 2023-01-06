@@ -31,7 +31,7 @@ export function DocViewTableRowBtnToggleColumn({ onClick, active, disabled = fal
   if (disabled) {
     return (
       <EuiButtonIcon
-        aria-label={i18n.translate('discover.docViews.table.toggleColumnInTableButtonAriaLabel', {
+        aria-label={i18n.translate('wazuh.discover.docViews.table.toggleColumnInTableButtonAriaLabel', {
           defaultMessage: 'Toggle column in table',
         })}
         className="kbnDocViewer__actionButton"
@@ -46,13 +46,13 @@ export function DocViewTableRowBtnToggleColumn({ onClick, active, disabled = fal
     <EuiToolTip
       content={
         <FormattedMessage
-          id="discover.docViews.table.toggleColumnInTableButtonTooltip"
+          id="wazuh.discover.docViews.table.toggleColumnInTableButtonTooltip"
           defaultMessage="Toggle column in table"
         />
       }
     >
       <EuiButtonIcon
-        aria-label={i18n.translate('discover.docViews.table.toggleColumnInTableButtonAriaLabel', {
+        aria-label={i18n.translate('wazuh.discover.docViews.table.toggleColumnInTableButtonAriaLabel', {
           defaultMessage: 'Toggle column in table',
         })}
         aria-pressed={active}

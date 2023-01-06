@@ -191,7 +191,7 @@ export const MultiSelect = ({
               <div className="euiFilterSelect__noteContent">
                 <EuiLoadingChart size="m" />
                 <EuiSpacer size="xs" />
-                <p>{ i18n.translate('components.common.customSearchBar.loadingFilter', { defaultMessage: 'Loading filters', })}</p>
+                <p>{ i18n.translate('wazuh.components.common.customSearchBar.loadingFilter', { defaultMessage: 'Loading filters', })}</p>
               </div>
             </div>
           )}
@@ -200,7 +200,7 @@ export const MultiSelect = ({
               <div className="euiFilterSelect__noteContent">
                 <EuiIcon type="minusInCircle" />
                 <EuiSpacer size="xs" />
-                <p>{ i18n.translate('components.common.customSearchBar.filterFound', { defaultMessage: 'No filters found', })}</p>
+                <p>{ i18n.translate('wazuh.components.common.customSearchBar.filterFound', { defaultMessage: 'No filters found', })}</p>
               </div>
             </div>
           )}

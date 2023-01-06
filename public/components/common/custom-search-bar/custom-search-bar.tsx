@@ -139,7 +139,7 @@ export const CustomSearchBar = ({ filtersValues, filterDrillDownValue = { field:
     filterManager.addFilters(currentFilters);
     refreshCustomSelectedFilter();
   };
-  const advanceLabel = i18n.translate('components.common.customSearchBar.advanceLabel', { defaultMessage: 'Advanced filters', })
+  const advanceLabel = i18n.translate('wazuh.components.common.customSearchBar.advanceLabel', { defaultMessage: 'Advanced filters', })
   const getComponent = (item: any) => {
     const types: { [key: string]: object } = {
       default: <></>,
@@ -187,7 +187,7 @@ export const CustomSearchBar = ({ filtersValues, filterDrillDownValue = { field:
           />
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
-  
+
           <EuiSwitch
             label= {advanceLabel}
             checked={avancedFiltersState}

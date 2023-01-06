@@ -23,14 +23,14 @@ describe('PanelSplit container', () => {
       <PanelSplit
         side={
           <div>
-            {i18n.translate('components.common.panels.sidePanal', {
+            {i18n.translate('wazuh.components.common.panels.sidePanal', {
               defaultMessage: 'Side panel',
             })}
           </div>
         }
         content={
           <div>
-            {i18n.translate('components.common.panels.contentPanal', {
+            {i18n.translate('wazuh.components.common.panels.contentPanal', {
               defaultMessage: 'Content panel',
             })}
           </div>

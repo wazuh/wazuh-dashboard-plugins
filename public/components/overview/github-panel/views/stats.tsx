@@ -90,13 +90,13 @@ const mapWModuleConfigurationToRenderProperties = (
       }
     : null;
 };
-const title1 = i18n.translate('components.addModule.guide.title1', {
+const title1 = i18n.translate('wazuh.components.overview.githubPanel.github', {
   defaultMessage: 'GitHub',
 });
-const title2 = i18n.translate('components.addModule.guide.title2', {
+const title2 = i18n.translate('wazuh.components.overview.githubPanel.stats.organization', {
   defaultMessage: 'Organization',
 });
-const title3 = i18n.translate('components.addModule.guide.title3', {
+const title3 = i18n.translate('wazuh.components.overview.githubPanel.token', {
   defaultMessage: 'Token',
 });
 
