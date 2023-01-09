@@ -6,6 +6,7 @@ const architectureButtons = [
   {
     id: 'x86_64',
     label: 'x86_64',
+    default: true
   },
   {
     id: 'armhf',
@@ -25,6 +26,7 @@ const architectureButtonsWithPPC64LE = [
   {
     id: 'x86_64',
     label: 'x86_64',
+    default: true
   },
   {
     id: 'armhf',
@@ -52,6 +54,7 @@ const architectureButtonsWithPPC64LEAlpine = [
   {
     id: 'x86_64',
     label: 'x86_64',
+    default: true
   },
   {
     id: 'armhf',
@@ -82,6 +85,7 @@ const architecturei386Andx86_64 = [
   {
     id: 'x86_64',
     label: 'x86_64',
+    default: true
   },
 ];
 
@@ -89,6 +93,7 @@ const architectureButtonsSolaris = [
   {
     id: 'i386',
     label: 'i386',
+    default: true
   },
   {
     id: 'sparc',
@@ -129,6 +134,7 @@ const versionButtonAmazonLinux = [
   {
     id: 'amazonlinux2022',
     label: 'Amazon Linux 2022',
+    default: true
   },
 ];
 
@@ -144,21 +150,23 @@ const versionButtonsRedHat = [
   {
     id: 'redhat7',
     label: 'Red Hat 7 +',
+    default: true
   },
 ];
 
 const versionButtonsCentos = [
   {
     id: 'centos5',
-    label: 'Centos 5',
+    label: 'CentOS 5',
   },
   {
     id: 'centos6',
-    label: 'Centos 6',
+    label: 'CentOS 6',
   },
   {
     id: 'centos7',
-    label: 'Centos 7 +',
+    label: 'CentOS 7 +',
+    default: true
   },
 ];
 
@@ -174,6 +182,7 @@ const versionButtonsDebian = [
   {
     id: 'debian9',
     label: 'Debian 9 +',
+    default: true
   },
 ];
 
@@ -192,6 +201,7 @@ const versionButtonsUbuntu = [
   {
     id: 'ubuntu15',
     label: 'Ubuntu 15 +',
+    default: true
   },
 ];
 
@@ -207,6 +217,7 @@ const versionButtonsWindows = [
   {
     id: 'windows7',
     label: 'Windows 7 +',
+    default: true
   },
 ];
 
@@ -218,6 +229,7 @@ const versionButtonsSuse = [
   {
     id: 'suse12',
     label: 'SUSE 12',
+    default: true
   },
 ];
 
@@ -243,6 +255,7 @@ const versionButtonsSolaris = [
   {
     id: 'solaris11',
     label: 'Solaris 11',
+    default: true
   },
 ];
 
@@ -268,6 +281,7 @@ const versionButtonsOracleLinux = [
   {
     id: 'oraclelinux6',
     label: 'Oracle Linux 6 +',
+    default: true
   },
 ];
 
