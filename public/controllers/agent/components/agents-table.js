@@ -217,11 +217,12 @@ export const AgentsTable = withErrorBoundary(
     async getItems() {
       try {
         this._isMount && this.setState({ isLoading: true });
-        const fields = this.defaultColumns
+        const selectFieldsList = this.defaultColumns
           .filter(field => field.field != 'actions')
-          .map(field => field.field.replace('os_', 'os.')) // "os_name" subfield should be specified as 'os.name'
-          .join(',');
-        const rawAgents = await this.props.wzReq('GET', '/agents', { params: { ...this.buildFilter(), select: fields } });
+          .map(field => field.field.replace('os_', 'os.')); // "os_name" subfield should be specified as 'os.name'
+        const selectFields = [...selectFieldsList, 'os.uname', 'os.version'].join(','); // Add version and uname fields to render the OS icon and version in the table
+
+        const rawAgents = await this.props.wzReq('GET', '/agents', { params: { ...this.buildFilter(), select: selectFields } });
         const formatedAgents = (((rawAgents || {}).data || {}).data || {}).affected_items.map(
           this.formatAgent.bind(this)
         );
