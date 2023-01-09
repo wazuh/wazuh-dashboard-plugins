@@ -43,7 +43,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Unify the SCA check result label name [#5031](https://github.com/wazuh/wazuh-kibana-app/pull/5031)
 - Updated `pdfmake, mocha and json5` dependencies [#5062](https://github.com/wazuh/wazuh-kibana-app/pull/5062)
 
-
 ### Fixed
 
 - Fixed nested fields filtering in dashboards tables and KPIs [#4425](https://github.com/wazuh/wazuh-kibana-app/pull/4425)
@@ -74,6 +73,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - A solaris command has been fixed [5035](https://github.com/wazuh/wazuh-kibana-app/pull/5035)
 - Fixed commands: Aix, OpenSUSE, Alpine, Suse11, Fedora, HP, Oracle Linux 5, Amazon Linux 2, Centos5. Changed the word 'or higher' in buttons to '+'.Fixed validations for Hp, Solaris and Alpine. [5045](https://github.com/wazuh/wazuh-kibana-app/pull/5045)
 - Fixed error in Github module PDF report. [5069](https://github.com/wazuh/wazuh-kibana-app/pull/5069)
+- Fixed menu content panel is displayed in the wrong place. [5092](https://github.com/wazuh/wazuh-kibana-app/pull/5092)
 
 ### Removed
 
