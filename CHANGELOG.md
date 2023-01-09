@@ -38,9 +38,9 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Show OS name and OS version in the agent installation wizard. [#4851](https://github.com/wazuh/wazuh-kibana-app/pull/4851)
 - Changed the endpoint that updates the plugin configuration to support multiple settings. [#4501](https://github.com/wazuh/wazuh-kibana-app/pull/4501)
 - Updated the `winston` dependency to `3.5.1` [#4985](https://github.com/wazuh/wazuh-kibana-app/pull/4985)
-- Updated the `pdfmake` dependency to `0.2.6` [#4985](https://github.com/wazuh/wazuh-kibana-app/pull/4985)
 - The button to export the app logs is now disabled when there are no results, instead of showing an error toast [#4992](https://github.com/wazuh/wazuh-kibana-app/pull/4992)
-- Updated `pdfmake, mocha and json5` dependencies [#5062](https://github.com/wazuh/wazuh-kibana-app/pull/5062)
+- Updated `mocha` dependency to `10.1.0` [#5062](https://github.com/wazuh/wazuh-kibana-app/pull/5062)
+- Remove `pug-loader` dependency [#5062](https://github.com/wazuh/wazuh-kibana-app/pull/5062)
 - Unify the SCA check result label name [#5031](https://github.com/wazuh/wazuh-kibana-app/pull/5031)
 
 ### Fixed
