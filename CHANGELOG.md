@@ -43,7 +43,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Unify the SCA check result label name [#5031](https://github.com/wazuh/wazuh-kibana-app/pull/5031)
 - Updated `mocha` dependency to `10.1.0` [#5062](https://github.com/wazuh/wazuh-kibana-app/pull/5062)
 - Updated `pdfmake` dependency to `0.2.7` [#5062](https://github.com/wazuh/wazuh-kibana-app/pull/5062)
-- Remove `pug-loader` dependency [#5062](https://github.com/wazuh/wazuh-kibana-app/pull/5062)
+- Remove `pug-loader` dependency [#5062](https://github.com/wazuh/wazuh-kibana-app/pull/5062) [#5089](https://github.com/wazuh/wazuh-kibana-app/pull/5089)
 
 ### Fixed
 
