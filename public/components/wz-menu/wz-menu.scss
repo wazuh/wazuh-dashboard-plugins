@@ -96,6 +96,14 @@ wz-menu {
     border-right: none!important;
 }
 
+.wz-expanded-header-min {
+    top: 53px !important;
+}
+
+.wz-expanded-header-max {
+    top: 105px !important;
+}
+
 .wz-menu-popover-over .euiPopover__panelArrow.euiPopover__panelArrow--bottom:after {
     border-bottom: 12px solid #fafbfd!important;
 }
