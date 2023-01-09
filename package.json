@@ -56,7 +56,7 @@
     "md5": "^2.3.0",
     "needle": "^2.0.1",
     "node-cron": "^1.1.2",
-    "pdfmake": "0.2.7",
+    "pdfmake": "0.1.65",
     "querystring-browser": "1.0.4",
     "react-codemirror": "^1.0.0",
     "react-cookie": "^4.0.3",
