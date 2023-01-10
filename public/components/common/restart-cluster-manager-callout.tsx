@@ -131,7 +131,7 @@ class WzRestartClusterManagerCallout extends Component<
                   onClick={() => this.toggleWarningRestartModalVisible()}
                 >
                   {i18n.translate(
-                    'components.welcome.restartCluster.restartLabel',
+                    'wazuh.components.welcome.restartCluster.restartLabel',
                     {
                       defaultMessage: 'Restart',
                     },

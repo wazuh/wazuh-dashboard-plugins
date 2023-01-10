@@ -155,7 +155,7 @@ export const AgentsWelcome = compose(
         defaultMessage: 'Security events',
       });
       const integrityMonitoring = i18n.translate(
-        'components.welcome.agentWelcome.integrityMonitoring',
+        'wazuh.components.welcome.agentWelcome.integrityMonitoring',
         {
           defaultMessage: 'Integrity monitoring',
         },
@@ -164,7 +164,7 @@ export const AgentsWelcome = compose(
         defaultMessage: 'SCA',
       });
       const systemAuditing = i18n.translate(
-        'components.welcome.agentWelcome.systemAuditing',
+        'wazuh.components.welcome.agentWelcome.systemAuditing',
         {
           defaultMessage: 'System Auditing',
         },
@@ -268,13 +268,13 @@ export const AgentsWelcome = compose(
                             defaultMessage: 'Security configuration assessment',
                           })
                           ? i18n.translate(
-                              'components.welcome.agentWelcome.inventoryText',
+                              'wazuh.components.welcome.agentWelcome.inventoryText',
                               {
                                 defaultMessage: 'inventory',
                               },
                             )
                           : i18n.translate(
-                              'components.welcome.agentWelcome.panelsText',
+                              'wazuh.components.welcome.agentWelcome.panelsText',
                               {
                                 defaultMessage: 'panels',
                               },
@@ -290,7 +290,7 @@ export const AgentsWelcome = compose(
                           })
                         ? menuAgent.text
                         : i18n.translate(
-                            'components.welcome.agentWelcome.scaLabel',
+                            'wazuh.components.welcome.agentWelcome.scaLabel',
                             {
                               defaultMessage: 'SCA',
                             },
@@ -377,7 +377,7 @@ export const AgentsWelcome = compose(
                         }
                       >
                         {i18n.translate(
-                          'components.welcome.agentWelcome.moduleButton',
+                          'wazuh.components.welcome.agentWelcome.moduleButton',
                           {
                             defaultMessage: 'Modules',
                           },
@@ -413,7 +413,7 @@ export const AgentsWelcome = compose(
                   onClick={() => this.props.switchTab('syscollector')}
                 >
                   {i18n.translate(
-                    'components.welcome.agentWelcome.inventoryDataButton',
+                    'wazuh.components.welcome.agentWelcome.inventoryDataButton',
                     {
                       defaultMessage: 'Inventory data',
                     },
@@ -426,7 +426,7 @@ export const AgentsWelcome = compose(
                   onClick={() => this.props.switchTab('stats')}
                 >
                   {i18n.translate(
-                    'components.welcome.agentWelcome.statsButton',
+                    'wazuh.components.welcome.agentWelcome.statsButton',
                     {
                       defaultMessage: 'Stats',
                     },
@@ -439,7 +439,7 @@ export const AgentsWelcome = compose(
                   onClick={() => this.props.switchTab('configuration')}
                 >
                   {i18n.translate(
-                    'components.welcome.agentWelcome.configurationButton',
+                    'wazuh.components.welcome.agentWelcome.configurationButton',
                     {
                       defaultMessage: 'Configuration',
                     },
@@ -494,7 +494,7 @@ export const AgentsWelcome = compose(
             onClick={this.onClickUpgradeAgent}
           >
             {i18n.translate(
-              'components.welcome.agentWelcome.upgradeButton',
+              'wazuh.components.welcome.agentWelcome.upgradeButton',
               {
                 defaultMessage: 'Upgrade',
               },
@@ -511,7 +511,7 @@ export const AgentsWelcome = compose(
 
     getOptions() {
       const pciDss = i18n.translate(
-        'components.welcome.agentWelcome.options.pci',
+        'wazuh.components.welcome.agentWelcome.options.pci',
         {
           defaultMessage: 'PCI DSS',
         },
@@ -522,7 +522,7 @@ export const AgentsWelcome = compose(
       });
 
       const nist = i18n.translate(
-      'components.welcome.agentWelcome.options.nist', {
+      'wazuh.components.welcome.agentWelcome.options.nist', {
         defaultMessage: 'NIST 800-53',
       });
 
