@@ -17,23 +17,36 @@ import {
   EuiTab,
   EuiTabs,
   EuiButton,
-  EuiButtonEmpty
+  EuiButtonEmpty,
 } from '@elastic/eui';
 import '../../common/modules/module.scss';
 import { ReportingService } from '../../../react-services/reporting';
 import { ModulesDefaults } from './modules-defaults';
 import { getAngularModule, getDataPlugin } from '../../../kibana-services';
-import { MainModuleAgent } from './main-agent'
+import { MainModuleAgent } from './main-agent';
 import { MainModuleOverview } from './main-overview';
 import { compose } from 'redux';
-import { withReduxProvider,withErrorBoundary } from '../hocs';
+import { withReduxProvider, withErrorBoundary } from '../hocs';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
+import { i18n } from '@kbn/i18n';
 
+const nameDashboard = i18n.translate(
+  'wazuh.components.common.module.main.module.nameDashboard',
+  {
+    defaultMessage: 'Dashboard',
+  },
+);
+const nameEvents = i18n.translate(
+  'wazuh.components.common.module.main.module.nameEvents',
+  {
+    defaultMessage: 'Events',
+  },
+);
 export const MainModule = compose(
   withErrorBoundary,
-  withReduxProvider
+  withReduxProvider,
 )(
   class MainModule extends Component {
     constructor(props) {
@@ -49,8 +62,8 @@ export const MainModule = compose(
       this.$rootScope = app.$injector.get('$rootScope');
       if (!(ModulesDefaults[this.props.section] || {}).notModule) {
         this.tabs = (ModulesDefaults[this.props.section] || {}).tabs || [
-          { id: 'dashboard', name: 'Dashboard' },
-          { id: 'events', name: 'Events' },
+          { id: 'dashboard', name: nameDashboard },
+          { id: 'events', name: nameEvents },
         ];
         this.module = ModulesDefaults[this.props.section];
       }
@@ -98,15 +111,29 @@ export const MainModule = compose(
           this.$rootScope.moduleDiscoverReady = false;
           if (this.props.switchSubTab)
             this.props.switchSubTab(
-              id === 'events' ? 'discover' : id === 'inventory' ? 'inventory' : 'panels'
+              id === 'events'
+                ? 'discover'
+                : id === 'inventory'
+                ? 'inventory'
+                : 'panels',
             );
           window.location.href = window.location.href.replace(
             new RegExp('tabView=' + '[^&]*'),
-            `tabView=${id === 'events' ? 'discover' : id === 'inventory' ? 'inventory' : 'panels'}`
+            `tabView=${
+              id === 'events'
+                ? 'discover'
+                : id === 'inventory'
+                ? 'inventory'
+                : 'panels'
+            }`,
           );
-          this.loadSection(id === 'panels' ? 'dashboard' : id === 'discover' ? 'events' : id);
+          this.loadSection(
+            id === 'panels' ? 'dashboard' : id === 'discover' ? 'events' : id,
+          );
         } else {
-          this.loadSection(id === 'panels' ? 'dashboard' : id === 'discover' ? 'events' : id);
+          this.loadSection(
+            id === 'panels' ? 'dashboard' : id === 'discover' ? 'events' : id,
+          );
         }
       }
     }
@@ -119,17 +146,23 @@ export const MainModule = compose(
         tabs: this.tabs,
         module: this.module,
         renderTabs: () => this.renderTabs(),
-        loadSection: (id) => this.loadSection(id),
-        onSelectedTabChanged: (id) => this.onSelectedTabChanged(id),
+        loadSection: id => this.loadSection(id),
+        onSelectedTabChanged: id => this.onSelectedTabChanged(id),
       };
       return (
         <>
-          {(agent && <MainModuleAgent {...{ ...this.props, ...mainProps }}></MainModuleAgent>) ||
+          {(agent && (
+            <MainModuleAgent
+              {...{ ...this.props, ...mainProps }}
+            ></MainModuleAgent>
+          )) ||
             (this.props.section && this.props.section !== 'welcome' && (
-              <MainModuleOverview {...{ ...this.props, ...mainProps }}></MainModuleOverview>
+              <MainModuleOverview
+                {...{ ...this.props, ...mainProps }}
+              ></MainModuleOverview>
             ))}
         </>
       );
     }
-  }
+  },
 );

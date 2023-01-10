@@ -16,34 +16,54 @@ import { PanelModuleConfiguration } from '../../../common/modules/panel';
 import { renderValueNoThenEnabled } from '../../../../controllers/management/components/management/configuration/utils/utils';
 import { LogoGitHub } from '../../../common/logos';
 import { i18n } from '@kbn/i18n';
-
+const label1 = i18n.translate('wazuh.components.overview.github.panel.label1', {
+  defaultMessage: 'Service status',
+});
+const label3 = i18n.translate('wazuh.components.overview.github.panel.label3', {
+  defaultMessage: 'Collect events generated since Wazuh agent was started',
+});
+const label4 = i18n.translate('wazuh.components.overview.github.panel.label4', {
+  defaultMessage:
+    'Time in seconds that each scan will monitor until that delay backwards',
+});
+const label5 = i18n.translate('wazuh.components.overview.github.panel.label5', {
+  defaultMessage: 'Maximum size allowed for the GitHub API response',
+});
+const label6 = i18n.translate('wazuh.components.overview.github.panel.label6', {
+  defaultMessage: 'Interval between GitHub wodle executions in seconds',
+});
+const label7 = i18n.translate('wazuh.components.overview.github.panel.label7', {
+  defaultMessage: 'Event type',
+});
+const label8 = i18n.translate('wazuh.components.overview.github.panel.label8', {
+  defaultMessage: 'Credentials',
+});
 const settings = [
   {
     field: 'enabled',
-    label: 'Service status',
+    label: label1,
     render: renderValueNoThenEnabled,
   },
   {
     field: 'only_future_events',
-    label: 'Collect events generated since Wazuh agent was started',
+    label: label3,
   },
   {
     field: 'time_delay',
-    label:
-      'Time in seconds that each scan will monitor until that delay backwards',
+    label: label4,
   },
   {
     field: 'curl_max_size',
-    label: 'Maximum size allowed for the GitHub API response',
+    label: label5,
   },
   {
     field: 'interval',
-    label: 'Interval between GitHub wodle executions in seconds',
+    label: label6,
   },
-  { field: 'event_type', label: 'Event type' },
+  { field: 'event_type', label: label7 },
   {
     field: 'api_auth',
-    label: 'Credentials',
+    label: label8,
     render: value =>
       value
         .map(v => (
@@ -93,9 +113,12 @@ const mapWModuleConfigurationToRenderProperties = (
 const title1 = i18n.translate('wazuh.components.overview.githubPanel.github', {
   defaultMessage: 'GitHub',
 });
-const title2 = i18n.translate('wazuh.components.overview.githubPanel.stats.organization', {
-  defaultMessage: 'Organization',
-});
+const title2 = i18n.translate(
+  'wazuh.components.overview.githubPanel.stats.organization',
+  {
+    defaultMessage: 'Organization',
+  },
+);
 const title3 = i18n.translate('wazuh.components.overview.githubPanel.token', {
   defaultMessage: 'Token',
 });

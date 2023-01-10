@@ -23,43 +23,50 @@ import {
   EuiButton,
   EuiOverlayMask,
   EuiOutsideClickDetector,
-  EuiCopy
+  EuiCopy,
 } from '@elastic/eui';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { updateToastNotificationsModal } from '../../redux/actions/appStateActions';
 import { withReduxProvider, withErrorBoundary } from '../common/hocs';
 import { compose } from 'redux';
-import { i18n } from "@kbn/i18n";
+import { i18n } from '@kbn/i18n';
 
-export const ToastNotificationsModal = compose (withErrorBoundary, withReduxProvider)(() => {
+export const ToastNotificationsModal = compose(
+  withErrorBoundary,
+  withReduxProvider,
+)(() => {
   const [isOpen, setIsOpen] = useState(false);
-  const toastNotification = useSelector(state => state.appStateReducers.toastNotification);
+  const toastNotification = useSelector(
+    state => state.appStateReducers.toastNotification,
+  );
   const dispatch = useDispatch();
   const closeModal = () => setIsOpen(false);
 
   useEffect(() => {
-    if(!isOpen){
+    if (!isOpen) {
       dispatch(updateToastNotificationsModal(false));
     }
   }, [isOpen]);
 
-
   useEffect(() => {
-    if(toastNotification){
+    if (toastNotification) {
       setIsOpen(true);
     }
   }, [toastNotification]);
 
-  if(!toastNotification){
+  if (!toastNotification) {
     return null;
-  };
-  const errorStack = (toastNotification.error && toastNotification.error.stack) || '';
-  const calloutTitle = toastNotification.path ? `[${toastNotification.path}] > ${toastNotification.error.message}` : toastNotification.error.message;
+  }
+  const errorStack =
+    (toastNotification.error && toastNotification.error.stack) || '';
+  const calloutTitle = toastNotification.path
+    ? `[${toastNotification.path}] > ${toastNotification.error.message}`
+    : toastNotification.error.message;
   const copyMessage = `\`\`\`**${toastNotification.title}**
   ${calloutTitle}
   ${errorStack}
-  \`\`\``
+  \`\`\``;
   return (
     <EuiOverlayMask>
       <EuiOutsideClickDetector onOutsideClick={() => closeModal()}>
@@ -68,11 +75,16 @@ export const ToastNotificationsModal = compose (withErrorBoundary, withReduxProv
             <EuiModalHeaderTitle>{toastNotification.title}</EuiModalHeaderTitle>
           </EuiModalHeader>
           <EuiModalBody>
-            <EuiCallOut size="s" color="danger" iconType="alert" title={calloutTitle} />
+            <EuiCallOut
+              size='s'
+              color='danger'
+              iconType='alert'
+              title={calloutTitle}
+            />
             {errorStack && (
               <Fragment>
-                <EuiSpacer size="s" />
-                <EuiCodeBlock /*isCopyable={true}*/ paddingSize="s">
+                <EuiSpacer size='s' />
+                <EuiCodeBlock /*isCopyable={true}*/ paddingSize='s'>
                   {errorStack}
                 </EuiCodeBlock>
               </Fragment>
@@ -80,11 +92,20 @@ export const ToastNotificationsModal = compose (withErrorBoundary, withReduxProv
           </EuiModalBody>
           <EuiModalFooter>
             <EuiCopy textToCopy={copyMessage}>
-              {copy => <EuiButton fill onClick={copy}>Copy Error</EuiButton>}
+              {copy => (
+                <EuiButton fill onClick={copy}>
+                  {i18n.translate(
+                    'wazuh.components.notifications.modal.copyError',
+                    {
+                      defaultMessage: 'Copy Error',
+                    },
+                  )}
+                </EuiButton>
+              )}
             </EuiCopy>
           </EuiModalFooter>
         </EuiModal>
       </EuiOutsideClickDetector>
     </EuiOverlayMask>
-  )
-})
+  );
+});
