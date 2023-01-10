@@ -43,7 +43,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - The button to export the app logs is now disabled when there are no results, instead of showing an error toast [#4992](https://github.com/wazuh/wazuh-kibana-app/pull/4992)
 - Updated `mocha` dependency to `10.1.0` [#5062](https://github.com/wazuh/wazuh-kibana-app/pull/5062)
 - Updated `pdfmake` dependency to `0.2.7` [#5062](https://github.com/wazuh/wazuh-kibana-app/pull/5062)
-- Remove `pug-loader` dependency [#5062](https://github.com/wazuh/wazuh-kibana-app/pull/5062)
 - Unify the SCA check result label name [#5031](https://github.com/wazuh/wazuh-kibana-app/pull/5031)
 
 ### Fixed
@@ -75,6 +74,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Removed
 
 - Removed the `angular-chart.js` dependency [#4985](https://github.com/wazuh/wazuh-kibana-app/pull/4985)
+- Removed the `pug-loader` dependency [#5062](https://github.com/wazuh/wazuh-kibana-app/pull/5062)
 
 ## Wazuh v4.3.10 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4311
 
