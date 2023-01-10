@@ -1,5 +1,0 @@
-<div flex="auto" layout="column" ng-cloak ng-controller="agentsController">
-    <div ng-show="load && tab !== 'configuration' && tab !== 'sca' && tabView === 'panels'"  
-    ng-style="tab === 'welcome' && {'padding':16}">
-        <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" ></react-component>
-    </div>
