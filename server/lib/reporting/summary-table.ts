@@ -43,14 +43,14 @@ export default class SummaryTable {
 
   /**
    * Parse the summary table setup to build the query
-   * @param summarySetup 
+   * @param summarySetup
    */
   _parseSummarySetup(summarySetup: SummarySetup) {
     let baseAggRef = this._base.aggs;
     summarySetup.aggs.forEach(( agg, key) => {
       this._columns.push(agg.customLabel);
       this._parseAggregation(baseAggRef,agg, key);
-      
+
       if (summarySetup.aggs.length > key + 1) {
         baseAggRef[`${key + 2}`].aggs = {};
         baseAggRef = baseAggRef[`${key + 2}`].aggs;
@@ -59,16 +59,16 @@ export default class SummaryTable {
       }
     },this);
   }
-  
+
   /**
    * Parse each aggregation to build the query
-   * @param baseAggRef 
-   * @param agg 
-   * @param key 
+   * @param baseAggRef
+   * @param agg
+   * @param key
    */
   _parseAggregation(baseAggRef: any, agg: any, key: string) {
-    const { field, size, order } = agg;
-    
+    const { field, size, order, missing } = agg;
+
     baseAggRef[`${key + 2}`] = {
       terms: {
         field,
@@ -78,6 +78,9 @@ export default class SummaryTable {
         size
       }
     };
+    if (missing) {
+      baseAggRef[`${key + 2}`].terms.missing = missing;
+    }
   }
 
   /**
@@ -90,7 +93,7 @@ export default class SummaryTable {
    *    ['502', 'Ossec server started', 3, 22],
    *  ]
    * }
-   * @param rawResponse 
+   * @param rawResponse
    */
   _formatResponseToTable(rawResponse) {
     const firstKey = parseInt(Object.keys(rawResponse)[0]);
@@ -110,15 +113,15 @@ export default class SummaryTable {
 
 /**
  * Makes a row from the response
- * @param bucket 
- * @param nextAggKey 
- * @param row 
+ * @param bucket
+ * @param nextAggKey
+ * @param row
  */
   _buildRow(bucket: any, nextAggKey: number, row: any[] = []): any[] {
     // Push the column value to the row
     row.push(bucket.key);
     // If there is a next aggregation, repeat the process
-    if (bucket[nextAggKey.toString()]?.buckets) {
+    if (bucket[nextAggKey.toString()]?.buckets?.length) {
       const newBucket = bucket[nextAggKey.toString()].buckets[0];
       row = this._buildRow(newBucket, (nextAggKey + 1), row);
     }
@@ -144,5 +147,5 @@ export default class SummaryTable {
       return Promise.reject(error);
     }
   }
-  
+
 }
