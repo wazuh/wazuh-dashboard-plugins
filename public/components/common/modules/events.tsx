@@ -408,12 +408,22 @@ export const Events = compose(
           text: toMountPoint(
             <EuiFlexGroup justifyContent='flexEnd' gutterSize='s'>
               <EuiFlexItem grow={false}>
-                There were some unknown fields for the current index pattern.
-                You need to refresh the page to apply the changes.
+                {i18n.translate(
+                  'wazuh.components.common.modules.event.indexPattern',
+                  {
+                    defaultMessage:
+                      'There were some unknown fields for the current index pattern.You need to refresh the page to apply the changes.',
+                  },
+                )}
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
                 <EuiButton onClick={() => window.location.reload()} size='s'>
-                  Reload page
+                  {i18n.translate(
+                    'wazuh.components.common.modules.event.reloadPage',
+                    {
+                      defaultMessage: 'Reload page',
+                    },
+                  )}
                 </EuiButton>
               </EuiFlexItem>
             </EuiFlexGroup>,

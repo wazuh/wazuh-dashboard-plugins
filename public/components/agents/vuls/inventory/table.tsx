@@ -46,6 +46,102 @@ const Descp7 = i18n.translate('wazuh.components.addModule.inventory.Descp7', {
 const Descp8 = i18n.translate('wazuh.components.addModule.inventory.Descp8', {
   defaultMessage: 'Filter by Detection Time',
 });
+const label1 = i18n.translate(
+  'wazuh.components.agents.vuls.inventory.table.label1',
+  {
+    defaultMessage: 'name',
+  },
+);
+const label2 = i18n.translate(
+  'wazuh.components.agents.vuls.inventory.table.label2',
+  {
+    defaultMessage: 'cve',
+  },
+);
+const label3 = i18n.translate(
+  'wazuh.components.agents.vuls.inventory.table.label3',
+  {
+    defaultMessage: 'version',
+  },
+);
+const label4 = i18n.translate(
+  'wazuh.components.agents.vuls.inventory.table.label4',
+  {
+    defaultMessage: 'architecture',
+  },
+);
+const label5 = i18n.translate(
+  'wazuh.components.agents.vuls.inventory.table.label5',
+  {
+    defaultMessage: 'severity',
+  },
+);
+const label6 = i18n.translate(
+  'wazuh.components.agents.vuls.inventory.table.label6',
+  {
+    defaultMessage: "'cvss2_score'",
+  },
+);
+const label7 = i18n.translate(
+  'wazuh.components.agents.vuls.inventory.table.label7',
+  {
+    defaultMessage: 'cvss3_score',
+  },
+);
+const label8 = i18n.translate(
+  'wazuh.components.agents.vuls.inventory.table.label8',
+  {
+    defaultMessage: 'detection_time',
+  },
+);
+const name1 = i18n.translate(
+  'wazuh.components.agents.vuls.inventory.table.name1',
+  {
+    defaultMessage: 'Name',
+  },
+);
+const name2 = i18n.translate(
+  'wazuh.components.agents.vuls.inventory.table.name2',
+  {
+    defaultMessage: 'Version',
+  },
+);
+const name3 = i18n.translate(
+  'wazuh.components.agents.vuls.inventory.table.name3',
+  {
+    defaultMessage: 'Architecture',
+  },
+);
+const name4 = i18n.translate(
+  'wazuh.components.agents.vuls.inventory.table.name4',
+  {
+    defaultMessage: 'Severity',
+  },
+);
+const name5 = i18n.translate(
+  'wazuh.components.agents.vuls.inventory.table.name5',
+  {
+    defaultMessage: 'CVE',
+  },
+);
+const name6 = i18n.translate(
+  'wazuh.components.agents.vuls.inventory.table.name6',
+  {
+    defaultMessage: "'cvss2_score'",
+  },
+);
+const name7 = i18n.translate(
+  'wazuh.components.agents.vuls.inventory.table.name7',
+  {
+    defaultMessage: 'cvss3_score',
+  },
+);
+const name8 = i18n.translate(
+  'wazuh.components.agents.vuls.inventory.table.name8',
+  {
+    defaultMessage: 'detection_time',
+  },
+);
 export class InventoryTable extends Component {
   state: {
     error?: string;
@@ -61,7 +157,7 @@ export class InventoryTable extends Component {
   suggestions: IWzSuggestItem[] = [
     {
       type: 'q',
-      label: 'name',
+      label: label1,
       description: Descp1,
       operators: ['=', '!=', '~'],
       values: async value =>
@@ -69,14 +165,14 @@ export class InventoryTable extends Component {
     },
     {
       type: 'q',
-      label: 'cve',
+      label: label2,
       description: Descp2,
       operators: ['=', '!=', '~'],
       values: async value => getFilterValues('cve', value, this.props.agent.id),
     },
     {
       type: 'q',
-      label: 'version',
+      label: label3,
       description: Descp3,
       operators: ['=', '!=', '~'],
       values: async value =>
@@ -84,7 +180,7 @@ export class InventoryTable extends Component {
     },
     {
       type: 'q',
-      label: 'architecture',
+      label: label4,
       description: Descp4,
       operators: ['=', '!=', '~'],
       values: async value =>
@@ -92,7 +188,7 @@ export class InventoryTable extends Component {
     },
     {
       type: 'q',
-      label: 'severity',
+      label: label5,
       description: Descp5,
       operators: ['=', '!=', '~'],
       values: async value =>
@@ -100,7 +196,7 @@ export class InventoryTable extends Component {
     },
     {
       type: 'q',
-      label: 'cvss2_score',
+      label: label6,
       description: Descp6,
       operators: ['=', '!=', '~'],
       values: async value =>
@@ -108,7 +204,7 @@ export class InventoryTable extends Component {
     },
     {
       type: 'q',
-      label: 'cvss3_score',
+      label: label7,
       description: Descp7,
       operators: ['=', '!=', '~'],
       values: async value =>
@@ -116,7 +212,7 @@ export class InventoryTable extends Component {
     },
     {
       type: 'q',
-      label: 'detection_time',
+      label: label8,
       description: Descp8,
       operators: ['=', '!=', '~'],
       values: async value =>
@@ -190,51 +286,51 @@ export class InventoryTable extends Component {
     return [
       {
         field: 'name',
-        name: 'Name',
+        name: name1,
         sortable: true,
         width: '100px',
       },
       {
         field: 'version',
-        name: 'Version',
+        name: name2,
         sortable: true,
         truncateText: true,
         width: `${width}`,
       },
       {
         field: 'architecture',
-        name: 'Architecture',
+        name: name3,
         sortable: true,
         width: '100px',
       },
       {
         field: 'severity',
-        name: 'Severity',
+        name: name4,
         sortable: true,
         width: `${width}`,
       },
       {
         field: 'cve',
-        name: 'CVE',
+        name: name5,
         sortable: true,
         truncateText: true,
         width: `${width}`,
       },
       {
         field: 'cvss2_score',
-        name: 'CVSS2 Score',
+        name: name6,
         sortable: true,
         width: `${width}`,
       },
       {
         field: 'cvss3_score',
-        name: 'CVSS3 Score',
+        name: name7,
         sortable: true,
         width: `${width}`,
       },
       {
         field: 'detection_time',
-        name: 'Detection Time',
+        name: name8,
         sortable: true,
         width: `100px`,
         render: formatUIDate,

@@ -68,20 +68,41 @@ const title6 = i18n.translate('wazuh.components.agents.stats.title6', {
 const title7 = i18n.translate('wazuh.components.agents.stats.title7', {
   defaultMessage: 'Last keep alive',
 });
+const title8 = i18n.translate('wazuh.components.agents.stats.title8', {
+  defaultMessage: 'Global',
+});
+const title9 = i18n.translate('wazuh.components.agents.stats.title9', {
+  defaultMessage: 'Interval',
+});
+const text1 = i18n.translate('wazuh.components.agents.stats.text1', {
+  defaultMessage: 'Agents',
+});
+const text2 = i18n.translate('wazuh.components.agents.stats.text2', {
+  defaultMessage: 'Stats',
+});
+const name1 = i18n.translate('wazuh.components.agents.stats.name1', {
+  defaultMessage: 'Location',
+});
+const name2 = i18n.translate('wazuh.components.agents.stats.name2', {
+  defaultMessage: 'Events',
+});
+const name3 = i18n.translate('wazuh.components.agents.stats.name3', {
+  defaultMessage: 'Bytes',
+});
 const tableColumns = [
   {
     field: 'location',
-    name: 'Location',
+    name: name1,
     sortable: true,
   },
   {
     field: 'events',
-    name: 'Events',
+    name: name2,
     sortable: true,
   },
   {
     field: 'bytes',
-    name: 'Bytes',
+    name: name3,
     sortable: true,
   },
 ];
@@ -129,12 +150,12 @@ export const MainAgentStats = compose(
       text: '',
     },
     {
-      text: 'Agents',
+      text: text1,
       href: '#/agents-preview',
     },
     { agent },
     {
-      text: 'Stats',
+      text: text2,
     },
   ]),
   withUserAuthorizationPrompt(({ agent }) => [
@@ -240,7 +261,7 @@ function AgentStats({ agent }) {
             <AgentStatTable
               columns={tableColumns}
               loading={loading}
-              title='Global'
+              title={title8}
               start={dataStatLogcollector?.global?.start}
               end={dataStatLogcollector?.global?.end}
               items={dataStatLogcollector?.global?.files}
@@ -251,7 +272,7 @@ function AgentStats({ agent }) {
             <AgentStatTable
               columns={tableColumns}
               loading={loading}
-              title='Interval'
+              title={title9}
               start={dataStatLogcollector?.interval?.start}
               end={dataStatLogcollector?.interval?.end}
               items={dataStatLogcollector?.interval?.files}

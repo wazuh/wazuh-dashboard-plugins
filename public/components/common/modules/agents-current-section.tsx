@@ -11,23 +11,26 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import {
-  EuiTitle
-} from '@elastic/eui';
+import { EuiTitle } from '@elastic/eui';
 import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
 import { updateCurrentTab } from '../../../redux/actions/appStateActions';
 import store from '../../../redux/store';
 import { connect } from 'react-redux';
 import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
 import { getAngularModule } from '../../../kibana-services';
-
+import { i18n } from '@kbn/i18n';
+const textAgent = i18n.translate(
+  'wazuh.components.common.module.discover.textAgent',
+  {
+    defaultMessage: 'Agents',
+  },
+);
 // TODO: check if this component is deprecated, if so remove it.
 // This component is wrapped by WzCurrentAgentsSectionWrapper
 class WzCurrentAgentsSection extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-    };
+    this.state = {};
   }
 
   setGlobalBreadcrumb() {
@@ -35,8 +38,8 @@ class WzCurrentAgentsSection extends Component {
       const breadcrumb = [
         { text: '' },
         {
-          text: 'Agents',
-          href: "#/agents-preview"
+          text: textAgent,
+          href: '#/agents-preview',
         },
         {
           text: `${this.props.agent.name} (${this.props.agent.id})`,
@@ -60,34 +63,33 @@ class WzCurrentAgentsSection extends Component {
     this.router = $injector.get('$route');
   }
 
-
   async componentDidUpdate() {
     if (this.props.state.currentTab !== this.props.currentTab) {
       const forceUpdate = this.props.tabView === 'discover';
-      if (this.props.state.currentTab) this.props.switchTab(this.props.state.currentTab, forceUpdate);
+      if (this.props.state.currentTab)
+        this.props.switchTab(this.props.state.currentTab, forceUpdate);
     }
     this.setGlobalBreadcrumb();
   }
 
   componentWillUnmount() {
-    store.dispatch(updateCurrentTab(""));
+    store.dispatch(updateCurrentTab(''));
   }
 
   render() {
     return (
       <span>
-        {this.props.currentTab && WAZUH_MODULES[this.props.currentTab] && WAZUH_MODULES[this.props.currentTab].title && (
-          <EuiTitle size='s'>
-            <h2>
-              {WAZUH_MODULES[this.props.currentTab].title}
-            </h2>
-          </EuiTitle>)}
+        {this.props.currentTab &&
+          WAZUH_MODULES[this.props.currentTab] &&
+          WAZUH_MODULES[this.props.currentTab].title && (
+            <EuiTitle size='s'>
+              <h2>{WAZUH_MODULES[this.props.currentTab].title}</h2>
+            </EuiTitle>
+          )}
       </span>
     );
   }
 }
-
-
 
 const mapStateToProps = state => {
   return {

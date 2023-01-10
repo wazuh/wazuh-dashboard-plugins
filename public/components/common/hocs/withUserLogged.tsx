@@ -39,7 +39,7 @@ export const withUserLogged = WrappedComponent => props => {
       ></img>
       <EuiSpacer size='s' />
       <EuiText className='subdued-color'>
-        {i18n.translate('wazuh.components.common.hocs.loading', {
+        {i18n.translate('wazuh.components.common.hocs.userLogged.loading', {
           defaultMessage: ' Loading ...',
         })}
       </EuiText>

@@ -34,6 +34,12 @@ import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
 import { AgentInfo } from '../../common/welcome/agents-info';
 import { getAngularModule } from '../../../kibana-services';
 import { i18n } from '@kbn/i18n';
+const textAgent1 = i18n.translate(
+  'wazuh.components.common.module.discover.textAgent1',
+  {
+    defaultMessage: 'Agents',
+  },
+);
 const agentConnected = i18n.translate(
   'wazuh.components.common.modules.main.agentConnected',
   { defaultMessage: 'This agent has never connected' },
@@ -83,7 +89,7 @@ export class MainModuleAgent extends Component {
           text: '',
         },
         {
-          text: 'Agents',
+          text: textAgent1,
           href: '#/agents-preview',
         },
         { agent: this.props.agent },
@@ -145,7 +151,12 @@ export class MainModuleAgent extends Component {
             isLoading={this.state.loadingReport}
             onClick={async () => this.startReport()}
           >
-            Generate report
+            {i18n.translate(
+              'wazuh.components.common.modules.event.gernalReport',
+              {
+                defaultMessage: 'Generate report',
+              },
+            )}
           </EuiButtonEmpty>
         </EuiFlexItem>
       )

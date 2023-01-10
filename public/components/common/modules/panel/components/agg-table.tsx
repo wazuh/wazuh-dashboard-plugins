@@ -10,11 +10,23 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { i18n } from '@kbn/i18n';
 
-import { EuiPanel, EuiTitle, EuiBasicTableColumn, EuiInMemoryTable } from '@elastic/eui';
+import {
+  EuiPanel,
+  EuiTitle,
+  EuiBasicTableColumn,
+  EuiInMemoryTable,
+} from '@elastic/eui';
 import { useEsSearch } from '../../../hooks';
 import React, { useState, useMemo } from 'react';
 
+const name1 = i18n.translate(
+  'wazuh.components.common.module.panel.comp.agg.table.name1',
+  {
+    defaultMessage: 'Count',
+  },
+);
 export const AggTable = ({
   onRowClick = (field, value) => {},
   aggTerm,
@@ -47,13 +59,13 @@ export const AggTable = ({
     },
     {
       field: 'doc_count',
-      name: 'Count',
+      name: name1,
       isExpander: false,
       align: 'right',
       sortable: true,
     },
   ];
-  const getRowProps = (item) => {
+  const getRowProps = item => {
     const { key } = item;
     return {
       'data-test-subj': `row-${key}`,
