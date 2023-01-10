@@ -6,6 +6,7 @@ const architectureButtons = [
   {
     id: 'x86_64',
     label: 'x86_64',
+    default: true
   },
   {
     id: 'armhf',
@@ -25,6 +26,35 @@ const architectureButtonsWithPPC64LE = [
   {
     id: 'x86_64',
     label: 'x86_64',
+    default: true
+  },
+  {
+    id: 'armhf',
+    label: 'armhf',
+  },
+  {
+    id: 'aarch64',
+    label: 'aarch64',
+  },
+  {
+    id: 'powerpc',
+    label: 'PowerPC',
+  },
+];
+
+const architectureButtonsWithPPC64LEAlpine = [
+  {
+    id: 'i386',
+    label: 'i386',
+  },
+  {
+    id: 'x86',
+    label: 'x86',
+  },
+  {
+    id: 'x86_64',
+    label: 'x86_64',
+    default: true
   },
   {
     id: 'armhf',
@@ -42,8 +72,8 @@ const architectureButtonsWithPPC64LE = [
 
 const architectureButtonsi386 = [
   {
-    id: 'i386',
-    label: 'i386',
+    id: 'i386/x86_64',
+    label: 'i386/x86_64',
   },
 ];
 
@@ -55,6 +85,7 @@ const architecturei386Andx86_64 = [
   {
     id: 'x86_64',
     label: 'x86_64',
+    default: true
   },
 ];
 
@@ -62,6 +93,7 @@ const architectureButtonsSolaris = [
   {
     id: 'i386',
     label: 'i386',
+    default: true
   },
   {
     id: 'sparc',
@@ -73,17 +105,6 @@ const architectureButtonsMacos = [
   {
     id: 'intel/applesilicon',
     label: 'Intel/Apple Silicon',
-  },
-];
-
-const architectureButtonsOpenSuse = [
-  {
-    id: 'x86_64',
-    label: 'x86_64',
-  },
-  {
-    id: 'ARM64',
-    label: 'ARM64',
   },
 ];
 
@@ -113,6 +134,7 @@ const versionButtonAmazonLinux = [
   {
     id: 'amazonlinux2022',
     label: 'Amazon Linux 2022',
+    default: true
   },
 ];
 
@@ -127,22 +149,24 @@ const versionButtonsRedHat = [
   },
   {
     id: 'redhat7',
-    label: 'Red Hat 7 or higher',
+    label: 'Red Hat 7 +',
+    default: true
   },
 ];
 
 const versionButtonsCentos = [
   {
     id: 'centos5',
-    label: 'Centos 5',
+    label: 'CentOS 5',
   },
   {
     id: 'centos6',
-    label: 'Centos 6',
+    label: 'CentOS 6',
   },
   {
     id: 'centos7',
-    label: 'Centos 7 or higher',
+    label: 'CentOS 7 +',
+    default: true
   },
 ];
 
@@ -157,18 +181,15 @@ const versionButtonsDebian = [
   },
   {
     id: 'debian9',
-    label: 'Debian 9',
-  },
-  {
-    id: 'debian10',
-    label: 'Debian 10 or higher',
+    label: 'Debian 9 +',
+    default: true
   },
 ];
 
 const versionButtonFedora = [
   {
     id: '22',
-    label: 'Fedora 22 or higher',
+    label: 'Fedora 22 +',
   },
 ];
 
@@ -179,7 +200,8 @@ const versionButtonsUbuntu = [
   },
   {
     id: 'ubuntu15',
-    label: 'Ubuntu 15 or higher',
+    label: 'Ubuntu 15 +',
+    default: true
   },
 ];
 
@@ -194,7 +216,8 @@ const versionButtonsWindows = [
   },
   {
     id: 'windows7',
-    label: 'Windows 7 or higher',
+    label: 'Windows 7 +',
+    default: true
   },
 ];
 
@@ -206,20 +229,21 @@ const versionButtonsSuse = [
   {
     id: 'suse12',
     label: 'SUSE 12',
+    default: true
   },
 ];
 
 const versionButtonsMacOS = [
   {
     id: 'sierra',
-    label: 'macOS Sierra or higher',
+    label: 'macOS Sierra +',
   },
 ];
 
 const versionButtonsOpenSuse = [
   {
     id: 'leap15',
-    label: 'OpenSuse Leap 15 or higher',
+    label: 'openSUSE Leap 15 +',
   },
 ];
 
@@ -231,20 +255,21 @@ const versionButtonsSolaris = [
   {
     id: 'solaris11',
     label: 'Solaris 11',
+    default: true
   },
 ];
 
 const versionButtonsAix = [
   {
     id: '6.1 TL9',
-    label: 'AIX 6.1 TL9 or higher',
+    label: 'AIX 6.1 TL9 +',
   },
 ];
 
 const versionButtonsHPUX = [
   {
     id: '11.31',
-    label: 'HP-UX 11.31 or higher',
+    label: 'HP-UX 11.31 +',
   },
 ];
 
@@ -255,7 +280,8 @@ const versionButtonsOracleLinux = [
   },
   {
     id: 'oraclelinux6',
-    label: 'Oracle Linux 6 or higher',
+    label: 'Oracle Linux 6 +',
+    default: true
   },
 ];
 
@@ -269,7 +295,7 @@ const versionButtonsRaspbian = [
 const versionButtonAlpine = [
   {
     id: '3.12.12',
-    label: '3.12.12 or higher',
+    label: '3.12.12 +',
   },
 ];
 
@@ -319,7 +345,7 @@ const osButtons = [
   },
   {
     id: 'open',
-    label: 'OpenSuse',
+    label: 'openSUSE',
   },
   {
     id: 'sol',
@@ -386,5 +412,5 @@ export {
   architectureButtonsSolaris,
   architectureButtonsAix,
   architectureButtonsHpUx,
-  architectureButtonsOpenSuse,
+  architectureButtonsWithPPC64LEAlpine,
 };
