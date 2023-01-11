@@ -60,7 +60,7 @@ import { withErrorBoundary, withReduxProvider } from '../hocs';
 import { compose } from 'redux';
 import { API_NAME_AGENT_STATUS } from '../../../../common/constants';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
-import { i18n } from '@/kbn/i18n'
+import { i18n } from '@kbn/i18n'
 
 export const AgentsWelcome = compose(
   withReduxProvider,

@@ -20,7 +20,6 @@ import WzTextWithTooltipIfTruncated from '../wz-text-with-tooltip-if-truncated';
 import { WzStat } from '../../wz-stat';
 import { GroupTruncate } from '../util/agent-group-truncate';
 import { AgentStatus } from '../../agents/agent_status';
-import { i18n } from '@/kbn/i18n';
 import { i18n } from '@kbn/i18n';
 
 const descp1 = i18n.translate(
