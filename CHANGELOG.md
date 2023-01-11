@@ -66,6 +66,9 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed commands: Aix, OpenSUSE, Alpine, Suse11, Fedora, HP, Oracle Linux 5, Amazon Linux 2, Centos5. Changed the word 'or higher' in buttons to '+'.Fixed validations for Hp, Solaris and Alpine. [5045](https://github.com/wazuh/wazuh-kibana-app/pull/5045)
 - Fixed error in Github module PDF report. [5069](https://github.com/wazuh/wazuh-kibana-app/pull/5069)
 - Fixed error when clicking on the selectors of agents in the group agents management [#5094](https://github.com/wazuh/wazuh-kibana-app/pull/5094)
+- Fixed menu content panel is displayed in the wrong place. [5092](https://github.com/wazuh/wazuh-kibana-app/pull/5092)
+- Fixed greyed and disabled menu section names [#5101](https://github.com/wazuh/wazuh-kibana-app/pull/5101)
+- Fixed mispelling in the NIST module [#5107](https://github.com/wazuh/wazuh-kibana-app/pull/5107)
 
 ### Removed
 
