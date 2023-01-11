@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component, Fragment, useState } from 'react';
+import React, { Component, Fragment } from 'react';
 import { version } from '../../../../package.json';
 import { WazuhConfig } from '../../../react-services/wazuh-config';
 import {
@@ -18,7 +18,6 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiPanel,
-  EuiButtonGroup,
   EuiComboBox,
   EuiFieldText,
   EuiText,
@@ -1126,7 +1125,9 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
               )}
               <div className='copy-codeblock-wrapper'>
                 <EuiCodeBlock style={codeBlock} language={language}>
-                  {this.state.wazuhPassword && !this.state.showPassword
+                  {this.state.wazuhPassword &&
+                  !this.state.showPassword &&
+                  !['sol', 'hp', 'alpine'].includes(this.state.selectedOS)
                     ? this.obfuscatePassword(text)
                     : text}
                 </EuiCodeBlock>
@@ -1181,26 +1182,29 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
                   ></EuiCallOut>
                 </>
               ) : this.state.selectedVersion == '6.1 TL9' ? (
-                <EuiCallOut
-                  color='warning'
-                  className='message'
-                  iconType='iInCircle'
-                  title={
-                    <span>
-                      Might require some extra installation{' '}
-                      <EuiLink
-                        target='_blank'
-                        href={webDocumentationLink(
-                          'installation-guide/wazuh-agent/wazuh-agent-package-aix.html',
-                          appVersionMajorDotMinor,
-                        )}
-                      >
-                        steps
-                      </EuiLink>
-                      .
-                    </span>
-                  }
-                ></EuiCallOut>
+                <>
+                  <EuiCallOut
+                    color='warning'
+                    className='message'
+                    iconType='iInCircle'
+                    title={
+                      <span>
+                        Might require some extra installation{' '}
+                        <EuiLink
+                          target='_blank'
+                          href={webDocumentationLink(
+                            'installation-guide/wazuh-agent/wazuh-agent-package-aix.html',
+                            appVersionMajorDotMinor,
+                          )}
+                        >
+                          steps
+                        </EuiLink>
+                        .
+                      </span>
+                    }
+                  ></EuiCallOut>
+                  <EuiSpacer />
+                </>
               ) : this.state.selectedVersion == '11.31' ? (
                 <>
                   <EuiCallOut
@@ -1283,35 +1287,41 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
                 this.state.selectedVersion == 'debian8' ||
                 this.state.selectedVersion == 'debian9' ||
                 this.state.selectedVersion == 'debian10' ? (
-                <EuiCallOut
-                  color='warning'
-                  className='message'
-                  iconType='iInCircle'
-                  title={
-                    <span>
-                      Might require some extra installation{' '}
-                      <EuiLink
-                        target='_blank'
-                        href={webDocumentationLink(
-                          'installation-guide/wazuh-agent/wazuh-agent-package-linux.html',
-                          appVersionMajorDotMinor,
-                        )}
-                      >
-                        steps
-                      </EuiLink>
-                      .
-                    </span>
-                  }
-                ></EuiCallOut>
+                <>
+                  <EuiCallOut
+                    color='warning'
+                    className='message'
+                    iconType='iInCircle'
+                    title={
+                      <span>
+                        Might require some extra installation{' '}
+                        <EuiLink
+                          target='_blank'
+                          href={webDocumentationLink(
+                            'installation-guide/wazuh-agent/wazuh-agent-package-linux.html',
+                            appVersionMajorDotMinor,
+                          )}
+                        >
+                          steps
+                        </EuiLink>
+                        .
+                      </span>
+                    }
+                  ></EuiCallOut>
+                  <EuiSpacer />
+                </>
               ) : (
                 ''
               )}
-              {this.state.needsPassword && (
+              {this.state.needsPassword &&
+              !['sol', 'hp', 'alpine'].includes(this.state.selectedOS) ? (
                 <EuiSwitch
                   label='Show password'
                   checked={this.state.showPassword}
                   onChange={active => this.setShowPassword(active)}
                 />
+              ) : (
+                ''
               )}
               <EuiSpacer />
             </EuiText>
@@ -1370,7 +1380,9 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
               )}
               <div className='copy-codeblock-wrapper'>
                 <EuiCodeBlock style={codeBlock} language={language}>
-                  {this.state.wazuhPassword && !this.state.showPassword
+                  {this.state.wazuhPassword &&
+                  !this.state.showPassword &&
+                  !['sol', 'hp', 'alpine'].includes(this.state.selectedOS)
                     ? this.obfuscatePassword(text)
                     : text}
                 </EuiCodeBlock>
@@ -1429,7 +1441,9 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
                 )}
                 <div className='copy-codeblock-wrapper'>
                   <EuiCodeBlock style={codeBlock} language={language}>
-                    {this.state.wazuhPassword && !this.state.showPassword
+                    {this.state.wazuhPassword &&
+                    !this.state.showPassword &&
+                    !['sol', 'hp', 'alpine'].includes(this.state.selectedOS)
                       ? this.obfuscatePassword(text)
                       : text}
                   </EuiCodeBlock>
@@ -2138,7 +2152,13 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
               },
             ]
           : []),
-        ...(!(!this.state.needsPassword || this.state.hidePasswordInput)
+        ...(!(
+          !this.state.needsPassword ||
+          this.state.hidePasswordInput ||
+          !!['solaris10', 'solaris11', '11.31', '3.12.12'].includes(
+            this.state.selectedVersion,
+          )
+        )
           ? [
               {
                 title: 'Wazuh password',
