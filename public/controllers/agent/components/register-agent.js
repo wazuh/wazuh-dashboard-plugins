@@ -254,7 +254,7 @@ export const RegisterAgent = withErrorBoundary(
         this.state.selectedVersion === 'ubuntu14'
       ) {
         return 'service wazuh-agent start';
-      }
+      } else return '';
     }
 
     systemSelectorNet() {
@@ -264,13 +264,13 @@ export const RegisterAgent = withErrorBoundary(
         this.state.selectedVersion === 'windows7'
       ) {
         return 'NET START WazuhSvc';
-      }
+      } else return '';
     }
 
     systemSelectorWazuhControlMacos() {
       if (this.state.selectedVersion == 'sierra') {
         return '/Library/Ossec/bin/wazuh-control start';
-      }
+      } else return '';
     }
 
     systemSelectorWazuhControl() {
@@ -281,13 +281,13 @@ export const RegisterAgent = withErrorBoundary(
         this.state.selectedVersion === '3.12.12'
       ) {
         return '/var/ossec/bin/wazuh-control start';
-      }
+      } else return '';
     }
 
     systemSelectorInitD() {
       if (this.state.selectedVersion === '11.31') {
         return '/sbin/init.d/wazuh-agent start';
-      }
+      } else return '';
     }
 
     selectSYS(sys) {
