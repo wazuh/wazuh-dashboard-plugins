@@ -67,11 +67,13 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed error in Github module PDF report. [5069](https://github.com/wazuh/wazuh-kibana-app/pull/5069)
 - Fixed password input in deploy new agent section [5098](https://github.com/wazuh/wazuh-kibana-app/pull/5098)
 - Fixed error when clicking on the selectors of agents in the group agents management [#5094](https://github.com/wazuh/wazuh-kibana-app/pull/5094)
+- Fixed mispelling in the NIST module [#5107](https://github.com/wazuh/wazuh-kibana-app/pull/5107)
 
 ### Removed
 
 - Removed the `angular-chart.js` dependency [#5014](https://github.com/wazuh/wazuh-kibana-app/pull/5014)
 - Removed the `pug-loader` dependency [#5062](https://github.com/wazuh/wazuh-kibana-app/pull/5062)
+- Removed unused file related to agent menu [#5102](https://github.com/wazuh/wazuh-kibana-app/pull/5102)
 
 ## Wazuh v4.3.10 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4311
 
