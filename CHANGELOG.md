@@ -77,6 +77,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed error when clicking on the selectors of agents in the group agents management [#5094](https://github.com/wazuh/wazuh-kibana-app/pull/5094)
 - Fixed menu content panel is displayed in the wrong place. [5092](https://github.com/wazuh/wazuh-kibana-app/pull/5092)
 - Fixed greyed and disabled menu section names [#5101](https://github.com/wazuh/wazuh-kibana-app/pull/5101)
+- Fixed mispelling in the NIST module [#5107](https://github.com/wazuh/wazuh-kibana-app/pull/5107)
 
 ### Removed
 
