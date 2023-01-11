@@ -47,78 +47,158 @@ import { i18n } from '@kbn/i18n';
 const architectureButtons = [
   {
     id: 'i386',
-    label: 'i386',
+    label: i18n.translate(
+      'wazuh.controller.agent.components.register.button.i386',
+      {
+        defaultMessage: 'i386',
+      },
+    ),
   },
   {
     id: 'x86_64',
-    label: 'x86_64',
+    label: i18n.translate(
+      'wazuh.controller.agent.components.register.button.x86',
+      {
+        defaultMessage: 'x86_64',
+      },
+    ),
   },
   {
     id: 'armhf',
-    label: 'armhf',
+    label: i18n.translate(
+      'wazuh.controller.agent.components.register.button.armhf',
+      {
+        defaultMessage: 'armhf',
+      },
+    ),
   },
   {
     id: 'aarch64',
-    label: 'aarch64',
+    label: i18n.translate(
+      'wazuh.controller.agent.components.register.button.aarch64',
+      {
+        defaultMessage: 'aarch64',
+      },
+    ),
   },
 ];
 const architectureCentos5OrRedHat5 = [
   {
     id: 'i386',
-    label: 'i386',
+    label: i18n.translate(
+      'wazuh.controller.agent.components.register.button.i386',
+      {
+        defaultMessage: 'i386',
+      },
+    ),
   },
   {
     id: 'x86_64',
-    label: 'x86_64',
+    label: i18n.translate(
+      'wazuh.controller.agent.components.register.button.x86',
+      {
+        defaultMessage: 'x86_64',
+      },
+    ),
   },
 ];
 
 const versionButtonsCentosOrRedHat = [
   {
     id: 'centos5',
-    label: 'CentOS5',
+    label: i18n.translate(
+      'wazuh.controller.agent.components.register.button.centOS5',
+      {
+        defaultMessage: 'CentOS5',
+      },
+    ),
   },
   {
     id: 'centos6',
-    label: 'CentOS6 or higher',
+    label: i18n.translate(
+      'wazuh.controller.agent.components.register.button.centOs6',
+      {
+        defaultMessage: 'CentOS6 or higher',
+      },
+    ),
   },
   {
     id: 'redhat5',
-    label: 'Red Hat 5',
+    label: i18n.translate(
+      'wazuh.controller.agent.components.register.button.redHat5',
+      {
+        defaultMessage: 'Red Hat 5',
+      },
+    ),
   },
   {
     id: 'redhat6',
-    label: 'Red Hat 6 or higher',
+    label: i18n.translate(
+      'wazuh.controller.agent.components.register.button.higher',
+      {
+        defaultMessage: 'Red Hat 6 or higher',
+      },
+    ),
   },
 ];
 
 const osButtons = [
   {
     id: 'rpm',
-    label: 'Red Hat / CentOS',
+    label: i18n.translate(
+      'wazuh.controller.agent.components.register.button.redhat',
+      {
+        defaultMessage: 'Red Hat / CentOS',
+      },
+    ),
   },
   {
     id: 'deb',
-    label: 'Debian / Ubuntu',
+    label: i18n.translate(
+      'wazuh.controller.agent.components.register.button.debain',
+      {
+        defaultMessage: 'Debian / Ubuntu',
+      },
+    ),
   },
   {
     id: 'win',
-    label: 'Windows',
+    label: i18n.translate(
+      'wazuh.controller.agent.components.register.button.windows',
+      {
+        defaultMessage: 'Windows',
+      },
+    ),
   },
   {
     id: 'macos',
-    label: 'MacOS',
+    label: i18n.translate(
+      'wazuh.controller.agent.components.register.button.macos',
+      {
+        defaultMessage: 'MacOS',
+      },
+    ),
   },
 ];
 
 const sysButtons = [
   {
     id: 'systemd',
-    label: 'Systemd',
+    label: i18n.translate(
+      'wazuh.controller.agent.components.register.button.systemd',
+      {
+        defaultMessage: 'Systemd',
+      },
+    ),
   },
   {
     id: 'sysV',
-    label: 'SysV Init',
+    label: i18n.translate(
+      'wazuh.controller.agent.components.register.button.sysV',
+      {
+        defaultMessage: 'SysV Init',
+      },
+    ),
   },
 ];
 
@@ -479,7 +559,13 @@ export const RegisterAgent = withErrorBoundary(
             <>
               <EuiCallOut
                 color='warning'
-                title='This section could not be configured because you do not have permission to read groups.'
+                title={i18n.translate(
+                  'wazuh.controller.agent.components.register.permission',
+                  {
+                    defaultMessage:
+                      'This section could not be configured because you do not have permission to read groups.',
+                  },
+                )}
                 iconType='iInCircle'
               />
               <EuiSpacer />
@@ -493,7 +579,14 @@ export const RegisterAgent = withErrorBoundary(
             </p>
             <EuiComboBox
               placeholder={
-                !this.state.groups.length ? 'Default' : 'Select group'
+                !this.state.groups.length
+                  ? 'Default'
+                  : i18n.translate(
+                      'wazuh.controller.agent.components.register.selectGroup',
+                      {
+                        defaultMessage: 'Select group',
+                      },
+                    )
               }
               options={this.state.groups}
               selectedOptions={this.state.selectedGroup}
@@ -559,9 +652,12 @@ export const RegisterAgent = withErrorBoundary(
               </li>
               <li>
                 <span>
-                  {i18n.translate('wazuh.controllers.sgent.components.powershell', {
-                    defaultMessage: 'PowerShell 3.0 or greater is required',
-                  })}
+                  {i18n.translate(
+                    'wazuh.controllers.sgent.components.powershell',
+                    {
+                      defaultMessage: 'PowerShell 3.0 or greater is required',
+                    },
+                  )}
                   .
                 </span>
               </li>
@@ -732,7 +828,12 @@ export const RegisterAgent = withErrorBoundary(
 
       const steps = [
         {
-          title: 'Choose the Operating system',
+          title: i18n.translate(
+            'wazuh.controller.agent.components.register.operatingSystem',
+            {
+              defaultMessage: 'Choose the Operating system',
+            },
+          ),
           children: (
             <EuiButtonGroup
               color='primary'
@@ -746,7 +847,12 @@ export const RegisterAgent = withErrorBoundary(
         ...(this.state.selectedOS == 'rpm'
           ? [
               {
-                title: 'Choose the version',
+                title: i18n.translate(
+                  'wazuh.controller.agent.components.register.version',
+                  {
+                    defaultMessage: 'Choose the version',
+                  },
+                ),
                 children: (
                   <EuiButtonGroup
                     color='primary'
@@ -764,7 +870,12 @@ export const RegisterAgent = withErrorBoundary(
         this.state.selectedVersion == 'redhat5'
           ? [
               {
-                title: 'Choose the architecture',
+                title: i18n.translate(
+                  'wazuh.controller.agent.components.register.architecture',
+                  {
+                    defaultMessage: 'Choose the architecture',
+                  },
+                ),
                 children: (
                   <EuiButtonGroup
                     color='primary'
@@ -785,7 +896,12 @@ export const RegisterAgent = withErrorBoundary(
         this.state.selectedVersion == 'redhat6'
           ? [
               {
-                title: 'Choose the architecture',
+                title: i18n.translate(
+                  'wazuh.controller.agent.components.register.architecture',
+                  {
+                    defaultMessage: 'Choose the architecture',
+                  },
+                ),
                 children: (
                   <EuiButtonGroup
                     color='primary'
@@ -801,23 +917,43 @@ export const RegisterAgent = withErrorBoundary(
             ]
           : []),
         {
-          title: 'Wazuh server address',
+          title: i18n.translate(
+            'wazuh.controller.agent.components.register.serverAddress',
+            {
+              defaultMessage: 'Wazuh server address',
+            },
+          ),
           children: <Fragment>{ipInput}</Fragment>,
         },
         ...(!(!this.state.needsPassword || this.state.hidePasswordInput)
           ? [
               {
-                title: 'Wazuh password',
+                title: i18n.translate(
+                  'wazuh.controller.agent.components.register.password',
+                  {
+                    defaultMessage: 'Wazuh password',
+                  },
+                ),
                 children: <Fragment>{passwordInput}</Fragment>,
               },
             ]
           : []),
         {
-          title: 'Assign the agent to a group',
+          title: i18n.translate(
+            'wazuh.controller.agent.components.register.assignAgent',
+            {
+              defaultMessage: 'Assign the agent to a group',
+            },
+          ),
           children: <Fragment>{groupInput}</Fragment>,
         },
         {
-          title: 'Install and enroll the agent',
+          title: i18n.translate(
+            'wazuh.controller.agent.components.register.enrollAgent',
+            {
+              defaultMessage: 'Install and enroll the agent',
+            },
+          ),
           children: this.state.gotErrorRegistrationServiceInfo ? (
             calloutErrorRegistrationServiceInfo
           ) : missingOSSelection.length ? (
@@ -833,7 +969,12 @@ export const RegisterAgent = withErrorBoundary(
         ...(this.state.selectedOS == 'rpm' || this.state.selectedOS == 'deb'
           ? [
               {
-                title: 'Start the agent',
+                title: i18n.translate(
+                  'wazuh.controller.agent.components.register.startAgent',
+                  {
+                    defaultMessage: 'Start the agent',
+                  },
+                ),
                 children: this.state.gotErrorRegistrationServiceInfo ? (
                   calloutErrorRegistrationServiceInfo
                 ) : missingOSSelection.length ? (
@@ -861,7 +1002,12 @@ export const RegisterAgent = withErrorBoundary(
         restartAgentCommand
           ? [
               {
-                title: 'Start the agent',
+                title: i18n.translate(
+                  'wazuh.controller.agent.components.register.startAgent',
+                  {
+                    defaultMessage: 'Start the agent',
+                  },
+                ),
                 children: this.state.gotErrorRegistrationServiceInfo ? (
                   calloutErrorRegistrationServiceInfo
                 ) : (

@@ -47,49 +47,133 @@ class WzMenuAgent extends Component {
     this.agentSections = {
       securityInformation: {
         id: 'securityInformation',
-        text: 'Security information management',
+        text: i18n.translate('wazuh.components.wz.menu.agent.management', {
+          defaultMessage: 'Security information management',
+        }),
       },
       auditing: { id: 'auditing', text: 'Auditing and Policy Monitoring' },
       threatDetection: {
         id: 'threatDetection',
-        text: 'Threat detection and response',
+        text: i18n.translate('wazuh.components.wz.menu.agent.response', {
+          defaultMessage: 'Threat detection and response',
+        }),
       },
       regulatoryCompliance: {
         id: 'regulatoryCompliance',
-        text: 'Regulatory Compliance',
+        text: i18n.translate('wazuh.components.wz.menu.agent.compliance', {
+          defaultMessage: 'Regulatory Compliance',
+        }),
       },
       general: {
         id: WAZUH_MODULES_ID.SECURITY_EVENTS,
-        text: 'Security Events',
+        text: i18n.translate('wazuh.components.wz.menu.agent.events', {
+          defaultMessage: 'Security Events',
+        }),
       },
       fim: {
         id: WAZUH_MODULES_ID.INTEGRITY_MONITORING,
-        text: 'Integrity Monitoring',
+        text: i18n.translate('wazuh.components.wz.menu.agent.monitor', {
+          defaultMessage: 'Integrity Monitoring',
+        }),
       },
       aws: { id: WAZUH_MODULES_ID.AMAZON_WEB_SERVICES, text: 'Amazon AWS' },
       gcp: {
         id: WAZUH_MODULES_ID.GOOGLE_CLOUD_PLATFORM,
-        text: 'Google Cloud Platform',
+        text: i18n.translate('wazuh.components.wz.menu.agent.cloud', {
+          defaultMessage: 'Google Cloud Platform',
+        }),
       },
       pm: { id: WAZUH_MODULES_ID.POLICY_MONITORING, text: 'Policy Monitoring' },
       sca: {
         id: WAZUH_MODULES_ID.SECURITY_CONFIGURATION_ASSESSMENT,
-        text: 'Security configuration assessment',
+        text: i18n.translate('wazuh.components.wz.menu.agent.confi', {
+          defaultMessage: 'Security configuration assessment',
+        }),
       },
-      audit: { id: WAZUH_MODULES_ID.AUDITING, text: 'System Auditing' },
-      oscap: { id: WAZUH_MODULES_ID.OPEN_SCAP, text: 'OpenSCAP' },
-      ciscat: { id: WAZUH_MODULES_ID.CIS_CAT, text: 'CIS-CAT' },
-      vuls: { id: WAZUH_MODULES_ID.VULNERABILITIES, text: 'Vulnerabilities' },
-      virustotal: { id: WAZUH_MODULES_ID.VIRUSTOTAL, text: 'VirusTotal' },
-      osquery: { id: WAZUH_MODULES_ID.OSQUERY, text: 'Osquery' },
-      docker: { id: WAZUH_MODULES_ID.DOCKER, text: 'Docker Listener' },
-      mitre: { id: WAZUH_MODULES_ID.MITRE_ATTACK, text: 'MITRE ATT&CK' },
-      pci: { id: WAZUH_MODULES_ID.PCI_DSS, text: 'PCI DSS' },
-      gdpr: { id: WAZUH_MODULES_ID.GDPR, text: 'GDPR' },
-      hipaa: { id: WAZUH_MODULES_ID.HIPAA, text: 'HIPAA' },
-      nist: { id: WAZUH_MODULES_ID.NIST_800_53, text: 'NIST 800-53' },
-      tsc: { id: WAZUH_MODULES_ID.TSC, text: 'TSC' },
-      github: { id: WAZUH_MODULES_ID.GITHUB, text: 'GitHub' },
+      audit: {
+        id: WAZUH_MODULES_ID.AUDITING,
+        text: i18n.translate('wazuh.components.wz.menu.agent.system', {
+          defaultMessage: 'System Auditing',
+        }),
+      },
+      oscap: {
+        id: WAZUH_MODULES_ID.OPEN_SCAP,
+        text: i18n.translate('wazuh.components.wz.menu.agent.openSCAP', {
+          defaultMessage: 'OpenSCAP',
+        }),
+      },
+      ciscat: {
+        id: WAZUH_MODULES_ID.CIS_CAT,
+        text: i18n.translate('wazuh.components.wz.menu.agent.cisCat', {
+          defaultMessage: 'CIS-CAT',
+        }),
+      },
+      vuls: {
+        id: WAZUH_MODULES_ID.VULNERABILITIES,
+        text: i18n.translate('wazuh.components.wz.menu.agent.vulne', {
+          defaultMessage: 'Vulnerabilities',
+        }),
+      },
+      virustotal: {
+        id: WAZUH_MODULES_ID.VIRUSTOTAL,
+        text: i18n.translate('wazuh.components.wz.menu.agent.virus', {
+          defaultMessage: 'VirusTotal',
+        }),
+      },
+      osquery: {
+        id: WAZUH_MODULES_ID.OSQUERY,
+        text: i18n.translate('wazuh.components.wz.menu.agent.osq', {
+          defaultMessage: 'Osquery',
+        }),
+      },
+      docker: {
+        id: WAZUH_MODULES_ID.DOCKER,
+        text: i18n.translate('wazuh.components.wz.menu.agent.dockerListener', {
+          defaultMessage: 'Docker Listener',
+        }),
+      },
+      mitre: {
+        id: WAZUH_MODULES_ID.MITRE_ATTACK,
+        text: i18n.translate('wazuh.components.wz.menu.agent.mitreAtt', {
+          defaultMessage: 'MITRE ATT&CK',
+        }),
+      },
+      pci: {
+        id: WAZUH_MODULES_ID.PCI_DSS,
+        text: i18n.translate('wazuh.components.wz.menu.agent.pciDss', {
+          defaultMessage: 'PCI DSS',
+        }),
+      },
+      gdpr: {
+        id: WAZUH_MODULES_ID.GDPR,
+        text: i18n.translate('wazuh.components.wz.menu.agent.gdpr', {
+          defaultMessage: 'GDPR',
+        }),
+      },
+      hipaa: {
+        id: WAZUH_MODULES_ID.HIPAA,
+        text: i18n.translate('wazuh.components.wz.menu.agent.hipaa', {
+          defaultMessage: 'HIPAA',
+        }),
+      },
+      nist: {
+        id: WAZUH_MODULES_ID.NIST_800_53,
+        text: i18n.translate('wazuh.components.wz.menu.agent.nist', {
+          defaultMessage: 'NIST 800-53',
+        }),
+      },
+      tsc: {
+        id: WAZUH_MODULES_ID.TSC,
+        text: i18n.translate('wazuh.components.wz.menu.agent.tsc', {
+          defaultMessage: 'TSC',
+        }),
+      },
+      github: {
+        id: WAZUH_MODULES_ID.GITHUB,
+        text: i18n.translate('wazuh.components.wz.menu.agent.gitHub', {
+          defaultMessage: 'GitHub',
+        }),
+      },
     };
 
     this.securityInformationItems = [
@@ -296,9 +380,12 @@ class WzMenuAgent extends Component {
                     iconType='inspect'
                   >
                     <span>
-                      {i18n.translate('wazuh.components.wz.menu.Inventory data', {
-                        defaultMessage: 'Inventory data',
-                      })}
+                      {i18n.translate(
+                        'wazuh.components.wz.menu.Inventory data',
+                        {
+                          defaultMessage: 'Inventory data',
+                        },
+                      )}
                     </span>
                   </EuiButton>
                 </EuiFlexItem>
@@ -308,9 +395,12 @@ class WzMenuAgent extends Component {
                     iconType='gear'
                   >
                     <span>
-                      {i18n.translate('wazuh.components.wz.menu.Configuration', {
-                        defaultMessage: 'Configuration',
-                      })}
+                      {i18n.translate(
+                        'wazuh.components.wz.menu.Configuration',
+                        {
+                          defaultMessage: 'Configuration',
+                        },
+                      )}
                     </span>
                   </EuiButton>
                 </EuiFlexItem>

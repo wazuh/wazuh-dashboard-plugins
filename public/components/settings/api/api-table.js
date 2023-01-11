@@ -43,9 +43,12 @@ const Title1 = i18n.translate('wazuh.components.settings.api.configureApi', {
   defaultMessage:
     'The configured API user is not allowed to use run_as. Give it permissions or set run_as with false value in the host configuration.',
 });
-const Title2 = i18n.translate('wazuh.components.settings.api.apiTable.context', {
-  defaultMessage: 'The configured API user uses the authentication context.',
-});
+const Title2 = i18n.translate(
+  'wazuh.components.settings.api.apiTable.context',
+  {
+    defaultMessage: 'The configured API user uses the authentication context.',
+  },
+);
 
 export const ApiTable = compose(
   withErrorBoundary,
@@ -230,9 +233,12 @@ export const ApiTable = compose(
               ) : item.status === 'down' ? (
                 <span>
                   <EuiHealth color='warning'>
-                    {i18n.translate('wazuh.components.setting.api.table.Warning', {
-                      defaultMessage: 'Warning',
-                    })}
+                    {i18n.translate(
+                      'wazuh.components.setting.api.table.Warning',
+                      {
+                        defaultMessage: 'Warning',
+                      },
+                    )}
                   </EuiHealth>
                   <EuiToolTip position='top' content={item.downReason}>
                     <EuiButtonIcon
@@ -249,9 +255,12 @@ export const ApiTable = compose(
               ) : (
                 <span>
                   <EuiHealth color='danger'>
-                    {i18n.translate('wazuh.components.setting.api.table.Offline', {
-                      defaultMessage: 'Offline',
-                    })}
+                    {i18n.translate(
+                      'wazuh.components.setting.api.table.Offline',
+                      {
+                        defaultMessage: 'Offline',
+                      },
+                    )}
                   </EuiHealth>
                   <EuiToolTip position='top' content={item.downReason}>
                     <EuiButtonIcon
@@ -272,9 +281,12 @@ export const ApiTable = compose(
                   <EuiLoadingSpinner size='s' />
                   <span>
                     &nbsp;&nbsp;
-                    {i18n.translate('wazuh.components.setting.api.table.Checking', {
-                      defaultMessage: 'Checking',
-                    })}
+                    {i18n.translate(
+                      'wazuh.components.setting.api.table.Checking',
+                      {
+                        defaultMessage: 'Checking',
+                      },
+                    )}
                   </span>
                 </span>
               );
@@ -379,9 +391,12 @@ export const ApiTable = compose(
                   <EuiFlexItem>
                     <EuiTitle>
                       <h2>
-                        {i18n.translate('wazuh.components.setting.api.table.confi', {
-                          defaultMessage: 'Wazuh API configuration',
-                        })}
+                        {i18n.translate(
+                          'wazuh.components.setting.api.table.confi',
+                          {
+                            defaultMessage: 'Wazuh API configuration',
+                          },
+                        )}
                       </h2>
                     </EuiTitle>
                   </EuiFlexItem>
@@ -394,7 +409,9 @@ export const ApiTable = compose(
                   roles={[]}
                   onClick={() => this.props.showAddApi()}
                 >
-                  Add new
+                  {i18n.translate('wazuh.components.setting.api.table.Addnew', {
+                    defaultMessage: 'Add new',
+                  })}
                 </WzButtonPermissions>
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
@@ -402,9 +419,12 @@ export const ApiTable = compose(
                   iconType='refresh'
                   onClick={async () => await this.refresh()}
                 >
-                  {i18n.translate('wazuh.components.setting.api.table.Refresh', {
-                    defaultMessage: 'Refresh',
-                  })}
+                  {i18n.translate(
+                    'wazuh.components.setting.api.table.Refresh',
+                    {
+                      defaultMessage: 'Refresh',
+                    },
+                  )}
                 </EuiButtonEmpty>
               </EuiFlexItem>
             </EuiFlexGroup>

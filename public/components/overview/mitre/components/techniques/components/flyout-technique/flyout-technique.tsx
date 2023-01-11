@@ -45,22 +45,74 @@ import { UI_LOGGER_LEVELS } from '../../../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../../../react-services/common-services';
 import { WzFlyout } from '../../../../../../../components/common/flyouts';
-import { i18n } from "@kbn/i18n";
+import { i18n } from '@kbn/i18n';
 
-
-
-const Title1 = i18n.translate("wazuh.components.overview.mitre.techninques.errorRequest", {
-  defaultMessage: "Error obtaining the requested technique",
-});
-const Title2 = i18n.translate("wazuh.components.overview.mitre.techninques.Title2", {
-  defaultMessage: "ID",
-});
-const Title3 = i18n.translate("wazuh.components.overview.mitre.techninques.Title3", {
-  defaultMessage: "Tactics",
-});
-const Title4 = i18n.translate("wazuh.components.overview.mitre.techninques.Title4", {
-  defaultMessage: "Version",
-});
+const label1 = i18n.translate(
+  'wazuh.components.overview.mitre.techinques.label1',
+  {
+    defaultMessage: 'Agent',
+  },
+);
+const label2 = i18n.translate(
+  'wazuh.components.overview.mitre.techinques.label2',
+  {
+    defaultMessage: 'Agent Name',
+  },
+);
+const label3 = i18n.translate(
+  'wazuh.components.overview.mitre.techinques.label3',
+  {
+    defaultMessage: 'Technique(s)',
+  },
+);
+const label4 = i18n.translate(
+  'wazuh.components.overview.mitre.techinques.label4',
+  {
+    defaultMessage: 'Tactic(s)',
+  },
+);
+const label5 = i18n.translate(
+  'wazuh.components.overview.mitre.techinques.label5',
+  {
+    defaultMessage: 'Level',
+  },
+);
+const label6 = i18n.translate(
+  'wazuh.components.overview.mitre.techinques.label6',
+  {
+    defaultMessage: 'Rule ID',
+  },
+);
+const label7 = i18n.translate(
+  'wazuh.components.overview.mitre.techinques.label7',
+  {
+    defaultMessage: 'Description',
+  },
+);
+const Title1 = i18n.translate(
+  'wazuh.components.overview.mitre.techninques.errorRequest',
+  {
+    defaultMessage: 'Error obtaining the requested technique',
+  },
+);
+const Title2 = i18n.translate(
+  'wazuh.components.overview.mitre.techninques.Title2',
+  {
+    defaultMessage: 'ID',
+  },
+);
+const Title3 = i18n.translate(
+  'wazuh.components.overview.mitre.techninques.Title3',
+  {
+    defaultMessage: 'Tactics',
+  },
+);
+const Title4 = i18n.translate(
+  'wazuh.components.overview.mitre.techninques.Title4',
+  {
+    defaultMessage: 'Version',
+  },
+);
 export class FlyoutTechnique extends Component {
   _isMount = false;
   clusterFilter: object;
@@ -115,11 +167,13 @@ export class FlyoutTechnique extends Component {
       this.state.techniqueData.replaced_external_references &&
       this.state.techniqueData.replaced_external_references.length > 0
     ) {
-      this.state.techniqueData.replaced_external_references.forEach((reference) => {
-        $(`.technique-reference-${reference.index}`).each(function () {
-          $(this).off();
-        });
-      });
+      this.state.techniqueData.replaced_external_references.forEach(
+        reference => {
+          $(`.technique-reference-${reference.index}`).each(function () {
+            $(this).off();
+          });
+        },
+      );
     }
   }
 
@@ -129,16 +183,21 @@ export class FlyoutTechnique extends Component {
       this.state.techniqueData.replaced_external_references &&
       this.state.techniqueData.replaced_external_references.length > 0
     ) {
-      this.state.techniqueData.replaced_external_references.forEach((reference) => {
-        $(`.technique-reference-citation-${reference.index}`).each(function () {
-          $(this).off();
-          $(this).click(() => {
-            $(`.euiFlyoutBody__overflow`).scrollTop(
-              $(`#technique-reference-${reference.index}`).position().top - 150
-            );
-          });
-        });
-      });
+      this.state.techniqueData.replaced_external_references.forEach(
+        reference => {
+          $(`.technique-reference-citation-${reference.index}`).each(
+            function () {
+              $(this).off();
+              $(this).click(() => {
+                $(`.euiFlyoutBody__overflow`).scrollTop(
+                  $(`#technique-reference-${reference.index}`).position().top -
+                    150,
+                );
+              });
+            },
+          );
+        },
+      );
     }
   }
 
@@ -146,21 +205,39 @@ export class FlyoutTechnique extends Component {
     try {
       this.setState({ loading: true, techniqueData: {} });
       const { currentTechnique } = this.props;
-      const techniqueResponse = await WzRequest.apiReq('GET', '/mitre/techniques', {
-        params: {
-          q: `external_id=${currentTechnique}`,
+      const techniqueResponse = await WzRequest.apiReq(
+        'GET',
+        '/mitre/techniques',
+        {
+          params: {
+            q: `external_id=${currentTechnique}`,
+          },
         },
-      });
-      const [techniqueData] = (((techniqueResponse || {}).data || {}).data || {}).affected_items;
-      const tacticsResponse = await WzRequest.apiReq('GET', '/mitre/tactics', {});
-      const tacticsData = (((tacticsResponse || {}).data || {}).data || {}).affected_items;
+      );
+      const [techniqueData] = (
+        ((techniqueResponse || {}).data || {}).data || {}
+      ).affected_items;
+      const tacticsResponse = await WzRequest.apiReq(
+        'GET',
+        '/mitre/tactics',
+        {},
+      );
+      const tacticsData = (((tacticsResponse || {}).data || {}).data || {})
+        .affected_items;
 
-      techniqueData.tactics && (techniqueData.tactics = techniqueData.tactics.map(tacticID => {
-        const tactic = tacticsData.find(tacticData => tacticData.id === tacticID);
-        return { id: tactic.external_id, name: tactic.name }
-      }));
+      techniqueData.tactics &&
+        (techniqueData.tactics = techniqueData.tactics.map(tacticID => {
+          const tactic = tacticsData.find(
+            tacticData => tacticData.id === tacticID,
+          );
+          return { id: tactic.external_id, name: tactic.name };
+        }));
       const { name, mitre_version, tactics } = techniqueData;
-      this._isMount &&  this.setState({ techniqueData: { name, mitre_version, tactics }, loading: false });
+      this._isMount &&
+        this.setState({
+          techniqueData: { name, mitre_version, tactics },
+          loading: false,
+        });
     } catch (error) {
       const options = {
         context: `${FlyoutTechnique.name}.getTechniqueData`,
@@ -188,8 +265,8 @@ export class FlyoutTechnique extends Component {
             <EuiLoadingContent lines={1} />
           </div>
         )) || (
-          <EuiTitle size="m">
-            <h2 id="flyoutSmallTitle">{techniqueData.name}</h2>
+          <EuiTitle size='m'>
+            <h2 id='flyoutSmallTitle'>{techniqueData.name}</h2>
           </EuiTitle>
         )}
       </EuiFlyoutHeader>
@@ -199,16 +276,21 @@ export class FlyoutTechnique extends Component {
   renderBody() {
     const { currentTechnique } = this.props;
     const { techniqueData } = this.state;
-    const implicitFilters = [{ 'rule.mitre.id': currentTechnique }, this.clusterFilter];
+    const implicitFilters = [
+      { 'rule.mitre.id': currentTechnique },
+      this.clusterFilter,
+    ];
     if (this.props.implicitFilters) {
-      this.props.implicitFilters.forEach((item) => implicitFilters.push(item));
+      this.props.implicitFilters.forEach(item => implicitFilters.push(item));
     }
 
     const link = `https://attack.mitre.org/techniques/${currentTechnique}/`;
     const formattedDescription = techniqueData.description ? (
       <div
-        className="wz-markdown-margin wz-markdown-wrapper"
-        dangerouslySetInnerHTML={{ __html: md.render(techniqueData.description) }}
+        className='wz-markdown-margin wz-markdown-wrapper'
+        dangerouslySetInnerHTML={{
+          __html: md.render(techniqueData.description),
+        }}
       ></div>
     ) : (
       techniqueData.description
@@ -218,12 +300,17 @@ export class FlyoutTechnique extends Component {
         title: Title2,
         description: (
           <EuiToolTip
-            position="top"
+            position='top'
             content={`Open ${currentTechnique} details in the Intelligence section`}
           >
             <EuiLink
-              onClick={(e) => {
-                AppNavigate.navigateToModule(e, 'overview', { "tab": 'mitre', "tabView": "intelligence", "tabRedirect": 'techniques', "idToRedirect": currentTechnique});
+              onClick={e => {
+                AppNavigate.navigateToModule(e, 'overview', {
+                  tab: 'mitre',
+                  tabView: 'intelligence',
+                  tabRedirect: 'techniques',
+                  idToRedirect: currentTechnique,
+                });
                 e.stopPropagation();
               }}
             >
@@ -235,16 +322,21 @@ export class FlyoutTechnique extends Component {
       {
         title: Title3,
         description: techniqueData.tactics
-          ? techniqueData.tactics.map((tactic) => {
+          ? techniqueData.tactics.map(tactic => {
               return (
                 <>
                   <EuiToolTip
-                    position="top"
+                    position='top'
                     content={`Open ${tactic.name} details in the Intelligence section`}
                   >
                     <EuiLink
-                      onClick={(e) => {
-                        AppNavigate.navigateToModule(e, 'overview', { "tab": 'mitre', "tabView": "intelligence", "tabRedirect": 'tactics', "idToRedirect": tactic.id});
+                      onClick={e => {
+                        AppNavigate.navigateToModule(e, 'overview', {
+                          tab: 'mitre',
+                          tabView: 'intelligence',
+                          tabRedirect: 'tactics',
+                          idToRedirect: tactic.id,
+                        });
                         e.stopPropagation();
                       }}
                     >
@@ -263,22 +355,25 @@ export class FlyoutTechnique extends Component {
       },
     ];
     return (
-      <EuiFlyoutBody className="flyout-body">
+      <EuiFlyoutBody className='flyout-body'>
         <EuiAccordion
           id={'details'}
           buttonContent={
-            <EuiTitle size="s">
-              <h3>{
-                i18n.translate("wazuh.components.agent.fim.ivv.lib.Techniquedetails", {
-                  defaultMessage: "Technique details",
-                })}
+            <EuiTitle size='s'>
+              <h3>
+                {i18n.translate(
+                  'wazuh.components.agent.fim.ivv.lib.Techniquedetails',
+                  {
+                    defaultMessage: 'Technique details',
+                  },
+                )}
               </h3>
             </EuiTitle>
           }
-          paddingSize="none"
+          paddingSize='none'
           initialIsOpen={true}
         >
-          <div className="flyout-row details-row">
+          <div className='flyout-row details-row'>
             {(Object.keys(techniqueData).length === 0 && (
               <div>
                 <EuiLoadingContent lines={2} />
@@ -292,54 +387,57 @@ export class FlyoutTechnique extends Component {
           </div>
         </EuiAccordion>
 
-        <EuiSpacer size="s" />
+        <EuiSpacer size='s' />
         <EuiAccordion
           style={{ textDecoration: 'none' }}
           id={'recent_events'}
-          className="events-accordion"
+          className='events-accordion'
           extraAction={
             <div style={{ marginBottom: 5 }}>
-              <strong>{this.state.totalHits || 0}</strong> {
-                i18n.translate("wazuh.components.agent.fim.ivv.lib.hits", {
-                  defaultMessage: "hits",
-                })}
+              <strong>{this.state.totalHits || 0}</strong>{' '}
+              {i18n.translate('wazuh.components.agent.fim.ivv.lib.hits', {
+                defaultMessage: 'hits',
+              })}
             </div>
           }
           buttonContent={
-            <EuiTitle size="s">
-              <h3>{
-                i18n.translate("wazuh.components.agent.fim.ivv.lib.Recentevents", {
-                  defaultMessage: "Recent events",
-                })}
+            <EuiTitle size='s'>
+              <h3>
+                {i18n.translate(
+                  'wazuh.components.agent.fim.ivv.lib.Recentevents',
+                  {
+                    defaultMessage: 'Recent events',
+                  },
+                )}
 
                 {this.props.view !== 'events' && (
                   <span style={{ marginLeft: 16 }}>
                     <span>
                       <EuiToolTip
-                        position="top"
+                        position='top'
                         content={'Show ' + currentTechnique + ' in Dashboard'}
                       >
                         <EuiIcon
-                          onMouseDown={(e) => {
+                          onMouseDown={e => {
                             this.props.openDashboard(e, currentTechnique);
                             e.stopPropagation();
                           }}
-                          color="primary"
-                          type="visualizeApp"
+                          color='primary'
+                          type='visualizeApp'
                           style={{ marginRight: '10px' }}
                         ></EuiIcon>
                       </EuiToolTip>
                       <EuiToolTip
-                        position="top"
+                        position='top'
                         content={'Inspect ' + currentTechnique + ' in Events'}
                       >
                         <EuiIcon
-                          onMouseDown={(e) => {
+                          onMouseDown={e => {
                             this.props.openDiscover(e, currentTechnique);
                             e.stopPropagation();
                           }}
-                          color="primary"
-                          type="discoverApp"
+                          color='primary'
+                          type='discoverApp'
                         ></EuiIcon>
                       </EuiToolTip>
                     </span>
@@ -348,10 +446,10 @@ export class FlyoutTechnique extends Component {
               </h3>
             </EuiTitle>
           }
-          paddingSize="none"
+          paddingSize='none'
           initialIsOpen={true}
         >
-          <EuiFlexGroup className="flyout-row">
+          <EuiFlexGroup className='flyout-row'>
             <EuiFlexItem>
               <Discover
                 kbnSearchBar
@@ -359,26 +457,26 @@ export class FlyoutTechnique extends Component {
                 initialColumns={[
                   { field: 'icon' },
                   { field: 'timestamp' },
-                  { field: 'agent.id', label: 'Agent' },
-                  { field: 'agent.name', label: 'Agent Name' },
-                  { field: 'rule.mitre.id', label: 'Technique(s)' },
-                  { field: 'rule.mitre.tactic', label: 'Tactic(s)' },
-                  { field: 'rule.level', label: 'Level' },
-                  { field: 'rule.id', label: 'Rule ID' },
-                  { field: 'rule.description', label: 'Description' },
+                  { field: 'agent.id', label: label1 },
+                  { field: 'agent.name', label: label2 },
+                  { field: 'rule.mitre.id', label: label3 },
+                  { field: 'rule.mitre.tactic', label: label4 },
+                  { field: 'rule.level', label: label5 },
+                  { field: 'rule.id', label: label6 },
+                  { field: 'rule.description', label: label7 },
                 ]}
                 initialAgentColumns={[
                   { field: 'icon' },
                   { field: 'timestamp' },
-                  { field: 'rule.mitre.id', label: 'Technique(s)' },
-                  { field: 'rule.mitre.tactic', label: 'Tactic(s)' },
-                  { field: 'rule.level', label: 'Level' },
-                  { field: 'rule.id', label: 'Rule ID' },
-                  { field: 'rule.description', label: 'Description' },
+                  { field: 'rule.mitre.id', label: label3 },
+                  { field: 'rule.mitre.tactic', label: label4 },
+                  { field: 'rule.level', label: label5 },
+                  { field: 'rule.id', label: label6 },
+                  { field: 'rule.description', label: label7 },
                 ]}
                 implicitFilters={implicitFilters}
                 initialFilters={[]}
-                updateTotalHits={(total) => this.updateTotalHits(total)}
+                updateTotalHits={total => this.updateTotalHits(total)}
               />
             </EuiFlexItem>
           </EuiFlexGroup>
@@ -387,7 +485,7 @@ export class FlyoutTechnique extends Component {
     );
   }
 
-  updateTotalHits = (total) => {
+  updateTotalHits = total => {
     this.setState({ totalHits: total });
   };
 

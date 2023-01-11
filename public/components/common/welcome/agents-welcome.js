@@ -60,7 +60,7 @@ import { withErrorBoundary, withReduxProvider } from '../hocs';
 import { compose } from 'redux';
 import { API_NAME_AGENT_STATUS } from '../../../../common/constants';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
-import { i18n } from '@kbn/i18n'
+import { i18n } from '@kbn/i18n';
 
 export const AgentsWelcome = compose(
   withReduxProvider,
@@ -151,9 +151,12 @@ export const AgentsWelcome = compose(
     }
 
     updateMenuAgents() {
-      const securityEvents = i18n.translate('wazuh.components.welcome.agentWelcome.securityEvent', {
-        defaultMessage: 'Security events',
-      });
+      const securityEvents = i18n.translate(
+        'wazuh.components.welcome.agentWelcome.securityEvent',
+        {
+          defaultMessage: 'Security events',
+        },
+      );
       const integrityMonitoring = i18n.translate(
         'wazuh.components.welcome.agentWelcome.integrityMonitoring',
         {
@@ -169,12 +172,18 @@ export const AgentsWelcome = compose(
           defaultMessage: 'System Auditing',
         },
       );
-      const vulnerability = i18n.translate('wazuh.components.welcome.agentWelcome.vulnerability', {
-        defaultMessage: 'Vulnerabilities',
-      });
-      const mitre = i18n.translate('wazuh.components.welcome.agentWelcome.mitre', {
-        defaultMessage: 'MITRE ATT&CK',
-      });
+      const vulnerability = i18n.translate(
+        'wazuh.components.welcome.agentWelcome.vulnerability',
+        {
+          defaultMessage: 'Vulnerabilities',
+        },
+      );
+      const mitre = i18n.translate(
+        'wazuh.components.welcome.agentWelcome.mitre',
+        {
+          defaultMessage: 'MITRE ATT&CK',
+        },
+      );
 
       const defaultMenuAgents = {
         general: {
@@ -264,9 +273,13 @@ export const AgentsWelcome = compose(
                       window.location.href = `#/overview/?tab=${
                         menuAgent.id
                       }&tabView=${
-                        menuAgent.text === i18n.translate('wazuh.components.welcome.agentWelcome.securityConfigurationAssessment', {
+                        menuAgent.text ===
+                        i18n.translate(
+                          'wazuh.components.welcome.agentWelcome.securityConfigurationAssessment',
+                          {
                             defaultMessage: 'Security configuration assessment',
-                          })
+                          },
+                        )
                           ? i18n.translate(
                               'wazuh.components.welcome.agentWelcome.inventoryText',
                               {
@@ -285,9 +298,13 @@ export const AgentsWelcome = compose(
                     style={{ cursor: 'pointer' }}
                   >
                     <span>
-                      {menuAgent.text !== i18n.translate('wazuh.components.welcome.agentWelcome.securityConfigurationAssessment', {
-                            defaultMessage: 'Security configuration assessment',
-                          })
+                      {menuAgent.text !==
+                      i18n.translate(
+                        'wazuh.components.welcome.agentWelcome.securityConfigurationAssessment',
+                        {
+                          defaultMessage: 'Security configuration assessment',
+                        },
+                      )
                         ? menuAgent.text
                         : i18n.translate(
                             'wazuh.components.welcome.agentWelcome.scaLabel',
@@ -312,11 +329,12 @@ export const AgentsWelcome = compose(
                     this.setState({ switchModule: !this.state.switchModule })
                   }
                 >
-                  {
-                    i18n.translate('wazuh.components.welcome.agentWelcome.moreLabel', {
+                  {i18n.translate(
+                    'wazuh.components.welcome.agentWelcome.moreLabel',
+                    {
                       defaultMessage: 'More...',
-                    })
-                  }
+                    },
+                  )}
                 </EuiButtonEmpty>
               }
               isOpen={this.state.switchModule}
@@ -517,29 +535,43 @@ export const AgentsWelcome = compose(
         },
       );
 
-      const gdpr = i18n.translate('wazuh.components.welcome.agentWelcome.options.gdpr', {
-        defaultMessage: 'GDPR',
-      });
+      const gdpr = i18n.translate(
+        'wazuh.components.welcome.agentWelcome.options.gdpr',
+        {
+          defaultMessage: 'GDPR',
+        },
+      );
 
       const nist = i18n.translate(
-      'wazuh.components.welcome.agentWelcome.options.nist', {
-        defaultMessage: 'NIST 800-53',
-      });
+        'wazuh.components.welcome.agentWelcome.options.nist',
+        {
+          defaultMessage: 'NIST 800-53',
+        },
+      );
 
-      const hipaa = i18n.translate('wazuh.components.welcome.agentWelcome.options.hipaa', {
-        defaultMessage: 'HIPAA',
-      });
+      const hipaa = i18n.translate(
+        'wazuh.components.welcome.agentWelcome.options.hipaa',
+        {
+          defaultMessage: 'HIPAA',
+        },
+      );
 
-      const gpg13 = i18n.translate('wazuh.components.welcome.agentWelcome.options.gpg13', {
-        defaultMessage: 'GPG13',
-      });
+      const gpg13 = i18n.translate(
+        'wazuh.components.welcome.agentWelcome.options.gpg13',
+        {
+          defaultMessage: 'GPG13',
+        },
+      );
 
-      const tsc = i18n.translate('wazuh.components.welcome.agentWelcome.options.tsc', {
-        defaultMessage: 'TSC',
-      });
+      const tsc = i18n.translate(
+        'wazuh.components.welcome.agentWelcome.options.tsc',
+        {
+          defaultMessage: 'TSC',
+        },
+      );
 
       return [
-        { value: 'pci', text: picDss },
+        { value: 'pci', text: pciDss },
         { value: 'gdpr', text: gdpr },
         { value: 'nist', text: nist },
         { value: 'hipaa', text: hipaa },
@@ -554,38 +586,59 @@ export const AgentsWelcome = compose(
 
     getRequirementVis() {
       if (this.state.selectedRequirement === 'pci') {
-        return i18n.translate('wazuh.components.welcome.agentWelcome.welcomeTopPci', {
-          defaultMessage: 'Wazuh-App-Agents-Welcome-Top-PCI',
-        });
+        return i18n.translate(
+          'wazuh.components.welcome.agentWelcome.welcomeTopPci',
+          {
+            defaultMessage: 'Wazuh-App-Agents-Welcome-Top-PCI',
+          },
+        );
       }
       if (this.state.selectedRequirement === 'gdpr') {
-        return i18n.translate('wazuh.components.welcome.agentWelcome.welcomeTopGdpr', {
-          defaultMessage: 'Wazuh-App-Agents-Welcome-Top-GDPR',
-        });
+        return i18n.translate(
+          'wazuh.components.welcome.agentWelcome.welcomeTopGdpr',
+          {
+            defaultMessage: 'Wazuh-App-Agents-Welcome-Top-GDPR',
+          },
+        );
       }
       if (this.state.selectedRequirement === 'hipaa') {
-        return i18n.translate('wazuh.components.welcome.agentWelcome.welcomeTopHipaa', {
-          defaultMessage: 'Wazuh-App-Agents-Welcome-Top-HIPAA',
-        });
+        return i18n.translate(
+          'wazuh.components.welcome.agentWelcome.welcomeTopHipaa',
+          {
+            defaultMessage: 'Wazuh-App-Agents-Welcome-Top-HIPAA',
+          },
+        );
       }
       if (this.state.selectedRequirement === 'nist') {
-        return i18n.translate('wazuh.components.welcome.agentWelcome.welcomeTopNist', {
-          defaultMessage: 'Wazuh-App-Agents-Welcome-Top-NIST-800-53',
-        });
+        return i18n.translate(
+          'wazuh.components.welcome.agentWelcome.welcomeTopNist',
+          {
+            defaultMessage: 'Wazuh-App-Agents-Welcome-Top-NIST-800-53',
+          },
+        );
       }
       if (this.state.selectedRequirement === 'gpg13') {
-        return i18n.translate('wazuh.components.welcome.agentWelcome.welcomeTopGpg', {
-          defaultMessage: 'Wazuh-App-Agents-Welcome-Top-GPG-13',
-        });
+        return i18n.translate(
+          'wazuh.components.welcome.agentWelcome.welcomeTopGpg',
+          {
+            defaultMessage: 'Wazuh-App-Agents-Welcome-Top-GPG-13',
+          },
+        );
       }
       if (this.state.selectedRequirement === 'tsc') {
-        return i18n.translate('wazuh.components.welcome.agentWelcome.welcomeTopTsc', {
-          defaultMessage: 'Wazuh-App-Agents-Welcome-Top-TSC',
-        });
+        return i18n.translate(
+          'wazuh.components.welcome.agentWelcome.welcomeTopTsc',
+          {
+            defaultMessage: 'Wazuh-App-Agents-Welcome-Top-TSC',
+          },
+        );
       }
-      return i18n.translate('wazuh.components.welcome.agentWelcome.welcomeTopPci', {
-        defaultMessage: 'Wazuh-App-Agents-Welcome-Top-PCI',
-      });
+      return i18n.translate(
+        'wazuh.components.welcome.agentWelcome.welcomeTopPci',
+        {
+          defaultMessage: 'Wazuh-App-Agents-Welcome-Top-PCI',
+        },
+      );
     }
 
     renderMitrePanel() {
@@ -598,19 +651,26 @@ export const AgentsWelcome = compose(
                   <h2 className='embPanel__title wz-headline-title'>
                     <EuiText size='xs'>
                       <h2>
-                      { i18n.translate('wazuh.components.welcome.agentWelcome.mitreText', {
-                          defaultMessage: 'MITRE',
-                        })
-                      }
+                        {i18n.translate(
+                          'wazuh.components.welcome.agentWelcome.mitreText',
+                          {
+                            defaultMessage: 'MITRE',
+                          },
+                        )}
                       </h2>
                     </EuiText>
                   </h2>
                 </EuiFlexItem>
                 <EuiFlexItem grow={false} style={{ alignSelf: 'center' }}>
-                  <EuiToolTip position='top' content={
-                      i18n.translate('wazuh.components.welcome.agentWelcome.openMitreText', {
+                  <EuiToolTip
+                    position='top'
+                    content={i18n.translate(
+                      'wazuh.components.welcome.agentWelcome.openMitreText',
+                      {
                         defaultMessage: 'Open MITRE',
-                      })}>
+                      },
+                    )}
+                  >
                     <EuiButtonIcon
                       iconType='popout'
                       color='primary'
@@ -618,10 +678,12 @@ export const AgentsWelcome = compose(
                         window.location.href = `#/overview?tab=mitre`;
                         this.router.reload();
                       }}
-                        aria-label={
-                          i18n.translate('wazuh.components.welcome.agentWelcome.openMitreText', {
-                            defaultMessage: 'Open MITRE',
-                          })}
+                      aria-label={i18n.translate(
+                        'wazuh.components.welcome.agentWelcome.openMitreText',
+                        {
+                          defaultMessage: 'Open MITRE',
+                        },
+                      )}
                     />
                   </EuiToolTip>
                 </EuiFlexItem>
@@ -659,10 +721,12 @@ export const AgentsWelcome = compose(
                 <h2 className='embPanel__title wz-headline-title'>
                   <EuiText size='xs'>
                     <h2>
-                    {
-                      i18n.translate('wazuh.components.welcome.agentWelcome.eventCountEvolution', {
-                        defaultMessage: 'Events count evolution',
-                    })}
+                      {i18n.translate(
+                        'wazuh.components.welcome.agentWelcome.eventCountEvolution',
+                        {
+                          defaultMessage: 'Events count evolution',
+                        },
+                      )}
                     </h2>
                   </EuiText>
                 </h2>
@@ -714,19 +778,24 @@ export const AgentsWelcome = compose(
             style={{ marginTop: 20 }}
             title={
               <h2>
-                {
-                  i18n.translate('wazuh.components.welcome.agentWelcome.agentNeverConnected', {
+                {i18n.translate(
+                  'wazuh.components.welcome.agentWelcome.agentNeverConnected',
+                  {
                     defaultMessage: 'Agent has never connected.',
-                })}
+                  },
+                )}
               </h2>
-              }
+            }
             body={
               <Fragment>
                 <p>
-                  {
-                    i18n.translate('wazuh.components.welcome.agentWelcome.agentNotConnectedWithManager', {
-                      defaultMessage: 'The agent has been registered but has not yet connected to the manager.',
-                  })}
+                  {i18n.translate(
+                    'wazuh.components.welcome.agentWelcome.agentNotConnectedWithManager',
+                    {
+                      defaultMessage:
+                        'The agent has been registered but has not yet connected to the manager.',
+                    },
+                  )}
                 </p>
                 <a
                   href={webDocumentationLink(
@@ -734,19 +803,24 @@ export const AgentsWelcome = compose(
                   )}
                   target='_blank'
                 >
-                  {
-                    i18n.translate('wazuh.components.welcome.agentWelcome.checkConnectionWithWazuhServer', {
-                      defaultMessage: 'Checking connection with the Wazuh server',
-                  })}
+                  {i18n.translate(
+                    'wazuh.components.welcome.agentWelcome.checkConnectionWithWazuhServer',
+                    {
+                      defaultMessage:
+                        'Checking connection with the Wazuh server',
+                    },
+                  )}
                 </a>
               </Fragment>
             }
             actions={
               <EuiButton href='#/agents-preview?' color='primary' fill>
-                {
-                  i18n.translate('wazuh.components.welcome.agentWelcome.backButton', {
+                {i18n.translate(
+                  'wazuh.components.welcome.agentWelcome.backButton',
+                  {
                     defaultMessage: 'Back',
-                })}
+                  },
+                )}
               </EuiButton>
             }
           />

@@ -26,8 +26,13 @@ import {
 import exportCsv from '../../../../../react-services/wz-csv';
 import { UploadFiles } from '../../upload-files';
 import columns from './utils/columns';
-import { resourceDictionary, RulesetHandler, RulesetResources } from './utils/ruleset-handler';
+import {
+  resourceDictionary,
+  RulesetHandler,
+  RulesetResources,
+} from './utils/ruleset-handler';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
+import { i18n } from '@kbn/i18n';
 
 import { connect } from 'react-redux';
 
@@ -61,14 +66,14 @@ class WzRulesetActionButtons extends Component {
     try {
       this.setState({ generatingCsv: true });
       const { section, filters } = this.props.state; //TODO get filters from the search bar from the REDUX store
-      const mapFilters = filters.map((filter) => ({
+      const mapFilters = filters.map(filter => ({
         name: filter.field,
         value: filter.value,
       })); // adapt to shape used in /api/csv file: server/controllers/wazuh-api.js
       await this.exportCsv(
         `/${section}${this.props.state.showingFiles ? '/files' : ''}`,
         mapFilters,
-        section
+        section,
       );
     } catch (error) {
       const options = {
@@ -205,14 +210,19 @@ class WzRulesetActionButtons extends Component {
     // Export button
     const exportButton = (
       <WzButtonPermissions
-        buttonType="empty"
+        buttonType='empty'
         permissions={getReadPermissionsFiles()}
-        iconType="exportAction"
-        iconSide="left"
+        iconType='exportAction'
+        iconSide='left'
         onClick={async () => await this.generateCsv()}
         isLoading={this.state.generatingCsv}
       >
-        Export formatted
+        {i18n.translate(
+          'wazuh.controllers.mnage.rulset.actions.Exportformatted',
+          {
+            defaultMessage: 'Export formatted',
+          },
+        )}
       </WzButtonPermissions>
     );
 
@@ -220,8 +230,8 @@ class WzRulesetActionButtons extends Component {
     const addNewRuleButton = (
       <WzButtonPermissions
         permissions={getUpdatePermissionsFiles()}
-        buttonType="empty"
-        iconType="plusInCircle"
+        buttonType='empty'
+        iconType='plusInCircle'
         onClick={() =>
           this.props.updteAddingRulesetFile({
             name: '',
@@ -237,9 +247,9 @@ class WzRulesetActionButtons extends Component {
     //Add new CDB list button
     const addNewCdbListButton = (
       <WzButtonPermissions
-        buttonType="empty"
+        buttonType='empty'
         permissions={getUpdatePermissionsFiles()}
-        iconType="plusInCircle"
+        iconType='plusInCircle'
         onClick={() =>
           this.props.updateListContent({
             name: false,
@@ -255,7 +265,7 @@ class WzRulesetActionButtons extends Component {
     // Manage files
     const manageFiles = (
       <WzButtonPermissions
-        buttonType="empty"
+        buttonType='empty'
         permissions={getUpdatePermissionsFiles()}
         iconType={showingFiles ? 'apmTrace' : 'folderClosed'}
         onClick={async () => await this.toggleFiles()}
@@ -266,8 +276,13 @@ class WzRulesetActionButtons extends Component {
 
     // Refresh
     const refresh = (
-      <EuiButtonEmpty iconType="refresh" onClick={async () => await this.refresh()}>
-        Refresh
+      <EuiButtonEmpty
+        iconType='refresh'
+        onClick={async () => await this.refresh()}
+      >
+        {i18n.translate('wazuh.controllers.mnage.rulset.actions.Refresh', {
+          defaultMessage: 'Refresh',
+        })}{' '}
       </EuiButtonEmpty>
     );
 
@@ -275,17 +290,23 @@ class WzRulesetActionButtons extends Component {
       try {
         const result = await this.uploadFiles(files, resource, overwrite);
         await this.refresh();
-        return result
+        return result;
       } catch (error) {
-        return error
+        return error;
       }
     };
 
     return (
       <Fragment>
-        {section !== 'lists' && <EuiFlexItem grow={false}>{manageFiles}</EuiFlexItem>}
-        {section !== 'lists' && <EuiFlexItem grow={false}>{addNewRuleButton}</EuiFlexItem>}
-        {section === 'lists' && <EuiFlexItem grow={false}>{addNewCdbListButton}</EuiFlexItem>}
+        {section !== 'lists' && (
+          <EuiFlexItem grow={false}>{manageFiles}</EuiFlexItem>
+        )}
+        {section !== 'lists' && (
+          <EuiFlexItem grow={false}>{addNewRuleButton}</EuiFlexItem>
+        )}
+        {section === 'lists' && (
+          <EuiFlexItem grow={false}>{addNewCdbListButton}</EuiFlexItem>
+        )}
         {(section === 'lists' || showingFiles) && (
           <EuiFlexItem grow={false}>
             <UploadFiles
@@ -304,21 +325,26 @@ class WzRulesetActionButtons extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
     state: state.rulesetReducers,
   };
 };
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
-    toggleShowFiles: (status) => dispatch(toggleShowFiles(status)),
-    updateLoadingStatus: (status) => dispatch(updateLoadingStatus(status)),
-    updteAddingRulesetFile: (content) => dispatch(updteAddingRulesetFile(content)),
-    updateListContent: (content) => dispatch(updateListContent(content)),
-    updateIsProcessing: (isProcessing) => dispatch(updateIsProcessing(isProcessing)),
-    updatePageIndex: (pageIndex) => dispatch(updatePageIndex(pageIndex)),
+    toggleShowFiles: status => dispatch(toggleShowFiles(status)),
+    updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
+    updteAddingRulesetFile: content =>
+      dispatch(updteAddingRulesetFile(content)),
+    updateListContent: content => dispatch(updateListContent(content)),
+    updateIsProcessing: isProcessing =>
+      dispatch(updateIsProcessing(isProcessing)),
+    updatePageIndex: pageIndex => dispatch(updatePageIndex(pageIndex)),
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(WzRulesetActionButtons);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(WzRulesetActionButtons);

@@ -13,7 +13,14 @@ import { i18n } from '@kbn/i18n';
 import React, { Component, Fragment } from 'react';
 import { WzButtonPermissions } from '../../components/common/permissions/button';
 
-import { EuiFlexItem, EuiCard, EuiFlexGrid, EuiFlexGroup, EuiCallOut, EuiSpacer } from '@elastic/eui';
+import {
+  EuiFlexItem,
+  EuiCard,
+  EuiFlexGrid,
+  EuiFlexGroup,
+  EuiCallOut,
+  EuiSpacer,
+} from '@elastic/eui';
 
 import { getToasts } from '../../kibana-services';
 import { WzRequest } from '../../react-services/wz-request';
@@ -23,6 +30,31 @@ import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { getErrorOrchestrator } from '../../react-services/common-services';
+
+const addingData = i18n.translate(
+  'wazuh.components.add.modules.sample.data.title1',
+  {
+    defaultMessage: "'Adding data'",
+  },
+);
+const addData = i18n.translate(
+  'wazuh.components.add.modules.sample.data.title2',
+  {
+    defaultMessage: 'Add data',
+  },
+);
+const removingData = i18n.translate(
+  'wazuh.components.add.modules.sample.data.title3',
+  {
+    defaultMessage: 'Removing data',
+  },
+);
+const removeData = i18n.translate(
+  'wazuh.components.add.modules.sample.data.title4',
+  {
+    defaultMessage: 'Remove data',
+  },
+);
 export default class WzSampleData extends Component {
   categories: {
     title: string;
@@ -43,9 +75,12 @@ export default class WzSampleData extends Component {
     this.generateAlertsParams = {}; // extra params to add to generateAlerts function in server
     this.categories = [
       {
-        title: i18n.translate('wazuh.components.addModulesData.sampleSecurityTitle', {
-          defaultMessage: 'Sample security information',
-        }),
+        title: i18n.translate(
+          'wazuh.components.addModulesData.sampleSecurityTitle',
+          {
+            defaultMessage: 'Sample security information',
+          },
+        ),
         description: i18n.translate(
           'wazuh.component.addModulesData.sampleSecurityDescription',
           {
@@ -92,12 +127,12 @@ export default class WzSampleData extends Component {
       },
     ];
     this.state = {};
-    this.categories.forEach((category) => {
+    this.categories.forEach(category => {
       this.state[category.categorySampleAlertsIndex] = {
         exists: false,
         addDataLoading: false,
         removeDataLoading: false,
-        havePermissions: false
+        havePermissions: false,
       };
     });
   }
@@ -109,10 +144,10 @@ export default class WzSampleData extends Component {
           this.categories.reduce((accum, cur) => {
             accum[cur.categorySampleAlertsIndex] = WzRequest.genericReq(
               'GET',
-              `/elastic/samplealerts/${cur.categorySampleAlertsIndex}`
+              `/elastic/samplealerts/${cur.categorySampleAlertsIndex}`,
             );
             return accum;
-          }, {})
+          }, {}),
         );
 
         this.setState(
@@ -124,8 +159,8 @@ export default class WzSampleData extends Component {
               };
               return accum;
             },
-            { ...this.state }
-          )
+            { ...this.state },
+          ),
         );
       } catch (error) {
         throw error;
@@ -155,13 +190,20 @@ export default class WzSampleData extends Component {
         error: {
           error: error,
           message: error.message || error,
-          title: 'Error checking sample data',
+          title: i18n.translate('wazuh.components.modules.wz.sampleDataError', {
+            defaultMessage: 'Error checking sample data',
+          }),
         },
       };
       getErrorOrchestrator().handleError(options);
     }
   }
-  showToast(color: string, title: string = '', text: string = '', time: number = 3000) {
+  showToast(
+    color: string,
+    title: string = '',
+    text: string = '',
+    time: number = 3000,
+  ) {
     getToasts().add({
       color: color,
       title: title,
@@ -182,9 +224,12 @@ export default class WzSampleData extends Component {
         `/elastic/samplealerts/${category.categorySampleAlertsIndex}`,
         { params: this.generateAlertsParams },
       );
-      const alertAdded = i18n.translate('wazuh.components.addModulesData.alertAdded', {
-        defaultMessage: 'Sample security information'
-      });
+      const alertAdded = i18n.translate(
+        'wazuh.components.addModulesData.alertAdded',
+        {
+          defaultMessage: 'Sample security information',
+        },
+      );
       this.showToast(
         'success',
         `${category.title} ${alertAdded}`,
@@ -208,9 +253,12 @@ export default class WzSampleData extends Component {
         error: {
           error: error,
           message: error.message || error,
-          title: i18n.translate('wazuh.components.addModulesData.errorAddSampleData', {
-            defaultMessage: 'Error trying to add sample data',
-          }),
+          title: i18n.translate(
+            'wazuh.components.addModulesData.errorAddSampleData',
+            {
+              defaultMessage: 'Error trying to add sample data',
+            },
+          ),
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -256,9 +304,12 @@ export default class WzSampleData extends Component {
         error: {
           error: error,
           message: error.message || error,
-          title: i18n.translate('wazuh.components.addModulesData.errorDeleteSampleData', {
-            defaultMessage: 'Error trying to delete sample data',
-          }),
+          title: i18n.translate(
+            'wazuh.components.addModulesData.errorDeleteSampleData',
+            {
+              defaultMessage: 'Error trying to delete sample data',
+            },
+          ),
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -276,21 +327,21 @@ export default class WzSampleData extends Component {
     return (
       <EuiFlexItem key={`sample-data-${category.title}`}>
         <EuiCard
-          textAlign="left"
+          textAlign='left'
           title={category.title}
           description={category.description}
           image={category.image}
           betaBadgeLabel={exists ? 'Installed' : undefined}
           footer={
-            <EuiFlexGroup justifyContent="flexEnd">
+            <EuiFlexGroup justifyContent='flexEnd'>
               <EuiFlexItem grow={false}>
                 {(exists && (
                   <WzButtonPermissions
-                    color="danger"
+                    color='danger'
                     roles={[WAZUH_ROLE_ADMINISTRATOR_NAME]}
                     onClick={() => this.removeSampleData(category)}
                   >
-                    {(removeDataLoading && 'Removing data') || 'Remove data'}
+                    {(removeDataLoading && removingData) || removeData}
                   </WzButtonPermissions>
                 )) || (
                   <WzButtonPermissions
@@ -298,7 +349,7 @@ export default class WzSampleData extends Component {
                     roles={[WAZUH_ROLE_ADMINISTRATOR_NAME]}
                     onClick={() => this.addSampleData(category)}
                   >
-                    {(addDataLoading && 'Adding data') || 'Add data'}
+                    {(addDataLoading && addingData) || addData}
                   </WzButtonPermissions>
                 )}
               </EuiFlexItem>
@@ -312,14 +363,18 @@ export default class WzSampleData extends Component {
     return (
       <>
         <EuiCallOut
-            title={ i18n.translate('wazuh.components.addModulesData.permissionRequireForAction', {
-              defaultMessage: 'These actions require permissions on the managed indices.',
-            })}
-            iconType="iInCircle"
+          title={i18n.translate(
+            'wazuh.components.addModulesData.permissionRequireForAction',
+            {
+              defaultMessage:
+                'These actions require permissions on the managed indices.',
+            },
+          )}
+          iconType='iInCircle'
         />
         <EuiSpacer />
         <EuiFlexGrid columns={3}>
-          {this.categories.map((category) => this.renderCard(category))}
+          {this.categories.map(category => this.renderCard(category))}
         </EuiFlexGrid>
       </>
     );
@@ -336,13 +391,13 @@ const zipObject = (keys = [], values = []) => {
 const PromiseAllRecursiveObject = function (obj) {
   const keys = Object.keys(obj);
   return Promise.all(
-    keys.map((key) => {
+    keys.map(key => {
       const value = obj[key];
       // Promise.resolve(value) !== value should work, but !value.then always works
       if (typeof value === 'object' && !value.then) {
         return PromiseAllRecursiveObject(value);
       }
       return value;
-    })
-  ).then((result) => zipObject(keys, result))
+    }),
+  ).then(result => zipObject(keys, result));
 };

@@ -40,122 +40,175 @@ class WzMenuOverview extends Component {
     this.overviewSections = {
       securityInformation: {
         id: 'securityInformation',
-        text: 'Security information management',
+        text: i18n.translate('wazuh.components.wz.menu.securityInformation', {
+          defaultMessage: 'Security information management',
+        }),
       },
-      auditing: { id: 'auditing', text: 'Auditing and Policy Monitoring' },
+      auditing: {
+        id: 'auditing',
+        text: i18n.translate('wazuh.components.wz.menu.policyMonitoring', {
+          defaultMessage: 'Auditing and Policy Monitoring',
+        }),
+      },
       threatDetection: {
         id: 'threatDetection',
-        text: 'Threat detection and response',
+        text: i18n.translate('wazuh.components.wz.menu.response', {
+          defaultMessage: 'Threat detection and response',
+        }),
       },
       regulatoryCompliance: {
         id: 'regulatoryCompliance',
-        text: 'Regulatory Compliance',
+        text: i18n.translate('wazuh.components.wz.menu.regulatory', {
+          defaultMessage: 'Regulatory Compliance',
+        }),
       },
       general: {
         id: WAZUH_MODULES_ID.SECURITY_EVENTS,
         cyTestId: WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID.SECURITY_EVENTS,
-        text: 'Security Events',
+        text: i18n.translate('wazuh.components.wz.menu.securityEvents', {
+          defaultMessage: 'Security Events',
+        }),
       },
       fim: {
         id: WAZUH_MODULES_ID.INTEGRITY_MONITORING,
         cyTestId: WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID.INTEGRITY_MONITORING,
-        text: 'Integrity Monitoring',
+        text: i18n.translate('wazuh.components.wz.menu.intergrity', {
+          defaultMessage: 'Integrity Monitoring',
+        }),
       },
       aws: {
         id: WAZUH_MODULES_ID.AMAZON_WEB_SERVICES,
         cyTestId: WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID.AMAZON_WEB_SERVICES,
-        text: 'Amazon AWS',
+        text: i18n.translate('wazuh.components.wz.menu.aws', {
+          defaultMessage: 'Amazon AWS',
+        }),
       },
       office: {
         id: WAZUH_MODULES_ID.OFFICE_365,
         cyTestId: WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID.OFFICE_365,
-        text: 'Office 365',
+        text: i18n.translate('wazuh.components.wz.menu.office365', {
+          defaultMessage: 'Office 365',
+        }),
       },
       gcp: {
         id: WAZUH_MODULES_ID.GOOGLE_CLOUD_PLATFORM,
         cyTestId: WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID.GOOGLE_CLOUD_PLATFORM,
-        text: 'Google Cloud Platform',
+        text: i18n.translate('wazuh.components.wz.menu.cloud', {
+          defaultMessage: 'Google Cloud Platform',
+        }),
       },
       pm: {
         id: WAZUH_MODULES_ID.POLICY_MONITORING,
         cyTestId: WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID.POLICY_MONITORING,
-        text: 'Policy Monitoring',
+        text: i18n.translate('wazuh.components.wz.menu.policy', {
+          defaultMessage: 'Policy Monitoring',
+        }),
       },
       sca: {
         id: WAZUH_MODULES_ID.SECURITY_CONFIGURATION_ASSESSMENT,
         cyTestId:
           WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID.SECURITY_CONFIGURATION_ASSESSMENT,
-        text: 'Security configuration assessment',
+        text: i18n.translate('wazuh.components.wz.menu.securityAsses', {
+          defaultMessage: 'Security configuration assessment',
+        }),
       },
       audit: {
         id: WAZUH_MODULES_ID.AUDITING,
         cyTestId: WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID.AUDITING,
-        text: 'System Auditing',
+        text: i18n.translate('wazuh.components.wz.menu.system', {
+          defaultMessage: 'System Auditing',
+        }),
       },
       oscap: {
         id: WAZUH_MODULES_ID.OPEN_SCAP,
         cyTestId: WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID.OPEN_SCAP,
-        text: 'OpenSCAP',
+        text: i18n.translate('wazuh.components.wz.menu.openscap', {
+          defaultMessage: 'OpenSCAP',
+        }),
       },
       ciscat: {
         id: WAZUH_MODULES_ID.CIS_CAT,
         cyTestId: WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID.CIS_CAT,
-        text: 'CIS-CAT',
+        text: i18n.translate('wazuh.components.wz.menu.ciscat', {
+          defaultMessage: 'CIS-CAT',
+        }),
       },
       vuls: {
         id: WAZUH_MODULES_ID.VULNERABILITIES,
         cyTestId: WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID.VULNERABILITIES,
-        text: 'Vulnerabilities',
+        text: i18n.translate('wazuh.components.wz.menu.vuln', {
+          defaultMessage: 'Vulnerabilities',
+        }),
       },
       virustotal: {
         id: WAZUH_MODULES_ID.VIRUSTOTAL,
         cyTestId: WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID.VIRUSTOTAL,
-        text: 'VirusTotal',
+        text: i18n.translate('wazuh.components.wz.menu.virus', {
+          defaultMessage: 'VirusTotal',
+        }),
       },
       osquery: {
         id: WAZUH_MODULES_ID.OSQUERY,
         cyTestId: WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID.OSQUERY,
-        text: 'Osquery',
+        text: i18n.translate('wazuh.components.wz.menu.osquery', {
+          defaultMessage: 'Osquery',
+        }),
       },
       docker: {
         id: WAZUH_MODULES_ID.DOCKER,
         cyTestId: WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID.DOCKER,
-        text: 'Docker Listener',
+        text: i18n.translate('wazuh.components.wz.menu.docker', {
+          defaultMessage: 'Docker Listener',
+        }),
       },
       mitre: {
         id: WAZUH_MODULES_ID.MITRE_ATTACK,
         cyTestId: WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID.MITRE_ATTACK,
-        text: 'MITRE ATT&CK',
+        text: i18n.translate('wazuh.components.wz.menu.mitre', {
+          defaultMessage: 'MITRE ATT&CK',
+        }),
       },
       pci: {
         id: WAZUH_MODULES_ID.PCI_DSS,
         cyTestId: WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID.PCI_DSS,
-        text: 'PCI DSS',
+        text: i18n.translate('wazuh.components.wz.menu.pci', {
+          defaultMessage: 'PCI DSS',
+        }),
       },
       gdpr: {
         id: WAZUH_MODULES_ID.GDPR,
         cyTestId: WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID.GDPR,
-        text: 'GDPR',
+        text: i18n.translate('wazuh.components.wz.menu.gdpr', {
+          defaultMessage: 'GDPR',
+        }),
       },
       hipaa: {
         id: WAZUH_MODULES_ID.HIPAA,
         cyTestId: WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID.HIPAA,
-        text: 'HIPAA',
+        text: i18n.translate('wazuh.components.wz.menu.hipaa', {
+          defaultMessage: 'HIPAA',
+        }),
       },
       nist: {
         id: WAZUH_MODULES_ID.NIST_800_53,
         cyTestId: WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID.NIST_800_53,
-        text: 'NIST 800-53',
+        text: i18n.translate('wazuh.components.wz.menu.nist', {
+          defaultMessage: 'NIST 800-53',
+        }),
       },
       tsc: {
         id: WAZUH_MODULES_ID.TSC,
         cyTestId: WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID.TSC,
-        text: 'TSC',
+        text: i18n.translate('wazuh.components.wz.menu.tsc', {
+          defaultMessage: 'TSC',
+        }),
       },
       github: {
         id: WAZUH_MODULES_ID.GITHUB,
         cyTestId: WAZUH_MENU_MODULES_SECTIONS_CY_TEST_ID.GITHUB,
-        text: 'GitHub',
+        text: i18n.translate('wazuh.components.wz.menu.github', {
+          defaultMessage: 'GitHub',
+        }),
       },
     };
 
@@ -308,9 +361,12 @@ class WzMenuOverview extends Component {
                       window.location.href = '#/overview';
                     }}
                   >
-                    {i18n.translate('wazuh.components.wz.menu.Modulesdirectory', {
-                      defaultMessage: 'Modules directory',
-                    })}
+                    {i18n.translate(
+                      'wazuh.components.wz.menu.Modulesdirectory',
+                      {
+                        defaultMessage: 'Modules directory',
+                      },
+                    )}
                   </EuiButtonEmpty>
                 </EuiFlexItem>
               </EuiFlexGroup>

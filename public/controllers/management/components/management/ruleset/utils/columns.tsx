@@ -6,6 +6,7 @@ import { WzButtonPermissions } from '../../../../../../components/common/permiss
 import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
 import { UIErrorLog, UILogLevel, UIErrorSeverity, UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
+import { i18n } from '@kbn/i18n';
 
 export default class RulesetColumns {
   constructor(tableProps) {
@@ -16,14 +17,18 @@ export default class RulesetColumns {
         rules: [
           {
             field: 'id',
-            name: 'ID',
+            name: i18n.translate("wazuh.controllers.management.comp.rulset.utils.id", {
+  defaultMessage: 'ID',
+}),
             align: 'left',
             sortable: true,
             width: '5%'
           },
           {
             field: 'description',
-            name: 'Description',
+            name: i18n.translate("wazuh.controllers.management.comp.rulset.utils.descp", {
+  defaultMessage:'Description' ,
+}),
             align: 'left',
             sortable: true,
             width: '30%',
@@ -56,25 +61,33 @@ export default class RulesetColumns {
           },
           {
             field: 'groups',
-            name: 'Groups',
+            name: i18n.translate("wazuh.controllers.management.comp.rulset.utils.groups", {
+  defaultMessage: 'Groups',
+}),
             align: 'left',
             sortable: false,
             width: '10%'
           },
           {
-            name: 'Regulatory compliance',
+            name: i18n.translate("wazuh.controllers.management.comp.rulset.utils.regulatory", {
+  defaultMessage: 'Regulatory compliance',
+}),
             render: this.buildComplianceBadges
           },
           {
             field: 'level',
-            name: 'Level',
+            name: i18n.translate("wazuh.controllers.management.comp.rulset.utils.level", {
+  defaultMessage:'Level' ,
+}),
             align: 'left',
             sortable: true,
             width: '5%'
           },
           {
             field: 'filename',
-            name: 'File',
+            name: i18n.translate("wazuh.controllers.management.comp.rulset.utils.file", {
+  defaultMessage: 'File',
+}),
             align: 'left',
             sortable: true,
             width: '15%',
@@ -106,7 +119,9 @@ export default class RulesetColumns {
           },
           {
             field: 'relative_dirname',
-            name: 'Path',
+            name: i18n.translate("wazuh.controllers.management.comp.rulset.utils.path", {
+  defaultMessage:'Path' ,
+}),
             align: 'left',
             sortable: true,
             width: '10%'
@@ -115,25 +130,33 @@ export default class RulesetColumns {
         decoders: [
           {
             field: 'name',
-            name: 'Name',
+            name: i18n.translate("wazuh.controllers.management.comp.rulset.utils.name", {
+  defaultMessage: 'Name',
+}),
             align: 'left',
             sortable: true
           },
           {
             field: 'details.program_name',
-            name: 'Program name',
+            name: i18n.translate("wazuh.controllers.management.comp.rulset.utils.programName", {
+  defaultMessage: 'Program name',
+}),
             align: 'left',
             sortable: false
           },
           {
             field: 'details.order',
-            name: 'Order',
+            name: i18n.translate("wazuh.controllers.management.comp.rulset.utils.order", {
+  defaultMessage: 'Order',
+}),
             align: 'left',
             sortable: false
           },
           {
             field: 'filename',
-            name: 'File',
+            name: i18n.translate("wazuh.controllers.management.comp.rulset.utils.file", {
+  defaultMessage: 'File',
+}),
             align: 'left',
             sortable: true,
             render: (value, item) => {
@@ -164,7 +187,9 @@ export default class RulesetColumns {
           },
           {
             field: 'relative_dirname',
-            name: 'Path',
+            name: i18n.translate("wazuh.controllers.management.comp.rulset.utils.path", {
+  defaultMessage: 'Path',
+}),
             align: 'left',
             sortable: true
           }
@@ -172,18 +197,24 @@ export default class RulesetColumns {
         lists: [
           {
             field: 'filename',
-            name: 'Name',
+            name: i18n.translate("wazuh.controllers.management.comp.rulset.utils.name", {
+  defaultMessage: 'Name',
+}),
             align: 'left',
             sortable: true
           },
           {
             field: 'relative_dirname',
-            name: 'Path',
+            name: i18n.translate("wazuh.controllers.management.comp.rulset.utils.path", {
+  defaultMessage: 'Path',
+}),
             align: 'left',
             sortable: true
           },
           {
-            name: 'Actions',
+            name: i18n.translate("wazuh.controllers.management.comp.rulset.utils.actions", {
+  defaultMessage: 'Actions',
+}),
             align: 'left',
             render: (item) => (
               <EuiToolTip position="top" content={`Export ${item.filename}`}>
@@ -211,12 +242,16 @@ export default class RulesetColumns {
         files: [
           {
             field: 'filename',
-            name: 'File',
+            name: i18n.translate("wazuh.controllers.management.comp.rulset.utils.", {
+  defaultMessage: ,
+})'File',
             align: 'left',
             sortable: true
           },
           {
-            name: 'Actions',
+            name: i18n.translate("wazuh.controllers.management.comp.rulset.utils.", {
+  defaultMessage: ,
+})'Actions',
             align: 'left',
             render: item => {
               if (item.relative_dirname.startsWith('ruleset/')) {

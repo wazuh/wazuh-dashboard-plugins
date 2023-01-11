@@ -10,20 +10,28 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import { EuiFlexItem, EuiFlexGroup, EuiSideNav, EuiIcon, EuiButtonEmpty, EuiToolTip } from '@elastic/eui';
+import {
+  EuiFlexItem,
+  EuiFlexGroup,
+  EuiSideNav,
+  EuiIcon,
+  EuiButtonEmpty,
+  EuiToolTip,
+} from '@elastic/eui';
 import { WzRequest } from '../../react-services/wz-request';
 import { connect } from 'react-redux';
 import { AppNavigate } from '../../react-services/app-navigate';
 import { getAngularModule } from '../../kibana-services';
 import { WAZUH_MENU_SETTINGS_SECTIONS_ID } from '../../../common/constants';
 import { WAZUH_MENU_SETTINGS_SECTIONS_CY_TEST_ID } from '../../../common/wazu-menu/wz-menu-settings.cy';
+import { i18n } from '@kbn/i18n';
 
 class WzMenuSettings extends Component {
   constructor(props) {
     super(props);
     this.state = {
       // TODO: Fix the selected section
-      selectedItemName: null
+      selectedItemName: null,
     };
     this.wzReq = WzRequest;
   }
@@ -40,48 +48,65 @@ class WzMenuSettings extends Component {
       settings: {
         id: WAZUH_MENU_SETTINGS_SECTIONS_ID.SETTINGS,
         cyTestId: WAZUH_MENU_SETTINGS_SECTIONS_CY_TEST_ID.SETTINGS,
-        text: 'Settings',
+        text: i18n.translate('wazuh.components.wz.menu.setting.Setting', {
+          defaultMessage: 'Settings',
+        }),
       },
       api: {
         id: WAZUH_MENU_SETTINGS_SECTIONS_ID.API_CONFIGURATION,
         cyTestId: WAZUH_MENU_SETTINGS_SECTIONS_CY_TEST_ID.API_CONFIGURATION,
-        text: 'API configuration',
+        text: i18n.translate('wazuh.components.wz.menu.setting.apiConfig', {
+          defaultMessage: 'API configuration',
+        }),
       },
       modules: {
         id: WAZUH_MENU_SETTINGS_SECTIONS_ID.MODULES,
         cyTestId: WAZUH_MENU_SETTINGS_SECTIONS_CY_TEST_ID.MODULES,
-        text: 'Modules',
+        text: i18n.translate('wazuh.components.wz.menu.setting.modules', {
+          defaultMessage: 'Modules',
+        }),
       },
       sample_data: {
         id: WAZUH_MENU_SETTINGS_SECTIONS_ID.SAMPLE_DATA,
         cyTestId: WAZUH_MENU_SETTINGS_SECTIONS_CY_TEST_ID.SAMPLE_DATA,
-        text: 'Sample data',
+        text: i18n.translate('wazuh.components.wz.menu.setting.sampleData', {
+          defaultMessage: 'Sample data',
+        }),
       },
       configuration: {
         id: WAZUH_MENU_SETTINGS_SECTIONS_ID.CONFIGURATION,
         cyTestId: WAZUH_MENU_SETTINGS_SECTIONS_CY_TEST_ID.CONFIGURATION,
-        text: 'Configuration',
+        text: i18n.translate('wazuh.components.wz.menu.setting.config', {
+          defaultMessage: 'Configuration',
+        }),
       },
       logs: {
         id: WAZUH_MENU_SETTINGS_SECTIONS_ID.LOGS,
         cyTestId: WAZUH_MENU_SETTINGS_SECTIONS_CY_TEST_ID.LOGS,
-        text: 'Logs' },
+        text: i18n.translate('wazuh.components.wz.menu.setting.logs', {
+          defaultMessage: 'Logs',
+        }),
+      },
       miscellaneous: {
         id: WAZUH_MENU_SETTINGS_SECTIONS_ID.MISCELLANEOUS,
         cyTestId: WAZUH_MENU_SETTINGS_SECTIONS_CY_TEST_ID.MISCELLANEOUS,
-        text: 'Miscellaneous',
+        text: i18n.translate('wazuh.components.wz.menu.setting.miscell', {
+          defaultMessage: 'Miscellaneous',
+        }),
       },
       about: {
         id: WAZUH_MENU_SETTINGS_SECTIONS_ID.ABOUT,
         cyTestId: WAZUH_MENU_SETTINGS_SECTIONS_CY_TEST_ID.ABOUT,
-        text: 'About',
+        text: i18n.translate('wazuh.components.wz.menu.setting.about', {
+          defaultMessage: 'About',
+        }),
       },
     };
-    return (auxSettings);
+    return auxSettings;
   }
 
   avaibleRenderSettings() {
-    const availableSettings = this.availableSettings()
+    const availableSettings = this.availableSettings();
     let auxItems = [
       this.createItem(availableSettings.api),
       this.createItem(availableSettings.modules),
@@ -90,8 +115,8 @@ class WzMenuSettings extends Component {
       this.createItem(availableSettings.logs),
       this.createItem(availableSettings.miscellaneous),
       this.createItem(availableSettings.about),
-    ]
-    return (auxItems);
+    ];
+    return auxItems;
   }
 
   clickMenuItem = async (ev, section) => {
@@ -111,28 +136,29 @@ class WzMenuSettings extends Component {
       id: item.id,
       name: item.text,
       'data-test-subj': item.cyTestId,
-      isSelected: window.location.href.includes('/settings') && this.props.state.selected_settings_section === item.id,
-      onClick: () => { },
-      onMouseDown: (ev) => this.clickMenuItem(ev, item.id)
+      isSelected:
+        window.location.href.includes('/settings') &&
+        this.props.state.selected_settings_section === item.id,
+      onClick: () => {},
+      onMouseDown: ev => this.clickMenuItem(ev, item.id),
     };
   };
 
   render() {
-    const availableSettings = this.availableSettings()
-    const renderSettings = this.avaibleRenderSettings()
+    const availableSettings = this.availableSettings();
+    const renderSettings = this.avaibleRenderSettings();
     const sideNavAdmin = [
       {
         name: availableSettings.settings.text,
         id: availableSettings.settings.id,
         disabled: true,
-        icon: <EuiIcon type="gear" color="primary"/>,
-        items: renderSettings
-      }
+        icon: <EuiIcon type='gear' color='primary' />,
+        items: renderSettings,
+      },
     ];
 
-
     return (
-      <div className="WzManagementSideMenu" style={{ width: 200 }}>
+      <div className='WzManagementSideMenu' style={{ width: 200 }}>
         <EuiFlexGroup responsive={false}>
           <EuiFlexItem grow={false}>
             <EuiSideNav items={sideNavAdmin} style={{ padding: '4px 12px' }} />
@@ -149,6 +175,4 @@ const mapStateToProps = state => {
   };
 };
 
-export default connect(
-  mapStateToProps,
-)(WzMenuSettings);
+export default connect(mapStateToProps)(WzMenuSettings);

@@ -14,6 +14,7 @@ import React, { Component, Fragment } from 'react';
 import { EuiFlexItem, EuiButtonEmpty } from '@elastic/eui';
 
 import { connect } from 'react-redux';
+import { i18n } from '@kbn/i18n';
 
 import {
   updateLoadingStatus,
@@ -119,7 +120,7 @@ class WzGroupsActionButtonsAgents extends Component {
     });
   }
 
-  onChangeNewGroupName = (e) => {
+  onChangeNewGroupName = e => {
     this.setState({
       newGroupName: e.target.value,
     });
@@ -135,7 +136,7 @@ class WzGroupsActionButtonsAgents extends Component {
         if (input.length) {
           const i = input[0];
           if (!i.onkeypress) {
-            i.onkeypress = async (e) => {
+            i.onkeypress = async e => {
               if (e.which === 13) {
                 await this.createGroup();
               }
@@ -164,7 +165,12 @@ class WzGroupsActionButtonsAgents extends Component {
     try {
       this.props.updateLoadingStatus(true);
       await this.groupsHandler.saveGroup(this.state.newGroupName);
-      this.showToast('success', 'Success', 'The group has been created successfully', 2000);
+      this.showToast(
+        'success',
+        'Success',
+        'The group has been created successfully',
+        2000,
+      );
       this.clearGroupName();
 
       this.props.updateIsProcessing(true);
@@ -183,12 +189,16 @@ class WzGroupsActionButtonsAgents extends Component {
     try {
       this.setState({ generatingCsv: true });
       const { section, filters } = this.props.state; //TODO get filters from the search bar from the REDUX store
-      await this.exportCsv(`/groups/${this.props.state.itemDetail.name}/agents`, filters, 'Groups');
+      await this.exportCsv(
+        `/groups/${this.props.state.itemDetail.name}/agents`,
+        filters,
+        'Groups',
+      );
       this.showToast(
         'success',
         'Success',
         'CSV. Your download should begin automatically...',
-        2000
+        2000,
       );
     } catch (error) {
       const options = {
@@ -219,39 +229,52 @@ class WzGroupsActionButtonsAgents extends Component {
   render() {
     // Add new group button
     const manageAgentsButton = (
-      <EuiButtonEmpty iconSide="left" iconType="folderOpen" onClick={() => this.showManageAgents()}>
-        Manage agents
+      <EuiButtonEmpty
+        iconSide='left'
+        iconType='folderOpen'
+        onClick={() => this.showManageAgents()}
+      >
+        {i18n.translate('wazuh.controllers.mnage.comp.groups.manageAgents', {
+          defaultMessage: 'Manage agents',
+        })}
       </EuiButtonEmpty>
     );
 
     // Export PDF button
     const exportPDFButton = (
       <ExportConfiguration
-        exportConfiguration={(enabledComponents) =>
+        exportConfiguration={enabledComponents =>
           this.reportingService.startConfigReport(
             this.props.state.itemDetail,
             'groupConfig',
-            enabledComponents
+            enabledComponents,
           )
         }
-        type="group"
+        type='group'
       />
     );
     // Export button
     const exportCSVButton = (
       <EuiButtonEmpty
-        iconType="exportAction"
+        iconType='exportAction'
         onClick={async () => await this.generateCsv()}
         isLoading={this.state.generatingCsv}
       >
-        Export formatted
+        {i18n.translate('wazuh.controllers.mnage.comp.groups.exportFormatted', {
+          defaultMessage: 'Export formatted',
+        })}
       </EuiButtonEmpty>
     );
 
     // Refresh
     const refreshButton = (
-      <EuiButtonEmpty iconType="refresh" onClick={async () => await this.refresh()}>
-        Refresh
+      <EuiButtonEmpty
+        iconType='refresh'
+        onClick={async () => await this.refresh()}
+      >
+        {i18n.translate('wazuh.controllers.mnage.comp.groups.Refresh', {
+          defaultMessage: 'Refresh',
+        })}
       </EuiButtonEmpty>
     );
 
@@ -266,19 +289,24 @@ class WzGroupsActionButtonsAgents extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
     state: state.groupsReducers,
   };
 };
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
-    updateLoadingStatus: (status) => dispatch(updateLoadingStatus(status)),
-    updateIsProcessing: (isProcessing) => dispatch(updateIsProcessing(isProcessing)),
-    updateShowAddAgents: (showAddAgents) => dispatch(updateShowAddAgents(showAddAgents)),
+    updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
+    updateIsProcessing: isProcessing =>
+      dispatch(updateIsProcessing(isProcessing)),
+    updateShowAddAgents: showAddAgents =>
+      dispatch(updateShowAddAgents(showAddAgents)),
     updateReload: () => dispatch(updateReload()),
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(WzGroupsActionButtonsAgents);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(WzGroupsActionButtonsAgents);

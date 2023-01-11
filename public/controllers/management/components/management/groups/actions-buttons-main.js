@@ -38,6 +38,18 @@ import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 
+const title1 = i18n.translate(
+  'wazuh.components.management.groups.action.title1',
+  {
+    defaultMessage: 'Error creating a new group',
+  },
+);
+const title2 = i18n.translate(
+  'wazuh.components.management.groups.action.title2',
+  {
+    defaultMessage: 'Error when exporting the CSV file:',
+  },
+);
 class WzGroupsActionButtons extends Component {
   _isMounted = false;
 
@@ -193,7 +205,7 @@ class WzGroupsActionButtons extends Component {
         error: {
           error: error,
           message: error.message || error,
-          title: `Error creating a new group`,
+          title: title1,
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -225,7 +237,7 @@ class WzGroupsActionButtons extends Component {
         error: {
           error: error,
           message: error.message || error,
-          title: `Error when exporting the CSV file: ${error.message || error}`,
+          title: `${title2} ${error.message || error}`,
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -256,7 +268,12 @@ class WzGroupsActionButtons extends Component {
         permissions={[{ action: 'group:create', resource: '*:*:*' }]}
         onClick={() => this.togglePopover()}
       >
-        Add new group
+        {i18n.translate(
+          'wazuh.controllers.mnage.comp.confi.groups.AddNewGroup',
+          {
+            defaultMessage: 'Add new group',
+          },
+        )}
       </WzButtonPermissions>
     );
 
@@ -267,7 +284,12 @@ class WzGroupsActionButtons extends Component {
         onClick={async () => await this.generateCsv()}
         isLoading={this.state.generatingCsv}
       >
-        Export formatted
+        {i18n.translate(
+          'wazuh.controllers.mnage.comp.confi.groups.exportFormatted',
+          {
+            defaultMessage: 'Export formatted',
+          },
+        )}
       </EuiButtonEmpty>
     );
 
@@ -277,7 +299,9 @@ class WzGroupsActionButtons extends Component {
         iconType='refresh'
         onClick={async () => await this.refresh()}
       >
-        Refresh
+        {i18n.translate('wazuh.controllers.mnage.comp.confi.groups.refresh', {
+          defaultMessage: 'Refresh',
+        })}
       </EuiButtonEmpty>
     );
 
@@ -311,9 +335,12 @@ class WzGroupsActionButtons extends Component {
                     await this.createGroup();
                   }}
                 >
-                  {i18n.translate('wazuh.controllers.mnage.comp.confi.groups.save', {
-                    defaultMessage: 'Save new group',
-                  })}
+                  {i18n.translate(
+                    'wazuh.controllers.mnage.comp.confi.groups.save',
+                    {
+                      defaultMessage: 'Save new group',
+                    },
+                  )}
                 </WzButtonPermissions>
               </EuiFlexItem>
             </EuiFlexGroup>

@@ -20,10 +20,14 @@ import {
   withReduxProvider,
   withUserAuthorizationPrompt,
 } from '../../common/hocs';
-import { UI_LOGGER_LEVELS, WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../../common/constants';
+import {
+  UI_LOGGER_LEVELS,
+  WAZUH_ROLE_ADMINISTRATOR_NAME,
+} from '../../../../common/constants';
 import { compose } from 'redux';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
+import { i18n } from '@kbn/i18n';
 
 export class EnableModulesWrapper extends Component {
   constructor(props) {
@@ -34,47 +38,256 @@ export class EnableModulesWrapper extends Component {
         extensions: [],
         groups: [
           {
-            title: 'Security Information Management',
+            title: i18n.translate(
+              'wazuh.components.setting.modules.wrapper.security',
+              {
+                defaultMessage: 'Security Information Management',
+              },
+            ),
             modules: [
-              { name: 'general', default: true, agent: false },
-              { name: 'fim', default: true, agent: false },
-              { name: 'office', default: false, agent: false },
-              { name: 'aws', default: false, agent: false },
-              { name: 'gcp', default: false, agent: false },
-              { name: 'github', default: false, agent: false }
-            ]
+              {
+                name: i18n.translate(
+                  'wazuh.components.setting.modules.wrapper.gernal',
+                  {
+                    defaultMessage: 'general',
+                  },
+                ),
+                default: true,
+                agent: false,
+              },
+              {
+                name: i18n.translate(
+                  'wazuh.components.setting.modules.wrapper.fim',
+                  {
+                    defaultMessage: 'fim',
+                  },
+                ),
+                default: true,
+                agent: false,
+              },
+              {
+                name: i18n.translate(
+                  'wazuh.components.setting.modules.wrapper.office',
+                  {
+                    defaultMessage: 'office',
+                  },
+                ),
+                default: false,
+                agent: false,
+              },
+              {
+                name: i18n.translate(
+                  'wazuh.components.setting.modules.wrapper.aws',
+                  {
+                    defaultMessage: 'aws',
+                  },
+                ),
+                default: false,
+                agent: false,
+              },
+              {
+                name: i18n.translate(
+                  'wazuh.components.setting.modules.wrapper.gcp',
+                  {
+                    defaultMessage: 'gcp',
+                  },
+                ),
+                default: false,
+                agent: false,
+              },
+              {
+                name: i18n.translate(
+                  'wazuh.components.setting.modules.wrapper.github',
+                  {
+                    defaultMessage: "'github'",
+                  },
+                ),
+                default: false,
+                agent: false,
+              },
+            ],
           },
           {
-            title: 'Auditing and Policy Monitoring',
+            title: i18n.translate(
+              'wazuh.components.setting.modules.wrapper.auditing',
+              {
+                defaultMessage: 'Auditing and Policy Monitoring',
+              },
+            ),
             modules: [
-              { name: 'pm', default: true, agent: false },
-              { name: 'sca', default: true, agent: false },
-              { name: 'audit', default: true, agent: false },
-              { name: 'oscap', default: false, agent: false },
-              { name: 'ciscat', default: false, agent: false }
-            ]
+              {
+                name: i18n.translate(
+                  'wazuh.components.setting.modules.wrapper.pm',
+                  {
+                    defaultMessage: 'pm',
+                  },
+                ),
+                default: true,
+                agent: false,
+              },
+              {
+                name: i18n.translate(
+                  'wazuh.components.setting.modules.wrapper.sca',
+                  {
+                    defaultMessage: 'sca',
+                  },
+                ),
+                default: true,
+                agent: false,
+              },
+              {
+                name: i18n.translate(
+                  'wazuh.components.setting.modules.wrapper.audit',
+                  {
+                    defaultMessage: 'audit',
+                  },
+                ),
+                default: true,
+                agent: false,
+              },
+              {
+                name: i18n.translate(
+                  'wazuh.components.setting.modules.wrapper.oscap',
+                  {
+                    defaultMessage: 'oscap',
+                  },
+                ),
+                default: false,
+                agent: false,
+              },
+              {
+                name: i18n.translate(
+                  'wazuh.components.setting.modules.wrapper.ciscat',
+                  {
+                    defaultMessage: 'ciscat',
+                  },
+                ),
+                default: false,
+                agent: false,
+              },
+            ],
           },
           {
-            title: 'Threat Detection and Response',
+            title: i18n.translate(
+              'wazuh.components.setting.modules.wrapper.response',
+              {
+                defaultMessage: 'Threat Detection and Response',
+              },
+            ),
             modules: [
-              { name: 'vuls', default: true, agent: false },
-              { name: 'mitre', default: true, agent: false },
-              { name: 'virustotal', default: false, agent: false },
-              { name: 'osquery', default: false, agent: false },
-              { name: 'docker', default: false, agent: false },
-            ]
+              {
+                name: i18n.translate(
+                  'wazuh.components.setting.modules.wrapper.vuls',
+                  {
+                    defaultMessage: 'vuls',
+                  },
+                ),
+                default: true,
+                agent: false,
+              },
+              {
+                name: i18n.translate(
+                  'wazuh.components.setting.modules.wrapper.mitre',
+                  {
+                    defaultMessage: 'mitre',
+                  },
+                ),
+                default: true,
+                agent: false,
+              },
+              {
+                name: i18n.translate(
+                  'wazuh.components.setting.modules.wrapper.virus',
+                  {
+                    defaultMessage: 'virustotal',
+                  },
+                ),
+                default: false,
+                agent: false,
+              },
+              {
+                name: i18n.translate(
+                  'wazuh.components.setting.modules.wrapper.osq',
+                  {
+                    defaultMessage: 'osquery',
+                  },
+                ),
+                default: false,
+                agent: false,
+              },
+              {
+                name: i18n.translate(
+                  'wazuh.components.setting.modules.wrapper.docker',
+                  {
+                    defaultMessage: 'docker',
+                  },
+                ),
+                default: false,
+                agent: false,
+              },
+            ],
           },
           {
-            title: 'Regulatory Compliance',
+            title: i18n.translate(
+              'wazuh.components.setting.modules.wrapper.compliance',
+              {
+                defaultMessage: 'Regulatory Compliance',
+              },
+            ),
             modules: [
-              { name: 'pci', default: true, agent: false },
-              { name: 'nist', default: true, agent: false },
-              { name: 'gdpr', default: false, agent: false },
-              { name: 'hipaa', default: false, agent: false },
-              { name: 'tsc', default: false, agent: false }
-            ]
-          }
-        ]
+              {
+                name: i18n.translate(
+                  'wazuh.components.setting.modules.wrapper.pci',
+                  {
+                    defaultMessage: 'pci',
+                  },
+                ),
+                default: true,
+                agent: false,
+              },
+              {
+                name: i18n.translate(
+                  'wazuh.components.setting.modules.wrapper.nist',
+                  {
+                    defaultMessage: 'nist',
+                  },
+                ),
+                default: true,
+                agent: false,
+              },
+              {
+                name: i18n.translate(
+                  'wazuh.components.setting.modules.wrapper.gdpr',
+                  {
+                    defaultMessage: 'gdpr',
+                  },
+                ),
+                default: false,
+                agent: false,
+              },
+              {
+                name: i18n.translate(
+                  'wazuh.components.setting.modules.wrapper.hipaa',
+                  {
+                    defaultMessage: 'hipaa',
+                  },
+                ),
+                default: false,
+                agent: false,
+              },
+              {
+                name: i18n.translate(
+                  'wazuh.components.setting.modules.wrapper.tsc',
+                  {
+                    defaultMessage: 'tsc',
+                  },
+                ),
+                default: false,
+                agent: false,
+              },
+            ],
+          },
+        ],
       };
     } catch (error) {
       const options = {
@@ -142,21 +355,25 @@ export class EnableModulesWrapper extends Component {
           <EuiFlexItem grow={false} style={{ minWidth: 90 }}>
             {!extension.default && (
               <EuiSwitch
-                label=""
+                label=''
                 style={{
                   padding: '8px 0px',
                   right: 0,
                   position: 'absolute',
-                  top: 0
+                  top: 0,
                 }}
-                checked={typeof this.state.extensions[extension.name] !== 'undefined' ? this.state.extensions[extension.name] : false}
+                checked={
+                  typeof this.state.extensions[extension.name] !== 'undefined'
+                    ? this.state.extensions[extension.name]
+                    : false
+                }
                 onChange={() => this.toggleExtension(extension)}
               />
             )}
             {extension.default && (
               <EuiBetaBadge
-                label="Default"
-                tooltipContent="This module is enabled by default"
+                label='Default'
+                tooltipContent='This module is enabled by default'
                 style={{ margin: '6px 0px' }}
               />
             )}
@@ -169,7 +386,7 @@ export class EnableModulesWrapper extends Component {
                     <span>
                       {extension.agent && (
                         <span>
-                          <EuiBadge color="#006bb4">{'Agent module'}</EuiBadge>
+                          <EuiBadge color='#006bb4'>{'Agent module'}</EuiBadge>
                           &nbsp;&nbsp;
                         </span>
                       )}
@@ -178,8 +395,8 @@ export class EnableModulesWrapper extends Component {
                   ),
                   description: (
                     <span>{WAZUH_MODULES[extension.name].description}</span>
-                  )
-                }
+                  ),
+                },
               ]}
             />
           </EuiFlexItem>
@@ -197,15 +414,15 @@ export class EnableModulesWrapper extends Component {
           key={i}
           style={{ paddingBottom: i !== this.state.groups.length - 1 ? 8 : 16 }}
         >
-          <EuiPanel paddingSize="l">
+          <EuiPanel paddingSize='l'>
             <EuiFlexGroup>
               <EuiFlexItem>
-                <EuiTitle size="s">
+                <EuiTitle size='s'>
                   <h2>{group.title}</h2>
                 </EuiTitle>
               </EuiFlexItem>
             </EuiFlexGroup>
-            <EuiSpacer size="l" />
+            <EuiSpacer size='l' />
             <EuiFlexGroup>
               <EuiFlexItem>{this.buildModuleGroup(group.modules)}</EuiFlexItem>
             </EuiFlexGroup>
@@ -216,8 +433,8 @@ export class EnableModulesWrapper extends Component {
   }
 }
 
-export const EnableModules = compose (
+export const EnableModules = compose(
   withErrorBoundary,
   withReduxProvider,
-  withUserAuthorizationPrompt(null, [WAZUH_ROLE_ADMINISTRATOR_NAME])
+  withUserAuthorizationPrompt(null, [WAZUH_ROLE_ADMINISTRATOR_NAME]),
 )(EnableModulesWrapper);

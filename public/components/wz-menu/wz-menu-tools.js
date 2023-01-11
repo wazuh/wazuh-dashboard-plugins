@@ -16,13 +16,14 @@ import { connect } from 'react-redux';
 import { AppNavigate } from '../../react-services/app-navigate';
 import { WAZUH_MENU_TOOLS_SECTIONS_ID } from '../../../common/constants';
 import { WAZUH_MENU_TOOLS_SECTIONS_CY_TEST_ID } from '../../../common/wazu-menu/wz-menu-tools.cy';
+import { i18n } from '@kbn/i18n';
 
 class WzMenuTools extends Component {
   constructor(props) {
     super(props);
     this.state = {
       // TODO: Fix the selected section
-      selectedItemName: null
+      selectedItemName: null,
     };
     this.wzReq = WzRequest;
   }
@@ -39,12 +40,16 @@ class WzMenuTools extends Component {
       this.createItem({
         id: WAZUH_MENU_TOOLS_SECTIONS_ID.API_CONSOLE,
         cyTestId: WAZUH_MENU_TOOLS_SECTIONS_CY_TEST_ID.API_CONSOLE,
-        text: 'API Console',
+        text: i18n.translate('wazuh.components.wz.menu.tool.apiConsole', {
+          defaultMessage: 'API Console',
+        }),
       }),
       this.createItem({
         id: WAZUH_MENU_TOOLS_SECTIONS_ID.RULESET_TEST,
         cyTestId: WAZUH_MENU_TOOLS_SECTIONS_CY_TEST_ID.RULESET_TEST,
-        text: 'Ruleset Test',
+        text: i18n.translate('wazuh.components.wz.menu.tool.rulesetTest', {
+          defaultMessage: 'Ruleset Test',
+        }),
       }),
     ];
   }
@@ -61,25 +66,27 @@ class WzMenuTools extends Component {
       id: item.id,
       name: item.text,
       'data-test-subj': item.cyTestId,
-      isSelected: window.location.href.includes('/wazuh-dev') && this.props.state.selected_tools_section === item.id,
-      onClick: () => { },
-      onMouseDown: (ev) => this.clickMenuItem(ev, item.id)
+      isSelected:
+        window.location.href.includes('/wazuh-dev') &&
+        this.props.state.selected_tools_section === item.id,
+      onClick: () => {},
+      onMouseDown: ev => this.clickMenuItem(ev, item.id),
     };
   };
 
   render() {
-    const renderSettings = this.avaibleRenderSettings()
+    const renderSettings = this.avaibleRenderSettings();
     const sideNavAdmin = [
       {
         name: 'Tools',
         id: 0,
-        icon: <EuiIcon type="devToolsApp" color="primary"/>,
-        items: renderSettings
-      }
+        icon: <EuiIcon type='devToolsApp' color='primary' />,
+        items: renderSettings,
+      },
     ];
 
     return (
-      <div className="WzManagementSideMenu" style={{ width: 200 }}>
+      <div className='WzManagementSideMenu' style={{ width: 200 }}>
         <EuiFlexGroup responsive={false}>
           <EuiFlexItem grow={false}>
             <EuiSideNav items={sideNavAdmin} style={{ padding: '4px 12px' }} />
@@ -92,7 +99,7 @@ class WzMenuTools extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.toolsReducers
+    state: state.toolsReducers,
   };
 };
 
