@@ -158,7 +158,6 @@ class WzMenuAgent extends Component {
   render() {
     const securityInformation = [
       this.createItem(this.agentSections.securityInformation, {
-        disabled: true,
         icon: <EuiIcon type="managementApp" color="primary" />,
         items: this.createItems(this.securityInformationItems),
       }),
@@ -166,7 +165,6 @@ class WzMenuAgent extends Component {
 
     const auditing = [
       this.createItem(this.agentSections.auditing, {
-        disabled: true,
         icon: <EuiIcon type="managementApp" color="primary" />,
         items: this.createItems(this.auditingItems),
       }),
@@ -174,7 +172,6 @@ class WzMenuAgent extends Component {
 
     const threatDetection = [
       this.createItem(this.agentSections.threatDetection, {
-        disabled: true,
         icon: <EuiIcon type="reportingApp" color="primary" />,
         items: this.createItems(this.threatDetectionItems),
       }),
@@ -182,7 +179,6 @@ class WzMenuAgent extends Component {
 
     const regulatoryCompliance = [
       this.createItem(this.agentSections.regulatoryCompliance, {
-        disabled: true,
         icon: <EuiIcon type="reportingApp" color="primary" />,
         items: this.createItems(this.regulatoryComplianceItems),
       }),
