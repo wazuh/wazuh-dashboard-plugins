@@ -1,8 +1,9 @@
 {
   "name": "wazuh",
   "version": "4.4.0",
-  "revision": "4400",
-  "code": "4400",
+  "revision": "00",
+  "stage": "alpha",
+  "commit": "f4f8345",
   "pluginPlatform": {
     "version": "7.16.0"
   },
@@ -46,7 +47,6 @@
     "angular": "^1.8.0",
     "angular-aria": "^1.8.0",
     "angular-animate": "1.7.8",
-    "angular-chart.js": "1.1.1",
     "angular-elastic": "^2.5.1",
     "angular-material": "1.1.18",
     "angular-recursion": "^1.0.5",
@@ -65,15 +65,14 @@
     "needle": "^2.0.1",
     "ngreact": "^0.5.1",
     "node-cron": "^1.1.2",
-    "pdfmake": "0.1.65",
-    "pug-loader": "^2.4.0",
+    "pdfmake": "0.2.7",
     "querystring-browser": "1.0.4",
     "react-codemirror": "^1.0.0",
     "react-cookie": "^4.0.3",
     "read-last-lines": "^1.7.2",
     "timsort": "^0.3.0",
     "typescript": "^4.4.2",
-    "winston": "3.0.0"
+    "winston": "3.5.1"
   },
   "devDependencies": {
     "@types/node-cron": "^2.0.3",

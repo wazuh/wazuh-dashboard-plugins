@@ -31,7 +31,6 @@ import {
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
 import { formatUIDate } from '../../../react-services/time-service';
-import exportCsv from '../../../react-services/wz-csv';
 import { getToasts } from '../../../kibana-services';
 import _ from 'lodash';
 import {
@@ -40,7 +39,11 @@ import {
   UIErrorSeverity,
   UILogLevel,
 } from '../../../react-services/error-orchestrator/types';
-import { API_NAME_AGENT_STATUS, UI_LOGGER_LEVELS } from '../../../../common/constants';
+import {
+  API_NAME_AGENT_STATUS,
+  MODULE_SCA_CHECK_RESULT_LABEL,
+  UI_LOGGER_LEVELS,
+} from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { VisualizationBasic } from '../../common/charts/visualizations/basic';
 import { AppNavigate } from '../../../react-services/app-navigate';
@@ -111,26 +114,26 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
       },
       {
         field: 'pass',
-        name: 'Pass',
+        name: MODULE_SCA_CHECK_RESULT_LABEL.passed,
         width: '100px',
         sortable: true,
       },
       {
         field: 'fail',
-        name: 'Fail',
+        name: MODULE_SCA_CHECK_RESULT_LABEL.failed,
         width: '100px',
         sortable: true,
       },
       {
         field: 'invalid',
-        name: 'Not applicable',
+        name: MODULE_SCA_CHECK_RESULT_LABEL['not applicable'],
         width: '100px',
         sortable: true,
       },
       {
         field: 'score',
         name: 'Score',
-        render: (score) => {
+        render: score => {
           return `${score}%`;
         },
         width: '100px',
@@ -147,13 +150,19 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
       if (match && match[0]) {
         this.setState({ loading: true });
         const id = match[0].split('=')[1];
-        const policy = await WzRequest.apiReq('GET', `/sca/${this.props.agent.id}`, {
-          q: 'policy_id=' + id,
-        });
-        await this.loadScaPolicy(((((policy || {}).data || {}).data || {}).items || [])[0]);
+        const policy = await WzRequest.apiReq(
+          'GET',
+          `/sca/${this.props.agent.id}`,
+          {
+            q: 'policy_id=' + id,
+          },
+        );
+        await this.loadScaPolicy(
+          ((((policy || {}).data || {}).data || {}).items || [])[0],
+        );
         window.location.href = window.location.href.replace(
           new RegExp('redirectPolicy=' + '[^&]*'),
-          ''
+          '',
         );
         this.setState({ loading: false });
       }
@@ -176,20 +185,31 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
 
   async componentDidUpdate(prevProps, prevState) {
     if (!_.isEqual(this.props.agent, prevProps.agent)) {
-      this.setState({ lookingPolicy: false }, async () => await this.initialize());
+      this.setState(
+        { lookingPolicy: false },
+        async () => await this.initialize(),
+      );
     }
     if (!_.isEqual(this.state.filters, prevState.filters)) {
       this.setState({
         itemIdToExpandedRowMap: {},
-        pageTableChecks: { pageIndex: 0, pageSize: this.state.pageTableChecks.pageSize },
+        pageTableChecks: {
+          pageIndex: 0,
+          pageSize: this.state.pageTableChecks.pageSize,
+        },
       });
     }
 
     const regex = new RegExp('redirectPolicyTable=' + '[^&]*');
     const match = window.location.href.match(regex);
-    if (match && match[0] && !this.state.secondTable && !this.state.secondTableBack) {
-      this.loadScaPolicy(match[0].split('=')[1], true)
-      this.setState({secondTableBack: true, checksIsLoading: true})
+    if (
+      match &&
+      match[0] &&
+      !this.state.secondTable &&
+      !this.state.secondTableBack
+    ) {
+      this.loadScaPolicy(match[0].split('=')[1], true);
+      this.setState({ secondTableBack: true, checksIsLoading: true });
     }
   }
 
@@ -224,10 +244,13 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
     }
   }
 
-  handleBack (ev) {
-        AppNavigate.navigateToModule(ev, 'agents', { tab: 'welcome', agent: this.props.agent.id });
-        ev.stopPropagation();
-  };
+  handleBack(ev) {
+    AppNavigate.navigateToModule(ev, 'agents', {
+      tab: 'welcome',
+      agent: this.props.agent.id,
+    });
+    ev.stopPropagation();
+  }
 
   async loadScaPolicy(policy, secondTable?) {
     this._isMount &&
@@ -235,20 +258,32 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
         loadingPolicy: true,
         itemIdToExpandedRowMap: {},
         pageTableChecks: { pageIndex: 0 },
-        secondTable: secondTable ? secondTable : false
+        secondTable: secondTable ? secondTable : false,
       });
     if (policy) {
       try {
-        const policyResponse = await WzRequest.apiReq('GET', `/sca/${this.props.agent.id}`, {
-          params: {
-            q: 'policy_id=' + policy,
+        const policyResponse = await WzRequest.apiReq(
+          'GET',
+          `/sca/${this.props.agent.id}`,
+          {
+            params: {
+              q: 'policy_id=' + policy,
+            },
           },
-        });
+        );
         const [policyData] = policyResponse.data.data.affected_items;
         this._isMount &&
-          this.setState({ lookingPolicy: policyData, loadingPolicy: false, checksIsLoading: false });
+          this.setState({
+            lookingPolicy: policyData,
+            loadingPolicy: false,
+            checksIsLoading: false,
+          });
       } catch (error) {
-        this.setState({ lookingPolicy: policy, loadingPolicy: false, checksIsLoading: false });
+        this.setState({
+          lookingPolicy: policy,
+          loadingPolicy: false,
+          checksIsLoading: false,
+        });
         const options: UIErrorLog = {
           context: `${Inventory.name}.loadScaPolicy`,
           level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
@@ -262,11 +297,17 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
         getErrorOrchestrator().handleError(options);
       }
     } else {
-      this._isMount && this.setState({ lookingPolicy: policy, loadingPolicy: false, items: [], checksIsLoading: false });
+      this._isMount &&
+        this.setState({
+          lookingPolicy: policy,
+          loadingPolicy: false,
+          items: [],
+          checksIsLoading: false,
+        });
     }
   }
 
-  toggleDetails = (item) => {
+  toggleDetails = item => {
     const itemIdToExpandedRowMap = { ...this.state.itemIdToExpandedRowMap };
 
     if (itemIdToExpandedRowMap[item.id]) {
@@ -277,7 +318,7 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
       checks += item.condition ? ` (Condition: ${item.condition})` : '';
       const complianceText =
         item.compliance && item.compliance.length
-          ? item.compliance.map((el) => `${el.key}: ${el.value}`).join('\n')
+          ? item.compliance.map(el => `${el.key}: ${el.value}`).join('\n')
           : '';
       const listItems = [
         {
@@ -309,10 +350,12 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
           description: <ComplianceText complianceText={complianceText} />,
         },
       ];
-      const itemsToShow = listItems.filter((x) => {
+      const itemsToShow = listItems.filter(x => {
         return x.description;
       });
-      itemIdToExpandedRowMap[item.id] = <EuiDescriptionList listItems={itemsToShow} />;
+      itemIdToExpandedRowMap[item.id] = (
+        <EuiDescriptionList listItems={itemsToShow} />
+      );
     }
     this.setState({ itemIdToExpandedRowMap });
   };
@@ -325,34 +368,12 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
     });
   };
 
-  /**
-   *
-   */
-  async downloadCsv() {
-    try {
-      this.showToast('success', 'Your download should begin automatically...', 3000);
-      await exportCsv(
-        '/sca/' + this.props.agent.id + '/checks/' + this.state.lookingPolicy.policy_id,
-        [],
-        this.state.lookingPolicy.policy_id
-      );
-    } catch (error) {
-      const options: UIErrorLog = {
-        context: `${Inventory.name}.downloadCsv`,
-        level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
-        severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: error.name,
-        },
-      };
-      getErrorOrchestrator().handleError(options);
-    }
-  }
-
   buttonStat(text, field, value) {
-    return <button onClick={() => this.setState({ filters: [{ field, value }] })}>{text}</button>;
+    return (
+      <button onClick={() => this.setState({ filters: [{ field, value }] })}>
+        {text}
+      </button>
+    );
   }
 
   onChangeTableChecks({ page: { index: pageIndex, size: pageSize } }) {
@@ -360,18 +381,22 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
   }
 
   render() {
-    const { onClickRow } = this.props
+    const { onClickRow } = this.props;
 
-    const handlePoliciesTableClickRow = async (policy) => {
-      onClickRow ? onClickRow(policy) : await this.loadScaPolicy(policy.policy_id)
-      this.setState({ loading: false, redirect: true })
-    }
+    const handlePoliciesTableClickRow = async policy => {
+      onClickRow
+        ? onClickRow(policy)
+        : await this.loadScaPolicy(policy.policy_id);
+      this.setState({ loading: false, redirect: true });
+    };
 
     const buttonPopover = (
       <EuiButtonEmpty
-        iconType="iInCircle"
-        aria-label="Help"
-        onClick={() => this.setState({ showMoreInfo: !this.state.showMoreInfo })}
+        iconType='iInCircle'
+        aria-label='Help'
+        onClick={() =>
+          this.setState({ showMoreInfo: !this.state.showMoreInfo })
+        }
       ></EuiButtonEmpty>
     );
     const { agent } = this.props;
@@ -379,20 +404,21 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
     return (
       <Fragment>
         <div>
-          {this.state.loading || this.state.checksIsLoading && (
-            <div style={{ margin: 16 }}>
-              <EuiSpacer size="m" />
-              <EuiProgress size="xs" color="primary" />
-            </div>
-          )}
+          {this.state.loading ||
+            (this.state.checksIsLoading && (
+              <div style={{ margin: 16 }}>
+                <EuiSpacer size='m' />
+                <EuiProgress size='xs' color='primary' />
+              </div>
+            ))}
         </div>
         <EuiPage>
           {agent &&
             (agent || {}).status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED &&
             !this.state.policies.length &&
             !this.state.loading && (
-              <EuiCallOut title="No scans available" iconType="iInCircle">
-                <EuiButton color="primary" onClick={() => this.initialize()}>
+              <EuiCallOut title='No scans available' iconType='iInCircle'>
+                <EuiButton color='primary' onClick={() => this.initialize()}>
                   Refresh
                 </EuiButton>
               </EuiCallOut>
@@ -402,11 +428,11 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
             (agent || {}).status === API_NAME_AGENT_STATUS.NEVER_CONNECTED &&
             !this.state.loading && (
               <EuiCallOut
-                title="Agent has never connected"
+                title='Agent has never connected'
                 style={{ width: '100%' }}
-                iconType="iInCircle"
+                iconType='iInCircle'
               >
-                <EuiButton color="primary" onClick={() => this.initialize()}>
+                <EuiButton color='primary' onClick={() => this.initialize()}>
                   Refresh
                 </EuiButton>
               </EuiCallOut>
@@ -415,7 +441,8 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
             (agent || {}).os &&
             !this.state.lookingPolicy &&
             this.state.policies.length > 0 &&
-            !this.state.loading && !this.state.checksIsLoading && (
+            !this.state.loading &&
+            !this.state.checksIsLoading && (
               <div>
                 {this.state.policies.length && (
                   <EuiFlexGroup style={{ marginTop: 0 }}>
@@ -428,28 +455,39 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
                           style={{ paddingBottom: 0 }}
                         >
                           <VisualizationBasic
-                            type="donut"
+                            type='donut'
                             size={{ width: '100%', height: '150px' }}
                             data={[
-                              { label: 'Pass', value: policy.pass, color: '#00a69b' },
-                              { label: 'Fail', value: policy.fail, color: '#ff645c' },
                               {
-                                label: 'Not applicable',
+                                label: MODULE_SCA_CHECK_RESULT_LABEL.passed,
+                                value: policy.pass,
+                                color: '#00a69b',
+                              },
+                              {
+                                label: MODULE_SCA_CHECK_RESULT_LABEL.failed,
+                                value: policy.fail,
+                                color: '#ff645c',
+                              },
+                              {
+                                label:
+                                  MODULE_SCA_CHECK_RESULT_LABEL[
+                                    'not applicable'
+                                  ],
                                 value: policy.invalid,
                                 color: '#5c6773',
                               },
                             ]}
                             showLegend
-                            noDataTitle="No results"
-                            noDataMessage="No results were found."
+                            noDataTitle='No results'
+                            noDataMessage='No results were found.'
                           />
-                          <EuiSpacer size="m" />
+                          <EuiSpacer size='m' />
                         </EuiCard>
                       </EuiFlexItem>
                     ))}
                   </EuiFlexGroup>
                 )}
-                 <EuiSpacer size="m" />
+                <EuiSpacer size='m' />
                 <EuiFlexGroup>
                   <EuiFlexItem>
                     <EuiPanel>
@@ -466,36 +504,47 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
           {agent &&
             (agent || {}).os &&
             this.state.lookingPolicy &&
-            ((!this.state.loading) || (!this.state.checksIsLoading )) && (
+            (!this.state.loading || !this.state.checksIsLoading) && (
               <div>
-                <EuiPanel paddingSize="l">
+                <EuiPanel paddingSize='l'>
                   <EuiFlexGroup>
                     <EuiFlexItem grow={false}>
                       <EuiButtonIcon
-                        color="primary"
+                        color='primary'
                         style={{ padding: '6px 0px' }}
-                        onClick={this.state.secondTableBack ? (ev) => this.handleBack(ev) : () => this.loadScaPolicy(false)}
-                        iconType="arrowLeft"
-                        aria-label="Back to policies"
+                        onClick={
+                          this.state.secondTableBack
+                            ? ev => this.handleBack(ev)
+                            : () => this.loadScaPolicy(false)
+                        }
+                        iconType='arrowLeft'
+                        aria-label='Back to policies'
                         {...{ iconSize: 'l' }}
                       />
                     </EuiFlexItem>
                     <EuiFlexItem>
-                      <EuiTitle size="s">
+                      <EuiTitle size='s'>
                         <h2>
                           {this.state.lookingPolicy.name}&nbsp;
-                          <EuiToolTip position="right" content="Show policy checksum">
+                          <EuiToolTip
+                            position='right'
+                            content='Show policy checksum'
+                          >
                             <EuiPopover
                               button={buttonPopover}
                               isOpen={this.state.showMoreInfo}
-                              closePopover={() => this.setState({ showMoreInfo: false })}
+                              closePopover={() =>
+                                this.setState({ showMoreInfo: false })
+                              }
                             >
                               <EuiFlexItem style={{ width: 700 }}>
-                                <EuiSpacer size="s" />
+                                <EuiSpacer size='s' />
                                 <EuiText>
-                                  <b>Policy description:</b> {this.state.lookingPolicy.description}
+                                  <b>Policy description:</b>{' '}
+                                  {this.state.lookingPolicy.description}
                                   <br></br>
-                                  <b>Policy checksum:</b> {this.state.lookingPolicy.hash_file}
+                                  <b>Policy checksum:</b>{' '}
+                                  {this.state.lookingPolicy.hash_file}
                                 </EuiText>
                               </EuiFlexItem>
                             </EuiPopover>
@@ -503,41 +552,33 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
                         </h2>
                       </EuiTitle>
                     </EuiFlexItem>
-                    <EuiFlexItem grow={false}>
-                      <EuiButtonEmpty
-                        iconType="importAction"
-                        onClick={async () => await this.downloadCsv()}
-                      >
-                        Export formatted
-                      </EuiButtonEmpty>
-                    </EuiFlexItem>
-                    <EuiFlexItem grow={false}>
-                      <EuiButtonEmpty
-                        iconType="refresh"
-                        onClick={() => this.loadScaPolicy(this.state.lookingPolicy.policy_id)}
-                      >
-                        Refresh
-                      </EuiButtonEmpty>
-                    </EuiFlexItem>
                   </EuiFlexGroup>
-                  <EuiSpacer size="m" />
+                  <EuiSpacer size='m' />
                   <EuiFlexGroup>
                     <EuiFlexItem>
                       <EuiStat
-                        title={this.buttonStat(this.state.lookingPolicy.pass, 'result', 'passed')}
-                        description="Pass"
-                        titleColor="secondary"
-                        titleSize="m"
-                        textAlign="center"
+                        title={this.buttonStat(
+                          this.state.lookingPolicy.pass,
+                          'result',
+                          'passed',
+                        )}
+                        description={MODULE_SCA_CHECK_RESULT_LABEL.passed}
+                        titleColor='secondary'
+                        titleSize='m'
+                        textAlign='center'
                       />
                     </EuiFlexItem>
                     <EuiFlexItem>
                       <EuiStat
-                        title={this.buttonStat(this.state.lookingPolicy.fail, 'result', 'failed')}
-                        description="Fail"
-                        titleColor="danger"
-                        titleSize="m"
-                        textAlign="center"
+                        title={this.buttonStat(
+                          this.state.lookingPolicy.fail,
+                          'result',
+                          'failed',
+                        )}
+                        description={MODULE_SCA_CHECK_RESULT_LABEL.failed}
+                        titleColor='danger'
+                        titleSize='m'
+                        textAlign='center'
                       />
                     </EuiFlexItem>
                     <EuiFlexItem>
@@ -545,39 +586,42 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
                         title={this.buttonStat(
                           this.state.lookingPolicy.invalid,
                           'result',
-                          'not applicable'
+                          'not applicable',
                         )}
-                        description="Not applicable"
-                        titleColor="subdued"
-                        titleSize="m"
-                        textAlign="center"
+                        description={
+                          MODULE_SCA_CHECK_RESULT_LABEL['not applicable']
+                        }
+                        titleColor='subdued'
+                        titleSize='m'
+                        textAlign='center'
                       />
                     </EuiFlexItem>
                     <EuiFlexItem>
                       <EuiStat
                         title={`${this.state.lookingPolicy.score}%`}
-                        description="Score"
-                        titleColor="accent"
-                        titleSize="m"
-                        textAlign="center"
+                        description='Score'
+                        titleColor='accent'
+                        titleSize='m'
+                        textAlign='center'
                       />
                     </EuiFlexItem>
                     <EuiFlexItem>
                       <EuiStat
                         title={formatUIDate(this.state.lookingPolicy.end_scan)}
-                        description="End scan"
-                        titleColor="primary"
-                        titleSize="s"
-                        textAlign="center"
+                        description='End scan'
+                        titleColor='primary'
+                        titleSize='s'
+                        textAlign='center'
                         style={{ padding: 5 }}
                       />
                     </EuiFlexItem>
                   </EuiFlexGroup>
-                  <EuiSpacer size="m" />
+                  <EuiSpacer size='m' />
                   <EuiFlexGroup>
                     <EuiFlexItem>
                       <InventoryPolicyChecksTable
                         agent={this.props.agent}
+                        filters={this.state.filters}
                         lookingPolicy={this.state.lookingPolicy}
                       />
                     </EuiFlexItem>
@@ -592,5 +636,5 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
 }
 
 Inventory.defaultProps = {
-  onClickRow: undefined
-}
+  onClickRow: undefined,
+};

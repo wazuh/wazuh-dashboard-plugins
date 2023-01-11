@@ -37,6 +37,7 @@ import './discover.scss';
 import { EuiFlexItem } from '@elastic/eui';
 import { WzRequest } from '../../../../react-services/wz-request';
 import WzTextWithTooltipTruncated from '../../../../components/common/wz-text-with-tooltip-if-truncated';
+import { formatHit } from '../../../../kibana-integrations/lib/format_hit';
 
 const capitalize = str => str[0].toUpperCase() + str.slice(1);
 
@@ -107,7 +108,7 @@ export class RowDetails extends Component {
           } else {
             return 0;
           };
-        })        
+        })
         .reduce((product, [key, value]) => {
           let fullPath = addDelimiter(head, key)
           return isObject(value) ?
@@ -175,6 +176,7 @@ export class RowDetails extends Component {
         const tmpRows = itemPaths.map((item) => {
           const key = isString(field) ? item : fieldsToShow[i] + "." + item; // = agent + . + id = agent.id
           const value = isString(field) ? field : this.getChildFromPath(this.props.item[fieldsToShow[i]], item);
+          const hasFieldMapping = this.props?.indexPattern?.fields?.getByName(key)?.filterable;// if the field is mapped the filter can be added and removed
           const filter = {};
           filter[key] = value;
           const cells: any[] = [];
@@ -185,8 +187,9 @@ export class RowDetails extends Component {
             {(this.state.hover === key &&
               <EuiFlexGroup style={{ height: 35 }}>
                 <EuiFlexItem grow={false} style={{ marginRight: 0, marginTop: 8 }}>
-                  <EuiToolTip position="top" content={`Filter for value`}>
+                  <EuiToolTip position="top" content={hasFieldMapping ? 'Filter for value' : 'Unindexed fields can not be searched'}>
                     <EuiButtonIcon
+                      isDisabled={!hasFieldMapping}
                       onClick={() => this.props.addFilter(filter)}
                       iconType="magnifyWithPlus"
                       aria-label="Filter"
@@ -195,8 +198,9 @@ export class RowDetails extends Component {
                   </EuiToolTip>
                 </EuiFlexItem>
                 <EuiFlexItem grow={false} style={{ marginRight: 0, marginLeft: 0, marginTop: 8 }}>
-                  <EuiToolTip position="top" content={`Filter out value`}>
+                  <EuiToolTip position="top" content={hasFieldMapping ? 'Filter for value' : 'Unindexed fields can not be searched'}>
                     <EuiButtonIcon
+                      isDisabled={!hasFieldMapping}
                       onClick={() => this.props.addFilterOut(filter)}
                       iconType="magnifyWithMinus"
                       aria-label="Filter"
@@ -229,7 +233,7 @@ export class RowDetails extends Component {
           cells.push(keyCell);
 
           const formattedValue = Array.isArray(value) ? this.renderArrayValue(value) : value.toString();
-          
+
           // If the field is an array of objects, show the collapse button to show the nested fields
           const showCollapseButton = Array.isArray(value) && arrayContainsObjects(value);
 
@@ -244,7 +248,7 @@ export class RowDetails extends Component {
             className={valueClassName}
             style={{ borderTop: 0, borderBottom: 0, padding: 0, margin: 0 }}
             key={key + "2"}>
-            { showCollapseButton && (
+            {showCollapseButton && (
               <DocViewTableRowBtnCollapse onClick={this.onToggleCollapse} isCollapsed={this.state.isCollapsed} />
             )}
             <div
@@ -271,7 +275,7 @@ export class RowDetails extends Component {
         }); //map
         rows = [...rows, ...tmpRows]
       }//if
-    } //for 
+    } //for
 
 
     return rows;
@@ -280,8 +284,9 @@ export class RowDetails extends Component {
   // Render the row value column supporting nested fields
   renderArrayValue = (value) => {
     if (arrayContainsObjects(value)) {
-      const formatted = this.props?.indexPattern?.formatHit({ _index: value }, 'html')?._index;
-      return trimAngularSpan(String(formatted));
+      // For compatibility reasons between Kibana 7.10 and 7.16.x we need to normalize the formatHit
+      const formatHitValue = (formatHit({ _index: value }, this.props?.indexPattern, 'html')?._index)
+      return trimAngularSpan(String(formatHitValue));
     }
     else {
       return value.join(', ')
@@ -440,7 +445,7 @@ export class RowDetails extends Component {
         </ul>
       );
     } else {
-    
+
       return value.toString();
     }
   }
@@ -542,7 +547,7 @@ export class RowDetails extends Component {
               extraAction={
                 <a href={`#/manager/rules?tab=rules&redirectRule=${id}`} target="_blank" style={{ paddingTop: 5 }}>
                   <EuiIcon type="popout" color='primary' />&nbsp;
-                    View in Rules
+                  View in Rules
                 </a>
               }
               paddingSize="none"

@@ -47,7 +47,7 @@ export function DocViewTableRowBtnFilterRemove({ onClick, disabled = false }: Pr
         })}
         className="kbnDocViewer__actionButton"
         data-test-subj="removeInclusiveFilterButton"
-        disabled={disabled}
+        isDisabled={disabled}
         onClick={onClick}
         iconType={'magnifyWithMinus'}
         iconSize={'s'}

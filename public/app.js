@@ -20,9 +20,6 @@ require('./utils/dom-to-image.js');
 // EUI React components wrapper
 import './components';
 
-// angular-charts.js
-import 'angular-chart.js';
-
 // Font Awesome, plugin platform framework and others
 import './utils/fontawesome/scss/font-awesome.scss';
 

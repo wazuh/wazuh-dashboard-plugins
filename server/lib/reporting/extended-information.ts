@@ -53,11 +53,11 @@ import { getSettingDefaultValue } from '../../../common/services/settings';
           const { data: { data: { affected_items: [agent] } } } = await context.wazuh.api.client.asCurrentUser.request(
             'GET',
             `/agents`,
-            { 
+            {
               params: {
                 q: `id=${agentID}`,
                 select: 'dateAdd,id,ip,lastKeepAlive,manager,name,os.name,os.version,version',
-              } 
+              }
             },
             { apiHostID: apiId }
           );
@@ -85,14 +85,16 @@ import { getSettingDefaultValue } from '../../../common/services/settings';
           { id: 'dateAdd', label: 'Registration date' },
           { id: 'lastKeepAlive', label: 'Last keep alive' },
         ],
-        items: agentsData.map((agent) => {
-          return {
-            ...agent,
-            os: (agent.os && agent.os.name && agent.os.version) ? `${agent.os.name} ${agent.os.version}` : '',
-            lastKeepAlive: moment(agent.lastKeepAlive).format(dateFormat),
-            dateAdd: moment(agent.dateAdd).format(dateFormat)
-          }
-        }),
+        items: agentsData
+          .filter(agent => agent) // Remove undefined agents when Wazuh API no longer finds and agentID
+          .map((agent) => {
+            return {
+              ...agent,
+              os: (agent.os && agent.os.name && agent.os.version) ? `${agent.os.name} ${agent.os.version}` : '',
+              lastKeepAlive: moment(agent.lastKeepAlive).format(dateFormat),
+              dateAdd: moment(agent.dateAdd).format(dateFormat)
+            }
+          }),
       });
     }else if(!agentsData.length && groupID){
       // For group reports when there is no agents in the group
@@ -101,7 +103,7 @@ import { getSettingDefaultValue } from '../../../common/services/settings';
         style: { fontSize: 12, color: '#000' },
       });
     }
-    
+
   } catch (error) {
     log('reporting:buildAgentsTable', error.message || error);
     return Promise.reject(error);
@@ -287,7 +289,7 @@ export async function extendedInformation(
         });
       }
     }
-    
+
     //--- OVERVIEW - GENERAL
     if (section === 'overview' && tab === 'general') {
       log('reporting:extendedInformation', 'Fetching top 3 agents with level 15 alerts', 'debug');
@@ -865,32 +867,21 @@ export async function extendedInformation(
     }
 
     //--- SUMMARY TABLES
-    const extraSummaryTables = [];
-    if (summaryTablesDefinitions?.[`${section}Summary`]?.[`${tab}AlertsSummary`]) {
-      log('reporting:AlertsSummaryTable', 'Fetching Alerts Summary Table', 'debug');
-      const alertsSummaryTable = new SummaryTable(
-        context,
-        from,
-        to,
-        filters,
-        summaryTablesDefinitions[`${section}Summary`][`${tab}AlertsSummary`],
-        pattern
-      );
-      const alertsSummaryData = await alertsSummaryTable.fetch();
-      extraSummaryTables.push(alertsSummaryData);
-    }
-    if (summaryTablesDefinitions?.[`${section}Summary`]?.[`${tab}GroupsSummary`]) {
-      log('reporting:GroupsSummaryTable', 'Fetching Groups Summary Table', 'debug');
-      const groupsSummaryTable = new SummaryTable(
-        context,
-        from,
-        to,
-        filters,
-        summaryTablesDefinitions[`${section}Summary`][`${tab}GroupsSummary`],
-        pattern
-      );
-      const groupsSummaryData = await groupsSummaryTable.fetch();
-      extraSummaryTables.push(groupsSummaryData);
+    let extraSummaryTables = [];
+    if (Array.isArray(summaryTablesDefinitions[section][tab])) {
+      const tablesPromises = summaryTablesDefinitions[section][tab].map((summaryTable) => {
+        log('reporting:AlertsTable', `Fetching ${summaryTable.title} Table`, 'debug');
+        const alertsSummaryTable = new SummaryTable(
+          context,
+          from,
+          to,
+          filters,
+          summaryTable,
+          pattern
+        );
+        return alertsSummaryTable.fetch();
+      });
+      extraSummaryTables = await Promise.all(tablesPromises);
     }
 
     return extraSummaryTables;

@@ -170,8 +170,6 @@ export const AgentsPreview = compose(
     }
 
     render() {
-      const evolutionIsReady = this.props.resultState !== 'loading';
-
       return (
         <EuiPage className="flex-column">
           <EuiFlexItem>
@@ -281,10 +279,12 @@ export const AgentsPreview = compose(
                   </EuiFlexItem>
                 </>
               )}
+              {this.state.showAgentsEvolutionVisualization && (
                 <EuiFlexItem
                   grow={false}
                   className="agents-evolution-visualization"
                   style={{
+                    display: !this.state.loading ? 'inherit' : 'none',
                     margin: !this.state.loading ? '12px' : 0,
                   }}
                 >
@@ -297,8 +297,8 @@ export const AgentsPreview = compose(
                     <EuiFlexGroup>
                       <EuiFlexItem>
                         <div style={{
-                          height: evolutionIsReady === 'ready' ? '202px' : 0,
-                          paddingTop: evolutionIsReady === 'ready' ? "12px" : 0
+                          height: this.props.resultState === 'ready' ? '202px' : 0,
+                          paddingTop: this.props.resultState === 'ready' ? "12px" : 0
                         }}
                         >
                           <WzKibanaVis
@@ -306,7 +306,7 @@ export const AgentsPreview = compose(
                             tab={'general'}
                           />
                         </div>
-                        {!evolutionIsReady && (
+                        {this.props.resultState === 'loading' && (
                           <div className="loading-chart-xl">
                             <EuiLoadingChart size="xl" />
                           </div>
@@ -333,6 +333,7 @@ export const AgentsPreview = compose(
                     />
                   </EuiCard>
                 </EuiFlexItem>
+              )}
             </EuiFlexGroup>
             <EuiSpacer size="m" />
             <WzReduxProvider>
