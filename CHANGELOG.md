@@ -14,7 +14,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
-- Fixed an issue that caused incorrect visualization of IPv6 addresses ([#4909](https://github.com/wazuh/wazuh-kibana-app/pull/4909)).
+- Fixed an issue that caused incorrect visualization of IPv6 addresses. [#4909](https://github.com/wazuh/wazuh-kibana-app/pull/4909)
 - Fixed several typos in the code, by @jctello [#4911](https://github.com/wazuh/wazuh-kibana-app/pull/4911)
 - Fixed the display of more than one protocol in the Global configuration section [#4917](https://github.com/wazuh/wazuh-kibana-app/pull/4917)
 - Handling endpoint response was done when there is no data to show [#4918](https://github.com/wazuh/wazuh-kibana-app/pull/4918)
