@@ -14,9 +14,9 @@ import subprocess
 # Wazuh version: major.minor.patch
 version = '4.4.0'
 # App's revision number (previous rev + 1)
-revision = '00'
+revision = '01'
 # One of 'pre-alpha', 'alpha', 'beta', 'release-candidate', 'stable'
-stage = 'alpha'
+stage = 'beta'
 
 # Global variable. Will be set later
 branch = None
@@ -66,6 +66,8 @@ def update_package_json() -> tuple:
 
     with open('package.json', 'w') as f:
         json.dump(data, f, indent=2)
+
+    os.system('node scripts/generate-build-version')
 
     return data, success
 
