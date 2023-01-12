@@ -50,7 +50,7 @@ def get_git_revision_short_hash() -> str:
     return subprocess.check_output(['git', 'rev-parse', '--short', branch]).decode('ascii').strip()
 
 
-def update_package_json() -> tuple:
+def update_package_json(v: str) -> tuple:
     logging.info(f'Updating package.json')
     data, success = {}, True
 
@@ -63,6 +63,7 @@ def update_package_json() -> tuple:
         data['version'] = version
         data['revision'] = revision
         data['stage'] = stage
+        data['pluginPlatform']['version'] = v
 
     with open('package.json', 'w') as f:
         json.dump(data, f, indent=2)
@@ -83,7 +84,7 @@ def main(platform: str, versions: list):
     for v in versions:
         tag = f'v{version}-{v}-{stage}'
         logging.info(f'Generating tag "{tag}"')
-        update_package_json()
+        update_package_json(v)
         os.system(f'git commit -am "Bump {tag}"')
         os.system(
             f'git tag -a {tag} -m "Wazuh {version} for {platform} {v}"')
