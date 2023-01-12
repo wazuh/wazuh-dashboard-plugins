@@ -63,11 +63,21 @@ export class WzStatisticsOverview extends Component {
     this.tabs = [
       {
         id: 'remoted',
-        name: 'Listener Engine',
+        name: i18n.translate(
+          'wazuh.controller.manage.staticts.overview.listenerEngine',
+          {
+            defaultMessage: 'Listener Engine',
+          },
+        ),
       },
       {
         id: 'analysisd',
-        name: 'Analysis Engine',
+        name: i18n.translate(
+          'wazuh.controller.manage.staticts.overview.analysisEngine',
+          {
+            defaultMessage: 'Analysis Engine',
+          },
+        ),
       },
     ];
 
