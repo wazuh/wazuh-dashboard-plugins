@@ -132,7 +132,9 @@ export class ReportingService {
       this.showToast(
         'success',
         'Created report',
-        'Success. Go to Wazuh > Management > Reporting',
+        i18n.translate('wazuh.public.react.services.reporting.management', {
+          defaultMessage: 'Success. Go to Wazuh > Management > Reporting',
+        }),
         4000,
       );
       return;
@@ -183,7 +185,9 @@ export class ReportingService {
       this.showToast(
         'success',
         'Created report',
-        'Success. Go to Wazuh > Management > Reporting',
+        i18n.translate('wazuh.public.react.services.reporting.management', {
+          defaultMessage: 'Success. Go to Wazuh > Management > Reporting',
+        }),
         4000,
       );
       return;
