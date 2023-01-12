@@ -62,6 +62,26 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
       console.error('plugin.ts: Error checking if Wazuh is enabled', error);
     }
 
+    // New module app registration
+    core.application.register({
+      id: 'wazuh-metrics',
+      title: 'Metrics',
+      chromeless: false,
+      appRoute: 'app/wazuh-metrics',
+      mount: async (params: AppMountParameters) => {
+        const { renderApp } = await import('./apps/metrics');
+        // @ts-ignore depsStart not used.
+        const [coreStart, depsStart] = await core.getStartServices();
+        return renderApp(coreStart, params);//, config.ui.basicauth.login);
+      },
+      category: {
+        id: 'wazuh',
+        label: 'Wazuh',
+        order: 1,
+        euiIconType: core.http.basePath.prepend(logosInitialState?.logos?.[SIDEBAR_LOGO] ? getAssetURL(logosInitialState?.logos?.[SIDEBAR_LOGO]) : getThemeAssetURL('icon.svg', UI_THEME)),
+      },
+    });
+
     if (!response.isWazuhDisabled) {
       core.application.register({
         id: `wazuh`,

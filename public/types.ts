@@ -1,6 +1,7 @@
 import { AppMountParameters, CoreStart } from 'opensearch_dashboards/public';
 import { ChartsPluginStart } from '../../../src/plugins/charts/public/plugin';
 import { DiscoverStart } from '../../../src/plugins/discover/public';
+import { DashboardStart } from '../../../src/plugins/dashboard/public';
 import { VisualizationsSetup, VisualizationsStart } from '../../../src/plugins/visualizations/public';
 import { DataPublicPluginSetup, DataPublicPluginStart } from '../../../src/plugins/data/public';
 import { NavigationPublicPluginStart } from '../../../src/plugins/navigation/public';
@@ -14,6 +15,7 @@ export interface AppPluginStartDependencies {
   data: DataPublicPluginStart;
   visualizations: VisualizationsStart;
   discover: DiscoverStart;
+  dashboard: DashboardStart;
   charts: ChartsPluginStart
   securityOss: SecurityOssPluginStart,
   savedObjects: SavedObjectsStart,
