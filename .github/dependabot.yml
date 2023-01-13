@@ -1,13 +1,13 @@
 version: 2
 updates:
 
-  - package-ecosystem: "yarn"
+  - package-ecosystem: "npm"
     directory: "/"
     schedule:
       interval: "daily"
     target-branch: master
     
-  - package-ecosystem: "yarn"
+  - package-ecosystem: "npm"
     directory: "/"
     schedule:
       interval: "daily"
