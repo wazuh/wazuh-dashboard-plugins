@@ -10,7 +10,7 @@ import { i18n } from '@kbn/i18n';
 
 export default class RulesetColumns {
   constructor(tableProps) {
-    this.tableProps = tableProps;    
+    this.tableProps = tableProps;
 
     this.buildColumns = () => {
       this.columns = {
@@ -242,16 +242,16 @@ export default class RulesetColumns {
         files: [
           {
             field: 'filename',
-            name: i18n.translate("wazuh.controllers.management.comp.rulset.utils.", {
-  defaultMessage: ,
-})'File',
+            name: i18n.translate("wazuh.controllers.management.comp.rulset.utils.file", {
+              defaultMessage: 'File',
+            }),
             align: 'left',
             sortable: true
           },
           {
-            name: i18n.translate("wazuh.controllers.management.comp.rulset.utils.", {
-  defaultMessage: ,
-})'Actions',
+            name: i18n.translate("wazuh.controllers.management.comp.rulset.utils.action", {
+              defaultMessage: 'Actions',
+            }),
             align: 'left',
             render: item => {
               if (item.relative_dirname.startsWith('ruleset/')) {
@@ -434,7 +434,7 @@ export default class RulesetColumns {
                       await exportCsv(`/lists`, [{_isCDBList: true, name: 'filename', value: `${item.filename}`}], item.filename)
                     }catch(error){
                       const options: UIErrorLog = this.getErrorOptions(
-                        error, 
+                        error,
                         'Lists.exportFile'
                       );
                       getErrorOrchestrator().handleError(options);

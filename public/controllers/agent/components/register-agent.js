@@ -103,6 +103,13 @@ const architectureCentos5OrRedHat5 = [
   },
 ];
 
+const selectOperatingSystem = i18n.translate(
+  'wazuh.controller.agent.components.register.os.select',
+  {
+    defaultMessage: 'Please Select the ',
+  },
+);
+
 const versionButtonsCentosOrRedHat = [
   {
     id: 'centos5',
@@ -959,7 +966,9 @@ export const RegisterAgent = withErrorBoundary(
           ) : missingOSSelection.length ? (
             <EuiCallOut
               color='warning'
-              title={`Please select the ${missingOSSelection.join(', ')}.`}
+              title={`${selectOperatingSystem} ${missingOSSelection.join(
+                ', ',
+              )}.`}
               iconType='iInCircle'
             />
           ) : (
@@ -980,7 +989,7 @@ export const RegisterAgent = withErrorBoundary(
                 ) : missingOSSelection.length ? (
                   <EuiCallOut
                     color='warning'
-                    title={`Please select the ${missingOSSelection.join(
+                    title={`${selectOperatingSystem} ${missingOSSelection.join(
                       ', ',
                     )}.`}
                     iconType='iInCircle'
