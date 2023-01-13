@@ -1,0 +1,15 @@
+version: 2
+updates:
+
+  - package-ecosystem: "yarn"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    target-branch: master
+    
+  - package-ecosystem: "yarn"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    target-branch: 4.4-2.4-wzd
+ 
