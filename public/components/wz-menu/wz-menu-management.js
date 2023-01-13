@@ -26,68 +26,86 @@ import { WAZUH_MENU_MANAGEMENT_SECTIONS_CY_TEST_ID } from '../../../common/wazu-
 import { i18n } from '@kbn/i18n';
 
 const management = i18n.translate(
-  'wazuh.public.components.wz.menu.management.',
+  'wazuh.public.components.wz.menu.management.manage',
   {
     defaultMessage: 'Management',
   },
 );
 const administration = i18n.translate(
-  'wazuh.public.components.wz.menu.management.',
+  'wazuh.public.components.wz.menu.management.administration',
   {
     defaultMessage: 'Administration',
   },
 );
-const ruleset = i18n.translate('wazuh.public.components.wz.menu.management.', {
-  defaultMessage: 'Ruleset',
-});
-const rules = i18n.translate('wazuh.public.components.wz.menu.management.', {
-  defaultMessage: 'Rules',
-});
-const decoders = i18n.translate('wazuh.public.components.wz.menu.management.', {
-  defaultMessage: 'Decoders',
-});
+const ruleset = i18n.translate(
+  'wazuh.public.components.wz.menu.management.ruleset',
+  {
+    defaultMessage: 'Ruleset',
+  },
+);
+const rules = i18n.translate(
+  'wazuh.public.components.wz.menu.management.rules',
+  {
+    defaultMessage: 'Rules',
+  },
+);
+const decoders = i18n.translate(
+  'wazuh.public.components.wz.menu.management.lists',
+  {
+    defaultMessage: 'Decoders',
+  },
+);
 const lists = i18n.translate('wazuh.public.components.wz.menu.management.', {
   defaultMessage: 'CDB lists',
 });
-const groups = i18n.translate('wazuh.public.components.wz.menu.management.', {
-  defaultMessage: 'Groups',
-});
+const groups = i18n.translate(
+  'wazuh.public.components.wz.menu.management.groups',
+  {
+    defaultMessage: 'Groups',
+  },
+);
 const configuration = i18n.translate(
-  'wazuh.public.components.wz.menu.management.',
+  'wazuh.public.components.wz.menu.management.configuration',
   {
     defaultMessage: 'Configuration',
   },
 );
 const statusReport = i18n.translate(
-  'wazuh.public.components.wz.menu.management.',
+  'wazuh.public.components.wz.menu.management.statusReport',
   {
     defaultMessage: 'Status and reports',
   },
 );
-const status1 = i18n.translate('wazuh.public.components.wz.menu.management.', {
-  defaultMessage: 'Status',
-});
+const status1 = i18n.translate(
+  'wazuh.public.components.wz.menu.management.cluster',
+  {
+    defaultMessage: 'Status',
+  },
+);
 const cluster = i18n.translate('wazuh.public.components.wz.menu.management.', {
   defaultMessage: 'Cluster',
 });
-const logs = i18n.translate('wazuh.public.components.wz.menu.management.', {
+const logs = i18n.translate('wazuh.public.components.wz.menu.management.logs', {
   defaultMessage: 'Logs',
 });
 const reporting = i18n.translate(
-  'wazuh.public.components.wz.menu.management.',
+  'wazuh.public.components.wz.menu.management.reporting',
   {
     defaultMessage: 'Reporting',
   },
 );
 const statistics = i18n.translate(
-  'wazuh.public.components.wz.menu.management.',
+  'wazuh.public.components.wz.menu.management.statistics',
   {
     defaultMessage: 'Statistics',
   },
 );
-const manager = i18n.translate('wazuh.public.components.wz.menu.management.', {
-  defaultMessage: 'manager',
-});
+const manager = i18n.translate(
+  'wazuh.public.components.wz.menu.management.manager',
+  {
+    defaultMessage: 'manager',
+  },
+);
 class WzMenuManagement extends Component {
   constructor(props) {
     super(props);
