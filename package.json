@@ -66,7 +66,7 @@
     "winston": "3.5.1"
   },
   "devDependencies": {
-    "@types/node-cron": "^2.0.3",
+    "@types/node-cron": "^3.0.7",
     "@typescript-eslint/eslint-plugin": "^5.38.1",
     "@typescript-eslint/parser": "^5.38.1",
     "eslint": "^8.24.0",
