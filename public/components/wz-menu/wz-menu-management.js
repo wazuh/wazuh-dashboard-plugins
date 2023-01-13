@@ -25,6 +25,69 @@ import { WAZUH_MENU_MANAGEMENT_SECTIONS_ID } from '../../../common/constants';
 import { WAZUH_MENU_MANAGEMENT_SECTIONS_CY_TEST_ID } from '../../../common/wazu-menu/wz-menu-management.cy';
 import { i18n } from '@kbn/i18n';
 
+const management = i18n.translate(
+  'wazuh.public.components.wz.menu.management.',
+  {
+    defaultMessage: 'Management',
+  },
+);
+const administration = i18n.translate(
+  'wazuh.public.components.wz.menu.management.',
+  {
+    defaultMessage: 'Administration',
+  },
+);
+const ruleset = i18n.translate('wazuh.public.components.wz.menu.management.', {
+  defaultMessage: 'Ruleset',
+});
+const rules = i18n.translate('wazuh.public.components.wz.menu.management.', {
+  defaultMessage: 'Rules',
+});
+const decoders = i18n.translate('wazuh.public.components.wz.menu.management.', {
+  defaultMessage: 'Decoders',
+});
+const lists = i18n.translate('wazuh.public.components.wz.menu.management.', {
+  defaultMessage: 'CDB lists',
+});
+const groups = i18n.translate('wazuh.public.components.wz.menu.management.', {
+  defaultMessage: 'Groups',
+});
+const configuration = i18n.translate(
+  'wazuh.public.components.wz.menu.management.',
+  {
+    defaultMessage: 'Configuration',
+  },
+);
+const statusReport = i18n.translate(
+  'wazuh.public.components.wz.menu.management.',
+  {
+    defaultMessage: 'Status and reports',
+  },
+);
+const status1 = i18n.translate('wazuh.public.components.wz.menu.management.', {
+  defaultMessage: 'Status',
+});
+const cluster = i18n.translate('wazuh.public.components.wz.menu.management.', {
+  defaultMessage: 'Cluster',
+});
+const logs = i18n.translate('wazuh.public.components.wz.menu.management.', {
+  defaultMessage: 'Logs',
+});
+const reporting = i18n.translate(
+  'wazuh.public.components.wz.menu.management.',
+  {
+    defaultMessage: 'Reporting',
+  },
+);
+const statistics = i18n.translate(
+  'wazuh.public.components.wz.menu.management.',
+  {
+    defaultMessage: 'Statistics',
+  },
+);
+const manager = i18n.translate('wazuh.public.components.wz.menu.management.', {
+  defaultMessage: 'manager',
+});
 class WzMenuManagement extends Component {
   constructor(props) {
     super(props);
@@ -37,72 +100,72 @@ class WzMenuManagement extends Component {
       management: {
         id: WAZUH_MENU_MANAGEMENT_SECTIONS_ID.MANAGEMENT,
         cyTestId: WAZUH_MENU_MANAGEMENT_SECTIONS_CY_TEST_ID.MANAGEMENT,
-        text: 'Management',
+        text: management,
       },
       administration: {
         id: WAZUH_MENU_MANAGEMENT_SECTIONS_ID.ADMINISTRATION,
         cyTestId: WAZUH_MENU_MANAGEMENT_SECTIONS_CY_TEST_ID.ADMINISTRATION,
-        text: 'Administration',
+        text: administration,
       },
       ruleset: {
         id: WAZUH_MENU_MANAGEMENT_SECTIONS_ID.RULESET,
         cyTestId: WAZUH_MENU_MANAGEMENT_SECTIONS_CY_TEST_ID.RULESET,
-        text: 'Ruleset',
+        text: ruleset,
       },
       rules: {
         id: WAZUH_MENU_MANAGEMENT_SECTIONS_ID.RULES,
         cyTestId: WAZUH_MENU_MANAGEMENT_SECTIONS_CY_TEST_ID.RULES,
-        text: 'Rules',
+        text: rules,
       },
       decoders: {
         id: WAZUH_MENU_MANAGEMENT_SECTIONS_ID.DECODERS,
         cyTestId: WAZUH_MENU_MANAGEMENT_SECTIONS_CY_TEST_ID.DECODERS,
-        text: 'Decoders',
+        text: decoders,
       },
       lists: {
         id: WAZUH_MENU_MANAGEMENT_SECTIONS_ID.CDB_LISTS,
         cyTestId: WAZUH_MENU_MANAGEMENT_SECTIONS_CY_TEST_ID.CDB_LISTS,
-        text: 'CDB lists',
+        text: lists,
       },
       groups: {
         id: WAZUH_MENU_MANAGEMENT_SECTIONS_ID.GROUPS,
         cyTestId: WAZUH_MENU_MANAGEMENT_SECTIONS_CY_TEST_ID.GROUPS,
-        text: 'Groups',
+        text: groups,
       },
       configuration: {
         id: WAZUH_MENU_MANAGEMENT_SECTIONS_ID.CONFIGURATION,
         cyTestId: WAZUH_MENU_MANAGEMENT_SECTIONS_CY_TEST_ID.CONFIGURATION,
-        text: 'Configuration',
+        text: configuration,
       },
       statusReports: {
         id: WAZUH_MENU_MANAGEMENT_SECTIONS_ID.STATUS_AND_REPORTS,
         cyTestId: WAZUH_MENU_MANAGEMENT_SECTIONS_CY_TEST_ID.STATUS_AND_REPORTS,
-        text: 'Status and reports',
+        text: statusReport,
       },
       status: {
         id: WAZUH_MENU_MANAGEMENT_SECTIONS_ID.STATUS,
         cyTestId: WAZUH_MENU_MANAGEMENT_SECTIONS_CY_TEST_ID.STATUS,
-        text: 'Status',
+        text: status1,
       },
       cluster: {
         id: WAZUH_MENU_MANAGEMENT_SECTIONS_ID.CLUSTER,
         cyTestId: WAZUH_MENU_MANAGEMENT_SECTIONS_CY_TEST_ID.CLUSTER,
-        text: 'Cluster',
+        text: cluster,
       },
       logs: {
         id: WAZUH_MENU_MANAGEMENT_SECTIONS_ID.LOGS,
         cyTestId: WAZUH_MENU_MANAGEMENT_SECTIONS_CY_TEST_ID.LOGS,
-        text: 'Logs',
+        text: logs,
       },
       reporting: {
         id: WAZUH_MENU_MANAGEMENT_SECTIONS_ID.REPORTING,
         cyTestId: WAZUH_MENU_MANAGEMENT_SECTIONS_CY_TEST_ID.REPORTING,
-        text: 'Reporting',
+        text: reporting,
       },
       statistics: {
         id: WAZUH_MENU_MANAGEMENT_SECTIONS_ID.STATISTICS,
         cyTestId: WAZUH_MENU_MANAGEMENT_SECTIONS_CY_TEST_ID.STATISTICS,
-        text: 'Statistics',
+        text: statistics,
       },
     };
 
@@ -124,7 +187,7 @@ class WzMenuManagement extends Component {
 
   clickMenuItem = (ev, section) => {
     this.props.closePopover();
-    AppNavigate.navigateToModule(ev, 'manager', { tab: section });
+    AppNavigate.navigateToModule(ev, manager, { tab: section });
   };
 
   createItem = (item, data = {}) => {
