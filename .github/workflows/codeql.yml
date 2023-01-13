@@ -11,7 +11,13 @@
 #
 name: "CodeQL"
 
-on: [ push ]
+on:
+  schedule:
+   - cron: '0 8 * * *'
+  push:
+    branches:
+      - 'master'
+      - '4.4-2.4-wzd'
 
 jobs:
   analyze:
