@@ -32,7 +32,7 @@ import { getAssetURL } from '../../utils/assets';
 import { getHttp } from '../../kibana-services';
 import { i18n } from '@kbn/i18n';
 
-const iniSetting = i18n.translate('wazuh.public.controllers.setting.', {
+const iniSetting = i18n.translate('wazuh.public.controllers.setting.iniSetting', {
   defaultMessage: 'Cannot initialize Settings',
 });
 const api = i18n.translate('wazuh.public.controllers.setting.API', {
@@ -41,7 +41,7 @@ const api = i18n.translate('wazuh.public.controllers.setting.API', {
 const modules = i18n.translate('wazuh.public.controllers.setting.Modules', {
   defaultMessage: 'Modules',
 });
-const sampleData = i18n.translate('wazuh.public.controllers.setting.', {
+const sampleData = i18n.translate('wazuh.public.controllers.setting.sampleData', {
   defaultMessage: 'Sample data',
 });
 const configuration = i18n.translate(

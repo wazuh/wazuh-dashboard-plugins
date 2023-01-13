@@ -50,12 +50,12 @@ const rules = i18n.translate(
   },
 );
 const decoders = i18n.translate(
-  'wazuh.public.components.wz.menu.management.lists',
+  'wazuh.public.components.wz.menu.management.decoders',
   {
     defaultMessage: 'Decoders',
   },
 );
-const lists = i18n.translate('wazuh.public.components.wz.menu.management.', {
+const lists = i18n.translate('wazuh.public.components.wz.menu.management.lists', {
   defaultMessage: 'CDB lists',
 });
 const groups = i18n.translate(
@@ -77,12 +77,12 @@ const statusReport = i18n.translate(
   },
 );
 const status1 = i18n.translate(
-  'wazuh.public.components.wz.menu.management.cluster',
+  'wazuh.public.components.wz.menu.management.status1',
   {
     defaultMessage: 'Status',
   },
 );
-const cluster = i18n.translate('wazuh.public.components.wz.menu.management.', {
+const cluster = i18n.translate('wazuh.public.components.wz.menu.management.cluster', {
   defaultMessage: 'Cluster',
 });
 const logs = i18n.translate('wazuh.public.components.wz.menu.management.logs', {
