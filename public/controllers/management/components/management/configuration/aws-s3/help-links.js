@@ -13,13 +13,13 @@ import { webDocumentationLink } from '../../../../../../../common/services/web_d
 import { i18n } from '@kbn/i18n';
 
 const text1 = i18n.translate(
-  'controller.manage.comp.confi.setting.response.active.text1',
+  'wazuh.controller.manage.comp.config.setting.response.active.text1',
   {
     defaultMessage: 'Using Wazuh to monitor AWS',
   },
 );
 const text2 = i18n.translate(
-  'controller.manage.comp.confi.setting.response.active.text2',
+  'wazuh.controller.manage.comp.config.setting.response.active.text2',
   {
     defaultMessage: 'Amazon S3 module reference',
   },
