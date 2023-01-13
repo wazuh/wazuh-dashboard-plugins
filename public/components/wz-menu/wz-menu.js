@@ -334,7 +334,12 @@ export const WzMenu = withWindowSize(
           error: {
             error: error,
             message: error.message || error,
-            title: `Error changing the Index Pattern`,
+            title: i18n.translate(
+              'wazuh.public.components.wz.menu.management.errorMsg1',
+              {
+                defaultMessage: 'Error changing the Index Pattern',
+              },
+            ),
           },
         };
         getErrorOrchestrator().handleError(options);
@@ -398,7 +403,12 @@ export const WzMenu = withWindowSize(
           error: {
             error: error,
             message: error.message || error,
-            title: `Error changing the selected API`,
+            title: i18n.translate(
+              'wazuh.public.components.wz.menu.management.changingTitle',
+              {
+                defaultMessage: 'Error changing the selected API',
+              },
+            ),
           },
         };
         getErrorOrchestrator().handleError(options);
@@ -469,7 +479,7 @@ export const WzMenu = withWindowSize(
                   <span>
                     {i18n.translate('wazuh.components.wz.menu.Reload', {
                       defaultMessage: ' Reload',
-                    })}{' '}
+                    })}
                   </span>
                 </EuiButtonEmpty>
               </EuiFlexItem>
@@ -686,7 +696,14 @@ export const WzMenu = withWindowSize(
       return (
         <>
           <EuiFlexItem grow={this.showSelectorsInPopover}>
-            <p>API</p>
+            <p>
+              {i18n.translate(
+                'wazuh.public.components.wz.menu.management.API',
+                {
+                  defaultMessage: 'API',
+                },
+              )}
+            </p>
           </EuiFlexItem>
           <EuiFlexItem grow={this.showSelectorsInPopover}>
             <div style={style}>
@@ -715,7 +732,14 @@ export const WzMenu = withWindowSize(
       return (
         <>
           <EuiFlexItem grow={this.showSelectorsInPopover}>
-            <p>Index pattern</p>
+            <p>
+              {i18n.translate(
+                'wazuh.public.components.wz.menu.management.indexPattern',
+                {
+                  defaultMessage: 'Index pattern',
+                },
+              )}
+            </p>
           </EuiFlexItem>
 
           <EuiFlexItem grow={this.showSelectorsInPopover}>
@@ -770,7 +794,14 @@ export const WzMenu = withWindowSize(
                 onClick={this.onClickOverviewButton.bind(this)}
               >
                 <EuiIcon type='visualizeApp' color='primary' size='m' />
-                <span className='wz-menu-button-title '>Modules</span>
+                <span className='wz-menu-button-title '>
+                  {i18n.translate(
+                    'wazuh.public.components.wz.menu.management.modules',
+                    {
+                      defaultMessage: 'Modules',
+                    },
+                  )}
+                </span>
                 <span className='flex'></span>
                 <span className='flex'></span>
                 {
@@ -798,7 +829,14 @@ export const WzMenu = withWindowSize(
                 onClick={this.onClickManagementButton.bind(this)}
               >
                 <EuiIcon type='managementApp' color='primary' size='m' />
-                <span className='wz-menu-button-title '>Management</span>
+                <span className='wz-menu-button-title '>
+                  {i18n.translate(
+                    'wazuh.public.components.wz.menu.management.Management',
+                    {
+                      defaultMessage: 'Management',
+                    },
+                  )}
+                </span>
                 <span className='flex'></span>
                 {
                   /*this.state.hover === 'manager' */ this.state
@@ -825,7 +863,14 @@ export const WzMenu = withWindowSize(
                 }}
               >
                 <EuiIcon type='watchesApp' color='primary' size='m' />
-                <span className='wz-menu-button-title '>Agents</span>
+                <span className='wz-menu-button-title '>
+                  {i18n.translate(
+                    'wazuh.public.components.wz.menu.management.agents',
+                    {
+                      defaultMessage: 'Agents',
+                    },
+                  )}
+                </span>
               </EuiButtonEmpty>
 
               <EuiButtonEmpty
@@ -842,7 +887,14 @@ export const WzMenu = withWindowSize(
                 onClick={this.onClickToolsButton.bind(this)}
               >
                 <EuiIcon type='console' color='primary' size='m' />
-                <span className='wz-menu-button-title '>Tools</span>
+                <span className='wz-menu-button-title '>
+                  {i18n.translate(
+                    'wazuh.public.components.wz.menu.management.tools',
+                    {
+                      defaultMessage: 'Tools',
+                    },
+                  )}
+                </span>
                 <span className='flex'></span>
                 {this.state.isToolsPopoverOpen && (
                   <EuiIcon color='subdued' type='arrowRight' />
@@ -865,7 +917,14 @@ export const WzMenu = withWindowSize(
                 onClick={this.onClickSecurityButton.bind(this)}
               >
                 <EuiIcon type='securityApp' color='primary' size='m' />
-                <span className='wz-menu-button-title '>Security</span>
+                <span className='wz-menu-button-title '>
+                  {i18n.translate(
+                    'wazuh.public.components.wz.menu.management.security',
+                    {
+                      defaultMessage: 'Security',
+                    },
+                  )}
+                </span>
                 <span className='flex'></span>
                 {this.state.isSecurityPopoverOpen && (
                   <EuiIcon color='subdued' type='arrowRight' />
@@ -886,7 +945,14 @@ export const WzMenu = withWindowSize(
                 onClick={this.onClickSettingsButton.bind(this)}
               >
                 <EuiIcon type='advancedSettingsApp' color='primary' size='m' />
-                <span className='wz-menu-button-title '>Settings</span>
+                <span className='wz-menu-button-title '>
+                  {i18n.translate(
+                    'wazuh.public.components.wz.menu.management.settings',
+                    {
+                      defaultMessage: 'Settings',
+                    },
+                  )}
+                </span>
                 <span className='flex'></span>
                 {this.state.isSettingsPopoverOpen && (
                   <EuiIcon color='subdued' type='arrowRight' />
