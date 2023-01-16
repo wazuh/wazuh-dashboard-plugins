@@ -32,18 +32,36 @@ import { getAssetURL } from '../../utils/assets';
 import { getHttp } from '../../kibana-services';
 import { i18n } from '@kbn/i18n';
 
+<<<<<<< HEAD
 const iniSetting = i18n.translate('wazuh.public.controllers.setting.iniSetting', {
   defaultMessage: 'Cannot initialize Settings',
 });
+=======
+const iniSetting = i18n.translate(
+  'wazuh.public.controllers.setting.iniSetting',
+  {
+    defaultMessage: 'Cannot initialize Settings',
+  },
+);
+>>>>>>> b531d9697 (recheching files)
 const api = i18n.translate('wazuh.public.controllers.setting.API', {
   defaultMessage: 'API',
 });
 const modules = i18n.translate('wazuh.public.controllers.setting.Modules', {
   defaultMessage: 'Modules',
 });
+<<<<<<< HEAD
 const sampleData = i18n.translate('wazuh.public.controllers.setting.sampleData', {
   defaultMessage: 'Sample data',
 });
+=======
+const sampleData = i18n.translate(
+  'wazuh.public.controllers.setting.sampleData',
+  {
+    defaultMessage: 'Sample data',
+  },
+);
+>>>>>>> b531d9697 (recheching files)
 const configuration = i18n.translate(
   'wazuh.public.controllers.setting.configuration',
   {
