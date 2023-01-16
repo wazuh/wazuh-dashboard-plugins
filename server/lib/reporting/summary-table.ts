@@ -47,9 +47,9 @@ export default class SummaryTable {
    */
   _parseSummarySetup(summarySetup: SummarySetup) {
     let baseAggRef = this._base.aggs;
-    summarySetup.aggs.forEach(( agg, key) => {
+    summarySetup.aggs.forEach((agg, key) => {
       this._columns.push(agg.customLabel);
-      this._parseAggregation(baseAggRef,agg, key);
+      this._parseAggregation(baseAggRef, agg, key);
 
       if (summarySetup.aggs.length > key + 1) {
         baseAggRef[`${key + 2}`].aggs = {};
@@ -57,7 +57,7 @@ export default class SummaryTable {
       } else {
         this._columns.push('Count');
       }
-    },this);
+    }, this);
   }
 
   /**
@@ -98,11 +98,11 @@ export default class SummaryTable {
   _formatResponseToTable(rawResponse) {
     const firstKey = parseInt(Object.keys(rawResponse)[0]);
 
-    this._rows = rawResponse[firstKey].buckets.map(bucket => {
+    this._rows = rawResponse[firstKey].buckets.reduce((totalRows, bucket) => {
       const nextKey = firstKey + 1;
-      const row = this._buildRow(bucket, nextKey);
-      return row;
-    })
+      this._buildRow(bucket, nextKey, totalRows);
+      return totalRows;
+    }, []);
 
     return {
       rows: this._rows,
@@ -111,30 +111,30 @@ export default class SummaryTable {
     }
   }
 
-/**
- * Makes a row from the response
- * @param bucket
- * @param nextAggKey
- * @param row
- */
-  _buildRow(bucket: any, nextAggKey: number, row: any[] = []): any[] {
-    // Push the column value to the row
-    row.push(bucket.key);
+  /**
+   * Makes a row from the response
+   * @param bucket
+   * @param nextAggKey
+   * @param row
+   */
+  _buildRow(bucket: any, nextAggKey: number, totalRows: any[], row: any[] = []): any[] {
+    const newRow = [...row, bucket.key];
     // If there is a next aggregation, repeat the process
     if (bucket[nextAggKey.toString()]?.buckets?.length) {
-      const newBucket = bucket[nextAggKey.toString()].buckets[0];
-      row = this._buildRow(newBucket, (nextAggKey + 1), row);
+      bucket[nextAggKey.toString()].buckets.forEach(newBucket => {
+        this._buildRow(newBucket, (nextAggKey + 1), totalRows, newRow);
+      });
     }
     // Add the Count as the last item in the row
     else if (bucket.doc_count) {
-      row.push(bucket.doc_count);
+      newRow.push(bucket.doc_count);
+      totalRows.push(newRow);
     }
-    return row;
   }
 
-/**
- * Executes the query and returns the response
- */
+  /**
+   * Executes the query and returns the response
+   */
   async fetch() {
     try {
       const response = await this._context.core.opensearch.client.asCurrentUser.search({
