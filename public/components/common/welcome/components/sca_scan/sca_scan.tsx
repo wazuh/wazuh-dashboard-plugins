@@ -162,7 +162,12 @@ export const ScaScan = compose(
                 title={lastScan.pass}
                 titleSize='m'
                 textAlign='center'
-                description='Pass'
+                description={i18n.translate(
+                  'wazuh.public.components.common.welcome.scaScan.Pass',
+                  {
+                    defaultMessage: 'Pass',
+                  },
+                )}
                 titleColor='secondary'
               />
             </EuiFlexItem>
@@ -171,7 +176,12 @@ export const ScaScan = compose(
                 title={lastScan.fail}
                 titleSize='m'
                 textAlign='center'
-                description='Fail'
+                description={i18n.translate(
+                  'wazuh.public.components.common.welcome.scaScan.Fail',
+                  {
+                    defaultMessage: 'Fail',
+                  },
+                )}
                 titleColor='danger'
               />
             </EuiFlexItem>
@@ -180,7 +190,12 @@ export const ScaScan = compose(
                 title={lastScan.total_checks}
                 titleSize='m'
                 textAlign='center'
-                description='Total checks'
+                description={i18n.translate(
+                  'wazuh.public.components.common.welcome.scaScan.Totalchecks',
+                  {
+                    defaultMessage: 'Total checks',
+                  },
+                )}
               />
             </EuiFlexItem>
             <EuiFlexItem>
@@ -188,7 +203,12 @@ export const ScaScan = compose(
                 title={`${lastScan.score}%`}
                 titleSize='m'
                 textAlign='center'
-                description='Score'
+                description={i18n.translate(
+                  'wazuh.public.components.common.welcome.scaScan.Score',
+                  {
+                    defaultMessage: 'Score',
+                  },
+                )}
               />
             </EuiFlexItem>
           </EuiFlexGroup>
@@ -282,7 +302,12 @@ export const ScaScan = compose(
                         );
                         this.router.reload();
                       }}
-                      aria-label='Open SCA Scans'
+                      aria-label={i18n.translate(
+                        'wazuh.public.components.common.welcome.scaScan.open',
+                        {
+                          defaultMessage: 'Open SCA Scans',
+                        },
+                      )}
                     />
                   </EuiToolTip>
                 </EuiFlexItem>

@@ -24,9 +24,12 @@ import { i18n } from '@kbn/i18n';
 const fileDescp = i18n.translate('wazuh.components.addModule.guide.fileDescp', {
   defaultMessage: 'Name of the file',
 });
-const prefileDescp = i18n.translate('wazuh.components.addModule.guide.prefileDescp', {
-  defaultMessage: 'Permissions of the file',
-});
+const prefileDescp = i18n.translate(
+  'wazuh.components.addModule.guide.prefileDescp',
+  {
+    defaultMessage: 'Permissions of the file',
+  },
+);
 const datefileDescp = i18n.translate(
   'wazuh.components.addModule.guide.datefileDescp',
   {
@@ -63,21 +66,109 @@ const md5Descp = i18n.translate('wazuh.components.addModule.guide.md5Descp', {
 const sha1Descp = i18n.translate('wazuh.components.addModule.guide.sha1Descp', {
   defaultMessage: 'sha1 hash',
 });
-const sha256Descp = i18n.translate('wazuh.components.addModule.guide.sha256Descp', {
-  defaultMessage: 'sha256 hash',
-});
-const inodeDescp = i18n.translate('wazuh.components.addModule.guide.inodeDescp', {
-  defaultMessage: 'Inode of the file',
-});
+const sha256Descp = i18n.translate(
+  'wazuh.components.addModule.guide.sha256Descp',
+  {
+    defaultMessage: 'sha256 hash',
+  },
+);
+const inodeDescp = i18n.translate(
+  'wazuh.components.addModule.guide.inodeDescp',
+  {
+    defaultMessage: 'Inode of the file',
+  },
+);
 const sizeDescp = i18n.translate('wazuh.components.addModule.guide.sizeDescp', {
   defaultMessage: 'Size of the file in Bytes',
 });
-const regkeyDescp = i18n.translate('wazuh.components.addModule.guide.regkeyDescp', {
-  defaultMessage: 'Name of the registry_key',
-});
+const regkeyDescp = i18n.translate(
+  'wazuh.components.addModule.guide.regkeyDescp',
+  {
+    defaultMessage: 'Name of the registry_key',
+  },
+);
 const filePlace = i18n.translate('wazuh.components.addModule.guide.filePlace', {
   defaultMessage: 'Filter or search file',
 });
+const file = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.filterBar.file',
+  {
+    defaultMessage: 'file',
+  },
+);
+const perm = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.filterBar.perm',
+  {
+    defaultMessage: 'perm',
+  },
+);
+const mtime = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.filterBar.mtime',
+  {
+    defaultMessage: 'mtime',
+  },
+);
+const date = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.filterBar.date',
+  {
+    defaultMessage: 'date',
+  },
+);
+const uname = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.filterBar.uname',
+  {
+    defaultMessage: 'uname',
+  },
+);
+const uid = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.filterBar.uid',
+  {
+    defaultMessage: 'uid',
+  },
+);
+
+const gname = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.filterBar.gname',
+  {
+    defaultMessage: 'gname',
+  },
+);
+const gid = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.filterBar.gid',
+  {
+    defaultMessage: 'gid',
+  },
+);
+const md5 = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.filterBar.md5',
+  {
+    defaultMessage: 'md5',
+  },
+);
+const sha1 = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.filterBar.sha1',
+  {
+    defaultMessage: 'sha1',
+  },
+);
+const sha256 = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.filterBar.sha256',
+  {
+    defaultMessage: 'sha256',
+  },
+);
+const inode = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.filterBar.inode',
+  {
+    defaultMessage: 'inode',
+  },
+);
+const size = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.filterBar.size',
+  {
+    defaultMessage: 'size',
+  },
+);
 
 export class FilterBar extends Component {
   // TODO: Change the type
@@ -85,7 +176,7 @@ export class FilterBar extends Component {
     files: [
       {
         type: 'q',
-        label: 'file',
+        label: file,
         description: fileDescp,
         operators: ['=', '!=', '~'],
         values: async value =>
@@ -95,7 +186,7 @@ export class FilterBar extends Component {
         ? [
             {
               type: 'q',
-              label: 'perm',
+              label: perm,
               description: prefileDescp,
               operators: ['=', '!=', '~'],
               values: async value =>
@@ -105,7 +196,7 @@ export class FilterBar extends Component {
         : []),
       {
         type: 'q',
-        label: 'mtime',
+        label: mtime,
         description: datefileDescp,
         operators: ['=', '!=', '>', '<'],
         values: async value =>
@@ -119,7 +210,7 @@ export class FilterBar extends Component {
       },
       {
         type: 'q',
-        label: 'date',
+        label: date,
         description: regdatefileDescp,
         operators: ['=', '!=', '>', '<'],
         values: async value =>
@@ -127,7 +218,7 @@ export class FilterBar extends Component {
       },
       {
         type: 'q',
-        label: 'uname',
+        label: uname,
         description: ownerfileDescp,
         operators: ['=', '!=', '~'],
         values: async value =>
@@ -135,7 +226,7 @@ export class FilterBar extends Component {
       },
       {
         type: 'q',
-        label: 'uid',
+        label: uid,
         description: owneridfileDescp,
         operators: ['=', '!=', '~'],
         values: async value =>
@@ -145,7 +236,7 @@ export class FilterBar extends Component {
         ? [
             {
               type: 'q',
-              label: 'gname',
+              label: gname,
               description: groupownerfileDescp,
               operators: ['=', '!=', '~'],
               values: async value =>
@@ -157,7 +248,7 @@ export class FilterBar extends Component {
         ? [
             {
               type: 'q',
-              label: 'gid',
+              label: gid,
               description: md5Descp,
               operators: ['=', '!=', '~'],
               values: async value =>
@@ -167,7 +258,7 @@ export class FilterBar extends Component {
         : []),
       {
         type: 'q',
-        label: 'md5',
+        label: md5,
         description: md5Descp,
         operators: ['=', '!=', '~'],
         values: async value =>
@@ -175,7 +266,7 @@ export class FilterBar extends Component {
       },
       {
         type: 'q',
-        label: 'sha1',
+        label: sha1,
         description: sha1Descp,
         operators: ['=', '!=', '~'],
         values: async value =>
@@ -183,7 +274,7 @@ export class FilterBar extends Component {
       },
       {
         type: 'q',
-        label: 'sha256',
+        label: sha256,
         description: sha256Descp,
         operators: ['=', '!=', '~'],
         values: async value =>
@@ -193,7 +284,7 @@ export class FilterBar extends Component {
         ? [
             {
               type: 'q',
-              label: 'inode',
+              label: inode,
               description: inodeDescp,
               operators: ['=', '!=', '~'],
               values: async value =>
@@ -203,7 +294,7 @@ export class FilterBar extends Component {
         : []),
       {
         type: 'q',
-        label: 'size',
+        label: size,
         description: sizeDescp,
         values: async value =>
           getFilterValues('size', value, this.props.agent.id),
@@ -212,7 +303,7 @@ export class FilterBar extends Component {
     registry: [
       {
         type: 'q',
-        label: 'file',
+        label: file,
         description: regkeyDescp,
         operators: ['=', '!=', '~'],
         values: async value =>

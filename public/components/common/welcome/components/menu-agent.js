@@ -159,7 +159,12 @@ class WzMenuAgent extends Component {
                   }}
                   color='primary'
                   type={this.menuAgent[item.id] ? 'pinFilled' : 'pin'}
-                  aria-label='Next'
+                  aria-label={i18n.translate(
+                    'wazuh.public.components.common.welcome.menuAgent.next',
+                    {
+                      defaultMessage: 'Next',
+                    },
+                  )}
                   style={{ cursor: 'pointer' }}
                 />
               </EuiFlexItem>

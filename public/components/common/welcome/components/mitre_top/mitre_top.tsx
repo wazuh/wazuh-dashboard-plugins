@@ -30,6 +30,12 @@ import { AppNavigate } from '../../../../../react-services/app-navigate';
 import { getDataPlugin } from '../../../../../kibana-services';
 import { i18n } from '@kbn/i18n';
 
+const tactics = i18n.translate(
+  'wazuh.public.components.common.welcome.mitre.tactics',
+  {
+    defaultMessage: 'Back Top Tactics',
+  },
+);
 export class MitreTopTactics extends Component {
   _isMount = false;
 
@@ -181,7 +187,7 @@ export class MitreTopTactics extends Component {
                   });
                 }}
                 iconType='sortLeft'
-                aria-label='Back Top Tactics'
+                aria-label={tactics}
               />
             </EuiFlexItem>
             <EuiFlexItem>

@@ -30,7 +30,14 @@ import {
 import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
 import { WzRequest } from '../../../../react-services/wz-request';
+import { i18n } from '@kbn/i18n';
 
+const fetchedFor = i18n.translate(
+  'wazuh.public.components.agents.vuls.inventory.flyOut.fetchedFor',
+  {
+    defaultMessage: 'Data could not be fetched for',
+  },
+);
 export class FlyoutDetail extends Component {
   state: {
     currentItem: boolean | { [key: string]: string };
@@ -60,7 +67,7 @@ export class FlyoutDetail extends Component {
     const response = await WzRequest.apiReq(
       'GET',
       `/vulnerability/${this.props.agentId}/last_scan`,
-      {}
+      {},
     );
     return ((response.data || {}).data || {}).affected_items[0] || {};
   }
@@ -89,13 +96,13 @@ export class FlyoutDetail extends Component {
         severity: UI_ERROR_SEVERITIES.UI as UIErrorSeverity,
         error: {
           error: error,
-          message: `Data could not be fetched for ${this.props.vulName}`,
+          message: `${fetchedFor} ${this.props.vulName}`,
           title: error.name || error,
         },
       };
       getErrorOrchestrator().handleError(options);
       this.setState({
-        error: `Data could not be fetched for ${this.props.vulName}`,
+        error: `${fetchedFor} ${this.props.vulName}`,
       });
     } finally {
       this.setState({ isLoading: false });
@@ -110,44 +117,52 @@ export class FlyoutDetail extends Component {
       name: 'data.vulnerability.package.name',
       cve: 'data.vulnerability.cve',
       architecture: 'data.vulnerability.package.architecture',
-      version: 'data.vulnerability.package.version'
+      version: 'data.vulnerability.package.version',
     };
     const implicitFilters = [
       { 'rule.groups': 'vulnerability-detector' },
       { 'agent.id': this.props.agentId },
       this.state.clusterFilter,
       ...Object.keys(filterMap)
-        .map((key) => {
+        .map(key => {
           if (currentItem[key]) {
             return { [filterMap[key]]: currentItem[key] };
           }
         })
-        .filter((item) => item),
+        .filter(item => item),
     ];
 
     return (
       <EuiFlyout
         onClose={() => this.props.closeFlyout()}
-        size="l"
+        size='l'
         aria-labelledby={title}
-        maxWidth="70%"
-        className="wz-inventory wzApp"
+        maxWidth='70%'
+        className='wz-inventory wzApp'
       >
-        <EuiFlyoutHeader hasBorder className="flyout-header">
-          <EuiTitle size="s">
+        <EuiFlyoutHeader hasBorder className='flyout-header'>
+          <EuiTitle size='s'>
             <h2 id={id}>{title}</h2>
           </EuiTitle>
         </EuiFlyoutHeader>
         {this.state.isLoading && (
-          <EuiFlyoutBody className="flyout-body">
+          <EuiFlyoutBody className='flyout-body'>
             {(this.state.error && (
-              <EuiCallOut title={this.state.error} color="warning" iconType="alert" />
+              <EuiCallOut
+                title={this.state.error}
+                color='warning'
+                iconType='alert'
+              />
             )) || <EuiLoadingContent style={{ margin: 16 }} />}
           </EuiFlyoutBody>
         )}
         {currentItem && !this.state.isLoading && (
-          <EuiFlyoutBody className="flyout-body">
-            <Details currentItem={currentItem} {...this.props} implicitFilters={implicitFilters} />
+          <EuiFlyoutBody className='flyout-body'>
+            <Details
+              currentItem={currentItem}
+              {...this.props}
+              implicitFilters={implicitFilters}
+            />
           </EuiFlyoutBody>
         )}
       </EuiFlyout>

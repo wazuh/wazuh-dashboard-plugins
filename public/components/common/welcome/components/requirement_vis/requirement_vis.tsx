@@ -31,13 +31,44 @@ const textCompliance = i18n.translate(
     defaultMessage: 'Compliance',
   },
 );
+
+const PCIDSS = i18n.translate(
+  'wazuh.public.components.common.welcome.req.PCIDSS',
+  {
+    defaultMessage: 'PCI DSS',
+  },
+);
+const GDPR = i18n.translate('wazuh.public.components.common.welcome.req.GDPR', {
+  defaultMessage: 'GDPR',
+});
+const NIST800 = i18n.translate(
+  'wazuh.public.components.common.welcome.req.nist',
+  {
+    defaultMessage: 'NIST 800-53',
+  },
+);
+const HIPAA = i18n.translate(
+  'wazuh.public.components.common.welcome.req.HIPAA',
+  {
+    defaultMessage: 'HIPAA',
+  },
+);
+const GPG13 = i18n.translate(
+  'wazuh.public.components.common.welcome.req.GPG13',
+  {
+    defaultMessage: 'GPG13',
+  },
+);
+const TSC = i18n.translate('wazuh.public.components.common.welcome.req.TSC', {
+  defaultMessage: 'TSC',
+});
 const selectionOptionsCompliance = [
-  { value: 'pci_dss', text: 'PCI DSS' },
-  { value: 'gdpr', text: 'GDPR' },
-  { value: 'nist_800_53', text: 'NIST 800-53' },
-  { value: 'hipaa', text: 'HIPAA' },
-  { value: 'gpg13', text: 'GPG13' },
-  { value: 'tsc', text: 'TSC' },
+  { value: 'pci_dss', text: PCIDSS },
+  { value: 'gdpr', text: GDPR },
+  { value: 'nist_800_53', text: NIST800 },
+  { value: 'hipaa', text: HIPAA },
+  { value: 'gpg13', text: GPG13 },
+  { value: 'tsc', text: TSC },
 ];
 
 const requirementNameModuleID = {

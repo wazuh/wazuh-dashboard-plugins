@@ -81,6 +81,21 @@ const Descp9 = i18n.translate("wazuh.components.agents.sca.Descp9", {
 const Descp10 = i18n.translate("wazuh.components.agents.sca.regkeyDescp", {
   defaultMessage: "Filter by check reason",
 });
+const pass = i18n.translate('wazuh.public.components.agents.sca.inventory.pass', {
+  defaultMessage: 'Pass',
+})
+const fail = i18n.translate('wazuh.public.components.agents.sca.inventory.fail', {
+  defaultMessage: 'Fail',
+})
+const notApp = i18n.translate('wazuh.public.components.agents.sca.inventory.notApp', {
+  defaultMessage: 'Not applicable',
+})
+const filter = i18n.translate('wazuh.public.components.agents.sca.inventory.filter', {
+  defaultMessage: 'The filter contains invalid characters',
+})
+const filSearch = i18n.translate('wazuh.public.components.agents.sca.inventory.filSearch', {
+  defaultMessage: 'Filter or search',
+})
 export class Inventory extends Component {
   _isMount = false;
   constructor(props) {
@@ -100,37 +115,51 @@ export class Inventory extends Component {
     this.columnsPolicies = [
       {
         field: 'name',
-        name: 'Policy',
+        name: i18n.translate('wazuh.public.components.agents.sca.inventory.Policy', {
+              defaultMessage: 'Policy',
+            }),
       },
       {
         field: 'description',
-        name: 'Description',
+        name: i18n.translate('wazuh.public.components.agents.sca.inventory.Description', {
+              defaultMessage: 'Description',
+            }),
         truncateText: true,
       },
       {
         field: 'end_scan',
-        name: 'End scan',
+        name: i18n.translate('wazuh.public.components.agents.sca.inventory.endscan', {
+              defaultMessage: 'End scan',
+            }),
         dataType: 'date',
         render: formatUIDate,
       },
       {
         field: 'pass',
-        name: 'Pass',
+        name: i18n.translate('wazuh.public.components.agents.sca.inventory.Pass', {
+              defaultMessage: 'Pass',
+            }),
         width: '100px',
       },
       {
         field: 'fail',
-        name: 'Fail',
+        name: i18n.translate('wazuh.public.components.agents.sca.inventory.Fail', {
+              defaultMessage: 'Fail',
+            }),
         width: '100px',
       },
       {
         field: 'invalid',
-        name: 'Not applicable',
+        name: i18n.translate('wazuh.public.components.agents.sca.inventory.Notapplicable', {
+              defaultMessage: 'Not applicable',
+            }),
         width: '100px',
       },
       {
         field: 'score',
-        name: 'Score',
+        name: i18n.translate('wazuh.public.components.agents.sca.inventory.Score', {
+              defaultMessage: 'Score',
+            }),
         render: (score) => {
           return `${score}%`;
         },
@@ -140,18 +169,24 @@ export class Inventory extends Component {
     this.columnsChecks = [
       {
         field: 'id',
-        name: 'ID',
+        name: i18n.translate('wazuh.public.components.agents.sca.inventory.ID', {
+              defaultMessage: 'ID',
+            }),
         sortable: true,
         width: '100px',
       },
       {
         field: 'title',
-        name: 'Title',
+        name: i18n.translate('wazuh.public.components.agents.sca.inventory.Title', {
+              defaultMessage: 'Title',
+            }),
         sortable: true,
         truncateText: true,
       },
       {
-        name: 'Target',
+        name: i18n.translate('wazuh.public.components.agents.sca.inventory.Target', {
+              defaultMessage: 'Target',
+            }),
         truncateText: true,
         render: (item) => (
           <div>
@@ -203,7 +238,9 @@ export class Inventory extends Component {
       },
       {
         field: 'result',
-        name: 'Result',
+        name: i18n.translate('wazuh.public.components.agents.sca.inventory', {
+              defaultMessage: '',
+            })'Result',
         truncateText: true,
         sortable: true,
         width: '150px',
@@ -338,70 +375,90 @@ export class Inventory extends Component {
       const defaultSuggestions = [
         {
           type: 'params',
-          label: 'condition',
+          label: i18n.translate('wazuh.public.components.agents.sca.inventory.condition', {
+              defaultMessage: 'condition',
+            }),
           description: Descp1,
           operators: ['=', '!='],
           values: (value) => getSuggestionsValues(value, 'condition'),
         },
         {
           type: 'params',
-          label: 'file',
+          label: i18n.translate('wazuh.public.components.agents.sca.inventory.file', {
+              defaultMessage: 'file',
+            }),
           description: Descp2,
           operators: ['=', '!='],
           values: (value) => getSuggestionsValues(value, 'file'),
         },
         {
           type: 'params',
-          label: 'title',
+          label: i18n.translate('wazuh.public.components.agents.sca.inventory.title', {
+              defaultMessage: 'title',
+            }),
           description: Descp3,
           operators: ['=', '!='],
           values: (value) => getSuggestionsValues(value, 'title'),
         },
         {
           type: 'params',
-          label: 'result',
+          label: i18n.translate('wazuh.public.components.agents.sca.inventory.result', {
+              defaultMessage: 'result',
+            }),
           description: Descp4,
           operators: ['=', '!='],
           values: (value) => getSuggestionsValues(value, 'result'),
         },
         {
           type: 'params',
-          label: 'status',
+          label: i18n.translate('wazuh.public.components.agents.sca.inventory.status', {
+              defaultMessage: 'status',
+            }),
           description: Descp5,
           operators: ['=', '!='],
           values: (value) => getSuggestionsValues(value, 'status'),
         },
         {
           type: 'params',
-          label: 'rationale',
+          label:i18n.translate('wazuh.public.components.agents.sca.inventory.rationale', {
+              defaultMessage: 'rationale',
+            }),
           description: Descp6,
           operators: ['=', '!='],
           values: (value) => getSuggestionsValues(value, 'rationale'),
         },
         {
           type: 'params',
-          label: 'registry',
+          label: i18n.translate('wazuh.public.components.agents.sca.inventory.registry', {
+              defaultMessage: 'registry',
+            }),
           description: Descp7,
           operators: ['=', '!='],
           values: (value) => getSuggestionsValues(value, 'registry'),
         },
         {
           type: 'params',
-          label: 'description',
+          label: i18n.translate('wazuh.public.components.agents.sca.inventory.description', {
+              defaultMessage: 'description',
+            }),
           description: Descp8,
           operators: ['=', '!='],
           values: (value) => getSuggestionsValues(value, 'description'),
         },
         {
           type: 'params',
-          label: 'remediation',
+          label: i18n.translate('wazuh.public.components.agents.sca.inventory.remediation', {
+              defaultMessage: 'remediation',
+            }),
           description: Descp9,
           operators: ['=', '!='],
           values: (value) => getSuggestionsValues(value, 'remediation'),
         },
         {
           type: 'params',
-          label: 'reason',
+          label: i18n.translate('wazuh.public.components.agents.sca.inventory.reason', {
+              defaultMessage: 'reason',
+            }),
           description: Descp10,
           operators: ['=', '!='],
           values: (value) => getSuggestionsValues(value, 'reason'),
@@ -481,7 +538,7 @@ export class Inventory extends Component {
           severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
           error: {
             error: error,
-            message: `The filter contains invalid characters` || error.message,
+            message: filter || error.message,
             title: error.name,
           },
         };
@@ -525,19 +582,27 @@ export class Inventory extends Component {
       const rulesText = item.rules.length ? item.rules.map((el) => el.rule).join('\n') : '';
       const listItems = [
         {
-          title: 'Check not applicable due to:',
+          title: i18n.translate('wazuh.public.components.agents.sca.inventory.checkApp', {
+              defaultMessage: 'Check not applicable due to:',
+            }),
           description: item.reason,
         },
         {
-          title: 'Rationale',
+          title: i18n.translate('wazuh.public.components.agents.sca.inventory.Rationale', {
+              defaultMessage: 'Rationale',
+            }),
           description: item.rationale || '-',
         },
         {
-          title: 'Remediation',
+          title: i18n.translate('wazuh.public.components.agents.sca.inventory.Remediation', {
+              defaultMessage: 'Remediation',
+            }),
           description: item.remediation || '-',
         },
         {
-          title: 'Description',
+          title: i18n.translate('wazuh.public.components.agents.sca.inventory.Description', {
+              defaultMessage: 'Description',
+            }),
           description: item.description || '-',
         },
         {
@@ -549,7 +614,9 @@ export class Inventory extends Component {
           description: <RuleText rules={item.rules.length ? item.rules : []} />,
         },
         {
-          title: 'Compliance',
+          title: i18n.translate('wazuh.public.components.agents.sca.inventory.Compliance', {
+              defaultMessage: 'Compliance',
+            }),
           description: <ComplianceText complianceText={complianceText} />,
         },
       ];
@@ -643,9 +710,13 @@ export class Inventory extends Component {
             (this.props.agent || {}).status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED &&
             !this.state.policies.length &&
             !this.state.loading && (
-              <EuiCallOut title="No scans available" iconType="iInCircle">
+              <EuiCallOut title= {i18n.translate('wazuh.public.components.agents.sca.inventory.noScans', {
+              defaultMessage: 'No scans available',
+            })} iconType="iInCircle">
                 <EuiButton color="primary" onClick={() => this.initialize()}>
-                  Refresh
+                 {i18n.translate('wazuh.public.components.agents.sca.inventory.Refresh', {
+              defaultMessage: 'Refresh',
+            })}
                 </EuiButton>
               </EuiCallOut>
             )}
@@ -659,7 +730,9 @@ export class Inventory extends Component {
                 iconType="iInCircle"
               >
                 <EuiButton color="primary" onClick={() => this.initialize()}>
-                  Refresh
+                  {i18n.translate('wazuh.public.components.agents.sca.inventory.Refresh', {
+              defaultMessage: 'Refresh',
+            })}
                 </EuiButton>
               </EuiCallOut>
             )}
@@ -683,10 +756,10 @@ export class Inventory extends Component {
                             type="donut"
                             size={{ width: '100%', height: '150px' }}
                             data={[
-                              { label: 'Pass', value: policy.pass, color: '#00a69b' },
-                              { label: 'Fail', value: policy.fail, color: '#ff645c' },
+                              { label: pass, value: policy.pass, color: '#00a69b' },
+                              { label: fail, value: policy.fail, color: '#ff645c' },
                               {
-                                label: 'Not applicable',
+                                label: notApp,
                                 value: policy.invalid,
                                 color: '#5c6773',
                               },
@@ -728,7 +801,9 @@ export class Inventory extends Component {
                         style={{ padding: '6px 0px' }}
                         onClick={() => this.loadScaPolicy(false)}
                         iconType="arrowLeft"
-                        aria-label="Back to policies"
+                        aria-label={i18n.translate('wazuh.public.components.agents.sca.inventory.policies', {
+              defaultMessage: 'Back to policies',
+            })}
                         {...{ iconSize: 'l' }}
                       />
                     </EuiFlexItem>
@@ -789,7 +864,9 @@ export class Inventory extends Component {
                     <EuiFlexItem>
                       <EuiStat
                         title={this.buttonStat(this.state.lookingPolicy.pass, 'result', 'passed')}
-                        description="Pass"
+                        description={i18n.translate('wazuh.public.components.agents.sca.inventory.Pass', {
+              defaultMessage: 'Pass',
+            })}
                         titleColor="secondary"
                         titleSize="m"
                         textAlign="center"
@@ -798,7 +875,9 @@ export class Inventory extends Component {
                     <EuiFlexItem>
                       <EuiStat
                         title={this.buttonStat(this.state.lookingPolicy.fail, 'result', 'failed')}
-                        description="Fail"
+                        description={i18n.translate('wazuh.public.components.agents.sca.inventory.Fail', {
+              defaultMessage: 'Fail',
+            })}
                         titleColor="danger"
                         titleSize="m"
                         textAlign="center"
@@ -811,7 +890,9 @@ export class Inventory extends Component {
                           'result',
                           'not applicable'
                         )}
-                        description="Not applicable"
+                        description={i18n.translate('wazuh.public.components.agents.sca.inventory.notApplicable', {
+              defaultMessage: 'Not applicable',
+            })}
                         titleColor="subdued"
                         titleSize="m"
                         textAlign="center"
@@ -820,7 +901,9 @@ export class Inventory extends Component {
                     <EuiFlexItem>
                       <EuiStat
                         title={`${this.state.lookingPolicy.score}%`}
-                        description="Score"
+                        description={i18n.translate('wazuh.public.components.agents.sca.inventory.score', {
+              defaultMessage: 'Score',
+            })}
                         titleColor="accent"
                         titleSize="m"
                         textAlign="center"
@@ -829,7 +912,9 @@ export class Inventory extends Component {
                     <EuiFlexItem>
                       <EuiStat
                         title={formatUIDate(this.state.lookingPolicy.end_scan)}
-                        description="End scan"
+                        description={i18n.translate('wazuh.public.components.agents.sca.inventory.endScan', {
+              defaultMessage: 'End scan',
+            })}
                         titleColor="primary"
                         titleSize="s"
                         textAlign="center"
@@ -844,7 +929,7 @@ export class Inventory extends Component {
                       <WzSearchBar
                         filters={this.state.filters}
                         suggestions={this.suggestions[this.state.lookingPolicy.policy_id]}
-                        placeholder="Filter or search"
+                        placeholder={filSearch}
                         onFiltersChange={(filters) => {
                           this.setState({ filters });
                         }}

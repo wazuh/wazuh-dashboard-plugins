@@ -60,6 +60,24 @@ import {
   getToasts,
   getUiSettings,
 } from '../../../../kibana-services';
+const customLabel = i18n.translate(
+  'wazuh.public.components.common.common.modules.discover.customLabel',
+  {
+    defaultMessage: '.hideCreateCustomLabel',
+  },
+);
+const removeColumn1 = i18n.translate(
+  'wazuh.public.components.common.common.modules.discover.removeColumn1',
+  {
+    defaultMessage: 'Remove column',
+  },
+);
+const filter = i18n.translate(
+  'wazuh.public.components.common.common.modules.discover.filter',
+  {
+    defaultMessage: 'Filter',
+  },
+);
 const nameTime = i18n.translate(
   'wazuh.components.common.module.discover.nameTime',
   {
@@ -318,7 +336,7 @@ export const Discover = compose(
         button.onclick = findAndHide;
       } catch (error) {
         const options = {
-          context: `${Discover.name}.hideCreateCustomLabel`,
+          context: `${Discover.name}${customLabel}`,
           level: UI_LOGGER_LEVELS.ERROR,
           severity: UI_ERROR_SEVERITIES.BUSINESS,
           error: {
@@ -605,7 +623,7 @@ export const Discover = compose(
             >
               {this.getLabel(item)}{' '}
               {this.state.hover === item && (
-                <EuiToolTip position='top' content={`Remove column`}>
+                <EuiToolTip position='top' content={removeColumn1}>
                   <EuiButtonIcon
                     style={{
                       paddingBottom: 12,
@@ -617,7 +635,7 @@ export const Discover = compose(
                       e.stopPropagation();
                     }}
                     iconType='cross'
-                    aria-label='Filter'
+                    aria-label={filter}
                     iconSize='s'
                   />
                 </EuiToolTip>

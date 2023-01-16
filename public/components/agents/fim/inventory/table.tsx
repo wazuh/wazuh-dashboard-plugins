@@ -32,6 +32,50 @@ import {
 import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
 
+import { i18n } from '@kbn/i18n';
+
+const file = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.table.file',
+  {
+    defaultMessage: 'File',
+  },
+);
+const lastModified = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.table.lastModified',
+  {
+    defaultMessage: 'Last Modified',
+  },
+);
+const user = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.table.user',
+  {
+    defaultMessage: 'User',
+  },
+);
+const userID = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.table.userID',
+  {
+    defaultMessage: 'User ID',
+  },
+);
+const group = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.table.group',
+  {
+    defaultMessage: 'Group',
+  },
+);
+const groupID = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.table.groupID',
+  {
+    defaultMessage: 'Group ID',
+  },
+);
+const size = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.table.size',
+  {
+    defaultMessage: 'Size',
+  },
+);
 export class InventoryTable extends Component {
   state: {
     syscheck: [];
@@ -91,24 +135,36 @@ export class InventoryTable extends Component {
   }
 
   async showFlyout(file, item, redirect = false) {
-    window.location.href = window.location.href.replace(new RegExp('&file=' + '[^&]*', 'g'), '');
+    window.location.href = window.location.href.replace(
+      new RegExp('&file=' + '[^&]*', 'g'),
+      '',
+    );
     let fileData = false;
     if (!redirect) {
-      fileData = this.state.syscheck.filter((item) => {
+      fileData = this.state.syscheck.filter(item => {
         return item.file === file;
       });
     } else {
-      const response = await WzRequest.apiReq('GET', `/syscheck/${this.props.agent.id}`, {
-        params: {
-          file: file,
+      const response = await WzRequest.apiReq(
+        'GET',
+        `/syscheck/${this.props.agent.id}`,
+        {
+          params: {
+            file: file,
+          },
         },
-      });
+      );
       fileData = ((response.data || {}).data || {}).affected_items || [];
     }
-    if (!redirect) window.location.href = window.location.href += `&file=${file}`;
+    if (!redirect)
+      window.location.href = window.location.href += `&file=${file}`;
     //if a flyout is opened, we close it and open a new one, so the components are correctly updated on start.
     this.setState({ isFlyoutVisible: false }, () =>
-      this.setState({ isFlyoutVisible: true, currentFile: file, syscheckItem: item })
+      this.setState({
+        isFlyoutVisible: true,
+        currentFile: file,
+        syscheckItem: item,
+      }),
     );
   }
 
@@ -127,12 +183,14 @@ export class InventoryTable extends Component {
       });
 
       this.props.onTotalItemsChange(
-        (((syscheck || {}).data || {}).data || {}).total_affected_items
+        (((syscheck || {}).data || {}).data || {}).total_affected_items,
       );
 
       this.setState({
-        syscheck: (((syscheck || {}).data || {}).data || {}).affected_items || {},
-        totalItems: (((syscheck || {}).data || {}).data || {}).total_affected_items - 1,
+        syscheck:
+          (((syscheck || {}).data || {}).data || {}).affected_items || {},
+        totalItems:
+          (((syscheck || {}).data || {}).data || {}).total_affected_items - 1,
         isLoading: false,
         error: undefined,
       });
@@ -185,7 +243,7 @@ export class InventoryTable extends Component {
         sortDirection,
         isLoading: true,
       },
-      () => this.getSyscheck()
+      () => this.getSyscheck(),
     );
   };
 
@@ -197,48 +255,48 @@ export class InventoryTable extends Component {
     return [
       {
         field: 'file',
-        name: 'File',
+        name: file,
         sortable: true,
         width: '250px',
       },
       {
         field: 'mtime',
-        name: 'Last Modified',
+        name: '',
         sortable: true,
         width: '100px',
         render: formatUIDate,
       },
       {
         field: 'uname',
-        name: 'User',
+        name: user,
         sortable: true,
         truncateText: true,
         width: `${width}`,
       },
       {
         field: 'uid',
-        name: 'User ID',
+        name: userID,
         sortable: true,
         truncateText: true,
         width: `${width}`,
       },
       {
         field: 'gname',
-        name: 'Group',
+        name: group,
         sortable: true,
         truncateText: true,
         width: `${width}`,
       },
       {
         field: 'gid',
-        name: 'Group ID',
+        name: groupID,
         sortable: true,
         truncateText: true,
         width: `${width}`,
       },
       {
         field: 'size',
-        name: 'Size',
+        name: size,
         sortable: true,
         width: `${width}`,
       },
@@ -246,7 +304,7 @@ export class InventoryTable extends Component {
   }
 
   renderFilesTable() {
-    const getRowProps = (item) => {
+    const getRowProps = item => {
       const { file } = item;
       return {
         'data-test-subj': `row-${file}`,
@@ -289,7 +347,7 @@ export class InventoryTable extends Component {
             onChange={this.onTableChange}
             rowProps={getRowProps}
             sorting={sorting}
-            itemId="file"
+            itemId='file'
             isExpandable={true}
             loading={isLoading}
           />
@@ -301,7 +359,7 @@ export class InventoryTable extends Component {
   render() {
     const filesTable = this.renderFilesTable();
     return (
-      <div className="wz-inventory">
+      <div className='wz-inventory'>
         {filesTable}
         {this.state.isFlyoutVisible && (
           <FlyoutDetail
@@ -309,8 +367,8 @@ export class InventoryTable extends Component {
             agentId={this.props.agent.id}
             item={this.state.syscheckItem}
             closeFlyout={() => this.closeFlyout()}
-            type="file"
-            view="inventory"
+            type='file'
+            view='inventory'
             showViewInEvents={true}
             {...this.props}
           />

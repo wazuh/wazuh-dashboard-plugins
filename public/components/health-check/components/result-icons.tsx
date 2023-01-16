@@ -22,40 +22,52 @@ import { resultsPreset } from '../types/result-icons-presets';
 import { i18n } from '@kbn/i18n';
 
 const ResultIcons = ({ result, children, initCheck }) => {
-
-
   return (
-    <>{
-      resultsPreset[result].disabled ? <>{
-        i18n.translate("wazuh.components.agent..health.components.disable", {
-          defaultMessage: "Disabled",
-        })}</> : <>
-        <EuiToolTip
-          position='top'
-          content={resultsPreset[result].tooltipText}>
-          {resultsPreset[result].spinner ? <EuiLoadingSpinner size="m" /> :
-            <EuiIcon aria-label={result} type={resultsPreset[result].iconType} color={resultsPreset[result].iconColor}></EuiIcon>
-          }
-        </EuiToolTip>
+    <>
+      {resultsPreset[result].disabled ? (
+        <>
+          {i18n.translate('wazuh.components.agent..health.components.disable', {
+            defaultMessage: 'Disabled',
+          })}
+        </>
+      ) : (
+        <>
+          <EuiToolTip
+            position='top'
+            content={resultsPreset[result].tooltipText}
+          >
+            {resultsPreset[result].spinner ? (
+              <EuiLoadingSpinner size='m' />
+            ) : (
+              <EuiIcon
+                aria-label={result}
+                type={resultsPreset[result].iconType}
+                color={resultsPreset[result].iconColor}
+              ></EuiIcon>
+            )}
+          </EuiToolTip>
 
-        {children}
-        {resultsPreset[result].retry && <EuiToolTip
-          position='top'
-          content='Retry'
-        >
-          <EuiButtonIcon
-            display="base"
-            iconType="refresh"
-            iconSize="m"
-            onClick={initCheck}
-            size="m"
-            aria-label="Next"
-          />
-        </EuiToolTip>}
-      </>
-    }
+          {children}
+          {resultsPreset[result].retry && (
+            <EuiToolTip position='top' content='Retry'>
+              <EuiButtonIcon
+                display='base'
+                iconType='refresh'
+                iconSize='m'
+                onClick={initCheck}
+                size='m'
+                aria-label={i18n.translate(
+                  'wazuh.public.components.healthCheck.next',
+                  {
+                    defaultMessage: 'Next',
+                  },
+                )}
+              />
+            </EuiToolTip>
+          )}
+        </>
+      )}
     </>
   );
-
 };
 export default ResultIcons;

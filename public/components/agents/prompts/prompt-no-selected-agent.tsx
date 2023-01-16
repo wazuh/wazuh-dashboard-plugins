@@ -13,9 +13,9 @@
 import React from 'react';
 import { PromptSelectAgent } from './';
 import { i18n } from '@kbn/i18n';
-const moduleTitle = i18n.translate('wazuh.components.promp.noAgentSelected', {
+const moduleTitle1 = i18n.translate('wazuh.components.promp.noAgentSelected', {
   defaultMessage: 'No agent is selected',
 });
 export const PromptNoSelectedAgent = ({ body }) => {
-  return <PromptSelectAgent body={body} title={moduleTitle} />;
+  return <PromptSelectAgent body={body} title={moduleTitle1} />;
 };

@@ -16,11 +16,24 @@ import { WzSearchBar } from '../../wz-search-bar/';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
+import { i18n } from '@kbn/i18n';
 
+const fatchingItems = i18n.translate(
+  'wazuh.public.components.common.table.searchBar.fatchingItems',
+  {
+    defaultMessage: ': Error fetching items',
+  },
+);
+const searchPlace = i18n.translate(
+  'wazuh.public.components.common.table.searchBar.searchPlace',
+  {
+    defaultMessage: 'Filter or search',
+  },
+);
 export function TableWithSearchBar({
   onSearch,
   searchBarSuggestions,
-  searchBarPlaceholder = 'Filter or search',
+  searchBarPlaceholder = searchPlace,
   searchBarProps = {},
   tableColumns,
   rowProps,
@@ -66,14 +79,19 @@ export function TableWithSearchBar({
   useEffect(() => {
     // Reset the page index when the endpoint changes.
     // This will cause that onSearch function is triggered because to changes in pagination in the another effect.
-    setPagination({pageIndex: 0, pageSize: pagination.pageSize});
+    setPagination({ pageIndex: 0, pageSize: pagination.pageSize });
   }, [endpoint]);
 
   useEffect(() => {
     (async function () {
       try {
         setLoading(true);
-        const { items, totalItems } = await onSearch(endpoint, filters, pagination, sorting);
+        const { items, totalItems } = await onSearch(
+          endpoint,
+          filters,
+          pagination,
+          sorting,
+        );
         setItems(items);
         setTotalItems(totalItems);
       } catch (error) {
@@ -86,7 +104,7 @@ export function TableWithSearchBar({
           error: {
             error: error,
             message: error.message || error,
-            title: `${error.name}: Error fetching items`,
+            title: `${error.name}${fatchingItems}`,
           },
         };
         getErrorOrchestrator().handleError(options);
@@ -114,7 +132,7 @@ export function TableWithSearchBar({
         placeholder={searchBarPlaceholder}
         {...searchBarProps}
       />
-      <EuiSpacer size="s" />
+      <EuiSpacer size='s' />
       <EuiBasicTable
         columns={tableColumns}
         items={items}

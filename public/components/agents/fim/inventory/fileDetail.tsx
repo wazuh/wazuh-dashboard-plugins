@@ -42,6 +42,117 @@ import { formatUIDate } from '../../../../react-services/time-service';
 import { FilterManager } from '../../../../../../../src/plugins/data/public/';
 import { i18n } from '@kbn/i18n';
 
+const lastAnalysis = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.lastAnalysis',
+  {
+    defaultMessage: 'Last analysis',
+  },
+);
+const lastModified = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.lastModified',
+  {
+    defaultMessage: 'Last modified',
+  },
+);
+const user = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.user',
+  {
+    defaultMessage: 'User',
+  },
+);
+const userID = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.userID',
+  {
+    defaultMessage: 'User ID',
+  },
+);
+const group = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.group',
+  {
+    defaultMessage: 'Group',
+  },
+);
+const groupID = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.groupID',
+  {
+    defaultMessage: 'Group ID',
+  },
+);
+const size = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.size',
+  {
+    defaultMessage: 'Size',
+  },
+);
+const iNode = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.iNode',
+  {
+    defaultMessage: 'Inode',
+  },
+);
+const MD5 = i18n.translate('wazuh.public.components.agents.fim.inventory.MD5', {
+  defaultMessage: 'MD5',
+});
+const SHA1 = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.SHA1',
+  {
+    defaultMessage: 'SHA1',
+  },
+);
+const SHA256 = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.SHA256',
+  {
+    defaultMessage: 'SHA256',
+  },
+);
+const permissions = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.permissions',
+  {
+    defaultMessage: 'Permissions',
+  },
+);
+const next = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.next',
+  {
+    defaultMessage: 'Next',
+  },
+);
+const agent = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.agent',
+  {
+    defaultMessage: 'Agent',
+  },
+);
+const agentName = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.agentName',
+  {
+    defaultMessage: 'Agent name',
+  },
+);
+const action = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.action',
+  {
+    defaultMessage: 'Action',
+  },
+);
+const descp = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.descp',
+  {
+    defaultMessage: 'Description',
+  },
+);
+const level = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.level',
+  {
+    defaultMessage: 'Level',
+  },
+);
+const ruleID = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.ruleID',
+  {
+    defaultMessage: 'Rule ID',
+  },
+);
 export class FileDetails extends Component {
   props!: {
     currentFile: {
@@ -96,7 +207,7 @@ export class FileDetails extends Component {
     return [
       {
         field: 'date',
-        name: 'Last analysis',
+        name: lastAnalysis,
         grow: 2,
         icon: 'clock',
         link: true,
@@ -104,7 +215,7 @@ export class FileDetails extends Component {
       },
       {
         field: 'mtime',
-        name: 'Last modified',
+        name: lastModified,
         grow: 2,
         icon: 'clock',
         link: true,
@@ -112,68 +223,68 @@ export class FileDetails extends Component {
       },
       {
         field: 'uname',
-        name: 'User',
+        name: user,
         icon: 'user',
         link: true,
       },
       {
         field: 'uid',
-        name: 'User ID',
+        name: userID,
         icon: 'user',
         link: true,
       },
       {
         field: 'gname',
-        name: 'Group',
+        name: group,
         icon: 'usersRolesApp',
         onlyLinux: true,
         link: true,
       },
       {
         field: 'gid',
-        name: 'Group ID',
+        name: groupID,
         onlyLinux: true,
         icon: 'usersRolesApp',
         link: true,
       },
       {
         field: 'size',
-        name: 'Size',
+        name: size,
         icon: 'nested',
         link: true,
         transformValue: value => this.renderFileDetailsSize(value),
       },
       {
         field: 'inode',
-        name: 'Inode',
+        name: INode,
         icon: 'link',
         onlyLinux: true,
         link: true,
       },
       {
         field: 'md5',
-        name: 'MD5',
+        name: MD5,
         checksum: true,
         icon: 'check',
         link: true,
       },
       {
         field: 'sha1',
-        name: 'SHA1',
+        name: SHA1,
         checksum: true,
         icon: 'check',
         link: true,
       },
       {
         field: 'sha256',
-        name: 'SHA256',
+        name: SHA256,
         checksum: true,
         icon: 'check',
         link: true,
       },
       {
         field: 'perm',
-        name: 'Permissions',
+        name: permissions,
         icon: 'lock',
         link: false,
         transformValue: value => this.renderFileDetailsPermissions(value),
@@ -185,14 +296,14 @@ export class FileDetails extends Component {
     return [
       {
         field: 'date',
-        name: 'Last analysis',
+        name: lastAnalysis,
         grow: 2,
         icon: 'clock',
         transformValue: formatUIDate,
       },
       {
         field: 'mtime',
-        name: 'Last modified',
+        name: LastModified,
         grow: 2,
         icon: 'clock',
         transformValue: formatUIDate,
@@ -325,7 +436,7 @@ export class FileDetails extends Component {
                             this.addFilter(item.field, value);
                           }}
                           iconType='magnifyWithPlus'
-                          aria-label='Next'
+                          aria-label={next}
                           iconSize='s'
                           className='buttonAddFilter'
                         />
@@ -507,9 +618,12 @@ export class FileDetails extends Component {
           extraAction={
             <div style={{ marginBottom: 5 }}>
               <strong>{this.state.totalHits || 0}</strong>{' '}
-              {i18n.translate('wazuh.components.agent.fim.ivv.file.detail.hits', {
-                defaultMessage: ' hits',
-              })}
+              {i18n.translate(
+                'wazuh.components.agent.fim.ivv.file.detail.hits',
+                {
+                  defaultMessage: ' hits',
+                },
+              )}
             </div>
           }
           buttonContent={
@@ -548,20 +662,20 @@ export class FileDetails extends Component {
                 initialColumns={[
                   { field: 'icon' },
                   { field: 'timestamp' },
-                  { field: 'agent.id', label: 'Agent' },
-                  { field: 'agent.name', label: 'Agent name' },
-                  { field: 'syscheck.event', label: 'Action' },
-                  { field: 'rule.description', label: 'Description' },
-                  { field: 'rule.level', label: 'Level' },
-                  { field: 'rule.id', label: 'Rule ID' },
+                  { field: 'agent.id', label: agent },
+                  { field: 'agent.name', label: agentName },
+                  { field: 'syscheck.event', label: action },
+                  { field: 'rule.description', label: descp },
+                  { field: 'rule.level', label: level },
+                  { field: 'rule.id', label: ruleID },
                 ]}
                 initialAgentColumns={[
                   { field: 'icon' },
                   { field: 'timestamp' },
-                  { field: 'syscheck.event', label: 'Action' },
-                  { field: 'rule.description', label: 'Description' },
-                  { field: 'rule.level', label: 'Level' },
-                  { field: 'rule.id', label: 'Rule ID' },
+                  { field: 'syscheck.event', label: action },
+                  { field: 'rule.description', label: descp },
+                  { field: 'rule.level', label: level },
+                  { field: 'rule.id', label: ruleID },
                 ]}
                 includeFilters='syscheck'
                 implicitFilters={implicitFilters}

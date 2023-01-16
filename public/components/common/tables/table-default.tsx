@@ -15,7 +15,14 @@ import { EuiBasicTable } from '@elastic/eui';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
+import { i18n } from '@kbn/i18n';
 
+const fatchingItems = i18n.translate(
+  'wazuh.public.components.common.table.export.fatchingItems',
+  {
+    defaultMessage: ': Error fetching items',
+  },
+);
 export function TableDefault({
   onSearch,
   tableColumns,
@@ -24,31 +31,29 @@ export function TableDefault({
   tableInitialSortingField = '',
   tableProps = {},
   reload,
-  endpoint
-})
-  {
-
+  endpoint,
+}) {
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState([]);
   const [totalItems, setTotalItems] = useState(0);
   const [pagination, setPagination] = useState({
     pageIndex: 0,
-    pageSize: tablePageSizeOptions[0]
+    pageSize: tablePageSizeOptions[0],
   });
 
   const [sorting, setSorting] = useState({
     sort: {
       field: tableInitialSortingField,
       direction: tableInitialSortingDirection,
-    }
+    },
   });
-  
-  function tableOnChange({ page = {}, sort = {} }){
+
+  function tableOnChange({ page = {}, sort = {} }) {
     const { index: pageIndex, size: pageSize } = page;
     const { field, direction } = sort;
     setPagination({
       pageIndex,
-      pageSize
+      pageSize,
     });
     setSorting({
       sort: {
@@ -56,22 +61,27 @@ export function TableDefault({
         direction,
       },
     });
-  };
-  
+  }
+
   useEffect(() => {
     // Reset the page index when the endpoint changes.
     // This will cause that onSearch function is triggered because to changes in pagination in the another effect.
-    setPagination({pageIndex: 0, pageSize: pagination.pageSize});
+    setPagination({ pageIndex: 0, pageSize: pagination.pageSize });
   }, [endpoint]);
-  
+
   useEffect(() => {
-    (async function(){
-      try{
+    (async function () {
+      try {
         setLoading(true);
-        const { items, totalItems } = await onSearch(endpoint, [], pagination, sorting);
+        const { items, totalItems } = await onSearch(
+          endpoint,
+          [],
+          pagination,
+          sorting,
+        );
         setItems(items);
         setTotalItems(totalItems);
-      }catch(error){
+      } catch (error) {
         setItems([]);
         setTotalItems(0);
         const options = {
@@ -81,21 +91,22 @@ export function TableDefault({
           error: {
             error: error,
             message: error.message || error,
-            title: `${error.name}: Error fetching items`,
+            title: `${error.name}${fatchingItems}`,
           },
         };
         getErrorOrchestrator().handleError(options);
       }
       setLoading(false);
-    })()
+    })();
   }, [endpoint, pagination, sorting, reload]);
 
   const tablePagination = {
     ...pagination,
     totalItemCount: totalItems,
-    pageSizeOptions: tablePageSizeOptions
-  }
-  return <EuiBasicTable
+    pageSizeOptions: tablePageSizeOptions,
+  };
+  return (
+    <EuiBasicTable
       columns={tableColumns}
       items={items}
       loading={loading}
@@ -104,4 +115,5 @@ export function TableDefault({
       onChange={tableOnChange}
       {...tableProps}
     />
+  );
 }

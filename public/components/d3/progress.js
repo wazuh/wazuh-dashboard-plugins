@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import * as d3 from 'd3';
+import { i18n } from '@kbn/i18n';
 
 export class ProgressChart extends Component {
   constructor(props) {
@@ -37,7 +38,7 @@ export class ProgressChart extends Component {
     var transform =
       'translate(' + this.props.width / 2 + ',' + this.props.height / 2 + ')';
     var styleText = {
-      fontSize: '22px'
+      fontSize: '22px',
     };
     return (
       <div>
@@ -51,13 +52,18 @@ export class ProgressChart extends Component {
             <path
               fill={'#006BB4'}
               d={arcLine({
-                endAngle: (2 * Math.PI * this.props.percent.toFixed(0)) / 100
+                endAngle: (2 * Math.PI * this.props.percent.toFixed(0)) / 100,
               })}
             ></path>
             <text
-              textAnchor="middle"
-              dy="6"
-              dx="0"
+              textAnchor={i18n.translate(
+                'wazuh.public.components.d3.progress',
+                {
+                  defaultMessage: 'middle',
+                },
+              )}
+              dy='6'
+              dx='0'
               fill={'#98A2B3'}
               style={styleText}
             >
@@ -73,5 +79,5 @@ export class ProgressChart extends Component {
 ProgressChart.propTypes = {
   width: PropTypes.number,
   height: PropTypes.number,
-  percent: PropTypes.number
+  percent: PropTypes.number,
 };

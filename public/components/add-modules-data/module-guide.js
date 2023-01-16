@@ -55,28 +55,141 @@ const js2xmlOptionsParser = {
     doubleQuotes: true,
   },
 };
-
+const manager = i18n.translate(
+  'wazuh.public.components.addData.modules.guide.manager',
+  {
+    defaultMessage: 'Manager',
+  },
+);
+const agent = i18n.translate(
+  'wazuh.public.components.addData.modules.guide.agent',
+  {
+    defaultMessage: 'Agent',
+  },
+);
+const linux = i18n.translate(
+  'wazuh.public.components.addData.modules.guide.linux',
+  {
+    defaultMessage: 'Linux',
+  },
+);
+const windows = i18n.translate(
+  'wazuh.public.components.addData.modules.guide.windows',
+  {
+    defaultMessage: 'Windows',
+  },
+);
+const linux1 = i18n.translate(
+  'wazuh.public.components.addData.modules.guide.linux1',
+  {
+    defaultMessage: 'linux',
+  },
+);
+const danger = i18n.translate(
+  'wazuh.public.components.addData.modules.guide.danger',
+  {
+    defaultMessage: 'danger',
+  },
+);
+const complete = i18n.translate(
+  'wazuh.public.components.addData.modules.guide.complete',
+  {
+    defaultMessage: 'complete',
+  },
+);
+const editOssec = i18n.translate(
+  'wazuh.public.components.addData.modules.guide.editOssec',
+  {
+    defaultMessage: 'Edit ossec.conf',
+  },
+);
+const configError = i18n.translate(
+  'wazuh.public.components.addData.modules.guide.configError',
+  {
+    defaultMessage: 'Configuration error',
+  },
+);
+const attributes = i18n.translate(
+  'wazuh.public.components.addData.modules.guide.attributes',
+  {
+    defaultMessage: 'Attributes',
+  },
+);
+const primary = i18n.translate(
+  'wazuh.public.components.addData.modules.guide.primary',
+  {
+    defaultMessage: 'primary',
+  },
+);
+const hideAttributes = i18n.translate(
+  'wazuh.public.components.addData.modules.guide.hideAttributes',
+  {
+    defaultMessage: 'Show / hide attributes',
+  },
+);
+const eye = i18n.translate(
+  'wazuh.public.components.addData.modules.guide.eye',
+  {
+    defaultMessage: 'eye',
+  },
+);
+const eyeClosed = i18n.translate(
+  'wazuh.public.components.addData.modules.guide.eyeClosed',
+  {
+    defaultMessage: 'eyeClosed',
+  },
+);
+const hideOption = i18n.translate(
+  'wazuh.public.components.addData.modules.guide.hideOption',
+  {
+    defaultMessage: 'Show / hide options',
+  },
+);
+const options = i18n.translate(
+  'wazuh.public.components.addData.modules.guide.option',
+  {
+    defaultMessage: 'Options',
+  },
+);
+const removeOption = i18n.translate(
+  'wazuh.public.components.addData.modules.guide.removeOption',
+  {
+    defaultMessage: 'Remove this option',
+  },
+);
+const addModulesData = i18n.translate(
+  'wazuh.public.components.addData.modules.guide.addModulesData',
+  {
+    defaultMessage: 'Back to add modules data',
+  },
+);
+const resetGuide = i18n.translate(
+  'wazuh.public.components.addData.modules.guide.resetGuide',
+  {
+    defaultMessage: 'Do you want reset the guide?',
+  },
+);
 const capitalize = str => str[0].toUpperCase() + str.slice(1);
 
 const agentTypeButtons = [
   {
     id: 'manager',
-    label: 'Manager',
+    label: manager,
   },
   {
     id: 'agent',
-    label: 'Agent',
+    label: agent,
   },
 ];
 
 const agentOsTabs = [
   {
     id: 'linux',
-    name: 'Linux',
+    name: linux,
   },
   {
     id: 'windows',
-    name: 'Windows',
+    name: windows,
   },
 ];
 
@@ -103,16 +216,16 @@ class WzModuleGuide extends Component {
       modalRestartIsVisble: false,
       agentTypeSelected:
         (this.props.agent &&
-          ((this.props.agent.id === '000' ? 'manager' : 'agent') ||
+          ((this.props.agent.id === '000' ? manager : agent) ||
             this.props.agent.type)) ||
-        (this.guide.avaliable_for_manager ? 'manager' : 'agent'),
+        (this.guide.avaliable_for_manager ? manager : agent),
       agentOSSelected:
         (this.props.agent &&
           (typeof this.props.agent.os === 'string'
             ? this.props.agent.os
-            : this.props.agent.os.platform === 'windows'
-            ? 'windows'
-            : 'linux')) ||
+            : this.props.agent.os.platform === windows
+            ? windows
+            : linux1)) ||
         '',
     };
     this.state.steps = this.buildInitialSteps(this.guide.steps);
@@ -148,7 +261,7 @@ class WzModuleGuide extends Component {
   buildConfigurationElementValue(option) {
     const defaultValue =
       option.default_value_linux !== undefined &&
-      this.state.agentOSSelected === 'linux'
+      this.state.agentOSSelected === linux1
         ? option.default_value_linux
         : option.default_value_windows !== undefined &&
           this.state.agentOSSelected === 'windows'
@@ -409,19 +522,17 @@ class WzModuleGuide extends Component {
           ) : null}
         </Fragment>
       ),
-      status: this.checkInvalidElements(step.elements) ? 'danger' : 'complete',
+      status: this.checkInvalidElements(step.elements) ? danger : complete,
     }));
     const invalidConfiguration = configurationSteps.reduce(
-      (accum, step) => accum || step.status === 'danger',
+      (accum, step) => accum || step.status === danger,
       false,
     );
 
     return [
       ...configurationSteps,
       {
-        title: !invalidConfiguration
-          ? 'Edit ossec.conf'
-          : 'Configuration error',
+        title: !invalidConfiguration ? editOssec : configError,
         children: (
           <Fragment>
             {!invalidConfiguration ? (
@@ -552,9 +663,12 @@ class WzModuleGuide extends Component {
                     },
                   )}{' '}
                   <EuiCode>{`<ossec_config>`}</EuiCode>{' '}
-                  {i18n.translate('wazuh.components.add.modulesdata.moduleguide', {
-                    defaultMessage: 'Add agent',
-                  })}
+                  {i18n.translate(
+                    'wazuh.components.add.modulesdata.moduleguide',
+                    {
+                      defaultMessage: 'Add agent',
+                    },
+                  )}
                   tag.
                 </EuiText>
               </Fragment>
@@ -571,7 +685,7 @@ class WzModuleGuide extends Component {
             )}
           </Fragment>
         ),
-        status: invalidConfiguration ? 'danger' : 'complete',
+        status: invalidConfiguration ? danger : complete,
       },
     ];
   }
@@ -588,18 +702,16 @@ class WzModuleGuide extends Component {
               !guideOption.collapsible) ? (
               <Fragment>
                 {guideOption.type && <EuiSpacer size='m' />}
-                <EuiToolTip position='top' content='Show / hide attributes'>
+                <EuiToolTip position='top' content={hideAttributes}>
                   <EuiButtonToggle
-                    label='Attributes'
+                    label={attributes}
                     color={
                       this.checkInvalidElements(guideOption.attributes)
-                        ? 'danger'
-                        : 'primary'
+                        ? danger
+                        : primary
                     }
                     fill={guideOption.show_attributes}
-                    iconType={
-                      !guideOption.show_attributes ? 'eye' : 'eyeClosed'
-                    }
+                    iconType={!guideOption.show_attributes ? eye : eyeClosed}
                     onChange={() =>
                       this.setElementProp(
                         keyID,
@@ -639,16 +751,16 @@ class WzModuleGuide extends Component {
               !guideOption.collapsible) ? (
               <Fragment>
                 {guideOption.show_attributes && <EuiSpacer size='m' />}
-                <EuiToolTip position='top' content='Show / hide options'>
+                <EuiToolTip position='top' content={hideOption}>
                   <EuiButtonToggle
-                    label='Options'
+                    label={option}
                     color={
                       this.checkInvalidElements(guideOption.options)
                         ? 'danger'
                         : 'primary'
                     }
                     fill={guideOption.show_options}
-                    iconType={!guideOption.show_options ? 'eye' : 'eyeClosed'}
+                    iconType={!guideOption.show_options ? eye : eyeClosed}
                     onChange={() =>
                       this.setElementProp(
                         keyID,
@@ -771,7 +883,13 @@ class WzModuleGuide extends Component {
                       )
                     }
                   >
-                    Add {guideOption.name}
+                    {i18n.translate(
+                      'wazuh.public.components.addData.modules.guide.Add',
+                      {
+                        defaultMessage: 'Add',
+                      },
+                    )}
+                    {guideOption.name}
                   </EuiButtonEmpty>
                 </EuiToolTip>
               </EuiFlexItem>
@@ -827,7 +945,7 @@ class WzModuleGuide extends Component {
           )}
           {guideOption.removable && (
             <span style={{ margin: '0 0 0 6px' }}>
-              <EuiToolTip position='top' content='Remove this option'>
+              <EuiToolTip position='top' content={removeOption}>
                 <EuiButtonIcon
                   color='danger'
                   iconType='minusInCircle'
@@ -838,18 +956,16 @@ class WzModuleGuide extends Component {
           )}
           {guideOption.enabled && guideOption.collapsible && (
             <Fragment>
-              <EuiToolTip position='top' content='Show / hide option'>
+              <EuiToolTip position='top' content={hideOption}>
                 <EuiButtonToggle
                   label=''
                   color={
-                    this.checkInvalidElements([guideOption])
-                      ? 'danger'
-                      : 'primary'
+                    this.checkInvalidElements([guideOption]) ? danger : primary
                   }
                   isEmpty
                   isIconOnly
                   size='s'
-                  iconType={guideOption.collapsed ? 'eye' : 'eyeClosed'}
+                  iconType={guideOption.collapsed ? eye : eyeClosed}
                   onChange={() =>
                     this.setElementProp(
                       keyID,
@@ -1072,7 +1188,7 @@ class WzModuleGuide extends Component {
     this.setState(
       {
         agentTypeSelected,
-        agentOSSelected: agentTypeSelected === 'agent' ? 'linux' : '',
+        agentOSSelected: agentTypeSelected === agent ? linux1 : '',
       },
       () => {
         this.resetGuide();
@@ -1096,15 +1212,12 @@ class WzModuleGuide extends Component {
               <EuiFlexItem>
                 <EuiTitle size='l'>
                   <h2>
-                    <EuiToolTip
-                      position='top'
-                      content='Back to add modules data'
-                    >
+                    <EuiToolTip position='top' content={addModulesData}>
                       <EuiButtonIcon
                         onClick={() => this.props.close()}
                         iconType='arrowLeft'
                         iconSize='l'
-                        aria-label='Back to add modules data'
+                        aria-label={addModulesData}
                       />
                     </EuiToolTip>
                     {guide.icon && <EuiIcon size='xl' type={guide.icon} />}
@@ -1120,7 +1233,12 @@ class WzModuleGuide extends Component {
                       external
                       target='_blank'
                     >
-                      Learn more
+                      {i18n.translate(
+                        'wazuh.public.components.addData.modules.guide.learnMore',
+                        {
+                          defaultMessage: 'Learn more',
+                        },
+                      )}
                     </EuiLink>
                   )}
                 </EuiText>
@@ -1211,7 +1329,12 @@ class WzModuleGuide extends Component {
                         iconType='refresh'
                         onClick={() => this.toggleResetGuideModal()}
                       >
-                        Reset guide
+                        {i18n.translate(
+                          'wazuh.public.components.addData.modules.guide.resetGuide',
+                          {
+                            defaultMessage: 'Reset guide',
+                          },
+                        )}
                       </EuiButtonEmpty>
                     </EuiFlexItem>
                   </EuiFlexGroup>
@@ -1246,7 +1369,7 @@ class WzModuleGuide extends Component {
         {modalRestartIsVisble && (
           <EuiOverlayMask>
             <EuiConfirmModal
-              title='Do you want reset the guide?'
+              title={resetGuide}
               onCancel={this.toggleResetGuideModal}
               onConfirm={this.resetGuideWithNotification}
               cancelButtonText="No, don't do it"
@@ -1271,8 +1394,8 @@ WzModuleGuide.propTypes = {
       },
     }),
     PropTypes.shape({
-      type: PropTypes.oneOf[('manager', 'agent')],
-      os: PropTypes.oneOf[('linux', 'windows')],
+      type: PropTypes.oneOf[(manager, agent)],
+      os: PropTypes.oneOf[(linux1, windows)],
     }),
     PropTypes.any,
   ]),

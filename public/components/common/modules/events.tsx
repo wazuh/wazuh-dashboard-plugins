@@ -404,7 +404,12 @@ export const Events = compose(
       if (satisfyPluginPlatformVersion('<7.11')) {
         getToasts().add({
           color: 'success',
-          title: 'The index pattern was refreshed successfully.',
+          title: i18n.translate(
+            'wazuh.public.components.common.modules.events.pattern',
+            {
+              defaultMessage: 'The index pattern was refreshed successfully.',
+            },
+          ),
           text: toMountPoint(
             <EuiFlexGroup justifyContent='flexEnd' gutterSize='s'>
               <EuiFlexItem grow={false}>

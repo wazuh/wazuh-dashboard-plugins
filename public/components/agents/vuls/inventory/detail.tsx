@@ -143,6 +143,42 @@ const label6 = i18n.translate(
     defaultMessage: "'Status'",
   },
 );
+const filterBy = i18n.translate(
+  'wazuh.public.components.agents.vuls.inventory.details.filterBy',
+  {
+    defaultMessage: 'Filter by',
+  },
+);
+const is = i18n.translate(
+  'wazuh.public.components.agents.vuls.inventory.details.is',
+  {
+    defaultMessage: 'is',
+  },
+);
+const in1 = i18n.translate(
+  'wazuh.public.components.agents.vuls.inventory.details.in',
+  {
+    defaultMessage: 'in',
+  },
+);
+const inventory = i18n.translate(
+  'wazuh.public.components.agents.vuls.inventory.details.inventory',
+  {
+    defaultMessage: 'inventory',
+  },
+);
+const next = i18n.translate(
+  'wazuh.public.components.agents.vuls.inventory.details.next',
+  {
+    defaultMessage: 'Next',
+  },
+);
+const permissions = i18n.translate(
+  'wazuh.public.components.agents.vuls.inventory.details.permissions',
+  {
+    defaultMessage: 'permissions',
+  },
+);
 export class Details extends Component {
   props!: {
     currentItem: {
@@ -393,14 +429,14 @@ export class Details extends Component {
                       <EuiToolTip
                         position='top'
                         anchorClassName='detail-tooltip'
-                        content={`Filter by ${item.field} is ${value} in inventory`}
+                        content={`${filterBy} ${item.field} ${is} ${value} ${in1} ${inventory}`}
                       >
                         <EuiButtonIcon
                           onClick={() => {
                             this.addFilter(item.field, value);
                           }}
                           iconType='magnifyWithPlus'
-                          aria-label='Next'
+                          aria-label={next}
                           iconSize='s'
                           className='buttonAddFilter'
                         />
@@ -510,7 +546,7 @@ export class Details extends Component {
             <EuiToolTip
               key={`permissions-windows-user-${username}`}
               content={permissions.join(', ')}
-              title={`${username} permissions`}
+              title={`${username} ${permissions}`}
             >
               <EuiBadge
                 color='hollow'

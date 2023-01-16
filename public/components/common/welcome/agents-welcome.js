@@ -114,7 +114,12 @@ export const AgentsWelcome = compose(
       const breadcrumb = [
         { text: '' },
         {
-          text: 'Agents',
+          text: i18n.translate(
+            'wazuh.public.components.common.welcome.agents.info.Agent',
+            {
+              defaultMessage: 'Agents',
+            },
+          ),
           href: '#/agents-preview',
         },
         {

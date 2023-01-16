@@ -151,7 +151,12 @@ export class AgentInfo extends Component {
                   agent={this.props.agent}
                   groups={this.props.agent.group}
                   length={40}
-                  label={'more'}
+                  label={i18n.translate(
+                    'wazuh.public.components.common.welcome.agents.info.more',
+                    {
+                      defaultMessage: 'more',
+                    },
+                  )}
                   action={'redirect'}
                   agent={this.props.agent}
                   {...this.props}

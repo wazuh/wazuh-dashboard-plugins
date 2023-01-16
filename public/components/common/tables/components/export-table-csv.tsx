@@ -20,12 +20,24 @@ import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
 import { i18n } from '@kbn/i18n';
 
-const successMsg = i18n.translate('wazuh.components.common.table.components.sucessMsg', {
-  defaultMessage: 'Your download should begin automatically...',
-});
-const errorMsg = i18n.translate('wazuh.components.common.table.components.errorMsg', {
-  defaultMessage: 'Error downloading csv',
-});
+const successMsg = i18n.translate(
+  'wazuh.components.common.table.components.sucessMsg',
+  {
+    defaultMessage: 'Your download should begin automatically...',
+  },
+);
+const errorMsg = i18n.translate(
+  'wazuh.components.common.table.components.errorMsg',
+  {
+    defaultMessage: 'Error downloading csv',
+  },
+);
+const downloadCSV = i18n.translate(
+  'wazuh.public.components.common.table.export.downloadCSV',
+  {
+    defaultMessage: '.downloadCsv',
+  },
+);
 export function ExportTableCsv({ endpoint, totalItems, filters, title }) {
   const showToast = (color, title, time) => {
     getToasts().add({
@@ -50,7 +62,7 @@ export function ExportTableCsv({ endpoint, totalItems, filters, title }) {
       );
     } catch (error) {
       const options = {
-        context: `${ExportTableCsv.name}.downloadCsv`,
+        context: `${ExportTableCsv.name}${downloadCSV}`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         error: {

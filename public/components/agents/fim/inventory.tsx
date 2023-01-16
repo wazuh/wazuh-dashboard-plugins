@@ -44,6 +44,30 @@ import {
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
 
+const files = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.tabs.files',
+  {
+    defaultMessage: 'Files',
+  },
+);
+const winReg = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.tabs.',
+  {
+    defaultMessage: 'Windows Registry',
+  },
+);
+const beginAuto = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.tabs.beginAuto',
+  {
+    defaultMessage: 'Your download should begin automatically...',
+  },
+);
+const registry = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.tabs.registry',
+  {
+    defaultMessage: 'registry',
+  },
+);
 export class Inventory extends Component {
   _isMount = false;
   state: {
@@ -119,7 +143,7 @@ export class Inventory extends Component {
     let auxTabs = [
       {
         id: 'files',
-        name: `Files ${
+        name: `${files} ${
           this.state.isLoading === true
             ? ''
             : '(' + this.state.totalItemsFile + ')'
@@ -131,7 +155,7 @@ export class Inventory extends Component {
     platform === 'windows'
       ? auxTabs.push({
           id: 'registry',
-          name: `Windows Registry ${
+          name: `${winReg} ${
             this.state.isLoading === true
               ? ''
               : '(' + this.state.totalItemsRegistry + ')'
@@ -296,11 +320,7 @@ export class Inventory extends Component {
         name: key,
         value: filtersObject[key],
       }));
-      this.showToast(
-        'success',
-        'Your download should begin automatically...',
-        3000,
-      );
+      this.showToast('success', beginAuto, 3000);
       await exportCsv(
         '/syscheck/' + this.props.agent.id,
         [
@@ -347,7 +367,7 @@ export class Inventory extends Component {
           selectView={selectedTabId}
           agent={this.props.agent}
         />
-        {selectedTabId === 'files' && (
+        {selectedTabId === files && (
           <InventoryTable
             {...this.props}
             filters={filters}
@@ -357,7 +377,7 @@ export class Inventory extends Component {
             onTotalItemsChange={this.onTotalItemsChange}
           />
         )}
-        {selectedTabId === 'registry' && (
+        {selectedTabId === registry && (
           <RegistryTable
             {...this.props}
             filters={filters}

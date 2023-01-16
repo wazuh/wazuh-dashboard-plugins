@@ -50,6 +50,15 @@ const text4 = i18n.translate('wazuh.components.addModule.guide.vuls.cvs', {
 const text5 = i18n.translate('wazuh.components.addModule.guide.vuls.cvs3', {
 	defaultMessage: 'CVSS3 Score',
 });
+const No1 = i18n.translate('wazuh.public.components.agents.vuls.inventory.No1', {
+  defaultMessage: 'No',
+})
+const result = i18n.translate('wazuh.public.components.agents.vuls.inventory.result', {
+  defaultMessage: 'results were found.',
+})
+const severity  = i18n.translate('wazuh.public.components.agents.vuls.inventory.severity', {
+  defaultMessage: 'Filter by Severity',
+})
 interface Aggregation {
 	title: number;
 	description: string;
@@ -101,16 +110,24 @@ export class Inventory extends Component {
 			stats: [
 				{
 					title: 0,
-					description: 'Critical',
+					description: i18n.translate('wazuh.public.components.agents.vuls.inventory.Critical', {
+              defaultMessage: 'Critical',
+            }),
 					titleColor: this.titleColors.Critical,
 				},
-				{ title: 0, description: 'High', titleColor: this.titleColors.High },
+				{ title: 0, description: i18n.translate('wazuh.public.components.agents.vuls.inventory.High', {
+              defaultMessage: 'High',
+            }), titleColor: this.titleColors.High },
 				{
 					title: 0,
-					description: 'Medium',
+					description: i18n.translate('wazuh.public.components.agents.vuls.inventory.Medium', {
+              defaultMessage: 'Medium',
+            }),
 					titleColor: this.titleColors.Medium,
 				},
-				{ title: 0, description: 'Low', titleColor: this.titleColors.Low },
+				{ title: 0, description: i18n.translate('wazuh.public.components.agents.vuls.inventory.Low', {
+              defaultMessage: 'Low',
+            }), titleColor: this.titleColors.Low },
 			],
 			severityPieStats: [],
 			vulnerabilityLastScan: {
@@ -244,7 +261,7 @@ export class Inventory extends Component {
 					textAlign='center'
 					isLoading={isLoadingStats}
 					title={
-						<EuiToolTip position='top' content={`Filter by Severity`}>
+						<EuiToolTip position='top' content={severity}>
 							<span
 								className={'statWithLink wz-user-select-none'}
 								style={{ cursor: 'pointer', fontSize: '2.25rem' }}
@@ -319,7 +336,9 @@ export class Inventory extends Component {
 											<EuiFlexItem>
 												<WzStat
 													title={last_full_scan}
-													description='Last full scan'
+													description={i18n.translate('wazuh.public.components.agents.vuls.inventory.fullScan', {
+              defaultMessage: 'Last full scan',
+            })}
 													textAlign='center'
 													titleSize='xs'
 												/>
@@ -327,7 +346,9 @@ export class Inventory extends Component {
 											<EuiFlexItem>
 												<WzStat
 													title={last_partial_scan}
-													description='Last partial scan'
+													description={i18n.translate('wazuh.public.components.agents.vuls.inventory.scan', {
+              defaultMessage: 'Last partial scan',
+            })}
 													textAlign='center'
 													titleSize='xs'
 												/>
@@ -359,7 +380,7 @@ export class Inventory extends Component {
 									onFetchExtraDependencies={[this.props.agent.id]}
 									noDataTitle='No results'
 									noDataMessage={(_, optionRequirement) =>
-										`No ${optionRequirement.text} results were found.`
+										${No1}` ${optionRequirement.text} ${result}`
 									}
 								/>
 							</EuiCard>
