@@ -55,16 +55,42 @@ import { getErrorOrchestrator } from '../../react-services/common-services';
 import { getThemeAssetURL, getAssetURL } from '../../utils/assets';
 import { AgentStatus } from '../agents/agent_status';
 import { i18n } from '@kbn/i18n';
-
+const overview = i18n.translate('wazuh.public.components.wz.menu.overview', {
+  defaultMessage: 'overview',
+});
+const manager = i18n.translate('wazuh.public.components.wz.menu.manager', {
+  defaultMessage: 'manager',
+});
+const agentsPreview = i18n.translate(
+  'wazuh.public.components.wz.menu.agentsPreview',
+  {
+    defaultMessage: 'agents-preview',
+  },
+);
+const setting = i18n.translate('wazuh.public.components.wz.menu.settings', {
+  defaultMessage: 'settings',
+});
+const wazuhDev = i18n.translate('wazuh.public.components.wz.menu.wazuhDev', {
+  defaultMessage: 'wazuh-dev',
+});
+const healthCheck = i18n.translate(
+  'wazuh.public.components.wz.menu.healthCheck',
+  {
+    defaultMessage: 'health-check',
+  },
+);
+const security = i18n.translate('wazuh.public.components.wz.menu.security', {
+  defaultMessage: 'security',
+});
 const sections = {
-  overview: 'overview',
-  manager: 'manager',
-  'agents-preview': 'agents-preview',
-  agents: 'agents-preview',
-  settings: 'settings',
-  'wazuh-dev': 'wazuh-dev',
-  'health-check': 'health-check',
-  security: 'security',
+  overview: overview,
+  manager: manager,
+  agentsPreview: agentsPreview,
+  agents: agentsPreview,
+  settings: setting,
+  wazuhDev: wazuhDev,
+  healthCheck: healthCheck,
+  security: security,
 };
 
 export const WzMenu = withWindowSize(
