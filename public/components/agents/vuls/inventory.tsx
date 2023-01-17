@@ -380,7 +380,7 @@ export class Inventory extends Component {
 									onFetchExtraDependencies={[this.props.agent.id]}
 									noDataTitle='No results'
 									noDataMessage={(_, optionRequirement) =>
-										${No1}` ${optionRequirement.text} ${result}`
+										`${No1} ${optionRequirement.text} ${result}`
 									}
 								/>
 							</EuiCard>

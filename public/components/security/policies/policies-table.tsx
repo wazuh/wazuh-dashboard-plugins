@@ -179,8 +179,8 @@ export const PoliciesTable = ({
             buttonType='icon'
             tooltip={{
               content: WzAPIUtils.isReservedID(item.id)
-                ? ${deleted}
-                : ${deletePolicy},
+                ? deleted
+                : deletePolicy,
               position: 'left',
             }}
             isDisabled={WzAPIUtils.isReservedID(item.id)}

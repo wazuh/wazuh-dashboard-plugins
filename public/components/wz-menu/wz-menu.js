@@ -157,12 +157,7 @@ const openSelector = i18n.translate(
     defaultMessage: 'Open selectors',
   },
 );
-const properOver = i18n.translate(
-  'wazuh.public.controllers.setting.properOver',
-  {
-    defaultMessage: 'wz-menu-popover wz-menu-popover-over',
-  },
-);
+
 const sections = {
   overview: overview,
   manager: manager,
@@ -1241,8 +1236,8 @@ export const WzMenu = withWindowSize(
                 <EuiPopover
                   panelClassName={
                     this.state.pluginPlatformMenuBlockedOrOpened
-                      ? properOver
-                      : properUnder
+                      ? 'wz-menu-popover wz-menu-popover-over'
+                      : 'wz-menu-popover wz-menu-popover-under'
                   }
                   button={mainButton}
                   isOpen={this.state.menuOpened}

@@ -157,7 +157,7 @@ export const EditRole = ({ role, closeFlyout }) => {
           }}
           onCancel={() => setIsModalVisible(false)}
           cancelButtonText={i18n.translate('wazuh.public.components.security.roles.edit.no', {
-              defaultMessage: 'No, don't do it',
+              defaultMessage: "No, don't do it",
             })}
           confirmButtonText={i18n.translate('wazuh.public.components.security.roles.edit.yes', {
               defaultMessage: 'Yes, do it',

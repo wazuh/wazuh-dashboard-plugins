@@ -43,7 +43,7 @@ const controls = i18n.translate(
     defaultMessage: 'Controls',
   },
 );
-const inventory = i18n.translate(
+const inventoryText = i18n.translate(
   'wazuh.public.components.common.common.modules.defaults.inventory',
   {
     defaultMessage: 'Inventory',
@@ -101,7 +101,7 @@ export const ModulesDefaults = {
     tabs: [
       {
         id: 'inventory',
-        name: inventory,
+        name: inventoryText,
         buttons: [ButtonModuleExploreAgent],
         component: MainFim,
       },
@@ -135,7 +135,7 @@ export const ModulesDefaults = {
     tabs: [
       {
         id: 'inventory',
-        name: inventory,
+        name: inventoryText,
         buttons: [ButtonModuleExploreAgent],
         component: MainSca,
       },
@@ -187,7 +187,7 @@ export const ModulesDefaults = {
     tabs: [
       {
         id: 'inventory',
-        name: inventory,
+        name: inventoryText,
         buttons: [ButtonModuleExploreAgent],
         component: MainVuls,
       },

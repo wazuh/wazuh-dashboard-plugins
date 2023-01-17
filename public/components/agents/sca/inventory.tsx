@@ -169,66 +169,92 @@ export class Inventory extends Component {
     this.columnsChecks = [
       {
         field: 'id',
-        name: i18n.translate('wazuh.public.components.agents.sca.inventory.ID', {
-              defaultMessage: 'ID',
-            }),
+        name: i18n.translate(
+          'wazuh.public.components.agents.sca.inventory.ID',
+          {
+            defaultMessage: 'ID',
+          },
+        ),
         sortable: true,
         width: '100px',
       },
       {
         field: 'title',
-        name: i18n.translate('wazuh.public.components.agents.sca.inventory.Title', {
-              defaultMessage: 'Title',
-            }),
+        name: i18n.translate(
+          'wazuh.public.components.agents.sca.inventory.Title',
+          {
+            defaultMessage: 'Title',
+          },
+        ),
         sortable: true,
         truncateText: true,
       },
       {
-        name: i18n.translate('wazuh.public.components.agents.sca.inventory.Target', {
-              defaultMessage: 'Target',
-            }),
+        name: i18n.translate(
+          'wazuh.public.components.agents.sca.inventory.Target',
+          {
+            defaultMessage: 'Target',
+          },
+        ),
         truncateText: true,
-        render: (item) => (
+        render: item => (
           <div>
             {item.file ? (
               <span>
-                <b>{
-                  i18n.translate("wazuh.components.agent.fim.ivv.lib.File", {
-                    defaultMessage: "File:",
+                <b>
+                  {i18n.translate('wazuh.components.agent.fim.ivv.lib.File', {
+                    defaultMessage: 'File:',
                   })}
-                  </b> {item.file}
+                </b>{' '}
+                {item.file}
               </span>
             ) : item.directory ? (
               <span>
-                <b>{
-                  i18n.translate("wazuh.components.agent.fim.ivv.lib.Directory", {
-                    defaultMessage: "Directory:",
-                  })}
-                </b> {item.directory}
+                <b>
+                  {i18n.translate(
+                    'wazuh.components.agent.fim.ivv.lib.Directory',
+                    {
+                      defaultMessage: 'Directory:',
+                    },
+                  )}
+                </b>{' '}
+                {item.directory}
               </span>
             ) : item.process ? (
               <span>
-                <b>{
-                  i18n.translate("wazuh.components.agent.fim.ivv.lib.Process", {
-                    defaultMessage: "Process:",
-                  })}
-                </b> {item.process}
+                <b>
+                  {i18n.translate(
+                    'wazuh.components.agent.fim.ivv.lib.Process',
+                    {
+                      defaultMessage: 'Process:',
+                    },
+                  )}
+                </b>{' '}
+                {item.process}
               </span>
             ) : item.command ? (
               <span>
-                <b>{
-                  i18n.translate("wazuh.components.agent.fim.ivv.lib.Command", {
-                    defaultMessage: "Command:",
-                  })}
-                </b> {item.command}
+                <b>
+                  {i18n.translate(
+                    'wazuh.components.agent.fim.ivv.lib.Command',
+                    {
+                      defaultMessage: 'Command:',
+                    },
+                  )}
+                </b>{' '}
+                {item.command}
               </span>
             ) : item.registry ? (
               <span>
-                <b>{
-                  i18n.translate("wazuh.components.agent.fim.ivv.lib.Registry", {
-                    defaultMessage: "Registry:",
-                  })}
-                </b> {item.registry}
+                <b>
+                  {i18n.translate(
+                    'wazuh.components.agent.fim.ivv.lib.Registry',
+                    {
+                      defaultMessage: 'Registry:',
+                    },
+                  )}
+                </b>{' '}
+                {item.registry}
               </span>
             ) : (
               '-'
@@ -239,8 +265,8 @@ export class Inventory extends Component {
       {
         field: 'result',
         name: i18n.translate('wazuh.public.components.agents.sca.inventory', {
-              defaultMessage: '',
-            })'Result',
+          defaultMessage: 'Result',
+        }),
         truncateText: true,
         sortable: true,
         width: '150px',
@@ -250,11 +276,17 @@ export class Inventory extends Component {
         align: 'right',
         width: '40px',
         isExpander: true,
-        render: (item) => (
+        render: item => (
           <EuiButtonIcon
             onClick={() => this.toggleDetails(item)}
-            aria-label={this.state.itemIdToExpandedRowMap[item.id] ? 'Collapse' : 'Expand'}
-            iconType={this.state.itemIdToExpandedRowMap[item.id] ? 'arrowUp' : 'arrowDown'}
+            aria-label={
+              this.state.itemIdToExpandedRowMap[item.id] ? 'Collapse' : 'Expand'
+            }
+            iconType={
+              this.state.itemIdToExpandedRowMap[item.id]
+                ? 'arrowUp'
+                : 'arrowDown'
+            }
           />
         ),
       },
