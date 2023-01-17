@@ -1330,7 +1330,7 @@ class WzModuleGuide extends Component {
                         onClick={() => this.toggleResetGuideModal()}
                       >
                         {i18n.translate(
-                          'wazuh.public.components.addData.modules.guide.resetGuide',
+                          'wazuh.public.components.addData.modules.guide.resetGuideText',
                           {
                             defaultMessage: 'Reset guide',
                           },

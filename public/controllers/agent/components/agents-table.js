@@ -1007,7 +1007,7 @@ export const AgentsTable = withErrorBoundary(
         },
         {
           field: 'name',
-          name: i18n.translate('wazuh.public.controller.agent.components.agent.table.name', {
+          name: i18n.translate('wazuh.public.controller.agent.components.agent.table.nameCapital', {
           defaultMessage: 'Name',
         }),
           sortable: true,
@@ -1016,7 +1016,7 @@ export const AgentsTable = withErrorBoundary(
         },
         {
           field: 'ip',
-          name: i18n.translate('wazuh.public.controller.agent.components.agent.table.ip', {
+          name: i18n.translate('wazuh.public.controller.agent.components.agent.table.ipCapital', {
           defaultMessage: 'IP',
         }),
           width: '10%',
