@@ -16,6 +16,7 @@ import { WzRequest } from '../../../react-services/wz-request';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
+import { i18n } from '@kbn/i18n';
 
 export class CheckUpgrade extends Component {
   props!: {
@@ -40,13 +41,20 @@ export class CheckUpgrade extends Component {
   componentDidUpdate(prevProps) {
     if (prevProps.upgrading !== this.props.upgrading) {
       if (this.props.upgrading === true)
-        this.interval = setInterval(() => this.checkUpgrade(this.props.id), 3000);
+        this.interval = setInterval(
+          () => this.checkUpgrade(this.props.id),
+          3000,
+        );
     }
   }
 
   async checkUpgrade(agentId) {
     try {
-      const response = await WzRequest.apiReq('GET', `/agents/${agentId}/upgrade_result`, {});
+      const response = await WzRequest.apiReq(
+        'GET',
+        `/agents/${agentId}/upgrade_result`,
+        {},
+      );
       if (response.data === 200) {
         this.props.changeStatusUpdate(agentId);
         this.props.reloadAgent();
@@ -76,8 +84,16 @@ export class CheckUpgrade extends Component {
     } else if (upgrading === true) {
       /* this.interval = setInterval(() => this.checkUpgrade(id), 30000); */
       return (
-        <EuiToolTip content="This agent is being updated." position="right">
-          <EuiLoadingSpinner size="s" />
+        <EuiToolTip
+          content={i18n.translate(
+            'wazuh.public.controller.agent.components.checkUpgrade.agent.',
+            {
+              defaultMessage: 'This agent is being updated.',
+            },
+          )}
+          position='right'
+        >
+          <EuiLoadingSpinner size='s' />
         </EuiToolTip>
       );
     }

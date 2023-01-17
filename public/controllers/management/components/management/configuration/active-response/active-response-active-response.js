@@ -23,28 +23,98 @@ import { connect } from 'react-redux';
 import { compose } from 'redux';
 import withWzConfig from '../util-hocs/wz-config';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
-const name2 = i18n.translate('wazuh.controller.manage.comp.confi.active.name2', {
-  defaultMessage: 'Active response documentation',
-});
-const name3 = i18n.translate('wazuh.controller.manage.comp.confi.active.name3', {
-  defaultMessage: 'Active response reference',
-});
-const title1 = i18n.translate('wazuh.controller.manage.comp.confi.active.title1', {
-  defaultMessage: 'Active response definitions',
-});
+const name2 = i18n.translate(
+  'wazuh.controller.manage.comp.confi.active.name2',
+  {
+    defaultMessage: 'Active response documentation',
+  },
+);
+const name3 = i18n.translate(
+  'wazuh.controller.manage.comp.confi.active.name3',
+  {
+    defaultMessage: 'Active response reference',
+  },
+);
+const title1 = i18n.translate(
+  'wazuh.controller.manage.comp.confi.active.title1',
+  {
+    defaultMessage: 'Active response definitions',
+  },
+);
 const mainSettings = [
   {
     field: 'disabled',
-    label: 'Status of this active response',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.active.response.active',
+      {
+        defaultMessage: 'Status of this active response',
+      },
+    ),
     render: renderValueNoThenEnabled,
   },
-  { field: 'command', label: 'Command to execute' },
-  { field: 'location', label: 'Execute the command on this location' },
-  { field: 'agent_id', label: 'Agent ID on which execute the command' },
-  { field: 'level', label: 'Match to this severity level or above' },
-  { field: 'rules_group', label: 'Match to one of these groups' },
-  { field: 'rules_id', label: 'Match to one of these rule IDs' },
-  { field: 'timeout', label: 'Timeout (in seconds) before reverting' },
+  {
+    field: 'command',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.active.response.execute',
+      {
+        defaultMessage: 'Command to execute',
+      },
+    ),
+  },
+  {
+    field: 'location',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.active.response.location',
+      {
+        defaultMessage: 'Execute the command on this location',
+      },
+    ),
+  },
+  {
+    field: 'agent_id',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.active.response.command',
+      {
+        defaultMessage: 'Agent ID on which execute the command',
+      },
+    ),
+  },
+  {
+    field: 'level',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.active.response.levelAbove',
+      {
+        defaultMessage: 'Match to this severity level or above',
+      },
+    ),
+  },
+  {
+    field: 'rules_group',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.active.response.groups',
+      {
+        defaultMessage: 'Match to one of these groups',
+      },
+    ),
+  },
+  {
+    field: 'rules_id',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.active.response.ruleID',
+      {
+        defaultMessage: 'Match to one of these rule IDs',
+      },
+    ),
+  },
+  {
+    field: 'timeout',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.active.response.timeOut',
+      {
+        defaultMessage: 'Timeout (in seconds) before reverting',
+      },
+    ),
+  },
 ];
 
 const helpLinks = [

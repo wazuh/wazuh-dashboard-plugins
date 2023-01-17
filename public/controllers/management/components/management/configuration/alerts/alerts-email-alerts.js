@@ -22,45 +22,117 @@ import { settingsListBuilder } from '../utils/builders';
 import { connect } from 'react-redux';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
+import { i18n } from '@kbn/i18n';
+
 const mainSettings = [
-  { field: 'email_to', label: 'Send alerts to this email address' },
+  {
+    field: 'email_to',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.alerts.emailAddress',
+      {
+        defaultMessage: 'Send alerts to this email address',
+      },
+    ),
+  },
   {
     field: 'level',
-    label: 'Minimum severity level to send the alert by email'
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.alerts.minimum',
+      {
+        defaultMessage: 'Minimum severity level to send the alert by email',
+      },
+    ),
   },
   {
     field: 'group',
-    label: 'Send only alerts that belong to one of these groups'
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.alerts.belong',
+      {
+        defaultMessage: 'Send only alerts that belong to one of these groups',
+      },
+    ),
   },
   {
     field: 'event_location',
-    label: 'Send alerts when they match this event location'
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.alerts.location',
+      {
+        defaultMessage: 'Send alerts when they match this event location',
+      },
+    ),
   },
-  { field: 'format', label: 'Format for email alerts' },
+  {
+    field: 'format',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.alerts.formate',
+      {
+        defaultMessage: 'Format for email alerts',
+      },
+    ),
+  },
   {
     field: 'rule_id',
-    label: 'Send only alerts that belong to one of these rule IDs'
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.alerts.rulesID',
+      {
+        defaultMessage: 'Send only alerts that belong to one of these rule IDs',
+      },
+    ),
   },
-  { field: 'do_not_delay', label: 'Disable delayed email delivery' },
+  {
+    field: 'do_not_delay',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.alerts.delivery',
+      {
+        defaultMessage: 'Disable delayed email delivery',
+      },
+    ),
+  },
   {
     field: 'do_not_group',
-    label: 'Disable alerts grouping into the same email'
-  }
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.alerts.email',
+      {
+        defaultMessage: 'Disable alerts grouping into the same email',
+      },
+    ),
+  },
 ];
 
 const helpLinks = [
   {
-    text: 'Configuring email alerts',
-    href: webDocumentationLink('user-manual/manager/manual-email-report/index.html')
+    text: i18n.translate(
+      'wazuh.public.controller.management.config.alerts.emailAlert',
+      {
+        defaultMessage: 'Configuring email alerts',
+      },
+    ),
+    href: webDocumentationLink(
+      'user-manual/manager/manual-email-report/index.html',
+    ),
   },
   {
-    text: 'SMTP server with authentication',
-    href: webDocumentationLink('user-manual/manager/manual-email-report/smtp-authentication.html')
+    text: i18n.translate(
+      'wazuh.public.controller.management.config.alerts.SMTP',
+      {
+        defaultMessage: 'SMTP server with authentication',
+      },
+    ),
+    href: webDocumentationLink(
+      'user-manual/manager/manual-email-report/smtp-authentication.html',
+    ),
   },
   {
-    text: 'Email alerts reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/email-alerts.html')
-  }
+    text: i18n.translate(
+      'wazuh.public.controller.management.config.alerts.referance',
+      {
+        defaultMessage: 'Email alerts reference',
+      },
+    ),
+    href: webDocumentationLink(
+      'user-manual/reference/ossec-conf/email-alerts.html',
+    ),
+  },
 ];
 
 class WzConfigurationAlertsEmailAlerts extends Component {
@@ -75,7 +147,7 @@ class WzConfigurationAlertsEmailAlerts extends Component {
       isArray(currentConfig['mail-alerts'].email_alerts)
         ? settingsListBuilder(
             currentConfig['mail-alerts'].email_alerts,
-            'email_to'
+            'email_to',
           )
         : [];
     return (
@@ -88,18 +160,28 @@ class WzConfigurationAlertsEmailAlerts extends Component {
         !isString(currentConfig['mail-alerts']) &&
         (!currentConfig['mail-alerts'].email_alerts ||
           !currentConfig['mail-alerts'].email_alerts.length) ? (
-          <WzNoConfig error="not-present" help={helpLinks} />
+          <WzNoConfig error='not-present' help={helpLinks} />
         ) : null}
         {wazuhNotReadyYet &&
           (!currentConfig || !currentConfig['mail-alerts']) && (
-            <WzNoConfig error="Wazuh not ready yet" help={helpLinks} />
+            <WzNoConfig error='Wazuh not ready yet' help={helpLinks} />
           )}
         {currentConfig['mail-alerts'] &&
         isArray(currentConfig['mail-alerts'].email_alerts) &&
         currentConfig['mail-alerts'].email_alerts.length ? (
           <WzConfigurationSettingsTabSelector
-            title="Main settings"
-            description="Granular email alert options"
+            title={i18n.translate(
+              'wazuh.public.controller.management.config.alerts.mainSetting',
+              {
+                defaultMessage: 'Main settings',
+              },
+            )}
+            description={i18n.translate(
+              'wazuh.public.controller.management.config.alerts.options',
+              {
+                defaultMessage: 'Granular email alert options',
+              },
+            )}
             currentConfig={currentConfig}
             minusHeight={320}
             helpLinks={helpLinks}
@@ -116,12 +198,12 @@ class WzConfigurationAlertsEmailAlerts extends Component {
 }
 
 const mapStateToProps = state => ({
-  wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet
+  wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet,
 });
 
 WzConfigurationAlertsEmailAlerts.propTypes = {
   // currentConfig: PropTypes.object.isRequired,
-  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string])
+  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
 };
 
 export default connect(mapStateToProps)(WzConfigurationAlertsEmailAlerts);

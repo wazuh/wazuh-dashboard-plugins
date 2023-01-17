@@ -123,14 +123,18 @@ export const AgentsTable = withErrorBoundary(
       this.suggestions = [
         {
           type: 'q',
-          label: 'status',
+          label: i18n.translate('wazuh.public.controller.agent.components.agent.table.status1', {
+          defaultMessage: 'status',
+        }),
           description: Descp1,
           operators: ['=', '!='],
           values: UI_ORDER_AGENT_STATUS,
         },
         {
           type: 'q',
-          label: 'os.platform',
+          label: i18n.translate('wazuh.public.controller.agent.components.agent.table.os.platform', {
+          defaultMessage: 'os.platform',
+        }),
           description: Descp2,
           operators: ['=', '!='],
           values: async value =>
@@ -138,7 +142,9 @@ export const AgentsTable = withErrorBoundary(
         },
         {
           type: 'q',
-          label: 'ip',
+          label: i18n.translate('wazuh.public.controller.agent.components.agent.table.ip', {
+          defaultMessage: 'ip',
+        }),
           description: Descp3,
           operators: ['=', '!='],
           values: async value =>
@@ -146,7 +152,9 @@ export const AgentsTable = withErrorBoundary(
         },
         {
           type: 'q',
-          label: 'name',
+          label: i18n.translate('wazuh.public.controller.agent.components.agent.table.name', {
+          defaultMessage: 'name',
+        }),
           description: Descp4,
           operators: ['=', '!='],
           values: async value =>
@@ -154,7 +162,9 @@ export const AgentsTable = withErrorBoundary(
         },
         {
           type: 'q',
-          label: 'id',
+          label: i18n.translate('wazuh.public.controller.agent.components.agent.table.id', {
+          defaultMessage: 'id',
+        }),
           description: Descp5,
           operators: ['=', '!='],
           values: async value =>
@@ -162,7 +172,9 @@ export const AgentsTable = withErrorBoundary(
         },
         {
           type: 'q',
-          label: 'group',
+          label: i18n.translate('wazuh.public.controller.agent.components.agent.table.group', {
+          defaultMessage: 'group',
+        }),
           description: Descp6,
           operators: ['=', '!='],
           values: async value =>
@@ -170,7 +182,9 @@ export const AgentsTable = withErrorBoundary(
         },
         {
           type: 'q',
-          label: 'node_name',
+          label: i18n.translate('wazuh.public.controller.agent.components.agent.table.nodeName', {
+          defaultMessage: 'node_name',
+        }),
           description: Descp7,
           operators: ['=', '!='],
           values: async value =>
@@ -178,7 +192,9 @@ export const AgentsTable = withErrorBoundary(
         },
         {
           type: 'q',
-          label: 'manager',
+          label: i18n.translate('wazuh.public.controller.agent.components.agent.table.manager', {
+          defaultMessage: 'manager',
+        }),
           description: Descp8,
           operators: ['=', '!='],
           values: async value =>
@@ -186,7 +202,9 @@ export const AgentsTable = withErrorBoundary(
         },
         {
           type: 'q',
-          label: 'version',
+          label: i18n.translate('wazuh.public.controller.agent.components.agent.table.version', {
+          defaultMessage: 'version',
+        }),
           description: Descp9,
           operators: ['=', '!='],
           values: async value =>
@@ -194,7 +212,9 @@ export const AgentsTable = withErrorBoundary(
         },
         {
           type: 'q',
-          label: 'configSum',
+          label: i18n.translate('wazuh.public.controller.agent.components.agent.table.configSum', {
+          defaultMessage: 'configSum',
+        }),
           description: Descp10,
           operators: ['=', '!='],
           values: async value =>
@@ -202,7 +222,9 @@ export const AgentsTable = withErrorBoundary(
         },
         {
           type: 'q',
-          label: 'mergedSum',
+          label: i18n.translate('wazuh.public.controller.agent.components.agent.table.mergedSum', {
+          defaultMessage: 'mergedSum',
+        }),
           description: Descp11,
           operators: ['=', '!='],
           values: async value =>
@@ -210,7 +232,9 @@ export const AgentsTable = withErrorBoundary(
         },
         {
           type: 'q',
-          label: 'dateAdd',
+          label: i18n.translate('wazuh.public.controller.agent.components.agent.table.dateAdd', {
+          defaultMessage: 'dateAdd',
+        }),
           description: Descp12,
           operators: ['=', '!='],
           values: async value =>
@@ -218,7 +242,9 @@ export const AgentsTable = withErrorBoundary(
         },
         {
           type: 'q',
-          label: 'lastKeepAlive',
+          label: i18n.translate('wazuh.public.controller.agent.components.agent.table.lastKeepAlive', {
+          defaultMessage: 'lastKeepAlive',
+        }),
           description: Descp13,
           operators: ['=', '!='],
           values: async value =>
@@ -320,7 +346,9 @@ export const AgentsTable = withErrorBoundary(
           error: {
             error: error,
             message: error.message || error,
-            title: `Could not get the agents list`,
+            title: i18n.translate('wazuh.public.controller.agent.components.agent.table.agentList', {
+          defaultMessage: 'Could not get the agents list',
+        }),
           },
         };
         getErrorOrchestrator().handleError(options);
@@ -423,7 +451,9 @@ export const AgentsTable = withErrorBoundary(
       return (
         <div className={'icon-box-action'}>
           <EuiToolTip
-            content='Open summary panel for this agent'
+            content={i18n.translate('wazuh.public.controller.agent.components.agent.table.', {
+          defaultMessage: '',
+        })}'Open summary panel for this agent'
             position='left'
           >
             <EuiButtonIcon
@@ -433,13 +463,17 @@ export const AgentsTable = withErrorBoundary(
               }}
               iconType='eye'
               color={'primary'}
-              aria-label='Open summary panel for this agent'
+              aria-label={i18n.translate('wazuh.public.controller.agent.components.agent.table.openSummary', {
+          defaultMessage: 'Open summary panel for this agent',
+        })}
             />
           </EuiToolTip>
           &nbsp;
           {agent.status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED && (
             <EuiToolTip
-              content='Open configuration for this agent'
+              content={i18n.translate('wazuh.public.controller.agent.components.agent.table.openConfig', {
+          defaultMessage: 'Open configuration for this agent',
+        })}
               position='left'
             >
               <EuiButtonIcon
@@ -449,7 +483,9 @@ export const AgentsTable = withErrorBoundary(
                 }}
                 color={'primary'}
                 iconType='wrench'
-                aria-label='Open configuration for this agent'
+                aria-label={i18n.translate('wazuh.public.controller.agent.components.agent.table.openConfig', {
+          defaultMessage: 'Open configuration for this agent',
+        })}
               />
             </EuiToolTip>
           )}
@@ -532,7 +568,9 @@ export const AgentsTable = withErrorBoundary(
             </EuiButtonEmpty>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
-            <EuiToolTip content='Select columns table' position='left'>
+            <EuiToolTip content={i18n.translate('wazuh.public.controller.agent.components.agent.table.selColumns', {
+          defaultMessage: 'Select columns table',
+        })} position='left'>
               <EuiButtonEmpty onClick={this.openColumnsFilter}>
                 <EuiIcon type='managementApp' color='primary' />
               </EuiButtonEmpty>
@@ -774,7 +812,7 @@ export const AgentsTable = withErrorBoundary(
               size='s'
               title={
                 !allSelected
-                  ? `The ${selectedItems.length} agents on this page are selected`
+                  ? `${The} ${selectedItems.length} ${pageAgents}`
                   : ''
               }
             >
@@ -789,8 +827,8 @@ export const AgentsTable = withErrorBoundary(
                     }}
                   >
                     {allSelected
-                      ? `Clear all agents selection (${totalItems})`
-                      : `Select all agents (${totalItems})`}
+                      ? `${clearAll} (${totalItems})`
+                      : `${selAgents} (${totalItems})`}
                   </EuiButton>
                 </EuiFlexItem>
               </EuiFlexGroup>
@@ -890,7 +928,9 @@ export const AgentsTable = withErrorBoundary(
           error: {
             error: error,
             message: error.message || error,
-            title: `Failed to delete selected agents`,
+            title: i18n.translate('wazuh.public.controller.agent.components.agent.table.selectedAgents', {
+          defaultMessage: 'Failed to delete selected agents',
+        }),
           },
         };
         getErrorOrchestrator().handleError(options);
@@ -930,7 +970,9 @@ export const AgentsTable = withErrorBoundary(
           error: {
             error: error,
             message: error.message || error,
-            title: `Failed to delete all agents`,
+            title: i18n.translate('wazuh.public.controller.agent.components.agent.table.allAgentsDelete', {
+          defaultMessage: 'Failed to delete all agents',
+        }),
           },
         };
         getErrorOrchestrator().handleError(options);
@@ -945,27 +987,35 @@ export const AgentsTable = withErrorBoundary(
       const defaultColumns = [
         {
           field: 'id',
-          name: 'ID',
+          name: i18n.translate('wazuh.public.controller.agent.components.agent.table.ID', {
+          defaultMessage: 'ID',
+        }),
           sortable: true,
           width: '6%',
         },
         {
           field: 'name',
-          name: 'Name',
+          name: i18n.translate('wazuh.public.controller.agent.components.agent.table.name', {
+          defaultMessage: 'Name',
+        }),
           sortable: true,
           width: '15%',
           truncateText: true,
         },
         {
           field: 'ip',
-          name: 'IP',
+          name: i18n.translate('wazuh.public.controller.agent.components.agent.table.ip', {
+          defaultMessage: 'IP',
+        }),
           width: '10%',
           truncateText: true,
           sortable: true,
         },
         {
           field: 'group',
-          name: 'Group(s)',
+          name: i18n.translate('wazuh.public.controller.agent.components.agent.table.groups', {
+          defaultMessage: 'Group(s)',
+        }),
           width: '20%',
           truncateText: true,
           sortable: true,
@@ -973,7 +1023,9 @@ export const AgentsTable = withErrorBoundary(
         },
         {
           field: 'os_name',
-          name: 'OS',
+          name: i18n.translate('wazuh.public.controller.agent.components.agent.table.OS', {
+          defaultMessage: 'OS',
+        }),
           sortable: true,
           width: '15%',
           truncateText: true,
@@ -981,14 +1033,18 @@ export const AgentsTable = withErrorBoundary(
         },
         {
           field: 'node_name',
-          name: 'Cluster node',
+          name: i18n.translate('wazuh.public.controller.agent.components.agent.table.ClusterNode', {
+          defaultMessage: 'Cluster node',
+        }),
           width: '10%',
           truncateText: true,
           sortable: true,
         },
         {
           field: 'version',
-          name: 'Version',
+          name: i18n.translate('wazuh.public.controller.agent.components.agent.table.Version', {
+          defaultMessage: 'Version',
+        }),
           width: '5%',
           truncateText: true,
           sortable: true,
@@ -996,21 +1052,27 @@ export const AgentsTable = withErrorBoundary(
         },
         {
           field: 'dateAdd',
-          name: 'Registration date',
+          name: i18n.translate('wazuh.public.controller.agent.components.agent.table.registrationDate', {
+          defaultMessage: 'Registration date',
+        }),
           width: '10%',
           truncateText: true,
           sortable: true,
         },
         {
           field: 'lastKeepAlive',
-          name: 'Last keep alive',
+          name: i18n.translate('wazuh.public.controller.agent.components.agent.table.LastKeepAlive', {
+          defaultMessage: 'Last keep alive',
+        }),
           width: '10%',
           truncateText: true,
           sortable: true,
         },
         {
           field: 'status',
-          name: 'Status',
+          name: i18n.translate('wazuh.public.controller.agent.components.agent.table.Status', {
+          defaultMessage: 'Status',
+        }),
           truncateText: true,
           sortable: true,
           width: '15%',
@@ -1025,7 +1087,9 @@ export const AgentsTable = withErrorBoundary(
           align: 'right',
           width: '5%',
           field: 'actions',
-          name: 'Actions',
+          name: i18n.translate('wazuh.public.controller.agent.components.agent.table.Actions', {
+          defaultMessage: 'Actions',
+        }),
           render: agent => this.actionButtonsRender(agent),
         },
       ];
@@ -1108,7 +1172,9 @@ export const AgentsTable = withErrorBoundary(
               onFiltersChange={filters =>
                 this.setState({ filters, pageIndex: 0 })
               }
-              placeholder='Filter or search agent'
+              placeholder={i18n.translate('wazuh.public.controller.agent.components.agent.table.filterAgent', {
+          defaultMessage: 'Filter or search agent',
+        })}
             />
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
@@ -1119,7 +1185,7 @@ export const AgentsTable = withErrorBoundary(
             >
               {i18n.translate('wazuh.controllers.sgent.components.Refresh', {
                 defaultMessage: 'Refresh',
-              })}{' '}
+              })}
             </EuiButton>
           </EuiFlexItem>
         </EuiFlexGroup>
@@ -1232,7 +1298,9 @@ export const AgentsTable = withErrorBoundary(
               cellProps={getCellProps}
               /*             isSelectable={false}
                         selection={selection} */
-              noItemsMessage='No agents found'
+              noItemsMessage={i18n.translate('wazuh.public.controller.agent.components.agent.table.noAgent', {
+          defaultMessage: 'No agents found',
+        })}
               {...(pagination && { pagination })}
             />
           </EuiFlexItem>
@@ -1263,7 +1331,9 @@ export const AgentsTable = withErrorBoundary(
         <GroupTruncate
           groups={groups}
           length={25}
-          label={'more'}
+          label={i18n.translate('wazuh.public.controller.agent.components.agent.table.more', {
+          defaultMessage: 'more',
+        })}
           action={'filter'}
           filterAction={this.filterGroupBadge}
           {...this.props}
@@ -1292,15 +1362,19 @@ export const AgentsTable = withErrorBoundary(
             <EuiConfirmModal
               title={
                 allSelected
-                  ? 'Delete all agents'
-                  : `Delete ${selectedItems.length} agents`
+                  ? deleteAll
+                  : `${Delete} ${selectedItems.length} ${agents}`
               }
               onCancel={() => {
                 this.setState({ purgeModal: false });
               }}
               onConfirm={allSelected ? this.onClickPurgeAll : this.onClickPurge}
-              cancelButtonText="No, don't do it"
-              confirmButtonText='Yes, delete agents'
+              cancelButtonText= { i18n.translate('wazuh.public.controller.agent.components.agent.table.no', {
+          defaultMessage: "No, don't do it",
+        })}
+              confirmButtonText= { i18n.translate('wazuh.public.controller.agent.components.agent.table.yes', {
+          defaultMessage: 'Yes, delete agents',
+        })}
               defaultFocusedButton='confirm'
               buttonColor='danger'
             >

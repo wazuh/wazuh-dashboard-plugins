@@ -44,7 +44,18 @@ const title1 = i18n.translate('wazuh.controller.agent.restarting', {
 const title2 = i18n.translate('wazuh.controller.agent.getting', {
   defaultMessage: 'Error getting the agent:',
 });
-
+const fim = i18n.translate('wazuh.public.controller.agent.agent.fim', {
+  defaultMessage: 'FIM scan failed on agent',
+});
+const dueto = i18n.translate('wazuh.public.controller.agent.agent.', {
+  defaultMessage: 'due to:',
+});
+const monitoring = i18n.translate(
+  'wazuh.public.controller.agent.agent.monitoring',
+  {
+    defaultMessage: 'Policy monitoring scan failed on agent',
+  },
+);
 export class AgentsController {
   /**
    * Class constructor
@@ -1063,9 +1074,9 @@ export class AgentsController {
         error: {
           error: error,
           message: error.message || error,
-          title: ` Policy monitoring scan failed on agent ${
-            this.$scope.agent.id
-          } due to: ${error.message || error}`,
+          title: ` ${monitoring} ${this.$scope.agent.id} ${due} ${
+            error.message || error
+          }`,
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -1098,7 +1109,7 @@ export class AgentsController {
         error: {
           error: error,
           message: error.message || error,
-          title: ` FIM scan failed on agent ${this.$scope.agent.id} due to: ${
+          title: ` ${fim} ${this.$scope.agent.id} ${due}${
             error.message || error
           }`,
         },

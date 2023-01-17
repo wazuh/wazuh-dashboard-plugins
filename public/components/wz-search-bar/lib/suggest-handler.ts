@@ -17,6 +17,8 @@ import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 
+import { i18n } from '@kbn/i18n';
+
 interface ISuggestHandlerProps extends IWzSearchBarProps {
   setStatus: Function;
   setIsOpen: Function;
@@ -53,14 +55,23 @@ export class SuggestHandler extends BaseHandler {
     if (inputRef) this.inputRef = inputRef;
   }
 
-  combine = (...args) => (input) => args.reduceRight((acc, arg) => (acc = arg(acc)), input);
+  combine =
+    (...args) =>
+    input =>
+      args.reduceRight((acc, arg) => (acc = arg(acc)), input);
 
-  someItem = (queryElement, key) => this.suggestItems.some((item) => item[key] === queryElement);
-  findItem = (queryElement, key) => this.suggestItems.find((item) => item[key] === queryElement);
+  someItem = (queryElement, key) =>
+    this.suggestItems.some(item => item[key] === queryElement);
+  findItem = (queryElement, key) =>
+    this.suggestItems.find(item => item[key] === queryElement);
 
   checkType = (input: string) => {
     const operator = /:|=|!=|~|<|>/.exec(input);
-    this.searchType = operator ? (operator[0] === ':' ? 'params' : 'q') : 'search';
+    this.searchType = operator
+      ? operator[0] === ':'
+        ? 'params'
+        : 'q'
+      : 'search';
     return input;
   };
 
@@ -68,7 +79,7 @@ export class SuggestHandler extends BaseHandler {
     let inputValue = (this.inputRef as HTMLInputElement).value;
     var index = inputValue.lastIndexOf(' ');
     var endOfQuery = inputValue.substring(index + 1);
-    return this.suggestItems.some((item) => item.label === endOfQuery);
+    return this.suggestItems.some(item => item.label === endOfQuery);
   };
 
   checkStage = (input: string) => {
@@ -100,23 +111,34 @@ export class SuggestHandler extends BaseHandler {
       const { inputStage, lastCall, searchType } = this;
       const { field = '', value = '', operator } = query;
       if (operator && !this.someItem(field, 'label'))
-        throw { error: 'Invalid field', message: `The field '${field}' is not valid` };
+        throw {
+          error: 'Invalid field',
+          message: `The field '${field}' is not valid`,
+        };
       //@ts-ignore
       if (
         operator &&
-        ((searchType === 'params' && operator !== ':') || (searchType === 'q' && operator === ':'))
+        ((searchType === 'params' && operator !== ':') ||
+          (searchType === 'q' && operator === ':'))
       )
-        throw { error: 'Invalid operator', message: `The operator '${operator}' is not valid` };
+        throw {
+          error: 'Invalid operator',
+          message: `The operator '${operator}' is not valid`,
+        };
       const suggestions = [
         ...this.buildSuggestSearch(field),
         ...(value && inputStage === 'value' ? this.buildSuggestApply() : []),
-        ...(value && inputStage === 'value' ? this.buildSuggestConjuntions(field) : []),
+        ...(value && inputStage === 'value'
+          ? this.buildSuggestConjuntions(field)
+          : []),
         ...((this.someItem(field, 'label') && inputStage !== 'value') ||
         this.queryEndWithField(field)
           ? this.buildSuggestOperator(field)
           : []),
         ...(inputStage === 'field' ? this.buildSuggestFields(field) : []),
-        ...(inputStage === 'value' ? await this.buildSuggestValues(field, value) : []),
+        ...(inputStage === 'value'
+          ? await this.buildSuggestValues(field, value)
+          : []),
       ];
       if (lastCall === this.lastCall) {
         this.lastCall++;
@@ -139,7 +161,7 @@ export class SuggestHandler extends BaseHandler {
     throw 'New request in progress';
   };
 
-  checkErrors = async (promise) => {
+  checkErrors = async promise => {
     const { suggestions = [], error } = await promise;
     if (!error) return suggestions;
     return [
@@ -155,7 +177,7 @@ export class SuggestHandler extends BaseHandler {
     this.checkErrors,
     this.checkQuery,
     this.checkStage,
-    this.checkType
+    this.checkType,
   );
 
   buildSuggestSearch(inputValue): suggestItem[] {
@@ -175,22 +197,32 @@ export class SuggestHandler extends BaseHandler {
   buildSuggestApply(): suggestItem[] {
     return [
       {
-        label: 'Apply filter',
+        label: i18n.translate(
+          'wazuh.public.components.wz.search.bar.handler.apply filter',
+          {
+            defaultMessage: 'Apply filter',
+          },
+        ),
         type: { iconType: 'kqlFunction', color: 'tint5' },
-        description: 'Click here or press "Enter" to apply the filter',
+        description: i18n.translate(
+          'wazuh.public.components.wz.search.bar.handler.enter',
+          {
+            defaultMessage: 'Click here or press "Enter" to apply the filter',
+          },
+        ),
       },
     ];
   }
 
   buildSuggestFields(inputValue: string) {
     return this.suggestItems
-      .filter((item) => item.label.includes(inputValue))
+      .filter(item => item.label.includes(inputValue))
       .map(this.mapSuggestFields);
   }
 
   buildSuggestOperator(inputValue: string) {
     const { operators } = this;
-    const operatorSuggest = (op) => ({
+    const operatorSuggest = op => ({
       label: op,
       description: operators[op],
       type: { iconType: 'kqlOperand', color: 'tint1' },
@@ -200,7 +232,7 @@ export class SuggestHandler extends BaseHandler {
       return [operatorSuggest(':')];
     } else {
       const ops = (item || {}).operators || Object.keys(operators);
-      return ops.filter((op) => op !== ':').map(operatorSuggest);
+      return ops.filter(op => op !== ':').map(operatorSuggest);
     }
   }
 
@@ -217,9 +249,35 @@ export class SuggestHandler extends BaseHandler {
   buildSuggestConjuntions(inputValue: string): suggestItem[] {
     if (this.searchType !== 'q') return [];
     const suggestions = [
-      { label: ' AND ', description: 'Requires `both arguments` to be true' },
-      { label: ' OR ', description: 'Requires `one or more arguments` to be true' },
-    ].map((item) => {
+      {
+        label: i18n.translate(
+          'wazuh.public.components.wz.search.bar.handler.and',
+          {
+            defaultMessage: ' AND ',
+          },
+        ),
+        description: i18n.translate(
+          'wazuh.public.components.wz.search.bar.handlertrueArugument',
+          {
+            defaultMessage: 'Requires `both arguments` to be true',
+          },
+        ),
+      },
+      {
+        label: i18n.translate(
+          'wazuh.public.components.wz.search.bar.handler.or',
+          {
+            defaultMessage: ' OR ',
+          },
+        ),
+        description: i18n.translate(
+          'wazuh.public.components.wz.search.bar.handler.arugement',
+          {
+            defaultMessage: 'Requires `one or more arguments` to be true',
+          },
+        ),
+      },
+    ].map(item => {
       return {
         type: { iconType: 'kqlSelector', color: 'tint3' },
         label: item.label,
@@ -240,8 +298,8 @@ export class SuggestHandler extends BaseHandler {
   }
 
   createParamFilter(field, value) {
-    const filters = [...this.filters.map((filter) => ({ ...filter }))]; // "Clone" the filter elements to new objects
-    const idx = filters.findIndex((filter) => filter.field === field);
+    const filters = [...this.filters.map(filter => ({ ...filter }))]; // "Clone" the filter elements to new objects
+    const idx = filters.findIndex(filter => filter.field === field);
     idx !== -1
       ? (filters[idx].value = value) // This change in filters produces a bug in ReactJS method componentDidUpdate if you try to modify the filter objects because prevState/prevPros and nextState/nextProps are same object and not cloning filter elements before the change of filter property
       : filters.push({ field: field, value });
@@ -270,7 +328,9 @@ export class SuggestHandler extends BaseHandler {
         return;
       case 'kqlField':
         this.searchType = (
-          this.suggestItems.find((e) => e.label === item.label) || { type: 'params' }
+          this.suggestItems.find(e => e.label === item.label) || {
+            type: 'params',
+          }
         ).type;
         if (this.searchType === 'params') {
           this.setInputValue(`${item.label}:`);

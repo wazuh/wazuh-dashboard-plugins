@@ -10,9 +10,11 @@
  * Find more information about this on the LICENSE file.
  */
 
+import { i18n } from '@kbn/i18n';
+
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { i18n } from "@kbn/i18n";
+import { i18n } from '@kbn/i18n';
 import withWzConfig from '../util-hocs/wz-config';
 import WzNoConfig from '../util-components/no-config';
 import WzConfigurationListSelector from '../util-components/configuration-settings-list-selector';
@@ -24,11 +26,51 @@ import { compose } from 'redux';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
 const mainSettings = [
-  { field: 'type', label: 'Agentless monitoring type' },
-  { field: 'frequency', label: 'Interval (in seconds) between checks' },
-  { field: 'host', label: 'Device username and hostname' },
-  { field: 'state', label: 'Device check type' },
-  { field: 'arguments', label: 'Pass these arguments to check' },
+  {
+    field: 'type',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.agentless.type',
+      {
+        defaultMessage: 'Agentless monitoring type',
+      },
+    ),
+  },
+  {
+    field: 'frequency',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.agentless.interval',
+      {
+        defaultMessage: 'Interval (in seconds) between checks',
+      },
+    ),
+  },
+  {
+    field: 'host',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.agentless.hotname',
+      {
+        defaultMessage: 'Device username and hostname',
+      },
+    ),
+  },
+  {
+    field: 'state',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.agentless.device',
+      {
+        defaultMessage: 'Device check type',
+      },
+    ),
+  },
+  {
+    field: 'arguments',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.agentless.arugments',
+      {
+        defaultMessage: 'Pass these arguments to check',
+      },
+    ),
+  },
 ];
 const text2 = i18n.translate(
   'wazuh.controller.manage.comp.confi.setting.response.agentless.text2',
@@ -88,8 +130,19 @@ class WzConfigurationAgentless extends Component {
         {currentConfig['agentless-agentless'] &&
           !isString(currentConfig['agentless-agentless']) && (
             <WzConfigurationSettingsTabSelector
-              title='Devices list'
-              description="List of monitored devices that don't use the agent"
+              title={i18n.translate(
+                'wazuh.public.controller.management.config.agentless.devices',
+                {
+                  defaultMessage: 'Devices list',
+                },
+              )}
+              description={i18n.translate(
+                'wazuh.public.controller.management.config.agentless.agentUse',
+                {
+                  defaultMessage:
+                    "List of monitored devices that don't use the agent",
+                },
+              )}
               currentConfig={currentConfig}
               minusHeight={260}
               helpLinks={helpLinks}

@@ -19,26 +19,57 @@ import WzNoConfig from '../util-components/no-config';
 import { isString, renderValueOrNo } from '../utils/utils';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
+import { i18n } from '@kbn/i18n';
+
 const mainSettings = [
   {
     field: 'log_alert_level',
-    label: 'Minimum severity level to store the alert'
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.alerts.gernal.level.minimum',
+      {
+        defaultMessage: 'Minimum severity level to store the alert',
+      },
+    ),
   },
   {
     field: 'email_alert_level',
-    label: 'Minimum severity level to send the alert by email'
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.alerts.gernal.email',
+      {
+        defaultMessage: 'Minimum severity level to send the alert by email',
+      },
+    ),
   },
-  { field: 'use_geoip', label: 'Enable GeoIP lookups', render: renderValueOrNo }
+  {
+    field: 'use_geoip',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.alerts.gernal',
+      {
+        defaultMessage: 'Enable GeoIP lookups',
+      },
+    ),
+    render: renderValueOrNo,
+  },
 ];
 const helpLinks = [
   {
-    text: 'Use cases about alerts generation',
-    href: webDocumentationLink('getting-started/use-cases/index.html')
+    text: i18n.translate(
+      'wazuh.public.controller.management.config.alerts.gernal.gernation',
+      {
+        defaultMessage: 'Use cases about alerts generation',
+      },
+    ),
+    href: webDocumentationLink('getting-started/use-cases/index.html'),
   },
   {
-    text: 'Alerts reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/alerts.html')
-  }
+    text: i18n.translate(
+      'wazuh.public.controller.management.config.alerts.gernal.alertRef',
+      {
+        defaultMessage: 'Alerts reference',
+      },
+    ),
+    href: webDocumentationLink('user-manual/reference/ossec-conf/alerts.html'),
+  },
 ];
 
 class WzConfigurationAlertsGeneral extends Component {
@@ -59,18 +90,28 @@ class WzConfigurationAlertsGeneral extends Component {
         {currentConfig['analysis-alerts'] &&
           !isString(currentConfig['analysis-alerts']) &&
           !currentConfig['analysis-alerts'].alerts && (
-            <WzNoConfig error="not-present" help={helpLinks} />
+            <WzNoConfig error='not-present' help={helpLinks} />
           )}
         {wazuhNotReadyYet &&
           (!currentConfig || !currentConfig['analysis-alerts']) && (
-            <WzNoConfig error="Wazuh not ready yet" help={helpLinks} />
+            <WzNoConfig error='Wazuh not ready yet' help={helpLinks} />
           )}
         {currentConfig['analysis-alerts'] &&
           !isString(currentConfig['analysis-alerts']) &&
           currentConfig['analysis-alerts'].alerts && (
             <WzConfigurationSettingsTabSelector
-              title="Main settings"
-              description="General alert settings"
+              title={i18n.translate(
+                'wazuh.public.controller.management.config.alerts.gernal.mainSetiing',
+                {
+                  defaultMessage: 'Main settings',
+                },
+              )}
+              description={i18n.translate(
+                'wazuh.public.controller.management.config.alerts.gernal.alertSetting',
+                {
+                  defaultMessage: 'General alert settings',
+                },
+              )}
               currentConfig={currentConfig}
               minusHeight={320}
               helpLinks={helpLinks}
@@ -88,7 +129,7 @@ class WzConfigurationAlertsGeneral extends Component {
 
 WzConfigurationAlertsGeneral.propTypes = {
   // currentConfig: PropTypes.object.isRequired,
-  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string])
+  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
 };
 
 export default WzConfigurationAlertsGeneral;
