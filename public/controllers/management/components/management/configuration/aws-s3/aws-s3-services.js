@@ -13,21 +13,70 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 
-import WzNoConfig from "../util-components/no-config";
+import WzNoConfig from '../util-components/no-config';
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzConfigurationListSelector from '../util-components/configuration-settings-list-selector';
 import { settingsListBuilder } from '../utils/builders';
 import helpLinks from './help-links';
+import { i18n } from '@kbn/i18n';
 
 import { connect } from 'react-redux';
 
 const mainSettings = [
-  { field: 'type', label: 'Service type' },
-  { field: 'aws_profile', label: 'Profile name with read permissions' },
-  { field: 'account_alias', label: 'AWS account alias' },
-  { field: 'iam_role_arn', label: 'IAM ARN role to read bucket logs' },
-  { field: 'only_logs_after', label: 'Parse only logs from this date onwards' },
-  { field: 'regions', label: 'Limit log parsing to these regions' }
+  {
+    field: 'type',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.aws.s3.services.type',
+      {
+        defaultMessage: 'Service type',
+      },
+    ),
+  },
+  {
+    field: 'aws_profile',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.aws.s3.services.profile',
+      {
+        defaultMessage: 'Profile name with read permissions',
+      },
+    ),
+  },
+  {
+    field: 'account_alias',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.aws.s3.services.awsaccount',
+      {
+        defaultMessage: 'AWS account alias',
+      },
+    ),
+  },
+  {
+    field: 'iam_role_arn',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.aws.s3.services.buckets',
+      {
+        defaultMessage: 'IAM ARN role to read bucket logs',
+      },
+    ),
+  },
+  {
+    field: 'only_logs_after',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.aws.s3.services.onwords',
+      {
+        defaultMessage: 'Parse only logs from this date onwards',
+      },
+    ),
+  },
+  {
+    field: 'regions',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.aws.s3.services.limit',
+      {
+        defaultMessage: 'Limit log parsing to these regions',
+      },
+    ),
+  },
 ];
 
 class WzConfigurationAmazonS3Services extends Component {
@@ -43,18 +92,29 @@ class WzConfigurationAmazonS3Services extends Component {
     return (
       <Fragment>
         {currentConfig &&
-        (!wodleConfig['aws-s3'] || (wodleConfig['aws-s3'] && !wodleConfig['aws-s3'].services)) && (
-            <WzNoConfig error="not-present" help={helpLinks} />
+          (!wodleConfig['aws-s3'] ||
+            (wodleConfig['aws-s3'] && !wodleConfig['aws-s3'].services)) && (
+            <WzNoConfig error='not-present' help={helpLinks} />
           )}
         {wazuhNotReadyYet && (!currentConfig || !wodleConfig['aws-s3']) && (
-          <WzNoConfig error="Wazuh not ready yet" help={helpLinks} />
+          <WzNoConfig error='Wazuh not ready yet' help={helpLinks} />
         )}
         {currentConfig &&
           wodleConfig['aws-s3'] &&
           wodleConfig['aws-s3'].services && (
             <WzConfigurationSettingsTabSelector
-              title="Services"
-              description="Amazon services from where logs are read"
+              title={i18n.translate(
+                'wazuh.public.controller.management.config.aws.s3.services',
+                {
+                  defaultMessage: 'Services',
+                },
+              )}
+              description={i18n.translate(
+                'wazuh.public.controller.management.config.aws.s3.services.read',
+                {
+                  defaultMessage: 'Amazon services from where logs are read',
+                },
+              )}
               currentConfig={wodleConfig}
               minusHeight={320}
               helpLinks={helpLinks}
@@ -71,12 +131,12 @@ class WzConfigurationAmazonS3Services extends Component {
 }
 
 const mapStateToProps = state => ({
-  wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet
+  wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet,
 });
 
 WzConfigurationAmazonS3Services.propTypes = {
   // currentConfig: PropTypes.object.isRequired,
-  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string])
+  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
 };
 
 export default connect(mapStateToProps)(WzConfigurationAmazonS3Services);

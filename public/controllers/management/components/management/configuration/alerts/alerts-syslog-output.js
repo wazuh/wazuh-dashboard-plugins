@@ -35,11 +35,15 @@ const title1 = i18n.translate('wazuh.controller.manage.comp.confi.setting.title1
 });
 const helpLinks = [
   {
-    text: 'Configuring syslog output',
+    text: i18n.translate('wazuh.public.controller.management.config.alerts.sysLog', {
+          defaultMessage: '',
+        })'Configuring syslog output',
     href: webDocumentationLink('user-manual/manager/manual-syslog-output.html'),
   },
   {
-    text: 'Syslog output reference',
+    text: i18n.translate('wazuh.public.controller.management.config.alerts.sysLog', {
+          defaultMessage: '',
+        })'Syslog output reference',
     href: webDocumentationLink(
       'user-manual/reference/ossec-conf/syslog-output.html',
     ),
@@ -47,14 +51,30 @@ const helpLinks = [
 ];
 
 const columns = [
-  { field: 'server', name: 'Server' },
-  { field: 'port', name: 'Port' },
-  { field: 'level', name: 'Level' },
-  { field: 'format', name: 'Format', render: renderValueOrDefault('default') },
-  { field: 'use_fqdn', name: 'FQDN', render: renderValueOrNo },
-  { field: 'rule_id', name: 'Rule ID', render: renderValueOrAll },
-  { field: 'group', name: 'Group', render: renderValueOrAll },
-  { field: 'location', name: 'Location', render: renderValueOrAll },
+  { field: 'server', name: i18n.translate('wazuh.public.controller.management.config.alerts.sysLog.Server', {
+          defaultMessage: 'Server',
+        }) },
+  { field: 'port', name: i18n.translate('wazuh.public.controller.management.config.alerts.sysLog.Port', {
+          defaultMessage: 'Port',
+        }) },
+  { field: 'level', name: i18n.translate('wazuh.public.controller.management.config.alerts.sysLog.Level', {
+          defaultMessage: 'Level',
+        }) },
+  { field: 'format', name: i18n.translate('wazuh.public.controller.management.config.alerts.sysLog.Format', {
+          defaultMessage: 'Format',
+        }), render: renderValueOrDefault('default') },
+  { field: 'use_fqdn', name: i18n.translate('wazuh.public.controller.management.config.alerts.sysLog.FQDN', {
+          defaultMessage: 'FQDN',
+        }), render: renderValueOrNo },
+  { field: 'rule_id', name: i18n.translate('wazuh.public.controller.management.config.alerts.sysLog.RuleID', {
+          defaultMessage: 'Rule ID',
+        }), render: renderValueOrAll },
+  { field: 'group', name: i18n.translate('wazuh.public.controller.management.config.alerts.sysLog.Group', {
+          defaultMessage: 'Group',
+        }), render: renderValueOrAll },
+  { field: 'location', name: i18n.translate('wazuh.public.controller.management.config.alerts.sysLog.Location', {
+          defaultMessage: 'Location',
+        }), render: renderValueOrAll },
 ];
 class WzConfigurationAlertsReports extends Component {
   constructor(props) {

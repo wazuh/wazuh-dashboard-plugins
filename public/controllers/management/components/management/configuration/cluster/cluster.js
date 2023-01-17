@@ -31,17 +31,78 @@ const text2 = i18n.translate('wazuh.controller.manage.comp.cluster.text2', {
   defaultMessage: 'Wazuh cluster reference',
 });
 const mainSettings = [
-  { field: 'disabled', label: 'Cluster status' },
-  { field: 'name', label: 'Cluster name' },
-  { field: 'node_name', label: 'Node name' },
-  { field: 'node_type', label: 'Node type' },
-  { field: 'nodes', label: 'Master node IP address' },
-  { field: 'port', label: 'Port to listen to cluster communications' },
+  {
+    field: 'disabled',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.cilent.cluster.status',
+      {
+        defaultMessage: 'Cluster status',
+      },
+    ),
+  },
+  {
+    field: 'name',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.cilent.cluster.name',
+      {
+        defaultMessage: 'Cluster name',
+      },
+    ),
+  },
+  {
+    field: 'node_name',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.cilent.cluster.NodeName',
+      {
+        defaultMessage: 'Node name',
+      },
+    ),
+  },
+  {
+    field: 'node_type',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.cilent.cluster.node',
+      {
+        defaultMessage: 'Node type',
+      },
+    ),
+  },
+  {
+    field: 'nodes',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.cilent.cluster.master',
+      {
+        defaultMessage: 'Master node IP address',
+      },
+    ),
+  },
+  {
+    field: 'port',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.cilent.cluster.port',
+      {
+        defaultMessage: 'Port to listen to cluster communications',
+      },
+    ),
+  },
   {
     field: 'bind_addr',
-    label: 'IP address to listen to cluster communications',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.cilent.cluster.ip',
+      {
+        defaultMessage: 'IP address to listen to cluster communications',
+      },
+    ),
   },
-  { field: 'hidden', label: 'Hide cluster information in alerts' },
+  {
+    field: 'hidden',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.cilent.cluster.hide',
+      {
+        defaultMessage: 'Hide cluster information in alerts',
+      },
+    ),
+  },
 ];
 
 const helpLinks = [
@@ -81,7 +142,12 @@ class WzCluster extends Component {
         {currentConfig['com-cluster'] &&
           !isString(currentConfig['com-cluster']) && (
             <WzConfigurationSettingsTabSelector
-              title='Main settings'
+              title={i18n.translate(
+                'wazuh.public.controller.management.config.cilent.cluster.Mainsettings',
+                {
+                  defaultMessage: 'Main settings',
+                },
+              )}
               currentConfig={currentConfig}
               minusHeight={260}
               helpLinks={helpLinks}

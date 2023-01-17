@@ -18,19 +18,31 @@ import WzConfigurationSettingsTabSelector from '../util-components/configuration
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 
 import withWzConfig from '../util-hocs/wz-config';
-const text1 = i18n.translate('wazuh.controller.manage.comp.confi.client.text1', {
-  defaultMessage: 'Anti-flooding mechanism',
-});
-const text2 = i18n.translate('wazuh.controller.manage.comp.confi.client.text2', {
-  defaultMessage: 'Client buffer reference',
-});
-const title1 = i18n.translate('wazuh.controller.manage.comp.confi.client.title1', {
-  defaultMessage: 'Main settings',
-});
-const descp1 = i18n.translate('wazuh.controller.manage.comp.confi.client.Descp1', {
-  defaultMessage:
-    'These settings determine the event processing rate for the agent',
-});
+const text1 = i18n.translate(
+  'wazuh.controller.manage.comp.confi.client.text1',
+  {
+    defaultMessage: 'Anti-flooding mechanism',
+  },
+);
+const text2 = i18n.translate(
+  'wazuh.controller.manage.comp.confi.client.text2',
+  {
+    defaultMessage: 'Client buffer reference',
+  },
+);
+const title1 = i18n.translate(
+  'wazuh.controller.manage.comp.confi.client.title1',
+  {
+    defaultMessage: 'Main settings',
+  },
+);
+const descp1 = i18n.translate(
+  'wazuh.controller.manage.comp.confi.client.Descp1',
+  {
+    defaultMessage:
+      'These settings determine the event processing rate for the agent',
+  },
+);
 import {
   isString,
   renderValueNoThenEnabled,
@@ -54,17 +66,32 @@ const helpLinks = [
 const mainSettings = [
   {
     field: 'disabled',
-    label: 'Buffer status',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.cilent.buffer.status',
+      {
+        defaultMessage: 'Buffer status',
+      },
+    ),
     render: renderValueNoThenEnabled,
   },
   {
     field: 'queue_size',
-    label: 'Queue size',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.cilent.buffer.size',
+      {
+        defaultMessage: 'Queue size',
+      },
+    ),
     render: renderValueOrDefault('5000'),
   },
   {
     field: 'events_per_second',
-    label: 'Events per second',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.cilent.buffer.event',
+      {
+        defaultMessage: 'Events per second',
+      },
+    ),
     render: renderValueOrDefault('500'),
   },
 ];

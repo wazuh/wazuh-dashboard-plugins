@@ -12,7 +12,7 @@
 
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { i18n } from "@kbn/i18n";
+import { i18n } from '@kbn/i18n';
 import { EuiBasicTable } from '@elastic/eui';
 
 import WzNoConfig from '../util-components/no-config';
@@ -42,9 +42,33 @@ const title1 = i18n.translate(
   },
 );
 const columns = [
-  { field: 'key', name: 'Label key' },
-  { field: 'value', name: 'Label value' },
-  { field: 'hidden', name: 'Hidden' },
+  {
+    field: 'key',
+    name: i18n.translate(
+      'wazuh.public.controller.management.config.alerts.label.key',
+      {
+        defaultMessage: 'Label key',
+      },
+    ),
+  },
+  {
+    field: 'value',
+    name: i18n.translate(
+      'wazuh.public.controller.management.config.alerts.label.value',
+      {
+        defaultMessage: 'Label value',
+      },
+    ),
+  },
+  {
+    field: 'hidden',
+    name: i18n.translate(
+      'wazuh.public.controller.management.config.alerts.label.Hidden',
+      {
+        defaultMessage: 'Hidden',
+      },
+    ),
+  },
 ];
 
 const helpLinks = [

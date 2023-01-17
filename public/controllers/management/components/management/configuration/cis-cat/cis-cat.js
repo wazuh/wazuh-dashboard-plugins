@@ -11,9 +11,10 @@
  */
 
 import React, { Component, Fragment } from 'react';
+import { i18n } from '@kbn/i18n';
 
 import WzTabSelector, {
-  WzTabSelectorTab
+  WzTabSelectorTab,
 } from '../util-components/tab-selector';
 import withWzConfig from '../util-hocs/wz-config';
 import WzConfigurationCisCatGeneral from './cis-cat-general';
@@ -37,13 +38,27 @@ class WzConfigurationCisCat extends Component {
   render() {
     return (
       <WzTabSelector>
-        <WzTabSelectorTab label="General">
+        <WzTabSelectorTab
+          label={i18n.translate(
+            'wazuh.public.controller.management.config.cis.js.General',
+            {
+              defaultMessage: 'General',
+            },
+          )}
+        >
           <WzConfigurationCisCatGeneral
             {...this.props}
             wodleConfig={this.wodleConfig}
           />
         </WzTabSelectorTab>
-        <WzTabSelectorTab label="Benchmarks">
+        <WzTabSelectorTab
+          label={i18n.translate(
+            'wazuh.public.controller.management.config.cis.js.Benchmarks',
+            {
+              defaultMessage: 'Benchmarks',
+            },
+          )}
+        >
           <WzConfigurationCisCatBenchmarks
             {...this.props}
             wodleConfig={this.wodleConfig}

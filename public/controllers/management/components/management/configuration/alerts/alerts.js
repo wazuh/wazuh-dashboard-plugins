@@ -14,7 +14,7 @@ import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 
 import WzTabSelector, {
-  WzTabSelectorTab
+  WzTabSelectorTab,
 } from '../util-components/tab-selector';
 import withWzConfig from '../util-hocs/wz-config';
 import WzConfigurationAlertsGeneral from './alerts-general';
@@ -34,19 +34,54 @@ class WzConfigurationAlerts extends Component {
     return (
       <Fragment>
         <WzTabSelector>
-          <WzTabSelectorTab label="General">
+          <WzTabSelectorTab
+            label={i18n.translate(
+              'wazuh.public.controller.management.config.alerts.General',
+              {
+                defaultMessage: 'General',
+              },
+            )}
+          >
             <WzConfigurationAlertsGeneral {...this.props} />
           </WzTabSelectorTab>
-          <WzTabSelectorTab label="Labels">
+          <WzTabSelectorTab
+            label={i18n.translate(
+              'wazuh.public.controller.management.config.alerts.Labels',
+              {
+                defaultMessage: 'Labels',
+              },
+            )}
+          >
             <WzConfigurationAlertsLabels {...this.props} />
           </WzTabSelectorTab>
-          <WzTabSelectorTab label="Email alerts">
+          <WzTabSelectorTab
+            label={i18n.translate(
+              'wazuh.public.controller.management.config.alerts.email',
+              {
+                defaultMessage: 'Email alerts',
+              },
+            )}
+          >
             <WzConfigurationAlertsEmailAlerts {...this.props} />
           </WzTabSelectorTab>
-          <WzTabSelectorTab label="Reports">
+          <WzTabSelectorTab
+            label={i18n.translate(
+              'wazuh.public.controller.management.config.alerts.Reports',
+              {
+                defaultMessage: 'Reports',
+              },
+            )}
+          >
             <WzConfigurationAlertsEmailReports {...this.props} />
           </WzTabSelectorTab>
-          <WzTabSelectorTab label="Syslog output">
+          <WzTabSelectorTab
+            label={i18n.translate(
+              'wazuh.public.controller.management.config.alerts.SyslogOutput',
+              {
+                defaultMessage: 'Syslog output',
+              },
+            )}
+          >
             <WzConfigurationAlertsSyslogOutput {...this.props} />
           </WzTabSelectorTab>
         </WzTabSelector>
@@ -60,19 +95,19 @@ const sections = [
   { component: 'analysis', configuration: 'labels' },
   { component: 'mail', configuration: 'alerts' },
   { component: 'monitor', configuration: 'reports' },
-  { component: 'csyslog', configuration: 'csyslog' }
+  { component: 'csyslog', configuration: 'csyslog' },
 ];
 
 const mapStateToProps = state => ({
-  wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet
+  wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet,
 });
 
 WzConfigurationAlerts.propTypes = {
   // currentConfig: PropTypes.object.isRequired,
-  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string])
+  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
 };
 
 export default compose(
   withWzConfig(sections),
-  connect(mapStateToProps)
+  connect(mapStateToProps),
 )(WzConfigurationAlerts);
