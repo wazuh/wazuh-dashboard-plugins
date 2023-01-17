@@ -50,13 +50,50 @@ const helpLinks = [
 ];
 
 const mainSettings = [
-  { field: 'name', label: 'Command name' },
-  { field: 'executable', label: 'Name of executable file' },
-  { field: 'expect', label: 'List of expected fields' },
-  { field: 'extra_args', label: 'Extra arguments' },
+  {
+    field: 'name',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.active.response.agent.command.name',
+      {
+        defaultMessage: 'Command name',
+      },
+    ),
+  },
+  {
+    field: 'executable',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.active.response.agent.command.file',
+      {
+        defaultMessage: 'Name of executable file',
+      },
+    ),
+  },
+  {
+    field: 'expect',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.active.response.agent.command.feilds',
+      {
+        defaultMessage: 'List of expected fields',
+      },
+    ),
+  },
+  {
+    field: 'extra_args',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.active.response.agent.command.extra',
+      {
+        defaultMessage: 'Extra arguments',
+      },
+    ),
+  },
   {
     field: 'timeout_allowed',
-    label: 'Allow this command to be reverted',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.active.response.agent.command.reverted',
+      {
+        defaultMessage: 'Allow this command to be reverted',
+      },
+    ),
     render: renderValueNoThenEnabled,
   },
 ];
@@ -97,8 +134,19 @@ class WzConfigurationActiveResponseCommands extends Component {
         currentConfig['analysis-command'].command &&
         currentConfig['analysis-command'].command.length ? (
           <WzConfigurationSettingsTabSelector
-            title='Command definitions'
-            description='Find here all the currently defined commands used for Active response'
+            title={i18n.translate(
+              'wazuh.public.controller.management.config.active.response.agent.command.def',
+              {
+                defaultMessage: 'Command definitions',
+              },
+            )}
+            description={i18n.translate(
+              'wazuh.public.controller.management.config.active.response.agent.command.currently',
+              {
+                defaultMessage:
+                  'Find here all the currently defined commands used for Active response',
+              },
+            )}
             currentConfig={currentConfig['analysis-command']}
             minusHeight={320}
             helpLinks={helpLinks}

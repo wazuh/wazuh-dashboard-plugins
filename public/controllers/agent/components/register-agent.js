@@ -43,7 +43,12 @@ import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
 import { i18n } from '@kbn/i18n';
-
+const operatingSystem = i18n.translate(
+  'wazuh.controller.agent.components.register.os',
+  {
+    defaultMessage: 'Operating system.',
+  },
+);
 const architectureButtons = [
   {
     id: 'i386',
@@ -494,7 +499,7 @@ export const RegisterAgent = withErrorBoundary(
 
     checkMissingOSSelection() {
       if (!this.state.selectedOS) {
-        return ['Operating system'];
+        return [operatingSystem];
       }
       switch (this.state.selectedOS) {
         case 'rpm':
@@ -553,7 +558,12 @@ export const RegisterAgent = withErrorBoundary(
             })}
           </p>
           <EuiFieldText
-            placeholder='Server address'
+            placeholder={i18n.translate(
+              'wazuh.public.controller.agent.components.register.agent.ServerAddress',
+              {
+                defaultMessage: 'Server address',
+              },
+            )}
             value={this.state.serverAddress}
             onChange={event => this.setServerAddress(event)}
           />
@@ -610,7 +620,12 @@ export const RegisterAgent = withErrorBoundary(
 
       const passwordInput = (
         <EuiFieldText
-          placeholder='Wazuh password'
+          placeholder={i18n.translate(
+            'wazuh.public.controller.agent.components.register.agent.Wazuhpassword',
+            {
+              defaultMessage: 'Wazuh password',
+            },
+          )}
           value={this.state.wazuhPassword}
           onChange={event => this.setWazuhPassword(event)}
         />
@@ -647,7 +662,15 @@ export const RegisterAgent = withErrorBoundary(
       const language = this.getHighlightCodeLanguage(this.state.selectedOS);
       const windowsAdvice = this.state.selectedOS === 'win' && (
         <>
-          <EuiCallOut title='Requirements' iconType='iInCircle'>
+          <EuiCallOut
+            title={i18n.translate(
+              'wazuh.public.controller.agent.components.register.agent.Requirements',
+              {
+                defaultMessage: 'Requirements',
+              },
+            )}
+            iconType='iInCircle'
+          >
             <ul class='wz-callout-list'>
               <li>
                 <span>
@@ -689,7 +712,13 @@ export const RegisterAgent = withErrorBoundary(
         .gotErrorRegistrationServiceInfo ? (
         <EuiCallOut
           color='danger'
-          title='This section could not be displayed because you do not have permission to get access to the registration service.'
+          title={i18n.translate(
+            'wazuh.public.controller.agent.components.register.agent.sectionNotDis',
+            {
+              defaultMessage:
+                'This section could not be displayed because you do not have permission to get access to the registration service.',
+            },
+          )}
           iconType='iInCircle'
         />
       ) : null;
@@ -699,7 +728,13 @@ export const RegisterAgent = withErrorBoundary(
           {this.state.gotErrorRegistrationServiceInfo ? (
             <EuiCallOut
               color='danger'
-              title='This section could not be displayed because you do not have permission to get access to the registration service.'
+              title={i18n.translate(
+                'wazuh.public.controller.agent.components.register.agent.sectionNot',
+                {
+                  defaultMessage:
+                    'This section could not be displayed because you do not have permission to get access to the registration service.',
+                },
+              )}
               iconType='iInCircle'
             />
           ) : (
@@ -752,7 +787,12 @@ export const RegisterAgent = withErrorBoundary(
                 </div>
                 {this.state.needsPassword && (
                   <EuiSwitch
-                    label='Show password'
+                    label={i18n.translate(
+                      'wazuh.public.controller.agent.components.register.agent.Showpassword',
+                      {
+                        defaultMessage: 'Show password',
+                      },
+                    )}
                     checked={this.state.showPassword}
                     onChange={active => this.setShowPassword(active)}
                   />
@@ -767,7 +807,12 @@ export const RegisterAgent = withErrorBoundary(
       const tabs = [
         {
           id: 'systemd',
-          name: 'Systemd',
+          name: i18n.translate(
+            'wazuh.public.controller.agent.components.register.agent.Systemd',
+            {
+              defaultMessage: 'Systemd',
+            },
+          ),
           content: (
             <Fragment>
               <EuiSpacer />
@@ -800,7 +845,12 @@ export const RegisterAgent = withErrorBoundary(
         },
         {
           id: 'sysV',
-          name: 'SysV Init',
+          name: i18n.translate(
+            'wazuh.public.controller.agent.components.register.agent.SysVInit',
+            {
+              defaultMessage: 'SysV Init',
+            },
+          ),
           content: (
             <Fragment>
               <EuiSpacer />

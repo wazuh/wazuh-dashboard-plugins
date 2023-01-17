@@ -55,20 +55,40 @@ const helpLinks = [
 const mainSettings = [
   {
     field: 'disabled',
-    label: 'Active response status',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.active.response.agent.responseActive',
+      {
+        defaultMessage: 'Active response status',
+      },
+    ),
     render: renderValueNoThenEnabled,
   },
   {
     field: 'repeated_offenders',
-    label: 'List of timeouts (in minutes) for repeated offenders',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.active.response.agent.timeOuts',
+      {
+        defaultMessage: 'List of timeouts (in minutes) for repeated offenders',
+      },
+    ),
   },
   {
     field: 'ca_store',
-    label: 'Use the following list of root CA certificates',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.active.response.agent.listRoot',
+      {
+        defaultMessage: 'Use the following list of root CA certificates',
+      },
+    ),
   },
   {
     field: 'ca_verification',
-    label: 'Validate WPKs using root CA certificate',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.active.response.agent.rootCA',
+      {
+        defaultMessage: 'Validate WPKs using root CA certificate',
+      },
+    ),
   },
 ];
 
@@ -100,8 +120,19 @@ class WzConfigurationActiveResponseAgent extends Component {
           !isString(currentConfig['com-active-response']) &&
           currentConfig['com-active-response']['active-response'] && (
             <WzConfigurationSettingsTabSelector
-              title='Active response settings'
-              description='Find here all the Active response settings for this agent'
+              title={i18n.translate(
+                'wazuh.public.controller.management.config.active.response.agent.activeSetting',
+                {
+                  defaultMessage: 'Active response settings',
+                },
+              )}
+              description={i18n.translate(
+                'wazuh.public.controller.management.config.active.response.agent.setting',
+                {
+                  defaultMessage:
+                    'Find here all the Active response settings for this agent',
+                },
+              )}
               currentConfig={currentConfig}
               minusHeight={this.props.agent.id === '000' ? 280 : 355}
               helpLinks={helpLinks}
