@@ -372,8 +372,18 @@ export class EnableModulesWrapper extends Component {
             )}
             {extension.default && (
               <EuiBetaBadge
-                label='Default'
-                tooltipContent='This module is enabled by default'
+                label={i18n.translate(
+                  'wazuh.public.components.setting..modules.wrapper.',
+                  {
+                    defaultMessage: 'Default',
+                  },
+                )}
+                tooltipContent={i18n.translate(
+                  'wazuh.public.components.setting..modules.wrapper.defaultModule',
+                  {
+                    defaultMessage: 'This module is enabled by default',
+                  },
+                )}
                 style={{ margin: '6px 0px' }}
               />
             )}

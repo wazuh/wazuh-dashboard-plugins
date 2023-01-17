@@ -15,8 +15,39 @@ import { WzAPIUtils } from '../../../../react-services/wz-api-utils';
 import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
+import { i18n } from '@kbn/i18n';
 
-export const UsersTable = ({ users, editUserFlyover, rolesLoading, roles, onSave }) => {
+const wantDelete = i18n.translate(
+  'wazuh.public.components.security.user.table.wantDelete',
+  {
+    defaultMessage: 'Do you want to delete',
+  },
+);
+const user = i18n.translate(
+  'wazuh.public.components.security.user.table.user',
+  {
+    defaultMessage: 'user?',
+  },
+);
+const resDel = i18n.translate(
+  'wazuh.public.components.security.user.table.resDel',
+  {
+    defaultMessage: "Reserved users can't be deleted",
+  },
+);
+const delUser = i18n.translate(
+  'wazuh.public.components.security.user.table.delUser',
+  {
+    defaultMessage: 'Delete user',
+  },
+);
+export const UsersTable = ({
+  users,
+  editUserFlyover,
+  rolesLoading,
+  roles,
+  onSave,
+}) => {
   const getRowProps = item => {
     const { id } = item;
     return {
@@ -25,7 +56,7 @@ export const UsersTable = ({ users, editUserFlyover, rolesLoading, roles, onSave
     };
   };
 
-  const onConfirmDeleteUser = (item) => {
+  const onConfirmDeleteUser = item => {
     return async () => {
       try {
         await UsersServices.DeleteUsers([item.id]);
@@ -51,34 +82,46 @@ export const UsersTable = ({ users, editUserFlyover, rolesLoading, roles, onSave
   const columns: EuiBasicTableColumn<any>[] = [
     {
       field: 'username',
-      name: 'User',
+      name: i18n.translate('wazuh.public.components.security.user.table.User', {
+        defaultMessage: 'User',
+      }),
       sortable: true,
       truncateText: true,
     },
     {
       field: 'allow_run_as',
-      name: 'Allow run as ',
+      name: i18n.translate(
+        'wazuh.public.components.security.user.table.allowRun',
+        {
+          defaultMessage: 'Allow run as',
+        },
+      ),
       sortable: true,
       truncateText: true,
     },
     {
       field: 'roles',
-      name: 'Roles',
+      name: i18n.translate(
+        'wazuh.public.components.security.user.table.Roles',
+        {
+          defaultMessage: 'Roles',
+        },
+      ),
       dataType: 'boolean',
       render: userRoles => {
         if (rolesLoading) {
-          return <EuiLoadingSpinner size="m" />;
+          return <EuiLoadingSpinner size='m' />;
         }
         if (!userRoles || !userRoles.length) return <></>;
         const tmpRoles = userRoles.map((userRole, idx) => {
           return (
             <EuiFlexItem grow={false} key={idx}>
-              <EuiBadge color="secondary">{roles[userRole]}</EuiBadge>
+              <EuiBadge color='secondary'>{roles[userRole]}</EuiBadge>
             </EuiFlexItem>
           );
         });
         return (
-          <EuiFlexGroup wrap responsive={false} gutterSize="xs">
+          <EuiFlexGroup wrap responsive={false} gutterSize='xs'>
             {tmpRoles}
           </EuiFlexGroup>
         );
@@ -88,24 +131,44 @@ export const UsersTable = ({ users, editUserFlyover, rolesLoading, roles, onSave
     {
       align: 'right',
       width: '5%',
-      name: 'Actions',
+      name: i18n.translate(
+        'wazuh.public.components.security.user.table.Actions',
+        {
+          defaultMessage: 'Actions',
+        },
+      ),
       render: item => (
         <div onClick={ev => ev.stopPropagation()}>
           <WzButtonModalConfirm
-            buttonType="icon"
+            buttonType='icon'
             tooltip={{
-              content: WzAPIUtils.isReservedID(item.id) ? "Reserved users can't be deleted" : 'Delete user',
+              content: WzAPIUtils.isReservedID(item.id) ? resDel : delUser,
               position: 'left',
             }}
             isDisabled={WzAPIUtils.isReservedID(item.id)}
-            modalTitle={`Do you want to delete ${item.username} user?`}
+            modalTitle={`${wantDelete} ${item.username} ${user}`}
             onConfirm={onConfirmDeleteUser(item)}
             modalProps={{ buttonColor: 'danger' }}
-            iconType="trash"
-            color="danger"
-            aria-label="Delete user"
-            modalCancelText="Cancel"
-            modalConfirmText="Confirm"
+            iconType='trash'
+            color='danger'
+            aria-label={i18n.translate(
+              'wazuh.public.components.security.user.table.Deleteuser',
+              {
+                defaultMessage: 'Delete user',
+              },
+            )}
+            modalCancelText={i18n.translate(
+              'wazuh.public.components.security.user.table.Cancel',
+              {
+                defaultMessage: 'Cancel',
+              },
+            )}
+            modalConfirmText={i18n.translate(
+              'wazuh.public.components.security.user.table.Confirm',
+              {
+                defaultMessage: 'Confirm',
+              },
+            )}
           />
         </div>
       ),

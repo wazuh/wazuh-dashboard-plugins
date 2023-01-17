@@ -16,6 +16,7 @@ import {
   EuiConfirmModal,
   EuiPanel,
 } from '@elastic/eui';
+import { i18n } from '@kbn/i18n';
 
 import { useApiService } from '../../../common/hooks/useApiService';
 import { Role } from '../../roles/types/role.type';
@@ -31,16 +32,43 @@ import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
 import { WzFlyout } from '../../../common/flyouts';
-
+const password1 = i18n.translate(
+  'wazuh.public.components.security.user.editUser.password1',
+  {
+    defaultMessage: 'password',
+  },
+);
+const confirmPassword1 = i18n.translate(
+  'wazuh.public.components.security.user.editUser.confirmPassword1',
+  {
+    defaultMessage: 'confirmPassword',
+  },
+);
+const passwordMatch = i18n.translate(
+  'wazuh.public.components.security.user.editUser.passwordMatch',
+  {
+    defaultMessage: "Passwords don't match.",
+  },
+);
+const passwordValid = i18n.translate(
+  'wazuh.public.components.security.user.editUser.passwordValid',
+  {
+    defaultMessage:
+      'The password must contain a length between 8 and 64 characters, and must contain at least one upper and lower case letter, a number and a symbol.',
+  },
+);
 export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
   const userRolesFormatted =
     currentUser.roles && currentUser.roles.length
-      ? currentUser.roles.map((item) => ({ label: rolesObject[item], id: item }))
+      ? currentUser.roles.map(item => ({ label: rolesObject[item], id: item }))
       : [];
   const [selectedRoles, setSelectedRole] = useState(userRolesFormatted);
-  const [rolesLoading, roles, rolesError] = useApiService<Role[]>(RolesServices.GetRoles, {});
+  const [rolesLoading, roles, rolesError] = useApiService<Role[]>(
+    RolesServices.GetRoles,
+    {},
+  );
   const rolesOptions: any = roles
-    ? roles.map((item) => {
+    ? roles.map(item => {
         return { label: item.name, id: item.id };
       })
     : [];
@@ -50,7 +78,9 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [initialPassword] = useState('');
   const [hasChanges, setHasChanges] = useState(false);
-  const [allowRunAs, setAllowRunAs] = useState<boolean>(currentUser.allow_run_as);
+  const [allowRunAs, setAllowRunAs] = useState<boolean>(
+    currentUser.allow_run_as,
+  );
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [formErrors, setFormErrors] = useState<any>({
     password: '',
@@ -61,21 +91,21 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
   const passwordRef = useRef(false);
   useDebouncedEffect(
     () => {
-      if (passwordRef.current) validateFields(['password', 'confirmPassword']);
+      if (passwordRef.current) validateFields([password1, confirmPassword1]);
       else passwordRef.current = true;
     },
     300,
-    [password]
+    [password],
   );
 
   const confirmPasswordRef = useRef(false);
   useDebouncedEffect(
     () => {
-      if (confirmPasswordRef.current) validateFields(['confirmPassword']);
+      if (confirmPasswordRef.current) validateFields([confirmPassword1]);
       else confirmPasswordRef.current = true;
     },
     300,
-    [confirmPassword]
+    [confirmPassword],
   );
 
   useDebouncedEffect(
@@ -84,12 +114,12 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
         isValidForm(false) &&
         (allowRunAs !== currentUser.allow_run_as ||
           password !== '' ||
-          Object.values(getRolesDiff()).some((i) => i.length));
+          Object.values(getRolesDiff()).some(i => i.length));
 
       setShowApply(_showApply);
     },
     300,
-    [password, confirmPassword, allowRunAs, selectedRoles]
+    [password, confirmPassword, allowRunAs, selectedRoles],
   );
 
   const validations = {
@@ -97,18 +127,22 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
       {
         fn: () =>
           password !== '' &&
-          !password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,64}$/)
-            ? 'The password must contain a length between 8 and 64 characters, and must contain at least one upper and lower case letter, a number and a symbol.'
+          !password.match(
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,64}$/,
+          )
+            ? passwordValid
             : '',
       },
     ],
-    confirmPassword: [{ fn: () => (confirmPassword !== password ? `Passwords don't match.` : '') }],
+    confirmPassword: [
+      { fn: () => (confirmPassword !== password ? passwordMatch : '') },
+    ],
   };
 
   const validateFields = (fields, showErrors = true) => {
     const _formErrors = { ...formErrors };
     let isValid = true;
-    fields.forEach((field) => {
+    fields.forEach(field => {
       const error = validations[field].reduce((currentError, validation) => {
         return !!currentError ? currentError : validation.fn();
       }, '');
@@ -136,7 +170,9 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
     const allowRunAsData: boolean = allowRunAs;
 
     if (allowRunAsData != currentUser.allow_run_as)
-      userPromises.push(UsersServices.UpdateAllowRunAs(currentUser.id, allowRunAsData));
+      userPromises.push(
+        UsersServices.UpdateAllowRunAs(currentUser.id, allowRunAsData),
+      );
 
     if (password) {
       userData.password = password;
@@ -167,32 +203,37 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
   };
 
   const getRolesDiff = () => {
-    const formattedRoles = selectedRoles.map((item) => item.id);
-    const _userRolesFormatted = userRolesFormatted.map((role) => role.id);
-    const toAdd = formattedRoles.filter((value) => !_userRolesFormatted.includes(value));
-    const toRemove = _userRolesFormatted.filter((value) => !formattedRoles.includes(value));
+    const formattedRoles = selectedRoles.map(item => item.id);
+    const _userRolesFormatted = userRolesFormatted.map(role => role.id);
+    const toAdd = formattedRoles.filter(
+      value => !_userRolesFormatted.includes(value),
+    );
+    const toRemove = _userRolesFormatted.filter(
+      value => !formattedRoles.includes(value),
+    );
     return { toAdd, toRemove };
   };
 
   const updateRoles = async () => {
     const { toAdd, toRemove } = getRolesDiff();
     if (toAdd.length) await UsersServices.AddUserRoles(currentUser.id, toAdd);
-    if (toRemove.length) await UsersServices.RemoveUserRoles(currentUser.id, toRemove);
+    if (toRemove.length)
+      await UsersServices.RemoveUserRoles(currentUser.id, toRemove);
   };
 
-  const onChangeRoles = (selectedRoles) => {
+  const onChangeRoles = selectedRoles => {
     setSelectedRole(selectedRoles);
   };
 
-  const onChangePassword = (e) => {
+  const onChangePassword = e => {
     setPassword(e.target.value);
   };
 
-  const onChangeConfirmPassword = (e) => {
+  const onChangeConfirmPassword = e => {
     setConfirmPassword(e.target.value);
   };
 
-  const onChangeAllowRunAs = (e) => {
+  const onChangeAllowRunAs = e => {
     setAllowRunAs(e.target.checked);
   };
 
@@ -201,7 +242,12 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
     modal = (
       <EuiOverlayMask>
         <EuiConfirmModal
-          title="Unsubmitted changes"
+          title={i18n.translate(
+            'wazuh.public.components.security.user.editUser.UnsubmittedChanges',
+            {
+              defaultMessage: 'Unsubmitted changes',
+            },
+          )}
           onConfirm={() => {
             setIsModalVisible(false);
             closeFlyout(false);
@@ -209,10 +255,16 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
           }}
           onCancel={() => setIsModalVisible(false)}
           cancelButtonText="No, don't do it"
-          confirmButtonText="Yes, do it"
+          confirmButtonText='Yes, do it'
         >
           <p style={{ textAlign: 'center' }}>
-            There are unsaved changes. Are you sure you want to proceed?
+            {i18n.translate(
+              'wazuh.public.components.security.user.editUser.unsavedChange',
+              {
+                defaultMessage:
+                  'There are unsaved changes. Are you sure you want to proceed?',
+              },
+            )}
           </p>
         </EuiConfirmModal>
       </EuiOverlayMask>
@@ -221,8 +273,10 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
 
   useEffect(() => {
     if (
-      initialPassword != password || initialPassword != confirmPassword ||
-      !_.isEqual(userRolesFormatted, selectedRoles) || allowRunAs != currentUser.allow_run_as
+      initialPassword != password ||
+      initialPassword != confirmPassword ||
+      !_.isEqual(userRolesFormatted, selectedRoles) ||
+      allowRunAs != currentUser.allow_run_as
     ) {
       setHasChanges(true);
     } else {
@@ -238,65 +292,127 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
     <>
       <WzFlyout flyoutProps={{ className: 'wzApp' }} onClose={onClose}>
         <EuiFlyoutHeader hasBorder={false}>
-          <EuiTitle size="m">
+          <EuiTitle size='m'>
             <h2>
-              Edit {currentUser.username} user &nbsp; &nbsp;
+              {i18n.translate(
+                'wazuh.public.components.security.user.editUser.Edit',
+                {
+                  defaultMessage: 'Edit',
+                },
+              )}
+              {currentUser.username} user &nbsp; &nbsp;
               {WzAPIUtils.isReservedID(currentUser.id) && (
-                <EuiBadge color="primary">Reserved</EuiBadge>
+                <EuiBadge color='primary'>
+                  {i18n.translate(
+                    'wazuh.public.components.security.user.editUser.Reserved',
+                    {
+                      defaultMessage: 'Reserved',
+                    },
+                  )}
+                </EuiBadge>
               )}
             </h2>
           </EuiTitle>
         </EuiFlyoutHeader>
         <EuiFlyoutBody>
-          <EuiForm component="form" style={{ padding: 24 }}>
+          <EuiForm component='form' style={{ padding: 24 }}>
             <EuiPanel>
-              <EuiTitle size="s">
-                <h2>Run as</h2>
+              <EuiTitle size='s'>
+                <h2>
+                  {i18n.translate(
+                    'wazuh.public.components.security.user.editUser.Runas',
+                    {
+                      defaultMessage: 'Run as',
+                    },
+                  )}
+                </h2>
               </EuiTitle>
-              <EuiFormRow label="" helpText="Set if the user is able to use run as">
+              <EuiFormRow
+                label=''
+                helpText={i18n.translate(
+                  'wazuh.public.components.security.user.editUser.setUser',
+                  {
+                    defaultMessage: 'Set if the user is able to use run as',
+                  },
+                )}
+              >
                 <WzButtonPermissions
-                  buttonType="switch"
-                  label="Allow run as"
+                  buttonType='switch'
+                  label={i18n.translate(
+                    'wazuh.public.components.security.user.editUser.allow',
+                    {
+                      defaultMessage: 'Allow run as',
+                    },
+                  )}
                   showLabel={true}
                   checked={allowRunAs}
-                  permissions={[{ action: 'security:edit_run_as', resource: '*:*:*' }]}
-                  onChange={(e) => onChangeAllowRunAs(e)}
-                  aria-label=""
+                  permissions={[
+                    { action: 'security:edit_run_as', resource: '*:*:*' },
+                  ]}
+                  onChange={e => onChangeAllowRunAs(e)}
+                  aria-label=''
                   disabled={WzAPIUtils.isReservedID(currentUser.id)}
                 />
               </EuiFormRow>
             </EuiPanel>
             <EuiSpacer />
             <EuiPanel>
-              <EuiTitle size="s">
-                <h2>Password</h2>
+              <EuiTitle size='s'>
+                <h2>
+                  {i18n.translate(
+                    'wazuh.public.components.security.user.editUser.Password1',
+                    {
+                      defaultMessage: 'Password',
+                    },
+                  )}
+                </h2>
               </EuiTitle>
               <EuiFormRow
-                label=""
+                label=''
                 isInvalid={!!formErrors.password}
                 error={formErrors.password}
-                helpText="Introduce a new password for the user."
+                helpText={i18n.translate(
+                  'wazuh.public.components.security.user.editUser.userPassword',
+                  {
+                    defaultMessage: 'Introduce a new password for the user.',
+                  },
+                )}
               >
                 <EuiFieldPassword
-                  placeholder="Password"
+                  placeholder={i18n.translate(
+                    'wazuh.public.components.security.user.editUser.Password',
+                    {
+                      defaultMessage: 'Password',
+                    },
+                  )}
                   value={password}
-                  onChange={(e) => onChangePassword(e)}
-                  aria-label=""
+                  onChange={e => onChangePassword(e)}
+                  aria-label=''
                   isInvalid={!!formErrors.password}
                   disabled={WzAPIUtils.isReservedID(currentUser.id)}
                 />
               </EuiFormRow>
               <EuiFormRow
-                label=""
+                label=''
                 isInvalid={!!formErrors.confirmPassword}
                 error={formErrors.confirmPassword}
-                helpText="Confirm the new password."
+                helpText={i18n.translate(
+                  'wazuh.public.components.security.user.editUser.confirmPassword',
+                  {
+                    defaultMessage: 'Confirm the new password.',
+                  },
+                )}
               >
                 <EuiFieldPassword
-                  placeholder="Confirm Password"
+                  placeholder={i18n.translate(
+                    'wazuh.public.components.security.user.editUser.ConfirmPassword',
+                    {
+                      defaultMessage: 'Confirm Password',
+                    },
+                  )}
                   value={confirmPassword}
-                  onChange={(e) => onChangeConfirmPassword(e)}
-                  aria-label=""
+                  onChange={e => onChangeConfirmPassword(e)}
+                  aria-label=''
                   isInvalid={!!formErrors.confirmPassword}
                   disabled={WzAPIUtils.isReservedID(currentUser.id)}
                 />
@@ -304,18 +420,38 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
             </EuiPanel>
             <EuiSpacer />
             <EuiPanel>
-              <EuiTitle size="s">
-                <h2>Roles</h2>
+              <EuiTitle size='s'>
+                <h2>
+                  {i18n.translate(
+                    'wazuh.public.components.security.user.editUser.Roles',
+                    {
+                      defaultMessage: 'Roles',
+                    },
+                  )}
+                </h2>
               </EuiTitle>
-              <EuiFormRow label="" helpText="Assign roles to the selected user">
+              <EuiFormRow
+                label=''
+                helpText={i18n.translate(
+                  'wazuh.public.components.security.user.editUser.assign',
+                  {
+                    defaultMessage: 'Assign roles to the selected user',
+                  },
+                )}
+              >
                 <EuiComboBox
-                  placeholder="Select roles"
+                  placeholder={i18n.translate(
+                    'wazuh.public.components.security.user.editUser.Select roles',
+                    {
+                      defaultMessage: 'Selectroles',
+                    },
+                  )}
                   options={rolesOptions}
                   selectedOptions={selectedRoles}
                   isLoading={rolesLoading || isLoading}
                   onChange={onChangeRoles}
                   isClearable={true}
-                  data-test-subj="demoComboBox"
+                  data-test-subj='demoComboBox'
                   isDisabled={WzAPIUtils.isReservedID(currentUser.id)}
                 />
               </EuiFormRow>
@@ -327,10 +463,17 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
                 <EuiButton
                   fill
                   isLoading={isLoading}
-                  isDisabled={WzAPIUtils.isReservedID(currentUser.id) || !showApply}
+                  isDisabled={
+                    WzAPIUtils.isReservedID(currentUser.id) || !showApply
+                  }
                   onClick={editUser}
                 >
-                  Apply
+                  {i18n.translate(
+                    'wazuh.public.components.security.user.editUser.Apply',
+                    {
+                      defaultMessage: 'Apply',
+                    },
+                  )}
                 </EuiButton>
               </EuiFlexItem>
             </EuiFlexGroup>

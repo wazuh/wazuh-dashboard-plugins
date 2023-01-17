@@ -80,7 +80,15 @@ export class MainModuleAgent extends Component {
     if (this.props.section === 'welcome') {
       breadcrumb = [
         { text: '' },
-        { text: 'Agents', href: '#/agents-preview' },
+        {
+          text: i18n.translate(
+            'wazuh.public.components.common.modules.mainAgents.agent',
+            {
+              defaultMessage: 'Agents',
+            },
+          ),
+          href: '#/agents-preview',
+        },
         { text: this.props.agent.id },
       ];
     } else {

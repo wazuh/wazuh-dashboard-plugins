@@ -17,6 +17,7 @@ import { withErrorBoundary } from '../common/hocs';
 import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
+import { i18n } from '@kbn/i18n';
 
 export const WzFilterBar = withErrorBoundary(
   class WzFilterBar extends Component {
@@ -32,11 +33,15 @@ export const WzFilterBar = withErrorBoundary(
       this.toggleButtons = [
         {
           id: 'AND',
-          label: 'AND',
+          label: i18n.translate('wazuh.public.components.wz.filter.bar.AND', {
+            defaultMessage: 'AND',
+          }),
         },
         {
           id: 'OR',
-          label: 'OR',
+          label: i18n.translate('wazuh.public.components.wz.filter.bar.OR', {
+            defaultMessage: 'OR',
+          }),
         },
       ];
       this.refComboBox = React.createRef();
@@ -46,7 +51,8 @@ export const WzFilterBar = withErrorBoundary(
       ev.preventDefault();
       const selectedOptions = this.state.selectedOptions;
       if (selectedOptions[option].type === 'search') return;
-      selectedOptions[option].type = selectedOptions[option].type === 'AND' ? 'OR' : 'AND';
+      selectedOptions[option].type =
+        selectedOptions[option].type === 'AND' ? 'OR' : 'AND';
       this.setState({
         isProcessing: true,
         selectedOptions,
@@ -54,7 +60,10 @@ export const WzFilterBar = withErrorBoundary(
     };
 
     componentDidUpdate(prevProps) {
-      if (JSON.stringify(this.state.selectedOptions) !== JSON.stringify(this.props.selectedOptions))
+      if (
+        JSON.stringify(this.state.selectedOptions) !==
+        JSON.stringify(this.props.selectedOptions)
+      )
         this.setState({
           isProcessing: true,
           selectedOptions: this.props.selectedOptions,
@@ -95,14 +104,16 @@ export const WzFilterBar = withErrorBoundary(
             if (i != 0) {
               if (selectedOptions.type != 'search') {
                 const button = $(
-                  `<button class="wzFilterBarOperatorBtn euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--xSmall"><b>${selectedOptions.type}<b></button>`
+                  `<button class="wzFilterBarOperatorBtn euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--xSmall"><b>${selectedOptions.type}<b></button>`,
                 );
-                button[0].addEventListener('click', (ev) => {
+                button[0].addEventListener('click', ev => {
                   this.onOperatorClick(ev, i);
                 });
                 $(el).prepend(button);
               } else {
-                const button = $(`<span class="wzFilterBarOperatorBtn"><b>AND<b></button>`);
+                const button = $(
+                  `<span class="wzFilterBarOperatorBtn"><b>AND<b></button>`,
+                );
                 $(el).prepend(button);
               }
             }
@@ -116,7 +127,9 @@ export const WzFilterBar = withErrorBoundary(
 
     checkIfExistsOrIsSearch(selectedOptions, last) {
       const { group, label, type } = selectedOptions[last];
-      const lastOption = `${group.trim().toLowerCase()}:${label.trim().toLowerCase()}`;
+      const lastOption = `${group.trim().toLowerCase()}:${label
+        .trim()
+        .toLowerCase()}`;
 
       for (const option of selectedOptions) {
         const isSelected = option.label.trim().toLowerCase() === lastOption;
@@ -140,7 +153,7 @@ export const WzFilterBar = withErrorBoundary(
     }
 
     decodeFilters(options, selectedOptions) {
-      const labels = selectedOptions.map((item) => {
+      const labels = selectedOptions.map(item => {
         return item.label_;
       });
       for (const groups of options) {
@@ -157,26 +170,28 @@ export const WzFilterBar = withErrorBoundary(
 
     clearSeletedOptions(options, selectedOptions) {
       selectedOptions
-        .filter((x) => {
+        .filter(x => {
           return x.type != 'search';
         })
-        .forEach((x) => {
-          const group = options.findIndex((m) => {
+        .forEach(x => {
+          const group = options.findIndex(m => {
             const g1 = x.group.toLowerCase();
             const g2 = ((m.options[0] || []).group || '').toLowerCase();
             return g1 === g2;
           });
           if (group != undefined && group != -1) {
-            const idx = options[group].options.findIndex((l) => {
-              return l.label.trim().toLowerCase() === x.label_.trim().toLowerCase();
+            const idx = options[group].options.findIndex(l => {
+              return (
+                l.label.trim().toLowerCase() === x.label_.trim().toLowerCase()
+              );
             });
             if (idx !== -1) options[group].options.splice(idx, 1);
           }
         });
     }
 
-    onChange = (selectedOptions) => {
-      const last = selectedOptions.findIndex((x) => {
+    onChange = selectedOptions => {
+      const last = selectedOptions.findIndex(x => {
         return !x.type;
       });
 
@@ -199,7 +214,7 @@ export const WzFilterBar = withErrorBoundary(
       });
     };
 
-    onCreateOption = (searchValue) => {
+    onCreateOption = searchValue => {
       if (!searchValue) {
         return;
       }
@@ -227,14 +242,14 @@ export const WzFilterBar = withErrorBoundary(
 
       // Select the option.
       this.setState(
-        (prevState) => ({
+        prevState => ({
           selectedOptions: prevState.selectedOptions.concat(newOption),
         }),
         () => {
           if (searchValue.includes(':')) {
             this.onChange(this.state.selectedOptions);
           }
-        }
+        },
       );
       this.setState({ isProcessing: true });
     };
@@ -246,10 +261,10 @@ export const WzFilterBar = withErrorBoundary(
           query: '',
           search: '',
         };
-        const queryElements = selectedOptions.filter((x) => {
+        const queryElements = selectedOptions.filter(x => {
           return x.type !== 'search';
         });
-        const searchElement = selectedOptions.filter((x) => {
+        const searchElement = selectedOptions.filter(x => {
           return x.type === 'search';
         });
         if (searchElement.length) {
@@ -263,7 +278,9 @@ export const WzFilterBar = withErrorBoundary(
           if (idx != 0) {
             queryObj.query += option.type === 'AND' ? ';' : ',';
           }
-          queryObj.query += option.query ? option.query : option.label.replace(':', '=');
+          queryObj.query += option.query
+            ? option.query
+            : option.label.replace(':', '=');
         });
         if (twoOrMoreElements) {
           queryObj.query += ')';
@@ -292,8 +309,13 @@ export const WzFilterBar = withErrorBoundary(
       const { options, selectedOptions } = this.state;
       return (
         <EuiComboBox
-          className="wz-search-bar"
-          placeholder="Add filter or search"
+          className='wz-search-bar'
+          placeholder={i18n.translate(
+            'wazuh.public.components.wz.filter.bar.place',
+            {
+              defaultMessage: 'Add filter or search',
+            },
+          )}
           options={options}
           selectedOptions={selectedOptions}
           onChange={this.onChange}
@@ -303,7 +325,7 @@ export const WzFilterBar = withErrorBoundary(
         />
       );
     }
-  }
+  },
 );
 
 WzFilterBar.propTypes = {

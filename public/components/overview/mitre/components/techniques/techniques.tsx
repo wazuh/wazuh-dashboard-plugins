@@ -662,11 +662,22 @@ export const Techniques = withWindowSize(
 
           <WzFieldSearchDelay
             fullWidth={true}
-            placeholder='Filter techniques of selected tactic/s'
+            placeholder={i18n.translate(
+              'wazuh.public.components.overview.mitre.tech.placeholder',
+              {
+                defaultMessage: 'Filter techniques of selected tactic/s',
+              },
+            )}
             onChange={this.onChange}
             onSearch={this.onSearch}
             isClearable={true}
-            aria-label='Use aria labels when no actual label is in use'
+            aria-label={i18n.translate(
+              'wazuh.public.components.overview.mitre.tech.label',
+              {
+                defaultMessage:
+                  'Use aria labels when no actual label is in use',
+              },
+            )}
           />
           <EuiSpacer size='s' />
 

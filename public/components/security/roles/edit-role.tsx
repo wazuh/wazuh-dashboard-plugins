@@ -148,14 +148,20 @@ export const EditRole = ({ role, closeFlyout }) => {
     modal = (
       <EuiOverlayMask>
         <EuiConfirmModal
-          title="Unsubmitted changes"
+          title={i18n.translate('wazuh.public.components.security.roles.edit.unsubmittedChanges', {
+              defaultMessage: 'Unsubmitted changes',
+            })}
           onConfirm={() => {
             setIsModalVisible(false);
             closeFlyout(false);
           }}
           onCancel={() => setIsModalVisible(false)}
-          cancelButtonText="No, don't do it"
-          confirmButtonText="Yes, do it"
+          cancelButtonText={i18n.translate('wazuh.public.components.security.roles.edit.no', {
+              defaultMessage: 'No, don't do it',
+            })}
+          confirmButtonText={i18n.translate('wazuh.public.components.security.roles.edit.yes', {
+              defaultMessage: 'Yes, do it',
+            })}
         >
           <p style={{ textAlign: 'center' }}>
             {
@@ -200,7 +206,9 @@ export const EditRole = ({ role, closeFlyout }) => {
             <EuiFlexGroup>
               <EuiFlexItem grow={true}>
                 <EuiFormRow
-                  label="Policies"
+                  label={i18n.translate('wazuh.public.components.security.roles.edit.Policies1', {
+              defaultMessage: 'Policies',
+            })}
                   isInvalid={selectedPoliciesError}
                   error={ Descp1}
                   helpText={Descp2}

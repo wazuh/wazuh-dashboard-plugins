@@ -113,6 +113,18 @@ const Title4 = i18n.translate(
     defaultMessage: 'Version',
   },
 );
+const details = i18n.translate(
+  'wazuh.public.components.overview.mitre.techninques.details',
+  {
+    defaultMessage: 'details in the Intelligence section',
+  },
+);
+const open1 = i18n.translate(
+  'wazuh.public.components.overview.mitre.techninques.open',
+  {
+    defaultMessage: 'Open',
+  },
+);
 export class FlyoutTechnique extends Component {
   _isMount = false;
   clusterFilter: object;
@@ -301,7 +313,7 @@ export class FlyoutTechnique extends Component {
         description: (
           <EuiToolTip
             position='top'
-            content={`Open ${currentTechnique} details in the Intelligence section`}
+            content={`${open1} ${currentTechnique} ${details}`}
           >
             <EuiLink
               onClick={e => {
@@ -327,7 +339,7 @@ export class FlyoutTechnique extends Component {
                 <>
                   <EuiToolTip
                     position='top'
-                    content={`Open ${tactic.name} details in the Intelligence section`}
+                    content={`${open1} ${tactic.name} ${details}`}
                   >
                     <EuiLink
                       onClick={e => {

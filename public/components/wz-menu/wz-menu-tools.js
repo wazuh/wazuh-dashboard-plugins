@@ -78,7 +78,9 @@ class WzMenuTools extends Component {
     const renderSettings = this.avaibleRenderSettings();
     const sideNavAdmin = [
       {
-        name: 'Tools',
+        name: i18n.translate('wazuh.public.components.wz.menu.tools', {
+          defaultMessage: 'Tools',
+        }),
         id: 0,
         icon: <EuiIcon type='devToolsApp' color='primary' />,
         items: renderSettings,

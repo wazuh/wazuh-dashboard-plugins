@@ -52,15 +52,23 @@ const Title = () => {
     <EuiFlexItem>
       <EuiTitle>
         <h2>
-          {i18n.translate('wazuh.components.setting.confi.comp.header.settings', {
-            defaultMessage: 'App current settings',
-          })}
+          {i18n.translate(
+            'wazuh.components.setting.confi.comp.header.settings',
+            {
+              defaultMessage: 'App current settings',
+            },
+          )}
           &nbsp;
           <EuiToolTip position='right' content='More about configuration file'>
             <EuiButtonIcon
               iconType='questionInCircle'
               iconSize='l'
-              aria-label='Help'
+              aria-label={i18n.translate(
+                'wazuh.public.components.setting.config.header.Help',
+                {
+                  defaultMessage: 'Help',
+                },
+              )}
               target='_blank'
               href={webDocumentationLink(
                 PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_APP_CONFIGURATION,
@@ -109,7 +117,12 @@ const SearchBar = ({ query, setQuery }) => {
           {
             type: 'field_value_selection',
             field: 'category',
-            name: 'Categories',
+            name: i18n.translate(
+              'wazuh.public.components.setting.config.header.Categories',
+              {
+                defaultMessage: 'Categories',
+              },
+            ),
             multiSelect: 'or',
             options: categories,
           },

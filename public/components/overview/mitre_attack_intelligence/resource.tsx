@@ -18,36 +18,42 @@ import { ModuleMitreAttackIntelligenceFlyout } from './resource_detail_flyout';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
+import { i18n } from '@kbn/i18n';
 
+const searchPlace = i18n.translate(
+  'wazuh.public.components.overview.mitre.attack.searchPlace',
+  {
+    defaultMessage: 'Search in',
+  },
+);
 export const ModuleMitreAttackIntelligenceResource = ({
   label,
   searchBarSuggestions,
   apiEndpoint,
   tableColumnsCreator,
   initialSortingField,
-  resourceFilters
+  resourceFilters,
 }) => {
   const [details, setDetails] = useState(null);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(location.href);
     const redirectTab = urlParams.get('tabRedirect');
-    const idToRedirect = urlParams.get("idToRedirect");
-    if(redirectTab && idToRedirect){
+    const idToRedirect = urlParams.get('idToRedirect');
+    if (redirectTab && idToRedirect) {
       const endpoint = `/mitre/${redirectTab}?q=external_id=${idToRedirect}`;
       getMitreItemToRedirect(endpoint);
       urlParams.delete('tabRedirect');
       urlParams.delete('idToRedirect');
-      window.history.pushState({},document.title,'#/overview/?tab=mitre')
+      window.history.pushState({}, document.title, '#/overview/?tab=mitre');
     }
-  },[]);
+  }, []);
 
-
-  const getMitreItemToRedirect = async (endpoint) => {
+  const getMitreItemToRedirect = async endpoint => {
     try {
-      const res = await WzRequest.apiReq("GET", endpoint, {});
+      const res = await WzRequest.apiReq('GET', endpoint, {});
       const data = res?.data?.data.affected_items;
-      setDetails(data[0]); 
+      setDetails(data[0]);
     } catch (error) {
       const options = {
         context: `${ModuleMitreAttackIntelligenceResource.name}.getMitreItemToRedirect`,
@@ -64,12 +70,12 @@ export const ModuleMitreAttackIntelligenceResource = ({
       getErrorOrchestrator().handleError(options);
     }
   };
-  
+
   const tableColumns = useMemo(() => tableColumnsCreator(setDetails), []);
 
   const closeFlyout = useCallback(() => {
     setDetails(null);
-  },[]);
+  }, []);
 
   return (
     <>
@@ -78,7 +84,7 @@ export const ModuleMitreAttackIntelligenceResource = ({
         title={label}
         tableColumns={tableColumns}
         tableInitialSortingField={initialSortingField}
-        searchBarPlaceholder={`Search in ${label}`}
+        searchBarPlaceholder={`${searchPlace} ${label}`}
         searchBarSuggestions={searchBarSuggestions}
         endpoint={apiEndpoint}
         tablePageSizeOptions={[10, 15, 25, 50, 100]}
@@ -91,6 +97,6 @@ export const ModuleMitreAttackIntelligenceResource = ({
           onSelectResource={setDetails}
         />
       )}
-    </> 
-  )
+    </>
+  );
 };

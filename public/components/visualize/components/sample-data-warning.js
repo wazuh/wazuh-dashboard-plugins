@@ -17,9 +17,12 @@ import { WzRequest } from '../../../react-services';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { i18n } from '@kbn/i18n';
 
-const Title1 = i18n.translate('wazuh.components.addModule.guide.dashboardSampleData', {
-  defaultMessage: 'This dashboard contains sample data',
-});
+const Title1 = i18n.translate(
+  'wazuh.components.visualize.addModule.sampleData.dashboardSampleData',
+  {
+    defaultMessage: 'This dashboard contains sample data',
+  },
+);
 export const SampleDataWarning = ({ ...props }) => {
   const [isSampleData, setIsSampleData] = useState(false);
 
@@ -63,14 +66,30 @@ export const SampleDataWarning = ({ ...props }) => {
         {...props}
       >
         <p>
-          {'The data displayed may contain sample alerts. Go '}
+          {i18n.translate(
+            'wazuh.public.components.visualize.addModule.sampleData.sampleAlert',
+            {
+              defaultMessage:
+                'The data displayed may contain sample alerts. Go',
+            },
+          )}
           <EuiLink
             href='#/settings?tab=sample_data'
-            aria-label='go to configure sample data'
+            aria-label={i18n.translate(
+              'wazuh.public.components.visualize.addModule.sampleData.goConfig',
+              {
+                defaultMessage: 'go to configure sample data',
+              },
+            )}
           >
             {'here '}
           </EuiLink>
-          {'to configure the sample data.'}
+          {i18n.translate(
+            'wazuh.public.components.visualize.addModule.sampleData.config',
+            {
+              defaultMessage: 'to configure the sample data.',
+            },
+          )}
         </p>
       </EuiCallOut>
     );

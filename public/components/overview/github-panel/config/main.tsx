@@ -18,15 +18,45 @@ import { i18n } from '@kbn/i18n';
 const title1 = i18n.translate('wazuh.components.overview.githubPanel.actors', {
   defaultMessage: 'Actors',
 });
-const title2 = i18n.translate('wazuh.components.overview.githubPanel.organization', {
-  defaultMessage: 'Organizations',
-});
-const title3 = i18n.translate('wazuh.components.overview.githubPanel.repository', {
-  defaultMessage: 'Repositories',
-});
+const title2 = i18n.translate(
+  'wazuh.components.overview.githubPanel.organization',
+  {
+    defaultMessage: 'Organizations',
+  },
+);
+const title3 = i18n.translate(
+  'wazuh.components.overview.githubPanel.repository',
+  {
+    defaultMessage: 'Repositories',
+  },
+);
 const title4 = i18n.translate('wazuh.components.overview.githubPanel.title4', {
   defaultMessage: 'Actions',
 });
+const label1 = i18n.translate(
+  'wazuh.public.components.overview.github.config.label1',
+  {
+    defaultMessage: 'Actor',
+  },
+);
+const label2 = i18n.translate(
+  'wazuh.public.components.overview.github.config.label2',
+  {
+    defaultMessage: 'Organization',
+  },
+);
+const label3 = i18n.translate(
+  'wazuh.public.components.overview.github.config.label3',
+  {
+    defaultMessage: 'Repository',
+  },
+);
+const label4 = i18n.translate(
+  'wazuh.public.components.overview.github.config.label4',
+  {
+    defaultMessage: 'Action',
+  },
+);
 export const MainViewConfig = {
   rows: [
     {
@@ -38,7 +68,7 @@ export const MainViewConfig = {
               <AggTable
                 tableTitle={title1}
                 aggTerm='data.github.actor'
-                aggLabel='Actor'
+                aggLabel={label1}
                 maxRows={5}
                 onRowClick={props.onRowClick}
               />
@@ -52,7 +82,7 @@ export const MainViewConfig = {
               <AggTable
                 tableTitle={title2}
                 aggTerm='data.github.org'
-                aggLabel='Organization'
+                aggLabel={label2}
                 maxRows={5}
                 onRowClick={props.onRowClick}
               />
@@ -70,7 +100,7 @@ export const MainViewConfig = {
               <AggTable
                 tableTitle={title3}
                 aggTerm='data.github.repo'
-                aggLabel='Repository'
+                aggLabel={label3}
                 maxRows={5}
                 onRowClick={props.onRowClick}
               />
@@ -84,7 +114,7 @@ export const MainViewConfig = {
               <AggTable
                 tableTitle={title4}
                 aggTerm='data.github.action'
-                aggLabel='Action'
+                aggLabel={label4}
                 maxRows={5}
                 onRowClick={props.onRowClick}
               />

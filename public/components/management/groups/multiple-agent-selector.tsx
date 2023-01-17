@@ -39,6 +39,60 @@ import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { Logtest } from '../../../directives/wz-logtest/components/logtest';
 import { i18n } from '@kbn/i18n';
 
+const backLabel = i18n.translate(
+  'wazuh.public.components.management.group.backLabel',
+  {
+    defaultMessage: 'Back',
+  },
+);
+const filterPlace = i18n.translate(
+  'wazuh.public.components.management.group.filterPlace',
+  {
+    defaultMessage: 'Filter...',
+  },
+);
+const filterLabel = i18n.translate(
+  'wazuh.public.components.management.group.filterLabel',
+  {
+    defaultMessage: 'Filter',
+  },
+);
+const title1 = i18n.translate(
+  'wazuh.public.components.management.groups.title1',
+  {
+    defaultMessage: 'Error loading agents',
+  },
+);
+const title2 = i18n.translate(
+  'wazuh.public.components.management.groups.title2',
+  {
+    defaultMessage: 'Error fetching all available agents',
+  },
+);
+const title3 = i18n.translate(
+  'wazuh.public.components.management.groups.title3',
+  {
+    defaultMessage: 'Error fetching group agents',
+  },
+);
+const addSelected = i18n.translate(
+  'wazuh.public.components.management.groups.addSelected',
+  {
+    defaultMessage: 'Add selected items',
+  },
+);
+const removeSelected = i18n.translate(
+  'wazuh.public.components.management.groups.removeSelected',
+  {
+    defaultMessage: 'Remove selected items',
+  },
+);
+const removeAll = i18n.translate(
+  'wazuh.public.components.management.groups.removeAll',
+  {
+    defaultMessage: 'Remove all items',
+  },
+);
 export const MultipleAgentSelector = withErrorBoundary(
   class MultipleAgentSelector extends Component {
     constructor(props) {
@@ -120,7 +174,7 @@ export const MultipleAgentSelector = withErrorBoundary(
           error: {
             error: error,
             message: error.message || error,
-            title: 'Error loading agents',
+            title: title1,
           },
         };
         getErrorOrchestrator().handleError(options);
@@ -417,7 +471,7 @@ export const MultipleAgentSelector = withErrorBoundary(
               error: {
                 error: error,
                 message: error.message || error,
-                title: 'Error fetching all available agents',
+                title: title2,
               },
             };
             getErrorOrchestrator().handleError(options);
@@ -470,7 +524,7 @@ export const MultipleAgentSelector = withErrorBoundary(
               error: {
                 error: error,
                 message: error.message || error,
-                title: 'Error fetching group agents',
+                title: title3,
               },
             };
             getErrorOrchestrator().handleError(options);
@@ -512,7 +566,7 @@ export const MultipleAgentSelector = withErrorBoundary(
                               style={{ marginRight: 0 }}
                             >
                               <EuiButtonIcon
-                                aria-label='Back'
+                                aria-label={backLabel}
                                 style={{ paddingTop: 8 }}
                                 color='primary'
                                 iconSize='l'
@@ -591,7 +645,7 @@ export const MultipleAgentSelector = withErrorBoundary(
                                   </EuiFlexItem>
                                   <EuiFlexItem grow={false}>
                                     <EuiButtonIcon
-                                      aria-label='Back'
+                                      aria-label={backLabel}
                                       color='primary'
                                       iconType='refresh'
                                       onClick={() =>
@@ -607,7 +661,7 @@ export const MultipleAgentSelector = withErrorBoundary(
                                 </EuiFlexGroup>
                                 <EuiSpacer size={'s'}></EuiSpacer>
                                 <WzFieldSearchDelay
-                                  placeholder='Filter...'
+                                  placeholder={filterPlace}
                                   onChange={searchValue => {
                                     this.setState({
                                       availableFilter: searchValue,
@@ -623,7 +677,7 @@ export const MultipleAgentSelector = withErrorBoundary(
                                   }}
                                   isClearable={true}
                                   fullWidth={true}
-                                  aria-label='Filter'
+                                  aria-label={filterLabel}
                                 />
                                 <EuiSpacer size={'m'}></EuiSpacer>
                                 <select
@@ -759,7 +813,7 @@ export const MultipleAgentSelector = withErrorBoundary(
                                 />
                               </EuiKeyPadMenuItem>
                               <EuiKeyPadMenuItem
-                                label='Add selected items'
+                                label={addSelected}
                                 onClick={() => {
                                   this.moveItem(
                                     this.state.availableItem,
@@ -785,7 +839,7 @@ export const MultipleAgentSelector = withErrorBoundary(
                                 />
                               </EuiKeyPadMenuItem>
                               <EuiKeyPadMenuItem
-                                label='Remove selected items'
+                                label={removeSelected}
                                 onClick={() => {
                                   this.moveItem(
                                     this.state.selectedElement,
@@ -811,7 +865,7 @@ export const MultipleAgentSelector = withErrorBoundary(
                                 />
                               </EuiKeyPadMenuItem>
                               <EuiKeyPadMenuItem
-                                label='Remove all items'
+                                label={removeAll}
                                 onClick={() => {
                                   this.moveAll(
                                     this.state.selectedAgents.data,
@@ -886,7 +940,7 @@ export const MultipleAgentSelector = withErrorBoundary(
                                 </EuiFlexGroup>
                                 <EuiSpacer size={'s'}></EuiSpacer>
                                 <EuiFieldSearch
-                                  placeholder='Filter...'
+                                  placeholder={filterPlace}
                                   onChange={ev =>
                                     this.setState({
                                       selectedFilter: ev.target.value,
@@ -898,7 +952,7 @@ export const MultipleAgentSelector = withErrorBoundary(
                                   }}
                                   isClearable={true}
                                   fullWidth={true}
-                                  aria-label='Filter'
+                                  aria-label={filterLabel}
                                 />
                                 <EuiSpacer size={'m'}></EuiSpacer>
                                 <select

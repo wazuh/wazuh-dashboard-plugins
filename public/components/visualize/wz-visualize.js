@@ -52,6 +52,9 @@ const Title2 = i18n.translate('wazuh.components.visualize.Title2', {
 const Title3 = i18n.translate('wazuh.components.visualize.Title3', {
   defaultMessage: 'More information in Wazuh documentation',
 });
+const Title4 = i18n.translate('wazuh.components.visualize.Title4', {
+  defaultMessage: 'The index pattern could not be refreshed',
+});
 const visHandler = new VisHandlers();
 
 export const WzVisualize = compose(
@@ -151,10 +154,7 @@ export const WzVisualize = compose(
             severity: UI_ERROR_SEVERITIES.BUSINESS,
             error: {
               error: error,
-              message:
-                'The index pattern could not be refreshed' ||
-                error.message ||
-                error,
+              message: Title4 || error.message || error,
               title: error.name || error,
             },
           };
@@ -170,7 +170,12 @@ export const WzVisualize = compose(
       if (satisfyPluginPlatformVersion('<7.11')) {
         getToasts().add({
           color: 'success',
-          title: 'The index pattern was refreshed successfully.',
+          title: i18n.translate(
+            'wazuh.public.components.visualize.wz.visualize.successfully',
+            {
+              defaultMessage: 'The index pattern was refreshed successfully.',
+            },
+          ),
           text: toMountPoint(
             <EuiFlexGroup justifyContent='flexEnd' gutterSize='s'>
               <EuiFlexItem grow={false}>
@@ -186,9 +191,12 @@ export const WzVisualize = compose(
                   )}
                   target='documentation'
                 >
-                  {i18n.translate('wazuh.components.visualize.wz.Troubleshooting', {
-                    defaultMessage: 'Troubleshooting',
-                  })}
+                  {i18n.translate(
+                    'wazuh.components.visualize.wz.Troubleshooting',
+                    {
+                      defaultMessage: 'Troubleshooting',
+                    },
+                  )}
                 </a>
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
@@ -219,9 +227,12 @@ export const WzVisualize = compose(
                   href={urlTroubleShootingDocs}
                   target='documentation'
                 >
-                  {i18n.translate('wazuh.components.visualize.wz.Troubleshooting', {
-                    defaultMessage: 'Troubleshooting',
-                  })}{' '}
+                  {i18n.translate(
+                    'wazuh.components.visualize.wz.Troubleshooting',
+                    {
+                      defaultMessage: 'Troubleshooting',
+                    },
+                  )}{' '}
                 </a>
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
@@ -266,7 +277,12 @@ export const WzVisualize = compose(
                     style={{ padding: '0px 6px', height: 30 }}
                     onClick={() => this.expand(vis.id)}
                     iconType='expand'
-                    aria-label='Expand'
+                    aria-label={i18n.translate(
+                      'wazuh.public.components.visualize.wz.visualize.Expand',
+                      {
+                        defaultMessage: 'Expand',
+                      },
+                    )}
                   />
                 </EuiFlexGroup>
                 <div style={{ height: '100%' }}>
@@ -319,8 +335,13 @@ export const WzVisualize = compose(
           {this.props.resultState === 'none' && (
             <div className='wz-margin-top-10 wz-margin-right-8 wz-margin-left-8'>
               <EuiCallOut
-                title='There are no results for selected time range. Try another
-                    one.'
+                title={i18n.translate(
+                  'wazuh.public.components.visualize.wz.visualize.another',
+                  {
+                    defaultMessage:
+                      'There are no results for selected time range. Try another one.',
+                  },
+                )}
                 color='warning'
                 iconType='help'
               ></EuiCallOut>
@@ -391,7 +412,12 @@ export const WzVisualize = compose(
                           style={{ padding: '0px 6px', height: 30 }}
                           onClick={() => this.expand('security-alerts')}
                           iconType='expand'
-                          aria-label='Expand'
+                          aria-label={i18n.translate(
+                            'wazuh.public.components.visualize.wz.visualize.Expand',
+                            {
+                              defaultMessage: 'Expand',
+                            },
+                          )}
                         />
                       </EuiFlexGroup>
                       <SecurityAlerts />

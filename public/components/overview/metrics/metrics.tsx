@@ -57,6 +57,108 @@ const Name8 = i18n.translate('wazuh.components.addModule.guide.Name8', {
 const Name9 = i18n.translate('wazuh.components.addModule.guide.Name9', {
   defaultMessage: 'Total positives',
 });
+const agentReport = i18n.translate(
+  'wazuh.public.components.overview.metrics.agentReport',
+  {
+    defaultMessage: 'Agents reporting',
+  },
+);
+const lastScan = i18n.translate(
+  'wazuh.public.components.overview.metrics.lastScan',
+  {
+    defaultMessage: 'Last scan not checked',
+  },
+);
+const lastScanPass = i18n.translate(
+  'wazuh.public.components.overview.metrics.lastScanPass',
+  {
+    defaultMessage: 'Last scan pass',
+  },
+);
+const lastScanScore = i18n.translate(
+  'wazuh.public.components.overview.metrics.lastScanScore',
+  {
+    defaultMessage: 'Last scan score',
+  },
+);
+const latScanDate = i18n.translate(
+  'wazuh.public.components.overview.metrics.latScanDate',
+  {
+    defaultMessage: 'Last scan date',
+  },
+);
+const lastScanError = i18n.translate(
+  'wazuh.public.components.overview.metrics.lastScanError',
+  {
+    defaultMessage: 'Last scan errors',
+  },
+);
+const lastScanFail = i18n.translate(
+  'wazuh.public.components.overview.metrics.lastScanFail',
+  {
+    defaultMessage: 'Last scan fails',
+  },
+);
+const lastScanUnknown = i18n.translate(
+  'wazuh.public.components.overview.metrics.lastScanUnknown',
+  {
+    defaultMessage: 'Last scan unknown',
+  },
+);
+const highScoreScan = i18n.translate(
+  'wazuh.public.components.overview.metrics.highScoreScan',
+  {
+    defaultMessage: 'Highest scan score',
+  },
+);
+const lowScoreScan = i18n.translate(
+  'wazuh.public.components.overview.metrics.lowScoreScan',
+  {
+    defaultMessage: 'Lowest scan score',
+  },
+);
+const maxLevel = i18n.translate(
+  'wazuh.public.components.overview.metrics.maxLevel',
+  {
+    defaultMessage: 'Max Rule Level',
+  },
+);
+const susDownload = i18n.translate(
+  'wazuh.public.components.overview.metrics.susDownload',
+  {
+    defaultMessage: 'Suspicious Downloads',
+  },
+);
+const fullAccess = i18n.translate(
+  'wazuh.public.components.overview.metrics.fullAccess',
+  {
+    defaultMessage: 'Full Access Permissions',
+  },
+);
+const phishing = i18n.translate(
+  'wazuh.public.components.overview.metrics.phishing',
+  {
+    defaultMessage: 'Phishing and Malware',
+  },
+);
+const organizations = i18n.translate(
+  'wazuh.public.components.overview.metrics.organizations',
+  {
+    defaultMessage: 'Organizations',
+  },
+);
+const repositories = i18n.translate(
+  'wazuh.public.components.overview.metrics.repositories',
+  {
+    defaultMessage: 'Repositories',
+  },
+);
+const actors = i18n.translate(
+  'wazuh.public.components.overview.metrics.actors',
+  {
+    defaultMessage: 'Actors',
+  },
+);
 export const Metrics = withAllowedAgents(
   class Metrics extends Component {
     _isMount = false;
@@ -177,11 +279,11 @@ export const Metrics = withAllowedAgents(
           { name: 'Total', type: 'total' },
         ],
         osquery: [
-          { name: 'Agents reporting', type: 'unique-count', field: 'agent.id' },
+          { name: agentReport, type: 'unique-count', field: 'agent.id' },
         ],
         ciscat: [
           {
-            name: 'Last scan not checked',
+            name: lastScan,
             type: 'custom',
             filter: { phrase: 'ciscat', field: 'rule.groups' },
             agg: {
@@ -199,7 +301,7 @@ export const Metrics = withAllowedAgents(
             color: 'subdued',
           },
           {
-            name: 'Last scan pass',
+            name: lastScanPass,
             type: 'custom',
             filter: { phrase: 'ciscat', field: 'rule.groups' },
             agg: {
@@ -215,7 +317,7 @@ export const Metrics = withAllowedAgents(
             color: 'secondary',
           },
           {
-            name: 'Last scan score',
+            name: lastScanScore,
             type: 'custom',
             filter: { phrase: 'ciscat', field: 'rule.groups' },
             agg: {
@@ -230,7 +332,7 @@ export const Metrics = withAllowedAgents(
             },
           },
           {
-            name: 'Last scan date',
+            name: latScanDate,
             type: 'custom',
             filter: { phrase: 'ciscat', field: 'rule.groups' },
             agg: {
@@ -247,7 +349,7 @@ export const Metrics = withAllowedAgents(
             transformValue: formatUIDate,
           },
           {
-            name: 'Last scan errors',
+            name: lastScanError,
             type: 'custom',
             filter: { phrase: 'ciscat', field: 'rule.groups' },
             agg: {
@@ -263,7 +365,7 @@ export const Metrics = withAllowedAgents(
             color: 'danger',
           },
           {
-            name: 'Last scan fails',
+            name: lastScanFail,
             type: 'custom',
             filter: { phrase: 'ciscat', field: 'rule.groups' },
             agg: {
@@ -279,7 +381,7 @@ export const Metrics = withAllowedAgents(
             color: 'danger',
           },
           {
-            name: 'Last scan unknown',
+            name: lastScanUnknown,
             type: 'custom',
             filter: { phrase: 'ciscat', field: 'rule.groups' },
             agg: {
@@ -297,7 +399,7 @@ export const Metrics = withAllowedAgents(
         ],
         oscap: [
           {
-            name: 'Last scan score',
+            name: lastScanScore,
             type: 'custom',
             filter: { phrase: 'oscap-report', field: 'rule.groups' },
             agg: {
@@ -314,7 +416,7 @@ export const Metrics = withAllowedAgents(
             },
           },
           {
-            name: 'Highest scan score',
+            name: highScoreScan,
             type: 'custom',
             filter: { phrase: 'oscap-report', field: 'rule.groups' },
             agg: {
@@ -332,7 +434,7 @@ export const Metrics = withAllowedAgents(
             color: 'secondary',
           },
           {
-            name: 'Lowest scan score',
+            name: lowScoreScan,
             type: 'custom',
             filter: { phrase: 'oscap-report', field: 'rule.groups' },
             agg: {
@@ -352,7 +454,7 @@ export const Metrics = withAllowedAgents(
         ],
         office: [
           {
-            name: 'Max Rule Level',
+            name: maxLevel,
             type: 'custom',
             filter: { phrase: 'office365', field: 'rule.groups' },
             agg: {
@@ -367,20 +469,20 @@ export const Metrics = withAllowedAgents(
             },
           },
           {
-            name: 'Suspicious Downloads',
+            name: susDownload,
             type: 'phrase',
             value: '91724',
             field: 'rule.id',
             color: 'danger',
           },
           {
-            name: 'Full Access Permissions',
+            name: fullAccess,
             type: 'phrase',
             value: '91725',
             field: 'rule.id',
           },
           {
-            name: 'Phishing and Malware',
+            name: phishing,
             type: 'phrases',
             values: ['91556', '91575', '91700'],
             field: 'rule.id',
@@ -389,18 +491,18 @@ export const Metrics = withAllowedAgents(
         ],
         github: [
           {
-            name: 'Organizations',
+            name: organizations,
             type: 'unique-count',
             field: 'data.github.org',
           },
           {
-            name: 'Repositories',
+            name: repositories,
             type: 'unique-count',
             field: 'data.github.repo',
             color: 'secondary',
           },
           {
-            name: 'Actors',
+            name: actors,
             type: 'unique-count',
             field: 'data.github.actor',
             color: 'danger',

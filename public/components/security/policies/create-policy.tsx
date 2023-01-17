@@ -291,7 +291,12 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
     modal = (
       <EuiOverlayMask>
         <EuiConfirmModal
-          title='Unsubmitted changes'
+          title={i18n.translate(
+            'wazuh.public.components.security.policies.create.unsubmit',
+            {
+              defaultMessage: 'Unsubmitted changes',
+            },
+          )}
           onConfirm={() => {
             setIsModalVisible(false);
             closeFlyout(false);
@@ -302,7 +307,13 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
           confirmButtonText='Yes, do it'
         >
           <p style={{ textAlign: 'center' }}>
-            There are unsaved changes. Are you sure you want to proceed?
+            {i18n.translate(
+              'wazuh.public.components.security.policies.create.youWant',
+              {
+                defaultMessage:
+                  'There are unsaved changes. Are you sure you want to proceed?',
+              },
+            )}
           </p>
         </EuiConfirmModal>
       </EuiOverlayMask>
@@ -344,14 +355,31 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
       <WzFlyout flyoutProps={{ className: 'wzApp' }} onClose={onClose}>
         <EuiFlyoutHeader hasBorder={false}>
           <EuiTitle size='m'>
-            <h2>New policy</h2>
+            <h2>
+              {i18n.translate(
+                'wazuh.public.components.security.policies.create.Newpolicy',
+                {
+                  defaultMessage: ' New policy',
+                },
+              )}
+            </h2>
           </EuiTitle>
         </EuiFlyoutHeader>
         <EuiFlyoutBody>
           <EuiForm component='form' style={{ padding: 24 }}>
             <EuiFormRow
-              label='Policy name'
-              helpText='Introduce a name for this new policy.'
+              label={i18n.translate(
+                'wazuh.public.components.security.policies.create.policyName',
+                {
+                  defaultMessage: 'Policy name',
+                },
+              )}
+              helpText={i18n.translate(
+                'wazuh.public.components.security.policies.create.introduce',
+                {
+                  defaultMessage: 'Introduce a name for this new policy.',
+                },
+              )}
             >
               <EuiFieldText
                 placeholder=''
@@ -364,8 +392,19 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
             <EuiFlexGroup>
               <EuiFlexItem>
                 <EuiFormRow
-                  label='Action'
-                  helpText='Set an action where the policy will be carried out.'
+                  label={i18n.translate(
+                    'wazuh.public.components.security.policies.create.Action',
+                    {
+                      defaultMessage: 'Action',
+                    },
+                  )}
+                  helpText={i18n.translate(
+                    'wazuh.public.components.security.policies.create.setAction',
+                    {
+                      defaultMessage:
+                        'Set an action where the policy will be carried out.',
+                    },
+                  )}
                 >
                   <EuiSuperSelect
                     options={actions}
@@ -384,7 +423,12 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
                     iconType='plusInCircle'
                     disabled={!actionValue}
                   >
-                    Add
+                    {i18n.translate(
+                      'wazuh.public.components.security.policies.create.Add',
+                      {
+                        defaultMessage: 'Add',
+                      },
+                    )}
                   </EuiButton>
                 </EuiFormRow>
               </EuiFlexItem>
@@ -406,8 +450,19 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
             <EuiFlexGroup>
               <EuiFlexItem>
                 <EuiFormRow
-                  label='Resource'
-                  helpText='Select the resource to which this policy is directed.'
+                  label={i18n.translate(
+                    'wazuh.public.components.security.policies.create.Resource',
+                    {
+                      defaultMessage: 'Resource',
+                    },
+                  )}
+                  helpText={i18n.translate(
+                    'wazuh.public.components.security.policies.create.policy',
+                    {
+                      defaultMessage:
+                        'Select the resource to which this policy is directed.',
+                    },
+                  )}
                 >
                   <EuiSuperSelect
                     options={resources}
@@ -421,8 +476,19 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
               </EuiFlexItem>
               <EuiFlexItem>
                 <EuiFormRow
-                  label='Resource identifier'
-                  helpText='Introduce the resource identifier. Type * for all.'
+                  label={i18n.translate(
+                    'wazuh.public.components.security.policies.create.resourses',
+                    {
+                      defaultMessage: 'Resource identifier',
+                    },
+                  )}
+                  helpText={i18n.translate(
+                    'wazuh.public.components.security.policies.create.type',
+                    {
+                      defaultMessage:
+                        'Introduce the resource identifier. Type * for all.',
+                    },
+                  )}
                 >
                   <EuiFieldText
                     placeholder={getIdentifier()}
@@ -439,7 +505,12 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
                     iconType='plusInCircle'
                     disabled={!resourceIdentifierValue}
                   >
-                    Add
+                    {i18n.translate(
+                      'wazuh.public.components.security.policies.create.Add',
+                      {
+                        defaultMessage: 'Add',
+                      },
+                    )}
                   </EuiButton>
                 </EuiFormRow>
               </EuiFlexItem>
@@ -458,7 +529,20 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
               </>
             )}
             <EuiSpacer></EuiSpacer>
-            <EuiFormRow label='Select an effect' helpText='Select an effect.'>
+            <EuiFormRow
+              label={i18n.translate(
+                'wazuh.public.components.security.policies.create.effect1',
+                {
+                  defaultMessage: 'Select an effect',
+                },
+              )}
+              helpText={i18n.translate(
+                'wazuh.public.components.security.policies.create.effect',
+                {
+                  defaultMessage: 'Select an effect.',
+                },
+              )}
+            >
               <EuiSuperSelect
                 options={effectOptions}
                 valueOfSelected={effectValue}
@@ -478,7 +562,12 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
               }}
               fill
             >
-              Create policy
+              {i18n.translate(
+                'wazuh.public.components.security.policies.create.Createpolicy',
+                {
+                  defaultMessage: 'Create policy',
+                },
+              )}
             </EuiButton>
           </EuiForm>
         </EuiFlyoutBody>

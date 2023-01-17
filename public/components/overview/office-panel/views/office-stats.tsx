@@ -18,9 +18,12 @@ import { LogoOffice365 } from '../../../common/logos';
 import { renderValueYesThenEnabled } from '../../../../controllers/management/components/management/configuration/utils/utils';
 import { i18n } from '@kbn/i18n';
 
-const Title1 = i18n.translate('wazuh.components.overview.officePanel.tenantId', {
-  defaultMessage: 'Tenant ID',
-});
+const Title1 = i18n.translate(
+  'wazuh.components.overview.officePanel.tenantId',
+  {
+    defaultMessage: 'Tenant ID',
+  },
+);
 const Title2 = i18n.translate('wazuh.components.overview.officePanel.Title2', {
   defaultMessage: 'Client ID',
 });
@@ -33,24 +36,51 @@ const Title4 = i18n.translate('wazuh.components.overview.officePanel.title4', {
 const settings = [
   {
     field: 'enabled',
-    label: 'Service status',
+    label: i18n.translate(
+      'wazuh.public.components.overview.office.panel.views.service',
+      {
+        defaultMessage: 'Service status',
+      },
+    ),
     render: renderValueYesThenEnabled,
   },
   {
     field: 'only_future_events',
-    label: 'Collect events generated since Wazuh manager was started',
+    label: i18n.translate(
+      'wazuh.public.components.overview.office.panel.views.collected',
+      {
+        defaultMessage:
+          'Collect events generated since Wazuh manager was started',
+      },
+    ),
   },
   {
     field: 'curl_max_size',
-    label: 'Maximum size allowed for the Office 365 API response',
+    label: i18n.translate(
+      'wazuh.public.components.overview.office.panel.views.apiResponse',
+      {
+        defaultMessage: 'Maximum size allowed for the Office 365 API response',
+      },
+    ),
   },
   {
     field: 'interval',
-    label: 'Interval between Office 365 wodle executions in seconds',
+    label: i18n.translate(
+      'wazuh.public.components.overview.office.panel.views.intBetweem',
+      {
+        defaultMessage:
+          'Interval between Office 365 wodle executions in seconds',
+      },
+    ),
   },
   {
     field: 'api_auth',
-    label: 'Credentials',
+    label: i18n.translate(
+      'wazuh.public.components.overview.office.panel.views.credentials',
+      {
+        defaultMessage: 'Credentials',
+      },
+    ),
     render: value =>
       value
         .map(v => (
@@ -82,7 +112,12 @@ const settings = [
   },
   {
     field: 'subscriptions',
-    label: 'Subscriptions',
+    label: i18n.translate(
+      'wazuh.public.components.overview.office.panel.views.Subscriptions',
+      {
+        defaultMessage: 'Subscriptions',
+      },
+    ),
     render: value =>
       value.map(v => (
         <EuiDescriptionList key={`module_configuration_subscriptions_${v}`}>
@@ -112,7 +147,12 @@ const mapWModuleConfigurationToRenderProperties = (
 
 export const ModuleConfiguration = props => (
   <PanelModuleConfiguration
-    moduleTitle='Office 365'
+    moduleTitle={i18n.translate(
+      'wazuh.public.components.overview.office.panel.views.Office365',
+      {
+        defaultMessage: 'Office 365',
+      },
+    )}
     moduleIconType={() => <LogoOffice365 className='euiIcon--primary' />}
     settings={settings}
     configurationAPIPartialPath='/wmodules/wmodules'

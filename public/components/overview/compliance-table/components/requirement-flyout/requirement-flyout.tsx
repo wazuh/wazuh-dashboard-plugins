@@ -64,6 +64,30 @@ const label6 = i18n.translate(
     defaultMessage: 'Rule ID',
   },
 );
+const show = i18n.translate(
+  'wazuh.public.components.overview.requirement.show',
+  {
+    defaultMessage: 'Show',
+  },
+);
+const inDashboard = i18n.translate(
+  'wazuh.public.components.overview.requirement.inDashboard',
+  {
+    defaultMessage: 'in Dashboard',
+  },
+);
+const inspect = i18n.translate(
+  'wazuh.public.components.overview.requirement.inspect',
+  {
+    defaultMessage: 'Inspect',
+  },
+);
+const inEvents = i18n.translate(
+  'wazuh.public.components.overview.requirement.inEvents',
+  {
+    defaultMessage: 'in Events',
+  },
+);
 export class RequirementFlyout extends Component {
   _isMount = false;
   state: {};
@@ -221,7 +245,7 @@ export class RequirementFlyout extends Component {
                     <span>
                       <EuiToolTip
                         position='top'
-                        content={'Show ' + currentRequirement + ' in Dashboard'}
+                        content={show + currentRequirement + inDashboard}
                       >
                         <EuiIcon
                           onMouseDown={e => {
@@ -235,7 +259,7 @@ export class RequirementFlyout extends Component {
                       </EuiToolTip>
                       <EuiToolTip
                         position='top'
-                        content={'Inspect ' + currentRequirement + ' in Events'}
+                        content={inspect + currentRequirement + inEvents}
                       >
                         <EuiIcon
                           onMouseDown={e => {

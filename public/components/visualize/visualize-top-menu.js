@@ -87,7 +87,7 @@ export class VisualizeTopMenu extends Component {
                 >
                   {i18n.translate('wazuh.components.visualize.top.agent', {
                     defaultMessage: 'agent',
-                  })}{' '}
+                  })}
                 </button>
               </div>
             </EuiModalBody>
@@ -101,7 +101,12 @@ export class VisualizeTopMenu extends Component {
           <EuiKeyPadMenu className='VisualizeTopMenu'>
             {!this.state.isAgent && (
               <EuiKeyPadMenuItem
-                label='Agent'
+                label={i18n.translate(
+                  'wazuh.public.components.visualize.topMenu.Agent',
+                  {
+                    defaultMessage: 'Agent',
+                  },
+                )}
                 onClick={() => this.showAgentModal()}
               >
                 <EuiIcon type='watchesApp' color='primary' size='m' />
@@ -110,7 +115,12 @@ export class VisualizeTopMenu extends Component {
             {this.state.isAgent && (
               <div className='TopMenuAgent'>
                 <EuiKeyPadMenuItem
-                  label='Change Agent'
+                  label={i18n.translate(
+                    'wazuh.public.components.visualize.topMenu.ChangeAgent',
+                    {
+                      defaultMessage: 'Change Agent',
+                    },
+                  )}
                   onClick={() => this.showAgentModal()}
                   betaBadgeLabel='Change'
                   betaBadgeTooltipContent={`Change Agent ${this.state.isAgent}`}
@@ -119,7 +129,12 @@ export class VisualizeTopMenu extends Component {
                   <EuiIcon type='watchesApp' color='primary' size='m' />
                 </EuiKeyPadMenuItem>
                 <EuiKeyPadMenuItem
-                  label='Remove Agent'
+                  label={i18n.translate(
+                    'wazuh.public.components.visualize.topMenu.RemoveAgent',
+                    {
+                      defaultMessage: 'Remove Agent',
+                    },
+                  )}
                   onClick={() => {
                     this.setState({ isAgent: false });
                     this.props.setAgent(false);
@@ -133,7 +148,15 @@ export class VisualizeTopMenu extends Component {
               </div>
             )}
             {this.state.subtab === 'panels' && (
-              <EuiKeyPadMenuItem isDisabled label='Report'>
+              <EuiKeyPadMenuItem
+                isDisabled
+                label={i18n.translate(
+                  'wazuh.public.components.visualize.topMenu.Report',
+                  {
+                    defaultMessage: 'Report',
+                  },
+                )}
+              >
                 <EuiIcon type='reportingApp' color='primary' size='m' />
               </EuiKeyPadMenuItem>
             )}

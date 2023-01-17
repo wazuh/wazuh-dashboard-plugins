@@ -49,7 +49,18 @@ const Title2 = i18n.translate(
     defaultMessage: 'The configured API user uses the authentication context.',
   },
 );
-
+const errorConnection = i18n.translate(
+  'wazuh.public.components.setting.api.table.errorConnection',
+  {
+    defaultMessage: 'Error checking manager connection:',
+  },
+);
+const wazuhIsNot = i18n.translate(
+  'wazuh.public.components.setting.api.table.wazuhIsNot',
+  {
+    defaultMessage: 'Wazuh is not reachable',
+  },
+);
 export const ApiTable = compose(
   withErrorBoundary,
   withReduxProvider,
@@ -103,7 +114,7 @@ export const ApiTable = compose(
                 ? error
                 : (error || {}).message ||
                   ((error || {}).data || {}).message ||
-                  'Wazuh is not reachable';
+                  wazuhIsNot;
             const status = code === 3099 ? 'down' : 'unknown';
             entries[idx].status = { status, downReason };
             if (entries[idx].id === this.props.currentDefault) {
@@ -150,7 +161,7 @@ export const ApiTable = compose(
               ? error
               : (error || {}).message ||
                 ((error || {}).data || {}).message ||
-                'Wazuh is not reachable';
+                wazuhIsNot;
           const status = code === 3099 ? 'down' : 'unknown';
           entries[idx].status = { status, downReason };
           throw error;
@@ -168,9 +179,7 @@ export const ApiTable = compose(
           error: {
             error: error,
             message: error.message || error,
-            title: `Error checking manager connection: ${
-              error.message || error
-            }`,
+            title: `${errorConnection} ${error.message || error}`,
           },
         };
 
@@ -183,43 +192,75 @@ export const ApiTable = compose(
       const columns = [
         {
           field: 'id',
-          name: 'ID',
+          name: i18n.translate('wazuh.public.components.setting.api.table.ID', {
+            defaultMessage: 'ID',
+          }),
           align: 'left',
           sortable: true,
         },
         {
           field: 'cluster_info.cluster',
-          name: 'Cluster',
+          name: i18n.translate(
+            'wazuh.public.components.setting.api.table.Cluster',
+            {
+              defaultMessage: 'Cluster',
+            },
+          ),
           align: 'left',
           sortable: true,
         },
         {
           field: 'cluster_info.manager',
-          name: 'Manager',
+          name: i18n.translate(
+            'wazuh.public.components.setting.api.table.Manager',
+            {
+              defaultMessage: 'Manager',
+            },
+          ),
           align: 'left',
           sortable: true,
         },
         {
           field: 'url',
-          name: 'Host',
+          name: i18n.translate(
+            'wazuh.public.components.setting.api.table.Host',
+            {
+              defaultMessage: 'Host',
+            },
+          ),
           align: 'left',
           sortable: true,
         },
         {
           field: 'port',
-          name: 'Port',
+          name: i18n.translate(
+            'wazuh.public.components.setting.api.table.Port',
+            {
+              defaultMessage: 'Port',
+            },
+          ),
           align: 'left',
           sortable: true,
         },
         {
           field: 'username',
-          name: 'Username',
+          name: i18n.translate(
+            'wazuh.public.components.setting.api.table.Username',
+            {
+              defaultMessage: 'Username',
+            },
+          ),
           align: 'left',
           sortable: true,
         },
         {
           field: 'status',
-          name: 'Status',
+          name: i18n.translate(
+            'wazuh.public.components.setting.api.table.Status',
+            {
+              defaultMessage: 'Status',
+            },
+          ),
           align: 'left',
           sortable: true,
           render: item => {
@@ -245,7 +286,12 @@ export const ApiTable = compose(
                       color='primary'
                       style={{ marginTop: '-12px' }}
                       iconType='questionInCircle'
-                      aria-label='Info about the error'
+                      aria-label={i18n.translate(
+                        'wazuh.public.components.setting.api.table.InfoAboutTheError',
+                        {
+                          defaultMessage: 'Info about the error',
+                        },
+                      )}
                       onClick={() =>
                         this.props.copyToClipBoard(item.downReason)
                       }
@@ -267,7 +313,12 @@ export const ApiTable = compose(
                       color='primary'
                       style={{ marginTop: '-12px' }}
                       iconType='questionInCircle'
-                      aria-label='Info about the error'
+                      aria-label={i18n.translate(
+                        'wazuh.public.components.setting.api.table.InfoAboutTheError',
+                        {
+                          defaultMessage: 'Info about the error',
+                        },
+                      )}
                       onClick={() =>
                         this.props.copyToClipBoard(item.downReason)
                       }
@@ -294,7 +345,12 @@ export const ApiTable = compose(
           },
         },
         {
-          name: 'Run as',
+          name: i18n.translate(
+            'wazuh.public.components.setting.api.table.Runas',
+            {
+              defaultMessage: 'Run as',
+            },
+          ),
           field: 'allow_run_as',
           align: 'center',
           sortable: true,
@@ -314,7 +370,12 @@ export const ApiTable = compose(
           },
         },
         {
-          name: 'Actions',
+          name: i18n.translate(
+            'wazuh.public.components.setting.api.table.Actions',
+            {
+              defaultMessage: 'Actions',
+            },
+          ),
           render: item => (
             <EuiFlexGroup>
               <EuiFlexItem grow={false}>
@@ -363,7 +424,12 @@ export const ApiTable = compose(
                   }
                 >
                   <EuiButtonIcon
-                    aria-label='Check connection'
+                    aria-label={i18n.translate(
+                      'wazuh.public.components.setting.api.table.Checkconnection',
+                      {
+                        defaultMessage: 'Check connection',
+                      },
+                    )}
                     iconType='refresh'
                     onClick={async () => await this.checkApi(item)}
                     color='success'

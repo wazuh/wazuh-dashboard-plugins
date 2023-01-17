@@ -14,20 +14,36 @@
 import React from 'react';
 import { WzFieldSearchDelay } from '../../../components/common/search';
 import { MitreAttackResources } from './resources';
-import { ModuleMitreAttackIntelligenceResourceButton } from './resource_button'
+import { ModuleMitreAttackIntelligenceResourceButton } from './resource_button';
+import { i18n } from '@kbn/i18n';
 
-export const ModuleMitreAttackIntelligenceLeftPanel = ({onSelectResource, selectedResource, onSearchTermAllResourcesChange, onSearchTermAllResourcesSearch}) => {
+export const ModuleMitreAttackIntelligenceLeftPanel = ({
+  onSelectResource,
+  selectedResource,
+  onSearchTermAllResourcesChange,
+  onSearchTermAllResourcesSearch,
+}) => {
   return (
     <>
-      <div style={{padding: 10}}>
+      <div style={{ padding: 10 }}>
         <WzFieldSearchDelay
           delay={1000}
           fullWidth
-          placeholder='Search in all resources'
+          placeholder={i18n.translate(
+            'wazuh.public.components.overview.mitre.attack.place',
+            {
+              defaultMessage: 'Search in all resources',
+            },
+          )}
           onChange={onSearchTermAllResourcesChange}
           onSearch={onSearchTermAllResourcesSearch}
           isClearable
-          aria-label='Search in all resources'
+          aria-label={i18n.translate(
+            'wazuh.public.components.overview.mitre.attack.label',
+            {
+              defaultMessage: 'Search in all resources',
+            },
+          )}
         />
       </div>
       {MitreAttackResources.map(resource => (
@@ -40,5 +56,5 @@ export const ModuleMitreAttackIntelligenceLeftPanel = ({onSelectResource, select
         </ModuleMitreAttackIntelligenceResourceButton>
       ))}
     </>
-  )
+  );
 };

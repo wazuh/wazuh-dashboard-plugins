@@ -17,18 +17,31 @@ import { EuiFlexItem } from '@elastic/eui';
 import { SecurityAlerts } from '../../../visualize/components';
 import { i18n } from '@kbn/i18n';
 
-const Title1 = i18n.translate('wazuh.components.overview.officePanel.config.topUser', {
-  defaultMessage: 'Top users',
-});
-const Title2 = i18n.translate('wazuh.components.overview.officePanel.config.title2', {
-  defaultMessage: 'Top client IP',
-});
-const Title3 = i18n.translate('wazuh.components.overview.officePanel.config.title3', {
-  defaultMessage: 'Top rules',
-});
-const Title4 = i18n.translate('wazuh.components.overview.officePanel.config.title4', {
-  defaultMessage: 'Top operations',
-});
+const Title1 = i18n.translate(
+  'wazuh.components.overview.officePanel.config.topUser',
+  {
+    defaultMessage: 'Top users',
+  },
+);
+const Title2 = i18n.translate(
+  'wazuh.components.overview.officePanel.config.title2',
+  {
+    defaultMessage: 'Top client IP',
+  },
+);
+const Title3 = i18n.translate(
+  'wazuh.components.overview.officePanel.config.title3',
+  {
+    defaultMessage: 'Top rules',
+  },
+);
+const Title4 = i18n.translate(
+  'wazuh.components.overview.officePanel.config.title4',
+  {
+    defaultMessage: 'Top operations',
+  },
+);
+
 export const MainViewConfig = {
   rows: [
     {
@@ -40,7 +53,12 @@ export const MainViewConfig = {
               <AggTable
                 tableTitle={Title1}
                 aggTerm='data.office365.UserId'
-                aggLabel='User'
+                aggLabel={i18n.translate(
+                  'wazuh.public.components.overview.officePanel.config.User',
+                  {
+                    defaultMessage: 'User',
+                  },
+                )}
                 maxRows={5}
                 onRowClick={(field, value) => props.onRowClick(field, value)}
               />
@@ -54,7 +72,12 @@ export const MainViewConfig = {
               <AggTable
                 tableTitle={Title2}
                 aggTerm='data.office365.ClientIP'
-                aggLabel='Client IP'
+                aggLabel={i18n.translate(
+                  'wazuh.public.components.overview.officePanel.config.ClientIP',
+                  {
+                    defaultMessage: 'Client IP',
+                  },
+                )}
                 maxRows={5}
                 onRowClick={(field, value) => props.onRowClick(field, value)}
               />
@@ -72,7 +95,12 @@ export const MainViewConfig = {
               <AggTable
                 tableTitle={Title3}
                 aggTerm='rule.description'
-                aggLabel='Rule'
+                aggLabel={i18n.translate(
+                  'wazuh.public.components.overview.officePanel.config.Rule',
+                  {
+                    defaultMessage: 'Rule',
+                  },
+                )}
                 maxRows={5}
                 onRowClick={(field, value) => props.onRowClick(field, value)}
               />
@@ -86,7 +114,12 @@ export const MainViewConfig = {
               <AggTable
                 tableTitle={Title4}
                 aggTerm='data.office365.Operation'
-                aggLabel='Operation'
+                aggLabel={i18n.translate(
+                  'wazuh.public.components.overview.officePanel.config.Operation',
+                  {
+                    defaultMessage: 'Operation',
+                  },
+                )}
                 maxRows={5}
                 onRowClick={(field, value) => props.onRowClick(field, value)}
               />

@@ -40,8 +40,20 @@ import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { getPluginDataPath } from '../../../../common/plugin';
 import { i18n } from '@kbn/i18n';
 
-const Title1 = i18n.translate('wazuh.components.addModule.guide.wazuhApiServiceStatus', {
-  defaultMessage: 'Check the Wazuh API service status',
+const Title1 = i18n.translate(
+  'wazuh.components.addModule.guide.wazuhApiServiceStatus',
+  {
+    defaultMessage: 'Check the Wazuh API service status',
+  },
+);
+const name1 = i18n.translate('wazuh.public.components.setting.api.down.name1', {
+  defaultMessage: 'ID',
+});
+const name2 = i18n.translate('wazuh.public.components.setting.api.down.name2', {
+  defaultMessage: 'Host',
+});
+const name3 = i18n.translate('wazuh.public.components.setting.api.down.name3', {
+  defaultMessage: 'Port',
 });
 export const ApiIsDown = withErrorBoundary(
   class ApiIsDown extends Component {
@@ -170,7 +182,12 @@ hosts:
           {this.state.status !== 'danger' &&
             this.state.status !== 'incomplete' && (
               <EuiButtonEmpty onClick={() => this.props.closeApiIsDown()}>
-                Close
+                {i18n.translate(
+                  'wazuh.public.components.setting.api.down.Close',
+                  {
+                    defaultMessage: 'Close',
+                  },
+                )}
               </EuiButtonEmpty>
             )}
           <EuiSpacer />
@@ -186,19 +203,27 @@ hosts:
               loading={this.state.refreshingEntries}
               items={this.state.apiEntries}
               columns={[
-                { field: 'id', name: 'ID' },
-                { field: 'url', name: 'Host' },
-                { field: 'port', name: 'Port' },
+                { field: 'id', name: name1 },
+                { field: 'url', name: name2 },
+                { field: 'port', name: name3 },
                 {
                   field: 'status',
-                  name: 'Status',
+                  name: i18n.translate(
+                    'wazuh.public.components.setting.api.down.Status',
+                    {
+                      defaultMessage: 'Status',
+                    },
+                  ),
                   render: item => {
                     if (item) {
                       return item === 'online' ? (
                         <EuiHealth color='success'>
-                          {i18n.translate('wazuh.components.setting.api.down.', {
-                            defaultMessage: 'Empty field',
-                          })}
+                          {i18n.translate(
+                            'wazuh.components.setting.api.down.',
+                            {
+                              defaultMessage: 'Empty field',
+                            },
+                          )}
                           Online
                         </EuiHealth>
                       ) : item.status === 'down' ? (
@@ -216,7 +241,12 @@ hosts:
                               color='primary'
                               style={{ marginTop: '-12px' }}
                               iconType='questionInCircle'
-                              aria-label='Info about the error'
+                              aria-label={i18n.translate(
+                                'wazuh.public.components.setting.api.down.infoError',
+                                {
+                                  defaultMessage: 'Info about the error',
+                                },
+                              )}
                               onClick={() =>
                                 this.props.copyToClipBoard(item.downReason)
                               }
@@ -238,7 +268,12 @@ hosts:
                               color='primary'
                               style={{ marginTop: '-12px' }}
                               iconType='questionInCircle'
-                              aria-label='Info about the error'
+                              aria-label={i18n.translate(
+                                'wazuh.public.components.setting.api.down.error',
+                                {
+                                  defaultMessage: 'Info about the error',
+                                },
+                              )}
                               onClick={() =>
                                 this.props.copyToClipBoard(item.downReason)
                               }
@@ -250,7 +285,15 @@ hosts:
                       return (
                         <span>
                           <EuiLoadingSpinner size='s' />
-                          <span>&nbsp;&nbsp;Checking</span>
+                          <span>
+                            &nbsp;&nbsp;
+                            {i18n.translate(
+                              'wazuh.public.components.setting.api.down.Checking',
+                              {
+                                defaultMessage: 'Checking',
+                              },
+                            )}
+                          </span>
                         </span>
                       );
                     }
@@ -300,7 +343,12 @@ hosts:
           ),
         },
         {
-          title: 'Check the configuration',
+          title: i18n.translate(
+            'wazuh.public.components.setting.api.down.checkConfig',
+            {
+              defaultMessage: 'Check the configuration',
+            },
+          ),
           children: (
             <div>
               <EuiText>
@@ -308,10 +356,9 @@ hosts:
                   defaultMessage: 'Review the settings in the',
                 })}{' '}
                 <EuiCode>{getPluginDataPath('config/wazuh.yml')}</EuiCode>{' '}
-                {i18n.translate('wazuh.components.setting.api.down.', {
-                  defaultMessage: 'Empty field',
+                {i18n.translate('wazuh.components.setting.api.down.file', {
+                  defaultMessage: 'file.',
                 })}
-                file.
               </EuiText>
               <EuiSpacer />
               <EuiCodeBlock language='yaml'>{apiExample}</EuiCodeBlock>
@@ -319,7 +366,12 @@ hosts:
           ),
         },
         {
-          title: 'Test the configuration',
+          title: i18n.translate(
+            'wazuh.public.components.setting.api.down.test',
+            {
+              defaultMessage: 'Test the configuration',
+            },
+          ),
           children: checkConnectionChildren,
           status: this.state.status,
         },

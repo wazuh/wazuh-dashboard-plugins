@@ -16,13 +16,14 @@ import { connect } from 'react-redux';
 import { AppNavigate } from '../../react-services/app-navigate';
 import { WAZUH_MENU_SECURITY_SECTIONS_ID } from '../../../common/constants';
 import { WAZUH_MENU_SECURITY_SECTIONS_CY_TEST_ID } from '../../../common/wazu-menu/wz-menu-security.cy';
+import { i18n } from '@kbn/i18n';
 
 class WzMenuSecurity extends Component {
   constructor(props) {
     super(props);
     this.state = {
       // TODO: Fix the selected section
-      selectedItemName: null
+      selectedItemName: null,
     };
     this.wzReq = WzRequest;
   }
@@ -39,22 +40,36 @@ class WzMenuSecurity extends Component {
       this.createItem({
         id: WAZUH_MENU_SECURITY_SECTIONS_ID.USERS,
         cyTestId: WAZUH_MENU_SECURITY_SECTIONS_CY_TEST_ID.USERS,
-        text: 'Users',
+        text: i18n.translate('wazuh.public.components.wz.menu.security.', {
+          defaultMessage: 'Users',
+        }),
       }),
       this.createItem({
         id: WAZUH_MENU_SECURITY_SECTIONS_ID.ROLES,
         cyTestId: WAZUH_MENU_SECURITY_SECTIONS_CY_TEST_ID.ROLES,
-        text: 'Roles',
+        text: i18n.translate('wazuh.public.components.wz.menu.security.Roles', {
+          defaultMessage: 'Roles',
+        }),
       }),
       this.createItem({
         id: WAZUH_MENU_SECURITY_SECTIONS_ID.POLICIES,
         cyTestId: WAZUH_MENU_SECURITY_SECTIONS_CY_TEST_ID.POLICIES,
-        text: 'Policies',
+        text: i18n.translate(
+          'wazuh.public.components.wz.menu.security.Policies',
+          {
+            defaultMessage: 'Policies',
+          },
+        ),
       }),
       this.createItem({
         id: WAZUH_MENU_SECURITY_SECTIONS_ID.ROLES_MAPPING,
         cyTestId: WAZUH_MENU_SECURITY_SECTIONS_CY_TEST_ID.ROLES_MAPPING,
-        text: 'Roles mapping',
+        text: i18n.translate(
+          'wazuh.public.components.wz.menu.security.Rolemapping',
+          {
+            defaultMessage: 'Roles mapping',
+          },
+        ),
       }),
     ];
   }
@@ -71,25 +86,32 @@ class WzMenuSecurity extends Component {
       id: item.id,
       name: item.text,
       'data-test-subj': item.cyTestId,
-      isSelected: window.location.href.includes('/security') && this.props.state.selected_security_section === item.id,
-      onClick: () => { },
-      onMouseDown: (ev) => this.clickMenuItem(ev, item.id)
+      isSelected:
+        window.location.href.includes('/security') &&
+        this.props.state.selected_security_section === item.id,
+      onClick: () => {},
+      onMouseDown: ev => this.clickMenuItem(ev, item.id),
     };
   };
 
   render() {
-    const renderSettings = this.avaibleRenderSettings()
+    const renderSettings = this.avaibleRenderSettings();
     const sideNavAdmin = [
       {
-        name: 'Security',
+        name: i18n.translate(
+          'wazuh.public.components.wz.menu.security.nameSecurity',
+          {
+            defaultMessage: 'Security',
+          },
+        ),
         id: 0,
-        icon: <EuiIcon type="securityApp" color="primary" />,
-        items: renderSettings
-      }
+        icon: <EuiIcon type='securityApp' color='primary' />,
+        items: renderSettings,
+      },
     ];
 
     return (
-      <div className="WzManagementSideMenu" style={{ width: 200 }}>
+      <div className='WzManagementSideMenu' style={{ width: 200 }}>
         <EuiFlexGroup responsive={false}>
           <EuiFlexItem grow={false}>
             <EuiSideNav items={sideNavAdmin} style={{ padding: '4px 12px' }} />
@@ -102,7 +124,7 @@ class WzMenuSecurity extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.securityReducers
+    state: state.securityReducers,
   };
 };
 
