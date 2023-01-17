@@ -65,9 +65,9 @@ export class WzSearchButtons extends Component {
   buildOptions = () => this.props.options.map((item) => ({
     id: item.label,
     label: item.label,
-    name: { i18n.translate('wazuh.public.components.wz.search.button.options', {
+    name: i18n.translate('wazuh.public.components.wz.search.button.options', {
           defaultMessage: 'options',
-        })},
+        }),
     ...(item.iconType && { iconType: item.iconType }),
   }));
 
@@ -85,7 +85,7 @@ export class WzSearchButtons extends Component {
       const newFilters = [...filters];
       const { field, value } = options[label];
       const filterIdx = filters.findIndex(filter => filter.field === field);
-      (filterIdx !== -1 && !IconSelectedMap[label]) 
+      (filterIdx !== -1 && !IconSelectedMap[label])
       ? newFilters.splice(filterIdx, 1)
       : newFilters.push({ field, value })
       return newFilters;

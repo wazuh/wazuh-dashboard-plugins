@@ -29,7 +29,7 @@ import { webDocumentationLink } from '../../../common/services/web_documentation
 
 import { i18n } from '@kbn/i18n';
 
-const version = i18n.translate(
+const wazuhVersion = i18n.translate(
   'wazuh.public.controller.agent.agent.preview.version',
   {
     defaultMessage: 'Could not get the Wazuh version:',
@@ -357,7 +357,7 @@ export class AgentsPreviewController {
         error: {
           error: error,
           message: error.message || error,
-          title: `${version} ${error.message || error}`,
+          title: `${wazuhVersion} ${error.message || error}`,
         },
       };
       getErrorOrchestrator().handleError(options);

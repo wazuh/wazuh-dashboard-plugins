@@ -451,9 +451,12 @@ export const AgentsTable = withErrorBoundary(
       return (
         <div className={'icon-box-action'}>
           <EuiToolTip
-            content={i18n.translate('wazuh.public.controller.agent.components.agent.table.', {
-          defaultMessage: '',
-        })}'Open summary panel for this agent'
+            content={i18n.translate(
+              'wazuh.public.controller.agent.components.agent.table.',
+              {
+                defaultMessage: 'Open summary panel for this agent',
+              },
+            )}
             position='left'
           >
             <EuiButtonIcon
@@ -463,17 +466,23 @@ export const AgentsTable = withErrorBoundary(
               }}
               iconType='eye'
               color={'primary'}
-              aria-label={i18n.translate('wazuh.public.controller.agent.components.agent.table.openSummary', {
-          defaultMessage: 'Open summary panel for this agent',
-        })}
+              aria-label={i18n.translate(
+                'wazuh.public.controller.agent.components.agent.table.openSummary',
+                {
+                  defaultMessage: 'Open summary panel for this agent',
+                },
+              )}
             />
           </EuiToolTip>
           &nbsp;
           {agent.status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED && (
             <EuiToolTip
-              content={i18n.translate('wazuh.public.controller.agent.components.agent.table.openConfig', {
-          defaultMessage: 'Open configuration for this agent',
-        })}
+              content={i18n.translate(
+                'wazuh.public.controller.agent.components.agent.table.openConfig',
+                {
+                  defaultMessage: 'Open configuration for this agent',
+                },
+              )}
               position='left'
             >
               <EuiButtonIcon
@@ -483,9 +492,12 @@ export const AgentsTable = withErrorBoundary(
                 }}
                 color={'primary'}
                 iconType='wrench'
-                aria-label={i18n.translate('wazuh.public.controller.agent.components.agent.table.openConfig', {
-          defaultMessage: 'Open configuration for this agent',
-        })}
+                aria-label={i18n.translate(
+                  'wazuh.public.controller.agent.components.agent.table.openConfig',
+                  {
+                    defaultMessage: 'Open configuration for this agent',
+                  },
+                )}
               />
             </EuiToolTip>
           )}

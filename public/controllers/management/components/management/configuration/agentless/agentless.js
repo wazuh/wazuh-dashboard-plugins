@@ -10,7 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { i18n } from '@kbn/i18n';
 
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
