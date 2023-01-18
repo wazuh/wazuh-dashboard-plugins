@@ -12,6 +12,7 @@
 
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { i18n } from '@kbn/i18n';
 
 import {
   EuiFlexGroup,
@@ -20,7 +21,7 @@ import {
   EuiLink,
   EuiSpacer,
   EuiText,
-  EuiTitle
+  EuiTitle,
 } from '@elastic/eui';
 
 import WzHelpButtonPopover from './help-button-popover';
@@ -30,37 +31,35 @@ class WzConfigurationSettingsHeader extends Component {
     super(props);
   }
   render() {
-    const {
-      title,
-      description,
-      json,
-      help,
-      settings,
-      xml,
-      viewSelected
-    } = this.props;
+    const { title, description, json, help, settings, xml, viewSelected } =
+      this.props;
     return (
       <Fragment>
-        <EuiFlexGroup alignItems="center">
+        <EuiFlexGroup alignItems='center'>
           <EuiFlexItem>
-            <EuiTitle size="s">
+            <EuiTitle size='s'>
               <h2>{title}</h2>
             </EuiTitle>
-            {description && <EuiText color="subdued">{description}</EuiText>}
+            {description && <EuiText color='subdued'>{description}</EuiText>}
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
             <EuiFlexGroup
-              alignItems="center"
-              gutterSize="none"
-              justifyContent="flexEnd"
+              alignItems='center'
+              gutterSize='none'
+              justifyContent='flexEnd'
             >
               {settings && (
                 <Fragment>
                   <span style={{ marginRight: '6px' }}>
                     <ButtonLink
                       viewSelected={viewSelected}
-                      view=""
-                      text="SETTINGS"
+                      view=''
+                      text={i18n.translate(
+                        'wazuh.public.controller.management.config.policy.util.components.header.SETTINGS',
+                        {
+                          defaultMessage: 'SETTINGS',
+                        },
+                      )}
                       onClick={settings}
                     />
                   </span>
@@ -71,16 +70,26 @@ class WzConfigurationSettingsHeader extends Component {
                   <span style={{ marginRight: '6px' }}>
                     <ButtonLink
                       viewSelected={viewSelected}
-                      view="json"
-                      text="JSON"
+                      view='json'
+                      text={i18n.translate(
+                        'wazuh.public.controller.management.config.policy.util.components.header.JSON',
+                        {
+                          defaultMessage: 'JSON',
+                        },
+                      )}
                       onClick={json}
                     />
                   </span>
                   <span>
                     <ButtonLink
                       viewSelected={viewSelected}
-                      view="xml"
-                      text="XML"
+                      view='xml'
+                      text={i18n.translate(
+                        'wazuh.public.controller.management.config.policy.util.components.header.XML',
+                        {
+                          defaultMessage: 'XML',
+                        },
+                      )}
                       onClick={xml}
                     />
                   </span>
@@ -94,9 +103,9 @@ class WzConfigurationSettingsHeader extends Component {
             </EuiFlexGroup>
           </EuiFlexItem>
         </EuiFlexGroup>
-        <EuiSpacer size="xs" />
+        <EuiSpacer size='xs' />
         {title && (
-          <EuiHorizontalRule margin="none" style={{ marginBottom: 16 }} />
+          <EuiHorizontalRule margin='none' style={{ marginBottom: 16 }} />
         )}
       </Fragment>
     );
@@ -105,7 +114,7 @@ class WzConfigurationSettingsHeader extends Component {
 
 WzConfigurationSettingsHeader.propTypes = {
   title: PropTypes.string,
-  description: PropTypes.string
+  description: PropTypes.string,
 };
 
 const ButtonLink = ({ onClick, text, view, viewSelected }) => {

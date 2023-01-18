@@ -18,47 +18,89 @@ import WzConfigurationListSelector from '../util-components/configuration-settin
 import {
   isString,
   renderValueOrDefault,
-  renderValueOrNoValue
+  renderValueOrNoValue,
 } from '../utils/utils';
 import { settingsListBuilder } from '../utils/builders';
+import { i18n } from '@kbn/i18n';
 
 import helpLinks from './help-links';
 
-const renderTargetField = item => item ? item.join(', ') : 'agent';
+const renderTargetField = item => (item ? item.join(', ') : 'agent');
 
 const mainSettings = [
-  { field: 'logformat', label: 'Log format' },
-  { field: 'file', label: 'Log location', render: renderValueOrNoValue },
+  {
+    field: 'logformat',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.log.collection.logs.format',
+      {
+        defaultMessage: 'Log format',
+      },
+    ),
+  },
+  {
+    field: 'file',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.log.collection.logs.location',
+      {
+        defaultMessage: 'Log location',
+      },
+    ),
+    render: renderValueOrNoValue,
+  },
   {
     field: 'only-future-events',
-    label: 'Only receive logs occured after start',
-    when: 'agent'
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.log.collection.logs.occured',
+      {
+        defaultMessage: 'Only receive logs occured after start',
+      },
+    ),
+    when: 'agent',
   },
   {
     field: 'reconnect_time',
-    label:
-      'Time in seconds to try to reconnect with Windows Event Channel when it has fallen',
-    when: 'agent'
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.log.collection.logs.',
+      {
+        defaultMessage:
+          'Time in seconds to try to reconnect with Windows Event Channel when it has fallen',
+      },
+    ),
+    when: 'agent',
   },
   {
     field: 'query',
-    label: 'Filter logs using this XPATH query',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.log.collection.logs.XPATH',
+      {
+        defaultMessage: 'Filter logs using this XPATH query',
+      },
+    ),
     render: renderValueOrNoValue,
-    when: 'agent'
+    when: 'agent',
   },
   {
     field: 'labels',
-    label: 'Only receive logs occured after start',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.log.collection.logs.after',
+      {
+        defaultMessage: 'Only receive logs occured after start',
+      },
+    ),
     render: renderValueOrNoValue,
-    when: 'agent'
+    when: 'agent',
   },
   {
     field: 'target',
-    label: 'Redirect output to this socket',
-    render: renderTargetField
-  }
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.log.collection.logs.socket',
+      {
+        defaultMessage: 'Redirect output to this socket',
+      },
+    ),
+    render: renderTargetField,
+  },
 ];
-
 
 const getMainSettingsAgentOrManager = agent =>
   agent && agent.id === '000'
@@ -66,7 +108,7 @@ const getMainSettingsAgentOrManager = agent =>
     : mainSettings.filter(setting =>
         setting.when === 'agent'
           ? agent && agent.os && agent.os.platform === 'windows'
-          : true
+          : true,
       );
 class WzConfigurationLogCollectionLogs extends Component {
   constructor(props) {
@@ -82,9 +124,12 @@ class WzConfigurationLogCollectionLogs extends Component {
             [
               'file',
               'alias',
-              'commnad', 
-              (item) => `${item.logformat}${item.target ? ` - ${item.target.join(', ')}` : ''}`
-            ]
+              'commnad',
+              item =>
+                `${item.logformat}${
+                  item.target ? ` - ${item.target.join(', ')}` : ''
+                }`,
+            ],
           )
         : [];
     return (
@@ -100,15 +145,25 @@ class WzConfigurationLogCollectionLogs extends Component {
         !isString(currentConfig['logcollector-localfile']) &&
         !(currentConfig['logcollector-localfile']['localfile-logs'] || [])
           .length ? (
-          <WzNoConfig error="not-present" help={helpLinks} />
+          <WzNoConfig error='not-present' help={helpLinks} />
         ) : null}
         {currentConfig['logcollector-localfile'] &&
         !isString(currentConfig['logcollector-localfile']) &&
         currentConfig['logcollector-localfile']['localfile-logs'] &&
         currentConfig['logcollector-localfile']['localfile-logs'].length ? (
           <WzConfigurationSettingsTabSelector
-            title="Logs files"
-            description="List of log files that will be analyzed"
+            title={i18n.translate(
+              'wazuh.public.controller.management.config.log.collection.logs.files',
+              {
+                defaultMessage: 'Logs files',
+              },
+            )}
+            description={i18n.translate(
+              'wazuh.public.controller.management.config.log.collection.logs.analyzed',
+              {
+                defaultMessage: 'List of log files that will be analyzed',
+              },
+            )}
             currentConfig={currentConfig}
             minusHeight={this.props.agent.id === '000' ? 320 : 415}
             helpLinks={helpLinks}

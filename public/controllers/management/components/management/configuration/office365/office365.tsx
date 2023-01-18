@@ -15,13 +15,16 @@ import WzNoConfig from '../util-components/no-config';
 import withWzConfig from '../util-hocs/wz-config';
 import { wodleBuilder } from '../utils/builders';
 import { compose } from 'redux';
-import WzTabSelector, { WzTabSelectorTab } from '../util-components/tab-selector';
+import WzTabSelector, {
+  WzTabSelectorTab,
+} from '../util-components/tab-selector';
 import { isString } from '../utils/utils';
 import { withGuard } from '../../../../../../components/common/hocs';
 import { HELP_LINKS, OFFICE_365, WMODULES_WMODULES } from './constants';
 import { GeneralTab } from './components/general-tab/general-tab';
 import { ApiAuthTab } from './components/api-auth-tab/api-auth-tab';
 import { SubscriptionTab } from './components/SubscriptionTab/SubscriptionTab';
+import { i18n } from '@kbn/i18n';
 
 interface IWzConfigOffice365 {
   currentConfig: {};
@@ -31,59 +34,83 @@ interface IWzConfigOffice365 {
 }
 const sections = [{ component: 'wmodules', configuration: 'wmodules' }];
 
-export const WzConfigurationOffice365: React.FunctionComponent<IWzConfigOffice365> = withWzConfig(
-  sections
-)(({ currentConfig, updateBadge, ...props }) => {
-  const wodleConfiguration = useMemo(() => wodleBuilder(currentConfig, OFFICE_365), [
-    currentConfig,
-  ]);
-
-  useEffect(() => {
-    updateBadge(
-      currentConfig &&
-        wodleConfiguration &&
-        wodleConfiguration[OFFICE_365] &&
-        wodleConfiguration[OFFICE_365].enabled === 'yes'
+export const WzConfigurationOffice365: React.FunctionComponent<IWzConfigOffice365> =
+  withWzConfig(sections)(({ currentConfig, updateBadge, ...props }) => {
+    const wodleConfiguration = useMemo(
+      () => wodleBuilder(currentConfig, OFFICE_365),
+      [currentConfig],
     );
-  }, [currentConfig]);
 
-  return (
-    <WzTabSelector>
-      <WzTabSelectorTab label="General">
-        <GeneralTabWrapped
-          wodleConfiguration={wodleConfiguration}
-          currentConfig={currentConfig}
-          {...props}
-        />
-      </WzTabSelectorTab>
-      <WzTabSelectorTab label="Credentials">
-        <ApiAuthTabWrapped
-          wodleConfiguration={wodleConfiguration}
-          currentConfig={currentConfig}
-          {...props}
-        />
-      </WzTabSelectorTab>
-      <WzTabSelectorTab label="Subscriptions">
-        <SubscriptionTabWrapped
-          wodleConfiguration={wodleConfiguration}
-          currentConfig={currentConfig}
-          {...props}
-        />
-      </WzTabSelectorTab>
-    </WzTabSelector>
-  );
-});
+    useEffect(() => {
+      updateBadge(
+        currentConfig &&
+          wodleConfiguration &&
+          wodleConfiguration[OFFICE_365] &&
+          wodleConfiguration[OFFICE_365].enabled === 'yes',
+      );
+    }, [currentConfig]);
+
+    return (
+      <WzTabSelector>
+        <WzTabSelectorTab
+          label={i18n.translate(
+            'wazuh.public.controller.management.config.office365t.General',
+            {
+              defaultMessage: 'General',
+            },
+          )}
+        >
+          <GeneralTabWrapped
+            wodleConfiguration={wodleConfiguration}
+            currentConfig={currentConfig}
+            {...props}
+          />
+        </WzTabSelectorTab>
+        <WzTabSelectorTab
+          label={i18n.translate(
+            'wazuh.public.controller.management.config.office365t.Credentials',
+            {
+              defaultMessage: 'Credentials',
+            },
+          )}
+        >
+          <ApiAuthTabWrapped
+            wodleConfiguration={wodleConfiguration}
+            currentConfig={currentConfig}
+            {...props}
+          />
+        </WzTabSelectorTab>
+        <WzTabSelectorTab
+          label={i18n.translate(
+            'wazuh.public.controller.management.config.office365t.Subscriptions',
+            {
+              defaultMessage: 'Subscriptions',
+            },
+          )}
+        >
+          <SubscriptionTabWrapped
+            wodleConfiguration={wodleConfiguration}
+            currentConfig={currentConfig}
+            {...props}
+          />
+        </WzTabSelectorTab>
+      </WzTabSelector>
+    );
+  });
 
 const tabWrapper = compose(
   withGuard(
     ({ currentConfig }) =>
-      currentConfig[WMODULES_WMODULES] && isString(currentConfig[WMODULES_WMODULES]),
-    ({ currentConfig }) => <WzNoConfig error={currentConfig[WMODULES_WMODULES]} help={HELP_LINKS} />
+      currentConfig[WMODULES_WMODULES] &&
+      isString(currentConfig[WMODULES_WMODULES]),
+    ({ currentConfig }) => (
+      <WzNoConfig error={currentConfig[WMODULES_WMODULES]} help={HELP_LINKS} />
+    ),
   ),
   withGuard(
     ({ wodleConfiguration }) => !wodleConfiguration[OFFICE_365],
-    (props) => <WzNoConfig error="not-present" help={HELP_LINKS} />
-  )
+    props => <WzNoConfig error='not-present' help={HELP_LINKS} />,
+  ),
 );
 
 const GeneralTabWrapped = tabWrapper(GeneralTab);

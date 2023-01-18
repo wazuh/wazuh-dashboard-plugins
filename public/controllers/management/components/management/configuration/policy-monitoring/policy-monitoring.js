@@ -14,8 +14,9 @@ import React, { Component, Fragment } from 'react';
 
 import withWzConfig from '../util-hocs/wz-config';
 import WzTabSelector, {
-  WzTabSelectorTab
+  WzTabSelectorTab,
 } from '../util-components/tab-selector';
+import { i18n } from '@kbn/i18n';
 
 import WzConfigurationPolicyMonitoringGeneral from './policy-monitoring-general';
 import WzConfigurationPolicyMonitoringSystemAudit from './policy-monitoring-system-audit';
@@ -42,10 +43,24 @@ class WzPolicyMonitoring extends Component {
       <Fragment>
         {(this.props.onlyShowTab === 'Policy Monitoring' && (
           <WzTabSelector>
-            <WzTabSelectorTab label="General">
+            <WzTabSelectorTab
+              label={i18n.translate(
+                'wazuh.public.controller.management.config.policy.monitoring.General',
+                {
+                  defaultMessage: 'General',
+                },
+              )}
+            >
               <WzConfigurationPolicyMonitoringGeneral {...this.props} />
             </WzTabSelectorTab>
-            <WzTabSelectorTab label="Ignored">
+            <WzTabSelectorTab
+              label={i18n.translate(
+                'wazuh.public.controller.management.config.policy.monitoring.Ignored',
+                {
+                  defaultMessage: 'Ignored',
+                },
+              )}
+            >
               <WzConfigurationPolicyMonitoringIgnored {...this.props} />
             </WzTabSelectorTab>
           </WzTabSelector>
@@ -57,16 +72,44 @@ class WzPolicyMonitoring extends Component {
             <WzConfigurationPolicyMonitoringSCA {...this.props} />
           )) || (
             <WzTabSelector>
-              <WzTabSelectorTab label="General">
+              <WzTabSelectorTab
+                label={i18n.translate(
+                  'wazuh.public.controller.management.config.policy.monitoring.General',
+                  {
+                    defaultMessage: 'General',
+                  },
+                )}
+              >
                 <WzConfigurationPolicyMonitoringGeneral {...this.props} />
               </WzTabSelectorTab>
-              <WzTabSelectorTab label="System audit">
+              <WzTabSelectorTab
+                label={i18n.translate(
+                  'wazuh.public.controller.management.config.policy.monitoring.Systemaudit',
+                  {
+                    defaultMessage: 'System audit',
+                  },
+                )}
+              >
                 <WzConfigurationPolicyMonitoringSystemAudit {...this.props} />
               </WzTabSelectorTab>
-              <WzTabSelectorTab label="Ignored">
+              <WzTabSelectorTab
+                label={i18n.translate(
+                  'wazuh.public.controller.management.config.policy.monitoring.Ignored',
+                  {
+                    defaultMessage: 'Ignored',
+                  },
+                )}
+              >
                 <WzConfigurationPolicyMonitoringIgnored {...this.props} />
               </WzTabSelectorTab>
-              <WzTabSelectorTab label="SCA">
+              <WzTabSelectorTab
+                label={i18n.translate(
+                  'wazuh.public.controller.management.config.policy.monitoring.SCA',
+                  {
+                    defaultMessage: 'SCA',
+                  },
+                )}
+              >
                 <WzConfigurationPolicyMonitoringSCA {...this.props} />
               </WzTabSelectorTab>
             </WzTabSelector>
@@ -78,7 +121,7 @@ class WzPolicyMonitoring extends Component {
 
 const sections = [
   { component: 'syscheck', configuration: 'rootcheck' },
-  { component: 'wmodules', configuration: 'wmodules' }
+  { component: 'wmodules', configuration: 'wmodules' },
 ];
 
 WzPolicyMonitoring.propTypes = {

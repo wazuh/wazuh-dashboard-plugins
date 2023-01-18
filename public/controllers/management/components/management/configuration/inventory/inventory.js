@@ -19,36 +19,126 @@ import withWzConfig from '../util-hocs/wz-config';
 import { isString, renderValueNoThenEnabled } from '../utils/utils';
 import { wodleBuilder } from '../utils/builders';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
+import { i18n } from '@kbn/i18n';
 
 const mainSettings = [
   {
     field: 'disabled',
-    label: 'Syscollector integration status',
-    render: renderValueNoThenEnabled
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.inventory.status',
+      {
+        defaultMessage: 'Syscollector integration status',
+      },
+    ),
+    render: renderValueNoThenEnabled,
   },
-  { field: 'interval', label: 'Interval between system scans' },
-  { field: 'scan-on-start', label: 'Scan on start' }
+  {
+    field: 'interval',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.inventory.',
+      {
+        defaultMessage: '',
+      },
+    ),
+  },
+  {
+    field: 'scan-on-start',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.inventory.ScanOnStart',
+      {
+        defaultMessage: 'Scan on start',
+      },
+    ),
+  },
 ];
 
 const scanSettings = [
-  { field: 'hardware', label: 'Scan hardware info' },
-  { field: 'processes', label: 'Scan current processes' },
-  { field: 'os', label: 'Scan operating system info' },
-  { field: 'packages', label: 'Scan installed packages' },
-  { field: 'network', label: 'Scan network interfaces' },
-  { field: 'ports', label: 'Scan listening network ports' },
-  { field: 'ports_all', label: 'Scan all network ports' }
+  {
+    field: 'hardware',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.inventory.ScanHardwareInfo',
+      {
+        defaultMessage: 'Scan hardware info',
+      },
+    ),
+  },
+  {
+    field: 'processes',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.inventory.Scancurrentprocesses',
+      {
+        defaultMessage: 'Scan current processes',
+      },
+    ),
+  },
+  {
+    field: 'os',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.inventory.scanOperating',
+      {
+        defaultMessage: 'Scan operating system info',
+      },
+    ),
+  },
+  {
+    field: 'packages',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.inventory.scanInstalled',
+      {
+        defaultMessage: 'Scan installed packages',
+      },
+    ),
+  },
+  {
+    field: 'network',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.inventory.interface',
+      {
+        defaultMessage: 'Scan network interfaces',
+      },
+    ),
+  },
+  {
+    field: 'ports',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.inventory.scanListening',
+      {
+        defaultMessage: 'Scan listening network ports',
+      },
+    ),
+  },
+  {
+    field: 'ports_all',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.inventory.networkPorts',
+      {
+        defaultMessage: 'Scan all network ports',
+      },
+    ),
+  },
 ];
 
 const helpLinks = [
   {
-    text: 'System inventory',
-    href: webDocumentationLink('user-manual/capabilities/syscollector.html')
+    text: i18n.translate(
+      'wazuh.public.controller.management.config.inventory.SystemInventory',
+      {
+        defaultMessage: 'System inventory',
+      },
+    ),
+    href: webDocumentationLink('user-manual/capabilities/syscollector.html'),
   },
   {
-    text: 'Syscollector module reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/wodle-syscollector.html')
-  }
+    text: i18n.translate(
+      'wazuh.public.controller.management.config.inventory.Syscollectormodulereference',
+      {
+        defaultMessage: 'Syscollector module reference',
+      },
+    ),
+    href: webDocumentationLink(
+      'user-manual/reference/ossec-conf/wodle-syscollector.html',
+    ),
+  },
 ];
 
 class WzConfigurationInventory extends Component {
@@ -80,12 +170,22 @@ class WzConfigurationInventory extends Component {
         {currentConfig &&
           !this.wodleConfig.syscollector &&
           !isString(currentConfig['wmodules-wmodules']) && (
-            <WzNoConfig error="not-present" help={helpLinks} />
+            <WzNoConfig error='not-present' help={helpLinks} />
           )}
         {currentConfig && this.wodleConfig && this.wodleConfig.syscollector && (
           <WzConfigurationSettingsTabSelector
-            title="Main settings"
-            description="General settings applied to all the scans"
+            title={i18n.translate(
+              'wazuh.public.controller.management.config.inventory.MainSettings',
+              {
+                defaultMessage: 'Main settings',
+              },
+            )}
+            description={i18n.translate(
+              'wazuh.public.controller.management.config.inventory.General settingsApplied',
+              {
+                defaultMessage: 'General settings applied to all the scans',
+              },
+            )}
             currentConfig={this.wodleConfig}
             minusHeight={this.props.agent.id === '000' ? 260 : 355}
             helpLinks={helpLinks}
@@ -95,8 +195,18 @@ class WzConfigurationInventory extends Component {
               items={mainSettings}
             />
             <WzConfigurationSettingsGroup
-              title="Scan settings"
-              description="Specific inventory scans to collect"
+              title={i18n.translate(
+                'wazuh.public.controller.management.config.inventory.Scansettings',
+                {
+                  defaultMessage: 'Scan settings',
+                },
+              )}
+              description={i18n.translate(
+                'wazuh.public.controller.management.config.inventory.collect',
+                {
+                  defaultMessage: 'Specific inventory scans to collect',
+                },
+              )}
               config={this.wodleConfig.syscollector}
               items={scanSettings}
             />

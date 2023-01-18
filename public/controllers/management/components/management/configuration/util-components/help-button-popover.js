@@ -12,6 +12,7 @@
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { i18n } from '@kbn/i18n';
 
 import { EuiButtonEmpty, EuiPopover, EuiText } from '@elastic/eui';
 
@@ -19,7 +20,7 @@ class WzHelpButtonPopover extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      showHelp: false
+      showHelp: false,
     };
   }
   toggleShowHelp() {
@@ -30,11 +31,11 @@ class WzHelpButtonPopover extends Component {
     const { children, links } = this.props;
     return (
       <EuiPopover
-        id="show-help"
+        id='show-help'
         button={
           <EuiButtonEmpty
-            iconSide="left"
-            iconType="questionInCircle"
+            iconSide='left'
+            iconType='questionInCircle'
             onClick={() => this.toggleShowHelp()}
           />
         }
@@ -42,12 +43,17 @@ class WzHelpButtonPopover extends Component {
         closePopover={() => this.toggleShowHelp()}
       >
         <div style={{ width: '300px' }}>
-          <EuiText color="subdued" style={{ padding: '0 8px' }}>
-            More info about this section
+          <EuiText color='subdued' style={{ padding: '0 8px' }}>
+            {i18n.translate(
+              'wazuh.public.controller.management.config.policy.util.components.button.about',
+              {
+                defaultMessage: 'More info about this section',
+              },
+            )}
           </EuiText>
           {links.map(link => (
             <div key={`show-help-${link.text}`}>
-              <EuiButtonEmpty target="_blank" href={link.href}>
+              <EuiButtonEmpty target='_blank' href={link.href}>
                 {link.text}
               </EuiButtonEmpty>
             </div>
@@ -59,7 +65,7 @@ class WzHelpButtonPopover extends Component {
 }
 
 WzHelpButtonPopover.propTypes = {
-  links: PropTypes.array
+  links: PropTypes.array,
 };
 
 export default WzHelpButtonPopover;

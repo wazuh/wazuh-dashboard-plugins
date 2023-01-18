@@ -47,8 +47,20 @@ import { getErrorOrchestrator } from '../../../../../react-services/common-servi
 export default compose(
   withGlobalBreadcrumb([
     { text: '' },
-    { text: 'Management', href: '#/manager' },
-    { text: 'Logs' },
+    {
+      text: i18n.translate(
+        'wazuh.public.controller.management.mg.logs.Management',
+        {
+          defaultMessage: 'Management',
+        },
+      ),
+      href: '#/manager',
+    },
+    {
+      text: i18n.translate('wazuh.public.controller.management.mg.logs.Log', {
+        defaultMessage: 'Logs',
+      }),
+    },
   ]),
   withUserAuthorizationPrompt([
     { action: 'cluster:status', resource: '*:*:*' },
@@ -145,7 +157,14 @@ export default compose(
         ];
         this.setState({ daemonsList });
       } catch (error) {
-        throw new Error('Error fetching daemons list: ' + error);
+        throw new Error(
+          i18n.translate(
+            'wazuh.public.controller.management.mg.logs.listError',
+            {
+              defaultMessage: 'Error fetching daemons list:',
+            },
+          ) + error,
+        );
       }
     }
 
@@ -282,13 +301,69 @@ export default compose(
 
     getLogLevelOptions() {
       return [
-        { value: 'all', text: 'All log levels' },
-        { value: 'info', text: 'Info' },
-        { value: 'error', text: 'Error' },
-        { value: 'warning', text: 'Warning' },
-        { value: 'critical', text: 'Critical' },
-        { value: 'debug', text: 'Debug' },
-        { value: 'debug2', text: 'Debug2' },
+        {
+          value: 'all',
+          text: i18n.translate(
+            'wazuh.public.controller.management.mg.logs.Allloglevels',
+            {
+              defaultMessage: 'All log levels',
+            },
+          ),
+        },
+        {
+          value: 'info',
+          text: i18n.translate(
+            'wazuh.public.controller.management.mg.logs.Info',
+            {
+              defaultMessage: 'Info',
+            },
+          ),
+        },
+        {
+          value: 'error',
+          text: i18n.translate(
+            'wazuh.public.controller.management.mg.logs.Error',
+            {
+              defaultMessage: '',
+            },
+          ),
+        },
+        {
+          value: 'warning',
+          text: i18n.translate(
+            'wazuh.public.controller.management.mg.logs.Warning',
+            {
+              defaultMessage: 'Warning',
+            },
+          ),
+        },
+        {
+          value: 'critical',
+          text: i18n.translate(
+            'wazuh.public.controller.management.mg.logs.Critical',
+            {
+              defaultMessage: 'Critical',
+            },
+          ),
+        },
+        {
+          value: 'debug',
+          text: i18n.translate(
+            'wazuh.public.controller.management.mg.logs.Debug',
+            {
+              defaultMessage: 'Debug',
+            },
+          ),
+        },
+        {
+          value: 'debug2',
+          text: i18n.translate(
+            'wazuh.public.controller.management.mg.logs.Debug2',
+            {
+              defaultMessage: 'Debug2',
+            },
+          ),
+        },
       ];
     }
 
@@ -309,7 +384,12 @@ export default compose(
           store: true,
           error: {
             error: error,
-            message: 'Error obtaining list of nodes.',
+            message: i18n.translate(
+              'wazuh.public.controller.management.mg.logs.nodes',
+              {
+                defaultMessage: 'Error obtaining list of nodes.',
+              },
+            ),
             title: error.name,
           },
         };
@@ -447,9 +527,12 @@ export default compose(
             <EuiFlexItem>
               <EuiTitle size={'m'}>
                 <h2>
-                  {i18n.translate('wazuh.controllers.mnage.comp.confi.groups.Logs', {
-                    defaultMessage: 'Logs',
-                  })}
+                  {i18n.translate(
+                    'wazuh.controllers.mnage.comp.confi.groups.Logs',
+                    {
+                      defaultMessage: 'Logs',
+                    },
+                  )}
                 </h2>
               </EuiTitle>
             </EuiFlexItem>
@@ -476,9 +559,12 @@ export default compose(
             <EuiFlexItem>
               <EuiTextColor color='subdued'>
                 <p>
-                  {i18n.translate('wazuh.controllers.mnage.comp.confi.groups.list', {
-                    defaultMessage: 'List and filter Wazuh logs.',
-                  })}
+                  {i18n.translate(
+                    'wazuh.controllers.mnage.comp.confi.groups.list',
+                    {
+                      defaultMessage: 'List and filter Wazuh logs.',
+                    },
+                  )}
                 </p>
               </EuiTextColor>
             </EuiFlexItem>
@@ -492,7 +578,12 @@ export default compose(
                     options={daemonsOptions}
                     value={this.state.selectedDaemon}
                     onChange={this.onDaemonChange}
-                    aria-label='Filter by daemon'
+                    aria-label={i18n.translate(
+                      'wazuh.public.controller.management.mg.logs.Filterbydaemon',
+                      {
+                        defaultMessage: 'Filter by daemon',
+                      },
+                    )}
                   />
                 </EuiFlexItem>
                 <EuiFlexItem grow={false}>
@@ -501,7 +592,12 @@ export default compose(
                     options={logLevelOptions}
                     value={this.state.logLevelSelect}
                     onChange={this.onLogLevelChange}
-                    aria-label='Filter by log level'
+                    aria-label={i18n.translate(
+                      'wazuh.public.controller.management.mg.logs.level',
+                      {
+                        defaultMessage: 'Filter by log level',
+                      },
+                    )}
                   />
                 </EuiFlexItem>
                 {this.state.selectedNode && (
@@ -511,20 +607,35 @@ export default compose(
                       options={nodeList}
                       value={this.state.selectedNode}
                       onChange={this.onSelectNode}
-                      aria-label='Select node'
+                      aria-label={i18n.translate(
+                        'wazuh.public.controller.management.mg.logs.Selectnode',
+                        {
+                          defaultMessage: 'Select node',
+                        },
+                      )}
                     />
                   </EuiFlexItem>
                 )}
                 <EuiFlexItem grow={false} style={{ paddingTop: '10px' }}>
                   <EuiSwitch
-                    label='Descending sort'
+                    label={i18n.translate(
+                      'wazuh.public.controller.management.mg.logs.Descendingsort',
+                      {
+                        defaultMessage: 'Descending sort',
+                      },
+                    )}
                     checked={this.state.descendingSort}
                     onChange={this.onSortSwitchChange}
                   />
                 </EuiFlexItem>
                 <EuiFlexItem grow={false} style={{ paddingTop: '10px' }}>
                   <EuiSwitch
-                    label='Realtime'
+                    label={i18n.translate(
+                      'wazuh.public.controller.management.mg.logs.Realtime',
+                      {
+                        defaultMessage: 'Realtime',
+                      },
+                    )}
                     checked={this.state.realTime}
                     onChange={() => this.switchRealTime()}
                   />
@@ -539,8 +650,18 @@ export default compose(
                 searchDelay={500}
                 onChange={this.onSearchBarChange}
                 onSearch={this.onSearchBarSearch}
-                placeholder='Filter logs'
-                aria-label='Filter logs'
+                placeholder={i18n.translate(
+                  'wazuh.public.controller.management.mg.logs.Filterlogs',
+                  {
+                    defaultMessage: 'Filter logs',
+                  },
+                )}
+                aria-label={i18n.translate(
+                  'wazuh.public.controller.management.mg.logs.Filterlogs',
+                  {
+                    defaultMessage: 'Filter logs',
+                  },
+                )}
                 fullWidth
               />
             </EuiFlexItem>
@@ -592,7 +713,12 @@ export default compose(
                           : undefined
                       }
                     >
-                      Load more logs
+                      {i18n.translate(
+                        'wazuh.public.controller.management.mg.logs.more',
+                        {
+                          defaultMessage: 'Load more logs',
+                        },
+                      )}
                     </EuiButtonEmpty>
                   </EuiFlexItem>
                 </EuiFlexGroup>
@@ -601,7 +727,12 @@ export default compose(
           )) || (
             <EuiCallOut
               color='warning'
-              title='No results match your search criteria.'
+              title={i18n.translate(
+                'wazuh.public.controller.management.mg.logs.noresult',
+                {
+                  defaultMessage: 'No results match your search criteria.',
+                },
+              )}
               iconType='alert'
             />
           )}

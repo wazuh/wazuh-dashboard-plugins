@@ -11,6 +11,7 @@
  */
 
 import React, { Component, Fragment } from 'react';
+import { i18n } from '@kbn/i18n';
 
 import { EuiBasicTable } from '@elastic/eui';
 
@@ -19,7 +20,17 @@ import WzConfigurationSettingsTabSelector from '../util-components/configuration
 import { isString } from '../utils/utils';
 import helpLinks from './help-links';
 
-const columns = [{ field: 'path', name: 'Path' }];
+const columns = [
+  {
+    field: 'path',
+    name: i18n.translate(
+      'wazuh.public.controller.management.config.policy.monitoring.aduit.Path',
+      {
+        defaultMessage: 'Path',
+      },
+    ),
+  },
+];
 
 class WzPolicyMonitoringSystemAudit extends Component {
   constructor(props) {
@@ -40,15 +51,26 @@ class WzPolicyMonitoringSystemAudit extends Component {
           currentConfig['syscheck-rootcheck'] &&
           currentConfig['syscheck-rootcheck'].rootcheck &&
           !currentConfig['syscheck-rootcheck'].rootcheck.system_audit && (
-            <WzNoConfig error="not-present" help={helpLinks} />
+            <WzNoConfig error='not-present' help={helpLinks} />
           )}
         {currentConfig &&
           currentConfig['syscheck-rootcheck'] &&
           currentConfig['syscheck-rootcheck'].rootcheck &&
           currentConfig['syscheck-rootcheck'].rootcheck.system_audit && (
             <WzConfigurationSettingsTabSelector
-              title="UNIX audit files"
-              description="Specified paths to audit definition files for Unix-like systems"
+              title={i18n.translate(
+                'wazuh.public.controller.management.config.policy.monitoring.aduit.unix',
+                {
+                  defaultMessage: 'UNIX audit files',
+                },
+              )}
+              description={i18n.translate(
+                'wazuh.public.controller.management.config.policy.monitoring.aduit.paths',
+                {
+                  defaultMessage:
+                    'Specified paths to audit definition files for Unix-like systems',
+                },
+              )}
               currentConfig={currentConfig}
               minusHeight={this.props.agent.id === '000' ? 320 : 415}
               helpLinks={helpLinks}

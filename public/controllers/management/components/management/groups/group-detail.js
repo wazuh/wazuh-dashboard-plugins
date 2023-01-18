@@ -36,12 +36,22 @@ class WzGroupDetail extends Component {
     this.tabs = [
       {
         id: 'agents',
-        name: 'Agents',
+        name: i18n.translate(
+          'wazuh.public.controller.management.groups.details.Agents',
+          {
+            defaultMessage: 'Agents',
+          },
+        ),
         disabled: false,
       },
       {
         id: 'files',
-        name: 'Files',
+        name: i18n.translate(
+          'wazuh.public.controller.management.groups.details.Files',
+          {
+            defaultMessage: 'Files',
+          },
+        ),
         disabled: false,
       },
     ];
@@ -88,9 +98,13 @@ class WzGroupDetail extends Component {
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiText color='subdued' style={{ paddingBottom: '15px' }}>
-              {i18n.translate('wazuh.controllers.mnage.comp.confi.groups.mange', {
-                defaultMessage: 'From here you can list and manage your agents',
-              })}{' '}
+              {i18n.translate(
+                'wazuh.controllers.mnage.comp.confi.groups.mange',
+                {
+                  defaultMessage:
+                    'From here you can list and manage your agents',
+                },
+              )}{' '}
             </EuiText>
           </EuiFlexItem>
         </EuiFlexGroup>
@@ -109,10 +123,13 @@ class WzGroupDetail extends Component {
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiText color='subdued' style={{ paddingBottom: '15px' }}>
-              {i18n.translate('wazuh.controllers.mnage.comp.confi.groups.files', {
-                defaultMessage:
-                  'From here you can list and see your group files, also, you can edit the group configuration',
-              })}
+              {i18n.translate(
+                'wazuh.controllers.mnage.comp.confi.groups.files',
+                {
+                  defaultMessage:
+                    'From here you can list and see your group files, also, you can edit the group configuration',
+                },
+              )}
             </EuiText>
           </EuiFlexItem>
         </EuiFlexGroup>
@@ -137,7 +154,12 @@ class WzGroupDetail extends Component {
                 <EuiFlexItem grow={false} style={{ marginRight: 0 }}>
                   <EuiToolTip position='right' content={`Back to groups`}>
                     <EuiButtonIcon
-                      aria-label='Back'
+                      aria-label={i18n.translate(
+                        'wazuh.public.controller.management.groups.details.Back',
+                        {
+                          defaultMessage: 'Back',
+                        },
+                      )}
                       style={{ paddingTop: 8 }}
                       color='primary'
                       iconSize='l'

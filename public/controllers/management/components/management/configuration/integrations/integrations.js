@@ -23,43 +23,77 @@ import withWzConfig from '../util-hocs/wz-config';
 import { capitalize, isString } from '../utils/utils';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
+
+import { i18n } from '@kbn/i18n';
+
+
 const helpLinks = [
   {
-    text: 'Integration with external APIs',
+    text: i18n.translate('wazuh.public.controller.management.config.integrations.externalapis', {
+          defaultMessage: 'Integration with external APIs',
+        }),
     href: webDocumentationLink('user-manual/manager/manual-integration.html')
   },
   {
-    text: 'VirusTotal integration',
+    text: i18n.translate('wazuh.public.controller.management.config.integrations.VirusTotal', {
+          defaultMessage: 'VirusTotal integration',
+        }),
     href: webDocumentationLink('user-manual/capabilities/virustotal-scan/index.html')
   },
   {
-    text: 'Integration reference',
+    text: i18n.translate('wazuh.public.controller.management.config.integrations.refence', {
+          defaultMessage: 'Integration reference',
+        }),
     href: webDocumentationLink('user-manual/reference/ossec-conf/integration.html')
   }
 ];
 
 const defaultIntegrations = [
-  { title: 'Slack', description: 'Get alerts directly on Slack' },
+  { title: i18n.translate('wazuh.public.controller.management.config.integrations.', {
+          defaultMessage: 'Slack',
+        }), description:i18n.translate('wazuh.public.controller.management.config.integrations.directely', {
+          defaultMessage: 'Get alerts directly on Slack',
+        })  },
   {
-    title: 'VirusTotal',
-    description: 'Get notified when malicious software is found'
+    title: i18n.translate('wazuh.public.controller.management.config.integrations.VirusTotal', {
+          defaultMessage: 'VirusTotal',
+        }),
+    description: i18n.translate('wazuh.public.controller.management.config.integrations.softFound', {
+          defaultMessage: 'Get notified when malicious software is found',
+        })
   },
   {
-    title: 'PagerDuty',
-    description: 'Get alerts on this streamlined incident resolution software'
+    title: i18n.translate('wazuh.public.controller.management.config.integrations.PagerDuty', {
+          defaultMessage: 'PagerDuty',
+        }),
+    description: i18n.translate('wazuh.public.controller.management.config.integrations.softwere', {
+          defaultMessage: 'Get alerts on this streamlined incident resolution software',
+        })
   }
 ];
 
 const integrationsSettings = [
-  { field: 'hook_url', label: 'Hook URL' },
-  { field: 'level', label: 'Filter alerts by this level or above' },
-  { field: 'rule_id', label: 'Filter alerts by these rule IDs' },
-  { field: 'group', label: 'Filter alerts by these rule groupst' },
+  { field: 'hook_url', label: i18n.translate('wazuh.public.controller.management.config.integrations.HookURL', {
+          defaultMessage: 'Hook URL',
+        }) },
+  { field: 'level', label: i18n.translate('wazuh.public.controller.management.config.integrations.level', {
+          defaultMessage: 'Filter alerts by this level or above',
+        }) },
+  { field: 'rule_id', label: i18n.translate('wazuh.public.controller.management.config.integrations.ruleID', {
+          defaultMessage: 'Filter alerts by these rule IDs',
+        }) },
+  { field: 'group', label: i18n.translate('wazuh.public.controller.management.config.integrations.groupst', {
+          defaultMessage: 'Filter alerts by these rule groupst',
+        }) },
   {
     field: 'event_location',
-    label: 'Filter alerts by location (agent, IP or file)'
+    label: i18n.translate('wazuh.public.controller.management.config.integrations.location ', {
+          defaultMessage: 'Filter alerts by location (agent, IP or file)',
+        })
   },
-  { field: 'alert_format', label: 'Used format to write alerts' }
+  { field: 'alert_format', label: i18n.translate('wazuh.public.controller.management.config.integrations.writalert', {
+          defaultMessage: 'Used format to write alerts',
+        }) }
 ];
 
 class WzConfigurationIntegrations extends Component {
@@ -76,7 +110,9 @@ class WzConfigurationIntegrations extends Component {
     return (
       defaultIntegrations.find(
         i => i.title && i.title.toLocaleLowerCase() === integration
-      ) || { title: capitalize(integration), description: 'Custom integration' }
+      ) || { title: capitalize(integration), description: i18n.translate('wazuh.public.controller.management.config.integrations.', {
+          defaultMessage: '',
+        })'Custom integration' }
     );
   }
   render() {

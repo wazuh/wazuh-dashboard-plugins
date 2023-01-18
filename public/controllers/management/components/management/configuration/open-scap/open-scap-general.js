@@ -17,16 +17,46 @@ import WzConfigurationSettingsGroup from '../util-components/configuration-setti
 import WzNoConfig from '../util-components/no-config';
 import helpLinks from './help-links';
 import { isString, renderValueNoThenEnabled } from '../utils/utils';
+import { i18n } from '@kbn/i18n';
 
 const mainSettings = [
   {
     field: 'disabled',
-    label: 'OpenSCAP integration status',
-    render: renderValueNoThenEnabled
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.open.scap.gernal.integation',
+      {
+        defaultMessage: 'OpenSCAP integration status',
+      },
+    ),
+    render: renderValueNoThenEnabled,
   },
-  { field: 'timeout', label: 'Timeout (in seconds) for scan executions' },
-  { field: 'interval', label: 'Interval between scan executions' },
-  { field: 'scan-on-start', label: 'Scan on start' }
+  {
+    field: 'timeout',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.open.scap.gernal.timeOut',
+      {
+        defaultMessage: 'Timeout (in seconds) for scan executions',
+      },
+    ),
+  },
+  {
+    field: 'interval',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.open.scap.gernal.interval',
+      {
+        defaultMessage: 'Interval between scan executions',
+      },
+    ),
+  },
+  {
+    field: 'scan-on-start',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.open.scap.gernal.start',
+      {
+        defaultMessage: 'Scan on start',
+      },
+    ),
+  },
 ];
 
 class WzConfigurationOpenSCAPGeneral extends Component {
@@ -47,12 +77,23 @@ class WzConfigurationOpenSCAPGeneral extends Component {
         {currentConfig &&
           !wodleConfig['open-scap'] &&
           !isString(currentConfig['wmodules-wmodules']) && (
-            <WzNoConfig error="not-present" help={helpLinks} />
+            <WzNoConfig error='not-present' help={helpLinks} />
           )}
         {wodleConfig['open-scap'] && (
           <WzConfigurationSettingsTabSelector
-            title="Main settings"
-            description="These settings apply to all OpenSCAP evaluations"
+            title={i18n.translate(
+              'wazuh.public.controller.management.config.open.scap.gernal.MainSettings',
+              {
+                defaultMessage: 'Main settings',
+              },
+            )}
+            description={i18n.translate(
+              'wazuh.public.controller.management.config.open.scap.gernal.setting',
+              {
+                defaultMessage:
+                  'These settings apply to all OpenSCAP evaluations',
+              },
+            )}
             currentConfig={wodleConfig}
             minusHeight={this.props.agent.id === '000' ? 320 : 415}
             helpLinks={helpLinks}

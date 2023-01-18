@@ -3,6 +3,7 @@ import { EuiToolTip, EuiButtonIcon } from '@elastic/eui';
 import GroupsHandler from '../utils/groups-handler';
 import beautifier from '../../../../../../utils/json-beautifier';
 import { WzButtonPermissions } from '../../../../../../components/common/permissions/button';
+import { i18n } from '@kbn/i18n';
 
 export default class GroupsFilesColumns {
   constructor(tableProps) {
@@ -13,7 +14,7 @@ export default class GroupsFilesColumns {
 
     this.actionFile = async (item, edit) => {
       let result = await this.groupsHandler.getFileContent(
-        `/groups/${itemDetail.name}/files/${item.filename}/xml`
+        `/groups/${itemDetail.name}/files/${item.filename}/xml`,
       );
 
       if (Object.keys(result).length == 0) {
@@ -40,45 +41,78 @@ export default class GroupsFilesColumns {
       this.columns = [
         {
           field: 'filename',
-          name: 'File',
+          name: i18n.translate(
+            'wazuh.public.controller.management.groups.utils.columns.File',
+            {
+              defaultMessage: 'File',
+            },
+          ),
           align: 'left',
-          sortable: true
+          sortable: true,
         },
         {
           field: 'hash',
-          name: 'Checksum',
+          name: i18n.translate(
+            'wazuh.public.controller.management.groups.utils.columns.Checksum',
+            {
+              defaultMessage: 'Checksum',
+            },
+          ),
           align: 'left',
-          sortable: true
-        }
+          sortable: true,
+        },
       ];
       this.columns.push({
-        name: 'Actions',
+        name: i18n.translate(
+          'wazuh.public.controller.management.groups.utils.columns.Actions',
+          {
+            defaultMessage: 'Actions',
+          },
+        ),
         align: 'left',
         render: item => {
           return (
             <div>
-              <EuiToolTip position="top" content={`See file content`}>
+              <EuiToolTip position='top' content={`See file content`}>
                 <EuiButtonIcon
-                  aria-label="See file content"
-                  iconType="eye"
+                  aria-label={i18n.translate(
+                    'wazuh.public.controller.management.groups.utils.columns.fileContent',
+                    {
+                      defaultMessage: 'See file content',
+                    },
+                  )}
+                  iconType='eye'
                   onClick={() => this.actionFile(item, false)}
-                  color="primary"
+                  color='primary'
                 />
               </EuiToolTip>
               {item.filename === 'agent.conf' && (
                 <WzButtonPermissions
-                  buttonType="icon"
-                  aria-label="Edit content"
-                  iconType="pencil"
-                  permissions={[{ action: 'group:read', resource: `group:id:${itemDetail.name}` }]}
-                  tooltip={{ position: 'top', content: `Edit ${item.filename}` }}
+                  buttonType='icon'
+                  aria-label={i18n.translate(
+                    'wazuh.public.controller.management.groups.utils.columns.Editcontent',
+                    {
+                      defaultMessage: 'Edit content',
+                    },
+                  )}
+                  iconType='pencil'
+                  permissions={[
+                    {
+                      action: 'group:read',
+                      resource: `group:id:${itemDetail.name}`,
+                    },
+                  ]}
+                  tooltip={{
+                    position: 'top',
+                    content: `Edit ${item.filename}`,
+                  }}
                   onClick={() => this.actionFile(item, true)}
-                  color="primary"
+                  color='primary'
                 />
               )}
             </div>
           );
-        }
+        },
       });
     };
 
@@ -113,7 +147,7 @@ export default class GroupsFilesColumns {
       'other->single': 0,
       'other->closing': -1,
       'other->opening': 0,
-      'other->other': 0
+      'other->other': 0,
     };
 
     for (var i = 0; i < lines.length; i++) {
@@ -128,10 +162,10 @@ export default class GroupsFilesColumns {
       var type = single
         ? 'single'
         : closing
-          ? 'closing'
-          : opening
-            ? 'opening'
-            : 'other';
+        ? 'closing'
+        : opening
+        ? 'opening'
+        : 'other';
       var fromTo = lastType + '->' + type;
       lastType = type;
       var padding = '';

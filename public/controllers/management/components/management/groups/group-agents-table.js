@@ -32,10 +32,13 @@ import { getAgentFilterValues } from './get-agents-filters-values';
 import { TableWzAPI } from '../../../../../components/common/tables';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 import { WzButtonPermissionsModalConfirm } from '../../../../../components/common/buttons';
-import { UI_LOGGER_LEVELS, UI_ORDER_AGENT_STATUS } from '../../../../../../common/constants';
+import {
+  UI_LOGGER_LEVELS,
+  UI_ORDER_AGENT_STATUS,
+} from '../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
-
+import { i18n } from '@kbn/i18n';
 
 class WzGroupAgentsTable extends Component {
   _isMounted = false;
@@ -44,91 +47,197 @@ class WzGroupAgentsTable extends Component {
     this.suggestions = [
       {
         type: 'q',
-        label: 'status',
-        description: 'Filter by agent connection status',
+        label: i18n.translate(
+          'wazuh.public.controller.management.groups.agents.table.status1',
+          {
+            defaultMessage: 'status',
+          },
+        ),
+        description: i18n.translate(
+          'wazuh.public.controller.management.groups.agents.table.status',
+          {
+            defaultMessage: 'Filter by agent connection status',
+          },
+        ),
         operators: ['=', '!='],
         values: UI_ORDER_AGENT_STATUS,
       },
       {
         type: 'q',
-        label: 'os.platform',
-        description: 'Filter by OS platform',
+        label: i18n.translate(
+          'wazuh.public.controller.management.groups.agents.table.os.platform',
+          {
+            defaultMessage: 'os.platform',
+          },
+        ),
+        description: i18n.translate(
+          'wazuh.public.controller.management.groups.agents.table.FilterbyOSplatform',
+          {
+            defaultMessage: 'Filter by OS platform',
+          },
+        ),
         operators: ['=', '!='],
-        values: async (value) =>
+        values: async value =>
           getAgentFilterValues('os.platform', value, {
             q: `group=${this.props.state.itemDetail.name}`,
           }),
       },
       {
         type: 'q',
-        label: 'ip',
-        description: 'Filter by agent IP',
+        label: i18n.translate(
+          'wazuh.public.controller.management.groups.agents.table.ip',
+          {
+            defaultMessage: 'ip',
+          },
+        ),
+        description: i18n.translate(
+          'wazuh.public.controller.management.groups.agents.table.FilterbyagentIP',
+          {
+            defaultMessage: 'Filter by agent IP',
+          },
+        ),
         operators: ['=', '!='],
-        values: async (value) =>
-          getAgentFilterValues('ip', value, { q: `group=${this.props.state.itemDetail.name}` }),
+        values: async value =>
+          getAgentFilterValues('ip', value, {
+            q: `group=${this.props.state.itemDetail.name}`,
+          }),
       },
       {
         type: 'q',
-        label: 'name',
-        description: 'Filter by agent name',
+        label: i18n.translate(
+          'wazuh.public.controller.management.groups.agents.table.name',
+          {
+            defaultMessage: 'name',
+          },
+        ),
+        description: i18n.translate(
+          'wazuh.public.controller.management.groups.agents.table.Filterbyagentname',
+          {
+            defaultMessage: 'Filter by agent name',
+          },
+        ),
         operators: ['=', '!='],
-        values: async (value) =>
-          getAgentFilterValues('name', value, { q: `group=${this.props.state.itemDetail.name}` }),
+        values: async value =>
+          getAgentFilterValues('name', value, {
+            q: `group=${this.props.state.itemDetail.name}`,
+          }),
       },
       {
         type: 'q',
-        label: 'id',
-        description: 'Filter by agent id',
+        label: i18n.translate(
+          'wazuh.public.controller.management.groups.agents.table.id',
+          {
+            defaultMessage: 'id',
+          },
+        ),
+        description: i18n.translate(
+          'wazuh.public.controller.management.groups.agents.table.Filterbyagentid',
+          {
+            defaultMessage: 'Filter by agent id',
+          },
+        ),
         operators: ['=', '!='],
-        values: async (value) =>
-          getAgentFilterValues('id', value, { q: `group=${this.props.state.itemDetail.name}` }),
+        values: async value =>
+          getAgentFilterValues('id', value, {
+            q: `group=${this.props.state.itemDetail.name}`,
+          }),
       },
       {
         type: 'q',
-        label: 'node_name',
-        description: 'Filter by node name',
+        label: i18n.translate(
+          'wazuh.public.controller.management.groups.agents.table.node_name',
+          {
+            defaultMessage: 'node_name',
+          },
+        ),
+        description: i18n.translate(
+          'wazuh.public.controller.management.groups.agents.table.nodeName',
+          {
+            defaultMessage: 'Filter by node name',
+          },
+        ),
         operators: ['=', '!='],
-        values: async (value) =>
+        values: async value =>
           getAgentFilterValues('node_name', value, {
             q: `group=${this.props.state.itemDetail.name}`,
           }),
       },
       {
         type: 'q',
-        label: 'manager',
-        description: 'Filter by manager',
+        label: i18n.translate(
+          'wazuh.public.controller.management.groups.agents.table.',
+          {
+            defaultMessage: 'manager',
+          },
+        ),
+        description: i18n.translate(
+          'wazuh.public.controller.management.groups.agents.table.Filterbymanager',
+          {
+            defaultMessage: 'Filter by manager',
+          },
+        ),
         operators: ['=', '!='],
-        values: async (value) =>
+        values: async value =>
           getAgentFilterValues('manager', value, {
             q: `group=${this.props.state.itemDetail.name}`,
           }),
       },
       {
         type: 'q',
-        label: 'version',
-        description: 'Filter by agent version',
+        label: i18n.translate(
+          'wazuh.public.controller.management.groups.agents.table.version',
+          {
+            defaultMessage: 'version',
+          },
+        ),
+        description: i18n.translate(
+          'wazuh.public.controller.management.groups.agents.table.Filterbyagentversion',
+          {
+            defaultMessage: 'Filter by agent version',
+          },
+        ),
         operators: ['=', '!='],
-        values: async (value) =>
+        values: async value =>
           getAgentFilterValues('version', value, {
             q: `group=${this.props.state.itemDetail.name}`,
           }),
       },
       {
         type: 'q',
-        label: 'configSum',
-        description: 'Filter by agent config sum',
+        label: i18n.translate(
+          'wazuh.public.controller.management.groups.agents.table.configSum1',
+          {
+            defaultMessage: 'configSum',
+          },
+        ),
+        description: i18n.translate(
+          'wazuh.public.controller.management.groups.agents.table.configSum',
+          {
+            defaultMessage: 'Filter by agent config sum',
+          },
+        ),
         operators: ['=', '!='],
-        values: async (value) =>
+        values: async value =>
           getAgentFilterValues('configSum', value, {
             q: `group=${this.props.state.itemDetail.name}`,
           }),
       },
       {
         type: 'q',
-        label: 'mergedSum',
-        description: 'Filter by agent merged sum',
+        label: i18n.translate(
+          'wazuh.public.controller.management.groups.agents.table.mergedSum',
+          {
+            defaultMessage: 'mergedSum',
+          },
+        ),
+        description: i18n.translate(
+          'wazuh.public.controller.management.groups.agents.table.filter',
+          {
+            defaultMessage: 'Filter by agent merged sum',
+          },
+        ),
         operators: ['=', '!='],
-        values: async (value) =>
+        values: async value =>
           getAgentFilterValues('mergedSum', value, {
             q: `group=${this.props.state.itemDetail.name}`,
           }),
@@ -141,92 +250,163 @@ class WzGroupAgentsTable extends Component {
     this.columns = [
       {
         field: 'id',
-        name: 'Id',
+        name: i18n.translate(
+          'wazuh.public.controller.management.groups.agents.table.Id',
+          {
+            defaultMessage: 'Id',
+          },
+        ),
         align: 'left',
         sortable: true,
       },
       {
         field: 'name',
-        name: 'Name',
+        name: i18n.translate(
+          'wazuh.public.controller.management.groups.agents.table.Name',
+          {
+            defaultMessage: 'Name',
+          },
+        ),
         align: 'left',
         sortable: true,
       },
       {
         field: 'ip',
-        name: 'Ip',
+        name: i18n.translate(
+          'wazuh.public.controller.management.groups.agents.table.Ip',
+          {
+            defaultMessage: 'Ip',
+          },
+        ),
         align: 'left',
         sortable: true,
       },
       {
         field: 'status',
-        name: 'Status',
+        name: i18n.translate(
+          'wazuh.public.controller.management.groups.agents.table.Status',
+          {
+            defaultMessage: 'Status',
+          },
+        ),
         align: 'left',
         sortable: true,
       },
       {
         field: 'os.name',
-        name: 'Os name',
+        name: i18n.translate(
+          'wazuh.public.controller.management.groups.agents.table.Osname',
+          {
+            defaultMessage: 'Os name',
+          },
+        ),
         align: 'left',
         sortable: true,
       },
       {
         field: 'os.version',
-        name: 'Os version',
+        name: i18n.translate(
+          'wazuh.public.controller.management.groups.agents.table.Osversion',
+          {
+            defaultMessage: 'Os version',
+          },
+        ),
         align: 'left',
         sortable: true,
       },
       {
         field: 'version',
-        name: 'Version',
+        name: i18n.translate(
+          'wazuh.public.controller.management.groups.agents.table.Version',
+          {
+            defaultMessage: 'Version',
+          },
+        ),
         align: 'left',
         sortable: true,
       },
       {
-        name: 'Actions',
+        name: i18n.translate(
+          'wazuh.public.controller.management.groups.agents.table.Actions',
+          {
+            defaultMessage: 'Actions',
+          },
+        ),
         align: 'left',
-        render: (item) => {
+        render: item => {
           return (
             <div>
               <WzButtonPermissions
-                buttonType="icon"
+                buttonType='icon'
                 permissions={[
                   [
                     { action: 'agent:read', resource: `agent:id:${item.id}` },
-                    ...(item.group || []).map((group) => ({
+                    ...(item.group || []).map(group => ({
                       action: 'agent:read',
                       resource: `agent:group:${group}`,
                     })),
                   ],
                 ]}
-                tooltip={{ position: 'top', content: 'Go to the agent' }}
-                aria-label="Go to the agent"
-                iconType="eye"
+                tooltip={{
+                  position: 'top',
+                  content: i18n.translate(
+                    'wazuh.public.controller.management.groups.agents.table.Gototheagent',
+                    {
+                      defaultMessage: 'Go to the agent',
+                    },
+                  ),
+                }}
+                aria-label={i18n.translate(
+                  'wazuh.public.controller.management.groups.agents.table.Gototheagent',
+                  {
+                    defaultMessage: 'Go to the agent',
+                  },
+                )}
+                iconType='eye'
                 onClick={async () => {
                   this.props.groupsProps.showAgent(item);
                 }}
-                color="primary"
+                color='primary'
               />
               {this.props?.state?.itemDetail?.name !== 'default' && (
                 <WzButtonPermissionsModalConfirm
-                  buttonType="icon"
+                  buttonType='icon'
                   permissions={[
                     [
-                      { action: 'agent:modify_group', resource: `agent:id:${item.id}` },
-                      ...(item.group || []).map((group) => ({
+                      {
+                        action: 'agent:modify_group',
+                        resource: `agent:id:${item.id}`,
+                      },
+                      ...(item.group || []).map(group => ({
                         action: 'agent:modify_group',
                         resource: `agent:group:${group}`,
                       })),
                     ],
                   ]}
-                  tooltip={{ position: 'top', content: 'Remove agent from this group' }}
-                  aria-label="Remove agent from this group"
-                  iconType="trash"
+                  tooltip={{
+                    position: 'top',
+                    content: i18n.translate(
+                      'wazuh.public.controller.management.groups.agents.table.thisGroup',
+                      {
+                        defaultMessage: 'Remove agent from this group',
+                      },
+                    ),
+                  }}
+                  aria-label={i18n.translate(
+                    'wazuh.public.controller.management.groups.agents.table.fromGrop',
+                    {
+                      defaultMessage: 'Remove agent from this group',
+                    },
+                  )}
+                  iconType='trash'
                   onConfirm={async () => {
                     this.removeItems([item]);
                   }}
-                  color="danger"
+                  color='danger'
                   isDisabled={item.name === 'default'}
-                  modalTitle={`Remove ${item.file || item.name} agent from this group?`}
+                  modalTitle={`Remove ${
+                    item.file || item.name
+                  } agent from this group?`}
                   modalProps={{
                     buttonColor: 'danger',
                   }}
@@ -249,7 +429,7 @@ class WzGroupAgentsTable extends Component {
       return (
         <TableWzAPI
           tableColumns={this.columns}
-          tableInitialSortingField="id"
+          tableInitialSortingField='id'
           searchBarSuggestions={this.suggestions}
           endpoint={`/groups/${this.props.state.itemDetail.name}/agents`}
           reload={this.props.state.reload}
@@ -257,7 +437,7 @@ class WzGroupAgentsTable extends Component {
         />
       );
     } else {
-      return <EuiCallOut color="warning" title={error} iconType="gear" />;
+      return <EuiCallOut color='warning' title={error} iconType='gear' />;
     }
   }
 
@@ -274,7 +454,11 @@ class WzGroupAgentsTable extends Component {
     const { itemDetail } = this.props.state;
     this.props.updateLoadingStatus(true);
     try {
-      await Promise.all(items.map(item => this.groupsHandler.deleteAgent(item.id, itemDetail.name)));
+      await Promise.all(
+        items.map(item =>
+          this.groupsHandler.deleteAgent(item.id, itemDetail.name),
+        ),
+      );
       this.props.updateIsProcessing(true);
       this.props.updateLoadingStatus(false);
       this.props.updateReload();
@@ -299,23 +483,27 @@ class WzGroupAgentsTable extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
     state: state.groupsReducers,
   };
 };
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
-    updateLoadingStatus: (status) => dispatch(updateLoadingStatus(status)),
-    updateFileContent: (content) => dispatch(updateFileContent(content)),
-    updateIsProcessing: (isProcessing) => dispatch(updateIsProcessing(isProcessing)),
-    updatePageIndexAgents: (pageIndexAgents) => dispatch(updatePageIndexAgents(pageIndexAgents)),
-    updateShowModal: (showModal) => dispatch(updateShowModal(showModal)),
-    updateListItemsForRemove: (itemList) => dispatch(updateListItemsForRemove(itemList)),
-    updateSortDirectionAgents: (sortDirectionAgents) =>
+    updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
+    updateFileContent: content => dispatch(updateFileContent(content)),
+    updateIsProcessing: isProcessing =>
+      dispatch(updateIsProcessing(isProcessing)),
+    updatePageIndexAgents: pageIndexAgents =>
+      dispatch(updatePageIndexAgents(pageIndexAgents)),
+    updateShowModal: showModal => dispatch(updateShowModal(showModal)),
+    updateListItemsForRemove: itemList =>
+      dispatch(updateListItemsForRemove(itemList)),
+    updateSortDirectionAgents: sortDirectionAgents =>
       dispatch(updateSortDirectionAgents(sortDirectionAgents)),
-    updateSortFieldAgents: (sortFieldAgents) => dispatch(updateSortFieldAgents(sortFieldAgents)),
+    updateSortFieldAgents: sortFieldAgents =>
+      dispatch(updateSortFieldAgents(sortFieldAgents)),
     updateReload: () => dispatch(updateReload()),
   };
 };

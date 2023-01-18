@@ -18,10 +18,31 @@ import WzNoConfig from '../util-components/no-config';
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import { isString } from '../utils/utils';
 import helpLinks from './help-links.js';
+import { i18n } from '@kbn/i18n';
 
-const columnsIgnore = [{ field: 'path', name: 'Path' }];
+const columnsIgnore = [
+  {
+    field: 'path',
+    name: i18n.translate(
+      'wazuh.public.controller.management.config.policy.monitoring.ignored.Path',
+      {
+        defaultMessage: 'Path',
+      },
+    ),
+  },
+];
 
-const columnsIgnoreSregex = [{ field: 'sreg', name: 'Sregex' }];
+const columnsIgnoreSregex = [
+  {
+    field: 'sreg',
+    name: i18n.translate(
+      'wazuh.public.controller.management.config.policy.monitoring.ignored.Sregex',
+      {
+        defaultMessage: 'Sregex',
+      },
+    ),
+  },
+];
 
 class WzConfigurationPolicyMonitoringSystemAudit extends Component {
   constructor(props) {
@@ -45,7 +66,7 @@ class WzConfigurationPolicyMonitoringSystemAudit extends Component {
             (currentConfig['syscheck-rootcheck'].rootcheck.ignore &&
               !currentConfig['syscheck-rootcheck'].rootcheck.ignore
                 .length)) && (
-            <WzNoConfig error="not-present" help={helpLinks} />
+            <WzNoConfig error='not-present' help={helpLinks} />
           )}
         {currentConfig &&
         currentConfig['syscheck-rootcheck'] &&
@@ -53,8 +74,19 @@ class WzConfigurationPolicyMonitoringSystemAudit extends Component {
         currentConfig['syscheck-rootcheck'].rootcheck.ignore &&
         currentConfig['syscheck-rootcheck'].rootcheck.ignore.length ? (
           <WzConfigurationSettingsTabSelector
-            title="Ignored files and directories"
-            description="These files and directories are ignored from the rootcheck scan"
+            title={i18n.translate(
+              'wazuh.public.controller.management.config.policy.monitoring.ignored.files',
+              {
+                defaultMessage: 'Ignored files and directories',
+              },
+            )}
+            description={i18n.translate(
+              'wazuh.public.controller.management.config.policy.monitoring.ignored.directories',
+              {
+                defaultMessage:
+                  'These files and directories are ignored from the rootcheck scan',
+              },
+            )}
             currentConfig={currentConfig}
             minusHeight={this.props.agent.id === '000' ? 320 : 415}
             helpLinks={helpLinks}
@@ -68,7 +100,7 @@ class WzConfigurationPolicyMonitoringSystemAudit extends Component {
                   ].rootcheck.ignore.map(item => ({ path: item }))}
                   columns={columnsIgnore}
                 />
-                <EuiSpacer size="m" />
+                <EuiSpacer size='m' />
               </Fragment>
             )}
             {(currentConfig['syscheck-rootcheck'].rootcheck.ignore_sregex || {})

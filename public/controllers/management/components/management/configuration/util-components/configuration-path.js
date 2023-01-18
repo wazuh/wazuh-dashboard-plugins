@@ -58,7 +58,12 @@ class WzConfigurationPath extends Component {
       modal = (
         <EuiOverlayMask>
           <EuiConfirmModal
-            title='Unsubmitted changes'
+            title={i18n.translate(
+              'wazuh.public.controller.management.config.policy.util.components.path.Unsubmittedchanges',
+              {
+                defaultMessage: 'Unsubmitted changes',
+              },
+            )}
             onConfirm={() => {
               closeModal;
               updateConfigurationSection('');
@@ -96,7 +101,12 @@ class WzConfigurationPath extends Component {
                         updateConfigurationSection('');
                       }
                     }}
-                    aria-label='back to configuration'
+                    aria-label={i18n.translate(
+                      'wazuh.public.controller.management.config.policy.util.components.path.backtoconfiguration',
+                      {
+                        defaultMessage: 'back to configuration',
+                      },
+                    )}
                   />
                 </EuiToolTip>
               </span>

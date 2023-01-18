@@ -17,16 +17,81 @@ import WzConfigurationSettingsGroup from '../util-components/configuration-setti
 import WzNoConfig from '../util-components/no-config';
 import { isString } from '../utils/utils';
 import helpLinks from './help-links';
+import { i18n } from '@kbn/i18n';
 
 const mainSettings = [
-  { field: 'plain_format', label: 'Plain format' },
-  { field: 'JSON format', label: 'json_format' },
-  { field: 'Compress rotatio', label: 'compress_rotation' },
-  { field: 'Saved rotations', label: 'saved_rotations' },
-  { field: 'schedule', label: 'Schedule' },
-  { field: 'maxsize', label: 'Maximum log size' },
-  { field: 'minsize', label: 'Minimum log size' },
-  { field: 'maxage', label: 'Maximum log age' }
+  {
+    field: 'plain_format',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.log.setting.archives.Plainformat',
+      {
+        defaultMessage: 'Plain format',
+      },
+    ),
+  },
+  {
+    field: 'JSON format',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.log.setting.archives.jsonformat',
+      {
+        defaultMessage: 'json_format',
+      },
+    ),
+  },
+  {
+    field: 'Compress rotatio',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.log.setting.archives.',
+      {
+        defaultMessage: 'compressrotation',
+      },
+    ),
+  },
+  {
+    field: 'Saved rotations',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.log.setting.archives.savedrotations',
+      {
+        defaultMessage: 'saved_rotations',
+      },
+    ),
+  },
+  {
+    field: 'schedule',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.log.setting.archives.Schedule',
+      {
+        defaultMessage: 'Schedule',
+      },
+    ),
+  },
+  {
+    field: 'maxsize',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.log.setting.archives.Maximumlogsize',
+      {
+        defaultMessage: 'Maximum log size',
+      },
+    ),
+  },
+  {
+    field: 'minsize',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.log.setting.archives.',
+      {
+        defaultMessage: 'Minimum log size',
+      },
+    ),
+  },
+  {
+    field: 'maxage',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.log.setting.archives.Maximumlogage',
+      {
+        defaultMessage: 'Maximum log age',
+      },
+    ),
+  },
 ];
 
 class WzConfigurationLogSettingsArchives extends Component {
@@ -51,8 +116,18 @@ class WzConfigurationLogSettingsArchives extends Component {
           (currentConfig['com-logging'] &&
             currentConfig['com-logging'].logging && (
               <WzConfigurationSettingsTabSelector
-                title="Archives settings"
-                description="Basic archives log settings"
+                title={i18n.translate(
+                  'wazuh.public.controller.management.config.log.setting.archives.Archivessettings',
+                  {
+                    defaultMessage: 'Archives settings',
+                  },
+                )}
+                description={i18n.translate(
+                  'wazuh.public.controller.management.config.log.setting.archives.logSettings',
+                  {
+                    defaultMessage: 'Basic archives log settings',
+                  },
+                )}
                 currentConfig={
                   currentConfig['analysis-logging'].logging.archives
                 }

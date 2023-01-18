@@ -10,17 +10,30 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { webDocumentationLink } from "../../../../../../../common/services/web_documentation";
+import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
+import { i18n } from '@kbn/i18n';
 
 export const OFFICE_365 = 'office365';
 export const WMODULES_WMODULES = 'wmodules-wmodules';
 export const HELP_LINKS = [
   {
-    text: 'Using Wazuh to monitor Office 365',
+    text: i18n.translate(
+      'wazuh.public.controller.management.config.office365.constant.moniter',
+      {
+        defaultMessage: 'Using Wazuh to monitor Office 365',
+      },
+    ),
     href: webDocumentationLink('office365/index.html'),
   },
   {
-    text: 'Configuration options for the module',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/office365-module.html'),
+    text: i18n.translate(
+      'wazuh.public.controller.management.config.office365.constant.module',
+      {
+        defaultMessage: 'Configuration options for the module',
+      },
+    ),
+    href: webDocumentationLink(
+      'user-manual/reference/ossec-conf/office365-module.html',
+    ),
   },
 ];

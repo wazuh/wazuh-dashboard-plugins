@@ -316,7 +316,15 @@ class WzGroupsActionButtons extends Component {
           >
             <EuiFlexGroup direction={'column'}>
               <EuiFlexItem>
-                <EuiFormRow label='Introduce the group name' id=''>
+                <EuiFormRow
+                  label={i18n.translate(
+                    'wazuh.public.controller.management.groups.button.main.name',
+                    {
+                      defaultMessage: 'Introduce the group name',
+                    },
+                  )}
+                  id=''
+                >
                   <EuiFieldText
                     className='groupNameInput'
                     value={this.state.newGroupName}

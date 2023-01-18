@@ -16,9 +16,10 @@ import WzConfigurationLogSettingsAlerts from './log-settings-alerts';
 import WzConfigurationLogSettingsArchives from './log-settings-archives';
 import WzConfigurationLogSettingsInternal from './log-settings-internal';
 import WzTabSelector, {
-  WzTabSelectorTab
+  WzTabSelectorTab,
 } from '../util-components/tab-selector';
 import withWzConfig from '../util-hocs/wz-config';
+import { i18n } from '@kbn/i18n';
 
 class WzConfigurationLogSettings extends Component {
   constructor(props) {
@@ -30,13 +31,34 @@ class WzConfigurationLogSettings extends Component {
       <Fragment>
         {agent && agent.id === '000' ? (
           <WzTabSelector>
-            <WzTabSelectorTab label="Alerts">
+            <WzTabSelectorTab
+              label={i18n.translate(
+                'wazuh.public.controller.management.config.log.setting.Alerts',
+                {
+                  defaultMessage: 'Alerts',
+                },
+              )}
+            >
               <WzConfigurationLogSettingsAlerts {...this.props} />
             </WzTabSelectorTab>
-            <WzTabSelectorTab label="Archives">
+            <WzTabSelectorTab
+              label={i18n.translate(
+                'wazuh.public.controller.management.config.log.setting.Archives',
+                {
+                  defaultMessage: 'Archives',
+                },
+              )}
+            >
               <WzConfigurationLogSettingsArchives {...this.props} />
             </WzTabSelectorTab>
-            <WzTabSelectorTab label="Internal">
+            <WzTabSelectorTab
+              label={i18n.translate(
+                'wazuh.public.controller.management.config.log.setting.Internal',
+                {
+                  defaultMessage: 'Internal',
+                },
+              )}
+            >
               <WzConfigurationLogSettingsInternal {...this.props} />
             </WzTabSelectorTab>
           </WzTabSelector>
@@ -51,7 +73,7 @@ class WzConfigurationLogSettings extends Component {
 
 const sections = [
   { component: 'analysis', configuration: 'logging' },
-  { component: 'monitor', configuration: 'logging' }
+  { component: 'monitor', configuration: 'logging' },
 ];
 
 const sectionsAgent = [
@@ -59,8 +81,8 @@ const sectionsAgent = [
     component: 'agent',
     configuration: 'logging',
     scope: 'null',
-    agentId: 'true'
-  }
+    agentId: 'true',
+  },
 ];
 
 export default withWzConfig(sections)(WzConfigurationLogSettings);

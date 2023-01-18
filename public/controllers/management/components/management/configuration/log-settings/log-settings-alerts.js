@@ -18,16 +18,81 @@ import { isString } from '../utils/utils';
 import helpLinks from './help-links';
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
+import { i18n } from '@kbn/i18n';
 
 const mainSettings = [
-  { field: 'plain_format', label: 'Plain format' },
-  { field: 'json_format', label: 'JSON format' },
-  { field: 'compress_rotation', label: 'Compress rotation' },
-  { field: 'saved_rotations', label: 'Saved rotations' },
-  { field: 'schedule', label: 'Schedule' },
-  { field: 'maxsize', label: 'Maximum log size' },
-  { field: 'minsize', label: 'Minimum log size' },
-  { field: 'maxage', label: 'Maximum log age' }
+  {
+    field: 'plain_format',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.log.setting.alert.Plainformat',
+      {
+        defaultMessage: 'Plain format',
+      },
+    ),
+  },
+  {
+    field: 'json_format',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.log.setting.alert.JSONFormat',
+      {
+        defaultMessage: 'JSON format',
+      },
+    ),
+  },
+  {
+    field: 'compress_rotation',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.log.setting.alert.CompressRotation',
+      {
+        defaultMessage: 'Compress rotation',
+      },
+    ),
+  },
+  {
+    field: 'saved_rotations',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.log.setting.alert.SavedRotations',
+      {
+        defaultMessage: 'Saved rotations',
+      },
+    ),
+  },
+  {
+    field: 'schedule',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.log.setting.alert.Schedule',
+      {
+        defaultMessage: 'Schedule',
+      },
+    ),
+  },
+  {
+    field: 'maxsize',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.log.setting.alert.Maximumlogsize',
+      {
+        defaultMessage: 'Maximum log size',
+      },
+    ),
+  },
+  {
+    field: 'minsize',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.log.setting.alert.Minimumlogsize',
+      {
+        defaultMessage: 'Minimum log size',
+      },
+    ),
+  },
+  {
+    field: 'maxage',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.log.setting.alert.Maximumlogage',
+      {
+        defaultMessage: 'Maximum log age',
+      },
+    ),
+  },
 ];
 
 class WzConfigurationLogSettingsAlerts extends Component {
@@ -50,8 +115,18 @@ class WzConfigurationLogSettingsAlerts extends Component {
           (currentConfig['com-logging'] &&
             currentConfig['com-logging'].logging)) && (
           <WzConfigurationSettingsTabSelector
-            title="Alerts settings"
-            description="Basic alerts log settings"
+            title={i18n.translate(
+              'wazuh.public.controller.management.config.log.setting.alert.AlertsSettings',
+              {
+                defaultMessage: 'Alerts settings',
+              },
+            )}
+            description={i18n.translate(
+              'wazuh.public.controller.management.config.log.setting.alert.basicAlert',
+              {
+                defaultMessage: 'Basic alerts log settings',
+              },
+            )}
             currentConfig={currentConfig['analysis-logging'].logging.alerts}
             helpLinks={helpLinks}
           >

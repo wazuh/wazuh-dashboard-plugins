@@ -11,6 +11,7 @@
  */
 
 import React, { Component, Fragment } from 'react';
+import { i18n } from '@kbn/i18n';
 
 import WzNoConfig from '../util-components/no-config';
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
@@ -19,14 +20,78 @@ import { isString } from '../utils/utils';
 import helpLinks from './help-links';
 
 const mainSettings = [
-  { field: 'plain_format', label: 'Plain format' },
-  { field: 'JSON format', label: 'json_format' },
-  { field: 'Compress rotatio', label: 'compress_rotation' },
-  { field: 'Saved rotations', label: 'saved_rotations' },
-  { field: 'schedule', label: 'Schedule' },
-  { field: 'maxsize', label: 'Maximum log size' },
-  { field: 'minsize', label: 'Minimum log size' },
-  { field: 'maxage', label: 'Maximum log age' }
+  {
+    field: 'plain_format',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.log.setting.internal.Plainformat',
+      {
+        defaultMessage: 'Plain format',
+      },
+    ),
+  },
+  {
+    field: 'JSON format',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.log.setting.internal.jsonformat',
+      {
+        defaultMessage: 'json_format',
+      },
+    ),
+  },
+  {
+    field: 'Compress rotatio',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.log.setting.internal.compressrotation',
+      {
+        defaultMessage: 'compress_rotation',
+      },
+    ),
+  },
+  {
+    field: 'Saved rotations',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.log.setting.internal.savedrotations',
+      {
+        defaultMessage: 'saved_rotations',
+      },
+    ),
+  },
+  {
+    field: 'schedule',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.log.setting.internal.Schedule',
+      {
+        defaultMessage: 'Schedule',
+      },
+    ),
+  },
+  {
+    field: 'maxsize',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.log.setting.internal.Maximumlogsize',
+      {
+        defaultMessage: 'Maximum log size',
+      },
+    ),
+  },
+  {
+    field: 'minsize',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.log.setting.internal.Minimumlogsize',
+      {
+        defaultMessage: 'Minimum log size',
+      },
+    ),
+  },
+  {
+    field: 'maxage',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.log.setting.internal.Maximumlogage',
+      {
+        defaultMessage: 'Maximum log age',
+      },
+    ),
+  },
 ];
 
 class WzConfigurationLogSettingsInternal extends Component {
@@ -51,8 +116,18 @@ class WzConfigurationLogSettingsInternal extends Component {
           (currentConfig['monitor-logging'] &&
             currentConfig['monitor-logging'].logging && (
               <WzConfigurationSettingsTabSelector
-                title="Internal settings"
-                description="Basic internal log settings"
+                title={i18n.translate(
+                  'wazuh.public.controller.management.config.log.setting.internal.InternalSettings',
+                  {
+                    defaultMessage: 'Internal settings',
+                  },
+                )}
+                description={i18n.translate(
+                  'wazuh.public.controller.management.config.log.setting.internal.BasicInternalLogSettings',
+                  {
+                    defaultMessage: 'Basic internal log settings',
+                  },
+                )}
                 currentConfig={currentConfig['monitor-logging'].logging}
                 helpLinks={helpLinks}
               >
@@ -65,8 +140,18 @@ class WzConfigurationLogSettingsInternal extends Component {
         {currentConfig['agent-logging'] &&
           currentConfig['agent-logging'].logging && (
             <WzConfigurationSettingsTabSelector
-              title="Internal settings"
-              description="Basic internal log settings"
+              title={i18n.translate(
+                'wazuh.public.controller.management.config.log.setting.internal.InternalSettings',
+                {
+                  defaultMessage: 'Internal settings',
+                },
+              )}
+              description={i18n.translate(
+                'wazuh.public.controller.management.config.log.setting.internal.BasicInternalLogSettings',
+                {
+                  defaultMessage: 'Basic internal log settings',
+                },
+              )}
               currentConfig={currentConfig['agent-logging'].logging}
               helpLinks={helpLinks}
             >

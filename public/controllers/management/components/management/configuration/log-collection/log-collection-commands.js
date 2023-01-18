@@ -18,29 +18,65 @@ import WzConfigurationListSelector from '../util-components/configuration-settin
 import {
   isString,
   renderValueOrDefault,
-  renderValueOrNoValue
+  renderValueOrNoValue,
 } from '../utils/utils';
 import { settingsListBuilder } from '../utils/builders';
 import helpLinks from './help-links';
+import { i18n } from '@kbn/i18n';
 
-const renderTargetField = item => item ? item.join(', ') : 'agent';
+const renderTargetField = item => (item ? item.join(', ') : 'agent');
 
 const mainSettings = [
-  { field: 'logformat', label: 'Log format' },
-  { field: 'command', label: 'Run this command', render: renderValueOrNoValue },
-  { field: 'alias', label: 'Command alias', render: renderValueOrNoValue },
+  {
+    field: 'logformat',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.log.collection.LogFormat',
+      {
+        defaultMessage: 'Log format',
+      },
+    ),
+  },
+  {
+    field: 'command',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.log.collection.runCommand',
+      {
+        defaultMessage: 'Run this command',
+      },
+    ),
+    render: renderValueOrNoValue,
+  },
+  {
+    field: 'alias',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.log.collection.CommandAlias',
+      {
+        defaultMessage: 'Command alias',
+      },
+    ),
+    render: renderValueOrNoValue,
+  },
   {
     field: 'frequency',
-    label: 'Interval between command executions',
-    render: renderValueOrNoValue
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.log.collection.executions',
+      {
+        defaultMessage: 'Interval between command executions',
+      },
+    ),
+    render: renderValueOrNoValue,
   },
   {
     field: 'target',
-    label: 'Redirect output to this socket',
-    render: renderTargetField
-  }
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.log.collection.socket',
+      {
+        defaultMessage: 'Redirect output to this socket',
+      },
+    ),
+    render: renderTargetField,
+  },
 ];
-
 
 class WzConfigurationLogCollectionCommands extends Component {
   constructor(props) {
@@ -56,9 +92,12 @@ class WzConfigurationLogCollectionCommands extends Component {
             [
               'file',
               'alias',
-              'commnad', 
-              (item) => `${item.logformat}${item.target ? ` - ${item.target.join(', ')}` : ''}`
-            ]
+              'commnad',
+              item =>
+                `${item.logformat}${
+                  item.target ? ` - ${item.target.join(', ')}` : ''
+                }`,
+            ],
           )
         : [];
     return (
@@ -74,15 +113,26 @@ class WzConfigurationLogCollectionCommands extends Component {
         !isString(currentConfig['logcollector-localfile']) &&
         !(currentConfig['logcollector-localfile']['localfile-commands'] || [])
           .length ? (
-          <WzNoConfig error="not-present" help={helpLinks} />
+          <WzNoConfig error='not-present' help={helpLinks} />
         ) : null}
         {currentConfig['logcollector-localfile'] &&
         !isString(currentConfig['logcollector-localfile']) &&
         currentConfig['logcollector-localfile']['localfile-commands'] &&
         currentConfig['logcollector-localfile']['localfile-commands'].length ? (
           <WzConfigurationSettingsTabSelector
-            title="Command monitoring"
-            description="All output from these commands will be read as one or more log messages depending on whether command or full_command is used."
+            title={i18n.translate(
+              'wazuh.public.controller.management.config.log.collection.CommandMonitoring',
+              {
+                defaultMessage: 'Command monitoring',
+              },
+            )}
+            description={i18n.translate(
+              'wazuh.public.controller.management.config.log.collection.',
+              {
+                defaultMessage:
+                  'All output from these commands will be read as one or more log messages depending on whether command or full_command is used.',
+              },
+            )}
             currentConfig={currentConfig}
             minusHeight={this.props.agent.id === '000' ? 320 : 415}
             helpLinks={helpLinks}

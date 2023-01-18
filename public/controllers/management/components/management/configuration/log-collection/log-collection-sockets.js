@@ -19,35 +19,76 @@ import {
   isString,
   isArray,
   renderValueOrDefault,
-  renderValueOrNoValue
+  renderValueOrNoValue,
 } from '../utils/utils';
 import { settingsListBuilder } from '../utils/builders';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
+import { i18n } from '@kbn/i18n';
 
 const helpLinks = [
   {
-    text: 'Using multiple outputs',
-    href: webDocumentationLink('user-manual/capabilities/log-data-collection/log-data-configuration.html#using-multiple-outputs')
+    text: i18n.translate(
+      'wazuh.public.controller.management.config.log.collection.sockets.multiplue',
+      {
+        defaultMessage: 'Using multiple outputs',
+      },
+    ),
+    href: webDocumentationLink(
+      'user-manual/capabilities/log-data-collection/log-data-configuration.html#using-multiple-outputs',
+    ),
   },
   {
-    text: 'Socket reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/socket.html')
-  }
+    text: i18n.translate(
+      'wazuh.public.controller.management.config.log.collection.sockets.refence',
+      {
+        defaultMessage: 'Socketreference',
+      },
+    ),
+    href: webDocumentationLink('user-manual/reference/ossec-conf/socket.html'),
+  },
 ];
 
 const mainSettings = [
-  { field: 'name', label: 'Socket name', render: renderValueOrNoValue },
-  { field: 'location', label: 'Socket location', render: renderValueOrNoValue },
+  {
+    field: 'name',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.log.collection.sockets.Socketname',
+      {
+        defaultMessage: 'Socket name',
+      },
+    ),
+    render: renderValueOrNoValue,
+  },
+  {
+    field: 'location',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.log.collection.sockets.Socketlocation',
+      {
+        defaultMessage: 'Socket location',
+      },
+    ),
+    render: renderValueOrNoValue,
+  },
   {
     field: 'mode',
-    label: 'UNIX socket protocol',
-    render: renderValueOrDefault('udp')
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.log.collection.sockets.unix',
+      {
+        defaultMessage: 'UNIX socket protocol',
+      },
+    ),
+    render: renderValueOrDefault('udp'),
   },
   {
     field: 'prefix',
-    label: 'Prefix to place before the message',
-    render: renderValueOrNoValue
-  }
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.log.collection.sockets.prefix',
+      {
+        defaultMessage: 'Prefix to place before the message',
+      },
+    ),
+    render: renderValueOrNoValue,
+  },
 ];
 
 class WzConfigurationLogCollectionSockets extends Component {
@@ -71,15 +112,25 @@ class WzConfigurationLogCollectionSockets extends Component {
         {currentConfig['logcollector-socket'] &&
         !isString(currentConfig['logcollector-socket']) &&
         !currentConfig['logcollector-socket'].target ? (
-          <WzNoConfig error="not-present" help={helpLinks} />
+          <WzNoConfig error='not-present' help={helpLinks} />
         ) : null}
         {currentConfig['logcollector-socket'] &&
         !isString(currentConfig['logcollector-socket']) &&
         currentConfig['logcollector-socket'].target &&
         currentConfig['logcollector-socket'].target.length ? (
           <WzConfigurationSettingsTabSelector
-            title="Output sockets"
-            description="Define custom outputs to send log data"
+            title={i18n.translate(
+              'wazuh.public.controller.management.config.log.collection.sockets.socketOutput',
+              {
+                defaultMessage: 'Output sockets',
+              },
+            )}
+            description={i18n.translate(
+              'wazuh.public.controller.management.config.log.collection.sockets.define',
+              {
+                defaultMessage: 'Define custom outputs to send log data',
+              },
+            )}
             currentConfig={currentConfig}
             minusHeight={this.props.agent.id === '000' ? 320 : 415}
             helpLinks={helpLinks}

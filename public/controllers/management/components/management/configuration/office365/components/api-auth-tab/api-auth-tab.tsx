@@ -15,6 +15,7 @@ import WzConfigurationSettingsTabSelector from '../../../util-components/configu
 import WzConfigurationSettingsListSelector from '../../../util-components/configuration-settings-list-selector';
 import { settingsListBuilder } from '../../../utils/builders';
 import { HELP_LINKS, OFFICE_365 } from '../../constants';
+import { i18n } from '@kbn/i18n';
 
 export type ApiAuthProps = {
   agent: { id: string };
@@ -22,22 +23,59 @@ export type ApiAuthProps = {
 };
 
 const columns = [
-  { field: 'tenant_id', label: 'Tenant Id' },
-  { field: 'client_id', label: 'Client Id' },
-  { field: 'client_secret', label: 'Client Secret' },
-  { field: 'client_secret_path', label: 'Client Secret Path' },
+  {
+    field: 'tenant_id',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.office365.api.auth.TenantId',
+      {
+        defaultMessage: 'Tenant Id',
+      },
+    ),
+  },
+  {
+    field: 'client_id',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.office365.api.auth.ClientId',
+      {
+        defaultMessage: 'Client Id',
+      },
+    ),
+  },
+  {
+    field: 'client_secret',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.office365.api.auth.ClientSecret',
+      {
+        defaultMessage: 'Client Secret',
+      },
+    ),
+  },
+  {
+    field: 'client_secret_path',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.office365.api.auth.ClientSecretPath',
+      {
+        defaultMessage: 'Client Secret Path',
+      },
+    ),
+  },
 ];
 
 export const ApiAuthTab = ({ agent, wodleConfiguration }: ApiAuthProps) => {
-  
-  const credentials = useMemo(() => settingsListBuilder(
-    wodleConfiguration[OFFICE_365].api_auth,
-    'tenant_id'
-  ), [wodleConfiguration]);
+  const credentials = useMemo(
+    () =>
+      settingsListBuilder(wodleConfiguration[OFFICE_365].api_auth, 'tenant_id'),
+    [wodleConfiguration],
+  );
 
   return (
     <WzConfigurationSettingsTabSelector
-      title="Credentials for the authentication with the API"
+      title={i18n.translate(
+        'wazuh.public.controller.management.config.office365.api.auth.credentials',
+        {
+          defaultMessage: 'Credentials for the authentication with the API',
+        },
+      )}
       currentConfig={wodleConfiguration}
       minusHeight={agent.id === '000' ? 370 : 320}
       helpLinks={HELP_LINKS}
