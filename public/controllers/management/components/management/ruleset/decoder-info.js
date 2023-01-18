@@ -67,25 +67,45 @@ class WzDecoderInfo extends Component {
     this.columns = [
       {
         field: 'name',
-        name: 'Name',
+        name: i18n.translate(
+          'wazuh.public.controller.management.ruleset.decoder.Name',
+          {
+            defaultMessage: 'Name',
+          },
+        ),
         align: 'left',
         sortable: true,
       },
       {
         field: 'details.program_name',
-        name: 'Program name',
+        name: i18n.translate(
+          'wazuh.public.controller.management.ruleset.decoder.Programname',
+          {
+            defaultMessage: 'Program name',
+          },
+        ),
         align: 'left',
         sortable: true,
       },
       {
         field: 'details.order',
-        name: 'Order',
+        name: i18n.translate(
+          'wazuh.public.controller.management.ruleset.decoder.Order',
+          {
+            defaultMessage: 'Order',
+          },
+        ),
         align: 'left',
         sortable: true,
       },
       {
         field: 'filename',
-        name: 'File',
+        name: i18n.translate(
+          'wazuh.public.controller.management.ruleset.decoder.File',
+          {
+            defaultMessage: 'File',
+          },
+        ),
         align: 'left',
         sortable: true,
         render: (value, item) => {
@@ -100,7 +120,12 @@ class WzDecoderInfo extends Component {
       },
       {
         field: 'relative_dirname',
-        name: 'Path',
+        name: i18n.translate(
+          'wazuh.public.controller.management.ruleset.decoder.Path',
+          {
+            defaultMessage: 'Path',
+          },
+        ),
         align: 'left',
         sortable: true,
       },
@@ -126,11 +151,25 @@ class WzDecoderInfo extends Component {
     return (
       <EuiFlexGrid columns={4}>
         <EuiFlexItem key='position'>
-          <b style={{ paddingBottom: 6 }}>Position</b>
+          <b style={{ paddingBottom: 6 }}>
+            {i18n.translate(
+              'wazuh.public.controller.management.ruleset.decoder.Position',
+              {
+                defaultMessage: 'Position',
+              },
+            )}
+          </b>
           {position}
         </EuiFlexItem>
         <EuiFlexItem key='file'>
-          <b style={{ paddingBottom: 6 }}>File</b>
+          <b style={{ paddingBottom: 6 }}>
+            {i18n.translate(
+              'wazuh.public.controller.management.ruleset.decoder.File',
+              {
+                defaultMessage: 'File',
+              },
+            )}
+          </b>
           <span>
             <EuiToolTip position='top' content={`Filter by this file: ${file}`}>
               <EuiLink

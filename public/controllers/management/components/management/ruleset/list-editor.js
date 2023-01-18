@@ -52,6 +52,13 @@ import { WzButtonPermissions } from '../../../../../components/common/permission
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
+
+const label1 = i18n.translate(
+  'wazuh.public.controller.management.ruleset.editor.label1',
+  {
+    defaultMessage: 'Error saving list:',
+  },
+);
 class WzListEditor extends Component {
   constructor(props) {
     super(props);
@@ -174,7 +181,7 @@ class WzListEditor extends Component {
         error: {
           error: error,
           message: error.message || error,
-          title: `Error saving list: ${error.message || error}`,
+          title: `${label1} ${error.message || error}`,
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -314,9 +321,22 @@ class WzListEditor extends Component {
         <EuiFlexItem grow={false}>
           <EuiTitle>
             <h2>
-              <EuiToolTip position='right' content={'Back to lists'}>
+              <EuiToolTip
+                position='right'
+                content={i18n.translate(
+                  'wazuh.public.controller.management.ruleset.editorlists',
+                  {
+                    defaultMessage: 'Back to lists',
+                  },
+                )}
+              >
                 <EuiButtonIcon
-                  aria-label='Back'
+                  aria-label={i18n.translate(
+                    'wazuh.public.controller.management.ruleset.editor',
+                    {
+                      defaultMessage: 'Back',
+                    },
+                  )}
                   color='primary'
                   iconSize='l'
                   iconType='arrowLeft'
@@ -339,7 +359,13 @@ class WzListEditor extends Component {
             )}
             value={this.state.newListName}
             onChange={this.onNewListNameChange}
-            aria-label='Use aria labels when no actual label is in use'
+            aria-label={i18n.translate(
+              'wazuh.public.controller.management.ruleset.editor.use1',
+              {
+                defaultMessage:
+                  'Use aria labels when no actual label is in use',
+              },
+            )}
           />
         </EuiFlexItem>
       </Fragment>
@@ -411,7 +437,13 @@ class WzListEditor extends Component {
                   )}
                   value={addingKey}
                   onChange={this.onChangeKey}
-                  aria-label='Use aria labels when no actual label is in use'
+                  aria-label={i18n.translate(
+                    'wazuh.public.controller.management.ruleset.editor.use',
+                    {
+                      defaultMessage:
+                        'Use aria labels when no actual label is in use',
+                    },
+                  )}
                 />
               </EuiFlexItem>
 
@@ -426,7 +458,13 @@ class WzListEditor extends Component {
                   )}
                   value={addingValue}
                   onChange={this.onChangeValue}
-                  aria-label='Use aria labels when no actual label is in use'
+                  aria-label={i18n.translate(
+                    'wazuh.public.controller.management.ruleset.editor.use',
+                    {
+                      defaultMessage:
+                        'Use aria labels when no actual label is in use',
+                    },
+                  )}
                 />
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
@@ -476,9 +514,22 @@ class WzListEditor extends Component {
         <EuiFlexItem grow={false}>
           <EuiTitle>
             <span style={{ fontSize: '22px' }}>
-              <EuiToolTip position='right' content={'Back to lists'}>
+              <EuiToolTip
+                position='right'
+                content={i18n.translate(
+                  'wazuh.public.controller.management.ruleset.editor.lists',
+                  {
+                    defaultMessage: 'Back to lists',
+                  },
+                )}
+              >
                 <EuiButtonIcon
-                  aria-label='Back'
+                  aria-label={i18n.translate(
+                    'wazuh.public.controller.management.ruleset.editor.Back',
+                    {
+                      defaultMessage: 'Back',
+                    },
+                  )}
                   color='primary'
                   iconSize='l'
                   iconType='arrowLeft'
@@ -522,10 +573,21 @@ class WzListEditor extends Component {
           if (this.state.editing === item.key) {
             return (
               <EuiFieldText
-                placeholder='New value'
+                placeholder={i18n.translate(
+                  'wazuh.public.controller.management.ruleset.editor.Newvalue',
+                  {
+                    defaultMessage: 'New value',
+                  },
+                )}
                 value={this.state.editingValue}
                 onChange={this.onChangeEditingValue}
-                aria-label='Use aria labels when no actual label is in use'
+                aria-label={i18n.translate(
+                  'wazuh.public.controller.management.ruleset.editor.arial',
+                  {
+                    defaultMessage:
+                      'Use aria labels when no actual label is in use',
+                  },
+                )}
               />
             );
           } else {
@@ -545,9 +607,22 @@ class WzListEditor extends Component {
           if (this.state.editing === item.key) {
             return (
               <Fragment>
-                <EuiToolTip position='top' content={'Save'}>
+                <EuiToolTip
+                  position='top'
+                  content={i18n.translate(
+                    'wazuh.public.controller.management.ruleset.editor.Save',
+                    {
+                      defaultMessage: 'Save',
+                    },
+                  )}
+                >
                   <EuiButtonIcon
-                    aria-label='Confirm value'
+                    aria-label={i18n.translate(
+                      'wazuh.public.controller.management.ruleset.editor.Confirmvalue',
+                      {
+                        defaultMessage: 'Confirm value',
+                      },
+                    )}
                     iconType='check'
                     onClick={() => {
                       this.setEditedValue();
@@ -555,9 +630,22 @@ class WzListEditor extends Component {
                     color='primary'
                   />
                 </EuiToolTip>
-                <EuiToolTip position='top' content={'Discard'}>
+                <EuiToolTip
+                  position='top'
+                  content={i18n.translate(
+                    'wazuh.public.controller.management.ruleset.editor.Discard',
+                    {
+                      defaultMessage: 'Discard',
+                    },
+                  )}
+                >
                   <EuiButtonIcon
-                    aria-label='Cancel edition'
+                    aria-label={i18n.translate(
+                      'wazuh.public.controller.management.ruleset.editor.Canceledition',
+                      {
+                        defaultMessage: 'Cancel edition',
+                      },
+                    )}
                     iconType='cross'
                     onClick={() => this.setState({ editing: false })}
                     color='danger'
@@ -570,7 +658,12 @@ class WzListEditor extends Component {
               <Fragment>
                 <WzButtonPermissions
                   buttonType='icon'
-                  aria-label='Edit content'
+                  aria-label={i18n.translate(
+                    'wazuh.public.controller.management.ruleset.editor.Editcontent',
+                    {
+                      defaultMessage: 'Edit content',
+                    },
+                  )}
                   iconType='pencil'
                   permissions={this.getUpdatePermissions(fileName)}
                   tooltip={{ position: 'top', content: `Edit ${item.key}` }}
@@ -584,7 +677,12 @@ class WzListEditor extends Component {
                 />
                 <WzButtonPermissions
                   buttonType='icon'
-                  aria-label='Remove content'
+                  aria-label={i18n.translate(
+                    'wazuh.public.controller.management.ruleset.editor.Removecontent',
+                    {
+                      defaultMessage: 'Remove content',
+                    },
+                  )}
                   iconType='trash'
                   permissions={this.getDeletePermissions(fileName)}
                   tooltip={{ position: 'top', content: `Remove ${item.key}` }}
