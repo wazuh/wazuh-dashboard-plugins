@@ -96,7 +96,7 @@ const mainSettings = [
   {
     field: 'interval',
     label: i18n.translate(
-      'wazuh.public.controller.management.config.azure.logs.',
+      'wazuh.public.controller.management.config.azure.logs.execution',
       {
         defaultMessage: 'Interval between Azure-Logs executions',
       },
@@ -117,7 +117,7 @@ const contentSettings = [
   {
     field: 'application_id',
     label: i18n.translate(
-      'wazuh.public.controller.management.config.azure.logs.',
+      'wazuh.public.controller.management.config.azure.logs.applicationId',
       {
         defaultMessage: 'Application id',
       },

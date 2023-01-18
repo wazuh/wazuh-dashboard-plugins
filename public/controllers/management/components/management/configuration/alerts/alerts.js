@@ -56,7 +56,7 @@ class WzConfigurationAlerts extends Component {
           </WzTabSelectorTab>
           <WzTabSelectorTab
             label={i18n.translate(
-              'wazuh.public.controller.management.config.alerts.email',
+              'wazuh.public.controller.management.config.alerts.emailAlertText',
               {
                 defaultMessage: 'Email alerts',
               },

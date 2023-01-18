@@ -35,15 +35,21 @@ const title1 = i18n.translate('wazuh.controller.manage.comp.confi.setting.title1
 });
 const helpLinks = [
   {
-    text: i18n.translate('wazuh.public.controller.management.config.alerts.sysLog', {
-          defaultMessage: '',
-        })'Configuring syslog output',
+    text: i18n.translate(
+      'wazuh.public.controller.management.config.alerts.sysLogConfigure',
+      {
+        defaultMessage: 'Configuring syslog output',
+      },
+    ),
     href: webDocumentationLink('user-manual/manager/manual-syslog-output.html'),
   },
   {
-    text: i18n.translate('wazuh.public.controller.management.config.alerts.sysLog', {
-          defaultMessage: '',
-        })'Syslog output reference',
+    text: i18n.translate(
+      'wazuh.public.controller.management.config.alerts.sysLog',
+      {
+        defaultMessage: 'Syslog output reference',
+      },
+    ),
     href: webDocumentationLink(
       'user-manual/reference/ossec-conf/syslog-output.html',
     ),
