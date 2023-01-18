@@ -20,12 +20,18 @@ import { isString, renderValueNoThenEnabled } from '../utils/utils';
 import { settingsListBuilder } from '../utils/builders';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 import { i18n } from '@kbn/i18n';
-const title1 = i18n.translate('wazuh.controller.manage.comp.confi.commands.title1', {
-  defaultMessage: 'Command definitions',
-});
-const descp1 = i18n.translate('wazuh.controller.manage.comp.confi.commands.descp1', {
-  defaultMessage: 'Find here all the currently defined commands',
-});
+const title1 = i18n.translate(
+  'wazuh.controller.manage.comp.confi.commands.title1',
+  {
+    defaultMessage: 'Command definitions',
+  },
+);
+const descp1 = i18n.translate(
+  'wazuh.controller.manage.comp.confi.commands.descp1',
+  {
+    defaultMessage: 'Find here all the currently defined commands',
+  },
+);
 const helpLinks = [
   {
     text: 'Command module reference',
@@ -36,17 +42,106 @@ const helpLinks = [
 ];
 
 const mainSettings = [
-  { field: 'disabled', label: 'Command status', renderValueNoThenEnabled },
-  { field: 'tag', label: 'Command name' },
-  { field: 'command', label: 'Command to execute' },
-  { field: 'interval', label: 'Interval between executions' },
-  { field: 'run_on_start', label: 'Run on start' },
-  { field: 'ignore_output', label: 'Ignore command output' },
-  { field: 'timeout', label: 'Timeout (in seconds) to wait for execution' },
-  { field: 'verify_md5', label: 'Verify MD5 sum' },
-  { field: 'verify_sha1', label: 'Verify SHA1 sum' },
-  { field: 'verify_sha256', label: 'Verify SHA256 sum' },
-  { field: 'skip_verification', label: 'Ignore checksum verification' },
+  {
+    field: 'disabled',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.cilent.command.status',
+      {
+        defaultMessage: 'Command status',
+      },
+    ),
+    renderValueNoThenEnabled,
+  },
+  {
+    field: 'tag',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.cilent.command.name',
+      {
+        defaultMessage: 'Command name',
+      },
+    ),
+  },
+  {
+    field: 'command',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.cilent.command.execute',
+      {
+        defaultMessage: 'Command to execute',
+      },
+    ),
+  },
+  {
+    field: 'interval',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.cilent.command.interval',
+      {
+        defaultMessage: 'Interval between executions',
+      },
+    ),
+  },
+  {
+    field: 'run_on_start',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.cilent.command.run',
+      {
+        defaultMessage: 'Run on start',
+      },
+    ),
+  },
+  {
+    field: 'ignore_output',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.cilent.command.output',
+      {
+        defaultMessage: 'Ignore command output',
+      },
+    ),
+  },
+  {
+    field: 'timeout',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.cilent.command.timeout',
+      {
+        defaultMessage: 'Timeout (in seconds) to wait for execution',
+      },
+    ),
+  },
+  {
+    field: 'verify_md5',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.cilent.command.MD5',
+      {
+        defaultMessage: 'Verify MD5 sum',
+      },
+    ),
+  },
+  {
+    field: 'verify_sha1',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.cilent.command.SHA1',
+      {
+        defaultMessage: 'Verify SHA1 sum',
+      },
+    ),
+  },
+  {
+    field: 'verify_sha256',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.cilent.command.SHA256',
+      {
+        defaultMessage: 'Verify SHA256 sum',
+      },
+    ),
+  },
+  {
+    field: 'skip_verification',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.cilent.command.verification',
+      {
+        defaultMessage: 'Ignore checksum verification',
+      },
+    ),
+  },
 ];
 
 class WzConfigurationCommands extends Component {

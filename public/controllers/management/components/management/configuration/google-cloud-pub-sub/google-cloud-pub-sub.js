@@ -1,5 +1,3 @@
-
-
 import React, { Component, Fragment } from 'react';
 
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
@@ -7,48 +5,140 @@ import WzConfigurationSettingsGroup from '../util-components/configuration-setti
 import WzNoConfig from '../util-components/no-config';
 
 import withWzConfig from '../util-hocs/wz-config';
+import { i18n } from '@kbn/i18n';
 
 import { wodleBuilder } from '../utils/builders';
 
-import {
-  renderValueYesThenEnabled,
-  isString
-} from '../utils/utils';
+import { renderValueYesThenEnabled, isString } from '../utils/utils';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
 const helpLinks = [
   {
-    text: 'Using Wazuh to monitor GCP services',
-    href: webDocumentationLink('gcp/index.html')
+    text: i18n.translate(
+      'wazuh.public.controller.management.config.google.cloud.usingWazuh',
+      {
+        defaultMessage: 'Using Wazuh to monitor GCP services',
+      },
+    ),
+    href: webDocumentationLink('gcp/index.html'),
   },
   {
-    text: 'Google Cloud Pub/Sub module reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/gcp-pubsub.html')
-  }
+    text: i18n.translate(
+      'wazuh.public.controller.management.config.google.cloud.moduleRef',
+      {
+        defaultMessage: 'Google Cloud Pub/Sub module reference',
+      },
+    ),
+    href: webDocumentationLink(
+      'user-manual/reference/ossec-conf/gcp-pubsub.html',
+    ),
+  },
 ];
 
 const mainSettings = [
   {
     field: 'enabled',
-    label: 'Google Cloud Pub/Sub integration status',
-    render: renderValueYesThenEnabled
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.google.cloud.pub.sub',
+      {
+        defaultMessage: 'Google Cloud Pub/Sub integration status',
+      },
+    ),
+    render: renderValueYesThenEnabled,
   },
-  { field: 'project_id', label: 'Project ID' },
-  { field: 'subscription_name', label: 'Subscription to read from' },
+  {
+    field: 'project_id',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.google.cloud.Project ID',
+      {
+        defaultMessage: 'Project ID',
+      },
+    ),
+  },
+  {
+    field: 'subscription_name',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.google.cloud.Subcription',
+      {
+        defaultMessage: 'Subscription to read from',
+      },
+    ),
+  },
   {
     field: 'credentials_file',
-    label: 'Path of the credentials file'
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.google.cloud.fileCre',
+      {
+        defaultMessage: 'Path of the credentials file',
+      },
+    ),
   },
-  { field: 'logging', label: 'Logging level' },
-  { field: 'max_messages', label: 'Maximum messages pulled in each iteration' },
-  { field: 'interval', label: 'Interval between module executions in seconds' },
-  { field: 'pull_on_start', label: 'Pull on start' },
-  { field: 'day', label: 'Day of the month to fetch logs' },
-  { field: 'wday', label: 'Day of the week to fetch logs' },
-  { field: 'time', label: 'Time of the day to fetch logs' },
+  {
+    field: 'logging',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.google.cloud.logging',
+      {
+        defaultMessage: 'Logging level',
+      },
+    ),
+  },
+  {
+    field: 'max_messages',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.google.cloud.pulled',
+      {
+        defaultMessage: 'Maximum messages pulled in each iteration',
+      },
+    ),
+  },
+  {
+    field: 'interval',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.google.cloud.execution',
+      {
+        defaultMessage: 'Interval between module executions in seconds',
+      },
+    ),
+  },
+  {
+    field: 'pull_on_start',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.google.cloud.pull',
+      {
+        defaultMessage: 'Pull on start',
+      },
+    ),
+  },
+  {
+    field: 'day',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.google.cloud.dayOfMonth',
+      {
+        defaultMessage: 'Day of the month to fetch logs',
+      },
+    ),
+  },
+  {
+    field: 'wday',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.google.cloud.dayOfWeek',
+      {
+        defaultMessage: 'Day of the week to fetch logs',
+      },
+    ),
+  },
+  {
+    field: 'time',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.google.cloud.time',
+      {
+        defaultMessage: 'Time of the day to fetch logs',
+      },
+    ),
+  },
 ];
 
-class WzConfigurationGoogleCloudPubSub extends Component{
+class WzConfigurationGoogleCloudPubSub extends Component {
   constructor(props) {
     super(props);
     this.wodleConfig = wodleBuilder(this.props.currentConfig, 'gcp-pubsub');
@@ -63,7 +153,7 @@ class WzConfigurationGoogleCloudPubSub extends Component{
       this.wodleConfig['gcp-pubsub'].enabled === 'yes'
     );
   }
-  render(){
+  render() {
     const { currentConfig } = this.props;
     return (
       <Fragment>
@@ -75,14 +165,25 @@ class WzConfigurationGoogleCloudPubSub extends Component{
             />
           )}
         {currentConfig &&
-          !this.wodleConfig['gcp-pubsub'] && 
+          !this.wodleConfig['gcp-pubsub'] &&
           !isString(currentConfig['wmodules-wmodules']) && (
-            <WzNoConfig error="not-present" help={helpLinks} />
-        )}
+            <WzNoConfig error='not-present' help={helpLinks} />
+          )}
         {currentConfig && this.wodleConfig['gcp-pubsub'] && (
           <WzConfigurationSettingsTabSelector
-            title="Main settings"
-            description="Configuration for the Google Cloud Pub/Sub module"
+            title={i18n.translate(
+              'wazuh.public.controller.management.config.google.cloud.Mainsettings',
+              {
+                defaultMessage: 'Main settings',
+              },
+            )}
+            description={i18n.translate(
+              'wazuh.public.controller.management.config.google.cloud.module',
+              {
+                defaultMessage:
+                  'Configuration for the Google Cloud Pub/Sub module',
+              },
+            )}
             currentConfig={this.wodleConfig}
             minusHeight={320}
             helpLinks={helpLinks}
@@ -94,7 +195,7 @@ class WzConfigurationGoogleCloudPubSub extends Component{
           </WzConfigurationSettingsTabSelector>
         )}
       </Fragment>
-    )
+    );
   }
 }
 

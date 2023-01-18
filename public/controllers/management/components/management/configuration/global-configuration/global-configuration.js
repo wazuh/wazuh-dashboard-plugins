@@ -12,9 +12,10 @@
 
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { i18n } from '@kbn/i18n';
 
 import WzTabSelector, {
-  WzTabSelectorTab
+  WzTabSelectorTab,
 } from '../util-components/tab-selector';
 import WzConfigurationGlobalConfigurationGlobal from './global-configuration-global';
 import WzConfigurationGlobalConfigurationRemote from './global-configuration-remote';
@@ -34,10 +35,24 @@ class WzConfigurationGlobalConfiguration extends Component {
       <Fragment>
         {agent && agent.id === '000' ? (
           <WzTabSelector>
-            <WzTabSelectorTab label="Global">
+            <WzTabSelectorTab
+              label={i18n.translate(
+                'wazuh.public.controller.management.config.global.config.Global',
+                {
+                  defaultMessage: 'Global',
+                },
+              )}
+            >
               <WzConfigurationGlobalConfigurationGlobal {...this.props} />
             </WzTabSelectorTab>
-            <WzTabSelectorTab label="Remote">
+            <WzTabSelectorTab
+              label={i18n.translate(
+                'wazuh.public.controller.management.config.global.config.Remote',
+                {
+                  defaultMessage: 'Remote',
+                },
+              )}
+            >
               <WzConfigurationGlobalConfigurationRemote {...this.props} />
             </WzTabSelectorTab>
           </WzTabSelector>
@@ -53,30 +68,30 @@ const sectionsManager = [
   { component: 'analysis', configuration: 'global' },
   { component: 'mail', configuration: 'global' },
   { component: 'request', configuration: 'remote' },
-  { component: 'com', configuration: 'logging' }
+  { component: 'com', configuration: 'logging' },
 ];
 
 const sectionsAgent = [{ component: 'com', configuration: 'logging' }];
 
 const mapStateToProps = state => ({
   wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet,
-  clusterNodeSelected: state.configurationReducers.clusterNodeSelected
+  clusterNodeSelected: state.configurationReducers.clusterNodeSelected,
 });
 
 export const WzConfigurationGlobalConfigurationManager = compose(
   connect(mapStateToProps),
-  withWzConfig(sectionsManager)
+  withWzConfig(sectionsManager),
 )(WzConfigurationGlobalConfiguration);
 
 export const WzConfigurationGlobalConfigurationAgent = compose(
   connect(mapStateToProps),
-  withWzConfig(sectionsAgent)
+  withWzConfig(sectionsAgent),
 )(WzConfigurationGlobalConfiguration);
 
 WzConfigurationGlobalConfigurationManager.propTypes = {
-  agent: PropTypes.object
+  agent: PropTypes.object,
 };
 
 WzConfigurationGlobalConfigurationAgent.propTypes = {
-  agent: PropTypes.object
+  agent: PropTypes.object,
 };

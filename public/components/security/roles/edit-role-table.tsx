@@ -83,7 +83,12 @@ export const EditRolesTable = ({
   const columns = [
     {
       field: 'label',
-      name: 'Policies',
+      name: i18n.translate(
+        'wazuh.public.components.security.roles.edit.Policies',
+        {
+          defaultMessage: 'Policies',
+        },
+      ),
       sortable: false,
       truncateText: true,
     },

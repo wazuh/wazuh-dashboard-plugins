@@ -27,53 +27,118 @@ import { wodleBuilder, settingsListBuilder } from '../utils/builders';
 import { withGuard } from '../../../../../../components/common/hocs';
 import withWzConfig from '../util-hocs/wz-config';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
-const text1 = i18n.translate('wazuh.controller.manage.comp.confi.github.text1', {
-  defaultMessage: 'Using Wazuh to monitor GitHub',
-});
-const text2 = i18n.translate('wazuh.controller.manage.comp.confi.github.text2', {
-  defaultMessage: 'GitHub module reference',
-});
-const title1 = i18n.translate('wazuh.controller.manage.comp.confi.github.title1', {
-  defaultMessage: 'Main settings',
-});
-const title2 = i18n.translate('wazuh.controller.manage.comp.confi.github.title2', {
-  defaultMessage: 'List of organizations to auditing',
-});
+const text1 = i18n.translate(
+  'wazuh.controller.manage.comp.confi.github.text1',
+  {
+    defaultMessage: 'Using Wazuh to monitor GitHub',
+  },
+);
+const text2 = i18n.translate(
+  'wazuh.controller.manage.comp.confi.github.text2',
+  {
+    defaultMessage: 'GitHub module reference',
+  },
+);
+const title1 = i18n.translate(
+  'wazuh.controller.manage.comp.confi.github.title1',
+  {
+    defaultMessage: 'Main settings',
+  },
+);
+const title2 = i18n.translate(
+  'wazuh.controller.manage.comp.confi.github.title2',
+  {
+    defaultMessage: 'List of organizations to auditing',
+  },
+);
 
-const descp1 = i18n.translate('wazuh.controller.manage.comp.confi.github.descp1', {
-  defaultMessage: 'Configuration for the GitHub module',
-});
+const descp1 = i18n.translate(
+  'wazuh.controller.manage.comp.confi.github.descp1',
+  {
+    defaultMessage: 'Configuration for the GitHub module',
+  },
+);
 const sections = [{ component: 'wmodules', configuration: 'wmodules' }];
 
 const mainSettings = [
   {
     field: 'enabled',
-    label: 'Service status',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.github.service',
+      {
+        defaultMessage: 'Service status',
+      },
+    ),
     render: renderValueYesThenEnabled,
   },
   {
     field: 'only_future_events',
-    label: 'Collect events generated since Wazuh agent was started',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.github.started',
+      {
+        defaultMessage:
+          'Collect events generated since Wazuh agent was started',
+      },
+    ),
   },
   {
     field: 'time_delay',
-    label:
-      'Time in seconds that each scan will monitor until that delay backwards',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.github.backwords',
+      {
+        defaultMessage:
+          'Time in seconds that each scan will monitor until that delay backwards',
+      },
+    ),
   },
   {
     field: 'curl_max_size',
-    label: 'Maximum size allowed for the GitHub API response',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.github.response',
+      {
+        defaultMessage: 'Maximum size allowed for the GitHub API response',
+      },
+    ),
   },
   {
     field: 'interval',
-    label: 'Interval between GitHub wodle executions in seconds',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.github.between',
+      {
+        defaultMessage: 'Interval between GitHub wodle executions in seconds',
+      },
+    ),
   },
-  { field: 'event_type', label: 'Event type' },
+  {
+    field: 'event_type',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.github.Eventtype',
+      {
+        defaultMessage: 'Event type',
+      },
+    ),
+  },
 ];
 
 const columns = [
-  { field: 'org_name', label: 'Organization' },
-  { field: 'api_token', label: 'Token' },
+  {
+    field: 'org_name',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.github.Organization',
+      {
+        defaultMessage: 'Organization',
+      },
+    ),
+  },
+  {
+    field: 'api_token',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.github.Token',
+      {
+        defaultMessage: 'Token',
+      },
+    ),
+  },
 ];
 
 const helpLinks = [
@@ -107,14 +172,28 @@ export const WzConfigurationGitHub = withWzConfig(sections)(
 
     return (
       <WzTabSelector>
-        <WzTabSelectorTab label='General'>
+        <WzTabSelectorTab
+          label={i18n.translate(
+            'wazuh.public.controller.management.config.github.General',
+            {
+              defaultMessage: 'General',
+            },
+          )}
+        >
           <GeneralTab
             wodleConfiguration={wodleConfiguration}
             currentConfig={currentConfig}
             {...rest}
           />
         </WzTabSelectorTab>
-        <WzTabSelectorTab label='Credentials'>
+        <WzTabSelectorTab
+          label={i18n.translate(
+            'wazuh.public.controller.management.config.github.Credential',
+            {
+              defaultMessage: 'Credentials',
+            },
+          )}
+        >
           <CredentialsTab
             wodleConfiguration={wodleConfiguration}
             currentConfig={currentConfig}
