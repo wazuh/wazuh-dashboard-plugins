@@ -21,6 +21,7 @@ import {
 } from '../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { getErrorOrchestrator } from '../../react-services/common-services';
+import { i18n } from '@kbn/i18n';
 
 export class ToolsController {
   /**
@@ -81,11 +82,21 @@ export class ToolsController {
    */
   setComponentProps() {
     let tabs = [
-      { id: 'devTools', name: 'API Console' },
-      { id: 'logtest', name: 'Ruleset Test' },
+      {
+        id: 'devTools',
+        name: i18n.translate('wazuh.public.controllers.tools.', {
+          defaultMessage: 'API Console',
+        }),
+      },
+      {
+        id: 'logtest',
+        name: i18n.translate('wazuh.public.controllers.tools.', {
+          defaultMessage: 'Ruleset Test',
+        }),
+      },
     ];
     this.toolsTabsProps = {
-      clickAction: (tab) => {
+      clickAction: tab => {
         this.switchTab(tab, true);
       },
       selectedTab: this.tab || 'devTools',

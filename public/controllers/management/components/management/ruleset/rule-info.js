@@ -88,14 +88,24 @@ class WzRuleInfo extends Component {
     this.columns = [
       {
         field: 'id',
-        name: 'ID',
+        name: i18n.translate(
+          'wazuh.public.controller.management.ruleset.info.ID',
+          {
+            defaultMessage: 'ID',
+          },
+        ),
         align: 'left',
         sortable: true,
         width: '5%',
       },
       {
         field: 'description',
-        name: 'Description',
+        name: i18n.translate(
+          'wazuh.public.controller.management.ruleset.info.Description',
+          {
+            defaultMessage: 'Description',
+          },
+        ),
         align: 'left',
         sortable: true,
         width: '30%',
@@ -122,7 +132,12 @@ class WzRuleInfo extends Component {
       },
       {
         field: 'groups',
-        name: 'Groups',
+        name: i18n.translate(
+          'wazuh.public.controller.management.ruleset.info.Groups',
+          {
+            defaultMessage: 'Groups',
+          },
+        ),
         align: 'left',
         sortable: true,
         width: '10%',
@@ -133,14 +148,24 @@ class WzRuleInfo extends Component {
       },
       {
         field: 'level',
-        name: 'Level',
+        name: i18n.translate(
+          'wazuh.public.controller.management.ruleset.info.Level',
+          {
+            defaultMessage: 'Level',
+          },
+        ),
         align: 'left',
         sortable: true,
         width: '5%',
       },
       {
         field: 'filename',
-        name: 'File',
+        name: i18n.translate(
+          'wazuh.public.controller.management.ruleset.info.File',
+          {
+            defaultMessage: 'File',
+          },
+        ),
         align: 'left',
         sortable: true,
         width: '15%',
@@ -581,7 +606,15 @@ class WzRuleInfo extends Component {
                 this.setNewFiltersAndBack([{ field: key, value: element }])
               }
             >
-              <EuiToolTip position='top' content='Filter by this compliance'>
+              <EuiToolTip
+                position='top'
+                content={i18n.translate(
+                  'wazuh.public.controller.management.ruleset.info.compliance',
+                  {
+                    defaultMessage: 'Filter by this compliance',
+                  },
+                )}
+              >
                 <span>{element}</span>
               </EuiToolTip>
             </EuiLink>
@@ -614,7 +647,15 @@ class WzRuleInfo extends Component {
                 ])
               }
             >
-              <EuiToolTip position='top' content='Filter by this compliance'>
+              <EuiToolTip
+                position='top'
+                content={i18n.translate(
+                  'wazuh.public.controller.management.ruleset.info.compliance',
+                  {
+                    defaultMessage: 'Filter by this compliance',
+                  },
+                )}
+              >
                 <span>{element}</span>
               </EuiToolTip>
             </EuiLink>
@@ -728,9 +769,22 @@ class WzRuleInfo extends Component {
               <EuiFlexItem>
                 <EuiTitle>
                   <span style={{ fontSize: '22px' }}>
-                    <EuiToolTip position='right' content='Back to rules'>
+                    <EuiToolTip
+                      position='right'
+                      content={i18n.translate(
+                        'wazuh.public.controller.management.ruleset.info.Backtorules',
+                        {
+                          defaultMessage: 'Back to rules',
+                        },
+                      )}
+                    >
                       <EuiButtonIcon
-                        aria-label='Back'
+                        aria-label={i18n.translate(
+                          'wazuh.public.controller.management.ruleset.info.Back',
+                          {
+                            defaultMessage: 'Back',
+                          },
+                        )}
                         color='primary'
                         iconSize='l'
                         iconType='arrowLeft'
@@ -756,7 +810,12 @@ class WzRuleInfo extends Component {
               <EuiFlexItem grow={false}>
                 <EuiButtonEmpty
                   iconType='popout'
-                  aria-label='popout'
+                  aria-label={i18n.translate(
+                    'wazuh.public.controller.management.ruleset.info.popout',
+                    {
+                      defaultMessage: 'popout',
+                    },
+                  )}
                   href={`#/overview?tab=general&tabView=panels&addRuleFilter=${id}`}
                   target='blank'
                 >

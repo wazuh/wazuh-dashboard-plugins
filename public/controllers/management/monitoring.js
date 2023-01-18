@@ -9,6 +9,9 @@
  *
  * Find more information about this on the LICENSE file.
  */
+
+import { i18n } from '@kbn/i18n';
+
 import { FilterHandler } from '../../utils/filter-handler';
 import { AppState } from '../../react-services/app-state';
 import { GenericRequest } from '../../react-services/generic-request';
@@ -31,10 +34,13 @@ export function ClusterController(
   discoverPendingUpdates,
   rawVisualizations,
   loadedVisualizations,
-  visHandlers
+  visHandlers,
 ) {
   const tabVisualizations = new TabVisualizations();
-  getDataPlugin().query.timefilter.timefilter.setRefreshInterval({ pause: true, value: 0 });
+  getDataPlugin().query.timefilter.timefilter.setRefreshInterval({
+    pause: true,
+    value: 0,
+  });
   $scope.search = term => {
     $scope.$broadcast('wazuhSearch', { term });
   };
@@ -54,7 +60,7 @@ export function ClusterController(
   loadedVisualizations.removeAll();
   tabVisualizations.setTab('monitoring');
   tabVisualizations.assign({
-    monitoring: 2
+    monitoring: 2,
   });
 
   $scope.loading = true;
@@ -86,7 +92,7 @@ export function ClusterController(
   $scope.goConfiguration = () => {
     setBooleans('showConfig');
     tabVisualizations.assign({
-      monitoring: 1
+      monitoring: 1,
     });
     assignFilters();
     $rootScope.$broadcast('updateVis');
@@ -98,10 +104,10 @@ export function ClusterController(
   $scope.goNodes = () => {
     setBooleans('showNodes');
     tabVisualizations.assign({
-      monitoring: 1
+      monitoring: 1,
     });
     assignFilters();
-    $scope.nodeProps = { goBack: () => $scope.goBack() }
+    $scope.nodeProps = { goBack: () => $scope.goBack() };
     $rootScope.$broadcast('updateVis');
   };
 
@@ -111,7 +117,7 @@ export function ClusterController(
   $scope.goBack = () => {
     setBooleans(null);
     tabVisualizations.assign({
-      monitoring: 2
+      monitoring: 2,
     });
     assignFilters();
     $rootScope.$broadcast('updateVis');
@@ -121,15 +127,14 @@ export function ClusterController(
   $scope.$on('wazuhShowClusterNode', async (event, parameters) => {
     try {
       tabVisualizations.assign({
-        monitoring: 1
+        monitoring: 1,
       });
       $scope.currentNode = parameters.node;
       const data = await WzRequest.apiReq('GET', '/cluster/healthcheck', {
-        node: $scope.currentNode.name
+        node: $scope.currentNode.name,
       });
 
-      $scope.currentNode.healthCheck =
-        data.data.data.affected_items[0];
+      $scope.currentNode.healthCheck = data.data.data.affected_items[0];
 
       if (
         $scope.currentNode.healthCheck &&
@@ -149,14 +154,14 @@ export function ClusterController(
             .date_end_master !== 'n/a'
         ) {
           const end = new Date(
-            $scope.currentNode.healthCheck.status.last_sync_integrity.date_end_master
+            $scope.currentNode.healthCheck.status.last_sync_integrity.date_end_master,
           );
           const start = new Date(
-            $scope.currentNode.healthCheck.status.last_sync_integrity.date_start_master
+            $scope.currentNode.healthCheck.status.last_sync_integrity.date_start_master,
           );
-          $scope.currentNode.healthCheck.status.last_sync_integrity.duration = `${(end -
-            start) /
-            1000}s`;
+          $scope.currentNode.healthCheck.status.last_sync_integrity.duration = `${
+            (end - start) / 1000
+          }s`;
         }
 
         if (
@@ -166,14 +171,14 @@ export function ClusterController(
             .date_end_master !== 'n/a'
         ) {
           const end = new Date(
-            $scope.currentNode.healthCheck.status.last_sync_agentinfo.date_end_master
+            $scope.currentNode.healthCheck.status.last_sync_agentinfo.date_end_master,
           );
           const start = new Date(
-            $scope.currentNode.healthCheck.status.last_sync_agentinfo.date_start_master
+            $scope.currentNode.healthCheck.status.last_sync_agentinfo.date_start_master,
           );
-          $scope.currentNode.healthCheck.status.last_sync_agentinfo.duration = `${(end -
-            start) /
-            1000}s`;
+          $scope.currentNode.healthCheck.status.last_sync_agentinfo.duration = `${
+            (end - start) / 1000
+          }s`;
         }
 
         if (
@@ -183,14 +188,14 @@ export function ClusterController(
             .date_end_master !== 'n/a'
         ) {
           const end = new Date(
-            $scope.currentNode.healthCheck.status.last_sync_agentgroups.date_end_master
+            $scope.currentNode.healthCheck.status.last_sync_agentgroups.date_end_master,
           );
           const start = new Date(
-            $scope.currentNode.healthCheck.status.last_sync_agentgroups.date_start_master
+            $scope.currentNode.healthCheck.status.last_sync_agentgroups.date_start_master,
           );
-          $scope.currentNode.healthCheck.status.last_sync_agentgroups.duration = `${(end -
-            start) /
-            1000}s`;
+          $scope.currentNode.healthCheck.status.last_sync_agentgroups.duration = `${
+            (end - start) / 1000
+          }s`;
         }
       }
 
@@ -212,7 +217,7 @@ export function ClusterController(
     try {
       filters = [];
       filters.push(
-        filterHandler.managerQuery(AppState.getClusterInfo().cluster, true)
+        filterHandler.managerQuery(AppState.getClusterInfo().cluster, true),
       );
       if (node) {
         filters.push(filterHandler.nodeQuery(node));
@@ -223,7 +228,7 @@ export function ClusterController(
       ErrorHandler.handle(
         'An error occurred while creating custom filters for visualizations',
         'Cluster',
-        { warning: true }
+        { warning: true },
       );
     }
   };
@@ -234,16 +239,15 @@ export function ClusterController(
       $scope.authorized = true;
       return status;
     } catch (error) {
-      if(error === '3013 - Permission denied: Resource type: *:*')
-        $scope.authorized = false
+      if (error === '3013 - Permission denied: Resource type: *:*')
+        $scope.authorized = false;
     }
-  }
+  };
 
   /**
    * This set some required settings at init
    */
   const load = async () => {
-
     try {
       visHandlers.removeAll();
       discoverPendingUpdates.removeAll();
@@ -251,9 +255,9 @@ export function ClusterController(
       loadedVisualizations.removeAll();
       const status = await clusterStatus();
       if (!status) {
-        $scope.permissions = [{action: 'cluster:status', resource: "*:*:*"}];
+        $scope.permissions = [{ action: 'cluster:status', resource: '*:*:*' }];
         $scope.loading = false;
-        $scope.$applyAsync()
+        $scope.$applyAsync();
         return;
       }
       $scope.status = status.data.data.running;
@@ -268,14 +272,14 @@ export function ClusterController(
         WzRequest.apiReq('GET', '/cluster/local/config', {}),
         WzRequest.apiReq('GET', '/', {}),
         WzRequest.apiReq('GET', '/agents', { limit: 1 }),
-        WzRequest.apiReq('GET', '/cluster/healthcheck', {})
+        WzRequest.apiReq('GET', '/cluster/healthcheck', {}),
       ]);
 
-      const nodeList = (((data[0] || {}).data || {}).data || {}) || false;
-      const clusterConfig = ((((data[1] || {}).data || {}).data || {}) || false);
-      const version = (((data[2] || {}).data || {}).data || {}).api_version || false;
-      const agents = ((((data[3] || {}).data || {}).data || {}) || false);
-
+      const nodeList = ((data[0] || {}).data || {}).data || {} || false;
+      const clusterConfig = ((data[1] || {}).data || {}).data || {} || false;
+      const version =
+        (((data[2] || {}).data || {}).data || {}).api_version || false;
+      const agents = ((data[3] || {}).data || {}).data || {} || false;
 
       $scope.nodesCount = nodeList.total_affected_items;
       $scope.configuration = clusterConfig.affected_items[0];
@@ -284,12 +288,14 @@ export function ClusterController(
 
       nodeList.name = $scope.configuration.name;
       nodeList.master_node = $scope.configuration.node_name;
-      const {id, title} = await getDataPlugin().indexPatterns.get(AppState.getCurrentPattern());
+      const { id, title } = await getDataPlugin().indexPatterns.get(
+        AppState.getCurrentPattern(),
+      );
 
       const visData = await GenericRequest.request(
         'POST',
         `/elastic/visualizations/cluster-monitoring/${AppState.getCurrentPattern()}`,
-        { nodes: nodeList, pattern: {id, title} }
+        { nodes: nodeList, pattern: { id, title } },
       );
 
       rawVisualizations.assignItems(visData.data.raw);
@@ -319,8 +325,16 @@ export function ClusterController(
 
   const breadcrumb = [
     { text: '' },
-    { text: 'Management', href: '#/manager' },
-    { text: 'Cluster' }
+    {
+      text: i18n.translate(
+        'wazuh.public.controller.management.monitering.Management',
+        {
+          defaultMessage: 'Management',
+        },
+      ),
+      href: '#/manager',
+    },
+    { text: 'Cluster' },
   ];
   store.dispatch(updateGlobalBreadcrumb(breadcrumb));
   if (clusterEnabled) load();

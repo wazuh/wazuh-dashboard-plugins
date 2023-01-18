@@ -43,7 +43,12 @@ export const PromptStatisticsDisabled = () => {
           iconType='gear'
           onMouseDown={goToConfigure}
         >
-          Go to configure
+          {i18n.translate(
+            'wazuh.controllers..mnage.comp.confi.groups.ruleset.Statistics.config',
+            {
+              defaultMessage: ' Go to configure',
+            },
+          )}
         </EuiButton>
       }
     />

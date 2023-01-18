@@ -67,20 +67,32 @@ export interface Props {
  * Additionally there's a button displayed that allows the user to show/hide more filter fields
  */
 export function DiscoverFieldSearch({ onChange, value, types }: Props) {
-  const searchPlaceholder = i18n.translate('wazuh.discover.fieldChooser.searchPlaceHolder', {
-    defaultMessage: 'Search field names',
-  });
-  const aggregatableLabel = i18n.translate('wazuh.discover.fieldChooser.filter.aggregatableLabel', {
-    defaultMessage: 'Aggregatable',
-  });
-  const searchableLabel = i18n.translate('wazuh.discover.fieldChooser.filter.searchableLabel', {
-    defaultMessage: 'Searchable',
-  });
-  const typeLabel = i18n.translate('wazuh.discover.fieldChooser.filter.typeLabel', {
-    defaultMessage: 'Type',
-  });
+  const searchPlaceholder = i18n.translate(
+    'wazuh.discover.fieldChooser.searchPlaceHolder',
+    {
+      defaultMessage: 'Search field names',
+    },
+  );
+  const aggregatableLabel = i18n.translate(
+    'wazuh.discover.fieldChooser.filter.aggregatableLabel',
+    {
+      defaultMessage: 'Aggregatable',
+    },
+  );
+  const searchableLabel = i18n.translate(
+    'wazuh.discover.fieldChooser.filter.searchableLabel',
+    {
+      defaultMessage: 'Searchable',
+    },
+  );
+  const typeLabel = i18n.translate(
+    'wazuh.discover.fieldChooser.filter.typeLabel',
+    {
+      defaultMessage: 'Type',
+    },
+  );
   const typeOptions = types
-    ? types.map((type) => {
+    ? types.map(type => {
         return { value: type, text: type };
       })
     : [{ value: 'any', text: 'any' }];
@@ -101,12 +113,18 @@ export function DiscoverFieldSearch({ onChange, value, types }: Props) {
   }
 
   const filterBtnAriaLabel = isPopoverOpen
-    ? i18n.translate('wazuh.discover.fieldChooser.toggleFieldFilterButtonHideAriaLabel', {
-        defaultMessage: 'Hide field filter settings',
-      })
-    : i18n.translate('wazuh.discover.fieldChooser.toggleFieldFilterButtonShowAriaLabel', {
-        defaultMessage: 'Show field filter settings',
-      });
+    ? i18n.translate(
+        'wazuh.discover.fieldChooser.toggleFieldFilterButtonHideAriaLabel',
+        {
+          defaultMessage: 'Hide field filter settings',
+        },
+      )
+    : i18n.translate(
+        'wazuh.discover.fieldChooser.toggleFieldFilterButtonShowAriaLabel',
+        {
+          defaultMessage: 'Show field filter settings',
+        },
+      );
 
   const handleFacetButtonClicked = () => {
     setPopoverOpen(!isPopoverOpen);
@@ -148,7 +166,7 @@ export function DiscoverFieldSearch({ onChange, value, types }: Props) {
   const updateFilterCount = (
     name: string,
     previousValue: string | boolean,
-    currentValue: string | boolean
+    currentValue: string | boolean,
   ) => {
     const previouslyFilterActive = isFilterActive(name, previousValue);
     const filterActive = isFilterActive(name, currentValue);
@@ -164,24 +182,26 @@ export function DiscoverFieldSearch({ onChange, value, types }: Props) {
   const buttonContent = (
     <EuiFacetButton
       aria-label={filterBtnAriaLabel}
-      data-test-subj="toggleFieldFilterButton"
-      className="dscFieldSearch__toggleButton"
-      icon={<EuiIcon type="filter" />}
+      data-test-subj='toggleFieldFilterButton'
+      className='dscFieldSearch__toggleButton'
+      icon={<EuiIcon type='filter' />}
       isSelected={activeFiltersCount > 0}
       quantity={activeFiltersCount}
       onClick={handleFacetButtonClicked}
     >
       <FormattedMessage
-        id="wazuh.discover.fieldChooser.fieldFilterFacetButtonLabel"
-        defaultMessage="Filter by type"
+        id='wazuh.discover.fieldChooser.fieldFilterFacetButtonLabel'
+        defaultMessage='Filter by type'
       />
     </EuiFacetButton>
   );
 
   const select = (
     id: string,
-    selectOptions: Array<{ text: ReactNode } & OptionHTMLAttributes<HTMLOptionElement>>,
-    selectValue: string
+    selectOptions: Array<
+      { text: ReactNode } & OptionHTMLAttributes<HTMLOptionElement>
+    >,
+    selectValue: string,
   ) => {
     return (
       <EuiSelect
@@ -191,10 +211,13 @@ export function DiscoverFieldSearch({ onChange, value, types }: Props) {
         onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
           handleValueChange(id, e.target.value)
         }
-        aria-label={i18n.translate('wazuh.discover.fieldChooser.filter.fieldSelectorLabel', {
-          defaultMessage: 'Selection of {id} filter options',
-          values: { id },
-        })}
+        aria-label={i18n.translate(
+          'wazuh.discover.fieldChooser.filter.fieldSelectorLabel',
+          {
+            defaultMessage: 'Selection of {id} filter options',
+            values: { id },
+          },
+        )}
         data-test-subj={`${id}Select`}
         compressed
       />
@@ -205,15 +228,21 @@ export function DiscoverFieldSearch({ onChange, value, types }: Props) {
     return [
       {
         id: `${id}-any`,
-        label: 'any',
+        label: i18n.translate('wazuh.public.discover.fieldChooser.filter.any', {
+          defaultMessage: 'any',
+        }),
       },
       {
         id: `${id}-true`,
-        label: 'yes',
+        label: i18n.translate('wazuh.public.discover.fieldChooser.filter.yes', {
+          defaultMessage: 'yes',
+        }),
       },
       {
         id: `${id}-false`,
-        label: 'no',
+        label: i18n.translate('wazuh.public.discover.fieldChooser.filter.no', {
+          defaultMessage: 'no',
+        }),
       },
     ];
   };
@@ -224,8 +253,10 @@ export function DiscoverFieldSearch({ onChange, value, types }: Props) {
         legend={legend}
         options={toggleButtons(id)}
         idSelected={`${id}-${values[id]}`}
-        onChange={(optionId) => handleValueChange(id, optionId.replace(`${id}-`, ''))}
-        buttonSize="compressed"
+        onChange={optionId =>
+          handleValueChange(id, optionId.replace(`${id}-`, ''))
+        }
+        buttonSize='compressed'
         isFullWidth
         data-test-subj={`${id}ButtonGroup`}
       />
@@ -233,15 +264,23 @@ export function DiscoverFieldSearch({ onChange, value, types }: Props) {
   };
 
   const selectionPanel = (
-    <div className="dscFieldSearch__formWrapper">
-      <EuiForm data-test-subj="filterSelectionPanel">
-        <EuiFormRow fullWidth label={aggregatableLabel} display="columnCompressed">
+    <div className='dscFieldSearch__formWrapper'>
+      <EuiForm data-test-subj='filterSelectionPanel'>
+        <EuiFormRow
+          fullWidth
+          label={aggregatableLabel}
+          display='columnCompressed'
+        >
           {buttonGroup('aggregatable', aggregatableLabel)}
         </EuiFormRow>
-        <EuiFormRow fullWidth label={searchableLabel} display="columnCompressed">
+        <EuiFormRow
+          fullWidth
+          label={searchableLabel}
+          display='columnCompressed'
+        >
           {buttonGroup('searchable', searchableLabel)}
         </EuiFormRow>
-        <EuiFormRow fullWidth label={typeLabel} display="columnCompressed">
+        <EuiFormRow fullWidth label={typeLabel} display='columnCompressed'>
           {select('type', typeOptions, values.type)}
         </EuiFormRow>
       </EuiForm>
@@ -254,23 +293,26 @@ export function DiscoverFieldSearch({ onChange, value, types }: Props) {
         <EuiFlexItem>
           <EuiFieldSearch
             aria-label={searchPlaceholder}
-            data-test-subj="fieldFilterSearchInput"
+            data-test-subj='fieldFilterSearchInput'
             compressed
             fullWidth
-            onChange={(event) => onChange('name', event.currentTarget.value)}
+            onChange={event => onChange('name', event.currentTarget.value)}
             placeholder={searchPlaceholder}
             value={value}
           />
         </EuiFlexItem>
       </EuiFlexGroup>
-      <div className="dscFieldSearch__filterWrapper">
-        <EuiOutsideClickDetector onOutsideClick={() => {}} isDisabled={!isPopoverOpen}>
+      <div className='dscFieldSearch__filterWrapper'>
+        <EuiOutsideClickDetector
+          onOutsideClick={() => {}}
+          isDisabled={!isPopoverOpen}
+        >
           <EuiPopover
-            id="dataPanelTypeFilter"
-            panelClassName="euiFilterGroup__popoverPanel"
-            panelPaddingSize="none"
-            anchorPosition="downLeft"
-            display="block"
+            id='dataPanelTypeFilter'
+            panelClassName='euiFilterGroup__popoverPanel'
+            panelPaddingSize='none'
+            anchorPosition='downLeft'
+            display='block'
             isOpen={isPopoverOpen}
             closePopover={() => {
               setPopoverOpen(false);
@@ -278,19 +320,25 @@ export function DiscoverFieldSearch({ onChange, value, types }: Props) {
             button={buttonContent}
           >
             <EuiPopoverTitle>
-              {i18n.translate('wazuh.discover.fieldChooser.filter.filterByTypeLabel', {
-                defaultMessage: 'Filter by type',
-              })}
+              {i18n.translate(
+                'wazuh.discover.fieldChooser.filter.filterByTypeLabel',
+                {
+                  defaultMessage: 'Filter by type',
+                },
+              )}
             </EuiPopoverTitle>
             {selectionPanel}
             <EuiPopoverFooter>
               <EuiSwitch
-                label={i18n.translate('wazuh.discover.fieldChooser.filter.hideMissingFieldsLabel', {
-                  defaultMessage: 'Hide missing fields',
-                })}
+                label={i18n.translate(
+                  'wazuh.discover.fieldChooser.filter.hideMissingFieldsLabel',
+                  {
+                    defaultMessage: 'Hide missing fields',
+                  },
+                )}
                 checked={values.missing}
                 onChange={handleMissingChange}
-                data-test-subj="missingSwitch"
+                data-test-subj='missingSwitch'
               />
             </EuiPopoverFooter>
           </EuiPopover>

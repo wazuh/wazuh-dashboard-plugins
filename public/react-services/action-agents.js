@@ -11,9 +11,13 @@
  */
 import { WzRequest } from './wz-request';
 import { getToasts } from '../kibana-services';
-import { API_NAME_AGENT_STATUS, UI_LOGGER_LEVELS } from '../../common/constants';
+import {
+  API_NAME_AGENT_STATUS,
+  UI_LOGGER_LEVELS,
+} from '../../common/constants';
 import { UI_ERROR_SEVERITIES } from './error-orchestrator/types';
 import { getErrorOrchestrator } from './common-services';
+import { i18n } from '@kbn/i18n';
 
 export class ActionAgents {
   static showToast = (color, title, text, time) => {
@@ -44,7 +48,12 @@ export class ActionAgents {
         error: {
           error: error,
           message: error.message || error,
-          title: `Error upgrading the agent`,
+          title: i18n.translate(
+            'wazuh.public.react.services.action.agents.ErrorAgent',
+            {
+              defaultMessage: 'Error upgrading the agent',
+            },
+          ),
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -57,7 +66,8 @@ export class ActionAgents {
    */
   static async upgradeAgents(selectedItems) {
     for (let item of selectedItems.filter(
-      (item) => item.outdated && item.status !== API_NAME_AGENT_STATUS.DISCONNECTED
+      item =>
+        item.outdated && item.status !== API_NAME_AGENT_STATUS.DISCONNECTED,
     )) {
       try {
         await WzRequest.apiReq('PUT', `/agents/${item.id}/upgrade`, '1');
@@ -71,7 +81,12 @@ export class ActionAgents {
           error: {
             error: error,
             message: error.message || error,
-            title: `Error upgrading selected agents`,
+            title: i18n.translate(
+              'wazuh.public.react.services.action.agents.upgrandeError',
+              {
+                defaultMessage: 'Error upgrading selected agents',
+              },
+            ),
           },
         };
         getErrorOrchestrator().handleError(options);
@@ -85,7 +100,7 @@ export class ActionAgents {
    * @param {String} managerVersion
    */
   static async upgradeAllAgents(selectedItems, managerVersion) {
-    selectedItems.forEach(async (agent) => {
+    selectedItems.forEach(async agent => {
       if (
         agent.id !== '000' &&
         this.compareVersions(agent.version, managerVersion) === true &&
@@ -103,7 +118,12 @@ export class ActionAgents {
             error: {
               error: error,
               message: error.message || error,
-              title: `Error upgrading all the agents`,
+              title: i18n.translate(
+                'wazuh.public.react.services.action.agents.upgrading',
+                {
+                  defaultMessage: 'Error upgrading all the agents',
+                },
+              ),
             },
           };
           getErrorOrchestrator().handleError(options);
@@ -129,7 +149,12 @@ export class ActionAgents {
         error: {
           error: error,
           message: error.message || error,
-          title: `Error restarting agent`,
+          title: i18n.translate(
+            'wazuh.public.react.services.action.agents.agentError',
+            {
+              defaultMessage: 'Error restarting agent',
+            },
+          ),
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -141,7 +166,7 @@ export class ActionAgents {
    * @param {Array} selectedItems
    */
   static async restartAgents(selectedItems) {
-    const agentsId = selectedItems.map((item) => item.id);
+    const agentsId = selectedItems.map(item => item.id);
     try {
       await WzRequest.apiReq('PUT', `/agents/restart`, { ids: [...agentsId] });
       this.showToast('success', 'Restarting selected agents...', '', 5000);
@@ -154,7 +179,12 @@ export class ActionAgents {
         error: {
           error: error,
           message: error.message || error,
-          title: `Error restarting selected agents`,
+          title: i18n.translate(
+            'wazuh.public.react.services.action.agents.restarting',
+            {
+              defaultMessage: 'Error restarting selected agents',
+            },
+          ),
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -167,13 +197,15 @@ export class ActionAgents {
    */
   static async restartAllAgents(selectedItems) {
     let idAvaibleAgents = [];
-    selectedItems.forEach((agent) => {
+    selectedItems.forEach(agent => {
       if (agent.id !== '000' && agent.status === API_NAME_AGENT_STATUS.ACTIVE) {
         idAvaibleAgents.push(agent.id);
       }
     });
     try {
-      await WzRequest.apiReq('PUT', `/agents/restart`, { ids: [...idAvaibleAgents] });
+      await WzRequest.apiReq('PUT', `/agents/restart`, {
+        ids: [...idAvaibleAgents],
+      });
       this.showToast('success', 'Restarting all agents...', '', 5000);
     } catch (error) {
       const options = {
@@ -184,7 +216,12 @@ export class ActionAgents {
         error: {
           error: error,
           message: error.message || error,
-          title: `Error restarting all agents`,
+          title: i18n.translate(
+            'wazuh.public.react.services.action.agents.error',
+            {
+              defaultMessage: 'Error restarting all agents',
+            },
+          ),
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -197,17 +234,22 @@ export class ActionAgents {
    */
   static async deleteAgents(selectedItems) {
     const auxAgents = selectedItems
-      .map((agent) => {
+      .map(agent => {
         return agent.id !== '000' ? agent.id : null;
       })
-      .filter((agent) => agent !== null);
+      .filter(agent => agent !== null);
     try {
       await WzRequest.apiReq('DELETE', `/agents`, {
         purge: true,
         ids: auxAgents,
         older_than: '1s',
       });
-      this.showToast('success', `Selected agents were successfully deleted`, '', 5000);
+      this.showToast(
+        'success',
+        `Selected agents were successfully deleted`,
+        '',
+        5000,
+      );
     } catch (error) {
       const options = {
         context: `${ActionAgents.name}.deleteAgents`,
@@ -217,7 +259,12 @@ export class ActionAgents {
         error: {
           error: error,
           message: error.message || error,
-          title: `Failed to delete selected agents`,
+          title: i18n.translate(
+            'wazuh.public.react.services.action.agents.failed',
+            {
+              defaultMessage: 'Failed to delete selected agents',
+            },
+          ),
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -232,12 +279,12 @@ export class ActionAgents {
    * @returns {Boolean}
    */
   static compareVersions(managerVersion, agentVersion) {
-    let agentMatch = new RegExp(/[.+]?v(?<version>\d+)\.(?<minor>\d+)\.(?<path>\d+)/).exec(
-      agentVersion
-    );
-    let managerMatch = new RegExp(/[.+]?v(?<version>\d+)\.(?<minor>\d+)\.(?<path>\d+)/).exec(
-      managerVersion
-    );
+    let agentMatch = new RegExp(
+      /[.+]?v(?<version>\d+)\.(?<minor>\d+)\.(?<path>\d+)/,
+    ).exec(agentVersion);
+    let managerMatch = new RegExp(
+      /[.+]?v(?<version>\d+)\.(?<minor>\d+)\.(?<path>\d+)/,
+    ).exec(managerVersion);
     if (agentMatch === null || managerMatch === null) return;
     return managerMatch[1] <= agentMatch[1]
       ? managerMatch[2] <= agentMatch[2]

@@ -144,7 +144,14 @@ export class SettingsController {
    */
   async $onInit() {
     try {
-      const breadcrumb = [{ text: '' }, { text: 'Settings' }];
+      const breadcrumb = [
+        { text: '' },
+        {
+          text: i18n.translate('wazuh.public.controllers.setting.Settings1', {
+            defaultMessage: 'Settings',
+          }),
+        },
+      ];
       store.dispatch(updateGlobalBreadcrumb(breadcrumb));
 
       const location = this.$location.search();

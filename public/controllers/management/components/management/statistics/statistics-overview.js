@@ -211,7 +211,12 @@ export class WzStatisticsOverview extends Component {
                   options={this.state.clusterNodes}
                   value={this.state.clusterNodeSelected}
                   onChange={this.onSelectNode}
-                  aria-label='Select node'
+                  aria-label={i18n.translate(
+                    'wazuh.public.controller.management.statistics.overview.Selectnode',
+                    {
+                      defaultMessage: 'Select node',
+                    },
+                  )}
                 />
               </EuiFlexItem>
             )}
@@ -299,7 +304,15 @@ export class WzStatisticsOverview extends Component {
 export default compose(
   withGlobalBreadcrumb([
     { text: '' },
-    { text: 'Management', href: '#/manager' },
+    {
+      text: i18n.translate(
+        'wazuh.public.controller.management.statistics.overview.Management',
+        {
+          defaultMessage: 'Management',
+        },
+      ),
+      href: '#/manager',
+    },
     { text: 'Statistics' },
   ]),
   withGuard(props => {

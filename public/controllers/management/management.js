@@ -19,6 +19,7 @@ import {
   RulesetHandler,
   RulesetResources,
 } from './components/management/ruleset/utils/ruleset-handler';
+import { i18n } from '@kbn/i18n';
 
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../common/constants';
@@ -30,7 +31,14 @@ export class ManagementController {
    * @param {*} $scope
    * @param {*} $location
    */
-  constructor($scope, $rootScope, $location, configHandler, errorHandler, $interval) {
+  constructor(
+    $scope,
+    $rootScope,
+    $location,
+    configHandler,
+    errorHandler,
+    $interval,
+  ) {
     this.$scope = $scope;
     this.$rootScope = $rootScope;
     this.$location = $location;
@@ -123,7 +131,7 @@ export class ManagementController {
             }
           },
           333,
-          100
+          100,
         );
       }
       this.isRestarting = true;
@@ -141,9 +149,11 @@ export class ManagementController {
       this.$scope.$applyAsync();
     });
 
-    this.$rootScope.$on('performRestart', (ev) => {
+    this.$rootScope.$on('performRestart', ev => {
       ev.stopPropagation();
-      this.clusterInfo.status === 'enabled' ? this.restartCluster() : this.restartManager();
+      this.clusterInfo.status === 'enabled'
+        ? this.restartCluster()
+        : this.restartManager();
     });
 
     this.$rootScope.timeoutIsReady;
@@ -154,7 +164,10 @@ export class ManagementController {
       if (this.$rootScope.resultState === 'ready') {
         this.$scope.isReady = true;
       } else {
-        this.$rootScope.timeoutIsReady = setTimeout(() => (this.$scope.isReady = false), 1000);
+        this.$rootScope.timeoutIsReady = setTimeout(
+          () => (this.$scope.isReady = false),
+          1000,
+        );
       }
     });
 
@@ -163,32 +176,64 @@ export class ManagementController {
     };
 
     this.managementTabsProps = {
-      clickAction: (tab) => this.switchTab(tab, true),
+      clickAction: tab => this.switchTab(tab, true),
       selectedTab: this.tab,
       tabs: [
-        { id: 'status', name: 'Status' },
-        { id: 'logs', name: 'Logs' },
-        { id: 'monitoring', name: 'Cluster' },
-        { id: 'reporting', name: 'Reporting' },
+        {
+          id: 'status',
+          name: i18n.translate(
+            'wazuh.public.controller.management.manage.Status',
+            {
+              defaultMessage: 'Status',
+            },
+          ),
+        },
+        {
+          id: 'logs',
+          name: i18n.translate(
+            'wazuh.public.controller.management.manage.Logs',
+            {
+              defaultMessage: 'Logs',
+            },
+          ),
+        },
+        {
+          id: 'monitoring',
+          name: i18n.translate(
+            'wazuh.public.controller.management.manage.Cluster1',
+            {
+              defaultMessage: 'Cluster',
+            },
+          ),
+        },
+        {
+          id: 'reporting',
+          name: i18n.translate(
+            'wazuh.public.controller.management.manage.Reporting',
+            {
+              defaultMessage: 'Reporting',
+            },
+          ),
+        },
       ],
     };
 
     this.logtestProps = {
-      clickAction: (log) => log,
+      clickAction: log => log,
       openCloseFlyout: () => this.openCloseFlyout(),
       showClose: true,
       onFlyout: true,
     };
 
     this.managementProps = {
-      switchTab: (section) => this.switchTab(section, true),
+      switchTab: section => this.switchTab(section, true),
       section: '',
       groupsProps: {},
       configurationProps: {
         agent: {
           id: '000',
         }, // TODO: get dynamically the agent?
-        updateWazuhNotReadyYet: (status) => {
+        updateWazuhNotReadyYet: status => {
           this.$rootScope.wazuhNotReadyYet = status;
           this.$scope.$applyAsync();
         },
@@ -221,7 +266,7 @@ export class ManagementController {
       this.uploadFilesProps = {
         msg: this.$scope.mctrl.rulesetTab,
         path: `etc/${this.$scope.mctrl.rulesetTab}`,
-        upload: (files) => this.uploadFiles(files, this.$scope.mctrl.rulesetTab),
+        upload: files => this.uploadFiles(files, this.$scope.mctrl.rulesetTab),
       };
     } catch (error) {
       const errorOptions = {
@@ -231,7 +276,12 @@ export class ManagementController {
         error: {
           error: error,
           message: error?.message || '',
-          title: 'Error restarting cluster',
+          title: i18n.translate(
+            'wazuh.public.controller.management.manage.ErrorCluster',
+            {
+              defaultMessage: 'Error restarting cluster',
+            },
+          ),
         },
       };
 
@@ -267,7 +317,12 @@ export class ManagementController {
         error: {
           error: error,
           message: error?.message || '',
-          title: 'Error restarting manager',
+          title: i18n.translate(
+            'wazuh.public.controller.management.manage.errorManger',
+            {
+              defaultMessage: 'Error restarting manager',
+            },
+          ),
         },
       };
 
@@ -293,7 +348,12 @@ export class ManagementController {
         error: {
           error: error,
           message: error?.message || '',
-          title: 'Error restarting cluster',
+          title: i18n.translate(
+            'wazuh.public.controller.management.manage.cluster',
+            {
+              defaultMessage: 'Error restarting cluster',
+            },
+          ),
         },
       };
 
@@ -366,7 +426,8 @@ export class ManagementController {
       this.currentList = false;
       this.managementTabsProps.selectedTab = this.tab;
     }
-    this.managementProps.section = this.tab === 'ruleset' ? this.rulesetTab : this.tab;
+    this.managementProps.section =
+      this.tab === 'ruleset' ? this.rulesetTab : this.tab;
     this.$location.search('tab', this.tab);
     this.loadNodeList();
   }
@@ -431,10 +492,13 @@ export class ManagementController {
       const clusterEnabled = clusterInfo.status === 'enabled';
       if (clusterEnabled) {
         const response = await WzRequest.apiReq('GET', '/cluster/nodes', {});
-        const nodeList = (((response || {}).data || {}).data || {}).items || false;
+        const nodeList =
+          (((response || {}).data || {}).data || {}).items || false;
         if (Array.isArray(nodeList) && nodeList.length) {
-          this.nodeList = nodeList.map((item) => item.name).reverse();
-          this.selectedNode = nodeList.filter((item) => item.type === 'master')[0].name;
+          this.nodeList = nodeList.map(item => item.name).reverse();
+          this.selectedNode = nodeList.filter(
+            item => item.type === 'master',
+          )[0].name;
         }
       }
     } catch (error) {
@@ -445,7 +509,12 @@ export class ManagementController {
         error: {
           error: error,
           message: error?.message || '',
-          title: 'Error loading node list',
+          title: i18n.translate(
+            'wazuh.public.controller.management.manage.nodeList',
+            {
+              defaultMessage: 'Error loading node list',
+            },
+          ),
         },
       };
 
@@ -477,7 +546,7 @@ export class ManagementController {
     this.uploadFilesProps = {
       msg: this.rulesetTab,
       path: `etc/${this.rulesetTab}`,
-      upload: (files) => this.uploadFiles(files, this.rulesetTab),
+      upload: files => this.uploadFiles(files, this.rulesetTab),
     };
   }
 
@@ -524,7 +593,12 @@ export class ManagementController {
         error: {
           error: error,
           message: error?.message || '',
-          title: 'Files cannot be loaded',
+          title: i18n.translate(
+            'wazuh.public.controller.management.manage.loaded',
+            {
+              defaultMessage: 'Files cannot be loaded',
+            },
+          ),
         },
       };
 

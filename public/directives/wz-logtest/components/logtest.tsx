@@ -58,9 +58,12 @@ const place2 = i18n.translate('wazuh.controllers.agent.comp.table.place2', {
 const descp3 = i18n.translate('wazuh.controllers.agent.comp.table.Descp3', {
   defaultMessage: 'Clear current session',
 });
-const descp4 = i18n.translate('wazuh.controllers.agent.comp.table.clearCurrentSession', {
-  defaultMessage: 'Do you want to clear current session?',
-});
+const descp4 = i18n.translate(
+  'wazuh.controllers.agent.comp.table.clearCurrentSession',
+  {
+    defaultMessage: 'Do you want to clear current session?',
+  },
+);
 const descp5 = i18n.translate('wazuh.controllers.agent.comp.table.Descp5', {
   defaultMessage:
     'Clearing the session means the logs execution history is removed. This affects to rules that fire an alert when similar logs are executed in a specific range of time.',
@@ -286,9 +289,12 @@ export const Logtest = compose(
               fill
               onClick={runAllTests}
             >
-              {i18n.translate('wazuh.driectives.wzlog.comp.logtext.session.Test', {
-                defaultMessage: 'Test',
-              })}
+              {i18n.translate(
+                'wazuh.driectives.wzlog.comp.logtext.session.Test',
+                {
+                  defaultMessage: 'Test',
+                },
+              )}
             </EuiButton>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
@@ -297,7 +303,12 @@ export const Logtest = compose(
               tooltip={{ position: 'top', content: { descp3 } }}
               fill
               isDisabled={sessionToken === '' ? true : false}
-              aria-label='Clear current session'
+              aria-label={i18n.translate(
+                'wazuh.public.drivitaves.wz.comp.session',
+                {
+                  defaultMessage: 'Clear current session',
+                },
+              )}
               iconType='broom'
               onConfirm={async () => {
                 deleteToken();

@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { i18n } from '@kbn/i18n'
+import { i18n } from '@kbn/i18n';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {
@@ -45,7 +45,7 @@ class OverviewActions extends Component {
   async removeAgentsFilter(shouldUpdate = true) {
     await this.props.setAgent(false);
     const currentAppliedFilters = this.state.filterManager.filters;
-    const agentFilters = currentAppliedFilters.filter((x) => {
+    const agentFilters = currentAppliedFilters.filter(x => {
       return x.meta.key !== 'agent.id';
     });
     this.state.filterManager.setFilters(agentFilters);
@@ -55,7 +55,8 @@ class OverviewActions extends Component {
     const { filterManager } = getDataPlugin().query;
 
     this.setState({ filterManager: filterManager }, () => {
-      if (this.props.initialFilter) this.agentTableSearch([this.props.initialFilter]);
+      if (this.props.initialFilter)
+        this.agentTableSearch([this.props.initialFilter]);
       if (this.props.agent.id) this.agentTableSearch([this.props.agent.id]);
     });
   }
@@ -63,7 +64,10 @@ class OverviewActions extends Component {
   componentDidUpdate() {
     if (this.state.isAgent && !this.props.agent.id) {
       this.setState({ isAgent: false });
-    } else if (this.props.agent.id && this.state.isAgent !== this.props.agent.id) {
+    } else if (
+      this.props.agent.id &&
+      this.state.isAgent !== this.props.agent.id
+    ) {
       this.setState({ isAgent: this.props.agent.id });
     }
   }
@@ -100,7 +104,7 @@ class OverviewActions extends Component {
     if (agentIdList && agentIdList.length) {
       if (agentIdList.length === 1) {
         const currentAppliedFilters = this.state.filterManager.filters;
-        const agentFilters = currentAppliedFilters.filter((x) => {
+        const agentFilters = currentAppliedFilters.filter(x => {
           return x.meta.key !== 'agent.id';
         });
         const filter = {
@@ -136,7 +140,9 @@ class OverviewActions extends Component {
     let selectedAgentsObject = {};
     for (
       var i = 0;
-      this.state.isAgent && this.state.isAgent.length && i < this.state.isAgent.length;
+      this.state.isAgent &&
+      this.state.isAgent.length &&
+      i < this.state.isAgent.length;
       ++i
     )
       selectedAgentsObject[this.state.isAgent[i]] = true;
@@ -146,27 +152,37 @@ class OverviewActions extends Component {
   render() {
     let modal;
 
-    if (this.state.isAgentModalVisible || this.props.state.showExploreAgentModal) {
+    if (
+      this.state.isAgentModalVisible ||
+      this.props.state.showExploreAgentModal
+    ) {
       modal = (
         <EuiOverlayMask>
-          <EuiOutsideClickDetector onOutsideClick={() => this.closeAgentModal()}>
+          <EuiOutsideClickDetector
+            onOutsideClick={() => this.closeAgentModal()}
+          >
             <EuiModal
-              className="wz-select-agent-modal"
+              className='wz-select-agent-modal'
               onClose={() => this.closeAgentModal()}
-              initialFocus="[name=popswitch]"
+              initialFocus='[name=popswitch]'
             >
               <EuiModalHeader>
                 <EuiModalHeaderTitle>
-                  { i18n.translate('wazuh.controller.overview.component.exploreAgent', {  defaultMessage: 'Explore agent'})
-                  }
-
+                  {i18n.translate(
+                    'wazuh.controller.overview.component.exploreAgent',
+                    { defaultMessage: 'Explore agent' },
+                  )}
                 </EuiModalHeaderTitle>
               </EuiModalHeader>
 
               <EuiModalBody>
                 <AgentSelectionTable
-                  updateAgentSearch={(agentsIdList) => this.agentTableSearch(agentsIdList)}
-                  removeAgentsFilter={(shouldUpdate) => this.removeAgentsFilter(shouldUpdate)}
+                  updateAgentSearch={agentsIdList =>
+                    this.agentTableSearch(agentsIdList)
+                  }
+                  removeAgentsFilter={shouldUpdate =>
+                    this.removeAgentsFilter(shouldUpdate)
+                  }
                   selectedAgents={this.getSelectedAgents()}
                 ></AgentSelectionTable>
               </EuiModalBody>
@@ -179,21 +195,25 @@ class OverviewActions extends Component {
     const thereAgentSelected = (this.props.agent || {}).id;
 
     const avaliableForAgent =
-      this.props.module.availableFor && this.props.module.availableFor.includes('agent');
+      this.props.module.availableFor &&
+      this.props.module.availableFor.includes('agent');
 
     let buttonUnpinAgent, buttonExploreAgent;
     if (thereAgentSelected) {
       buttonUnpinAgent = (
         <WzButton
-          buttonType="icon"
-          className="wz-unpin-agent"
-          iconType="pinFilled"
+          buttonType='icon'
+          className='wz-unpin-agent'
+          iconType='pinFilled'
           onClick={() => {
             this.props.updateCurrentAgentData({});
             this.removeAgentsFilter();
           }}
           tooltip={{ position: 'bottom', content: 'Unpin agent' }}
-          aria-label="Unpin agent"
+          aria-label={i18n.translate(
+            'wazuh.controller.overview.component.Unpinagent',
+            { defaultMessage: 'Unpin agent' },
+          )}
         />
       );
     }
@@ -212,9 +232,12 @@ class OverviewActions extends Component {
                 { defaultMessage: 'This module is not supported for agents.' },
               )
             : thereAgentSelected
-            ? i18n.translate('wazuh.controller.overview.component.changeAgent', {
-                defaultMessage: 'Change agent selected',
-              })
+            ? i18n.translate(
+                'wazuh.controller.overview.component.changeAgent',
+                {
+                  defaultMessage: 'Change agent selected',
+                },
+              )
             : i18n.translate(
                 'wazuh.controller.overview.component.selectAgentToExplore',
                 {
@@ -230,17 +253,11 @@ class OverviewActions extends Component {
         iconType='watchesApp'
         onClick={() => this.showAgentModal()}
       >
-        {
-          (thereAgentSelected
-            ? `${this.props.agent.name} (${this.props.agent.id})`
-            : i18n.translate(
-                'wazuh.controller.overview.component.exploreAgent',
-                {
-                  defaultMessage: 'Explore agent',
-                }
-              )
-          )
-        }
+        {thereAgentSelected
+          ? `${this.props.agent.name} (${this.props.agent.id})`
+          : i18n.translate('wazuh.controller.overview.component.exploreAgent', {
+              defaultMessage: 'Explore agent',
+            })}
       </WzButton>
     );
 
@@ -254,16 +271,16 @@ class OverviewActions extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
     state: state.appStateReducers,
     agent: state.appStateReducers.currentAgentData,
   };
 };
 
-const mapDispatchToProps = (dispatch) => ({
-  updateCurrentAgentData: (agent) => dispatch(updateCurrentAgentData(agent)),
-  showExploreAgentModal: (data) => dispatch(showExploreAgentModal(data)),
+const mapDispatchToProps = dispatch => ({
+  updateCurrentAgentData: agent => dispatch(updateCurrentAgentData(agent)),
+  showExploreAgentModal: data => dispatch(showExploreAgentModal(data)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(OverviewActions);

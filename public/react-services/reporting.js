@@ -150,7 +150,12 @@ export class ReportingService {
         error: {
           error: error,
           message: error.message || error,
-          title: `Error creating the report`,
+          title: i18n.translate(
+            'wazuh.public.react.services.reporting.ErrorCreating',
+            {
+              defaultMessage: 'Error creating the report',
+            },
+          ),
         },
       };
       getErrorOrchestrator().handleError(options);

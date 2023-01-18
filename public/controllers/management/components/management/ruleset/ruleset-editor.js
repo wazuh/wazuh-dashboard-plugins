@@ -59,6 +59,43 @@ import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchest
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 
+const label1 = i18n.translate(
+  'wazuh.public.controller.management.ruleset.editor.label1',
+  {
+    defaultMessage: 'Type your new',
+  },
+);
+const label2 = i18n.translate(
+  'wazuh.public.controller.management.ruleset.editor.label2',
+  {
+    defaultMessage: 'file name here',
+  },
+);
+const label3 = i18n.translate(
+  'wazuh.public.controller.management.ruleset.editor.label3',
+  {
+    defaultMessage: 'Back to',
+  },
+);
+const label4 = i18n.translate(
+  'wazuh.public.controller.management.ruleset.editor.label4',
+  {
+    defaultMessage: 'Error file content is incorrect:',
+  },
+);
+const label5 = i18n.translate(
+  'wazuh.public.controller.management.ruleset.editor.label5',
+  {
+    defaultMessage:
+      'is incorrect. There were found several errors while validating the configuration:',
+  },
+);
+const label6 = i18n.translate(
+  'wazuh.public.controller.management.ruleset.editor.label6',
+  {
+    defaultMessage: 'AgeThe content of the filent',
+  },
+);
 class WzRulesetEditor extends Component {
   _isMounted = false;
   constructor(props) {
@@ -135,10 +172,8 @@ class WzRulesetEditor extends Component {
           severity: UI_ERROR_SEVERITIES.BUSINESS,
           error: {
             error: error,
-            message: `The content of the file ${name} is incorrect. There were found several errors while validating the configuration: ${
-              error.message || error
-            }`,
-            title: `Error file content is incorrect: ${error.message || error}`,
+            message: `${label6} ${name} ${label5} ${error.message || error}`,
+            title: `${label4} ${error.message || error}`,
           },
         };
         getErrorOrchestrator().handleError(options);
@@ -278,7 +313,12 @@ class WzRulesetEditor extends Component {
       modal = (
         <EuiOverlayMask>
           <EuiConfirmModal
-            title='Unsubmitted changes'
+            title={i18n.translate(
+              'wazuh.public.controller.management.ruleset.editor.Unsubmittedchanges',
+              {
+                defaultMessage: 'Unsubmitted changes',
+              },
+            )}
             onConfirm={() => {
               closeModal;
               this.props.cleanInfo();
@@ -314,10 +354,15 @@ class WzRulesetEditor extends Component {
                         <EuiFlexItem grow={false}>
                           <EuiToolTip
                             position='right'
-                            content={`Back to ${section}`}
+                            content={`${label3} ${section}`}
                           >
                             <EuiButtonIcon
-                              aria-label='Back'
+                              aria-label={i18n.translate(
+                                'wazuh.public.controller.management.ruleset.editor.Back',
+                                {
+                                  defaultMessage: 'Back',
+                                },
+                              )}
                               color='primary'
                               iconSize='l'
                               iconType='arrowLeft'
@@ -339,10 +384,16 @@ class WzRulesetEditor extends Component {
                         <EuiFlexItem>
                           <EuiFieldText
                             style={{ width: '300px' }}
-                            placeholder={`Type your new ${section} file name here`}
+                            placeholder={`${label1} ${section} ${label2}`}
                             value={this.state.inputValue}
                             onChange={this.onChange}
-                            aria-label='aria-label to prevent react warning'
+                            aria-label={i18n.translate(
+                              'wazuh.public.controller.management.ruleset.editor.warning',
+                              {
+                                defaultMessage:
+                                  'aria-label to prevent react warning',
+                              },
+                            )}
                           />
                         </EuiFlexItem>
                       </EuiFlexGroup>
@@ -354,7 +405,12 @@ class WzRulesetEditor extends Component {
                             content={`Back to ${section}`}
                           >
                             <EuiButtonIcon
-                              aria-label='Back'
+                              aria-label={i18n.translate(
+                                'wazuh.public.controller.management.ruleset.editor.Back',
+                                {
+                                  defaultMessage: 'Back',
+                                },
+                              )}
                               color='primary'
                               iconSize='l'
                               iconType='arrowLeft'

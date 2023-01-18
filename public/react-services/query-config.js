@@ -64,7 +64,12 @@ export const queryConfig = async (agentId, sections, node = false) => {
             error: {
               error: error,
               message: error.message || error,
-              title: `Fetch Configuration`,
+              title: i18n.translate(
+                'wazuh.public.react.services.query.FetchConfiguration',
+                {
+                  defaultMessage: 'Fetch Configuration',
+                },
+              ),
             },
           };
           getErrorOrchestrator().handleError(options);

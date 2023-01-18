@@ -40,7 +40,15 @@ export class FilesInGroupTable extends Component {
       isLoading: false,
     };
 
-    this.filters = { name: 'search', value: '' };
+    this.filters = {
+      name: i18n.translate(
+        'wazuh.public.controller.management.componts.files.group.table.search',
+        {
+          defaultMessage: 'search',
+        },
+      ),
+      value: '',
+    };
   }
 
   async componentDidMount() {
@@ -93,22 +101,50 @@ export class FilesInGroupTable extends Component {
     const columns = [
       {
         field: 'filename',
-        name: 'File',
+        name: i18n.translate(
+          'wazuh.public.controller.management.componts.files.group.table.File',
+          {
+            defaultMessage: 'File',
+          },
+        ),
         sortable: true,
       },
       {
         field: 'hash',
-        name: 'Checksum',
+        name: i18n.translate(
+          'wazuh.public.controller.management.componts.files.group.table.Checksum',
+          {
+            defaultMessage: 'Checksum',
+          },
+        ),
         sortable: true,
       },
       {
-        name: 'Actions',
+        name: i18n.translate(
+          'wazuh.public.controller.management.componts.files.group.table.Actions',
+          {
+            defaultMessage: 'Actions',
+          },
+        ),
 
         render: item => {
           return (
-            <EuiToolTip position='right' content='See file content'>
+            <EuiToolTip
+              position='right'
+              content={i18n.translate(
+                'wazuh.public.controller.management.componts.files.group.table.Seefilecontent',
+                {
+                  defaultMessage: 'See file content',
+                },
+              )}
+            >
               <EuiButtonIcon
-                aria-label='See file content'
+                aria-label={i18n.translate(
+                  'wazuh.public.controller.management.componts.files.group.table.Seefilecontent',
+                  {
+                    defaultMessage: 'See file content',
+                  },
+                )}
                 onClick={() =>
                   this.props.openFileContent(
                     this.state.groupName,

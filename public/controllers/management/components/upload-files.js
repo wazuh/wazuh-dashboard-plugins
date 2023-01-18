@@ -334,7 +334,13 @@ export class UploadFiles extends Component {
         iconSide='left'
         onClick={this.onButtonClick}
       >
-        Import files
+        {' '}
+        {i18n.translate(
+          'wazuh.public.controller.management.componts.uplodFiles.Importfiles',
+          {
+            defaultMessage: 'Import files',
+          },
+        )}
       </WzButtonPermissions>
     );
     return (

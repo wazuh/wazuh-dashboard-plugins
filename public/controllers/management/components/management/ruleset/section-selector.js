@@ -11,6 +11,7 @@
  */
 import React, { Component } from 'react';
 import { EuiSelect } from '@elastic/eui';
+import { i18n } from '@kbn/i18n';
 
 import { connect } from 'react-redux';
 import {
@@ -19,7 +20,7 @@ import {
   toggleShowFiles,
   cleanFilters,
   updateError,
-  updateIsProcessing
+  updateIsProcessing,
 } from '../../../../redux/actions/rulesetActions';
 
 import { WzRequest } from '../../../../react-services/wz-request';
@@ -27,20 +28,50 @@ import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchest
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 
+const label1 = i18n.translate(
+  'wazuh.public.controller.management.ruleset.searchBar.selector.label1',
+  {
+    defaultMessage: 'Error fetching data:',
+  },
+);
 class WzSectionSelector extends Component {
   constructor(props) {
     super(props);
 
     this.sections = [
-      { value: 'rules', text: 'Rules' },
-      { value: 'decoders', text: 'Decoders' },
-      { value: 'lists', text: 'CDB lists' }
+      {
+        value: 'rules',
+        text: i18n.translate(
+          'wazuh.public.controller.management.ruleset.searchBar.selector.Rules',
+          {
+            defaultMessage: 'Rules',
+          },
+        ),
+      },
+      {
+        value: 'decoders',
+        text: i18n.translate(
+          'wazuh.public.controller.management.ruleset.searchBar.selector.Decoders',
+          {
+            defaultMessage: 'Decoders',
+          },
+        ),
+      },
+      {
+        value: 'lists',
+        text: i18n.translate(
+          'wazuh.public.controller.management.ruleset.searchBar.selector.CDBlists',
+          {
+            defaultMessage: 'CDB lists',
+          },
+        ),
+      },
     ];
 
     this.paths = {
       rules: '/rules',
       decoders: '/decoders',
-      lists: '/lists/files'
+      lists: '/lists/files',
     };
 
     this.wzReq = WzRequest;
@@ -62,7 +93,7 @@ class WzSectionSelector extends Component {
       this.props.updateLoadingStatus(true);
       const result = await this.wzReq.apiReq('GET', this.paths[newSection], {});
       const items = result.data.data.items;
-      
+
       this.props.toggleShowFiles(false);
       this.props.changeSection(newSection);
       this.props.updateLoadingStatus(false);
@@ -78,7 +109,7 @@ class WzSectionSelector extends Component {
       this.props.cleanFilters();
       this.props.updateIsProcessing(true);
       this.fetchData(section);
-    }catch (error){
+    } catch (error) {
       const options = {
         context: `${WzSectionSelector.name}.onChange`,
         level: UI_LOGGER_LEVELS.ERROR,
@@ -86,7 +117,7 @@ class WzSectionSelector extends Component {
         error: {
           error: error,
           message: error.message || error,
-          title: `Error fetching data: ${error.message || error}`,
+          title: `${label1} ${error.message || error}`,
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -96,11 +127,16 @@ class WzSectionSelector extends Component {
   render() {
     return (
       <EuiSelect
-        id="wzSelector"
+        id='wzSelector'
         options={this.sections}
         value={this.props.state.section}
         onChange={this.onChange}
-        aria-label="Section selector"
+        aria-label={i18n.translate(
+          'wazuh.public.controller.management.ruleset.searchBar.selector.section.',
+          {
+            defaultMessage: 'Section selector',
+          },
+        )}
       />
     );
   }
@@ -108,7 +144,7 @@ class WzSectionSelector extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.rulesetReducers
+    state: state.rulesetReducers,
   };
 };
 
@@ -120,11 +156,8 @@ const mapDispatchToProps = dispatch => {
     cleanFilters: () => dispatch(cleanFilters()),
     updateError: error => dispatch(updateError(error)),
     updateIsProcessing: isProcessing =>
-      dispatch(updateIsProcessing(isProcessing))
+      dispatch(updateIsProcessing(isProcessing)),
   };
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WzSectionSelector);
+export default connect(mapStateToProps, mapDispatchToProps)(WzSectionSelector);
