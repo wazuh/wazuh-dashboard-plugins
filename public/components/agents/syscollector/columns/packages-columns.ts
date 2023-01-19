@@ -27,9 +27,18 @@ const FreebsdColumns = [
   { id: 'description', width: '30%' },
 ];
 
+const SolarisColumns = [
+  { id: 'name' },
+  { id: 'version' },
+  { id: 'format' },
+  { id: 'architecture', width: '20%' },
+  { id: 'vendor', width: '20%' },
+  { id: 'description', width: '30%' },
+];
 export const packagesColumns = {
   windows: windowsColumns,
   linux: linuxColumns,
   apple: MacColumns,
   freebsd: FreebsdColumns,
+  solaris: SolarisColumns,
 };
