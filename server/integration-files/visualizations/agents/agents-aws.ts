@@ -191,7 +191,7 @@ export default [
     _id: 'Wazuh-App-Agents-AWS-Events-by-source',
     _type: 'visualization',
     _source: {
-      title: i18n.translate('wazuh.server.integrationvis.agent.aws.time', {
+      title: i18n.translate('wazuh.server.integrationvis.agent.aws.eventTime', {
         defaultMessage: 'Events by source over time',
       }),
       visState: JSON.stringify({
@@ -691,14 +691,14 @@ export default [
     _type: 'visualization',
     _source: {
       title: i18n.translate(
-        'wazuh.server.integrationvis.agent.aws.Alertssummary',
+        'wazuh.server.integrationvis.agent.aws.alertSummary',
         {
-          defaultMessage: 'Alertssummary',
+          defaultMessage: 'Alerts summary',
         },
       ),
       visState: JSON.stringify({
         title: i18n.translate(
-          'wazuh.server.integrationvis.agent.aws.Alertssummary',
+          'wazuh.server.integrationvis.agent.aws.alertSummary',
           {
             defaultMessage: 'Alerts summary',
           },

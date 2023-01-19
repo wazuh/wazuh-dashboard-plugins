@@ -412,7 +412,12 @@ export const PLUGIN_PLATFORM_SETTING_NAME_MAX_BUCKETS = max_buckets;
 
 // Default metaFields set by the app
 export const WAZUH_PLUGIN_PLATFORM_SETTING_METAFIELDS = ['_source', '_index'];
-export const PLUGIN_PLATFORM_SETTING_NAME_METAFIELDS = 'metaFields';
+export const PLUGIN_PLATFORM_SETTING_NAME_METAFIELDS = i18n.translate(
+  'wazuh.common.constant.metaFieldsText',
+  {
+    defaultMessage: 'metaFields',
+  },
+);
 
 // Logger
 export const UI_LOGGER_LEVELS = {

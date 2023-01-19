@@ -52,7 +52,9 @@ export class WazuhPlugin
     const UI_THEME = core.uiSettings.get('theme:darkMode') ? 'dark' : 'light';
     core.application.register({
       id: `wazuh`,
-      title: 'Wazuh',
+      title: i18n.translate('wazuh.public.plugins.Wazuh', {
+        defaultMessage: 'Wazuh',
+      }),
       icon: core.http.basePath.prepend(getThemeAssetURL('icon.svg', UI_THEME)),
       mount: async (params: AppMountParameters) => {
         try {
