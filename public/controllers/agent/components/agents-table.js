@@ -467,6 +467,7 @@ export const AgentsTable = withErrorBoundary(
         name: 'ID',
         sortable: true,
         width: '6%',
+        enabledByDefault: true,
       },
       {
         field: 'name',
@@ -474,6 +475,7 @@ export const AgentsTable = withErrorBoundary(
         sortable: true,
         width: '10%',
         truncateText: true,
+        enabledByDefault: true,
       },
       {
         field: 'ip',
@@ -481,6 +483,7 @@ export const AgentsTable = withErrorBoundary(
         width: '8%',
         truncateText: true,
         sortable: true,
+        enabledByDefault: true,
       },
       {
         field: 'group',
@@ -488,6 +491,7 @@ export const AgentsTable = withErrorBoundary(
         width: '14%',
         truncateText: true,
         sortable: true,
+        enabledByDefault: true,
         render: (groups) => (groups !== '-' ? this.renderGroups(groups) : '-'),
       },
       {
@@ -496,6 +500,7 @@ export const AgentsTable = withErrorBoundary(
         sortable: true,
         width: '10%',
         truncateText: true,
+        enabledByDefault: true,
         render: this.addIconPlatformRender,
       },
       {
@@ -504,6 +509,7 @@ export const AgentsTable = withErrorBoundary(
         width: '8%',
         truncateText: true,
         sortable: true,
+        enabledByDefault: true,
       },
       {
         field: 'version',
@@ -511,6 +517,7 @@ export const AgentsTable = withErrorBoundary(
         width: '5%',
         truncateText: true,
         sortable: true,
+        enabledByDefault: true,
       },
       {
         field: 'dateAdd',
@@ -518,6 +525,7 @@ export const AgentsTable = withErrorBoundary(
         width: '8%',
         truncateText: true,
         sortable: true,
+        enabledByDefault: true,
       },
       {
         field: 'lastKeepAlive',
@@ -525,6 +533,7 @@ export const AgentsTable = withErrorBoundary(
         width: '8%',
         truncateText: true,
         sortable: true,
+        enabledByDefault: true,
       },
       {
         field: 'status',
@@ -532,6 +541,7 @@ export const AgentsTable = withErrorBoundary(
         truncateText: true,
         sortable: true,
         width: '10%',
+        enabledByDefault: true,
         render: (status) => <AgentStatus status={status} labelProps={{ className: 'hide-agent-status' }} />,
       },
       {
@@ -540,6 +550,7 @@ export const AgentsTable = withErrorBoundary(
         truncateText: true,
         sortable: true,
         width: '10%',
+        enabledByDefault: false,
         render: (synced) => <AgentSynced synced={synced}/>,
       },
       {
@@ -547,6 +558,7 @@ export const AgentsTable = withErrorBoundary(
         width: '5%',
         field: 'actions',
         name: 'Actions',
+        enabledByDefault: true,
         render: (agent) => this.actionButtonsRender(agent),
       },
     ];
@@ -564,7 +576,9 @@ export const AgentsTable = withErrorBoundary(
         });
         return newSelectedColumns;
       } else {
-        const fieldColumns = this.defaultColumns.map((item) => {
+        const fieldColumns = this.defaultColumns
+        .filter(column=>column.enabledByDefault)
+        .map((item) => {
           return {
             field: item.field,
             name: item.name,
@@ -572,7 +586,7 @@ export const AgentsTable = withErrorBoundary(
           };
         });
         this.setTableColumnsSelected(fieldColumns);
-        return this.defaultColumns;
+        return fieldColumns;
       }
     }
 
