@@ -288,7 +288,7 @@ export const AgentsTable = withErrorBoundary(
         ip: compressIPv6(agent.ip),
         status: agent.status,
         group_config_status: agent.group_config_status,
-        group: agent?.group || [],
+        group: agent?.group || '-',
         os_name: agent,
         version: agentVersion,
         node_name: node_name,
