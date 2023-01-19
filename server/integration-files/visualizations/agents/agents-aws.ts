@@ -9,14 +9,24 @@
  *
  * Find more information about this on the LICENSE file.
  */
+
+import { i18n } from '@kbn/i18n';
+
 export default [
   {
     _id: 'Wazuh-App-Agents-AWS-Top-5-rules',
     _type: 'visualization',
     _source: {
-      title: 'Top rules',
+      title: i18n.translate('wazuh.server.integrationvis.agent.aws.Toprules', {
+        defaultMessage: 'Top rules',
+      }),
       visState: JSON.stringify({
-        title: 'Top rules',
+        title: i18n.translate(
+          'wazuh.server.integrationvis.agent.aws.Toprules',
+          {
+            defaultMessage: 'Top rules',
+          },
+        ),
         type: 'table',
         params: {
           perPage: 10,
@@ -28,7 +38,13 @@ export default [
           totalFunc: 'sum',
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '3',
             enabled: true,
@@ -83,9 +99,19 @@ export default [
     _id: 'Wazuh-App-Agents-AWS-geo',
     _type: 'visualization',
     _source: {
-      title: 'Geolocation map',
+      title: i18n.translate(
+        'wazuh.server.integrationvis.agent.aws.Geolocationmap',
+        {
+          defaultMessage: 'Geolocation map',
+        },
+      ),
       visState: JSON.stringify({
-        title: 'Geolocation map',
+        title: i18n.translate(
+          'wazuh.server.integrationvis.agent.aws.Geolocationmap',
+          {
+            defaultMessage: 'Geolocation map',
+          },
+        ),
         type: 'tile_map',
         params: {
           colorSchema: 'Green to Red',
@@ -96,9 +122,17 @@ export default [
           legendPosition: 'bottomright',
           mapZoom: 1,
           mapCenter: [0, 0],
-          wms: { enabled: false, options: { format: 'image/png', transparent: true } },
+          wms: {
+            enabled: false,
+            options: { format: 'image/png', transparent: true },
+          },
           dimensions: {
-            metric: { accessor: 1, format: { id: 'number' }, params: {}, aggType: 'count' },
+            metric: {
+              accessor: 1,
+              format: { id: 'number' },
+              params: {},
+              aggType: 'count',
+            },
             geohash: {
               accessor: 0,
               format: { id: 'string' },
@@ -114,7 +148,13 @@ export default [
           },
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,
@@ -151,13 +191,21 @@ export default [
     _id: 'Wazuh-App-Agents-AWS-Events-by-source',
     _type: 'visualization',
     _source: {
-      title: 'Events by source over time',
+      title: i18n.translate('wazuh.server.integrationvis.agent.aws.time', {
+        defaultMessage: 'Events by source over time',
+      }),
       visState: JSON.stringify({
-        title: 'Alerts by action over time',
+        title: i18n.translate('wazuh.server.integrationvis.agent.aws.time', {
+          defaultMessage: 'Alerts by action over time',
+        }),
         type: 'area',
         params: {
           type: 'area',
-          grid: { categoryLines: true, style: { color: '#eee' }, valueAxis: 'ValueAxis-1' },
+          grid: {
+            categoryLines: true,
+            style: { color: '#eee' },
+            valueAxis: 'ValueAxis-1',
+          },
           categoryAxes: [
             {
               id: 'CategoryAxis-1',
@@ -173,7 +221,12 @@ export default [
           valueAxes: [
             {
               id: 'ValueAxis-1',
-              name: 'LeftAxis-1',
+              name: i18n.translate(
+                'wazuh.server.integrationvis.agent.aws.LeftAxis-1',
+                {
+                  defaultMessage: 'LeftAxis-1',
+                },
+              ),
               type: 'value',
               position: 'left',
               show: true,
@@ -202,7 +255,13 @@ export default [
           addTimeMarker: false,
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,
@@ -254,9 +313,16 @@ export default [
     _id: 'Wazuh-App-Agents-AWS-Top-accounts',
     _type: 'visualization',
     _source: {
-      title: 'Accounts',
+      title: i18n.translate('wazuh.server.integrationvis.agent.aws.Accounts', {
+        defaultMessage: 'Accounts',
+      }),
       visState: JSON.stringify({
-        title: 'Accounts',
+        title: i18n.translate(
+          'wazuh.server.integrationvis.agent.aws.Accounts',
+          {
+            defaultMessage: 'Accounts',
+          },
+        ),
         type: 'pie',
         params: {
           type: 'pie',
@@ -264,10 +330,21 @@ export default [
           addLegend: true,
           legendPosition: 'right',
           isDonut: true,
-          labels: { show: false, values: true, last_level: true, truncate: 100 },
+          labels: {
+            show: false,
+            values: true,
+            last_level: true,
+            truncate: 100,
+          },
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,
@@ -302,9 +379,13 @@ export default [
     _id: 'Wazuh-App-Agents-AWS-Top-sources',
     _type: 'visualization',
     _source: {
-      title: 'Sources',
+      title: i18n.translate('wazuh.server.integrationvis.agent.aws.Sources', {
+        defaultMessage: 'Sources',
+      }),
       visState: JSON.stringify({
-        title: 'Sources',
+        title: i18n.translate('wazuh.server.integrationvis.agent.aws.Sources', {
+          defaultMessage: 'Sources',
+        }),
         type: 'pie',
         params: {
           type: 'pie',
@@ -312,10 +393,21 @@ export default [
           addLegend: true,
           legendPosition: 'right',
           isDonut: true,
-          labels: { show: false, values: true, last_level: true, truncate: 100 },
+          labels: {
+            show: false,
+            values: true,
+            last_level: true,
+            truncate: 100,
+          },
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,
@@ -350,9 +442,13 @@ export default [
     _id: 'Wazuh-App-Agents-AWS-Top-buckets',
     _type: 'visualization',
     _source: {
-      title: 'Buckets',
+      title: i18n.translate('wazuh.server.integrationvis.agent.aws.Buckets', {
+        defaultMessage: 'Buckets',
+      }),
       visState: JSON.stringify({
-        title: 'Buckets',
+        title: i18n.translate('wazuh.server.integrationvis.agent.aws.Buckets', {
+          defaultMessage: 'Buckets',
+        }),
         type: 'pie',
         params: {
           type: 'pie',
@@ -360,10 +456,21 @@ export default [
           addLegend: true,
           legendPosition: 'right',
           isDonut: true,
-          labels: { show: false, values: true, last_level: true, truncate: 100 },
+          labels: {
+            show: false,
+            values: true,
+            last_level: true,
+            truncate: 100,
+          },
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,
@@ -398,9 +505,13 @@ export default [
     _id: 'Wazuh-App-Agents-AWS-Top-regions',
     _type: 'visualization',
     _source: {
-      title: 'Regions',
+      title: i18n.translate('wazuh.server.integrationvis.agent.aws.Regions', {
+        defaultMessage: 'Regions',
+      }),
       visState: JSON.stringify({
-        title: 'Regions',
+        title: i18n.translate('wazuh.server.integrationvis.agent.aws.Regions', {
+          defaultMessage: 'Regions',
+        }),
         type: 'pie',
         params: {
           type: 'pie',
@@ -408,10 +519,21 @@ export default [
           addLegend: true,
           legendPosition: 'right',
           isDonut: true,
-          labels: { show: false, values: true, last_level: true, truncate: 100 },
+          labels: {
+            show: false,
+            values: true,
+            last_level: true,
+            truncate: 100,
+          },
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,
@@ -446,13 +568,21 @@ export default [
     _id: 'Wazuh-App-Agents-AWS-Events-by-s3-bucket',
     _type: 'visualization',
     _source: {
-      title: 'Events by S3 bucket over time',
+      title: i18n.translate('wazuh.server.integrationvis.agent.aws.overtime', {
+        defaultMessage: 'Events by S3 bucket over time',
+      }),
       visState: JSON.stringify({
-        title: 'Alerts by action over time',
+        title: i18n.translate('wazuh.server.integrationvis.agent.aws.alert', {
+          defaultMessage: 'Alerts by action over time',
+        }),
         type: 'area',
         params: {
           type: 'area',
-          grid: { categoryLines: true, style: { color: '#eee' }, valueAxis: 'ValueAxis-1' },
+          grid: {
+            categoryLines: true,
+            style: { color: '#eee' },
+            valueAxis: 'ValueAxis-1',
+          },
           categoryAxes: [
             {
               id: 'CategoryAxis-1',
@@ -468,7 +598,12 @@ export default [
           valueAxes: [
             {
               id: 'ValueAxis-1',
-              name: 'LeftAxis-1',
+              name: i18n.translate(
+                'wazuh.server.integrationvis.agent.aws.LeftAxis-1',
+                {
+                  defaultMessage: 'LeftAxis-1',
+                },
+              ),
               type: 'value',
               position: 'left',
               show: true,
@@ -497,7 +632,13 @@ export default [
           addTimeMarker: false,
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,
@@ -549,9 +690,19 @@ export default [
     _id: 'Wazuh-App-Agents-AWS-Alerts-summary',
     _type: 'visualization',
     _source: {
-      title: 'Alerts summary',
+      title: i18n.translate(
+        'wazuh.server.integrationvis.agent.aws.Alertssummary',
+        {
+          defaultMessage: 'Alertssummary',
+        },
+      ),
       visState: JSON.stringify({
-        title: 'Alerts summary',
+        title: i18n.translate(
+          'wazuh.server.integrationvis.agent.aws.Alertssummary',
+          {
+            defaultMessage: 'Alerts summary',
+          },
+        ),
         type: 'table',
         params: {
           perPage: 10,
@@ -563,7 +714,13 @@ export default [
           totalFunc: 'sum',
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,

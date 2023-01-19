@@ -9,6 +9,9 @@
  *
  * Find more information about this on the LICENSE file.
  */
+
+import { i18n } from '@kbn/i18n';
+
 export default [
   {
     _id: 'Wazuh-App-Cluster-monitoring-Overview',
@@ -37,9 +40,19 @@ export default [
     _id: 'Wazuh-App-Cluster-monitoring-Overview-Manager',
     _type: 'visualization',
     _source: {
-      title: 'Wazuh App Cluster Overview Manager',
+      title: i18n.translate(
+        'wazuh.server.intergation.cluster.monitering.overview',
+        {
+          defaultMessage: 'Wazuh App Cluster Overview Manager',
+        },
+      ),
       visState: JSON.stringify({
-        title: 'Wazuh App Cluster Overview Manager',
+        title: i18n.translate(
+          'wazuh.server.intergation.cluster.monitering.overview',
+          {
+            defaultMessage: 'Wazuh App Cluster Overview Manager',
+          },
+        ),
         type: 'timelion',
         params: { expression: '.es(q=agent.id:000)', interval: 'auto' },
         aggs: [],
@@ -59,9 +72,19 @@ export default [
   {
     _id: 'Wazuh-App-Cluster-monitoring-Overview-Node',
     _source: {
-      title: 'Wazuh App Cluster Overview Node',
+      title: i18n.translate(
+        'wazuh.server.intergation.cluster.monitering.node',
+        {
+          defaultMessage: 'Wazuh App Cluster Overview Node',
+        },
+      ),
       visState: JSON.stringify({
-        title: 'Wazuh App Cluster Overview Node',
+        title: i18n.translate(
+          'wazuh.server.intergation.cluster.monitering.node',
+          {
+            defaultMessage: 'Wazuh App Cluster Overview Node',
+          },
+        ),
         type: 'histogram',
         params: {
           type: 'histogram',
@@ -81,7 +104,12 @@ export default [
           valueAxes: [
             {
               id: 'ValueAxis-1',
-              name: 'LeftAxis-1',
+              name: i18n.translate(
+                'wazuh.server.intergation.cluster.monitering.LeftAxis-1',
+                {
+                  defaultMessage: 'LeftAxis-1',
+                },
+              ),
               type: 'value',
               position: 'left',
               show: true,
@@ -109,7 +137,13 @@ export default [
           addTimeMarker: false,
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,
@@ -145,9 +179,16 @@ export default [
     _id: 'Wazuh-App-Cluster-monitoring-Overview-Node-Pie',
     _type: 'visualization',
     _source: {
-      title: 'Wazuh App Cluster Overview Node Pie',
+      title: i18n.translate('wazuh.server.intergation.cluster.monitering.pie', {
+        defaultMessage: 'Wazuh App Cluster Overview Node Pie',
+      }),
       visState: JSON.stringify({
-        title: 'Wazuh App Cluster Overview Node Pie',
+        title: i18n.translate(
+          'wazuh.server.intergation.cluster.monitering.pie',
+          {
+            defaultMessage: 'Wazuh App Cluster Overview Node Pie',
+          },
+        ),
         type: 'pie',
         params: {
           type: 'pie',
@@ -155,10 +196,21 @@ export default [
           addLegend: true,
           legendPosition: 'right',
           isDonut: true,
-          labels: { show: false, values: true, last_level: true, truncate: 100 },
+          labels: {
+            show: false,
+            values: true,
+            last_level: true,
+            truncate: 100,
+          },
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,

@@ -17,18 +17,21 @@ import {
   EuiConfirmModal,
   EuiSpacer,
 } from '@elastic/eui';
+import { i18n } from '@kbn/i18n';
 
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 import GroupsHandler from './utils/groups-handler';
 import { getToasts } from '../../../../../kibana-services';
-import { WzSearchBar, filtersToObject } from '../../../../../components/wz-search-bar';
+import {
+  WzSearchBar,
+  filtersToObject,
+} from '../../../../../components/wz-search-bar';
 import { withUserPermissions } from '../../../../../components/common/hocs/withUserPermissions';
 import { WzUserPermissions } from '../../../../../react-services/wz-user-permissions';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
-
 
 import {
   updateLoadingStatus,
@@ -72,7 +75,8 @@ class WzGroupsTable extends Component {
     if (showModal !== nextProps.state.showModal) return true;
     if (isProcessing !== nextProps.state.isProcessing) return true;
     if (JSON.stringify(items) !== JSON.stringify(nextState.items)) return true;
-    if (JSON.stringify(filters) !== JSON.stringify(nextState.filters)) return true;
+    if (JSON.stringify(filters) !== JSON.stringify(nextState.filters))
+      return true;
     if (isLoading !== nextProps.state.isLoading) return true;
     return false;
   }
@@ -98,8 +102,12 @@ class WzGroupsTable extends Component {
     this.setState({ items: [], totalItems: 0 }, async () => {
       try {
         this.props.updateLoadingStatus(true);
-        const rawItems = await this.groupsHandler.listGroups({ params: this.buildFilter() });
-        const { affected_items, total_affected_items } = ((rawItems || {}).data || {}).data;
+        const rawItems = await this.groupsHandler.listGroups({
+          params: this.buildFilter(),
+        });
+        const { affected_items, total_affected_items } = (
+          (rawItems || {}).data || {}
+        ).data;
 
         this.setState({
           items: affected_items,
@@ -118,7 +126,12 @@ class WzGroupsTable extends Component {
           error: {
             error: error,
             message: error.message || error,
-            title: `Error getting groups`,
+            title: i18n.translate(
+              'wazuh.public.controller.management.groups.table.j.error',
+              {
+                defaultMessage: 'Error getting groups',
+              },
+            ),
           },
         };
         getErrorOrchestrator().handleError(options);
@@ -162,7 +175,8 @@ class WzGroupsTable extends Component {
     const { filters } = this.state;
 
     this.groupsColumns = new GroupsColums(this.props);
-    const { isLoading, pageIndex, error, sortField, sortDirection } = this.props.state;
+    const { isLoading, pageIndex, error, sortField, sortDirection } =
+      this.props.state;
     const { items, pageSize, totalItems } = this.state;
     const columns = this.groupsColumns.columns;
     const message = isLoading ? null : 'No results...';
@@ -178,14 +192,14 @@ class WzGroupsTable extends Component {
         direction: sortDirection,
       },
     };
-    const getRowProps = (item) => {
+    const getRowProps = item => {
       const { id } = item;
       return {
         'data-test-subj': `row-${id}`,
         className: 'customRowClass',
         onClick: !WzUserPermissions.checkMissingUserPermissions(
           [{ action: 'group:read', resource: `group:id:${item.name}` }],
-          this.props.userPermissions
+          this.props.userPermissions,
         )
           ? () => this.props.updateGroupDetail(item)
           : undefined,
@@ -193,7 +207,7 @@ class WzGroupsTable extends Component {
     };
 
     if (error) {
-      return <EuiCallOut color="warning" title={error} iconType="gear" />;
+      return <EuiCallOut color='warning' title={error} iconType='gear' />;
     }
     const itemList = this.props.state.itemList;
     return (
@@ -201,12 +215,19 @@ class WzGroupsTable extends Component {
         <WzSearchBar
           filters={filters}
           suggestions={this.suggestions}
-          onFiltersChange={(filters) => this._isMounted && this.setState({ filters })}
-          placeholder="Search group"
+          onFiltersChange={filters =>
+            this._isMounted && this.setState({ filters })
+          }
+          placeholder={i18n.translate(
+            'wazuh.public.controller.management.groups.table.j.Searchgroup',
+            {
+              defaultMessage: 'Search group',
+            },
+          )}
         />
-        <EuiSpacer size="s" />
+        <EuiSpacer size='s' />
         <EuiBasicTable
-          itemId="id"
+          itemId='id'
           items={items}
           columns={columns}
           pagination={pagination}
@@ -220,16 +241,18 @@ class WzGroupsTable extends Component {
         {this.props.state.showModal ? (
           <EuiOverlayMask>
             <EuiConfirmModal
-              title={`Delete ${itemList[0].file ? itemList[0].file : itemList[0].name} group?`}
+              title={`Delete ${
+                itemList[0].file ? itemList[0].file : itemList[0].name
+              } group?`}
               onCancel={() => this.props.updateShowModal(false)}
               onConfirm={() => {
                 this.removeItems(itemList);
                 this.props.updateShowModal(false);
               }}
-              cancelButtonText="Cancel"
-              confirmButtonText="Delete"
-              defaultFocusedButton="cancel"
-              buttonColor="danger"
+              cancelButtonText='Cancel'
+              confirmButtonText='Delete'
+              defaultFocusedButton='cancel'
+              buttonColor='danger'
             ></EuiConfirmModal>
           </EuiOverlayMask>
         ) : null}
@@ -253,41 +276,44 @@ class WzGroupsTable extends Component {
     });
 
     Promise.all(results).then(
-      (completed) => {
+      completed => {
         this.props.updateIsProcessing(true);
         this.props.updateLoadingStatus(false);
         this.showToast('success', 'Success', 'Deleted successfully', 3000);
       },
-      (error) => {
+      error => {
         this.props.updateIsProcessing(true);
         this.props.updateLoadingStatus(false);
         this.showToast('danger', 'Error', error, 3000);
-      }
+      },
     );
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
     state: state.groupsReducers,
   };
 };
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
-    updateLoadingStatus: (status) => dispatch(updateLoadingStatus(status)),
-    updateFileContent: (content) => dispatch(updateFileContent(content)),
-    updateIsProcessing: (isProcessing) => dispatch(updateIsProcessing(isProcessing)),
-    updatePageIndex: (pageIndex) => dispatch(updatePageIndex(pageIndex)),
-    updateShowModal: (showModal) => dispatch(updateShowModal(showModal)),
-    updateListItemsForRemove: (itemList) => dispatch(updateListItemsForRemove(itemList)),
-    updateSortDirection: (sortDirection) => dispatch(updateSortDirection(sortDirection)),
-    updateSortField: (sortField) => dispatch(updateSortField(sortField)),
-    updateGroupDetail: (itemDetail) => dispatch(updateGroupDetail(itemDetail)),
+    updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
+    updateFileContent: content => dispatch(updateFileContent(content)),
+    updateIsProcessing: isProcessing =>
+      dispatch(updateIsProcessing(isProcessing)),
+    updatePageIndex: pageIndex => dispatch(updatePageIndex(pageIndex)),
+    updateShowModal: showModal => dispatch(updateShowModal(showModal)),
+    updateListItemsForRemove: itemList =>
+      dispatch(updateListItemsForRemove(itemList)),
+    updateSortDirection: sortDirection =>
+      dispatch(updateSortDirection(sortDirection)),
+    updateSortField: sortField => dispatch(updateSortField(sortField)),
+    updateGroupDetail: itemDetail => dispatch(updateGroupDetail(itemDetail)),
   };
 };
 
 export default compose(
   connect(mapStateToProps, mapDispatchToProps),
-  withUserPermissions
+  withUserPermissions,
 )(WzGroupsTable);
