@@ -11,7 +11,13 @@
  */
 
 import React, { Fragment } from 'react';
-import { EuiEmptyPrompt, EuiButton, EuiFlexGroup, EuiFlexItem, EuiCallOut } from '@elastic/eui';
+import {
+  EuiEmptyPrompt,
+  EuiButton,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiCallOut,
+} from '@elastic/eui';
 import { InventoryMetrics } from './components/syscollector-metrics';
 import { SyscollectorTable } from './components/syscollector-table';
 import { processColumns, portsColumns, packagesColumns } from './columns';
@@ -22,22 +28,27 @@ export function SyscollectorInventory({ agent }) {
   if (agent && agent.status === API_NAME_AGENT_STATUS.NEVER_CONNECTED) {
     return (
       <EuiEmptyPrompt
-        iconType="securitySignalDetected"
+        iconType='securitySignalDetected'
         style={{ marginTop: 20 }}
         title={<h2>Agent has never connected.</h2>}
         body={
           <Fragment>
-            <p>The agent has been registered but has not yet connected to the manager.</p>
+            <p>
+              The agent has been registered but has not yet connected to the
+              manager.
+            </p>
             <a
-              href={webDocumentationLink('user-manual/agents/agent-connection.html')}
-              target="_blank"
+              href={webDocumentationLink(
+                'user-manual/agents/agent-connection.html',
+              )}
+              target='_blank'
             >
               Checking connection with the Wazuh server
             </a>
           </Fragment>
         }
         actions={
-          <EuiButton href="#/agents-preview?" color="primary" fill>
+          <EuiButton href='#/agents-preview?' color='primary' fill>
             Back
           </EuiButton>
         }
@@ -46,7 +57,6 @@ export function SyscollectorInventory({ agent }) {
   }
 
   let soPlatform;
-
   if (((agent.os || {}).uname || '').includes('Linux')) {
     soPlatform = 'linux';
   } else if ((agent.os || {}).platform === 'windows') {
@@ -55,8 +65,9 @@ export function SyscollectorInventory({ agent }) {
     soPlatform = 'apple';
   } else if (((agent.os || {}).uname.toLowerCase() || '').includes('freebsd')) {
     soPlatform = 'freebsd';
+  } else if (((agent.os || {}).uname.toLowerCase() || '').includes('sunos')) {
+    soPlatform = 'solaris';
   }
-
   const netifaceColumns = [
     { id: 'name' },
     { id: 'mac' },
@@ -77,17 +88,17 @@ export function SyscollectorInventory({ agent }) {
       {agent && agent.status === API_NAME_AGENT_STATUS.DISCONNECTED && (
         <EuiCallOut
           style={{ margin: '8px 16px 8px 16px' }}
-          title="This agent is currently disconnected, the data may be outdated."
-          iconType="iInCircle"
+          title='This agent is currently disconnected, the data may be outdated.'
+          iconType='iInCircle'
         />
       )}
-      <EuiFlexGroup gutterSize="s">
+      <EuiFlexGroup gutterSize='s'>
         <EuiFlexItem style={{ marginBottom: 0 }}>
           <InventoryMetrics agent={agent}></InventoryMetrics>
         </EuiFlexItem>
       </EuiFlexGroup>
 
-      <EuiFlexGroup gutterSize="s">
+      <EuiFlexGroup gutterSize='s'>
         <EuiFlexItem grow={2} style={{ marginRight: 4, marginTop: 0 }}>
           <SyscollectorTable
             tableParams={{
@@ -114,7 +125,7 @@ export function SyscollectorInventory({ agent }) {
         </EuiFlexItem>
       </EuiFlexGroup>
 
-      <EuiFlexGroup gutterSize="s">
+      <EuiFlexGroup gutterSize='s'>
         <EuiFlexItem grow={3} style={{ marginRight: 4 }}>
           <SyscollectorTable
             tableParams={{
@@ -143,7 +154,7 @@ export function SyscollectorInventory({ agent }) {
         )}
       </EuiFlexGroup>
 
-      <EuiFlexGroup gutterSize="s">
+      <EuiFlexGroup gutterSize='s'>
         <EuiFlexItem>
           <SyscollectorTable
             tableParams={{
@@ -159,7 +170,7 @@ export function SyscollectorInventory({ agent }) {
         </EuiFlexItem>
       </EuiFlexGroup>
 
-      <EuiFlexGroup gutterSize="s">
+      <EuiFlexGroup gutterSize='s'>
         <EuiFlexItem>
           <SyscollectorTable
             tableParams={{
