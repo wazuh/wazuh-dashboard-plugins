@@ -92,7 +92,7 @@ class WzRulesetSearchBar extends Component {
         },
       ),
       description: i18n.translate(
-        'wazuh.public.controller.management.ruleset.searchBar.filename1',
+        'wazuh.public.controller.management.ruleset.searchBar.filterRule',
         {
           defaultMessage: 'Filters the rules by file name.',
         },

@@ -60,7 +60,7 @@ import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 
 const label1 = i18n.translate(
-  'wazuh.public.controller.management.ruleset.editor.label1',
+  'wazuh.public.controller.management.ruleset.editor.labelNew',
   {
     defaultMessage: 'Type your new',
   },

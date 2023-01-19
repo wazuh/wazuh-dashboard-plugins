@@ -406,7 +406,7 @@ class WzConfigurationGlobalConfigurationGlobal extends Component {
                 />
                 <WzConfigurationSettingsGroup
                   title={i18n.translate(
-                    'wazuh.public.controller.management.config.global.output',
+                    'wazuh.public.controller.management.config.global.outputPrelude',
                     {
                       defaultMessage: 'Prelude and ZeroMQ output',
                     },

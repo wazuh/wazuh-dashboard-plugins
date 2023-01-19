@@ -69,9 +69,9 @@ const allSettings = [
   {
     field: 'check_files',
     label: i18n.translate(
-      'wazuh.public.controller.management.config.policy.monitoring.gernal.',
+      'wazuh.public.controller.management.config.policy.monitoring.gernal.checkFiles',
       {
-        defaultMessage: '',
+        defaultMessage: 'Check files',
       },
     ),
   },

@@ -84,13 +84,13 @@ export class ToolsController {
     let tabs = [
       {
         id: 'devTools',
-        name: i18n.translate('wazuh.public.controllers.tools.', {
+        name: i18n.translate('wazuh.public.controllers.tools.apiConsole', {
           defaultMessage: 'API Console',
         }),
       },
       {
         id: 'logtest',
-        name: i18n.translate('wazuh.public.controllers.tools.', {
+        name: i18n.translate('wazuh.public.controllers.tools.ruleset', {
           defaultMessage: 'Ruleset Test',
         }),
       },

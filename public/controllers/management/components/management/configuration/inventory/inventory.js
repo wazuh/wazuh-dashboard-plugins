@@ -35,9 +35,9 @@ const mainSettings = [
   {
     field: 'interval',
     label: i18n.translate(
-      'wazuh.public.controller.management.config.inventory.',
+      'wazuh.public.controller.management.config.inventory.interval',
       {
-        defaultMessage: '',
+        defaultMessage: 'Interval between system scans',
       },
     ),
   },

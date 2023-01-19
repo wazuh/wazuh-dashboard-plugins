@@ -41,7 +41,7 @@ const mainSettings = [
   {
     field: 'Compress rotatio',
     label: i18n.translate(
-      'wazuh.public.controller.management.config.log.setting.archives.',
+      'wazuh.public.controller.management.config.log.setting.archives.compressRotation',
       {
         defaultMessage: 'compressrotation',
       },
@@ -77,7 +77,7 @@ const mainSettings = [
   {
     field: 'minsize',
     label: i18n.translate(
-      'wazuh.public.controller.management.config.log.setting.archives.',
+      'wazuh.public.controller.management.config.log.setting.archives.logSize',
       {
         defaultMessage: 'Minimum log size',
       },

@@ -140,7 +140,7 @@ const mainSettings = [
     label: i18n.translate(
       'wazuh.public.controller.management.config.intergrity.moniterted.Checkfilesgroups',
       {
-        defaultMessage: '',
+        defaultMessage: 'Check files groups',
       },
     ),
     render: renderOptsIncludes('check_group'),

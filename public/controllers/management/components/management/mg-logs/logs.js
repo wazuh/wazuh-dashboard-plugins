@@ -324,7 +324,7 @@ export default compose(
           text: i18n.translate(
             'wazuh.public.controller.management.mg.logs.Error',
             {
-              defaultMessage: '',
+              defaultMessage: 'Error',
             },
           ),
         },

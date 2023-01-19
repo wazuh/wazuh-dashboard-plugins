@@ -35,7 +35,7 @@ const helpLinks = [
     href: webDocumentationLink('user-manual/manager/manual-integration.html')
   },
   {
-    text: i18n.translate('wazuh.public.controller.management.config.integrations.VirusTotal', {
+    text: i18n.translate('wazuh.public.controller.management.config.integrations.VirusTotalIntegration', {
           defaultMessage: 'VirusTotal integration',
         }),
     href: webDocumentationLink('user-manual/capabilities/virustotal-scan/index.html')
@@ -49,7 +49,7 @@ const helpLinks = [
 ];
 
 const defaultIntegrations = [
-  { title: i18n.translate('wazuh.public.controller.management.config.integrations.', {
+  { title: i18n.translate('wazuh.public.controller.management.config.integrations.slack', {
           defaultMessage: 'Slack',
         }), description:i18n.translate('wazuh.public.controller.management.config.integrations.directely', {
           defaultMessage: 'Get alerts directly on Slack',
@@ -110,9 +110,9 @@ class WzConfigurationIntegrations extends Component {
     return (
       defaultIntegrations.find(
         i => i.title && i.title.toLocaleLowerCase() === integration
-      ) || { title: capitalize(integration), description: i18n.translate('wazuh.public.controller.management.config.integrations.', {
-          defaultMessage: '',
-        })'Custom integration' }
+      ) || { title: capitalize(integration), description: i18n.translate('wazuh.public.controller.management.config.integrations.customIntegration', {
+          defaultMessage: 'Custom integration',
+        })}
     );
   }
   render() {

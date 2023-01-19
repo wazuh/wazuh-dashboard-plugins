@@ -76,8 +76,8 @@ const mainSettings = [
   {
     field: 'force.key_mismatch',
     label: i18n.translate('wazuh.public.controller.management.config.policy.registration.', {
-          defaultMessage: '',
-        })'Avoid re-registering agents that already have valid keys'
+          defaultMessage: 'Avoid re-registering agents that already have valid keys',
+    })
   },
   {
     field: 'force.disconnected_time.enabled',
