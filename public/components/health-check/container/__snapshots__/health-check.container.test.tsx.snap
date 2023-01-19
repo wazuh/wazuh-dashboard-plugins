@@ -21,7 +21,7 @@ const title6 = i18n.translate("wazuh.components.overview.github.panel.title6", {
   defaultMessage: "Check timelion:max_buckets setting",
 });
 const title7 = i18n.translate(
-  "wazuh.components.common.welcome.comp.agent.sections.title7",
+  "wazuh.components.common.welcome.comp.agent.sections.metaFields",
   {
     defaultMessage: "Check metaFields setting",
   }
