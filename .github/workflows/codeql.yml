@@ -29,7 +29,6 @@ jobs:
       fail-fast: false
       matrix:
         language: [ 'javascript' ]
-        branches: [ 'master', '4.4-2.4-wzd' ]
         # CodeQL supports [ 'cpp', 'csharp', 'go', 'java', 'javascript', 'python', 'ruby' ]
         # Use only 'java' to analyze code written in Java, Kotlin or both
         # Use only 'javascript' to analyze code written in JavaScript, TypeScript or both
@@ -38,8 +37,6 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
-      with:
-        ref: ${{ matrix.branches }}
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
