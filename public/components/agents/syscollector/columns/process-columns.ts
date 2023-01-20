@@ -36,4 +36,5 @@ export const processColumns = {
   linux: linuxColumns,
   apple: macColumns,
   freebsd: linuxColumns,
+  solaris: linuxColumns,
 };
