@@ -70,7 +70,6 @@ export const AgentsPreview = compose(
         agentStatusSummary: { active: '-', disconnected: '-', total: '-', pending: '-', never_connected: '-' },
         agentConfiguration: {},
         agentsActiveCoverage: 0,
-        agentsSynced: 0,
       };
       this.wazuhConfig = new WazuhConfig();
       this.agentStatus = UI_ORDER_AGENT_STATUS.map(agentStatus => ({
@@ -120,7 +119,6 @@ export const AgentsPreview = compose(
         agentStatusSummary,
         agentConfiguration,
         agentsActiveCoverage: ((agentStatusSummary.active / agentStatusSummary.total) * 100).toFixed(2),
-        agentsSynced: ((agentConfiguration.synced/agentConfiguration.total)*100).toFixed(2),
       });
     }
 
