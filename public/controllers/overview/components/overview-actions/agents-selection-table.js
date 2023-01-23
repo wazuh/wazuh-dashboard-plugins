@@ -119,8 +119,8 @@ export class AgentSelectionTable extends Component {
     ];
     this.suggestions = [
       { type: 'q', label: 'status', description: 'Filter by agent connection status', operators: ['=', '!=',], values: UI_ORDER_AGENT_STATUS },
-      { type: 'q', label: 'os.platform', description: 'Filter by OS platform', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('os.platform', value, { q: 'id!=000'})},
-      { type: 'q', label: 'ip', description: 'Filter by agent IP', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('ip', value, { q: 'id!=000'})},
+      { type: 'q', label: 'os.platform', description: 'Filter by operating system platform', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('os.platform', value, { q: 'id!=000'})},
+      { type: 'q', label: 'ip', description: 'Filter by agent IP address', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('ip', value, { q: 'id!=000'})},
       { type: 'q', label: 'name', description: 'Filter by agent name', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('name', value, { q: 'id!=000'})},
       { type: 'q', label: 'id', description: 'Filter by agent id', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('id', value, { q: 'id!=000'})},
       { type: 'q', label: 'group', description: 'Filter by agent group', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('group', value, { q: 'id!=000'})},

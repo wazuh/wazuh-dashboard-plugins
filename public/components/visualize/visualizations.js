@@ -235,7 +235,7 @@ export const visualizations = {
         height: 450,
         vis: [
           {
-            title: 'Top 5 Map by source ip',
+            title: 'Top 5 Map by source IP address',
             id: 'Wazuh-App-Overview-GCP-Map-By-SourceIp',
             width: 100
           },

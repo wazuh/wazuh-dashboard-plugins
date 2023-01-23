@@ -41,7 +41,7 @@ export const MainViewConfig = {
               <AggTable
                 tableTitle="Top client IP"
                 aggTerm="data.office365.ClientIP"
-                aggLabel="Client IP"
+                aggLabel="Client IP address"
                 maxRows={5}
                 onRowClick={(field, value) => props.onRowClick(field, value)}
               />

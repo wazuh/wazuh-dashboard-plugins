@@ -44,7 +44,7 @@ export const NodeList = withErrorBoundary (class NodeList extends Component {
             },
             {
                 field: 'ip',
-                name: 'IP',
+                name: 'IP Address',
                 sortable: true,
             },
             {

@@ -88,7 +88,7 @@ export const AgentsTable = withErrorBoundary(
         {
           type: 'q',
           label: 'ip',
-          description: 'Filter by agent IP',
+          description: 'Filter by agent IP address',
           operators: ['=', '!='],
           values: async (value) => getAgentFilterValues('ip', value, { q: 'id!=000' }),
         },
@@ -220,7 +220,7 @@ export const AgentsTable = withErrorBoundary(
         const selectFieldsList = this.defaultColumns
           .filter(field => field.field != 'actions')
           .map(field => field.field.replace('os_', 'os.')); // "os_name" subfield should be specified as 'os.name'
-        const selectFields = [...selectFieldsList, 'os.uname', 'os.version'].join(','); // Add version and uname fields to render the OS icon and version in the table
+        const selectFields = [...selectFieldsList, 'os.platform', 'os.uname', 'os.version'].join(','); // Add version and uname fields to render the OS icon and version in the table
 
         const rawAgents = await this.props.wzReq('GET', '/agents', { params: { ...this.buildFilter(), select: selectFields } });
         const formatedAgents = (((rawAgents || {}).data || {}).data || {}).affected_items.map(
@@ -342,17 +342,17 @@ export const AgentsTable = withErrorBoundary(
       };
       const os = (agent || {}).os;
 
-      if (((os || {}).uname || '').includes('Linux')) {
+      if ((os?.uname || '').includes('Linux')) {
         icon = 'linux';
-      } else if ((os || {}).platform === 'windows') {
+      } else if (os?.platform === 'windows') {
         icon = 'windows';
-      } else if ((os || {}).platform === 'darwin') {
+      } else if (os?.platform === 'darwin') {
         icon = 'apple';
       }
       const os_name =
-        checkField(((agent || {}).os || {}).name) +
+        checkField(agent?.os?.name) +
         ' ' +
-        checkField(((agent || {}).os || {}).version);
+        checkField(agent?.os?.version);
 
       return (
         <span className="euiTableCellContent__text euiTableCellContent--truncateText">
@@ -466,21 +466,18 @@ export const AgentsTable = withErrorBoundary(
         field: 'id',
         name: 'ID',
         sortable: true,
-        width: '6%',
         show: true,
       },
       {
         field: 'name',
         name: 'Name',
         sortable: true,
-        width: '10%',
         truncateText: true,
         show: true,
       },
       {
         field: 'ip',
-        name: 'IP',
-        width: '8%',
+        name: 'IP address',
         truncateText: true,
         sortable: true,
         show: true,
@@ -488,7 +485,6 @@ export const AgentsTable = withErrorBoundary(
       {
         field: 'group',
         name: 'Group(s)',
-        width: '14%',
         truncateText: true,
         sortable: true,
         show: true,
@@ -496,9 +492,8 @@ export const AgentsTable = withErrorBoundary(
       },
       {
         field: 'os_name',
-        name: 'OS',
+        name: 'Operating system',
         sortable: true,
-        width: '10%',
         truncateText: true,
         show: true,
         render: this.addIconPlatformRender,
@@ -506,7 +501,6 @@ export const AgentsTable = withErrorBoundary(
       {
         field: 'node_name',
         name: 'Cluster node',
-        width: '8%',
         truncateText: true,
         sortable: true,
         show: true,
@@ -514,7 +508,6 @@ export const AgentsTable = withErrorBoundary(
       {
         field: 'version',
         name: 'Version',
-        width: '5%',
         truncateText: true,
         sortable: true,
         show: true,
@@ -522,25 +515,22 @@ export const AgentsTable = withErrorBoundary(
       {
         field: 'dateAdd',
         name: 'Registration date',
-        width: '8%',
         truncateText: true,
         sortable: true,
-        show: true,
+        show: false,
       },
       {
         field: 'lastKeepAlive',
         name: 'Last keep alive',
-        width: '8%',
         truncateText: true,
         sortable: true,
-        show: true,
+        show: false,
       },
       {
         field: 'status',
         name: 'Status',
         truncateText: true,
         sortable: true,
-        width: '10%',
         show: true,
         render: (status) => <AgentStatus status={status} labelProps={{ className: 'hide-agent-status' }} />,
       },
@@ -549,7 +539,6 @@ export const AgentsTable = withErrorBoundary(
         name: 'Synced',
         truncateText: true,
         sortable: true,
-        width: '10%',
         show: false,
         render: (synced) => <AgentSynced synced={synced}/>,
       },
@@ -730,6 +719,7 @@ export const AgentsTable = withErrorBoundary(
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiBasicTable
+              tableLayout="auto"
               items={agents}
               itemId="id"
               columns={columns}

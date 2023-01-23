@@ -52,7 +52,7 @@ class WzGroupAgentsTable extends Component {
       {
         type: 'q',
         label: 'os.platform',
-        description: 'Filter by OS platform',
+        description: 'Filter by operating system platform',
         operators: ['=', '!='],
         values: async (value) =>
           getAgentFilterValues('os.platform', value, {
@@ -62,7 +62,7 @@ class WzGroupAgentsTable extends Component {
       {
         type: 'q',
         label: 'ip',
-        description: 'Filter by agent IP',
+        description: 'Filter by agent IP address',
         operators: ['=', '!='],
         values: async (value) =>
           getAgentFilterValues('ip', value, { q: `group=${this.props.state.itemDetail.name}` }),
@@ -153,7 +153,7 @@ class WzGroupAgentsTable extends Component {
       },
       {
         field: 'ip',
-        name: 'Ip',
+        name: 'IP address',
         align: 'left',
         sortable: true,
       },

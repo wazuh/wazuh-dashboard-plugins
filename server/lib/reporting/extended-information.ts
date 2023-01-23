@@ -78,7 +78,7 @@ import { getSettingDefaultValue } from '../../../common/services/settings';
         columns: [
           { id: 'id', label: 'ID' },
           { id: 'name', label: 'Name' },
-          { id: 'ip', label: 'IP' },
+          { id: 'ip', label: 'IP address' },
           { id: 'version', label: 'Version' },
           { id: 'manager', label: 'Manager' },
           { id: 'os', label: 'OS' },

@@ -72,7 +72,7 @@ class WzConfigurationGlobalConfigurationRemote extends Component {
       },
       {
         field: 'local_ip',
-        name: 'Local IP',
+        name: 'Local IP address',
         render: renderValueOrDefault('All interfaces')
       },
       {
