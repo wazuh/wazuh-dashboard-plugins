@@ -52,7 +52,7 @@ export const KeyEquivalence: {[key: string]: string} = {
   dateAdd: 'Registration date',
   manager: 'Manager',
   lastKeepAlive: 'Last keep alive',
-  os: 'OS',
+  os: 'Operating system',
   path: 'Path',
   details: 'Details',
   position: 'Position',

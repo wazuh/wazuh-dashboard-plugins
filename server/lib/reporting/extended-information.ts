@@ -81,7 +81,7 @@ import { getSettingDefaultValue } from '../../../common/services/settings';
           { id: 'ip', label: 'IP address' },
           { id: 'version', label: 'Version' },
           { id: 'manager', label: 'Manager' },
-          { id: 'os', label: 'OS' },
+          { id: 'os', label: 'Operating system' },
           { id: 'dateAdd', label: 'Registration date' },
           { id: 'lastKeepAlive', label: 'Last keep alive' },
         ],
