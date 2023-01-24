@@ -341,7 +341,7 @@ export class WazuhReportingCtrl {
       }
 
       //add authorized agents
-      if (agentsFilter) {
+      if (agentsFilter?.agentsText) {
         printer.addAgentsFilters(agentsFilter.agentsText);
       }
 
