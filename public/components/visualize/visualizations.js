@@ -104,7 +104,7 @@ export const visualizations = {
             width: 40
           },
           {
-            title: 'IP by Users',
+            title: 'IP address by Users',
             id: 'Wazuh-App-Overview-Office-IPs-By-User-Barchart',
             width: 30
           },

@@ -97,7 +97,7 @@ export class AgentSelectionTable extends Component {
       },
       {
         id: 'os',
-        label: 'OS',
+        label: 'Operating system',
         alignment: LEFT_ALIGNMENT,
         mobileOptions: {
           show: false,

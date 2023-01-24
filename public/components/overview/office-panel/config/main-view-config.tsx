@@ -39,7 +39,7 @@ export const MainViewConfig = {
           component: (props) => (
             <EuiFlexItem grow={props.grow}>
               <AggTable
-                tableTitle="Top client IP"
+                tableTitle="Top client IP address"
                 aggTerm="data.office365.ClientIP"
                 aggLabel="Client IP address"
                 maxRows={5}

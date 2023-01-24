@@ -25,7 +25,7 @@ export const KeyEquivalence: {[key: string]: string} = {
   'os.uname': 'OS uname',
   status: 'Status',
   group: 'Group',
-  ip: 'IP',
+  ip: 'IP address',
   description: 'Description',
   tag: 'Tag',
   level: 'Level',

@@ -165,13 +165,13 @@ class WzGroupAgentsTable extends Component {
       },
       {
         field: 'os.name',
-        name: 'Os name',
+        name: 'Operating system name',
         align: 'left',
         sortable: true,
       },
       {
         field: 'os.version',
-        name: 'Os version',
+        name: 'Operating system version',
         align: 'left',
         sortable: true,
       },

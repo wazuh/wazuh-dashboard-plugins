@@ -62,12 +62,12 @@ class WzConfigurationGlobalConfigurationRemote extends Component {
       { field: 'ipv6', name: 'IPv6', render: renderValueOrNoValue },
       {
         field: 'allowed-ips',
-        name: 'Allowed IPs',
+        name: 'Allowed IP addresses',
         render: item => renderAllowedDeniedIPs(item, 'allowed')
       },
       {
         field: 'denied-ips',
-        name: 'Denied Ips',
+        name: 'Denied IP addresses',
         render: item => renderAllowedDeniedIPs(item, 'denied')
       },
       {

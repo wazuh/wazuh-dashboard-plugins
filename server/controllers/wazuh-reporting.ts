@@ -961,14 +961,14 @@ export class WazuhReportingCtrl {
             columns:
               agentOs === 'windows'
                 ? [
-                    { id: 'local_ip', label: 'Local IP' },
+                    { id: 'local_ip', label: 'Local IP address' },
                     { id: 'local_port', label: 'Local port' },
                     { id: 'process', label: 'Process' },
                     { id: 'state', label: 'State' },
                     { id: 'protocol', label: 'Protocol' },
                   ]
                 : [
-                    { id: 'local_ip', label: 'Local IP' },
+                    { id: 'local_ip', label: 'Local IP address' },
                     { id: 'local_port', label: 'Local port' },
                     { id: 'state', label: 'State' },
                     { id: 'protocol', label: 'Protocol' },
@@ -1001,7 +1001,7 @@ export class WazuhReportingCtrl {
             title: 'Network settings',
             columns: [
               { id: 'iface', label: 'Interface' },
-              { id: 'address', label: 'address' },
+              { id: 'address', label: 'Address' },
               { id: 'netmask', label: 'Netmask' },
               { id: 'proto', label: 'Protocol' },
               { id: 'broadcast', label: 'Broadcast' },

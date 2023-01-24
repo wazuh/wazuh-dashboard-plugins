@@ -81,7 +81,7 @@ export const AgentsTable = withErrorBoundary(
         {
           type: 'q',
           label: 'os.platform',
-          description: 'Filter by OS platform',
+          description: 'Filter by operating system platform',
           operators: ['=', '!='],
           values: async (value) => getAgentFilterValues('os.platform', value, { q: 'id!=000' }),
         },
