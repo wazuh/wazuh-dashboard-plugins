@@ -79,6 +79,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed menu content panel is displayed in the wrong place. [5092](https://github.com/wazuh/wazuh-kibana-app/pull/5092)
 - Fixed greyed and disabled menu section names [#5101](https://github.com/wazuh/wazuh-kibana-app/pull/5101)
 - Fixed mispelling in the NIST module [#5107](https://github.com/wazuh/wazuh-kibana-app/pull/5107)
+- Fixed the style of the buttons showing more event information in the event view table. [#5137](https://github.com/wazuh/wazuh-kibana-app/pull/5137)
 
 ### Removed
 
