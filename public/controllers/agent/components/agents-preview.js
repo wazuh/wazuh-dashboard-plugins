@@ -55,7 +55,7 @@ import {
 
 import { i18n } from '@kbn/i18n';
 
-const status = i18n.translate(
+const filterByAgentStatus = i18n.translate(
   'wazuh.public.controller.agent.components.preview.agentStatus',
   {
     defaultMessage: 'Filter by agent status:',
@@ -239,7 +239,7 @@ export const AgentsPreview = compose(
                               title={
                                 <EuiToolTip
                                   position='top'
-                                  content={`${agentStatus} ${status}`}
+                                  content={`${filterByAgentStatus} ${status}`}
                                 >
                                   <span
                                     onClick={() =>

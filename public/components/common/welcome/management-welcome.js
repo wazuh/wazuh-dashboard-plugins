@@ -26,7 +26,7 @@ import store from '../../../redux/store';
 import { updateManagementSection } from '../../../redux/actions/managementActions';
 import WzReduxProvider from '../../../redux/wz-redux-provider';
 import { connect } from 'react-redux';
-
+import { i18n } from '@kbn/i18n';
 class ManagementWelcome extends Component {
   constructor(props) {
     super(props);

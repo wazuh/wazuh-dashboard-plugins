@@ -27,7 +27,7 @@ import WzGroupsActionButtons from './actions-buttons-main';
 import { connect } from 'react-redux';
 import { withUserAuthorizationPrompt } from '../../../../../components/common/hocs';
 import { compose } from 'redux';
-
+import { i18n } from '@kbn/i18n';
 export class WzGroupsOverview extends Component {
   _isMounted = false;
   constructor(props) {

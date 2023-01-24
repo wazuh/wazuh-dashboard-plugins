@@ -400,11 +400,15 @@ export class EnableModulesWrapper extends Component {
                           &nbsp;&nbsp;
                         </span>
                       )}
-                      {WAZUH_MODULES[extension.name].title}
+                      {WAZUH_MODULES[extension.name] &&
+                        WAZUH_MODULES[extension.name].title}
                     </span>
                   ),
                   description: (
-                    <span>{WAZUH_MODULES[extension.name].description}</span>
+                    <span>
+                      {WAZUH_MODULES[extension.name] &&
+                        WAZUH_MODULES[extension.name].description}
+                    </span>
                   ),
                 },
               ]}

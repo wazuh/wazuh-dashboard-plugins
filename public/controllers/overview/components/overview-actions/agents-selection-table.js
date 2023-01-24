@@ -786,7 +786,12 @@ export class AgentSelectionTable extends Component {
               onFiltersChange={filters =>
                 this.setState({ filters, pageIndex: 0 })
               }
-              placeholder='Filter or search agent'
+              placeholder={i18n.translate(
+                'wazuh.public.controller.agent.components.agent.  table.filterAgent',
+                {
+                  defaultMessage: 'Filter or search agent',
+                },
+              )}
             />
           </EuiFlexItem>
         </EuiFlexGroup>
