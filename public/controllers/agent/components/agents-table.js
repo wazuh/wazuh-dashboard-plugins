@@ -461,6 +461,8 @@ export const AgentsTable = withErrorBoundary(
       window.localStorage.setItem('columnsSelectedTableAgent', JSON.stringify(data));
     }
 
+    // Columns with the property truncateText: true won't wrap the text
+    // This is added to prevent the wrap because of the table-layout: auto
     defaultColumns = [
       {
         field: 'id',
@@ -472,7 +474,6 @@ export const AgentsTable = withErrorBoundary(
         field: 'name',
         name: 'Name',
         sortable: true,
-        truncateText: true,
         show: true,
       },
       {
@@ -485,7 +486,6 @@ export const AgentsTable = withErrorBoundary(
       {
         field: 'group',
         name: 'Group(s)',
-        truncateText: true,
         sortable: true,
         show: true,
         render: (groups) => (groups !== '-' ? this.renderGroups(groups) : '-'),
@@ -494,14 +494,12 @@ export const AgentsTable = withErrorBoundary(
         field: 'os_name',
         name: 'Operating system',
         sortable: true,
-        truncateText: true,
         show: true,
         render: this.addIconPlatformRender,
       },
       {
         field: 'node_name',
         name: 'Cluster node',
-        truncateText: true,
         sortable: true,
         show: true,
       },
@@ -522,7 +520,6 @@ export const AgentsTable = withErrorBoundary(
       {
         field: 'lastKeepAlive',
         name: 'Last keep alive',
-        truncateText: true,
         sortable: true,
         show: false,
       },
@@ -537,10 +534,9 @@ export const AgentsTable = withErrorBoundary(
       {
         field: 'group_config_status',
         name: 'Synced',
-        truncateText: true,
         sortable: true,
         show: false,
-        render: (synced) => <AgentSynced synced={synced}/>,
+        render: (synced) => <AgentSynced synced={synced} />,
       },
       {
         align: 'right',
@@ -673,7 +669,7 @@ export const AgentsTable = withErrorBoundary(
         return {
           'data-test-subj': `row-${id}`,
           className: 'customRowClass',
-          onClick: () => {},
+          onClick: () => { },
         };
       };
 
@@ -702,11 +698,11 @@ export const AgentsTable = withErrorBoundary(
       const pagination =
         totalItems > 15
           ? {
-              pageIndex: pageIndex,
-              pageSize: pageSize,
-              totalItemCount: totalItems,
-              pageSizeOptions: [15, 25, 50, 100],
-            }
+            pageIndex: pageIndex,
+            pageSize: pageSize,
+            totalItemCount: totalItems,
+            pageSizeOptions: [15, 25, 50, 100],
+          }
           : false;
       const sorting = {
         sort: {
@@ -715,6 +711,9 @@ export const AgentsTable = withErrorBoundary(
         },
       };
 
+      // The EuiBasicTable tableLayout is set to "auto" to improve the use of empty space in the component.
+      // Previously the tableLayout is set to "fixed" with percentage width for each column, but the use of space was not optimal.
+      // Important: If all the columns have the truncateText property set to true, the table cannot adjust properly when the viewport size is small.
       return (
         <EuiFlexGroup>
           <EuiFlexItem>
@@ -742,8 +741,8 @@ export const AgentsTable = withErrorBoundary(
       if (filters.length > 0) {
         !auxFilters.includes(group)
           ? this.setState({
-              filters: [...filters, { field: 'q', value: `group=${group}` }],
-            })
+            filters: [...filters, { field: 'q', value: `group=${group}` }],
+          })
           : false;
       } else {
         this.setState({
