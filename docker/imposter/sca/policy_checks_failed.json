@@ -1,0 +1,32 @@
+{
+  "data": {
+    "affected_items": [
+      {
+        "remediation": "For new installations, during installation create a custom partition setup and specify a separate partition for /var. For systems that were previously installed, create a new partition and configure /etc/fstab as appropriate",
+        "rationale": "Since the /var directory may contain world-writable files and directories, there is a risk of resource exhaustion if it is not bound to a separate partition",
+        "title": "Ensure separate partition exists for /var",
+        "policy_id": "cis_debian",
+        "file": "/etc/fstab",
+        "description": "The /var directory is used by daemons and other system services to temporarily store dynamic data. Some directories created by these processes may be world-writable",
+        "id": 5003,
+        "result": "failed",
+        "condition": "all",
+        "references": "https://tldp.org/HOWTO/LVM-HOWTO/",
+        "compliance": [
+          {
+            "key": "cis",
+            "value": "1.1.6"
+          },
+          {
+            "key": "cis_csc",
+            "value": "5"
+          }
+        ]
+      }
+    ],
+    "total_affected_items": 191,
+    "total_failed_items": 0,
+    "failed_items": []
+  },
+  "error": 0
+}
