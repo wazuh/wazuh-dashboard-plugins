@@ -889,7 +889,7 @@ export class WazuhReportingCtrl {
       createDirectoryIfNotExists(path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, hashUsername));
 
       log('reporting:createReportsAgentsInventory', `Syscollector report`, 'debug');
-      const sanitizedFilters = filters ? this.sanitizeKibanaFilters(filters, searchBar) : false;
+      const [sanitizedFilters, agentsFilter] = filters ? this.sanitizeKibanaFilters(filters, searchBar) : [false, null];
 
       // Get the agent OS
       let agentOs = '';
@@ -1071,6 +1071,7 @@ export class WazuhReportingCtrl {
           from,
           to,
           sanitizedFilters + ' AND rule.groups: "vulnerability-detector"',
+          agentsFilter,
           indexPatternTitle,
           agentID
         );
