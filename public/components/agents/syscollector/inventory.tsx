@@ -68,6 +68,7 @@ export function SyscollectorInventory({ agent }) {
   } else if (((agent.os || {}).uname.toLowerCase() || '').includes('sunos')) {
     soPlatform = 'solaris';
   }
+
   const netifaceColumns = [
     { id: 'name' },
     { id: 'mac' },
