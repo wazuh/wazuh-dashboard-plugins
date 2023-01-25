@@ -28,7 +28,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Changed
 
 - Changed the HTTP verb from `GET` to `POST` in the requests to login to the Wazuh API [#4103](https://github.com/wazuh/wazuh-kibana-app/pull/4103)
-- Improved alerts summary performance [#4376](https://github.com/wazuh/wazuh-kibana-app/pull/4376) [#5071](https://github.com/wazuh/wazuh-kibana-app/pull/5071)
+- Improved alerts summary performance [#4376](https://github.com/wazuh/wazuh-kibana-app/pull/4376) [#5071](https://github.com/wazuh/wazuh-kibana-app/pull/5071) [#5131](https://github.com/wazuh/wazuh-kibana-app/pull/5131)
 - Improved Agents Overview performance [#4363](https://github.com/wazuh/wazuh-kibana-app/pull/4363) [#5076](https://github.com/wazuh/wazuh-kibana-app/pull/5076)
 - Improved the message displayed when there is a versions mismatch between the Wazuh API and the Wazuh APP [#4529](https://github.com/wazuh/wazuh-kibana-app/pull/4529) [#4964](https://github.com/wazuh/wazuh-kibana-app/pull/4964)
 - Independently load each dashboard from the `Agents Overview` page [#4363](https://github.com/wazuh/wazuh-kibana-app/pull/4363)
@@ -66,7 +66,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Deploy new agent section: Fixed the way macos versions and architectures were displayed, fixed the way agents were displayed, fixed the way ubuntu versions were displayed. [#4933](https://github.com/wazuh/wazuh-kibana-app/pull/4933)
 - Fixed agent deployment instructions for HP-UX and Solaris. [#4943](https://github.com/wazuh/wazuh-kibana-app/pull/4943)
 - Fixed Inventory checks table filters by stats [#4999](https://github.com/wazuh/wazuh-kibana-app/pull/4999)
-- Fixed agent graph in opensearch dashboard [#4942] (https://github.com/wazuh/wazuh-kibana-app/pull/4942)
+- Fixed agent graph in opensearch dashboard [#4942](https://github.com/wazuh/wazuh-kibana-app/pull/4942)
 - Fixed commands in the deploy new agent section(most of the commands are missing '-1') [#4962](https://github.com/wazuh/wazuh-kibana-app/pull/4962)
 - Fixed agent installation command for macOS in the deploy new agent section. [#4968](https://github.com/wazuh/wazuh-kibana-app/pull/4968)
 - Fixed commands in the deploy new agent section(most of the commands are missing '-1') [#4984](https://github.com/wazuh/wazuh-kibana-app/pull/4984)
@@ -79,6 +79,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed menu content panel is displayed in the wrong place. [5092](https://github.com/wazuh/wazuh-kibana-app/pull/5092)
 - Fixed greyed and disabled menu section names [#5101](https://github.com/wazuh/wazuh-kibana-app/pull/5101)
 - Fixed mispelling in the NIST module [#5107](https://github.com/wazuh/wazuh-kibana-app/pull/5107)
+- Fixed Statistic cronjob bulk document insert [#5150](https://github.com/wazuh/wazuh-kibana-app/pull/5150)
 - Fixed the style of the buttons showing more event information in the event view table. [#5137](https://github.com/wazuh/wazuh-kibana-app/pull/5137)
 
 ### Removed
