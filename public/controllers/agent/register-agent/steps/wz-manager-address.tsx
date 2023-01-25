@@ -14,6 +14,9 @@ const WzManagerAddressInput = (props: Props) => {
     if(defaultValue){
       setValue(defaultValue);
       onChange(defaultValue);
+    }else{
+      setValue('');
+      onChange('');
     }
   },[])
   /**
