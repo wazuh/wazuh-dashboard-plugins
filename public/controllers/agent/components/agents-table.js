@@ -355,7 +355,7 @@ export const AgentsTable = withErrorBoundary(
         checkField(agent?.os?.version);
 
       return (
-        <EuiFlexGroup gutterSize="none">
+        <EuiFlexGroup gutterSize="xs">
           <EuiFlexItem grow={false} ><i
             className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`}
             aria-hidden="true"
