@@ -194,18 +194,7 @@ export const WAZUH_DATA_CONFIG_REGISTRY_PATH = path.join(
   WAZUH_DATA_CONFIG_DIRECTORY_PATH,
   'wazuh-registry.json',
 );
-const max_buckets = i18n.translate(
-  'wazuh.common.constants.plugins.max_buckets',
-  {
-    defaultMessage: 'timelion:max_buckets',
-  },
-);
-const timeDefaults = i18n.translate(
-  'wazuh.common.constants.plugins.timeDefaults',
-  {
-    defaultMessage: 'timepicker:timeDefaults',
-  },
-);
+
 // Wazuh data path - logs
 export const MAX_MB_LOG_FILES = 100;
 export const WAZUH_DATA_LOGS_DIRECTORY_PATH = path.join(
@@ -398,20 +387,16 @@ export const WAZUH_PLUGIN_PLATFORM_SETTING_TIME_FILTER = {
   from: 'now-24h',
   to: 'now',
 };
-export const PLUGIN_PLATFORM_SETTING_NAME_TIME_FILTER = timeDefaults;
+export const PLUGIN_PLATFORM_SETTING_NAME_TIME_FILTER =
+  'timepicker:timeDefaults';
 
 // Default maxBuckets set by the app
 export const WAZUH_PLUGIN_PLATFORM_SETTING_MAX_BUCKETS = 200000;
-export const PLUGIN_PLATFORM_SETTING_NAME_MAX_BUCKETS = max_buckets;
+export const PLUGIN_PLATFORM_SETTING_NAME_MAX_BUCKETS = 'timelion:max_buckets';
 
 // Default metaFields set by the app
 export const WAZUH_PLUGIN_PLATFORM_SETTING_METAFIELDS = ['_source', '_index'];
-export const PLUGIN_PLATFORM_SETTING_NAME_METAFIELDS = i18n.translate(
-  'wazuh.common.constant.metaFieldsText',
-  {
-    defaultMessage: 'metaFields',
-  },
-);
+export const PLUGIN_PLATFORM_SETTING_NAME_METAFIELDS = 'metaFields';
 
 // Logger
 export const UI_LOGGER_LEVELS = {
