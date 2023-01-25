@@ -479,7 +479,6 @@ export const AgentsTable = withErrorBoundary(
       {
         field: 'ip',
         name: 'IP address',
-        truncateText: true,
         sortable: true,
         show: true,
       },
@@ -506,14 +505,12 @@ export const AgentsTable = withErrorBoundary(
       {
         field: 'version',
         name: 'Version',
-        truncateText: true,
         sortable: true,
         show: true,
       },
       {
         field: 'dateAdd',
         name: 'Registration date',
-        truncateText: true,
         sortable: true,
         show: false,
       },
