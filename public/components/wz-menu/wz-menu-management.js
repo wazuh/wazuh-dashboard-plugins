@@ -205,7 +205,7 @@ class WzMenuManagement extends Component {
 
   clickMenuItem = (ev, section) => {
     this.props.closePopover();
-    AppNavigate.navigateToModule(ev, manager, { tab: section });
+    AppNavigate.navigateToModule(ev, 'manager', { tab: section });
   };
 
   createItem = (item, data = {}) => {

@@ -861,7 +861,10 @@ export class AgentSelectionTable extends Component {
                   isMobileFullWidth={true}
                   align='center'
                 >
-                  {this.state.isLoading ? 'Loading agents' : 'No results found'}
+                  {this.state.isLoading ?
+                    i18n.translate('wazuh.controller.overview.component.overviewAction.loadAgents', { defaultMessage: 'Loading agents' }) :
+                     i18n.translate('wazuh.controller.overview.component.overviewAction.noResultFound', { defaultMessage: 'No results found' })
+                  }
                 </EuiTableRowCell>
               </EuiTableRow>
             </EuiTableBody>

@@ -7,7 +7,6 @@ import {
   Plugin,
   PluginInitializerContext,
 } from 'kibana/public';
-import { i18n } from '@kbn/i18n';
 
 import {
   setDataPlugin,
@@ -52,9 +51,7 @@ export class WazuhPlugin
     const UI_THEME = core.uiSettings.get('theme:darkMode') ? 'dark' : 'light';
     core.application.register({
       id: `wazuh`,
-      title: i18n.translate('wazuh.public.plugins.Wazuh', {
-        defaultMessage: 'Wazuh',
-      }),
+      title: 'Wazuh',
       icon: core.http.basePath.prepend(getThemeAssetURL('icon.svg', UI_THEME)),
       mount: async (params: AppMountParameters) => {
         try {
@@ -98,9 +95,7 @@ export class WazuhPlugin
               status: response.data.isWazuhDisabled,
               category: {
                 id: 'wazuh',
-                label: i18n.translate('wazuh.public.plugins.Wazuh', {
-                  defaultMessage: 'Wazuh',
-                }),
+                label: 'Wazuh',
                 order: 0,
                 euiIconType: core.http.basePath.prepend(
                   response.data.logoSidebar
@@ -119,9 +114,7 @@ export class WazuhPlugin
       },
       category: {
         id: 'wazuh',
-        label: i18n.translate('wazuh.public.plugins.', {
-          defaultMessage: 'Wazuh',
-        }),
+        label: 'Wazuh',
         order: 0,
         euiIconType: core.http.basePath.prepend(
           getThemeAssetURL('icon.svg', UI_THEME),

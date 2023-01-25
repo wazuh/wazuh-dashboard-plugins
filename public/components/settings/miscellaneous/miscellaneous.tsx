@@ -69,8 +69,8 @@ export const SettingsMiscellaneous = () => {
           title={Title2}
           actions={[
             {
-              title: { Title1 },
-              description: { Descp1 },
+              title: Title1,
+              description: Descp1,
               render: (
                 <EuiFormRow>
                   <EuiButton fill onClick={redirectHealthCheckDebugMode}>

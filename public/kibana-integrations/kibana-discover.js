@@ -383,14 +383,11 @@ function discoverController(
 
   const pageTitleSuffix = savedSearch.id && savedSearch.title ? `: ${savedSearch.title}` : '';
   chrome.docTitle.change(`Wazuh${pageTitleSuffix}`);
-  const discoverBreadcrumbsTitle = i18n.translate('wazuh.discover.discoverBreadcrumbTitle', {
-    defaultMessage: 'Wazuh',
-  });
 
   if (savedSearch.id && savedSearch.title) {
     chrome.setBreadcrumbs([
       {
-        text: discoverBreadcrumbsTitle,
+        text: 'Wazuh',
         href: '#/',
       },
       { text: savedSearch.title },
@@ -398,7 +395,7 @@ function discoverController(
   } else {
     chrome.setBreadcrumbs([
       {
-        text: discoverBreadcrumbsTitle,
+        text: 'Wazuh',
       },
     ]);
   }

@@ -27,6 +27,10 @@ import WzRestartClusterManagerCallout from '../../../../../components/common/res
 import { compose } from 'redux';
 import { resourceDictionary } from './utils/ruleset-handler';
 
+const manageRules = i18n.translate(
+  'wazuh.public.controller.management.ruleset.overview.manageRules',
+  { defaultMessage: 'From here you can manage your' },
+);
 class WzRulesetOverview extends Component {
   sectionNames = {
     rules: 'Rules',
@@ -77,7 +81,8 @@ class WzRulesetOverview extends Component {
           <EuiFlexGroup>
             <EuiFlexItem>
               <EuiText color='subdued'>
-                {`From here you can manage your ${section}.`}
+
+                {`${manageRules} ${section}.`}
               </EuiText>
             </EuiFlexItem>
           </EuiFlexGroup>
