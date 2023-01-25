@@ -355,13 +355,13 @@ export const AgentsTable = withErrorBoundary(
         checkField(agent?.os?.version);
 
       return (
-        <span className="euiTableCellContent__text euiTableCellContent--truncateText">
-          <i
+        <EuiFlexGroup gutterSize="none">
+          <EuiFlexItem grow={false} ><i
             className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`}
             aria-hidden="true"
-          ></i>{' '}
-          {os_name === '- -' ? '-' : os_name}
-        </span>
+          ></i></EuiFlexItem>{' '}
+          <EuiFlexItem>{os_name === '- -' ? '-' : os_name}</EuiFlexItem>
+        </EuiFlexGroup>
       );
     }
 
