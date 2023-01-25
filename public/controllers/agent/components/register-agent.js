@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component, Fragment, useState } from 'react';
+import React, { Component, Fragment } from 'react';
 import { version } from '../../../../package.json';
 import { WazuhConfig } from '../../../react-services/wazuh-config';
 import {
@@ -18,7 +18,6 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiPanel,
-  EuiButtonGroup,
   EuiComboBox,
   EuiFieldText,
   EuiText,
@@ -255,7 +254,7 @@ export const RegisterAgent = withErrorBoundary(
         this.state.selectedVersion === 'ubuntu14'
       ) {
         return 'service wazuh-agent start';
-      }
+      } else return '';
     }
 
     systemSelectorNet() {
@@ -265,13 +264,13 @@ export const RegisterAgent = withErrorBoundary(
         this.state.selectedVersion === 'windows7'
       ) {
         return 'NET START WazuhSvc';
-      }
+      } else return '';
     }
 
     systemSelectorWazuhControlMacos() {
       if (this.state.selectedVersion == 'sierra') {
         return '/Library/Ossec/bin/wazuh-control start';
-      }
+      } else return '';
     }
 
     systemSelectorWazuhControl() {
@@ -282,13 +281,13 @@ export const RegisterAgent = withErrorBoundary(
         this.state.selectedVersion === '3.12.12'
       ) {
         return '/var/ossec/bin/wazuh-control start';
-      }
+      } else return '';
     }
 
     systemSelectorInitD() {
       if (this.state.selectedVersion === '11.31') {
         return '/sbin/init.d/wazuh-agent start';
-      }
+      } else return '';
     }
 
     selectSYS(sys) {
@@ -1082,7 +1081,8 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
               title='This section could not be displayed because you do not have permission to get access to the registration service.'
               iconType='iInCircle'
             />
-          ) : this.state.connectionSecure === true &&
+          ) : this.state.selectedOS &&
+            this.state.connectionSecure === true &&
             this.state.udpProtocol === false ? (
             <EuiText>
               {this.state.agentName.length > 0 ? (
@@ -1125,7 +1125,9 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
               )}
               <div className='copy-codeblock-wrapper'>
                 <EuiCodeBlock style={codeBlock} language={language}>
-                  {this.state.wazuhPassword && !this.state.showPassword
+                  {this.state.wazuhPassword &&
+                  !this.state.showPassword &&
+                  !['sol', 'hp', 'alpine'].includes(this.state.selectedOS)
                     ? this.obfuscatePassword(text)
                     : text}
                 </EuiCodeBlock>
@@ -1180,26 +1182,29 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
                   ></EuiCallOut>
                 </>
               ) : this.state.selectedVersion == '6.1 TL9' ? (
-                <EuiCallOut
-                  color='warning'
-                  className='message'
-                  iconType='iInCircle'
-                  title={
-                    <span>
-                      Might require some extra installation{' '}
-                      <EuiLink
-                        target='_blank'
-                        href={webDocumentationLink(
-                          'installation-guide/wazuh-agent/wazuh-agent-package-aix.html',
-                          appVersionMajorDotMinor,
-                        )}
-                      >
-                        steps
-                      </EuiLink>
-                      .
-                    </span>
-                  }
-                ></EuiCallOut>
+                <>
+                  <EuiCallOut
+                    color='warning'
+                    className='message'
+                    iconType='iInCircle'
+                    title={
+                      <span>
+                        Might require some extra installation{' '}
+                        <EuiLink
+                          target='_blank'
+                          href={webDocumentationLink(
+                            'installation-guide/wazuh-agent/wazuh-agent-package-aix.html',
+                            appVersionMajorDotMinor,
+                          )}
+                        >
+                          steps
+                        </EuiLink>
+                        .
+                      </span>
+                    }
+                  ></EuiCallOut>
+                  <EuiSpacer />
+                </>
               ) : this.state.selectedVersion == '11.31' ? (
                 <>
                   <EuiCallOut
@@ -1282,39 +1287,45 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
                 this.state.selectedVersion == 'debian8' ||
                 this.state.selectedVersion == 'debian9' ||
                 this.state.selectedVersion == 'debian10' ? (
-                <EuiCallOut
-                  color='warning'
-                  className='message'
-                  iconType='iInCircle'
-                  title={
-                    <span>
-                      Might require some extra installation{' '}
-                      <EuiLink
-                        target='_blank'
-                        href={webDocumentationLink(
-                          'installation-guide/wazuh-agent/wazuh-agent-package-linux.html',
-                          appVersionMajorDotMinor,
-                        )}
-                      >
-                        steps
-                      </EuiLink>
-                      .
-                    </span>
-                  }
-                ></EuiCallOut>
+                <>
+                  <EuiCallOut
+                    color='warning'
+                    className='message'
+                    iconType='iInCircle'
+                    title={
+                      <span>
+                        Might require some extra installation{' '}
+                        <EuiLink
+                          target='_blank'
+                          href={webDocumentationLink(
+                            'installation-guide/wazuh-agent/wazuh-agent-package-linux.html',
+                            appVersionMajorDotMinor,
+                          )}
+                        >
+                          steps
+                        </EuiLink>
+                        .
+                      </span>
+                    }
+                  ></EuiCallOut>
+                  <EuiSpacer />
+                </>
               ) : (
                 ''
               )}
-              {this.state.needsPassword && (
+              {this.state.needsPassword &&
+              !['sol', 'hp', 'alpine'].includes(this.state.selectedOS) ? (
                 <EuiSwitch
                   label='Show password'
                   checked={this.state.showPassword}
                   onChange={active => this.setShowPassword(active)}
                 />
+              ) : (
+                ''
               )}
               <EuiSpacer />
             </EuiText>
-          ) : this.state.connectionSecure === false ? (
+          ) : this.state.selectedOS && this.state.connectionSecure === false ? (
             <EuiText>
               <p>
                 You can use this command to install and enroll the Wazuh agent
@@ -1369,7 +1380,9 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
               )}
               <div className='copy-codeblock-wrapper'>
                 <EuiCodeBlock style={codeBlock} language={language}>
-                  {this.state.wazuhPassword && !this.state.showPassword
+                  {this.state.wazuhPassword &&
+                  !this.state.showPassword &&
+                  !['sol', 'hp', 'alpine'].includes(this.state.selectedOS)
                     ? this.obfuscatePassword(text)
                     : text}
                 </EuiCodeBlock>
@@ -1393,63 +1406,67 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
               <EuiSpacer />
             </EuiText>
           ) : (
-            <EuiText>
-              <p>
-                You can use this command to install and enroll the Wazuh agent
-                in one or more hosts.
-              </p>
-              <EuiCallOut
-                color='warning'
-                title={warningUpgrade}
-                iconType='iInCircle'
-              />
-              <EuiSpacer />
-              {windowsAdvice}
-              {this.state.selectedVersion === 'windowsxp' && (
-                <>
-                  <EuiCallOut
-                    color='warning'
-                    title={warningCommand}
-                    iconType='iInCircle'
-                  />
-                  <EuiSpacer />
-                </>
-              )}
-              {this.state.selectedVersion === 'windowsserver2008' && (
-                <>
-                  <EuiCallOut
-                    color='warning'
-                    title={warningCommand}
-                    iconType='iInCircle'
-                  />
-                  <EuiSpacer />
-                </>
-              )}
-              <div className='copy-codeblock-wrapper'>
-                <EuiCodeBlock style={codeBlock} language={language}>
-                  {this.state.wazuhPassword && !this.state.showPassword
-                    ? this.obfuscatePassword(text)
-                    : text}
-                </EuiCodeBlock>
-                <EuiCopy textToCopy={text || ''}>
-                  {copy => (
-                    <div className='copy-overlay' onClick={copy}>
-                      <p>
-                        <EuiIcon type='copy' /> Copy command
-                      </p>
-                    </div>
-                  )}
-                </EuiCopy>
-              </div>
-              {this.state.needsPassword && (
-                <EuiSwitch
-                  label='Show password'
-                  checked={this.state.showPassword}
-                  onChange={active => this.setShowPassword(active)}
+            this.state.selectedOS && (
+              <EuiText>
+                <p>
+                  You can use this command to install and enroll the Wazuh agent
+                  in one or more hosts.
+                </p>
+                <EuiCallOut
+                  color='warning'
+                  title={warningUpgrade}
+                  iconType='iInCircle'
                 />
-              )}
-              <EuiSpacer />
-            </EuiText>
+                <EuiSpacer />
+                {windowsAdvice}
+                {this.state.selectedVersion === 'windowsxp' && (
+                  <>
+                    <EuiCallOut
+                      color='warning'
+                      title={warningCommand}
+                      iconType='iInCircle'
+                    />
+                    <EuiSpacer />
+                  </>
+                )}
+                {this.state.selectedVersion === 'windowsserver2008' && (
+                  <>
+                    <EuiCallOut
+                      color='warning'
+                      title={warningCommand}
+                      iconType='iInCircle'
+                    />
+                    <EuiSpacer />
+                  </>
+                )}
+                <div className='copy-codeblock-wrapper'>
+                  <EuiCodeBlock style={codeBlock} language={language}>
+                    {this.state.wazuhPassword &&
+                    !this.state.showPassword &&
+                    !['sol', 'hp', 'alpine'].includes(this.state.selectedOS)
+                      ? this.obfuscatePassword(text)
+                      : text}
+                  </EuiCodeBlock>
+                  <EuiCopy textToCopy={text || ''}>
+                    {copy => (
+                      <div className='copy-overlay' onClick={copy}>
+                        <p>
+                          <EuiIcon type='copy' /> Copy command
+                        </p>
+                      </div>
+                    )}
+                  </EuiCopy>
+                </div>
+                {this.state.needsPassword && (
+                  <EuiSwitch
+                    label='Show password'
+                    checked={this.state.showPassword}
+                    onChange={active => this.setShowPassword(active)}
+                  />
+                )}
+                <EuiSpacer />
+              </EuiText>
+            )
           )}
         </div>
       );
@@ -1689,11 +1706,14 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
           ? [
               {
                 title: 'Choose the version',
-                children: <RegisterAgentButtonGroup
-                  legend='Choose the version'
-                  options={versionButtonsRedHat}
-                  idSelected={this.state.selectedVersion}
-                  onChange={version => this.setVersion(version)} />,
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the version'
+                    options={versionButtonsRedHat}
+                    idSelected={this.state.selectedVersion}
+                    onChange={version => this.setVersion(version)}
+                  />
+                ),
               },
             ]
           : []),
@@ -1701,11 +1721,14 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
           ? [
               {
                 title: 'Choose the version',
-                children: <RegisterAgentButtonGroup
-                  legend='Choose the version'
-                  options={versionButtonsOracleLinux}
-                  idSelected={this.state.selectedVersion}
-                  onChange={version => this.setVersion(version)} />,
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the version'
+                    options={versionButtonsOracleLinux}
+                    idSelected={this.state.selectedVersion}
+                    onChange={version => this.setVersion(version)}
+                  />
+                ),
               },
             ]
           : []),
@@ -1713,11 +1736,14 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
           ? [
               {
                 title: 'Choose the version',
-                children: <RegisterAgentButtonGroup
-                  legend='Choose the version'
-                  options={versionButtonsRaspbian}
-                  idSelected={this.state.selectedVersion}
-                  onChange={version => this.setVersion(version)} />,
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the version'
+                    options={versionButtonsRaspbian}
+                    idSelected={this.state.selectedVersion}
+                    onChange={version => this.setVersion(version)}
+                  />
+                ),
               },
             ]
           : []),
@@ -1725,11 +1751,14 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
           ? [
               {
                 title: 'Choose the version',
-                children: <RegisterAgentButtonGroup
-                  legend='Choose the version'
-                  options={versionButtonAmazonLinux}
-                  idSelected={this.state.selectedVersion}
-                  onChange={version => this.setVersion(version)} />,
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the version'
+                    options={versionButtonAmazonLinux}
+                    idSelected={this.state.selectedVersion}
+                    onChange={version => this.setVersion(version)}
+                  />
+                ),
               },
             ]
           : []),
@@ -1737,11 +1766,14 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
           ? [
               {
                 title: 'Choose the version',
-                children: <RegisterAgentButtonGroup
-                  legend='Choose the version'
-                  options={versionButtonsCentos}
-                  idSelected={this.state.selectedVersion}
-                  onChange={version => this.setVersion(version)} />,
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the version'
+                    options={versionButtonsCentos}
+                    idSelected={this.state.selectedVersion}
+                    onChange={version => this.setVersion(version)}
+                  />
+                ),
               },
             ]
           : []),
@@ -1749,11 +1781,14 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
           ? [
               {
                 title: 'Choose the version',
-                children: <RegisterAgentButtonGroup
-                  legend='Choose the version'
-                  options={versionButtonFedora}
-                  idSelected={this.state.selectedVersion}
-                  onChange={version => this.setVersion(version)} />,
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the version'
+                    options={versionButtonFedora}
+                    idSelected={this.state.selectedVersion}
+                    onChange={version => this.setVersion(version)}
+                  />
+                ),
               },
             ]
           : []),
@@ -1761,11 +1796,14 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
           ? [
               {
                 title: 'Choose the version',
-                children: <RegisterAgentButtonGroup
-                  legend='Choose the version'
-                  options={versionButtonsDebian}
-                  idSelected={this.state.selectedVersion}
-                  onChange={version => this.setVersion(version)} />,
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the version'
+                    options={versionButtonsDebian}
+                    idSelected={this.state.selectedVersion}
+                    onChange={version => this.setVersion(version)}
+                  />
+                ),
               },
             ]
           : []),
@@ -1773,11 +1811,14 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
           ? [
               {
                 title: 'Choose the version',
-                children: <RegisterAgentButtonGroup
-                  legend='Choose the version'
-                  options={versionButtonsUbuntu}
-                  idSelected={this.state.selectedVersion}
-                  onChange={version => this.setVersion(version)} />,
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the version'
+                    options={versionButtonsUbuntu}
+                    idSelected={this.state.selectedVersion}
+                    onChange={version => this.setVersion(version)}
+                  />
+                ),
               },
             ]
           : []),
@@ -1785,11 +1826,14 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
           ? [
               {
                 title: 'Choose the version',
-                children: <RegisterAgentButtonGroup
-                  legend='Choose the version'
-                  options={versionButtonsWindows}
-                  idSelected={this.state.selectedVersion}
-                  onChange={version => this.setVersion(version)} />,
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the version'
+                    options={versionButtonsWindows}
+                    idSelected={this.state.selectedVersion}
+                    onChange={version => this.setVersion(version)}
+                  />
+                ),
               },
             ]
           : []),
@@ -1797,11 +1841,14 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
           ? [
               {
                 title: 'Choose the version',
-                children: <RegisterAgentButtonGroup
-                  legend='Choose the version'
-                  options={versionButtonsMacOS}
-                  idSelected={this.state.selectedVersion}
-                  onChange={version => this.setVersion(version)} />,
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the version'
+                    options={versionButtonsMacOS}
+                    idSelected={this.state.selectedVersion}
+                    onChange={version => this.setVersion(version)}
+                  />
+                ),
               },
             ]
           : []),
@@ -1809,11 +1856,14 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
           ? [
               {
                 title: 'Choose the version',
-                children: <RegisterAgentButtonGroup
-                  legend='Choose the version'
-                  options={versionButtonsSuse}
-                  idSelected={this.state.selectedVersion}
-                  onChange={version => this.setVersion(version)} />,
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the version'
+                    options={versionButtonsSuse}
+                    idSelected={this.state.selectedVersion}
+                    onChange={version => this.setVersion(version)}
+                  />
+                ),
               },
             ]
           : []),
@@ -1821,11 +1871,14 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
           ? [
               {
                 title: 'Choose the version',
-                children: <RegisterAgentButtonGroup
-                  legend='Choose the version'
-                  options={versionButtonsOpenSuse}
-                  idSelected={this.state.selectedVersion}
-                  onChange={version => this.setVersion(version)} />,
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the version'
+                    options={versionButtonsOpenSuse}
+                    idSelected={this.state.selectedVersion}
+                    onChange={version => this.setVersion(version)}
+                  />
+                ),
               },
             ]
           : []),
@@ -1833,11 +1886,14 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
           ? [
               {
                 title: 'Choose the version',
-                children: <RegisterAgentButtonGroup
-                  legend='Choose the version'
-                  options={versionButtonsSolaris}
-                  idSelected={this.state.selectedVersion}
-                  onChange={version => this.setVersion(version)} />,
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the version'
+                    options={versionButtonsSolaris}
+                    idSelected={this.state.selectedVersion}
+                    onChange={version => this.setVersion(version)}
+                  />
+                ),
               },
             ]
           : []),
@@ -1845,11 +1901,14 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
           ? [
               {
                 title: 'Choose the version',
-                children: <RegisterAgentButtonGroup
-                  legend='Choose the version'
-                  options={versionButtonsAix}
-                  idSelected={this.state.selectedVersion}
-                  onChange={version => this.setVersion(version)} />,
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the version'
+                    options={versionButtonsAix}
+                    idSelected={this.state.selectedVersion}
+                    onChange={version => this.setVersion(version)}
+                  />
+                ),
               },
             ]
           : []),
@@ -1857,11 +1916,14 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
           ? [
               {
                 title: 'Choose the version',
-                children: <RegisterAgentButtonGroup
-                  legend='Choose the version'
-                  options={versionButtonsHPUX}
-                  idSelected={this.state.selectedVersion}
-                  onChange={version => this.setVersion(version)} />,
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the version'
+                    options={versionButtonsHPUX}
+                    idSelected={this.state.selectedVersion}
+                    onChange={version => this.setVersion(version)}
+                  />
+                ),
               },
             ]
           : []),
@@ -1869,11 +1931,14 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
           ? [
               {
                 title: 'Choose the version',
-                children: <RegisterAgentButtonGroup
-                  legend='Choose the version'
-                  options={versionButtonAlpine}
-                  idSelected={this.state.selectedVersion}
-                  onChange={version => this.setVersion(version)} />,
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the version'
+                    options={versionButtonAlpine}
+                    idSelected={this.state.selectedVersion}
+                    onChange={version => this.setVersion(version)}
+                  />
+                ),
               },
             ]
           : []),
@@ -1884,11 +1949,16 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
           ? [
               {
                 title: 'Choose the architecture',
-                children: <RegisterAgentButtonGroup 
-                  legend='Choose the architecture'
-                  options={architecturei386Andx86_64}
-                  idSelected={this.state.selectedArchitecture}
-                  onChange={architecture => this.setArchitecture(architecture)} />
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the architecture'
+                    options={architecturei386Andx86_64}
+                    idSelected={this.state.selectedArchitecture}
+                    onChange={architecture =>
+                      this.setArchitecture(architecture)
+                    }
+                  />
+                ),
               },
             ]
           : []),
@@ -1896,11 +1966,16 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
           ? [
               {
                 title: 'Choose the architecture',
-                children: <RegisterAgentButtonGroup 
-                  legend='Choose the architecture'
-                  options={architectureButtonsWithPPC64LE}
-                  idSelected={this.state.selectedArchitecture}
-                  onChange={architecture => this.setArchitecture(architecture)} />
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the architecture'
+                    options={architectureButtonsWithPPC64LE}
+                    idSelected={this.state.selectedArchitecture}
+                    onChange={architecture =>
+                      this.setArchitecture(architecture)
+                    }
+                  />
+                ),
               },
             ]
           : []),
@@ -1908,11 +1983,16 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
           ? [
               {
                 title: 'Choose the architecture',
-                children: <RegisterAgentButtonGroup
-                  legend='Choose the architecture'
-                  options={architectureButtonsWithPPC64LEAlpine}
-                  idSelected={this.state.selectedArchitecture}
-                  onChange={architecture => this.setArchitecture(architecture)} />
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the architecture'
+                    options={architectureButtonsWithPPC64LEAlpine}
+                    idSelected={this.state.selectedArchitecture}
+                    onChange={architecture =>
+                      this.setArchitecture(architecture)
+                    }
+                  />
+                ),
               },
             ]
           : []),
@@ -1929,11 +2009,16 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
           ? [
               {
                 title: 'Choose the architecture',
-                children: <RegisterAgentButtonGroup
-                  legend='Choose the architecture'
-                  options={architectureButtons}
-                  idSelected={this.state.selectedArchitecture}
-                  onChange={architecture => this.setArchitecture(architecture)} />
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the architecture'
+                    options={architectureButtons}
+                    idSelected={this.state.selectedArchitecture}
+                    onChange={architecture =>
+                      this.setArchitecture(architecture)
+                    }
+                  />
+                ),
               },
             ]
           : []),
@@ -1946,11 +2031,16 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
           ? [
               {
                 title: 'Choose the architecture',
-                children: <RegisterAgentButtonGroup
-                  legend='Choose the architecture'
-                  options={architectureButtonsWithPPC64LE}
-                  idSelected={this.state.selectedArchitecture}
-                  onChange={architecture => this.setArchitecture(architecture)} />
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the architecture'
+                    options={architectureButtonsWithPPC64LE}
+                    idSelected={this.state.selectedArchitecture}
+                    onChange={architecture =>
+                      this.setArchitecture(architecture)
+                    }
+                  />
+                ),
               },
             ]
           : []),
@@ -1960,11 +2050,16 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
           ? [
               {
                 title: 'Choose the architecture',
-                children: <RegisterAgentButtonGroup
-                  legend='Choose the architecture'
-                  options={architectureButtonsi386}
-                  idSelected={this.state.selectedArchitecture}
-                  onChange={architecture => this.setArchitecture(architecture)} />
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the architecture'
+                    options={architectureButtonsi386}
+                    idSelected={this.state.selectedArchitecture}
+                    onChange={architecture =>
+                      this.setArchitecture(architecture)
+                    }
+                  />
+                ),
               },
             ]
           : []),
@@ -1972,11 +2067,16 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
           ? [
               {
                 title: 'Choose the architecture',
-                children: <RegisterAgentButtonGroup
-                  legend='Choose the architecture'
-                  options={architectureButtonsMacos}
-                  idSelected={this.state.selectedArchitecture}
-                  onChange={architecture => this.setArchitecture(architecture)} />
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the architecture'
+                    options={architectureButtonsMacos}
+                    idSelected={this.state.selectedArchitecture}
+                    onChange={architecture =>
+                      this.setArchitecture(architecture)
+                    }
+                  />
+                ),
               },
             ]
           : []),
@@ -1985,11 +2085,16 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
           ? [
               {
                 title: 'Choose the architecture',
-                children: <RegisterAgentButtonGroup
-                  legend='Choose the architecture'
-                  options={architectureButtonsSolaris}
-                  idSelected={this.state.selectedArchitecture}
-                  onChange={architecture => this.setArchitecture(architecture)} />
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the architecture'
+                    options={architectureButtonsSolaris}
+                    idSelected={this.state.selectedArchitecture}
+                    onChange={architecture =>
+                      this.setArchitecture(architecture)
+                    }
+                  />
+                ),
               },
             ]
           : []),
@@ -1997,11 +2102,16 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
           ? [
               {
                 title: 'Choose the architecture',
-                children: <RegisterAgentButtonGroup
-                  legend='Choose the architecture'
-                  options={architectureButtonsAix}
-                  idSelected={this.state.selectedArchitecture}
-                  onChange={architecture => this.setArchitecture(architecture)} />
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the architecture'
+                    options={architectureButtonsAix}
+                    idSelected={this.state.selectedArchitecture}
+                    onChange={architecture =>
+                      this.setArchitecture(architecture)
+                    }
+                  />
+                ),
               },
             ]
           : []),
@@ -2009,11 +2119,16 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
           ? [
               {
                 title: 'Choose the architecture',
-                children: <RegisterAgentButtonGroup
-                  legend='Choose the architecture'
-                  options={architectureButtonsHpUx}
-                  idSelected={this.state.selectedArchitecture}
-                  onChange={architecture => this.setArchitecture(architecture)} />
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the architecture'
+                    options={architectureButtonsHpUx}
+                    idSelected={this.state.selectedArchitecture}
+                    onChange={architecture =>
+                      this.setArchitecture(architecture)
+                    }
+                  />
+                ),
               },
             ]
           : []),
@@ -2037,7 +2152,13 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
               },
             ]
           : []),
-        ...(!(!this.state.needsPassword || this.state.hidePasswordInput)
+        ...(!(
+          !this.state.needsPassword ||
+          this.state.hidePasswordInput ||
+          !!['solaris10', 'solaris11', '11.31', '3.12.12'].includes(
+            this.state.selectedVersion,
+          )
+        )
           ? [
               {
                 title: 'Wazuh password',
