@@ -10,6 +10,19 @@
                     "uname": "Linux |wazuh-manager-master-0 |4.14.114-105.126.amzn2.x86_64 |#1 SMP Tue May 7 02:26:40 UTC 2019 |x86_64",
                     "version": "2"
                 },
+                "group": [
+                    "default",
+                    "test",
+                    "test2",
+                    "test3",
+                    "test4",
+                    "test5",
+                    "test6",
+                    "test7",
+                    "test8",
+                    "test9",
+                    "test10"
+                ],
                 "ip": "127.0.0.1",
                 "id": "000",
                 "registerIP": "127.0.0.1",
@@ -30,6 +43,14 @@
                     "uname": "Linux |wazuh-manager-master-0 |4.14.114-105.126.amzn2.x86_64 |#1 SMP Tue May 7 02:26:40 UTC 2019 |x86_64",
                     "version": "2"
                 },
+                "group": [
+                  "default",
+                  "test",
+                  "test2",
+                  "test3",
+                  "test4",
+                  "test5"
+                ],
                 "ip": "127.0.0.1",
                 "id": "001",
                 "registerIP": "127.0.0.1",
@@ -50,6 +71,7 @@
                     "uname": "Linux |wazuh-manager-master-0 |4.14.114-105.126.amzn2.x86_64 |#1 SMP Tue May 7 02:26:40 UTC 2019 |x86_64",
                     "version": "2"
                 },
+                "group": ["default", "test", "test2"],
                 "ip": "127.0.0.1",
                 "id": "002",
                 "registerIP": "127.0.0.1",
