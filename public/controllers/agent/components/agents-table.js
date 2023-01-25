@@ -712,7 +712,7 @@ export const AgentsTable = withErrorBoundary(
       // Previously the tableLayout is set to "fixed" with percentage width for each column, but the use of space was not optimal.
       // Important: If all the columns have the truncateText property set to true, the table cannot adjust properly when the viewport size is small.
       return (
-        <EuiFlexGroup>
+        <EuiFlexGroup className="wz-overflow-auto">
           <EuiFlexItem>
             <EuiBasicTable
               tableLayout="auto"
