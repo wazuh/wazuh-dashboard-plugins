@@ -1668,44 +1668,15 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
         if (!nodeSelected) {
           this.setState({
             serverAddress: '',
-            udpProtocol: false,
-            connectionSecure: null,
+            udpProtocol: this.state.haveUdpProtocol,
+            connectionSecure: this.state.haveUdpProtocol ? false : true
           });
         } else {
-          if (nodeSelected === this.state.defaultServerAddress) {
-            this.setState({
-              serverAddress: nodeSelected,
-              udpProtocol: false,
-              connectionSecure: true,
-            });
-          } else {
-            try {
-              this.setState({
-                serverAddress: nodeSelected,
-                udpProtocol: this.state.haveUdpProtocol,
-                connectionSecure: this.state.haveUdpProtocol ? false : true
-              });
-            } catch (error) {
-              const options = {
-                context: `${RegisterAgent.name}.onChangeServerAddress`,
-                level: UI_LOGGER_LEVELS.ERROR,
-                severity: UI_ERROR_SEVERITIES.BUSINESS,
-                display: true,
-                store: false,
-                error: {
-                  error: error,
-                  message: error.message || error,
-                  title: error.name || error,
-                },
-              };
-              getErrorOrchestrator().handleError(options);
-              this.setState({
-                serverAddress: nodeSelected,
-                udpProtocol: false,
-                connectionSecure: false,
-              });
-            }
-          }
+          this.setState({
+            serverAddress: nodeSelected,
+            udpProtocol: false,
+            connectionSecure: true,
+          });
         }
       };
 

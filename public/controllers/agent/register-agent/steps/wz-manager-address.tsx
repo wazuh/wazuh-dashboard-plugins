@@ -43,4 +43,4 @@ const WzManagerAddressInput = (props: Props) => {
   );
 };
 
-export default memo(WzManagerAddressInput);
+export default WzManagerAddressInput;
