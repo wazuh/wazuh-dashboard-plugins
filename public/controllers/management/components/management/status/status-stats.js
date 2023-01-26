@@ -32,11 +32,6 @@ export class WzStatusStats extends Component {
       description: 'Agents coverage',
       status: 'coverage'
     })
-    this.agentStatus.push({
-      color: undefined,
-      description: 'Synced agents',
-      status: 'synced'
-    })
   }
 
   componentDidMount() {
@@ -54,13 +49,12 @@ export class WzStatusStats extends Component {
     const metric = {
       [status]: stats?.agentsCount?.[status],
       coverage: `${stats?.agentsCoverage}%`,
-      synced: `${stats?.agentsSynced}%`
     };
     return metric[status];
   }
 
   render() {
-    
+
     return (
       <div>
         <EuiFlexGroup>
