@@ -69,6 +69,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed password input in deploy new agent section [#5098](https://github.com/wazuh/wazuh-kibana-app/pull/5098)
 - Fixed error when clicking on the selectors of agents in the group agents management [#5094](https://github.com/wazuh/wazuh-kibana-app/pull/5094)
 - Fixed mispelling in the NIST module [#5107](https://github.com/wazuh/wazuh-kibana-app/pull/5107)
+- Fixed Statistic cronjob bulk document insert [#5150](https://github.com/wazuh/wazuh-kibana-app/pull/5150)
 - Fixed Inventory module for solaris agents [#5144](https://github.com/wazuh/wazuh-kibana-app/pull/5144)
 
 ### Removed
