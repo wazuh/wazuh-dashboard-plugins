@@ -81,6 +81,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed mispelling in the NIST module [#5107](https://github.com/wazuh/wazuh-kibana-app/pull/5107)
 - Fixed Statistic cronjob bulk document insert [#5150](https://github.com/wazuh/wazuh-kibana-app/pull/5150)
 - Fixed the style of the buttons showing more event information in the event view table. [#5137](https://github.com/wazuh/wazuh-kibana-app/pull/5137)
+- Fixed the module information button in Office365 and Github Panel tab to open the nav drawer. [#5167](https://github.com/wazuh/wazuh-kibana-app/pull/5167)
 
 ### Removed
 
