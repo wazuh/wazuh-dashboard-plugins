@@ -46,7 +46,7 @@
     "angular-animate": "1.7.8",
     "angular-chart.js": "1.1.1",
     "angular-material": "1.1.18",
-    "axios": "^0.21.1",
+    "axios": "^1.2.5",
     "install": "^0.10.1",
     "js2xmlparser": "^3.0.0",
     "json2csv": "^4.1.2",
