@@ -24,7 +24,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added file saving conditions in File Editor [#4970](https://github.com/wazuh/wazuh-kibana-app/pull/4970)
 - Added character validation to avoid invalid agent names in the section 'Deploy new agent'. [#5021](https://github.com/wazuh/wazuh-kibana-app/pull/5021) [#5028](https://github.com/wazuh/wazuh-kibana-app/pull/5028)
 - Added default selected options in Deploy Agent page [#5063](https://github.com/wazuh/wazuh-kibana-app/pull/5063)
-- Added new Server Address component [#5166](https://github.com/wazuh/wazuh-kibana-app/pull/5166)
+- Added new Server Address input in Deploy agent section  [#5166](https://github.com/wazuh/wazuh-kibana-app/pull/5166)
 
 ### Changed
 
