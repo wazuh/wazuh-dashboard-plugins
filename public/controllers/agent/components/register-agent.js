@@ -200,15 +200,10 @@ export const RegisterAgent = withErrorBoundary(
 
     getRemoteConfig = async () => {
       const remoteConfig = await getMasterRemoteConfiguration();
-      const serverAddress = this.defaultServerAddress || this.configuration['enrollment.dns'] || '';
-      if (serverAddress) {
-        this.setState({ 
-          udpProtocol: false,
-          connectionSecure: true, 
-          serverAddress });
-      }else{
+      if (remoteConfig) {
         this.setState({
           haveUdpProtocol: remoteConfig.isUdp,
+          haveConnectionSecure: remoteConfig.isSecure,
           udpProtocol: remoteConfig.isUdp,
           connectionSecure: remoteConfig.isSecure,
         })
@@ -1665,19 +1660,11 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
       ];
 
       const onChangeServerAddress = async nodeSelected => {
-        if (!nodeSelected) {
-          this.setState({
-            serverAddress: '',
-            udpProtocol: this.state.haveUdpProtocol,
-            connectionSecure: this.state.haveUdpProtocol ? false : true
-          });
-        } else {
           this.setState({
             serverAddress: nodeSelected,
-            udpProtocol: false,
-            connectionSecure: true,
-          });
-        }
+            udpProtocol: this.state.haveUdpProtocol,
+            connectionSecure: this.state.haveConnectionSecure
+          }); 
       };
 
       const steps = [
