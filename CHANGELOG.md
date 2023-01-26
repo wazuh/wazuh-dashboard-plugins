@@ -62,12 +62,13 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed agent deployment instructions for HP-UX and Solaris. [#4943](https://github.com/wazuh/wazuh-kibana-app/pull/4943)
 - Fixed Inventory checks table filters by stats [#4999](https://github.com/wazuh/wazuh-kibana-app/pull/4999)
 - Fixed vulnerabilities default last scan date formatter [#4975](https://github.com/wazuh/wazuh-kibana-app/pull/4975)
-- A solaris command has been fixed [5035](https://github.com/wazuh/wazuh-kibana-app/pull/5035)
-- Fixed commands: Aix, OpenSUSE, Alpine, Suse11, Fedora, HP, Oracle Linux 5, Amazon Linux 2, Centos5. Changed the word 'or higher' in buttons to '+'.Fixed validations for Hp, Solaris and Alpine. [5045](https://github.com/wazuh/wazuh-kibana-app/pull/5045)
-- Fixed error in Github module PDF report. [5069](https://github.com/wazuh/wazuh-kibana-app/pull/5069)
-- Fixed password input in deploy new agent section [5098](https://github.com/wazuh/wazuh-kibana-app/pull/5098)
+- A solaris command has been fixed [#5035](https://github.com/wazuh/wazuh-kibana-app/pull/5035)
+- Fixed commands: Aix, OpenSUSE, Alpine, Suse11, Fedora, HP, Oracle Linux 5, Amazon Linux 2, Centos5. Changed the word 'or higher' in buttons to '+'.Fixed validations for Hp, Solaris and Alpine. [#5045](https://github.com/wazuh/wazuh-kibana-app/pull/5045)
+- Fixed error in Github module PDF report. [#5069](https://github.com/wazuh/wazuh-kibana-app/pull/5069)
+- Fixed password input in deploy new agent section [#5098](https://github.com/wazuh/wazuh-kibana-app/pull/5098)
 - Fixed error when clicking on the selectors of agents in the group agents management [#5094](https://github.com/wazuh/wazuh-kibana-app/pull/5094)
 - Fixed mispelling in the NIST module [#5107](https://github.com/wazuh/wazuh-kibana-app/pull/5107)
+- Fixed Inventory module for solaris agents [#5144](https://github.com/wazuh/wazuh-kibana-app/pull/5144)
 
 ### Removed
 
