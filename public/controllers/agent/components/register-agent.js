@@ -194,14 +194,13 @@ export const RegisterAgent = withErrorBoundary(
     }
 
     getEnrollDNSConfig = () => {
-      let serverAddress = this.configuration['enrollment.dns'] || '';
+      const serverAddress = this.configuration['enrollment.dns'] || '';
       this.setState({ defaultServerAddress: serverAddress });
     };
 
     getRemoteConfig = async () => {
       const remoteConfig = await getMasterRemoteConfiguration();
-      let serverAddress = this.defaultServerAddress || this.configuration['enrollment.dns'] || '';
-      console.log('remote config', remoteConfig);
+      const serverAddress = this.defaultServerAddress || this.configuration['enrollment.dns'] || '';
       if (serverAddress) {
         this.setState({ 
           udpProtocol: false,
