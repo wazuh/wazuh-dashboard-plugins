@@ -163,7 +163,7 @@ export const AgentConfiguration = {
           subtitle: 'Inventory data',
           docuLink: webDocumentationLink('user-manual/reference/ossec-conf/wodle-syscollector.html'),
           desc:
-            'Gather relevant information about system OS, hardware, networking and packages',
+            'Gather relevant information about the operating system, hardware, networking and packages',
           wodle: [{ name: 'syscollector' }],
           labels: [
             {

@@ -38,7 +38,7 @@ export const ModuleConfig = {
   'data.office365.ClientIP': {
     length: () => drilldownIPConfig.rows.reduce((total, row) => total + row.columns.length, 0),
     component: (props) => (
-      <OfficeDrilldown title={'Client IP'} {...{ ...drilldownIPConfig, ...props }} />
+      <OfficeDrilldown title={'Client IP address'} {...{ ...drilldownIPConfig, ...props }} />
     ),
   },
   'data.office365.Operation': {

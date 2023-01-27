@@ -78,10 +78,10 @@ import { getSettingDefaultValue } from '../../../common/services/settings';
         columns: [
           { id: 'id', label: 'ID' },
           { id: 'name', label: 'Name' },
-          { id: 'ip', label: 'IP' },
+          { id: 'ip', label: 'IP address' },
           { id: 'version', label: 'Version' },
           { id: 'manager', label: 'Manager' },
-          { id: 'os', label: 'OS' },
+          { id: 'os', label: 'Operating system' },
           { id: 'dateAdd', label: 'Registration date' },
           { id: 'lastKeepAlive', label: 'Last keep alive' },
         ],
@@ -133,6 +133,7 @@ export async function extendedInformation(
   from,
   to,
   filters,
+  allowedAgentsFilter,
   pattern = getSettingDefaultValue('pattern'),
   agent = null
 ) {
@@ -174,6 +175,7 @@ export async function extendedInformation(
                 to,
                 vulnerabilitiesLevel,
                 filters,
+                allowedAgentsFilter,
                 pattern
               );
               return count
@@ -200,6 +202,7 @@ export async function extendedInformation(
         to,
         'Low',
         filters,
+        allowedAgentsFilter,
         pattern
       );
       const mediumRank = await VulnerabilityRequest.topAgentCount(
@@ -208,6 +211,7 @@ export async function extendedInformation(
         to,
         'Medium',
         filters,
+        allowedAgentsFilter,
         pattern
       );
       const highRank = await VulnerabilityRequest.topAgentCount(
@@ -216,6 +220,7 @@ export async function extendedInformation(
         to,
         'High',
         filters,
+        allowedAgentsFilter,
         pattern
       );
       const criticalRank = await VulnerabilityRequest.topAgentCount(
@@ -224,6 +229,7 @@ export async function extendedInformation(
         to,
         'Critical',
         filters,
+        allowedAgentsFilter,
         pattern
       );
       log(
@@ -272,7 +278,7 @@ export async function extendedInformation(
         'Fetching overview vulnerability detector top 3 CVEs',
         'debug'
       );
-      const cveRank = await VulnerabilityRequest.topCVECount(context, from, to, filters, pattern);
+      const cveRank = await VulnerabilityRequest.topCVECount(context, from, to, filters, allowedAgentsFilter, pattern);
       log(
         'reporting:extendedInformation',
         'Adding overview vulnerability detector top 3 CVEs',
@@ -294,7 +300,7 @@ export async function extendedInformation(
     if (section === 'overview' && tab === 'general') {
       log('reporting:extendedInformation', 'Fetching top 3 agents with level 15 alerts', 'debug');
 
-      const level15Rank = await OverviewRequest.topLevel15(context, from, to, filters, pattern);
+      const level15Rank = await OverviewRequest.topLevel15(context, from, to, filters, allowedAgentsFilter, pattern);
 
       log('reporting:extendedInformation', 'Adding top 3 agents with level 15 alerts', 'debug');
       if (level15Rank.length) {
@@ -314,6 +320,7 @@ export async function extendedInformation(
         from,
         to,
         filters,
+        allowedAgentsFilter,
         pattern
       );
       log('reporting:extendedInformation', 'Adding most common rootkits', 'debug');
@@ -344,6 +351,7 @@ export async function extendedInformation(
         from,
         to,
         filters,
+        allowedAgentsFilter,
         pattern
       );
       hiddenPids &&
@@ -362,6 +370,7 @@ export async function extendedInformation(
         from,
         to,
         filters,
+        allowedAgentsFilter,
         pattern
       );
       hiddenPorts &&
@@ -385,6 +394,7 @@ export async function extendedInformation(
         from,
         to,
         filters,
+        allowedAgentsFilter,
         pattern
       );
       printer.addContentWithNewLine({
@@ -397,6 +407,7 @@ export async function extendedInformation(
           from,
           to,
           filters,
+          allowedAgentsFilter,
           item,
           pattern
         );
@@ -429,6 +440,7 @@ export async function extendedInformation(
         from,
         to,
         filters,
+        allowedAgentsFilter,
         pattern
       );
       printer.addContentWithNewLine({
@@ -441,6 +453,7 @@ export async function extendedInformation(
           from,
           to,
           filters,
+          allowedAgentsFilter,
           item,
           pattern
         );
@@ -473,6 +486,7 @@ export async function extendedInformation(
         from,
         to,
         filters,
+        allowedAgentsFilter,
         pattern
       );
       printer.addContentWithNewLine({
@@ -485,6 +499,7 @@ export async function extendedInformation(
           from,
           to,
           filters,
+          allowedAgentsFilter,
           item,
           pattern
         );
@@ -522,6 +537,7 @@ export async function extendedInformation(
         from,
         to,
         filters,
+        allowedAgentsFilter,
         pattern
       );
       if (auditAgentsNonSuccess && auditAgentsNonSuccess.length) {
@@ -536,6 +552,7 @@ export async function extendedInformation(
         from,
         to,
         filters,
+        allowedAgentsFilter,
         pattern
       );
       if (auditAgentsFailedSyscall && auditAgentsFailedSyscall.length) {
@@ -561,7 +578,7 @@ export async function extendedInformation(
     //--- OVERVIEW - FIM
     if (section === 'overview' && tab === 'fim') {
       log('reporting:extendedInformation', 'Fetching top 3 rules for FIM', 'debug');
-      const rules = await SyscheckRequest.top3Rules(context, from, to, filters, pattern);
+      const rules = await SyscheckRequest.top3Rules(context, from, to, filters, allowedAgentsFilter, pattern);
 
       if (rules && rules.length) {
         printer.addContentWithNewLine({ text: 'Top 3 FIM rules', style: 'h2' }).addSimpleTable({
@@ -578,7 +595,7 @@ export async function extendedInformation(
       }
 
       log('reporting:extendedInformation', 'Fetching top 3 agents for FIM', 'debug');
-      const agents = await SyscheckRequest.top3agents(context, from, to, filters, pattern);
+      const agents = await SyscheckRequest.top3agents(context, from, to, filters, allowedAgentsFilter, pattern);
 
       if (agents && agents.length) {
         printer.addContentWithNewLine({
@@ -602,6 +619,7 @@ export async function extendedInformation(
         from,
         to,
         filters,
+        allowedAgentsFilter,
         pattern
       );
       auditFailedSyscall &&
@@ -655,6 +673,7 @@ export async function extendedInformation(
         from,
         to,
         filters,
+        allowedAgentsFilter,
         pattern
       );
 
@@ -675,6 +694,7 @@ export async function extendedInformation(
         from,
         to,
         filters,
+        allowedAgentsFilter,
         pattern
       );
 
@@ -714,9 +734,9 @@ export async function extendedInformation(
         },
         {
           endpoint: `/syscollector/${agent}/os`,
-          loggerMessage: `Fetching OS information for agent ${agent}`,
+          loggerMessage: `Fetching operating system information for agent ${agent}`,
           list: {
-            title: { text: 'OS information', style: 'h2' },
+            title: { text: 'Operating system information', style: 'h2' },
           },
           mapResponse: (osData) => [
             osData.sysname,
@@ -783,6 +803,7 @@ export async function extendedInformation(
                 to,
                 vulnerabilitiesLevel,
                 filters,
+                allowedAgentsFilter,
                 pattern
               );
             } catch (error) {
@@ -814,6 +835,7 @@ export async function extendedInformation(
         to,
         'Critical',
         filters,
+        allowedAgentsFilter,
         pattern
       );
       if (topCriticalPackages && topCriticalPackages.length) {
@@ -843,6 +865,7 @@ export async function extendedInformation(
         to,
         'High',
         filters,
+        allowedAgentsFilter,
         pattern
       );
       if (topHighPackages && topHighPackages.length) {
@@ -876,6 +899,7 @@ export async function extendedInformation(
           from,
           to,
           filters,
+          allowedAgentsFilter,
           summaryTable,
           pattern
         );
