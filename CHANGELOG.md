@@ -29,8 +29,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Changed
 
 - Changed the HTTP verb from `GET` to `POST` in the requests to login to the Wazuh API [#4103](https://github.com/wazuh/wazuh-kibana-app/pull/4103)
-- Improved alerts summary performance [#4376](https://github.com/wazuh/wazuh-kibana-app/pull/4376) [#5071](https://github.com/wazuh/wazuh-kibana-app/pull/5071)
-- Improved Agents Overview performance [#4363](https://github.com/wazuh/wazuh-kibana-app/pull/4363) [#4996](https://github.com/wazuh/wazuh-kibana-app/pull/4996) [#5076](https://github.com/wazuh/wazuh-kibana-app/pull/5076)
+- Improved alerts summary performance [#4376](https://github.com/wazuh/wazuh-kibana-app/pull/4376) [#5071](https://github.com/wazuh/wazuh-kibana-app/pull/5071) [#5131](https://github.com/wazuh/wazuh-kibana-app/pull/5131)
+- Improved Agents Overview performance [#4363](https://github.com/wazuh/wazuh-kibana-app/pull/4363) [#5076](https://github.com/wazuh/wazuh-kibana-app/pull/5076)
 - Improved the message displayed when there is a versions mismatch between the Wazuh API and the Wazuh APP [#4529](https://github.com/wazuh/wazuh-kibana-app/pull/4529) [#4964](https://github.com/wazuh/wazuh-kibana-app/pull/4964)
 - Independently load each dashboard from the `Agents Overview` page [#4363](https://github.com/wazuh/wazuh-kibana-app/pull/4363)
 - The endpoint `/agents/summary/status` response was adapted. [#3874](https://github.com/wazuh/wazuh-kibana-app/pull/3874)
@@ -74,6 +74,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed password input in deploy new agent section [5098](https://github.com/wazuh/wazuh-kibana-app/pull/5098)
 - Fixed error when clicking on the selectors of agents in the group agents management [#5094](https://github.com/wazuh/wazuh-kibana-app/pull/5094)
 - Fixed mispelling in the NIST module [#5107](https://github.com/wazuh/wazuh-kibana-app/pull/5107)
+- Fixed Statistic cronjob bulk document insert [#5150](https://github.com/wazuh/wazuh-kibana-app/pull/5150)
 
 ### Removed
 
