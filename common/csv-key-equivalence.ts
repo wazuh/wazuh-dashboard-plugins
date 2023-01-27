@@ -72,7 +72,7 @@ export const KeyEquivalence: {[key: string]: string} = {
   address: 'Address',
   protocol: 'Protocol',
   netmask: 'Netmask',
-  'local.ip': 'Local IP',
+  'local.ip': 'Local IP address',
   'remote.ip': 'Remote IP',
   'local.port': 'Local port',
   'remote.port': 'Remote port',
