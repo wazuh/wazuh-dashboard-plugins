@@ -1615,6 +1615,10 @@ div.euiPopover__panel.euiPopover__panel-isOpen.euiPopover__panel--bottom.wz-menu
   padding-left: 320px;
 }
 
+.icon-box-action {
+  display: flex;
+}
+
 @media only screen and (max-width: 1200px) {
   .hide-agent-status {
     display: none;
