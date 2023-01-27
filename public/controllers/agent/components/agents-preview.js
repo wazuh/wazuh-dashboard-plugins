@@ -68,7 +68,6 @@ export const AgentsPreview = compose(
         agentStatusSummary: { active: '-', disconnected: '-', total: '-', pending: '-', never_connected: '-' },
         agentConfiguration: {},
         agentsActiveCoverage: 0,
-        agentsSynced: 0,
       };
       this.wazuhConfig = new WazuhConfig();
       this.agentStatus = UI_ORDER_AGENT_STATUS.map(agentStatus => ({
@@ -82,8 +81,8 @@ export const AgentsPreview = compose(
       this._isMount = true;
       this.fetchAgentStatusDetailsData();
       if (this.wazuhConfig.getConfig()['wazuh.monitoring.enabled']) {
-        this._isMount && this.setState({ 
-          showAgentsEvolutionVisualization: true 
+        this._isMount && this.setState({
+          showAgentsEvolutionVisualization: true
         });
       }
     }
@@ -112,7 +111,6 @@ export const AgentsPreview = compose(
         agentStatusSummary,
         agentConfiguration,
         agentsActiveCoverage: ((agentStatusSummary.active / agentStatusSummary.total) * 100).toFixed(2),
-        agentsSynced: ((agentConfiguration.synced/agentConfiguration.total)*100).toFixed(2),
       });
     }
 
@@ -228,15 +226,6 @@ export const AgentsPreview = compose(
                             description="Agents coverage"
                             className="white-space-nowrap"
                             />
-                        </EuiFlexItem>
-                        <EuiFlexItem className="agents-link-item">
-                          <EuiStat
-                            isLoading={this.state.loadingSummary}
-                            title={`${this.state.agentsSynced}%`}
-                            titleSize='s'
-                            description="Synced agents"
-                            className="white-space-nowrap"
-                          />
                         </EuiFlexItem>
                       </EuiFlexGroup>
                       <EuiFlexGroup className="mt-0">

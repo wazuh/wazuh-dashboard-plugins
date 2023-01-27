@@ -39,7 +39,7 @@ export function InventoryMetrics({agent}) {
                     <EuiText>Arch: {syscollector.isLoading ? <EuiLoadingSpinner size="s" /> : <strong>{syscollector.data.os.architecture}</strong>}</EuiText>
                 </EuiFlexItem>
                 <EuiFlexItem grow={false}>
-                    <EuiText>OS: {syscollector.isLoading ? <EuiLoadingSpinner size="s" /> : <strong>{syscollector.data.os.os.name} {syscollector.data.os.os.version}</strong>}</EuiText>
+                    <EuiText>Operating system: {syscollector.isLoading ? <EuiLoadingSpinner size="s" /> : <strong>{syscollector.data.os.os.name} {syscollector.data.os.os.version}</strong>}</EuiText>
                 </EuiFlexItem>
                 <EuiFlexItem grow={true}>
                     <EuiText>CPU: {syscollector.isLoading ? <EuiLoadingSpinner size="s" /> : <strong>{syscollector.data.hardware.cpu.name}</strong>}</EuiText>
