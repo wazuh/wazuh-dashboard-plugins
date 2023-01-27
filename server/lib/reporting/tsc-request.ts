@@ -25,6 +25,7 @@ export const topTSCRequirements = async (
   gte,
   lte,
   filters,
+  allowedAgentsFilter,
   pattern = getSettingDefaultValue('pattern')
 ) => {
   if (filters.includes('rule.tsc: exists')) {
@@ -34,7 +35,7 @@ export const topTSCRequirements = async (
   try {
     const base = {};
 
-    Object.assign(base, Base(pattern, filters, gte, lte));
+    Object.assign(base, Base(pattern, filters, gte, lte, allowedAgentsFilter));
 
     Object.assign(base.aggs, {
       '2': {
@@ -95,6 +96,7 @@ export const getRulesByRequirement = async (
   gte,
   lte,
   filters,
+  allowedAgentsFilter,
   requirement,
   pattern = getSettingDefaultValue('pattern')
 ) => {
@@ -105,7 +107,7 @@ export const getRulesByRequirement = async (
   try {
     const base = {};
 
-    Object.assign(base, Base(pattern, filters, gte, lte));
+    Object.assign(base, Base(pattern, filters, gte, lte, allowedAgentsFilter));
 
     Object.assign(base.aggs, {
       '2': {
