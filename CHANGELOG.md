@@ -7,7 +7,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Added
 
 - Added the option to sort by the agents count in the group table. [#4323](https://github.com/wazuh/wazuh-kibana-app/pull/4323)
-- Added agent synchronization status in the agent module. [#3874](https://github.com/wazuh/wazuh-kibana-app/pull/3874) [#5143](https://github.com/wazuh/wazuh-kibana-app/pull/5143)
+- Added agent synchronization status in the agent module. [#3874](https://github.com/wazuh/wazuh-kibana-app/pull/3874) [#5143](https://github.com/wazuh/wazuh-kibana-app/pull/5143) [#5177](https://github.com/wazuh/wazuh-kibana-app/pull/5177)
 - Added the ability to set the name of the agent using the deployment wizard. [#4739](https://github.com/wazuh/wazuh-kibana-app/pull/4739)
 - The input name was added and when the user adds a value the variable WAZUH_AGENT_NAME with its value appears in the installation command. [#4739](https://github.com/wazuh/wazuh-kibana-app/pull/4739)
 - Redesign the SCA table from agent's dashboard [#4512](https://github.com/wazuh/wazuh-kibana-app/pull/4512)
