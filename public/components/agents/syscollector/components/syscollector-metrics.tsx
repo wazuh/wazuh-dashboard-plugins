@@ -83,7 +83,7 @@ export function InventoryMetrics({ agent }) {
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
           <EuiText>
-            OS:{' '}
+            Operating system:{' '}
             {syscollector.isLoading ? (
               <EuiLoadingSpinner size='s' />
             ) : (
