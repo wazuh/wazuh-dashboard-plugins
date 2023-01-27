@@ -7,7 +7,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Added
 
 - Added the option to sort by the agents count in the group table. [#4323](https://github.com/wazuh/wazuh-kibana-app/pull/4323)
-- Added agent synchronization status in the agent module. [#3874](https://github.com/wazuh/wazuh-kibana-app/pull/3874)
+- Added agent synchronization status in the agent module. [#3874](https://github.com/wazuh/wazuh-kibana-app/pull/3874) [#5143](https://github.com/wazuh/wazuh-kibana-app/pull/5143)
 - The input name was added and when the user adds a value the variable WAZUH_AGENT_NAME with its value appears in the installation command. [#4739](https://github.com/wazuh/wazuh-kibana-app/pull/4739)
 - Redesign the SCA table from agent's dashboard [#4512](https://github.com/wazuh/wazuh-kibana-app/pull/4512)
 - Enhanced the plugin setting description displayed in the UI and the configuration file. [#4501](https://github.com/wazuh/wazuh-kibana-app/pull/4501)
@@ -24,6 +24,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added file saving conditions in File Editor [#4970](https://github.com/wazuh/wazuh-kibana-app/pull/4970)
 - Added character validation to avoid invalid agent names in the section 'Deploy new agent'. [#5021](https://github.com/wazuh/wazuh-kibana-app/pull/5021) [#5028](https://github.com/wazuh/wazuh-kibana-app/pull/5028)
 - Added default selected options in Deploy Agent page [#5063](https://github.com/wazuh/wazuh-kibana-app/pull/5063)
+- Added server address and wazuh protocol definition in Deploy agent section [#5166](https://github.com/wazuh/wazuh-kibana-app/pull/5166)
 
 ### Changed
 
@@ -82,6 +83,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed Statistic cronjob bulk document insert [#5150](https://github.com/wazuh/wazuh-kibana-app/pull/5150)
 - Fixed the style of the buttons showing more event information in the event view table. [#5137](https://github.com/wazuh/wazuh-kibana-app/pull/5137)
 - Fixed Inventory module for solaris agents [#5144](https://github.com/wazuh/wazuh-kibana-app/pull/5144)
+- Fixed the module information button in Office365 and Github Panel tab to open the nav drawer. [#5167](https://github.com/wazuh/wazuh-kibana-app/pull/5167)
 
 ### Removed
 

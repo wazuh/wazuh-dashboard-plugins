@@ -889,7 +889,7 @@ export class WazuhReportingCtrl {
       createDirectoryIfNotExists(path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, hashUsername));
 
       log('reporting:createReportsAgentsInventory', `Syscollector report`, 'debug');
-      const sanitizedFilters = filters ? this.sanitizeKibanaFilters(filters, searchBar) : false;
+      const [sanitizedFilters, agentsFilter] = filters ? this.sanitizeKibanaFilters(filters, searchBar) : [false, null];
 
       // Get the agent OS
       let agentOs = '';
@@ -969,14 +969,14 @@ export class WazuhReportingCtrl {
             columns:
               agentOs === 'windows'
                 ? [
-                    { id: 'local_ip', label: 'Local IP' },
+                    { id: 'local_ip', label: 'Local IP address' },
                     { id: 'local_port', label: 'Local port' },
                     { id: 'process', label: 'Process' },
                     { id: 'state', label: 'State' },
                     { id: 'protocol', label: 'Protocol' },
                   ]
                 : [
-                    { id: 'local_ip', label: 'Local IP' },
+                    { id: 'local_ip', label: 'Local IP address' },
                     { id: 'local_port', label: 'Local port' },
                     { id: 'state', label: 'State' },
                     { id: 'protocol', label: 'Protocol' },
@@ -1009,7 +1009,7 @@ export class WazuhReportingCtrl {
             title: 'Network settings',
             columns: [
               { id: 'iface', label: 'Interface' },
-              { id: 'address', label: 'address' },
+              { id: 'address', label: 'Address' },
               { id: 'netmask', label: 'Netmask' },
               { id: 'proto', label: 'Protocol' },
               { id: 'broadcast', label: 'Broadcast' },
@@ -1071,6 +1071,7 @@ export class WazuhReportingCtrl {
           from,
           to,
           sanitizedFilters + ' AND rule.groups: "vulnerability-detector"',
+          agentsFilter,
           indexPatternTitle,
           agentID
         );

@@ -71,10 +71,9 @@ import {
   architectureButtonsWithPPC64LEAlpine,
 } from '../wazuh-config';
 import './register-agent.scss';
-import ServerAddress from '../register-agent/steps/server-address';
+import WzManagerAddressInput from '../register-agent/steps/wz-manager-address';
 import {
-  getConnectionConfig,
-  fetchClusterNodesOptions,
+  getMasterRemoteConfiguration
 } from './register-agent-service';
 import { PrincipalButtonGroup } from './wz-accordion';
 import RegisterAgentButtonGroup from '../register-agent/register-agent-button-group';
@@ -122,6 +121,7 @@ export const RegisterAgent = withErrorBoundary(
       };
     }
 
+
     async componentDidMount() {
       try {
         this.setState({ loading: true });
@@ -129,6 +129,7 @@ export const RegisterAgent = withErrorBoundary(
         let wazuhPassword = '';
         let hidePasswordInput = false;
         this.getEnrollDNSConfig();
+        await this.getRemoteConfig();
         let authInfo = await this.getAuthInfo();
         const needsPassword = (authInfo.auth || {}).use_password === 'yes';
         if (needsPassword) {
@@ -194,14 +195,22 @@ export const RegisterAgent = withErrorBoundary(
     }
 
     getEnrollDNSConfig = () => {
-      let serverAddress = this.configuration['enrollment.dns'] || '';
+      const serverAddress = this.configuration['enrollment.dns'] || '';
       this.setState({ defaultServerAddress: serverAddress });
-      if (serverAddress) {
-        this.setState({ udpProtocol: true });
-      } else {
-        this.setState({ udpProtocol: false });
-      }
     };
+
+    getRemoteConfig = async () => {
+      const remoteConfig = await getMasterRemoteConfiguration();
+      if (remoteConfig) {
+        this.setState({
+          haveUdpProtocol: remoteConfig.isUdp,
+          haveConnectionSecure: remoteConfig.isSecure,
+          udpProtocol: remoteConfig.isUdp,
+          connectionSecure: remoteConfig.isSecure,
+        })
+      }
+    }
+
 
     async getAuthInfo() {
       try {
@@ -376,7 +385,6 @@ export const RegisterAgent = withErrorBoundary(
       let deployment =
         this.state.serverAddress &&
         `WAZUH_MANAGER='${this.state.serverAddress}' `;
-      const protocol = false;
       if (this.state.selectedOS == 'win') {
         deployment += `WAZUH_REGISTRATION_SERVER='${this.state.serverAddress}' `;
       }
@@ -1651,43 +1659,12 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
         },
       ];
 
-      const onChangeServerAddress = async selectedNodes => {
-        if (selectedNodes.length === 0) {
+      const onChangeServerAddress = async nodeSelected => {
           this.setState({
-            serverAddress: '',
-            udpProtocol: false,
-            connectionSecure: null,
-          });
-        } else {
-          const nodeSelected = selectedNodes[0];
-          try {
-            const remoteConfig = await getConnectionConfig(nodeSelected);
-            this.setState({
-              serverAddress: remoteConfig.serverAddress,
-              udpProtocol: remoteConfig.udpProtocol,
-              connectionSecure: remoteConfig.connectionSecure,
-            });
-          } catch (error) {
-            const options = {
-              context: `${RegisterAgent.name}.onChangeServerAddress`,
-              level: UI_LOGGER_LEVELS.ERROR,
-              severity: UI_ERROR_SEVERITIES.BUSINESS,
-              display: true,
-              store: false,
-              error: {
-                error: error,
-                message: error.message || error,
-                title: error.name || error,
-              },
-            };
-            getErrorOrchestrator().handleError(options);
-            this.setState({
-              serverAddress: nodeSelected.label,
-              udpProtocol: false,
-              connectionSecure: false,
-            });
-          }
-        }
+            serverAddress: nodeSelected,
+            udpProtocol: this.state.haveUdpProtocol,
+            connectionSecure: this.state.haveConnectionSecure
+          }); 
       };
 
       const steps = [
@@ -2142,10 +2119,9 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
                 title: 'Wazuh server address',
                 children: (
                   <Fragment>
-                    <ServerAddress
+                    <WzManagerAddressInput
                       defaultValue={this.state.defaultServerAddress}
                       onChange={onChangeServerAddress}
-                      fetchOptions={fetchClusterNodesOptions}
                     />
                   </Fragment>
                 ),

@@ -133,7 +133,7 @@ export default [
       {
         name: 'Inventory data',
         description:
-          'Gather relevant information about system OS, hardware, networking and packages',
+          'Gather relevant information about system operating system, hardware, networking and packages',
         goto: 'inventory'
       },
       {
