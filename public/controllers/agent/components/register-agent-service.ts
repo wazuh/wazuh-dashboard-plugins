@@ -198,4 +198,16 @@ export const getMasterNode = (
     return nodeIps.filter(nodeIp => nodeIp.nodetype === 'master');
 };
 
+/**
+ * Get the remote configuration from manager
+ * This function get the config from manager mode or cluster mode 
+ */
+export const getMasterRemoteConfiguration = async () => {
+  const nodes = await fetchClusterNodesOptions();
+  const masterNode = getMasterNode(nodes);
+  return await getRemoteConfiguration(masterNode[0].label);      
+}
+
+
+
 export { getConnectionConfig, getRemoteConfiguration };
