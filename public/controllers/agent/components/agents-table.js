@@ -305,7 +305,7 @@ export const AgentsTable = withErrorBoundary(
 
     actionButtonsRender(agent) {
       return (
-        <div className={'icon-box-action'}>
+        <div>
           <EuiToolTip content="Open summary panel for this agent" position="left">
             <EuiButtonIcon
               onClick={(ev) => {
