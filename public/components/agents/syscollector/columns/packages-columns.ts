@@ -32,4 +32,5 @@ export const packagesColumns = {
   linux: linuxColumns,
   apple: MacColumns,
   freebsd: FreebsdColumns,
+  solaris: linuxColumns,
 };
