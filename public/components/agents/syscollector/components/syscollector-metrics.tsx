@@ -28,7 +28,6 @@ export function InventoryMetrics({ agent }) {
       return (result || {}).data || {};
     },
   );
-  console.log('syscollector', syscollector);
   if (
     !syscollector.isLoading &&
     (mapValues.isEmpty(syscollector.data.hardware) ||
