@@ -57,7 +57,7 @@ const integrationsSettings = [
   { field: 'group', label: 'Filter alerts by these rule groupst' },
   {
     field: 'event_location',
-    label: 'Filter alerts by location (agent, IP or file)'
+    label: 'Filter alerts by location (agent, IP address or file)'
   },
   { field: 'alert_format', label: 'Used format to write alerts' }
 ];

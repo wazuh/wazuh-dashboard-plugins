@@ -78,10 +78,10 @@ export async function buildAgentsTable(context, printer: ReportPrinter, agentIDs
         columns: [
           { id: 'id', label: 'ID' },
           { id: 'name', label: 'Name' },
-          { id: 'ip', label: 'IP' },
+          { id: 'ip', label: 'IP address' },
           { id: 'version', label: 'Version' },
           { id: 'manager', label: 'Manager' },
-          { id: 'os', label: 'OS' },
+          { id: 'os', label: 'Operating system' },
           { id: 'dateAdd', label: 'Registration date' },
           { id: 'lastKeepAlive', label: 'Last keep alive' },
         ],
@@ -734,9 +734,9 @@ export async function extendedInformation(
         },
         {
           endpoint: `/syscollector/${agent}/os`,
-          loggerMessage: `Fetching OS information for agent ${agent}`,
+          loggerMessage: `Fetching operating system information for agent ${agent}`,
           list: {
-            title: { text: 'OS information', style: 'h2' },
+            title: { text: 'Operating system information', style: 'h2' },
           },
           mapResponse: (osData) => [
             osData.sysname,

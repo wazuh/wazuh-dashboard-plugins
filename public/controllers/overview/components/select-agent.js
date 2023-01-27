@@ -170,7 +170,7 @@ export const SelectAgent = withErrorBoundary (class SelectAgent extends Componen
       },
       {
         field: 'ip',
-        name: 'IP',
+        name: 'IP address',
         truncateText: true,
         sortable: true
       },

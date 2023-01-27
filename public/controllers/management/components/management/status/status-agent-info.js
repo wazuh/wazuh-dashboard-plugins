@@ -80,7 +80,7 @@ export class WzStatusAgentInfo extends Component {
           <EuiFlexItem style={{...greyStyle}}>{agentStatusLabelByAgentStatus(agentInfo.status)}</EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup>
-          <EuiFlexItem>IP Address</EuiFlexItem>
+          <EuiFlexItem>IP address</EuiFlexItem>
           <EuiFlexItem style={greyStyle}>{agentInfo.ip}</EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup>
