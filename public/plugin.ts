@@ -27,12 +27,11 @@ import { Cookies } from 'react-cookie';
 import { AppState } from './react-services/app-state';
 import { setErrorOrchestrator } from './react-services/common-services';
 import { ErrorOrchestratorService } from './react-services/error-orchestrator/error-orchestrator.service';
-import { getThemeAssetURL, getAssetURL } from './utils/assets';
 import store from './redux/store';
 import { updateAppConfig } from './redux/actions/appConfigActions';
 import { initializeInterceptor, unregisterInterceptor } from './services/request-handler';
+import AppsRegister from './apps';
 
-const SIDEBAR_LOGO = 'customization.logo.sidebar';
 const innerAngularName = 'app/wazuh';
 
 export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlugins, WazuhStartPlugins> {
@@ -42,45 +41,11 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
   private stateUpdater = new BehaviorSubject<AppUpdater>(() => ({}));
   private hideTelemetryBanner?: () => void;
   public async setup(core: CoreSetup, plugins: WazuhSetupPlugins): WazuhSetup {
-    const UI_THEME = core.uiSettings.get('theme:darkMode') ? 'dark' : 'light';
 
-    // Get custom logos configuration to start up the app with the correct logos
-    let logosInitialState = {};
-    try {
-      logosInitialState = await core.http.get(`/api/logos`);
-    }
-    catch (error) {
-      console.error('plugin.ts: Error getting logos configuration', error);
-    }
+    const apps = new AppsRegister(core);
 
-    //Check if user has wazuh disabled and avoid registering the application if not
-    let response = { isWazuhDisabled: 1 };
-    try {
-      response = await core.http.get('/api/check-wazuh');
-    }
-    catch (error) {
-      console.error('plugin.ts: Error checking if Wazuh is enabled', error);
-    }
 
-    // New module app registration
-    core.application.register({
-      id: 'wazuh-metrics',
-      title: 'Metrics',
-      chromeless: false,
-      appRoute: 'app/wazuh-metrics',
-      mount: async (params: AppMountParameters) => {
-        const { renderApp } = await import('./apps/metrics');
-        // @ts-ignore depsStart not used.
-        const [coreStart, depsStart] = await core.getStartServices();
-        return renderApp(coreStart, params);//, config.ui.basicauth.login);
-      },
-      category: {
-        id: 'wazuh',
-        label: 'Wazuh',
-        order: 1,
-        euiIconType: core.http.basePath.prepend(logosInitialState?.logos?.[SIDEBAR_LOGO] ? getAssetURL(logosInitialState?.logos?.[SIDEBAR_LOGO]) : getThemeAssetURL('icon.svg', UI_THEME)),
-      },
-    });
+    apps.registerApps();
 
     if (!response.isWazuhDisabled) {
       core.application.register({

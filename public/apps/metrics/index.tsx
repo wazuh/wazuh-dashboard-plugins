@@ -13,7 +13,7 @@ export function renderApp(
   params: AppMountParameters,
   // config: ClientConfigType
 ) {
-  const deps = { coreStart,params};
+  const deps = { coreStart, params };
   ReactDOM.render(
     <I18nProvider>
       <AppRouter {...deps} />
