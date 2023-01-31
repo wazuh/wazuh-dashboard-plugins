@@ -1,10 +1,11 @@
 <td ng-click="toggleRow()" data-test-subj="docTableExpandToggleColumn" class="kbnDocTableCell__toggleDetails">
   <button
-    class="euiButtonIcon euiButtonIcon--text euiButtonIcon--open euiButtonIcon--auto"
+    class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--xSmall euiButtonEmpty--open euiButtonEmpty--auto"
     aria-expanded="{{!!open}}"
-    aria-label="{{ ::'discover.docTable.tableRow.toggleRowDetailsButtonAriaLabel' | i18n: {defaultMessage: 'Toggle row details'} }}"
-  >
-    <icon ng-if="open" type="'arrowDown'" size="'s'"></icon>
-    <icon ng-if="!open" type="'arrowRight'" size="'s'"></icon>
+    aria-label="{{ ::'discover.docTable.tableRow.toggleRowDetailsButtonAriaLabel' | i18n: {defaultMessage: 'Toggle row details'} }}">
+    <span class="euiButtonContent euiButtonEmpty__content">
+        <icon ng-if="open" type="'arrowDown'" size="'s'"></icon>
+        <icon ng-if="!open" type="'arrowRight'" size="'s'"></icon>
+    </span>
   </button>
 </td>
