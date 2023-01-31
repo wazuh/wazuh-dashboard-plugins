@@ -12,18 +12,3 @@
   width: 14px; /* 1 */
   height: 14px;
 }
-
-.euiButtonIcon.euiButtonIcon--open {
-  box-shadow: none;
-  min-height: 24px;
-  min-width: 24px;
-  line-height: 0;
-  transition: all 250ms ease-in-out 0s;
-  border: none;
-  background-color: transparent;
-
-  &:hover,
-  &:focus {
-    box-shadow: none;
-  }
-}
