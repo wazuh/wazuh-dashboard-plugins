@@ -55,45 +55,7 @@ import { getErrorOrchestrator } from '../../react-services/common-services';
 import { getThemeAssetURL, getAssetURL } from '../../utils/assets';
 import { AgentStatus } from '../agents/agent_status';
 import { i18n } from '@kbn/i18n';
-const overview = i18n.translate('wazuh.public.components.wz.menu.overview', {
-  defaultMessage: 'overview',
-});
-const manager = i18n.translate('wazuh.public.components.wz.menu.manager', {
-  defaultMessage: 'manager',
-});
-const agentsPreview = i18n.translate(
-  'wazuh.public.components.wz.menu.agentsPreview',
-  {
-    defaultMessage: 'agents-preview',
-  },
-);
-const setting = i18n.translate('wazuh.public.components.wz.menu.settings', {
-  defaultMessage: 'settings',
-});
-const wazuhDev = i18n.translate('wazuh.public.components.wz.menu.wazuhDev', {
-  defaultMessage: 'wazuh-dev',
-});
-const healthCheck = i18n.translate(
-  'wazuh.public.components.wz.menu.healthCheck',
-  {
-    defaultMessage: 'health-check',
-  },
-);
-const security = i18n.translate('wazuh.public.components.wz.menu.security', {
-  defaultMessage: 'security',
-});
-const componentDidMount = i18n.translate(
-  'wazuh.public.components.wz.menu.componentDidMount',
-  {
-    defaultMessage: '.componentDidMount',
-  },
-);
-const changePattern = i18n.translate(
-  'wazuh.public.components.wz.menu.changePattern',
-  {
-    defaultMessage: '.changePattern',
-  },
-);
+
 const selectIndexPattern = i18n.translate(
   'wazuh.public.components.wz.menu.selectIndexPattern',
   {
@@ -118,15 +80,7 @@ const selectorAPI = i18n.translate(
     defaultMessage: 'API selector',
   },
 );
-const wazuhRecovered = i18n.translate('wazuh.public.components.wz.menu.', {
-  defaultMessage: 'Wazuh could not be recovered.',
-});
-const wzMenuActive = i18n.translate(
-  'wazuh.public.components.wz.menu.wzMenuActive',
-  {
-    defaultMessage: 'wz-menu-active',
-  },
-);
+
 const open11 = i18n.translate('wazuh.public.components.wz.menu.open', {
   defaultMessage: 'Open',
 });
@@ -145,7 +99,7 @@ const unpinAgent = i18n.translate(
     defaultMessage: 'Unpin agent',
   },
 );
-const showSelector = i18n.translate(
+const showSelectors = i18n.translate(
   'wazuh.public.components.wz.menu.showSelector',
   {
     defaultMessage: 'Show selectors',
@@ -159,14 +113,14 @@ const openSelector = i18n.translate(
 );
 
 const sections = {
-  overview: overview,
-  manager: manager,
-  agentsPreview: agentsPreview,
-  agents: agentsPreview,
-  settings: setting,
-  wazuhDev: wazuhDev,
-  healthCheck: healthCheck,
-  security: security,
+  'overview': 'overview',
+  'manager': 'manager',
+  'agents-preview': 'agents-preview',
+  'agents': 'agents-preview',
+  'settings': 'settings',
+  'wazuh-dev': 'wazuh-dev',
+  'health-check': 'health-check',
+  'security': 'security',
 };
 
 export const WzMenu = withWindowSize(
@@ -216,7 +170,7 @@ export const WzMenu = withWindowSize(
         }
       } catch (error) {
         const options = {
-          context: `${WzMenu.name}${componentDidMount}`,
+          context: `${WzMenu.name}.componentDidMount`,
           level: UI_LOGGER_LEVELS.ERROR,
           severity: UI_ERROR_SEVERITIES.CRITICAL,
           store: true,
@@ -499,7 +453,7 @@ export const WzMenu = withWindowSize(
         }
       } catch (error) {
         const options = {
-          context: `${WzMenu.name}${changePattern}`,
+          context: `${WzMenu.name}.changePattern`,
           level: UI_LOGGER_LEVELS.ERROR,
           severity: UI_ERROR_SEVERITIES.BUSINESS,
           error: {
@@ -570,7 +524,8 @@ export const WzMenu = withWindowSize(
                   </p>
                 </EuiFlexItem>
               )}
-            {this.props.state.wazuhNotReadyYet === { wazuhRecovered } && (
+            {this.props.state.wazuhNotReadyYet ===
+              'Wazuh could not be recovered' && (
               <EuiFlexItem grow={false}>
                 <EuiButtonEmpty
                   grow={false}
@@ -579,7 +534,7 @@ export const WzMenu = withWindowSize(
                 >
                   <span>
                     {i18n.translate('wazuh.components.wz.menu.Reload', {
-                      defaultMessage: ' Reload',
+                      defaultMessage: 'Reload',
                     })}
                   </span>
                 </EuiButtonEmpty>
@@ -600,7 +555,7 @@ export const WzMenu = withWindowSize(
         this.setState(() => {
           return {
             isToolsPopoverOpen: true,
-            currentMenuTab: wazuhDev,
+            currentMenuTab: 'wazuh-dev',
             isOverviewPopoverOpen: false,
             isManagementPopoverOpen: false,
             isSecurityPopoverOpen: false,
@@ -616,7 +571,7 @@ export const WzMenu = withWindowSize(
         this.setState(() => {
           return {
             isSettingsPopoverOpen: true,
-            currentMenuTab: setting,
+            currentMenuTab: 'settings',
             isOverviewPopoverOpen: false,
             isManagementPopoverOpen: false,
             isSecurityPopoverOpen: false,
@@ -632,7 +587,7 @@ export const WzMenu = withWindowSize(
         this.setState(() => {
           return {
             isSecurityPopoverOpen: true,
-            currentMenuTab: security,
+            currentMenuTab: 'security',
             isOverviewPopoverOpen: false,
             isManagementPopoverOpen: false,
             isSettingsPopoverOpen: false,
@@ -648,7 +603,7 @@ export const WzMenu = withWindowSize(
         this.setState(() => {
           return {
             isManagementPopoverOpen: true,
-            currentMenuTab: manager,
+            currentMenuTab: 'manager',
             isOverviewPopoverOpen: false,
             isSettingsPopoverOpen: false,
             isSecurityPopoverOpen: false,
@@ -664,7 +619,7 @@ export const WzMenu = withWindowSize(
         this.setState(state => {
           return {
             isOverviewPopoverOpen: true,
-            currentMenuTab: overview,
+            currentMenuTab: 'overview',
             isManagementPopoverOpen: false,
             isSettingsPopoverOpen: false,
             isSecurityPopoverOpen: false,
@@ -676,27 +631,27 @@ export const WzMenu = withWindowSize(
     }
 
     onClickToolsButton() {
-      this.setMenuItem(wazuhDev);
+      this.setMenuItem('wazuh-dev');
       this.toolsPopoverToggle();
     }
 
     onClickSettingsButton() {
-      this.setMenuItem(setting);
+      this.setMenuItem('settings');
       this.settingsPopoverToggle();
     }
 
     onClickSecurityButton() {
-      this.setMenuItem(security);
+      this.setMenuItem('security');
       this.securityPopoverToggle();
     }
 
     onClickManagementButton() {
-      this.setMenuItem(manager);
+      this.setMenuItem('manager');
       this.managementPopoverToggle();
     }
 
     onClickOverviewButton() {
-      this.setMenuItem(overview);
+      this.setMenuItem('overview');
       this.overviewPopoverToggle();
     }
 
@@ -730,15 +685,15 @@ export const WzMenu = withWindowSize(
       const pluginPlatformMenuBlockedOrOpened =
         document.body.classList.contains('euiBody--collapsibleNavIsDocked') ||
         document.body.classList.contains('euiBody--collapsibleNavIsOpen');
-      if (!this.state.menuOpened && this.state.currentMenuTab === manager) {
+      if (!this.state.menuOpened && this.state.currentMenuTab === "manager") {
         this.managementPopoverToggle();
-      } else if (this.state.currentMenuTab === overview) {
+      } else if (this.state.currentMenuTab === "overview") {
         this.overviewPopoverToggle();
-      } else if (this.state.currentMenuTab === wazuhDev) {
+      } else if (this.state.currentMenuTab === "wazuh-dev") {
         this.toolsPopoverToggle();
-      } else if (this.state.currentMenuTab === setting) {
+      } else if (this.state.currentMenuTab === "settings") {
         this.settingsPopoverToggle();
-      } else if (this.state.currentMenuTab === security) {
+      } else if (this.state.currentMenuTab === "security") {
         this.securityPopoverToggle();
       } else {
         this.closeAllPopover();
@@ -888,7 +843,7 @@ export const WzMenu = withWindowSize(
                   ((this.state.currentMenuTab === 'overview' &&
                     !this.isAnyPopoverOpen()) ||
                   this.state.isOverviewPopoverOpen
-                    ? wzMenuActive
+                    ? 'wz-menu-active'
                     : '')
                 }
                 color='text'
@@ -920,10 +875,10 @@ export const WzMenu = withWindowSize(
                 }}
                 className={
                   'wz-menu-button ' +
-                  ((this.state.currentMenuTab === manager &&
+                  ((this.state.currentMenuTab === "manager" &&
                     !this.isAnyPopoverOpen()) ||
                   this.state.isManagementPopoverOpen
-                    ? wzMenuActive
+                    ? 'wz-menu-active'
                     : '')
                 }
                 color='text'
@@ -951,15 +906,15 @@ export const WzMenu = withWindowSize(
                 data-test-subj='menuAgentsButton'
                 className={
                   'wz-menu-button ' +
-                  (this.state.currentMenuTab === agentsPreview &&
+                  (this.state.currentMenuTab === "agents-preview" &&
                   !this.isAnyPopoverOpen()
-                    ? wzMenuActive
+                    ? 'wz-menu-active'
                     : '')
                 }
                 color='text'
                 href='#/agents-preview'
                 onClick={() => {
-                  this.setMenuItem(agentsPreview);
+                  this.setMenuItem('agents-preview');
                   this.setState({ menuOpened: false });
                 }}
               >
@@ -978,10 +933,10 @@ export const WzMenu = withWindowSize(
                 data-test-subj='menuToolsButton'
                 className={
                   'wz-menu-button ' +
-                  ((this.state.currentMenuTab === wazuhDev &&
+                  ((this.state.currentMenuTab === "wazuh-dev" &&
                     !this.isAnyPopoverOpen()) ||
                   this.state.isToolsPopoverOpen
-                    ? wzMenuActive
+                    ? 'wz-menu-active'
                     : '')
                 }
                 color='text'
@@ -1007,14 +962,14 @@ export const WzMenu = withWindowSize(
                 data-test-subj='menuSecurityButton'
                 className={
                   'wz-menu-button ' +
-                  ((this.state.currentMenuTab === security &&
+                  ((this.state.currentMenuTab === "security" &&
                     !this.isAnyPopoverOpen()) ||
                   this.state.isSecurityPopoverOpen
-                    ? wzMenuActive
+                    ? 'wz-menu-active'
                     : '')
                 }
                 color='text'
-                aria-label={security}
+                aria-label="Security"
                 onClick={this.onClickSecurityButton.bind(this)}
               >
                 <EuiIcon type='securityApp' color='primary' size='m' />
@@ -1035,10 +990,10 @@ export const WzMenu = withWindowSize(
                 data-test-subj='menuSettingsButton'
                 className={
                   'wz-menu-button ' +
-                  ((this.state.currentMenuTab === setting &&
+                  ((this.state.currentMenuTab === "settings" &&
                     !this.isAnyPopoverOpen()) ||
                   this.state.isSettingsPopoverOpen
-                    ? wzMenuActive
+                    ? 'wz-menu-active'
                     : '')
                 }
                 color='text'
@@ -1215,7 +1170,7 @@ export const WzMenu = withWindowSize(
       );
 
       const openSelectorsButton = (
-        <EuiToolTip position='bottom' content={showSelector}>
+        <EuiToolTip position='bottom' content={showSelectors}>
           <EuiButtonEmpty
             iconType='boxesVertical'
             iconSide='right'
