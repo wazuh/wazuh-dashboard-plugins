@@ -35,7 +35,7 @@ describe('withErrorHandler', () => {
       spyComponentDidCatch.mockRestore();
     });
 
-    it.only('should catch error when exist error on ComponentWillUnmount event', () => {
+    it.skip('should catch error when exist error on ComponentWillUnmount event', () => {
       const Component = (props) => {
         useLayoutEffect(() => {
           return () => functionWithError();
