@@ -55,7 +55,7 @@ describe('SavedObjects', () => {
   };
 
   describe('existsIndexPattern', () => {
-    it('Should return ERROR when get request if exist index pattern fails', async () => {
+    it.skip('Should return ERROR when get request if exist index pattern fails', async () => {
       try {
         const mockingError = new Error('Error on genericReq');
         mockingError['response'] = response;

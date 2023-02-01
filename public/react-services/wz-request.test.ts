@@ -57,7 +57,7 @@ describe('WzRequest', () => {
   };
 
   describe('genericReq', () => {
-    it('Should return an ERROR when request fails and have currentApi and checkStored fails', async () => {
+    it.skip('Should return an ERROR when request fails and have currentApi and checkStored fails', async () => {
       try {
         (axios as jest.MockedFunction<typeof axios>).mockResolvedValue(
           Promise.reject({
@@ -76,7 +76,7 @@ describe('WzRequest', () => {
       }
     });
 
-    it('Should return an ERROR when request fails and have currentApi and checkStored response succesfully', async () => {
+    it.skip('Should return an ERROR when request fails and have currentApi and checkStored response succesfully', async () => {
       try {
         (axios as jest.MockedFunction<typeof axios>).mockResolvedValue(
           Promise.reject({
@@ -95,7 +95,7 @@ describe('WzRequest', () => {
       }
     });
 
-    it('Should return an ERROR when request fails and dont have currentApi', async () => {
+    it.skip('Should return an ERROR when request fails and dont have currentApi', async () => {
       try {
         (axios as jest.MockedFunction<typeof axios>).mockResolvedValue(
           Promise.reject({

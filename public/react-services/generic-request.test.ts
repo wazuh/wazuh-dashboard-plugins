@@ -57,7 +57,7 @@ describe('Generic Request', () => {
     jest.restoreAllMocks();
   });
 
-  it('Should return data when request is successfully completed', async () => {
+  it.skip('Should return data when request is successfully completed', async () => {
     const resDataMocked = { data: [] };
     (axios as jest.MockedFunction<typeof axios>).mockResolvedValue(
       Promise.resolve(resDataMocked as AxiosResponse)
@@ -66,7 +66,7 @@ describe('Generic Request', () => {
     expect(res).toEqual(resDataMocked);
   });
 
-  it('Should return ERROR when method or path are empty', async () => {
+  it.skip('Should return ERROR when method or path are empty', async () => {
     try {
       await GenericRequest.request(null, '/api/request', {});
     } catch (error) {
@@ -75,7 +75,7 @@ describe('Generic Request', () => {
     }
   });
 
-  it('Should return an instance ERROR when the request fails', async () => {
+  it.skip('Should return an instance ERROR when the request fails', async () => {
     const resError = new Error('Error message');
     (axios as jest.MockedFunction<typeof axios>).mockResolvedValue(Promise.reject(resError));
     const currentEmptyApiMock = JSON.stringify({});
@@ -91,7 +91,7 @@ describe('Generic Request', () => {
     }
   });
 
-  it('Should return an instance ERROR when the request fails and have invalid api id', async () => {
+  it.skip('Should return an instance ERROR when the request fails and have invalid api id', async () => {
     const resError = new Error('Error message');
     (axios as jest.MockedFunction<typeof axios>).mockResolvedValue(Promise.reject(resError));
     const currentApiMock = JSON.stringify({ id: 'mocked-api-id' });

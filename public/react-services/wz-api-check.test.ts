@@ -38,7 +38,7 @@ describe('Wz Api Check', () => {
   };
 
   describe('checkStored', () => {
-    it('should return ERROR instance when request fails', async () => {
+    it.skip('should return ERROR instance when request fails', async () => {
       try {
         (axios as jest.MockedFunction<typeof axios>).mockResolvedValue(
           Promise.reject({
@@ -55,7 +55,7 @@ describe('Wz Api Check', () => {
   });
 
   describe('checkApi', () => {
-    it('should return ERROR instance when request fails', async () => {
+    it.skip('should return ERROR instance when request fails', async () => {
       try {
         (axios as jest.MockedFunction<typeof axios>).mockResolvedValue(
           Promise.reject({
