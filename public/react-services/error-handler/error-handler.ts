@@ -30,7 +30,7 @@ export default class ErrorHandler {
    *
    * @param error
    */
-  static handleError(error) {
+  static handleError(error: Error | string) {
     // define error type
     const errorParsed = this.returnError(error);
     // send error to error orchestrator
@@ -42,7 +42,7 @@ export default class ErrorHandler {
    * @param error
    * @returns
    */
-  static returnError(error) {
+  static returnError(error: Error | string){
     const errorType = this.getErrorType(error);
     if (errorType) return ErrorFactory.createError(error, errorType);
     return error;
@@ -90,7 +90,7 @@ export default class ErrorHandler {
    * @param error
    * @returns
    */
-  static isWazuhApiError(error): boolean {
+  static isWazuhApiError(error: any): boolean {
     if (
       error.response?.data?.error &&
       error.response?.data?.statusCode &&
