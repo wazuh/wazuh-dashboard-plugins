@@ -23,11 +23,13 @@ export class ErrorFactory {
    * Create an new error instance receiving an error instance or a string
    * Paste error stack in new error
    * @param error
+   * @param ErrorType
+   * @param message
    * @returns Error instance
    */
-  public static createError(error: Error | string | unknown, errorType, message?: string): Error {
+  public static createError(error: Error | string | unknown, ErrorType: any, message?: string): Error {
     const errorMessage = message || ErrorHandler.extractMessage(error);
-    return ErrorFactory.errorCreator(errorType, errorMessage);
+    return ErrorFactory.errorCreator(ErrorType, errorMessage);
   }
 
   /**

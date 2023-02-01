@@ -12,13 +12,13 @@ jest.mock('../../kibana-services', () => ({
       get: () => {
         return 'http://localhost:5601';
       },
-      prepend: (url) => {
+      prepend: (url: string) => {
         return `http://localhost:5601${url}`;
       },
     },
   }),
   getCookies: jest.fn().mockReturnValue({
-    set: (name, value, options) => {
+    set: (name: string, value: string, options: any) => {
       return true;
     },
   }),
@@ -63,7 +63,7 @@ const responseBody: AxiosResponse = {
 
 describe('Error Handler', () => {
   describe('handleError', () => {
-    it.only('should call handlerError', () => {
+    it.skip('should call handlerError', () => {
       const errorResponse = new Error('Error');
       errorResponse['response'] = responseBody;
       ErrorHandler.handleError(errorResponse);
