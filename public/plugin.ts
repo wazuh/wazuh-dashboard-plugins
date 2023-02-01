@@ -30,8 +30,11 @@ import { ErrorOrchestratorService } from './react-services/error-orchestrator/er
 import store from './redux/store';
 import { updateAppConfig } from './redux/actions/appConfigActions';
 import { initializeInterceptor, unregisterInterceptor } from './services/request-handler';
-import AppsRegister from './apps';
+import AppsRegister from './apps/apps-handler';
+import appMetrics from './apps/metrics';
+import appWazuh from './apps/wazuh-app';
 
+const SIDEBAR_LOGO = 'customization.logo.sidebar';
 const innerAngularName = 'app/wazuh';
 
 export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlugins, WazuhStartPlugins> {
@@ -40,77 +43,86 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
   private innerAngularInitialized: boolean = false;
   private stateUpdater = new BehaviorSubject<AppUpdater>(() => ({}));
   private hideTelemetryBanner?: () => void;
+
   public async setup(core: CoreSetup, plugins: WazuhSetupPlugins): WazuhSetup {
 
-    const apps = new AppsRegister(core);
+    const appsRegister = new AppsRegister(core);
+    await appsRegister.initLogos();
+    await appsRegister.setIsWazuhDisabled();
 
+    const apps = [
+      appMetrics(),
+      appWazuh({
+        initializeInnerAngular: this.initializeInnerAngular,
+        stateUpdater: this.stateUpdater,
+      })
+    ];
+    appsRegister.registerApps({
+      apps,
+      hideTelemetryBanner: this.hideTelemetryBanner
+    });
+    // core.application.register({
+    //   id: `wazuh`,
+    //   title: 'Wazuh',
+    //   icon: core.http.basePath.prepend(
+    //     logosInitialState?.logos?.[SIDEBAR_LOGO] ?
+    //       getAssetURL(logosInitialState?.logos?.[SIDEBAR_LOGO]) :
+    //       getThemeAssetURL('icon.svg', UI_THEME)),
+    //   mount: async (params: AppMountParameters) => {
+    //     try {
+    //       initializeInterceptor(core);
+    //       if (!this.initializeInnerAngular) {
+    //         throw Error('Wazuh plugin method initializeInnerAngular is undefined');
+    //       }
 
-    apps.registerApps();
-
-    if (!response.isWazuhDisabled) {
-      core.application.register({
-        id: `wazuh`,
-        title: 'Wazuh',
-        icon: core.http.basePath.prepend(
-          logosInitialState?.logos?.[SIDEBAR_LOGO] ?
-            getAssetURL(logosInitialState?.logos?.[SIDEBAR_LOGO]) :
-            getThemeAssetURL('icon.svg', UI_THEME)),
-        mount: async (params: AppMountParameters) => {
-          try {
-            initializeInterceptor(core);
-            if (!this.initializeInnerAngular) {
-              throw Error('Wazuh plugin method initializeInnerAngular is undefined');
-            }
-
-            // Update redux app state logos with the custom logos
-            if (logosInitialState?.logos) {
-              store.dispatch(updateAppConfig(logosInitialState.logos));
-            }
-            // hide the telemetry banner.
-            // Set the flag in the telemetry saved object as the notice was seen and dismissed
-            this.hideTelemetryBanner && await this.hideTelemetryBanner();
-            setScopedHistory(params.history);
-            // Load application bundle
-            const { renderApp } = await import('./application');
-            // Get start services as specified in kibana.json
-            const [coreStart, depsStart] = await core.getStartServices();
-            setErrorOrchestrator(ErrorOrchestratorService);
-            setHttp(core.http);
-            setCookies(new Cookies());
-            if (!AppState.checkCookies() || params.history.parentHistory.action === 'PUSH') {
-              window.location.reload();
-            }
-            await this.initializeInnerAngular();
-            params.element.classList.add('dscAppWrapper', 'wz-app');
-            const unmount = await renderApp(innerAngularName, params.element);
-            this.stateUpdater.next(() => {
-              return {
-                status: response.isWazuhDisabled,
-                category: {
-                  id: 'wazuh',
-                  label: 'Wazuh',
-                  order: 0,
-                  euiIconType: core.http.basePath.prepend(logosInitialState?.logos?.[SIDEBAR_LOGO] ? getAssetURL(logosInitialState?.logos?.[SIDEBAR_LOGO]) : getThemeAssetURL('icon.svg', UI_THEME)),
-                }
-              }
-            })
-            return () => {
-              unmount();
-              unregisterInterceptor();
-            };
-          } catch (error) {
-            console.debug(error);
-          }
-        },
-        category: {
-          id: 'wazuh',
-          label: 'Wazuh',
-          order: 0,
-          euiIconType: core.http.basePath.prepend(logosInitialState?.logos?.[SIDEBAR_LOGO] ? getAssetURL(logosInitialState?.logos?.[SIDEBAR_LOGO]) : getThemeAssetURL('icon.svg', UI_THEME)),
-        },
-        updater$: this.stateUpdater
-      });
-    }
+    //       // Update redux app state logos with the custom logos
+    //       if (logosInitialState?.logos) {
+    //         store.dispatch(updateAppConfig(logosInitialState.logos));
+    //       }
+    //       // hide the telemetry banner.
+    //       // Set the flag in the telemetry saved object as the notice was seen and dismissed
+    //       this.hideTelemetryBanner && await this.hideTelemetryBanner();
+    //       setScopedHistory(params.history);
+    //       // Load application bundle
+    //       const { renderApp } = await import('./application');
+    //       // Get start services as specified in kibana.json
+    //       const [coreStart, depsStart] = await core.getStartServices();
+    //       setErrorOrchestrator(ErrorOrchestratorService);
+    //       setHttp(core.http);
+    //       setCookies(new Cookies());
+    //       if (!AppState.checkCookies() || params.history.parentHistory.action === 'PUSH') {
+    //         window.location.reload();
+    //       }
+    //       await this.initializeInnerAngular();
+    //       params.element.classList.add('dscAppWrapper', 'wz-app');
+    //       const unmount = await renderApp(innerAngularName, params.element);
+    //       this.stateUpdater.next(() => {
+    //         return {
+    //           status: 0,
+    //           category: {
+    //             id: 'wazuh',
+    //             label: 'Wazuh',
+    //             order: 0,
+    //             euiIconType: core.http.basePath.prepend(logosInitialState?.logos?.[SIDEBAR_LOGO] ? getAssetURL(logosInitialState?.logos?.[SIDEBAR_LOGO]) : getThemeAssetURL('icon.svg', UI_THEME)),
+    //           }
+    //         }
+    //       })
+    //       return () => {
+    //         unmount();
+    //         unregisterInterceptor();
+    //       };
+    //     } catch (error) {
+    //       console.debug(error);
+    //     }
+    //   },
+    //   category: {
+    //     id: 'wazuh',
+    //     label: 'Wazuh',
+    //     order: 0,
+    //     euiIconType: core.http.basePath.prepend(logosInitialState?.logos?.[SIDEBAR_LOGO] ? getAssetURL(logosInitialState?.logos?.[SIDEBAR_LOGO]) : getThemeAssetURL('icon.svg', UI_THEME)),
+    //   },
+    //   updater$: this.stateUpdater
+    // });
     return {};
   }
   public start(core: CoreStart, plugins: AppPluginStartDependencies): WazuhStart {

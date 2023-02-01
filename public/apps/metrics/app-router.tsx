@@ -91,7 +91,7 @@ export function AppRouter(props: AppDependencies) {
   const setGlobalBreadcrumbs = flow(getBreadcrumbs, props.coreStart.chrome.setBreadcrumbs);
 
   return (
-    <Router basename={props.params.appBasePath}>
+    <Router>
       <EuiPage>
         {allNavPanelUrls.map((route) => (
           // Create different routes to update the 'selected' nav item .
