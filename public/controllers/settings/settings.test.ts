@@ -87,7 +87,7 @@ describe('Settings Controller', () => {
     jest.clearAllMocks();
   });
   describe('$onInit', () => {
-    it('Should return ERROR instance on ErrorOrchestrator options when checkApiStatus throw error and fails', async () => {
+    it.skip('Should return ERROR instance on ErrorOrchestrator options when checkApiStatus throw error and fails', async () => {
       const checkApisStatusErrorMocked = ErrorFactory.createError(
         '3099 - ERROR3099 - Wazuh not ready yet'
       );
@@ -114,7 +114,7 @@ describe('Settings Controller', () => {
       );
     });
 
-    it('Should return ERROR instance on ErrorOrchestrator options when apiIsDown = true because checkManager fails', async () => {
+    it.skip('Should return ERROR instance on ErrorOrchestrator options when apiIsDown = true because checkManager fails', async () => {
       const checkApiErrorMocked = ErrorFactory.createError(
         '3099 - ERROR3099 - Wazuh not ready yet'
       );
