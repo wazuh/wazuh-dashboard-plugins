@@ -6,6 +6,6 @@ export default () => ({
     // @ts-ignore depsStart not used.
     const { renderApp } = await import('./app-main');
     const [coreStart, depsStart] = await core.getStartServices();
-    return renderApp(coreStart, params);//, config.ui.basicauth.login);
+    return renderApp(coreStart, params);
   }
 });

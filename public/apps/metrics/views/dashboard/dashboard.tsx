@@ -64,7 +64,7 @@ export function DashboardPage(props: DashboardDeps) {
       </EuiText>
       <TopNavMenu
         onFiltersUpdated={() => {setDashboardConfig()}}
-        onQueryChange={() => {setDashboardConfig()}}//http://localhost:5601/app/wazuh-metrics#/app/wazuh-metrics/getstarted
+        onQueryChange={() => {setDashboardConfig()}}
         appName={'metrics'}
         showSearchBar={true}
         useDefaultBehaviors={true}

@@ -24,11 +24,9 @@ import {
 } from '../kibana-services';
 import { getThemeAssetURL, getAssetURL } from '../utils/assets';
 import { initializeInterceptor, unregisterInterceptor } from '../services/request-handler';
-import { AppState } from '../react-services/app-state';
+
 import { setErrorOrchestrator } from '../react-services/common-services';
 import { ErrorOrchestratorService } from '../react-services/error-orchestrator/error-orchestrator.service';
-import store from '../redux/store';
-import { updateAppConfig } from '../redux/actions/appConfigActions';
 
 export default class AppsHandler {
   constructor() { }
@@ -43,14 +41,26 @@ export default class AppsHandler {
   private _hideTelemetryBanner?: () => void;
   private _innerAngularName = 'app/wazuh';
 
-  public async setSetupCore(core) {
+  /**
+   * Sets the setup core object to be used in the app setup process.
+   * @param core
+   */
+  public async setSetupCore(core: CoreSetup) {
     this._core = core;
   }
 
+  /**
+   * Sets the UI theme to be used in the application.
+   */
   public initUITheme() {
     this._UI_THEME = this._core.uiSettings.get('theme:darkMode') ? 'dark' : 'light';
   }
 
+  /**
+   * Check if Wazuh is disabled by making a request to the backend.
+   * If it is disabled, the application will not be registered.
+   * Checks if the logged in user has the RBAC disable role.
+   */
   public async setIsWazuhDisabled() {
     //Check if user has wazuh disabled and avoid registering the application if not
     try {
@@ -63,6 +73,9 @@ export default class AppsHandler {
     }
   }
 
+  /**
+   * Get the custom logos configuration from the backend.
+   */
   public async initLogos() {
     try {
       this._logosInitialState = await this._core.http.get(`/api/logos`);
@@ -72,11 +85,18 @@ export default class AppsHandler {
     }
   }
 
+  /**
+   *
+   * @returns the main logo to be used in the app
+   */
   public getMainLogo(): string {
     return this._core.http.basePath.prepend(this._logosInitialState?.logos?.[this._SIDEBAR_LOGO] ? getAssetURL(this._logosInitialState?.logos?.[this._SIDEBAR_LOGO]) : getThemeAssetURL('icon.svg', this._UI_THEME))
   }
 
-
+  /**
+   * Method to be executed in the setup lifecycle of the plugin. It registers the apps of the plugin.
+   * @param apps array of apps configuration to be registered
+   */
   public registerApps(apps: []) {
     if (!this._isWazuhDisabled) {
       apps.forEach((app: Object, key: number) => {
@@ -85,10 +105,6 @@ export default class AppsHandler {
           ...app,
           icon: this.getMainLogo(),
           mount: async (params) => {
-            // Update redux app state logos with the custom logos
-            // if (logosInitialState?.logos) {
-            //   store.dispatch(updateAppConfig(logosInitialState.logos));
-            // }
 
             // hide the telemetry banner.
             // Set the flag in the telemetry saved object as the notice was seen and dismissed
@@ -101,6 +117,8 @@ export default class AppsHandler {
             const unmount = await app.mount({
               core: this._core,
               params,
+              euiIconType: this.getMainLogo(),
+              logos: this._logosInitialState?.logos,
               initializeInnerAngular: () => this._initializeInnerAngular(),
               // stateUpdater: this._stateUpdater,
             });
@@ -119,11 +137,20 @@ export default class AppsHandler {
       });
     }
   }
-  public startApps(core: CoreStart, plugins: AppPluginStartDependencies, initializerContext:PluginInitializerContext) {
+
+  /**
+   * Method to be executed in the start lifecycle of the plugin
+   * @param core
+   * @param plugins
+   * @param initializerContext
+   */
+  public startApps(core: CoreStart, plugins: AppPluginStartDependencies, initializerContext: PluginInitializerContext) {
+
     // hide security alert
     if (plugins.securityOss) {
       plugins.securityOss.insecureCluster.hideAlert(true);
     };
+
     if (plugins?.telemetry?.telemetryNotifications?.setOptedInNoticeSeen) {
       // assign to a method to hide the telemetry banner used when the app is mounted
       this._hideTelemetryBanner = () => plugins.telemetry.telemetryNotifications.setOptedInNoticeSeen();

@@ -8,6 +8,8 @@ import {
   setScopedHistory,
   setCookies,
 } from '../../kibana-services';
+import store from '../../redux/store';
+import { updateAppConfig } from '../../redux/actions/appConfigActions';
 
 export default function wazuhAppRegisterConfig(stateUpdater) {
   const innerAngularName = 'app/wazuh';
@@ -15,16 +17,16 @@ export default function wazuhAppRegisterConfig(stateUpdater) {
   return {
     id: `wazuh`,
     title: 'Wazuh',
-    mount: async ({ core, params, initializeInnerAngular }) => {
+    mount: async ({ core, params, initializeInnerAngular, logos, euiIconType }) => {
       try {
         if (!initializeInnerAngular) {
           throw Error('Wazuh plugin method initializeInnerAngular is undefined');
         }
 
         // Update redux app state logos with the custom logos
-        // if (logosInitialState?.logos) {
-        //   store.dispatch(updateAppConfig(logosInitialState.logos));
-        // }
+        if (logos) {
+          store.dispatch(updateAppConfig(logos));
+        }
 
 
         setScopedHistory(params.history);
@@ -48,7 +50,7 @@ export default function wazuhAppRegisterConfig(stateUpdater) {
               id: 'wazuh',
               label: 'Wazuh',
               order: 0,
-              // euiIconType: core.http.basePath.prepend(logosInitialState?.logos?.[SIDEBAR_LOGO] ? getAssetURL(logosInitialState?.logos?.[SIDEBAR_LOGO]) : getThemeAssetURL('icon.svg', UI_THEME)),
+              euiIconType,
             }
           }
         })
