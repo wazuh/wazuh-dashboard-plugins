@@ -2,19 +2,20 @@ import { AppMountParameters } from 'opensearch_dashboards/public';
 import { setErrorOrchestrator } from '../../react-services/common-services';
 import { AppState } from '../../react-services/app-state';
 import { ErrorOrchestratorService } from '../../react-services/error-orchestrator/error-orchestrator.service';
+import { Cookies } from 'react-cookie';
 import {
   setHttp,
   setScopedHistory,
   setCookies,
 } from '../../kibana-services';
 
-export default function wazuhAppRegisterConfig({ initializeInnerAngular, stateUpdater }) {
+export default function wazuhAppRegisterConfig(stateUpdater) {
   const innerAngularName = 'app/wazuh';
 
   return {
     id: `wazuh`,
     title: 'Wazuh',
-    mount: async (params: AppMountParameters) => {
+    mount: async ({ core, params, initializeInnerAngular }) => {
       try {
         if (!initializeInnerAngular) {
           throw Error('Wazuh plugin method initializeInnerAngular is undefined');
