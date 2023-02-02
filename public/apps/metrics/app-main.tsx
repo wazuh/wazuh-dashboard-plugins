@@ -9,9 +9,7 @@ import { AppRouter } from './app-router';
 
 export function renderApp(
   coreStart: CoreStart,
-  // navigation: AppPluginStartDependencies,
   params: AppMountParameters,
-  // config: ClientConfigType
 ) {
   const deps = { coreStart, params };
   ReactDOM.render(
