@@ -4,6 +4,7 @@ import ErrorHandler from './error-handler';
 import { ErrorOrchestratorService } from '../error-orchestrator/error-orchestrator.service';
 
 import { ApiResponse, errors } from '@elastic/elasticsearch';
+import { ElasticApiError, ElasticError, WazuhApiError, WazuhReportingError } from './errors';
 // mocked some required kibana-services
 jest.mock('../../kibana-services', () => ({
   ...(jest.requireActual('../../kibana-services') as object),
@@ -39,36 +40,26 @@ const responseBody: AxiosResponse = {
   request: {},
 };
 
-/**
- * Error codes: code
- * wazuh-api-elastic 20XX
- * wazuh-api         30XX
- * wazuh-elastic     40XX
- * wazuh-reporting   50XX
- * unknown           1000
- */
-
-// statusCode = http status code
-// 200 = OK
-// 201 = Created
-// 202 = Accepted
-// 204 = No Content
-// 400 = Bad Request
-// 401 = unauthorized
-// 403 = forbidden
-// 404 = not found
-// 405 = method not allowed
-// 500 = internal server error
-// 501 = not implemented
-
 describe('Error Handler', () => {
   describe('handleError', () => {
-    it.skip('should call handlerError', () => {
+    it('should call errorOrchestrator handlerError with the corresponing definition', () => {
       const errorResponse = new Error('Error');
       errorResponse['response'] = responseBody;
+      const errorReturned = ErrorHandler.returnError(errorResponse);
       ErrorHandler.handleError(errorResponse);
       const spyErrorOrch = jest.spyOn(ErrorOrchestratorService, 'handleError');
-      expect(spyErrorOrch).toHaveBeenCalledWith({});
+      expect(spyErrorOrch).toHaveBeenCalledWith({
+        context: '',
+        level: 'ERROR',
+        severity: 'CRITICAL',
+        display: true,
+        error: {
+          error: errorReturned,
+          message: '3099 - ERROR3099 - Wazuh not ready yet',
+          title: 'WazuhApiError',
+        },
+        store: true,
+      });
     });
   });
 
@@ -104,6 +95,53 @@ describe('Error Handler', () => {
       expect(error.stack).toBeDefined();
     });
 
+  });
+
+  describe('getErrorType', () => {
+    it('should return an Error class if receives an string', () => {
+      const error = ErrorHandler.getErrorType('test');
+      const errorType = new error('test')
+      expect(errorType).toBeInstanceOf(Error);
+      expect(errorType.name).toEqual('Error');
+      expect(errorType.message).toEqual('test');
+    })
+
+    it('should return an ElasticApiError class if receives error with code >= 2000', () => {
+      const errorElastic = new Error('Error');
+      errorElastic['code'] = 2000;
+      const error = ErrorHandler.getErrorType(errorElastic);
+      const errorType = new error('test')
+      expect(errorType).toBeInstanceOf(ElasticApiError);
+      expect(errorType.name).toEqual('ElasticApiError');
+    })
+
+    it('should return an WazuhApiError class if receives error with code >= 3000', () => {
+      const wazuhApiError = new Error('Error');
+      wazuhApiError['code'] = 3000;
+      const error = ErrorHandler.getErrorType(wazuhApiError);
+      const errorType = new error('test')
+      expect(errorType).toBeInstanceOf(WazuhApiError);
+      expect(errorType.name).toEqual('WazuhApiError');
+    })
+
+    it('should return an ElasticError class if receives error with code >= 4000', () => {
+      const elasticError = new Error('Error');
+      elasticError['code'] = 4000;
+      const error = ErrorHandler.getErrorType(elasticError);
+      const errorType = new error('test')
+      expect(errorType).toBeInstanceOf(ElasticError);
+      expect(errorType.name).toEqual('ElasticError');
+    })
+
+    it('should return an WazuhReportingError class if receives error with code >= 5000', () => {
+      const wazuhReporting = new Error('Error');
+      wazuhReporting['code'] = 5000;
+      const error = ErrorHandler.getErrorType(wazuhReporting);
+      const errorType = new error('test')
+      expect(errorType).toBeInstanceOf(WazuhReportingError);
+      expect(errorType.name).toEqual('WazuhReportingError');
+    })
+    
     /*
     it.only('should return error', async () => {
       const throwError = () => {
@@ -121,5 +159,5 @@ describe('Error Handler', () => {
       }
     });
     */
-  });
+  })
 });
