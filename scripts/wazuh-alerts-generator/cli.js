@@ -41,7 +41,7 @@
 			}
 		},
 		"bulk-api": {
-			description: "Format the alerts to OpenSearch or Elasticsearch bulk API.",
+			description: "Format the alerts to OpenSearch or Elasticsearch Bulk API.",
 			run: (createAlerts, configuration) => {
 				if (!configuration.index) {
 					console.error("Index is not defined.")
@@ -125,8 +125,8 @@ Options:
   --category-module-<category-module-id>              Enable the alerts generation of this category module.
 	  <category-module-id> is one of: ${Object.keys(categoryAlertModules).sort().join(', ')}. You can add multiple flags to enable more categories.
   --size <size>                                       Set the size of alerts to generate for each module. Default: ${defaultConfiguration.size}.
-	--display-configuration                             Display the configuration. Log to sterr.
-	--examples                                          Display examples of usage.
+  --display-configuration                             Display the configuration. Log to sterr.
+  --examples                                          Display examples of usage.
   --help                                              Display the help.
   --index <index>                                     Define the index used for some outputs (bulk-api).
   --format <format>                                   Set the format. Default: ${defaultConfiguration.format}.
@@ -145,16 +145,16 @@ ${Object.keys(outputs).sort().map(outputID => `      ${outputID}: ${outputs[outp
 
 	function displayExamples() {
 		console.log(`
-- Generate alerts for all the modules in ndjson format and save to a output.json file
+- Generate alerts for all the modules in ndjson format and save to a output.ndjson file
 node ${cliFilePath} --all-modules > output.ndjson
 
-- Generate alerts for all the modules in OpenSearch/Elasticsearch bulk API format to a wazuh-alerts index and save to a output.json file
+- Generate alerts for all the modules in OpenSearch/Elasticsearch Bulk API format to a wazuh-alerts index and save to a output.ndjson file
 node ${cliFilePath} --all-modules --format bulk-api --index wazuh-alerts > output.ndjson
 
-- Generate alerts for AWS module and save to output.json file
+- Generate alerts for AWS module and save to output.ndjson file
 node ${cliFilePath} --module-aws > output.ndjson
 
-- Generate alerts for AWS and GitHub modules, set the size of alerts for module and save to output.json file
+- Generate alerts for AWS and GitHub modules, set the size of alerts for module and save to output.ndjson file
 node ${cliFilePath} --module-aws --module-github --size 5000 > output.ndjson
 `)
 	}
