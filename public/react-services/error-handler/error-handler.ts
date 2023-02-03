@@ -1,5 +1,10 @@
 import { ErrorFactory } from '../error-factory';
-import { WazuhApiError, ElasticApiError, ElasticError, WazuhReportingError } from './errors';
+import {
+  WazuhApiError,
+  ElasticApiError,
+  ElasticError,
+  WazuhReportingError,
+} from './errors';
 import { UIErrorLog } from '../error-orchestrator/types';
 import { ErrorOrchestratorService } from '../error-orchestrator/error-orchestrator.service';
 
@@ -25,81 +30,87 @@ import { ErrorOrchestratorService } from '../error-orchestrator/error-orchestrat
 // 500 = internal server error
 // 501 = not implemented
 
+interface iErrorType {}
+
 export default class ErrorHandler {
   /**
-   *
+   * Receives an error and create a new error instance then treat the error
    * @param error
    */
   static handleError(error: Error | string) {
-    // define error type
     const errorParsed = this.returnError(error);
-    // send error to error orchestrator
     this.showError(errorParsed);
   }
 
   /**
+   * Receives an error and create a new error instance depending on the error type defined or not
    *
    * @param error
    * @returns
    */
-  static returnError(error: Error | string){
+  static returnError(error: Error | string) {
     const errorType = this.getErrorType(error);
     if (errorType) return ErrorFactory.createError(error, errorType);
     return error;
   }
 
   /**
+   * Reveives an error and return a new error instance depending on the error type
    *
    * @param error
    * @returns
    */
-  private static getErrorType(error: Error | string): typeof WazuhApiError | null {
-    // if have error code
-    // if not have error code but have status code
+  private static getErrorType(
+    error: Error | string,
+  ) {
     if (this.isString(error)) return Error;
-    if (this.isWazuhApiError(error)) return WazuhApiError;
-    return null;
+    if(error?.code){
+      return this.getErrorTypeByErrorCode(error?.code);
+    }
+    return error;
   }
 
   /**
+   * Depending on the error code, return the error type
    *
    * @param errorCode
    * @returns
    */
   private static getErrorTypeByErrorCode(errorCode: number) {
     switch (true) {
-      case errorCode >= 2000:
+      case errorCode >= 2000 && errorCode < 3000:
         return ElasticApiError;
-      case errorCode >= 3000:
+      case errorCode >= 3000 && errorCode < 4000:
         return WazuhApiError;
-      case errorCode >= 4000:
+      case errorCode >= 4000 && errorCode < 5000:
         return ElasticError;
-      case errorCode >= 5000:
+      case errorCode >= 5000  && errorCode < 6000:
         return WazuhReportingError;
       default:
         return Error;
     }
   }
 
+  /**
+   * Check if the parameter received is a string
+   * @param error
+   */
   static isString(error: Error | string): boolean {
     return typeof error === 'string';
   }
 
   /**
-   *
+   * Check if the error received is a WazuhApiError
    * @param error
    * @returns
    */
   static isWazuhApiError(error: any): boolean {
-    if (
-      error.response?.data?.error &&
+    // put the correct type -- not any type
+    return error.response?.data?.error &&
       error.response?.data?.statusCode &&
       error.response?.data?.message
-    ) {
-      return true;
-    }
-
-    return false;
+      ? true
+      : false;
   }
 
   /**
@@ -122,15 +133,15 @@ export default class ErrorHandler {
 
     if (error.name === 'WazuhApiError') {
       // we can define severity, display, and some options by status error code
-      console.log('is WazuhApiError');
+      //console.log('is WazuhApiError');
     }
 
     if (error.name === 'TypeError') {
-      console.log('is TypeError');
+      //console.log('is TypeError');
     }
 
     if (error.name === 'Error') {
-      console.log('is Error');
+      //console.log('is Error');
     }
 
     ErrorOrchestratorService.handleError(errorOrchestratorOptions);
