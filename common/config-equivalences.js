@@ -4,134 +4,95 @@ const descp1 = i18n.translate('wazuh.common.config.equivalence.descp1', {
   defaultMessage:
     "Default index pattern to use on the app. If there's no valid index pattern, the app will automatically create one with the name indicated in this option.",
 });
-const descp2 = i18n.translate('wazuh.common.config.equivalence.descp2', {
-  defaultMessage: 'customization.logo.app',
-});
 const descp3 = i18n.translate('wazuh.common.config.equivalence.descp3', {
   defaultMessage: 'Set the name of the app logo stored at',
 });
-const descp4 = i18n.translate('wazuh.common.config.equivalence.descp4', {
-  defaultMessage: 'customization.logo.sidebar',
-});
+
 const descp5 = i18n.translate('wazuh.common.config.equivalence.descp5', {
   defaultMessage: 'Set the name of the sidebar logo stored at',
 });
-const descp6 = i18n.translate('wazuh.common.config.equivalence.descp6', {
-  defaultMessage: 'customization.logo.healthcheck',
-});
+
 const descp7 = i18n.translate('wazuh.common.config.equivalence.descp7', {
   defaultMessage: 'Set the name of the health-check logo stored at',
-});
-const descp8 = i18n.translate('wazuh.common.config.equivalence.descp8', {
-  defaultMessage: 'customization.logo.reports',
 });
 const descp9 = i18n.translate('wazuh.common.config.equivalence.descp9', {
   defaultMessage: 'Set the name of the reports logo (.png) stored at',
 });
-const descp10 = i18n.translate('wazuh.common.config.equivalence.descp', {
-  defaultMessage: 'checks.pattern',
+const descp10 = i18n.translate('wazuh.common.config.equivalence.descp10', {
+  defaultMessage:
+    'Enable or disable the index pattern health check when opening the app.',
 });
-const descp11 = i18n.translate('wazuh.common.config.equivalence.descp11', {
-  defaultMessage: 'checks.template',
-});
+
 const descp12 = i18n.translate('wazuh.common.config.equivalence.descp12', {
   defaultMessage:
     'Enable or disable the template health check when opening the app.',
 });
-const descp13 = i18n.translate('wazuh.common.config.equivalence.descp13', {
-  defaultMessage: 'checks.api',
-});
+
 const descp14 = i18n.translate('wazuh.common.config.equivalence.descp14', {
   defaultMessage:
     'Enable or disable the API health check when opening the app.',
 });
-const descp15 = i18n.translate('wazuh.common.config.equivalence.descp15', {
-  defaultMessage: 'checks.setup',
-});
+
 const descp16 = i18n.translate('wazuh.common.config.equivalence.descp16', {
   defaultMessage:
     'Enable or disable the setup health check when opening the app.',
 });
-const descp17 = i18n.translate('wazuh.common.config.equivalence.descp17', {
-  defaultMessage: 'checks.fields',
-});
+
 const descp18 = i18n.translate('wazuh.common.config.equivalence.descp18', {
   defaultMessage:
     'Enable or disable the known fields health check when opening the app.',
 });
-const descp19 = i18n.translate('wazuh.common.config.equivalence.descp19', {
-  defaultMessage: 'checks.metaFields',
-});
+
 const descp20 = i18n.translate('wazuh.common.config.equivalence.descp20', {
   defaultMessage: 'Change the default value of the',
 });
 const descp21 = i18n.translate('wazuh.common.config.equivalence.descp21', {
   defaultMessage: 'metaField configuration',
 });
-const descp22 = i18n.translate('wazuh.common.config.equivalence.descp22', {
-  defaultMessage: 'checks.timeFilter',
-});
+
 const descp23 = i18n.translate('wazuh.common.config.equivalence.descp23', {
   defaultMessage: 'Change the default value of the',
 });
 const descp24 = i18n.translate('wazuh.common.config.equivalence.descp24', {
   defaultMessage: 'timeFilter configuration',
 });
-const descp25 = i18n.translate('wazuh.common.config.equivalence.descp25', {
-  defaultMessage: 'checks.maxBuckets',
-});
+
 const descp26 = i18n.translate('wazuh.common.config.equivalence.descp26', {
   defaultMessage: 'Change the default value of the',
 });
 const descp27 = i18n.translate('wazuh.common.config.equivalence.descp27', {
   defaultMessage: 'max buckets configuration',
 });
-const descp28 = i18n.translate('wazuh.common.config.equivalence.descp28', {
-  defaultMessage: 'extensions.pci',
-});
+
 const descp29 = i18n.translate('wazuh.common.config.equivalence.descp29', {
   defaultMessage: 'Enable or disable the PCI DSS tab on Overview and Agents.',
 });
-const descp30 = i18n.translate('wazuh.common.config.equivalence.descp30', {
-  defaultMessage: 'extensions.gdpr',
-});
+
 const descp31 = i18n.translate('wazuh.common.config.equivalence.descp31', {
   defaultMessage: 'Enable or disable the GDPR tab on Overview and Agents.',
 });
-const descp32 = i18n.translate('wazuh.common.config.equivalence.descp32', {
-  defaultMessage: 'extensions.hipaa',
-});
+
 const descp33 = i18n.translate('wazuh.common.config.equivalence.descp33', {
   defaultMessage: 'Enable or disable the HIPAA tab on Overview and Agents.',
 });
-const descp34 = i18n.translate('wazuh.common.config.equivalence.descp34', {
-  defaultMessage: 'extensions.nist',
-});
+
 const descp35 = i18n.translate('wazuh.common.config.equivalence.descp35', {
   defaultMessage:
     'Enable or disable the NIST 800-53 tab on Overview and Agents.',
 });
-const descp36 = i18n.translate('wazuh.common.config.equivalence.descp36', {
-  defaultMessage: 'extensions.tsc',
-});
+
 const descp37 = i18n.translate('wazuh.common.config.equivalence.descp37', {
   defaultMessage: 'Enable or disable the TSC tab on Overview and Agents.',
 });
-const descp38 = i18n.translate('wazuh.common.config.equivalence.descp38', {
-  defaultMessage: 'extensions.audit',
-});
+
 const descp39 = i18n.translate('wazuh.common.config.equivalence.descp39', {
   defaultMessage: 'Enable or disable the Audit tab on Overview and Agents.',
 });
-const descp40 = i18n.translate('wazuh.common.config.equivalence.descp40', {
-  defaultMessage: 'extensions.oscap',
-});
+
 const descp41 = i18n.translate('wazuh.common.config.equivalence.descp41', {
   defaultMessage: 'Enable or disable the Open SCAP tab on Overview and Agents.',
 });
-const descp42 = i18n.translate('wazuh.common.config.equivalence.descp42', {
-  defaultMessage: 'extensions.ciscat',
-});
+
 const descp43 = i18n.translate('wazuh.common.config.equivalence.descp43', {
   defaultMessage: 'Enable or disable the CIS-CAT tab on Overview and Agents.',
 });
@@ -141,35 +102,25 @@ const descp44 = i18n.translate('wazuh.common.config.equivalence.descp44', {
 const descp45 = i18n.translate('wazuh.common.config.equivalence.descp45', {
   defaultMessage: 'Enable or disable the Amazon (AWS) tab on Overview.',
 });
-const descp46 = i18n.translate('wazuh.common.config.equivalence.descp46', {
-  defaultMessage: 'extensions.gcp',
-});
+
 const descp47 = i18n.translate('wazuh.common.config.equivalence.descp47', {
   defaultMessage:
     'Enable or disable the Google Cloud Platform tab on Overview.',
 });
-const descp48 = i18n.translate('wazuh.common.config.equivalence.descp48', {
-  defaultMessage: 'extensions.virustotal',
-});
+
 const descp49 = i18n.translate('wazuh.common.config.equivalence.descp49', {
   defaultMessage:
     'Enable or disable the VirusTotal tab on Overview and Agents.',
 });
-const descp50 = i18n.translate('wazuh.common.config.equivalence.descp50', {
-  defaultMessage: 'extensions.osquery',
-});
+
 const descp51 = i18n.translate('wazuh.common.config.equivalence.descp51', {
   defaultMessage: 'Enable or disable the Osquery tab on Overview and Agents.',
 });
-const descp52 = i18n.translate('wazuh.common.config.equivalence.descp52', {
-  defaultMessage: 'extensions.mitre',
-});
+
 const descp53 = i18n.translate('wazuh.common.config.equivalence.descp53', {
   defaultMessage: 'Enable or disable the MITRE tab on Overview and Agents.',
 });
-const descp54 = i18n.translate('wazuh.common.config.equivalence.descp54', {
-  defaultMessage: 'extensions.docker',
-});
+
 const descp55 = i18n.translate('wazuh.common.config.equivalence.descp55', {
   defaultMessage:
     'Enable or disable the Docker listener tab on Overview and Agents.',
@@ -178,54 +129,41 @@ const descp56 = i18n.translate('wazuh.common.config.equivalence.descp56', {
   defaultMessage:
     'Maximum time, in milliseconds, the app will wait for an API response when making requests to it. It will be ignored if the value is set under 1500 milliseconds.',
 });
-const descp57 = i18n.translate('wazuh.common.config.equivalence.descp57', {
-  defaultMessage: 'ip.selector',
-});
+
 const descp58 = i18n.translate('wazuh.common.config.equivalence.descp58', {
   defaultMessage:
     'Define if the user is allowed to change the selected index pattern directly from the top menu bar.',
 });
-const descp59 = i18n.translate('wazuh.common.config.equivalence.descp59', {
-  defaultMessage: 'ip.ignore',
-});
+
 const descp60 = i18n.translate('wazuh.common.config.equivalence.descp60', {
   defaultMessage:
     'Disable certain index pattern names from being available in index pattern selector from the Wazuh app.',
 });
-const descp61 = i18n.translate('wazuh.common.config.equivalence.descp61', {
-  defaultMessage: 'wazuh.monitoring.enabled',
-});
+
 const descp62 = i18n.translate('wazuh.common.config.equivalence.descp62', {
   defaultMessage:
     'Enable or disable the wazuh-monitoring index creation and/or visualization.',
 });
-const descp63 = i18n.translate('wazuh.common.config.equivalence.descp63', {
-  defaultMessage: 'wazuh.monitoring.frequency',
-});
+
 const descp64 = i18n.translate('wazuh.common.config.equivalence.descp64', {
   defaultMessage:
     'Frequency, in seconds, of API requests to get the state of the agents and create a new document in the wazuh-monitoring index with this data.',
 });
-const descp65 = i18n.translate('wazuh.common.config.equivalence.descp65', {
-  defaultMessage: 'wazuh.monitoring.shards',
-});
+
 const descp66 = i18n.translate('wazuh.common.config.equivalence.descp66', {
   defaultMessage:
     'Define the number of shards to use for the wazuh-monitoring-* indices.',
 });
 const descp67 = i18n.translate('wazuh.common.config.equivalence.descp67', {
-  defaultMessage: 'wazuh.monitoring.replicas',
+  defaultMessage:
+    'Define the number of replicas to use for the wazuh-monitoring-* indices.',
 });
-const descp68 = i18n.translate('wazuh.common.config.equivalence.descp68', {
-  defaultMessage: 'wazuh.monitoring.creation',
-});
+
 const descp69 = i18n.translate('wazuh.common.config.equivalence.descp69', {
   defaultMessage:
     'Define the interval in which a new wazuh-monitoring index will be created.',
 });
-const descp70 = i18n.translate('wazuh.common.config.equivalence.descp70', {
-  defaultMessage: 'wazuh.monitoring.pattern',
-});
+
 const descp71 = i18n.translate('wazuh.common.config.equivalence.descp71', {
   defaultMessage: 'Default index pattern to use for Wazuh monitoring.',
 });
@@ -235,86 +173,73 @@ const descp72 = i18n.translate('wazuh.common.config.equivalence.descp72', {
 const descp73 = i18n.translate('wazuh.common.config.equivalence.descp73', {
   defaultMessage: 'Hide the alerts of the manager in every dashboard.',
 });
-const descp74 = i18n.translate('wazuh.common.config.equivalence.descp74', {
-  defaultMessage: 'logs.level',
-});
-const descp75 = i18n.translate('wazuh.common.config.equivalence.descp75', {
+
+const descp74 = i18n.translate('wazuh.common.config.equivalence.descp75', {
   defaultMessage: 'Logging level of the App.',
 });
-const descp76 = i18n.translate('wazuh.common.config.equivalence.descp76', {
-  defaultMessage: 'enrollment.dns',
-});
+
 const descp77 = i18n.translate('wazuh.common.config.equivalence.descp77', {
   defaultMessage:
     'Specifies the Wazuh registration server, used for the agent enrollment.',
 });
-const descp78 = i18n.translate('wazuh.common.config.equivalence.descp78', {
-  defaultMessage: 'enrollment.password',
-});
+
 const descp79 = i18n.translate('wazuh.common.config.equivalence.descp79', {
   defaultMessage:
     'Specifies the password used to authenticate during the agent enrollment.',
 });
-const descp80 = i18n.translate('wazuh.common.config.equivalence.descp80', {
-  defaultMessage: 'cron.prefix',
-});
+
 const descp81 = i18n.translate('wazuh.common.config.equivalence.descp81', {
   defaultMessage: 'Define the index prefix of predefined jobs.',
 });
-const descp82 = i18n.translate('wazuh.common.config.equivalence.descp82', {
-  defaultMessage: 'cron.statistics.status',
-});
+
 const descp83 = i18n.translate('wazuh.common.config.equivalence.descp83', {
   defaultMessage: 'Enable or disable the statistics tasks.',
 });
-const descp84 = i18n.translate('wazuh.common.config.equivalence.descp84', {
-  defaultMessage: 'cron.statistics.apis',
-});
+
 const descp85 = i18n.translate('wazuh.common.config.equivalence.descp85', {
   defaultMessage:
     'Enter the ID of the hosts you want to save data from, leave this empty to run the task on every host.',
 });
-const descp86 = i18n.translate('wazuh.common.config.equivalence.descp86', {
-  defaultMessage: 'cron.statistics.interval',
-});
+
 const descp87 = i18n.translate('wazuh.common.config.equivalence.descp87', {
   defaultMessage:
     'Define the frequency of task execution using cron schedule expressions.',
 });
-const descp88 = i18n.translate('wazuh.common.config.equivalence.descp88', {
-  defaultMessage: 'cron.statistics.index.name',
-});
+
 const descp89 = i18n.translate('wazuh.common.config.equivalence.descp89', {
   defaultMessage:
     'Define the name of the index in which the documents will be saved.',
 });
-const descp90 = i18n.translate('wazuh.common.config.equivalence.descp90', {
-  defaultMessage: 'cron.statistics.index.creation',
-});
+
 const descp91 = i18n.translate('wazuh.common.config.equivalence.descp91', {
   defaultMessage: 'Define the interval in which a new index will be created.',
 });
-const descp92 = i18n.translate('wazuh.common.config.equivalence.descp92', {
-  defaultMessage: 'cron.statistics.index.shards',
-});
+
 const descp93 = i18n.translate('wazuh.common.config.equivalence.descp93', {
   defaultMessage:
     'Define the number of shards to use for the statistics indices.',
 });
-const descp94 = i18n.translate('wazuh.common.config.equivalence.descp94', {
-  defaultMessage: 'cron.statistics.index.replicas',
-});
+
 const descp95 = i18n.translate('wazuh.common.config.equivalence.descp95', {
   defaultMessage:
     'Define the number of replicas to use for the statistics indices.',
 });
-const descp96 = i18n.translate('wazuh.common.config.equivalence.descp96', {
-  defaultMessage: 'alerts.sample.prefix',
-});
+
 const descp97 = i18n.translate('wazuh.common.config.equivalence.descp97', {
   defaultMessage:
     'Define the index name prefix of sample alerts. It must match the template used by the index pattern to avoid unknown fields in dashboards.',
 });
+
+
+
+
+
+
+
+
+
+
+
 const pattern1 = i18n.translate('wazuh.common.config.equivalence.pattern1', {
   defaultMessage: 'Index pattern',
 });
@@ -740,54 +665,54 @@ const text6 = i18n.translate(
 );
 export const configEquivalences = {
   pattern: descp1,
-  descp2: `${descp3} ${ASSETS_PUBLIC_URL}`,
-  descp4: ` ${descp5} ${ASSETS_PUBLIC_URL}`,
-  descp6: `${descp7} ${ASSETS_PUBLIC_URL}`,
-  descp8: `${descp9} ${ASSETS_PUBLIC_URL}`,
-  descp10:  descp10 ,
-  descp11:  descp12 ,
-  descp13:  descp14 ,
-  descp15:  descp16 ,
-  descp17:  descp18 ,
-  descp19: `${descp20} ${PLUGIN_PLATFORM_NAME} ${descp21}`,
-  descp22: ` ${descp23} ${PLUGIN_PLATFORM_NAME} ${descp24}`,
-  descp25: ` ${descp26} ${PLUGIN_PLATFORM_NAME} ${descp27}`,
-  descp28: descp29,
-  descp30: descp31,
-  descp32: descp33,
-  descp34: descp35,
-  descp36: descp37,
-  descp38: descp39,
-  descp40: descp41,
-  descp42: descp43,
-  descp44: descp45,
-  descp46: descp47,
-  descp48: descp49,
-  descp50: descp51,
-  descp52: descp53,
-  descp54: descp55,
+  'customization.logo.app': `${descp3} ${ASSETS_PUBLIC_URL}`,
+  'customization.logo.sidebar': ` ${descp5} ${ASSETS_PUBLIC_URL}`,
+  'customization.logo.healthcheck': `${descp7} ${ASSETS_PUBLIC_URL}`,
+  'customization.logo.reports': `${descp9} ${ASSETS_PUBLIC_URL}`,
+  'checks.pattern': descp10,
+  'checks.template': descp12,
+  'checks.api': descp14,
+  'checks.setup': descp16,
+  'checks.fields': descp18,
+  'checks.metaFields': `${descp20} ${PLUGIN_PLATFORM_NAME} ${descp21}`,
+  'checks.timeFilter': ` ${descp23} ${PLUGIN_PLATFORM_NAME} ${descp24}`,
+  'checks.maxBuckets': ` ${descp26} ${PLUGIN_PLATFORM_NAME} ${descp27}`,
+  'extensions.pci': descp29,
+  'extensions.gdpr': descp31,
+  'extensions.hipaa': descp33,
+  'extensions.nist': descp35,
+  'extensions.tsc': descp37,
+  'extensions.audit': descp39,
+  'extensions.oscap': descp41,
+  'extensions.ciscat': descp43,
+  'extensions.aws': descp45,
+  'extensions.gcp': descp47,
+  'extensions.virustotal': descp49,
+  'extensions.osquery': descp51,
+  'extensions.mitre': descp53,
+  'extensions.docker': descp55,
   timeout: descp56,
-  descp57: descp58,
-  descp59: descp60,
-  descp61: descp62,
-  descp63: descp64,
-  descp65: descp66,
-  descp67: descp68,
-  descp69: descp70,
-  descp71: descp72,
+  'ip.selector': descp58,
+  'ip.ignore': descp60,
+  'wazuh.monitoring.enabled': descp62,
+  'wazuh.monitoring.frequency': descp64,
+  'wazuh.monitoring.shards': descp66,
+  'wazuh.monitoring.replicas': descp67,
+  'wazuh.monitoring.creation': descp69,
+  'wazuh.monitoring.pattern': descp71,
   hideManagerAlerts: descp73,
-  descp74: descp75,
-  descp76: descp77,
-  descp78: descp79,
-  descp80: descp81,
-  descp82: descp83,
-  descp84: descp85,
-  descp86: descp87,
-  descp88: descp89,
-  descp90: descp91,
-  descp92: descp93,
-  descp94: descp95,
-  descp96: descp97,
+  'logs.level': descp74,
+  'enrollment.dns': descp77,
+  'enrollment.password': descp79,
+  'cron.prefix': descp81,
+  'cron.statistics.status': descp83,
+  'cron.statistics.apis': descp85,
+  'cron.statistics.interval': descp87,
+  'cron.statistics.index.name': descp89,
+  'cron.statistics.index.creation': descp91,
+  'cron.statistics.index.shards': descp93,
+  'cron.statistics.index.replicas': descp95,
+  'alerts.sample.prefix': descp97,
 };
 
 export const nameEquivalence = {
