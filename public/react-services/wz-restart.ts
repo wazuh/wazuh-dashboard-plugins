@@ -192,7 +192,6 @@ export class RestartHandler {
 
       const error = validationError.data.error !== 0;
       if (error) {
-        console.log(error);
         return [];
       }
 
@@ -323,6 +322,8 @@ export class RestartHandler {
       }
 
       updateRedux.updateRestartStatus(ENUM_RESTART_STATES.RESTARTED_INFO);
+
+      return ENUM_RESTART_STATES.RESTARTED
 
     } catch (error: any) {
       let errorType;
