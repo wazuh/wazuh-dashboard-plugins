@@ -21,19 +21,19 @@ exports[`Restart status: restart_error renders correctly to match the snapshot. 
             class="euiOverlayMask euiOverlayMask--aboveHeader"
           >
             <div
-              class="wz-modal-restart"
+              class="wz-modal-restart-error"
             >
               <div
                 class="euiEmptyPrompt"
               >
+                <h2
+                  class="euiTitle euiTitle--medium wz-modal-restart-title"
+                >
+                  Unsuccessful restart.
+                </h2>
                 <span
                   class="euiTextColor euiTextColor--subdued"
                 >
-                  <h2
-                    class="euiTitle euiTitle--medium wz-modal-restart-title"
-                  >
-                    Unable to connect to Wazuh.
-                  </h2>
                   <div
                     class="euiSpacer euiSpacer--m"
                   />
@@ -192,40 +192,83 @@ exports[`Restart status: restart_error renders correctly to match the snapshot. 
                   class="euiSpacer euiSpacer--l"
                 />
                 <div
-                  class="euiSpacer euiSpacer--s"
-                />
-                <a
-                  class="euiButton euiButton--primary euiButton--fill"
-                  href="#/health-check"
-                  rel="noreferrer"
+                  class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentFlexEnd euiFlexGroup--directionRow euiFlexGroup--responsive"
                 >
-                  <span
-                    class="euiButtonContent euiButton__content"
+                  <div
+                    class="euiFlexItem euiFlexItem--flexGrowZero"
                   >
-                    <span
-                      class="euiButton__text"
+                    <button
+                      class="euiButton euiButton--text euiButton--fill"
+                      type="button"
                     >
-                      Go to Healthcheck
-                    </span>
-                  </span>
-                </a>
+                      <span
+                        class="euiButtonContent euiButton__content"
+                      >
+                        <span
+                          class="euiButton__text"
+                        >
+                          Cancel
+                        </span>
+                      </span>
+                    </button>
+                  </div>
+                  <div
+                    class="euiFlexItem euiFlexItem--flexGrowZero"
+                  >
+                    <a
+                      class="euiButton euiButton--primary euiButton--fill"
+                      href="#/health-check"
+                      rel="noreferrer"
+                    >
+                      <span
+                        class="euiButtonContent euiButton__content"
+                      >
+                        <span
+                          class="euiButton__text"
+                        >
+                          Go to Healthcheck
+                        </span>
+                      </span>
+                    </a>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         }
       >
         <div
-          className="wz-modal-restart"
+          className="wz-modal-restart-error"
         >
           <EuiEmptyPrompt
             actions={
-              <EuiButton
-                color="primary"
-                fill={true}
-                href="#/health-check"
+              <EuiFlexGroup
+                justifyContent="flexEnd"
               >
-                Go to Healthcheck
-              </EuiButton>
+                <EuiFlexItem
+                  grow={false}
+                >
+                  <EuiButton
+                    color="text"
+                    fill={true}
+                    onClick={[Function]}
+                  >
+                    Cancel
+                  </EuiButton>
+                </EuiFlexItem>
+                <EuiFlexItem
+                  grow={false}
+                >
+                  <EuiButton
+                    color="primary"
+                    fill={true}
+                    href="#/health-check"
+                    onClick={[Function]}
+                  >
+                    Go to Healthcheck
+                  </EuiButton>
+                </EuiFlexItem>
+              </EuiFlexGroup>
             }
             body={
               <React.Fragment>
@@ -269,28 +312,28 @@ exports[`Restart status: restart_error renders correctly to match the snapshot. 
               <h2
                 className="wz-modal-restart-title"
               >
-                Unable to connect to Wazuh.
+                Unsuccessful restart.
               </h2>
             }
           >
             <div
               className="euiEmptyPrompt"
             >
+              <EuiTitle
+                size="m"
+              >
+                <h2
+                  className="euiTitle euiTitle--medium wz-modal-restart-title"
+                >
+                  Unsuccessful restart.
+                </h2>
+              </EuiTitle>
               <EuiTextColor
                 color="subdued"
               >
                 <span
                   className="euiTextColor euiTextColor--subdued"
                 >
-                  <EuiTitle
-                    size="m"
-                  >
-                    <h2
-                      className="euiTitle euiTitle--medium wz-modal-restart-title"
-                    >
-                      Unable to connect to Wazuh.
-                    </h2>
-                  </EuiTitle>
                   <EuiSpacer
                     size="m"
                   >
@@ -737,53 +780,128 @@ exports[`Restart status: restart_error renders correctly to match the snapshot. 
                   className="euiSpacer euiSpacer--l"
                 />
               </EuiSpacer>
-              <EuiSpacer
-                size="s"
+              <EuiFlexGroup
+                justifyContent="flexEnd"
               >
                 <div
-                  className="euiSpacer euiSpacer--s"
-                />
-              </EuiSpacer>
-              <EuiButton
-                color="primary"
-                fill={true}
-                href="#/health-check"
-              >
-                <EuiButtonDisplay
-                  color="primary"
-                  element="a"
-                  fill={true}
-                  href="#/health-check"
-                  isDisabled={false}
-                  rel="noreferrer"
+                  className="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentFlexEnd euiFlexGroup--directionRow euiFlexGroup--responsive"
                 >
-                  <a
-                    className="euiButton euiButton--primary euiButton--fill"
-                    href="#/health-check"
-                    rel="noreferrer"
+                  <EuiFlexItem
+                    grow={false}
                   >
-                    <EuiButtonContent
-                      className="euiButton__content"
-                      iconSide="left"
-                      textProps={
-                        Object {
-                          "className": "euiButton__text",
-                        }
-                      }
+                    <div
+                      className="euiFlexItem euiFlexItem--flexGrowZero"
                     >
-                      <span
-                        className="euiButtonContent euiButton__content"
+                      <EuiButton
+                        color="text"
+                        fill={true}
+                        onClick={[Function]}
                       >
-                        <span
-                          className="euiButton__text"
+                        <EuiButtonDisplay
+                          baseClassName="euiButton"
+                          color="text"
+                          disabled={false}
+                          element="button"
+                          fill={true}
+                          isDisabled={false}
+                          onClick={[Function]}
+                          type="button"
                         >
-                          Go to Healthcheck
-                        </span>
-                      </span>
-                    </EuiButtonContent>
-                  </a>
-                </EuiButtonDisplay>
-              </EuiButton>
+                          <button
+                            className="euiButton euiButton--text euiButton--fill"
+                            disabled={false}
+                            onClick={[Function]}
+                            style={
+                              Object {
+                                "minWidth": undefined,
+                              }
+                            }
+                            type="button"
+                          >
+                            <EuiButtonContent
+                              className="euiButton__content"
+                              iconSide="left"
+                              textProps={
+                                Object {
+                                  "className": "euiButton__text",
+                                }
+                              }
+                            >
+                              <span
+                                className="euiButtonContent euiButton__content"
+                              >
+                                <span
+                                  className="euiButton__text"
+                                >
+                                  Cancel
+                                </span>
+                              </span>
+                            </EuiButtonContent>
+                          </button>
+                        </EuiButtonDisplay>
+                      </EuiButton>
+                    </div>
+                  </EuiFlexItem>
+                  <EuiFlexItem
+                    grow={false}
+                  >
+                    <div
+                      className="euiFlexItem euiFlexItem--flexGrowZero"
+                    >
+                      <EuiButton
+                        color="primary"
+                        fill={true}
+                        href="#/health-check"
+                        onClick={[Function]}
+                      >
+                        <EuiButtonDisplay
+                          baseClassName="euiButton"
+                          color="primary"
+                          element="a"
+                          fill={true}
+                          href="#/health-check"
+                          isDisabled={false}
+                          onClick={[Function]}
+                          rel="noreferrer"
+                        >
+                          <a
+                            className="euiButton euiButton--primary euiButton--fill"
+                            disabled={false}
+                            href="#/health-check"
+                            onClick={[Function]}
+                            rel="noreferrer"
+                            style={
+                              Object {
+                                "minWidth": undefined,
+                              }
+                            }
+                          >
+                            <EuiButtonContent
+                              className="euiButton__content"
+                              iconSide="left"
+                              textProps={
+                                Object {
+                                  "className": "euiButton__text",
+                                }
+                              }
+                            >
+                              <span
+                                className="euiButtonContent euiButton__content"
+                              >
+                                <span
+                                  className="euiButton__text"
+                                >
+                                  Go to Healthcheck
+                                </span>
+                              </span>
+                            </EuiButtonContent>
+                          </a>
+                        </EuiButtonDisplay>
+                      </EuiButton>
+                    </div>
+                  </EuiFlexItem>
+                </div>
+              </EuiFlexGroup>
             </div>
           </EuiEmptyPrompt>
         </div>
@@ -820,14 +938,14 @@ exports[`Restart status: restarted renders correctly to match the snapshot. 1`] 
               <div
                 class="euiEmptyPrompt"
               >
+                <h2
+                  class="wz-modal-restart-title"
+                >
+                  Wazuh restarted
+                </h2>
                 <span
                   class="euiTextColor euiTextColor--subdued"
                 >
-                  <h2
-                    class="wz-modal-restart-title"
-                  >
-                    Wazuh restarted
-                  </h2>
                   <div
                     class="euiSpacer euiSpacer--m"
                   />
@@ -890,9 +1008,6 @@ exports[`Restart status: restarted renders correctly to match the snapshot. 1`] 
                 </span>
                 <div
                   class="euiSpacer euiSpacer--l"
-                />
-                <div
-                  class="euiSpacer euiSpacer--s"
                 />
                 <div
                   class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentFlexEnd euiFlexGroup--directionRow euiFlexGroup--responsive"
@@ -975,21 +1090,21 @@ exports[`Restart status: restarted renders correctly to match the snapshot. 1`] 
             <div
               className="euiEmptyPrompt"
             >
+              <EuiTitle
+                size="m"
+              >
+                <h2
+                  className="wz-modal-restart-title"
+                >
+                  Wazuh restarted
+                </h2>
+              </EuiTitle>
               <EuiTextColor
                 color="subdued"
               >
                 <span
                   className="euiTextColor euiTextColor--subdued"
                 >
-                  <EuiTitle
-                    size="m"
-                  >
-                    <h2
-                      className="wz-modal-restart-title"
-                    >
-                      Wazuh restarted
-                    </h2>
-                  </EuiTitle>
                   <EuiSpacer
                     size="m"
                   >
@@ -1166,13 +1281,6 @@ exports[`Restart status: restarted renders correctly to match the snapshot. 1`] 
                   className="euiSpacer euiSpacer--l"
                 />
               </EuiSpacer>
-              <EuiSpacer
-                size="s"
-              >
-                <div
-                  className="euiSpacer euiSpacer--s"
-                />
-              </EuiSpacer>
               <EuiFlexGroup
                 justifyContent="flexEnd"
               >
@@ -1191,6 +1299,7 @@ exports[`Restart status: restarted renders correctly to match the snapshot. 1`] 
                         onClick={[Function]}
                       >
                         <EuiButtonDisplay
+                          baseClassName="euiButton"
                           color="primary"
                           disabled={false}
                           element="button"
@@ -1203,6 +1312,11 @@ exports[`Restart status: restarted renders correctly to match the snapshot. 1`] 
                             className="euiButton euiButton--primary euiButton--fill"
                             disabled={false}
                             onClick={[Function]}
+                            style={
+                              Object {
+                                "minWidth": undefined,
+                              }
+                            }
                             type="button"
                           >
                             <EuiButtonContent
@@ -1267,14 +1381,14 @@ exports[`Restart status: restarted_info renders correctly to match the snapshot.
               <div
                 class="euiEmptyPrompt"
               >
+                <h2
+                  class="wz-modal-restart-title"
+                >
+                  Wazuh restarted
+                </h2>
                 <span
                   class="euiTextColor euiTextColor--subdued"
                 >
-                  <h2
-                    class="wz-modal-restart-title"
-                  >
-                    Wazuh restarted
-                  </h2>
                   <div
                     class="euiSpacer euiSpacer--m"
                   />
@@ -1429,9 +1543,6 @@ exports[`Restart status: restarted_info renders correctly to match the snapshot.
                   class="euiSpacer euiSpacer--l"
                 />
                 <div
-                  class="euiSpacer euiSpacer--s"
-                />
-                <div
                   class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentFlexEnd euiFlexGroup--directionRow euiFlexGroup--responsive"
                 >
                   <div
@@ -1520,21 +1631,21 @@ exports[`Restart status: restarted_info renders correctly to match the snapshot.
             <div
               className="euiEmptyPrompt"
             >
+              <EuiTitle
+                size="m"
+              >
+                <h2
+                  className="wz-modal-restart-title"
+                >
+                  Wazuh restarted
+                </h2>
+              </EuiTitle>
               <EuiTextColor
                 color="subdued"
               >
                 <span
                   className="euiTextColor euiTextColor--subdued"
                 >
-                  <EuiTitle
-                    size="m"
-                  >
-                    <h2
-                      className="wz-modal-restart-title"
-                    >
-                      Wazuh restarted
-                    </h2>
-                  </EuiTitle>
                   <EuiSpacer
                     size="m"
                   >
@@ -1976,13 +2087,6 @@ exports[`Restart status: restarted_info renders correctly to match the snapshot.
                   className="euiSpacer euiSpacer--l"
                 />
               </EuiSpacer>
-              <EuiSpacer
-                size="s"
-              >
-                <div
-                  className="euiSpacer euiSpacer--s"
-                />
-              </EuiSpacer>
               <EuiFlexGroup
                 justifyContent="flexEnd"
               >
@@ -2001,6 +2105,7 @@ exports[`Restart status: restarted_info renders correctly to match the snapshot.
                         onClick={[Function]}
                       >
                         <EuiButtonDisplay
+                          baseClassName="euiButton"
                           color="primary"
                           disabled={false}
                           element="button"
@@ -2013,6 +2118,11 @@ exports[`Restart status: restarted_info renders correctly to match the snapshot.
                             className="euiButton euiButton--primary euiButton--fill"
                             disabled={false}
                             onClick={[Function]}
+                            style={
+                              Object {
+                                "minWidth": undefined,
+                              }
+                            }
                             type="button"
                           >
                             <EuiButtonContent
@@ -2077,14 +2187,14 @@ exports[`Restart status: restarting renders correctly to match the snapshot. 1`]
               <div
                 class="euiEmptyPrompt"
               >
+                <h2
+                  class="wz-modal-restart-title"
+                >
+                  Restarting Wazuh
+                </h2>
                 <span
                   class="euiTextColor euiTextColor--subdued"
                 >
-                  <h2
-                    class="wz-modal-restart-title"
-                  >
-                    Restarting Wazuh
-                  </h2>
                   <div
                     class="euiSpacer euiSpacer--m"
                   />
@@ -2188,9 +2298,6 @@ exports[`Restart status: restarting renders correctly to match the snapshot. 1`]
                   class="euiSpacer euiSpacer--l"
                 />
                 <div
-                  class="euiSpacer euiSpacer--s"
-                />
-                <div
                   class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentFlexEnd euiFlexGroup--directionRow euiFlexGroup--responsive"
                 >
                   <div
@@ -2281,21 +2388,21 @@ exports[`Restart status: restarting renders correctly to match the snapshot. 1`]
             <div
               className="euiEmptyPrompt"
             >
+              <EuiTitle
+                size="m"
+              >
+                <h2
+                  className="wz-modal-restart-title"
+                >
+                  Restarting Wazuh
+                </h2>
+              </EuiTitle>
               <EuiTextColor
                 color="subdued"
               >
                 <span
                   className="euiTextColor euiTextColor--subdued"
                 >
-                  <EuiTitle
-                    size="m"
-                  >
-                    <h2
-                      className="wz-modal-restart-title"
-                    >
-                      Restarting Wazuh
-                    </h2>
-                  </EuiTitle>
                   <EuiSpacer
                     size="m"
                   >
@@ -2581,13 +2688,6 @@ exports[`Restart status: restarting renders correctly to match the snapshot. 1`]
                   className="euiSpacer euiSpacer--l"
                 />
               </EuiSpacer>
-              <EuiSpacer
-                size="s"
-              >
-                <div
-                  className="euiSpacer euiSpacer--s"
-                />
-              </EuiSpacer>
               <EuiFlexGroup
                 justifyContent="flexEnd"
               >
@@ -2607,6 +2707,7 @@ exports[`Restart status: restarting renders correctly to match the snapshot. 1`]
                         onClick={[Function]}
                       >
                         <EuiButtonDisplay
+                          baseClassName="euiButton"
                           color="primary"
                           disabled={true}
                           element="button"
@@ -2619,6 +2720,11 @@ exports[`Restart status: restarting renders correctly to match the snapshot. 1`]
                             className="euiButton euiButton--primary euiButton--fill euiButton-isDisabled"
                             disabled={true}
                             onClick={[Function]}
+                            style={
+                              Object {
+                                "minWidth": undefined,
+                              }
+                            }
                             type="button"
                           >
                             <EuiButtonContent
@@ -2678,19 +2784,19 @@ exports[`Restart status: sync_error renders correctly to match the snapshot. 1`]
             class="euiOverlayMask euiOverlayMask--aboveHeader"
           >
             <div
-              class="wz-modal-restart"
+              class="wz-modal-restart-error"
             >
               <div
                 class="euiEmptyPrompt"
               >
+                <h2
+                  class="euiTitle euiTitle--medium wz-modal-restart-title"
+                >
+                  File deployment failure
+                </h2>
                 <span
                   class="euiTextColor euiTextColor--subdued"
                 >
-                  <h2
-                    class="euiTitle euiTitle--medium wz-modal-restart-title"
-                  >
-                    Synchronization failed
-                  </h2>
                   <div
                     class="euiSpacer euiSpacer--m"
                   />
@@ -2849,9 +2955,6 @@ exports[`Restart status: sync_error renders correctly to match the snapshot. 1`]
                   class="euiSpacer euiSpacer--l"
                 />
                 <div
-                  class="euiSpacer euiSpacer--s"
-                />
-                <div
                   class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentFlexEnd euiFlexGroup--directionRow euiFlexGroup--responsive"
                 >
                   <div
@@ -2897,7 +3000,7 @@ exports[`Restart status: sync_error renders correctly to match the snapshot. 1`]
         }
       >
         <div
-          className="wz-modal-restart"
+          className="wz-modal-restart-error"
         >
           <EuiEmptyPrompt
             actions={
@@ -2966,28 +3069,28 @@ exports[`Restart status: sync_error renders correctly to match the snapshot. 1`]
               <h2
                 className="wz-modal-restart-title"
               >
-                Synchronization failed
+                File deployment failure
               </h2>
             }
           >
             <div
               className="euiEmptyPrompt"
             >
+              <EuiTitle
+                size="m"
+              >
+                <h2
+                  className="euiTitle euiTitle--medium wz-modal-restart-title"
+                >
+                  File deployment failure
+                </h2>
+              </EuiTitle>
               <EuiTextColor
                 color="subdued"
               >
                 <span
                   className="euiTextColor euiTextColor--subdued"
                 >
-                  <EuiTitle
-                    size="m"
-                  >
-                    <h2
-                      className="euiTitle euiTitle--medium wz-modal-restart-title"
-                    >
-                      Synchronization failed
-                    </h2>
-                  </EuiTitle>
                   <EuiSpacer
                     size="m"
                   >
@@ -3433,13 +3536,6 @@ exports[`Restart status: sync_error renders correctly to match the snapshot. 1`]
                   className="euiSpacer euiSpacer--l"
                 />
               </EuiSpacer>
-              <EuiSpacer
-                size="s"
-              >
-                <div
-                  className="euiSpacer euiSpacer--s"
-                />
-              </EuiSpacer>
               <EuiFlexGroup
                 justifyContent="flexEnd"
               >
@@ -3466,6 +3562,7 @@ exports[`Restart status: sync_error renders correctly to match the snapshot. 1`]
                           <EuiButtonContent
                             className="euiButtonEmpty__content"
                             iconSide="left"
+                            iconSize="m"
                             textProps={
                               Object {
                                 "className": "euiButtonEmpty__text",
@@ -3498,6 +3595,7 @@ exports[`Restart status: sync_error renders correctly to match the snapshot. 1`]
                         onClick={[Function]}
                       >
                         <EuiButtonDisplay
+                          baseClassName="euiButton"
                           color="primary"
                           disabled={false}
                           element="button"
@@ -3510,6 +3608,11 @@ exports[`Restart status: sync_error renders correctly to match the snapshot. 1`]
                             className="euiButton euiButton--primary euiButton--fill"
                             disabled={false}
                             onClick={[Function]}
+                            style={
+                              Object {
+                                "minWidth": undefined,
+                              }
+                            }
                             type="button"
                           >
                             <EuiButtonContent
@@ -3581,16 +3684,14 @@ exports[`Restart status: syncing renders correctly to match the snapshot. 1`] = 
               <div
                 class="euiEmptyPrompt"
               >
+                <h2
+                  class="wz-modal-restart-title"
+                >
+                  Ensure the deployment of files
+                </h2>
                 <span
                   class="euiTextColor euiTextColor--subdued"
                 >
-                  <h2
-                    class="wz-modal-restart-title"
-                  >
-                    Ensuring 
-                    rules
-                     deployment
-                  </h2>
                   <div
                     class="euiSpacer euiSpacer--m"
                   />
@@ -3709,9 +3810,6 @@ exports[`Restart status: syncing renders correctly to match the snapshot. 1`] = 
                   class="euiSpacer euiSpacer--l"
                 />
                 <div
-                  class="euiSpacer euiSpacer--s"
-                />
-                <div
                   class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentFlexEnd euiFlexGroup--directionRow euiFlexGroup--responsive"
                 >
                   <div
@@ -3823,9 +3921,7 @@ exports[`Restart status: syncing renders correctly to match the snapshot. 1`] = 
                 <h2
                   className="wz-modal-restart-title"
                 >
-                  Ensuring 
-                  rules
-                   deployment
+                  Ensure the deployment of files
                 </h2>
               </React.Fragment>
             }
@@ -3833,23 +3929,21 @@ exports[`Restart status: syncing renders correctly to match the snapshot. 1`] = 
             <div
               className="euiEmptyPrompt"
             >
+              <EuiTitle
+                size="m"
+              >
+                <h2
+                  className="wz-modal-restart-title"
+                >
+                  Ensure the deployment of files
+                </h2>
+              </EuiTitle>
               <EuiTextColor
                 color="subdued"
               >
                 <span
                   className="euiTextColor euiTextColor--subdued"
                 >
-                  <EuiTitle
-                    size="m"
-                  >
-                    <h2
-                      className="wz-modal-restart-title"
-                    >
-                      Ensuring 
-                      rules
-                       deployment
-                    </h2>
-                  </EuiTitle>
                   <EuiSpacer
                     size="m"
                   >
@@ -4185,13 +4279,6 @@ exports[`Restart status: syncing renders correctly to match the snapshot. 1`] = 
                   className="euiSpacer euiSpacer--l"
                 />
               </EuiSpacer>
-              <EuiSpacer
-                size="s"
-              >
-                <div
-                  className="euiSpacer euiSpacer--s"
-                />
-              </EuiSpacer>
               <EuiFlexGroup
                 justifyContent="flexEnd"
               >
@@ -4219,6 +4306,7 @@ exports[`Restart status: syncing renders correctly to match the snapshot. 1`] = 
                           <EuiButtonContent
                             className="euiButtonEmpty__content"
                             iconSide="left"
+                            iconSize="m"
                             textProps={
                               Object {
                                 "className": "euiButtonEmpty__text",
@@ -4251,6 +4339,7 @@ exports[`Restart status: syncing renders correctly to match the snapshot. 1`] = 
                         onClick={[Function]}
                       >
                         <EuiButtonDisplay
+                          baseClassName="euiButton"
                           color="primary"
                           disabled={false}
                           element="button"
@@ -4263,6 +4352,11 @@ exports[`Restart status: syncing renders correctly to match the snapshot. 1`] = 
                             className="euiButton euiButton--primary euiButton--fill"
                             disabled={false}
                             onClick={[Function]}
+                            style={
+                              Object {
+                                "minWidth": undefined,
+                              }
+                            }
                             type="button"
                           >
                             <EuiButtonContent
