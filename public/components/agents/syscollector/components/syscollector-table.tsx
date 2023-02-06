@@ -6,7 +6,11 @@ import { AppState } from '../../../../react-services/app-state';
 
 
 export function SyscollectorTable({ tableParams }) {
-  const [params, setParams] = useState<{ limit: number, offset: number, q?: string}>({ limit: 10, offset: 0,});
+  const [params, setParams] = useState<{ limit: number, offset: number, select:string, q?: string}>({
+    limit: 10,
+    offset: 0,
+    select: tableParams.columns.map(({id}) => id).join(",")
+  });
   const [pageIndex, setPageIndex] = useState(0);
   const [searchBarValue, setSearchBarValue] = useState("");
   const [pageSize, setPageSize] = useState(10);
