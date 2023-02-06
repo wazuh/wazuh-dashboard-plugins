@@ -53,11 +53,11 @@ import { getSettingDefaultValue } from '../../../common/services/settings';
           const { data: { data: { affected_items: [agent] } } } = await context.wazuh.api.client.asCurrentUser.request(
             'GET',
             `/agents`,
-            { 
+            {
               params: {
                 q: `id=${agentID}`,
                 select: 'dateAdd,id,ip,lastKeepAlive,manager,name,os.name,os.version,version',
-              } 
+              }
             },
             { apiHostID: apiId }
           );
@@ -78,21 +78,23 @@ import { getSettingDefaultValue } from '../../../common/services/settings';
         columns: [
           { id: 'id', label: 'ID' },
           { id: 'name', label: 'Name' },
-          { id: 'ip', label: 'IP' },
+          { id: 'ip', label: 'IP address' },
           { id: 'version', label: 'Version' },
           { id: 'manager', label: 'Manager' },
-          { id: 'os', label: 'OS' },
+          { id: 'os', label: 'Operating system' },
           { id: 'dateAdd', label: 'Registration date' },
           { id: 'lastKeepAlive', label: 'Last keep alive' },
         ],
-        items: agentsData.map((agent) => {
-          return {
-            ...agent,
-            os: (agent.os && agent.os.name && agent.os.version) ? `${agent.os.name} ${agent.os.version}` : '',
-            lastKeepAlive: moment(agent.lastKeepAlive).format(dateFormat),
-            dateAdd: moment(agent.dateAdd).format(dateFormat)
-          }
-        }),
+        items: agentsData
+          .filter(agent => agent) // Remove undefined agents when Wazuh API no longer finds and agentID
+          .map((agent) => {
+            return {
+              ...agent,
+              os: (agent.os && agent.os.name && agent.os.version) ? `${agent.os.name} ${agent.os.version}` : '',
+              lastKeepAlive: moment(agent.lastKeepAlive).format(dateFormat),
+              dateAdd: moment(agent.dateAdd).format(dateFormat)
+            }
+          }),
       });
     }else if(!agentsData.length && groupID){
       // For group reports when there is no agents in the group
@@ -101,7 +103,7 @@ import { getSettingDefaultValue } from '../../../common/services/settings';
         style: { fontSize: 12, color: '#000' },
       });
     }
-    
+
   } catch (error) {
     log('reporting:buildAgentsTable', error.message || error);
     return Promise.reject(error);
@@ -131,6 +133,7 @@ export async function extendedInformation(
   from,
   to,
   filters,
+  allowedAgentsFilter,
   pattern = getSettingDefaultValue('pattern'),
   agent = null
 ) {
@@ -172,6 +175,7 @@ export async function extendedInformation(
                 to,
                 vulnerabilitiesLevel,
                 filters,
+                allowedAgentsFilter,
                 pattern
               );
               return count
@@ -198,6 +202,7 @@ export async function extendedInformation(
         to,
         'Low',
         filters,
+        allowedAgentsFilter,
         pattern
       );
       const mediumRank = await VulnerabilityRequest.topAgentCount(
@@ -206,6 +211,7 @@ export async function extendedInformation(
         to,
         'Medium',
         filters,
+        allowedAgentsFilter,
         pattern
       );
       const highRank = await VulnerabilityRequest.topAgentCount(
@@ -214,6 +220,7 @@ export async function extendedInformation(
         to,
         'High',
         filters,
+        allowedAgentsFilter,
         pattern
       );
       const criticalRank = await VulnerabilityRequest.topAgentCount(
@@ -222,6 +229,7 @@ export async function extendedInformation(
         to,
         'Critical',
         filters,
+        allowedAgentsFilter,
         pattern
       );
       log(
@@ -270,7 +278,7 @@ export async function extendedInformation(
         'Fetching overview vulnerability detector top 3 CVEs',
         'debug'
       );
-      const cveRank = await VulnerabilityRequest.topCVECount(context, from, to, filters, pattern);
+      const cveRank = await VulnerabilityRequest.topCVECount(context, from, to, filters, allowedAgentsFilter, pattern);
       log(
         'reporting:extendedInformation',
         'Adding overview vulnerability detector top 3 CVEs',
@@ -287,12 +295,12 @@ export async function extendedInformation(
         });
       }
     }
-    
+
     //--- OVERVIEW - GENERAL
     if (section === 'overview' && tab === 'general') {
       log('reporting:extendedInformation', 'Fetching top 3 agents with level 15 alerts', 'debug');
 
-      const level15Rank = await OverviewRequest.topLevel15(context, from, to, filters, pattern);
+      const level15Rank = await OverviewRequest.topLevel15(context, from, to, filters, allowedAgentsFilter, pattern);
 
       log('reporting:extendedInformation', 'Adding top 3 agents with level 15 alerts', 'debug');
       if (level15Rank.length) {
@@ -312,6 +320,7 @@ export async function extendedInformation(
         from,
         to,
         filters,
+        allowedAgentsFilter,
         pattern
       );
       log('reporting:extendedInformation', 'Adding most common rootkits', 'debug');
@@ -342,6 +351,7 @@ export async function extendedInformation(
         from,
         to,
         filters,
+        allowedAgentsFilter,
         pattern
       );
       hiddenPids &&
@@ -360,6 +370,7 @@ export async function extendedInformation(
         from,
         to,
         filters,
+        allowedAgentsFilter,
         pattern
       );
       hiddenPorts &&
@@ -383,6 +394,7 @@ export async function extendedInformation(
         from,
         to,
         filters,
+        allowedAgentsFilter,
         pattern
       );
       printer.addContentWithNewLine({
@@ -395,6 +407,7 @@ export async function extendedInformation(
           from,
           to,
           filters,
+          allowedAgentsFilter,
           item,
           pattern
         );
@@ -427,6 +440,7 @@ export async function extendedInformation(
         from,
         to,
         filters,
+        allowedAgentsFilter,
         pattern
       );
       printer.addContentWithNewLine({
@@ -439,6 +453,7 @@ export async function extendedInformation(
           from,
           to,
           filters,
+          allowedAgentsFilter,
           item,
           pattern
         );
@@ -471,6 +486,7 @@ export async function extendedInformation(
         from,
         to,
         filters,
+        allowedAgentsFilter,
         pattern
       );
       printer.addContentWithNewLine({
@@ -483,6 +499,7 @@ export async function extendedInformation(
           from,
           to,
           filters,
+          allowedAgentsFilter,
           item,
           pattern
         );
@@ -520,6 +537,7 @@ export async function extendedInformation(
         from,
         to,
         filters,
+        allowedAgentsFilter,
         pattern
       );
       if (auditAgentsNonSuccess && auditAgentsNonSuccess.length) {
@@ -534,6 +552,7 @@ export async function extendedInformation(
         from,
         to,
         filters,
+        allowedAgentsFilter,
         pattern
       );
       if (auditAgentsFailedSyscall && auditAgentsFailedSyscall.length) {
@@ -559,7 +578,7 @@ export async function extendedInformation(
     //--- OVERVIEW - FIM
     if (section === 'overview' && tab === 'fim') {
       log('reporting:extendedInformation', 'Fetching top 3 rules for FIM', 'debug');
-      const rules = await SyscheckRequest.top3Rules(context, from, to, filters, pattern);
+      const rules = await SyscheckRequest.top3Rules(context, from, to, filters, allowedAgentsFilter, pattern);
 
       if (rules && rules.length) {
         printer.addContentWithNewLine({ text: 'Top 3 FIM rules', style: 'h2' }).addSimpleTable({
@@ -576,7 +595,7 @@ export async function extendedInformation(
       }
 
       log('reporting:extendedInformation', 'Fetching top 3 agents for FIM', 'debug');
-      const agents = await SyscheckRequest.top3agents(context, from, to, filters, pattern);
+      const agents = await SyscheckRequest.top3agents(context, from, to, filters, allowedAgentsFilter, pattern);
 
       if (agents && agents.length) {
         printer.addContentWithNewLine({
@@ -600,6 +619,7 @@ export async function extendedInformation(
         from,
         to,
         filters,
+        allowedAgentsFilter,
         pattern
       );
       auditFailedSyscall &&
@@ -653,6 +673,7 @@ export async function extendedInformation(
         from,
         to,
         filters,
+        allowedAgentsFilter,
         pattern
       );
 
@@ -673,6 +694,7 @@ export async function extendedInformation(
         from,
         to,
         filters,
+        allowedAgentsFilter,
         pattern
       );
 
@@ -712,9 +734,9 @@ export async function extendedInformation(
         },
         {
           endpoint: `/syscollector/${agent}/os`,
-          loggerMessage: `Fetching OS information for agent ${agent}`,
+          loggerMessage: `Fetching operating system information for agent ${agent}`,
           list: {
-            title: { text: 'OS information', style: 'h2' },
+            title: { text: 'Operating system information', style: 'h2' },
           },
           mapResponse: (osData) => [
             osData.sysname,
@@ -781,6 +803,7 @@ export async function extendedInformation(
                 to,
                 vulnerabilitiesLevel,
                 filters,
+                allowedAgentsFilter,
                 pattern
               );
             } catch (error) {
@@ -812,6 +835,7 @@ export async function extendedInformation(
         to,
         'Critical',
         filters,
+        allowedAgentsFilter,
         pattern
       );
       if (topCriticalPackages && topCriticalPackages.length) {
@@ -841,6 +865,7 @@ export async function extendedInformation(
         to,
         'High',
         filters,
+        allowedAgentsFilter,
         pattern
       );
       if (topHighPackages && topHighPackages.length) {
@@ -865,32 +890,22 @@ export async function extendedInformation(
     }
 
     //--- SUMMARY TABLES
-    const extraSummaryTables = [];
-    if (summaryTablesDefinitions?.[`${section}Summary`]?.[`${tab}AlertsSummary`]) {
-      log('reporting:AlertsSummaryTable', 'Fetching Alerts Summary Table', 'debug');
-      const alertsSummaryTable = new SummaryTable(
-        context,
-        from,
-        to,
-        filters,
-        summaryTablesDefinitions[`${section}Summary`][`${tab}AlertsSummary`],
-        pattern
-      );
-      const alertsSummaryData = await alertsSummaryTable.fetch();
-      extraSummaryTables.push(alertsSummaryData);
-    }
-    if (summaryTablesDefinitions?.[`${section}Summary`]?.[`${tab}GroupsSummary`]) {
-      log('reporting:GroupsSummaryTable', 'Fetching Groups Summary Table', 'debug');
-      const groupsSummaryTable = new SummaryTable(
-        context,
-        from,
-        to,
-        filters,
-        summaryTablesDefinitions[`${section}Summary`][`${tab}GroupsSummary`],
-        pattern
-      );
-      const groupsSummaryData = await groupsSummaryTable.fetch();
-      extraSummaryTables.push(groupsSummaryData);
+    let extraSummaryTables = [];
+    if (Array.isArray(summaryTablesDefinitions[section][tab])) {
+      const tablesPromises = summaryTablesDefinitions[section][tab].map((summaryTable) => {
+        log('reporting:AlertsTable', `Fetching ${summaryTable.title} Table`, 'debug');
+        const alertsSummaryTable = new SummaryTable(
+          context,
+          from,
+          to,
+          filters,
+          allowedAgentsFilter,
+          summaryTable,
+          pattern
+        );
+        return alertsSummaryTable.fetch();
+      });
+      extraSummaryTables = await Promise.all(tablesPromises);
     }
 
     return extraSummaryTables;

@@ -1612,7 +1612,7 @@ div.euiPopover__panel.euiPopover__panel-isOpen.euiPopover__panel--bottom.wz-menu
         overflow: hidden;
       }
     }
-  } 
+  }
 }
 
 @media (min-width: 1600px) {
@@ -1856,4 +1856,8 @@ iframe.width-changed {
     margin-top: 10px;
     display: flex;
     flex-direction: row;
+}
+
+.wz-overflow-auto{
+  overflow: auto;
 }

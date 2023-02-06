@@ -945,6 +945,10 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
    
 
     const container = document.getElementsByClassName('euiBreadcrumbs');
+    const expandedHeader = document.getElementById('globalHeaderBars')
+    const wzExpandedHeader = expandedHeader.children.length === 1 
+      ? 'wz-expanded-header-min'  
+      : 'wz-expanded-header-max'
     return ReactDOM.createPortal(
       <WzReduxProvider>
         {this.state.showMenu && (
@@ -954,8 +958,8 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
               <EuiPopover
                 panelClassName={
                   this.state.pluginPlatformMenuBlockedOrOpened ?
-                    "wz-menu-popover wz-menu-popover-over" :
-                    "wz-menu-popover wz-menu-popover-under"
+                    `wz-menu-popover wz-menu-popover-over ${wzExpandedHeader}` :
+                    `wz-menu-popover wz-menu-popover-under ${wzExpandedHeader}`
                 }
                 button={mainButton}
                 isOpen={this.state.menuOpened}
