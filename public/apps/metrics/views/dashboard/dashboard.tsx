@@ -48,8 +48,6 @@ export function DashboardPage(props: DashboardDeps) {
         <h1>{'Metrics'}</h1>
       </EuiText>
       <TopNavMenu
-        onFiltersUpdated={() => {setDashboardConfig()}}
-        onQueryChange={() => {setDashboardConfig()}}
         appName={'metrics'}
         showSearchBar={true}
         useDefaultBehaviors={true}
