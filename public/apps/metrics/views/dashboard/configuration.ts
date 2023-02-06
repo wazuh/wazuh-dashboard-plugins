@@ -1,4 +1,5 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
+import { useFilterManager, useQueryManager, useTimeFilter } from "../../../../components/common/hooks";
 import { TABLE_CONTAINER } from "../../../../embeddables/table";
 import { HELLO_WORLD_EMBEDDABLE } from "../../../../embeddables/hello-world";
 import { setState } from "../../../../kibana-integrations/discover/application/angular/discover_state";
@@ -479,6 +480,14 @@ export const useDashboardConfiguration = (
   const setDashboardConfig = useCallback(()=>{
     setConfig(generateConfig())
   },[]);
+
+  const { filters } = useFilterManager();
+  const [ query ] = useQueryManager();
+  const { timeFilter } = useTimeFilter();
+
+  useEffect(() => {
+    setConfig(generateConfig())
+  }, [filters, query, timeFilter]);
 
   return [config, setDashboardConfig]
 };
