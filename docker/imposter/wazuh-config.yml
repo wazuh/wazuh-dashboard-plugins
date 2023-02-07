@@ -1,6 +1,6 @@
 ---
 plugin: openapi
-specFile: https://raw.githubusercontent.com/wazuh/wazuh/4.4/api/api/spec/spec.yaml
+specFile: https://raw.githubusercontent.com/wazuh/wazuh/master/api/api/spec/spec.yaml
 system:
   stores:
     # this store is preloaded from file
@@ -142,7 +142,9 @@ resources:
   # Summarize agents status
   - method: GET
     path: /agents/summary/status
-
+    response:
+      statusCode: 200
+      staticFile: agents/summary_status.json
   # ===================================================== #
   #   CISCAT
   # ===================================================== #
@@ -620,13 +622,6 @@ resources:
 
   # Login
   - method: POST
-    path: /security/user/authenticate
-    response:
-      statusCode: 200
-      scriptFile: security/login.js
-
-  # Login (@deprecated in 4.4.0)
-  - method: GET
     path: /security/user/authenticate
     response:
       statusCode: 200

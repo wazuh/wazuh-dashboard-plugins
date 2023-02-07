@@ -41,6 +41,7 @@ import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { AgentStatus } from '../../../components/agents/agent_status';
 import { AgentSynced } from '../../../components/agents/agent-synced';
+import { compressIPv6 } from '../../../services/ipv6-services';
 
 export const AgentsTable = withErrorBoundary(
   class AgentsTable extends Component {
@@ -285,11 +286,10 @@ export const AgentsTable = withErrorBoundary(
       };
       const agentVersion = agent.version !== undefined ? agent.version.split(' ')[1] : '-';
       const node_name = agent.node_name && agent.node_name !== 'unknown' ? agent.node_name : '-';
-
       return {
         id: agent.id,
         name: agent.name,
-        ip: agent.ip,
+        ip: compressIPv6(agent.ip),
         status: agent.status,
         group_config_status: agent.group_config_status,
         group: checkField(agent.group),
