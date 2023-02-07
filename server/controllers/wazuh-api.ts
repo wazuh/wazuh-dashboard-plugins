@@ -784,7 +784,7 @@ export class WazuhApiCtrl {
 
       log('wazuh-api:csv', `Report ${tmpPath}`, 'debug');
       // Real limit, regardless the user query
-      const params = { limit: HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR };
+      const params = { limit: 500 };
 
       if (filters.length) {
         for (const filter of filters) {

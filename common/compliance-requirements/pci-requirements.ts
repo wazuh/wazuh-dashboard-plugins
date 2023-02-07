@@ -34,7 +34,7 @@ export const pciRequirementsFile = {
   '6.5':
     'Address common coding vulnerabilities in software development processes as follows:Train developers in secure coding techniques, including how to avoid common coding vulnerabilities, and understanding how sensitive data is handled in memory. Develop applications based on secure coding guidelines. ',
   '6.5.1':
-    'Injection flaws, particularly SQL injection. Also consider OS Command Injection, LDAP and XPath injection flaws as well as other injection flaws.',
+    'Injection flaws, particularly SQL injection. Also consider Operating System Command Injection, LDAP and XPath injection flaws as well as other injection flaws.',
   '6.5.2': 'Buffer overflows',
   '6.5.5': 'Improper error handling',
   '6.5.7': 'Cross-site scripting (XSS)',
