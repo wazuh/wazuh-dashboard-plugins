@@ -54,7 +54,7 @@
     "markdown-it-link-attributes": "^3.0.0",
     "md5": "^2.3.0",
     "needle": "^2.0.1",
-    "node-cron": "^1.1.2",
+    "node-cron": "^3.0.2",
     "pdfmake": "0.2.7",
     "querystring-browser": "1.0.4",
     "react-codemirror": "^1.0.0",
