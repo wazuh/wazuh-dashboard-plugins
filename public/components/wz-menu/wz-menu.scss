@@ -90,11 +90,18 @@ wz-menu {
 
 .wz-menu-popover{
     position: fixed;
-    top: 105px !important;
     left: 96px !important;
     border-radius: 0px 0px 4px 0px;
     max-height: unset!important;
     border-right: none!important;
+}
+
+.wz-expanded-header-min {
+    top: 53px !important;
+}
+
+.wz-expanded-header-max {
+    top: 105px !important;
 }
 
 .wz-menu-popover-over .euiPopover__panelArrow.euiPopover__panelArrow--bottom:after {

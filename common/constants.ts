@@ -1919,3 +1919,10 @@ export enum HTTP_STATUS_CODES {
   INSUFFICIENT_STORAGE = 507,
   NETWORK_AUTHENTICATION_REQUIRED = 511
 }
+
+// Module Security configuration assessment
+export const MODULE_SCA_CHECK_RESULT_LABEL = {
+  passed: 'Passed',
+  failed: 'Failed',
+  'not applicable': 'Not applicable'
+}

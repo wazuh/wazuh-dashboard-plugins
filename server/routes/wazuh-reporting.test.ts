@@ -175,11 +175,11 @@ describe('[endpoint] PUT /utils/configuration', () => {
   // If any of the parameters is changed this variable should be updated with the new md5
   it.each`
   footer              | header                                | responseStatusCode | expectedMD5                           | tab
-  ${null}             | ${null}                               | ${200}             | ${'9fbdebb41c6c4fe09841fc94a14de174'} | ${'pm'}
-  ${'Custom\nFooter'} | ${'info@company.com\nFake Avenue 123'}| ${200}             | ${'f01f3aa26436cca6c92e7c45da72efce'} | ${'general'}
-  ${''}               | ${''}                                 | ${200}             | ${'fa6c0527535b314aaf50d27e98fda093'} | ${'fim'}
-  ${'Custom Footer'}  | ${null}                               | ${200}             | ${'e4aba02dcb618387a4da4103ce833238'} | ${'aws'}
-  ${null}             | ${'Custom Header'}                    | ${200}             | ${'102c342384edd4796a02045e28f970cd'} | ${'gcp'}
+  ${null}             | ${null}                               | ${200}             | ${'7b6fa0e2a5911880d17168800c173f89'} | ${'pm'}
+  ${'Custom\nFooter'} | ${'info@company.com\nFake Avenue 123'}| ${200}             | ${'51b268066bb5107e5eb0a9d791a89d0c'} | ${'general'}
+  ${''}               | ${''}                                 | ${200}             | ${'23d5e0eedce38dc6df9e98e898628f68'} | ${'fim'}
+  ${'Custom Footer'}  | ${null}                               | ${200}             | ${'2b16be2ea88d3891cda7acb6075826d9'} | ${'aws'}
+  ${null}             | ${'Custom Header'}                    | ${200}             | ${'91e30564f157942718afdd97db3b4ddf'} | ${'gcp'}
 `(`Set custom report header and footer - Verify PDF output`, async ({footer, header, responseStatusCode, expectedMD5, tab}) => {
 
       // Mock PDF report parameters

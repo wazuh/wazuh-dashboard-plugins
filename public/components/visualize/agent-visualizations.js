@@ -660,12 +660,12 @@ export const agentVisualizations = {
         vis: [
           {
             title: 'Alerts evolution by organization',
-            id: 'Wazuh-App-Overview-GitHub-Alerts-Evolution-By-Organization',
+            id: 'Wazuh-App-Agents-GitHub-Alerts-Evolution-By-Organization',
             width: 60
           },
           {
             title: 'Top 5 organizations by alerts',
-            id: 'Wazuh-App-Overview-GitHub-Top-5-Organizations-By-Alerts',
+            id: 'Wazuh-App-Agents-GitHub-Top-5-Organizations-By-Alerts',
             width: 40
           }
         ]
@@ -675,12 +675,12 @@ export const agentVisualizations = {
         vis: [
           {
             title: 'Top alerts by action type and organization',
-            id: 'Wazuh-App-Overview-GitHub-Alert-Action-Type-By-Organization',
+            id: 'Wazuh-App-Agents-GitHub-Alert-Action-Type-By-Organization',
             width: 40
           },
           {
             title: 'Users with more alerts',
-            id: 'Wazuh-App-Overview-GitHub-Users-With-More-Alerts',
+            id: 'Wazuh-App-Agents-GitHub-Users-With-More-Alerts',
             width: 60
           }
         ]

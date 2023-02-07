@@ -63,7 +63,7 @@ export const drilldownOperationsConfig = {
                     { field: 'timestamp' },
                     { field: 'rule.description', label: 'Description' },
                     { field: 'data.office365.UserId', label: 'User ID' },
-                    { field: 'data.office365.ClientIP', label: 'Client IP' },
+                    { field: 'data.office365.ClientIP', label: 'Client IP address' },
                     { field: 'rule.level', label: 'Level' },
                     { field: 'rule.id', label: 'Rule ID' },
                   ]}

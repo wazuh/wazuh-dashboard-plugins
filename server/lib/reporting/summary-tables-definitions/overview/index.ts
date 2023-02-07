@@ -44,7 +44,7 @@ const officeAlertsSummary = {
   ]
 }
 
-const pcidssAlertsSummary = {
+const pciAlertsSummary = {
   title: 'Alerts summary',
   aggs: [
     AggregationFields['agent.name'],
@@ -134,11 +134,11 @@ const pmAlertsSummary = {
 }
 
 const dockerAlertsSummary = {
-  title: 'Alerts summary',
+  title: 'Events summary',
   aggs: [
     AggregationFields['data.docker.Actor.Attributes.name'],
     AggregationFields['data.docker.Action'],
-    AggregationFields['data.docker.timestamp'],
+    AggregationFields['timestamp'],
   ]
 }
 
@@ -151,32 +151,44 @@ const githubAlertsSummary = {
   ]
 }
 
-const oscapAlertsSummary = {
-  title: 'Alerts summary',
+// 'Wazuh-App-Overview-OSCAP-Last-alerts'
+const oscapLastAlerts = {
+  title: 'Last alerts',
   aggs: [
     AggregationFields['agent.name'],
-    AggregationFields['data.github.org'],
+    AggregationFields['data.oscap.check.title'],
+    AggregationFields['data.oscap.scan.profile.title'],
+  ]
+}
+
+// 'Wazuh-App-Overview-Audit-Last-alerts'
+const auditLastAlerts = {
+  title: 'Last alerts',
+  aggs: [
+    AggregationFields['agent.name'],
     AggregationFields['rule.description'],
+    AggregationFields['data.audit.exe'],
   ]
 }
 
 export default {
-  awsAlertsSummary,
-  ciscatAlertsSummary,
-  dockerAlertsSummary,
-  fimAlertsSummary,
-  gcpAlertsSummary,
-  gdprAlertsSummary,
-  generalAlertsSummary,
-  githubAlertsSummary,
-  hipaaAlertsSummary,
-  mitreAlertsSummary,
-  nistAlertsSummary,
-  officeAlertsSummary,
-  oscapAlertsSummary,
-  osqueryAlertsSummary,
-  pcidssAlertsSummary,
-  pmAlertsSummary,
-  tscAlertsSummary,
-  virustotalAlertsSummary,
+  aws: [awsAlertsSummary],
+  ciscat: [ciscatAlertsSummary],
+  docker: [dockerAlertsSummary],
+  fim: [fimAlertsSummary],
+  gcp: [gcpAlertsSummary],
+  gdpr: [gdprAlertsSummary],
+  general: [generalAlertsSummary],
+  github: [githubAlertsSummary],
+  hipaa: [hipaaAlertsSummary],
+  mitre: [mitreAlertsSummary],
+  nist: [nistAlertsSummary],
+  office: [officeAlertsSummary],
+  oscap: [oscapLastAlerts],
+  osquery: [osqueryAlertsSummary],
+  pci: [pciAlertsSummary],
+  pm: [pmAlertsSummary],
+  tsc: [tscAlertsSummary],
+  virustotal: [virustotalAlertsSummary],
+  audit: [auditLastAlerts],
 }

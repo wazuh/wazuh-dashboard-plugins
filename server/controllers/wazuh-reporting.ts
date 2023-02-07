@@ -30,6 +30,11 @@ import {
 import { createDirectoryIfNotExists, createDataDirectoryIfNotExists } from '../lib/filesystem';
 import { agentStatusLabelByAgentStatus } from '../../common/services/wz_agent_status';
 
+interface AgentsFilter {
+  query: any;
+  agentsText: string;
+}
+
 export class WazuhReportingCtrl {
   constructor() {}
   /**
@@ -37,7 +42,7 @@ export class WazuhReportingCtrl {
    * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
    * @param {String} searchBar search term
    */
-  private sanitizeKibanaFilters(filters: any, searchBar?: string): [string, string] {
+  private sanitizeKibanaFilters(filters: any, searchBar?: string): [string, AgentsFilter] {
     log('reporting:sanitizeKibanaFilters', `Started to sanitize filters`, 'info');
     log(
       'reporting:sanitizeKibanaFilters',
@@ -46,12 +51,14 @@ export class WazuhReportingCtrl {
     );
     let str = '';
 
-    const agentsFilter: any = [];
+    const agentsFilter: AgentsFilter = { query: {}, agentsText: '' };
+    const agentsList: string[] = [];
 
     //separate agents filter
     filters = filters.filter((filter) => {
       if (filter.meta.controlledBy === AUTHORIZED_AGENTS) {
-        agentsFilter.push(filter);
+        agentsFilter.query = filter.query;
+        agentsList.push(filter);
         return false;
       }
       return filter;
@@ -81,15 +88,15 @@ export class WazuhReportingCtrl {
       str += ` AND (${ searchBar})`;
     }
 
-    const agentsFilterStr = agentsFilter.map((filter) => filter.meta.value).join(',');
+    agentsFilter.agentsText = agentsList.map((filter) => filter.meta.value).join(',');
 
     log(
       'reporting:sanitizeKibanaFilters',
-      `str: ${str}, agentsFilterStr: ${agentsFilterStr}`,
+      `str: ${str}, agentsFilterStr: ${agentsFilter.agentsText}`,
       'debug'
     );
 
-    return [str, agentsFilterStr];
+    return [str, agentsFilter];
   }
 
   /**
@@ -305,7 +312,7 @@ export class WazuhReportingCtrl {
 
       const [sanitizedFilters, agentsFilter] = filters
         ? this.sanitizeKibanaFilters(filters, searchBar)
-        : [false, false];
+        : [false, null];
 
       if (time && sanitizedFilters) {
         printer.addTimeRangeAndFilters(from, to, sanitizedFilters, browserTimezone);
@@ -321,6 +328,7 @@ export class WazuhReportingCtrl {
           new Date(from).getTime(),
           new Date(to).getTime(),
           sanitizedFilters,
+          agentsFilter,
           indexPatternTitle,
           agents
         );
@@ -333,8 +341,8 @@ export class WazuhReportingCtrl {
       }
 
       //add authorized agents
-      if (agentsFilter) {
-        printer.addAgentsFilters(agentsFilter);
+      if (agentsFilter?.agentsText) {
+        printer.addAgentsFilters(agentsFilter.agentsText);
       }
 
       await printer.print(context.wazuhEndpointParams.pathFilename);
@@ -881,7 +889,7 @@ export class WazuhReportingCtrl {
       createDirectoryIfNotExists(path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, hashUsername));
 
       log('reporting:createReportsAgentsInventory', `Syscollector report`, 'debug');
-      const sanitizedFilters = filters ? this.sanitizeKibanaFilters(filters, searchBar) : false;
+      const [sanitizedFilters, agentsFilter] = filters ? this.sanitizeKibanaFilters(filters, searchBar) : [false, null];
 
       // Get the agent OS
       let agentOs = '';
@@ -961,14 +969,14 @@ export class WazuhReportingCtrl {
             columns:
               agentOs === 'windows'
                 ? [
-                    { id: 'local_ip', label: 'Local IP' },
+                    { id: 'local_ip', label: 'Local IP address' },
                     { id: 'local_port', label: 'Local port' },
                     { id: 'process', label: 'Process' },
                     { id: 'state', label: 'State' },
                     { id: 'protocol', label: 'Protocol' },
                   ]
                 : [
-                    { id: 'local_ip', label: 'Local IP' },
+                    { id: 'local_ip', label: 'Local IP address' },
                     { id: 'local_port', label: 'Local port' },
                     { id: 'state', label: 'State' },
                     { id: 'protocol', label: 'Protocol' },
@@ -1001,7 +1009,7 @@ export class WazuhReportingCtrl {
             title: 'Network settings',
             columns: [
               { id: 'iface', label: 'Interface' },
-              { id: 'address', label: 'address' },
+              { id: 'address', label: 'Address' },
               { id: 'netmask', label: 'Netmask' },
               { id: 'proto', label: 'Protocol' },
               { id: 'broadcast', label: 'Broadcast' },
@@ -1063,6 +1071,7 @@ export class WazuhReportingCtrl {
           from,
           to,
           sanitizedFilters + ' AND rule.groups: "vulnerability-detector"',
+          agentsFilter,
           indexPatternTitle,
           agentID
         );
