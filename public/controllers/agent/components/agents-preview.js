@@ -68,7 +68,6 @@ export const AgentsPreview = compose(
         agentStatusSummary: { active: '-', disconnected: '-', total: '-', pending: '-', never_connected: '-' },
         agentConfiguration: {},
         agentsActiveCoverage: 0,
-        agentsSynced: 0,
       };
       this.wazuhConfig = new WazuhConfig();
       this.agentStatus = UI_ORDER_AGENT_STATUS.map(agentStatus => ({
@@ -82,8 +81,8 @@ export const AgentsPreview = compose(
       this._isMount = true;
       this.fetchAgentStatusDetailsData();
       if (this.wazuhConfig.getConfig()['wazuh.monitoring.enabled']) {
-        this._isMount && this.setState({ 
-          showAgentsEvolutionVisualization: true 
+        this._isMount && this.setState({
+          showAgentsEvolutionVisualization: true
         });
       }
     }
@@ -112,7 +111,6 @@ export const AgentsPreview = compose(
         agentStatusSummary,
         agentConfiguration,
         agentsActiveCoverage: ((agentStatusSummary.active / agentStatusSummary.total) * 100).toFixed(2),
-        agentsSynced: ((agentConfiguration.synced/agentConfiguration.total)*100).toFixed(2),
       });
     }
 
@@ -170,8 +168,6 @@ export const AgentsPreview = compose(
     }
 
     render() {
-      const evolutionIsReady = this.props.resultState !== 'loading';
-
       return (
         <EuiPage className="flex-column">
           <EuiFlexItem>
@@ -231,15 +227,6 @@ export const AgentsPreview = compose(
                             className="white-space-nowrap"
                             />
                         </EuiFlexItem>
-                        <EuiFlexItem className="agents-link-item">
-                          <EuiStat
-                            isLoading={this.state.loadingSummary}
-                            title={`${this.state.agentsSynced}%`}
-                            titleSize='s'
-                            description="Synced agents"
-                            className="white-space-nowrap"
-                          />
-                        </EuiFlexItem>
                       </EuiFlexGroup>
                       <EuiFlexGroup className="mt-0">
                           <EuiFlexItem className="agents-link-item">
@@ -281,10 +268,12 @@ export const AgentsPreview = compose(
                   </EuiFlexItem>
                 </>
               )}
+              {this.state.showAgentsEvolutionVisualization && (
                 <EuiFlexItem
                   grow={false}
                   className="agents-evolution-visualization"
                   style={{
+                    display: !this.state.loading ? 'inherit' : 'none',
                     margin: !this.state.loading ? '12px' : 0,
                   }}
                 >
@@ -297,8 +286,8 @@ export const AgentsPreview = compose(
                     <EuiFlexGroup>
                       <EuiFlexItem>
                         <div style={{
-                          height: evolutionIsReady === 'ready' ? '202px' : 0,
-                          paddingTop: evolutionIsReady === 'ready' ? "12px" : 0
+                          height: this.props.resultState === 'ready' ? '202px' : 0,
+                          paddingTop: this.props.resultState === 'ready' ? "12px" : 0
                         }}
                         >
                           <WzKibanaVis
@@ -306,7 +295,7 @@ export const AgentsPreview = compose(
                             tab={'general'}
                           />
                         </div>
-                        {!evolutionIsReady && (
+                        {this.props.resultState === 'loading' && (
                           <div className="loading-chart-xl">
                             <EuiLoadingChart size="xl" />
                           </div>
@@ -333,6 +322,7 @@ export const AgentsPreview = compose(
                     />
                   </EuiCard>
                 </EuiFlexItem>
+              )}
             </EuiFlexGroup>
             <EuiSpacer size="m" />
             <WzReduxProvider>

@@ -47,7 +47,7 @@ export function DocViewTableRowBtnFilterAdd({ onClick, disabled = false }: Props
         })}
         className="kbnDocViewer__actionButton"
         data-test-subj="addInclusiveFilterButton"
-        disabled={disabled}
+        isDisabled={disabled}
         onClick={onClick}
         iconType={'magnifyWithPlus'}
         iconSize={'s'}

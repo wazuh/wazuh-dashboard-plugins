@@ -23,6 +23,7 @@ export default class SummaryTable {
     gte,
     lte,
     filters,
+    allowedAgentsFilter,
     summarySetup: SummarySetup,
     pattern = getSettingDefaultValue('pattern')
   ) {
@@ -35,7 +36,7 @@ export default class SummaryTable {
     this._rows = [];
     this._title = summarySetup.title;
 
-    Object.assign(this._base, Base(pattern, filters, gte, lte));
+    Object.assign(this._base, Base(pattern, filters, gte, lte, allowedAgentsFilter));
 
     this._parseSummarySetup(summarySetup);
 
@@ -43,32 +44,32 @@ export default class SummaryTable {
 
   /**
    * Parse the summary table setup to build the query
-   * @param summarySetup 
+   * @param summarySetup
    */
   _parseSummarySetup(summarySetup: SummarySetup) {
     let baseAggRef = this._base.aggs;
-    summarySetup.aggs.forEach(( agg, key) => {
+    summarySetup.aggs.forEach((agg, key) => {
       this._columns.push(agg.customLabel);
-      this._parseAggregation(baseAggRef,agg, key);
-      
+      this._parseAggregation(baseAggRef, agg, key);
+
       if (summarySetup.aggs.length > key + 1) {
         baseAggRef[`${key + 2}`].aggs = {};
         baseAggRef = baseAggRef[`${key + 2}`].aggs;
       } else {
         this._columns.push('Count');
       }
-    },this);
+    }, this);
   }
-  
+
   /**
    * Parse each aggregation to build the query
-   * @param baseAggRef 
-   * @param agg 
-   * @param key 
+   * @param baseAggRef
+   * @param agg
+   * @param key
    */
   _parseAggregation(baseAggRef: any, agg: any, key: string) {
-    const { field, size, order } = agg;
-    
+    const { field, size, order, missing } = agg;
+
     baseAggRef[`${key + 2}`] = {
       terms: {
         field,
@@ -78,6 +79,9 @@ export default class SummaryTable {
         size
       }
     };
+    if (missing) {
+      baseAggRef[`${key + 2}`].terms.missing = missing;
+    }
   }
 
   /**
@@ -90,16 +94,16 @@ export default class SummaryTable {
    *    ['502', 'Ossec server started', 3, 22],
    *  ]
    * }
-   * @param rawResponse 
+   * @param rawResponse
    */
   _formatResponseToTable(rawResponse) {
     const firstKey = parseInt(Object.keys(rawResponse)[0]);
 
-    this._rows = rawResponse[firstKey].buckets.map(bucket => {
+    this._rows = rawResponse[firstKey].buckets.reduce((totalRows, bucket) => {
       const nextKey = firstKey + 1;
-      const row = this._buildRow(bucket, nextKey);
-      return row;
-    })
+      this._buildRow(bucket, nextKey, totalRows);
+      return totalRows;
+    }, []);
 
     return {
       rows: this._rows,
@@ -108,30 +112,30 @@ export default class SummaryTable {
     }
   }
 
-/**
- * Makes a row from the response
- * @param bucket 
- * @param nextAggKey 
- * @param row 
- */
-  _buildRow(bucket: any, nextAggKey: number, row: any[] = []): any[] {
-    // Push the column value to the row
-    row.push(bucket.key);
+  /**
+   * Makes a row from the response
+   * @param bucket
+   * @param nextAggKey
+   * @param row
+   */
+  _buildRow(bucket: any, nextAggKey: number, totalRows: any[], row: any[] = []): any[] {
+    const newRow = [...row, bucket.key];
     // If there is a next aggregation, repeat the process
-    if (bucket[nextAggKey.toString()]?.buckets) {
-      const newBucket = bucket[nextAggKey.toString()].buckets[0];
-      row = this._buildRow(newBucket, (nextAggKey + 1), row);
+    if (bucket[nextAggKey.toString()]?.buckets?.length) {
+      bucket[nextAggKey.toString()].buckets.forEach(newBucket => {
+        this._buildRow(newBucket, (nextAggKey + 1), totalRows, newRow);
+      });
     }
     // Add the Count as the last item in the row
     else if (bucket.doc_count) {
-      row.push(bucket.doc_count);
+      newRow.push(bucket.doc_count);
+      totalRows.push(newRow);
     }
-    return row;
   }
 
-/**
- * Executes the query and returns the response
- */
+  /**
+   * Executes the query and returns the response
+   */
   async fetch() {
     try {
       const response = await this._context.core.elasticsearch.client.asCurrentUser.search({
@@ -144,5 +148,5 @@ export default class SummaryTable {
       return Promise.reject(error);
     }
   }
-  
+
 }
