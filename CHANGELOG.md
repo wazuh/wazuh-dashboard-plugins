@@ -6,7 +6,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Added
 
-- Add rel="noopener noreferrer" in documentation links. [#5197](https://github.com/wazuh/wazuh-kibana-app/pull/5197)
+- Added rel="noopener noreferrer" in documentation links. [#5197](https://github.com/wazuh/wazuh-kibana-app/pull/5197)
 
 ### Changed
 
