@@ -19,10 +19,10 @@ import configureMockStore from 'redux-mock-store';
 import { Provider } from 'react-redux';
 
 jest.mock('../../../../redux/reducers/restartReducers', () => ({
-  unsynchronizedNodes: (state) => state,
-  restartStatus: (state) => state,
-  syncNodesInfo: (state) => state,
-  restartNodesInfo: (state) => state,
+  unsynchronizedNodes: state => state,
+  restartStatus: state => state,
+  syncNodesInfo: state => state,
+  restartNodesInfo: state => state,
 }));
 
 const restartedState = {
@@ -120,7 +120,7 @@ describe('Restart status: restarted', () => {
     const wrapper = mount(
       <Provider store={store}>
         <RestartModal />;
-      </Provider>
+      </Provider>,
     );
     expect(wrapper).toMatchSnapshot();
   });
@@ -133,7 +133,7 @@ describe('Restart status: restarting', () => {
     const wrapper = mount(
       <Provider store={store}>
         <RestartModal />;
-      </Provider>
+      </Provider>,
     );
     expect(wrapper).toMatchSnapshot();
   });
@@ -146,7 +146,7 @@ describe('Restart status: restarted_info', () => {
     const wrapper = mount(
       <Provider store={store}>
         <RestartModal />;
-      </Provider>
+      </Provider>,
     );
     expect(wrapper).toMatchSnapshot();
   });
@@ -157,8 +157,11 @@ describe('Restart status: restarted_info', () => {
 
     const wrapper = mount(
       <Provider store={store}>
-        <RestartModal isSyncCanceled={{ isSyncCanceled: false }} cancelSync={cancelModal} />
-      </Provider>
+        <RestartModal
+          isSyncCanceled={{ isSyncCanceled: false }}
+          cancelSync={cancelModal}
+        />
+      </Provider>,
     );
 
     const buttonCancel = wrapper.find('EuiButton');
@@ -177,7 +180,7 @@ describe('Restart status: restart_error', () => {
     const wrapper = mount(
       <Provider store={store}>
         <RestartModal />;
-      </Provider>
+      </Provider>,
     );
     expect(wrapper).toMatchSnapshot();
   });
@@ -189,10 +192,10 @@ describe('Restart status: restart_error', () => {
     const wrapper = mount(
       <Provider store={store}>
         <RestartModal />
-      </Provider>
+      </Provider>,
     );
 
-    const goToHealthcheckButton = wrapper.find('EuiButton');
+    const goToHealthcheckButton = wrapper.find('EuiButton').at(1);
 
     expect(goToHealthcheckButton.props().href).toBe(goToHealthcheckHref);
     expect(goToHealthcheckButton.text().trim()).toContain('Go to Healthcheck');
@@ -206,7 +209,7 @@ describe('Restart status: sync_error', () => {
     const wrapper = mount(
       <Provider store={store}>
         <RestartModal />;
-      </Provider>
+      </Provider>,
     );
     expect(wrapper).toMatchSnapshot();
   });
@@ -218,8 +221,11 @@ describe('Restart status: sync_error', () => {
 
     const wrapper = mount(
       <Provider store={store}>
-        <RestartModal isSyncCanceled={{ isSyncCanceled: false }} cancelSync={cancelModal} />
-      </Provider>
+        <RestartModal
+          isSyncCanceled={{ isSyncCanceled: false }}
+          cancelSync={cancelModal}
+        />
+      </Provider>,
     );
 
     const buttonForceRestart = wrapper.find('EuiButtonEmpty');
@@ -235,8 +241,11 @@ describe('Restart status: sync_error', () => {
 
     const wrapper = mount(
       <Provider store={store}>
-        <RestartModal isSyncCanceled={{ isSyncCanceled: false }} cancelSync={cancelModal} />
-      </Provider>
+        <RestartModal
+          isSyncCanceled={{ isSyncCanceled: false }}
+          cancelSync={cancelModal}
+        />
+      </Provider>,
     );
 
     const buttonCancel = wrapper.find('EuiButton');
@@ -255,8 +264,11 @@ describe('Restart status: syncing', () => {
 
     const wrapper = mount(
       <Provider store={store}>
-        <RestartModal isSyncCanceled={{ isSyncCanceled: false }} cancelSync={cancelModal} />
-      </Provider>
+        <RestartModal
+          isSyncCanceled={{ isSyncCanceled: false }}
+          cancelSync={cancelModal}
+        />
+      </Provider>,
     );
     expect(wrapper).toMatchSnapshot();
   });
@@ -267,8 +279,11 @@ describe('Restart status: syncing', () => {
 
     const wrapper = mount(
       <Provider store={store}>
-        <RestartModal isSyncCanceled={{ isSyncCanceled: false }} cancelSync={cancelModal} />
-      </Provider>
+        <RestartModal
+          isSyncCanceled={{ isSyncCanceled: false }}
+          cancelSync={cancelModal}
+        />
+      </Provider>,
     );
 
     const buttonForceRestart = wrapper.find('EuiButtonEmpty');
@@ -283,8 +298,11 @@ describe('Restart status: syncing', () => {
 
     const wrapper = mount(
       <Provider store={store}>
-        <RestartModal isSyncCanceled={{ isSyncCanceled: false }} cancelSync={cancelModal} />
-      </Provider>
+        <RestartModal
+          isSyncCanceled={{ isSyncCanceled: false }}
+          cancelSync={cancelModal}
+        />
+      </Provider>,
     );
 
     const buttonCancel = wrapper.find('EuiButton');
