@@ -264,20 +264,6 @@ export const Discover = compose(
       this.indexPattern = {
         ...(await this.PluginPlatformServices.indexPatterns.get(AppState.getCurrentPattern())),
       };
-      const fields: IFieldType[] = [];
-      Object.keys(this.indexPattern.fields).forEach((item) => {
-        if (isNaN(item)) {
-          fields.push(this.indexPattern.fields[item]);
-        } else if (
-          this.props.includeFilters &&
-          this.indexPattern.fields[item].name.includes(this.props.includeFilters)
-        ) {
-          fields.unshift(this.indexPattern.fields[item]);
-        } else {
-          fields.push(this.indexPattern.fields[item]);
-        }
-      });
-      this.indexPattern.fields = fields;
     }
 
     hideCreateCustomLabel = () => {
@@ -336,6 +322,7 @@ export const Discover = compose(
               addFilterOut={(filter) => this.addFilterOut(filter)}
               toggleColumn={(id) => this.addColumn(id)}
               rowDetailsFields={rowDetailsFields}
+              indexPattern={this.indexPattern}
             />
           </div>
         );
@@ -370,7 +357,7 @@ export const Discover = compose(
       const previousFilters =
         (this.PluginPlatformServices && this.PluginPlatformServices.query.filterManager.getFilters()) || [];
       const elasticQuery = buildEsQuery(
-        undefined,
+        this.indexPattern,
         query,
         _.union(
           previousFilters,

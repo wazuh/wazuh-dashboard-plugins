@@ -316,6 +316,7 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
           <EuiForm component="form" style={{ padding: 24 }}>
             <EuiFormRow label="Policy name" helpText="Introduce a name for this new policy.">
               <EuiFieldText
+                data-test-subj="createPolicyName"
                 placeholder=""
                 value={policyName}
                 onChange={(e) => onChangePolicyName(e)}
@@ -326,6 +327,7 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
             <EuiFlexGroup>
               <EuiFlexItem>
                 <EuiFormRow
+                  data-test-subj="createPolicyActionRow"
                   label="Action"
                   helpText="Set an action where the policy will be carried out."
                 >
@@ -342,6 +344,7 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
               <EuiFlexItem grow={false}>
                 <EuiFormRow hasEmptyLabelSpace>
                   <EuiButton
+                    data-test-subj="createPolicyAddAction"
                     onClick={() => addAction()}
                     iconType="plusInCircle"
                     disabled={!actionValue}
@@ -367,6 +370,7 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
                 <EuiFormRow
                   label="Resource"
                   helpText="Select the resource to which this policy is directed."
+                  data-test-subj="createPolicyResourceRow"
                 >
                   <EuiSuperSelect
                     options={resources}
@@ -384,6 +388,7 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
                   helpText="Introduce the resource identifier. Type * for all."
                 >
                   <EuiFieldText
+                    data-test-subj="createPolicyResourceIdentifier"
                     placeholder={getIdentifier()}
                     value={resourceIdentifierValue}
                     onChange={(e) => onChangeResourceIdentifierValue(e)}
@@ -394,6 +399,7 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
               <EuiFlexItem grow={false}>
                 <EuiFormRow hasEmptyLabelSpace>
                   <EuiButton
+                    data-test-subj="createPolicyAddResource"
                     onClick={() => addResource()}
                     iconType="plusInCircle"
                     disabled={!resourceIdentifierValue}
@@ -414,7 +420,7 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
               </>
             )}
             <EuiSpacer></EuiSpacer>
-            <EuiFormRow label="Select an effect" helpText="Select an effect.">
+            <EuiFormRow label="Select an effect" helpText="Select an effect." data-test-subj="createPolicyEffectRow">
               <EuiSuperSelect
                 options={effectOptions}
                 valueOfSelected={effectValue}
@@ -423,6 +429,7 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
             </EuiFormRow>
             <EuiSpacer />
             <EuiButton
+              data-test-subj="createPolicyButton"
               disabled={
                 !policyName || !addedActions.length || !addedResources.length || !effectValue
               }

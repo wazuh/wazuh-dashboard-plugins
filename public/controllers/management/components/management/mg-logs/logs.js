@@ -413,6 +413,7 @@ export default compose(
                     iconType="importAction"
                     onClick={this.exportFormatted}
                     isLoading={this.state.generatingCsv}
+                    isDisabled={!this.state.logsList}
                   >
                     Export formatted
                   </EuiButtonEmpty>

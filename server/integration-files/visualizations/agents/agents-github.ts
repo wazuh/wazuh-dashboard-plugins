@@ -12,7 +12,7 @@
 
 export default [
   {
-    _id: 'Wazuh-App-Overview-GitHub-Alerts-Evolution-By-Organization',
+    _id: 'Wazuh-App-Agents-GitHub-Alerts-Evolution-By-Organization',
     _source: {
       title: 'Alerts evolution by organization',
       visState: JSON.stringify({
@@ -152,7 +152,7 @@ export default [
     _type: 'visualization',
   },
   {
-    _id: 'Wazuh-App-Overview-GitHub-Top-5-Organizations-By-Alerts',
+    _id: 'Wazuh-App-Agents-GitHub-Top-5-Organizations-By-Alerts',
     _source: {
       title: 'Top 5 organizations by alerts',
       visState: JSON.stringify({
@@ -207,7 +207,7 @@ export default [
     _type: 'visualization',
   },
   {
-    _id: 'Wazuh-App-Overview-GitHub-Users-With-More-Alerts',
+    _id: 'Wazuh-App-Agents-GitHub-Users-With-More-Alerts',
     _source: {
       title: 'Users with more alerts',
       visState: JSON.stringify({
@@ -341,7 +341,7 @@ export default [
     _type: 'visualization',
   },
   {
-    _id: 'Wazuh-App-Overview-GitHub-Alert-Action-Type-By-Organization',
+    _id: 'Wazuh-App-Agents-GitHub-Alert-Action-Type-By-Organization',
     _source: {
       title: 'Top alerts by alert action type and organization',
       visState: JSON.stringify({
@@ -412,11 +412,11 @@ export default [
     _type: 'visualization',
   },
   {
-    _id: 'Wazuh-App-Overview-GitHub-Alert-Summary',
+    _id: 'Wazuh-App-Agents-GitHub-Alert-Summary',
     _source: {
-      title: 'Alert summary',
+      title: 'Alerts summary',
       visState: JSON.stringify({
-        "title": "Alert summary",
+        "title": "Alerts summary",
         "type": "table",
         "aggs": [
           {

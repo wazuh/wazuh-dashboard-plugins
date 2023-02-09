@@ -78,8 +78,13 @@
     padding-top: 105px;
 }
 
-.wz-module.wz-module-welcome .wz-module-body{
-    padding-top: 109px !important;
+.wz-module.wz-module-welcome{
+    .wz-module-agent-body{
+        padding-top: 50px !important;
+    }
+    .wz-module-body{
+        padding-top: 109px !important;
+    }
 }
 
 .wz-module.wz-module-showing-agent .wz-module-body{
@@ -111,19 +116,23 @@ discover-app-w .sidebar-container {
         padding-top: 189px !important;
     }
     @media only screen and (max-width: 767px){
-        .wz-module-header-agent h1{    
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            overflow: hidden;
+        .wz-module.wz-module-welcome .wz-module-agent-body{
+            padding-top: 0px !important;
         }
-    
+        .wz-module-header-agent{
+            height: auto;
+            h1{    
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                overflow: hidden;
+            }
+        }
         .wz-module-body {
             margin-top: -160px;
         }
     
         .wz-module-header-agent-wrapper, .wz-module-header-nav-wrapper{
             position: relative;
-            padding-left: 0px;
         }
     
         .wz-module-header-nav-wrapper{
@@ -137,5 +146,18 @@ discover-app-w .sidebar-container {
         .wz-module-body-agent-info > .euiFlexGroup > .euiFlexItem {
             max-width: unset!important;
         }
+
+        .wz-module-header-agent-title .euiFlexItem{
+            align-items: flex-start!important;    
+        }
+        .wz-agent-empty-item .euiFlexItem{
+            margin-top: 0px!important;
+            margin-bottom:0px!important;
+        }
     }
+}
+
+.wz-section-sca-euiFlexGroup {
+    display: flex;
+    justify-content: space-between;
 }

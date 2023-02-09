@@ -75,6 +75,7 @@ exports[`Table Default component renders correctly to match the snapshot 1`] = `
     onChange={[Function]}
     pagination={
       Object {
+        "hidePerPageOptions": false,
         "pageIndex": 0,
         "pageSize": 15,
         "pageSizeOptions": Array [

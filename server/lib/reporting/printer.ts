@@ -10,13 +10,14 @@ import {
 import { log } from '../logger';
 import * as TimSort from 'timsort';
 import { getConfiguration } from '../get-configuration';
-import { REPORTS_PRIMARY_COLOR, REPORTS_LOGO_IMAGE_ASSETS_RELATIVE_PATH, REPORTS_PAGE_FOOTER_TEXT, REPORTS_PAGE_HEADER_TEXT } from '../../../common/constants';
+import { REPORTS_PRIMARY_COLOR} from '../../../common/constants';
+import { getCustomizationSetting } from '../../../common/services/settings';
 
 const COLORS = {
   PRIMARY: REPORTS_PRIMARY_COLOR
 };
 
-const pageConfiguration = (nameLogo) => ({
+const pageConfiguration = ({ pathToLogo, pageHeader, pageFooter }) => ({
   styles: {
     h1: {
       fontSize: 22,
@@ -54,14 +55,15 @@ const pageConfiguration = (nameLogo) => ({
     margin: [40, 20, 0, 0],
     columns: [
       {
-        image: path.join(__dirname, `../../../public/assets/${nameLogo}`),
-        width: 190
+        image: path.join(__dirname, `../../../public/assets/${pathToLogo}`),
+        fit: [190, 50]
       },
       {
-        text: REPORTS_PAGE_HEADER_TEXT,
+        text: pageHeader,
         alignment: 'right',
         margin: [0, 0, 40, 0],
-        color: COLORS.PRIMARY
+        color: COLORS.PRIMARY,
+        width: 'auto'
       }
     ]
   },
@@ -70,7 +72,7 @@ const pageConfiguration = (nameLogo) => ({
     return {
       columns: [
         {
-          text: REPORTS_PAGE_FOOTER_TEXT,
+          text: pageFooter,
           color: COLORS.PRIMARY,
           margin: [40, 40, 0, 0]
         },
@@ -78,7 +80,8 @@ const pageConfiguration = (nameLogo) => ({
           text: 'Page ' + currentPage.toString() + ' of ' + pageCount,
           alignment: 'right',
           margin: [0, 40, 40, 0],
-          color: COLORS.PRIMARY
+          color: COLORS.PRIMARY,
+          width: 'auto'
         }
       ]
     };
@@ -473,7 +476,7 @@ export class ReportPrinter{
       this.addContent(typeof title === 'string' ? { text: title, style: 'h4' } : title)
         .addNewLine();
     }
-  
+
     if (!items || !items.length) {
       this.addContent({
         text: 'No results match your search criteria',
@@ -494,23 +497,23 @@ export class ReportPrinter{
           style: 'standard'
         }
       })
-    }); 
+    });
 
     // 385 is the max initial width per column
     let totalLength = columns.length - 1;
     const widthColumn = 385/totalLength;
     let totalWidth = totalLength * widthColumn;
-    
+
     const widths:(number)[] = [];
-    
+
     for (let step = 0; step < columns.length - 1; step++) {
 
       let columnLength = this.getColumnWidth(columns[step], tableRows, step);
-      
+
       if (columnLength <= Math.round(totalWidth / totalLength)) {
         widths.push(columnLength);
         totalWidth -= columnLength;
-      } 
+      }
       else {
         widths.push(Math.round(totalWidth / totalLength));
         totalWidth -= Math.round((totalWidth / totalLength));
@@ -518,7 +521,7 @@ export class ReportPrinter{
       totalLength--;
     }
     widths.push('*');
-  
+
     this.addContent({
       fontSize: 8,
       table: {
@@ -562,9 +565,9 @@ export class ReportPrinter{
       `agents: ${agents}`,
       'debug'
     );
-    
+
     this.addNewLine();
-    
+
     this.addContent({
       text:
         'NOTE: This report only includes the authorized agents of the user who generated the report',
@@ -613,22 +616,36 @@ export class ReportPrinter{
     );
   }
 
-  async print(reportPath: string){
-    const nameLogo = ( await getConfiguration() )['customization.logo.reports'] || REPORTS_LOGO_IMAGE_ASSETS_RELATIVE_PATH;
+  async print(reportPath: string) {
+    return new Promise((resolve, reject) => {
+      try {
+        const configuration = getConfiguration();
 
-    const document = this._printer.createPdfKitDocument({...pageConfiguration(nameLogo), content: this._content});
-    await document.pipe(
-      fs.createWriteStream(reportPath)
-    );
-    document.end();
+        const pathToLogo = getCustomizationSetting(configuration, 'customization.logo.reports');
+        const pageHeader = getCustomizationSetting(configuration, 'customization.reports.header');
+        const pageFooter = getCustomizationSetting(configuration, 'customization.reports.footer');
+
+        const document = this._printer.createPdfKitDocument({ ...pageConfiguration({ pathToLogo, pageHeader, pageFooter }), content: this._content });
+
+        document.on('error', reject);
+        document.on('end', resolve);
+
+        document.pipe(
+          fs.createWriteStream(reportPath)
+        );
+        document.end();
+      } catch (ex) {
+        reject(ex);
+      }
+    });
   }
 
   /**
    * Returns the width of a given column
-   * 
-   * @param column 
-   * @param tableRows 
-   * @param step 
+   *
+   * @param column
+   * @param tableRows
+   * @param step
    * @returns {number}
    */
   getColumnWidth(column, tableRows, index){

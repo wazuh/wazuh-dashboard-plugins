@@ -15,7 +15,7 @@ import { ManageHosts } from './manage-hosts';
 import https from 'https';
 
 const httpsAgent = new https.Agent({
-  rejectUnauthorized: false,  
+  rejectUnauthorized: false,
 });
 
 const _axios = axios.create({ httpsAgent });
@@ -47,7 +47,7 @@ export const authenticate = async (apiHostID: string, authContext?: any): Promis
   try{
     const api: APIHost = await manageHosts.getHostById(apiHostID);
     const optionsRequest = {
-      method: !!authContext ? 'POST' : 'GET',
+      method: 'POST',
       headers: {
         'content-type': 'application/json',
       },

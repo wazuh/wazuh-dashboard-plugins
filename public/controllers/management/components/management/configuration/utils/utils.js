@@ -103,8 +103,15 @@ export const objectWithoutProperties = obj => {
  * @param {any} defaultValue
  * @returns {function}
  */
-export const renderValueOrDefault = defaultValue => value =>
-  typeof value !== 'undefined' ? value : defaultValue;
+export const renderValueOrDefault = defaultValue => value => {
+  if (typeof value !== 'undefined') {
+    if (isArray(value)) {
+      return value.join(', ');
+    }
+    return value;
+  }
+  return defaultValue;
+};
 
 /**
  * Return value if isn't falsy or '-'

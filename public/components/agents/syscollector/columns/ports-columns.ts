@@ -17,4 +17,5 @@ export const portsColumns = {
   linux: defaultColumns,
   apple: defaultColumns,
   freebsd: defaultColumns,
+  solaris: defaultColumns,
 };

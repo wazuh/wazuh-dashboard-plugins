@@ -396,7 +396,7 @@ export const MultipleAgentSelector = withErrorBoundary(
     };
 
     unselectElementsOfSelectByID(containerID) {
-      document.getElementById(containerID).options.forEach((option) => {
+      Array.from(document.getElementById(containerID).options).forEach((option) => {
         option.selected = false;
       });
     }

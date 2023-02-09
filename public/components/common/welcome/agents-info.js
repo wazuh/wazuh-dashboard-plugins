@@ -25,6 +25,7 @@ import WzTextWithTooltipIfTruncated from '../wz-text-with-tooltip-if-truncated';
 import { WzStat } from '../../wz-stat';
 import { GroupTruncate } from '../util/agent-group-truncate'
 import { AgentStatus } from '../../agents/agent_status';
+import { compressIPv6 } from '../../../services/ipv6-services';
 
 export class AgentInfo extends Component {
   constructor(props) {
@@ -33,7 +34,7 @@ export class AgentInfo extends Component {
     this.state = {};
   }
 
-  
+
   async componentDidMount() {
     const managerVersion = await WzRequest.apiReq('GET', '/', {});
     this.setState({
@@ -73,7 +74,7 @@ export class AgentInfo extends Component {
     const osName = os_name === '- -' ? '-' : os_name;
 
     return (
-      <WzTextWithTooltipIfTruncated position='bottom' tooltipProps={{ anchorClassName: 'wz-width-100'}} elementStyle={{ maxWidth: style.maxWidth, fontSize: 12 }}>
+      <WzTextWithTooltipIfTruncated position='bottom' tooltipProps={{ anchorClassName: 'wz-width-100' }} elementStyle={{ maxWidth: style.maxWidth, fontSize: 12 }}>
         {this.getPlatformIcon(this.props.agent)}
         {' '}{osName}
       </WzTextWithTooltipIfTruncated>
@@ -99,13 +100,13 @@ export class AgentInfo extends Component {
     )
   }
 
-  buildStats(items) {    
+  buildStats(items) {
     const checkField = field => {
       return field !== undefined || field ? field : '-';
     };
     const stats = items.map(item => {
       // We add tooltipProps, so that the ClusterNode and Operating System fields occupy their space and do not exceed this, overlapping with the one on the right
-      const tooltipProps = item.description === 'Cluster node' ? { anchorClassName: 'wz-width-100'} : {};
+      const tooltipProps = item.description === 'Cluster node' ? { anchorClassName: 'wz-width-100' } : {};
       return (
         <EuiFlexItem key={item.description} style={item.style || null}>
           <WzStat
@@ -122,7 +123,7 @@ export class AgentInfo extends Component {
               ) : item.description === 'Operating system' ? (
                 this.addTextPlatformRender(this.props.agent, item.style)
               ) : item.description === 'Status' ? (
-                <AgentStatus status={this.props.agent.status} style={{...item.style, fontSize: '12px'}} />
+                <AgentStatus status={this.props.agent.status} style={{ ...item.style, fontSize: '12px' }} />
               ) : (
                 <WzTextWithTooltipIfTruncated position='bottom' tooltipProps={tooltipProps} elementStyle={{ maxWidth: item.style.maxWidth, fontSize: 12 }}>
                   {checkField(item.title)}
@@ -157,7 +158,7 @@ export class AgentInfo extends Component {
       arrayStats = [
         { title: agent.id, description: 'ID', style: { minWidth: 30 } },
         { title: agent.status, description: 'Status', style: { minWidth: 130 } },
-        { title: agent.ip, description: 'IP', style: { minWidth: 80 } },
+        { title: compressIPv6(agent.ip), description: 'IP address', style: { minWidth: 80 } },
         { title: agent.version, description: 'Version', style: { minWidth: 100 } },
         { title: agent.group, description: 'Groups', style: { minWidth: 150 } },
         { title: agent.name, description: 'Operating system', style: { minWidth: 150 } },
@@ -173,7 +174,7 @@ export class AgentInfo extends Component {
 
     return (
       <Fragment>
-        <EuiFlexGroup wrap style={{responsive: true }} className="wz-welcome-page-agent-info-details">
+        <EuiFlexGroup wrap style={{ responsive: true }} className="wz-welcome-page-agent-info-details">
           {stats}
         </EuiFlexGroup>
       </Fragment>

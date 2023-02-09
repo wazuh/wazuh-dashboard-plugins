@@ -273,7 +273,7 @@ export const Metrics = withAllowedAgents(
           },
         ],
         office: [
-          { name: "Max Rule Level", type: "custom", filter: { phrase: "office365", field: "rule.groups" }, agg: { "customAggResult": { "terms": { "field": "timestamp", "order": { "_term": "desc" }, "size": 1 }, "aggs": { "aggResult": { "terms": { "field": "rule.level" } } } } } },
+          { name: "Max Rule Level", type: "custom", filter: { phrase: "office365", field: "rule.groups" }, agg: { "customAggResult": { "terms": { "field": "rule.level", "order": { "_term": "desc" }, "size": 1 }, "aggs": { "aggResult": { "terms": { "field": "rule.level" } } } } } },
           { name: "Suspicious Downloads", type: "phrase", value: "91724", field: "rule.id", color: "danger" },
           { name: "Full Access Permissions", type: "phrase", value: "91725", field: "rule.id" },
           { name: "Phishing and Malware", type: "phrases", values: ["91556", "91575", "91700"], field: "rule.id", color: "danger" },
@@ -317,9 +317,7 @@ export const Metrics = withAllowedAgents(
 
     async buildMetric() {
       if (!this.metricsList[this.props.section] || !this._isMount) return <></>;
-      const newFilters = this.filterManager.getFilters();
       const searchBarQuery = this.scope.state.query;
-      const newTime = this.timefilter.getTime();
       const filterParams = {};
       filterParams['time'] = this.timefilter.getTime();
       filterParams['query'] = searchBarQuery;

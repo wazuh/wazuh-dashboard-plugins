@@ -36,7 +36,7 @@ import { AppNavigate } from '../../../../react-services/app-navigate';
 import { TruncateHorizontalComponents } from '../../../common/util';
 import { getDataPlugin, getUiSettings } from '../../../../kibana-services';
 import { FilterManager } from '../../../../../../../src/plugins/data/public/';
-import { formatUIDate } from '../../../../react-services/time-service';
+import { beautifyDate } from './lib/';
 export class Details extends Component {
   props!: {
     currentItem: {
@@ -132,28 +132,28 @@ export class Details extends Component {
         name: 'Last full scan',
         icon: 'clock',
         link: false,
-        transformValue: this.beautifyDate
+        transformValue: beautifyDate
       },
       {
         field: 'last_partial_scan',
         name: 'Last partial scan',
         icon: 'clock',
         link: false,
-        transformValue: this.beautifyDate
+        transformValue: beautifyDate
       },
       {
         field: 'published',
         name: 'Published',
         icon: 'clock',
         link: false,
-        transformValue: this.beautifyDate
+        transformValue: beautifyDate
       },
       {
         field: 'updated',
         name: 'Updated',
         icon: 'clock',
         link: false,
-        transformValue: this.beautifyDate
+        transformValue: beautifyDate
       },
       {
         field: 'external_references',
@@ -165,12 +165,7 @@ export class Details extends Component {
     ];
   }
 
-  // This method was created because Wazuh API returns 1970-01-01T00:00:00Z dates or undefined ones
-  // when vulnerability module is not configured
-  // its meant to render nothing when such date is received
-  beautifyDate(date?: string) {
-    return date && !['1970-01-01T00:00:00Z', '-'].includes(date) ? formatUIDate(date) : '-';
-  }
+
 
   viewInEvents = (ev) => {
     const { cve } = this.props.currentItem;

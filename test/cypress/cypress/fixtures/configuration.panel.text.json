@@ -1,0 +1,206 @@
+{
+    "configurationTitle": "App current settings",
+    "configurationDescription": "Configuration file located at /usr/share/kibana/data/wazuh/config/wazuh.yml",
+    "Panel": [
+        {
+            "name": "General",
+            "items": [
+                {
+                    "title": "Index pattern",
+                    "subTitle": "Default index pattern to use on the app. If there's no valid index pattern, the app will automatically create one with the name indicated in this option.",
+                    "label": "pattern"
+                },
+                {
+                    "title": "Request timeout",
+                    "subTitle": "Maximum time, in milliseconds, the app will wait for an API response when making requests to it. It will be ignored if the value is set under 1500 milliseconds.",
+                    "label": "timeout"
+                },
+                {
+                    "title": "IP selector",
+                    "subTitle": "Define if the user is allowed to change the selected index pattern directly from the top menu bar.",
+                    "label": "ip.selector"
+                },
+                {
+                    "title": "IP ignore",
+                    "subTitle": "Disable certain index pattern names from being available in index pattern selector from the Wazuh app.",
+                    "label": "ip.ignore"
+                },
+                {
+                    "title": "Cron prefix",
+                    "subTitle": "Define the index prefix of predefined jobs.",
+                    "label": "cron.prefix"
+                },
+                {
+                    "title": "Sample alerts prefix",
+                    "subTitle": "Define the index name prefix of sample alerts. It must match the template used by the index pattern to avoid unknown fields in dashboards.",
+                    "label": "alerts.sample.prefix"
+                },
+                {
+                    "title": "Hide manager alerts",
+                    "subTitle": "Hide the alerts of the manager in every dashboard.",
+                    "label": "hideManagerAlerts"
+                },
+                {
+                    "title": "Log level",
+                    "subTitle": "Logging level of the App.",
+                    "label": "logs.level"
+                },
+                {
+                    "title": "Enrollment DNS",
+                    "subTitle": "Specifies the Wazuh registration server, used for the agent enrollment.",
+                    "label": "enrollment.dns"
+                }
+            ]
+        },
+        {
+            "name": "Health Check",
+            "items": [
+                {
+                    "title": "Index pattern",
+                    "subTitle": "Enable or disable the index pattern health check when opening the app.",
+                    "label": "checks.pattern"
+                },
+                {
+                    "title": "Index template",
+                    "subTitle": "Enable or disable the template health check when opening the app.",
+                    "label": "checks.template"
+                },
+                {
+                    "title": "API connection",
+                    "subTitle": "Enable or disable the API health check when opening the app.",
+                    "label": "checks.api"
+                },
+                {
+                    "title": "API version",
+                    "subTitle": "Enable or disable the setup health check when opening the app.",
+                    "label": "checks.setup"
+                },
+                {
+                    "title": "Known fields",
+                    "subTitle": "Enable or disable the known fields health check when opening the app.",
+                    "label": "checks.fields"
+                },
+                {
+                    "title": "Remove meta fields",
+                    "subTitle": "Change the default value of the Kibana metaField configuration",
+                    "label": "checks.metaFields"
+                },
+                {
+                    "title": "Set max buckets to 200000",
+                    "subTitle": "Change the default value of the Kibana max buckets configuration",
+                    "label": "checks.maxBuckets"
+                },
+                {
+                    "title": "Set time filter to 24h",
+                    "subTitle": "Change the default value of the Kibana timeFilter configuration",
+                    "label": "checks.timeFilter"
+                }
+            ]
+        },
+        {
+            "name": "Monitoring",
+            "items": [
+                {
+                    "title": "Status",
+                    "subTitle": "Enable or disable the wazuh-monitoring index creation and/or visualization.",
+                    "label": "wazuh.monitoring.enabled"
+                },
+                {
+                    "title": "Frequency",
+                    "subTitle": "Frequency, in seconds, of API requests to get the state of the agents and create a new document in the wazuh-monitoring index with this data.",
+                    "label": "wazuh.monitoring.frequency"
+                },
+                {
+                    "title": "Index shards",
+                    "subTitle": "Define the number of shards to use for the wazuh-monitoring-* indices.",
+                    "label": "wazuh.monitoring.shards"
+                },
+                {
+                    "title": "Index replicas",
+                    "subTitle": "Define the number of replicas to use for the wazuh-monitoring-* indices.",
+                    "label": "wazuh.monitoring.replicas"
+                },
+                {
+                    "title": "Index creation",
+                    "subTitle": "Define the interval in which a new wazuh-monitoring index will be created.",
+                    "label": "wazuh.monitoring.creation"
+                },
+                {
+                    "title": "Index pattern",
+                    "subTitle": "Default index pattern to use for Wazuh monitoring.",
+                    "label": "wazuh.monitoring.pattern"
+                },
+                {
+                    "title": "",
+                    "subTitle": "",
+                    "label": ""
+                }
+            ]
+        },
+        {
+            "name": "Statistics",
+            "items": [
+                {
+                    "title": "Status",
+                    "subTitle": "Enable or disable the statistics tasks.",
+                    "label": "cron.statistics.status"
+                },
+                {
+                    "title": "Includes apis",
+                    "subTitle": "Enter the ID of the hosts you want to save data from, leave this empty to run the task on every host.",
+                    "label": "cron.statistics.apis"
+                },
+                {
+                    "title": "Interval",
+                    "subTitle": "Define the frequency of task execution using cron schedule expressions.",
+                    "label": "cron.statistics.interval"
+                },
+                {
+                    "title": "Index name",
+                    "subTitle": "Define the name of the index in which the documents will be saved.",
+                    "label": "cron.statistics.index.name"
+                },
+                {
+                    "title": "Index creation",
+                    "subTitle": "Define the interval in which a new index will be created.",
+                    "label": "cron.statistics.index.creation"
+                },
+                {
+                    "title": "Index shards",
+                    "subTitle": "Define the number of shards to use for the statistics indices.",
+                    "label": "cron.statistics.index.shards"
+                },
+                {
+                    "title": "Index replicas",
+                    "subTitle": "Define the number of replicas to use for the statistics indices.",
+                    "label": "cron.statistics.index.replicas"
+                }
+            ]
+        },
+        {
+            "name": "Logo Customization",
+            "items": [
+                {
+                    "title": "Logo App",
+                    "subTitle": "Set the name of the app logo stored at /plugins/wazuh/public/assets/",
+                    "label": "customization.logo.app"
+                },
+                {
+                    "title": "Logo Sidebar",
+                    "subTitle": "Set the name of the sidebar logo stored at /plugins/wazuh/public/assets/",
+                    "label": "customization.logo.sidebar"
+                },
+                {
+                    "title": "Logo Health Check",
+                    "subTitle": "Set the name of the health-check logo stored at /plugins/wazuh/public/assets/",
+                    "label": "customization.logo.healthcheck"
+                },
+                {
+                    "title": "Logo Reports",
+                    "subTitle": "Set the name of the reports logo (.png) stored at /plugins/wazuh/public/assets/",
+                    "label": "customization.logo.reports"
+                }
+            ]
+        }
+    ]
+}
