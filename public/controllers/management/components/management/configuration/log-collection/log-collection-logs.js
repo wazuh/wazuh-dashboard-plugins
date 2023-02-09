@@ -15,13 +15,21 @@ import React, { Component, Fragment } from 'react';
 import WzNoConfig from '../util-components/no-config';
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzConfigurationListSelector from '../util-components/configuration-settings-list-selector';
-import { isString, renderValueOrDefault, renderValueOrNoValue } from '../utils/utils';
+import { isString, renderValueOrNoValue } from '../utils/utils';
 import { settingsListBuilder } from '../utils/builders';
 
 import helpLinks from './help-links';
 import { LOGCOLLECTOR_LOCALFILE_PROP, LOCALFILE_LOGS_PROP } from './types';
 
 const renderTargetField = (item) => (item ? item.join(', ') : 'agent');
+const renderArrayObjectField = arrayObjectField => {
+  const stringToRender = arrayObjectField
+    ? arrayObjectField
+      .map(({ value, type }) => value?.concat(type ? ` (${type})` : ''))
+      .join(', ')
+    : '-';
+  return stringToRender;
+};
 
 const mainSettings = [
   { field: 'logformat', label: 'Log format' },
@@ -52,6 +60,16 @@ const mainSettings = [
     field: 'target',
     label: 'Redirect output to this socket',
     render: renderTargetField,
+  },
+  {
+    field: 'ignore',
+    label: 'Ignore',
+    render: renderArrayObjectField,
+  },
+  {
+    field: 'restrict',
+    label: 'Restrict',
+    render: renderArrayObjectField,
   },
 ];
 
