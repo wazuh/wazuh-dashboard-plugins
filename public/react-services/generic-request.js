@@ -28,13 +28,15 @@ export class GenericRequest {
       const { timeout } = wazuhConfig.getConfig();
       const requestHeaders = {
         ...PLUGIN_PLATFORM_REQUEST_HEADERS,
-        'content-type': 'application/json'
+        'content-type': 'application/json',
       };
       const tmpUrl = getHttp().basePath.prepend(path);
 
-      try{
-        requestHeaders.pattern = (await getDataPlugin().indexPatterns.get(AppState.getCurrentPattern())).title;
-      }catch(error){};
+      try {
+        requestHeaders.pattern = (
+          await getDataPlugin().indexPatterns.get(AppState.getCurrentPattern())
+        ).title;
+      } catch (error) {}
 
       try {
         requestHeaders.id = JSON.parse(AppState.getCurrentAPI()).id;
@@ -49,7 +51,7 @@ export class GenericRequest {
           method: method,
           headers: requestHeaders,
           url: tmpUrl,
-          timeout: timeout || 20000
+          timeout: timeout || 20000,
         };
       }
       if (method === 'PUT') {
@@ -58,7 +60,7 @@ export class GenericRequest {
           headers: requestHeaders,
           data: payload,
           url: tmpUrl,
-          timeout: timeout || 20000
+          timeout: timeout || 20000,
         };
       }
       if (method === 'POST') {
@@ -67,7 +69,7 @@ export class GenericRequest {
           headers: requestHeaders,
           data: payload,
           url: tmpUrl,
-          timeout: timeout || 20000
+          timeout: timeout || 20000,
         };
       }
       if (method === 'DELETE') {
@@ -76,14 +78,14 @@ export class GenericRequest {
           headers: requestHeaders,
           data: payload,
           url: tmpUrl,
-          timeout: timeout || 20000
+          timeout: timeout || 20000,
         };
       }
 
       Object.assign(data, await request(options));
       if (!data) {
         throw new Error(
-          `Error doing a request to ${tmpUrl}, method: ${method}.`
+          `Error doing a request to ${tmpUrl}, method: ${method}.`,
         );
       }
 
@@ -98,10 +100,14 @@ export class GenericRequest {
           const wzMisc = new WzMisc();
           wzMisc.setApiIsDown(true);
 
-          if (!window.location.hash.includes('#/settings') && 
-          !window.location.hash.includes('#/health-check') &&
-          !window.location.hash.includes('#/blank-screen')) {
-            window.location.href = getHttp().basePath.prepend('/app/wazuh#/health-check');
+          if (
+            !window.location.hash.includes('#/settings') &&
+            !window.location.hash.includes('#/health-check') &&
+            !window.location.hash.includes('#/blank-screen')
+          ) {
+            window.location.href = getHttp().basePath.prepend(
+              '/app/wazuh#/health-check',
+            );
           }
         }
       }
