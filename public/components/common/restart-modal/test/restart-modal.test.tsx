@@ -24,6 +24,11 @@ jest.mock('../../../../redux/reducers/restartReducers', () => ({
   syncNodesInfo: state => state,
   restartNodesInfo: state => state,
 }));
+jest.mock('../../../../react-services/common-services', () => ({
+  getErrorOrchestrator: () => ({
+    handleError: options => {},
+  }),
+}));
 
 const restartedState = {
   restartWazuhReducers: {
