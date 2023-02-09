@@ -57,7 +57,6 @@ export function DashboardPage(props: DashboardDeps) {
       />
       <DashboardByRenderer input={config} onInputUpdated={(newInput)=>{
         console.log(newInput)
-        // setDashboardConfig()
         }}>
         <WzKpi title='title' value='34%'></WzKpi>
       </DashboardByRenderer>

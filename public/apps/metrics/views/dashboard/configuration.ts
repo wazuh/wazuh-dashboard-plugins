@@ -1,4 +1,6 @@
 import { useCallback, useState } from "react";
+import { TABLE_CONTAINER } from "../../../../embeddables/table";
+import { HELLO_WORLD_EMBEDDABLE } from "../../../../embeddables/hello-world";
 import { setState } from "../../../../kibana-integrations/discover/application/angular/discover_state";
 import { getDataPlugin } from '../../../../kibana-services';
 
@@ -424,6 +426,34 @@ export const useDashboardConfiguration = (
           type: 'visualization',
           explicitInput: {
             id: '5',
+            savedVis: getVisState4(indexPattern)
+          },
+        },
+        '6': {
+          gridData: {
+            w: 20,
+            h: 10,
+            x: 20,
+            y: 10,
+            i: '6',
+          },
+          type: HELLO_WORLD_EMBEDDABLE,
+          explicitInput: {
+            id: '6',
+            savedVis: getVisState4(indexPattern)
+          },
+        },
+        '7': {
+          gridData: {
+            w: 20,
+            h: 10,
+            x: 20,
+            y: 10,
+            i: '7',
+          },
+          type: TABLE_CONTAINER,
+          explicitInput: {
+            id: '7',
             savedVis: getVisState4(indexPattern)
           },
         },

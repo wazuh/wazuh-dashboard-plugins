@@ -6,6 +6,7 @@ import { VisualizationsSetup, VisualizationsStart } from '../../../src/plugins/v
 import { DataPublicPluginSetup, DataPublicPluginStart } from '../../../src/plugins/data/public';
 import { NavigationPublicPluginStart } from '../../../src/plugins/navigation/public';
 import { UiActionsSetup } from '../../../src/plugins/ui_actions/public';
+import { Embeddable } from '../../../src/plugins/embeddable/public';
 import { SecurityOssPluginStart } from '../../../src/plugins/security_oss/public/';
 import { SavedObjectsStart } from '../../../src/plugins/saved_objects/public';
 import { TelemetryPluginStart, TelemetryPluginSetup } from '../../../src/plugins/telemetry/public';
@@ -28,6 +29,7 @@ export interface AppDependencies {
 }
 
 export type WazuhSetupPlugins = {
+  embeddable: Embeddable;
   uiActions: UiActionsSetup;
   visualizations: VisualizationsSetup;
   data: DataPublicPluginSetup;

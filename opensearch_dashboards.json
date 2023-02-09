@@ -12,6 +12,7 @@
     "dashboard",
     "inspector",
     "visualizations",
+    "embeddable",
     "uiActions",
     "charts",
     "savedObjects",

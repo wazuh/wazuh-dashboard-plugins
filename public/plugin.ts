@@ -1,4 +1,11 @@
-import { AppMountParameters, CoreSetup, CoreStart, AppUpdater, Plugin, PluginInitializerContext } from 'opensearch_dashboards/public';
+import {
+  AppMountParameters,
+  CoreSetup,
+  CoreStart,
+  AppUpdater,
+  Plugin,
+  PluginInitializerContext
+} from 'opensearch_dashboards/public';
 import { BehaviorSubject } from 'rxjs';
 import {
   AppPluginStartDependencies,
@@ -7,6 +14,11 @@ import {
   WazuhStart,
   WazuhStartPlugins,
 } from './types';
+
+import {
+  RegisterEmbeddable,
+  EmbeddableFactories
+} from './embeddables';
 
 import AppsHandler from './apps/apps-handler';
 import appMetrics from './apps/metrics';
@@ -18,6 +30,7 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
   constructor(private readonly initializerContext: PluginInitializerContext) {
     this._appsHandler = new AppsHandler();
   }
+  private _embeddableFactories:EmbeddableFactories = {};
   private _appsHandler;
   private _stateUpdater = new BehaviorSubject<AppUpdater>(() => ({}));
 
@@ -27,6 +40,8 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
     this._appsHandler.initUITheme();
     await this._appsHandler.initLogos();
     await this._appsHandler.setIsWazuhDisabled();
+
+    this._embeddableFactories = RegisterEmbeddable(core, plugins);
 
     const apps = [
       appMetrics(),
@@ -40,6 +55,8 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
 
     this._appsHandler.startApps(core, plugins, this.initializerContext);
 
-    return {};
+    return {
+      factories: this._embeddableFactories as EmbeddableFactories,
+    };
   }
 }
