@@ -1023,6 +1023,28 @@ function generateAlerts(params, numAlerts = 1) {
   return alerts;
 }
 
+const csvWriter = require('csv-writer').createObjectCsvWriter;
+const csvFile = csvWriter({
+  path: 'alerts.csv',
+  header: [
+    { id: 'ruleId', title: 'ruleId' },
+    { id: 'message', title: 'message' },
+    { id: 'timestamp', title: 'timestamp' }
+  ]
+});
+
+// Rest of the code from the original script
+
+// Generate the alerts
+const alerts = generateAlerts(numberOfAlerts);
+
+// Write the alerts to the CSV file
+csvFile.writeRecords(alerts)
+  .then(() => {
+    console.log('The CSV file was successfully written.');
+  });
+
+
 /**
  * Get a random Date in range(7 days ago - now)
  * @returns {date} - Random date in range (7 days ago - now)
