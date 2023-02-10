@@ -80,11 +80,6 @@ export class WzRequest {
             }
             throw new Error(error);
           }
-<<<<<<< HEAD
-=======
-          // maybe return promise.reject(error);
-          throw ErrorFactory.createError(error);
->>>>>>> 2f9347a58 (Added error factory in wz-request)
         }
       }
       const errorParsed = ErrorFactory.createError(error);
