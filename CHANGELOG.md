@@ -84,6 +84,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed the style of the buttons showing more event information in the event view table. [#5137](https://github.com/wazuh/wazuh-kibana-app/pull/5137)
 - Fixed Inventory module for solaris agents [#5144](https://github.com/wazuh/wazuh-kibana-app/pull/5144)
 - Fixed the module information button in Office365 and Github Panel tab to open the nav drawer. [#5167](https://github.com/wazuh/wazuh-kibana-app/pull/5167)
+- Fixed a UI crash due to `external_references` field could be missing in some vulnerability data [#5200](https://github.com/wazuh/wazuh-kibana-app/pull/5200)
 
 ### Removed
 
