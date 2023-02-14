@@ -10,9 +10,10 @@ export default class WazuhError extends Error implements IWazuhError  {
         this.message = message;
         if(code)
         this.code = code;
-        // Because we are extending built in class
-        Object.setPrototypeOf(this, WazuhError.prototype);
-        this.name = this.constructor.name;
+        const childrenName = this.constructor.name; // keep the children class name
+        Object.setPrototypeOf(this, WazuhError.prototype); // Because we are extending built in class
+        this.name = childrenName;
+        this.stack = this.error.stack; // keep the stack trace from children
     }
     /**
      * This method decides how to treat the error
