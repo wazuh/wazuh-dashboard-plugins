@@ -1,12 +1,12 @@
-import { ErrorFactory } from '../error-factory';
+import { ErrorFactory } from '../error-factory/error-factory';
 import {
   WazuhApiError,
   ElasticApiError,
   ElasticError,
   WazuhReportingError,
-} from './errors';
-import { UIErrorLog } from '../error-orchestrator/types';
-import { ErrorOrchestratorService } from '../error-orchestrator/error-orchestrator.service';
+} from '../error-factory/errors';
+import { UIErrorLog } from '../../error-orchestrator/types';
+import { ErrorOrchestratorService } from '../../error-orchestrator/error-orchestrator.service';
 
 /**
  * Error codes: code
@@ -30,14 +30,15 @@ import { ErrorOrchestratorService } from '../error-orchestrator/error-orchestrat
 // 500 = internal server error
 // 501 = not implemented
 
-interface iErrorType {}
-
 export default class ErrorHandler {
   /**
    * Receives an error and create a new error instance then treat the error
    * @param error
    */
-  static handleError(error: Error | string) {
+  static handleError(error: Error): void {
+    if(!error){
+      throw Error('Error must be defined');
+    }
     const errorParsed = this.returnError(error);
     this.showError(errorParsed);
   }
@@ -48,9 +49,12 @@ export default class ErrorHandler {
    * @param error
    * @returns
    */
-  static returnError(error: Error | string) {
+  static returnError(error: Error): Error {
+    if(!error){
+      throw Error('Error must be defined');
+    }
     const errorType = this.getErrorType(error);
-    if (errorType) return ErrorFactory.createError(error, errorType);
+    if (errorType) return ErrorFactory.create(error, errorType);
     return error;
   }
 
@@ -61,13 +65,13 @@ export default class ErrorHandler {
    * @returns
    */
   private static getErrorType(
-    error: Error | string,
+    error: Error,
   ) {
     if (this.isString(error)) return Error;
     if(error?.code){
       return this.getErrorTypeByErrorCode(error?.code);
     }
-    return error;
+    return Error;
   }
 
   /**
