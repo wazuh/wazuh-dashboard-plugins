@@ -4,12 +4,15 @@ import { I18nProvider } from '@osd/i18n/react';
 import { AppMountParameters, CoreStart } from '../../../../../src/core/public';
 import { AppPluginStartDependencies, ClientConfigType } from './types';
 import { AppRouter } from './app-router';
+import {
+  getPlugins
+} from '../../kibana-services';
 
 export function renderApp(
   coreStart: CoreStart,
   params: AppMountParameters,
 ) {
-  const deps = { coreStart, params };
+  const deps = { coreStart, params, plugins: getPlugins() };
   ReactDOM.render(
     <I18nProvider>
       <AppRouter {...deps} />

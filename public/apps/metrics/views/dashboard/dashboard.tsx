@@ -5,36 +5,41 @@ import {
   EuiListGroup,
 } from '@elastic/eui';
 import { CoreStart } from '../../../../../../../src/core/public';
-// import { DashboardEmbeddableByValue } from '../../../../../../../examples/dashboard_embeddable_examples/public/by_value/embeddable';
-import {
-  getAngularModule,
-  getToasts,
-  getVisualizationsPlugin,
-  getSavedObjects,
-  getDataPlugin,
-  getChrome,
-  getOverlays,
-  getPlugins,
-  getNavigationPlugin
-} from '../../../../kibana-services';
+
+// import {
+//   getAngularModule,
+//   getToasts,
+//   getVisualizationsPlugin,
+//   getSavedObjects,
+//   getDataPlugin,
+//   getChrome,
+//   getOverlays,
+//   getPlugins,
+//   getNavigationPlugin
+// } from '../../../../kibana-services';
+import { AppPluginStartDependencies, ClientConfigType } from './types';
 import { WzKpi } from '../../components/wz-kpi/wz-kpi';
 import {useDashboardConfiguration} from './configuration';
 
 
 interface DashboardDeps {
   coreStart: CoreStart;
+  plugins: AppPluginStartDependencies;
 }
-const DashboardByRenderer = getPlugins()
+
+export function DashboardPage({coreStart, plugins}: DashboardDeps) {
+  const [indexPattern, setIndexPattern] = useState<IndexPattern | null>();
+  const [config, setDashboardConfig] = useDashboardConfiguration({ id: 'id1', title: 'title1' });
+
+  const DashboardByRenderer = plugins
   .dashboard
   .DashboardContainerByValueRenderer
 
-const TopNavMenu = getPlugins().navigation.ui.TopNavMenu;
-export function DashboardPage(props: DashboardDeps) {
-  const [indexPattern, setIndexPattern] = useState<IndexPattern | null>();
-  const [config, setDashboardConfig] = useDashboardConfiguration({ id: 'id1', title: 'title1' });
+const TopNavMenu = plugins.navigation.ui.TopNavMenu;
+
   useEffect(() => {
     const setDefaultIndexPattern = async () => {
-      const defaultIndexPattern = await getDataPlugin().indexPatterns.getDefault();
+      const defaultIndexPattern = await plugins.data.indexPatterns.getDefault();
       setIndexPattern(defaultIndexPattern);
     };
 

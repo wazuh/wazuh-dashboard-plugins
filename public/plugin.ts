@@ -23,7 +23,7 @@ import {
 import AppsHandler from './apps/apps-handler';
 import appMetrics from './apps/metrics';
 import appWazuh from './apps/wazuh-app';
-
+import { createMetricsDashboard } from './apps/metrics/views/dashboard/create-dashboard';
 
 
 export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlugins, WazuhStartPlugins> {
@@ -57,6 +57,7 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
 
     return {
       factories: this._embeddableFactories as EmbeddableFactories,
+      AppMetrics: createMetricsDashboard(core, plugins),
     };
   }
 }

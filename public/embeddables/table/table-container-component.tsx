@@ -38,6 +38,7 @@ import {
   ContainerOutput,
   EmbeddableStart,
 } from '../../../../../src/plugins/embeddable/public';
+import { EuiBasicTable } from '@opensearch-project/oui';
 
 interface Props {
   embeddable: IContainer;
@@ -52,25 +53,23 @@ function renderTable(
   embeddableServices: EmbeddableStart
 ) {
   let number = 0;
-  const table = Object.values(panels).map((panel) => {
-    const child = embeddable.getChild(panel.explicitInput.id);
+
+    const {node} = embeddable;
     number++;
     return (
       <EuiPanel key={number.toString()}>
         <EuiFlexGroup gutterSize="none">
           <EuiFlexItem grow={false}>
             <EuiText>
-              <h3>{number}</h3>
+              <h3>Example table</h3>
             </EuiText>
           </EuiFlexItem>
           <EuiFlexItem>
-            <embeddableServices.EmbeddablePanel embeddable={child} />
+            {/* <embeddableServices.EmbeddablePanel embeddable={node} /> */}
           </EuiFlexItem>
         </EuiFlexGroup>
       </EuiPanel>
     );
-  });
-  return table;
 }
 
 export function TableContainerComponentInner({ embeddable, input, embeddableServices }: Props) {

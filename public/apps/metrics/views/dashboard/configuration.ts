@@ -444,20 +444,20 @@ export const useDashboardConfiguration = (
             savedVis: getVisState4(indexPattern)
           },
         },
-        '7': {
-          gridData: {
-            w: 20,
-            h: 10,
-            x: 20,
-            y: 10,
-            i: '7',
-          },
-          type: TABLE_CONTAINER,
-          explicitInput: {
-            id: '7',
-            savedVis: getVisState4(indexPattern)
-          },
-        },
+        // '7': {
+        //   gridData: {
+        //     w: 20,
+        //     h: 10,
+        //     x: 20,
+        //     y: 10,
+        //     i: '7',
+        //   },
+        //   type: TABLE_CONTAINER,
+        //   explicitInput: {
+        //     id: '7',
+        //     savedVis: getVisState4(indexPattern)
+        //   },
+        // },
       },
       isFullScreenMode: false,
       filters: getDataPlugin().query.filterManager.getFilters(),
