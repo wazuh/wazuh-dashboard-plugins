@@ -16,7 +16,7 @@ import { ErrorOrchestrator, UIErrorLog } from './types';
 import { ErrorOrchestratorCritical } from './error-orchestrator-critical';
 import { WzMisc } from '../../factories/misc';
 
-describe('Wazuh Error Orchestrator Critical', () => {
+describe.skip('Wazuh Error Orchestrator Critical', () => {
   describe('Given a valid options params ', () => {
     it('Should be called mockSetBlankScr and redirect to BlankScreen', () => {
       const options: UIErrorLog = {

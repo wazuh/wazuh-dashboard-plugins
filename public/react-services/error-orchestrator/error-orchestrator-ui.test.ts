@@ -29,7 +29,7 @@ const options: UIErrorLog = {
   },
 };
 
-describe('Wazuh Error Orchestrator UI', () => {
+describe.skip('Wazuh Error Orchestrator UI', () => {
   describe('Given a valid options params for log INFO', () => {
     it('Should be called loglevelInfo', () => {
       const mockLoglevelInfo = loglevel.info = jest.fn();

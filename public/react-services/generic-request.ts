@@ -17,6 +17,7 @@ import { WzMisc } from '../factories/misc';
 import { getHttp, getDataPlugin } from '../kibana-services';
 import { PLUGIN_PLATFORM_REQUEST_HEADERS } from '../../common/constants';
 import { request } from '../services/request-handler';
+import { ErrorHandler } from './error-management';
 
 export class GenericRequest {
   static async request(
@@ -86,7 +87,7 @@ export class GenericRequest {
           }
         }
       }
-      const responseError = ErrorFactory.createError(err as Error);
+      const responseError = ErrorHandler.createError(err as Error);
       if (returnError) return Promise.reject(responseError);
       return Promise.reject(responseError);
     }

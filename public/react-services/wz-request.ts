@@ -18,6 +18,7 @@ import IApiResponse from './interfaces/api-response.interface';
 import { getHttp } from '../kibana-services';
 import { PLUGIN_PLATFORM_REQUEST_HEADERS } from '../../common/constants';
 import { request } from '../services/request-handler';
+import { ErrorHandler } from './error-management';
 
 export class WzRequest {
   static wazuhConfig: any;
@@ -82,13 +83,13 @@ export class WzRequest {
           }
         }
       }
-      const errorParsed = ErrorFactory.createError(error);
+      const errorParsed = ErrorHandler.createError(error);
       if (errorParsed.message.includes('status code 401') && shouldRetry) {
         try {
           await WzAuthentication.refresh(true);
           return this.genericReq(method, path, payload, { shouldRetry: false });
         } catch (error) {
-          return Promise.reject(ErrorFactory.createError(error));
+          return Promise.reject(ErrorHandler.createError(error));
         }
       }
       return Promise.reject(errorParsed);
@@ -126,11 +127,11 @@ export class WzRequest {
         const errorMessage = `${message} (${error.code}) - ${error.message} ${
           failed_ids && failed_ids.length > 1 ? ` Affected ids: ${failed_ids} ` : ''
         }`;
-        return Promise.reject(ErrorFactory.createError(errorMessage));
+        return Promise.reject(ErrorHandler.createError(errorMessage));
       }
       return Promise.resolve(response);
     } catch (error) {
-      return Promise.reject(ErrorFactory.createError(error));
+      return Promise.reject(ErrorHandler.createError(error));
     }
   }
 
@@ -149,7 +150,7 @@ export class WzRequest {
       const data = await this.genericReq('POST', '/api/csv', requestData);
       return Promise.resolve(data);
     } catch (error) {
-      return Promise.reject(ErrorFactory.createError(error));
+      return Promise.reject(ErrorHandler.createError(error));
     }
   }
 }
