@@ -1,10 +1,8 @@
 import { AxiosResponse } from 'axios';
 import ErrorHandler from './error-handler';
+import { ErrorOrchestratorService } from '../../error-orchestrator/error-orchestrator.service';
+import { ElasticApiError, ElasticError, WazuhApiError, WazuhReportingError } from '../error-factory/errors';
 
-import { ErrorOrchestratorService } from '../error-orchestrator/error-orchestrator.service';
-
-import { ApiResponse, errors } from '@elastic/elasticsearch';
-import { ElasticApiError, ElasticError, WazuhApiError, WazuhReportingError } from './errors';
 // mocked some required kibana-services
 jest.mock('../../kibana-services', () => ({
   ...(jest.requireActual('../../kibana-services') as object),
@@ -42,7 +40,7 @@ const responseBody: AxiosResponse = {
 
 describe('Error Handler', () => {
   describe('handleError', () => {
-    it('should call errorOrchestrator handlerError with the corresponing definition', () => {
+    it.only('should call errorOrchestrator handlerError with the corresponing definition', () => {
       const errorResponse = new Error('Error');
       errorResponse['response'] = responseBody;
       const errorReturned = ErrorHandler.returnError(errorResponse);

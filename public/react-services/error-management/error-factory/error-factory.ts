@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Error handler service
+ * Wazuh app - Error factory class
  * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -10,7 +10,11 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { ErrorHandler } from '../error-handler';
+import {
+  IWazuhError,
+  IWazuhErrorConstructor,
+} from '../types';
+import { IErrorOpts } from '../types';
 
 // error
 // message
@@ -27,9 +31,11 @@ export class ErrorFactory {
    * @param message
    * @returns Error instance
    */
-  public static createError(error: Error | string | unknown, ErrorType: any, message?: string): Error {
-    const errorMessage = message || ErrorHandler.extractMessage(error);
-    return ErrorFactory.errorCreator(ErrorType, errorMessage);
+  public static create(
+    ErrorType: IWazuhErrorConstructor,
+    opts: IErrorOpts,
+  ): Error | IWazuhError {
+    return ErrorFactory.errorCreator(ErrorType, opts);
   }
 
   /**
@@ -39,10 +45,10 @@ export class ErrorFactory {
    * @returns Error instance depending type received
    */
 
-  private static errorCreator<T extends Error>(
-    ErrorType: { new (message: string): T },
-    message: string
-  ): T {
-    return new ErrorType(message);
+  private static errorCreator(
+    ErrorType: IWazuhErrorConstructor,
+    opts: IErrorOpts,
+  ): IWazuhError {
+    return new ErrorType(opts?.error, opts?.message, opts?.code);
   }
 }
