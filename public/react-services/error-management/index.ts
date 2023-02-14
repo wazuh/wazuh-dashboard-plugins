@@ -1,2 +1,2 @@
 export * from './error-factory';
-export * from './errors';
+export * from './error-handler';
