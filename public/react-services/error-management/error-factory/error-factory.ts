@@ -16,12 +16,6 @@ import {
 } from '../types';
 import { IErrorOpts } from '../types';
 
-// error
-// message
-// statusCode
-// statusText
-// error-orchestrator-ui.ts:30 [request body.id]: expected value of type [string] but got [undefined] Error: Request failed with status code 400
-
 export class ErrorFactory {
   /**
    * Create an new error instance receiving an error instance or a string

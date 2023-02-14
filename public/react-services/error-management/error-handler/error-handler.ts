@@ -1,10 +1,13 @@
 import { ErrorFactory } from '../error-factory/error-factory';
 import {
-  WazuhApiError,
   ElasticApiError,
   ElasticError,
   WazuhReportingError,
+  WazuhApiError,
 } from '../error-factory/errors';
+import { IWazuhError, IWazuhErrorConstructor } from '../types';
+
+// error orchestrator
 import { UIErrorLog } from '../../error-orchestrator/types';
 import { ErrorOrchestratorService } from '../../error-orchestrator/error-orchestrator.service';
 
@@ -30,7 +33,7 @@ import { ErrorOrchestratorService } from '../../error-orchestrator/error-orchest
 // 500 = internal server error
 // 501 = not implemented
 
-export default class ErrorHandler {
+export class ErrorHandler {
   /**
    * Receives an error and create a new error instance then treat the error
    * @param error
@@ -39,8 +42,8 @@ export default class ErrorHandler {
     if(!error){
       throw Error('Error must be defined');
     }
-    const errorParsed = this.returnError(error);
-    this.showError(errorParsed);
+    const errorCreated = this.createError(error);
+    this.showError(errorCreated);
   }
 
   /**
@@ -49,12 +52,13 @@ export default class ErrorHandler {
    * @param error
    * @returns
    */
-  static returnError(error: Error): Error {
+  static createError(error: Error | string): IWazuhError | Error {
     if(!error){
       throw Error('Error must be defined');
     }
+    if(typeof error === 'string') return new Error(error);
     const errorType = this.getErrorType(error);
-    if (errorType) return ErrorFactory.create(error, errorType);
+    if (errorType) return ErrorFactory.create(errorType, { error, message: error.message });
     return error;
   }
 
@@ -65,13 +69,16 @@ export default class ErrorHandler {
    * @returns
    */
   private static getErrorType(
-    error: Error,
-  ) {
-    if (this.isString(error)) return Error;
-    if(error?.code){
-      return this.getErrorTypeByErrorCode(error?.code);
+    //error: string | Error | AxiosError | OpenSearchDashboardsResponse, // ToDo: Get error types
+    error: Error | any
+  ): IWazuhErrorConstructor | null {
+    let errorType = null;
+    if(this.isWazuhApiError(error)){
+      errorType = this.getErrorTypeByErrorCode(error?.response?.data?.code, error?.response?.data?.message);
+    }else{
+      errorType = this.getErrorTypeByErrorCode(error.message, error?.code);
     }
-    return Error;
+    return errorType;
   }
 
   /**
@@ -80,7 +87,14 @@ export default class ErrorHandler {
    * @param errorCode
    * @returns
    */
-  private static getErrorTypeByErrorCode(errorCode: number) {
+  private static getErrorTypeByErrorCode(errorResponseCode: number, message: string): IWazuhErrorConstructor | null {
+    let errorCode = errorResponseCode;
+    if(!errorResponseCode && message){
+      let errorCodeFromMessage: string | number = message.split('-')[0].trim();
+      if(!errorCodeFromMessage) return null;
+      errorCode = Number(errorCodeFromMessage);
+    }
+
     switch (true) {
       case errorCode >= 2000 && errorCode < 3000:
         return ElasticApiError;
@@ -91,7 +105,7 @@ export default class ErrorHandler {
       case errorCode >= 5000  && errorCode < 6000:
         return WazuhReportingError;
       default:
-        return Error;
+        return null;
     }
   }
 
@@ -135,19 +149,13 @@ export default class ErrorHandler {
       store: true,
     };
 
-    if (error.name === 'WazuhApiError') {
-      // we can define severity, display, and some options by status error code
-      //console.log('is WazuhApiError');
+    switch(error.name){
+      case 'ElasticApiError':
+      case 'WazuhApiError':
+      case 'ElasticError':
+      case 'WazuhReportingError':
+      case 'Error':
     }
-
-    if (error.name === 'TypeError') {
-      //console.log('is TypeError');
-    }
-
-    if (error.name === 'Error') {
-      //console.log('is Error');
-    }
-
     ErrorOrchestratorService.handleError(errorOrchestratorOptions);
   }
 }

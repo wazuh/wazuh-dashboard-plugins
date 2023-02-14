@@ -15,7 +15,7 @@ import { AppState } from './app-state';
 import { WzMisc } from '../factories/misc';
 import { getHttp } from '../kibana-services';
 import { PLUGIN_PLATFORM_REQUEST_HEADERS } from '../../common/constants';
-import { ErrorFactory } from './error-factory';
+import { ErrorHandler } from './error-management';
 
 interface IPayload {
   id: string;
@@ -59,7 +59,7 @@ export class ApiCheck {
         const wzMisc = new WzMisc();
         wzMisc.setApiIsDown(true);
       }
-      return Promise.reject(ErrorFactory.createError(err));
+      return Promise.reject(ErrorHandler.createError(err));
     }
   }
 
@@ -90,7 +90,7 @@ export class ApiCheck {
 
       return response;
     } catch (err) {
-      return Promise.reject(ErrorFactory.createError(err));
+      return Promise.reject(ErrorHandler.createError(err));
     }
   }
 }
