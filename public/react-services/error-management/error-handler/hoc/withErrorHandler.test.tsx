@@ -9,7 +9,7 @@ const functionWithError = () => {
   throw new Error('Error generated');
 };
 
-describe.skip('withErrorHandler', () => {
+describe('withErrorHandler', () => {
   describe('Functional Component', () => {
     afterEach(() => {
       jest.resetAllMocks();
