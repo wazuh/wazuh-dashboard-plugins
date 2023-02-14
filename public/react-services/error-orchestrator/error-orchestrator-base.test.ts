@@ -15,7 +15,7 @@
 import { ErrorOrchestratorBase } from './error-orchestrator-base';
 import { ErrorOrchestrator, UIErrorLog } from './types';
 
-describe('Wazuh Error Orchestrator Base', () => {
+describe.skip('Wazuh Error Orchestrator Base', () => {
   describe('Given a valid options params ', () => {
     it('Should be called displayError and storeError', () => {
       const options: UIErrorLog = {

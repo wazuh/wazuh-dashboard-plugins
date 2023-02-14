@@ -15,7 +15,7 @@
 import { ErrorOrchestrator, UIErrorLog } from './types';
 import { getToasts } from '../../kibana-services';
 import { ErrorOrchestratorBusiness } from './error-orchestrator-business';
-import { ErrorToastOptions } from 'opensearch_dashboards/public';
+//import { ErrorToastOptions } from 'opensearch_dashboards/public';
 
 const options: UIErrorLog = {
   context: 'unitTest',
@@ -30,12 +30,14 @@ const options: UIErrorLog = {
   },
 };
 
+/*
 jest.mock('../../kibana-services', () => ({
   getAngularModule: jest.fn(),
   getToasts: () => ({
     addInfo: (mockError: string, toast: ErrorToastOptions) => {},
   }),
 }));
+*/
 
 describe.skip('Wazuh Error Orchestrator Business', () => {
   describe('Given a valid options params for display toast INFO', () => {

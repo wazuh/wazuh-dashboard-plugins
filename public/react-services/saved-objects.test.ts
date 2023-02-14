@@ -1,7 +1,7 @@
 import axios, { AxiosResponse } from 'axios';
 import { SavedObject } from './saved-objects';
 import { AppState } from './app-state';
-import { ErrorFactory } from './error-factory';
+import { ErrorFactory } from './error-management';
 
 jest.mock('./app-state');
 
