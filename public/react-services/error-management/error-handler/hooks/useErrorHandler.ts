@@ -1,4 +1,4 @@
-import ErrorHandler from '../error-handler';
+import { ErrorHandler } from '../error-handler';
 
 /**
  *
