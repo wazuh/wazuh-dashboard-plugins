@@ -1,5 +1,7 @@
 import { EuiComboBoxOptionOption } from '@elastic/eui';
 import { NavigationPublicPluginStart } from '../../../../../src/plugins/navigation/public';
+import { DashboardStart } from '../../../../../src/plugins/dashboard/public';
+import { DataPublicPluginStart } from '../../../../../src/plugins/data/public';
 import { AppMountParameters, CoreStart } from '../../../../../src/core/public';
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface OpendistroSecurityPluginSetup {}
@@ -8,6 +10,8 @@ export interface OpendistroSecurityPluginStart {}
 
 export interface AppPluginStartDependencies {
   navigation: NavigationPublicPluginStart;
+  dashboard: DashboardStart;
+  data: DataPublicPluginStart;
 }
 
 export interface AppDependencies {

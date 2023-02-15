@@ -6,18 +6,7 @@ import {
 } from '@elastic/eui';
 import { CoreStart } from '../../../../../../../src/core/public';
 
-// import {
-//   getAngularModule,
-//   getToasts,
-//   getVisualizationsPlugin,
-//   getSavedObjects,
-//   getDataPlugin,
-//   getChrome,
-//   getOverlays,
-//   getPlugins,
-//   getNavigationPlugin
-// } from '../../../../kibana-services';
-import { AppPluginStartDependencies, ClientConfigType } from './types';
+import { AppPluginStartDependencies, ClientConfigType } from '../../types';
 import { WzKpi } from '../../components/wz-kpi/wz-kpi';
 import {useDashboardConfiguration} from './configuration';
 
