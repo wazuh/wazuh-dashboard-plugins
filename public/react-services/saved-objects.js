@@ -60,19 +60,19 @@ export class SavedObject {
       result = this.validateIndexPatterns(list);
     }
 
-    return result.map((item: { id: string; attributes: { title: string } }) => {
+    return result.map((item) => {
       return { id: item.id, title: item.attributes.title };
     });
   }
 
   static validateIndexPatterns(list) {
-    const requiredFields = ['timestamp', 'rule.groups', 'manager.name', 'agent.id'];
-    return list.filter(
-      (item) =>
-        item &&
-        item._fields &&
-        requiredFields.every((reqField) => item._fields.some((field) => field.name === reqField))
-    );
+    const requiredFields = [
+      'timestamp',
+      'rule.groups',
+      'manager.name',
+      'agent.id',
+    ];
+    return list.filter(item => item && item._fields && requiredFields.every((reqField => item._fields.some(field => field.name === reqField))));
   }
 
   static async existsOrCreateIndexPattern(patternID) {
@@ -167,13 +167,17 @@ export class SavedObject {
     try {
       // same logic as plugin platform when a new index is created, you need to refresh it to see its fields
       // we force the refresh of the index by requesting its fields and the assign these fields
-      await GenericRequest.request('PUT', `/api/saved_objects/index-pattern/${id}`, {
-        attributes: {
-          fields: JSON.stringify(fields),
-          timeFieldName: 'timestamp',
-          title: title,
-        },
-      });
+      await GenericRequest.request(
+        'PUT',
+        `/api/saved_objects/index-pattern/${id}`,
+        {
+          attributes: {
+            fields: JSON.stringify(fields),
+            timeFieldName: 'timestamp',
+            title: title
+          },
+        }
+      );
     } catch (error) {
       throw ((error || {}).data || {}).message || false ? new Error(error.data.message) : error;
     }
@@ -195,8 +199,8 @@ export class SavedObject {
       await this.refreshFieldsOfIndexPattern(pattern.id, pattern.title, fields);
     } catch (error) {
       return ((error || {}).data || {}).message || false
-        ? new Error(error.data.message)
-        : new Error(error.message) || error;
+        ? error.data.message
+        : error.message || error;
     }
   }
 
@@ -246,7 +250,9 @@ export class SavedObject {
       );
       return;
     } catch (error) {
-      throw ((error || {}).data || {}).message || false ? new Error(error.data.message) : error;
+      throw ((error || {}).data || {}).message || false
+        ? error.data.message
+        : error.message || error;
     }
   }
 

@@ -33,7 +33,7 @@ export class ApiCheck {
         headers: { ...PLUGIN_PLATFORM_REQUEST_HEADERS, 'content-type': 'application/json' },
         url: url,
         data: payload,
-        timeout: timeout || 20000,
+        timeout: timeout || 20000
       };
 
       if (Object.keys(configuration).length) {
@@ -65,7 +65,7 @@ export class ApiCheck {
    * Check the status of an API entry
    * @param {String} apiObject
    */
-  static async checkApi(apiEntry, forceRefresh = false) {
+  static async checkApi(apiEntry, forceRefresh=false) {
     try {
       const wazuhConfig = new WazuhConfig();
       const { timeout } = wazuhConfig.getConfig();
@@ -75,8 +75,8 @@ export class ApiCheck {
         method: 'POST',
         headers: { ...PLUGIN_PLATFORM_REQUEST_HEADERS, 'content-type': 'application/json' },
         url: url,
-        data: { ...apiEntry, forceRefresh },
-        timeout: timeout || 20000,
+        data: {...apiEntry, forceRefresh},
+        timeout: timeout || 20000
       };
 
       const response = await request(options);
