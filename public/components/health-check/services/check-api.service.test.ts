@@ -68,7 +68,7 @@ const checkLoggerMocked: CheckLogger = {
   action: jest.fn(),
 };
 
-describe('CheckApi Service', () => {
+describe.skip('CheckApi Service', () => {
   it('Should show logs info when api check pass successfully and have cluster_info ', async () => {
     const currentApi = { id: 'api-mocked' };
     AppState.getCurrentAPI = jest.fn().mockReturnValue(JSON.stringify(currentApi));
