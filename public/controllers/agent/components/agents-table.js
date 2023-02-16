@@ -41,6 +41,7 @@ import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { AgentStatus } from '../../../components/agents/agent_status';
 import { AgentSynced } from '../../../components/agents/agent-synced';
+import { SearchBar } from '../../../components/search-bar';
 
 export const AgentsTable = withErrorBoundary(
   class AgentsTable extends Component {
@@ -611,12 +612,95 @@ export const AgentsTable = withErrorBoundary(
               noDeleteFiltersOnUpdateSuggests
               filters={this.state.filters}
               suggestions={this.suggestions}
-              onFiltersChange={(filters) => this.setState({ filters, pageIndex: 0 })}
-              placeholder="Filter or search agent"
+              onFiltersChange={filters =>
+                this.setState({ filters, pageIndex: 0 })
+              }
+              placeholder='Filter or search agent'
+            />
+            {/** Example implementation */}
+            <SearchBar
+              syntax='aql'
+              modes={[
+                {
+                  id: 'aql',
+                  implicitQuery: 'id!=000;',
+                  suggestions: {
+                    field() {
+                      return [
+                        { label: 'status', description: 'Status' },
+                        { label: 'ip', description: 'IP address' },
+                      ].map(field => ({ type: 'field', ...field }));
+                    },
+                    value: async (currentValue, { previousField }) => {
+                      switch (previousField) {
+                        case 'status':
+                          try {
+                            const results = await this.props.wzReq(
+                              'GET',
+                              `/agents/stats/distinct`,
+                              {
+                                params: {
+                                  fields: 'status',
+                                  limit: 30,
+                                },
+                              },
+                            );
+
+                            return results.data.data.affected_items.map(
+                              ({ status }) => ({
+                                type: 'value',
+                                label: status,
+                              }),
+                            );
+                          } catch (error) {
+                            console.log({ error });
+                            return [];
+                          }
+                          break;
+                        case 'ip':
+                          try {
+                            const results = await this.props.wzReq(
+                              'GET',
+                              `/agents/stats/distinct`,
+                              {
+                                params: {
+                                  fields: 'ip',
+                                  limit: 30,
+                                },
+                              },
+                            );
+
+                            console.log({ results });
+                            return results.data.data.affected_items.map(
+                              ({ ip }) => ({ type: 'value', label: ip }),
+                            );
+                          } catch (error) {
+                            console.log({ error });
+                            return [];
+                          }
+                          break;
+                        default:
+                          return [];
+                          break;
+                      }
+                    },
+                  },
+                },
+                {
+                  id: 'uiql',
+                  implicitQuery: 'id!=000;',
+                },
+              ]}
+              onChange={console.log}
+              onSearch={console.log}
             />
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
-            <EuiButton iconType="refresh" fill={true} onClick={() => this.reloadAgents()}>
+            <EuiButton
+              iconType='refresh'
+              fill={true}
+              onClick={() => this.reloadAgents()}
+            >
               Refresh
             </EuiButton>
           </EuiFlexItem>
