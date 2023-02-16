@@ -12,7 +12,7 @@
  *
  */
 
-import { ErrorFactory } from '../../../react-services/error-factory';
+import { ErrorHandler } from '../../../react-services/error-management';
 import { getToasts } from '../../../kibana-services';
 import { ApiCheck, AppState, GenericRequest } from '../../../react-services';
 import { CheckLogger } from '../types/check_logger';
@@ -64,10 +64,10 @@ const trySetDefault = async (checkLogger: CheckLogger) => {
         return Promise.reject(new Error('No API available to connect'));
       }
     }
-    return Promise.reject(ErrorFactory.createError('No API configuration found'));
+    return Promise.reject(ErrorHandler.createError('No API configuration found'));
   } catch (error) {
     checkLogger.error(`Error connecting to API: ${error}`);
-    return Promise.reject(ErrorFactory.createError(error, `Error connecting to API: ${error}`));
+    return Promise.reject(ErrorHandler.createError(`Error connecting to API: ${error}`));
   }
 };
 
