@@ -1,6 +1,6 @@
 import { ErrorHandler, ApiCheck, AppState, formatUIDate } from '../../react-services';
 import { SettingsController } from './settings';
-import { ErrorFactory } from '../../react-services/error-factory';
+import { ErrorFactory } from '../../react-services/error-management';
 import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 
