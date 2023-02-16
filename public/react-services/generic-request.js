@@ -17,54 +17,74 @@ import { WzMisc } from '../factories/misc';
 import { getHttp, getDataPlugin } from '../kibana-services';
 import { PLUGIN_PLATFORM_REQUEST_HEADERS } from '../../common/constants';
 import { request } from '../services/request-handler';
-import { ErrorHandler } from './error-management';
 
 export class GenericRequest {
-  static async request(
-    method: RequestMethod,
-    path: string,
-    payload: any = null,
-    returnError = false
-  ) {
+  static async request(method, path, payload = null, returnError = false) {
     try {
       if (!method || !path) {
         throw new Error('Missing parameters');
       }
       const wazuhConfig = new WazuhConfig();
       const { timeout } = wazuhConfig.getConfig();
-      const requestHeaders: any = {
+      const requestHeaders = {
         ...PLUGIN_PLATFORM_REQUEST_HEADERS,
-        'content-type': 'application/json',
+        'content-type': 'application/json'
       };
       const tmpUrl = getHttp().basePath.prepend(path);
 
-      try {
-        requestHeaders.pattern = (
-          await getDataPlugin().indexPatterns.get(AppState.getCurrentPattern())
-        ).title;
-      } catch (error) {}
+      try{
+        requestHeaders.pattern = (await getDataPlugin().indexPatterns.get(AppState.getCurrentPattern())).title;
+      }catch(error){};
 
       try {
         requestHeaders.id = JSON.parse(AppState.getCurrentAPI()).id;
       } catch (error) {
         // Intended
       }
-      var options = {
-        method: method,
-        headers: requestHeaders,
-        url: tmpUrl,
-        timeout: timeout || 20000,
-      };
+      var options = {};
 
       const data = {};
-
-      if (['PUT', 'POST', 'DELETE'].includes(method)) {
-        options['data'] = payload;
+      if (method === 'GET') {
+        options = {
+          method: method,
+          headers: requestHeaders,
+          url: tmpUrl,
+          timeout: timeout || 20000
+        };
+      }
+      if (method === 'PUT') {
+        options = {
+          method: method,
+          headers: requestHeaders,
+          data: payload,
+          url: tmpUrl,
+          timeout: timeout || 20000
+        };
+      }
+      if (method === 'POST') {
+        options = {
+          method: method,
+          headers: requestHeaders,
+          data: payload,
+          url: tmpUrl,
+          timeout: timeout || 20000
+        };
+      }
+      if (method === 'DELETE') {
+        options = {
+          method: method,
+          headers: requestHeaders,
+          data: payload,
+          url: tmpUrl,
+          timeout: timeout || 20000
+        };
       }
 
       Object.assign(data, await request(options));
       if (!data) {
-        throw new Error(`Error doing a request to ${tmpUrl}, method: ${method}.`);
+        throw new Error(
+          `Error doing a request to ${tmpUrl}, method: ${method}.`
+        );
       }
 
       return data;
@@ -78,18 +98,17 @@ export class GenericRequest {
           const wzMisc = new WzMisc();
           wzMisc.setApiIsDown(true);
 
-          if (
-            !window.location.hash.includes('#/settings') &&
-            !window.location.hash.includes('#/health-check') &&
-            !window.location.hash.includes('#/blank-screen')
-          ) {
+          if (!window.location.hash.includes('#/settings') && 
+          !window.location.hash.includes('#/health-check') &&
+          !window.location.hash.includes('#/blank-screen')) {
             window.location.href = getHttp().basePath.prepend('/app/wazuh#/health-check');
           }
         }
       }
-      const responseError = ErrorHandler.createError(err as Error);
-      if (returnError) return Promise.reject(responseError);
-      return Promise.reject(responseError);
+      if (returnError) return Promise.reject(err);
+      return (((err || {}).response || {}).data || {}).message || false
+        ? Promise.reject(err.response.data.message)
+        : Promise.reject(err || 'Server did not respond');
     }
   }
 }
