@@ -1,13 +1,15 @@
-import { IWazuhError } from "../../types";
+import { IWazuhError, IWazuhErrorLogOpts } from "../../types";
 
 export default class WazuhError extends Error implements IWazuhError  {
     error: Error;
     message: string;
     code?: number;
-    constructor(error: Error, message: string, code?: number) {
+    logOptions: IWazuhErrorLogOpts;
+    constructor(error: Error, message: string, logOptions: IWazuhErrorLogOpts, code?: number) {
         super(message);
         this.error = error;
         this.message = message;
+        this.logOptions = logOptions;
         if(code)
         this.code = code;
         const childrenName = this.constructor.name; // keep the children class name
@@ -15,10 +17,13 @@ export default class WazuhError extends Error implements IWazuhError  {
         this.name = childrenName;
         this.stack = this.error.stack; // keep the stack trace from children
     }
+
     /**
-     * This method decides how to treat the error
-     */
-    handleError(){
-        throw new Error('Handle Error must be implemented!');
+     * This options define how the error will be logged and treated
+     
+    public get logOptions(): IWazuhErrorLogOpts {
+        throw new Error('Log options must be defined!');
     }
+    */
+
 }
