@@ -19,6 +19,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed the display of more than one protocol in the Global configuration section [#4917](https://github.com/wazuh/wazuh-kibana-app/pull/4917)
 - Handling endpoint response was done when there is no data to show [#4918](https://github.com/wazuh/wazuh-kibana-app/pull/4918)
 - Fixed references to Elasticsearch in Wazuh-stack plugin [4894](https://github.com/wazuh/wazuh-kibana-app/pull/4894)
+- Fixed the 2 errors that appeared in console in Settings>Configuration section. [#5135](https://github.com/wazuh/wazuh-kibana-app/pull/5135)
 
 ## Wazuh v4.4.0 - OpenSearch Dashboards 2.3.0 - Revision 4400
 
