@@ -20,8 +20,7 @@ export const useFilterManager = () => {
 
   useEffect(() => {
     const subscription = filterManager.getUpdates$().subscribe(() => {
-      const newFilters = filterManager.getFilters();
-      setFilters(newFilters);
+      setFilters(filterManager.getFilters());
     });
     return () => {
       subscription.unsubscribe();
