@@ -10,8 +10,9 @@ export const useErrorHandler = async (callback: Function) => {
     let res = await callback();
     return [res, null];
   } catch (error) {
-    // should execute errorHandler
-    ErrorHandler.handleError(error);
+    if (error instanceof Error) {
+      ErrorHandler.handleError(error);
+    }
     return [null, error];
   }
 };

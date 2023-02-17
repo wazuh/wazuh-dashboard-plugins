@@ -2,6 +2,13 @@ import { AxiosError, AxiosResponse } from 'axios';
 import { ErrorHandler } from './error-handler';
 import { ErrorOrchestratorService } from '../../error-orchestrator/error-orchestrator.service';
 import WazuhError from '../error-factory/errors/WazuhError';
+import {
+  ElasticApiError,
+  ElasticError,
+  WazuhApiError,
+  WazuhReportingError,
+} from '../error-factory';
+import { IWazuhErrorConstructor } from '../types';
 
 // mocked some required kibana-services
 jest.mock('../../../kibana-services', () => ({
@@ -48,7 +55,7 @@ describe('Error Handler', () => {
       { ErrorType: SyntaxError, name: 'SyntaxError' },
       { ErrorType: URIError, name: 'URIError' },
     ])(
-      'Should return the same $name instance when receive a native javascript error',
+      'should preserve and return the same "$name" instance when receive a native javascript error',
       ({ ErrorType, name }: { ErrorType: ErrorConstructor; name: string }) => {
         const errorTriggered = new ErrorType(`${name} error test`);
         const error = ErrorHandler.createError(errorTriggered);
@@ -70,7 +77,7 @@ describe('Error Handler', () => {
         message: '5000 - ERROR5000 - WazuhReportingError',
       },
     ])(
-      'Should return the same $name instance when receive a native javascript error',
+      'should created a new "$name" instance when receive a native javascript error',
       ({ name, message }: { name: string; message: string }) => {
         let error = new Error(message) as AxiosError;
         error.response = responseBody;
@@ -98,7 +105,7 @@ describe('Error Handler', () => {
         message: '5000 - ERROR5000 - WazuhReportingError',
       },
     ])(
-      'Should return the same $name instance when receive a native javascript error',
+      'should send the "$name" instance to the ERROR ORCHESTRATOR service',
       ({ name, message }: { name: string; message: string }) => {
         let error = new Error(message) as AxiosError;
         error.response = responseBody;
@@ -124,26 +131,65 @@ describe('Error Handler', () => {
         });
       },
     );
+
+    it.each([
+      {
+        name: 'ElasticApiError',
+        message: '2000 - ERROR2000 - ElasticApiError',
+      },
+      {
+        name: 'WazuhApiError',
+        message: '3000 - ERROR3000 - WazuhApiError',
+      },
+      {
+        name: 'ElasticError',
+        message: '4000 - ERROR4000 - ElasticError',
+      },
+      {
+        name: 'WazuhReportingError',
+        message: '5000 - ERROR5000 - WazuhReportingError',
+      },
+      { ErrorType: Error, name: 'Error', message: 'Error' },
+      { ErrorType: TypeError, name: 'TypeError', message: 'Error TypeError' },
+      { ErrorType: EvalError, name: 'EvalError', message: 'Error EvalError' },
+      {
+        ErrorType: ReferenceError,
+        name: 'ReferenceError',
+        message: 'Error ReferenceError',
+      },
+      {
+        ErrorType: SyntaxError,
+        name: 'SyntaxError',
+        message: 'Error SyntaxError',
+      },
+      { ErrorType: URIError, name: 'URIError', message: 'Error URIError' },
+    ])(
+      'should return the created "$name" instance after handle the error',
+      ({
+        ErrorType,
+        name,
+        message,
+      }: {
+        ErrorType?: ErrorConstructor;
+        name: string;
+        message: string;
+      }) => {
+        let error;
+        if (ErrorType) {
+          error = new ErrorType(message);
+        } else {
+          error = new Error(message) as AxiosError;
+          error.response = responseBody;
+          error.response.data.message = message;
+          error.response.data.error = error;
+        }
+        const errorReturned = ErrorHandler.createError(error);
+        const errorFromHandler = ErrorHandler.handleError(error);
+        expect(errorFromHandler).toEqual(errorReturned);
+        expect(errorFromHandler).toBeInstanceOf(ErrorType ? ErrorType : WazuhError);
+        expect(errorFromHandler.message).toBe(message);
+        expect(errorFromHandler.name).toBe(name);
+      },
+    );
   });
-
-  /*
-    it.only('should return error', async () => {
-      const throwError = () => {
-        const response = {
-          statusCode: 500,
-          body: {},
-        };
-        throw new errors.ResponseError(response as ApiResponse);
-      };
-
-      try {
-        throwError();
-      } catch (error) {
-        console.log(JSON.stringify(error));
-      }
-    });
-
-
-  })
-  */
 });

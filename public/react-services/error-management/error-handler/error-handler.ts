@@ -6,44 +6,22 @@ import {
   WazuhApiError,
 } from '../error-factory/errors';
 import { IWazuhError, IWazuhErrorConstructor } from '../types';
-
 // error orchestrator
 import { UIErrorLog } from '../../error-orchestrator/types';
 import { ErrorOrchestratorService } from '../../error-orchestrator/error-orchestrator.service';
 
-/**
- * Error codes: code
- * wazuh-api-elastic 20XX
- * wazuh-api         30XX
- * wazuh-elastic     40XX
- * wazuh-reporting   50XX
- * unknown           1000
- */
-
-// statusCode = http status code
-// 200 = OK
-// 201 = Created
-// 202 = Accepted
-// 204 = No Content
-// 400 = Bad Request
-// 401 = unauthorized
-// 403 = forbidden
-// 404 = not found
-// 405 = method not allowed
-// 500 = internal server error
-// 501 = not implemented
-
 export class ErrorHandler {
   /**
-   * Receives an error and create a new error instance then treat the error
+   * Receives an error and create return a new error instance then treat the error
    * @param error
    */
-  static handleError(error: Error): void {
+  static handleError(error: Error): Error | IWazuhError {
     if(!error){
       throw Error('Error must be defined');
     }
     const errorCreated = this.createError(error);
     this.showError(errorCreated);
+    return errorCreated;
   }
 
   /**

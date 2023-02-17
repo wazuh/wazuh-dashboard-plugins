@@ -106,6 +106,27 @@ In this way, using the errorHandler HOC we can catch all the errors by the error
 - Operational errors (development)
 - Axios errors
 
+
+ ### Error codes: code
+ * wazuh-api-elastic 20XX
+ * wazuh-api         30XX
+ * wazuh-elastic     40XX
+ * wazuh-reporting   50XX
+ * unknown           1000
+ 
+### HTTP status code
+- 200 = OK
+- 201 = Created
+- 202 = Accepted
+- 204 = No Content
+- 400 = Bad Request
+- 401 = unauthorized
+- 403 = forbidden
+- 404 = not found
+- 405 = method not allowed
+- 500 = internal server error
+- 501 = not implemented
+
 # Error management components
 
 ## Error factory
