@@ -4,10 +4,17 @@ import '@testing-library/jest-dom';
 
 import { withErrorHandler, ErrorHandlerComponent } from './withErrorHandler';
 import { debug } from 'console';
+import { ErrorHandler } from '../error-handler';
 
 const functionWithError = () => {
   throw new Error('Error generated');
 };
+
+jest.mock('../error-handler', () => ({
+  ErrorHandler: {
+    handleError: jest.fn()
+  }
+}));
 
 describe('withErrorHandler', () => {
   describe('Functional Component', () => {
@@ -15,8 +22,8 @@ describe('withErrorHandler', () => {
       jest.resetAllMocks();
     });
 
-    it('should catch error when exist error on ComponentDidMount event', () => {
-      const Component = (props) => {
+    it('should catch error when exist error on ComponentDidMount event and call ErrorHandler', () => {
+      const Component = (props: any) => {
         useEffect(() => {
           // Component did mount
           functionWithError();
@@ -26,36 +33,21 @@ describe('withErrorHandler', () => {
       // to avoid react console error when error boundary throw error
       const spyReactConsoleError = jest.spyOn(console, 'error');
       spyReactConsoleError.mockImplementation(() => {});
+      // spy on componentDidCatch to check if it was called
       const spyComponentDidCatch = jest.spyOn(ErrorHandlerComponent.prototype, 'componentDidCatch');
+
       const ComponentWithErrorHandler = withErrorHandler(Component);
       expect(() => render(<ComponentWithErrorHandler />)).not.toThrowError();
       expect(spyComponentDidCatch).toHaveBeenCalledTimes(1);
       expect(spyComponentDidCatch).toHaveBeenCalledWith(expect.any(Error), expect.any(Object));
+      // spy on ErrorHandler to check if it was called
+      expect(ErrorHandler.handleError).toHaveBeenCalledTimes(1);
       spyReactConsoleError.mockRestore();
       spyComponentDidCatch.mockRestore();
     });
 
-    it.skip('should catch error when exist error on ComponentWillUnmount event', () => {
-      const Component = (props) => {
-        useLayoutEffect(() => {
-          return () => functionWithError();
-        }, []);
-        return <div>Example Component</div>;
-      };
-      // to avoid react console error when error boundary throw error
-      const spyReactConsoleError = jest.spyOn(console, 'error');
-      spyReactConsoleError.mockImplementation(() => {});
-      const spyComponentDidCatch = jest.spyOn(ErrorHandlerComponent.prototype, 'componentDidCatch');
-      const ComponentWithErrorHandler = withErrorHandler(Component);
-      expect(() => render(<ComponentWithErrorHandler />)).not.toThrowError();
-      expect(spyComponentDidCatch).toHaveBeenCalledTimes(1);
-      expect(spyComponentDidCatch).toHaveBeenCalledWith(expect.any(Error), expect.any(Object));
-      spyReactConsoleError.mockRestore();
-      spyComponentDidCatch.mockRestore();
-    });
-
-    it('should catch error when exist error on ComponentDidUpdate event', () => {
-      const Component = (props) => {
+    it('should catch error when exist error on ComponentDidUpdate event and call ErrorHandler', () => {
+      const Component = (props: any) => {
         const [count, setCount] = useState(0);
         useEffect(() => {
           // Component did update
@@ -79,30 +71,10 @@ describe('withErrorHandler', () => {
       fireEvent.click(btnWithError);
       expect(spyComponentDidCatch).toHaveBeenCalledTimes(1);
       expect(spyComponentDidCatch).toHaveBeenCalledWith(expect.any(Error), expect.any(Object));
+      expect(ErrorHandler.handleError).toHaveBeenCalledTimes(1);
+      spyReactConsoleError.mockRestore();
       spyComponentDidCatch.mockRestore();
     });
 
-    it.skip('should catch error when exist error on user event', () => {
-      const Component = (props) => {
-        return (
-          <div>
-            <button onClick={() => functionWithError()}>Button With Error</button>
-            Example Component
-          </div>
-        );
-      };
-      const spyComponentDidCatch = jest.spyOn(ErrorHandlerComponent.prototype, 'componentDidCatch');
-      const ComponentWithErrorHandler = withErrorHandler(Component);
-      const { getByRole } = render(<ComponentWithErrorHandler />);
-      debug();
-      const btnWithError = getByRole('button');
-
-      try {
-        fireEvent.click(btnWithError);
-      } catch (error) {
-        console.log('error catch', error);
-        expect(spyComponentDidCatch).toHaveBeenCalledTimes(0);
-      }
-    });
   });
 });

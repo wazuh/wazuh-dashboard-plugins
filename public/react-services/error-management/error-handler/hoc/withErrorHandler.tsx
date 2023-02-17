@@ -1,8 +1,9 @@
 import React, { ErrorInfo } from 'react';
+import { ErrorHandler } from '../../error-handler';
 
-export class ErrorHandlerComponent extends React.Component {
+export class ErrorHandlerComponent extends React.Component<{ children: any}> {
   componentDidCatch(error: Error, info: ErrorInfo) {
-    //console.log('error', error, info);
+    ErrorHandler.handleError(error)
   }
 
   render() {
@@ -10,7 +11,7 @@ export class ErrorHandlerComponent extends React.Component {
   }
 }
 
-export const withErrorHandler = (WrappedComponent) => (props) => {
+export const withErrorHandler = (WrappedComponent: React.ComponentType<{}>) => (props: any) => {
   return (
     <ErrorHandlerComponent>
       <WrappedComponent {...props} />
