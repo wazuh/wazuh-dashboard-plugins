@@ -9,6 +9,7 @@ import {
   WazuhReportingError,
 } from '../error-factory';
 import { IWazuhErrorConstructor } from '../types';
+import { UIErrorLog } from '../../error-orchestrator/types';
 
 // mocked some required kibana-services
 jest.mock('../../../kibana-services', () => ({
@@ -104,31 +105,61 @@ describe('Error Handler', () => {
         name: 'WazuhReportingError',
         message: '5000 - ERROR5000 - WazuhReportingError',
       },
+      { ErrorType: Error, name: 'Error', message: 'Error' },
+      { ErrorType: TypeError, name: 'TypeError', message: 'Error TypeError' },
+      { ErrorType: EvalError, name: 'EvalError', message: 'Error EvalError' },
+      {
+        ErrorType: ReferenceError,
+        name: 'ReferenceError',
+        message: 'Error ReferenceError',
+      },
+      {
+        ErrorType: SyntaxError,
+        name: 'SyntaxError',
+        message: 'Error SyntaxError',
+      },
+      { ErrorType: URIError, name: 'URIError', message: 'Error URIError' },
     ])(
-      'should send the "$name" instance to the ERROR ORCHESTRATOR service',
-      ({ name, message }: { name: string; message: string }) => {
-        let error = new Error(message) as AxiosError;
-        error.response = responseBody;
-        error.response.data.message = message;
-        error.response.data.error = error;
-        const errorReturned = ErrorHandler.createError(error);
-        ErrorHandler.handleError(error);
+      'should send the "$name" instance to the ERROR ORCHESTRATOR service with the correct log options defined in the error class',
+      ({
+        ErrorType,
+        name,
+        message,
+      }: {
+        ErrorType?: ErrorConstructor;
+        name: string;
+        message: string;
+      }) => {
+        let error;
+        if (ErrorType) {
+          error = new ErrorType(message);
+        } else {
+          error = new Error(message) as AxiosError;
+          error.response = responseBody;
+          error.response.data.message = message;
+          error.response.data.error = error;
+        }
+        const errorHandled = ErrorHandler.handleError(error)
         const spyErrorOrch = jest.spyOn(
           ErrorOrchestratorService,
           'handleError',
         );
-        expect(spyErrorOrch).toHaveBeenCalledWith({
-          context: '',
-          level: 'ERROR',
-          severity: 'CRITICAL',
-          display: true,
+
+        let logOptionsExpected: UIErrorLog = {
           error: {
-            error: errorReturned,
-            message,
-            title: name,
+            message: errorHandled.message,
+            title: errorHandled.message,
+            error: errorHandled,
           },
-          store: true,
-        });
+          level: 'ERROR',
+          severity: 'UI',
+          display: false,
+          store: false,
+        };
+        if(errorHandled instanceof WazuhError){
+          logOptionsExpected = errorHandled.logOptions;
+        }
+        expect(spyErrorOrch).toHaveBeenCalledWith(logOptionsExpected);
       },
     );
 

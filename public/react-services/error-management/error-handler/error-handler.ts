@@ -6,6 +6,7 @@ import {
   WazuhApiError,
 } from '../error-factory/errors';
 import { IWazuhError, IWazuhErrorConstructor } from '../types';
+import WazuhError from '../error-factory/errors/WazuhError';
 // error orchestrator
 import { UIErrorLog } from '../../error-orchestrator/types';
 import { ErrorOrchestratorService } from '../../error-orchestrator/error-orchestrator.service';
@@ -20,7 +21,7 @@ export class ErrorHandler {
       throw Error('Error must be defined');
     }
     const errorCreated = this.createError(error);
-    this.showError(errorCreated);
+    this.logError(errorCreated);
     return errorCreated;
   }
 
@@ -110,30 +111,30 @@ export class ErrorHandler {
   }
 
   /**
-   *
+   * This method log the error depending on the error type and the log options defined in the error class
    * @param error
    */
-  private static showError(error: Error) {
-    const errorOrchestratorOptions: UIErrorLog = {
-      context: '',
-      level: 'ERROR',
-      severity: 'CRITICAL',
-      display: true,
-      error: {
-        error: error,
-        message: error.message,
-        title: error.name,
-      },
-      store: true,
-    };
-
-    switch(error.name){
-      case 'ElasticApiError':
-      case 'WazuhApiError':
-      case 'ElasticError':
-      case 'WazuhReportingError':
-      case 'Error':
+  private static logError(error: Error | IWazuhError) {
+    if(error instanceof WazuhError){
+      const errorLog: UIErrorLog = {
+        ...error.logOptions,
+      };
+      ErrorOrchestratorService.handleError(errorLog);
+    }else{
+      // this is a generic error treatment
+      // this condition is for the native error classes
+      const errorLog: UIErrorLog = {
+        error: {
+          message: error.message,
+          title: error.message,
+          error: error,
+        },
+        level: 'ERROR',
+        severity: 'UI',
+        display: false,
+        store: false,
+      };
+      ErrorOrchestratorService.handleError(errorLog);
     }
-    ErrorOrchestratorService.handleError(errorOrchestratorOptions);
   }
 }

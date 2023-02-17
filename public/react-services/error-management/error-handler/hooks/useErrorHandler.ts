@@ -11,7 +11,7 @@ export const useErrorHandler = async (callback: Function) => {
     return [res, null];
   } catch (error) {
     if (error instanceof Error) {
-      ErrorHandler.handleError(error);
+      error = ErrorHandler.handleError(error);
     }
     return [null, error];
   }
