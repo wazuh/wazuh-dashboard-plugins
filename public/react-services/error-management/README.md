@@ -70,6 +70,13 @@ In this way, using the useErrorHandler hook we can omit the use of try-catch and
 The recommended use of the Error Handler HOC is to catch all the errors produced in the `component lifecycle`.
 This HOC will wrap the react component and will catch all the errors and treat them by the error handler class
 
+The HOC will recognize the errors in the following lyficlycle methods:
+
+- `ComponentDidMount`
+- `ComponentDidUpdate`
+
+The HOC will not catch the errors in the render method.
+
 ### Example
 ```javascript
 
