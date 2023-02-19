@@ -1,5 +1,4 @@
 import { ApiCheck } from './index';
-import { getHttp, getCookies } from '../kibana-services';
 
 import axios, { AxiosResponse } from 'axios';
 jest.mock('axios');
@@ -11,13 +10,13 @@ jest.mock('../kibana-services', () => ({
       get: () => {
         return 'http://localhost:5601';
       },
-      prepend: (url) => {
+      prepend: (url: string) => {
         return `http://localhost:5601${url}`;
       },
     },
   }),
   getCookies: jest.fn().mockReturnValue({
-    set: (name, value, options) => {
+    set: (name: string, value: any, options: object) => {
       return true;
     },
   }),
@@ -38,35 +37,37 @@ describe('Wz Api Check', () => {
   };
 
   describe('checkStored', () => {
-    it.skip('should return ERROR instance when request fails', async () => {
+    it('should return ERROR instance when request fails', async () => {
       try {
         (axios as jest.MockedFunction<typeof axios>).mockResolvedValue(
           Promise.reject({
             response,
-          })
+          }),
         );
         await ApiCheck.checkStored('api-2');
       } catch (error) {
         expect(error).toBeInstanceOf(Error);
         expect(typeof error).not.toBe('string');
-        expect(error.message).toBe(response.data.message);
+        if (error instanceof Error)
+          expect(error.message).toBe(response.data.message);
       }
     });
   });
 
   describe('checkApi', () => {
-    it.skip('should return ERROR instance when request fails', async () => {
+    it('should return ERROR instance when request fails', async () => {
       try {
         (axios as jest.MockedFunction<typeof axios>).mockResolvedValue(
           Promise.reject({
             response,
-          })
+          }),
         );
         await ApiCheck.checkApi({ id: 'api-id-mocked' });
       } catch (error) {
         expect(error).toBeInstanceOf(Error);
         expect(typeof error).not.toBe('string');
-        expect(error.message).toBe(response.data.message);
+        if (error instanceof Error)
+          expect(error.message).toBe(response.data.message);
       }
     });
   });
