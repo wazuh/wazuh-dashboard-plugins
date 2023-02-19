@@ -15,5 +15,10 @@ export interface IWazuhError extends Error, IErrorOpts {
 }
 
 export interface IWazuhErrorConstructor {
-  new (error: Error, message: string, code?: number): IWazuhError;
+  new (error: Error, info: IWazuhErrorInfo): IWazuhError;
+}
+
+export interface IWazuhErrorInfo {
+  message: string;
+  code?: number;
 }

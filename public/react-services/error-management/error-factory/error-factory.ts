@@ -43,6 +43,6 @@ export class ErrorFactory {
     ErrorType: IWazuhErrorConstructor,
     opts: IErrorOpts,
   ): IWazuhError {
-    return new ErrorType(opts?.error, opts?.message, opts?.code);
+    return new ErrorType(opts?.error, { message: opts?.message, code: opts?.code });
   }
 }

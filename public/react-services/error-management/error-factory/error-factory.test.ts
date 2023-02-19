@@ -45,7 +45,7 @@ describe('Error Factory', () => {
       };
       const errorCreated = ErrorFactory.create(errorType, {
         error,
-        message: response.data.message,
+        message: response.data.message
       });
       expect(errorCreated.name).toBe(name);
       expect(errorCreated.stack).toBe(error.stack);
