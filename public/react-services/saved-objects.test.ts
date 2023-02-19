@@ -1,7 +1,7 @@
-import axios, { AxiosResponse } from 'axios';
+import axios, { AxiosError, AxiosResponse } from 'axios';
 import { SavedObject } from './saved-objects';
 import { AppState } from './app-state';
-import { ErrorFactory } from './error-management';
+import { ErrorHandler } from './error-management';
 
 jest.mock('./app-state');
 
@@ -14,13 +14,13 @@ jest.mock('../kibana-services', () => ({
       get: () => {
         return 'http://localhost:5601';
       },
-      prepend: (url) => {
+      prepend: (url: string) => {
         return `http://localhost:5601${url}`;
       },
     },
   }),
   getCookies: jest.fn().mockReturnValue({
-    set: (name, value, options) => {
+    set: (name: string, value: any, options: object) => {
       return true;
     },
   }),
@@ -55,13 +55,12 @@ describe('SavedObjects', () => {
   };
 
   describe('existsIndexPattern', () => {
-    it.skip('Should return ERROR when get request if exist index pattern fails', async () => {
+    it('Should return ERROR when get request if exist index pattern fails', async () => {
       try {
-        const mockingError = new Error('Error on genericReq');
-        mockingError['response'] = response;
-
+        const mockingError = new Error('Error on genericReq') as AxiosError;
+        mockingError.response = response;
         (axios as jest.MockedFunction<typeof axios>).mockResolvedValue(
-          Promise.reject(ErrorFactory.createError(mockingError))
+          Promise.reject(ErrorHandler.createError(mockingError)),
         );
         const currentApiMock = JSON.stringify({ id: 'mocked-api-id' });
         AppState.getCurrentAPI = jest.fn().mockReturnValue(currentApiMock);
@@ -69,7 +68,9 @@ describe('SavedObjects', () => {
       } catch (error) {
         expect(error).toBeInstanceOf(Error);
         expect(typeof error).not.toBe('string');
-        expect(error.message).toBe(response.data.message);
+        if (error instanceof Error) {
+          expect(error.message).toBe(response.data.message);
+        }
       }
     });
   });
