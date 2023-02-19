@@ -23,7 +23,7 @@ jest.mock('../kibana-services', () => ({
       get: () => {
         return 'http://localhost:5601';
       },
-      prepend: (url) => {
+      prepend: (url: string) => {
         return `http://localhost:5601${url}`;
       },
     },
@@ -57,52 +57,57 @@ describe('Generic Request', () => {
     jest.restoreAllMocks();
   });
 
-  it.skip('Should return data when request is successfully completed', async () => {
+  it('Should return data when request is successfully completed', async () => {
     const resDataMocked = { data: [] };
     (axios as jest.MockedFunction<typeof axios>).mockResolvedValue(
       Promise.resolve(resDataMocked as AxiosResponse)
     );
-    let res = await GenericRequest.request('GET', '/api/request', {});
+    let res = await GenericRequest.request('GET', '/api/request');
     expect(res).toEqual(resDataMocked);
   });
 
-  it.skip('Should return ERROR when method or path are empty', async () => {
+  it('Should return ERROR when method or path are empty', async () => {
     try {
-      await GenericRequest.request(null, '/api/request', {});
+      await GenericRequest.request(null, '/api/request');
     } catch (error) {
       expect(error).toBeInstanceOf(Error);
+      if(error instanceof Error) 
       expect(error.message).toBe('Missing parameters');
     }
   });
 
-  it.skip('Should return an instance ERROR when the request fails', async () => {
+  it('Should return an instance ERROR when the request fails', async () => {
     const resError = new Error('Error message');
     (axios as jest.MockedFunction<typeof axios>).mockResolvedValue(Promise.reject(resError));
     const currentEmptyApiMock = JSON.stringify({});
     AppState.getCurrentAPI = jest.fn().mockReturnValue(currentEmptyApiMock);
     try {
-      await GenericRequest.request('GET', '/api/request', {});
+      await GenericRequest.request('GET', '/api/request');
     } catch (error) {
       expect(error).toBeInstanceOf(Error);
-      expect(error.stack).toBeTruthy();
-      expect(error.message).toEqual(resError.message);
-      expect(error.stack).toBeTruthy();
+      if(error instanceof Error){
+        expect(error?.stack).toBeTruthy();
+        expect(error?.message).toEqual(resError.message);
+        expect(error?.stack).toBeTruthy();
+      }
       expect(typeof error).not.toBe('string');
     }
   });
 
-  it.skip('Should return an instance ERROR when the request fails and have invalid api id', async () => {
+  it('Should return an instance ERROR when the request fails and have invalid api id', async () => {
     const resError = new Error('Error message');
     (axios as jest.MockedFunction<typeof axios>).mockResolvedValue(Promise.reject(resError));
     const currentApiMock = JSON.stringify({ id: 'mocked-api-id' });
     AppState.getCurrentAPI = jest.fn().mockReturnValue(currentApiMock);
     try {
-      await GenericRequest.request('GET', '/api/request', {});
+      await GenericRequest.request('GET', '/api/request');
     } catch (error) {
       expect(error).toBeInstanceOf(Error);
-      expect(error.stack).toBeTruthy();
-      expect(error.message).toEqual(resError.message);
-      expect(error.stack).toBeTruthy();
+      if(error instanceof Error){
+        expect(error.stack).toBeTruthy();
+        expect(error.message).toEqual(resError.message);
+        expect(error.stack).toBeTruthy();
+      }
       expect(typeof error).not.toBe('string');
     }
   });

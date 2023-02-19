@@ -38,7 +38,7 @@ export const request = async (options = {}) => {
     return Promise.reject("Missing parameters");
   };
   options = {
-    ...options, cancelToken: source.token
+    ...options, cancelToken: source?.token
   };
 
   if (allow) {
