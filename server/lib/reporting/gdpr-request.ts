@@ -21,10 +21,11 @@ import { getSettingDefaultValue } from '../../../common/services/settings';
  * @returns {Array<String>}
  */
 export const topGDPRRequirements = async (
-  context, 
-  gte, 
-  lte, 
-  filters, 
+  context,
+  gte,
+  lte,
+  filters,
+  allowedAgentsFilter,
   pattern = getSettingDefaultValue('pattern')
 ) => {
   if (filters.includes('rule.gdpr: exists')) {
@@ -35,7 +36,7 @@ export const topGDPRRequirements = async (
   try {
     const base = {};
 
-    Object.assign(base, Base(pattern, filters, gte, lte));
+    Object.assign(base, Base(pattern, filters, gte, lte, allowedAgentsFilter));
 
     Object.assign(base.aggs, {
       '2': {
@@ -81,6 +82,7 @@ export const getRulesByRequirement= async (
   gte,
   lte,
   filters,
+  allowedAgentsFilter,
   requirement,
   pattern = getSettingDefaultValue('pattern')
 ) => {
@@ -92,7 +94,7 @@ export const getRulesByRequirement= async (
   try {
     const base = {};
 
-    Object.assign(base, Base(pattern, filters, gte, lte));
+    Object.assign(base, Base(pattern, filters, gte, lte, allowedAgentsFilter));
 
     Object.assign(base.aggs, {
       '2': {

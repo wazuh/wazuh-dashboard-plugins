@@ -264,20 +264,6 @@ export const Discover = compose(
       this.indexPattern = {
         ...(await this.PluginPlatformServices.indexPatterns.get(AppState.getCurrentPattern())),
       };
-      const fields: IFieldType[] = [];
-      Object.keys(this.indexPattern.fields).forEach((item) => {
-        if (isNaN(item)) {
-          fields.push(this.indexPattern.fields[item]);
-        } else if (
-          this.props.includeFilters &&
-          this.indexPattern.fields[item].name.includes(this.props.includeFilters)
-        ) {
-          fields.unshift(this.indexPattern.fields[item]);
-        } else {
-          fields.push(this.indexPattern.fields[item]);
-        }
-      });
-      this.indexPattern.fields = fields;
     }
 
     hideCreateCustomLabel = () => {

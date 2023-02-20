@@ -1,0 +1,50 @@
+{
+  "data": {
+    "affected_items": [
+      {
+        "description": "The cramfs filesystem type is a compressed read-only Linux filesystem embedded in small footprint systems. A cramfs image can be used without having to first decompress the image.",
+        "id": 19000,
+        "reason": "Invalid path or wrong permissions to run command 'modprobe -n -v cramfs'",
+        "command": "modprobe -n -v cramfs,lsmod",
+        "rationale": "Removing support for unneeded filesystem types reduces the local attack surface of the server. If this filesystem type is not needed, disable it.",
+        "condition": "all",
+        "title": "Ensure mounting of cramfs filesystems is disabled.",
+        "result": "not applicable",
+        "policy_id": "cis_ubuntu20-04",
+        "remediation": "1) Edit or create a file in the /etc/modprobe.d/ directory ending in .conf and add the following line: install cramfs /bin/true. 2) Run the following command to unload the cramfs module: # rmmod cramfs",
+        "compliance": [
+          {
+            "value": "1.1.1.1",
+            "key": "cis"
+          },
+          {
+            "value": "5.1",
+            "key": "cis_csc"
+          },
+          {
+            "value": "2.2.5",
+            "key": "pci_dss"
+          },
+          {
+            "value": "CC6.3",
+            "key": "tsc"
+          }
+        ],
+        "rules": [
+          {
+            "type": "command",
+            "rule": "c:modprobe -n -v cramfs -> r:^install /bin/true"
+          },
+          {
+            "type": "numeric",
+            "rule": "not c:lsmod -> r:cramfs"
+          }
+        ]
+      }
+    ],
+    "total_affected_items": 191,
+    "total_failed_items": 0,
+    "failed_items": []
+  },
+  "error": 0
+}

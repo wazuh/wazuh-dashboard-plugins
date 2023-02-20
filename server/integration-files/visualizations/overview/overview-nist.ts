@@ -268,7 +268,7 @@ export default [
   {
     _id: 'Wazuh-App-Overview-NIST-requirements-by-agents',
     _source: {
-      title: 'Requiments distribution by agent',
+      title: 'Requirements distribution by agent',
       visState: JSON.stringify({
         title: 'NIST-Top-requirements-by-agent',
         type: 'area',
