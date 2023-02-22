@@ -17,7 +17,7 @@ export class ErrorHandler {
    * @param error
    */
   static handleError(error: Error): Error | IWazuhError {
-    if(!error){
+    if (!error) {
       throw Error('Error must be defined');
     }
     const errorCreated = this.createError(error);
@@ -32,12 +32,13 @@ export class ErrorHandler {
    * @returns
    */
   static createError(error: Error | string): IWazuhError | Error {
-    if(!error){
+    if (!error) {
       throw Error('Error must be defined');
     }
-    if(typeof error === 'string') return new Error(error);
+    if (typeof error === 'string') return new Error(error);
     const errorType = this.getErrorType(error);
-    if (errorType) return ErrorFactory.create(errorType, { error, message: error.message });
+    if (errorType)
+      return ErrorFactory.create(errorType, { error, message: error.message });
     return error;
   }
 
@@ -49,12 +50,15 @@ export class ErrorHandler {
    */
   private static getErrorType(
     //error: string | Error | AxiosError | OpenSearchDashboardsResponse, // ToDo: Get error types
-    error: Error | any
+    error: Error | any,
   ): IWazuhErrorConstructor | null {
     let errorType = null;
-    if(this.isWazuhApiError(error)){
-      errorType = this.getErrorTypeByErrorCode(error?.response?.data?.code, error?.response?.data?.message);
-    }else{
+    if (this.isWazuhApiError(error)) {
+      errorType = this.getErrorTypeByErrorCode(
+        error?.response?.data?.code,
+        error?.response?.data?.message,
+      );
+    } else {
       errorType = this.getErrorTypeByErrorCode(error.message, error?.code);
     }
     return errorType;
@@ -66,11 +70,14 @@ export class ErrorHandler {
    * @param errorCode
    * @returns
    */
-  private static getErrorTypeByErrorCode(errorResponseCode: number, message: string): IWazuhErrorConstructor | null {
+  private static getErrorTypeByErrorCode(
+    errorResponseCode: number,
+    message: string,
+  ): IWazuhErrorConstructor | null {
     let errorCode = errorResponseCode;
-    if(!errorResponseCode && message){
+    if (!errorResponseCode && message) {
       let errorCodeFromMessage: string | number = message.split('-')[0].trim();
-      if(!errorCodeFromMessage) return null;
+      if (!errorCodeFromMessage) return null;
       errorCode = Number(errorCodeFromMessage);
     }
 
@@ -81,7 +88,7 @@ export class ErrorHandler {
         return WazuhApiError;
       case errorCode >= 4000 && errorCode < 5000:
         return ElasticError;
-      case errorCode >= 5000  && errorCode < 6000:
+      case errorCode >= 5000 && errorCode < 6000:
         return WazuhReportingError;
       default:
         return null;
@@ -115,26 +122,24 @@ export class ErrorHandler {
    * @param error
    */
   private static logError(error: Error | IWazuhError) {
-    if(error instanceof WazuhError){
-      const errorLog: UIErrorLog = {
+    // this is a generic error treatment
+    // this condition is for the native error classes
+    let defaultErrorLog: UIErrorLog = {
+      error: {
+        message: error.message,
+        title: error.message,
+        error: error,
+      },
+      level: 'ERROR',
+      severity: 'UI',
+      display: false,
+      store: false,
+    };
+    if (error instanceof WazuhError) {
+      defaultErrorLog = {
         ...error.logOptions,
       };
-      ErrorOrchestratorService.handleError(errorLog);
-    }else{
-      // this is a generic error treatment
-      // this condition is for the native error classes
-      const errorLog: UIErrorLog = {
-        error: {
-          message: error.message,
-          title: error.message,
-          error: error,
-        },
-        level: 'ERROR',
-        severity: 'UI',
-        display: false,
-        store: false,
-      };
-      ErrorOrchestratorService.handleError(errorLog);
     }
+    ErrorOrchestratorService.handleError(defaultErrorLog);
   }
 }
