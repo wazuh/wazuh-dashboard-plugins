@@ -1,9 +1,8 @@
-import { fireEvent, render } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import {
-  errorHandlerDecorator,
-  errorHandlerWrapper,
+  errorHandlerDecorator
 } from './error-handler-decorator';
 import { ErrorHandler } from '../error-handler';
 
@@ -27,36 +26,5 @@ describe('Error handler decorator', () => {
     result();
     expect(ErrorHandler.handleError).toHaveBeenCalledTimes(1);
     expect(ErrorHandler.handleError).toHaveBeenCalledWith(errorGenerated);
-  });
-
-  it.skip('should catch the error from react functional component', () => {
-    const errorGenerated = new Error('callback error');
-    const functionWithError = () => {
-      throw errorGenerated;
-    };
-
-    const Component = (props: any) => {
-      useEffect(() => {
-        // Component did mount
-        functionWithError();
-      }, []);
-      return <div>Example Component</div>;
-    };
-
-    const ComponentWithDecorator = errorHandlerDecorator(Component);
-    render(<ComponentWithDecorator />);
-    expect(ErrorHandler.handleError).toHaveBeenCalledTimes(1);
-    expect(ErrorHandler.handleError).toHaveBeenCalledWith(errorGenerated);
-  });
-
-  it.skip('should catch all error from class', () => {
-    const errorGenerated = new Error('callback error');
-    class classMocked {
-      methodWithError() {
-        throw errorGenerated;
-      }
-    }
-
-    const classMockedWithError = errorHandlerDecorator(classMocked);
   });
 });
