@@ -63,12 +63,12 @@ const mainSettings = [
   },
   {
     field: 'ignore',
-    label: 'If the expression matches, the log will be ignored.',
+    label: 'If the expression matches, the log will be ignored',
     render: renderArrayObjectField,
   },
   {
     field: 'restrict',
-    label: 'The log will only be processed if the expression matches.',
+    label: 'The log will only be processed if the expression matches',
     render: renderArrayObjectField,
   },
 ];
