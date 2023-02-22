@@ -6,6 +6,7 @@
 - [Components](#components)
   - [Error factory](#error-factory)
   - [Error handler](#error-handler)
+  - [Error orchestrator](#error-orchestrator)
   - [React patterns](#react-patterns)
   - [Error Classes](#error-classes)
 - [How to use Error handler](#how-to-use-error-handler)
@@ -88,6 +89,8 @@ The `error factory` is responsible to create different instances of error depend
 The `error handler` is responsible to receive the errors (or strings) and define what type of error will be returned.
 After identifying and classifying the parameters received the error factory returns a new error instance.
 Always will return an error instance.
+
+## Error orchestrator
 
 ## React patterns
 
