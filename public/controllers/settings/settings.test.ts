@@ -1,6 +1,6 @@
-import { ErrorHandler, ApiCheck, AppState, formatUIDate } from '../../react-services';
+import { ApiCheck, AppState, formatUIDate } from '../../react-services';
 import { SettingsController } from './settings';
-import { ErrorFactory } from '../../react-services/error-management';
+import { ErrorHandler } from '../../react-services/error-management';
 import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 
@@ -19,13 +19,13 @@ jest.mock('../../kibana-services', () => ({
       get: () => {
         return 'http://localhost:5601';
       },
-      prepend: (url) => {
+      prepend: (url: string) => {
         return `http://localhost:5601${url}`;
       },
     },
   }),
   getCookies: jest.fn().mockReturnValue({
-    set: (name, value, options) => {
+    set: (name: string, value: any, options: object) => {
       return true;
     },
   }),
@@ -87,8 +87,8 @@ describe('Settings Controller', () => {
     jest.clearAllMocks();
   });
   describe('$onInit', () => {
-    it.skip('Should return ERROR instance on ErrorOrchestrator options when checkApiStatus throw error and fails', async () => {
-      const checkApisStatusErrorMocked = ErrorFactory.createError(
+    it('Should return ERROR instance on ErrorOrchestrator options when checkApiStatus throw error and fails', async () => {
+      const checkApisStatusErrorMocked = ErrorHandler.createError(
         '3099 - ERROR3099 - Wazuh not ready yet'
       );
       const controller = new SettingsController($scope, window, window.location, ErrorHandler);
@@ -114,8 +114,8 @@ describe('Settings Controller', () => {
       );
     });
 
-    it.skip('Should return ERROR instance on ErrorOrchestrator options when apiIsDown = true because checkManager fails', async () => {
-      const checkApiErrorMocked = ErrorFactory.createError(
+    it('Should return ERROR instance on ErrorOrchestrator options when apiIsDown = true because checkManager fails', async () => {
+      const checkApiErrorMocked = ErrorHandler.createError(
         '3099 - ERROR3099 - Wazuh not ready yet'
       );
       const expectedErrorOrchestratorOptions = {
