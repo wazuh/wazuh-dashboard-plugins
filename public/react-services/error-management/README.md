@@ -1,3 +1,124 @@
+# Content
+
+- [Scope](#scope)
+- [Error sources](#error-sources)
+- [Architecture](#architecture)
+- [Components](#components)
+  - [Error factory](#error-factory)
+  - [Error handler](#error-handler)
+  - [React patterns](#react-patterns)
+  - [Error Classes](#error-classes)
+- [How to use Error handler](#how-to-use)
+  - [How to use `Error Handler (class)`](#use-error-handler-class)
+  - [How to use `Error Handler (Hook)`](#use-error-handler-hook)
+  - [How to use `Error Handler (HOC)`](#use-error-handler-hoc)
+  - [How to use `Error Handler (Decorator)`](#use-error-handler-decorator)
+
+
+# Scope
+
+This solution try to simplify the error management in the wazuh-kibana-app plugin.
+The main goal is to create a standard way to manage the errors in the plugin.
+By this way, the developer must be abstracted to the error management.
+
+The error handler must 
+# Error sources
+
+- Wazuh API errors
+- Elasticsearch Error
+- Operational errors (development) - Native javascript errors
+- Axios errors
+
+ ### Error codes: code
+ * wazuh-api-elastic 20XX
+ * wazuh-api         30XX
+ * wazuh-elastic     40XX
+ * wazuh-reporting   50XX
+ * unknown           1000
+ 
+### HTTP status code
+- 200 = OK
+- 201 = Created
+- 202 = Accepted
+- 204 = No Content
+- 400 = Bad Request
+- 401 = unauthorized
+- 403 = forbidden
+- 404 = not found
+- 405 = method not allowed
+- 500 = internal server error
+- 501 = not implemented
+
+# Architecture
+
+```mermaid
+graph TD;
+ withErrorHandler-HOC-->ErrorHandler
+ useErrorHandler-Hook-->ErrorHandler
+ errorHandlerDecorator-Decorator-->ErrorHandler
+ ErrorHandler-->ErrorFactory
+ ErrorHandler-->ErrorOrchestratorService
+ ErrorFactory-->WazuhApiError
+ ErrorFactory-->WazuhReportingError
+ ErrorFactory-->ElasticApiError
+ ErrorFactory-->ElasticError
+```
+
+# Components
+
+The error management solution is composed by some components, these components are:
+
+## Error factory
+
+The `error factory` is responsible to create different instances of error depending on the parameters received.
+
+**The error factory can receive:**
+- A `string`
+- An `error instance`
+- An `error type`: this param defines the error type returned
+
+ The errors returned are defined as the `error type` received.
+
+- ElasticError
+- WazuhApiError
+- UIError
+
+## Error handler
+
+The `error handler` is responsible to receive the errors (or strings) and define what type of error will be returned.
+After identifying and classifying the parameters received the error factory returns a new error instance.
+Always will return an error instance.
+
+# React patterns
+
+The error handler can be implemented using react patterns:
+
+- ### HOC (Higher order component)
+- ### Hook
+- ### Decorator
+
+# Error Classes
+
+The next diagram shows how is the relationship between the different types of errors created.
+
+```mermaid
+classDiagram
+
+class iWazuhError {
+    <<interface>>
+    +Error error
+    +integer code
+    +IWazuhErrorLogOptions logOptions
+}
+
+iWazuhError <|-- WazuhError : implements
+WazuhError <|-- WazuhApiError : extends
+WazuhError <|-- WazuhReportingError : extends
+WazuhError <|-- ElasticApiError : extends
+WazuhError <|-- ElasticError : extends
+
+```
+
 ## How to use Error handler
 
 Exists 3 ways to implement the error handler
@@ -5,22 +126,10 @@ Exists 3 ways to implement the error handler
 - using javascript class `errorHandler`
 - use a react hook called `useErrorHanlder`
 - use a react HOC called `withErrorHandler`
+- use a react decorator called `errorHandlerDecorator`
 
 These types of error handlers were created to give flexibility to the error management implementation.
 All these implementations encapsulate the error handler class.
-
-## Error management architecture
-
-```mermaid
-graph TD;
- withErrorHandler-HOC-->ErrorHandler
- useErrorHandler-Hook-->ErrorHandler
- ErrorHandler-->ErrorFactory
- ErrorFactory-->WazuhApiError
- ErrorFactory-->WazuhReportingError
- ErrorFactory-->ElasticApiError
- ErrorFactory-->ElasticError
-```
 
 ## How to use `Error Handler (class)`
 
@@ -98,84 +207,5 @@ In this way, using the errorHandler HOC we can catch all the errors by the error
 ## How to use `Error Handler (Decorator)`
 
 
-## Error sources
-
-- Wazuh API errors
-- Elasticsearch Error
-- Operational errors (development)
-- Axios errors
 
 
- ### Error codes: code
- * wazuh-api-elastic 20XX
- * wazuh-api         30XX
- * wazuh-elastic     40XX
- * wazuh-reporting   50XX
- * unknown           1000
- 
-### HTTP status code
-- 200 = OK
-- 201 = Created
-- 202 = Accepted
-- 204 = No Content
-- 400 = Bad Request
-- 401 = unauthorized
-- 403 = forbidden
-- 404 = not found
-- 405 = method not allowed
-- 500 = internal server error
-- 501 = not implemented
-
-# Error management components
-
-## Error factory
-
-The `error factory` is responsible to create different instances of error depending on the parameters received.
-
-**The error factory can receive:**
-- A `string`
-- An `error instance`
-- An `error type`: this param defines the error type returned
-
- The errors returned are defined as the `error type` received.
-
-- ElasticError
-- WazuhApiError
-- UIError
-
-## Error handler
-
-The `error handler` is responsible to receive the errors (or strings) and define what type of error will be returned.
-After identifying and classifying the parameters received the error factory returns a new error instance.
-Always will return an error instance.
-
-# React patterns
-
-The error handler can be implemented using react patterns:
-
-- ### HOC (Higher order component)
-- ### Hook
-- ### Decorator
-
-
-# Errors Classes
-
-The next diagram shows how is the relationship between the different types of errors created.
-
-```mermaid
-classDiagram
-
-class iWazuhError {
-    <<interface>>
-    +Error error
-    +integer code
-    +IWazuhErrorLogOptions logOptions
-}
-
-iWazuhError <|-- WazuhError : implements
-WazuhError <|-- WazuhApiError : extends
-WazuhError <|-- WazuhReportingError : extends
-WazuhError <|-- ElasticApiError : extends
-WazuhError <|-- ElasticError : extends
-
-```

@@ -3,7 +3,6 @@ import { fireEvent, render } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 import { withErrorHandler, ErrorHandlerComponent } from './withErrorHandler';
-import { debug } from 'console';
 import { ErrorHandler } from '../error-handler';
 
 const functionWithError = () => {
