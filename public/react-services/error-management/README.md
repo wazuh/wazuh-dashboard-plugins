@@ -8,11 +8,11 @@
   - [Error handler](#error-handler)
   - [React patterns](#react-patterns)
   - [Error Classes](#error-classes)
-- [How to use Error handler](#how-to-use)
-  - [How to use `Error Handler (class)`](#use-error-handler-class)
-  - [How to use `Error Handler (Hook)`](#use-error-handler-hook)
-  - [How to use `Error Handler (HOC)`](#use-error-handler-hoc)
-  - [How to use `Error Handler (Decorator)`](#use-error-handler-decorator)
+- [How to use Error handler](#how-to-use-error-handler)
+  - [How to use Class](#how-to-use-class)
+  - [How to use Hook](#how-to-use-hook)
+  - [How to use HOC](#how-to-use-hoc)
+  - [How to use Decorator](#how-to-use-decorator)
 
 
 # Scope
@@ -89,7 +89,7 @@ The `error handler` is responsible to receive the errors (or strings) and define
 After identifying and classifying the parameters received the error factory returns a new error instance.
 Always will return an error instance.
 
-# React patterns
+## React patterns
 
 The error handler can be implemented using react patterns:
 
@@ -97,7 +97,7 @@ The error handler can be implemented using react patterns:
 - ### Hook
 - ### Decorator
 
-# Error Classes
+## Error Classes
 
 The next diagram shows how is the relationship between the different types of errors created.
 
@@ -119,7 +119,7 @@ WazuhError <|-- ElasticError : extends
 
 ```
 
-## How to use Error handler
+# How to use Error handler
 
 Exists 3 ways to implement the error handler
 
@@ -131,7 +131,7 @@ Exists 3 ways to implement the error handler
 These types of error handlers were created to give flexibility to the error management implementation.
 All these implementations encapsulate the error handler class.
 
-## How to use `Error Handler (class)`
+## How to use Class
 
 The recommended use of the Error Handler is in `javascript methods (not react component)`.
 This handler will receive an Error instance or error message and it will classify and categorize the error by its structure and create and return the corresponding Error instance.
@@ -146,7 +146,7 @@ const newErrorCreated = ErrorHandler.handleError(errorResponse);
 // the newErrorCreated var could be anyone error type defined in the graph above
 ```
 
-## How to use `Error Handler (Hook)`
+## How to use Hook
 
 The recommended use of the Error handler hook is when we have any method inside a component that `makes an API call` that can fail. In this case, will pass the async method like a javascript callback.
 
@@ -173,7 +173,7 @@ if(error){
 In this way, using the useErrorHandler hook we can omit the use of try-catch and do the code clear.
 
 
-## How to use `Error Handler (HOC)`
+## How to use HOC
 
 The recommended use of the Error Handler HOC is to catch all the errors produced in the `component lifecycle`.
 This HOC will wrap the react component and will catch all the errors and treat them by the error handler class
@@ -203,8 +203,7 @@ const ComponentWrapped = withErrorHandler(Component);
 
 In this way, using the errorHandler HOC we can catch all the errors by the error handler class
 
-
-## How to use `Error Handler (Decorator)`
+## How to use Decorator
 
 
 
