@@ -1,6 +1,4 @@
-import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { useEffect } from 'react';
 import {
   errorHandlerDecorator
 } from './error-handler-decorator';
