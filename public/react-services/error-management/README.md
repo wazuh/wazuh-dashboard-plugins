@@ -20,7 +20,6 @@ graph TD;
  ErrorFactory-->WazuhReportingError
  ErrorFactory-->ElasticApiError
  ErrorFactory-->ElasticError
- ErrorFactory-->Etc
 ```
 
 ## How to use `Error Handler (class)`
@@ -96,7 +95,7 @@ const ComponentWrapped = withErrorHandler(Component);
 In this way, using the errorHandler HOC we can catch all the errors by the error handler class
 
 
-## How to use `Error Handler (Decorator)` `coming soon`
+## How to use `Error Handler (Decorator)`
 
 
 ## Error sources
@@ -143,7 +142,6 @@ The `error factory` is responsible to create different instances of error depend
 - ElasticError
 - WazuhApiError
 - UIError
-- etc
 
 ## Error handler
 
@@ -157,7 +155,7 @@ The error handler can be implemented using react patterns:
 
 - ### HOC (Higher order component)
 - ### Hook
-- ### Decorator (Coming soon)
+- ### Decorator
 
 
 # Errors Classes
@@ -170,9 +168,8 @@ classDiagram
 class iWazuhError {
     <<interface>>
     +Error error
-    +string message
-    +integer code    
-    +handle()
+    +integer code
+    +IWazuhErrorLogOptions logOptions
 }
 
 iWazuhError <|-- WazuhError : implements
