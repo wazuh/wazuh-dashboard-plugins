@@ -1,4 +1,4 @@
-import { act, render, waitFor } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ErrorHandler } from '../error-handler';
 import { useErrorHandler } from './useErrorHandler';
@@ -9,7 +9,10 @@ jest.mock('../error-handler', () => ({
     handleError: jest.fn(),
   },
 }));
-describe.skip('UseErrorHandler', () => {
+describe('UseErrorHandler', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
   it('should return error instance and pass to ErrorHandler when callback fails', async () => {
     const callbackWithError = async () => {
       return Promise.reject(new Error('callback error'));
@@ -19,17 +22,17 @@ describe.skip('UseErrorHandler', () => {
       const [res, error] = useErrorHandler(callbackWithError);
       return <div>Mocked component</div>;
     };
-    const { container } = render(<Component />);
+    const { container, findByText } = render(<Component />);
 
-    //await waitFor(() => {
-      expect(container).toBeInTheDocument();
-      expect(ErrorHandler.handleError).toHaveBeenCalledTimes(1);
-      expect(ErrorHandler.handleError).toHaveBeenCalledWith(
-        new Error('callback error'),
-      );
-    //});
+    await waitFor(async () => {
+      await findByText('Mocked component');
+    });
 
-    
+    expect(container).toBeInTheDocument();
+    expect(ErrorHandler.handleError).toHaveBeenCalledTimes(1);
+    expect(ErrorHandler.handleError).toHaveBeenCalledWith(
+      new Error('callback error'),
+    );
   });
 
   it('should return error instance when callback is resolved', async () => {
@@ -44,11 +47,13 @@ describe.skip('UseErrorHandler', () => {
       return <div>Mocked component</div>;
     };
 
-    const { container } = render(<Component />);
+    const { container, findByText } = render(<Component />);
 
-    //await waitFor(() => {
-      expect(container).toBeInTheDocument();
-      expect(ErrorHandler.handleError).toHaveBeenCalledTimes(0);
-    //});
+    await waitFor(async () => {
+      await findByText('Mocked component');
+    });
+
+    expect(container).toBeInTheDocument();
+    expect(ErrorHandler.handleError).toHaveBeenCalledTimes(0);
   });
 });

@@ -1,7 +1,5 @@
 import '@testing-library/jest-dom';
-import {
-  errorHandlerDecorator
-} from './error-handler-decorator';
+import { errorHandlerDecorator } from './error-handler-decorator';
 import { ErrorHandler } from '../error-handler';
 
 jest.mock('../error-handler', () => ({
@@ -10,7 +8,11 @@ jest.mock('../error-handler', () => ({
   },
 }));
 
-describe.skip('Error handler decorator', () => {
+describe('Error handler decorator', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('should return a function', () => {
     const result = errorHandlerDecorator(() => {});
     expect(typeof result).toBe('function');
