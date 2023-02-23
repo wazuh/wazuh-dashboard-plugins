@@ -151,7 +151,7 @@ By this way, the current solution allows to create new error types and add new e
 
 # How to use the Error Management
 
-Exists 4 artefacts implemented to use the error handler
+Exists 4 artefacts implemented to use the error handler.
 
 - using javascript class `errorHandler`
 - use a react hook called `useErrorHanlder`
