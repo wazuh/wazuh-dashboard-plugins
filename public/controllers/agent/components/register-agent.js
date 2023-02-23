@@ -1025,7 +1025,7 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
           <a
             href={urlCheckConnectionDocumentation}
             target='_blank'
-            rel='noreferrer'
+            rel="noopener noreferrer"
           >
             document.
           </a>
@@ -1664,7 +1664,7 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
             serverAddress: nodeSelected,
             udpProtocol: this.state.haveUdpProtocol,
             connectionSecure: this.state.haveConnectionSecure
-          }); 
+          });
       };
 
       const steps = [

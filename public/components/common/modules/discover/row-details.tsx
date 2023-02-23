@@ -455,12 +455,20 @@ export class RowDetails extends Component {
       let name = "";
 
       value.forEach(item => {
-        if (item.type === 'cve')
+        if (item.type === 'cve'){
           name = item.name;
-        if (item.type === 'link')
-          link = <a href={item.name} target="_blank">{item.name}</a>
-      })
-      return <span>{name}: {link}</span>
+        }
+        if (item.type === 'link') {
+          link = <a
+            href={item.name}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {item.name}
+          </a>;
+        }
+      });
+      return <span>{name}: {link}</span>;
     } else {
       const _value = typeof value === 'string' ? value : this.getValueAsString(value);
       return (
@@ -543,7 +551,11 @@ export class RowDetails extends Component {
                 </EuiTitle>
               }
               extraAction={
-                <a href={`#/manager/rules?tab=rules&redirectRule=${id}`} target="_blank" style={{ paddingTop: 5 }}>
+                <a
+                  href={`#/manager/rules?tab=rules&redirectRule=${id}`}
+                  target="_blank" style={{ paddingTop: 5 }}
+                  rel="noopener noreferrer"
+                >
                   <EuiIcon type="popout" color='primary' />&nbsp;
                   View in Rules
                 </a>
