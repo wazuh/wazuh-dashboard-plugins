@@ -267,5 +267,5 @@ const ComponentWrapped = withErrorHandler(Component);
 | Decorator | On component user event methods          |
 
 
-For more details about the usage you can check the unit tests files for every artefact implemented in the error management solution.
+For more details about the usage you can check the `unit tests` files for every artefact implemented in the error management solution.
 
