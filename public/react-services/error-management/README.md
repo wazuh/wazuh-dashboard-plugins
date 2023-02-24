@@ -155,18 +155,18 @@ By this way, the current solution allows to create new error types and add new e
 For every error type handled we have defined how the error will be showed or not to the user/developer.
 In the next table we have defined how the will be treated.
 
-| Error type          | Toast | Blank-screen | Log               | Store | Display |
-|---------------------|-------|--------------|-------------------|-------|---------|
-| WazuhApiError       |       |              | info\|warn\|error |       |         |
-| WazuhReportingError |       |              | info\|warn\|error |       |         |
-| ElasticError        |       |              | info\|warn\|error |       |         |
-| ElasticApiError     |       |              | info\|warn\|error |       |         |
-| Error               |       |              | info\|warn\|error |       |         |
-| TypeError           |       |              | info\|warn\|error |       |         |
-| EvalError           |       |              | info\|warn\|error |       |         |
-| ReferenceError      |       |              | info\|warn\|error |       |         |
-| SyntaxError         |       |              | info\|warn\|error |       |         |
-| URIError            |       |              | info\|warn\|error |       |         |
+| Error type          | show                                          | store | display |
+|---------------------|-----------------------------------------------|-------|---------|
+| WazuhApiError       | [toast\|blank-screen\|log(info\|warn\|error)] |       |         |
+| WazuhReportingError | [toast\|blank-screen\|log(info\|warn\|error)] |       |         |
+| ElasticError        | [toast\|blank-screen\|log(info\|warn\|error)] |       |         |
+| ElasticApiError     | [toast\|blank-screen\|log(info\|warn\|error)] |       |         |
+| Error               | [toast\|blank-screen\|log(info\|warn\|error)] |       |         |
+| TypeError           | [toast\|blank-screen\|log(info\|warn\|error)] |       |         |
+| EvalError           | [toast\|blank-screen\|log(info\|warn\|error)] |       |         |
+| ReferenceError      | [toast\|blank-screen\|log(info\|warn\|error)] |       |         |
+| SyntaxError         | [toast\|blank-screen\|log(info\|warn\|error)] |       |         |
+| URIError            | [toast\|blank-screen\|log(info\|warn\|error)] |       |         |
 
 
 # How to use the Error Management
