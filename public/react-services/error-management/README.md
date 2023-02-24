@@ -9,6 +9,7 @@
   - [React patterns](#react-patterns)
   - [Error factory](#error-factory)
   - [Error classes](#error-classes)
+  - [Error types treatment](#error-types-treatment)
 - [How to use the Error Management](#how-to-use-the-error-management)
   - [How to use Class](#how-to-use-class)
   - [How to use Hook](#how-to-use-hook)
@@ -149,6 +150,25 @@ WazuhError <|-- ElasticError : extends
 
 By this way, the current solution allows to create new error types and add new error treatment without modify the error handler or the error factory. Each error type can have its own error treatment. This is a good practice and allow the scalability of the error management solution.
 
+# Error types treatment
+
+For every error type handled we have defined how the error will be showed or not to the user/developer.
+In the next table we have defined how the will be treated.
+
+| Error type          | Toast | Blank-screen | Log               | Store | Display |
+|---------------------|-------|--------------|-------------------|-------|---------|
+| WazuhApiError       |       |              | info\|warn\|error |       |         |
+| WazuhReportingError |       |              | info\|warn\|error |       |         |
+| ElasticError        |       |              | info\|warn\|error |       |         |
+| ElasticApiError     |       |              | info\|warn\|error |       |         |
+| Error               |       |              | info\|warn\|error |       |         |
+| TypeError           |       |              | info\|warn\|error |       |         |
+| EvalError           |       |              | info\|warn\|error |       |         |
+| ReferenceError      |       |              | info\|warn\|error |       |         |
+| SyntaxError         |       |              | info\|warn\|error |       |         |
+| URIError            |       |              | info\|warn\|error |       |         |
+
+
 # How to use the Error Management
 
 Exists 4 artefacts implemented to use the error handler.
@@ -201,7 +221,6 @@ if(error){
 
 **Important**
 In this way, using the useErrorHandler hook we can omit the use of try-catch and do the code clear.
-
 
 ## How to use HOC
 
