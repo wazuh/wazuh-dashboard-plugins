@@ -31,6 +31,7 @@ import { getThemeAssetURL, getAssetURL } from './utils/assets';
 import store from './redux/store';
 import { updateAppConfig } from './redux/actions/appConfigActions';
 import { initializeInterceptor, unregisterInterceptor } from './services/request-handler';
+import { CustomFieldFormat } from './apps/field-format-test';
 
 const SIDEBAR_LOGO = 'customization.logo.sidebar';
 const innerAngularName = 'app/wazuh';
@@ -43,6 +44,9 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
   private hideTelemetryBanner?: () => void;
   public async setup(core: CoreSetup, plugins: WazuhSetupPlugins): WazuhSetup {
     const UI_THEME = core.uiSettings.get('theme:darkMode') ? 'dark' : 'light';
+
+    // Register custom field format
+    plugins.data.fieldFormats.register([CustomFieldFormat]);
 
     // Get custom logos configuration to start up the app with the correct logos
     let logosInitialState = {};
