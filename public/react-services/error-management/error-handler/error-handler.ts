@@ -1,7 +1,7 @@
 import { ErrorFactory } from '../error-factory/error-factory';
 import {
-  ElasticApiError,
-  ElasticError,
+  IndexerApiError,
+  IndexerError,
   WazuhReportingError,
   WazuhApiError,
 } from '../error-factory/errors';
@@ -83,11 +83,11 @@ export class ErrorHandler {
 
     switch (true) {
       case errorCode >= 2000 && errorCode < 3000:
-        return ElasticApiError;
+        return IndexerApiError;
       case errorCode >= 3000 && errorCode < 4000:
         return WazuhApiError;
       case errorCode >= 4000 && errorCode < 5000:
-        return ElasticError;
+        return IndexerError;
       case errorCode >= 5000 && errorCode < 6000:
         return WazuhReportingError;
       default:

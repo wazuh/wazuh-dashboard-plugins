@@ -29,18 +29,18 @@ Exists the following error sources:
 
 - Operational errors (development) - Native javascript errors
 - Wazuh API errors
-- Elasticsearch Error
+- Indexer Error
 - Axios errors
 - Etc
 
 
-Our frontend server-side have a intermedial layer between the frontend and the backend APIs like elastic and wazuh.
+Our frontend server-side have a intermedial layer between the frontend and the backend APIs like Indexer and wazuh.
 This layer catch the error and categorize them by type and add a custom error code.
 
  ### Error codes: code
- * wazuh-api-elastic 20XX
+ * wazuh-api-Indexer 20XX
  * wazuh-api         30XX
- * wazuh-elastic     40XX
+ * wazuh-Indexer     40XX
  * wazuh-reporting   50XX
  * unknown           1000
  
@@ -72,8 +72,8 @@ graph TD;
  ErrorHandler-->ErrorOrchestratorService
  ErrorFactory-->WazuhApiError
  ErrorFactory-->WazuhReportingError
- ErrorFactory-->ElasticApiError
- ErrorFactory-->ElasticError
+ ErrorFactory-->IndexerApiError
+ ErrorFactory-->IndexerError
 ```
 
 # Components
@@ -119,8 +119,8 @@ The errors returned are defined as the `error type` received.
 
 - WazuhApiError
 - WazuhReportingError
-- ElasticError
-- ElasticApiError
+- IndexerError
+- IndexerApiError
 
 ## Error Classes
 
@@ -143,8 +143,8 @@ class iWazuhError {
 iWazuhError <|-- WazuhError : implements
 WazuhError <|-- WazuhApiError : extends
 WazuhError <|-- WazuhReportingError : extends
-WazuhError <|-- ElasticApiError : extends
-WazuhError <|-- ElasticError : extends
+WazuhError <|-- IndexerApiError : extends
+WazuhError <|-- IndexerError : extends
 
 ```
 
@@ -159,8 +159,8 @@ In the next table we have defined how the will be treated.
 |---------------------|-----------------------------------------------|-------|---------|
 | WazuhApiError       | [toast\|blank-screen\|log(info\|warn\|error)] |       |         |
 | WazuhReportingError | [toast\|blank-screen\|log(info\|warn\|error)] |       |         |
-| ElasticError        | [toast\|blank-screen\|log(info\|warn\|error)] |       |         |
-| ElasticApiError     | [toast\|blank-screen\|log(info\|warn\|error)] |       |         |
+| IndexerError        | [toast\|blank-screen\|log(info\|warn\|error)] |       |         |
+| IndexerApiError     | [toast\|blank-screen\|log(info\|warn\|error)] |       |         |
 | Error               | [toast\|blank-screen\|log(info\|warn\|error)] |       |         |
 | TypeError           | [toast\|blank-screen\|log(info\|warn\|error)] |       |         |
 | EvalError           | [toast\|blank-screen\|log(info\|warn\|error)] |       |         |

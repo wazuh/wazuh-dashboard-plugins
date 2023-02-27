@@ -12,7 +12,7 @@
 import { AxiosError, AxiosResponse } from 'axios';
 import { WazuhApiError } from './errors/WazuhApiError';
 import { ErrorFactory } from './error-factory';
-import { ElasticApiError, ElasticError, WazuhReportingError } from './errors';
+import { IndexerApiError, IndexerError, WazuhReportingError } from './errors';
 import WazuhError from './errors/WazuhError';
 
 const response: AxiosResponse = {
@@ -30,9 +30,9 @@ const response: AxiosResponse = {
 
 describe('Error Factory', () => {
   it.each([
-    { errorType: ElasticApiError, name: 'ElasticApiError' },
+    { errorType: IndexerApiError, name: 'IndexerApiError' },
     { errorType: WazuhApiError, name: 'WazuhApiError' },
-    { errorType: ElasticError, name: 'ElasticError' },
+    { errorType: IndexerError, name: 'IndexerError' },
     { errorType: WazuhReportingError, name: 'WazuhReportingError' },
   ])(
     'Should return a $name when receive and error and error type',

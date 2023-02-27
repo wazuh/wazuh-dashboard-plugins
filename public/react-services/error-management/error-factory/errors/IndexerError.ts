@@ -1,7 +1,7 @@
 import { IWazuhErrorInfo, IWazuhErrorLogOpts } from '../../types';
 import WazuhError from './WazuhError';
 
-export class ElasticApiError extends WazuhError {
+export class IndexerError extends WazuhError {
   logOptions: IWazuhErrorLogOpts;
   constructor(error: Error, info?: IWazuhErrorInfo) {
     super(error, info);
@@ -14,7 +14,7 @@ export class ElasticApiError extends WazuhError {
       level: 'ERROR',
       severity: 'BUSINESS',
       display: true,
-      store: false,
+      store: true,
     };
   }
 }
