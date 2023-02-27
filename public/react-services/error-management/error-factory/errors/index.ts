@@ -1,4 +1,4 @@
-export * from './ElasticApiError';
+export * from './IndexerApiError';
 export * from './WazuhApiError';
-export * from './ElasticError';
+export * from './IndexerError';
 export * from './WazuhReportingError';

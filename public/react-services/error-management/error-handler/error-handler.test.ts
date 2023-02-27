@@ -3,8 +3,8 @@ import { ErrorHandler } from './error-handler';
 import { ErrorOrchestratorService } from '../../error-orchestrator/error-orchestrator.service';
 import WazuhError from '../error-factory/errors/WazuhError';
 import {
-  ElasticApiError,
-  ElasticError,
+  IndexerApiError,
+  IndexerError,
   WazuhApiError,
   WazuhReportingError,
 } from '../error-factory';
@@ -68,11 +68,11 @@ describe('Error Handler', () => {
 
     it.each([
       {
-        name: 'ElasticApiError',
-        message: '2000 - ERROR2000 - ElasticApiError',
+        name: 'IndexerApiError',
+        message: '2000 - ERROR2000 - IndexerApiError',
       },
       { name: 'WazuhApiError', message: '3000 - ERROR3000 - WazuhApiError' },
-      { name: 'ElasticError', message: '4000 - ERROR4000 - ElasticError' },
+      { name: 'IndexerError', message: '4000 - ERROR4000 - IndexerError' },
       {
         name: 'WazuhReportingError',
         message: '5000 - ERROR5000 - WazuhReportingError',
@@ -96,11 +96,11 @@ describe('Error Handler', () => {
   describe('handleError', () => {
     it.each([
       {
-        name: 'ElasticApiError',
-        message: '2000 - ERROR2000 - ElasticApiError',
+        name: 'IndexerApiError',
+        message: '2000 - ERROR2000 - IndexerApiError',
       },
       { name: 'WazuhApiError', message: '3000 - ERROR3000 - WazuhApiError' },
-      { name: 'ElasticError', message: '4000 - ERROR4000 - ElasticError' },
+      { name: 'IndexerError', message: '4000 - ERROR4000 - IndexerError' },
       {
         name: 'WazuhReportingError',
         message: '5000 - ERROR5000 - WazuhReportingError',
@@ -165,16 +165,16 @@ describe('Error Handler', () => {
 
     it.each([
       {
-        name: 'ElasticApiError',
-        message: '2000 - ERROR2000 - ElasticApiError',
+        name: 'IndexerApiError',
+        message: '2000 - ERROR2000 - IndexerApiError',
       },
       {
         name: 'WazuhApiError',
         message: '3000 - ERROR3000 - WazuhApiError',
       },
       {
-        name: 'ElasticError',
-        message: '4000 - ERROR4000 - ElasticError',
+        name: 'IndexerError',
+        message: '4000 - ERROR4000 - IndexerError',
       },
       {
         name: 'WazuhReportingError',
