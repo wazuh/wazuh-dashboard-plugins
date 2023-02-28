@@ -1,0 +1,67 @@
+<!-- dev tools -->
+<div ng-cloack ng-controller="toolsController as tctrl">
+  <div ng-show="tctrl.load">
+    <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}"></react-component>
+  </div>
+
+  <div ng-if="!tctrl.load && tctrl.toolsTabsProps">
+    <react-component name="Tabs" props="tctrl.toolsTabsProps"></react-component>
+  </div>
+  <div ng-if="tctrl.tab === 'devTools' && !tctrl.load">
+    <div
+      flex="auto"
+      ng-controller="devToolsController as ctrl"
+      layout="column"
+      class="dev-tools-max-height"
+    >
+      <md-content flex layout="column" class="md-padding" layout-align="start">
+        <div class="wz-dev-box">
+          <div id="wz-dev-left-column" flex layout="column">
+            <span class="wz-headline-title wz-dev-title"
+              >Console
+              <i
+                ng-click="ctrl.send()"
+                title="Click to send the request"
+                class="fa fa-play wz-play-dev-color cursor-pointer pull-right fa-fw wz-always-top CodeMirror-styled-background"
+                id="play_button"
+                aria-hidden="true"
+              ></i>
+              <a
+                href=""
+                target="__blank"
+                title="Open documentation"
+                class="fa fa-info-circle cursor-pointer pull-right fa-fw wz-always-top CodeMirror-styled-background"
+                id="wazuh_dev_tools_documentation"
+              >
+              </a>
+            </span>
+
+            <textarea flex id="api_input"></textarea>
+          </div>
+          <div class="wz-dev-column-separator layout-column"><span>︙</span></div>
+          <div id="wz-dev-right-column" flex layout="column">
+            <span class="wz-headline-title wz-dev-title">
+              <i
+                ng-click="ctrl.help()"
+                class="fa fa-question wz-question-dev-color cursor-pointer pull-right fa-fw"
+                aria-hidden="true"
+              ></i>
+              <i
+                ng-click="ctrl.exportOutput()"
+                tooltip="Export as JSON"
+                tooltip-placement="bottom"
+                class="fa fa-download wz-question-dev-color cursor-pointer pull-right fa-fw"
+                aria-hidden="true"
+              ></i>
+            </span>
+            <textarea flex id="api_output"></textarea>
+          </div>
+        </div>
+      </md-content>
+    </div>
+  </div>
+  <div ng-show="tctrl.tab === 'logtest' && !tctrl.load">
+    <react-component name="Logtest" props="tctrl.toolsLogtestProps"></react-component>
+  </div>
+</div>
+<!-- end dev tools -->

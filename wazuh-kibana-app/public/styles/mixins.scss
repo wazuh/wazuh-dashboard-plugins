@@ -1,0 +1,15 @@
+@mixin _icon_fill($primary, $secondary){
+  .euiIcon{
+    fill: $primary;
+    
+    .euiIcon__fillSecondary{
+      fill: $secondary;
+    }
+  }
+}
+
+@mixin apply_brand_color($primary_color, $secondary_color){
+  .wz-welcome-page .euiCard{
+    @include _icon_fill($primary_color, $secondary_color);
+  }
+}

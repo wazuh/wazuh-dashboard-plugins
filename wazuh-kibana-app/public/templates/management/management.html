@@ -1,0 +1,520 @@
+<!-- head -->
+<div ng-cloak ng-controller="managementController as mctrl">
+  <!-- Navigation section -->
+
+  <div flex="30" ng-if="mctrl.logtestOpened" class="md-padding logtest-side">
+    <react-component name="Logtest" props="mctrl.logtestProps"></react-component>
+  </div>
+
+  <div
+    layout="row"
+    layout-align="start center"
+    ng-if="mctrl.tab !== 'monitoring' && mctrl.tab !== 'configuration'"
+  >
+    <!-- Breadcrumbs -->
+    <div
+      layout="row"
+      layout-padding
+      ng-if="mctrl.tab === 'groups' && mctrl.currentGroup && mctrl.currentGroup.name"
+    >
+      <span class="wz-text-link cursor-pointer" ng-click="mctrl.switchTab('groups', true)"
+        >{{ mctrl.tabNames[mctrl.tab] }}</span
+      >
+      <span> / {{ mctrl.currentGroup.name }} </span>
+    </div>
+    <!-- End breadcrumbs -->
+  </div>
+  <!-- end head -->
+  <!-- welcome -->
+  <div ng-if="mctrl.tab === 'welcome'" style="padding-top: 16px">
+    <react-component
+      flex
+      name="ManagementWelcomeWrapper"
+      props="mctrl.welcomeCardsProps"
+    ></react-component>
+  </div>
+  <!-- end welcome -->
+  <!-- monitoring -->
+  <div ng-controller="clusterController" ng-if="mctrl.tab === 'monitoring'" style="padding: 16px">
+    <!-- Cluster disabled or not running -->
+    <div ng-if="!authorized">
+      <react-component name="WzEmptyPromptNoPermissions" props="{permissions}"></react-component>
+    </div>
+
+    <!-- Cluster disabled or not running -->
+    <div ng-if="!isClusterEnabled || !isClusterRunning">
+      <react-component
+        name="ClusterDisabled"
+        props="{enabled: isClusterEnabled, running: isClusterRunning}"
+      ></react-component>
+    </div>
+
+    <!-- Cluster enabled -->
+    <div ng-show="isClusterEnabled && isClusterRunning && authorized" class="monitoring-discover">
+      <div ng-show="loading" style="padding: 16px">
+        <react-component
+          name="EuiProgress"
+          props="{size: 'xs', color: 'primary'}"
+        ></react-component>
+      </div>
+
+      <!-- Discover search bar section -->
+      <kbn-dis
+        class="hide-filter-control"
+        ng-show="!loading && (!showNodes || currentNode)"
+      ></kbn-dis>
+      <!-- End Discover search bar section -->
+
+      <!-- Loading status section -->
+      <div
+        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceAround euiFlexGroup--directionRow euiFlexGroup--responsive"
+      >
+        <div
+          class="euiFlexItem euiFlexItem--flexGrowZero euiTextAlign euiTextAlign--center"
+          ng-show="!loading && !rendered && resultState === 'ready' && (!showNodes || (showNodes && currentNode))"
+        >
+          <span class="euiLoadingChart euiLoadingChart--large">
+            <span class="euiLoadingChart__bar"></span>
+            <span class="euiLoadingChart__bar"></span>
+            <span class="euiLoadingChart__bar"></span>
+            <span class="euiLoadingChart__bar"></span>
+          </span>
+          <div class="euiSpacer euiSpacer--m"></div>
+          <div class="percentage">{{loadingStatus}}</div>
+        </div>
+      </div>
+      <!-- End loading status section -->
+    </div>
+
+    <!-- main -->
+    <div
+      class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--responsive"
+      ng-if="!loading && !showConfig && !showNodes && isClusterEnabled && isClusterRunning && authorized"
+    >
+      <!-- TODO - migrate to a React Component-->
+
+      <!-- Overview card -->
+      <div class="euiFlexItem">
+        <div class="euiPanel euiPanel--paddingMedium">
+          <span class="euiTitle euiTitle--small euiCard__title"
+            >Details&nbsp;
+            <button
+              ng-click="goConfiguration()"
+              class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--xSmall"
+              type="button"
+            >
+              <span class="euiButtonEmpty__content"
+                ><i class="fa fa-fw fa-pie-chart"></i
+                ><span class="euiButtonEmpty__text">View Overview</span>
+              </span>
+            </button>
+          </span>
+          <div class="euiSpacer euiSpacer--m"></div>
+          <div layout="row" class="wz-padding-top-10">
+            <span flex="25">IP</span>
+            <span class="color-grey">{{configuration.nodes[0] || '-'}}</span>
+          </div>
+          <div layout="row" class="wz-padding-top-10">
+            <span flex="25">Running</span>
+            <span class="color-grey">{{ status || 'no' }}</span>
+          </div>
+          <div layout="row" class="wz-padding-top-10">
+            <span flex="25">Version</span>
+            <span class="color-grey">{{version}}</span>
+          </div>
+        </div>
+      </div>
+      <!-- End overview card -->
+
+      <!-- Info card -->
+      <div class="euiFlexItem">
+        <div class="euiPanel euiPanel--paddingMedium">
+          <span class="euiTitle euiTitle--small euiCard__title">Information</span>
+          <div class="euiSpacer euiSpacer--m"></div>
+          <!-- Nodes -->
+          <div layout="row" class="wz-padding-top-10 cursor-pointer" ng-click="goNodes()">
+            <span
+              flex="25"
+              class="wz-text-link"
+              tooltip="Click to open the list of nodes"
+              tooltip-placement="left"
+              >Nodes</span
+            >
+            <span
+              class="wz-text-link"
+              tooltip="Click to open the list of nodes"
+              tooltip-placement="right"
+              >{{nodesCount}}</span
+            >
+          </div>
+          <!-- Agents -->
+          <div layout="row" class="wz-padding-top-10 cursor-pointer" ng-click="goAgents()">
+            <span
+              flex="25"
+              class="wz-text-link"
+              tooltip="Click to open the list of agents"
+              tooltip-placement="left"
+              >Agents</span
+            >
+            <span
+              class="wz-text-link"
+              tooltip="Click to open the list of agents"
+              tooltip-placement="right"
+              >{{agentsCount}}</span
+            >
+          </div>
+        </div>
+      </div>
+      <!-- End info card -->
+    </div>
+    <!-- end main -->
+    <!-- main timelions -->
+    <!-- No results section -->
+    <div
+      class="wz-margin-bottom-45 wz-margin-top-17"
+      ng-show="resultState === 'none' && !loading && !showConfig && !showNodes"
+    >
+      <div flex class="euiCallOut euiCallOut--warning">
+        <div class="euiCallOutHeader">
+          <react-component
+            name="EuiIcon"
+            props="{type:'help',className:'euiCallOutHeader__title'}"
+          ></react-component>
+          <span class="euiCallOutHeader__title"
+            >There are no results for selected time range. Try another one.</span
+          >
+        </div>
+      </div>
+    </div>
+    <!-- End no results section -->
+
+    <!-- Monitoring Timelion visualizations section -->
+    <div
+      class="height-400"
+      ng-class="{'no-opacity': resultState === 'none' || !rendered}"
+      ng-show="!loading && !showConfig && !showNodes && rendered"
+    >
+      <react-component name="ClusterTimelions" props="{}"></react-component>
+    </div>
+    <!-- End monitoring Timelion visualizations section -->
+    <!-- end main timelions -->
+    <!--  configuration -->
+    <!-- end configuration -->
+    <!-- Cards for overview monitoring section -->
+    <div ng-show="showConfig">
+      <div class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--responsive">
+        <div class="euiFlexItem euiFlexItem--flexGrowZero">
+          <h2 class="euiTitle euiTitle--medium">
+            <md-button
+              class="md-icon-button md-icon-button-back wz-padding-right-16 btn btn-info"
+              aria-label="Back"
+              tooltip="Go back"
+              tooltip-placement="bottom"
+              ng-click="goBack()"
+              ><i class="fa fa-fw fa-arrow-left" aria-hidden="true"></i
+            ></md-button>
+            Overview
+          </h2>
+        </div>
+      </div>
+
+      <div class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--responsive">
+        <!-- Overview visualization card -->
+        <div class="euiPanel euiFlexItem euiFlexItem--flexGrowZero" style="min-width: 500px; overflow: hidden;">
+           <span class="euiLoadingChart custom-charts-bar euiLoadingChart--large euiTextAlign--center "  style="top: 50%; transform: translate(0px, -25px); position: relative;" ng-if="!isReady || !rendered" >
+              <span class="euiLoadingChart__bar"></span>
+              <span class="euiLoadingChart__bar"></span>
+              <span class="euiLoadingChart__bar"></span>
+              <span class="euiLoadingChart__bar"></span>
+          </span> 
+          <md-card-content
+            class="wazuh-column"
+            ng-class="{'no-opacity-overview-monitoring': !isReady || !rendered }"
+          >
+            <span
+              class="embPanel__header embPanel__title embPanel__dragger layout-row wz-headline-title"
+              >Top 5 nodes </span
+            >
+            <react-component
+              style="height: 100%"
+              name="KibanaVisualization"
+              props="{visId: 'Wazuh-App-Cluster-monitoring-Overview-Node-Pie', tab: 'monitoring'}"
+            ></react-component>
+            <span class="wz-padding-top-10 wz-text-center" ng-show="!rendered"
+              >There are no results for selected time range. Try another one.</span
+            >
+          </md-card-content>
+        </div>
+        <!-- Cluster configuration card -->
+        <div class="euiFlexItem">
+          <div class="euiPanel euiPanel--paddingMedium">
+            <span class="euiTitle euiTitle--small euiCard__title">Configuration</span>
+            <div class="euiSpacer euiSpacer--m"></div>
+            <!-- Configuration options -->
+            <div layout="row" class="wz-padding-top-10">
+              <span flex="25">Disabled</span>
+              <span class="color-grey">{{configuration.disabled}}</span>
+            </div>
+            <div layout="row" class="wz-padding-top-10">
+              <span flex="25">Hidden</span>
+              <span class="color-grey">{{configuration.hidden}}</span>
+            </div>
+            <div layout="row" class="wz-padding-top-10">
+              <span flex="25">Name</span>
+              <span class="color-grey">{{configuration.name}}</span>
+            </div>
+            <div layout="row" class="wz-padding-top-10">
+              <span flex="25">Node name</span>
+              <span class="color-grey">{{configuration.node_name}}</span>
+            </div>
+            <div layout="row" class="wz-padding-top-10">
+              <span flex="25">Node type</span>
+              <span class="color-grey">{{configuration.node_type}}</span>
+            </div>
+            <div layout="row" class="wz-padding-top-10">
+              <span flex="25">Bind address</span>
+              <span class="color-grey">{{configuration.bind_addr}}</span>
+            </div>
+            <div layout="row" class="wz-padding-top-10">
+              <span flex="25">IP</span>
+              <span class="color-grey">{{configuration.nodes[0] || '-'}}</span>
+            </div>
+            <div layout="row" class="wz-padding-top-10">
+              <span flex="25">Port</span>
+              <span class="color-grey">{{configuration.port}}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End cards for overview monitoring section -->
+    <!-- end configuration -->
+    <!-- nodes-list -->
+    <div ng-if="showNodes && !currentNode">
+      <react-component name="NodeList" props="nodeProps"></react-component>
+    </div>
+    <!-- end node-list -->
+    <!-- nodes-detail -->
+    <div ng-show="currentNode">
+      <!-- Back button -->
+      <div class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--responsive">
+        <div class="euiFlexItem euiFlexItem--flexGrowZero">
+          <h2 class="euiTitle euiTitle--medium">
+            <md-button
+              class="md-icon-button md-icon-button-back wz-padding-right-16 btn btn-info"
+              aria-label="Back"
+              tooltip="Go back"
+              tooltip-placement="bottom"
+              ng-click="goNodes()"
+              ><i class="fa fa-fw fa-arrow-left" aria-hidden="true"></i
+            ></md-button>
+            Node {{ currentNode.name }}
+          </h2>
+        </div>
+      </div>
+      <!-- Node alerts summary card -->
+      <div class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--responsive">
+        <div
+          class="height-250 euiPanel euiFlexItem"
+          ng-class="{'no-opacity': resultState !== 'ready' || !rendered}"
+          ng-show="!loading && currentNode && !showConfig"
+        >
+          <md-card-content class="wazuh-column">
+            <span
+              class="embPanel__header embPanel__title embPanel__dragger layout-row wz-headline-title"
+              >{{ currentNode.name }} alerts summary</span
+            >
+            <react-component
+              style="height: 100%"
+              name="KibanaVisualization"
+              props="{visId: 'Wazuh-App-Cluster-monitoring-Overview-Node', tab: 'monitoring'}"
+            ></react-component>
+          </md-card-content>
+        </div>
+      </div>
+      <!-- End node alerts summary card -->
+
+      <!-- Node info and files cards section -->
+      <div
+        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--responsive"
+        ng-show="currentNode && currentNode.healthCheck && currentNode.healthCheck"
+      >
+        <!-- Node information card -->
+        <div
+          class="euiFlexItem"
+          ng-show="currentNode && currentNode.healthCheck && currentNode.healthCheck.info"
+        >
+          <div class="euiPanel euiPanel--paddingMedium">
+            <span class="euiTitle euiTitle--small euiCard__title">Node information</span>
+            <div class="euiSpacer euiSpacer--m"></div>
+            <div layout="row" class="wz-padding-top-10">
+              <span flex="30">IP</span>
+              <span class="color-grey">{{currentNode.healthCheck.info.ip}}</span>
+            </div>
+            <div layout="row" class="wz-padding-top-10">
+              <span flex="30">Version</span>
+              <span class="color-grey">{{currentNode.healthCheck.info.version}}</span>
+            </div>
+            <div layout="row" class="wz-padding-top-10">
+              <span flex="30">Type</span>
+              <span class="color-grey">{{currentNode.healthCheck.info.type}}</span>
+            </div>
+            <div layout="row" class="wz-padding-top-10">
+              <span flex="30">Name</span>
+              <span class="color-grey">{{currentNode.healthCheck.info.name}}</span>
+            </div>
+            <div layout="row" class="wz-padding-top-10">
+              <span flex="30">Active agents</span>
+              <span class="color-grey">{{ currentNode.healthCheck.info.n_active_agents }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Last files sync card -->
+        <div
+          class="euiFlexItem"
+          ng-show="currentNode && currentNode.healthCheck && currentNode.healthCheck.status"
+        >
+          <div class="euiPanel euiPanel--paddingMedium">
+            <span class="euiTitle euiTitle--small euiCard__title"
+              >Last files integrity synchronization</span
+            >
+            <div class="euiSpacer euiSpacer--m"></div>
+            <div layout="row" class="wz-padding-top-10">
+              <span flex="30">Last sync</span>
+              <span class="color-grey"
+                >{{currentNode.healthCheck.status.last_sync_integrity.date_end_master}}</span
+              >
+            </div>
+            <div layout="row" class="wz-padding-top-10">
+              <span flex="30">Duration</span>
+              <span class="color-grey"
+                >{{currentNode.healthCheck.status.last_sync_integrity.duration}}</span
+              >
+            </div>
+            <div layout="row" class="wz-padding-top-10">
+              <span flex="30">Total shared files</span>
+              <span class="color-grey"
+                >{{currentNode.healthCheck.status.last_sync_integrity.total_files.shared}}</span
+              >
+            </div>
+            <div layout="row" class="wz-padding-top-10">
+              <span flex="30">Total missing files</span>
+              <span class="color-grey"
+                >{{currentNode.healthCheck.status.last_sync_integrity.total_files.missing}}</span
+              >
+            </div>
+            <div layout="row" class="wz-padding-top-10">
+              <span flex="30">Total extra but valid files</span>
+              <span class="color-grey"
+                >{{currentNode.healthCheck.status.last_sync_integrity.total_files.extra_valid}}</span
+              >
+            </div>
+            <div layout="row" class="wz-padding-top-10">
+              <span flex="30">Total extra files</span>
+              <span class="color-grey"
+                >{{currentNode.healthCheck.status.last_sync_integrity.total_files.extra}}</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- End node info and files cards section -->
+
+      <!-- Node agents cards section -->
+      <div
+        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--responsive"
+        ng-show="currentNode && currentNode.healthCheck && currentNode.healthCheck.status"
+      >
+        <!-- Agents sync card -->
+        <div class="euiFlexItem">
+          <div class="euiPanel euiPanel--paddingMedium">
+            <span class="euiTitle euiTitle--small euiCard__title"
+              >Last agents information synchronization</span
+            >
+            <div class="euiSpacer euiSpacer--m"></div>
+            <div layout="row" class="wz-padding-top-10">
+              <span flex="30">Last sync</span>
+              <span class="color-grey"
+                >{{currentNode.healthCheck.status.last_sync_agentinfo.date_end_master}}</span
+              >
+            </div>
+            <div layout="row" class="wz-padding-top-10">
+              <span flex="30">Duration</span>
+              <span class="color-grey"
+                >{{currentNode.healthCheck.status.last_sync_agentinfo.duration}}</span
+              >
+            </div>
+            <div layout="row" class="wz-padding-top-10">
+              <span flex="30">Total agent info</span>
+              <span class="color-grey"
+                >{{currentNode.healthCheck.status.last_sync_agentinfo.total_agentinfo}}</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- Groups sync card -->
+        <div class="euiFlexItem">
+          <div class="euiPanel euiPanel--paddingMedium">
+            <span class="euiTitle euiTitle--small euiCard__title"
+              >Last agents groups synchronization</span
+            >
+            <div class="euiSpacer euiSpacer--m"></div>
+            <div layout="row" class="wz-padding-top-10">
+              <span flex="30">Last sync</span>
+              <span class="color-grey"
+                >{{currentNode.healthCheck.status.last_sync_agentgroups.date_end_master}}</span
+              >
+            </div>
+            <div layout="row" class="wz-padding-top-10">
+              <span flex="30">Duration</span>
+              <span class="color-grey"
+                >{{currentNode.healthCheck.status.last_sync_agentgroups.duration}}</span
+              >
+            </div>
+            <div layout="row" class="wz-padding-top-10">
+              <span flex="30">Total agent info</span>
+              <span class="color-grey"
+                >{{currentNode.healthCheck.status.last_sync_agentgroups.total_agentgroups}}</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- End node agents cards section -->
+    </div>
+    <!-- end nodes-detail -->
+  </div>
+
+  <!-- end monitoring -->
+  <!-- statistics -->
+  <div ng-if="mctrl.tab === 'statistics'">
+    <kbn-dis ng-show="false"></kbn-dis>
+  </div>
+  <!-- end statiscts -->
+  <!-- management -->
+  <div ng-if="!rctrl.loading && mctrl.managementProps && mctrl.tab !== 'welcome'" layout="column">
+    <react-component name="WzManagement" props="mctrl.managementProps"></react-component>
+  </div>
+  <!-- end management -->
+  <!-- groups -->
+  <div
+    ng-class="{'cursor-wait': multipleSelectorLoading}"
+    ng-controller="groupsPreviewController as gp"
+    ng-if="mctrl.tab == 'groups'"
+  >
+    <!-- TODO -
+        - remove GroupsPreviewController
+        - add 'Manage agents' section to the Groups component
+    -->
+    <div ng-if="gp.currentGroup && gp.addingAgents">
+      <react-component
+        name="MultipleAgentSelector"
+        props="gp.multipleAgentSelectorProps"
+        ng-init="gp.groupsSelectedTab='agents'"
+      ></react-component>
+    </div>
+  </div>
+  <!-- end groups -->
+</div>

@@ -1,0 +1,38 @@
+.euiBreadcrumbs--truncate .wz-global-breadcrumb .euiBreadcrumb:not(.euiBreadcrumb--collapsed) span.euiToolTipAnchor {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: text-bottom;
+}
+
+.wz-global-breadcrumb {
+  font-size: 14px;
+  padding: 0px;
+}
+
+.wz-global-breadcrumb-btn {
+  max-width: unset !important;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+
+  _::-webkit-full-page-media,
+  _:future,
+  :root,
+  .wz-global-breadcrumb {
+    line-height: 1.5;
+  }
+}
+
+@-moz-document url-prefix() {
+  .wz-global-breadcrumb #breadcrumbNoTitle {
+    height: auto !important;
+  }
+}
+
+// styles for opensearch >2.x
+
+.osdHeaderBreadcrumbs ,
+.osdHeaderBreadcrumbs--dark {
+  filter: none;
+}

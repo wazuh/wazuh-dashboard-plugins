@@ -1,0 +1,326 @@
+version: "2.2"
+
+x-logging: &logging
+  logging:
+    driver: loki
+    options:
+      loki-url: "http://host.docker.internal:3100/loki/api/v1/push"
+
+services:
+  exporter:
+    image: quay.io/prometheuscommunity/elasticsearch-exporter:latest
+    <<: *logging
+    hostname: "exporter-kbn-${ES_VERSION}"
+    networks:
+      - es-rel
+      - mon
+    command:
+      - '--es.uri=https://kibana_system:${KIBANA_PASSWORD}@es01:9200'
+      - '--es.ssl-skip-verify'
+      - '--es.all'
+
+  wazuh.manager:
+    depends_on:
+      setup:
+        condition: service_healthy
+    image: wazuh/wazuh-manager:${WAZUH_VERSION}
+    hostname: wazuh.manager
+    networks:
+      - es-rel
+    <<: *logging
+    environment:
+      - INDEXER_URL=https://es01:9200
+      - INDEXER_USERNAME=elastic
+      - INDEXER_PASSWORD=${ELASTIC_PASSWORD}
+      - FILEBEAT_SSL_VERIFICATION_MODE=full
+      - SSL_CERTIFICATE_AUTHORITIES=/etc/ssl/elastic/ca/ca.crt
+      - SSL_CERTIFICATE=/etc/ssl/elastic/wazuh.manager/wazuh.manager.crt
+      - SSL_KEY=/etc/ssl/elastic/wazuh.manager/wazuh.manager.key
+      - API_USERNAME=wazuh-wui
+      - API_PASSWORD=MyS3cr37P450r.*-
+    volumes:
+      - certs:/etc/ssl/elastic
+      - wazuh_api_configuration:/var/ossec/api/configuration
+      - wazuh_etc:/var/ossec/etc
+      - wazuh_logs:/var/ossec/logs
+      - wazuh_queue:/var/ossec/queue
+      - wazuh_var_multigroups:/var/ossec/var/multigroups
+      - wazuh_integrations:/var/ossec/integrations
+      - wazuh_active_response:/var/ossec/active-response/bin
+      - wazuh_agentless:/var/ossec/agentless
+      - wazuh_wodles:/var/ossec/wodles
+      - filebeat_etc:/etc/filebeat
+      - filebeat_var:/var/lib/filebeat
+      - ./config/wazuh_cluster/wazuh_manager.conf:/wazuh-config-mount/etc/ossec.conf
+
+  setup:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ES_VERSION}
+    networks:
+      - es-rel
+    volumes:
+      - certs:/usr/share/elasticsearch/config/certs
+      - ./config/wazuh_indexer_ssl_certs/:/tmp/certs
+      - ./config/setup_permissions.sh:/tmp/setup_permissions.sh
+    user: "0"
+    command: >
+      bash -c '
+        if [ x${ELASTIC_PASSWORD} == x ]; then
+          echo "Set the ELASTIC_PASSWORD environment variable in the .env file";
+          exit 1;
+        elif [ x${KIBANA_PASSWORD} == x ]; then
+          echo "Set the KIBANA_PASSWORD environment variable in the .env file";
+          exit 1;
+        fi;
+        if [ ! -f config/certs/ca.zip ]; then
+          echo "Creating CA";
+          bin/elasticsearch-certutil ca --silent --pem -out config/certs/ca.zip;
+          unzip config/certs/ca.zip -d config/certs;
+        fi;
+        if [ ! -f config/certs/certs.zip ]; then
+          echo "Creating certs";
+          echo -ne \
+          "instances:\n"\
+          "  - name: es01\n"\
+          "    dns:\n"\
+          "      - es01\n"\
+          "      - localhost\n"\
+          "    ip:\n"\
+          "      - 127.0.0.1\n"\
+          "  - name: es02\n"\
+          "    dns:\n"\
+          "      - es02\n"\
+          "      - localhost\n"\
+          "    ip:\n"\
+          "      - 127.0.0.1\n"\
+          "  - name: es03\n"\
+          "    dns:\n"\
+          "      - es03\n"\
+          "      - localhost\n"\
+          "    ip:\n"\
+          "      - 127.0.0.1\n"\
+          "  - name: wazuh.manager\n"\
+          "    dns:\n"\
+          "      - wazuh.manager\n"\
+          "      - localhost\n"\
+          "    ip:\n"\
+          "      - 127.0.0.1\n"\
+          > config/certs/instances.yml;
+          bin/elasticsearch-certutil cert --silent --pem -out config/certs/certs.zip --in config/certs/instances.yml --ca-cert config/certs/ca/ca.crt --ca-key config/certs/ca/ca.key;
+          unzip config/certs/certs.zip -d config/certs;
+        fi;
+        echo "Setting file permissions"
+        chown -R root:root config/certs;
+        find . -type d -exec chmod 750 \{\} \;;
+        find . -type f -exec chmod 640 \{\} \;;
+        echo "Waiting for Elasticsearch availability";
+        until curl -s --cacert config/certs/ca/ca.crt https://es01:9200 | grep -q "missing authentication credentials"; do sleep 30; done;
+        echo "Setting kibana_system password";
+        until curl -s -X POST --cacert config/certs/ca/ca.crt -u elastic:${ELASTIC_PASSWORD} -H "Content-Type: application/json" https://es01:9200/_security/user/kibana_system/_password -d "{\"password\":\"${KIBANA_PASSWORD}\"}" | grep -q "^{}"; do sleep 10; done;
+
+        # Setup permissions for the app
+        sh /tmp/setup_permissions.sh es01;
+
+        echo "All done!";
+      '
+    healthcheck:
+      test: ["CMD-SHELL", "[ -f config/certs/es01/es01.crt ]"]
+      interval: 1s
+      timeout: 5s
+      retries: 120
+
+  es01:
+    hostname: es01
+    <<: *logging
+    depends_on:
+      setup:
+        condition: service_healthy
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ES_VERSION}
+    networks:
+      - es-rel
+    volumes:
+      - certs:/usr/share/elasticsearch/config/certs
+      - esdata01:/usr/share/elasticsearch/data
+    environment:
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - node.name=es01
+      - cluster.name=${CLUSTER_NAME}
+      # - cluster.initial_master_nodes=es01,es02,es03
+      - cluster.initial_master_nodes=es01
+      # - discovery.seed_hosts=es02,es03
+      - discovery.seed_hosts=es01
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      - bootstrap.memory_lock=true
+      - xpack.security.enabled=true
+      - xpack.security.http.ssl.enabled=true
+      - xpack.security.http.ssl.key=certs/es01/es01.key
+      - xpack.security.http.ssl.certificate=certs/es01/es01.crt
+      - xpack.security.http.ssl.certificate_authorities=certs/ca/ca.crt
+      - xpack.security.http.ssl.verification_mode=certificate
+      - xpack.security.transport.ssl.enabled=true
+      - xpack.security.transport.ssl.key=certs/es01/es01.key
+      - xpack.security.transport.ssl.certificate=certs/es01/es01.crt
+      - xpack.security.transport.ssl.certificate_authorities=certs/ca/ca.crt
+      - xpack.security.transport.ssl.verification_mode=certificate
+      - xpack.license.self_generated.type=${LICENSE}
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -s --cacert config/certs/ca/ca.crt https://localhost:9200 | grep -q 'missing authentication credentials'",
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 120
+
+  # es02:
+  #   hostname: es02
+  #   <<: *logging
+  #   depends_on:
+  #     - es01
+  #   image: docker.elastic.co/elasticsearch/elasticsearch:${ES_VERSION}
+  #   networks:
+  #     - es-rel
+  #   volumes:
+  #     - certs:/usr/share/elasticsearch/config/certs
+  #     - esdata02:/usr/share/elasticsearch/data
+  #   environment:
+  #     - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+  #     - node.name=es02
+  #     - cluster.name=${CLUSTER_NAME}
+  #     - cluster.initial_master_nodes=es01,es02,es03
+  #     - discovery.seed_hosts=es01,es03
+  #     - bootstrap.memory_lock=true
+  #     - xpack.security.enabled=true
+  #     - xpack.security.http.ssl.enabled=true
+  #     - xpack.security.http.ssl.key=certs/es02/es02.key
+  #     - xpack.security.http.ssl.certificate=certs/es02/es02.crt
+  #     - xpack.security.http.ssl.certificate_authorities=certs/ca/ca.crt
+  #     - xpack.security.http.ssl.verification_mode=certificate
+  #     - xpack.security.transport.ssl.enabled=true
+  #     - xpack.security.transport.ssl.key=certs/es02/es02.key
+  #     - xpack.security.transport.ssl.certificate=certs/es02/es02.crt
+  #     - xpack.security.transport.ssl.certificate_authorities=certs/ca/ca.crt
+  #     - xpack.security.transport.ssl.verification_mode=certificate
+  #     - xpack.license.self_generated.type=${LICENSE}
+  #   ulimits:
+  #     memlock:
+  #       soft: -1
+  #       hard: -1
+  #   healthcheck:
+  #     test:
+  #       [
+  #         "CMD-SHELL",
+  #         "curl -s --cacert config/certs/ca/ca.crt https://localhost:9200 | grep -q 'missing authentication credentials'",
+  #       ]
+  #     interval: 10s
+  #     timeout: 10s
+  #     retries: 120
+
+  # es03:
+  #   hostname: es03
+  #   <<: *logging
+  #   depends_on:
+  #     - es02
+  #   image: docker.elastic.co/elasticsearch/elasticsearch:${ES_VERSION}
+  #   networks:
+  #     - es-rel
+  #   volumes:
+  #     - certs:/usr/share/elasticsearch/config/certs
+  #     - esdata03:/usr/share/elasticsearch/data
+  #   environment:
+  #     - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+  #     - node.name=es03
+  #     - cluster.name=${CLUSTER_NAME}
+  #     - cluster.initial_master_nodes=es01,es02,es03
+  #     - discovery.seed_hosts=es01,es02
+  #     - bootstrap.memory_lock=true
+  #     - xpack.security.enabled=true
+  #     - xpack.security.http.ssl.enabled=true
+  #     - xpack.security.http.ssl.key=certs/es03/es03.key
+  #     - xpack.security.http.ssl.certificate=certs/es03/es03.crt
+  #     - xpack.security.http.ssl.certificate_authorities=certs/ca/ca.crt
+  #     - xpack.security.http.ssl.verification_mode=certificate
+  #     - xpack.security.transport.ssl.enabled=true
+  #     - xpack.security.transport.ssl.key=certs/es03/es03.key
+  #     - xpack.security.transport.ssl.certificate=certs/es03/es03.crt
+  #     - xpack.security.transport.ssl.certificate_authorities=certs/ca/ca.crt
+  #     - xpack.security.transport.ssl.verification_mode=certificate
+  #     - xpack.license.self_generated.type=${LICENSE}
+  #   ulimits:
+  #     memlock:
+  #       soft: -1
+  #       hard: -1
+  #   healthcheck:
+  #     test:
+  #       [
+  #         "CMD-SHELL",
+  #         "curl -s --cacert config/certs/ca/ca.crt https://localhost:9200 | grep -q 'missing authentication credentials'",
+  #       ]
+  #     interval: 10s
+  #     timeout: 10s
+  #     retries: 120
+
+  kibana:
+    hostname: kibana
+    networks:
+      - es-rel
+    <<: *logging
+    depends_on:
+      es01:
+        condition: service_healthy
+      # es02:
+      #   condition: service_healthy
+      # es03:
+      #   condition: service_healthy
+    image: docker.elastic.co/kibana/kibana:${ES_VERSION}
+    volumes:
+      - certs:/usr/share/kibana/config/certs
+      - kibanadata:/usr/share/kibana/data
+    ports:
+      - ${KIBANA_PORT}:5601
+    environment:
+      - SERVERNAME=kibana
+      - ELASTICSEARCH_HOSTS=https://es01:9200
+      - ELASTICSEARCH_USERNAME=wazuh_app
+      - ELASTICSEARCH_PASSWORD=wazuh_app
+      - ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES=config/certs/ca/ca.crt
+      - XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY=xpack.encryptedSavedObjects.encr"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -s -I http://localhost:5601 | grep -q 'HTTP/1.1 302 Found'",
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 120
+
+networks:
+  es-rel:
+    name: "${COMPOSE_PROJECT_NAME}"
+    driver: bridge
+  mon:
+    external: true
+
+volumes:
+  certs:
+  esdata01:
+  esdata02:
+  esdata03:
+  kibanadata:
+  wazuh_api_configuration:
+  wazuh_etc:
+  wazuh_logs:
+  wazuh_queue:
+  wazuh_var_multigroups:
+  wazuh_integrations:
+  wazuh_active_response:
+  wazuh_agentless:
+  wazuh_wodles:
+  filebeat_etc:
+  filebeat_var:
+  wazuh-indexer-data:

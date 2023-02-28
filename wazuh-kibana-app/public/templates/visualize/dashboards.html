@@ -1,0 +1,119 @@
+<div ng-controller="agentsPreviewController as actrl">
+  <div ng-init="actrl.addNewAgent(false)" ng-show="actrl.addingNewAgent">
+    <react-component name="RegisterAgent" props="actrl.registerAgentsProps"></react-component>
+  </div>
+  <div ng-show="!actrl.addingNewAgent">
+    <div ng-controller="overviewController as octrl">
+      <!-- Navigation section -->
+      <div ng-show="octrl.tab && octrl.tab !== 'welcome'">
+        <react-component
+          ng-if="octrl.tab && ctrl.tab !== 'welcome' && octrl.overviewModuleReady"
+          name="MainModule"
+          props="getMainProps(resultState)"
+        ></react-component>
+        <react-component
+          style="visibility: hidden"
+          flex
+          name="WzCurrentOverviewSectionWrapper"
+          props="octrl.currentOverviewSectionProps"
+        ></react-component>
+      </div>
+
+      <div ng-class="{'no-opacity': !moduleDiscoverReady}">
+        <!-- Discover search bar section -->
+        <kbn-dis
+          class="hide-filter-control"
+          ng-show="octrl.tab && octrl.tab !== 'welcome'"
+        ></kbn-dis>
+        <!-- End Discover search bar section -->
+      </div>
+
+      <!-- End loading status section -->
+      <!-- Report status section -->
+      <div
+        ng-if="reportBusy && reportStatus && showModuleDashboard"
+        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceAround euiFlexGroup--directionRow euiFlexGroup--responsive"
+      >
+        <div class="euiFlexItem euiFlexItem--flexGrowZero euiTextAlign euiTextAlign--center">
+          <div class="euiSpacer euiSpacer--m"></div>
+          <span class="euiLoadingChart euiLoadingChart--large">
+            <span class="euiLoadingChart__bar"></span>
+            <span class="euiLoadingChart__bar"></span>
+            <span class="euiLoadingChart__bar"></span>
+            <span class="euiLoadingChart__bar"></span>
+          </span>
+          <div class="euiSpacer euiSpacer--m"></div>
+          <div class="percentage">{{reportStatus}}</div>
+          <div class="euiSpacer euiSpacer--l"></div>
+        </div>
+      </div>
+      <!-- No results section -->
+      <div
+        layout="row"
+        class="wz-margin-top-10 wz-margin-right-8 wz-margin-left-8"
+        ng-if="tab !== 'welcome'"
+        ng-show="resultState === 'none' && tabView === 'panels' && showModuleDashboard"
+      >
+        <react-component
+          flex
+          name="EuiCallOut"
+          props="{color:'warning',iconType:'help', title:'There are no results for selected time range. Try another one.'}"
+        ></react-component>
+      </div>
+
+      <div
+        ng-if="actrl.hasAgents === false"
+        class="wz-margin-top-10 wz-margin-right-8 wz-margin-left-8 euiCallOut euiCallOut--warning"
+      >
+        <div class="euiCallOutHeader">
+          <span class="euiCallOutHeader__title ng-binding">
+            <react-component name="EuiIcon" props="{type:'help'}"
+              ><svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                xmlns="http://www.w3.org/2000/svg"
+                class="euiIcon euiIcon--medium euiIcon-isLoaded"
+                focusable="false"
+              >
+                <defs>
+                  <path
+                    id="help-a"
+                    d="M13.6 12.186l-1.357-1.358c-.025-.025-.058-.034-.084-.056.53-.794.84-1.746.84-2.773a4.977 4.977 0 0 0-.84-2.772c.026-.02.059-.03.084-.056L13.6 3.813a6.96 6.96 0 0 1 0 8.373zM8 15A6.956 6.956 0 0 1 3.814 13.6l1.358-1.358c.025-.025.034-.057.055-.084C6.02 12.688 6.974 13 8 13a4.978 4.978 0 0 0 2.773-.84c.02.026.03.058.056.083l1.357 1.358A6.956 6.956 0 0 1 8 15zm-5.601-2.813a6.963 6.963 0 0 1 0-8.373l1.359 1.358c.024.025.057.035.084.056A4.97 4.97 0 0 0 3 8c0 1.027.31 1.98.842 2.773-.027.022-.06.031-.084.056l-1.36 1.358zm5.6-.187A4 4 0 1 1 8 4a4 4 0 0 1 0 8zM8 1c1.573 0 3.019.525 4.187 1.4l-1.357 1.358c-.025.025-.035.057-.056.084A4.979 4.979 0 0 0 8 3a4.979 4.979 0 0 0-2.773.842c-.021-.027-.03-.059-.055-.084L3.814 2.4A6.957 6.957 0 0 1 8 1zm0-1a8.001 8.001 0 1 0 .003 16.002A8.001 8.001 0 0 0 8 0z"
+                  ></path>
+                </defs>
+                <use xlink:href="#help-a" fill-rule="evenodd"></use></svg>
+            </react-component>
+            No agents were added to this manager:
+          </span>
+          <a ng-click="actrl.addNewAgent(true)"> Deploy new agent </a>
+        </div>
+      </div>
+      <!-- End report status section -->
+      <div ng-if="octrl.tab && octrl.tab!=='welcome'" ng-show="octrl.tabView === 'panels'">
+        <div ng-if='octrl.tabView === "panels"' ng-class="{'no-opacity': !moduleDiscoverReady}">
+          <react-component
+            ng-show="showModuleDashboard"
+            id="moduleDashboard"
+            name="WzVisualize"
+            props="getVisualizeProps(resultState)"
+          ></react-component>
+        </div>
+      </div>
+      <!-- end dashboards -->
+      <!-- welcome -->
+      <div layout="column" layout-align="start stretch" ng-if="octrl.tab === 'welcome'">
+        <div layout="row" layout-padding>
+          <react-component
+            name="StatsOverview"
+            style="padding-bottom: 0"
+            flex
+            props="octrl.agentsCount"
+          />
+        </div>
+        <react-component name="OverviewWelcome" props="octrl.welcomeCardsProps"></react-component>
+      </div>
+      <!-- end welcome -->
+    </div>
+  </div>
+</div>

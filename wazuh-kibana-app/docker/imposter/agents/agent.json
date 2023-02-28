@@ -1,0 +1,39 @@
+{
+    "data": {
+        "affected_items": [
+            {
+                "os": {
+                    "arch": "x86_64",
+                    "codename": "stretch",
+                    "major": "9",
+                    "name": "Debian GNU/Linux",
+                    "platform": "debian",
+                    "uname": "Linux |ip-10-0-1-106 |4.9.0-9-amd64 |#1 SMP Debian 4.9.168-1+deb9u2 (2019-05-13) |x86_64",
+                    "version": "9"
+                },
+                "ip": "10.0.1.106",
+                "configSum": "6f4293818ef64291ca53727fb9ab8958",
+                "mergedSum": "7976a83d1aebcca09bc14459b5518ed5",
+                "id": "001",
+                "registerIP": "any",
+                "dateAdd": "2022-08-25T16:25:53Z",
+                "disconnection_time": "2022-08-25T16:36:35Z",
+                "name": "Debian",
+                "status": "active",
+                "manager": "wazuh-manager-master-0",
+                "node_name": "master",
+                "group": [
+                    "default",
+                    "debian"
+                ],
+                "lastKeepAlive": "2022-09-12T08:48:40Z",
+                "version": "Wazuh v4.3.7"
+            }
+        ],
+        "total_affected_items": 1,
+        "total_failed_items": 0,
+        "failed_items": []
+    },
+    "message": "All selected agents information was returned",
+    "error": 0
+}

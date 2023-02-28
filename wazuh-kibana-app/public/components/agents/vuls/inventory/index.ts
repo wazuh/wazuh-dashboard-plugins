@@ -1,0 +1,1 @@
+export { InventoryTable } from './table';

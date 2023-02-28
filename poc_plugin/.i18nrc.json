@@ -1,0 +1,7 @@
+{
+  "prefix": "pocPlugin",
+  "paths": {
+    "pocPlugin": "."
+  },
+  "translations": ["translations/ja-JP.json"]
+}

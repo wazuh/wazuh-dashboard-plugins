@@ -1,0 +1,24 @@
+{
+  "baseUrl": "http://localhost:5601/",
+  "testFiles": ["**/*.{feature,features}"],
+  "defaultCommandTimeout": 40000,
+  "viewportWidth": 1400,
+  "viewportHeight": 1500,
+  "reporter": "mochawesome",
+  "watchForFileChanges": false,
+  "numTestsKeptInMemory": 0,
+  "reporterOptions": {
+    "charts": true,
+    "overwrite": false,
+    "html": true,
+    "json": true,
+    "reportDir": "cypress/report/mochawesome-report",
+    "mochaFile": "cypress/report/output.html"
+  },
+  "videosFolder": "cypress/report/video",
+  "screenshotsFolder": "cypress/report/screenshots",
+  "experimentalSessionAndOrigin": true,
+  "env": {
+      "type": "odfe"
+    }
+}

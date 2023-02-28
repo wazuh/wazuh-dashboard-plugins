@@ -1,0 +1,186 @@
+/*
+ * Wazuh app - Text & typography stylesheet
+ * Copyright (C) 2015-2022 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
+
+/* -------------------------------------------------------------------------- */
+/* ------------------- Wazuh text & typography stylesheet ------------------- */
+/* -------------------------------------------------------------------------- */
+
+/* Apply the Open Sans font in the whole app */
+html,
+body,
+button:not(.fa):not(.fa-times),
+textarea,
+input,
+select{
+  //font-size: 14px;
+}
+
+.wz-headline-title:not(.wz-dev-title) {
+  padding: 8px!important;
+  justify-content: start!important;
+  font-size: 12px;
+}
+
+/* Override font size of md-headline class */
+.wz-headline {
+  font-size: 16px !important;
+}
+
+.color-grey {
+  color: grey !important;
+}
+
+.color-f9 {
+  color: #ff9999;
+}
+
+.wz-color-orange {
+  color: #f39c12 !important;
+}
+
+.color-pointer {
+  color: #006bb4 !important;
+}
+
+.wz-line-height {
+  line-height: 20px !important;
+}
+
+.wz-line-height-40 {
+  line-height: 40px !important;
+}
+
+.wz-text-center {
+  text-align: center;
+}
+
+.wz-text-right {
+  text-align: right;
+}
+
+.wz-text-left {
+  text-align: left;
+}
+
+.wz-text-bold {
+  font-weight: bold !important;
+}
+
+.wz-text-monospace {
+  font-family: monospace !important;
+}
+
+.wz-text-capitalize {
+  text-transform: capitalize !important;
+}
+
+.wz-text-uppercase {
+  text-transform: uppercase !important;
+}
+
+.wz-text-normal {
+  text-transform: none !important;
+}
+
+.wz-text-ellipsis {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.wz-text-truncatable {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  &:before {
+    content: attr(data-name);
+  }
+}
+
+.wz-text-truncatable-container {
+  overflow: hidden;
+  width: auto;
+  display: grid;
+}
+
+.font-size-12 {
+  font-size: 12px !important;
+}
+
+.font-size-16 {
+  font-size: 16px;
+}
+
+.font-size-18 {
+  font-size: 18px;
+}
+
+.font-size-25 {
+  font-size: 25px;
+}
+
+/* JSON viewer font colors */
+
+.json-key {
+  color: rgb(255, 100, 92);
+}
+
+.json-value {
+  color: rgb(0, 121, 165);
+}
+
+.json-string {
+  color: rgb(0, 166, 155);
+}
+
+/* Class for linkable text elements */
+.wz-text-link {
+  cursor: pointer !important;
+  color: #006bb4 !important;
+
+  &:hover {
+    text-decoration: underline !important;
+  }
+}
+
+.wz-text-link-add {
+  cursor: pointer !important;
+  color: #006bb4 !important;
+
+  &:hover {
+    text-decoration: none !important;
+  }
+}
+
+.wz-text-active {
+  color: rgb(0, 121, 165);
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+/* Special fix for text in navbars */
+
+.md-button {
+  text-transform: none !important;
+}
+
+.wz-text-teal {
+  color: rgb(0, 166, 155);
+}
+
+.wz-text-red {
+  color: rgb(255, 100, 92);
+}
+
+b {
+  font-weight: bold;
+}

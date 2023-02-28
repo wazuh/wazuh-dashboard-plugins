@@ -1,0 +1,137 @@
+/*
+ * Wazuh app - Component stylesheet
+ * Copyright (C) 2015-2022 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
+
+/* -------------------------------------------------------------------------- */
+/* ----------------------- Wazuh component stylesheet ----------------------- */
+/* -------------------------------------------------------------------------- */
+
+/* Custom nav bar styles */
+
+.wz-nav-bar .md-nav-bar {
+  height: auto !important;
+}
+
+.wz-nav-item button,
+.wz-no-padding {
+  padding: 0 5px !important;
+}
+
+.wz-nav-item button.md-primary {
+  color: rgb(0, 121, 165) !important;
+  background: #f5fafb !important;
+  border-bottom: 2px solid #006bb4;
+}
+
+.wz-nav-item button.md-unselected {
+  color: rgba(0, 0, 0, 0.87) !important;
+}
+
+.wz-nav-bar md-nav-ink-bar {
+  color: rgb(0, 121, 165) !important;
+  background: rgb(0, 121, 165) !important;
+}
+
+.wz-nav-bar md-nav-ink-bar._md-left,
+.wz-nav-bar md-nav-ink-bar._md-right {
+  transition: none !important;
+}
+
+/* Custom tooltip styles */
+
+.wz-tooltip {
+  background-color: rgba(0, 0, 0, 0.87) !important;
+  color: #fff !important;
+}
+
+/* Custom switch styles */
+
+.wz-switch {
+  margin: 0 !important;
+}
+
+/* Custom chips styles */
+
+.wz-chips .md-chips {
+  box-shadow: none !important;
+  padding-bottom: 0;
+}
+
+.wz-chip {
+  font-size: 12px;
+  color: white;
+  background-color: #006bb4;
+  height: 26px !important;
+  line-height: 26px !important;
+  margin: 0 8px 0 0 !important;
+}
+
+.sca-chart-widget {
+  margin: 0 auto;
+  //width:350px;
+  margin-top: 50px;
+  background-color: #222d3a;
+  border-radius: 5px;
+  box-shadow: 0px 0px 1px 0px #06060d;
+}
+
+.sca-chart-header {
+  background-color: #29384d;
+  height: 40px;
+  color: #929daf;
+  text-align: center;
+  line-height: 40px;
+  border-top-left-radius: 7px;
+  border-top-right-radius: 7px;
+  font-weight: 400;
+  font-size: 1.5em;
+  text-shadow: 1px 1px #06060d;
+}
+
+.sca-chart {
+  padding: 12px;
+}
+
+.sca-chart-shadow {
+  -webkit-filter: drop-shadow(0px 3px 3px rgba(0, 0, 0, 0.5));
+  filter: drop-shadow(0px 3px 3px rgba(0, 0, 0, 0.5));
+}
+
+kbn-dis doc-table .kbnDocViewer__warning {
+  display: none;
+}
+
+/* Custom Breadcrumb styles*/
+.header__breadcrumbsWithExtensionContainer .euiHeaderBreadcrumbs {
+  flex-grow: 1;
+  margin-right: 12px;
+}
+.header__breadcrumbsWithExtensionContainer .header__breadcrumbsAppendExtension {
+  flex-grow: 0;
+}
+
+.osButtonsStyle {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-gap: 10px;
+}
+
+.osButtonsStyleMac {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 10px;
+}
+
+.message {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: row;
+}

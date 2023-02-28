@@ -1,0 +1,103 @@
+.wz-inventory {
+  .flyout-header {
+    padding: 12px 16px;
+  }
+
+  .flyout-body > .euiFlyoutBody__overflow {
+    padding: 8px 16px 16px 16px;
+    mask-image: unset;
+  }
+
+  .flyout-row {
+    padding: 16px;
+    border-top: 1px solid #d3dae6;
+  }
+
+  .details-row {
+    background: #fcfdfe;
+  }
+
+  .detail-icon {
+    position: absolute;
+    margin-top: 6px;
+  }
+
+  .detail-title {
+    margin-left: 36px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .detail-value {
+    font-size: 14px;
+    font-weight: 300;
+    cursor: default;
+    margin-left: 36px;
+    float: left;
+    white-space: break-spaces;
+    position: relative;
+  }
+
+  .buttonAddFilter {
+    min-height: 0;
+  }
+
+  .detail-value-checksum {
+    font-size: 13px !important;
+    display: inline-flex;
+  }
+
+  .detail-value-perm {
+    word-break: break-word;
+    display: inline-block;
+    overflow: hidden;
+  }
+
+  .detail-tooltip {
+    position: absolute;
+    right: 36px;
+    background-color: #fcfdfe;
+  }
+
+  .application .euiAccordion,
+  .flyout-body .euiAccordion {
+    margin: 0px -16px;
+    border-top: none;
+    border-bottom: 1px solid #d3dae6;
+  }
+
+  .application .euiAccordion__triggerWrapper,
+  .flyout-body .euiAccordion__triggerWrapper {
+    padding: 0px 16px;
+  }
+
+  .application .euiAccordion__triggerWrapper .euiTitle,
+  .flyout-body .euiAccordion__triggerWrapper .euiTitle {
+    font-size: 16px;
+  }
+
+  .application .euiAccordion__button,
+  .flyout-body .euiAccordion__button {
+    padding: 0px 0px 8px 0;
+  }
+
+  .events-accordion,
+  .euiStat .euiTitle .detail-value .euiAccordion {
+    border-bottom: none !important;
+  }
+
+  .view-in-events-btn {
+    height: 30px;
+  }
+
+  .module-discover-table .euiTableRow-isExpandedRow .euiTableCellContent {
+    animation: none !important;
+  }
+
+  /* This resets to the original value of "display" style for EuiTooltip used in ".euiAccordion__childWrapper .euiToolTipAnchor" definition,
+    which is defined above in this same file as block!important.
+*/
+  .rule_reset_display_anchor .euiToolTipAnchor {
+    display: inline-block !important;
+  }
+}

@@ -1,0 +1,11 @@
+{
+    "data": {
+        "severity": {
+            "Critical": 8,
+            "Medium": 3,
+            "High": 1,
+            "Low": 0
+        }
+    },
+    "error": 0
+}

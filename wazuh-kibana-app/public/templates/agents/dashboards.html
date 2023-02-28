@@ -1,0 +1,145 @@
+<!-- head -->
+<div flex="auto" layout="column" ng-cloak ng-controller="agentsController">
+  <div
+    ng-show="load && tab !== 'configuration' && tab !== 'sca' && tabView === 'panels'"
+    ng-style="tab === 'welcome' && {'padding':16}"
+  >
+    <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}"></react-component>
+  </div>
+  <!-- end head -->
+
+  <!-- agents-welcome -->
+  <div ng-if="tab === 'welcome'">
+    <div layout="column" layout-align="start stretch" ng-show="!load && !agent">
+      <div layout="row" class="layout-padding">
+        <div class="euiPanel euiFlexItem wz-margin-10" flex class="wz-md-card" flex>
+          <md-card-content class="wz-text-center">
+            <div layout="row" layout-padding>
+              <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i>
+              <span
+                class="embPanel__header embPanel__title embPanel__dragger layout-row wz-headline-title"
+                >Could not fetch data for this agent.
+                <span ng-if="emptyAgent">Reason: {{emptyAgent}}</span></span
+              >
+            </div>
+            <div layout="row" layout-padding ng-if="emptyAgent">
+              <span class="cursor-pointer" ng-click="getAgent()"
+                ><i class="fa fa-fw fa-refresh" aria-hidden="true"></i> Try again</span
+              >
+            </div>
+          </md-card-content>
+        </div>
+      </div>
+    </div>
+    <div ng-show="!load && agent">
+      <div ng-if="welcomeCardsProps">
+        <react-component
+          name="AgentsWelcome"
+          props="getWelcomeCardsProps(resultState)"
+        ></react-component>
+      </div>
+    </div>
+  </div>
+  <!-- end agents-welcome -->
+  <!-- agents module -->
+  <div ng-if="agent">
+    <div ng-if="tab !== 'welcome' && agent && agent.status !== 'never_connected'">
+      <react-component
+        name="MainModule"
+        props="{agent, section: tab, disabledReport: resultState !== 'ready', cardsProps: getWelcomeCardsProps(resultState), goGroups: goGroups, exportConfiguration: exportConfiguration}"
+      ></react-component>
+    </div>
+    <div ng-if="!loadingDashboard">
+      <div
+        ng-show='(showModuleDashboard || showModuleEvents || showMitre) && showModuleDashboard !== "welcome"'
+      >
+        <div ng-class="{'no-opacity': !moduleDiscoverReady}">
+          <kbn-dis class="hide-filter-control"></kbn-dis>
+        </div>
+      </div>
+    </div>
+
+    <div ng-if="tab === 'mitre' && showMitre">
+      <react-component name="Mitre"></react-component>
+    </div>
+
+    <!-- Loading status section -->
+    <div
+      ng-if="tabView === 'panels' && !showMitre && showModuleDashboard && !rendered && resultState !== 'none'"
+      class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceAround euiFlexGroup--directionRow euiFlexGroup--responsive"
+    >
+      <div class="euiFlexItem euiFlexItem--flexGrowZero euiTextAlign euiTextAlign--center">
+        <div class="euiSpacer euiSpacer--m"></div>
+        <span class="euiLoadingChart euiLoadingChart--large">
+          <span class="euiLoadingChart__bar"></span>
+          <span class="euiLoadingChart__bar"></span>
+          <span class="euiLoadingChart__bar"></span>
+          <span class="euiLoadingChart__bar"></span>
+        </span>
+        <div class="euiSpacer euiSpacer--m"></div>
+        <div class="percentage">{{loadingStatus}}</div>
+      </div>
+    </div>
+    <!-- End loading status section -->
+    <!-- Report status section -->
+    <div
+      ng-if="reportBusy && reportStatus && showModuleDashboard"
+      class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceAround euiFlexGroup--directionRow euiFlexGroup--responsive"
+    >
+      <div class="euiFlexItem euiFlexItem--flexGrowZero euiTextAlign euiTextAlign--center">
+        <div class="euiSpacer euiSpacer--m"></div>
+        <span class="euiLoadingChart euiLoadingChart--large">
+          <span class="euiLoadingChart__bar"></span>
+          <span class="euiLoadingChart__bar"></span>
+          <span class="euiLoadingChart__bar"></span>
+          <span class="euiLoadingChart__bar"></span>
+        </span>
+        <div class="euiSpacer euiSpacer--m"></div>
+        <div class="percentage">{{reportStatus}}</div>
+        <div class="euiSpacer euiSpacer--l"></div>
+      </div>
+    </div>
+    <!-- No results section -->
+    <div
+      layout="row"
+      class="wz-margin-top-10 wz-margin-right-8 wz-margin-left-8"
+      ng-if="tab !== 'welcome'"
+      ng-show="resultState === 'none' && tabView === 'panels' && showModuleDashboard"
+    >
+      <react-component
+        flex
+        name="EuiCallOut"
+        props="{color:'warning',iconType:'help', title:'There are no results for selected time range. Try another
+      one.'}"
+      ></react-component>
+    </div>
+
+    <!-- End report status section -->
+    <div ng-if="tab && tab!=='welcome'" ng-show="resultState !== 'none'">
+      <div ng-class="{'no-opacity': !moduleDiscoverReady}">
+        <react-component
+          ng-show="showModuleDashboard"
+          name="WzVisualize"
+          props="{selectedTab: tab, isAgent: true}"
+        ></react-component>
+      </div>
+    </div>
+  </div>
+  <!-- end agents module -->
+  <!-- agents syscollector -->
+  <div ng-if="tab === 'syscollector'" ng-show="!load" class="euiPageBody wz-module-body-main">
+    <react-component name="MainSyscollector" props="{agent: agent}"></react-component>
+  </div>
+  <!-- end agents syscollector-->
+  <!-- agents stats -->
+  <div ng-if="tab === 'stats'" class="euiPageBody wz-module-body-main">
+    <react-component name="MainAgentStats" props="{agent: agent}"></react-component>
+  </div>
+  <!-- end agents stats-->
+  <react-component
+    class="wz-module-body-main"
+    ng-if="tab === 'configuration' && agent"
+    name="WzManagementConfiguration"
+    props="{agent: agent, goGroups: goGroups, exportConfiguration: exportConfiguration}"
+  ></react-component>
+</div>

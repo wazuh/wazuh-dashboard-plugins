@@ -1,0 +1,54 @@
+div.euiPanel.euiComboBoxOptionsList.euiComboBoxOptionsList {
+    z-index: 10000;
+}
+
+.module-discover-table .euiTableRow.euiTableRow-isExpandedRow .euiTableRowCell {
+    background: white;
+}
+
+.module-discover-table .euiTable {
+    margin-top: 16px;
+}
+
+.module-discover-table > .euiTable .euiTableRow-isExpandedRow .euiTableCellContent{
+    background: white;
+    margin-top: -1px;
+    display: inline-block;
+    padding: 8px 0px 8px 32px;
+    width: 100%;
+    font-family: monospace;
+}
+
+.module-discover-table-description-list .euiDescriptionList__title, 
+.module-discover-table-description-list .euiDescriptionList__description{
+    margin-top: 7px!important;
+}
+
+.module-discover-table-description-list .euiDescriptionList__title{
+    margin-top: 8px!important;
+    font-weight: 500!important;
+    width: 22%!important;
+}
+
+.module-discover-table-description-list .euiDescriptionList__description{
+    width: 78%!important;
+}
+
+.hover-row{
+    background-color: #fbfcfd;
+}
+
+.module-discover-table .module-discover-table-details {
+    td {
+        vertical-align: text-bottom;
+
+        .wzDocViewer__value {
+            display: inline-block;
+            word-break: break-all;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            vertical-align: top;
+            padding-top: 2px;
+        }
+    }
+}

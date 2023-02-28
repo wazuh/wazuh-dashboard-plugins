@@ -1,0 +1,50 @@
+<div ng-cloak flex="auto" ng-controller="agentsPreviewController as ctrl" layout="column">
+  <div class="md-padding md-padding-top-16" ng-show="ctrl.init || ctrl.loading">
+    <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}"></react-component>
+  </div>
+  <div
+    ng-if="!ctrl.init && !ctrl.loading && ctrl.errorInit"
+    class="wz-margin-top-16"
+    layout="column"
+    layout-align="start space-around"
+  >
+    <div flex layout="row" layout-align="center center">
+      <div class="euiPanel euiFlexItem wz-margin-10" flex="50" class="wz-md-card" flex>
+        <md-card-content class="wz-text-center">
+          <span
+            class="embPanel__header embPanel__title embPanel__dragger layout-row wz-headline-title"
+          >
+            <react-component name="EuiIcon" props="{type: 'help'}"></react-component> Error fetching
+            agents
+          </span>
+          <md-divider class="wz-margin-top-10"></md-divider>
+          <div layout="row" class="wz-margin-top-10 layout-align-center-center">
+            <p class="wz-text-gray">{{ ctrl.errorInit || 'Internal error' }}</p>
+          </div>
+          <div layout="row" class="wz-margin-top-10 layout-align-center-center">
+            <button class="kuiButton kuiButton--secondary height-35" ng-click="ctrl.load()">
+              <react-component name="EuiIcon" props="{type: 'refresh'}"></react-component> Refresh
+            </button>
+          </div>
+        </md-card-content>
+      </div>
+    </div>
+  </div>
+
+  <div
+    ng-if="!ctrl.init && !ctrl.loading && !ctrl.errorInit"
+    layout="column"
+    layout-align="start space-around"
+  >
+    <div class="registerAgent" ng-if="ctrl.addingNewAgent">
+      <react-component name="RegisterAgent" props="ctrl.registerAgentsProps"></react-component>
+    </div>
+    <div ng-show="!ctrl.addingNewAgent">
+      <kbn-dis class="hide-filter-control" ng-show="false"></kbn-dis>
+      <react-component
+        name="AgentsPreview"
+        props="{tableProps : ctrl.tableAgentsProps, resultState: resultState}"
+      ></react-component>
+    </div>
+  </div>
+</div>

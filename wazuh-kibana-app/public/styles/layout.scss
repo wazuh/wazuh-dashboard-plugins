@@ -1,0 +1,520 @@
+/*
+ * Wazuh app - Layouts stylesheet
+ * Copyright (C) 2015-2022 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
+
+/* -------------------------------------------------------------------------- */
+/* ------------------------ Wazuh layouts stylesheet ------------------------ */
+/* -------------------------------------------------------------------------- */
+
+html{
+  font-size: 14.5px!important;
+  font-family: "Inter UI", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"!important;
+}
+
+.h-100{
+  height: 100%;
+}
+
+/* Margins */
+
+.wz-margin-right-8 {
+  margin-right: 8px;
+}
+
+.wz-margin-left-8 {
+  margin-left: 8px;
+}
+
+.wz-margin-8-no-left {
+  margin: 8px 8px 8px 0px;
+}
+
+.wz-margin-right-15 {
+  margin-right: 15px;
+}
+
+.wz-margin-right-16 {
+  margin-right: 16px;
+}
+
+.wz-margin-right-20 {
+  margin-right: 20px;
+}
+
+.wz-margin-right-24 {
+  margin-right: 24px;
+}
+
+.no-margin-right {
+  margin-right: 0px !important;
+}
+
+.wz-margin-top-0 {
+  margin-top: 4px;
+}
+
+.wz-margin-top-4 {
+  margin-top: 4px;
+}
+
+.wz-margin-top-8 {
+  margin-top: 8px;
+}
+
+.wz-margin-top-10 {
+  margin-top: 10px;
+}
+
+.wz-margin-top-16 {
+  margin-top: 16px;
+}
+
+.wz-margin-top-17 {
+  margin-top: 17px;
+}
+
+.margin-top-30 {
+  margin-top: 30px;
+}
+
+.wz-margin-top-40 {
+  margin-top: 40px;
+}
+
+.wz-margin-left-7 {
+  margin-left: 7px;
+}
+
+.wz-margin-left-16 {
+  margin-left: 16px;
+}
+
+.no-margin-left {
+  margin-left: 0px;
+}
+
+.wz-margin-bottom-10 {
+  margin-bottom: 10px;
+}
+
+.wz-margin-bottom-25 {
+  margin-bottom: 25px;
+}
+
+.wz-margin-bottom-40 {
+  margin-bottom: 40px;
+}
+
+.wz-margin-bottom-45 {
+  margin-bottom: 45px;
+}
+
+.wz-margin-bottom-40-inv {
+  margin-bottom: -40px !important;
+}
+
+.no-margin-bottom {
+  margin-bottom: 0px;
+}
+
+.wz-no-margin {
+  margin: 0 !important;
+}
+
+.wz-no-top-bottom-margin {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+/* Paddings */
+
+.wz-no-padding {
+  padding: 0 !important;
+}
+
+.wz-padding-top-0 {
+  padding-top: 0px !important;
+}
+
+.wz-padding-bottom-0 {
+  padding-bottom: 0px !important;
+}
+
+.wz-padding-bottom-5 {
+  padding-bottom: 5px !important;
+}
+
+.wz-padding-top-5 {
+  padding-top: 5px !important;
+}
+
+.wz-padding-top-10 {
+  padding-top: 10px;
+}
+
+.wz-padding-top-14 {
+  padding-top: 14px;
+}
+
+.padding-left-0 {
+  padding-left: 0px;
+}
+
+.wz-padding-left-8 {
+  padding-left: 8px;
+}
+
+.wz-padding-left-16 {
+  padding-left: 16px;
+}
+
+.padding-right-0 {
+  padding-right: 0px !important;
+}
+
+.wz-padding-right-8 {
+  padding-right: 8px;
+}
+
+.wz-padding-right-16 {
+  padding-right: 16px;
+}
+
+.wz-padding-right-17 {
+  padding-right: 17px;
+}
+
+.wz-padding-metric {
+  line-height: 16px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+
+.wz-padding-21 {
+  padding: 21px !important;
+}
+
+.wz-padding-16 {
+  padding: 16px !important;
+}
+
+.wz-lateral-padding-16 {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+/* Overflows */
+
+.overflow-hidden {
+  overflow: hidden;
+}
+
+.wz-overflow-y-auto {
+  overflow-y: auto;
+}
+
+.wz-overflow-x-hidden {
+  overflow-x: hidden;
+}
+
+/* Widths */
+
+.wz-width-100 {
+  width: 100%;
+}
+
+.wz-mitre-width { 
+  width: calc(100% - 35px);
+}
+
+.wz-width-auto {
+  width: auto;
+}
+
+/* Others */
+
+.wz-no-display {
+  display: none !important;
+}
+
+.wz-display-inline-grid {
+  display: inline-grid;
+  display: -moz-inline-grid;
+  display: -ms-inline-grid;
+}
+
+.wazuh-column {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 100%;
+  padding: 0px 8px 8px 8px;
+}
+
+.no-opacity {
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0px !important;
+  overflow: hidden;
+}
+
+.no-opacity-overview-monitoring {
+  opacity: 0 !important;
+  height: 0px !important;
+  width: 0px !important;
+  margin-right: -8px !important;
+}
+
+.wz-no-margin-padding {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.table-vertical-align-middle tr td {
+  vertical-align: middle !important;
+}
+
+.table-layout-fixed {
+  table-layout: fixed !important;
+}
+
+.inventory-metrics {
+  margin-top: 10px;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.wz-inline-block {
+  display: inline;
+}
+
+md-dialog-actions button {
+  color: white !important;
+  transition: none !important;
+  background-color: rgb(0, 85, 113) !important;
+}
+
+md-backdrop.md-opaque {
+  opacity: 1 !important;
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+md-backdrop.md-opaque.ng-leave {
+  opacity: 0 !important;
+  transition: none !important;
+  transform: none !important;
+}
+
+md-dialog.md-transition-in {
+  transition: 150ms ease-in !important;
+  transform: none !important;
+  animation: 350ms cubic-bezier(0.34, 1.61, 0.7, 1);
+}
+
+md-dialog.md-transition-out {
+  transition: none !important;
+  transform: none !important;
+}
+
+.md-dialog-container {
+  //padding-bottom: 10vh;
+  z-index: 100 !important;
+}
+
+md-dialog .md-dialog-content {
+  padding: 0px !important;
+}
+
+md-dialog {
+  animation: 350ms cubic-bezier(0.34, 1.61, 0.7, 1);
+  border: 1px solid #d9d9d9;
+  border-color: #c4cace;
+  border-top-color: #e2e5e7;
+  border-bottom-color: #a7b0b6;
+  min-width: 400px;
+  max-width: 768px;
+  padding: 15px;
+  box-shadow: 0 40px 64px 0 rgba(59, 79, 93, 0.1),
+    0 24px 32px 0 rgba(59, 79, 93, 0.1), 0 16px 16px 0 rgba(59, 79, 93, 0.1),
+    0 8px 8px 0 rgba(59, 79, 93, 0.1), 0 4px 4px 0 rgba(59, 79, 93, 0.1),
+    0 2px 2px 0 rgba(59, 79, 93, 0.1) !important;
+}
+
+.md-cancel-button {
+  background-color: #ffffff !important;
+  color: #005571 !important;
+}
+
+.md-title {
+  color: #1a1a1a;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 2.5rem;
+}
+
+md-dialog md-dialog-content .md-dialog-content-body {
+  padding-top: 15px;
+  margin-bottom: 45px;
+}
+
+md-dialog .md-dialog-content {
+  padding: 25px 5px 35px 5px;
+  overflow: hidden !important;
+  height: auto !important;
+}
+
+md-dialog .md-actions,
+md-dialog md-dialog-actions {
+  border: none !important;
+}
+
+md-dialog .md-button.md-primary:not(.md-cancel-button) {
+  color: #ffffff;
+  background-color: #006bb4 !important;
+  border-color: #006bb4 !important;
+  border-radius: 4px;
+}
+
+md-dialog .md-button.md-primary:not(.md-cancel-button):hover {
+  background-color: #005472 !important;
+  border-color: #004c68 !important;
+}
+
+md-dialog.modalTheme {
+  animation: none !important;
+  transition: none !important;
+  transform: none !important;
+  bottom: 0;
+  right: 0;
+  position: fixed;
+  width: 350px;
+}
+
+md-dialog.modalTheme .md-button {
+  margin-bottom: 0;
+}
+
+.md-dialog-body {
+  top: 0 !important;
+  width: 100vw !important;
+}
+
+.md-dialog-body {
+  top: 0 !important;
+  width: 100vw !important;
+}
+
+.md-dialog-body .md-scroll-mask {
+  display: none !important;
+}
+
+.md-dialog-body .md-dialog-container {
+  height: 0 !important;
+  width: 0 !important;
+}
+
+.chrHeaderWrapper--navIsLocked ~ .app-wrapper .fullscreen {
+  width: calc(100vw - 400px)!important;
+  left: 321px!important;
+}
+
+.fullscreen {
+  z-index: 3000;
+  height: calc(100vh - 119px);
+  width: calc(100vw - 80px);
+  position: fixed;
+  top: 72px;
+  left: 0px;
+  max-width: 100% !important;
+  margin: 35px;
+  outline: 35px solid rgba(0, 0, 0, 0.2);
+}
+
+.fullscreen kbn-vis {
+  padding: 5%;
+}
+
+.filter-bar .filter {
+  background-color: #0079a5 !important;
+}
+
+.columns-bar {
+  margin-top: -17px;
+  margin-left: -16px;
+  margin-right: -16px;
+  padding-right: 16px;
+  padding-left: 16px;
+  min-height: 42px;
+  padding-top: 8px;
+}
+
+.columns-bar-active {
+  padding-top: 10px !important;
+  margin-bottom: 10px;
+}
+
+.error-enum-configuration {
+  max-height: 16px !important;
+  min-height: 16px !important;
+}
+
+.table-vis {
+  overflow: hidden !important;
+}
+
+.kbnAggTable__paginated th {
+  min-width: 110px;
+}
+
+.wzKbnTopNav .kbnTopNav {
+  background-color: transparent !important;
+  border-bottom: 0 !important;
+}
+
+.wz-menu-discover-icon path {
+  fill: #fff !important;
+}
+
+:focus {
+  outline: none !important;
+  outline-color: transparent !important;
+}
+
+.globalQueryBar:not(:empty) {
+  padding: 8px!important;
+}
+
+.dscWrapper {
+  .table > thead > tr > th,
+  .table > tbody > tr > th,
+  .table > tfoot > tr > th,
+  .table > thead > tr > td,
+  .table > tbody > tr > td,
+  .table > tfoot > tr > td {
+    font-size: 12px !important;
+    font-kerning: normal !important;
+  }
+}
+
+.table > thead > tr > th,
+.table > tbody > tr > th,
+.table > tfoot > tr > th,
+.table > thead > tr > td,
+.table > tbody > tr > td,
+.table > tfoot > tr > td {
+  font-size: 13px !important;
+  font-kerning: normal !important;
+  padding: 8px!important;
+}
+
+.kbnTableCellFilter {
+  cursor: pointer;
+}

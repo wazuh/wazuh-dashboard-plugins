@@ -1,0 +1,249 @@
+{
+    "data": {
+        "affected_items": [
+            {
+                "wmodules": [
+                    {
+                        "agent-upgrade": {
+                            "enabled": "yes",
+                            "max_threads": 8,
+                            "chunk_size": 512
+                        }
+                    },
+                    {
+                        "task-manager": {
+                            "enabled": "yes"
+                        }
+                    },
+                    {
+                        "cis-cat": {
+                            "disabled": "yes",
+                            "scan-on-start": "yes",
+                            "interval": 86400,
+                            "java_path": "wodles/java",
+                            "ciscat_path": "wodles/ciscat",
+                            "timeout": 1800
+                        }
+                    },
+                    {
+                        "osquery": {
+                            "disabled": "yes",
+                            "run_daemon": "yes",
+                            "add_labels": "yes",
+                            "log_path": "/var/log/osquery/test.log",
+                            "config_path": "/etc/osquery/test.conf"
+                        }
+                    },
+                    {
+                        "syscollector": {
+                            "disabled": "no",
+                            "scan-on-start": "yes",
+                            "interval": 3600,
+                            "network": "yes",
+                            "os": "yes",
+                            "hardware": "yes",
+                            "packages": "yes",
+                            "ports": "yes",
+                            "ports_all": "no",
+                            "processes": "yes",
+                            "sync_max_eps": 10
+                        }
+                    },
+                    {
+                        "sca": {
+                            "interval": 43200,
+                            "enabled": "yes",
+                            "scan_on_start": "yes",
+                            "skip_nfs": "yes",
+                            "policies": [
+                                "/var/ossec/ruleset/sca/test.yml"
+                            ]
+                        }
+                    },
+                    {
+                        "vulnerability-detector": {
+                            "enabled": "yes",
+                            "run_on_start": "yes",
+                            "interval": 300,
+                            "min_full_scan_interval": 21600,
+                            "retry_interval": 30,
+                            "providers": [
+                                {
+                                    "name": "canonical",
+                                    "version": "TRUSTY",
+                                    "url": "https://test.com",
+                                    "update_interval": 3600,
+                                    "download_timeout": 300
+                                },
+                                {
+                                    "name": "canonical",
+                                    "version": "XENIAL",
+                                    "url": "https://test.com",
+                                    "update_interval": 3600,
+                                    "download_timeout": 300
+                                },
+                                {
+                                    "name": "canonical",
+                                    "version": "BIONIC",
+                                    "url": "https://test.com",
+                                    "update_interval": 3600,
+                                    "download_timeout": 300
+                                },
+                                {
+                                    "name": "canonical",
+                                    "version": "FOCAL",
+                                    "url": "https://test.com",
+                                    "update_interval": 3600,
+                                    "download_timeout": 300
+                                },
+                                {
+                                    "name": "debian",
+                                    "version": "STRETCH",
+                                    "url": "https://test.com",
+                                    "update_interval": 3600,
+                                    "download_timeout": 300
+                                },
+                                {
+                                    "name": "debian",
+                                    "version": "BUSTER",
+                                    "url": "https://test.com",
+                                    "update_interval": 3600,
+                                    "download_timeout": 300
+                                },
+                                {
+                                    "name": "redhat",
+                                    "version": "5",
+                                    "url": "https://test.com",
+                                    "update_interval": 3600,
+                                    "download_timeout": 300
+                                },
+                                {
+                                    "name": "redhat",
+                                    "version": "6",
+                                    "url": "https://test.com",
+                                    "update_interval": 3600,
+                                    "download_timeout": 300
+                                },
+                                {
+                                    "name": "redhat",
+                                    "version": "7",
+                                    "url": "https://test.com",
+                                    "update_interval": 3600,
+                                    "download_timeout": 300
+                                },
+                                {
+                                    "name": "redhat",
+                                    "version": "8",
+                                    "url": "https://test.com",
+                                    "update_interval": 3600,
+                                    "download_timeout": 300
+                                },
+                                {
+                                    "name": "jredhat",
+                                    "update_interval": 3600,
+                                    "download_timeout": 0
+                                },
+                                {
+                                    "name": "alas",
+                                    "version": "Amazon-Linux",
+                                    "url": "https://test.com",
+                                    "update_interval": 3600,
+                                    "download_timeout": 300
+                                },
+                                {
+                                    "name": "test",
+                                    "version": "test",
+                                    "url": "https://test.com",
+                                    "update_interval": 3600,
+                                    "download_timeout": 300
+                                },
+                                {
+                                    "name": "arch",
+                                    "update_interval": 3600,
+                                    "download_timeout": 300
+                                },
+                                {
+                                    "name": "nvd",
+                                    "update_from_year": 2010,
+                                    "update_interval": 3600,
+                                    "download_timeout": 300
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "aws-s3": {
+                            "interval": 1800,
+                            "disabled": "no",
+                            "run_on_start": "yes",
+                            "skip_on_error": "no",
+                            "buckets": [
+                                {
+                                    "name": "test",
+                                    "aws_profile": "prod",
+                                    "only_logs_after": "2020-MAY-01",
+                                    "type": "cloudtrail",
+                                    "remove_from_bucket": "no"
+                                },
+                                {
+                                    "name": "test2",
+                                    "aws_profile": "prod",
+                                    "path": "guardduty",
+                                    "only_logs_after": "2020-MAY-01",
+                                    "type": "guardduty",
+                                    "remove_from_bucket": "no"
+                                },
+                                {
+                                    "name": "test3",
+                                    "aws_profile": "prod",
+                                    "path": "macie",
+                                    "only_logs_after": "2020-MAY-01",
+                                    "type": "custom",
+                                    "remove_from_bucket": "no"
+                                },
+                                {
+                                    "name": "test4",
+                                    "aws_profile": "prod",
+                                    "path": "vpc",
+                                    "only_logs_after": "2020-MAY-01",
+                                    "type": "vpcflow",
+                                    "remove_from_bucket": "no"
+                                }
+                            ],
+                            "services": [
+                                {
+                                    "type": "inspector",
+                                    "aws_profile": "prod",
+                                    "remove_log_streams": "no"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "database": {
+                            "sync_agents": "yes",
+                            "real_time": "yes",
+                            "interval": 60,
+                            "max_queued_events": 0
+                        }
+                    },
+                    {
+                        "wazuh_download": {
+                            "enabled": "yes"
+                        }
+                    },
+                    {
+                        "wazuh_control": {
+                            "enabled": "yes"
+                        }
+                    }
+                ]
+            }
+        ],
+        "total_affected_items": 1,
+        "total_failed_items": 0,
+        "failed_items": []
+    },
+    "message": "Active configuration was successfully read in specified node",
+    "error": 0
+}

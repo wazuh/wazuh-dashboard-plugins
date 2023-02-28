@@ -1,0 +1,145 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Health Check container should render a Health check screen 1`] = `
+<div
+  className="health-check"
+>
+  <img
+    alt=""
+    className="health-check-logo"
+    src="/plugins/wazuh/assets/images/themes/light/logo.svg"
+  />
+  <div
+    className="margin-top-30"
+  >
+    <EuiDescriptionList
+      align="center"
+      textStyle="reverse"
+      type="column"
+    >
+      <CheckResult
+        awaitFor={Array []}
+        canRetry={true}
+        checksReady={Object {}}
+        cleanErrors={[Function]}
+        handleCheckReady={[Function]}
+        handleErrors={[Function]}
+        isLoading={false}
+        key="health_check_check_api"
+        name="api"
+        shouldCheck={true}
+        showLogButton={false}
+        title="Check Wazuh API connection"
+        validationService={[Function]}
+      />
+      <CheckResult
+        awaitFor={
+          Array [
+            "api",
+          ]
+        }
+        checksReady={Object {}}
+        cleanErrors={[Function]}
+        handleCheckReady={[Function]}
+        handleErrors={[Function]}
+        isLoading={false}
+        key="health_check_check_setup"
+        name="setup"
+        shouldCheck={true}
+        showLogButton={false}
+        title="Check Wazuh API version"
+        validationService={[Function]}
+      />
+      <CheckResult
+        awaitFor={Array []}
+        canRetry={true}
+        checksReady={Object {}}
+        cleanErrors={[Function]}
+        handleCheckReady={[Function]}
+        handleErrors={[Function]}
+        isLoading={false}
+        key="health_check_check_pattern"
+        name="pattern"
+        shouldCheck={true}
+        showLogButton={false}
+        title="Check alerts index pattern"
+        validationService={[Function]}
+      />
+      <CheckResult
+        awaitFor={Array []}
+        canRetry={true}
+        checksReady={Object {}}
+        cleanErrors={[Function]}
+        handleCheckReady={[Function]}
+        handleErrors={[Function]}
+        isLoading={false}
+        key="health_check_check_patternMonitoring"
+        name="patternMonitoring"
+        shouldCheck={true}
+        showLogButton={false}
+        title="Check monitoring index pattern"
+        validationService={[Function]}
+      />
+      <CheckResult
+        awaitFor={Array []}
+        canRetry={true}
+        checksReady={Object {}}
+        cleanErrors={[Function]}
+        handleCheckReady={[Function]}
+        handleErrors={[Function]}
+        isLoading={false}
+        key="health_check_check_patternStatistics"
+        name="patternStatistics"
+        shouldCheck={true}
+        showLogButton={false}
+        title="Check statistics index pattern"
+        validationService={[Function]}
+      />
+      <CheckResult
+        awaitFor={Array []}
+        canRetry={true}
+        checksReady={Object {}}
+        cleanErrors={[Function]}
+        handleCheckReady={[Function]}
+        handleErrors={[Function]}
+        isLoading={false}
+        key="health_check_check_maxBuckets"
+        name="maxBuckets"
+        shouldCheck={true}
+        showLogButton={false}
+        title="Check timeline:max_buckets setting"
+      />
+      <CheckResult
+        awaitFor={Array []}
+        canRetry={true}
+        checksReady={Object {}}
+        cleanErrors={[Function]}
+        handleCheckReady={[Function]}
+        handleErrors={[Function]}
+        isLoading={false}
+        key="health_check_check_metaFields"
+        name="metaFields"
+        shouldCheck={true}
+        showLogButton={false}
+        title="Check metaFields setting"
+      />
+      <CheckResult
+        awaitFor={Array []}
+        canRetry={true}
+        checksReady={Object {}}
+        cleanErrors={[Function]}
+        handleCheckReady={[Function]}
+        handleErrors={[Function]}
+        isLoading={false}
+        key="health_check_check_timeFilter"
+        name="timeFilter"
+        showLogButton={false}
+        title="Check timepicker:timeDefaults setting"
+      />
+    </EuiDescriptionList>
+  </div>
+  <EuiSpacer
+    size="xl"
+  />
+</div>
+`;

@@ -1,0 +1,48 @@
+.VisualizeTopMenu .euiKeyPadMenuItem {
+  width: auto;
+  height: 65px;
+}
+
+.VisualizeTopMenu > .euiKeyPadMenuItem {
+  width: 75px !important;
+  height: 30px !important;
+  margin-left: 8px;
+}
+
+.VisualizeTopMenu {
+  width: auto !important;
+}
+
+.TopMenuAgent {
+  display: flex;
+  background: #f4f5f8;
+  border-radius: 5px;
+  padding: 5px;
+}
+
+.TopMenuAgent .euiKeyPadMenuItem:first-child {
+  margin-right: 8px;
+}
+
+.TopMenuAgent .euiKeyPadMenuItem:nth-child(1) .euiBetaBadge {
+  background: #006bb4;
+  color: white;
+}
+.TopMenuAgent .euiKeyPadMenuItem:nth-child(2) .euiBetaBadge {
+  background: #bd271e;
+  color: white;
+}
+
+.wz-explore-agent .euiButtonEmpty:focus {
+  background-color: transparent;
+}
+
+.wz-unpin-agent {
+  background-color: rgba(0, 107, 180, 0.1);
+  border-radius: 0;
+  height: 40px;
+}
+
+.wz-unpin-agent:hover {
+  transform: translateY(0px) !important;
+}

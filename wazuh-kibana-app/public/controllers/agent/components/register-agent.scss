@@ -1,0 +1,14 @@
+.registerAgent{
+  min-height: calc(100vh - 100px);
+  background: #fafbfd;
+  .euiButtonGroup__buttons {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-gap: 10px;
+    padding: 0 3px;
+    box-shadow: none;
+  }
+  .euiButtonGroup--medium .euiButtonGroupButton:not(:first-child), .euiButtonGroup--small .euiButtonGroupButton:not(:first-child) {
+      margin-left: 0 !important;
+  }
+}

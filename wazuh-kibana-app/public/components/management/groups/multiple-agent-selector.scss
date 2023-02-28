@@ -1,0 +1,82 @@
+/*
+ * Wazuh app - Wazuh Multiple selector stylesheet
+ * Copyright (C) 2015-2022 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
+
+/* -------------------------------------------------------------------------- */
+/* ------------------------ Wazuh Multiple selector ------------------------- */
+/* -------------------------------------------------------------------------- */
+
+
+.wzMultipleSelector{
+    width: 100%;
+}
+
+.wzMultipleSelector .panel-primary{
+    border: 1px solid #d9d9d9;
+    box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1) !important;
+    border-radius: 2px;
+}
+
+.wzMultipleSelector .panel-primary > .panel-heading{
+    background: none;
+    color: #000;
+    margin: 5px 15px;
+    border-color: #e0e0e0;
+}
+
+.wzMultipleSelectorButtons{
+    width: 100px;
+    float: left;
+    text-align: center;
+    height: 400px;
+    display: grid;
+}
+
+.wzMultipleSelectorButtons button{
+    margin: 5px;
+    height: 75px;
+}
+
+.wzMultipleSelectorLeft, .wzMultipleSelectorRight{
+    width: calc(#{"50% - 65px"});
+    float: left;
+}
+
+.wzMultipleSelectorRight{
+    margin: 0 0 0 15px;
+}
+
+.wzMultipleSelectorSelect{
+    width: 100%;
+    background-color: #fbfcfd;
+    border: 1px solid #D3DAE6;
+}
+  
+.wzMultipleSelectorLeft{
+    margin: 0 15px 0 0;
+}
+
+.wzMultipleSelector .panel-body{
+    display: grid;
+}
+
+.wzMultipleSelector select{
+    border-color: #e0e0e0;
+    margin-top: 15px;
+}
+
+.wzMultipleSelectorAdding{
+    background-color: #c6ffc6;
+}
+
+.wzMultipleSelectorRemoving{
+    background-color: #ffe7e7;
+}

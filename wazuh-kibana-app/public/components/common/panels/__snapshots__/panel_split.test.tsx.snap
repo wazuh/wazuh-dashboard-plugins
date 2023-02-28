@@ -1,0 +1,36 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PanelSplit container should render the component 1`] = `
+<EuiPanel
+  paddingSize="none"
+>
+  <EuiFlexGroup
+    style={
+      Object {
+        "margin": 0,
+      }
+    }
+  >
+    <EuiFlexItem
+      grow={false}
+      style={
+        Object {
+          "backgroundColor": "#80808014",
+          "margin": 0,
+        }
+      }
+    >
+      <div>
+        Side panel
+      </div>
+    </EuiFlexItem>
+    <EuiFlexItem
+      style={Object {}}
+    >
+      <div>
+        Content panel
+      </div>
+    </EuiFlexItem>
+  </EuiFlexGroup>
+</EuiPanel>
+`;
