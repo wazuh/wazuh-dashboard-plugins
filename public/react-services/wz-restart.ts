@@ -1,7 +1,11 @@
 import { delayAsPromise } from '../../common/utils';
 import { WzRequest } from './wz-request';
 import { getHttp } from '../kibana-services';
-import { ENUM_RESTART_STATES } from './interfaces/wz-restart.interface';
+import {
+  ENUM_RESTART_STATES,
+  NodeType,
+  UpdateReduxType,
+} from './interfaces/wz-restart.interface';
 
 /**
  * Wazuh restart wizard.
@@ -22,11 +26,12 @@ export class RestartHandler {
    * Get if it is a cluster or not
    * @returns boolean
    */
-  static async clusterReq() {  // TODO rename to isCluster
+  static async clusterReq() {
     try {
       const response = await WzRequest.apiReq('GET', '/cluster/status', {});
       const isCluster =
-        response.data.data.enabled === 'yes' && response.data.data.running === 'yes';
+        response.data.data.enabled === 'yes' &&
+        response.data.data.running === 'yes';
       return isCluster;
     } catch (error) {
       return Promise.reject(error);
@@ -36,23 +41,30 @@ export class RestartHandler {
   /**
    * Check daemons status
    * @param {Object} updateRedux - Redux update function
-   * @param {Object} params - with array of nodes and isCluster
+   * @param {Object} params - with array nodesRestarted (array of strings) and isCluster (boolean)
    * @returns {boolean} restarted or not
    */
-  static async checkDaemons(updateRedux, params) {
+  static async checkDaemons(
+    updateRedux: UpdateReduxType,
+    params: { nodesRestarted: string[]; isCluster: boolean },
+  ) {
     try {
       const response = await WzRequest.apiReq(
         'GET',
-        `/cluster/nodes`,
+        '/cluster/nodes',
         {},
-        { checkCurrentApiIsUp: false }
+        { checkCurrentApiIsUp: false },
       );
-      const nodesWorking = response?.data?.data?.affected_items;
+      const nodesWorking: NodeType[] = response?.data?.data?.affected_items;
 
-      const [nodeMaster] = nodesWorking.filter((node) => node.type === 'master');
+      const [nodeMaster] = nodesWorking.filter(
+        (node: NodeType) => node.type === 'master',
+      );
 
-      const isNodesRestarted = params.nodesRestarted.map((node) => {
-        const [activeNode] = nodesWorking.filter((activeNodes) => activeNodes.name === node);
+      const isNodesRestarted = params.nodesRestarted.map(node => {
+        const [activeNode] = nodesWorking.filter(
+          activeNodes => activeNodes.name === node,
+        );
 
         if (!activeNode) {
           return {
@@ -62,7 +74,8 @@ export class RestartHandler {
         }
 
         const timestampNode =
-          new Date(activeNode.connection_date) >= new Date(nodeMaster.connection_date);
+          new Date(activeNode.connection_date) >=
+          new Date(nodeMaster.connection_date);
 
         return {
           name: node,
@@ -71,7 +84,9 @@ export class RestartHandler {
       });
       updateRedux.updateRestartNodesInfo(isNodesRestarted);
 
-      const isAllNodesRestarted = isNodesRestarted.every((node) => node.isRestarted);
+      const isAllNodesRestarted = isNodesRestarted.every(
+        node => node.isRestarted,
+      );
 
       if (isAllNodesRestarted) {
         return isAllNodesRestarted;
@@ -79,7 +94,7 @@ export class RestartHandler {
         return false;
       }
     } catch (error) {
-      const IsNodesRestartedError = params.nodesRestarted.map((node) => ({
+      const IsNodesRestartedError = params.nodesRestarted.map(node => ({
         name: node,
         isRestarted: false,
       }));
@@ -93,10 +108,14 @@ export class RestartHandler {
    * @param {Object} updateRedux - Redux update function
    * @returns {boolean} synced or not
    */
-  static async checkSync(updateRedux) {
+  static async checkSync(updateRedux: UpdateReduxType) {
     try {
       const { updateUnsynchronizedNodes, updateSyncNodesInfo } = updateRedux;
-      const response = await WzRequest.apiReq('GET', '/cluster/ruleset/synchronization', {});
+      const response = await WzRequest.apiReq(
+        'GET',
+        '/cluster/ruleset/synchronization',
+        {},
+      );
 
       if (response.data.error !== 0) {
         throw response.data.message;
@@ -106,10 +125,12 @@ export class RestartHandler {
 
       updateSyncNodesInfo(nodes);
 
-      const isSynced = nodes.every((node) => node.synced);
+      const isSynced = nodes.every(node => node.synced);
 
       if (!isSynced) {
-        const unsyncedNodes = nodes.flatMap((node) => (node.synced ? [] : node.name));
+        const unsyncedNodes = nodes.flatMap(node =>
+          node.synced ? [] : node.name,
+        );
         updateUnsynchronizedNodes(unsyncedNodes);
       }
 
@@ -129,11 +150,18 @@ export class RestartHandler {
   /**
    * Make ping to Wazuh API
    * @param updateRedux - Redux update function
-   * @param breakCondition - Break condition: sync or restart
-   * @param {Object} params - with array of nodes and isCluster
+   * @param breakCondition - Break condition: sync (checkSync) or restart (checkDaemons)
+   * @param {Object} params - with array nodesRestarted (array of strings) and isCluster (boolean)
    * @return {Promise}
    */
-  static async makePing(updateRedux, breakCondition, params?) {
+  static async makePing(
+    updateRedux: UpdateReduxType,
+    breakCondition: (
+      updateRedux: UpdateReduxType,
+      params: { nodesRestarted: string[]; isCluster: boolean },
+    ) => Promise<boolean>,
+    params?: { nodesRestarted: string[]; isCluster: boolean },
+  ) {
     try {
       let isValid = false;
 
@@ -149,11 +177,14 @@ export class RestartHandler {
       ) {
         try {
           isValid = await breakCondition(updateRedux, params);
-          if (!isValid) await delayAsPromise(this.POLLING_DELAY);
+          if (!isValid) {
+            return await delayAsPromise(this.POLLING_DELAY);
+          }
         } catch (error) {
           await delayAsPromise(this.POLLING_DELAY);
           // console.error(error);
-          // The message in the console is disabled because the user will see the error message on the healthcheck page.
+          // The message in the console is disabled
+          // because the user will see the error message on the healthcheck page.
         }
       }
 
@@ -161,7 +192,9 @@ export class RestartHandler {
         return isValid;
       }
       return Promise.resolve(
-        `Wazuh is ${breakCondition === this.checkDaemons ? 'restarted' : 'synced'}`
+        `Wazuh is ${
+          breakCondition === this.checkDaemons ? 'restarted' : 'synced'
+        }`,
       );
     } catch (error) {
       return false;
@@ -172,7 +205,9 @@ export class RestartHandler {
    * Healthcheck redirect
    */
   static goToHealthcheck() {
-    window.location.href = getHttp().basePath.prepend('/app/wazuh#/health-check');
+    window.location.href = getHttp().basePath.prepend(
+      '/app/wazuh#/health-check',
+    );
   }
 
   /**
@@ -180,27 +215,32 @@ export class RestartHandler {
    * @param isCluster - Is cluster or not
    * @returns {object|Array}
    */
-  static async restart(isCluster) {
-    try {
-      const clusterOrManager = isCluster ? 'cluster' : 'manager';
+  static async restart(isCluster: boolean) {
+    // try {
+    const clusterOrManager = isCluster ? 'cluster' : 'manager';
 
-      const validationError = await WzRequest.apiReq(
-        'GET',
-        `/${clusterOrManager}/configuration/validation`,
-        {}
-      );
+    const validationError = await WzRequest.apiReq(
+      'GET',
+      `/${clusterOrManager}/configuration/validation`,
+      {},
+    );
 
-      const error = validationError.data.error !== 0;
-      if (error) {
-        return [];
-      }
+    // If the configuration of all the nodes is incorrect, restart does not begin
 
-      const nodesRestarted = await WzRequest.apiReq('PUT', `/${clusterOrManager}/restart`, {});
-
-      return nodesRestarted.data.data.affected_items;
-    } catch (error) {
-      throw error;
+    const error = validationError.data.error !== 0;
+    if (error) {
+      return [];
     }
+
+    const nodesRestarted = await WzRequest.apiReq(
+      'PUT',
+      `/${clusterOrManager}/restart`,
+      {},
+    );
+
+    // If the restart is successful, the API returns the list of nodes that have been restarted
+
+    return nodesRestarted.data.data.affected_items;
   }
 
   /**
@@ -208,26 +248,32 @@ export class RestartHandler {
    * @param node - Node name
    * @returns {object|Array}
    */
-  static async restartNode(node) {
-    try {
-      const nodeParam = node && typeof node === 'string' ? `?nodes_list=${node}` : '';
+  static async restartNode(node: string) {
+    const nodeParam =
+      node && typeof node === 'string' ? `?nodes_list=${node}` : '';
 
-      const validationError = await WzRequest.apiReq(
-        'GET',
-        `/cluster/configuration/validation`,
-        {}
-      );
+    const validationError = await WzRequest.apiReq(
+      'GET',
+      '/cluster/configuration/validation',
+      {},
+    );
 
-      const error = validationError.data.error !== 0;
-      if (error) {
-        return [];
-      }
+    // If the configuration of all the nodes is incorrect, restart does not begin
 
-      const result = await WzRequest.apiReq('PUT', `/cluster/restart${nodeParam}`, {});
-      return result.data.data.affected_items;
-    } catch (error) {
-      throw error;
+    const error = validationError.data.error !== 0;
+    if (error) {
+      return [];
     }
+
+    const result = await WzRequest.apiReq(
+      'PUT',
+      `/cluster/restart${nodeParam}`,
+      {},
+    );
+
+    // If the restart is successful, the API returns the list of nodes that have been restarted
+
+    return result.data.data.affected_items;
   }
 
   /**
@@ -236,7 +282,11 @@ export class RestartHandler {
    * @param updateRedux Redux update function
    * @return {object}
    */
-  static async restartSelectedNode(selectedNode, updateRedux, isSyncCanceled = { isSyncCanceled: false }) {
+  static async restartSelectedNode(
+    selectedNode: string,
+    updateRedux: UpdateReduxType,
+    isSyncCanceled = { isSyncCanceled: false },
+  ) {
     try {
       this.cancel = isSyncCanceled;
       // Dispatch a Redux action
@@ -251,14 +301,18 @@ export class RestartHandler {
         nodesRestarted,
       };
 
-      const nodesRestartInfo = nodesRestarted.map((node) => ({
+      const nodesRestartInfo = nodesRestarted.map(node => ({
         name: node,
         isRestarted: false,
       }));
 
       updateRedux.updateRestartNodesInfo(nodesRestartInfo);
 
-      const isRestarted = await this.makePing(updateRedux, this.checkDaemons, params);
+      const isRestarted = await this.makePing(
+        updateRedux,
+        this.checkDaemons,
+        params,
+      );
       if (!isRestarted) {
         updateRedux.updateRestartStatus(ENUM_RESTART_STATES.RESTART_ERROR);
         throw new Error('Not restarted');
@@ -278,12 +332,16 @@ export class RestartHandler {
    * @param isSyncCanceled cancellation of synchronization
    */
   static async restartWazuh(
-    updateRedux,
+    updateRedux: UpdateReduxType,
     useDelay = false,
-    isSyncCanceled = { isSyncCanceled: false }
+    isSyncCanceled = { isSyncCanceled: false },
   ) {
     try {
       this.cancel = isSyncCanceled;
+
+      // If you need to synchronize the files on the nodes,
+      // you will check if they are already synchronized.
+
       if (useDelay) {
         updateRedux.updateRestartStatus(ENUM_RESTART_STATES.SYNCING);
 
@@ -292,18 +350,26 @@ export class RestartHandler {
         if (isSyncCanceled?.isSyncCanceled) {
           return;
         }
-        // if the synchronization was not completed within the polling time, it will show the sync error modal.
+
+        // if the synchronization was not completed within the polling time,
+        // it will show the sync error modal.
+
         if (!isSync) {
           updateRedux.updateRestartStatus(ENUM_RESTART_STATES.SYNC_ERROR);
           throw new Error('Not synced');
         }
       }
 
+      // The restart begins
+
       updateRedux.updateRestartStatus(ENUM_RESTART_STATES.RESTARTING);
 
       const isCluster = await this.clusterReq();
-      // Dispatch a Redux action
       const nodesRestarted = await this.restart(isCluster);
+
+      // If the configuration of all nodes is incorrect,
+      // an empty array is returned,
+      // no restart is initiated.
 
       if (nodesRestarted.length === 0) {
         return;
@@ -314,7 +380,11 @@ export class RestartHandler {
         nodesRestarted,
       };
 
-      const isRestarted = await this.makePing(updateRedux, this.checkDaemons, params);
+      const isRestarted = await this.makePing(
+        updateRedux,
+        this.checkDaemons,
+        params,
+      );
 
       if (!isRestarted) {
         updateRedux.updateRestartStatus(ENUM_RESTART_STATES.RESTART_ERROR);
@@ -323,8 +393,7 @@ export class RestartHandler {
 
       updateRedux.updateRestartStatus(ENUM_RESTART_STATES.RESTARTED_INFO);
 
-      return ENUM_RESTART_STATES.RESTARTED
-
+      return ENUM_RESTART_STATES.RESTARTED;
     } catch (error: any) {
       let errorType;
       if (error.message === 'Not synced') {
@@ -344,7 +413,7 @@ export class RestartHandler {
     }
   }
 
-  static clearState(updateRedux, errorType) {
+  static clearState(updateRedux: UpdateReduxType, errorType: string) {
     updateRedux.updateRestartStatus(errorType);
   }
 }

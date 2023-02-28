@@ -18,3 +18,28 @@ export enum ENUM_RESTART_STATES {
   RESTARTED = 'restarted',
   RESTARTED_INFO = 'restarted_info',
 }
+
+export type NodeType = {
+  name: string;
+  type: string;
+  version: string;
+  ip: string;
+  connection_date: string;
+};
+
+export type UpdateReduxType = {
+  updateUnsynchronizedNodes: (unsynchronizedNodes: string[]) => void;
+  updateRestartStatus: (restartStatus: string) => void;
+  updateSyncNodesInfo: (
+    syncNodesInfo: {
+      name: string;
+      synced: boolean;
+    }[],
+  ) => void;
+  updateRestartNodesInfo: (
+    restartNodesInfo: {
+      name: string;
+      isRestarted: boolean;
+    }[],
+  ) => void;
+};
