@@ -94,6 +94,25 @@ describe('Error Handler', () => {
   });
 
   describe('handleError', () => {
+
+    it('should send the error to the ERROR ORCHESTRATOR service with custom log options when is defined', () => {
+      const mockedError = new Error('Mocked error');
+      ErrorHandler.handleError(mockedError, { title: 'Custom title', message: 'Custom message' });
+      const spyErrorOrch = jest.spyOn(
+        ErrorOrchestratorService,
+        'handleError',
+      );
+
+      let logOptionsExpected = {
+        error: {
+          message: 'Custom message',
+          title: 'Custom title',
+          error: mockedError,
+        }
+      };
+      expect(spyErrorOrch).toHaveBeenCalledWith(expect.objectContaining(logOptionsExpected));
+    })
+
     it.each([
       {
         name: 'IndexerApiError',

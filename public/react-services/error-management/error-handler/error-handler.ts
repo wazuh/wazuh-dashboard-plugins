@@ -11,17 +11,25 @@ import WazuhError from '../error-factory/errors/WazuhError';
 import { UIErrorLog } from '../../error-orchestrator/types';
 import { ErrorOrchestratorService } from '../../error-orchestrator/error-orchestrator.service';
 
+interface ILogCustomOptions {
+  title: string;
+  message?: string;
+}
 export class ErrorHandler {
+ 
   /**
    * Receives an error and create return a new error instance then treat the error
-   * @param error
+   * 
+   * @param error error instance
+   * @param customLogOptions custom log options to show when the error is presented to the UI (toast|logs|blank-screen)
+   * @returns 
    */
-  static handleError(error: Error): Error | IWazuhError {
+  static handleError(error: Error, customLogOptions?: ILogCustomOptions): Error | IWazuhError {
     if (!error) {
       throw Error('Error must be defined');
     }
     const errorCreated = this.createError(error);
-    this.logError(errorCreated);
+    this.logError(errorCreated, customLogOptions);
     return errorCreated;
   }
 
@@ -121,13 +129,13 @@ export class ErrorHandler {
    * This method log the error depending on the error type and the log options defined in the error class
    * @param error
    */
-  private static logError(error: Error | IWazuhError) {
+  private static logError(error: Error | IWazuhError, customLogOptions?: ILogCustomOptions) {
     // this is a generic error treatment
     // this condition is for the native error classes
     let defaultErrorLog: UIErrorLog = {
       error: {
-        message: error.message,
-        title: error.message,
+        title: customLogOptions?.title || error.message,
+        message: customLogOptions?.message ||error.message,
         error: error,
       },
       level: 'ERROR',
