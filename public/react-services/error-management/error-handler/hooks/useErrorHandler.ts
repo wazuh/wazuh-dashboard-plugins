@@ -11,7 +11,7 @@ export const useErrorHandler = (callback: Function) => {
   const [res, setRes] = useState(null);
   const [error, setError] = useState<Error|WazuhError|null>(null);
   useEffect(() => {
-    (async () => {
+    const handleCallback =  async () => {
       try {
         let res = await callback();
         setRes(res);
@@ -23,7 +23,9 @@ export const useErrorHandler = (callback: Function) => {
         setRes(null);
         setError(error as Error | WazuhError);
       }
-    })()
+    }
+
+    handleCallback();
   }, [])
   
   return [res, error];
