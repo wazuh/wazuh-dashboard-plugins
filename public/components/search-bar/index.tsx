@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {
   EuiButtonEmpty,
+  EuiFormRow,
   EuiLink,
   EuiPopover,
   EuiSpacer,
@@ -156,26 +157,28 @@ export const SearchBar = ({
           {modes?.length && modes.length > 1 && (
             <>
               <EuiSpacer />
-              <EuiSelect
-                id='query-language-selector'
-                options={modes.map(({ id }) => ({
-                  value: id,
-                  text: searchBarQueryLanguages[id].label,
-                }))}
-                value={queryLanguage.id}
-                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                  const queryLanguageID: string = event.target.value;
-                  setQueryLanguage({
-                    id: queryLanguageID,
-                    configuration:
-                      searchBarQueryLanguages[
-                        queryLanguageID
-                      ]?.getConfiguration?.() || {},
-                  });
-                  setInput('');
-                }}
-                aria-label='query-language-selector'
-              />
+              <EuiFormRow label='Select a query language' fullWidth>
+                <EuiSelect
+                  id='query-language-selector'
+                  options={modes.map(({ id }) => ({
+                    value: id,
+                    text: searchBarQueryLanguages[id].label,
+                  }))}
+                  value={queryLanguage.id}
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                    const queryLanguageID: string = event.target.value;
+                    setQueryLanguage({
+                      id: queryLanguageID,
+                      configuration:
+                        searchBarQueryLanguages[
+                          queryLanguageID
+                        ]?.getConfiguration?.() || {},
+                    });
+                    setInput('');
+                  }}
+                  aria-label='query-language-selector'
+                />
+              </EuiFormRow>
             </>
           )}
         </EuiPopover>

@@ -625,59 +625,126 @@ export const AgentsTable = withErrorBoundary(
                   id: 'aql',
                   implicitQuery: 'id!=000;',
                   suggestions: {
-                    field() {
+                    field(currentValue) {
                       return [
-                        { label: 'status', description: 'Status' },
+                        { label: 'configSum', description: 'Config sum' },
+                        { label: 'dateAdd', description: 'Date add' },
+                        { label: 'id', description: 'ID' },
                         { label: 'ip', description: 'IP address' },
-                      ].map(field => ({ type: 'field', ...field }));
+                        { label: 'group', description: 'Group' },
+                        { label: 'group_config_status', description: 'Synced configuration status' },
+                        { label: 'lastKeepAline', description: 'Date add' },
+                        { label: 'manager', description: 'Manager' },
+                        { label: 'mergedSum', description: 'Merged sum' },
+                        { label: 'name', description: 'Agent name' },
+                        { label: 'node_name', description: 'Node name' },
+                        { label: 'os.platform', description: 'Operating system platform' },
+                        { label: 'status', description: 'Status' },
+                        { label: 'version', description: 'Version' },
+                      ]
+                      .map(field => ({ type: 'field', ...field }));
                     },
                     value: async (currentValue, { previousField }) => {
                       switch (previousField) {
-                        case 'status':
-                          try {
-                            const results = await this.props.wzReq(
-                              'GET',
-                              `/agents/stats/distinct`,
-                              {
-                                params: {
-                                  fields: 'status',
-                                  limit: 30,
-                                },
-                              },
-                            );
-
-                            return results.data.data.affected_items.map(
-                              ({ status }) => ({
-                                type: 'value',
-                                label: status,
-                              }),
-                            );
-                          } catch (error) {
-                            console.log({ error });
-                            return [];
-                          }
+                        case 'configSum':
+                          return await getAgentFilterValuesMapToSearchBarSuggestion(
+                            previousField,
+                            currentValue,
+                            {q: 'id!=000'}
+                          );
+                          break;
+                        case 'dateAdd':
+                          return await getAgentFilterValuesMapToSearchBarSuggestion(
+                            previousField,
+                            currentValue,
+                            {q: 'id!=000'}
+                          );
+                          break;
+                        case 'id':
+                          return await getAgentFilterValuesMapToSearchBarSuggestion(
+                            previousField,
+                            currentValue,
+                            {q: 'id!=000'}
+                          );
                           break;
                         case 'ip':
-                          try {
-                            const results = await this.props.wzReq(
-                              'GET',
-                              `/agents/stats/distinct`,
-                              {
-                                params: {
-                                  fields: 'ip',
-                                  limit: 30,
-                                },
-                              },
-                            );
-
-                            console.log({ results });
-                            return results.data.data.affected_items.map(
-                              ({ ip }) => ({ type: 'value', label: ip }),
-                            );
-                          } catch (error) {
-                            console.log({ error });
-                            return [];
-                          }
+                          return await getAgentFilterValuesMapToSearchBarSuggestion(
+                            previousField,
+                            currentValue,
+                            {q: 'id!=000'}
+                          );
+                          break;
+                        case 'group':
+                          return await getAgentFilterValuesMapToSearchBarSuggestion(
+                            previousField,
+                            currentValue,
+                            {q: 'id!=000'}
+                          );
+                          break;
+                        case 'group_config_status':
+                          return [AGENT_SYNCED_STATUS.SYNCED, AGENT_SYNCED_STATUS.NOT_SYNCED].map(
+                            (status) => ({
+                              type: 'value',
+                              label: status,
+                            }),
+                          );
+                          break;
+                        case 'lastKeepAline':
+                          return await getAgentFilterValuesMapToSearchBarSuggestion(
+                            previousField,
+                            currentValue,
+                            {q: 'id!=000'}
+                          );
+                          break;
+                        case 'manager':
+                          return await getAgentFilterValuesMapToSearchBarSuggestion(
+                            previousField,
+                            currentValue,
+                            {q: 'id!=000'}
+                          );
+                          break;
+                        case 'mergedSum':
+                          return await getAgentFilterValuesMapToSearchBarSuggestion(
+                            previousField,
+                            currentValue,
+                            {q: 'id!=000'}
+                          );
+                          break;
+                        case 'name':
+                          return await getAgentFilterValuesMapToSearchBarSuggestion(
+                            previousField,
+                            currentValue,
+                            {q: 'id!=000'}
+                          );
+                          break;
+                        case 'node_name':
+                          return await getAgentFilterValuesMapToSearchBarSuggestion(
+                            previousField,
+                            currentValue,
+                            {q: 'id!=000'}
+                          );
+                          break;
+                        case 'os.platform':
+                          return await getAgentFilterValuesMapToSearchBarSuggestion(
+                            previousField,
+                            currentValue,
+                            {q: 'id!=000'}
+                          );
+                          break;
+                        case 'status':
+                          return UI_ORDER_AGENT_STATUS.map(
+                            (status) => ({
+                              type: 'value',
+                              label: status,
+                            }),
+                          );
+                          break;
+                        case 'version':
+                          return await getAgentFilterValuesMapToSearchBarSuggestion(
+                            previousField,
+                            currentValue,
+                            {q: 'id!=000'}
+                          );
                           break;
                         default:
                           return [];
@@ -878,4 +945,13 @@ AgentsTable.propTypes = {
   clickAction: PropTypes.func,
   timeService: PropTypes.func,
   reload: PropTypes.func,
+};
+
+
+const getAgentFilterValuesMapToSearchBarSuggestion = async (key, value, params) => {
+  try{
+    return (await getAgentFilterValues(key, value, params)).map(label => ({type: 'value', label}));
+  }catch(error){
+    return [];
+  };
 };

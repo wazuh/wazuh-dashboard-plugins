@@ -13,7 +13,7 @@ abilities are restricted by this one.
 
 - Supports multiple query languages.
 - Switch the selected query language.
-- Self-contained query language implementation and ability to interact with the search bar component
+- Self-contained query language implementation and ability to interact with the search bar component.
 - React to external changes to set the new input. This enables to change the input from external components.
 
 # Usage
@@ -28,6 +28,135 @@ Basic usage:
     {
       id: 'aql',
       // specific query language parameters
+      implicitQuery: 'id!=000;',
+      suggestions: {
+        field(currentValue) {
+          return [
+            { label: 'configSum', description: 'Config sum' },
+            { label: 'dateAdd', description: 'Date add' },
+            { label: 'id', description: 'ID' },
+            { label: 'ip', description: 'IP address' },
+            { label: 'group', description: 'Group' },
+            { label: 'group_config_status', description: 'Synced configuration status' },
+            { label: 'lastKeepAline', description: 'Date add' },
+            { label: 'manager', description: 'Manager' },
+            { label: 'mergedSum', description: 'Merged sum' },
+            { label: 'name', description: 'Agent name' },
+            { label: 'node_name', description: 'Node name' },
+            { label: 'os.platform', description: 'Operating system platform' },
+            { label: 'status', description: 'Status' },
+            { label: 'version', description: 'Version' },
+          ]
+          .map(field => ({ type: 'field', ...field }));
+        },
+        value: async (currentValue, { previousField }) => {
+          switch (previousField) {
+            case 'configSum':
+              return await getAgentFilterValuesMapToSearchBarSuggestion(
+                previousField,
+                currentValue,
+                {q: 'id!=000'}
+              );
+              break;
+            case 'dateAdd':
+              return await getAgentFilterValuesMapToSearchBarSuggestion(
+                previousField,
+                currentValue,
+                {q: 'id!=000'}
+              );
+              break;
+            case 'id':
+              return await getAgentFilterValuesMapToSearchBarSuggestion(
+                previousField,
+                currentValue,
+                {q: 'id!=000'}
+              );
+              break;
+            case 'ip':
+              return await getAgentFilterValuesMapToSearchBarSuggestion(
+                previousField,
+                currentValue,
+                {q: 'id!=000'}
+              );
+              break;
+            case 'group':
+              return await getAgentFilterValuesMapToSearchBarSuggestion(
+                previousField,
+                currentValue,
+                {q: 'id!=000'}
+              );
+              break;
+            case 'group_config_status':
+              return [AGENT_SYNCED_STATUS.SYNCED, AGENT_SYNCED_STATUS.NOT_SYNCED].map(
+                (status) => ({
+                  type: 'value',
+                  label: status,
+                }),
+              );
+              break;
+            case 'lastKeepAline':
+              return await getAgentFilterValuesMapToSearchBarSuggestion(
+                previousField,
+                currentValue,
+                {q: 'id!=000'}
+              );
+              break;
+            case 'manager':
+              return await getAgentFilterValuesMapToSearchBarSuggestion(
+                previousField,
+                currentValue,
+                {q: 'id!=000'}
+              );
+              break;
+            case 'mergedSum':
+              return await getAgentFilterValuesMapToSearchBarSuggestion(
+                previousField,
+                currentValue,
+                {q: 'id!=000'}
+              );
+              break;
+            case 'name':
+              return await getAgentFilterValuesMapToSearchBarSuggestion(
+                previousField,
+                currentValue,
+                {q: 'id!=000'}
+              );
+              break;
+            case 'node_name':
+              return await getAgentFilterValuesMapToSearchBarSuggestion(
+                previousField,
+                currentValue,
+                {q: 'id!=000'}
+              );
+              break;
+            case 'os.platform':
+              return await getAgentFilterValuesMapToSearchBarSuggestion(
+                previousField,
+                currentValue,
+                {q: 'id!=000'}
+              );
+              break;
+            case 'status':
+              return UI_ORDER_AGENT_STATUS.map(
+                (status) => ({
+                  type: 'value',
+                  label: status,
+                }),
+              );
+              break;
+            case 'version':
+              return await getAgentFilterValuesMapToSearchBarSuggestion(
+                previousField,
+                currentValue,
+                {q: 'id!=000'}
+              );
+              break;
+            default:
+              return [];
+              break;
+          }
+        },
+      }
     },
   ]}
 ></SearchBar>

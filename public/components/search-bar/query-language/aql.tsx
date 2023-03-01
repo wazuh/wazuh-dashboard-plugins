@@ -12,10 +12,18 @@ type IToken = { type: ITokenType; value: string };
 type ITokens = IToken[];
 
 /* API Query Language
+Define the API Query Language to use in the search bar.
+It is based in the language used by the q query parameter.
 https://documentation.wazuh.com/current/user-manual/api/queries.html
 
-Syntax schema:
+Use the regular expression of API with some modifications to allow the decomposition of
+input in entities that doesn't compose a valid query. It allows get not-completed queries.
+
+API schema:
 <operator_group>?<field><operator_compare><value><operator_conjunction>?<operator_group>?
+
+Implemented schema:
+<operator_group>?<field>?<operator_compare>?<value>?<operator_conjunction>?<operator_group>?
 */
 
 // Language definition
@@ -64,151 +72,127 @@ const suggestionMappingLanguageTokenType = {
   function_search: { iconType: 'search', color: 'tint5' },
 };
 
-type ITokenizerInput = { input: string; output?: ITokens };
 
 /**
  * Tokenize the input string. Returns an array with the tokens.
- * @param param0
+ * @param input
  * @returns
  */
-export function tokenizer({ input, output = [] }: ITokenizerInput): ITokens {
-  if (!input) {
-    return output;
-  }
-  const character = input[0];
+export function tokenizerAPI(input: string): ITokens{
+  // API regular expression
+  // https://github.com/wazuh/wazuh/blob/v4.4.0-rc1/framework/wazuh/core/utils.py#L1242-L1257
+  //   self.query_regex = re.compile(
+  //     # A ( character.
+  //     r"(\()?" +
+  //     # Field name: name of the field to look on DB.
+  //     r"([\w.]+)" +
+  //     # Operator: looks for '=', '!=', '<', '>' or '~'.
+  //     rf"([{''.join(self.query_operators.keys())}]{{1,2}})" +
+  //     # Value: A string.
+  //     r"((?:(?:\((?:\[[\[\]\w _\-.,:?\\/'\"=@%<>{}]*]|[\[\]\w _\-.:?\\/'\"=@%<>{}]*)\))*"
+  //     r"(?:\[[\[\]\w _\-.,:?\\/'\"=@%<>{}]*]|[\[\]\w _\-.:?\\/'\"=@%<>{}]+)"
+  //     r"(?:\((?:\[[\[\]\w _\-.,:?\\/'\"=@%<>{}]*]|[\[\]\w _\-.:?\\/'\"=@%<>{}]*)\))*)+)" +
+  //     # A ) character.
+  //     r"(\))?" +
+  //     # Separator: looks for ';', ',' or nothing.
+  //     rf"([{''.join(self.query_separators.keys())}])?"
+  // )
 
-  // When there is no tokens, the first expected values are:
-  if (!output.length) {
-    // A literal `(`
-    if (character === '(') {
-      output.push({ type: 'operator_group', value: '(' });
-    }
+  const re = new RegExp(
+    // The following regular expression is based in API one but was modified to use named groups
+    // and added the optional operator to allow matching the entities when the query is not
+    // completed. This helps to tokenize the query and manage when the input is not completed.
+    // A ( character.
+    '(?<operator_group_open>\\()?' +
+    // Field name: name of the field to look on DB.
+    '(?<field>[\\w.]+)?' + // Added a optional find
+    // Operator: looks for '=', '!=', '<', '>' or '~'.
+    // This seems to be a bug because is not searching the literal valid operators.
+    // I guess the operator is validated after the regular expression matches
+    `(?<operator_compare>[${Object.keys(language.tokens.operator_compare.literal)}]{1,2})?` + // Added a optional find 
+    // Value: A string.
+    '(?<value>(?:(?:\\((?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|[\\[\\]\\w _\\-.:?\\/\'"=@%<>{}]*)\\))*' +
+    '(?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|[\\[\\]\\w _\\-.:?\\\\/\'"=@%<>{}]+)' +
+    '(?:\\((?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|[\\[\\]\\w _\\-.:?\\\\/\'"=@%<>{}]*)\\))*)+)?' + // Added a optional find
+    // A ) character.
+    '(?<operator_group_close>\\))?' +
+    `(?<conjunction>[${Object.keys(language.tokens.conjunction.literal)}])?`,
+    'g'
+  );
 
-    // Any character that matches the regex for the field
-    if (language.tokens.field.regex.test(character)) {
-      output.push({ type: 'field', value: character });
-    }
-  } else {
-    // Get the last token
-    const lastToken = output[output.length - 1];
-
-    switch (lastToken.type) {
-      // Token: field
-      case 'field': {
-        if (
-          Object.keys(language.tokens.operator_compare.literal)
-            .map(str => str[0])
-            .includes(character)
-        ) {
-          // If the character is the first character of an operator_compare token,
-          // add a new token with the input character
-          output.push({ type: 'operator_compare', value: character });
-        } else if (
-          Object.keys(language.tokens.operator_compare.literal).includes(
-            character,
-          )
-        ) {
-          // If the character matches with an operator_compare token,
-          // add a new token with the input character
-          output.push({ type: 'operator_compare', value: character });
-        } else if (language.tokens.field.regex.test(character)) {
-          // If the character matches with a character of field,
-          // appends the character to the current field token
-          lastToken.value = lastToken.value + character;
-        }
-        break;
-      }
-
-      // Token: operator_compare
-      case 'operator_compare': {
-        if (
-          Object.keys(language.tokens.operator_compare.literal)
-            .map(str => str[lastToken.value.length])
-            .includes(character)
-        ) {
-          // If the character is included in the operator_compare token,
-          // appends the character to the current operator_compare token
-          lastToken.value = lastToken.value + character;
-        } else {
-          // If the character is not a operator_compare token,
-          // add a new value token with the character
-          output.push({ type: 'value', value: character });
-        }
-        break;
-      }
-
-      // Token: value
-      case 'value': {
-        if (
-          Object.keys(language.tokens.conjunction.literal).includes(character)
-        ) {
-          // If the character is a conjunction, add a new conjunction token with the character
-          output.push({ type: 'conjunction', value: character });
-        } else if (character === ')') {
-          // If the character is the ")" literal, then add a new operator_group token
-          output.push({ type: 'operator_group', value: character });
-        } else {
-          // Else appends the character to the current value token
-          lastToken.value = lastToken.value + character;
-        }
-        break;
-      }
-
-      // Token: conjunction
-      case 'conjunction': {
-        if (character === '(') {
-          // If the character is the "(" literal, then add a new operator_group token
-          output.push({ type: 'operator_group', value: character });
-        } else if (language.tokens.field.regex.test(character)) {
-          // If the character matches with a character of field,
-          // appends the character to the current field token
-          output.push({ type: 'field', value: character });
-        }
-        break;
-      }
-
-      // Token: operator_group
-      case 'operator_group': {
-        if (lastToken.value === '(') {
-          // If the character is the "(" literal
-          if (language.tokens.field.regex.test(character)) {
-            // If the character matches with a character of field,
-            // appends the character to the current field token
-            output.push({ type: 'field', value: character });
-          }
-        } else if (lastToken.value === ')') {
-          if (
-            Object.keys(language.tokens.conjunction.literal).includes(character)
-          ) {
-            // If the character is a conjunction, add a new conjunction token with the character
-            output.push({ type: 'conjunction', value: character });
-          }
-        }
-        break;
-      }
-
-      default:
-    }
-  }
-
-  // Split the string from the second character
-  const substring = input.substring(1);
-
-  // Call recursively
-  return tokenizer({ input: substring, output }, language);
-}
+  return [
+    ...input.matchAll(re)]
+      .map(
+        ({groups}) => Object.entries(groups)
+                        .map(([key, value]) => ({
+                          type: key.startsWith('operator_group') ? 'operator_group' : key,
+                          value})
+                        )
+      ).flat();
+};
 
 /**
- * Check the
+ * Check if the input is valid
  * @param tokens
  * @returns
  */
-function validate(tokens: ITokens): boolean {
+export function validate(input: string, options): boolean {
   // TODO: enhance the validation
-  return tokens.every(
-    ({ type }, index) =>
-      type === ['field', 'operator_compare', 'value', 'conjunction'][index % 4],
+
+  // API regular expression
+  //   self.query_regex = re.compile(
+  //     # A ( character.
+  //     r"(\()?" +
+  //     # Field name: name of the field to look on DB.
+  //     r"([\w.]+)" +
+  //     # Operator: looks for '=', '!=', '<', '>' or '~'.
+  //     rf"([{''.join(self.query_operators.keys())}]{{1,2}})" +
+  //     # Value: A string.
+  //     r"((?:(?:\((?:\[[\[\]\w _\-.,:?\\/'\"=@%<>{}]*]|[\[\]\w _\-.:?\\/'\"=@%<>{}]*)\))*"
+  //     r"(?:\[[\[\]\w _\-.,:?\\/'\"=@%<>{}]*]|[\[\]\w _\-.:?\\/'\"=@%<>{}]+)"
+  //     r"(?:\((?:\[[\[\]\w _\-.,:?\\/'\"=@%<>{}]*]|[\[\]\w _\-.:?\\/'\"=@%<>{}]*)\))*)+)" +
+  //     # A ) character.
+  //     r"(\))?" +
+  //     # Separator: looks for ';', ',' or nothing.
+  //     rf"([{''.join(self.query_separators.keys())}])?"
+  // )
+
+  const re = new RegExp(
+    // A ( character.
+    '(\\()?' +
+    // Field name: name of the field to look on DB.
+    '([\\w.]+)?' +
+    // Operator: looks for '=', '!=', '<', '>' or '~'.
+    // This seems to be a bug because is not searching the literal valid operators.
+    // I guess the operator is validated after the regular expression matches
+    `([${Object.keys(language.tokens.operator_compare.literal)}]{1,2})?` +
+    // Value: A string.
+    '((?:(?:\\((?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|[\\[\\]\\w _\\-.:?\\/\'"=@%<>{}]*)\\))*' +
+    '(?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|[\\[\\]\\w _\\-.:?\\\\/\'"=@%<>{}]+)' +
+    '(?:\\((?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|[\\[\\]\\w _\\-.:?\\\\/\'"=@%<>{}]*)\\))*)+)?' +
+    // '([\\w]+)'+
+    // A ) character.
+    '(\\))?' +
+    `([${Object.keys(language.tokens.conjunction.literal)}])?`,
+    'g'
   );
+
+  [...input.matchAll(re)].reduce((accum, [_, operator_group_open, field, operator, value, operator_group_close, conjunction ]) => {
+    if(!accum){
+      return accum;
+    };
+
+    return [operator_group_open, field, operator, value, operator_group_close, conjunction]
+  }, true);
+
+  const errors = [];
+
+  for (let [_, operator_group_open, field, operator, value, operator_group_close, conjunction ] in input.matchAll(re)) {
+    if(!options.fields.includes(field)){
+      errors.push(`Field ${field} is not valid.`)
+    };
+  }
+  return errors.length === 0;
 }
 
 type OptionSuggestionHandler = (
@@ -227,12 +211,30 @@ type optionsQL = {
 };
 
 /**
- * Get the last token by type
+ * Get the last token with value
  * @param tokens Tokens
  * @param tokenType token type to search
  * @returns
  */
-function getLastTokenByType(
+function getLastTokenWithValue(
+  tokens: ITokens
+): IToken | undefined {
+  // Reverse the tokens array and use the Array.protorype.find method
+  const shallowCopyArray = Array.from([...tokens]);
+  const shallowCopyArrayReversed = shallowCopyArray.reverse();
+  const tokenFound = shallowCopyArrayReversed.find(
+    ({ value }) => value,
+  );
+  return tokenFound;
+}
+
+/**
+ * Get the last token with value by type
+ * @param tokens Tokens
+ * @param tokenType token type to search
+ * @returns
+ */
+function getLastTokenWithValueByType(
   tokens: ITokens,
   tokenType: ITokenType,
 ): IToken | undefined {
@@ -241,7 +243,7 @@ function getLastTokenByType(
   const shallowCopyArray = Array.from([...tokens]);
   const shallowCopyArrayReversed = shallowCopyArray.reverse();
   const tokenFound = shallowCopyArrayReversed.find(
-    ({ type }) => type === tokenType,
+    ({ type, value }) => type === tokenType && value,
   );
   return tokenFound;
 }
@@ -253,13 +255,18 @@ function getLastTokenByType(
  * @param options
  * @returns
  */
-export async function getSuggestions(tokens: ITokens, options: optionsQL) {
+export async function getSuggestionsAPI(tokens: ITokens, options: optionsQL) {
   if (!tokens.length) {
     return [];
   }
 
   // Get last token
-  const lastToken = tokens[tokens.length - 1];
+  const lastToken = getLastTokenWithValue(tokens);
+
+  // If it can't get a token with value, then no return suggestions
+  if(!lastToken?.type){
+    return  [];
+  };
 
   switch (lastToken.type) {
     case 'field':
@@ -274,15 +281,15 @@ export async function getSuggestions(tokens: ITokens, options: optionsQL) {
           ({ label }) => label === lastToken.value,
         )
           ? [
-              ...Object.keys(language.tokens.operator_compare.literal).map(
-                operator => ({
-                  type: 'operator_compare',
-                  label: operator,
-                  description:
-                    language.tokens.operator_compare.literal[operator],
-                }),
-              ),
-            ]
+            ...Object.keys(language.tokens.operator_compare.literal).map(
+              operator => ({
+                type: 'operator_compare',
+                label: operator,
+                description:
+                  language.tokens.operator_compare.literal[operator],
+              }),
+            ),
+          ]
           : []),
       ];
       break;
@@ -303,14 +310,14 @@ export async function getSuggestions(tokens: ITokens, options: optionsQL) {
           operator => operator === lastToken.value,
         )
           ? [
-              ...(await options.suggestions.value(undefined, {
-                previousField: getLastTokenByType(tokens, 'field')!.value,
-                previousOperatorCompare: getLastTokenByType(
-                  tokens,
-                  'operator_compare',
-                )!.value,
-              })),
-            ]
+            ...(await options.suggestions.value(undefined, {
+              previousField: getLastTokenWithValueByType(tokens, 'field')!.value,
+              previousOperatorCompare: getLastTokenWithValueByType(
+                tokens,
+                'operator_compare',
+              )!.value,
+            })),
+          ]
           : []),
       ];
       break;
@@ -318,27 +325,22 @@ export async function getSuggestions(tokens: ITokens, options: optionsQL) {
       return [
         ...(lastToken.value
           ? [
-              {
-                type: 'function_search',
-                label: 'Search',
-                description: 'Run the search query',
-              },
-            ]
+            {
+              type: 'function_search',
+              label: 'Search',
+              description: 'Run the search query',
+            },
+          ]
           : []),
-        {
-          type: 'value',
-          label: lastToken.value,
-          description: 'Current value',
-        },
         ...(await options.suggestions.value(lastToken.value, {
-          previousField: getLastTokenByType(tokens, 'field')!.value,
-          previousOperatorCompare: getLastTokenByType(
+          previousField: getLastTokenWithValueByType(tokens, 'field')!.value,
+          previousOperatorCompare: getLastTokenWithValueByType(
             tokens,
             'operator_compare',
           )!.value,
         })),
         ...Object.entries(language.tokens.conjunction.literal).map(
-          ([conjunction, description]) => ({
+          ([ conjunction, description]) => ({
             type: 'conjunction',
             label: conjunction,
             description,
@@ -369,14 +371,14 @@ export async function getSuggestions(tokens: ITokens, options: optionsQL) {
           conjunction => conjunction === lastToken.value,
         )
           ? [
-              ...(await options.suggestions.field()).map(
-                ({ label, description }) => ({
-                  type: 'field',
-                  label,
-                  description,
-                }),
-              ),
-            ]
+            ...(await options.suggestions.field()).map(
+              ({ label, description }) => ({
+                type: 'field',
+                label,
+                description,
+              }),
+            ),
+          ]
           : []),
         {
           type: 'operator_group',
@@ -454,14 +456,14 @@ export const AQL = {
   },
   async run(input, params) {
     // Get the tokens from the input
-    const tokens: ITokens = tokenizer({ input }, language);
+    const tokens: ITokens = tokenizerAPI(input);
 
     return {
       searchBarProps: {
         // Props that will be used by the EuiSuggest component
         // Suggestions
         suggestions: transformSuggestionsToUI(
-          await getSuggestions(tokens, params.queryLanguage.parameters),
+          await getSuggestionsAPI(tokens, params.queryLanguage.parameters),
           suggestionMappingLanguageTokenType,
         ),
         // Handler to manage when clicking in a suggestion item
@@ -472,7 +474,7 @@ export const AQL = {
             params.onSearch(getOutput(input, params.queryLanguage.parameters));
           } else {
             // When the clicked item has another iconType
-            const lastToken: IToken = tokens[tokens.length - 1];
+            const lastToken: IToken = getLastTokenWithValue(tokens);
             // if the clicked suggestion is of same type of last token
             if (
               suggestionMappingLanguageTokenType[lastToken.type].iconType ===
@@ -491,7 +493,12 @@ export const AQL = {
             }
           }
           // Change the input
-          params.setInput(tokens.map(({ value }) => value).join(''));
+          params.setInput(tokens
+            .filter(value => value) // Ensure the input is rebuilt using tokens with value.
+            // The input tokenization can contain tokens with no value due to the used
+            // regular expression.
+            .map(({ value }) => value)
+            .join(''));
         },
         prepend: params.queryLanguage.parameters.implicitQuery ? (
           <EuiPopover
