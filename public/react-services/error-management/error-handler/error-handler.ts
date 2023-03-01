@@ -146,7 +146,15 @@ export class ErrorHandler {
     if (error instanceof WazuhError) {
       defaultErrorLog = {
         ...error.logOptions,
+        ...{
+          error: {
+            title: customLogOptions?.title || error.message,
+            message: customLogOptions?.message || error.message,
+            error: error,
+          }
+        }
       };
+
     }
     ErrorOrchestratorService.handleError(defaultErrorLog);
   }
