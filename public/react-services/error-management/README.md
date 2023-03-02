@@ -30,7 +30,7 @@ Exists the following error sources:
 - Operational errors (development) - Native javascript errors
 - Wazuh API errors
 - Indexer Error
-- Axios errors
+- Http errors
 - Etc
 
 
@@ -90,9 +90,9 @@ Always will return an error instance.
 
 The error orchestrator have the responsability to receive and error and showing it by the following ways:
 
-- Showing the error in a toast message
-- Showing the error in browser console.log
-- Showing the error and render critical error page in the UI
+- Showing the error in a toast message `(Bussiness)`
+- Showing the error in browser console.log `(UI)`
+- Showing the error and render critical error page in the UI `(Blank-screen)`
 
 The current error handler tells the error orchestrator how the error will be shown to the user/developer. It sends the error and the showing options to the error orchestrator.
 
@@ -119,8 +119,8 @@ The errors returned are defined as the `error type` received.
 
 - WazuhApiError
 - WazuhReportingError
-- IndexerError
 - IndexerApiError
+- HttpError
 
 ## Error Classes
 
@@ -136,15 +136,15 @@ classDiagram
 class iWazuhError {
     <<interface>>
     +Error error
-    +integer code
     +IWazuhErrorLogOptions logOptions
 }
 
 iWazuhError <|-- WazuhError : implements
-WazuhError <|-- WazuhApiError : extends
-WazuhError <|-- WazuhReportingError : extends
-WazuhError <|-- IndexerApiError : extends
-WazuhError <|-- IndexerError : extends
+WazuhError <|-- HttpError : extends
+HttpError <|-- WazuhApiError : extends
+HttpError <|-- WazuhReportingError : extends
+HttpError <|-- IndexerApiError : extends
+HttpError <|-- IndexerError : extends
 
 ```
 
@@ -159,8 +159,8 @@ In the next table we have defined how the will be treated.
 |---------------------|-----------------------------------------------|-------|---------|
 | WazuhApiError       | [toast\|blank-screen\|log(info\|warn\|error)] |       |         |
 | WazuhReportingError | [toast\|blank-screen\|log(info\|warn\|error)] |       |         |
-| IndexerError        | [toast\|blank-screen\|log(info\|warn\|error)] |       |         |
 | IndexerApiError     | [toast\|blank-screen\|log(info\|warn\|error)] |       |         |
+| HttpError           | [toast\|blank-screen\|log(info\|warn\|error)] |       |         |
 | Error               | [toast\|blank-screen\|log(info\|warn\|error)] |       |         |
 | TypeError           | [toast\|blank-screen\|log(info\|warn\|error)] |       |         |
 | EvalError           | [toast\|blank-screen\|log(info\|warn\|error)] |       |         |
@@ -275,16 +275,14 @@ const Component = (props) => {
 
 const ComponentWrapped = withErrorHandler(Component);
 ```
-
 # React patterns artefact use cases
 
 
 | Artefact  | When to use                              |
 |-----------|------------------------------------------|
 | HOC       | On react lyfecicles methods              |
-| Hook      | On component methods called after render (like react custom hook) |
+| Hook      | On functional component methods called after render (like react custom hook) |
 | Decorator | On component user event methods          |
 
 
 For more details about the usage you can check the `unit tests` files for every artefact implemented in the error management solution.
-

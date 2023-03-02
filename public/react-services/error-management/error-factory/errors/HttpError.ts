@@ -7,8 +7,8 @@ export class HttpError extends WazuhError {
     super(error, info);
     this.logOptions = {
       error: {
-        message: error.message,
-        title: error.message,
+        message: `[${this.constructor.name}]: ${error.message}`,
+        title: `Unexpected ${this.constructor.name}: ${error.message}`,
         error: error,
       },
       level: 'ERROR',
