@@ -1,20 +1,27 @@
 import { ErrorFactory } from '../error-factory/error-factory';
 import {
   IndexerApiError,
-  IndexerError,
   WazuhReportingError,
   WazuhApiError,
+  HttpError,
 } from '../error-factory/errors';
 import { IWazuhError, IWazuhErrorConstructor } from '../types';
 import WazuhError from '../error-factory/errors/WazuhError';
 // error orchestrator
 import { UIErrorLog } from '../../error-orchestrator/types';
 import { ErrorOrchestratorService } from '../../error-orchestrator/error-orchestrator.service';
+import axios, { AxiosError } from 'axios';
+import { OpenSearchDashboardsResponse } from '../../../../../../src/core/server/http/router/response';
 
 interface ILogCustomOptions {
   title: string;
   message?: string;
 }
+
+interface IUrlRequestedTypes {
+  [key: string]: IWazuhErrorConstructor;
+}
+
 export class ErrorHandler {
  
   /**
@@ -39,7 +46,7 @@ export class ErrorHandler {
    * @param error
    * @returns
    */
-  static createError(error: Error | string): IWazuhError | Error {
+  static createError(error: Error | AxiosError | string): IWazuhError | Error {
     if (!error) {
       throw Error('Error must be defined');
     }
@@ -57,50 +64,46 @@ export class ErrorHandler {
    * @returns
    */
   private static getErrorType(
-    //error: string | Error | AxiosError | OpenSearchDashboardsResponse, // ToDo: Get error types
-    error: Error | any,
+    error: Error | AxiosError | OpenSearchDashboardsResponse, // ToDo: Get error types
   ): IWazuhErrorConstructor | null {
     let errorType = null;
-    if (this.isWazuhApiError(error)) {
-      errorType = this.getErrorTypeByErrorCode(
-        error?.response?.data?.code,
-        error?.response?.data?.message,
-      );
-    } else {
-      errorType = this.getErrorTypeByErrorCode(error.message, error?.code);
+    // if is http error (axios error) then get new to create a new error instance
+    if(this.isHttpError(error)){
+      errorType = this.getErrorTypeByConfig(error as AxiosError);
     }
     return errorType;
   }
 
   /**
-   * Depending on the error code, return the error type
-   *
-   * @param errorCode
-   * @returns
+   * Check if the error received is an http error (axios error)
+   * @param error 
+   * @returns 
    */
-  private static getErrorTypeByErrorCode(
-    errorResponseCode: number,
-    message: string,
-  ): IWazuhErrorConstructor | null {
-    let errorCode = errorResponseCode;
-    if (!errorResponseCode && message) {
-      let errorCodeFromMessage: string | number = message.split('-')[0].trim();
-      if (!errorCodeFromMessage) return null;
-      errorCode = Number(errorCodeFromMessage);
+  static isHttpError(error: Error | IWazuhError | AxiosError | OpenSearchDashboardsResponse): boolean {
+    return axios.isAxiosError(error);
+  }
+
+  /**
+   * Get the error type depending on the error config only when the error received is a http error and have the config property
+   * @param error 
+   * @returns 
+   */
+  private static getErrorTypeByConfig(error: AxiosError): IWazuhErrorConstructor | null {
+    const requestedUrlbyErrorTypes: IUrlRequestedTypes = {
+      '/api': WazuhApiError,
+      '/reports': WazuhReportingError,
+      '/elastic': IndexerApiError,
     }
 
-    switch (true) {
-      case errorCode >= 2000 && errorCode < 3000:
-        return IndexerApiError;
-      case errorCode >= 3000 && errorCode < 4000:
-        return WazuhApiError;
-      case errorCode >= 4000 && errorCode < 5000:
-        return IndexerError;
-      case errorCode >= 5000 && errorCode < 6000:
-        return WazuhReportingError;
-      default:
-        return null;
+    // get the config object from the error
+    const requestedUrl = error.response?.config?.url || error.config?.url;
+    if (!requestedUrl) return HttpError;
+
+    const urls = Object.keys(requestedUrlbyErrorTypes);
+    for (const url of urls) {
+      if(requestedUrl.includes(url)) return requestedUrlbyErrorTypes[url];
     }
+    return HttpError;
   }
 
   /**
@@ -109,20 +112,6 @@ export class ErrorHandler {
    */
   static isString(error: Error | string): boolean {
     return typeof error === 'string';
-  }
-
-  /**
-   * Check if the error received is a WazuhApiError
-   * @param error
-   * @returns
-   */
-  static isWazuhApiError(error: any): boolean {
-    // put the correct type -- not any type
-    return error.response?.data?.error &&
-      error.response?.data?.statusCode &&
-      error.response?.data?.message
-      ? true
-      : false;
   }
 
   /**

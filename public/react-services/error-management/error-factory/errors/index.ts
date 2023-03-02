@@ -1,4 +1,5 @@
 export * from './IndexerApiError';
 export * from './WazuhApiError';
-export * from './IndexerError';
 export * from './WazuhReportingError';
+export * from './WazuhError';
+export * from './HttpError';

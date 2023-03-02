@@ -1,7 +1,7 @@
 import { IWazuhErrorInfo, IWazuhErrorLogOpts } from '../../types';
-import WazuhError from './WazuhError';
+import { HttpError } from './HttpError';
 
-export class IndexerApiError extends WazuhError {
+export class IndexerApiError extends HttpError {
   logOptions: IWazuhErrorLogOpts;
   constructor(error: Error, info?: IWazuhErrorInfo) {
     super(error, info);
