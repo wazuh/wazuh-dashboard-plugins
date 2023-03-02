@@ -2,13 +2,6 @@ import { AxiosError, AxiosResponse } from 'axios';
 import { ErrorHandler } from './error-handler';
 import { ErrorOrchestratorService } from '../../error-orchestrator/error-orchestrator.service';
 import WazuhError from '../error-factory/errors/WazuhError';
-import {
-  IndexerApiError,
-  IndexerError,
-  WazuhApiError,
-  WazuhReportingError,
-} from '../error-factory';
-import { IWazuhErrorConstructor } from '../types';
 import { UIErrorLog } from '../../error-orchestrator/types';
 
 // mocked some required kibana-services
@@ -42,11 +35,20 @@ const responseBody: AxiosResponse = {
   status: 500,
   statusText: 'Internal Server Error',
   headers: {},
-  config: {},
+  config: {
+    url: '/api/request',
+    data: {
+      params: 'here-any-custom-params'
+    }, // the data could contain the params of the request
+  },
   request: {},
 };
 
 describe('Error Handler', () => {
+
+  beforeAll(() => {
+    jest.clearAllMocks();
+  })
   describe('createError', () => {
     it.each([
       { ErrorType: Error, name: 'Error' },
@@ -69,60 +71,92 @@ describe('Error Handler', () => {
     it.each([
       {
         name: 'IndexerApiError',
-        message: '2000 - ERROR2000 - IndexerApiError',
+        message: 'Error IndexerApiError',
+        url: '/elastic/samplealerts',
       },
-      { name: 'WazuhApiError', message: '3000 - ERROR3000 - WazuhApiError' },
-      { name: 'IndexerError', message: '4000 - ERROR4000 - IndexerError' },
+      {
+        name: 'WazuhApiError',
+        message: 'Error WazuhApiError',
+        url: '/api/request',
+      },
       {
         name: 'WazuhReportingError',
-        message: '5000 - ERROR5000 - WazuhReportingError',
+        message: 'Error WazuhReportingError',
+        url: '/reports',
+      },
+      {
+        name: 'HttpError',
+        url: '/any/url',
+        message: 'Error HttpError',
       },
     ])(
-      'should created a new "$name" instance when receive a native javascript error',
-      ({ name, message }: { name: string; message: string }) => {
+      'should created a new "$name" instance when receive a native javascript error when is an http error',
+      ({
+        name,
+        message,
+        url,
+      }: {
+        name: string;
+        message: string;
+        url: string;
+      }) => {
         let error = new Error(message) as AxiosError;
         error.response = responseBody;
         error.response.data.message = message;
         error.response.data.error = error;
+        error.response.config.url = url;
+        const spyIshttp = jest.spyOn(ErrorHandler, 'isHttpError').mockImplementation(() => true);
         const errorCreated = ErrorHandler.createError(error);
         expect(errorCreated).toBeInstanceOf(WazuhError);
         expect(errorCreated.message).toBe(message);
         expect(errorCreated.name).toBe(name);
         expect(errorCreated.stack).toBe(error.stack);
+        spyIshttp.mockRestore();
       },
     );
   });
 
   describe('handleError', () => {
-
     it('should send the error to the ERROR ORCHESTRATOR service with custom log options when is defined', () => {
       const mockedError = new Error('Mocked error');
-      ErrorHandler.handleError(mockedError, { title: 'Custom title', message: 'Custom message' });
-      const spyErrorOrch = jest.spyOn(
-        ErrorOrchestratorService,
-        'handleError',
-      );
+      ErrorHandler.handleError(mockedError, {
+        title: 'Custom title',
+        message: 'Custom message',
+      });
+      const spyErrorOrch = jest.spyOn(ErrorOrchestratorService, 'handleError');
 
       let logOptionsExpected = {
         error: {
           message: 'Custom message',
           title: 'Custom title',
           error: mockedError,
-        }
+        },
       };
-      expect(spyErrorOrch).toHaveBeenCalledWith(expect.objectContaining(logOptionsExpected));
-    })
+      expect(spyErrorOrch).toHaveBeenCalledWith(
+        expect.objectContaining(logOptionsExpected),
+      );
+    });
 
     it.each([
       {
         name: 'IndexerApiError',
-        message: '2000 - ERROR2000 - IndexerApiError',
+        message: 'Error IndexerApiError',
+        url: '/elastic/samplealerts',
       },
-      { name: 'WazuhApiError', message: '3000 - ERROR3000 - WazuhApiError' },
-      { name: 'IndexerError', message: '4000 - ERROR4000 - IndexerError' },
+      {
+        name: 'WazuhApiError',
+        message: 'Error WazuhApiError',
+        url: '/api/request',
+      },
       {
         name: 'WazuhReportingError',
-        message: '5000 - ERROR5000 - WazuhReportingError',
+        message: 'Error WazuhReportingError',
+        url: '/reports',
+      },
+      {
+        name: 'HttpError',
+        url: '/any/url',
+        message: 'Error HttpError',
       },
       { ErrorType: Error, name: 'Error', message: 'Error' },
       { ErrorType: TypeError, name: 'TypeError', message: 'Error TypeError' },
@@ -144,21 +178,27 @@ describe('Error Handler', () => {
         ErrorType,
         name,
         message,
+        url
       }: {
         ErrorType?: ErrorConstructor;
         name: string;
         message: string;
+        url?: string;
       }) => {
         let error;
+        let spyIshttp = jest.spyOn(ErrorHandler, 'isHttpError')
         if (ErrorType) {
+          spyIshttp = jest.spyOn(ErrorHandler, 'isHttpError').mockImplementation(() => false);
           error = new ErrorType(message);
         } else {
+          spyIshttp = jest.spyOn(ErrorHandler, 'isHttpError').mockImplementation(() => true);
           error = new Error(message) as AxiosError;
           error.response = responseBody;
           error.response.data.message = message;
           error.response.data.error = error;
+          error.response.config.url = url;
         }
-        const errorHandled = ErrorHandler.handleError(error)
+        const errorHandled = ErrorHandler.handleError(error);
         const spyErrorOrch = jest.spyOn(
           ErrorOrchestratorService,
           'handleError',
@@ -175,29 +215,34 @@ describe('Error Handler', () => {
           display: false,
           store: false,
         };
-        if(errorHandled instanceof WazuhError){
+        if (errorHandled instanceof WazuhError) {
           logOptionsExpected = errorHandled.logOptions;
         }
         expect(spyErrorOrch).toHaveBeenCalledWith(logOptionsExpected);
+        spyIshttp.mockRestore();
       },
     );
 
     it.each([
       {
         name: 'IndexerApiError',
-        message: '2000 - ERROR2000 - IndexerApiError',
+        message: 'Error IndexerApiError',
+        url: '/elastic/samplealerts',
       },
       {
         name: 'WazuhApiError',
-        message: '3000 - ERROR3000 - WazuhApiError',
-      },
-      {
-        name: 'IndexerError',
-        message: '4000 - ERROR4000 - IndexerError',
+        message: 'Error WazuhApiError',
+        url: '/api/request',
       },
       {
         name: 'WazuhReportingError',
-        message: '5000 - ERROR5000 - WazuhReportingError',
+        message: 'Error WazuhReportingError',
+        url: '/reports',
+      },
+      {
+        name: 'HttpError',
+        url: '/any/url',
+        message: 'Error HttpError',
       },
       { ErrorType: Error, name: 'Error', message: 'Error' },
       { ErrorType: TypeError, name: 'TypeError', message: 'Error TypeError' },
@@ -219,27 +264,36 @@ describe('Error Handler', () => {
         ErrorType,
         name,
         message,
+        url
       }: {
         ErrorType?: ErrorConstructor;
         name: string;
         message: string;
+        url?: string;
       }) => {
         let error;
+        let spyIshttp = jest.spyOn(ErrorHandler, 'isHttpError')
         if (ErrorType) {
+          spyIshttp = jest.spyOn(ErrorHandler, 'isHttpError').mockImplementation(() => false);
           error = new ErrorType(message);
         } else {
+          spyIshttp = jest.spyOn(ErrorHandler, 'isHttpError').mockImplementation(() => true);
           error = new Error(message) as AxiosError;
           error.response = responseBody;
           error.response.data.message = message;
           error.response.data.error = error;
+          error.response.config.url = url;
         }
         const errorReturned = ErrorHandler.createError(error);
         const errorFromHandler = ErrorHandler.handleError(error);
         expect(errorFromHandler).toEqual(errorReturned);
-        expect(errorFromHandler).toBeInstanceOf(ErrorType ? ErrorType : WazuhError);
+        expect(errorFromHandler).toBeInstanceOf(
+          ErrorType ? ErrorType : WazuhError,
+        );
         expect(errorFromHandler.message).toBe(message);
         expect(errorFromHandler.name).toBe(name);
-      },
+        spyIshttp.mockRestore();
+      }
     );
   });
 });

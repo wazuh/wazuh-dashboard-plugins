@@ -10,9 +10,8 @@
  * Find more information about this on the LICENSE file.
  */
 import { AxiosError, AxiosResponse } from 'axios';
-import { WazuhApiError } from './errors/WazuhApiError';
 import { ErrorFactory } from './error-factory';
-import { IndexerApiError, IndexerError, WazuhReportingError } from './errors';
+import { IndexerApiError, WazuhReportingError, HttpError, WazuhApiError } from './errors';
 import WazuhError from './errors/WazuhError';
 
 const response: AxiosResponse = {
@@ -32,8 +31,8 @@ describe('Error Factory', () => {
   it.each([
     { errorType: IndexerApiError, name: 'IndexerApiError' },
     { errorType: WazuhApiError, name: 'WazuhApiError' },
-    { errorType: IndexerError, name: 'IndexerError' },
     { errorType: WazuhReportingError, name: 'WazuhReportingError' },
+    { errorType: HttpError, name: 'HttpError' },
   ])(
     'Should return a $name when receive and error and error type',
     ({ errorType, name }) => {
