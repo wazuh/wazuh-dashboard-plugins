@@ -135,6 +135,7 @@ describe('Error Handler', () => {
       expect(spyErrorOrch).toHaveBeenCalledWith(
         expect.objectContaining(logOptionsExpected),
       );
+      spyErrorOrch.mockRestore();
     });
 
     it.each([
@@ -220,6 +221,7 @@ describe('Error Handler', () => {
         }
         expect(spyErrorOrch).toHaveBeenCalledWith(logOptionsExpected);
         spyIshttp.mockRestore();
+        spyErrorOrch.mockRestore();
       },
     );
 

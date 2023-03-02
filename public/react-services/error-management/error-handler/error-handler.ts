@@ -124,12 +124,12 @@ export class ErrorHandler {
     let defaultErrorLog: UIErrorLog = {
       error: {
         title: customLogOptions?.title || error.message,
-        message: customLogOptions?.message ||error.message,
+        message: customLogOptions?.message || `[Unexpected error]`,
         error: error,
       },
       level: 'ERROR',
-      severity: 'UI',
-      display: false,
+      severity: "UI",
+      display: true,
       store: false,
     };
     if (error instanceof WazuhError) {
@@ -137,8 +137,8 @@ export class ErrorHandler {
         ...error.logOptions,
         ...{
           error: {
-            title: customLogOptions?.title || error.message,
-            message: customLogOptions?.message || error.message,
+            title: customLogOptions?.title || error.logOptions.error.title || error.message,
+            message: customLogOptions?.message || error.logOptions.error.message || error.stack as string,
             error: error,
           }
         }
