@@ -490,15 +490,16 @@ export const AQL = {
                 )[0],
                 value: item.label,
               });
-            }
+            };
+
+            // Change the input
+            params.setInput(tokens
+              .filter(value => value) // Ensure the input is rebuilt using tokens with value.
+              // The input tokenization can contain tokens with no value due to the used
+              // regular expression.
+              .map(({ value }) => value)
+              .join(''));
           }
-          // Change the input
-          params.setInput(tokens
-            .filter(value => value) // Ensure the input is rebuilt using tokens with value.
-            // The input tokenization can contain tokens with no value due to the used
-            // regular expression.
-            .map(({ value }) => value)
-            .join(''));
         },
         prepend: params.queryLanguage.parameters.implicitQuery ? (
           <EuiPopover
@@ -535,6 +536,11 @@ export const AQL = {
             <EuiText color='subdued'>This query is added to the input.</EuiText>
           </EuiPopover>
         ) : null,
+        // Disable the focus trap in the EuiInputPopover.
+        // This causes when using the Search suggestion, the suggestion popover can be closed.
+        // If this is disabled, then the suggestion popover is open after a short time for this
+        // use case.
+        disableFocusTrap: true
       },
       output: getOutput(input, params.queryLanguage.parameters),
     };

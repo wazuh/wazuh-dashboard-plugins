@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   EuiButtonEmpty,
   EuiFormRow,
@@ -51,14 +51,13 @@ export const SearchBar = ({
   const [isOpenSuggestionPopover, setIsOpenSuggestionPopover] =
     useState<boolean>(false);
   // Reference to the input
-  const [inputRef, setInputRef] = useState();
+  const inputRef = useRef();
 
   // Handler when searching
   const _onSearch = (output: any) => {
     // TODO: fix when searching
-    inputRef && inputRef.blur();
-    setIsOpenSuggestionPopover(false);
     onSearch(output);
+    setIsOpenSuggestionPopover(false);
   };
 
   // Handler on change the input field text
@@ -75,7 +74,7 @@ export const SearchBar = ({
   useEffect(() => {
     // React to external changes and set the internal input text. Use the `transformUnifiedQuery` of
     // the query language in use
-    setInput(
+    rest.input && setInput(
       searchBarQueryLanguages[queryLanguage.id]?.transformUnifiedQuery?.(
         rest.input,
       ),
@@ -91,16 +90,17 @@ export const SearchBar = ({
           setInput,
           closeSuggestionPopover: () => setIsOpenSuggestionPopover(false),
           openSuggestionPopover: () => setIsOpenSuggestionPopover(true),
-          queryLanguage: {
-            configuration: queryLanguage.configuration,
-            parameters: modes.find(({ id }) => id === queryLanguage.id),
-          },
           setQueryLanguageConfiguration: (configuration: any) =>
             setQueryLanguage(state => ({
               ...state,
               configuration:
                 configuration?.(state.configuration) || configuration,
             })),
+          inputRef,
+          queryLanguage: {
+            configuration: queryLanguage.configuration,
+            parameters: modes.find(({ id }) => id === queryLanguage.id),
+          },
         }),
       );
     })();
@@ -115,7 +115,7 @@ export const SearchBar = ({
 
   return (
     <EuiSuggest
-      inputRef={setInputRef}
+      inputRef={inputRef}
       value={input}
       onChange={onChangeInput}
       onKeyPress={onKeyPressHandler}

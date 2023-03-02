@@ -619,7 +619,6 @@ export const AgentsTable = withErrorBoundary(
             />
             {/** Example implementation */}
             <SearchBar
-              syntax='aql'
               modes={[
                 {
                   id: 'aql',
