@@ -63,6 +63,7 @@ export const AgentsTable = withErrorBoundary(
         filters: sessionStorage.getItem('agents_preview_selected_options')
           ? JSON.parse(sessionStorage.getItem('agents_preview_selected_options'))
           : [],
+        query: ''
       };
       this.suggestions = [
         {
@@ -210,7 +211,7 @@ export const AgentsTable = withErrorBoundary(
         this.props.filters &&
         this.props.filters.length
       ) {
-        this.setState({ filters: this.props.filters, pageIndex: 0 });
+        this.setState({ filters: this.props.filters, pageIndex: 0, query: this.props.filters.find(({field}) => field === 'q')?.value || '' });
         this.props.removeFilters();
       }
     }
@@ -619,6 +620,7 @@ export const AgentsTable = withErrorBoundary(
             />
             {/** Example implementation */}
             <SearchBar
+              input={this.state.query}
               modes={[
                 {
                   id: 'aql',
@@ -758,7 +760,29 @@ export const AgentsTable = withErrorBoundary(
                 },
               ]}
               onChange={console.log}
-              onSearch={console.log}
+              onSearch={async ({language, query}) => {
+                try{
+                  this.setState({isLoading: true});
+                  const response = await this.props.wzReq('GET', '/agents', { params: { 
+                    limit: this.state.pageSize,
+                    offset: 0,
+                    q: query,
+                    sort: this.buildSortFilter()
+                  }});
+
+                  const formatedAgents = response?.data?.data?.affected_items?.map(
+                    this.formatAgent.bind(this)
+                  );
+
+                  this._isMount && this.setState({
+                    agents: formatedAgents,
+                    totalItems: response?.data?.data?.total_affected_items,
+                    isLoading: false,
+                  });
+                }catch(error){
+                  this.setState({isLoading: false});
+                };
+              }}
             />
           </EuiFlexItem>
           <EuiFlexItem grow={false}>

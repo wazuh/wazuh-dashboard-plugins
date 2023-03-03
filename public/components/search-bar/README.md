@@ -22,7 +22,7 @@ Basic usage:
 
 ```tsx
 <SearchBar
-  // Define the query languages.
+  // Define the query languages. Required.
   // The ID of them should be registered previously. See How to add a new query language documentation.
   modes={[
     {
@@ -159,6 +159,13 @@ Basic usage:
       }
     },
   ]}
+  // Handler fired when the input handler changes. Optional.
+  onChange={onChange}
+  // Handler fired when the user press the Enter key or custom implementations. Required.
+  onSearch={onSearch}
+  // Used to define the internal input. Optional.
+  // This could be used to change the input text from the external components.
+  input="" 
 ></SearchBar>
 ```
 
