@@ -16,6 +16,7 @@
   - [How to use HOC](#how-to-use-hoc)
   - [How to use Decorator](#how-to-use-decorator)
 - [React patterns artefact use cases](#react-patterns-artefact-use-cases)
+- [Use cases examples documentation](#use-cases-examples-documentation)
 
 # Scope
 
@@ -285,4 +286,6 @@ const ComponentWrapped = withErrorHandler(Component);
 | Decorator | On component user event methods          |
 
 
-For more details about the usage you can check the `unit tests` files for every artefact implemented in the error management solution.
+# Use cases examples documentation
+
+For more details about the usage you can check [the examples documentation folder](../docs/examples)
