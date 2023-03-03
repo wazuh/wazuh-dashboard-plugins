@@ -98,3 +98,8 @@ class ExampleComponent extends Component {
 **Toast Content**
 
 ![error-handler-class-http](../../images/error-handler-class-example-log-http-error-2.png)]
+
+
+## Examples unit tests
+
+![error-handler-class-unit-tests](../../images/error-handler-examples-unit-tests.png)]
