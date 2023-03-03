@@ -63,7 +63,7 @@
     "read-last-lines": "^1.7.2",
     "timsort": "^0.3.0",
     "typescript": "^4.4.2",
-    "winston": "3.5.1"
+    "winston": "3.8.2"
   },
   "devDependencies": {
     "@types/node-cron": "^2.0.3",
