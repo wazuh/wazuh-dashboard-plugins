@@ -21,11 +21,12 @@ import {
   EuiTitle,
   EuiButtonEmpty,
   EuiText,
-  EuiToolTip
+  EuiToolTip,
 } from '@elastic/eui';
 
 import { ExportConfiguration } from '../../agent/components/export-configuration';
 import { ReportingService } from '../../../react-services/reporting';
+import { i18n } from '@kbn/i18n';
 
 export class FilesInGroupTable extends Component {
   constructor(props) {
@@ -36,10 +37,18 @@ export class FilesInGroupTable extends Component {
       groupName: this.props.group.name || 'Group',
       files: [],
       originalfiles: [],
-      isLoading: false
+      isLoading: false,
     };
 
-    this.filters = { name: 'search', value: '' };
+    this.filters = {
+      name: i18n.translate(
+        'wazuh.public.controller.management.componts.files.group.table.search',
+        {
+          defaultMessage: 'search',
+        },
+      ),
+      value: '',
+    };
   }
 
   async componentDidMount() {
@@ -47,7 +56,7 @@ export class FilesInGroupTable extends Component {
       const files = await this.props.getFilesFromGroup(this.props.group.name);
       this.setState({
         files: files,
-        originalfiles: files
+        originalfiles: files,
       });
     } catch (error) {
       console.error('error mounting the component ', error);
@@ -66,7 +75,7 @@ export class FilesInGroupTable extends Component {
         : this.state.originalfiles;
       this.setState({
         isLoading: false,
-        files: items
+        files: items,
       });
     }
   };
@@ -80,7 +89,7 @@ export class FilesInGroupTable extends Component {
       const files = await this.props.getFilesFromGroup(this.props.group.name);
       this.setState({
         originalfiles: files,
-        refreshingFiles: false
+        refreshingFiles: false,
       });
     } catch (error) {
       this.setState({ refreshingFiles: false });
@@ -92,46 +101,74 @@ export class FilesInGroupTable extends Component {
     const columns = [
       {
         field: 'filename',
-        name: 'File',
-        sortable: true
+        name: i18n.translate(
+          'wazuh.public.controller.management.componts.files.group.table.File',
+          {
+            defaultMessage: 'File',
+          },
+        ),
+        sortable: true,
       },
       {
         field: 'hash',
-        name: 'Checksum',
-        sortable: true
+        name: i18n.translate(
+          'wazuh.public.controller.management.componts.files.group.table.Checksum',
+          {
+            defaultMessage: 'Checksum',
+          },
+        ),
+        sortable: true,
       },
       {
-        name: 'Actions',
+        name: i18n.translate(
+          'wazuh.public.controller.management.componts.files.group.table.Actions',
+          {
+            defaultMessage: 'Actions',
+          },
+        ),
 
         render: item => {
           return (
-            <EuiToolTip position="right" content="See file content">
+            <EuiToolTip
+              position='right'
+              content={i18n.translate(
+                'wazuh.public.controller.management.componts.files.group.table.Seefilecontent',
+                {
+                  defaultMessage: 'See file content',
+                },
+              )}
+            >
               <EuiButtonIcon
-                aria-label="See file content"
-                onClick={() => 
+                aria-label={i18n.translate(
+                  'wazuh.public.controller.management.componts.files.group.table.Seefilecontent',
+                  {
+                    defaultMessage: 'See file content',
+                  },
+                )}
+                onClick={() =>
                   this.props.openFileContent(
                     this.state.groupName,
-                    item.filename
+                    item.filename,
                   )
                 }
-                iconType="eye"
+                iconType='eye'
               />
             </EuiToolTip>
           );
-        }
-      }
+        },
+      },
     ];
 
     const search = {
       onChange: this.onQueryChange,
       box: {
         incremental: this.state.incremental,
-        schema: true
-      }
+        schema: true,
+      },
     };
 
     return (
-      <EuiPanel paddingSize="l" className="wz-margin-16">
+      <EuiPanel paddingSize='l' className='wz-margin-16'>
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiFlexGroup>
@@ -144,11 +181,16 @@ export class FilesInGroupTable extends Component {
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
             <EuiButtonEmpty
-              iconSide="left"
-              iconType="pencil"
+              iconSide='left'
+              iconType='pencil'
               onClick={() => this.props.editConfig()}
             >
-              Edit group configuration
+              {i18n.translate(
+                'wazuh.controllers..mnage.comp.confi.groups.status.agent.Refresh.export.edit',
+                {
+                  defaultMessage: 'Edit group configuration',
+                },
+              )}
             </EuiButtonEmpty>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
@@ -157,7 +199,7 @@ export class FilesInGroupTable extends Component {
                 this.reportingService.startConfigReport(
                   this.props.state.itemDetail,
                   'groupConfig',
-                  enabledComponents
+                  enabledComponents,
                 )
               }
               type='group'
@@ -165,30 +207,45 @@ export class FilesInGroupTable extends Component {
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
             <EuiButtonEmpty
-              iconType="importAction"
+              iconType='importAction'
               onClick={async () =>
                 await this.props.export(this.state.groupName, [this.filters])
               }
             >
-              Export formatted
+              {i18n.translate(
+                'wazuh.controllers..mnage.comp.confi.groups.status.agent.Refresh.export',
+                {
+                  defaultMessage: 'Export formatted',
+                },
+              )}
             </EuiButtonEmpty>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
-            <EuiButtonEmpty iconType="refresh" onClick={() => this.refresh()}>
-              Refresh
+            <EuiButtonEmpty iconType='refresh' onClick={() => this.refresh()}>
+              {i18n.translate(
+                'wazuh.controllers..mnage.comp.confi.groups.status.agent.Refresh',
+                {
+                  defaultMessage: 'Refresh',
+                },
+              )}
             </EuiButtonEmpty>
           </EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup>
           <EuiFlexItem>
-            <EuiText color="subdued" style={{ paddingBottom: '15px' }}>
-              From here you can list and see your group files, also, you can
-              edit the group configuration
+            <EuiText color='subdued' style={{ paddingBottom: '15px' }}>
+              {i18n.translate(
+                'wazuh.controllers..mnage.comp.confi.groups.status.agent.configuration',
+                {
+                  defaultMessage:
+                    'From here you can list and see your group files, also, you can edit the group configuration',
+                },
+              )}
             </EuiText>
           </EuiFlexItem>
         </EuiFlexGroup>
         <EuiInMemoryTable
-          itemId="id"
+          itemId='id'
           items={this.state.files}
           columns={columns}
           search={search}
@@ -206,5 +263,5 @@ FilesInGroupTable.propTypes = {
   export: PropTypes.func,
   exportConfigurationProps: PropTypes.object,
   editConfig: PropTypes.func,
-  openFileContent: PropTypes.func
+  openFileContent: PropTypes.func,
 };

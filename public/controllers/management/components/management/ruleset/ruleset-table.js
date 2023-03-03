@@ -10,10 +10,19 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import { EuiBasicTable, EuiCallOut, EuiOverlayMask, EuiConfirmModal } from '@elastic/eui';
+import {
+  EuiBasicTable,
+  EuiCallOut,
+  EuiOverlayMask,
+  EuiConfirmModal,
+} from '@elastic/eui';
 
 import { connect } from 'react-redux';
-import { RulesetHandler, RulesetResources, resourceDictionary } from './utils/ruleset-handler';
+import {
+  RulesetHandler,
+  RulesetResources,
+  resourceDictionary,
+} from './utils/ruleset-handler';
 import { getToasts } from '../../../../../kibana-services';
 
 import {
@@ -26,6 +35,7 @@ import {
   updateRuleInfo,
   updateDecoderInfo,
 } from '../../../../../redux/actions/rulesetActions';
+import { i18n } from '@kbn/i18n';
 
 import RulesetColums from './utils/columns';
 import { WzRequest } from '../../../../../react-services/wz-request';
@@ -36,6 +46,31 @@ import { compose } from 'redux';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
+
+const label1 = i18n.translate(
+  'wazuh.public.controller.management.ruleset.searchBar.table.label1',
+  {
+    defaultMessage: 'Error deleting item:',
+  },
+);
+const label2 = i18n.translate(
+  'wazuh.public.controller.management.ruleset.searchBar.table.label2',
+  {
+    defaultMessage: 'Error updating info:',
+  },
+);
+const label3 = i18n.translate(
+  'wazuh.public.controller.management.ruleset.searchBar.table.label3',
+  {
+    defaultMessage: 'Error getting items:',
+  },
+);
+const label4 = i18n.translate(
+  'wazuh.public.controller.management.ruleset.searchBar.table.label4',
+  {
+    defaultMessage: 'Error getting resources:',
+  },
+);
 class WzRulesetTable extends Component {
   _isMounted = false;
   constructor(props) {
@@ -96,7 +131,7 @@ class WzRulesetTable extends Component {
             severity: UI_ERROR_SEVERITIES.BUSINESS,
             error: {
               error: error,
-              message: `Error getting resources: ${error.message || error}`,
+              message: `${label4} ${error.message || error}`,
               title: error.name || error,
             },
           };
@@ -143,7 +178,7 @@ class WzRulesetTable extends Component {
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         error: {
           error: error,
-          message: `Error getting items: ${error.message || error}`,
+          message: `${label3} ${error.message || error}`,
           title: error.name || error,
         },
       };
@@ -167,8 +202,8 @@ class WzRulesetTable extends Component {
     const rawItems = await this.wzReq(
       'GET',
       `${this.paths[this.props.request]}${showingFiles ? '/files' : ''}`,
-      { params: this.buildFilter() }
-    ).catch((error) => {
+      { params: this.buildFilter() },
+    ).catch(error => {
       throw new Error(`Error when get the items of ${section}`);
     });
 
@@ -185,11 +220,15 @@ class WzRulesetTable extends Component {
 
   async setDefaultItems() {
     try {
-      const requestDefaultItems = await this.wzReq('GET', '/manager/configuration', {
-        wait_for_complete: false,
-        section: 'ruleset',
-        field: 'list',
-      });
+      const requestDefaultItems = await this.wzReq(
+        'GET',
+        '/manager/configuration',
+        {
+          wait_for_complete: false,
+          section: 'ruleset',
+          field: 'list',
+        },
+      );
 
       const defaultItems = ((requestDefaultItems || {}).data || {}).data;
       this.props.updateDefaultItems(defaultItems);
@@ -268,10 +307,10 @@ class WzRulesetTable extends Component {
     if (!error) {
       const itemList = this.props.state.itemList;
 
-      const getRowProps = (item) => {
+      const getRowProps = item => {
         const { id, name } = item;
 
-        const getRequiredPermissions = (item) => {
+        const getRequiredPermissions = item => {
           const { section } = this.props.state;
           const { permissionResource } = resourceDictionary[section];
           return [
@@ -286,10 +325,13 @@ class WzRulesetTable extends Component {
           if (this.isLoading) return;
           this.setState({ isLoading: true });
           const { section } = this.props.state;
-          section === RulesetResources.RULES && (window.location.href = `${window.location.href}&redirectRule=${id}`);
+          section === RulesetResources.RULES &&
+            (window.location.href = `${window.location.href}&redirectRule=${id}`);
           try {
             if (section === RulesetResources.LISTS) {
-              const result = await this.rulesetHandler.getFileContent(item.filename);
+              const result = await this.rulesetHandler.getFileContent(
+                item.filename,
+              );
               const file = {
                 name: item.filename,
                 content: result,
@@ -305,8 +347,10 @@ class WzRulesetTable extends Component {
               if (result.data) {
                 Object.assign(result.data, { current: id || name });
               }
-              if (section === RulesetResources.RULES) this.props.updateRuleInfo(result.data);
-              if (section === RulesetResources.DECODERS) this.props.updateDecoderInfo(result.data);
+              if (section === RulesetResources.RULES)
+                this.props.updateRuleInfo(result.data);
+              if (section === RulesetResources.DECODERS)
+                this.props.updateDecoderInfo(result.data);
             }
           } catch (error) {
             const options = {
@@ -315,7 +359,7 @@ class WzRulesetTable extends Component {
               severity: UI_ERROR_SEVERITIES.BUSINESS,
               error: {
                 error: error,
-                message: `Error updating info: ${error.message || error}`,
+                message: `${label2} ${error.message || error}`,
                 title: error.name || error,
               },
             };
@@ -330,7 +374,7 @@ class WzRulesetTable extends Component {
           className: 'customRowClass',
           onClick: !WzUserPermissions.checkMissingUserPermissions(
             getRequiredPermissions(item),
-            this.props.userPermissions
+            this.props.userPermissions,
           )
             ? updateInfo
             : undefined,
@@ -340,34 +384,52 @@ class WzRulesetTable extends Component {
       return (
         <div>
           <EuiBasicTable
-            itemId="id"
+            itemId='id'
             items={items}
             columns={columns}
             pagination={pagination}
             onChange={this.onTableChange}
             loading={isLoading || isRedirect}
-            rowProps={(!this.props.state.showingFiles && getRowProps) || undefined}
+            rowProps={
+              (!this.props.state.showingFiles && getRowProps) || undefined
+            }
             sorting={sorting}
             message={message}
           />
           {this.props.state.showModal ? (
             <EuiOverlayMask>
               <EuiConfirmModal
-                title="Are you sure?"
+                title={i18n.translate(
+                  'wazuh.public.controller.management.ruleset.searchBar.table.sure',
+                  {
+                    defaultMessage: 'Are you sure?',
+                  },
+                )}
                 onCancel={() => this.props.updateShowModal(false)}
                 onConfirm={() => {
                   this.removeItems(itemList);
                   this.props.updateShowModal(false);
                 }}
                 cancelButtonText="No, don't do it"
-                confirmButtonText="Yes, do it"
-                defaultFocusedButton="cancel"
-                buttonColor="danger"
+                confirmButtonText='Yes, do it'
+                defaultFocusedButton='cancel'
+                buttonColor='danger'
               >
-                <p>These items will be removed</p>
+                <p>
+                  {i18n.translate(
+                    'wazuh.public.controller.management.ruleset.searchBar.table.removed',
+                    {
+                      defaultMessage: 'These items will be removed',
+                    },
+                  )}
+                </p>
                 <div>
                   {itemList.map(function (item, i) {
-                    return <li key={i}>{item.filename ? item.filename : item.name}</li>;
+                    return (
+                      <li key={i}>
+                        {item.filename ? item.filename : item.name}
+                      </li>
+                    );
                   })}
                 </div>
               </EuiConfirmModal>
@@ -376,7 +438,7 @@ class WzRulesetTable extends Component {
         </div>
       );
     } else {
-      return <EuiCallOut color="warning" title={error} iconType="gear" />;
+      return <EuiCallOut color='warning' title={error} iconType='gear' />;
     }
   }
 
@@ -396,7 +458,7 @@ class WzRulesetTable extends Component {
         await this.rulesetHandler.deleteFile(item.filename || item.name);
       });
 
-      Promise.all(results).then((completed) => {
+      Promise.all(results).then(completed => {
         this.props.updateIsProcessing(true);
         this.showToast('success', 'Success', 'Deleted successfully', 3000);
       });
@@ -407,7 +469,7 @@ class WzRulesetTable extends Component {
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         error: {
           error: error,
-          message: `Error deleting item: ${error.message || error}`,
+          message: `${label1} ${error.message || error}`,
           title: error.name || error,
         },
       };
@@ -416,26 +478,29 @@ class WzRulesetTable extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
     state: state.rulesetReducers,
   };
 };
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
-    updateDefaultItems: (defaultItems) => dispatch(updateDefaultItems(defaultItems)), //TODO: Research to remove
-    updateIsProcessing: (isProcessing) => dispatch(updateIsProcessing(isProcessing)),
-    updateShowModal: (showModal) => dispatch(updateShowModal(showModal)),
-    updateFileContent: (fileContent) => dispatch(updateFileContent(fileContent)),
-    updateListContent: (listInfo) => dispatch(updateListContent(listInfo)),
-    updateListItemsForRemove: (itemList) => dispatch(updateListItemsForRemove(itemList)),
-    updateRuleInfo: (rule) => dispatch(updateRuleInfo(rule)),
-    updateDecoderInfo: (rule) => dispatch(updateDecoderInfo(rule)),
+    updateDefaultItems: defaultItems =>
+      dispatch(updateDefaultItems(defaultItems)), //TODO: Research to remove
+    updateIsProcessing: isProcessing =>
+      dispatch(updateIsProcessing(isProcessing)),
+    updateShowModal: showModal => dispatch(updateShowModal(showModal)),
+    updateFileContent: fileContent => dispatch(updateFileContent(fileContent)),
+    updateListContent: listInfo => dispatch(updateListContent(listInfo)),
+    updateListItemsForRemove: itemList =>
+      dispatch(updateListItemsForRemove(itemList)),
+    updateRuleInfo: rule => dispatch(updateRuleInfo(rule)),
+    updateDecoderInfo: rule => dispatch(updateDecoderInfo(rule)),
   };
 };
 
 export default compose(
   connect(mapStateToProps, mapDispatchToProps),
-  withUserPermissions
+  withUserPermissions,
 )(WzRulesetTable);

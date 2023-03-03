@@ -14,11 +14,12 @@ import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 
 import WzTabSelector, {
-  WzTabSelectorTab
+  WzTabSelectorTab,
 } from '../util-components/tab-selector';
 import WzConfigurationActiveResponseActiveResponse from './active-response-active-response';
 import WzConfigurationActiveResponseCommands from './active-response-commands';
 import withWzConfig from '../util-hocs/wz-config';
+import { i18n } from '@kbn/i18n';
 
 class WzConfigurationActiveResponse extends Component {
   constructor(props) {
@@ -28,10 +29,24 @@ class WzConfigurationActiveResponse extends Component {
     return (
       <Fragment>
         <WzTabSelector>
-          <WzTabSelectorTab label="Active response">
+          <WzTabSelectorTab
+            label={i18n.translate(
+              'wazuh.public.controller.management.config.active.response.agent.res.Activeresponse',
+              {
+                defaultMessage: 'Active response',
+              },
+            )}
+          >
             <WzConfigurationActiveResponseActiveResponse {...this.props} />
           </WzTabSelectorTab>
-          <WzTabSelectorTab label="Commands">
+          <WzTabSelectorTab
+            label={i18n.translate(
+              'wazuh.public.controller.management.config.active.response.agent.res.Commands',
+              {
+                defaultMessage: 'Commands',
+              },
+            )}
+          >
             <WzConfigurationActiveResponseCommands {...this.props} />
           </WzTabSelectorTab>
         </WzTabSelector>
@@ -42,7 +57,7 @@ class WzConfigurationActiveResponse extends Component {
 
 const sections = [
   { component: 'analysis', configuration: 'command' },
-  { component: 'analysis', configuration: 'active_response' }
+  { component: 'analysis', configuration: 'active_response' },
 ];
 
 WzConfigurationActiveResponse.propTypes = {

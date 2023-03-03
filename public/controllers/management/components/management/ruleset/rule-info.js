@@ -20,6 +20,7 @@ import {
 
 import { connect } from 'react-redux';
 import { WzRequest } from '../../../../../react-services/wz-request';
+import { i18n } from '@kbn/i18n';
 
 import { RulesetHandler, RulesetResources } from './utils/ruleset-handler';
 
@@ -59,7 +60,7 @@ class WzRuleInfo extends Component {
     };
     this.rulesetHandler = new RulesetHandler(RulesetResources.RULES);
 
-    const handleFileClick = async (event, {filename, relative_dirname}) => {
+    const handleFileClick = async (event, { filename, relative_dirname }) => {
       event.stopPropagation();
       try {
         const result = await this.rulesetHandler.getFileContent(filename);
@@ -87,14 +88,24 @@ class WzRuleInfo extends Component {
     this.columns = [
       {
         field: 'id',
-        name: 'ID',
+        name: i18n.translate(
+          'wazuh.public.controller.management.ruleset.info.ID',
+          {
+            defaultMessage: 'ID',
+          },
+        ),
         align: 'left',
         sortable: true,
         width: '5%',
       },
       {
         field: 'description',
-        name: 'Description',
+        name: i18n.translate(
+          'wazuh.public.controller.management.ruleset.info.Description',
+          {
+            defaultMessage: 'Description',
+          },
+        ),
         align: 'left',
         sortable: true,
         width: '30%',
@@ -104,7 +115,10 @@ class WzRuleInfo extends Component {
           let result = value.match(regex);
           if (result !== null) {
             for (const oldValue of result) {
-              let newValue = oldValue.replace('$(', `<strong style="color:#006BB4">`);
+              let newValue = oldValue.replace(
+                '$(',
+                `<strong style="color:#006BB4">`,
+              );
               newValue = newValue.replace(')', ' </strong>');
               value = value.replace(oldValue, newValue);
             }
@@ -118,7 +132,12 @@ class WzRuleInfo extends Component {
       },
       {
         field: 'groups',
-        name: 'Groups',
+        name: i18n.translate(
+          'wazuh.public.controller.management.ruleset.info.Groups',
+          {
+            defaultMessage: 'Groups',
+          },
+        ),
         align: 'left',
         sortable: true,
         width: '10%',
@@ -129,21 +148,33 @@ class WzRuleInfo extends Component {
       },
       {
         field: 'level',
-        name: 'Level',
+        name: i18n.translate(
+          'wazuh.public.controller.management.ruleset.info.Level',
+          {
+            defaultMessage: 'Level',
+          },
+        ),
         align: 'left',
         sortable: true,
         width: '5%',
       },
       {
         field: 'filename',
-        name: 'File',
+        name: i18n.translate(
+          'wazuh.public.controller.management.ruleset.info.File',
+          {
+            defaultMessage: 'File',
+          },
+        ),
         align: 'left',
         sortable: true,
         width: '15%',
         render: (value, item) => {
           return (
-            <EuiToolTip position="top" content={`Show ${value} content`}>
-              <EuiLink onClick={async (event) => handleFileClick(event, item)}>{value}</EuiLink>
+            <EuiToolTip position='top' content={`Show ${value} content`}>
+              <EuiLink onClick={async event => handleFileClick(event, item)}>
+                {value}
+              </EuiLink>
             </EuiToolTip>
           );
         },
@@ -162,28 +193,49 @@ class WzRuleInfo extends Component {
    */
   buildCompliance(ruleInfo) {
     const compliance = {};
-    const complianceKeys = ['gdpr', 'gpg13', 'hipaa', 'nist-800-53', 'pci', 'tsc', 'mitre'];
-    Object.keys(ruleInfo).forEach((key) => {
-      if (complianceKeys.includes(key) && ruleInfo[key].length) compliance[key] = ruleInfo[key];
+    const complianceKeys = [
+      'gdpr',
+      'gpg13',
+      'hipaa',
+      'nist-800-53',
+      'pci',
+      'tsc',
+      'mitre',
+    ];
+    Object.keys(ruleInfo).forEach(key => {
+      if (complianceKeys.includes(key) && ruleInfo[key].length)
+        compliance[key] = ruleInfo[key];
     });
     return compliance || {};
   }
 
   buildComplianceBadges(item) {
     const badgeList = [];
-    const fields = ['pci_dss', 'gpg13', 'hipaa', 'gdpr', 'nist_800_53', 'tsc', 'mitre'];
-    const buildBadge = (field) => {
+    const fields = [
+      'pci_dss',
+      'gpg13',
+      'hipaa',
+      'gdpr',
+      'nist_800_53',
+      'tsc',
+      'mitre',
+    ];
+    const buildBadge = field => {
       const idGenerator = () => {
         return '_' + Math.random().toString(36).substr(2, 9);
       };
 
       return (
-        <EuiToolTip content={item[field].join(', ')} key={idGenerator()} position="bottom">
+        <EuiToolTip
+          content={item[field].join(', ')}
+          key={idGenerator()}
+          position='bottom'
+        >
           <EuiBadge
             title={null}
-            onClick={(ev) => ev.stopPropagation()}
+            onClick={ev => ev.stopPropagation()}
             onClickAriaLabel={field.toUpperCase()}
-            color="hollow"
+            color='hollow'
             style={{ margin: '1px 2px' }}
           >
             {field.toUpperCase()}
@@ -206,7 +258,7 @@ class WzRuleInfo extends Component {
           error: error,
           message: error.message || error,
           title: error.name || error,
-        }
+        },
       };
       getErrorOrchestrator().handleError(options);
     }
@@ -218,7 +270,10 @@ class WzRuleInfo extends Component {
    * Clean the existing filters and sets the new ones and back to the previous section
    */
   setNewFiltersAndBack(filters) {
-    window.location.href = window.location.href.replace(new RegExp('redirectRule=' + '[^&]*'), '');
+    window.location.href = window.location.href.replace(
+      new RegExp('redirectRule=' + '[^&]*'),
+      '',
+    );
     this.props.cleanFilters();
     this.props.updateFilters(filters);
     this.props.cleanInfo();
@@ -234,37 +289,63 @@ class WzRuleInfo extends Component {
   renderInfo(id, level, file, path, groups) {
     return (
       <EuiFlexGrid columns={4}>
-        <EuiFlexItem key="rule_ids" grow={1}>
+        <EuiFlexItem key='rule_ids' grow={1}>
           <b style={{ paddingBottom: 6 }}>ID</b>
           <span>
-            <EuiToolTip position="top" content={`Filter by this rule ID: ${id}`}>
+            <EuiToolTip
+              position='top'
+              content={`Filter by this rule ID: ${id}`}
+            >
               <EuiLink
-                onClick={async () => this.setNewFiltersAndBack([{ field: 'rule_ids', value: id }])}
+                onClick={async () =>
+                  this.setNewFiltersAndBack([{ field: 'rule_ids', value: id }])
+                }
               >
                 {id}
               </EuiLink>
             </EuiToolTip>
           </span>
         </EuiFlexItem>
-        <EuiFlexItem key="level" grow={1}>
-          <b style={{ paddingBottom: 6 }}>Level</b>
+        <EuiFlexItem key='level' grow={1}>
+          <b style={{ paddingBottom: 6 }}>
+            {i18n.translate(
+              'wazuh.controllers.mnage.comp.confi.groups.ruleset.Level',
+              {
+                defaultMessage: 'Level',
+              },
+            )}
+          </b>
           <span>
-            <EuiToolTip position="top" content={`Filter by this level: ${level}`}>
+            <EuiToolTip
+              position='top'
+              content={`Filter by this level: ${level}`}
+            >
               <EuiLink
-                onClick={async () => this.setNewFiltersAndBack([{ field: 'level', value: level }])}
+                onClick={async () =>
+                  this.setNewFiltersAndBack([{ field: 'level', value: level }])
+                }
               >
                 {level}
               </EuiLink>
             </EuiToolTip>
           </span>
         </EuiFlexItem>
-        <EuiFlexItem key="file" grow={1}>
-          <b style={{ paddingBottom: 6 }}>File</b>
+        <EuiFlexItem key='file' grow={1}>
+          <b style={{ paddingBottom: 6 }}>
+            {i18n.translate(
+              'wazuh.controllers.mnage.comp.confi.groups.ruleset.File',
+              {
+                defaultMessage: 'File',
+              },
+            )}
+          </b>
           <span>
-            <EuiToolTip position="top" content={`Filter by this file: ${file}`}>
+            <EuiToolTip position='top' content={`Filter by this file: ${file}`}>
               <EuiLink
                 onClick={async () =>
-                  this.setNewFiltersAndBack([{ field: 'filename', value: file }])
+                  this.setNewFiltersAndBack([
+                    { field: 'filename', value: file },
+                  ])
                 }
               >
                 {file}
@@ -272,13 +353,22 @@ class WzRuleInfo extends Component {
             </EuiToolTip>
           </span>
         </EuiFlexItem>
-        <EuiFlexItem key="path" grow={1}>
-          <b style={{ paddingBottom: 6 }}>Path</b>
+        <EuiFlexItem key='path' grow={1}>
+          <b style={{ paddingBottom: 6 }}>
+            {i18n.translate(
+              'wazuh.controllers.mnage.comp.confi.groups.ruleset.Path',
+              {
+                defaultMessage: 'Path',
+              },
+            )}
+          </b>
           <span>
-            <EuiToolTip position="top" content={`Filter by this path: ${path}`}>
+            <EuiToolTip position='top' content={`Filter by this path: ${path}`}>
               <EuiLink
                 onClick={async () =>
-                  this.setNewFiltersAndBack([{ field: 'relative_dirname', value: path }])
+                  this.setNewFiltersAndBack([
+                    { field: 'relative_dirname', value: path },
+                  ])
                 }
               >
                 {path}
@@ -286,11 +376,18 @@ class WzRuleInfo extends Component {
             </EuiToolTip>
           </span>
         </EuiFlexItem>
-        <EuiFlexItem key="Groups" grow={1}>
-          <b style={{ paddingBottom: 6 }}>Groups</b>
+        <EuiFlexItem key='Groups' grow={1}>
+          <b style={{ paddingBottom: 6 }}>
+            {i18n.translate(
+              'wazuh.controllers.mnage.comp.confi.groups.ruleset.Groups',
+              {
+                defaultMessage: 'Groups',
+              },
+            )}
+          </b>
           {this.renderGroups(groups)}
         </EuiFlexItem>
-        <EuiSpacer size="s" />
+        <EuiSpacer size='s' />
       </EuiFlexGrid>
     );
   }
@@ -300,11 +397,11 @@ class WzRuleInfo extends Component {
       let link = '';
       let name = '';
 
-      value.forEach((item) => {
+      value.forEach(item => {
         if (item.type === 'cve') name = item.name;
         if (item.type === 'link')
           link = (
-            <a href={item.name} target="_blank">
+            <a href={item.name} target='_blank'>
               {item.name}
             </a>
           );
@@ -314,7 +411,11 @@ class WzRuleInfo extends Component {
           {name}: {link}
         </span>
       );
-    } else if (value && typeof value === 'object' && value.constructor === Object) {
+    } else if (
+      value &&
+      typeof value === 'object' &&
+      value.constructor === Object
+    ) {
       let list = [];
       Object.keys(value).forEach((key, idx) => {
         list.push(
@@ -323,7 +424,7 @@ class WzRuleInfo extends Component {
             {value[key]}
             {idx < Object.keys(value).length - 1 && ', '}
             <br />
-          </span>
+          </span>,
         );
       });
       return (
@@ -332,7 +433,11 @@ class WzRuleInfo extends Component {
         </ul>
       );
     } else {
-      return <WzTextWithTooltipTruncated position="top">{value}</WzTextWithTooltipTruncated>;
+      return (
+        <WzTextWithTooltipTruncated position='top'>
+          {value}
+        </WzTextWithTooltipTruncated>
+      );
     }
   }
 
@@ -342,16 +447,22 @@ class WzRuleInfo extends Component {
    */
   renderDetails(details) {
     const detailsToRender = [];
-    const capitalize = (str) => str[0].toUpperCase() + str.slice(1);
+    const capitalize = str => str[0].toUpperCase() + str.slice(1);
     // Exclude group key of details
     Object.keys(details)
-      .filter((key) => key !== 'group')
-      .forEach((key) => {
+      .filter(key => key !== 'group')
+      .forEach(key => {
         detailsToRender.push(
-          <EuiFlexItem key={key} grow={1} style={{ maxWidth: 'calc(25% - 24px)' }}>
+          <EuiFlexItem
+            key={key}
+            grow={1}
+            style={{ maxWidth: 'calc(25% - 24px)' }}
+          >
             <b style={{ paddingBottom: 6 }}>{capitalize(key)}</b>
-            {details[key] === '' ? 'true' : this.getFormattedDetails(details[key])}
-          </EuiFlexItem>
+            {details[key] === ''
+              ? 'true'
+              : this.getFormattedDetails(details[key])}
+          </EuiFlexItem>,
         );
       });
     return <EuiFlexGrid columns={4}>{detailsToRender}</EuiFlexGrid>;
@@ -367,14 +478,19 @@ class WzRuleInfo extends Component {
       listGroups.push(
         <span key={group}>
           <EuiLink
-            onClick={async () => this.setNewFiltersAndBack([{ field: 'group', value: group }])}
+            onClick={async () =>
+              this.setNewFiltersAndBack([{ field: 'group', value: group }])
+            }
           >
-            <EuiToolTip position="top" content={`Filter by this group: ${group}`}>
+            <EuiToolTip
+              position='top'
+              content={`Filter by this group: ${group}`}
+            >
               <span>{group}</span>
             </EuiToolTip>
           </EuiLink>
           {index < groups.length - 1 && ', '}
-        </span>
+        </span>,
       );
     });
     return (
@@ -392,9 +508,10 @@ class WzRuleInfo extends Component {
           tactic_ids: tactics.toString(),
         },
       });
-      const formattedData = ((data || {}).data.data || {}).affected_items || [] || {};
+      const formattedData =
+        ((data || {}).data.data || {}).affected_items || [] || {};
       formattedData &&
-        formattedData.forEach((item) => {
+        formattedData.forEach(item => {
           tacticsObj.push(item.name);
         });
       return tacticsObj;
@@ -409,21 +526,23 @@ class WzRuleInfo extends Component {
       const mitreName = [];
       const mitreIds = [];
       const mitreTactics = await Promise.all(
-        compliance.map(async (i) => {
+        compliance.map(async i => {
           const data = await WzRequest.apiReq('GET', '/mitre/techniques', {
             params: {
               q: `external_id=${i}`,
             },
           });
-          const formattedData = (((data || {}).data.data || {}).affected_items || [])[0] || {};
+          const formattedData =
+            (((data || {}).data.data || {}).affected_items || [])[0] || {};
           const tactics = this.getTacticsNames(formattedData.tactics) || [];
           mitreName.push(formattedData.name);
           mitreIds.push(i);
           return tactics;
-        })
+        }),
       );
       if (mitreTactics.length) {
-        let removeDuplicates = (arr) => arr.filter((v, i) => arr.indexOf(v) === i);
+        let removeDuplicates = arr =>
+          arr.filter((v, i) => arr.indexOf(v) === i);
         const uniqueTactics = removeDuplicates(mitreTactics.flat());
         this.setState({
           mitreLoading: false,
@@ -458,7 +577,11 @@ class WzRuleInfo extends Component {
       this.state && this.state.currentRuleId
         ? this.state.currentRuleId
         : this.props.state.ruleInfo.current;
-    if (compliance.mitre && compliance.mitre.length && currentRuleId !== this.state.mitreRuleId) {
+    if (
+      compliance.mitre &&
+      compliance.mitre.length &&
+      currentRuleId !== this.state.mitreRuleId
+    ) {
       this.addMitreInformation(compliance.mitre, currentRuleId);
     } else if (currentRuleId !== this.state.mitreRuleId) {
       this.setState({
@@ -479,9 +602,19 @@ class WzRuleInfo extends Component {
         return (
           <span key={index}>
             <EuiLink
-              onClick={async () => this.setNewFiltersAndBack([{ field: key, value: element }])}
+              onClick={async () =>
+                this.setNewFiltersAndBack([{ field: key, value: element }])
+              }
             >
-              <EuiToolTip position="top" content="Filter by this compliance">
+              <EuiToolTip
+                position='top'
+                content={i18n.translate(
+                  'wazuh.public.controller.management.ruleset.info.compliance',
+                  {
+                    defaultMessage: 'Filter by this compliance',
+                  },
+                )}
+              >
                 <span>{element}</span>
               </EuiToolTip>
             </EuiLink>
@@ -491,11 +624,15 @@ class WzRuleInfo extends Component {
       });
 
       listCompliance.push(
-        <EuiFlexItem key={key} grow={1} style={{ maxWidth: 'calc(25% - 24px)' }}>
+        <EuiFlexItem
+          key={key}
+          grow={1}
+          style={{ maxWidth: 'calc(25% - 24px)' }}
+        >
           <b style={{ paddingBottom: 6 }}>{this.complianceEquivalences[key]}</b>
           <p>{values}</p>
-          <EuiSpacer size="s" />
-        </EuiFlexItem>
+          <EuiSpacer size='s' />
+        </EuiFlexItem>,
       );
     }
 
@@ -505,10 +642,20 @@ class WzRuleInfo extends Component {
           <span key={index}>
             <EuiLink
               onClick={async () =>
-                this.setNewFiltersAndBack([{ field: 'mitre', value: this.state.mitreIds[index] }])
+                this.setNewFiltersAndBack([
+                  { field: 'mitre', value: this.state.mitreIds[index] },
+                ])
               }
             >
-              <EuiToolTip position="top" content="Filter by this compliance">
+              <EuiToolTip
+                position='top'
+                content={i18n.translate(
+                  'wazuh.public.controller.management.ruleset.info.compliance',
+                  {
+                    defaultMessage: 'Filter by this compliance',
+                  },
+                )}
+              >
                 <span>{element}</span>
               </EuiToolTip>
             </EuiLink>
@@ -517,21 +664,35 @@ class WzRuleInfo extends Component {
         );
       });
       listCompliance.push(
-        <EuiFlexItem key={listCompliance.length} grow={1} style={{ maxWidth: 'calc(25% - 24px)' }}>
-          <b style={{ paddingBottom: 6 }}>{this.complianceEquivalences['mitreTechniques']}</b>
-          {(this.state.mitreLoading && <EuiLoadingSpinner size="m" />) || <p>{values}</p>}
-          <EuiSpacer size="s" />
-        </EuiFlexItem>
+        <EuiFlexItem
+          key={listCompliance.length}
+          grow={1}
+          style={{ maxWidth: 'calc(25% - 24px)' }}
+        >
+          <b style={{ paddingBottom: 6 }}>
+            {this.complianceEquivalences['mitreTechniques']}
+          </b>
+          {(this.state.mitreLoading && <EuiLoadingSpinner size='m' />) || (
+            <p>{values}</p>
+          )}
+          <EuiSpacer size='s' />
+        </EuiFlexItem>,
       );
     }
 
     if (this.state.mitreTactics && this.state.mitreTactics.length) {
       listCompliance.push(
-        <EuiFlexItem key={listCompliance.length} grow={1} style={{ maxWidth: 'calc(25% - 24px)' }}>
-          <b style={{ paddingBottom: 6 }}>{this.complianceEquivalences['mitreTactics']}</b>
+        <EuiFlexItem
+          key={listCompliance.length}
+          grow={1}
+          style={{ maxWidth: 'calc(25% - 24px)' }}
+        >
+          <b style={{ paddingBottom: 6 }}>
+            {this.complianceEquivalences['mitreTactics']}
+          </b>
           <p>{this.state.mitreTactics.toString()}</p>
-          <EuiSpacer size="s" />
-        </EuiFlexItem>
+          <EuiSpacer size='s' />
+        </EuiFlexItem>,
       );
     }
 
@@ -545,7 +706,7 @@ class WzRuleInfo extends Component {
   changeBetweenRules(ruleId) {
     window.location.href = window.location.href.replace(
       new RegExp('redirectRule=' + '[^&]*'),
-      `redirectRule=${ruleId}`
+      `redirectRule=${ruleId}`,
     );
     this.setState({ currentRuleId: ruleId });
   }
@@ -571,17 +732,27 @@ class WzRuleInfo extends Component {
   render() {
     const { ruleInfo, isLoading } = this.props.state;
     const currentRuleId =
-      this.state && this.state.currentRuleId ? this.state.currentRuleId : ruleInfo.current;
+      this.state && this.state.currentRuleId
+        ? this.state.currentRuleId
+        : ruleInfo.current;
     const rules = ruleInfo.affected_items;
-    const currentRuleArr = rules.filter((r) => {
+    const currentRuleArr = rules.filter(r => {
       return r.id === currentRuleId;
     });
     const currentRuleInfo = currentRuleArr[0];
-    const { description, details, filename, relative_dirname, level, id, groups } = currentRuleInfo;
+    const {
+      description,
+      details,
+      filename,
+      relative_dirname,
+      level,
+      id,
+      groups,
+    } = currentRuleInfo;
     const compliance = this.buildCompliance(currentRuleInfo);
     const columns = this.columns;
 
-    const onClickRow = (item) => {
+    const onClickRow = item => {
       return {
         onClick: () => {
           this.changeBetweenRules(item.id);
@@ -598,16 +769,29 @@ class WzRuleInfo extends Component {
               <EuiFlexItem>
                 <EuiTitle>
                   <span style={{ fontSize: '22px' }}>
-                    <EuiToolTip position="right" content="Back to rules">
+                    <EuiToolTip
+                      position='right'
+                      content={i18n.translate(
+                        'wazuh.public.controller.management.ruleset.info.Backtorules',
+                        {
+                          defaultMessage: 'Back to rules',
+                        },
+                      )}
+                    >
                       <EuiButtonIcon
-                        aria-label="Back"
-                        color="primary"
-                        iconSize="l"
-                        iconType="arrowLeft"
+                        aria-label={i18n.translate(
+                          'wazuh.public.controller.management.ruleset.info.Back',
+                          {
+                            defaultMessage: 'Back',
+                          },
+                        )}
+                        color='primary'
+                        iconSize='l'
+                        iconType='arrowLeft'
                         onClick={() => {
                           window.location.href = window.location.href.replace(
                             new RegExp('redirectRule=' + '[^&]*'),
-                            ''
+                            '',
                           );
                           this.props.cleanInfo();
                         }}
@@ -615,7 +799,9 @@ class WzRuleInfo extends Component {
                     </EuiToolTip>
                     {
                       <span
-                        dangerouslySetInnerHTML={{ __html: this.updateStyleTitle(description) }}
+                        dangerouslySetInnerHTML={{
+                          __html: this.updateStyleTitle(description),
+                        }}
                       />
                     }
                   </span>
@@ -623,32 +809,57 @@ class WzRuleInfo extends Component {
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
                 <EuiButtonEmpty
-                  iconType="popout"
-                  aria-label="popout"
+                  iconType='popout'
+                  aria-label={i18n.translate(
+                    'wazuh.public.controller.management.ruleset.info.popout',
+                    {
+                      defaultMessage: 'popout',
+                    },
+                  )}
                   href={`#/overview?tab=general&tabView=panels&addRuleFilter=${id}`}
-                  target="blank"
+                  target='blank'
                 >
-                  View alerts of this Rule
+                  {i18n.translate(
+                    'wazuh.controllers..mnage.comp.confi.groups.ruleset.Information.rule',
+                    {
+                      defaultMessage: 'View alerts of this Rule',
+                    },
+                  )}
                 </EuiButtonEmpty>
               </EuiFlexItem>
             </EuiFlexGroup>
             {/* Cards */}
-            <EuiPanel style={{ margin: '16px 0', padding: '16px 16px 0px 16px' }}>
+            <EuiPanel
+              style={{ margin: '16px 0', padding: '16px 16px 0px 16px' }}
+            >
               <EuiFlexGroup>
                 {/* General info */}
                 <EuiFlexItem style={{ marginBottom: 16, marginTop: 8 }}>
                   <EuiAccordion
-                    id="Info"
+                    id='Info'
                     buttonContent={
-                      <EuiTitle size="s">
-                        <h3>Information</h3>
+                      <EuiTitle size='s'>
+                        <h3>
+                          {i18n.translate(
+                            'wazuh.controllers..mnage.comp.confi.groups.ruleset.Information',
+                            {
+                              defaultMessage: 'Information',
+                            },
+                          )}
+                        </h3>
                       </EuiTitle>
                     }
-                    paddingSize="none"
+                    paddingSize='none'
                     initialIsOpen={true}
                   >
-                    <div className="flyout-row details-row">
-                      {this.renderInfo(id, level, filename, relative_dirname, groups)}
+                    <div className='flyout-row details-row'>
+                      {this.renderInfo(
+                        id,
+                        level,
+                        filename,
+                        relative_dirname,
+                        groups,
+                      )}
                     </div>
                   </EuiAccordion>
                 </EuiFlexItem>
@@ -657,16 +868,25 @@ class WzRuleInfo extends Component {
               <EuiFlexGroup>
                 <EuiFlexItem style={{ marginTop: 8 }}>
                   <EuiAccordion
-                    id="Details"
+                    id='Details'
                     buttonContent={
-                      <EuiTitle size="s">
-                        <h3>Details</h3>
+                      <EuiTitle size='s'>
+                        <h3>
+                          {i18n.translate(
+                            'wazuh.controllers..mnage.comp.confi.groups.ruleset.Details',
+                            {
+                              defaultMessage: 'Details',
+                            },
+                          )}
+                        </h3>
                       </EuiTitle>
                     }
-                    paddingSize="none"
+                    paddingSize='none'
                     initialIsOpen={true}
                   >
-                    <div className="flyout-row details-row">{this.renderDetails(details)}</div>
+                    <div className='flyout-row details-row'>
+                      {this.renderDetails(details)}
+                    </div>
                   </EuiAccordion>
                 </EuiFlexItem>
               </EuiFlexGroup>
@@ -675,16 +895,23 @@ class WzRuleInfo extends Component {
                 <EuiFlexGroup>
                   <EuiFlexItem style={{ marginTop: 8 }}>
                     <EuiAccordion
-                      id="Compliance"
+                      id='Compliance'
                       buttonContent={
-                        <EuiTitle size="s">
-                          <h3>Compliance</h3>
+                        <EuiTitle size='s'>
+                          <h3>
+                            {i18n.translate(
+                              'wazuh.controllers..mnage.comp.confi.groups.ruleset.Compliance',
+                              {
+                                defaultMessage: 'Compliance',
+                              },
+                            )}
+                          </h3>
                         </EuiTitle>
                       }
-                      paddingSize="none"
+                      paddingSize='none'
                       initialIsOpen={true}
                     >
-                      <div className="flyout-row details-row">
+                      <div className='flyout-row details-row'>
                         {this.renderCompliance(compliance)}
                       </div>
                     </EuiAccordion>
@@ -695,20 +922,27 @@ class WzRuleInfo extends Component {
               <EuiFlexGroup>
                 <EuiFlexItem style={{ marginTop: 8 }}>
                   <EuiAccordion
-                    id="Related"
+                    id='Related'
                     buttonContent={
-                      <EuiTitle size="s">
-                        <h3>Related rules</h3>
+                      <EuiTitle size='s'>
+                        <h3>
+                          {i18n.translate(
+                            'wazuh.controllers..mnage.comp.confi.groups.ruleset.Relatedrules',
+                            {
+                              defaultMessage: 'Related rules',
+                            },
+                          )}
+                        </h3>
                       </EuiTitle>
                     }
-                    paddingSize="none"
+                    paddingSize='none'
                     initialIsOpen={true}
                   >
-                    <div className="flyout-row related-rules-row">
+                    <div className='flyout-row related-rules-row'>
                       <EuiFlexGroup>
                         <EuiFlexItem>
                           <EuiInMemoryTable
-                            itemId="id"
+                            itemId='id'
                             items={rules}
                             rowProps={onClickRow}
                             columns={columns}
@@ -731,17 +965,17 @@ class WzRuleInfo extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
     state: state.rulesetReducers,
   };
 };
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
-    updateFileContent: (content) => dispatch(updateFileContent(content)),
+    updateFileContent: content => dispatch(updateFileContent(content)),
     cleanFileContent: () => dispatch(cleanFileContent()),
-    updateFilters: (filters) => dispatch(updateFilters(filters)),
+    updateFilters: filters => dispatch(updateFilters(filters)),
     cleanFilters: () => dispatch(cleanFilters()),
     cleanInfo: () => dispatch(cleanInfo()),
   };

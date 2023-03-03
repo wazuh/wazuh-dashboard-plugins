@@ -9,15 +9,30 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { webDocumentationLink } from "../../../../../../../common/services/web_documentation";
+import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
+import { i18n } from '@kbn/i18n';
 
+const text1 = i18n.translate(
+  'wazuh.controller.manage.comp.config.setting.response.active.text1',
+  {
+    defaultMessage: 'Using Wazuh to monitor AWS',
+  },
+);
+const text2 = i18n.translate(
+  'wazuh.controller.manage.comp.config.setting.response.active.text2',
+  {
+    defaultMessage: 'Amazon S3 module reference',
+  },
+);
 export default [
   {
-    text: 'Using Wazuh to monitor AWS',
-    href: webDocumentationLink('amazon/index.html')
+    text: text1,
+    href: webDocumentationLink('amazon/index.html'),
   },
   {
-    text: 'Amazon S3 module reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/wodle-s3.html')
-  }
+    text: text2,
+    href: webDocumentationLink(
+      'user-manual/reference/ossec-conf/wodle-s3.html',
+    ),
+  },
 ];

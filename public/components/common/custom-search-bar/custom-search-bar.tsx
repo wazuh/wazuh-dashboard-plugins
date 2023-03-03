@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Filter } from '../../../../../../src/plugins/data/public/';
+import { i18n } from '@kbn/i18n';
 import {
   FilterMeta,
   FilterState,
@@ -40,7 +41,7 @@ export const CustomSearchBar = ({ filtersValues, filterDrillDownValue = { field:
     onFiltersUpdated();
   }, [filters]);
 
-  
+
   const checkSelectDrillDownValue = (key) => {
     return filterDrillDownValue.field === key && filterDrillDownValue.value != '' ? true : false
   }
@@ -138,7 +139,7 @@ export const CustomSearchBar = ({ filtersValues, filterDrillDownValue = { field:
     filterManager.addFilters(currentFilters);
     refreshCustomSelectedFilter();
   };
-
+  const advanceLabel = i18n.translate('wazuh.components.common.customSearchBar.advanceLabel', { defaultMessage: 'Advanced filters', })
   const getComponent = (item: any) => {
     const types: { [key: string]: object } = {
       default: <></>,
@@ -155,6 +156,7 @@ export const CustomSearchBar = ({ filtersValues, filterDrillDownValue = { field:
     };
     return types[item.type] || types.default;
   };
+
 
   return (
     <>
@@ -185,8 +187,9 @@ export const CustomSearchBar = ({ filtersValues, filterDrillDownValue = { field:
           />
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
+
           <EuiSwitch
-            label="Advanced filters"
+            label= {advanceLabel}
             checked={avancedFiltersState}
             onChange={() => changeSwitch()}
           />

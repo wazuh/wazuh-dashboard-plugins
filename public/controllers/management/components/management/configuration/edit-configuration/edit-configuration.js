@@ -76,16 +76,24 @@ class WzEditConfiguration extends Component {
     try {
       this.setState({ saving: true });
       this.props.clusterNodeSelected
-        ? await saveFileCluster(this.state.editorValue, this.props.clusterNodeSelected)
+        ? await saveFileCluster(
+            this.state.editorValue,
+            this.props.clusterNodeSelected,
+          )
         : await saveFileManager(this.state.editorValue);
-      this.setState({ saving: false, infoChangesAfterRestart: true, hasChanges: false });
+      this.setState({
+        saving: false,
+        infoChangesAfterRestart: true,
+        hasChanges: false,
+      });
       this.addToast({
         title: (
           <Fragment>
-            <EuiIcon type="check" />
+            <EuiIcon type='check' />
             &nbsp;
             <span>
-              <b>{this.props.clusterNodeSelected || 'Manager'}</b> configuration has been updated
+              <b>{this.props.clusterNodeSelected || 'Manager'}</b> configuration
+              has been updated
             </span>
           </Fragment>
         ),
@@ -106,7 +114,12 @@ class WzEditConfiguration extends Component {
         error: {
           error: error,
           message: errorMessage || error,
-          title: "Error found saving the file.",
+          title: i18n.translate(
+            'wazuh.public.controller.management.config.edit.config.file',
+            {
+              defaultMessage: 'Error found saving the file.',
+            },
+          ),
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -151,14 +164,23 @@ class WzEditConfiguration extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     if (prevState.editorValue !== this.state.editorValue) {
-      this.setState({ hasChanges: this.state.editorValue !== this.state.initialValue });
+      this.setState({
+        hasChanges: this.state.editorValue !== this.state.initialValue,
+      });
     }
   }
 
   async confirmRestart() {
     try {
-      this.setState({ restarting: true, saving: true, infoChangesAfterRestart: false });
-      await restartNodeSelected(this.props.clusterNodeSelected, this.props.updateWazuhNotReadyYet);
+      this.setState({
+        restarting: true,
+        saving: true,
+        infoChangesAfterRestart: false,
+      });
+      await restartNodeSelected(
+        this.props.clusterNodeSelected,
+        this.props.updateWazuhNotReadyYet,
+      );
       this.props.updateWazuhNotReadyYet('');
       this.setState({ restart: false, saving: false, restarting: false });
       await this.checkIfClusterOrManager();
@@ -166,20 +188,30 @@ class WzEditConfiguration extends Component {
         this.addToast({
           title: (
             <Fragment>
-              <EuiIcon type="iInCircle" />
+              <EuiIcon type='iInCircle' />
               &nbsp;
               <span>
-                Nodes could take some time to restart, it may be necessary to perform a refresh to
-                see them all.
+                {i18n.translate(
+                  'wazuh.public.controller.management.config.edit.config.restatTime',
+                  {
+                    defaultMessage:
+                      'Nodes could take some time to restart, it may be necessary to perform a refresh to see them all.',
+                  },
+                )}
               </span>
             </Fragment>
           ),
           color: 'success',
         });
       }
-      if(!this.props.clusterNodeSelected){
+      if (!this.props.clusterNodeSelected) {
         this.addToast({
-          title: 'Manager was restarted',
+          title: i18n.translate(
+            'wazuh.public.controller.management.config.edit.config.restarted',
+            {
+              defaultMessage: 'Manager was restarted',
+            },
+          ),
           color: 'success',
         });
       }
@@ -204,37 +236,58 @@ class WzEditConfiguration extends Component {
     try {
       // in case which enable/disable cluster configuration, update Redux Store
       const clusterStatus = await clusterReq();
-      if (clusterStatus.data.data.enabled === 'yes' && clusterStatus.data.data.running === 'yes') {
+      if (
+        clusterStatus.data.data.enabled === 'yes' &&
+        clusterStatus.data.data.running === 'yes'
+      ) {
         // try if it is a cluster
         const nodes = await clusterNodes();
         // set cluster nodes in Redux Store
         this.props.updateClusterNodes(nodes.data.data.affected_items);
         // set cluster node selected in Redux Store
-        const existsClusterCurrentNodeSelected = nodes.data.data.affected_items.find(
-          (node) => node.name === this.props.clusterNodeSelected
-        );
+        const existsClusterCurrentNodeSelected =
+          nodes.data.data.affected_items.find(
+            node => node.name === this.props.clusterNodeSelected,
+          );
         this.props.updateClusterNodeSelected(
           existsClusterCurrentNodeSelected
             ? existsClusterCurrentNodeSelected.name
-            : nodes.data.data.affected_items.find((node) => node.type === 'master').name
+            : nodes.data.data.affected_items.find(
+                node => node.type === 'master',
+              ).name,
         );
-        this.props.updateConfigurationSection('edit-configuration', 'Cluster configuration');
+        this.props.updateConfigurationSection(
+          'edit-configuration',
+          'Cluster configuration',
+        );
       } else {
         // do nothing if it isn't a cluster
         this.props.updateClusterNodes(false);
         this.props.updateClusterNodeSelected(false);
-        this.props.updateConfigurationSection('edit-configuration', 'Manager configuration');
+        this.props.updateConfigurationSection(
+          'edit-configuration',
+          'Manager configuration',
+        );
       }
     } catch (error) {
       // do nothing if it isn't a cluster
       this.props.updateClusterNodes(false);
       this.props.updateClusterNodeSelected(false);
-      this.props.updateConfigurationSection('edit-configuration', 'Manager configuration');
+      this.props.updateConfigurationSection(
+        'edit-configuration',
+        'Manager configuration',
+      );
       throw error;
     }
   }
   render() {
-    const { restart, restarting, saving, editorValue, disableSaveRestartButtons } = this.state;
+    const {
+      restart,
+      restarting,
+      saving,
+      editorValue,
+      disableSaveRestartButtons,
+    } = this.state;
     const { clusterNodeSelected, agent } = this.props;
     const xmlError = editorValue && validateXML(editorValue);
     return (
@@ -249,8 +302,13 @@ class WzEditConfiguration extends Component {
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
             {xmlError ? (
-              <EuiButton iconType="alert" isDisabled>
-                XML format error
+              <EuiButton iconType='alert' isDisabled>
+                {i18n.translate(
+                  'wazuh.public.controller.management.config.edit.config.XMLerror',
+                  {
+                    defaultMessage: 'XML format error',
+                  },
+                )}
               </EuiButton>
             ) : (
               <WzButtonPermissions
@@ -263,7 +321,7 @@ class WzEditConfiguration extends Component {
                     : { action: 'manager:update_config', resource: '*:*:*' },
                 ]}
                 isDisabled={saving || disableSaveRestartButtons}
-                iconType="save"
+                iconType='save'
                 onClick={() => this.editorSave()}
               >
                 Save
@@ -281,21 +339,24 @@ class WzEditConfiguration extends Component {
                   : { action: 'manager:restart', resource: '*:*:*' },
               ]}
               fill
-              iconType="refresh"
+              iconType='refresh'
               onClick={() => this.toggleRestart()}
               isDisabled={disableSaveRestartButtons || restarting}
               isLoading={restarting}
             >
-              {restarting ? 'Restarting' : 'Restart'} {clusterNodeSelected || 'Manager'}
+              {restarting ? 'Restarting' : 'Restart'}{' '}
+              {clusterNodeSelected || 'Manager'}
             </WzButtonPermissions>
           </EuiFlexItem>
         </WzConfigurationPath>
         <WzEditorConfiguration
-          onChange={(value) => this.onChange(value)}
-          onDidMount={(xmlFetched, errorXMLFetched) => this.onDidMount(xmlFetched, errorXMLFetched)}
+          onChange={value => this.onChange(value)}
+          onDidMount={(xmlFetched, errorXMLFetched) =>
+            this.onDidMount(xmlFetched, errorXMLFetched)
+          }
           toggleRestart={() => this.toggleRestart()}
           confirmRestart={() => this.confirmRestart()}
-          onLoadingConfiguration={(value) => this.onLoadingConfiguration(value)}
+          onLoadingConfiguration={value => this.onLoadingConfiguration(value)}
           {...this.state}
           agent={agent}
           xmlError={xmlError}
@@ -306,9 +367,9 @@ class WzEditConfiguration extends Component {
               title={`${clusterNodeSelected || 'Manager'} will be restarted`}
               onCancel={() => this.toggleRestart()}
               onConfirm={() => this.confirmRestart()}
-              cancelButtonText="Cancel"
-              confirmButtonText="Confirm"
-              defaultFocusedButton="cancel"
+              cancelButtonText='Cancel'
+              confirmButtonText='Confirm'
+              defaultFocusedButton='cancel'
             />
           </EuiOverlayMask>
         )}
@@ -317,17 +378,18 @@ class WzEditConfiguration extends Component {
   }
 }
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = state => ({
   wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet,
   clusterNodes: state.configurationReducers.clusterNodes,
   clusterNodeSelected: state.configurationReducers.clusterNodeSelected,
 });
 
-const mapDispatchToProps = (dispatch) => ({
-  updateClusterNodes: (clusterNodes) => dispatch(updateClusterNodes(clusterNodes)),
-  updateClusterNodeSelected: (clusterNodeSelected) =>
+const mapDispatchToProps = dispatch => ({
+  updateClusterNodes: clusterNodes =>
+    dispatch(updateClusterNodes(clusterNodes)),
+  updateClusterNodeSelected: clusterNodeSelected =>
     dispatch(updateClusterNodeSelected(clusterNodeSelected)),
-  updateWazuhNotReadyYet: (value) => dispatch(updateWazuhNotReadyYet(value)),
+  updateWazuhNotReadyYet: value => dispatch(updateWazuhNotReadyYet(value)),
 });
 
 WzEditConfiguration.propTypes = {
@@ -335,9 +397,12 @@ WzEditConfiguration.propTypes = {
   updateWazuhNotReadyYet: PropTypes.func,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(WzEditConfiguration);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(WzEditConfiguration);
 
-const mapStateToPropsEditor = (state) => ({
+const mapStateToPropsEditor = state => ({
   clusterNodeSelected: state.configurationReducers.clusterNodeSelected,
   clusterNodes: state.configurationReducers.clusterNodes,
   refreshTime: state.configurationReducers.refreshTime,
@@ -347,7 +412,7 @@ const mapStateToPropsEditor = (state) => ({
 const WzEditorConfiguration = compose(
   connect(mapStateToPropsEditor),
   withLoading(
-    async (props) => {
+    async props => {
       try {
         props.onLoadingConfiguration(true);
         const xmlFetched = await fetchFile(props.clusterNodeSelected);
@@ -363,8 +428,8 @@ const WzEditorConfiguration = compose(
         props.clusterNodeSelected &&
         prevProps.clusterNodeSelected &&
         props.clusterNodeSelected !== prevProps.clusterNodeSelected) ||
-      props.refreshTime !== prevProps.refreshTime
-  )
+      props.refreshTime !== prevProps.refreshTime,
+  ),
 )(
   // eslint-disable-next-line react/no-multi-comp
   class WzEditorConfiguration extends Component {
@@ -386,7 +451,9 @@ const WzEditorConfiguration = compose(
       } = this.props;
       const existsClusterCurrentNodeSelected =
         this.props.clusterNodes &&
-        this.props.clusterNodes.find((node) => node.name === this.props.clusterNodeSelected);
+        this.props.clusterNodes.find(
+          node => node.name === this.props.clusterNodeSelected,
+        );
       return (
         <Fragment>
           {!this.props.errorXMLFetched ? (
@@ -394,10 +461,15 @@ const WzEditorConfiguration = compose(
               <EuiText>
                 Edit <span style={{ fontWeight: 'bold' }}>ossec.conf</span> of{' '}
                 <span style={{ fontWeight: 'bold' }}>
-                  {(existsClusterCurrentNodeSelected && clusterNodeSelected) || 'Manager'}
-                  {existsClusterCurrentNodeSelected && clusterNodeSelected && clusterNodes
+                  {(existsClusterCurrentNodeSelected && clusterNodeSelected) ||
+                    'Manager'}
+                  {existsClusterCurrentNodeSelected &&
+                  clusterNodeSelected &&
+                  clusterNodes
                     ? ' (' +
-                      clusterNodes.find((node) => node.name === clusterNodeSelected).type +
+                      clusterNodes.find(
+                        node => node.name === clusterNodeSelected,
+                      ).type +
                       ')'
                     : ''}
                 </span>
@@ -405,17 +477,25 @@ const WzEditorConfiguration = compose(
               </EuiText>
               {infoChangesAfterRestart && (
                 <EuiCallOut
-                  iconType="iInCircle"
-                  title="Changes will not take effect until a restart is performed."
+                  iconType='iInCircle'
+                  title={i18n.translate(
+                    'wazuh.public.controller.management.config.edit.config.perfomed',
+                    {
+                      defaultMessage:
+                        'Changes will not take effect until a restart is performed.',
+                    },
+                  )}
                 />
               )}
-              <EuiSpacer size="s" />
+              <EuiSpacer size='s' />
               {typeof editorValue === 'string' && (
                 <WzCodeEditor
-                  mode="xml"
+                  mode='xml'
                   value={editorValue}
-                  onChange={(value) => onChange(value)}
-                  minusHeight={wazuhNotReadyYet || infoChangesAfterRestart ? 320 : 270}
+                  onChange={value => onChange(value)}
+                  minusHeight={
+                    wazuhNotReadyYet || infoChangesAfterRestart ? 320 : 270
+                  }
                 />
               )}
             </Fragment>
@@ -425,5 +505,5 @@ const WzEditorConfiguration = compose(
         </Fragment>
       );
     }
-  }
+  },
 );

@@ -1,15 +1,15 @@
 /*
-* Wazuh app - Office365 interactive extension guide
-* Copyright (C) 2015-2022 Wazuh, Inc.
-*
-* This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation; either version 2 of the License, or
-* (at your option) any later version.
-*
-* Find more information about this on the LICENSE file.
-*/
-import { webDocumentationLink } from "../../../../common/services/web_documentation";
+ * Wazuh app - Office365 interactive extension guide
+ * Copyright (C) 2015-2022 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
+import { webDocumentationLink } from '../../../../common/services/web_documentation';
 
 export default {
   id: 'office',
@@ -17,7 +17,9 @@ export default {
   wodle_name: 'office',
   description: 'Configuration options of the Office 365 wodle.',
   category: 'Security information management',
-  documentation_link: webDocumentationLink('user-manual/reference/ossec-conf/wodle-s3.html'),
+  documentation_link: webDocumentationLink(
+    'user-manual/reference/ossec-conf/wodle-s3.html',
+  ),
   icon: 'logoOfficeMono',
   avaliable_for_manager: true,
   avaliable_for_agent: true,
@@ -49,7 +51,6 @@ export default {
     //       required: true,
     //       default_value: true
     //     },
-
     //   ]
     // },
     // {
@@ -179,5 +180,5 @@ export default {
     //     }
     //   ]
     // }
-  ]
-} 
+  ],
+};

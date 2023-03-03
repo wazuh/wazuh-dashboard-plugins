@@ -33,6 +33,7 @@ import './welcome.scss';
 import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
 import { withErrorBoundary } from '../hocs';
 import { LogoDocker, LogoGitHub, LogoGoogleCloud, LogoOffice365 } from '../logos';
+import { i18n } from '@kbn/i18n';
 
 export const OverviewWelcome = withErrorBoundary(class OverviewWelcome extends Component {
   constructor(props) {
@@ -74,7 +75,18 @@ export const OverviewWelcome = withErrorBoundary(class OverviewWelcome extends C
       <>
         <EuiFlexGroup >
           <EuiFlexItem >
-            <EuiCallOut title={<>No agents were added to this manager.  <EuiButtonEmpty href='#/agents-preview?'>Add agent</EuiButtonEmpty></>} color="warning" iconType="alert">
+
+            <EuiCallOut title={<>{
+              i18n.translate('wazuh.components.welcome.overviewWelcome.noAgentAdded', {
+                defaultMessage: 'No agents were added to this manager.',
+              })
+            }
+            <EuiButtonEmpty href='#/agents-preview?'>{
+              i18n.translate('wazuh.components.welcome.overviewWelcome.addAgent', {
+                defaultMessage: 'Add agent',
+              })
+            }
+            </EuiButtonEmpty></>} color="warning" iconType="alert">
             </EuiCallOut>
           </EuiFlexItem >
         </EuiFlexGroup>
@@ -92,7 +104,12 @@ export const OverviewWelcome = withErrorBoundary(class OverviewWelcome extends C
               {this.props.agentsCountTotal == 0 && this.addAgent()}
               <EuiFlexGroup>
                 <EuiFlexItem>
-                  <EuiCard title description betaBadgeLabel="Security Information Management">
+                  <EuiCard title description betaBadgeLabel={
+                    i18n.translate('wazuh.components.welcome.overviewWelcome.securityInformationManagement', {
+                      defaultMessage: "Security Information Management"
+                    })
+                  }
+                  >
                     <EuiSpacer size="s" />
                     <EuiFlexGrid columns={2}>
                       {this.buildTabCard('general', 'dashboardApp')}
@@ -109,7 +126,12 @@ export const OverviewWelcome = withErrorBoundary(class OverviewWelcome extends C
                   </EuiCard>
                 </EuiFlexItem>
                 <EuiFlexItem>
-                  <EuiCard title description betaBadgeLabel="Auditing and Policy Monitoring">
+                  <EuiCard title description betaBadgeLabel={
+                    i18n.translate('wazuh.components.welcome.overviewWelcome.auditingAndPolicyMonitoring', {
+                      defaultMessage: "Auditing and Policy Monitoring"
+                    })
+                  }
+                  >
                     <EuiSpacer size="s" />
                     <EuiFlexGrid columns={2}>
                       {this.buildTabCard('pm', 'advancedSettingsApp')}
@@ -128,7 +150,12 @@ export const OverviewWelcome = withErrorBoundary(class OverviewWelcome extends C
               <EuiSpacer size="xl" />
               <EuiFlexGroup>
                 <EuiFlexItem>
-                  <EuiCard title description betaBadgeLabel="Threat Detection and Response">
+                  <EuiCard title description betaBadgeLabel={
+                    i18n.translate('wazuh.components.welcome.overviewWelcome.threatDetectionAndResponse', {
+                      defaultMessage: "Threat Detection and Response"
+                    })
+                  }
+                  >
                     <EuiSpacer size="s" />
                     <EuiFlexGrid columns={2}>
                       {this.buildTabCard('vuls', 'securityApp')}
@@ -145,9 +172,14 @@ export const OverviewWelcome = withErrorBoundary(class OverviewWelcome extends C
                 </EuiFlexItem>
 
                 <EuiFlexItem>
-                  <EuiCard title description betaBadgeLabel="Regulatory Compliance">
+                  <EuiCard title description betaBadgeLabel={
+                    i18n.translate('wazuh.components.welcome.overviewWelcome.regulatoryCompliance', {
+                      defaultMessage: "Regulatory Compliance"
+                    })
+                  }
+                  >
                     <EuiSpacer size="s" />
-                    {!this.props.extensions.pci &&
+                    {true || !this.props.extensions.pci &&
                       !this.props.extensions.gdpr &&
                       !this.props.extensions.hipaa &&
                       !this.props.extensions.tsc &&

@@ -12,6 +12,7 @@
 
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { i18n } from '@kbn/i18n';
 
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
@@ -22,13 +23,23 @@ import { renderValueYesThenEnabled } from '../utils/utils';
 const mainSettings = [
   {
     field: 'enabled',
-    label: 'File limit status',
-    render: renderValueYesThenEnabled
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.fileLimit.status',
+      {
+        defaultMessage: 'File limit status',
+      },
+    ),
+    render: renderValueYesThenEnabled,
   },
   {
     field: 'entries',
-    label: 'Maximum number of files to monitor'
-  }
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.fileLimit.moniter',
+      {
+        defaultMessage: 'Maximum number of files to monitor',
+      },
+    ),
+  },
 ];
 
 class WzConfigurationIntegrityMonitoringFileLimit extends Component {
@@ -44,21 +55,29 @@ class WzConfigurationIntegrityMonitoringFileLimit extends Component {
         currentConfig['syscheck-syscheck'].syscheck &&
         currentConfig['syscheck-syscheck'].syscheck.file_limit ? (
           <WzConfigurationSettingsTabSelector
-            title="File limit"
-            description="Limit the maximum of files to be monitored"
+            title={i18n.translate(
+              'wazuh.public.controller.management.config.fileLimit.file',
+              {
+                defaultMessage: 'File limit',
+              },
+            )}
+            description={i18n.translate(
+              'wazuh.public.controller.management.config.fileLimit.monitored',
+              {
+                defaultMessage: 'Limit the maximum of files to be monitored',
+              },
+            )}
             currentConfig={currentConfig['syscheck-syscheck']}
             minusHeight={this.props.agent.id === '000' ? 320 : 415}
             helpLinks={helpLinks}
           >
             <WzConfigurationSettingsGroup
-              config={
-                currentConfig['syscheck-syscheck'].syscheck.file_limit
-              }
+              config={currentConfig['syscheck-syscheck'].syscheck.file_limit}
               items={mainSettings}
             />
           </WzConfigurationSettingsTabSelector>
         ) : (
-          <WzNoConfig error="not-present" help={helpLinks} />
+          <WzNoConfig error='not-present' help={helpLinks} />
         )}
       </Fragment>
     );

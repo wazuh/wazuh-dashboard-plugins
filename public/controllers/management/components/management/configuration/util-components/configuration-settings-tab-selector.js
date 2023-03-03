@@ -15,12 +15,13 @@ import React, { Component, Fragment } from 'react';
 import WzConfigurationSettingsHeader from './configuration-settings-header';
 import WzViewSelector, { WzViewSelectorSwitch } from './view-selector';
 import { WzSettingsViewer } from './code-viewer';
+import { i18n } from '@kbn/i18n';
 
 class WzConfigurationSettingsTabSelector extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      view: ''
+      view: '',
     };
   }
   changeView(view) {
@@ -28,12 +29,40 @@ class WzConfigurationSettingsTabSelector extends Component {
   }
   getTitleDescription(view) {
     const result = {};
-    if (view === 'json') {
-      result.title = 'JSON Viewer';
-      result.description = 'View this configuration in raw JSON format';
+    if (
+      view ===
+      i18n.translate(
+        'wazuh.public.controller.management.config.policy.util.components.tab.selector.json1',
+        {
+          defaultMessage: 'json',
+        },
+      )
+    ) {
+      result.title = i18n.translate(
+        'wazuh.public.controller.management.config.policy.util.components.tab.selector.JSONViewer',
+        {
+          defaultMessage: 'JSON Viewer',
+        },
+      );
+      result.description = i18n.translate(
+        'wazuh.public.controller.management.config.policy.util.components.tab.selector.json',
+        {
+          defaultMessage: 'View this configuration in raw JSON format',
+        },
+      );
     } else if (view === 'xml') {
-      result.title = 'XML Viewer';
-      result.description = 'View this configuration in raw XML format';
+      result.title = i18n.translate(
+        'wazuh.public.controller.management.config.policy.util.components.tab.selector.XMLViewer',
+        {
+          defaultMessage: 'XML Viewer',
+        },
+      );
+      result.description = i18n.translate(
+        'wazuh.public.controller.management.config.policy.util.components.tab.selector.xml',
+        {
+          defaultMessage: 'View this configuration in raw XML format',
+        },
+      );
     } else {
       result.title = this.props.title;
       result.description = this.props.description;
@@ -46,7 +75,7 @@ class WzConfigurationSettingsTabSelector extends Component {
     const { currentConfig, helpLinks, children, minusHeight } = this.props;
     const { title, description } = this.getTitleDescription(view);
     const codeViewerMinusHeight = minusHeight !== undefined ? minusHeight : 280;
-    
+
     return (
       <Fragment>
         <WzConfigurationSettingsHeader
@@ -60,16 +89,16 @@ class WzConfigurationSettingsTabSelector extends Component {
         />
         <WzViewSelector view={view}>
           <WzViewSelectorSwitch default>{children}</WzViewSelectorSwitch>
-          <WzViewSelectorSwitch view="json">
+          <WzViewSelectorSwitch view='json'>
             <WzSettingsViewer
-              mode="json"
+              mode='json'
               value={currentConfig}
               minusHeight={codeViewerMinusHeight}
             />
           </WzViewSelectorSwitch>
-          <WzViewSelectorSwitch view="xml">
+          <WzViewSelectorSwitch view='xml'>
             <WzSettingsViewer
-              mode="xml"
+              mode='xml'
               value={currentConfig}
               minusHeight={codeViewerMinusHeight}
             />

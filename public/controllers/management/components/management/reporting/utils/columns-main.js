@@ -6,6 +6,9 @@ import { WzButtonPermissions } from '../../../../../../components/common/permiss
 import { WAZUH_ROLE_ADMINISTRATOR_NAME } from '../../../../../../../common/constants';
 import { getHttp, getUiSettings } from '../../../../../../kibana-services';
 import { formatUIDate } from '../../../../../../react-services/time-service';
+
+import { i18n } from '@kbn/i18n';
+
 export default class ReportingColums {
   constructor(tableProps) {
     this.tableProps = tableProps;
@@ -15,57 +18,103 @@ export default class ReportingColums {
       this.columns = [
         {
           field: 'name',
-          name: 'File',
+          name: i18n.translate(
+            'wazuh.public.controller.management.reports.utils.column.File',
+            {
+              defaultMessage: 'File',
+            },
+          ),
           align: 'left',
-          sortable: true
+          sortable: true,
         },
         {
           field: 'size',
-          name: 'Size',
+          name: i18n.translate(
+            'wazuh.public.controller.management.reports.utils.column.Size',
+            {
+              defaultMessage: 'Size',
+            },
+          ),
           render: size => {
             const fixedSize = size / 1024;
             return `${fixedSize.toFixed(2)}KB`;
           },
-          sortable: true
+          sortable: true,
         },
         {
           field: 'date',
-          name: 'Created',
+          name: i18n.translate(
+            'wazuh.public.controller.management.reports.utils.column.Created',
+            {
+              defaultMessage: 'Created',
+            },
+          ),
           render: value => formatUIDate(value),
-          sortable: true
-        }
+          sortable: true,
+        },
       ];
       this.columns.push({
-        name: 'Actions',
+        name: i18n.translate(
+          'wazuh.public.controller.management.reports.utils.column.Actions',
+          {
+            defaultMessage: 'Actions',
+          },
+        ),
         align: 'left',
         render: item => {
           return (
             <div>
-              <EuiToolTip position="top" content={`Download report`}>
+              <EuiToolTip
+                position='top'
+                content={i18n.translate(
+                  'wazuh.public.controller.management.reports.utils.column.Dowloadreport',
+                  {
+                    defaultMessage: 'Dowload report',
+                  },
+                )}
+              >
                 <EuiButtonIcon
-                  aria-label="Dowload report"
-                  iconType="importAction"
+                  aria-label={i18n.translate(
+                    'wazuh.public.controller.management.reports.utils.column.Dowloadreport',
+                    {
+                      defaultMessage: 'Dowload report',
+                    },
+                  )}
+                  iconType='importAction'
                   onClick={() => this.goReport(item.name)}
-                  color="primary"
+                  color='primary'
                 />
               </EuiToolTip>
 
               <WzButtonPermissions
                 buttonType='icon'
                 roles={[WAZUH_ROLE_ADMINISTRATOR_NAME]}
-                aria-label="Delete report"
-                iconType="trash"
-                tooltip={{position: 'top', content: 'Delete report'}}
+                aria-label={i18n.translate(
+                  'wazuh.public.controller.management.reports.utils.column.Deletereport',
+                  {
+                    defaultMessage: 'Delete report',
+                  },
+                )}
+                iconType='trash'
+                tooltip={{
+                  position: 'top',
+                  content: i18n.translate(
+                    'wazuh.public.controller.management.reports.utils.column.Deletereport',
+                    {
+                      defaultMessage: 'Delete report',
+                    },
+                  ),
+                }}
                 onClick={async () => {
                   this.tableProps.updateListItemsForRemove([item]);
                   this.tableProps.updateShowModal(true);
                 }}
-                color="danger"
+                color='danger'
                 isDisabled={item.name === 'default'}
               />
             </div>
           );
-        }
+        },
       });
     };
 

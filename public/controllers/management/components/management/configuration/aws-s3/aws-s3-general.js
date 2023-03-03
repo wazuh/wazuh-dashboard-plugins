@@ -10,6 +10,8 @@
  * Find more information about this on the LICENSE file.
  */
 
+import { i18n } from '@kbn/i18n';
+
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 
@@ -17,26 +19,57 @@ import WzConfigurationSettingsTabSelector from '../util-components/configuration
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import WzNoConfig from '../util-components/no-config';
 
-import {
-  renderValueNoThenEnabled,
-  isString
-} from '../utils/utils';
+import { renderValueNoThenEnabled, isString } from '../utils/utils';
 
 import helpLinks from './help-links';
 
 const mainSettings = [
   {
     field: 'disabled',
-    label: 'Amazon S3 integration status',
-    render: renderValueNoThenEnabled
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.aws.s3.general.amazon',
+      {
+        defaultMessage: 'Amazon S3 integration status',
+      },
+    ),
+    render: renderValueNoThenEnabled,
   },
-  { field: 'interval', label: 'Frequency for reading from S3 buckets' },
-  { field: 'run_on_start', label: 'Run on start' },
+  {
+    field: 'interval',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.aws.s3.general.frequency',
+      {
+        defaultMessage: 'Frequency for reading from S3 buckets',
+      },
+    ),
+  },
+  {
+    field: 'run_on_start',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.aws.s3.general.start',
+      {
+        defaultMessage: 'Run on start',
+      },
+    ),
+  },
   {
     field: 'remove_from_bucket',
-    label: 'Remove bucket logs after being read'
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.aws.s3.general.read',
+      {
+        defaultMessage: 'Remove bucket logs after being read',
+      },
+    ),
   },
-  { field: 'skip_on_error', label: "Skip logs that can't be processed" }
+  {
+    field: 'skip_on_error',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.aws.s3.general.skip',
+      {
+        defaultMessage: "Skip logs that can't be processed",
+      },
+    ),
+  },
 ];
 
 class WzConfigurationAmazonS3General extends Component {
@@ -58,12 +91,23 @@ class WzConfigurationAmazonS3General extends Component {
         {currentConfig &&
           !wodleConfig['aws-s3'] &&
           !isString(currentConfig['wmodules-wmodules']) && (
-            <WzNoConfig error="not-present" help={helpLinks} />
+            <WzNoConfig error='not-present' help={helpLinks} />
           )}
         {currentConfig && wodleConfig['aws-s3'] && (
           <WzConfigurationSettingsTabSelector
-            title="Main settings"
-            description="Common settings applied to all Amazon S3 buckets"
+            title={i18n.translate(
+              'wazuh.public.controller.management.config.aws.s3.general.main',
+              {
+                defaultMessage: 'Main settings',
+              },
+            )}
+            description={i18n.translate(
+              'wazuh.public.controller.management.config.aws.s3.general.common',
+              {
+                defaultMessage:
+                  'Common settings applied to all Amazon S3 buckets',
+              },
+            )}
             currentConfig={wodleConfig}
             minusHeight={320}
             helpLinks={helpLinks}
@@ -81,7 +125,7 @@ class WzConfigurationAmazonS3General extends Component {
 
 WzConfigurationAmazonS3General.propTypes = {
   // currentConfig: PropTypes.object.isRequired,
-  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string])
+  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
 };
 
 export default WzConfigurationAmazonS3General;

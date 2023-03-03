@@ -29,11 +29,55 @@ import {
   EuiLoadingSpinner,
 } from '@elastic/eui';
 import { AppNavigate } from '../../../../../react-services/app-navigate';
+import { i18n } from '@kbn/i18n';
+
 import { AppState } from '../../../../../react-services/app-state';
 import { RequirementFlyout } from '../requirement-flyout/requirement-flyout';
 import { WAZUH_ALERTS_PATTERN } from '../../../../../../common/constants';
 import { getDataPlugin } from '../../../../../kibana-services';
 
+const show = i18n.translate(
+  'wazuh.public.components.overview.comp.table.show',
+  {
+    defaultMessage: 'Show',
+  },
+);
+const inDashboard = i18n.translate(
+  'wazuh.public.components.overview.comp.table.inDashboard',
+  {
+    defaultMessage: 'in Dashboard',
+  },
+);
+const inspect = i18n.translate(
+  'wazuh.public.components.overview.comp.table.inspect',
+  {
+    defaultMessage: 'Inspect',
+  },
+);
+const inEvents = i18n.translate(
+  'wazuh.public.components.overview.comp.table.inEvents',
+  {
+    defaultMessage: 'in Events',
+  },
+);
+const resultTitle = i18n.translate(
+  'wazuh.public.components.overview.comp.table.resultTitle',
+  {
+    defaultMessage: 'There are no results.',
+  },
+);
+const reqPlace = i18n.translate(
+  'wazuh.public.components.overview.comp.table.reqPlace',
+  {
+    defaultMessage: 'Filter requirements',
+  },
+);
+const actualLabel = i18n.translate(
+  'wazuh.public.components.overview.comp.table.actualLabel',
+  {
+    defaultMessage: 'Use aria labels when no actual label is in use',
+  },
+);
 export class ComplianceSubrequirements extends Component {
   _isMount = false;
   state: {};
@@ -52,7 +96,7 @@ export class ComplianceSubrequirements extends Component {
     this.setState({ hideAlerts: !this.state.hideAlerts });
   }
 
-  onSearchValueChange = (e) => {
+  onSearchValueChange = e => {
     this.setState({ searchValue: e.target.value });
   };
 
@@ -99,12 +143,20 @@ export class ComplianceSubrequirements extends Component {
   }
 
   openDashboardCurrentWindow(requirementId) {
-    this.addFilter({ key: this.getRequirementKey(), value: requirementId, negate: false });
+    this.addFilter({
+      key: this.getRequirementKey(),
+      value: requirementId,
+      negate: false,
+    });
     this.props.onSelectedTabChanged('dashboard');
   }
 
   openDiscoverCurrentWindow(requirementId) {
-    this.addFilter({ key: this.getRequirementKey(), value: requirementId, negate: false });
+    this.addFilter({
+      key: this.getRequirementKey(),
+      value: requirementId,
+      negate: false,
+    });
     this.props.onSelectedTabChanged('events');
   }
 
@@ -115,7 +167,7 @@ export class ComplianceSubrequirements extends Component {
       e,
       'overview',
       { tab: this.props.section, tabView: 'discover', filters },
-      () => this.openDiscoverCurrentWindow(requirementId)
+      () => this.openDiscoverCurrentWindow(requirementId),
     );
   }
 
@@ -126,7 +178,7 @@ export class ComplianceSubrequirements extends Component {
       e,
       'overview',
       { tab: this.props.section, tabView: 'panels', filters },
-      () => this.openDashboardCurrentWindow(requirementId)
+      () => this.openDashboardCurrentWindow(requirementId),
     );
   }
 
@@ -142,14 +194,20 @@ export class ComplianceSubrequirements extends Component {
         currentTechniques.forEach((technique, idx) => {
           if (
             !showTechniques[technique] &&
-            (technique.toLowerCase().includes(this.state.searchValue.toLowerCase()) ||
+            (technique
+              .toLowerCase()
+              .includes(this.state.searchValue.toLowerCase()) ||
               this.props.descriptions[technique]
                 .toLowerCase()
                 .includes(this.state.searchValue.toLowerCase()))
           ) {
             const quantity =
-              (requirementsCount.find((item) => item.key === technique) || {}).doc_count || 0;
-            if (!this.state.hideAlerts || (this.state.hideAlerts && quantity > 0)) {
+              (requirementsCount.find(item => item.key === technique) || {})
+                .doc_count || 0;
+            if (
+              !this.state.hideAlerts ||
+              (this.state.hideAlerts && quantity > 0)
+            ) {
               showTechniques[technique] = true;
               tacticsToRender.push({
                 id: technique,
@@ -167,17 +225,22 @@ export class ComplianceSubrequirements extends Component {
       .map((item, idx) => {
         const tooltipContent = `View details of ${item.id}`;
         const toolTipAnchorClass =
-          'wz-display-inline-grid' + (this.state.hover === item.id ? ' wz-mitre-width' : ' ');
+          'wz-display-inline-grid' +
+          (this.state.hover === item.id ? ' wz-mitre-width' : ' ');
         return (
           <EuiFlexItem
             onMouseEnter={() => this.setState({ hover: item.id })}
             onMouseLeave={() => this.setState({ hover: '' })}
             key={idx}
-            style={{ border: '1px solid #8080804a', maxWidth: 'calc(25% - 8px)', maxHeight: 41 }}
+            style={{
+              border: '1px solid #8080804a',
+              maxWidth: 'calc(25% - 8px)',
+              maxHeight: 41,
+            }}
           >
             <EuiPopover
-              id="techniqueActionsContextMenu"
-              anchorClassName="wz-width-100"
+              id='techniqueActionsContextMenu'
+              anchorClassName='wz-width-100'
               button={
                 <EuiFacetButton
                   style={{
@@ -193,7 +256,7 @@ export class ComplianceSubrequirements extends Component {
                   }}
                 >
                   <EuiToolTip
-                    position="top"
+                    position='top'
                     content={tooltipContent}
                     anchorClassName={toolTipAnchorClass}
                   >
@@ -211,25 +274,31 @@ export class ComplianceSubrequirements extends Component {
 
                   {this.state.hover === item.id && (
                     <span style={{ float: 'right', position: 'fixed' }}>
-                      <EuiToolTip position="top" content={'Show ' + item.id + ' in Dashboard'}>
+                      <EuiToolTip
+                        position='top'
+                        content={show + item.id + inDashboard}
+                      >
                         <EuiIcon
-                          onMouseDown={(e) => {
+                          onMouseDown={e => {
                             this.openDashboard(e, item.id);
                             e.stopPropagation();
                           }}
-                          color="primary"
-                          type="visualizeApp"
+                          color='primary'
+                          type='visualizeApp'
                         ></EuiIcon>
                       </EuiToolTip>{' '}
                       &nbsp;
-                      <EuiToolTip position="top" content={'Inspect ' + item.id + ' in Events'}>
+                      <EuiToolTip
+                        position='top'
+                        content={inspect + item.id + inEvents}
+                      >
                         <EuiIcon
-                          onMouseDown={(e) => {
+                          onMouseDown={e => {
                             this.openDiscover(e, item.id);
                             e.stopPropagation();
                           }}
-                          color="primary"
-                          type="discoverApp"
+                          color='primary'
+                          type='discoverApp'
                         ></EuiIcon>
                       </EuiToolTip>
                     </span>
@@ -238,9 +307,9 @@ export class ComplianceSubrequirements extends Component {
               }
               isOpen={this.state.actionsOpen === item.id}
               closePopover={() => {}}
-              panelPaddingSize="none"
+              panelPaddingSize='none'
               style={{ width: '100%' }}
-              anchorPosition="downLeft"
+              anchorPosition='downLeft'
             >
               xxx
             </EuiPopover>
@@ -251,7 +320,7 @@ export class ComplianceSubrequirements extends Component {
       return (
         <EuiFlexGrid
           columns={4}
-          gutterSize="s"
+          gutterSize='s'
           style={{
             maxHeight: 'calc(100vh - 420px)',
             overflow: 'overlay',
@@ -265,12 +334,16 @@ export class ComplianceSubrequirements extends Component {
       );
     } else {
       return (
-        <EuiCallOut title="There are no results." iconType="help" color="warning"></EuiCallOut>
+        <EuiCallOut
+          title={resultTitle}
+          iconType='help'
+          color='warning'
+        ></EuiCallOut>
       );
     }
   }
 
-  onChangeFlyout = (flyoutOn) => {
+  onChangeFlyout = flyoutOn => {
     this.setState({ flyoutOn });
   };
 
@@ -290,8 +363,12 @@ export class ComplianceSubrequirements extends Component {
       <div style={{ padding: 10 }}>
         <EuiFlexGroup>
           <EuiFlexItem grow={true}>
-            <EuiTitle size="m">
-              <h1>Requirements</h1>
+            <EuiTitle size='m'>
+              <h1>
+                {i18n.translate('wazuh.components.subre.req', {
+                  defaultMessage: 'Requirements',
+                })}
+              </h1>
             </EuiTitle>
           </EuiFlexItem>
 
@@ -299,34 +376,41 @@ export class ComplianceSubrequirements extends Component {
             <EuiFlexGroup>
               <EuiFlexItem grow={false}>
                 <EuiText grow={false}>
-                  <span>Hide requirements with no alerts </span> &nbsp;
+                  <span>
+                    {i18n.translate('wazuh.components.subre.reqAlert', {
+                      defaultMessage: 'Hide requirements with no alerts ',
+                    })}
+                  </span>{' '}
+                  &nbsp;
                   <EuiSwitch
-                    label=""
+                    label=''
                     checked={this.state.hideAlerts}
-                    onChange={(e) => this.hideAlerts()}
+                    onChange={e => this.hideAlerts()}
                   />
                 </EuiText>
               </EuiFlexItem>
             </EuiFlexGroup>
           </EuiFlexItem>
         </EuiFlexGroup>
-        <EuiSpacer size="xs" />
+        <EuiSpacer size='xs' />
 
         <EuiFieldSearch
           fullWidth={true}
-          placeholder="Filter requirements"
+          placeholder={reqPlace}
           value={this.state.searchValue}
-          onChange={(e) => this.onSearchValueChange(e)}
+          onChange={e => this.onSearchValueChange(e)}
           isClearable={true}
-          aria-label="Use aria labels when no actual label is in use"
+          aria-label={actualLabel}
         />
-        <EuiSpacer size="s" />
+        <EuiSpacer size='s' />
 
         <div>
           {this.props.loadingAlerts ? (
-            <EuiFlexItem style={{ height: 'calc(100vh - 410px)', alignItems: 'center' }}>
+            <EuiFlexItem
+              style={{ height: 'calc(100vh - 410px)', alignItems: 'center' }}
+            >
               <EuiLoadingSpinner
-                size="xl"
+                size='xl'
                 style={{
                   margin: 0,
                   position: 'absolute',
@@ -341,16 +425,18 @@ export class ComplianceSubrequirements extends Component {
         </div>
 
         {this.state.flyoutOn && (
-            <RequirementFlyout
-              currentRequirement={this.state.selectedRequirement}
-              onChangeFlyout={this.onChangeFlyout}
-              description={this.props.descriptions[this.state.selectedRequirement]}
-              getRequirementKey={() => {
-                return this.getRequirementKey();
-              }}
-              openDashboard={(e, itemId) => this.openDashboard(e, itemId)}
-              openDiscover={(e, itemId) => this.openDiscover(e, itemId)}
-            />
+          <RequirementFlyout
+            currentRequirement={this.state.selectedRequirement}
+            onChangeFlyout={this.onChangeFlyout}
+            description={
+              this.props.descriptions[this.state.selectedRequirement]
+            }
+            getRequirementKey={() => {
+              return this.getRequirementKey();
+            }}
+            openDashboard={(e, itemId) => this.openDashboard(e, itemId)}
+            openDiscover={(e, itemId) => this.openDiscover(e, itemId)}
+          />
         )}
       </div>
     );

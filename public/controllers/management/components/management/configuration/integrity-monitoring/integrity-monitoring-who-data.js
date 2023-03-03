@@ -13,6 +13,7 @@
 import React, { Component, Fragment } from 'react';
 
 import { EuiBasicTable, EuiIcon, EuiLink } from '@elastic/eui';
+import { i18n } from '@kbn/i18n';
 
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
@@ -20,11 +21,37 @@ import WzNoConfig from '../util-components/no-config';
 import helpLinks from './help-links';
 
 const mainSettings = [
-  { field: 'restart_audit', label: 'Restart audit' },
-  { field: 'startup_healthcheck', label: 'Startup healthcheck' }
+  {
+    field: 'restart_audit',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.moniterting.who.Restartaudit',
+      {
+        defaultMessage: 'Restart audit',
+      },
+    ),
+  },
+  {
+    field: 'startup_healthcheck',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.moniterting.who.healthCheck',
+      {
+        defaultMessage: 'Startup healthcheck',
+      },
+    ),
+  },
 ];
 
-const columns = [{ field: 'audit_key', name: 'Keys' }];
+const columns = [
+  {
+    field: 'audit_key',
+    name: i18n.translate(
+      'wazuh.public.controller.management.config.moniterting.who.key',
+      {
+        defaultMessage: 'Keys',
+      },
+    ),
+  },
+];
 
 class WzConfigurationIntegrityMonitoringWhoData extends Component {
   constructor(props) {
@@ -38,15 +65,26 @@ class WzConfigurationIntegrityMonitoringWhoData extends Component {
           currentConfig['syscheck-syscheck'] &&
           currentConfig['syscheck-syscheck'].syscheck &&
           !currentConfig['syscheck-syscheck'].syscheck.whodata && (
-            <WzNoConfig error="not-present" help={helpLinks} />
+            <WzNoConfig error='not-present' help={helpLinks} />
           )}
         {currentConfig &&
           currentConfig['syscheck-syscheck'] &&
           currentConfig['syscheck-syscheck'].syscheck &&
           currentConfig['syscheck-syscheck'].syscheck.whodata && (
             <WzConfigurationSettingsTabSelector
-              title="Who-data audit keys"
-              description="Wazuh will include in its FIM baseline those events being monitored by Audit using audit_key."
+              title={i18n.translate(
+                'wazuh.public.controller.management.config.moniterting.who.keys',
+                {
+                  defaultMessage: 'Who-data audit keys',
+                },
+              )}
+              description={i18n.translate(
+                'wazuh.public.controller.management.config.moniterting.who.wazuh',
+                {
+                  defaultMessage:
+                    'Wazuh will include in its FIM baseline those events being monitored by Audit using audit_key.',
+                },
+              )}
               currentConfig={currentConfig['syscheck-syscheck']}
               minusHeight={this.props.agent.id === '000' ? 320 : 415}
               helpLinks={helpLinks}
@@ -61,7 +99,7 @@ class WzConfigurationIntegrityMonitoringWhoData extends Component {
                   items={currentConfig[
                     'syscheck-syscheck'
                   ].syscheck.whodata.audit_key.map(item => ({
-                    audit_key: item
+                    audit_key: item,
                   }))}
                   columns={columns}
                 />

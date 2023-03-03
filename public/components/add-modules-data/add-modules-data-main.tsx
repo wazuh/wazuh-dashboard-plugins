@@ -10,21 +10,22 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Fragment, Component } from 'react';
+import { i18n } from '@kbn/i18n';
 
 import {
-	EuiButtonIcon,
-	EuiCard,
-	EuiFlexGrid,
-	EuiFlexGroup,
-	EuiFlexItem,
-	EuiIcon,
-	EuiPage,
-	EuiPageBody,
-	EuiSpacer,
-	EuiTabbedContent,
-	EuiText,
-	EuiTitle,
-	EuiToolTip
+  EuiButtonIcon,
+  EuiCard,
+  EuiFlexGrid,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiIcon,
+  EuiPage,
+  EuiPageBody,
+  EuiSpacer,
+  EuiTabbedContent,
+  EuiText,
+  EuiTitle,
+  EuiToolTip,
 } from '@elastic/eui';
 
 import WzModuleGuide from './module-guide';
@@ -35,94 +36,104 @@ import { WAZUH_MODULES } from '../../../common/wazuh-modules';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
 import store from '../../redux/store';
 
-const guides = Object.keys(modeGuides).map(key => modeGuides[key]).sort((a,b) => {
-	if (a.name < b.name) { return -1 }
-	else if (a.name > b.name) { return 1 }
-	return 0
-});
+const guides = Object.keys(modeGuides)
+  .map(key => modeGuides[key])
+  .sort((a, b) => {
+    if (a.name < b.name) {
+      return -1;
+    } else if (a.name > b.name) {
+      return 1;
+    }
+    return 0;
+  });
 
 interface IPropsWzAddModulesData {
-	close: Function
-};
+  close: Function;
+}
 
 interface IStateWzAddModulesData {
-	guide: string
-	selectedGuideCategory: any
-};
+  guide: string;
+  selectedGuideCategory: any;
+}
 
-export default class WzAddModulesData extends Component<IPropsWzAddModulesData, IStateWzAddModulesData>{
-	tabs: any
-	constructor(props){
-		super(props);
-		// DON'T DELETE THE BELOW CODE. IT'S FOR MODULE GUIDES.
-		// const categories = Object.keys(modeGuides).map(key => modeGuides[key].category).filter((value,key,array) => array.indexOf(value) === key);
-		// this.tabs = [
-		// 	...categories.map(category => ({
-		// 		id: category,
-		// 		name: category,
-		// 		content: (
-		// 			<Fragment>
-		// 				<EuiSpacer size='m' />
-		// 				<EuiFlexGrid columns={4}>
-		// 					{this.getModulesFromCategory(category).map(extension => (
-		// 						<EuiFlexItem key={`add-modules-data--${extension.id}`}>
-		// 							<EuiCard
-		// 								layout='horizontal'
-		// 								icon={(<EuiIcon size='xl' type={extension.icon} />) }
-		// 								title={extension.name}
-		// 								description={(WAZUH_MODULES[extension.id] && WAZUH_MODULES[extension.id].description) || extension.description}
-		// 								onClick={() => this.changeGuide(extension.id) }
-		// 							/>
-		// 						</EuiFlexItem>
-		// 					))}
-		// 				</EuiFlexGrid>
-		// 			</Fragment>
-		// 		)
-		// 	})),
-		// 	{
-		// 		id: 'sample_data',
-		// 		name: 'Sample data',
-		// 		content: (
-		// 			<Fragment>
-		// 				<EuiSpacer size='m' />
-		// 				<WzSampleData/>
-		// 			</Fragment>
-		// 		)
-		// 	}
-		// ];
-		// this.state = {
-		// 	guide: '',
-		// 	selectedGuideCategory: window.location.href.includes('redirect=sample_data') ? this.tabs.find(tab => tab.id === 'sample_data') : this.tabs[0]
-		// }
-		// "redirect=sample_data" is injected into the href of the "here" button in the callout notifying of installed sample alerts
-	}
-	setGlobalBreadcrumb() {
+export default class WzAddModulesData extends Component<
+  IPropsWzAddModulesData,
+  IStateWzAddModulesData
+> {
+  tabs: any;
+  constructor(props) {
+    super(props);
+    // DON'T DELETE THE BELOW CODE. IT'S FOR MODULE GUIDES.
+    // const categories = Object.keys(modeGuides).map(key => modeGuides[key].category).filter((value,key,array) => array.indexOf(value) === key);
+    // this.tabs = [
+    // 	...categories.map(category => ({
+    // 		id: category,
+    // 		name: category,
+    // 		content: (
+    // 			<Fragment>
+    // 				<EuiSpacer size='m' />
+    // 				<EuiFlexGrid columns={4}>
+    // 					{this.getModulesFromCategory(category).map(extension => (
+    // 						<EuiFlexItem key={`add-modules-data--${extension.id}`}>
+    // 							<EuiCard
+    // 								layout='horizontal'
+    // 								icon={(<EuiIcon size='xl' type={extension.icon} />) }
+    // 								title={extension.name}
+    // 								description={(WAZUH_MODULES[extension.id] && WAZUH_MODULES[extension.id].description) || extension.description}
+    // 								onClick={() => this.changeGuide(extension.id) }
+    // 							/>
+    // 						</EuiFlexItem>
+    // 					))}
+    // 				</EuiFlexGrid>
+    // 			</Fragment>
+    // 		)
+    // 	})),
+    // 	{
+    // 		id: 'sample_data',
+    // 		name: 'Sample data',
+    // 		content: (
+    // 			<Fragment>
+    // 				<EuiSpacer size='m' />
+    // 				<WzSampleData/>
+    // 			</Fragment>
+    // 		)
+    // 	}
+    // ];
+    // this.state = {
+    // 	guide: '',
+    // 	selectedGuideCategory: window.location.href.includes('redirect=sample_data') ? this.tabs.find(tab => tab.id === 'sample_data') : this.tabs[0]
+    // }
+    // "redirect=sample_data" is injected into the href of the "here" button in the callout notifying of installed sample alerts
+  }
+  setGlobalBreadcrumb() {
     const breadcrumb = [
-			{ text: '' },
-			{ text: 'Management', href: '#/manager' },
-			{ text: 'Sample data' }
-		];
+      { text: '' },
+      { text: 'Management', href: '#/manager' },
+      { text: 'Sample data' },
+    ];
     store.dispatch(updateGlobalBreadcrumb(breadcrumb));
   }
   componentDidMount() {
     this.setGlobalBreadcrumb();
   }
-	changeGuide = (guide: string = '') => {
-		this.setState({ guide });
-	}
-	changeSelectedGuideCategory = (selectedGuideCategory: string = '') => {
-		this.setState({ selectedGuideCategory });
-	}
-	getModulesFromCategory(category: string = ''){
-		return category !== '' ? guides.filter(guide => guide.category === category) : guides;
-	}
-	render(){
-		// const { guide, selectedGuideCategory } = this.state; // DON'T DELETE. IT'S FOR MODULE GUIDES. 
-		return (
-			<EuiPage restrictWidth='1200px'>
-				<EuiPageBody>
-					{/** Module guides with sample data rendered as tabs */}
-					{/* {guide && (
+  changeGuide = (guide: string = '') => {
+    this.setState({ guide });
+  };
+  changeSelectedGuideCategory = (selectedGuideCategory: string = '') => {
+    this.setState({ selectedGuideCategory });
+  };
+  getModulesFromCategory(category: string = '') {
+    return category !== ''
+      ? guides.filter(guide => guide.category === category)
+      : guides;
+  }
+  render() {
+    // const { guide, selectedGuideCategory } = this.state; // DON'T DELETE. IT'S FOR MODULE GUIDES.
+    return (
+      <EuiPage restrictWidth='1200px'>
+        <EuiPageBody>
+          {/** Module guides with sample data rendered as tabs */}
+          {/* {guide && (
 						<WzModuleGuide guideId={guide} close={() => this.changeGuide('')} {...this.props}/>
 						) || (
 						<Fragment>
@@ -160,21 +171,31 @@ export default class WzAddModulesData extends Component<IPropsWzAddModulesData, 
 							</EuiFlexGroup>
 						</Fragment>
 					)} */}
-					{/* Only sample data */}
-					<EuiFlexGroup>
-						<EuiFlexItem>
-							<EuiTitle size='l'><span>Sample data</span></EuiTitle>
-							<EuiText color='subdued'>Add sample data to modules.</EuiText>
-						</EuiFlexItem>
-					</EuiFlexGroup>
-					<EuiSpacer size='m'/>
-					<EuiFlexGroup>
-						<EuiFlexItem>
-							<WzSampleData/>
-						</EuiFlexItem>
-					</EuiFlexGroup>
-				</EuiPageBody>
-			</EuiPage>
-		)
-	}
+          {/* Only sample data */}
+          <EuiFlexGroup>
+            <EuiFlexItem>
+              <EuiTitle size='l'>
+                <span>
+                  {i18n.translate('wazuh.components.addmodules.sampledata1', {
+                    defaultMessage: ' Sample data',
+                  })}
+                </span>
+              </EuiTitle>
+              <EuiText color='subdued'>
+                {i18n.translate('wazuh.components.addmodules.sampledata', {
+                  defaultMessage: 'Add sample data to modules.',
+                })}
+              </EuiText>
+            </EuiFlexItem>
+          </EuiFlexGroup>
+          <EuiSpacer size='m' />
+          <EuiFlexGroup>
+            <EuiFlexItem>
+              <WzSampleData />
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        </EuiPageBody>
+      </EuiPage>
+    );
+  }
 }

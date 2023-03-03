@@ -15,16 +15,52 @@
 import { AppState, SavedObject } from '../../../../react-services';
 import { getDataPlugin } from '../../../../kibana-services';
 import { CheckLogger } from '../../types/check_logger';
+import { i18n } from '@kbn/i18n';
 
-export const checkFieldsService = async (appConfig, checkLogger: CheckLogger) => {
+const indexPattern = i18n.translate(
+  'wazuh.public.components.healthCheck.service.indexPattern',
+  {
+    defaultMessage: 'Index pattern id in cookie:',
+  },
+);
+const gettingIndex = i18n.translate(
+  'wazuh.public.components.healthCheck.service.gettingIndex',
+  {
+    defaultMessage: 'Getting index pattern data',
+  },
+);
+const dataFound = i18n.translate(
+  'wazuh.public.components.healthCheck.service.dataFound',
+  {
+    defaultMessage: 'Index pattern data found:',
+  },
+);
+const refreshing = i18n.translate(
+  'wazuh.public.components.healthCheck.service.refreshing',
+  {
+    defaultMessage: 'Refreshing index pattern fields: title',
+  },
+);
+const refreshingIndex = i18n.translate(
+  'wazuh.public.components.healthCheck.service.',
+  {
+    defaultMessage: 'Refreshed index pattern fields: title',
+  },
+);
+export const checkFieldsService = async (
+  appConfig,
+  checkLogger: CheckLogger,
+) => {
   const patternId = AppState.getCurrentPattern();
-  checkLogger.info(`Index pattern id in cookie: [${patternId}]`);
-  
-  checkLogger.info(`Getting index pattern data [${patternId}]...`);
+  checkLogger.info(`${indexPattern} [${patternId}]`);
+
+  checkLogger.info(`${gettingIndex} [${patternId}]...`);
   const pattern = await getDataPlugin().indexPatterns.get(patternId);
-  checkLogger.info(`Index pattern data found: [${pattern ? 'yes' : 'no'}]`);
-  
-  checkLogger.info(`Refreshing index pattern fields: title [${pattern.title}], id [${pattern.id}]...`);
+  checkLogger.info(`${dataFound} [${pattern ? 'yes' : 'no'}]`);
+
+  checkLogger.info(`${refreshing} [${pattern.title}], id [${pattern.id}]...`);
   await SavedObject.refreshIndexPattern(pattern, null);
-  checkLogger.action(`Refreshed index pattern fields: title [${pattern.title}], id [${pattern.id}]`);
+  checkLogger.action(
+    `${refreshingIndex} [${pattern.title}], id [${pattern.id}]`,
+  );
 };

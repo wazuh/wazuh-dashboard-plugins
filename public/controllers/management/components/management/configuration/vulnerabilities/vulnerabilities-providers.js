@@ -11,8 +11,9 @@
  */
 
 import React, { Component, Fragment } from 'react';
+import { i18n } from '@kbn/i18n';
 
-import { EuiBasicTable, } from '@elastic/eui';
+import { EuiBasicTable } from '@elastic/eui';
 
 import WzNoConfig from '../util-components/no-config';
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
@@ -27,19 +28,40 @@ const renderUrlAttr = item => {
       <div style={{ display: 'block' }}>
         {item.start && (
           <div>
-            <b>Start: </b>
+            <b>
+              {i18n.translate(
+                'wazuh.public.controller.management.config.vulnerabilities.providers.Start',
+                {
+                  defaultMessage: 'Start:',
+                },
+              )}{' '}
+            </b>
             {item.start}
           </div>
         )}
         {item.end && (
           <div>
-            <b>End: </b>
+            <b>
+              {i18n.translate(
+                'wazuh.public.controller.management.config.vulnerabilities.providers.End',
+                {
+                  defaultMessage: 'End:',
+                },
+              )}{' '}
+            </b>
             {item.end}
           </div>
         )}
         {item.port && (
           <div>
-            <b>Port: </b>
+            <b>
+              {i18n.translate(
+                'wazuh.public.controller.management.config.vulnerabilities.providersPort.',
+                {
+                  defaultMessage: 'Port:',
+                },
+              )}{' '}
+            </b>
             {item.port}
           </div>
         )}
@@ -50,12 +72,26 @@ const renderUrlAttr = item => {
 };
 
 const columnsAllowAttr = [
-  { field: 'replaced_os', name: 'Replaced OS', render: renderTableField },
+  {
+    field: 'replaced_os',
+    name: i18n.translate(
+      'wazuh.public.controller.management.config.vulnerabilities.providers.ReplacedOS',
+      {
+        defaultMessage: 'Replaced OS',
+      },
+    ),
+    render: renderTableField,
+  },
   {
     field: 'src',
-    name: 'Source',
-    render: item => renderTableField(item.toString())
-  }
+    name: i18n.translate(
+      'wazuh.public.controller.management.config.vulnerabilities.providers.Source',
+      {
+        defaultMessage: 'Source',
+      },
+    ),
+    render: item => renderTableField(item.toString()),
+  },
 ];
 
 const renderAllowAttr = item => {
@@ -66,23 +102,96 @@ const renderAllowAttr = item => {
 };
 
 const columns = [
-  { field: 'name', name: 'Name', render: renderValueOrNoValue },
-  { field: 'version', name: 'Version', render: renderValueOrNoValue },
+  {
+    field: 'name',
+    name: i18n.translate(
+      'wazuh.public.controller.management.config.vulnerabilities.providers.Name',
+      {
+        defaultMessage: 'Name',
+      },
+    ),
+    render: renderValueOrNoValue,
+  },
+  {
+    field: 'version',
+    name: i18n.translate(
+      'wazuh.public.controller.management.config.vulnerabilities.providers.Version',
+      {
+        defaultMessage: 'Version',
+      },
+    ),
+    render: renderValueOrNoValue,
+  },
   {
     field: 'update_interval',
-    name: 'Update interval',
-    render: renderValueOrNoValue
+    name: i18n.translate(
+      'wazuh.public.controller.management.config.vulnerabilities.providers.Updateinterval',
+      {
+        defaultMessage: 'Update interval',
+      },
+    ),
+    render: renderValueOrNoValue,
   },
   {
     field: 'update_from_year',
-    name: 'Update from year',
-    render: renderValueOrNoValue
+    name: i18n.translate(
+      'wazuh.public.controller.management.config.vulnerabilities.providers.Updatefromyear',
+      {
+        defaultMessage: 'Update from year',
+      },
+    ),
+    render: renderValueOrNoValue,
   },
-  { field: 'download_timeout', name: 'Download timeout', render: renderValueOrNoValue },
-  { field: 'path', name: 'Path', render: renderValueOrNoValue },
-  { field: 'url', name: 'URL', render: renderValueOrNoValue },
-  { field: 'url_attrs', name: 'URL attributes', render: renderUrlAttr },
-  { field: 'allow', name: 'Allow', render: renderAllowAttr }
+  {
+    field: 'download_timeout',
+    name: i18n.translate(
+      'wazuh.public.controller.management.config.vulnerabilities.providers.Downloadtimeout',
+      {
+        defaultMessage: 'Download timeout',
+      },
+    ),
+    render: renderValueOrNoValue,
+  },
+  {
+    field: 'path',
+    name: i18n.translate(
+      'wazuh.public.controller.management.config.vulnerabilities.providers.Path',
+      {
+        defaultMessage: 'Path',
+      },
+    ),
+    render: renderValueOrNoValue,
+  },
+  {
+    field: 'url',
+    name: i18n.translate(
+      'wazuh.public.controller.management.config.vulnerabilities.providers.URL',
+      {
+        defaultMessage: 'URL',
+      },
+    ),
+    render: renderValueOrNoValue,
+  },
+  {
+    field: 'url_attrs',
+    name: i18n.translate(
+      'wazuh.public.controller.management.config.vulnerabilities.providers.URLattributes',
+      {
+        defaultMessage: 'URL attributes',
+      },
+    ),
+    render: renderUrlAttr,
+  },
+  {
+    field: 'allow',
+    name: i18n.translate(
+      'wazuh.public.controller.management.config.vulnerabilities.providers.Allow',
+      {
+        defaultMessage: 'Allow',
+      },
+    ),
+    render: renderAllowAttr,
+  },
 ];
 
 class WzConfigurationVulnerabilitiesProviders extends Component {
@@ -104,14 +213,25 @@ class WzConfigurationVulnerabilitiesProviders extends Component {
           wodleConfig['vulnerability-detector'] &&
           !wodleConfig['vulnerability-detector'].providers &&
           !isString(currentConfig['wmodules-wmodules']) && (
-            <WzNoConfig error="not-present" help={helpLinks} />
+            <WzNoConfig error='not-present' help={helpLinks} />
           )}
         {wodleConfig['vulnerability-detector'] &&
         wodleConfig['vulnerability-detector'].providers ? (
           <Fragment>
             <WzConfigurationSettingsTabSelector
-              title="Providers"
-              description="List of OVAL databases providers to check for vulnerability scans"
+              title={i18n.translate(
+                'wazuh.public.controller.management.config.vulnerabilities.providers.pro',
+                {
+                  defaultMessage: 'Providers',
+                },
+              )}
+              description={i18n.translate(
+                'wazuh.public.controller.management.config.vulnerabilities.providers.OVAL',
+                {
+                  defaultMessage:
+                    'List of OVAL databases providers to check for vulnerability scans',
+                },
+              )}
               currentConfig={wodleConfig}
               minusHeight={320}
               helpLinks={helpLinks}

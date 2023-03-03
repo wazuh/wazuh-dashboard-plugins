@@ -12,7 +12,7 @@
 
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
-
+import { i18n } from '@kbn/i18n';
 import { EuiBasicTable } from '@elastic/eui';
 
 import WzNoConfig from '../util-components/no-config';
@@ -23,22 +23,63 @@ import { isString, hasSize } from '../utils/utils';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
-
+const text2 = i18n.translate(
+  'wazuh.controller.manage.comp.confi.setting.response.Agentlabels.text2',
+  {
+    defaultMessage: 'Agent labels',
+  },
+);
+const text3 = i18n.translate(
+  'wazuh.controller.manage.comp.confi.setting.response.Labelsreference.text3',
+  {
+    defaultMessage: 'Labels reference',
+  },
+);
+const title1 = i18n.translate(
+  'wazuh.controller.manage.comp.confi.setting.response.definedlabel',
+  {
+    defaultMessage: 'Defined labels',
+  },
+);
 const columns = [
-  { field: 'key', name: 'Label key' },
-  { field: 'value', name: 'Label value' },
-  { field: 'hidden', name: 'Hidden' }
+  {
+    field: 'key',
+    name: i18n.translate(
+      'wazuh.public.controller.management.config.alerts.label.key',
+      {
+        defaultMessage: 'Label key',
+      },
+    ),
+  },
+  {
+    field: 'value',
+    name: i18n.translate(
+      'wazuh.public.controller.management.config.alerts.label.value',
+      {
+        defaultMessage: 'Label value',
+      },
+    ),
+  },
+  {
+    field: 'hidden',
+    name: i18n.translate(
+      'wazuh.public.controller.management.config.alerts.label.Hidden',
+      {
+        defaultMessage: 'Hidden',
+      },
+    ),
+  },
 ];
 
 const helpLinks = [
   {
-    text: 'Agent labels',
-    href: webDocumentationLink('user-manual/capabilities/labels.html')
+    text: text2,
+    href: webDocumentationLink('user-manual/capabilities/labels.html'),
   },
   {
-    text: 'Labels reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/labels.html')
-  }
+    text: text3,
+    href: webDocumentationLink('user-manual/reference/ossec-conf/labels.html'),
+  },
 ];
 
 class WzConfigurationAlertsLabels extends Component {
@@ -55,7 +96,7 @@ class WzConfigurationAlertsLabels extends Component {
           isString(
             currentConfig[
               agent && agent.id !== '000' ? 'agent-labels' : 'analysis-labels'
-            ]
+            ],
           ) && (
             <WzNoConfig
               error={
@@ -74,33 +115,33 @@ class WzConfigurationAlertsLabels extends Component {
           !isString(
             currentConfig[
               agent && agent.id !== '000' ? 'agent-labels' : 'analysis-labels'
-            ]
+            ],
           ) &&
           !hasSize(
             currentConfig[
               agent && agent.id !== '000' ? 'agent-labels' : 'analysis-labels'
-            ].labels
-          ) && <WzNoConfig error="not-present" help={helpLinks} />}
+            ].labels,
+          ) && <WzNoConfig error='not-present' help={helpLinks} />}
         {wazuhNotReadyYet &&
           (!currentConfig ||
             !currentConfig[
               agent && agent.id !== '000' ? 'agent-labels' : 'analysis-labels'
-            ]) && <WzNoConfig error="Wazuh not ready yet" />}
+            ]) && <WzNoConfig error='Wazuh not ready yet' />}
         {currentConfig[
           agent && agent.id !== '000' ? 'agent-labels' : 'analysis-labels'
         ] &&
         !isString(
           currentConfig[
             agent && agent.id !== '000' ? 'agent-labels' : 'analysis-labels'
-          ]
+          ],
         ) &&
         hasSize(
           currentConfig[
             agent && agent.id !== '000' ? 'agent-labels' : 'analysis-labels'
-          ].labels
+          ].labels,
         ) ? (
           <WzConfigurationSettingsTabSelector
-            title="Defined labels"
+            title={title1}
             currentConfig={currentConfig}
             minusHeight={agent.id === '000' ? 320 : 355}
             helpLinks={helpLinks}
@@ -123,7 +164,7 @@ class WzConfigurationAlertsLabels extends Component {
 }
 
 const mapStateToProps = state => ({
-  wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet
+  wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet,
 });
 
 export default connect(mapStateToProps)(WzConfigurationAlertsLabels);
@@ -132,15 +173,15 @@ const sectionsAgent = [{ component: 'agent', configuration: 'labels' }];
 
 export const WzConfigurationAlertsLabelsAgent = compose(
   connect(mapStateToProps),
-  withWzConfig(sectionsAgent)
+  withWzConfig(sectionsAgent),
 )(WzConfigurationAlertsLabels);
 
 WzConfigurationAlertsLabels.propTypes = {
   // currentConfig: PropTypes.object.isRequired,
-  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string])
+  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
 };
 
 WzConfigurationAlertsLabelsAgent.propTypes = {
   // currentConfig: PropTypes.object.isRequired,
-  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string])
+  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
 };

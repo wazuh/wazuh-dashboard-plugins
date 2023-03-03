@@ -28,7 +28,10 @@ import {
 import { Discover } from '../../../common/modules/discover';
 import { ModulesHelper } from '../../../common/modules/modules-helper';
 import { ICustomBadges } from '../../../wz-search-bar/components';
-import { buildPhraseFilter, IIndexPattern } from '../../../../../../../src/plugins/data/common';
+import {
+  buildPhraseFilter,
+  IIndexPattern,
+} from '../../../../../../../src/plugins/data/common';
 import { getIndexPattern } from '../../../overview/mitre/lib';
 import moment from 'moment-timezone';
 import { AppNavigate } from '../../../../react-services/app-navigate';
@@ -37,7 +40,119 @@ import { getDataPlugin, getUiSettings } from '../../../../kibana-services';
 import { RegistryValues } from './registryValues';
 import { formatUIDate } from '../../../../react-services/time-service';
 import { FilterManager } from '../../../../../../../src/plugins/data/public/';
+import { i18n } from '@kbn/i18n';
 
+const lastAnalysis = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.lastAnalysis',
+  {
+    defaultMessage: 'Last analysis',
+  },
+);
+const lastModified = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.lastModified',
+  {
+    defaultMessage: 'Last modified',
+  },
+);
+const user = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.user',
+  {
+    defaultMessage: 'User',
+  },
+);
+const userID = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.userID',
+  {
+    defaultMessage: 'User ID',
+  },
+);
+const group = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.group',
+  {
+    defaultMessage: 'Group',
+  },
+);
+const groupID = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.groupID',
+  {
+    defaultMessage: 'Group ID',
+  },
+);
+const size = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.size',
+  {
+    defaultMessage: 'Size',
+  },
+);
+const iNode = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.iNode',
+  {
+    defaultMessage: 'Inode',
+  },
+);
+const MD5 = i18n.translate('wazuh.public.components.agents.fim.inventory.MD5', {
+  defaultMessage: 'MD5',
+});
+const SHA1 = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.SHA1',
+  {
+    defaultMessage: 'SHA1',
+  },
+);
+const SHA256 = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.SHA256',
+  {
+    defaultMessage: 'SHA256',
+  },
+);
+const permissions = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.permissions',
+  {
+    defaultMessage: 'Permissions',
+  },
+);
+const next = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.next',
+  {
+    defaultMessage: 'Next',
+  },
+);
+const agent = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.agent',
+  {
+    defaultMessage: 'Agent',
+  },
+);
+const agentName = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.agentName',
+  {
+    defaultMessage: 'Agent name',
+  },
+);
+const action = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.action',
+  {
+    defaultMessage: 'Action',
+  },
+);
+const descp = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.descp',
+  {
+    defaultMessage: 'Description',
+  },
+);
+const level = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.level',
+  {
+    defaultMessage: 'Level',
+  },
+);
+const ruleID = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.ruleID',
+  {
+    defaultMessage: 'Rule ID',
+  },
+);
 export class FileDetails extends Component {
   props!: {
     currentFile: {
@@ -50,22 +165,22 @@ export class FileDetails extends Component {
   };
   userSvg = (
     <svg
-      width="16"
-      height="16"
-      viewBox="0 0 16 16"
-      xmlns="http://www.w3.org/2000/svg"
-      className="euiIcon euiIcon--large euiIcon euiIcon--primary euiIcon-isLoaded detail-icon"
-      focusable="false"
-      role="img"
-      aria-hidden="true"
+      width='16'
+      height='16'
+      viewBox='0 0 16 16'
+      xmlns='http://www.w3.org/2000/svg'
+      className='euiIcon euiIcon--large euiIcon euiIcon--primary euiIcon-isLoaded detail-icon'
+      focusable='false'
+      role='img'
+      aria-hidden='true'
     >
       <path
-        fill-rule="evenodd"
-        d="M5.482 4.344a2 2 0 10-2.963 0c-.08.042-.156.087-.23.136-.457.305-.75.704-.933 1.073A3.457 3.457 0 001 6.978V9a1 1 0 001 1h2.5a3.69 3.69 0 01.684-.962L5.171 9H2V7s0-2 2-2c1.007 0 1.507.507 1.755 1.01.225-.254.493-.47.793-.636a2.717 2.717 0 00-1.066-1.03zM4 4a1 1 0 100-2 1 1 0 000 2zm10 6h-2.5a3.684 3.684 0 00-.684-.962L10.829 9H14V7s0-2-2-2c-1.007 0-1.507.507-1.755 1.01a3.012 3.012 0 00-.793-.636 2.716 2.716 0 011.066-1.03 2 2 0 112.963 0c.08.042.156.087.23.136.457.305.75.704.933 1.073A3.453 3.453 0 0115 6.944V9a1 1 0 01-1 1zm-2-6a1 1 0 100-2 1 1 0 000 2z"
+        fill-rule='evenodd'
+        d='M5.482 4.344a2 2 0 10-2.963 0c-.08.042-.156.087-.23.136-.457.305-.75.704-.933 1.073A3.457 3.457 0 001 6.978V9a1 1 0 001 1h2.5a3.69 3.69 0 01.684-.962L5.171 9H2V7s0-2 2-2c1.007 0 1.507.507 1.755 1.01.225-.254.493-.47.793-.636a2.717 2.717 0 00-1.066-1.03zM4 4a1 1 0 100-2 1 1 0 000 2zm10 6h-2.5a3.684 3.684 0 00-.684-.962L10.829 9H14V7s0-2-2-2c-1.007 0-1.507.507-1.755 1.01a3.012 3.012 0 00-.793-.636 2.716 2.716 0 011.066-1.03 2 2 0 112.963 0c.08.042.156.087.23.136.457.305.75.704.933 1.073A3.453 3.453 0 0115 6.944V9a1 1 0 01-1 1zm-2-6a1 1 0 100-2 1 1 0 000 2z'
       ></path>
       <path
-        fill-rule="evenodd"
-        d="M10 8c0 .517-.196.989-.518 1.344a2.755 2.755 0 011.163 1.21A3.453 3.453 0 0111 11.977V14a1 1 0 01-1 1H6a1 1 0 01-1-1v-2.022a2.005 2.005 0 01.006-.135 3.456 3.456 0 01.35-1.29 2.755 2.755 0 011.162-1.21A2 2 0 1110 8zm-4 4v2h4v-2s0-2-2-2-2 2-2 2zm3-4a1 1 0 11-2 0 1 1 0 012 0z"
+        fill-rule='evenodd'
+        d='M10 8c0 .517-.196.989-.518 1.344a2.755 2.755 0 011.163 1.21A3.453 3.453 0 0111 11.977V14a1 1 0 01-1 1H6a1 1 0 01-1-1v-2.022a2.005 2.005 0 01.006-.135 3.456 3.456 0 01.35-1.29 2.755 2.755 0 011.162-1.21A2 2 0 1110 8zm-4 4v2h4v-2s0-2-2-2-2 2-2 2zm3-4a1 1 0 11-2 0 1 1 0 012 0z'
       ></path>
     </svg>
   );
@@ -85,14 +200,14 @@ export class FileDetails extends Component {
   }
 
   componentDidMount() {
-    getIndexPattern().then((idxPtn) => (this.indexPattern = idxPtn));
+    getIndexPattern().then(idxPtn => (this.indexPattern = idxPtn));
   }
 
   details() {
     return [
       {
         field: 'date',
-        name: 'Last analysis',
+        name: lastAnalysis,
         grow: 2,
         icon: 'clock',
         link: true,
@@ -100,7 +215,7 @@ export class FileDetails extends Component {
       },
       {
         field: 'mtime',
-        name: 'Last modified',
+        name: lastModified,
         grow: 2,
         icon: 'clock',
         link: true,
@@ -108,71 +223,71 @@ export class FileDetails extends Component {
       },
       {
         field: 'uname',
-        name: 'User',
+        name: user,
         icon: 'user',
         link: true,
       },
       {
         field: 'uid',
-        name: 'User ID',
+        name: userID,
         icon: 'user',
         link: true,
       },
       {
         field: 'gname',
-        name: 'Group',
+        name: group,
         icon: 'usersRolesApp',
         onlyLinux: true,
         link: true,
       },
       {
         field: 'gid',
-        name: 'Group ID',
+        name: groupID,
         onlyLinux: true,
         icon: 'usersRolesApp',
         link: true,
       },
       {
         field: 'size',
-        name: 'Size',
+        name: size,
         icon: 'nested',
         link: true,
-        transformValue: (value) => this.renderFileDetailsSize(value),
+        transformValue: value => this.renderFileDetailsSize(value),
       },
       {
         field: 'inode',
-        name: 'Inode',
+        name: INode,
         icon: 'link',
         onlyLinux: true,
         link: true,
       },
       {
         field: 'md5',
-        name: 'MD5',
+        name: MD5,
         checksum: true,
         icon: 'check',
         link: true,
       },
       {
         field: 'sha1',
-        name: 'SHA1',
+        name: SHA1,
         checksum: true,
         icon: 'check',
         link: true,
       },
       {
         field: 'sha256',
-        name: 'SHA256',
+        name: SHA256,
         checksum: true,
         icon: 'check',
         link: true,
       },
       {
         field: 'perm',
-        name: 'Permissions',
+        name: permissions,
         icon: 'lock',
         link: false,
-        transformValue: (value) => this.renderFileDetailsPermissions(value),
+        transformValue: value => this.renderFileDetailsPermissions(value),
       },
     ];
   }
@@ -181,14 +296,14 @@ export class FileDetails extends Component {
     return [
       {
         field: 'date',
-        name: 'Last analysis',
+        name: lastAnalysis,
         grow: 2,
         icon: 'clock',
         transformValue: formatUIDate,
       },
       {
         field: 'mtime',
-        name: 'Last modified',
+        name: LastModified,
         grow: 2,
         icon: 'clock',
         transformValue: formatUIDate,
@@ -196,7 +311,7 @@ export class FileDetails extends Component {
     ];
   }
 
-  viewInEvents = (ev) => {
+  viewInEvents = ev => {
     const { file } = this.props.currentFile;
     if (this.props.view === 'extern') {
       AppNavigate.navigateToModule(ev, 'overview', {
@@ -209,7 +324,7 @@ export class FileDetails extends Component {
         ev,
         'overview',
         { tab: 'fim', tabView: 'events', filters: { 'syscheck.path': file } },
-        () => this.openEventCurrentWindow()
+        () => this.openEventCurrentWindow(),
       );
     }
   };
@@ -218,7 +333,11 @@ export class FileDetails extends Component {
     const { file } = this.props.currentFile;
     const filters = [
       {
-        ...buildPhraseFilter({ name: 'syscheck.path', type: 'text' }, file, this.indexPattern),
+        ...buildPhraseFilter(
+          { name: 'syscheck.path', type: 'text' },
+          file,
+          this.indexPattern,
+        ),
         $state: { store: 'appState' },
       },
     ];
@@ -231,10 +350,10 @@ export class FileDetails extends Component {
     const { filterManager } = getDataPlugin().query;
     const _filters = filterManager.getFilters();
     if (_filters && _filters.length) {
-      const syscheckPathFilters = _filters.filter((x) => {
+      const syscheckPathFilters = _filters.filter(x => {
         return x.meta.key === 'syscheck.path';
       });
-      syscheckPathFilters.map((x) => {
+      syscheckPathFilters.map(x => {
         filterManager.removeFilter(x);
       });
       filterManager.addFilters([filters]);
@@ -253,20 +372,24 @@ export class FileDetails extends Component {
     if (field === 'date' || field === 'mtime') {
       let value_max = moment(value).add(1, 'day');
       newBadge.value = `${field}>${moment(value).format(
-        'YYYY-MM-DD'
+        'YYYY-MM-DD',
       )} AND ${field}<${value_max.format('YYYY-MM-DD')}`;
     } else {
-      newBadge.value = `${field}=${field === 'size' ? this.props.currentFile[field] : value}`;
+      newBadge.value = `${field}=${
+        field === 'size' ? this.props.currentFile[field] : value
+      }`;
     }
-    !filters.some((item) => item.field === newBadge.field && item.value === newBadge.value) &&
-      onFiltersChange([...filters, newBadge]);
+    !filters.some(
+      item => item.field === newBadge.field && item.value === newBadge.value,
+    ) && onFiltersChange([...filters, newBadge]);
     this.props.closeFlyout();
   }
 
   getDetails() {
     const { view } = this.props;
     const columns =
-      this.props.type === 'registry_key' || this.props.currentFile.type === 'registry_key'
+      this.props.type === 'registry_key' ||
+      this.props.currentFile.type === 'registry_key'
         ? this.registryDetails()
         : this.details();
     const generalDetails = columns.map((item, idx) => {
@@ -276,8 +399,13 @@ export class FileDetails extends Component {
       }
       var link = (item.link && !['events', 'extern'].includes(view)) || false;
       const agentPlatform = ((this.props.agent || {}).os || {}).platform;
-      if (!item.onlyLinux || (item.onlyLinux && this.props.agent && agentPlatform !== 'windows')) {
-        let className = item.checksum ? 'detail-value detail-value-checksum' : 'detail-value';
+      if (
+        !item.onlyLinux ||
+        (item.onlyLinux && this.props.agent && agentPlatform !== 'windows')
+      ) {
+        let className = item.checksum
+          ? 'detail-value detail-value-checksum'
+          : 'detail-value';
         className += item.field === 'perm' ? ' detail-value-perm' : '';
         className += ' wz-width-100';
         return (
@@ -299,18 +427,18 @@ export class FileDetails extends Component {
                     {value}
                     {this.state.hoverAddFilter === item.field && (
                       <EuiToolTip
-                        position="top"
-                        anchorClassName="detail-tooltip"
+                        position='top'
+                        anchorClassName='detail-tooltip'
                         content={`Filter by ${item.field} is ${value} in inventory`}
                       >
                         <EuiButtonIcon
                           onClick={() => {
                             this.addFilter(item.field, value);
                           }}
-                          iconType="magnifyWithPlus"
-                          aria-label="Next"
-                          iconSize="s"
-                          className="buttonAddFilter"
+                          iconType='magnifyWithPlus'
+                          aria-label={next}
+                          iconSize='s'
+                          className='buttonAddFilter'
                         />
                       </EuiToolTip>
                     )}
@@ -320,15 +448,25 @@ export class FileDetails extends Component {
               description={
                 <span>
                   {item.icon !== 'users' ? (
-                    <EuiIcon size="l" type={item.icon} color="primary" className="detail-icon" />
+                    <EuiIcon
+                      size='l'
+                      type={item.icon}
+                      color='primary'
+                      className='detail-icon'
+                    />
                   ) : (
                     this.userSvg
                   )}
-                  {item.name === 'Permissions' &&  agentPlatform === 'windows' ? '' : <span className="detail-title">{item.name}</span> }
+                  {item.name === 'Permissions' &&
+                  agentPlatform === 'windows' ? (
+                    ''
+                  ) : (
+                    <span className='detail-title'>{item.name}</span>
+                  )}
                 </span>
               }
-              textAlign="left"
-              titleSize="xs"
+              textAlign='left'
+              titleSize='xs'
             />
           </EuiFlexItem>
         );
@@ -341,35 +479,40 @@ export class FileDetails extends Component {
     );
   }
 
-  updateTotalHits = (total) => {
+  updateTotalHits = total => {
     this.setState({ totalHits: total });
   };
 
   renderFileDetailsPermissions(value) {
-    if (((this.props.agent || {}).os || {}).platform === 'windows' && value && value !== '-') {
+    if (
+      ((this.props.agent || {}).os || {}).platform === 'windows' &&
+      value &&
+      value !== '-'
+    ) {
       return (
-        <EuiAccordion 
+        <EuiAccordion
           id={Math.random().toString()}
-          paddingSize="none" 
-          initialIsOpen={false} 
-          arrowDisplay="none"
+          paddingSize='none'
+          initialIsOpen={false}
+          arrowDisplay='none'
           buttonContent={
-          <EuiTitle size="s">
-            <h3>
-              Permissions
-                  <span style={{ marginLeft: 16 }}>
-                    <EuiToolTip position="top" content="Show">
-                      <EuiIcon
-                        className="euiButtonIcon euiButtonIcon--primary"
-                        type="inspect"
-                        aria-label="show"
-                      />
-                    </EuiToolTip>
-                  </span>
-            </h3>
-          </EuiTitle>
-        }>
-          <EuiCodeBlock language="json" paddingSize="l">
+            <EuiTitle size='s'>
+              <h3>
+                Permissions
+                <span style={{ marginLeft: 16 }}>
+                  <EuiToolTip position='top' content='Show'>
+                    <EuiIcon
+                      className='euiButtonIcon euiButtonIcon--primary'
+                      type='inspect'
+                      aria-label='show'
+                    />
+                  </EuiToolTip>
+                </span>
+              </h3>
+            </EuiTitle>
+          }
+        >
+          <EuiCodeBlock language='json' paddingSize='l'>
             {JSON.stringify(value, null, 2)}
           </EuiCodeBlock>
         </EuiAccordion>
@@ -394,41 +537,70 @@ export class FileDetails extends Component {
   }
 
   render() {
-    const { fileName, type, implicitFilters, view, currentFile, agent, agentId } = this.props;
-    const inspectButtonText = view === 'extern' ? 'Inspect in FIM' : 'Inspect in Events';
+    const {
+      fileName,
+      type,
+      implicitFilters,
+      view,
+      currentFile,
+      agent,
+      agentId,
+    } = this.props;
+    const inspectButtonText =
+      view === 'extern' ? 'Inspect in FIM' : 'Inspect in Events';
     return (
       <Fragment>
         <EuiAccordion
-          id={fileName === undefined ? Math.random().toString() : `${fileName}_details`}
+          id={
+            fileName === undefined
+              ? Math.random().toString()
+              : `${fileName}_details`
+          }
           buttonContent={
-            <EuiTitle size="s">
-              <h3>Details</h3>
+            <EuiTitle size='s'>
+              <h3>
+                {i18n.translate('wazuh.components.agent.fim.ivv.file.detail', {
+                  defaultMessage: ' Details',
+                })}
+              </h3>
             </EuiTitle>
           }
-          paddingSize="none"
+          paddingSize='none'
           initialIsOpen={true}
         >
-          <div className="flyout-row details-row">{this.getDetails()}</div>
+          <div className='flyout-row details-row'>{this.getDetails()}</div>
         </EuiAccordion>
         {(type === 'registry_key' || currentFile.type === 'registry_key') && (
           <>
-            <EuiSpacer size="s" />
+            <EuiSpacer size='s' />
             <EuiAccordion
-              id={fileName === undefined ? Math.random().toString() : `${fileName}_values`}
+              id={
+                fileName === undefined
+                  ? Math.random().toString()
+                  : `${fileName}_values`
+              }
               buttonContent={
-                <EuiTitle size="s">
-                  <h3>Registry values</h3>
+                <EuiTitle size='s'>
+                  <h3>
+                    {' '}
+                    {i18n.translate(
+                      'wazuh.component.agent.fim.ivv.file.detail.regVal',
+                      {
+                        defaultMessage: ' Registry values',
+                      },
+                    )}
+                  </h3>
                 </EuiTitle>
               }
-              paddingSize="none"
+              paddingSize='none'
               initialIsOpen={true}
             >
-              <EuiFlexGroup className="flyout-row">
+              <EuiFlexGroup className='flyout-row'>
                 <EuiFlexItem>
-                  <RegistryValues 
-                    currentFile={currentFile} 
-                    agent={agent} 
-                    agentId={agentId} 
+                  <RegistryValues
+                    currentFile={currentFile}
+                    agent={agent}
+                    agentId={agentId}
                   />
                 </EuiFlexItem>
               </EuiFlexGroup>
@@ -437,24 +609,40 @@ export class FileDetails extends Component {
         )}
         <EuiSpacer />
         <EuiAccordion
-          id={fileName === undefined ? Math.random().toString() : `${fileName}_events`}
-          className="events-accordion"
+          id={
+            fileName === undefined
+              ? Math.random().toString()
+              : `${fileName}_events`
+          }
+          className='events-accordion'
           extraAction={
             <div style={{ marginBottom: 5 }}>
-              <strong>{this.state.totalHits || 0}</strong> hits
+              <strong>{this.state.totalHits || 0}</strong>{' '}
+              {i18n.translate(
+                'wazuh.components.agent.fim.ivv.file.detail.hits',
+                {
+                  defaultMessage: ' hits',
+                },
+              )}
             </div>
           }
           buttonContent={
-            <EuiTitle size="s">
+            <EuiTitle size='s'>
               <h3>
-                Recent events
+                {' '}
+                {i18n.translate(
+                  'wazuh.components.agent.fim.ivv.file.detail.recevents',
+                  {
+                    defaultMessage: ' Recent events',
+                  },
+                )}
                 {view !== 'events' && (
                   <span style={{ marginLeft: 16 }}>
-                    <EuiToolTip position="top" content={inspectButtonText}>
+                    <EuiToolTip position='top' content={inspectButtonText}>
                       <EuiIcon
-                        className="euiButtonIcon euiButtonIcon--primary"
-                        onMouseDown={(ev) => this.viewInEvents(ev)}
-                        type="popout"
+                        className='euiButtonIcon euiButtonIcon--primary'
+                        onMouseDown={ev => this.viewInEvents(ev)}
+                        type='popout'
                         aria-label={inspectButtonText}
                       />
                     </EuiToolTip>
@@ -463,10 +651,10 @@ export class FileDetails extends Component {
               </h3>
             </EuiTitle>
           }
-          paddingSize="none"
+          paddingSize='none'
           initialIsOpen={true}
         >
-          <EuiFlexGroup className="flyout-row">
+          <EuiFlexGroup className='flyout-row'>
             <EuiFlexItem>
               <Discover
                 kbnSearchBar
@@ -474,26 +662,26 @@ export class FileDetails extends Component {
                 initialColumns={[
                   { field: 'icon' },
                   { field: 'timestamp' },
-                  { field: 'agent.id', label: 'Agent' },
-                  { field: 'agent.name', label: 'Agent name' },
-                  { field: 'syscheck.event', label: 'Action' },
-                  { field: 'rule.description', label: 'Description' },
-                  { field: 'rule.level', label: 'Level' },
-                  { field: 'rule.id', label: 'Rule ID' },
+                  { field: 'agent.id', label: agent },
+                  { field: 'agent.name', label: agentName },
+                  { field: 'syscheck.event', label: action },
+                  { field: 'rule.description', label: descp },
+                  { field: 'rule.level', label: level },
+                  { field: 'rule.id', label: ruleID },
                 ]}
                 initialAgentColumns={[
                   { field: 'icon' },
                   { field: 'timestamp' },
-                  { field: 'syscheck.event', label: 'Action' },
-                  { field: 'rule.description', label: 'Description' },
-                  { field: 'rule.level', label: 'Level' },
-                  { field: 'rule.id', label: 'Rule ID' },
+                  { field: 'syscheck.event', label: action },
+                  { field: 'rule.description', label: descp },
+                  { field: 'rule.level', label: level },
+                  { field: 'rule.id', label: ruleID },
                 ]}
-                includeFilters="syscheck"
+                includeFilters='syscheck'
                 implicitFilters={implicitFilters}
                 initialFilters={[]}
                 type={type}
-                updateTotalHits={(total) => this.updateTotalHits(total)}
+                updateTotalHits={total => this.updateTotalHits(total)}
               />
             </EuiFlexItem>
           </EuiFlexGroup>

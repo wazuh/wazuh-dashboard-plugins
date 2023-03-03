@@ -33,7 +33,61 @@ import { requirementGoal } from '../../requirement-goal';
 import { getUiSettings } from '../../../../../kibana-services';
 import { FilterManager } from '../../../../../../../../src/plugins/data/public/';
 import { WzFlyout } from '../../../../../components/common/flyouts';
-
+import { i18n } from '@kbn/i18n';
+const label1 = i18n.translate(
+  'wazuh.components.overview.compliance.table.label1',
+  {
+    defaultMessage: 'Agent',
+  },
+);
+const label2 = i18n.translate(
+  'wazuh.components.overview.compliance.table.label2',
+  {
+    defaultMessage: 'Agent name',
+  },
+);
+const label3 = i18n.translate(
+  'wazuh.components.overview.compliance.table.label3',
+  {
+    defaultMessage: 'Description',
+  },
+);
+const label5 = i18n.translate(
+  'wazuh.components.overview.compliance.table.label5',
+  {
+    defaultMessage: 'Level',
+  },
+);
+const label6 = i18n.translate(
+  'wazuh.components.overview.compliance.table.label6',
+  {
+    defaultMessage: 'Rule ID',
+  },
+);
+const show = i18n.translate(
+  'wazuh.public.components.overview.requirement.show',
+  {
+    defaultMessage: 'Show',
+  },
+);
+const inDashboard = i18n.translate(
+  'wazuh.public.components.overview.requirement.inDashboard',
+  {
+    defaultMessage: 'in Dashboard',
+  },
+);
+const inspect = i18n.translate(
+  'wazuh.public.components.overview.requirement.inspect',
+  {
+    defaultMessage: 'Inspect',
+  },
+);
+const inEvents = i18n.translate(
+  'wazuh.public.components.overview.requirement.inEvents',
+  {
+    defaultMessage: 'in Events',
+  },
+);
 export class RequirementFlyout extends Component {
   _isMount = false;
   state: {};
@@ -61,15 +115,20 @@ export class RequirementFlyout extends Component {
             <EuiLoadingContent lines={1} />
           </div>
         )) || (
-          <EuiTitle size="m">
-            <h2 id="flyoutSmallTitle">Requirement {currentRequirement}</h2>
+          <EuiTitle size='m'>
+            <h2 id='flyoutSmallTitle'>
+              {i18n.translate('wazuh.components.overview.Requirement', {
+                defaultMessage: 'Requirement',
+              })}{' '}
+              {currentRequirement}
+            </h2>
           </EuiTitle>
         )}
       </EuiFlyoutHeader>
     );
   }
 
-  updateTotalHits = (total) => {
+  updateTotalHits = total => {
     this.setState({ totalHits: total });
   };
 
@@ -81,37 +140,51 @@ export class RequirementFlyout extends Component {
       ? { 'cluster.name': AppState.getClusterInfo().cluster }
       : { 'manager.name': AppState.getClusterInfo().manager };
     this.clusterFilter = clusterFilter;
-    requirementImplicitFilter[this.props.getRequirementKey()] = currentRequirement;
+    requirementImplicitFilter[this.props.getRequirementKey()] =
+      currentRequirement;
 
     const implicitFilters = [requirementImplicitFilter, this.clusterFilter];
     if (this.props.implicitFilters) {
-      this.props.implicitFilters.forEach((item) => implicitFilters.push(item));
+      this.props.implicitFilters.forEach(item => implicitFilters.push(item));
     }
     //Goal for PCI
     const currentReq = this.props.currentRequirement.split('.')[0];
 
     return (
-      <EuiFlyoutBody className="flyout-body">
+      <EuiFlyoutBody className='flyout-body'>
         <EuiAccordion
           id={'details'}
           buttonContent={
-            <EuiTitle size="s">
-              <h3>Details</h3>
+            <EuiTitle size='s'>
+              <h3>
+                {i18n.translate('wazuh.components.overview.Details', {
+                  defaultMessage: 'Details',
+                })}
+              </h3>
             </EuiTitle>
           }
-          paddingSize="xs"
+          paddingSize='xs'
           initialIsOpen={true}
         >
-          <div className="flyout-row details-row">
-            <EuiSpacer size="xs" />
+          <div className='flyout-row details-row'>
+            <EuiSpacer size='xs' />
             {requirementGoal[currentReq] && (
               <EuiFlexGroup style={{ marginBottom: 10 }}>
                 <EuiFlexItem grow={false}>
-                  <EuiIcon size="l" type={'bullseye'} color="primary" style={{ marginTop: 8 }} />
+                  <EuiIcon
+                    size='l'
+                    type={'bullseye'}
+                    color='primary'
+                    style={{ marginTop: 8 }}
+                  />
                 </EuiFlexItem>
                 <EuiFlexItem style={{ marginLeft: 2 }} grow={true}>
                   <EuiText style={{ marginLeft: 8, fontSize: 14 }}>
-                    <p style={{ fontWeight: 500, marginBottom: 2 }}>Goals</p>
+                    <p style={{ fontWeight: 500, marginBottom: 2 }}>
+                      {i18n.translate('wazuh.components.overview.Goals', {
+                        defaultMessage: 'Goals',
+                      })}
+                    </p>
 
                     <p>{requirementGoal[currentReq]}</p>
                   </EuiText>
@@ -121,62 +194,80 @@ export class RequirementFlyout extends Component {
 
             <EuiFlexGroup>
               <EuiFlexItem grow={false}>
-                <EuiIcon size="l" type={'filebeatApp'} color="primary" style={{ marginTop: 8 }} />
+                <EuiIcon
+                  size='l'
+                  type={'filebeatApp'}
+                  color='primary'
+                  style={{ marginTop: 8 }}
+                />
               </EuiFlexItem>
               <EuiFlexItem style={{ marginLeft: 2 }} grow={true}>
                 <EuiText style={{ marginLeft: 8, fontSize: 14 }}>
-                  <p style={{ fontWeight: 500, marginBottom: 2 }}>Requirement description</p>
+                  <p style={{ fontWeight: 500, marginBottom: 2 }}>
+                    {i18n.translate(
+                      'wazuh.components.overview.Requirementdescription',
+                      {
+                        defaultMessage: 'Requirement description',
+                      },
+                    )}
+                  </p>
 
                   <p>{this.props.description}</p>
                 </EuiText>
               </EuiFlexItem>
             </EuiFlexGroup>
-            <EuiSpacer size="xs" />
+            <EuiSpacer size='xs' />
           </div>
         </EuiAccordion>
 
-        <EuiSpacer size="s" />
+        <EuiSpacer size='s' />
         <EuiAccordion
           style={{ textDecoration: 'none' }}
           id={'recent_events'}
-          className="events-accordion"
+          className='events-accordion'
           extraAction={
             <div style={{ marginBottom: 5 }}>
-              <strong>{this.state.totalHits || 0}</strong> hits
+              <strong>{this.state.totalHits || 0}</strong>{' '}
+              {i18n.translate('wazuh.components.overview.hits', {
+                defaultMessage: 'hits',
+              })}
             </div>
           }
           buttonContent={
-            <EuiTitle size="s">
+            <EuiTitle size='s'>
               <h3>
-                Recent events
+                {i18n.translate('wazuh.components.overview.Recentevents', {
+                  defaultMessage: 'Recent events',
+                })}
+
                 {this.props.view !== 'events' && (
                   <span style={{ marginLeft: 16 }}>
                     <span>
                       <EuiToolTip
-                        position="top"
-                        content={'Show ' + currentRequirement + ' in Dashboard'}
+                        position='top'
+                        content={show + currentRequirement + inDashboard}
                       >
                         <EuiIcon
-                          onMouseDown={(e) => {
+                          onMouseDown={e => {
                             this.props.openDashboard(e, currentRequirement);
                             e.stopPropagation();
                           }}
-                          color="primary"
-                          type="visualizeApp"
+                          color='primary'
+                          type='visualizeApp'
                           style={{ marginRight: '10px' }}
                         ></EuiIcon>
                       </EuiToolTip>
                       <EuiToolTip
-                        position="top"
-                        content={'Inspect ' + currentRequirement + ' in Events'}
+                        position='top'
+                        content={inspect + currentRequirement + inEvents}
                       >
                         <EuiIcon
-                          onMouseDown={(e) => {
+                          onMouseDown={e => {
                             this.props.openDiscover(e, currentRequirement);
                             e.stopPropagation();
                           }}
-                          color="primary"
-                          type="discoverApp"
+                          color='primary'
+                          type='discoverApp'
                         ></EuiIcon>
                       </EuiToolTip>
                     </span>
@@ -185,10 +276,10 @@ export class RequirementFlyout extends Component {
               </h3>
             </EuiTitle>
           }
-          paddingSize="none"
+          paddingSize='none'
           initialIsOpen={true}
         >
-          <EuiFlexGroup className="flyout-row">
+          <EuiFlexGroup className='flyout-row'>
             <EuiFlexItem>
               <Discover
                 kbnSearchBar
@@ -196,24 +287,24 @@ export class RequirementFlyout extends Component {
                 initialColumns={[
                   { field: 'icon' },
                   { field: 'timestamp' },
-                  { field: 'agent.id', label: 'Agent' },
-                  { field: 'agent.name', label: 'Agent name' },
+                  { field: 'agent.id', label: label1 },
+                  { field: 'agent.name', label: label2 },
                   { field: this.props.getRequirementKey() },
-                  { field: 'rule.description', label: 'Description' },
-                  { field: 'rule.level', label: 'Level' },
-                  { field: 'rule.id', label: 'Rule ID' },
+                  { field: 'rule.description', label: label3 },
+                  { field: 'rule.level', label: label5 },
+                  { field: 'rule.id', label: label6 },
                 ]}
                 initialAgentColumns={[
                   { field: 'icon' },
                   { field: 'timestamp' },
                   { field: this.props.getRequirementKey() },
-                  { field: 'rule.description', label: 'Description' },
-                  { field: 'rule.level', label: 'Level' },
-                  { field: 'rule.id', label: 'Rule ID' },
+                  { field: 'rule.description', label: label3 },
+                  { field: 'rule.level', label: label5 },
+                  { field: 'rule.id', label: label6 },
                 ]}
                 implicitFilters={implicitFilters}
                 initialFilters={[]}
-                updateTotalHits={(total) => this.updateTotalHits(total)}
+                updateTotalHits={total => this.updateTotalHits(total)}
               />
             </EuiFlexItem>
           </EuiFlexGroup>

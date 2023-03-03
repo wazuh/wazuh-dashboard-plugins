@@ -17,7 +17,7 @@ import {
   EuiPanel,
   EuiTitle,
   EuiText,
-  EuiPage
+  EuiPage,
 } from '@elastic/eui';
 
 // Wazuh components
@@ -25,9 +25,9 @@ import WzGroupsTable from './groups-table';
 import WzGroupsActionButtons from './actions-buttons-main';
 
 import { connect } from 'react-redux';
-import { withUserAuthorizationPrompt } from '../../../../../components/common/hocs'
+import { withUserAuthorizationPrompt } from '../../../../../components/common/hocs';
 import { compose } from 'redux';
-
+import { i18n } from '@kbn/i18n';
 export class WzGroupsOverview extends Component {
   _isMounted = false;
   constructor(props) {
@@ -43,7 +43,11 @@ export class WzGroupsOverview extends Component {
               <EuiFlexGroup>
                 <EuiFlexItem>
                   <EuiTitle>
-                    <h2>Groups</h2>
+                    <h2>
+                      {i18n.translate('wazuh.controllers.mnage.comp.confi.groups', {
+                        defaultMessage: 'Groups',
+                      })}
+                    </h2>
                   </EuiTitle>
                 </EuiFlexItem>
               </EuiFlexGroup>
@@ -52,9 +56,14 @@ export class WzGroupsOverview extends Component {
           </EuiFlexGroup>
           <EuiFlexGroup>
             <EuiFlexItem>
-              <EuiText color="subdued" style={{ paddingBottom: '15px' }}>
-                From here you can list and check your groups, its agents and
-                files.
+              <EuiText color='subdued' style={{ paddingBottom: '15px' }}>
+                {i18n.translate(
+                  'wazuh.controllers..mnage.comp.confi.groups.itsagent',
+                  {
+                    defaultMessage:
+                      'From here you can list and check your groups, its agents and files.',
+                  },
+                )}
               </EuiText>
             </EuiFlexItem>
           </EuiFlexGroup>
@@ -71,14 +80,13 @@ export class WzGroupsOverview extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.groupsReducers
+    state: state.groupsReducers,
   };
 };
 
-
 export default compose(
-  withUserAuthorizationPrompt([{action: 'group:read', resource: 'group:id:*'}]),
-  connect(
-    mapStateToProps
-  ),
+  withUserAuthorizationPrompt([
+    { action: 'group:read', resource: 'group:id:*' },
+  ]),
+  connect(mapStateToProps),
 )(WzGroupsOverview);

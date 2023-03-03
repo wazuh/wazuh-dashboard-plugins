@@ -20,6 +20,7 @@ import { RolesTable } from './roles-table';
 import { WzRequest } from '../../../react-services/wz-request'
 import { CreateRole } from './create-role';
 import { EditRole } from './edit-role';
+import { i18n } from "@kbn/i18n";
 
 export const Roles = () => {
   const [isFlyoutVisible, setIsFlyoutVisible] = useState(false);
@@ -71,7 +72,7 @@ export const Roles = () => {
   let editFlyout;
   if (isEditFlyoutVisible) {
     editFlyout = (
-        <EditRole role={editingRole} 
+        <EditRole role={editingRole}
         closeFlyout={async (isVisible) => {
           setIsEditFlyoutVisible(isVisible);
           await getData();
@@ -84,7 +85,11 @@ export const Roles = () => {
       <EuiPageContentHeader>
         <EuiPageContentHeaderSection>
           <EuiTitle>
-            <h2>Roles</h2>
+            <h2>{
+              i18n.translate("wazuh.components.overview.Roles", {
+                defaultMessage: "Roles",
+              })}
+            </h2>
           </EuiTitle>
         </EuiPageContentHeaderSection>
         <EuiPageContentHeaderSection>
@@ -94,8 +99,11 @@ export const Roles = () => {
           <div>
             <EuiButton
               onClick={() => setIsFlyoutVisible(true)}>
-              Create role
-                        </EuiButton>
+              {
+                i18n.translate("wazuh.components.overview.Createrole", {
+                  defaultMessage: "Create role",
+                })}
+            </EuiButton>
             {flyout}
             {editFlyout}
           </div>

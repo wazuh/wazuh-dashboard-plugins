@@ -2,6 +2,7 @@ import React from 'react';
 import { EuiToolTip, EuiButtonIcon } from '@elastic/eui';
 import GroupsHandler from './groups-handler';
 import { WzButtonPermissions } from '../../../../../../components/common/permissions/button';
+import { i18n } from '@kbn/i18n';
 
 export default class GroupsColums {
   constructor(tableProps) {
@@ -12,44 +13,84 @@ export default class GroupsColums {
       this.columns = [
         {
           field: 'name',
-          name: 'Name',
+          name: i18n.translate(
+            'wazuh.public.controller.management.groups.utils.columns.main.Name',
+            {
+              defaultMessage: 'Name',
+            },
+          ),
           align: 'left',
-          sortable: true
+          sortable: true,
         },
         {
           field: 'count',
-          name: 'Agents',
-          align: 'left'
+          name: i18n.translate(
+            'wazuh.public.controller.management.groups.utils.columns.main.Agents',
+            {
+              defaultMessage: 'Agents',
+            },
+          ),
+          align: 'left',
         },
         {
           field: 'configSum',
-          name: 'Configuration checksum',
-          align: 'left'
-        }
+          name: i18n.translate(
+            'wazuh.public.controller.management.groups.utils.columns.main.Configurationchecksum',
+            {
+              defaultMessage: 'Configuration checksum',
+            },
+          ),
+          align: 'left',
+        },
       ];
       this.columns.push({
-        name: 'Actions',
+        name: i18n.translate(
+          'wazuh.public.controller.management.groups.utils.columns.main.Actions',
+          {
+            defaultMessage: 'Actions',
+          },
+        ),
         align: 'left',
         render: item => {
           return (
             <div>
               <WzButtonPermissions
                 buttonType='icon'
-                permissions={[{action: 'group:read', resource: `group:id:${item.name}`}]}
-                tooltip={{position: 'top', content: `View ${item.name} details`}}
-                aria-label="View group details"
-                iconType="eye"
+                permissions={[
+                  { action: 'group:read', resource: `group:id:${item.name}` },
+                ]}
+                tooltip={{
+                  position: 'top',
+                  content: `View ${item.name} details`,
+                }}
+                aria-label={i18n.translate(
+                  'wazuh.public.controller.management.groups.utils.columns.main.groupDetails',
+                  {
+                    defaultMessage: 'View group details',
+                  },
+                )}
+                iconType='eye'
                 onClick={async () => {
                   this.tableProps.updateGroupDetail(item);
                 }}
-                color="primary"
+                color='primary'
               />
               <WzButtonPermissions
                 buttonType='icon'
-                permissions={[{action: 'group:read', resource: `group:id:${item.name}`}]}
-                tooltip={{position: 'top', content: 'Edit group configuration'}}
-                aria-label="Edit group configuration"
-                iconType="pencil"
+                permissions={[
+                  { action: 'group:read', resource: `group:id:${item.name}` },
+                ]}
+                tooltip={{
+                  position: 'top',
+                  content: 'Edit group configuration',
+                }}
+                aria-label={i18n.translate(
+                  'wazuh.public.controller.management.groups.utils.columns.main.editConfig',
+                  {
+                    defaultMessage: 'Edit group configuration',
+                  },
+                )}
+                iconType='pencil'
                 onClick={async ev => {
                   ev.stopPropagation();
                   this.showGroupConfiguration(item.name);
@@ -57,21 +98,34 @@ export default class GroupsColums {
               />
               <WzButtonPermissions
                 buttonType='icon'
-                permissions={[{action: 'group:delete', resource: `group:id:${item.name}`}]}
-                tooltip={{posiiton: 'top', content: item.name === 'default' ? `The ${item.name} group cannot be deleted`: `Delete ${item.name}`}}
-                aria-label="Delete content"
-                iconType="trash"
+                permissions={[
+                  { action: 'group:delete', resource: `group:id:${item.name}` },
+                ]}
+                tooltip={{
+                  posiiton: 'top',
+                  content:
+                    item.name === 'default'
+                      ? `The ${item.name} group cannot be deleted`
+                      : `Delete ${item.name}`,
+                }}
+                aria-label={i18n.translate(
+                  'wazuh.public.controller.management.groups.utils.columns.main.Deletecontent',
+                  {
+                    defaultMessage: 'Delete content',
+                  },
+                )}
+                iconType='trash'
                 onClick={async ev => {
                   ev.stopPropagation();
                   this.tableProps.updateListItemsForRemove([item]);
                   this.tableProps.updateShowModal(true);
                 }}
-                color="danger"
+                color='danger'
                 isDisabled={item.name === 'default'}
               />
             </div>
           );
-        }
+        },
       });
     };
 
@@ -80,14 +134,14 @@ export default class GroupsColums {
 
   async showGroupConfiguration(groupId) {
     const result = await this.groupsHandler.getFileContent(
-      `/groups/${groupId}/files/agent.conf/xml`
+      `/groups/${groupId}/files/agent.conf/xml`,
     );
 
     const file = {
       name: 'agent.conf',
       content: this.autoFormat(result),
       isEditable: true,
-      groupName: groupId
+      groupName: groupId,
     };
     this.tableProps.updateFileContent(file);
   }
@@ -120,7 +174,7 @@ export default class GroupsColums {
       'other->single': 0,
       'other->closing': -1,
       'other->opening': 0,
-      'other->other': 0
+      'other->other': 0,
     };
 
     for (var i = 0; i < lines.length; i++) {

@@ -10,30 +10,78 @@
  * Find more information about this on the LICENSE file.
  */
 import React from 'react';
-import { useFilterManager, useQuery, useRefreshAngularDiscover } from '../../common/hooks';
+import {
+  useFilterManager,
+  useQuery,
+  useRefreshAngularDiscover,
+} from '../../common/hooks';
 import { Discover } from '../../common/modules/discover';
 import { useAllowedAgents } from '../../common/hooks/useAllowedAgents';
 
+import { i18n } from '@kbn/i18n';
+
+const label1 = i18n.translate(
+  'wazuh.components.visualize.components.security.alert.label1',
+  {
+    defaultMessage: 'Technique(s)',
+  },
+);
+const label2 = i18n.translate(
+  'wazuh.components.visualize.components.security.alert.label2',
+  {
+    defaultMessage: 'Tactic(s)',
+  },
+);
+const label3 = i18n.translate(
+  'wazuh.components.visualize.components.security.alert.label3',
+  {
+    defaultMessage: 'Description',
+  },
+);
+const label4 = i18n.translate(
+  'wazuh.components.visualize.components.security.alert.label4',
+  {
+    defaultMessage: 'Level',
+  },
+);
+const label5 = i18n.translate(
+  'wazuh.components.visualize.components.security.alert.label5',
+  {
+    defaultMessage: 'Rule ID',
+  },
+);
+const label6 = i18n.translate(
+  'wazuh.components.visualize.components.security.alert.label6',
+  {
+    defaultMessage: 'Agent',
+  },
+);
+const label7 = i18n.translate(
+  'wazuh.components.visualize.components.security.alert.label7',
+  {
+    defaultMessage: 'Agent name',
+  },
+);
 export const SecurityAlerts = ({
   initialColumns = [
     { field: 'icon' },
     { field: 'timestamp' },
-    { field: 'agent.id', label: 'Agent' },
-    { field: 'agent.name', label: 'Agent name' },
-    { field: 'rule.mitre.id', label: 'Technique(s)' },
-    { field: 'rule.mitre.tactic', label: 'Tactic(s)' },
-    { field: 'rule.description', label: 'Description' },
-    { field: 'rule.level', label: 'Level' },
-    { field: 'rule.id', label: 'Rule ID' },
+    { field: 'agent.id', label: label6 },
+    { field: 'agent.name', label: label7 },
+    { field: 'rule.mitre.id', label: label1 },
+    { field: 'rule.mitre.tactic', label: label2 },
+    { field: 'rule.description', label: label3 },
+    { field: 'rule.level', label: label4 },
+    { field: 'rule.id', label: label5 },
   ],
   initialAgentColumns = [
     { field: 'icon' },
     { field: 'timestamp' },
-    { field: 'rule.mitre.id', label: 'Technique(s)' },
-    { field: 'rule.mitre.tactic', label: 'Tactic(s)' },
-    { field: 'rule.description', label: 'Description' },
-    { field: 'rule.level', label: 'Level' },
-    { field: 'rule.id', label: 'Rule ID' },
+    { field: 'rule.mitre.id', label: label1 },
+    { field: 'rule.mitre.tactic', label: label2 },
+    { field: 'rule.description', label: label3 },
+    { field: 'rule.level', label: label4 },
+    { field: 'rule.id', label: label5 },
   ],
   useAgentColumns = true,
 }) => {
@@ -43,7 +91,8 @@ export const SecurityAlerts = ({
 
   const customFilterWithAllowedAgents = [];
   const { filterAllowedAgents } = useAllowedAgents();
-  filterAllowedAgents && customFilterWithAllowedAgents.push(filterAllowedAgents);
+  filterAllowedAgents &&
+    customFilterWithAllowedAgents.push(filterAllowedAgents);
 
   return (
     <Discover
@@ -54,7 +103,7 @@ export const SecurityAlerts = ({
       initialAgentColumns={useAgentColumns ? initialAgentColumns : undefined}
       implicitFilters={[]}
       initialFilters={[]}
-      updateTotalHits={(total) => {}}
+      updateTotalHits={total => {}}
       refreshAngularDiscover={refreshAngularDiscover}
     />
   );

@@ -11,9 +11,10 @@
  */
 
 import { WAZUH_API_RESERVED_ID_LOWER_THAN } from '../../common/constants';
+import { i18n } from '@kbn/i18n';
 
-export class WzAPIUtils{
-  static isReservedID(id: number): boolean{
-    return id < WAZUH_API_RESERVED_ID_LOWER_THAN
+export class WzAPIUtils {
+  static isReservedID(id: number): boolean {
+    return id < WAZUH_API_RESERVED_ID_LOWER_THAN;
   }
 }

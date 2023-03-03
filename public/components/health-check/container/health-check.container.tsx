@@ -11,7 +11,7 @@
  * Find more information about this on the LICENSE file.
  *
  */
-
+import { i18n } from '@kbn/i18n';
 import {
   EuiButton,
   EuiCallOut,
@@ -19,10 +19,7 @@ import {
   EuiSpacer,
 } from '@elastic/eui';
 import React, { Fragment, useState, useEffect, useRef } from 'react';
-import {
-  EuiFlexGroup,
-  EuiFlexItem
-} from '@elastic/eui';
+import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import { AppState, ErrorHandler } from '../../../react-services';
 import { useAppConfig, useRootScope } from '../../../components/common/hooks';
 import {
@@ -32,6 +29,7 @@ import {
   checkPatternSupportService,
   checkSetupService,
 } from '../services';
+
 import { CheckResult } from '../components/check-result';
 import { withErrorBoundary, withReduxProvider } from '../../common/hocs';
 import { getHttp } from '../../../kibana-services';
@@ -51,74 +49,139 @@ import { getDataPlugin } from '../../../kibana-services';
 import { CheckLogger } from '../types/check_logger';
 import { compose } from 'redux';
 import { getThemeAssetURL, getAssetURL } from '../../../utils/assets';
-
+const apiTitle = i18n.translate('wazuh.components.healthCheck.apiCheck', {
+  defaultMessage: 'Check Wazuh API connection',
+});
+const apiLabel = i18n.translate('wazuh.components.healthCheck.apiConnection', {
+  defaultMessage: 'API connection',
+});
+const setupTitle = i18n.translate(
+  'wazuh.components.healthCheck.checkApiVersion',
+  { defaultMessage: 'Check Wazuh API version' },
+);
+const setupLabel = i18n.translate('wazuh.components.healthCheck.apiVersion', {
+  defaultMessage: 'API version',
+});
+const patternTitle = i18n.translate('wazuh.components.healthCheck.checkAlert', {
+  defaultMessage: 'Check alerts index pattern',
+});
+const patternLabel = i18n.translate(
+  'wazuh.components.healthCheck.alertPattern',
+  { defaultMessage: 'Alerts index pattern' },
+);
+const patternMonitoringTitle = i18n.translate(
+  'wazuh.components.healthCheck.checkMonitoring',
+  { defaultMessage: 'Check monitoring index pattern' },
+);
+const patternMonitoringLabel = i18n.translate(
+  'wazuh.components.healthCheck.monitorPattern',
+  { defaultMessage: 'Monitoring index pattern' },
+);
+const patternStatisticsTitle = i18n.translate(
+  'wazuh.components.healthCheck.checkStat',
+  { defaultMessage: 'Check statistics index pattern' },
+);
+const patternStatisticsLabel = i18n.translate(
+  'wazuh.components.healthCheck.statPattern',
+  { defaultMessage: 'Statistics index pattern' },
+);
+const label1 = i18n.translate('wazuh.public.components.healthCheck.label1', {
+  defaultMessage: 'check',
+});
+const label2 = i18n.translate('wazuh.public.components.healthCheck.label2', {
+  defaultMessage: 'setting',
+});
 const checks = {
-  api: {    
-    title: 'Check Wazuh API connection',
-    label: 'API connection',
+  api: {
+    title: apiTitle,
+    label: apiLabel,
     validator: checkApiService,
     awaitFor: [],
     canRetry: true,
   },
   setup: {
-    title: 'Check Wazuh API version',
-    label: 'API version',
+    title: setupTitle,
+    label: setupLabel,
     validator: checkSetupService,
-    awaitFor: ["api"],
+    awaitFor: ['api'],
   },
   pattern: {
-    title: 'Check alerts index pattern',
-    label: 'Alerts index pattern',
+    title: patternTitle,
+    label: patternLabel,
     validator: checkIndexPatternService,
     awaitFor: [],
     shouldCheck: true,
     canRetry: true,
   },
   patternMonitoring: {
-    title: 'Check monitoring index pattern',
-    label: 'Monitoring index pattern',
-    validator: (appConfig) => checkPatternSupportService(appConfig.data['wazuh.monitoring.pattern'], WAZUH_INDEX_TYPE_MONITORING),
+    title: patternMonitoringTitle,
+    label: patternMonitoringLabel,
+    validator: appConfig =>
+      checkPatternSupportService(
+        appConfig.data['wazuh.monitoring.pattern'],
+        WAZUH_INDEX_TYPE_MONITORING,
+      ),
     awaitFor: [],
     shouldCheck: true,
     canRetry: true,
   },
   patternStatistics: {
-    title: 'Check statistics index pattern',
-    label: 'Statistics index pattern',
-    validator: (appConfig) => checkPatternSupportService(`${appConfig.data['cron.prefix']}-${appConfig.data['cron.statistics.index.name']}-*`, WAZUH_INDEX_TYPE_STATISTICS),
+    title: patternStatisticsTitle,
+    label: patternStatisticsLabel,
+    validator: appConfig =>
+      checkPatternSupportService(
+        `${appConfig.data['cron.prefix']}-${appConfig.data['cron.statistics.index.name']}-*`,
+        WAZUH_INDEX_TYPE_STATISTICS,
+      ),
     awaitFor: [],
     shouldCheck: true,
     canRetry: true,
   },
   maxBuckets: {
-    title: `Check ${PLUGIN_PLATFORM_SETTING_NAME_MAX_BUCKETS} setting`,
-    label: `${PLUGIN_PLATFORM_SETTING_NAME_MAX_BUCKETS} setting`,
-    validator: checkPluginPlatformSettings(PLUGIN_PLATFORM_SETTING_NAME_MAX_BUCKETS, WAZUH_PLUGIN_PLATFORM_SETTING_MAX_BUCKETS),
+    title: `${label1} ${PLUGIN_PLATFORM_SETTING_NAME_MAX_BUCKETS} ${label2}`,
+    label: `${PLUGIN_PLATFORM_SETTING_NAME_MAX_BUCKETS} ${label2}`,
+    validator: checkPluginPlatformSettings(
+      PLUGIN_PLATFORM_SETTING_NAME_MAX_BUCKETS,
+      WAZUH_PLUGIN_PLATFORM_SETTING_MAX_BUCKETS,
+    ),
     awaitFor: [],
     canRetry: true,
   },
   metaFields: {
-    title: `Check ${PLUGIN_PLATFORM_SETTING_NAME_METAFIELDS} setting`,
-    label: `${PLUGIN_PLATFORM_SETTING_NAME_METAFIELDS} setting`,
-    validator: checkPluginPlatformSettings(PLUGIN_PLATFORM_SETTING_NAME_METAFIELDS, WAZUH_PLUGIN_PLATFORM_SETTING_METAFIELDS),
+    title: `${label1} ${PLUGIN_PLATFORM_SETTING_NAME_METAFIELDS} ${label2}`,
+    label: `${PLUGIN_PLATFORM_SETTING_NAME_METAFIELDS} ${label2}`,
+    validator: checkPluginPlatformSettings(
+      PLUGIN_PLATFORM_SETTING_NAME_METAFIELDS,
+      WAZUH_PLUGIN_PLATFORM_SETTING_METAFIELDS,
+    ),
     awaitFor: [],
     canRetry: true,
   },
   timeFilter: {
-    title: `Check ${PLUGIN_PLATFORM_SETTING_NAME_TIME_FILTER} setting`,
-    label: `${PLUGIN_PLATFORM_SETTING_NAME_TIME_FILTER} setting`,
-    validator: checkPluginPlatformSettings(PLUGIN_PLATFORM_SETTING_NAME_TIME_FILTER, JSON.stringify(WAZUH_PLUGIN_PLATFORM_SETTING_TIME_FILTER), (checkLogger: CheckLogger, options: {defaultAppValue: any}) => {
-      getDataPlugin().query.timefilter.timefilter.setTime(WAZUH_PLUGIN_PLATFORM_SETTING_TIME_FILTER)
-        && checkLogger.action(`Timefilter set to ${JSON.stringify(options.defaultAppValue)}`);
-    }),
+    title: `${label1} ${PLUGIN_PLATFORM_SETTING_NAME_TIME_FILTER} ${label2}`,
+    label: `${PLUGIN_PLATFORM_SETTING_NAME_TIME_FILTER} ${label2}`,
+    validator: checkPluginPlatformSettings(
+      PLUGIN_PLATFORM_SETTING_NAME_TIME_FILTER,
+      JSON.stringify(WAZUH_PLUGIN_PLATFORM_SETTING_TIME_FILTER),
+      (checkLogger: CheckLogger, options: { defaultAppValue: any }) => {
+        getDataPlugin().query.timefilter.timefilter.setTime(
+          WAZUH_PLUGIN_PLATFORM_SETTING_TIME_FILTER,
+        ) &&
+          checkLogger.action(
+            `Timefilter set to ${JSON.stringify(options.defaultAppValue)}`,
+          );
+      },
+    ),
     awaitFor: [],
     canRetry: true,
-  }
+  },
 };
 
 function HealthCheckComponent() {
-  const [checkErrors, setCheckErrors] = useState<{[key:string]: []}>({});
-  const [checksReady, setChecksReady] = useState<{[key: string]: boolean}>({});
+  const [checkErrors, setCheckErrors] = useState<{ [key: string]: [] }>({});
+  const [checksReady, setChecksReady] = useState<{ [key: string]: boolean }>(
+    {},
+  );
   const [isDebugMode, setIsDebugMode] = useState<boolean>(false);
   const appConfig = useAppConfig();
   const checksInitiated = useRef(false);
@@ -126,8 +189,11 @@ function HealthCheckComponent() {
 
   const redirectionPassHealthcheck = () => {
     const params = $rootScope.previousParams || {};
-    const queryString = Object.keys(params).map(key => key + '=' + params[key]).join('&');
-    const url = '/app/wazuh#' + ($rootScope.previousLocation || '') + '?' + queryString;
+    const queryString = Object.keys(params)
+      .map(key => key + '=' + params[key])
+      .join('&');
+    const url =
+      '/app/wazuh#' + ($rootScope.previousLocation || '') + '?' + queryString;
     window.location.href = getHttp().basePath.prepend(url);
   };
 
@@ -140,41 +206,50 @@ function HealthCheckComponent() {
 
   useEffect(() => {
     // Redirect to app when all checks are ready
-    Object.keys(checks)
-      .every(check => checksReady[check])
-    && !isDebugMode && (() => setTimeout(redirectionPassHealthcheck, HEALTH_CHECK_REDIRECTION_TIME)
-      )()
+    Object.keys(checks).every(check => checksReady[check]) &&
+      !isDebugMode &&
+      (() =>
+        setTimeout(
+          redirectionPassHealthcheck,
+          HEALTH_CHECK_REDIRECTION_TIME,
+        ))();
   }, [checksReady]);
 
   useEffect(() => {
     // Check if Health should not redirect automatically (Debug mode)
     setIsDebugMode(window.location.href.includes('debug'));
-  },[]);
+  }, []);
 
   const handleErrors = (checkID, errors, parsed) => {
     const newErrors = parsed
-      ? errors.map((error) =>
-          ErrorHandler.handle(error, 'Health Check', { warning: false, silent: true })
+      ? errors.map(error =>
+          ErrorHandler.handle(error, 'Health Check', {
+            warning: false,
+            silent: true,
+          }),
         )
       : errors;
-    setCheckErrors((prev) => ({...prev, [checkID]: newErrors}));
+    setCheckErrors(prev => ({ ...prev, [checkID]: newErrors }));
   };
 
   const cleanErrors = (checkID: string) => {
     delete checkErrors[checkID];
-    setCheckErrors({...checkErrors});
-  }
+    setCheckErrors({ ...checkErrors });
+  };
 
-  const handleCheckReady = (checkID, isReady) => {    
-    setChecksReady(prev =>  ({...prev, [checkID]: isReady}));
-  }
+  const handleCheckReady = (checkID, isReady) => {
+    setChecksReady(prev => ({ ...prev, [checkID]: isReady }));
+  };
 
-
-  const logoUrl = getHttp().basePath.prepend(appConfig.data['customization.logo.healthcheck'] ? getAssetURL(appConfig.data['customization.logo.healthcheck']) : getThemeAssetURL('logo.svg'));
+  const logoUrl = getHttp().basePath.prepend(
+    appConfig.data['customization.logo.healthcheck']
+      ? getAssetURL(appConfig.data['customization.logo.healthcheck'])
+      : getThemeAssetURL('logo.svg'),
+  );
   const thereAreErrors = Object.keys(checkErrors).length > 0;
 
   const renderChecks = () => {
-    const showLogButton = (thereAreErrors || isDebugMode);
+    const showLogButton = thereAreErrors || isDebugMode;
     return Object.keys(checks).map((check, index) => {
       return (
         <CheckResult
@@ -183,12 +258,14 @@ function HealthCheckComponent() {
           name={check}
           title={checks[check].title}
           awaitFor={checks[check].awaitFor}
-          shouldCheck={checks[check].shouldCheck || appConfig.data[`checks.${check}`]}
+          shouldCheck={
+            checks[check].shouldCheck || appConfig.data[`checks.${check}`]
+          }
           validationService={checks[check].validator(appConfig)}
           handleErrors={handleErrors}
           cleanErrors={cleanErrors}
           isLoading={appConfig.isLoading}
-          handleCheckReady= {handleCheckReady}
+          handleCheckReady={handleCheckReady}
           checksReady={checksReady}
           canRetry={checks[check].canRetry}
         />
@@ -197,65 +274,81 @@ function HealthCheckComponent() {
   };
 
   const renderErrors = () => {
-    return Object.keys(checkErrors).map((checkID) => 
+    return Object.keys(checkErrors).map(checkID =>
       checkErrors[checkID].map((error, index) => (
         <Fragment key={index}>
           <EuiCallOut
-            title={(<>{`[${checks[checkID].label}]`} <span dangerouslySetInnerHTML={{__html: error}}></span></>)}
-            color="danger"
-            iconType="alert"
+            title={
+              <>
+                {`[${checks[checkID].label}]`}{' '}
+                <span dangerouslySetInnerHTML={{ __html: error }}></span>
+              </>
+            }
+            color='danger'
+            iconType='alert'
             style={{ textAlign: 'left' }}
             data-test-subj='callOutError'
           ></EuiCallOut>
-          <EuiSpacer size="xs" />
+          <EuiSpacer size='xs' />
         </Fragment>
-      ))
-    ) 
+      )),
+    );
   };
 
   return (
-    <div className="health-check">
-      <img src={logoUrl} className="health-check-logo" alt=""></img>
-      <div className="margin-top-30">
-        <EuiDescriptionList textStyle="reverse" align="center" type="column">
+    <div className='health-check'>
+      <img src={logoUrl} className='health-check-logo' alt=''></img>
+      <div className='margin-top-30'>
+        <EuiDescriptionList textStyle='reverse' align='center' type='column'>
           {renderChecks()}
         </EuiDescriptionList>
       </div>
       {thereAreErrors && (
         <>
-          <EuiSpacer size="xl" />
+          <EuiSpacer size='xl' />
           {renderErrors()}
         </>
       )}
       {(thereAreErrors || isDebugMode) && (
         <>
-          <EuiSpacer size="xl" />
+          <EuiSpacer size='xl' />
           <EuiFlexGroup justifyContent='center'>
             {thereAreErrors && (
               <EuiFlexItem grow={false}>
-                <EuiButton fill href={getHttp().basePath.prepend('/app/wazuh#/settings')}>
-                  Go to Settings
+                <EuiButton
+                  fill
+                  href={getHttp().basePath.prepend('/app/wazuh#/settings')}
+                >
+                  {i18n.translate('wazuh.components.health.continer.Setting', {
+                    defaultMessage: 'Go to Settings',
+                  })}
                 </EuiButton>
               </EuiFlexItem>
             )}
-            {isDebugMode && Object.keys(checks).every(check => checksReady[check]) && (
-              <EuiFlexItem grow={false}>
-                <EuiButton fill onClick={redirectionPassHealthcheck}>
-                  Continue
-                </EuiButton>
-              </EuiFlexItem>
-            )}
+            {isDebugMode &&
+              Object.keys(checks).every(check => checksReady[check]) && (
+                <EuiFlexItem grow={false}>
+                  <EuiButton fill onClick={redirectionPassHealthcheck}>
+                    {i18n.translate(
+                      'wazuh.components.health.continer.Continue',
+                      {
+                        defaultMessage: 'Continue',
+                      },
+                    )}
+                  </EuiButton>
+                </EuiFlexItem>
+              )}
           </EuiFlexGroup>
         </>
-      )
-      }
-      <EuiSpacer size="xl" />
+      )}
+      <EuiSpacer size='xl' />
     </div>
   );
 }
 
-export const HealthCheck = compose (withErrorBoundary,withReduxProvider) (HealthCheckComponent);
+export const HealthCheck = compose(
+  withErrorBoundary,
+  withReduxProvider,
+)(HealthCheckComponent);
 
 export const HealthCheckTest = HealthCheckComponent;
-
-

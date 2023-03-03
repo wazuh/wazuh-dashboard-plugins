@@ -14,6 +14,7 @@ import React from 'react';
 import { useDispatch } from 'react-redux';
 import { EuiButton, EuiEmptyPrompt } from '@elastic/eui';
 import { showExploreAgentModal } from '../../../redux/actions/appStateActions';
+import { i18n } from '@kbn/i18n';
 
 type PromptSelectAgentProps = {
   body?: string;
@@ -25,12 +26,14 @@ export const PromptSelectAgent = ({ body, title }: PromptSelectAgentProps) => {
   const openAgentSelector = () => dispatch(showExploreAgentModal(true));
   return (
     <EuiEmptyPrompt
-      iconType="watchesApp"
+      iconType='watchesApp'
       title={<h2>{title}</h2>}
       body={body && <p>{body}</p>}
       actions={
-        <EuiButton color="primary" fill onClick={openAgentSelector}>
-          Select agent
+        <EuiButton color='primary' fill onClick={openAgentSelector}>
+          {i18n.translate('wazuh.components.agent.fim.ivv.lib.selectAgent', {
+            defaultMessage: 'Select agent',
+          })}
         </EuiButton>
       }
     />

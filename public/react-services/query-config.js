@@ -15,7 +15,11 @@ import { getErrorOrchestrator } from './common-services';
 import { AppState } from './app-state';
 import { UI_LOGGER_LEVELS } from '../../common/constants';
 import { UI_ERROR_SEVERITIES } from './error-orchestrator/types';
+import { i18n } from '@kbn/i18n';
 
+const Title1 = i18n.translate('wazuh.kibana-int.vis.', {
+  defaultMessage: 'Error getting the query config',
+});
 export const queryConfig = async (agentId, sections, node = false) => {
   try {
     if (
@@ -30,42 +34,48 @@ export const queryConfig = async (agentId, sections, node = false) => {
     }
 
     const result = {};
-    await Promise.all(sections.map(async(section)=> {
-      const { component, configuration } = section;
-      if (
-        !component ||
-        typeof component !== 'string' ||
-        !configuration ||
-        typeof configuration !== 'string'
-      ) {
-        throw new Error('Invalid section');
-      }
-      try {
-        const url = node
-          ? `/cluster/${node}/configuration/${component}/${configuration}`
-          : !node
-            && agentId === '000'
+    await Promise.all(
+      sections.map(async section => {
+        const { component, configuration } = section;
+        if (
+          !component ||
+          typeof component !== 'string' ||
+          !configuration ||
+          typeof configuration !== 'string'
+        ) {
+          throw new Error('Invalid section');
+        }
+        try {
+          const url = node
+            ? `/cluster/${node}/configuration/${component}/${configuration}`
+            : !node && agentId === '000'
             ? `/manager/configuration/${component}/${configuration}`
             : `/agents/${agentId}/configuration/${component}/${configuration}`;
 
-        const partialResult = await WzRequest.apiReq('GET', url, {});
-        result[`${component}-${configuration}`] = partialResult.data.data;
-      } catch (error) {
-        const options = {
-          context: `${AppState.name}.queryConfig`,
-          level: UI_LOGGER_LEVELS.ERROR,
-          severity: UI_ERROR_SEVERITIES.BUSINESS,
-          store: true,
-          display: false,
-          error: {
-            error: error,
-            message: error.message || error,
-            title: `Fetch Configuration`,
-          },
-        };
-        getErrorOrchestrator().handleError(options);
-      }
-    }));
+          const partialResult = await WzRequest.apiReq('GET', url, {});
+          result[`${component}-${configuration}`] = partialResult.data.data;
+        } catch (error) {
+          const options = {
+            context: `${AppState.name}.queryConfig`,
+            level: UI_LOGGER_LEVELS.ERROR,
+            severity: UI_ERROR_SEVERITIES.BUSINESS,
+            store: true,
+            display: false,
+            error: {
+              error: error,
+              message: error.message || error,
+              title: i18n.translate(
+                'wazuh.public.react.services.query.FetchConfiguration',
+                {
+                  defaultMessage: 'Fetch Configuration',
+                },
+              ),
+            },
+          };
+          getErrorOrchestrator().handleError(options);
+        }
+      }),
+    );
     return result;
   } catch (error) {
     const options = {
@@ -77,10 +87,10 @@ export const queryConfig = async (agentId, sections, node = false) => {
       error: {
         error: error,
         message: error.message || error,
-        title: `Error getting the query config`,
+        title: Title1,
       },
     };
 
     getErrorOrchestrator().handleError(options);
   }
-}
+};

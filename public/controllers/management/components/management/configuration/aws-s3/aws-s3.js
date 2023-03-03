@@ -14,7 +14,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import WzTabSelector, {
-  WzTabSelectorTab
+  WzTabSelectorTab,
 } from '../util-components/tab-selector';
 import withWzConfig from '../util-hocs/wz-config';
 import { wodleBuilder } from '../utils/builders';
@@ -22,6 +22,7 @@ import { wodleBuilder } from '../utils/builders';
 import WzConfigurationAmazonS3General from './aws-s3-general';
 import WzConfigurationAmazonS3Buckets from './aws-s3-buckets';
 import WzConfigurationAmazonS3Services from './aws-s3-services';
+import { i18n } from '@kbn/i18n';
 
 class WzConfigurationAmazonS3 extends Component {
   constructor(props) {
@@ -41,19 +42,40 @@ class WzConfigurationAmazonS3 extends Component {
   render() {
     return (
       <WzTabSelector>
-        <WzTabSelectorTab label="General">
+        <WzTabSelectorTab
+          label={i18n.translate(
+            'wazuh.public.controller.management.config.aws.s3.js.General',
+            {
+              defaultMessage: 'General',
+            },
+          )}
+        >
           <WzConfigurationAmazonS3General
             currentConfig={this.props.currentConfig}
             wodleConfig={this.wodleConfig}
           />
         </WzTabSelectorTab>
-        <WzTabSelectorTab label="Buckets">
+        <WzTabSelectorTab
+          label={i18n.translate(
+            'wazuh.public.controller.management.config.aws.s3.js.Buckets',
+            {
+              defaultMessage: 'Buckets',
+            },
+          )}
+        >
           <WzConfigurationAmazonS3Buckets
             currentConfig={this.props.currentConfig}
             wodleConfig={this.wodleConfig}
           />
         </WzTabSelectorTab>
-        <WzTabSelectorTab label="Services">
+        <WzTabSelectorTab
+          label={i18n.translate(
+            'wazuh.public.controller.management.config.aws.s3.js.Services',
+            {
+              defaultMessage: 'Services',
+            },
+          )}
+        >
           <WzConfigurationAmazonS3Services
             currentConfig={this.props.currentConfig}
             wodleConfig={this.wodleConfig}
@@ -68,7 +90,7 @@ const sections = [{ component: 'wmodules', configuration: 'wmodules' }];
 
 WzConfigurationAmazonS3.propTypes = {
   // currentConfig: PropTypes.object.isRequired,
-  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string])
+  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
 };
 
 export default withWzConfig(sections)(WzConfigurationAmazonS3);

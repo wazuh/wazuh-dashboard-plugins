@@ -31,15 +31,15 @@ interface Props {
 }
 
 export function DiscoverFieldBucket({ field, bucket, onAddFilter }: Props) {
-  const emptyTxt = i18n.translate('discover.fieldChooser.detailViews.emptyStringText', {
+  const emptyTxt = i18n.translate('wazuh.discover.fieldChooser.detailViews.emptyStringText', {
     defaultMessage: 'Empty string',
   });
-  const addLabel = i18n.translate('discover.fieldChooser.detailViews.filterValueButtonAriaLabel', {
+  const addLabel = i18n.translate('wazuh.discover.fieldChooser.detailViews.filterValueButtonAriaLabel', {
     defaultMessage: 'Filter for {field}: "{value}"',
     values: { value: bucket.value, field: field.name },
   });
   const removeLabel = i18n.translate(
-    'discover.fieldChooser.detailViews.filterOutValueButtonAriaLabel',
+    'wazuh.discover.fieldChooser.detailViews.filterOutValueButtonAriaLabel',
     {
       defaultMessage: 'Filter out {field}: "{value}"',
       values: { value: bucket.value, field: field.name },

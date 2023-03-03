@@ -14,6 +14,8 @@ import React, { Component } from 'react';
 import { EuiButtonGroup } from '@elastic/eui';
 import { IFilter } from './';
 
+import { i18n } from '@kbn/i18n';
+
 export interface filterButton {
   label: string
   field: string
@@ -63,7 +65,9 @@ export class WzSearchButtons extends Component {
   buildOptions = () => this.props.options.map((item) => ({
     id: item.label,
     label: item.label,
-    name: "options",
+    name: i18n.translate('wazuh.public.components.wz.search.button.options', {
+          defaultMessage: 'options',
+        }),
     ...(item.iconType && { iconType: item.iconType }),
   }));
 
@@ -81,7 +85,7 @@ export class WzSearchButtons extends Component {
       const newFilters = [...filters];
       const { field, value } = options[label];
       const filterIdx = filters.findIndex(filter => filter.field === field);
-      (filterIdx !== -1 && !IconSelectedMap[label]) 
+      (filterIdx !== -1 && !IconSelectedMap[label])
       ? newFilters.splice(filterIdx, 1)
       : newFilters.push({ field, value })
       return newFilters;
@@ -105,7 +109,9 @@ export class WzSearchButtons extends Component {
     return (
       <EuiButtonGroup
         legend="Text align"
-        name="textAlign"
+        name={ i18n.translate('wazuh.public.components.wz.search.buttontextAlign', {
+          defaultMessage: "textAlign",
+        })}
         buttonSize="m"
         options={options}
         idToSelectedMap={IconSelectedMap}

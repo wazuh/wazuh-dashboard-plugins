@@ -30,7 +30,7 @@ import { ReportingService } from '../../../../../react-services/reporting';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
-
+import { i18n } from '@kbn/i18n';
 
 class WzGroupsActionButtonsFiles extends Component {
   _isMounted = false;
@@ -98,11 +98,14 @@ class WzGroupsActionButtonsFiles extends Component {
     }, 100);
   }
 
-  autoFormat = (xml) => {
+  autoFormat = xml => {
     var reg = /(>)\s*(<)(\/*)/g;
     var wsexp = / *(.*) +\n/g;
     var contexp = /(<.+>)(.+\n)/g;
-    xml = xml.replace(reg, '$1\n$2$3').replace(wsexp, '$1\n').replace(contexp, '$1\n$2');
+    xml = xml
+      .replace(reg, '$1\n$2$3')
+      .replace(wsexp, '$1\n')
+      .replace(contexp, '$1\n$2');
     var formatted = '';
     var lines = xml.split('\n');
     var indent = 0;
@@ -135,7 +138,13 @@ class WzGroupsActionButtonsFiles extends Component {
       var single = Boolean(ln.match(/<.+\/>/)); // is this line a single tag? ex. <br />
       var closing = Boolean(ln.match(/<\/.+>/)); // is this a closing tag? ex. </a>
       var opening = Boolean(ln.match(/<[^!].*>/)); // is this even a tag (that's not <!something>)
-      var type = single ? 'single' : closing ? 'closing' : opening ? 'opening' : 'other';
+      var type = single
+        ? 'single'
+        : closing
+        ? 'closing'
+        : opening
+        ? 'opening'
+        : 'other';
       var fromTo = lastType + '->' + type;
       lastType = type;
       var padding = '';
@@ -155,7 +164,7 @@ class WzGroupsActionButtonsFiles extends Component {
   async showGroupConfiguration() {
     const { itemDetail } = this.props.state;
     let result = await this.groupsHandler.getFileContent(
-      `/groups/${itemDetail.name}/files/agent.conf/xml`
+      `/groups/${itemDetail.name}/files/agent.conf/xml`,
     );
 
     if (Object.keys(result).length == 0) {
@@ -187,7 +196,7 @@ class WzGroupsActionButtonsFiles extends Component {
     });
   }
 
-  onChangeNewGroupName = (e) => {
+  onChangeNewGroupName = e => {
     this.setState({
       newGroupName: e.target.value,
     });
@@ -203,7 +212,7 @@ class WzGroupsActionButtonsFiles extends Component {
         if (input.length) {
           const i = input[0];
           if (!i.onkeypress) {
-            i.onkeypress = async (e) => {
+            i.onkeypress = async e => {
               if (e.which === 13) {
                 await this.createGroup();
               }
@@ -232,7 +241,12 @@ class WzGroupsActionButtonsFiles extends Component {
     try {
       this.props.updateLoadingStatus(true);
       await this.groupsHandler.saveGroup(this.state.newGroupName);
-      this.showToast('success', 'Success', 'The group has been created successfully', 2000);
+      this.showToast(
+        'success',
+        'Success',
+        'The group has been created successfully',
+        2000,
+      );
       this.clearGroupName();
 
       this.props.updateIsProcessing(true);
@@ -251,12 +265,16 @@ class WzGroupsActionButtonsFiles extends Component {
     try {
       this.setState({ generatingCsv: true });
       const { section, filters } = this.props.state; //TODO get filters from the search bar from the REDUX store
-      await this.exportCsv(`/groups/${this.props.state.itemDetail.name}/files`, filters, 'Groups');
+      await this.exportCsv(
+        `/groups/${this.props.state.itemDetail.name}/files`,
+        filters,
+        'Groups',
+      );
       this.showToast(
         'success',
         'Success',
         'CSV. Your download should begin automatically...',
-        2000
+        2000,
       );
     } catch (error) {
       const options = {
@@ -288,46 +306,58 @@ class WzGroupsActionButtonsFiles extends Component {
     // Add new group button
     const groupConfigurationButton = (
       <WzButtonPermissions
-        buttonType="empty"
+        buttonType='empty'
         permissions={[
-          { action: 'group:read', resource: `group:id:${this.props.state.itemDetail.name}` },
+          {
+            action: 'group:read',
+            resource: `group:id:${this.props.state.itemDetail.name}`,
+          },
         ]}
-        iconSide="left"
-        iconType="documentEdit"
+        iconSide='left'
+        iconType='documentEdit'
         onClick={() => this.showGroupConfiguration()}
       >
-        Edit group configuration
+        {i18n.translate('wazuh.controllers.mnage.comp.confi.groups.editgroup', {
+          defaultMessage: 'Edit group configuration',
+        })}
       </WzButtonPermissions>
     );
 
     // Export PDF button
     const exportPDFButton = (
       <ExportConfiguration
-        exportConfiguration={(enabledComponents) =>
+        exportConfiguration={enabledComponents =>
           this.reportingService.startConfigReport(
             this.props.state.itemDetail,
             'groupConfig',
-            enabledComponents
+            enabledComponents,
           )
         }
-        type="group"
+        type='group'
       />
     );
     // Export button
     const exportCSVButton = (
       <EuiButtonEmpty
-        iconType="exportAction"
+        iconType='exportAction'
         onClick={async () => await this.generateCsv()}
         isLoading={this.state.generatingCsv}
       >
-        Export formatted
+        {i18n.translate('wazuh.controllers.mnage.comp.confi.groups.Exportformatted', {
+          defaultMessage: 'Export formatted',
+        })}
       </EuiButtonEmpty>
     );
 
     // Refresh
     const refreshButton = (
-      <EuiButtonEmpty iconType="refresh" onClick={async () => await this.refresh()}>
-        Refresh
+      <EuiButtonEmpty
+        iconType='refresh'
+        onClick={async () => await this.refresh()}
+      >
+        {i18n.translate('wazuh.controllers.mnage.comp.confi.groups.Refresh', {
+          defaultMessage: 'Refresh',
+        })}{' '}
       </EuiButtonEmpty>
     );
 
@@ -342,18 +372,22 @@ class WzGroupsActionButtonsFiles extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
     state: state.groupsReducers,
   };
 };
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
-    updateLoadingStatus: (status) => dispatch(updateLoadingStatus(status)),
-    updateIsProcessing: (isProcessing) => dispatch(updateIsProcessing(isProcessing)),
-    updateFileContent: (content) => dispatch(updateFileContent(content)),
+    updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
+    updateIsProcessing: isProcessing =>
+      dispatch(updateIsProcessing(isProcessing)),
+    updateFileContent: content => dispatch(updateFileContent(content)),
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(WzGroupsActionButtonsFiles);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(WzGroupsActionButtonsFiles);

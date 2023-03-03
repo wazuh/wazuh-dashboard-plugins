@@ -13,6 +13,7 @@
 import React, { Component, Fragment } from 'react';
 
 import { EuiBadge } from '@elastic/eui';
+import { i18n } from '@kbn/i18n';
 
 class WzBadge extends Component {
   constructor(props) {
@@ -21,17 +22,65 @@ class WzBadge extends Component {
   }
   static getDerivedStateFromProps(nextProps, prevState) {
     if (typeof nextProps === 'object') {
-      if (typeof nextProps.enabled !== 'undefined') {
+      if (
+        typeof nextProps.enabled !==
+        i18n.translate(
+          'wazuh.public.controller.management.config.policy.util.components.badge.undefined',
+          {
+            defaultMessage: 'undefined',
+          },
+        )
+      ) {
         if (nextProps.enabled) {
-          return { color: 'secondary', content: 'ENABLED' };
+          return {
+            color: 'secondary',
+            content: i18n.translate(
+              'wazuh.public.controller.management.config.policy.util.components.badge.ENABLED',
+              {
+                defaultMessage: 'ENABLED',
+              },
+            ),
+          };
         } else {
-          return { color: 'danger', content: 'DISABLED' };
+          return {
+            color: 'danger',
+            content: i18n.translate(
+              'wazuh.public.controller.management.config.policy.util.components.badge.DISABLED',
+              {
+                defaultMessage: 'DISABLED',
+              },
+            ),
+          };
         }
-      } else if (typeof nextProps.synchronized !== 'undefined') {
+      } else if (
+        typeof nextProps.synchronized !==
+        i18n.translate(
+          'wazuh.public.controller.management.config.policy.util.components.badge.undefined',
+          {
+            defaultMessage: 'undefined',
+          },
+        )
+      ) {
         if (nextProps.synchronized) {
-          return { color: 'secondary', content: 'SYNCHRONIZED' };
+          return {
+            color: 'secondary',
+            content: i18n.translate(
+              'wazuh.public.controller.management.config.policy.util.components.badge.SYNCHRONIZED',
+              {
+                defaultMessage: 'SYNCHRONIZED',
+              },
+            ),
+          };
         } else {
-          return { color: 'danger', content: 'NOT SYNCHRONIZED' };
+          return {
+            color: 'danger',
+            content: i18n.translate(
+              'wazuh.public.controller.management.config.policy.util.components.badge.NOTSYNCHRONIZED',
+              {
+                defaultMessage: 'NOT SYNCHRONIZED',
+              },
+            ),
+          };
         }
       } else if (nextProps.color && nextProps.content) {
         return { color: nextProps.color, content: nextProps.content };

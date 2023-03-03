@@ -16,6 +16,7 @@ import WzReduxProvider from '../../../../../redux/wz-redux-provider';
 import WzReportingOverview from './reporting-overview';
 import { updateGlobalBreadcrumb } from '../../../../../redux/actions/globalBreadcrumbActions';
 import store from '../../../../../redux/store';
+import { i18n } from '@kbn/i18n';
 
 class WzReporting extends Component {
   constructor(props) {
@@ -26,8 +27,23 @@ class WzReporting extends Component {
   setGlobalBreadcrumb() {
     const breadcrumb = [
       { text: '' },
-      { text: 'Management', href: '#/manager' },
-      { text: 'Reporting' }
+      {
+        text: i18n.translate(
+          'wazuh.public.controller.management.reports.main.Management',
+          {
+            defaultMessage: 'Management',
+          },
+        ),
+        href: '#/manager',
+      },
+      {
+        text: i18n.translate(
+          'wazuh.public.controller.management.reports.main.Reporting',
+          {
+            defaultMessage: 'Reporting',
+          },
+        ),
+      },
     ];
     store.dispatch(updateGlobalBreadcrumb(breadcrumb));
   }

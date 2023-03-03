@@ -11,6 +11,7 @@
  */
 
 import React, { Component, Fragment } from 'react';
+import { i18n } from '@kbn/i18n';
 
 import { EuiBasicTable } from '@elastic/eui';
 
@@ -18,7 +19,17 @@ import WzConfigurationSettingsTabSelector from '../util-components/configuration
 import WzNoConfig from '../util-components/no-config';
 import helpLinks from './help-links';
 
-const columnsPath = [{ field: 'path', name: 'Path' }];
+const columnsPath = [
+  {
+    field: 'path',
+    name: i18n.translate(
+      'wazuh.public.controller.management.config.Nomoniterted.Path',
+      {
+        defaultMessage: 'Path',
+      },
+    ),
+  },
+];
 
 class WzConfigurationIntegrityMonitoringNoDiff extends Component {
   constructor(props) {
@@ -32,22 +43,33 @@ class WzConfigurationIntegrityMonitoringNoDiff extends Component {
           currentConfig['syscheck-syscheck'] &&
           currentConfig['syscheck-syscheck'].syscheck &&
           !currentConfig['syscheck-syscheck'].syscheck.nodiff && (
-            <WzNoConfig error="not-present" help={helpLinks} />
+            <WzNoConfig error='not-present' help={helpLinks} />
           )}
         {currentConfig &&
           currentConfig['syscheck-syscheck'] &&
           currentConfig['syscheck-syscheck'].syscheck &&
           currentConfig['syscheck-syscheck'].syscheck.nodiff && (
             <WzConfigurationSettingsTabSelector
-              title="No diff directories"
-              description="These files won't have their diff calculated"
+              title={i18n.translate(
+                'wazuh.public.controller.management.config.Nomoniterted.noDiff',
+                {
+                  defaultMessage: 'No diff directories',
+                },
+              )}
+              description={i18n.translate(
+                'wazuh.public.controller.management.config.Nomoniterted.diffCalculated',
+                {
+                  defaultMessage:
+                    "These files won't have their diff calculated",
+                },
+              )}
               currentConfig={currentConfig['syscheck-syscheck']}
               minusHeight={this.props.agent.id === '000' ? 320 : 415}
               helpLinks={helpLinks}
             >
               <EuiBasicTable
                 items={currentConfig['syscheck-syscheck'].syscheck.nodiff.map(
-                  item => ({ path: item })
+                  item => ({ path: item }),
                 )}
                 columns={columnsPath}
               />

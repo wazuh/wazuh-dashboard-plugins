@@ -22,12 +22,86 @@ import { formatUIDate } from '../../react-services/time-service';
 import store from '../../redux/store';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
 import { updateSelectedSettingsSection } from '../../redux/actions/appStateActions';
-import { UI_LOGGER_LEVELS, PLUGIN_PLATFORM_NAME } from '../../../common/constants';
+import {
+  UI_LOGGER_LEVELS,
+  PLUGIN_PLATFORM_NAME,
+} from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
 import { getAssetURL } from '../../utils/assets';
 import { getHttp } from '../../kibana-services';
+import { i18n } from '@kbn/i18n';
 
+const iniSetting = i18n.translate(
+  'wazuh.public.controllers.setting.iniSetting',
+  {
+    defaultMessage: 'Cannot initialize Settings',
+  },
+);
+const api = i18n.translate('wazuh.public.controllers.setting.API', {
+  defaultMessage: 'API',
+});
+const modules = i18n.translate('wazuh.public.controllers.setting.Modules', {
+  defaultMessage: 'Modules',
+});
+const sampleData = i18n.translate(
+  'wazuh.public.controllers.setting.sampleData',
+  {
+    defaultMessage: 'Sample data',
+  },
+);
+const configuration = i18n.translate(
+  'wazuh.public.controllers.setting.configuration',
+  {
+    defaultMessage: 'Configuration',
+  },
+);
+const logs = i18n.translate('wazuh.public.controllers.setting.logs', {
+  defaultMessage: 'Logs',
+});
+const miscellaneous = i18n.translate(
+  'wazuh.public.controllers.setting.miscellaneous',
+  {
+    defaultMessage: 'Miscellaneous',
+  },
+);
+const about = i18n.translate('wazuh.public.controllers.setting.about', {
+  defaultMessage: 'About',
+});
+const wazuhNot = i18n.translate('wazuh.public.controllers.setting.wazuhNot', {
+  defaultMessage: 'Wazuh is not reachable',
+});
+const validIndex = i18n.translate(
+  'wazuh.public.controllers.setting.validIndex',
+  {
+    defaultMessage: 'Sorry but no valid index patterns were found',
+  },
+);
+const errorApi = i18n.translate('wazuh.public.controllers.setting.errorApi', {
+  defaultMessage: 'Error getting API entries',
+});
+const loadingError = i18n.translate(
+  'wazuh.public.controllers.setting.loadingError',
+  {
+    defaultMessage: 'Error when loading Wazuh app logs',
+  },
+);
+const msg1 = i18n.translate('wazuh.public.controllers.setting.msg1', {
+  defaultMessage: 'There were not found any API entry in the wazuh.yml',
+});
+const msg2 = i18n.translate('wazuh.public.controllers.setting.msg2', {
+  defaultMessage: 'Wazuh API not recheable, please review your configuration',
+});
+const msg3 = i18n.translate('wazuh.public.controllers.setting.msg3', {
+  defaultMessage:
+    'Some of the API entries are not reachable. You can still use the Wazuh APP but please, review your hosts configuration.',
+});
+const textarea = i18n.translate('wazuh.public.controllers.setting.textarea', {
+  defaultMessage: 'textarea',
+});
+const clipboard = i18n.translate('wazuh.public.controllers.setting.clipboard', {
+  defaultMessage: 'Error copied to the clipboard',
+});
 export class SettingsController {
   /**
    * Class constructor
@@ -60,7 +134,9 @@ export class SettingsController {
     this.tabNames = TabNames;
     this.indexPatterns = [];
     this.apiEntries = [];
-    this.$scope.googleGroupsSVG = getHttp().basePath.prepend(getAssetURL('images/icons/google_groups.svg'));
+    this.$scope.googleGroupsSVG = getHttp().basePath.prepend(
+      getAssetURL('images/icons/google_groups.svg'),
+    );
   }
 
   /**
@@ -68,13 +144,21 @@ export class SettingsController {
    */
   async $onInit() {
     try {
-      const breadcrumb = [{ text: '' }, { text: 'Settings' }];
+      const breadcrumb = [
+        { text: '' },
+        {
+          text: i18n.translate('wazuh.public.controllers.setting.Settings1', {
+            defaultMessage: 'Settings',
+          }),
+        },
+      ];
       store.dispatch(updateGlobalBreadcrumb(breadcrumb));
 
       const location = this.$location.search();
       if (location && location.tab) {
         this.tab = location.tab;
-        if(this.tab==='about') store.dispatch(updateSelectedSettingsSection('about'));
+        if (this.tab === 'about')
+          store.dispatch(updateSelectedSettingsSection('about'));
       }
       // Set component props
       this.setComponentProps();
@@ -95,7 +179,7 @@ export class SettingsController {
         error: {
           error: error,
           message: error.message || error,
-          title: `${error.name}: Cannot initialize Settings`,
+          title: `${error.name}: ${iniSetting}`,
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -114,39 +198,39 @@ export class SettingsController {
       checkManager: entry => this.checkManager(entry),
       showAddApi: () => this.showAddApi(),
       getHosts: () => this.getHosts(),
-      testApi: (entry,force) => ApiCheck.checkApi(entry,force),
+      testApi: (entry, force) => ApiCheck.checkApi(entry, force),
       showAddApiWithInitialError: error =>
         this.showAddApiWithInitialError(error),
       updateClusterInfoInRegistry: (id, clusterInfo) =>
         this.updateClusterInfoInRegistry(id, clusterInfo),
       showApiIsDown: () => this.showApiIsDown(),
-      copyToClipBoard: msg => this.copyToClipBoard(msg)
+      copyToClipBoard: msg => this.copyToClipBoard(msg),
     };
 
     this.addApiProps = {
       checkForNewApis: () => this.checkForNewApis(),
-      closeAddApi: () => this.closeAddApi()
+      closeAddApi: () => this.closeAddApi(),
     };
 
     this.apiIsDownProps = {
       apiEntries: this.apiEntries,
       setDefault: entry => this.setDefault(entry),
-      testApi: (entry,force) => ApiCheck.checkApi(entry,force),
+      testApi: (entry, force) => ApiCheck.checkApi(entry, force),
       closeApiIsDown: () => this.closeApiIsDown(),
       getHosts: () => this.getHosts(),
       updateClusterInfoInRegistry: (id, clusterInfo) =>
         this.updateClusterInfoInRegistry(id, clusterInfo),
-      copyToClipBoard: msg => this.copyToClipBoard(msg)
+      copyToClipBoard: msg => this.copyToClipBoard(msg),
     };
 
     let tabs = [
-      { id: 'api', name: 'API' },
-      { id: 'modules', name: 'Modules' },
-      { id: 'sample_data', name: 'Sample data' },
-      { id: 'configuration', name: 'Configuration' },
-      { id: 'logs', name: 'Logs' },
-      { id: 'miscellaneous', name: 'Miscellaneous'},
-      { id: 'about', name: 'About' }
+      { id: 'api', name: api },
+      { id: 'modules', name: modules },
+      { id: 'sample_data', name: sampleData },
+      { id: 'configuration', name: configuration },
+      { id: 'logs', name: logs },
+      { id: 'miscellaneous', name: miscellaneous },
+      { id: 'about', name: about },
     ];
     this.settingsTabsProps = {
       clickAction: tab => {
@@ -157,13 +241,13 @@ export class SettingsController {
       },
       selectedTab: this.tab || 'api',
       tabs,
-      wazuhConfig: this.wazuhConfig
+      wazuhConfig: this.wazuhConfig,
     };
 
     this.settingsLogsProps = {
       getLogs: async () => {
         return await this.getAppLogs();
-      }
+      },
     };
   }
 
@@ -172,7 +256,7 @@ export class SettingsController {
    * @param {Object} tab
    */
   switchTab(tab) {
-    if(tab==='about') store.dispatch(updateSelectedSettingsSection('about'));
+    if (tab === 'about') store.dispatch(updateSelectedSettingsSection('about'));
     this.tab = tab;
     this.$location.search('tab', this.tab);
   }
@@ -212,7 +296,7 @@ export class SettingsController {
               ? error
               : (error || {}).message ||
                 ((error || {}).data || {}).message ||
-                'Wazuh is not reachable';
+                wazuhNot;
           const status = code === 3099 ? 'down' : 'unknown';
           this.apiEntries[idx].status = { status, downReason };
           numError = numError + 1;
@@ -253,8 +337,8 @@ export class SettingsController {
       AppState.setCurrentAPI(
         JSON.stringify({
           name: clusterEnabled ? manager : cluster,
-          id: id
-        })
+          id: id,
+        }),
       );
 
       this.$scope.$emit('updateAPI', {});
@@ -294,10 +378,11 @@ export class SettingsController {
   // Get settings function
   async getSettings() {
     try {
-      try{
-        this.indexPatterns = await SavedObject.getListOfWazuhValidIndexPatterns();
-      }catch(error){
-        this.wzMisc.setBlankScr('Sorry but no valid index patterns were found');
+      try {
+        this.indexPatterns =
+          await SavedObject.getListOfWazuhValidIndexPatterns();
+      } catch (error) {
+        this.wzMisc.setBlankScr(validIndex);
         this.$location.search('tab', null);
         this.$location.path('/blank-screen');
         return;
@@ -337,14 +422,14 @@ export class SettingsController {
         error: {
           error: error,
           message: error.message || error,
-          title: `${error.name}: Error getting API entries`,
+          title: `${error.name}: ${errorApi} `,
         },
       };
       getErrorOrchestrator().handleError(options);
     }
     // Every time that the API entries are required in the settings the registry will be checked in order to remove orphan host entries
     await this.genericReq.request('POST', '/hosts/remove-orphan-entries', {
-      entries: this.apiEntries
+      entries: this.apiEntries,
     });
     return;
   }
@@ -357,7 +442,7 @@ export class SettingsController {
     try {
       const url = `/hosts/update-hostname/${id}`;
       await this.genericReq.request('PUT', url, {
-        cluster_info: clusterInfo
+        cluster_info: clusterInfo,
       });
     } catch (error) {
       return Promise.reject(error);
@@ -379,7 +464,7 @@ export class SettingsController {
         port: port,
         cluster_info: {},
         insecure: 'true',
-        id: id
+        id: id,
       };
 
       // Test the connection
@@ -452,8 +537,8 @@ export class SettingsController {
         {
           date: new Date(),
           level: 'error',
-          message: 'Error when loading Wazuh app logs'
-        }
+          message: loadingError,
+        },
       ];
     }
   }
@@ -468,7 +553,7 @@ export class SettingsController {
       this.appInfo = {
         'app-version': response['app-version'],
         installationDate: formatUIDate(response['installationDate']),
-        revision: response['revision']
+        revision: response['revision'],
       };
 
       this.load = false;
@@ -523,25 +608,24 @@ export class SettingsController {
       //Tries to check if there are new APIs entries in the wazuh.yml also, checks if some of them have connection
       if (!hosts.length)
         throw {
-          message: 'There were not found any API entry in the wazuh.yml',
+          message: msg1,
           type: 'warning',
-          closedEnabled: false
+          closedEnabled: false,
         };
       const notRecheable = await this.checkApisStatus();
       if (notRecheable) {
         if (notRecheable >= hosts.length) {
           this.apiIsDown = true;
           throw {
-            message:
-              'Wazuh API not recheable, please review your configuration',
+            message: msg2,
             type: 'danger',
-            closedEnabled: true
+            closedEnabled: true,
           };
         }
         throw {
-          message: `Some of the API entries are not reachable. You can still use the Wazuh APP but please, review your hosts configuration.`,
+          message: msg3,
           type: 'warning',
-          closedEnabled: true
+          closedEnabled: true,
         };
       }
     } catch (error) {
@@ -567,7 +651,10 @@ export class SettingsController {
     try {
       const result = await this.genericReq.request('GET', '/hosts/apis', {});
       const hosts = result.data || [];
-      this.apiEntries = this.apiTableProps.apiEntries = this.apiIsDownProps.apiEntries = hosts;
+      this.apiEntries =
+        this.apiTableProps.apiEntries =
+        this.apiIsDownProps.apiEntries =
+          hosts;
       if (!hosts.length) {
         this.apiIsDown = false;
         this.addingApi = true;
@@ -656,12 +743,12 @@ export class SettingsController {
    * @param {String} msg
    */
   copyToClipBoard(msg) {
-    const el = document.createElement('textarea');
+    const el = document.createElement(textarea);
     el.value = msg;
     document.body.appendChild(el);
     el.select();
     document.execCommand('copy');
     document.body.removeChild(el);
-    ErrorHandler.info('Error copied to the clipboard');
+    ErrorHandler.info(clipboard);
   }
 }

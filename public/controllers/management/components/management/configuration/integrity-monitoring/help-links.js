@@ -10,15 +10,30 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { webDocumentationLink } from "../../../../../../../common/services/web_documentation";
+import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
+import { i18n } from '@kbn/i18n';
 
 export default [
   {
-    text: 'Integrity monitoring documentation',
-    href: webDocumentationLink('user-manual/capabilities/file-integrity/index.html')
+    text: i18n.translate(
+      'wazuh.public.controller.management.config.helplink.docunment',
+      {
+        defaultMessage: 'Integrity monitoring documentation',
+      },
+    ),
+    href: webDocumentationLink(
+      'user-manual/capabilities/file-integrity/index.html',
+    ),
   },
   {
-    text: 'Syscheck reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/syscheck.html')
-  }
+    text: i18n.translate(
+      'wazuh.public.controller.management.config.helplink.SyscheckReference',
+      {
+        defaultMessage: 'Syscheck reference',
+      },
+    ),
+    href: webDocumentationLink(
+      'user-manual/reference/ossec-conf/syscheck.html',
+    ),
+  },
 ];

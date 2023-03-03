@@ -2,11 +2,14 @@
     <!-- Back button -->
     <div class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--responsive">
         <div class="euiFlexItem euiFlexItem--flexGrowZero">
-            <h2 class="euiTitle euiTitle--medium">
+            <h2 class="euiTitle euiTitle--medium"
+              i18n-id="wazuh.templates.management.node"
+              i18n-default-message="Node"
+            >
                 <md-button class="md-icon-button md-icon-button-back wz-padding-right-16 btn btn-info" aria-label="Back"
                     tooltip="Go back" tooltip-placement="bottom" ng-click="goNodes()"><i class="fa fa-fw fa-arrow-left"
                         aria-hidden="true"></i></md-button>
-                Node {{ currentNode.name }}
+                {{ currentNode.name }}
             </h2>
         </div>
     </div>
@@ -33,23 +36,38 @@
                 <span class="euiTitle euiTitle--small euiCard__title">Node information</span>
                 <div class="euiSpacer euiSpacer--m"></div>
                 <div layout="row" class="wz-padding-top-10">
-                    <span flex="30">IP</span>
+                    <span flex="30"
+                      i18n-id="wazuh.templates.management.ip"
+                      i18n-default-message="IP"
+                    ></span>
                     <span class="color-grey">{{currentNode.healthCheck.info.ip}}</span>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
-                    <span flex="30">Version</span>
+                    <span flex="30"
+                      i18n-id="wazuh.templates.management.version"
+                      i18n-default-message="Version"
+                    ></span>
                     <span class="color-grey">{{currentNode.healthCheck.info.version}}</span>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
-                    <span flex="30">Type</span>
+                    <span flex="30"
+                      i18n-id="wazuh.templates.management.type"
+                      i18n-default-message="Type"
+                    ></span>
                     <span class="color-grey">{{currentNode.healthCheck.info.type}}</span>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
-                    <span flex="30">Name</span>
+                    <span flex="30"
+                      i18n-id="wazuh.templates.management.name"
+                      i18n-default-message="Name"
+                    ></span>
                     <span class="color-grey">{{currentNode.healthCheck.info.name}}</span>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
-                    <span flex="30">Active agents</span>
+                    <span flex="30"
+                      i18n-id="wazuh.templates.management.activeAgents"
+                      i18n-default-message="Active agents"
+                    ></span>
                     <span class="color-grey">{{ currentNode.healthCheck.info.n_active_agents }}</span>
                 </div>
             </div>
@@ -58,34 +76,56 @@
         <!-- Last files sync card -->
         <div class="euiFlexItem" ng-show="currentNode && currentNode.healthCheck && currentNode.healthCheck.status">
             <div class="euiPanel euiPanel--paddingMedium">
-                <span class="euiTitle euiTitle--small euiCard__title">Last files integrity synchronization</span>
+                <span class="euiTitle euiTitle--small euiCard__title"
+                  i18n-id="wazuh.templates.management.lastFileIntegritySync"
+                  i18n-default-message="Last files integrity synchronization"
+                ></span>
                 <div class="euiSpacer euiSpacer--m"></div>
                 <div layout="row" class="wz-padding-top-10">
-                    <span flex="30">Last sync</span>
+                    <span flex="30"
+                      i18n-id="wazuh.templates.management.lastSync"
+                      i18n-default-message="Last sync"
+                    ></span>
                     <span
                         class="color-grey">{{currentNode.healthCheck.status.last_sync_integrity.date_end_master}}</span>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
-                    <span flex="30">Duration</span>
+                    <span flex="30"
+                      i18n-id="wazuh.templates.management.duration"
+                      i18n-default-message="Duration"
+                    ></span>
                     <span class="color-grey">{{currentNode.healthCheck.status.last_sync_integrity.duration}}</span>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
-                    <span flex="30">Total shared files</span>
+                    <span flex="30"
+                      i18n-id="wazuh.templates.management.totalSharedFiles"
+                      i18n-default-message="Total shared files"
+                    ></span>
                     <span
                         class="color-grey">{{currentNode.healthCheck.status.last_sync_integrity.total_files.shared}}</span>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
-                    <span flex="30">Total missing files</span>
+                    <span flex="30"
+                      i18n-id="wazuh.templates.management.totalMissingFiles"
+                      i18n-default-message="Total missing files"
+                    >
+                    </span>
                     <span
                         class="color-grey">{{currentNode.healthCheck.status.last_sync_integrity.total_files.missing}}</span>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
-                    <span flex="30">Total extra but valid files</span>
+                    <span flex="30"
+                      i18n-id="wazuh.templates.management.extraValidFiles"
+                      i18n-default-message="Total extra but valid files"
+                    ></span>
                     <span
                         class="color-grey">{{currentNode.healthCheck.status.last_sync_integrity.total_files.extra_valid}}</span>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
-                    <span flex="30">Total extra files</span>
+                    <span flex="30"
+                      i18n-id="wazuh.templates.management.extraFiles"
+                      i18n-default-message="Total extra files"
+                    ></span>
                     <span
                         class="color-grey">{{currentNode.healthCheck.status.last_sync_integrity.total_files.extra}}</span>
                 </div>
@@ -100,19 +140,31 @@
         <!-- Agents sync card -->
         <div class="euiFlexItem">
             <div class="euiPanel euiPanel--paddingMedium">
-                <span class="euiTitle euiTitle--small euiCard__title">Last agents information synchronization</span>
+                <span class="euiTitle euiTitle--small euiCard__title"
+                  i18n-id="wazuh.templates.management.lastAgentInfoSync"
+                  i18n-default-message="Last agents information synchronization"
+                ></span>
                 <div class="euiSpacer euiSpacer--m"></div>
                 <div layout="row" class="wz-padding-top-10">
-                    <span flex="30">Last sync</span>
+                    <span flex="30"
+                      i18n-id="wazuh.templates.management.lastSync"
+                      i18n-default-message="Last sync"
+                    ></span>
                     <span
                         class="color-grey">{{currentNode.healthCheck.status.last_sync_agentinfo.date_end_master}}</span>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
-                    <span flex="30">Duration</span>
+                    <span flex="30"
+                      i18n-id="wazuh.templates.management.duration"
+                      i18n-default-message="Duration"
+                    ></span>
                     <span class="color-grey">{{currentNode.healthCheck.status.last_sync_agentinfo.duration}}</span>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
-                    <span flex="30">Total agent info</span>
+                    <span flex="30"
+                      i18n-id="wazuh.templates.management.totalAgentInfo"
+                      i18n-default-message="Total agent info"
+                    ></span>
                     <span
                         class="color-grey">{{currentNode.healthCheck.status.last_sync_agentinfo.total_agentinfo}}</span>
                 </div>
@@ -122,19 +174,31 @@
         <!-- Groups sync card -->
         <div class="euiFlexItem">
             <div class="euiPanel euiPanel--paddingMedium">
-                <span class="euiTitle euiTitle--small euiCard__title">Last agents groups synchronization</span>
+                <span class="euiTitle euiTitle--small euiCard__title"
+                  i18n-id="wazuh.templates.management.lastAgentGroupSync"
+                  i18n-default-message="Last agents groups synchronization"
+                ></span>
                 <div class="euiSpacer euiSpacer--m"></div>
                 <div layout="row" class="wz-padding-top-10">
-                    <span flex="30">Last sync</span>
+                    <span flex="30"
+                      i18n-id="wazuh.templates.management.lastSync"
+                      i18n-default-message="Last sync"
+                    ></span>
                     <span
                         class="color-grey">{{currentNode.healthCheck.status.last_sync_agentgroups.date_end_master}}</span>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
-                    <span flex="30">Duration</span>
+                    <span flex="30"
+                      i18n-id="wazuh.templates.management.duration"
+                      i18n-default-message="Duration"
+                    ></span>
                     <span class="color-grey">{{currentNode.healthCheck.status.last_sync_agentgroups.duration}}</span>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
-                    <span flex="30">Total agent info</span>
+                    <span flex="30"
+                      i18n-id="wazuh.templates.management.totalAgentInfo"
+                      i18n-default-message="Total agent info"
+                    ></span>
                     <span
                         class="color-grey">{{currentNode.healthCheck.status.last_sync_agentgroups.total_agentgroups}}</span>
                 </div>

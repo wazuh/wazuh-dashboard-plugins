@@ -33,30 +33,71 @@ import { formatUIDate } from '../../../../../react-services/time-service';
 import { FlyoutDetail } from '../../../../agents/fim/inventory/flyout';
 import { EuiLink } from '@elastic/eui';
 import { getDataPlugin } from '../../../../../kibana-services';
-
+import { i18n } from '@kbn/i18n';
+const textAction = i18n.translate(
+  'wazuh.components.common.welcome.comp.fim.events.textAction',
+  {
+    defaultMessage: 'Action',
+  },
+);
+const nameRuleLevel = i18n.translate(
+  'wazuh.components.common.welcome.comp.fim.events.nameRuleLevel',
+  {
+    defaultMessage: 'Rule Level',
+  },
+);
+const nameRuleId = i18n.translate(
+  'wazuh.components.common.welcome.comp.fim.events.nameRuleId',
+  {
+    defaultMessage: 'Rule Id',
+  },
+);
+const nameRuleDescription = i18n.translate(
+  'wazuh.components.common.welcome.comp.fim.events.nameRuleDescription',
+  {
+    defaultMessage: 'Rule description',
+  },
+);
+const namePath = i18n.translate(
+  'wazuh.components.common.welcome.comp.fim.events.namePath',
+  {
+    defaultMessage: 'Path',
+  },
+);
+const nameTime = i18n.translate(
+  'wazuh.components.common.welcome.comp.fim.events.nameTime',
+  {
+    defaultMessage: 'Time',
+  },
+);
 export function FimEventsTable({ agent, router }) {
   return (
     <EuiFlexItem>
-      <EuiPanel paddingSize="m">
+      <EuiPanel paddingSize='m'>
         <EuiFlexItem>
           <EuiFlexGroup>
             <EuiFlexItem>
-              <EuiText size="xs">
-                <h2>FIM: Recent events</h2>
+              <EuiText size='xs'>
+                <h2>
+                  {i18n.translate(
+                    'wazuh.components.common.welcome.components.recentEvent',
+                    { defaultMessage: 'FIM: Recent events' },
+                  )}
+                </h2>
               </EuiText>
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
-              <EuiToolTip position="top" content="Open FIM">
+              <EuiToolTip position='top' content='Open FIM'>
                 <EuiButtonIcon
-                  iconType="popout"
-                  color="primary"
+                  iconType='popout'
+                  color='primary'
                   onClick={() => navigateToFim(agent, router)}
-                  aria-label="Open FIM"
+                  aria-label='Open FIM'
                 />
               </EuiToolTip>
             </EuiFlexItem>
           </EuiFlexGroup>
-          <EuiSpacer size="s" />
+          <EuiSpacer size='s' />
           <FimTable agent={agent} />
         </EuiFlexItem>
       </EuiPanel>
@@ -82,7 +123,10 @@ function FimTable({ agent }) {
   const [fimAlerts, setFimAlerts] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
   const [file, setFile] = useState('');
-  const [sort, setSort] = useState({ field: '_source.timestamp', direction: 'desc' });
+  const [sort, setSort] = useState({
+    field: '_source.timestamp',
+    direction: 'desc',
+  });
   const timeFilter = useTimeFilter();
   useEffect(() => {
     getFimAlerts(agent.id, timeFilter, sort).then(setFimAlerts);
@@ -94,16 +138,16 @@ function FimTable({ agent }) {
         columns={columns(setFile, setIsOpen)}
         loading={false}
         sorting={{ sort }}
-        onChange={(e) => setSort(e.sort)}
-        itemId="fim-alerts"
-        noItemsMessage="No recent events"
+        onChange={e => setSort(e.sort)}
+        itemId='fim-alerts'
+        noItemsMessage='No recent events'
       />
       {isOpen && (
         <FlyoutDetail
           agentId={agent.id}
           closeFlyout={() => setIsOpen(false)}
           fileName={file}
-          view="extern"
+          view='extern'
           {...{ agent }}
         />
       )}
@@ -120,32 +164,42 @@ function navigateToFim(agent, router) {
 const columns = (setFile, setIsOpen) => [
   {
     field: '_source.timestamp',
-    name: 'Time',
+    name: nameTime,
     sortable: true,
-    render: (field) => formatUIDate(field),
+    render: field => formatUIDate(field),
     width: '150px',
   },
   {
     field: '_source.syscheck.path',
-    name: 'Path',
+    name: namePath,
     sortable: true,
     truncateText: true,
-    render: (path) => renderPath(path, setFile, setIsOpen),
+    render: path => renderPath(path, setFile, setIsOpen),
   },
-  { field: '_source.syscheck.event', name: 'Action', sortable: true, width: '100px' },
+  {
+    field: '_source.syscheck.event',
+    name: textAction,
+    sortable: true,
+    width: '100px',
+  },
   {
     field: '_source.rule.description',
-    name: 'Rule description',
+    name: nameRuleDescription,
     sortable: true,
     truncateText: true,
   },
-  { field: '_source.rule.level', name: 'Rule Level', sortable: true, width: '75px' },
-  { field: '_source.rule.id', name: 'Rule Id', sortable: true, width: '75px' },
+  {
+    field: '_source.rule.level',
+    name: nameRuleLevel,
+    sortable: true,
+    width: '75px',
+  },
+  { field: '_source.rule.id', name: nameRuleId, sortable: true, width: '75px' },
 ];
 
 const renderPath = (path, setFile, setIsOpen) => (
   <EuiLink
-    className="euiTableCellContent__text euiTableCellContent--truncateText"
+    className='euiTableCellContent__text euiTableCellContent--truncateText'
     onClick={() => {
       setFile(path), setIsOpen(true);
     }}

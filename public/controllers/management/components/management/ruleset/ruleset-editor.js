@@ -10,11 +10,12 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component, Fragment } from 'react';
+import { i18n } from '@kbn/i18n';
 
 import { connect } from 'react-redux';
 import {
   cleanInfo,
-  updateFileContent
+  updateFileContent,
 } from '../../../../../redux/actions/rulesetActions';
 
 import 'brace/theme/textmate';
@@ -34,7 +35,11 @@ import {
   EuiPanel,
 } from '@elastic/eui';
 
-import { resourceDictionary, RulesetHandler, RulesetResources } from './utils/ruleset-handler';
+import {
+  resourceDictionary,
+  RulesetHandler,
+  RulesetResources,
+} from './utils/ruleset-handler';
 import validateConfigAfterSent from './utils/valid-configuration';
 
 import { getToasts } from '../../../../../kibana-services';
@@ -46,7 +51,7 @@ import 'brace/theme/textmate';
 import 'brace/mode/xml';
 import 'brace/snippets/xml';
 import 'brace/ext/language_tools';
-import "brace/ext/searchbox";
+import 'brace/ext/searchbox';
 import { showFlyoutLogtest } from '../../../../../redux/actions/appStateActions';
 import _ from 'lodash';
 
@@ -54,6 +59,43 @@ import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchest
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 
+const label1 = i18n.translate(
+  'wazuh.public.controller.management.ruleset.editor.labelNew',
+  {
+    defaultMessage: 'Type your new',
+  },
+);
+const label2 = i18n.translate(
+  'wazuh.public.controller.management.ruleset.editor.label2',
+  {
+    defaultMessage: 'file name here',
+  },
+);
+const label3 = i18n.translate(
+  'wazuh.public.controller.management.ruleset.editor.label3',
+  {
+    defaultMessage: 'Back to',
+  },
+);
+const label4 = i18n.translate(
+  'wazuh.public.controller.management.ruleset.editor.label4',
+  {
+    defaultMessage: 'Error file content is incorrect:',
+  },
+);
+const label5 = i18n.translate(
+  'wazuh.public.controller.management.ruleset.editor.label5',
+  {
+    defaultMessage:
+      'is incorrect. There were found several errors while validating the configuration:',
+  },
+);
+const label6 = i18n.translate(
+  'wazuh.public.controller.management.ruleset.editor.label6',
+  {
+    defaultMessage: 'AgeThe content of the filent',
+  },
+);
 class WzRulesetEditor extends Component {
   _isMounted = false;
   constructor(props) {
@@ -70,7 +112,9 @@ class WzRulesetEditor extends Component {
     };
     this.rulesetHandler = new RulesetHandler(this.props.state.section);
     const { fileContent, addingRulesetFile } = this.props.state;
-    const { name, content, path } = fileContent ? fileContent : addingRulesetFile;
+    const { name, content, path } = fileContent
+      ? fileContent
+      : addingRulesetFile;
 
     this.state = {
       isSaving: false,
@@ -96,7 +140,6 @@ class WzRulesetEditor extends Component {
     this._isMounted = true;
   }
 
-
   /**
    * Save the new content
    * @param {String} name
@@ -105,10 +148,15 @@ class WzRulesetEditor extends Component {
   async save(name, overwrite = true) {
     if (!this._isMounted) {
       return;
-    }else if(/\s/.test(name)) {
-      this.showToast('warning', 'Warning', `The ${this.props.state.section} name must not contain spaces.`, 3000);
+    } else if (/\s/.test(name)) {
+      this.showToast(
+        'warning',
+        'Warning',
+        `The ${this.props.state.section} name must not contain spaces.`,
+        3000,
+      );
       return;
-    }  
+    }
     try {
       const { content } = this.state;
 
@@ -124,8 +172,8 @@ class WzRulesetEditor extends Component {
           severity: UI_ERROR_SEVERITIES.BUSINESS,
           error: {
             error: error,
-            message:`The content of the file ${name} is incorrect. There were found several errors while validating the configuration: ${error.message || error}`,
-            title: `Error file content is incorrect: ${error.message || error}`,
+            message: `${label6} ${name} ${label5} ${error.message || error}`,
+            title: `${label4} ${error.message || error}`,
           },
         };
         getErrorOrchestrator().handleError(options);
@@ -140,7 +188,11 @@ class WzRulesetEditor extends Component {
           toastMessage = 'The new file was deleted.';
         } else {
           //restore file to previous version
-          await this.rulesetHandler.updateFile(name, this.state.initContent, overwrite);
+          await this.rulesetHandler.updateFile(
+            name,
+            this.state.initContent,
+            overwrite,
+          );
           toastMessage = 'The content file was restored to previous state.';
         }
 
@@ -154,7 +206,6 @@ class WzRulesetEditor extends Component {
         initialInputValue: this.state.inputValue,
         initContent: content,
       });
-
     } catch (error) {
       this.setState({ error, isSaving: false });
       const options = {
@@ -180,7 +231,7 @@ class WzRulesetEditor extends Component {
     });
   };
 
-  goToEdit = (name) => {
+  goToEdit = name => {
     const { content, path } = this.state;
     const file = { name: name, content: content, path: path };
     this.props.updateFileContent(file);
@@ -189,7 +240,7 @@ class WzRulesetEditor extends Component {
   /**
    * onChange the input value in case adding new file
    */
-  onChange = (e) => {
+  onChange = e => {
     this.setState({
       inputValue: e.target.value,
     });
@@ -205,7 +256,9 @@ class WzRulesetEditor extends Component {
       ? true
       : path !== 'ruleset/rules' && path !== 'ruleset/decoders';
     let nameForSaving = addingRulesetFile ? this.state.inputValue : name;
-    nameForSaving = nameForSaving.endsWith('.xml') ? nameForSaving : `${nameForSaving}.xml`;
+    nameForSaving = nameForSaving.endsWith('.xml')
+      ? nameForSaving
+      : `${nameForSaving}.xml`;
     const overwrite = fileContent ? true : false;
 
     const xmlError = validateXML(content);
@@ -218,10 +271,10 @@ class WzRulesetEditor extends Component {
     const buildLogtestButton = () => {
       return (
         <WzButtonPermissions
-          buttonType="empty"
+          buttonType='empty'
           permissions={[{ action: 'logtest:run', resource: `*:*:*` }]}
-          color="primary"
-          iconType="documentEdit"
+          color='primary'
+          iconType='documentEdit'
           style={{ margin: '0px 8px', cursor: 'pointer' }}
           onClick={onClickOpenLogtest}
         >
@@ -237,7 +290,8 @@ class WzRulesetEditor extends Component {
           permissions={[
             {
               action: `${section}:update`,
-              resource: resourceDictionary[section].permissionResource(nameForSaving),
+              resource:
+                resourceDictionary[section].permissionResource(nameForSaving),
             },
           ]}
           fill
@@ -259,17 +313,28 @@ class WzRulesetEditor extends Component {
       modal = (
         <EuiOverlayMask>
           <EuiConfirmModal
-            title="Unsubmitted changes"
+            title={i18n.translate(
+              'wazuh.public.controller.management.ruleset.editor.Unsubmittedchanges',
+              {
+                defaultMessage: 'Unsubmitted changes',
+              },
+            )}
             onConfirm={() => {
               closeModal;
               this.props.cleanInfo();
             }}
             onCancel={closeModal}
             cancelButtonText="No, don't do it"
-            confirmButtonText="Yes, do it"
+            confirmButtonText='Yes, do it'
           >
             <p style={{ textAlign: 'center' }}>
-              There are unsaved changes. Are you sure you want to proceed?
+              {i18n.translate(
+                'wazuh.controllers..mnage.comp.confi.groups.ruleset.proceed',
+                {
+                  defaultMessage:
+                    'There are unsaved changes. Are you sure you want to proceed?',
+                },
+              )}
             </p>
           </EuiConfirmModal>
         </EuiOverlayMask>
@@ -287,16 +352,26 @@ class WzRulesetEditor extends Component {
                     {(!fileContent && (
                       <EuiFlexGroup>
                         <EuiFlexItem grow={false}>
-                          <EuiToolTip position="right" content={`Back to ${section}`}>
+                          <EuiToolTip
+                            position='right'
+                            content={`${label3} ${section}`}
+                          >
                             <EuiButtonIcon
-                              aria-label="Back"
-                              color="primary"
-                              iconSize="l"
-                              iconType="arrowLeft"
+                              aria-label={i18n.translate(
+                                'wazuh.public.controller.management.ruleset.editor.Back',
+                                {
+                                  defaultMessage: 'Back',
+                                },
+                              )}
+                              color='primary'
+                              iconSize='l'
+                              iconType='arrowLeft'
                               onClick={() => {
                                 if (
-                                  this.state.content !== this.state.initContent ||
-                                  this.state.inputValue !== this.state.initialInputValue
+                                  this.state.content !==
+                                    this.state.initContent ||
+                                  this.state.inputValue !==
+                                    this.state.initialInputValue
                                 ) {
                                   showModal();
                                 } else {
@@ -309,26 +384,42 @@ class WzRulesetEditor extends Component {
                         <EuiFlexItem>
                           <EuiFieldText
                             style={{ width: '300px' }}
-                            placeholder={`Type your new ${section} file name here`}
+                            placeholder={`${label1} ${section} ${label2}`}
                             value={this.state.inputValue}
                             onChange={this.onChange}
-                            aria-label="aria-label to prevent react warning"
+                            aria-label={i18n.translate(
+                              'wazuh.public.controller.management.ruleset.editor.warning',
+                              {
+                                defaultMessage:
+                                  'aria-label to prevent react warning',
+                              },
+                            )}
                           />
                         </EuiFlexItem>
                       </EuiFlexGroup>
                     )) || (
                       <EuiTitle>
                         <span style={{ fontSize: '22px' }}>
-                          <EuiToolTip position="right" content={`Back to ${section}`}>
+                          <EuiToolTip
+                            position='right'
+                            content={`Back to ${section}`}
+                          >
                             <EuiButtonIcon
-                              aria-label="Back"
-                              color="primary"
-                              iconSize="l"
-                              iconType="arrowLeft"
+                              aria-label={i18n.translate(
+                                'wazuh.public.controller.management.ruleset.editor.Back',
+                                {
+                                  defaultMessage: 'Back',
+                                },
+                              )}
+                              color='primary'
+                              iconSize='l'
+                              iconType='arrowLeft'
                               onClick={() => {
                                 if (
-                                  this.state.content !== this.state.initContent ||
-                                  this.state.inputValue !== this.state.initialInputValue
+                                  this.state.content !==
+                                    this.state.initContent ||
+                                  this.state.inputValue !==
+                                    this.state.initialInputValue
                                 ) {
                                   showModal();
                                 } else {
@@ -350,31 +441,36 @@ class WzRulesetEditor extends Component {
                     </EuiFlexItem>
                   )}
                 </EuiFlexGroup>
-                <EuiSpacer size="m" />
+                <EuiSpacer size='m' />
                 {this.state.showWarningRestart && (
                   <Fragment>
                     <WzRestartClusterManagerCallout
-                      onRestarted={() => this.setState({ showWarningRestart: false })}
-                      onRestartedError={() => this.setState({ showWarningRestart: true })}
+                      onRestarted={() =>
+                        this.setState({ showWarningRestart: false })
+                      }
+                      onRestartedError={() =>
+                        this.setState({ showWarningRestart: true })
+                      }
                     />
-                    <EuiSpacer size="s" />
+                    <EuiSpacer size='s' />
                   </Fragment>
                 )}
                 {xmlError && (
                   <Fragment>
                     <span style={{ color: 'red' }}> {xmlError}</span>
-                    <EuiSpacer size="s" />
+                    <EuiSpacer size='s' />
                   </Fragment>
                 )}
                 <EuiFlexGroup>
                   <EuiFlexItem>
                     <EuiFlexGroup>
-                      <EuiFlexItem className="codeEditorWrapper">
+                      <EuiFlexItem className='codeEditorWrapper'>
                         <EuiCodeEditor
-                          theme="textmate"
-                          width="100%"
+                          theme='textmate'
+                          width='100%'
                           height={`calc(100vh - ${
-                            (showWarningRestart && !xmlError) || wazuhNotReadyYet
+                            (showWarningRestart && !xmlError) ||
+                            wazuhNotReadyYet
                               ? 300
                               : xmlError
                               ? !showWarningRestart
@@ -383,14 +479,14 @@ class WzRulesetEditor extends Component {
                               : 230
                           }px)`}
                           value={content}
-                          onChange={(newContent) => {
+                          onChange={newContent => {
                             this.setState({ content: newContent });
                           }}
-                          mode="xml"
+                          mode='xml'
                           isReadOnly={!isEditable}
                           wrapEnabled
                           setOptions={this.codeEditorOptions}
-                          aria-label="Code Editor"
+                          aria-label='Code Editor'
                         />
                       </EuiFlexItem>
                     </EuiFlexGroup>
@@ -418,12 +514,10 @@ const mapDispatchToProps = dispatch => {
   return {
     cleanInfo: () => dispatch(cleanInfo()),
     updateFileContent: content => dispatch(updateFileContent(content)),
-    updateWazuhNotReadyYet: wazuhNotReadyYet => dispatch(updateWazuhNotReadyYet(wazuhNotReadyYet)),
+    updateWazuhNotReadyYet: wazuhNotReadyYet =>
+      dispatch(updateWazuhNotReadyYet(wazuhNotReadyYet)),
     showFlyoutLogtest: showFlyout => dispatch(showFlyoutLogtest(showFlyout)),
   };
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WzRulesetEditor);
+export default connect(mapStateToProps, mapDispatchToProps)(WzRulesetEditor);

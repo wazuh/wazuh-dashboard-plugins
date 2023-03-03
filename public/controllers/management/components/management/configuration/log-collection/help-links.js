@@ -10,15 +10,30 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { webDocumentationLink } from "../../../../../../../common/services/web_documentation";
+import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
+import { i18n } from '@kbn/i18n';
 
 export default [
   {
-    text: 'Log data collection documentation',
-    href: webDocumentationLink('user-manual/capabilities/log-data-collection/index.html')
+    text: i18n.translate(
+      'wazuh.public.controller.management.config.help.link.docunments',
+      {
+        defaultMessage: 'Log data collection documentation',
+      },
+    ),
+    href: webDocumentationLink(
+      'user-manual/capabilities/log-data-collection/index.html',
+    ),
   },
   {
-    text: 'Localfile reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/localfile.html')
-  }
+    text: i18n.translate(
+      'wazuh.public.controller.management.config.help.link.LocalfileReference',
+      {
+        defaultMessage: 'Localfile reference',
+      },
+    ),
+    href: webDocumentationLink(
+      'user-manual/reference/ossec-conf/localfile.html',
+    ),
+  },
 ];

@@ -10,19 +10,41 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { webDocumentationLink } from "../../../../../../../common/services/web_documentation";
+import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
+import { i18n } from '@kbn/i18n';
 
 export default [
   {
-    text: 'Anomaly and malware detection',
-    href: webDocumentationLink('user-manual/capabilities/anomalies-detection/index.html')
+    text: i18n.translate(
+      'wazuh.public.controller.management.config.policy.monitoring.help.anomaly',
+      {
+        defaultMessage: 'Anomaly and malware detection',
+      },
+    ),
+    href: webDocumentationLink(
+      'user-manual/capabilities/anomalies-detection/index.html',
+    ),
   },
   {
-    text: 'Monitoring security policies',
-    href: webDocumentationLink('user-manual/capabilities/policy-monitoring/index.html')
+    text: i18n.translate(
+      'wazuh.public.controller.management.config.policy.monitoring.help.Monitoringsecuritypolicies',
+      {
+        defaultMessage: 'Monitoring security policies',
+      },
+    ),
+    href: webDocumentationLink(
+      'user-manual/capabilities/policy-monitoring/index.html',
+    ),
   },
   {
-    text: 'Rootcheck reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/rootcheck.html')
-  }
+    text: i18n.translate(
+      'wazuh.public.controller.management.config.policy.monitoring.help.Rootcheckreference',
+      {
+        defaultMessage: 'Rootcheck reference',
+      },
+    ),
+    href: webDocumentationLink(
+      'user-manual/reference/ossec-conf/rootcheck.html',
+    ),
+  },
 ];

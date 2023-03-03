@@ -25,7 +25,16 @@ import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { WzFlyout } from '../../common/flyouts';
-
+import { i18n } from '@kbn/i18n';
+const Descp1 = i18n.translate("wazuh.components.security.roles.Descp1", {
+  defaultMessage: "At least one policy must be selected.",
+});
+const Descp2 = i18n.translate("wazuh.components.security.roles.Descp2", {
+  defaultMessage: "Assign policies to the role.",
+});
+const Descp3 = i18n.translate("wazuh.components.security.roles.Descp3", {
+  defaultMessage: "Select policies",
+});
 const reservedRoles = [
   'administrator',
   'readonly',
@@ -139,17 +148,27 @@ export const EditRole = ({ role, closeFlyout }) => {
     modal = (
       <EuiOverlayMask>
         <EuiConfirmModal
-          title="Unsubmitted changes"
+          title={i18n.translate('wazuh.public.components.security.roles.edit.unsubmittedChanges', {
+              defaultMessage: 'Unsubmitted changes',
+            })}
           onConfirm={() => {
             setIsModalVisible(false);
             closeFlyout(false);
           }}
           onCancel={() => setIsModalVisible(false)}
-          cancelButtonText="No, don't do it"
-          confirmButtonText="Yes, do it"
+          cancelButtonText={i18n.translate('wazuh.public.components.security.roles.edit.no', {
+              defaultMessage: "No, don't do it",
+            })}
+          confirmButtonText={i18n.translate('wazuh.public.components.security.roles.edit.yes', {
+              defaultMessage: 'Yes, do it',
+            })}
         >
           <p style={{ textAlign: 'center' }}>
-            There are unsaved changes. Are you sure you want to proceed?
+            {
+              i18n.translate("wazuh.components.overview.role.sure", {
+                defaultMessage: "There are unsaved changes. Are you sure you want to proceed?",
+              })
+            }
           </p>
         </EuiConfirmModal>
       </EuiOverlayMask>
@@ -168,8 +187,17 @@ export const EditRole = ({ role, closeFlyout }) => {
         <EuiFlyoutHeader hasBorder={false}>
           <EuiTitle size="m">
             <h2>
-              Edit {role.name} role &nbsp;
-              {isReserved && <EuiBadge color="primary">Reserved</EuiBadge>}
+              {
+                i18n.translate("wazuh.components.overview.role.Edit", {
+                  defaultMessage: "Edit",
+                })} {role.name} {
+                i18n.translate("wazuh.components.overview.rolerole", {
+                  defaultMessage: "role",
+                })} &nbsp;
+                            {isReserved && <EuiBadge color="primary">{
+                i18n.translate("wazuh.components.overview.rolerole.Reserved", {
+                  defaultMessage: "Reserved",
+                })}</EuiBadge>}
             </h2>
           </EuiTitle>
         </EuiFlyoutHeader>
@@ -178,13 +206,15 @@ export const EditRole = ({ role, closeFlyout }) => {
             <EuiFlexGroup>
               <EuiFlexItem grow={true}>
                 <EuiFormRow
-                  label="Policies"
+                  label={i18n.translate('wazuh.public.components.security.roles.edit.Policies1', {
+              defaultMessage: 'Policies',
+            })}
                   isInvalid={selectedPoliciesError}
-                  error={'At least one policy must be selected.'}
-                  helpText="Assign policies to the role."
+                  error={ Descp1}
+                  helpText={Descp2}
                 >
                   <EuiComboBox
-                    placeholder="Select policies"
+                    placeholder={Descp3}
                     options={policies}
                     isDisabled={isReserved}
                     selectedOptions={selectedPolicies}
@@ -201,7 +231,11 @@ export const EditRole = ({ role, closeFlyout }) => {
                   fill
                   onClick={addPolicy}
                 >
-                  Add policy
+                  {
+                    i18n.translate("wazuh.components.overview.role.Addpolicy", {
+                      defaultMessage: "Add policy",
+                    })
+                  }
                 </EuiButton>
               </EuiFlexItem>
             </EuiFlexGroup>

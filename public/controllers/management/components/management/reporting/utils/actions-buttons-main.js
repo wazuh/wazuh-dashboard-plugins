@@ -12,6 +12,7 @@
 import React, { Component, Fragment } from 'react';
 // Eui components
 import { EuiFlexItem, EuiButtonEmpty } from '@elastic/eui';
+import { i18n } from '@kbn/i18n';
 
 import { connect } from 'react-redux';
 
@@ -63,10 +64,16 @@ class WzReportingActionButtons extends Component {
     // Refresh
     const refreshButton = (
       <EuiButtonEmpty
-        iconType="refresh"
+        iconType='refresh'
         onClick={async () => await this.refresh()}
       >
-        Refresh
+        {' '}
+        {i18n.translate(
+          'wazuh.public.controller.management.reports.utils.button.Refresh',
+          {
+            defaultMessage: 'Refresh',
+          },
+        )}
       </EuiButtonEmpty>
     );
 
@@ -80,18 +87,18 @@ class WzReportingActionButtons extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.reportingReducers
+    state: state.reportingReducers,
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
     updateIsProcessing: isProcessing =>
-      dispatch(updateIsProcessing(isProcessing))
+      dispatch(updateIsProcessing(isProcessing)),
   };
 };
 
 export default connect(
   mapStateToProps,
-  mapDispatchToProps
+  mapDispatchToProps,
 )(WzReportingActionButtons);

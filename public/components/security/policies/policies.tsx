@@ -24,6 +24,7 @@ import { PoliciesTable } from './policies-table';
 import { WzRequest } from '../../../react-services/wz-request';
 import { EditPolicyFlyout } from './edit-policy';
 import { CreatePolicyFlyout } from './create-policy';
+import { i18n } from '@kbn/i18n';
 
 
 export const Policies = () => {
@@ -139,7 +140,7 @@ export const Policies = () => {
     setIsEditingPolicy(false);
     await getPolicies();
   };
-  
+
   const closeCreatingFlyout = async () => {
     setIsCreatingPolicy(false);
     await getPolicies();
@@ -164,21 +165,29 @@ export const Policies = () => {
       <EuiPageContentHeader>
         <EuiPageContentHeaderSection>
           <EuiTitle>
-            <h2>Policies</h2>
+            <h2>{
+              i18n.translate("wazuh.components.overview.mitre.Policies", {
+                defaultMessage: "Policies",
+              })}
+            </h2>
           </EuiTitle>
         </EuiPageContentHeaderSection>
         <EuiPageContentHeaderSection>
-         { 
+         {
           !loading
           &&
           <div>
             <EuiButton
               onClick={() => setIsCreatingPolicy(true)}>
-              Create policy
+                {
+                  i18n.translate("wazuh.components.overview.mitre.Createpolicy", {
+                    defaultMessage: "Create policy",
+                  })
+                }
             </EuiButton>
             {flyout}
             {editFlyout}
-          </div>          
+          </div>
         }
         </EuiPageContentHeaderSection>
       </EuiPageContentHeader>

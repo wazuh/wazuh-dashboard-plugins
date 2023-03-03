@@ -18,25 +18,41 @@
  */
 
 import { SavedObjectsClientContract } from 'kibana/public';
-import { SavedObjectLoader, SavedObjectsStart } from '../../../../../../src/plugins/saved_objects/public';
+import {
+  SavedObjectLoader,
+  SavedObjectsStart,
+} from '../../../../../../src/plugins/saved_objects/public';
 import { createSavedSearchClass } from './_saved_search';
+import { i18n } from '@kbn/i18n';
 
 interface Services {
   savedObjectsClient: SavedObjectsClientContract;
   savedObjects: SavedObjectsStart;
 }
 
-export function createSavedSearchesLoader({ savedObjectsClient, savedObjects }: Services) {
+export function createSavedSearchesLoader({
+  savedObjectsClient,
+  savedObjects,
+}: Services) {
   const SavedSearchClass = createSavedSearchClass(savedObjects);
-  const savedSearchLoader = new SavedObjectLoader(SavedSearchClass, savedObjectsClient);
+  const savedSearchLoader = new SavedObjectLoader(
+    SavedSearchClass,
+    savedObjectsClient,
+  );
   // Customize loader properties since adding an 's' on type doesn't work for type 'search' .
   savedSearchLoader.loaderProperties = {
-    name: 'searches',
+    name: i18n.translate(
+      'wazuh.public.kibana.intergrations.discover.saved.searches.searches11',
+      {
+        defaultMessage: 'searches',
+      },
+    ),
     noun: 'Saved Search',
     nouns: 'saved searches',
   };
 
-  savedSearchLoader.urlFor = (id: string) => (id ? `#/view/${encodeURIComponent(id)}` : '#/');
+  savedSearchLoader.urlFor = (id: string) =>
+    id ? `#/view/${encodeURIComponent(id)}` : '#/';
 
   return savedSearchLoader;
 }

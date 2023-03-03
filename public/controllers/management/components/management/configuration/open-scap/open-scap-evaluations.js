@@ -13,6 +13,7 @@
 import React, { Component, Fragment } from 'react';
 
 import { EuiBasicTable } from '@elastic/eui';
+import { i18n } from '@kbn/i18n';
 
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzNoConfig from '../util-components/no-config';
@@ -34,10 +35,43 @@ const renderProfile = item => (
 );
 
 const columns = [
-  { field: 'path', name: 'Path' },
-  { field: 'profile', name: 'Profile', render: renderProfile },
-  { field: 'type', name: 'Type' },
-  { field: 'timeout', name: 'Timeout' }
+  {
+    field: 'path',
+    name: i18n.translate(
+      'wazuh.public.controller.management.config.open.scap.eva.Path',
+      {
+        defaultMessage: 'Path',
+      },
+    ),
+  },
+  {
+    field: 'profile',
+    name: i18n.translate(
+      'wazuh.public.controller.management.config.open.scap.eva.Profile',
+      {
+        defaultMessage: 'Profile',
+      },
+    ),
+    render: renderProfile,
+  },
+  {
+    field: 'type',
+    name: i18n.translate(
+      'wazuh.public.controller.management.config.open.scap.eva.Type',
+      {
+        defaultMessage: 'Type',
+      },
+    ),
+  },
+  {
+    field: 'timeout',
+    name: i18n.translate(
+      'wazuh.public.controller.management.config.open.scap.eva.Timeout',
+      {
+        defaultMessage: 'Timeout',
+      },
+    ),
+  },
 ];
 
 class WzConfigurationOpenScapEvaluations extends Component {
@@ -56,15 +90,26 @@ class WzConfigurationOpenScapEvaluations extends Component {
             />
           )}
         {currentConfig &&
-          ((wodleConfig['open-scap'] &&
-          !wodleConfig['open-scap'].content) || !wodleConfig['open-scap']) &&
+          ((wodleConfig['open-scap'] && !wodleConfig['open-scap'].content) ||
+            !wodleConfig['open-scap']) &&
           !isString(currentConfig['wmodules-wmodules']) && (
-            <WzNoConfig error="not-present" help={helpLinks} />
+            <WzNoConfig error='not-present' help={helpLinks} />
           )}
         {wodleConfig['open-scap'] && wodleConfig['open-scap'].content && (
           <WzConfigurationSettingsTabSelector
-            title="Evaluations"
-            description="Scans executed according to specific security policies and their profiles"
+            title={i18n.translate(
+              'wazuh.public.controller.management.config.open.scap.eva.Evaluations',
+              {
+                defaultMessage: 'Evaluations',
+              },
+            )}
+            description={i18n.translate(
+              'wazuh.public.controller.management.config.open.scap.eva.specific',
+              {
+                defaultMessage:
+                  'Scans executed according to specific security policies and their profiles',
+              },
+            )}
             currentConfig={wodleConfig}
             minusHeight={this.props.agent.id === '000' ? 320 : 415}
             helpLinks={helpLinks}

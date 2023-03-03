@@ -18,13 +18,20 @@
               <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i>
               <span
                 class="embPanel__header embPanel__title embPanel__dragger layout-row wz-headline-title"
-                >Could not fetch data for this agent.
-                <span ng-if="emptyAgent">Reason: {{emptyAgent}}</span></span
+                i18n-id="wazuh.templates.agent.dashboard.errorAgentData"
+                i18n-default-message="Could not fetch data for this agent."
+                >
+                <span ng-if="emptyAgent" i18n-id="wazuh.templates.agent.dashboard.reason"
+                i18n-default-message="Reason: "
+                >{{emptyAgent}}</span></span
               >
             </div>
             <div layout="row" layout-padding ng-if="emptyAgent">
               <span class="cursor-pointer" ng-click="getAgent()"
-                ><i class="fa fa-fw fa-refresh" aria-hidden="true"></i> Try again</span
+                i18n-id="wazuh.templates.agent.dashboard.tryAgain"
+                i18n-default-message="Try again"
+                ><i class="fa fa-fw fa-refresh" aria-hidden="true"></i>
+              </span
               >
             </div>
           </md-card-content>

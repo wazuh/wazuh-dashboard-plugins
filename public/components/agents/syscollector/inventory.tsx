@@ -9,6 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { i18n } from '@kbn/i18n';
 
 import React, { Fragment } from 'react';
 import { EuiEmptyPrompt, EuiButton, EuiFlexGroup, EuiFlexItem, EuiCallOut } from '@elastic/eui';
@@ -18,27 +19,62 @@ import { processColumns, portsColumns, packagesColumns } from './columns';
 import { API_NAME_AGENT_STATUS } from '../../../../common/constants';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
 
+const title1 = i18n.translate("wazuh.components.agents.syscollector.inventory.disconnectedAgent", {
+  defaultMessage:
+    "This agent is currently disconnected, the data may be outdated.",
+});
+const title2 = i18n.translate("wazuh.components.agents.syscollector.inventory.title2", {
+  defaultMessage: "Network interfaces",
+});
+const title3 = i18n.translate("wazuh.components.agents.syscollector.inventory.title3", {
+  defaultMessage: "Network ports",
+});
+const title4 = i18n.translate("wazuh.components.agents.syscollector.inventory.title4", {
+  defaultMessage: "Network settings",
+});
+const title5 = i18n.translate("wazuh.components.agents.syscollector.inventory.title5", {
+  defaultMessage: "Windows updates",
+});
+const title6 = i18n.translate("wazuh.components.agents.syscollector.inventory.title6", {
+  defaultMessage: "Packages",
+});
+const title7 = i18n.translate("wazuh.components.agents.syscollector.inventory.title7", {
+  defaultMessage: "Processes",
+});
 export function SyscollectorInventory({ agent }) {
   if (agent && agent.status === API_NAME_AGENT_STATUS.NEVER_CONNECTED) {
     return (
       <EuiEmptyPrompt
         iconType="securitySignalDetected"
         style={{ marginTop: 20 }}
-        title={<h2>Agent has never connected.</h2>}
+        title={<h2>{
+          i18n.translate("wazuh.components.agent.fim.ivv.lib.nevercon", {
+            defaultMessage: "Agent has never connected.",
+          })}</h2>}
         body={
           <Fragment>
-            <p>The agent has been registered but has not yet connected to the manager.</p>
+            <p>{
+              i18n.translate("wazuh.components.agent.fim.ivv.lib.agent", {
+                defaultMessage: "The agent has been registered but has not yet connected to the manager.",
+              })}
+            </p>
             <a
               href={webDocumentationLink('user-manual/agents/agent-connection.html')}
               target="_blank"
             >
-              Checking connection with the Wazuh server
+              {
+                i18n.translate("wazuh.components.agent.fim.ivv.lib.wazuhServer", {
+                  defaultMessage: "Checking connection with the Wazuh server",
+                })}
             </a>
           </Fragment>
         }
         actions={
           <EuiButton href="#/agents-preview?" color="primary" fill>
-            Back
+            {
+              i18n.translate("wazuh.components.agent.fim.ivv.lib.Back", {
+                defaultMessage: "Back",
+              })}
           </EuiButton>
         }
       />
@@ -77,7 +113,7 @@ export function SyscollectorInventory({ agent }) {
       {agent && agent.status === API_NAME_AGENT_STATUS.DISCONNECTED && (
         <EuiCallOut
           style={{ margin: '8px 16px 8px 16px' }}
-          title="This agent is currently disconnected, the data may be outdated."
+          title={title1}
           iconType="iInCircle"
         />
       )}
@@ -92,7 +128,7 @@ export function SyscollectorInventory({ agent }) {
           <SyscollectorTable
             tableParams={{
               path: `/syscollector/${agent.id}/netiface`,
-              title: 'Network interfaces',
+              title: title2,
               columns: netifaceColumns,
               icon: 'indexMapping',
               searchBar: false,
@@ -104,7 +140,7 @@ export function SyscollectorInventory({ agent }) {
           <SyscollectorTable
             tableParams={{
               path: `/syscollector/${agent.id}/ports`,
-              title: 'Network ports',
+              title: title3,
               columns: portsColumns[soPlatform],
               icon: 'inputOutput',
               searchBar: true,
@@ -119,7 +155,7 @@ export function SyscollectorInventory({ agent }) {
           <SyscollectorTable
             tableParams={{
               path: `/syscollector/${agent.id}/netaddr`,
-              title: 'Network settings',
+              title: title4,
               columns: netaddrColumns,
               icon: 'controlsHorizontal',
               searchBar: false,
@@ -132,7 +168,7 @@ export function SyscollectorInventory({ agent }) {
             <SyscollectorTable
               tableParams={{
                 path: `/syscollector/${agent.id}/hotfixes`,
-                title: 'Windows updates',
+                title: title5,
                 columns: [{ id: 'hotfix' }],
                 icon: 'logoWindows',
                 searchBar: false,
@@ -149,7 +185,7 @@ export function SyscollectorInventory({ agent }) {
             tableParams={{
               path: `/syscollector/${agent.id}/packages`,
               hasTotal: true,
-              title: 'Packages',
+              title: title6,
               columns: packagesColumns[soPlatform],
               icon: 'apps',
               searchBar: true,
@@ -165,7 +201,7 @@ export function SyscollectorInventory({ agent }) {
             tableParams={{
               path: `/syscollector/${agent.id}/processes`,
               hasTotal: true,
-              title: 'Processes',
+              title: title7,
               columns: processColumns[soPlatform],
               icon: 'console',
               searchBar: true,

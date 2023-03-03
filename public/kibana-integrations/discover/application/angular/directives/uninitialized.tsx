@@ -37,7 +37,7 @@ export const DiscoverUninitialized = ({ onRefresh }: Props) => {
               title={
                 <h2>
                   <FormattedMessage
-                    id="discover.uninitializedTitle"
+                    id="wazuh.discover.uninitializedTitle"
                     defaultMessage="Start searching"
                   />
                 </h2>
@@ -45,7 +45,7 @@ export const DiscoverUninitialized = ({ onRefresh }: Props) => {
               body={
                 <p>
                   <FormattedMessage
-                    id="discover.uninitializedText"
+                    id="wazuh.discover.uninitializedText"
                     defaultMessage="Write a query, add some filters, or simply hit Refresh to retrieve results for the current query."
                   />
                 </p>
@@ -53,7 +53,7 @@ export const DiscoverUninitialized = ({ onRefresh }: Props) => {
               actions={
                 <EuiButton color="primary" fill onClick={onRefresh}>
                   <FormattedMessage
-                    id="discover.uninitializedRefreshButtonText"
+                    id="wazuh.discover.uninitializedRefreshButtonText"
                     defaultMessage="Refresh data"
                   />
                 </EuiButton>

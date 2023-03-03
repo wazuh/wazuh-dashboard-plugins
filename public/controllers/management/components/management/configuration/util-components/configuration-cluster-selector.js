@@ -14,11 +14,10 @@ import React, { Component } from 'react';
 
 import { EuiSelect } from '@elastic/eui';
 
-import {
-  updateClusterNodeSelected
-} from '../../../../../../redux/actions/configurationActions';
+import { updateClusterNodeSelected } from '../../../../../../redux/actions/configurationActions';
 
 import { connect } from 'react-redux';
+import { i18n } from '@kbn/i18n';
 
 class WzConfigurationClusterSelect extends Component {
   constructor(props) {
@@ -30,15 +29,20 @@ class WzConfigurationClusterSelect extends Component {
   render() {
     const options = this.props.clusterNodes.map(clusterNode => ({
       value: clusterNode.name,
-      text: `${clusterNode.name} (${clusterNode.type})`
+      text: `${clusterNode.name} (${clusterNode.type})`,
     }));
     return (
       <EuiSelect
-        id="selectConfigurationClusterNode"
+        id='selectConfigurationClusterNode'
         options={options}
         value={this.props.clusterNodeSelected}
         onChange={this.onChange}
-        aria-label="Select Configuration Cluster Node"
+        aria-label={i18n.translate(
+          'wazuh.public.controller.management.config.policy.util.components.cluster.node',
+          {
+            defaultMessage: 'Select Configuration Cluster Node',
+          },
+        )}
         fullWidth={true}
       />
     );
@@ -47,15 +51,15 @@ class WzConfigurationClusterSelect extends Component {
 
 const mapStateToProps = state => ({
   clusterNodes: state.configurationReducers.clusterNodes,
-  clusterNodeSelected: state.configurationReducers.clusterNodeSelected
+  clusterNodeSelected: state.configurationReducers.clusterNodeSelected,
 });
 
 const mapDispatchToProps = dispatch => ({
   updateClusterNodeSelected: clusterNodeSelected =>
-    dispatch(updateClusterNodeSelected(clusterNodeSelected))
+    dispatch(updateClusterNodeSelected(clusterNodeSelected)),
 });
 
 export default connect(
   mapStateToProps,
-  mapDispatchToProps
+  mapDispatchToProps,
 )(WzConfigurationClusterSelect);

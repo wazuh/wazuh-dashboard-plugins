@@ -14,7 +14,26 @@ import { WzRequest } from '../../../../../../react-services/wz-request';
 import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
+import { i18n } from '@kbn/i18n';
 
+const label1 = i18n.translate(
+  'wazuh.public.controller.management.groups.utils.group.handler.label1',
+  {
+    defaultMessage: 'Error deleting the group:',
+  },
+);
+const label2 = i18n.translate(
+  'wazuh.public.controller.management.groups.utils.group.handler.label2',
+  {
+    defaultMessage: 'Error obtaining the agents of the group:',
+  },
+);
+const label3 = i18n.translate(
+  'wazuh.public.controller.management.groups.utils.group.handler.label3',
+  {
+    defaultMessage: 'Error obtaining the content of groups files:',
+  },
+);
 export default class GroupsHandler {
   /**
    * Save a new group
@@ -52,7 +71,7 @@ export default class GroupsHandler {
         error: {
           error: error,
           message: error.message || error,
-          title: `Error deleting the group: ${error.message || error}`,
+          title: `${label1} ${error.message || error}`,
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -66,7 +85,11 @@ export default class GroupsHandler {
    */
   static async deleteAgent(agentId, groupId) {
     try {
-      const result = await WzRequest.apiReq('DELETE', `/agents/${agentId}/group/${groupId}`, {});
+      const result = await WzRequest.apiReq(
+        'DELETE',
+        `/agents/${agentId}/group/${groupId}`,
+        {},
+      );
       return result;
     } catch (error) {
       throw new Error(error);
@@ -79,7 +102,11 @@ export default class GroupsHandler {
    */
   static async agentsGroup(name, filters) {
     try {
-      const result = await WzRequest.apiReq('GET', `/groups/${name}/agents`, filters);
+      const result = await WzRequest.apiReq(
+        'GET',
+        `/groups/${name}/agents`,
+        filters,
+      );
       return result;
     } catch (error) {
       const options = {
@@ -90,7 +117,7 @@ export default class GroupsHandler {
         error: {
           error: error,
           message: error.message || error,
-          title: `Error obtaining the agents of the group: ${error.message || error}`,
+          title: `${label2} ${error.message || error}`,
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -103,7 +130,11 @@ export default class GroupsHandler {
    */
   static async filesGroup(name, filters) {
     try {
-      const result = await WzRequest.apiReq('GET', `/groups/${name}/files`, filters);
+      const result = await WzRequest.apiReq(
+        'GET',
+        `/groups/${name}/files`,
+        filters,
+      );
       return result;
     } catch (error) {
       throw new Error(error);
@@ -140,7 +171,7 @@ export default class GroupsHandler {
         error: {
           error: error,
           message: error.message || error,
-          title: `Error obtaining the content of groups files: ${error.message || error}`,
+          title: `${label3} ${error.message || error}`,
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -155,10 +186,14 @@ export default class GroupsHandler {
    */
   static async sendGroupConfiguration(fileName, groupId, content) {
     try {
-      const result = await WzRequest.apiReq('PUT', `/groups/${groupId}/configuration`, {
-        body: content,
-        origin: 'xmleditor',
-      });
+      const result = await WzRequest.apiReq(
+        'PUT',
+        `/groups/${groupId}/configuration`,
+        {
+          body: content,
+          origin: 'xmleditor',
+        },
+      );
       return result;
     } catch (error) {
       throw new Error(error);

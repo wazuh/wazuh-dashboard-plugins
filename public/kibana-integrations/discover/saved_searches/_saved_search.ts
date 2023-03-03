@@ -17,15 +17,28 @@
  * under the License.
  */
 
-import { SavedObject, SavedObjectsStart } from '../../../../../../src/plugins/saved_objects/public';
+import {
+  SavedObject,
+  SavedObjectsStart,
+} from '../../../../../../src/plugins/saved_objects/public';
+import { i18n } from '@kbn/i18n';
 
 export function createSavedSearchClass(savedObjects: SavedObjectsStart) {
-
   class SavedSearch extends savedObjects.SavedObjectClass {
     public static type: string = 'search';
     public static mapping = {
-      title: 'text',
-      description: 'text',
+      title: i18n.translate(
+        'wazuh.public.kibana.intergrations.discover.saved.searches.text',
+        {
+          defaultMessage: 'text',
+        },
+      ),
+      description: i18n.translate(
+        'wazuh.public.kibana.intergrations.discover.saved.searches.text',
+        {
+          defaultMessage: 'text',
+        },
+      ),
       hits: 'integer',
       columns: 'keyword',
       sort: 'keyword',
@@ -43,8 +56,18 @@ export function createSavedSearchClass(savedObjects: SavedObjectsStart) {
         id,
         type: 'search',
         mapping: {
-          title: 'text',
-          description: 'text',
+          title: i18n.translate(
+            'wazuh.public.kibana.intergrations.discover.saved.searches.text',
+            {
+              defaultMessage: 'text',
+            },
+          ),
+          description: i18n.translate(
+            'wazuh.public.kibana.intergrations.discover.saved.searches.text',
+            {
+              defaultMessage: 'text',
+            },
+          ),
           hits: 'integer',
           columns: 'keyword',
           sort: 'keyword',

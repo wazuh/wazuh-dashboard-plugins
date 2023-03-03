@@ -19,21 +19,32 @@ import {
 } from '@elastic/eui';
 import { filtersToObject } from '../../wz-search-bar';
 import { TableWithSearchBar } from './table-with-search-bar';
-import { TableDefault } from './table-default'
+import { TableDefault } from './table-default';
 import { WzRequest } from '../../../react-services/wz-request';
-import { ExportTableCsv }  from './components/export-table-csv';
+import { ExportTableCsv } from './components/export-table-csv';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
+import { i18n } from '@kbn/i18n';
 
-export function TableWzAPI({...rest}){
-
+const items = i18n.translate('wazuh.public.components.common.table.api.items', {
+  defaultMessage: 'Error searching items',
+});
+export function TableWzAPI({ ...rest }) {
   const [totalItems, setTotalItems] = useState(0);
   const [filters, setFilters] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const onFiltersChange = filters => typeof rest.onFiltersChange === 'function' ? rest.onFiltersChange(filters) : null;
+  const onFiltersChange = filters =>
+    typeof rest.onFiltersChange === 'function'
+      ? rest.onFiltersChange(filters)
+      : null;
 
-  const onSearch = useCallback(async function(endpoint, filters, pagination, sorting){
+  const onSearch = useCallback(async function (
+    endpoint,
+    filters,
+    pagination,
+    sorting,
+  ) {
     try {
       const { pageIndex, pageSize } = pagination;
       const { field, direction } = sorting.sort;
@@ -44,15 +55,20 @@ export function TableWzAPI({...rest}){
         ...filtersToObject(filters),
         offset: pageIndex * pageSize,
         limit: pageSize,
-        sort: `${direction === 'asc' ? '+' : '-'}${field}`
+        sort: `${direction === 'asc' ? '+' : '-'}${field}`,
       };
 
       const response = await WzRequest.apiReq('GET', endpoint, { params });
 
-      const { affected_items: items, total_affected_items: totalItems } = ((response || {}).data || {}).data;
+      const { affected_items: items, total_affected_items: totalItems } = (
+        (response || {}).data || {}
+      ).data;
       setIsLoading(false);
       setTotalItems(totalItems);
-      return { items: rest.mapResponseItem ? items.map(rest.mapResponseItem) : items, totalItems };
+      return {
+        items: rest.mapResponseItem ? items.map(rest.mapResponseItem) : items,
+        totalItems,
+      };
     } catch (error) {
       setIsLoading(false);
       setTotalItems(0);
@@ -63,46 +79,58 @@ export function TableWzAPI({...rest}){
         error: {
           error: error,
           message: error.message || error,
-          title: `${error.name}: Error searching items`,
+          title: `${error.name}: ${items}`,
         },
       };
       getErrorOrchestrator().handleError(options);
-    };
-  },[]);
+    }
+  },
+  []);
 
   const header = (
     <EuiFlexGroup>
       <EuiFlexItem>
         {rest.title && (
-          <EuiTitle size="s">
-            <h1>{rest.title} {isLoading ? <EuiLoadingSpinner size="s" /> : <span>({ totalItems })</span>}</h1>
+          <EuiTitle size='s'>
+            <h1>
+              {rest.title}{' '}
+              {isLoading ? (
+                <EuiLoadingSpinner size='s' />
+              ) : (
+                <span>({totalItems})</span>
+              )}
+            </h1>
           </EuiTitle>
         )}
       </EuiFlexItem>
-      {rest.downloadCsv && <ExportTableCsv endpoint={rest.endpoint} totalItems={totalItems} filters={filters} title={rest.title}/>}
+      {rest.downloadCsv && (
+        <ExportTableCsv
+          endpoint={rest.endpoint}
+          totalItems={totalItems}
+          filters={filters}
+          title={rest.title}
+        />
+      )}
     </EuiFlexGroup>
-  )
+  );
 
-  const table = rest.searchTable ?  
-      <TableWithSearchBar
-        onSearch={onSearch}
-        {...rest}
-      /> :
-      <TableDefault
-        onSearch={onSearch}
-        {...rest}
-      />
-  
+  const table = rest.searchTable ? (
+    <TableWithSearchBar onSearch={onSearch} {...rest} />
+  ) : (
+    <TableDefault onSearch={onSearch} {...rest} />
+  );
+
   return (
-  <>
-    {header}
-    {table}
-  </>)
+    <>
+      {header}
+      {table}
+    </>
+  );
 }
 
 // Set default props
 TableWzAPI.defaultProps = {
   title: null,
   downloadCsv: false,
-  searchBar: false
+  searchBar: false,
 };

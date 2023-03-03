@@ -13,6 +13,7 @@
 import React, { Component, Fragment } from 'react';
 
 import { EuiBasicTable } from '@elastic/eui';
+import { i18n } from '@kbn/i18n';
 
 import WzNoConfig from '../util-components/no-config';
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
@@ -20,10 +21,42 @@ import { isString } from '../utils/utils';
 import helpLinks from './help-links';
 
 const columns = [
-  { field: 'path', name: 'Path' },
-  { field: 'profile', name: 'Profile' },
-  { field: 'timeout', name: 'Timeout' },
-  { field: 'type', name: 'Type' }
+  {
+    field: 'path',
+    name: i18n.translate(
+      'wazuh.public.controller.management.config.cis.cat.Path',
+      {
+        defaultMessage: 'Path',
+      },
+    ),
+  },
+  {
+    field: 'profile',
+    name: i18n.translate(
+      'wazuh.public.controller.management.config.cis.cat.Profile',
+      {
+        defaultMessage: 'Profile',
+      },
+    ),
+  },
+  {
+    field: 'timeout',
+    name: i18n.translate(
+      'wazuh.public.controller.management.config.cis.cat.Timeout',
+      {
+        defaultMessage: 'Timeout',
+      },
+    ),
+  },
+  {
+    field: 'type',
+    name: i18n.translate(
+      'wazuh.public.controller.management.config.cis.cat.Type',
+      {
+        defaultMessage: 'Type',
+      },
+    ),
+  },
 ];
 class WzConfigurationCisCatBenchmarks extends Component {
   constructor(props) {
@@ -43,13 +76,24 @@ class WzConfigurationCisCatBenchmarks extends Component {
         {currentConfig &&
           wodleConfig['cis-cat'] &&
           !wodleConfig['cis-cat'].content && (
-            <WzNoConfig error="not-present" help={helpLinks} />
+            <WzNoConfig error='not-present' help={helpLinks} />
           )}
         {wodleConfig['cis-cat'] && wodleConfig['cis-cat'].content && (
           <Fragment>
             <WzConfigurationSettingsTabSelector
-              title="Benchmarks"
-              description="List of CIS-CAT benchmark templates to perform scans"
+              title={i18n.translate(
+                'wazuh.public.controller.management.config.cis.cat.Benchmarks',
+                {
+                  defaultMessage: 'Benchmarks',
+                },
+              )}
+              description={i18n.translate(
+                'wazuh.public.controller.management.config.cis.cat.scan',
+                {
+                  defaultMessage:
+                    'List of CIS-CAT benchmark templates to perform scans',
+                },
+              )}
               currentConfig={wodleConfig}
               minusHeight={this.props.agent.id === '000' ? 320 : 415}
               helpLinks={helpLinks}

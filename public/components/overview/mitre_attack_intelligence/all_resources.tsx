@@ -12,12 +12,13 @@
  */
 
 import React, {useCallback, useState} from 'react';
-import { 
+import {
   EuiTitle,
   EuiSpacer
 } from '@elastic/eui';
 import { ModuleMitreAttackIntelligenceAllResourcesSearchResults } from './all_resources_search_results';
 import { ModuleMitreAttackIntelligenceFlyout } from './resource_detail_flyout';
+import { i18n } from "@kbn/i18n";
 
 export const ModuleMitreAttackIntelligenceAllResources = ({ results, loading }) => {
   const [details, setDetails] = useState(null);
@@ -32,9 +33,12 @@ export const ModuleMitreAttackIntelligenceAllResources = ({ results, loading }) 
 
   return (
     <>
-      <EuiTitle><h1>Search results</h1></EuiTitle>
+      <EuiTitle><h1>{
+        i18n.translate("wazuh.components.overview.mitre.Searchresults", {
+          defaultMessage: "Search results",
+        })}</h1></EuiTitle>
       <EuiSpacer />
-      <ModuleMitreAttackIntelligenceAllResourcesSearchResults results={results} loading={loading} onSelectResource={selectResource}/> 
+      <ModuleMitreAttackIntelligenceAllResourcesSearchResults results={results} loading={loading} onSelectResource={selectResource}/>
 
       {details && (
         <ModuleMitreAttackIntelligenceFlyout

@@ -31,10 +31,25 @@ import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { satisfyPluginPlatformVersion } from '../../../../common/semver';
-
+import { i18n } from '@kbn/i18n';
+const foundIndexPattern = i18n.translate(
+  'wazuh.components.common.modules.event.foundIndexPatttern',
+  { defaultMessage: 'Found unknown fields in the index pattern.' },
+);
+const indexPattern = i18n.translate(
+  'wazuh.components.common.modules.event.indexPatttern',
+  { defaultMessage: 'The index pattern could not be refreshed.' },
+);
+const indexPatternText = i18n.translate(
+  'wazuh.components.common.modules.event.indexPattternText',
+  {
+    defaultMessage:
+      'There are some unknown fields for the current index pattern. The index pattern fields need to be refreshed.',
+  },
+);
 export const Events = compose(
   withAgentSupportModule,
-  withModuleTabLoader
+  withModuleTabLoader,
 )(
   class Events extends Component {
     intervalCheckExistsDiscoverTableTime: number = 200;
@@ -68,7 +83,10 @@ export const Events = compose(
         this.$rootScope.$applyAsync();
         const fields = [...EventsSelectedFiles[this.props.section]];
         const index = fields.indexOf('agent.name');
-        if (index > -1 && store.getState().appStateReducers.currentAgentData.id) {
+        if (
+          index > -1 &&
+          store.getState().appStateReducers.currentAgentData.id
+        ) {
           //if an agent is pinned we don't show the agent.name column
           fields.splice(index, 1);
         }
@@ -77,17 +95,25 @@ export const Events = compose(
           scope.addColumn(false);
           scope.removeColumn(false);
         }
-        this.fetchWatch = scope.$watchCollection('fetchStatus', (fetchStatus) => {
+        this.fetchWatch = scope.$watchCollection('fetchStatus', fetchStatus => {
           if (scope.fetchStatus === 'complete') {
             setTimeout(() => {
               ModulesHelper.cleanAvailableFields();
             }, 1000);
             // Check the discover table is in the DOM and enhance the initial table cells
             this.intervalCheckExistsDiscoverTable = setInterval(() => {
-              const discoverTableTBody = document.querySelector('.kbn-table tbody');
+              const discoverTableTBody =
+                document.querySelector('.kbn-table tbody');
               if (discoverTableTBody) {
-                const options = { setFlyout: this.setFlyout, closeFlyout: this.closeFlyout };
-                this.enhanceDiscoverTableCurrentRows(this.state.discoverRowsData, options, true);
+                const options = {
+                  setFlyout: this.setFlyout,
+                  closeFlyout: this.closeFlyout,
+                };
+                this.enhanceDiscoverTableCurrentRows(
+                  this.state.discoverRowsData,
+                  options,
+                  true,
+                );
                 this.enhanceDiscoverTableAddObservers(options);
                 clearInterval(this.intervalCheckExistsDiscoverTable);
               }
@@ -104,81 +130,120 @@ export const Events = compose(
       this.$rootScope.showModuleEvents = false;
       this.$rootScope.moduleDiscoverReady = false;
       this.$rootScope.$applyAsync();
-      this.discoverTableRowsObserver && this.discoverTableRowsObserver.disconnect();
-      this.discoverTableColumnsObserver && this.discoverTableColumnsObserver.disconnect();
+      this.discoverTableRowsObserver &&
+        this.discoverTableRowsObserver.disconnect();
+      this.discoverTableColumnsObserver &&
+        this.discoverTableColumnsObserver.disconnect();
       this.intervalCheckExistsDiscoverTableTime &&
         clearInterval(this.intervalCheckExistsDiscoverTable);
     }
 
-    enhanceDiscoverTableAddObservers = (options) => {
+    enhanceDiscoverTableAddObservers = options => {
       // Scrolling table observer, when load more events
-      this.discoverTableRowsObserver = new MutationObserver((mutationsList) => {
-        mutationsList.forEach((mutation) => {
-          if (mutation.type === 'childList' && mutation.addedNodes && mutation.addedNodes[0]) {
+      this.discoverTableRowsObserver = new MutationObserver(mutationsList => {
+        mutationsList.forEach(mutation => {
+          if (
+            mutation.type === 'childList' &&
+            mutation.addedNodes &&
+            mutation.addedNodes[0]
+          ) {
             this.enhanceDiscoverTableScrolling(
               mutation.addedNodes[0],
               this.state.discoverRowsData,
-              options
+              options,
             );
           }
         });
       });
       const discoverTableTBody = document.querySelector('.kbn-table tbody');
-      this.discoverTableRowsObserver.observe(discoverTableTBody, { childList: true });
+      this.discoverTableRowsObserver.observe(discoverTableTBody, {
+        childList: true,
+      });
 
       // Add observer when add or remove table header column
-      this.discoverTableColumnsObserver = new MutationObserver((mutationsList) => {
-        mutationsList.forEach((mutation) => {
-          if (mutation.type === 'childList') {
-            this.enhanceDiscoverTableCurrentRows(this.state.discoverRowsData, options);
-          }
-        });
+      this.discoverTableColumnsObserver = new MutationObserver(
+        mutationsList => {
+          mutationsList.forEach(mutation => {
+            if (mutation.type === 'childList') {
+              this.enhanceDiscoverTableCurrentRows(
+                this.state.discoverRowsData,
+                options,
+              );
+            }
+          });
+        },
+      );
+      const discoverTableElement =
+        document.querySelector('.kbn-table').parentElement.parentElement
+          .parentElement;
+      this.discoverTableColumnsObserver.observe(discoverTableElement, {
+        childList: true,
       });
-      const discoverTableElement = document.querySelector('.kbn-table').parentElement.parentElement
-        .parentElement;
-      this.discoverTableColumnsObserver.observe(discoverTableElement, { childList: true });
     };
 
-    enhanceDiscoverTableCurrentRows = (discoverRowsData, options, addObserverDetails = false) => {
+    enhanceDiscoverTableCurrentRows = (
+      discoverRowsData,
+      options,
+      addObserverDetails = false,
+    ) => {
       // Get table headers
-      const discoverTableHeaders = document.querySelectorAll(`.kbn-table thead th`);
+      const discoverTableHeaders =
+        document.querySelectorAll(`.kbn-table thead th`);
       // Get table rows
-      const discoverTableRows = document.querySelectorAll(`.kbn-table tbody tr.kbnDocTable__row`);
+      const discoverTableRows = document.querySelectorAll(
+        `.kbn-table tbody tr.kbnDocTable__row`,
+      );
 
       discoverTableRows.forEach((row, rowIndex) => {
         // Enhance each cell of table rows
         discoverTableHeaders.forEach((header, headerIndex) => {
-          const cell = row.querySelector(`td:nth-child(${headerIndex + 1}) div`);
+          const cell = row.querySelector(
+            `td:nth-child(${headerIndex + 1}) div`,
+          );
           if (cell) {
             enhanceDiscoverEventsCell(
               header.textContent,
               cell.textContent,
               discoverRowsData[rowIndex],
               cell,
-              options
+              options,
             );
           }
         });
         // Add observer to row details
         if (addObserverDetails) {
           const rowDetails = row.nextElementSibling;
-          this.enhanceDiscoverTableRowDetailsAddObserver(rowDetails, discoverRowsData, options);
+          this.enhanceDiscoverTableRowDetailsAddObserver(
+            rowDetails,
+            discoverRowsData,
+            options,
+          );
         }
       });
     };
 
-    checkDiscoverTableDetailsMutation(element, mutation, discoverRowsData, options) {
+    checkDiscoverTableDetailsMutation(
+      element,
+      mutation,
+      discoverRowsData,
+      options,
+    ) {
       const rowTable = element.previousElementSibling;
-      const discoverTableRows = document.querySelectorAll(`.kbn-table tbody tr.kbnDocTable__row`);
+      const discoverTableRows = document.querySelectorAll(
+        `.kbn-table tbody tr.kbnDocTable__row`,
+      );
       const rowIndex = Array.from(discoverTableRows).indexOf(rowTable);
-      const rowDetailsFields = mutation.addedNodes[0].querySelectorAll('.kbnDocViewer__field');
+      const rowDetailsFields = mutation.addedNodes[0].querySelectorAll(
+        '.kbnDocViewer__field',
+      );
       let hasUnknownFields = false;
       if (rowDetailsFields) {
         rowDetailsFields.forEach(async (rowDetailField, i) => {
           //check for unknown fields until 1 unknown field is found
           if (!hasUnknownFields && this.checkUnknownFields(rowDetailField))
             hasUnknownFields = true;
-          const fieldName = rowDetailField.childNodes[0].childNodes[1].textContent || '';
+          const fieldName =
+            rowDetailField.childNodes[0].childNodes[1].textContent || '';
           const fieldCell =
             rowDetailField.parentNode.childNodes &&
             rowDetailField.parentNode.childNodes[2].childNodes[0];
@@ -190,7 +255,7 @@ export const Events = compose(
             (fieldCell || {}).textContent || '',
             discoverRowsData[rowIndex],
             fieldCell,
-            options
+            options,
           );
         });
         if (hasUnknownFields) {
@@ -198,11 +263,12 @@ export const Events = compose(
         }
       }
     }
-  
+
     checkUnknownFields(rowDetailField) {
       const fieldCell =
-        rowDetailField.parentNode.childNodes && rowDetailField.parentNode.childNodes[2];
-      return (fieldCell.querySelector('svg[data-test-subj="noMappingWarning"]'))
+        rowDetailField.parentNode.childNodes &&
+        rowDetailField.parentNode.childNodes[2];
+      return fieldCell.querySelector('svg[data-test-subj="noMappingWarning"]');
     }
 
     refreshKnownFields = async () => {
@@ -210,7 +276,7 @@ export const Events = compose(
         try {
           this.hasRefreshedKnownFields = true;
           this.isRefreshing = true;
-          
+
           if (satisfyPluginPlatformVersion('<7.11')) {
             await PatternHandler.refreshIndexPattern();
           }
@@ -221,19 +287,32 @@ export const Events = compose(
           throw error;
         }
       } else if (this.isRefreshing) {
-        await new Promise((r) => setTimeout(r, 150));
+        await new Promise(r => setTimeout(r, 150));
         await this.refreshKnownFields();
       }
     };
 
-    enhanceDiscoverTableRowDetailsAddObserver(element, discoverRowsData, options) {
+    enhanceDiscoverTableRowDetailsAddObserver(
+      element,
+      discoverRowsData,
+      options,
+    ) {
       // Open for first time the row details
-      const observer = new MutationObserver((mutationsList) => {
-        mutationsList.forEach((mutation) => {
-          if (mutation.type === 'childList' && mutation.addedNodes && mutation.addedNodes[0]) {
-            this.checkDiscoverTableDetailsMutation(element, mutation, discoverRowsData, options);
+      const observer = new MutationObserver(mutationsList => {
+        mutationsList.forEach(mutation => {
+          if (
+            mutation.type === 'childList' &&
+            mutation.addedNodes &&
+            mutation.addedNodes[0]
+          ) {
+            this.checkDiscoverTableDetailsMutation(
+              element,
+              mutation,
+              discoverRowsData,
+              options,
+            );
             // Add observer when switch between the tabs of Table and JSON
-            new MutationObserver((mutationList) => {
+            new MutationObserver(mutationList => {
               if (
                 mutation.addedNodes[0]
                   .querySelector('div[role=tabpanel]')
@@ -243,29 +322,41 @@ export const Events = compose(
                   element,
                   mutation,
                   discoverRowsData,
-                  options
+                  options,
                 );
               }
-            }).observe(mutation.addedNodes[0].querySelector('div[role=tabpanel]'), {
-              attributes: true,
-            });
+            }).observe(
+              mutation.addedNodes[0].querySelector('div[role=tabpanel]'),
+              {
+                attributes: true,
+              },
+            );
           }
         });
       });
       observer.observe(element, { childList: true });
     }
 
-    enhanceDiscoverTableScrolling = (mutationElement, discoverRowsData, options) => {
+    enhanceDiscoverTableScrolling = (
+      mutationElement,
+      discoverRowsData,
+      options,
+    ) => {
       // Get table headers
-      const discoverTableHeaders = document.querySelectorAll(`.kbn-table thead th`);
+      const discoverTableHeaders =
+        document.querySelectorAll(`.kbn-table thead th`);
       // Get table rows
-      const discoverTableRows = document.querySelectorAll(`.kbn-table tbody tr.kbnDocTable__row`);
+      const discoverTableRows = document.querySelectorAll(
+        `.kbn-table tbody tr.kbnDocTable__row`,
+      );
       try {
         const rowIndex = Array.from(discoverTableRows).indexOf(mutationElement);
         if (rowIndex !== -1) {
           // It is a discover table row
           discoverTableHeaders.forEach((header, headerIndex) => {
-            const cell = mutationElement.querySelector(`td:nth-child(${headerIndex + 1}) div`);
+            const cell = mutationElement.querySelector(
+              `td:nth-child(${headerIndex + 1}) div`,
+            );
             if (!cell) {
               return;
             }
@@ -274,7 +365,7 @@ export const Events = compose(
               cell.textContent,
               discoverRowsData[rowIndex],
               cell,
-              options
+              options,
             );
           });
         } else {
@@ -282,7 +373,7 @@ export const Events = compose(
           this.enhanceDiscoverTableRowDetailsAddObserver(
             mutationElement,
             discoverRowsData,
-            options
+            options,
           );
         }
       } catch (error) {
@@ -300,7 +391,7 @@ export const Events = compose(
       }
     };
 
-    setFlyout = (flyout) => {
+    setFlyout = flyout => {
       this.setState({ flyout });
     };
 
@@ -313,50 +404,72 @@ export const Events = compose(
       if (satisfyPluginPlatformVersion('<7.11')) {
         getToasts().add({
           color: 'success',
-          title: 'The index pattern was refreshed successfully.',
+          title: i18n.translate(
+            'wazuh.public.components.common.modules.events.pattern',
+            {
+              defaultMessage: 'The index pattern was refreshed successfully.',
+            },
+          ),
           text: toMountPoint(
-            <EuiFlexGroup justifyContent="flexEnd" gutterSize="s">
+            <EuiFlexGroup justifyContent='flexEnd' gutterSize='s'>
               <EuiFlexItem grow={false}>
-                There were some unknown fields for the current index pattern. You need to refresh
-                the page to apply the changes.
+                {i18n.translate(
+                  'wazuh.components.common.modules.event.indexPattern',
+                  {
+                    defaultMessage:
+                      'There were some unknown fields for the current index pattern.You need to refresh the page to apply the changes.',
+                  },
+                )}
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
-                <EuiButton onClick={() => window.location.reload()} size="s">
-                  Reload page
+                <EuiButton onClick={() => window.location.reload()} size='s'>
+                  {i18n.translate(
+                    'wazuh.components.common.modules.event.reloadPage',
+                    {
+                      defaultMessage: 'Reload page',
+                    },
+                  )}
                 </EuiButton>
               </EuiFlexItem>
-            </EuiFlexGroup>
+            </EuiFlexGroup>,
           ),
           toastLifeTimeMs,
         });
       } else if (satisfyPluginPlatformVersion('>=7.11')) {
         getToasts().add({
           color: 'warning',
-          title: 'Found unknown fields in the index pattern.',
+          title: { foundIndexPattern },
           text: toMountPoint(
-            <EuiFlexGroup justifyContent="flexEnd" gutterSize="s">
+            <EuiFlexGroup justifyContent='flexEnd' gutterSize='s'>
               <EuiFlexItem grow={false}>
-                There are some unknown fields for the current index pattern. You need to refresh the
-                page to update the fields.
+                {i18n.translate(
+                  'wazuh.components.common.modules.event.unkownFields',
+                  {
+                    defaultMessage:
+                      'There are some unknown fields for the current index pattern. You need to refresh the page to update the fields.',
+                  },
+                )}
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
-                <EuiButton onClick={() => window.location.reload()} size="s">
-                  Reload page
+                <EuiButton onClick={() => window.location.reload()} size='s'>
+                  {i18n.translate(
+                    'wazuh.component.common.modules.event.reloadPage',
+                    { defaultMessage: 'Reload page' },
+                  )}
                 </EuiButton>
               </EuiFlexItem>
-            </EuiFlexGroup>
+            </EuiFlexGroup>,
           ),
           toastLifeTimeMs,
         });
       }
     };
 
-    errorToast = (error) => {
+    errorToast = error => {
       getToasts().add({
         color: 'danger',
-        title: 'The index pattern could not be refreshed.',
-        text:
-          'There are some unknown fields for the current index pattern. The index pattern fields need to be refreshed.',
+        title: { indexPattern },
+        text: { indexPatternText },
       });
     };
 
@@ -375,5 +488,5 @@ export const Events = compose(
         </Fragment>
       );
     }
-  }
+  },
 );

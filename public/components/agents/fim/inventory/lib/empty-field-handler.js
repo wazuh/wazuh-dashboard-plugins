@@ -12,6 +12,7 @@
 
 import { EuiCode, EuiIcon, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import React from 'react';
+import { i18n } from '@kbn/i18n';
 
 /* This function can be used to render possibly empty fields.
 It takes a render function suitable for an EuiTable and returns another. */
@@ -19,9 +20,13 @@ export const emptyFieldHandler = (renderFn = (value, record) => value) => {
   return (value, record) => {
     if (value === '' || value === undefined) {
       return (
-        <span style={{display:"flex", minWidth:"0"}}>
-            <EuiIcon type="iInCircle" />
-            <EuiCode className="wz-ellipsis" style={{whiteSpace:"nowrap"}}>Empty field</EuiCode>
+        <span style={{ display: 'flex', minWidth: '0' }}>
+          <EuiIcon type='iInCircle' />
+          <EuiCode className='wz-ellipsis' style={{ whiteSpace: 'nowrap' }}>
+            {i18n.translate('wazuh.components.agent.fim.ivv.lib.emptyField', {
+              defaultMessage: 'Empty field',
+            })}
+          </EuiCode>
         </span>
       );
     } else {

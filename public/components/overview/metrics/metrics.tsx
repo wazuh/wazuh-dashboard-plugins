@@ -28,7 +28,137 @@ import { formatUIDate } from '../../../react-services';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
+import { i18n } from '@kbn/i18n';
 
+const Name1 = i18n.translate('wazuh.components.addModule.guide.Name1', {
+  defaultMessage: 'Level 12 or above alerts',
+});
+const Name2 = i18n.translate('wazuh.components.addModule.guide.Name2', {
+  defaultMessage: 'Authentication failure',
+});
+const Name3 = i18n.translate('wazuh.components.addModule.guide.Name3', {
+  defaultMessage: 'Authentication success',
+});
+const Name4 = i18n.translate('wazuh.components.addModule.guide.Name4', {
+  defaultMessage: 'Critical Severity Alerts',
+});
+const Name5 = i18n.translate('wazuh.components.addModule.guide.Name5', {
+  defaultMessage: 'High Severity Alerts',
+});
+const Name6 = i18n.translate('wazuh.components.addModule.guide.Name6', {
+  defaultMessage: 'Medium Severity Alerts',
+});
+const Name7 = i18n.translate('wazuh.components.addModule.guide.Name7', {
+  defaultMessage: 'Low Severity Alerts',
+});
+const Name8 = i18n.translate('wazuh.components.addModule.guide.Name8', {
+  defaultMessage: 'Total malicious',
+});
+const Name9 = i18n.translate('wazuh.components.addModule.guide.Name9', {
+  defaultMessage: 'Total positives',
+});
+const agentReport = i18n.translate(
+  'wazuh.public.components.overview.metrics.agentReport',
+  {
+    defaultMessage: 'Agents reporting',
+  },
+);
+const lastScan = i18n.translate(
+  'wazuh.public.components.overview.metrics.lastScan',
+  {
+    defaultMessage: 'Last scan not checked',
+  },
+);
+const lastScanPass = i18n.translate(
+  'wazuh.public.components.overview.metrics.lastScanPass',
+  {
+    defaultMessage: 'Last scan pass',
+  },
+);
+const lastScanScore = i18n.translate(
+  'wazuh.public.components.overview.metrics.lastScanScore',
+  {
+    defaultMessage: 'Last scan score',
+  },
+);
+const latScanDate = i18n.translate(
+  'wazuh.public.components.overview.metrics.latScanDate',
+  {
+    defaultMessage: 'Last scan date',
+  },
+);
+const lastScanError = i18n.translate(
+  'wazuh.public.components.overview.metrics.lastScanError',
+  {
+    defaultMessage: 'Last scan errors',
+  },
+);
+const lastScanFail = i18n.translate(
+  'wazuh.public.components.overview.metrics.lastScanFail',
+  {
+    defaultMessage: 'Last scan fails',
+  },
+);
+const lastScanUnknown = i18n.translate(
+  'wazuh.public.components.overview.metrics.lastScanUnknown',
+  {
+    defaultMessage: 'Last scan unknown',
+  },
+);
+const highScoreScan = i18n.translate(
+  'wazuh.public.components.overview.metrics.highScoreScan',
+  {
+    defaultMessage: 'Highest scan score',
+  },
+);
+const lowScoreScan = i18n.translate(
+  'wazuh.public.components.overview.metrics.lowScoreScan',
+  {
+    defaultMessage: 'Lowest scan score',
+  },
+);
+const maxLevel = i18n.translate(
+  'wazuh.public.components.overview.metrics.maxLevel',
+  {
+    defaultMessage: 'Max Rule Level',
+  },
+);
+const susDownload = i18n.translate(
+  'wazuh.public.components.overview.metrics.susDownload',
+  {
+    defaultMessage: 'Suspicious Downloads',
+  },
+);
+const fullAccess = i18n.translate(
+  'wazuh.public.components.overview.metrics.fullAccess',
+  {
+    defaultMessage: 'Full Access Permissions',
+  },
+);
+const phishing = i18n.translate(
+  'wazuh.public.components.overview.metrics.phishing',
+  {
+    defaultMessage: 'Phishing and Malware',
+  },
+);
+const organizations = i18n.translate(
+  'wazuh.public.components.overview.metrics.organizations',
+  {
+    defaultMessage: 'Organizations',
+  },
+);
+const repositories = i18n.translate(
+  'wazuh.public.components.overview.metrics.repositories',
+  {
+    defaultMessage: 'Repositories',
+  },
+);
+const actors = i18n.translate(
+  'wazuh.public.components.overview.metrics.actors',
+  {
+    defaultMessage: 'Actors',
+  },
+);
 export const Metrics = withAllowedAgents(
   class Metrics extends Component {
     _isMount = false;
@@ -75,7 +205,7 @@ export const Metrics = withAllowedAgents(
         general: [
           { name: 'Total', type: 'total' },
           {
-            name: 'Level 12 or above alerts',
+            name: Name1,
             type: 'range',
             gte: '12',
             lt: null,
@@ -83,7 +213,7 @@ export const Metrics = withAllowedAgents(
             color: 'danger',
           }, //null = infinite
           {
-            name: 'Authentication failure',
+            name: Name2,
             type: 'phrases',
             values: [
               'win_authentication_failed',
@@ -94,7 +224,7 @@ export const Metrics = withAllowedAgents(
             color: 'danger',
           },
           {
-            name: 'Authentication success',
+            name: Name3,
             type: 'phrase',
             value: 'authentication_success',
             field: 'rule.groups',
@@ -103,27 +233,27 @@ export const Metrics = withAllowedAgents(
         ],
         vuls: [
           {
-            name: 'Critical Severity Alerts',
+            name: Name4,
             type: 'phrase',
             value: 'Critical',
             field: 'data.vulnerability.severity',
             color: 'danger',
           },
           {
-            name: 'High Severity Alerts',
+            name: Name5,
             type: 'phrase',
             value: 'High',
             field: 'data.vulnerability.severity',
           },
           {
-            name: 'Medium Severity Alerts',
+            name: Name6,
             type: 'phrase',
             value: 'Medium',
             field: 'data.vulnerability.severity',
             color: 'secondary',
           },
           {
-            name: 'Low Severity Alerts',
+            name: Name7,
             type: 'phrase',
             value: 'Low',
             field: 'data.vulnerability.severity',
@@ -132,14 +262,14 @@ export const Metrics = withAllowedAgents(
         ],
         virustotal: [
           {
-            name: 'Total malicious',
+            name: Name8,
             type: 'phrase',
             value: '1',
             field: 'data.virustotal.malicious',
             color: 'danger',
           },
           {
-            name: 'Total positives',
+            name: Name9,
             type: 'phrase',
             value: '0',
             negate: true,
@@ -148,50 +278,70 @@ export const Metrics = withAllowedAgents(
           },
           { name: 'Total', type: 'total' },
         ],
-        osquery: [{ name: 'Agents reporting', type: 'unique-count', field: 'agent.id' }],
+        osquery: [
+          { name: agentReport, type: 'unique-count', field: 'agent.id' },
+        ],
         ciscat: [
           {
-            name: 'Last scan not checked',
+            name: lastScan,
             type: 'custom',
             filter: { phrase: 'ciscat', field: 'rule.groups' },
             agg: {
               customAggResult: {
-                terms: { field: 'timestamp', order: { _term: 'desc' }, size: 1 },
-                aggs: { aggResult: { terms: { field: 'data.cis.notchecked' } } },
+                terms: {
+                  field: 'timestamp',
+                  order: { _term: 'desc' },
+                  size: 1,
+                },
+                aggs: {
+                  aggResult: { terms: { field: 'data.cis.notchecked' } },
+                },
               },
             },
             color: 'subdued',
           },
           {
-            name: 'Last scan pass',
+            name: lastScanPass,
             type: 'custom',
             filter: { phrase: 'ciscat', field: 'rule.groups' },
             agg: {
               customAggResult: {
-                terms: { field: 'timestamp', order: { _term: 'desc' }, size: 1 },
+                terms: {
+                  field: 'timestamp',
+                  order: { _term: 'desc' },
+                  size: 1,
+                },
                 aggs: { aggResult: { terms: { field: 'data.cis.pass' } } },
               },
             },
             color: 'secondary',
           },
           {
-            name: 'Last scan score',
+            name: lastScanScore,
             type: 'custom',
             filter: { phrase: 'ciscat', field: 'rule.groups' },
             agg: {
               customAggResult: {
-                terms: { field: 'timestamp', order: { _term: 'desc' }, size: 1 },
+                terms: {
+                  field: 'timestamp',
+                  order: { _term: 'desc' },
+                  size: 1,
+                },
                 aggs: { aggResult: { terms: { field: 'data.cis.score' } } },
               },
             },
           },
           {
-            name: 'Last scan date',
+            name: latScanDate,
             type: 'custom',
             filter: { phrase: 'ciscat', field: 'rule.groups' },
             agg: {
               customAggResult: {
-                terms: { field: 'timestamp', order: { _term: 'desc' }, size: 1 },
+                terms: {
+                  field: 'timestamp',
+                  order: { _term: 'desc' },
+                  size: 1,
+                },
                 aggs: { aggResult: { terms: { field: 'data.cis.timestamp' } } },
               },
             },
@@ -199,36 +349,48 @@ export const Metrics = withAllowedAgents(
             transformValue: formatUIDate,
           },
           {
-            name: 'Last scan errors',
+            name: lastScanError,
             type: 'custom',
             filter: { phrase: 'ciscat', field: 'rule.groups' },
             agg: {
               customAggResult: {
-                terms: { field: 'timestamp', order: { _term: 'desc' }, size: 1 },
+                terms: {
+                  field: 'timestamp',
+                  order: { _term: 'desc' },
+                  size: 1,
+                },
                 aggs: { aggResult: { terms: { field: 'data.cis.error' } } },
               },
             },
             color: 'danger',
           },
           {
-            name: 'Last scan fails',
+            name: lastScanFail,
             type: 'custom',
             filter: { phrase: 'ciscat', field: 'rule.groups' },
             agg: {
               customAggResult: {
-                terms: { field: 'timestamp', order: { _term: 'desc' }, size: 1 },
+                terms: {
+                  field: 'timestamp',
+                  order: { _term: 'desc' },
+                  size: 1,
+                },
                 aggs: { aggResult: { terms: { field: 'data.cis.fail' } } },
               },
             },
             color: 'danger',
           },
           {
-            name: 'Last scan unknown',
+            name: lastScanUnknown,
             type: 'custom',
             filter: { phrase: 'ciscat', field: 'rule.groups' },
             agg: {
               customAggResult: {
-                terms: { field: 'timestamp', order: { _term: 'desc' }, size: 1 },
+                terms: {
+                  field: 'timestamp',
+                  order: { _term: 'desc' },
+                  size: 1,
+                },
                 aggs: { aggResult: { terms: { field: 'data.cis.unknown' } } },
               },
             },
@@ -237,52 +399,115 @@ export const Metrics = withAllowedAgents(
         ],
         oscap: [
           {
-            name: 'Last scan score',
+            name: lastScanScore,
             type: 'custom',
             filter: { phrase: 'oscap-report', field: 'rule.groups' },
             agg: {
               customAggResult: {
-                terms: { field: 'timestamp', order: { _term: 'desc' }, size: 1 },
-                aggs: { aggResult: { terms: { field: 'data.oscap.scan.score' } } },
+                terms: {
+                  field: 'timestamp',
+                  order: { _term: 'desc' },
+                  size: 1,
+                },
+                aggs: {
+                  aggResult: { terms: { field: 'data.oscap.scan.score' } },
+                },
               },
             },
           },
           {
-            name: 'Highest scan score',
+            name: highScoreScan,
             type: 'custom',
             filter: { phrase: 'oscap-report', field: 'rule.groups' },
             agg: {
               customAggResult: {
-                terms: { field: 'data.oscap.scan.score', order: { _term: 'desc' }, size: 1 },
-                aggs: { aggResult: { terms: { field: 'data.oscap.scan.score' } } },
+                terms: {
+                  field: 'data.oscap.scan.score',
+                  order: { _term: 'desc' },
+                  size: 1,
+                },
+                aggs: {
+                  aggResult: { terms: { field: 'data.oscap.scan.score' } },
+                },
               },
             },
             color: 'secondary',
           },
           {
-            name: 'Lowest scan score',
+            name: lowScoreScan,
             type: 'custom',
             filter: { phrase: 'oscap-report', field: 'rule.groups' },
             agg: {
               customAggResult: {
-                terms: { field: 'data.oscap.scan.score', order: { _term: 'asc' }, size: 1 },
-                aggs: { aggResult: { terms: { field: 'data.oscap.scan.score' } } },
+                terms: {
+                  field: 'data.oscap.scan.score',
+                  order: { _term: 'asc' },
+                  size: 1,
+                },
+                aggs: {
+                  aggResult: { terms: { field: 'data.oscap.scan.score' } },
+                },
               },
             },
             color: 'danger',
           },
         ],
         office: [
-          { name: "Max Rule Level", type: "custom", filter: { phrase: "office365", field: "rule.groups" }, agg: { "customAggResult": { "terms": { "field": "timestamp", "order": { "_term": "desc" }, "size": 1 }, "aggs": { "aggResult": { "terms": { "field": "rule.level" } } } } } },
-          { name: "Suspicious Downloads", type: "phrase", value: "91724", field: "rule.id", color: "danger" },
-          { name: "Full Access Permissions", type: "phrase", value: "91725", field: "rule.id" },
-          { name: "Phishing and Malware", type: "phrases", values: ["91556", "91575", "91700"], field: "rule.id", color: "danger" },
+          {
+            name: maxLevel,
+            type: 'custom',
+            filter: { phrase: 'office365', field: 'rule.groups' },
+            agg: {
+              customAggResult: {
+                terms: {
+                  field: 'timestamp',
+                  order: { _term: 'desc' },
+                  size: 1,
+                },
+                aggs: { aggResult: { terms: { field: 'rule.level' } } },
+              },
+            },
+          },
+          {
+            name: susDownload,
+            type: 'phrase',
+            value: '91724',
+            field: 'rule.id',
+            color: 'danger',
+          },
+          {
+            name: fullAccess,
+            type: 'phrase',
+            value: '91725',
+            field: 'rule.id',
+          },
+          {
+            name: phishing,
+            type: 'phrases',
+            values: ['91556', '91575', '91700'],
+            field: 'rule.id',
+            color: 'danger',
+          },
         ],
         github: [
-          { name: "Organizations", type: "unique-count",  field: "data.github.org"},
-          { name: "Repositories", type: "unique-count",  field: "data.github.repo", color: "secondary"},
-          { name: "Actors", type: "unique-count",  field: "data.github.actor", color: "danger"},
-        ]
+          {
+            name: organizations,
+            type: 'unique-count',
+            field: 'data.github.org',
+          },
+          {
+            name: repositories,
+            type: 'unique-count',
+            field: 'data.github.repo',
+            color: 'secondary',
+          },
+          {
+            name: actors,
+            type: 'unique-count',
+            field: 'data.github.actor',
+            color: 'danger',
+          },
+        ],
       };
     }
 
@@ -295,7 +520,12 @@ export const Metrics = withAllowedAgents(
 
     async getResults(filterParams, aggs = {}) {
       const params = { size: 0, track_total_hits: true };
-      const result = await getElasticAlerts(this.indexPattern, filterParams, aggs, params);
+      const result = await getElasticAlerts(
+        this.indexPattern,
+        filterParams,
+        aggs,
+        params,
+      );
       let totalHits = 0;
       if (Object.keys(aggs).length) {
         const agg = (result.data || {}).aggregations || {};
@@ -303,8 +533,10 @@ export const Metrics = withAllowedAgents(
           //CUSTOM AGG
           totalHits =
             (
-              (((((agg.customAggResult || {}).buckets || [])[0] || {}).aggResult || {}).buckets ||
-                [])[0] || {}
+              ((
+                (((agg.customAggResult || {}).buckets || [])[0] || {})
+                  .aggResult || {}
+              ).buckets || [])[0] || {}
             ).key || 0;
         } else {
           totalHits = (agg.aggResult || {}).value || 0;
@@ -329,7 +561,7 @@ export const Metrics = withAllowedAgents(
       this.setState({ filterParams, loading: true });
       const newOnClick = {};
 
-      const result = this.metricsList[this.props.section].map(async (item) => {
+      const result = this.metricsList[this.props.section].map(async item => {
         let filters = [];
         if (item.type === 'range') {
           const results = {};
@@ -339,7 +571,7 @@ export const Metrics = withAllowedAgents(
             ...buildRangeFilter(
               { name: item.field, type: 'integer' },
               valuesArray,
-              this.indexPattern
+              this.indexPattern,
             ),
             $state: { store: 'appState' },
           };
@@ -359,7 +591,7 @@ export const Metrics = withAllowedAgents(
             ...buildPhrasesFilter(
               { name: item.field, type: 'string' },
               item.values,
-              this.indexPattern
+              this.indexPattern,
             ),
             $state: { store: 'appState' },
           };
@@ -384,7 +616,7 @@ export const Metrics = withAllowedAgents(
               ...buildPhraseFilter(
                 { name: item.filter.field, type: 'string' },
                 item.filter.phrase,
-                this.indexPattern
+                this.indexPattern,
               ),
               $state: { store: 'appState' },
             };
@@ -396,7 +628,10 @@ export const Metrics = withAllowedAgents(
           const results = {};
           const existsFilters = {};
           const filters = {
-            ...buildExistsFilter({ name: item.field, type: 'nested' }, this.indexPattern),
+            ...buildExistsFilter(
+              { name: item.field, type: 'nested' },
+              this.indexPattern,
+            ),
             $state: { store: 'appState' },
           };
           existsFilters['filters'] = [...filterParams['filters']];
@@ -431,7 +666,7 @@ export const Metrics = withAllowedAgents(
             ...buildPhraseFilter(
               { name: item.field, type: 'string' },
               item.value,
-              this.indexPattern
+              this.indexPattern,
             ),
             $state: { store: 'appState' },
           };
@@ -457,7 +692,7 @@ export const Metrics = withAllowedAgents(
       try {
         const completed = await Promise.all(result);
         const newResults = {};
-        completed.forEach((item) => {
+        completed.forEach(item => {
           const key = Object.keys(item)[0];
           newResults[key] = item[key];
         });
@@ -491,21 +726,28 @@ export const Metrics = withAllowedAgents(
         this.props.resultState === 'ready' &&
         this.state.resultState === 'loading'
       ) {
-        this.setState({ buildingMetrics: true, resultState: this.props.resultState }, () => {
-          this.stats = this.buildMetric();
-        });
+        this.setState(
+          { buildingMetrics: true, resultState: this.props.resultState },
+          () => {
+            this.stats = this.buildMetric();
+          },
+        );
       } else if (this.props.resultState !== this.state.resultState) {
-        const isLoading = this.props.resultState === 'loading' ? { loading: true } : {};
+        const isLoading =
+          this.props.resultState === 'loading' ? { loading: true } : {};
         this.setState({ resultState: this.props.resultState, ...isLoading });
       }
     }
 
     buildTitleButton = (count, itemName) => {
       return (
-        <EuiToolTip position="top" content={`Filter by ${itemName}`}>
+        <EuiToolTip position='top' content={`Filter by ${itemName}`}>
           <span
             className={'statWithLink'}
-            style={{ cursor: 'pointer', fontSize: count > 20 ? '2rem' : '2.25rem' }}
+            style={{
+              cursor: 'pointer',
+              fontSize: count > 20 ? '2rem' : '2.25rem',
+            }}
             onClick={this.state.metricsOnClicks[itemName]}
           >
             {this.state.results[itemName]}
@@ -536,7 +778,7 @@ export const Metrics = withAllowedAgents(
                 description={item.name}
                 titleColor={this.metricsList[section][idx].color || 'primary'}
                 isLoading={this.state.loading}
-                textAlign="center"
+                textAlign='center'
               />
             </EuiFlexItem>
           );
@@ -554,5 +796,5 @@ export const Metrics = withAllowedAgents(
         </EuiFlexGroup>
       );
     }
-  }
+  },
 );

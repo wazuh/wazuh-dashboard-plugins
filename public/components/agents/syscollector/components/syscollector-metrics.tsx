@@ -3,6 +3,7 @@ import {EuiPanel, EuiFlexGroup, EuiFlexItem, EuiText, EuiLoadingSpinner, EuiIcon
 import mapValues from 'lodash';
 import {useGenericRequest} from '../../../common/hooks/useGenericRequest';
 import { formatUIDate } from '../../../../react-services/time-service';
+import { i18n } from '@kbn/i18n';
 
 export function InventoryMetrics({agent}) {
     const [params, setParams] = useState({});
@@ -21,7 +22,10 @@ export function InventoryMetrics({agent}) {
   ) {
     return (
       <EuiPanel paddingSize="s" style={{ margin: 16, textAlign: 'center' }}>
-        <EuiIcon type="iInCircle" /> Not enough hardware or operating system information
+        <EuiIcon type="iInCircle" /> {
+          i18n.translate("wazuh.components.agent.fim.ivv.lib.sys", {
+            defaultMessage: "Not enough hardware or operating system information",
+          })}
       </EuiPanel>
     );
   }
@@ -30,26 +34,48 @@ export function InventoryMetrics({agent}) {
         <EuiPanel paddingSize="s" style={{margin: 16}}>
             <EuiFlexGroup>
                 <EuiFlexItem grow={false}>
-                    <EuiText>Cores: {syscollector.isLoading ? <EuiLoadingSpinner size="s" /> : <strong>{syscollector.data.hardware.cpu.cores}</strong>}</EuiText>
+                    <EuiText>{
+                      i18n.translate("wazuh.components.agent.fim.ivv.lib.Cores", {
+                        defaultMessage: "Cores:",
+                      })} {syscollector.isLoading ? <EuiLoadingSpinner size="s" /> : <strong>{syscollector.data.hardware.cpu.cores}</strong>}</EuiText>
                 </EuiFlexItem>
                 <EuiFlexItem grow={false}>
-                    <EuiText>Memory: {syscollector.isLoading ? <EuiLoadingSpinner size="s" /> : <strong>{ (syscollector.data.hardware.ram.total / 1024).toFixed(2)  } MB</strong>}</EuiText>
+                  <EuiText>{
+                    i18n.translate("wazuh.components.agent.fim.ivv.lib.memomry", {
+                      defaultMessage: "Memory:",
+                    })} {syscollector.isLoading ? <EuiLoadingSpinner size="s" /> : <strong>{ (syscollector.data.hardware.ram.total / 1024).toFixed(2)  } {
+                    i18n.translate("wazuh.components.agent.fim.ivv.lib.MB", {
+                      defaultMessage: "MB",
+                    })}</strong>}
+                  </EuiText>
                 </EuiFlexItem>
                 <EuiFlexItem grow={false}>
-                    <EuiText>Arch: {syscollector.isLoading ? <EuiLoadingSpinner size="s" /> : <strong>{syscollector.data.os.architecture}</strong>}</EuiText>
+                  <EuiText>{
+                    i18n.translate("wazuh.components.agent.fim.ivv.lib.Arch", {
+                      defaultMessage: "Arch:",
+                    })} {syscollector.isLoading ? <EuiLoadingSpinner size="s" /> : <strong>{syscollector.data.os.architecture}</strong>}
+                  </EuiText>
                 </EuiFlexItem>
                 <EuiFlexItem grow={false}>
-                    <EuiText>OS: {syscollector.isLoading ? <EuiLoadingSpinner size="s" /> : <strong>{syscollector.data.os.os.name} {syscollector.data.os.os.version}</strong>}</EuiText>
+                    <EuiText>{
+                      i18n.translate("wazuh.components.agent.fim.ivv.lib.OS", {
+                        defaultMessage: "OS:",
+                      })} {syscollector.isLoading ? <EuiLoadingSpinner size="s" /> : <strong>{syscollector.data.os.os.name} {syscollector.data.os.os.version}</strong>}</EuiText>
                 </EuiFlexItem>
                 <EuiFlexItem grow={true}>
-                    <EuiText>CPU: {syscollector.isLoading ? <EuiLoadingSpinner size="s" /> : <strong>{syscollector.data.hardware.cpu.name}</strong>}</EuiText>
+                    <EuiText>{
+                      i18n.translate("wazuh.components.agent.fim.ivv.lib.CPU:", {
+                        defaultMessage: "CPU:",
+                      })} {syscollector.isLoading ? <EuiLoadingSpinner size="s" /> : <strong>{syscollector.data.hardware.cpu.name}</strong>}</EuiText>
                 </EuiFlexItem>
                 <EuiFlexItem grow={false}>
-                    <EuiText>Last scan: {syscollector.isLoading ? <EuiLoadingSpinner size="s" /> : <strong>{offsetTimestamp('',syscollector.data.os.scan.time)}</strong>}</EuiText>
+                  <EuiText>{
+                    i18n.translate("wazuh.components.agent.fim.ivv.lib.Lastscan:", {
+                      defaultMessage: "Last scan:",
+                    })} {syscollector.isLoading ? <EuiLoadingSpinner size="s" /> : <strong>{offsetTimestamp('',syscollector.data.os.scan.time)}</strong>}
+                  </EuiText>
                 </EuiFlexItem>
             </EuiFlexGroup>
         </EuiPanel>
         );
-
-
 }

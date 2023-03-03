@@ -59,13 +59,13 @@ export function DiscoverIndexPatternTitle({
           <EuiToolTip
             content={
               <FormattedMessage
-                id="discover.fieldChooser.indexPattern.changeLinkTooltip"
+                id="wazuh.discover.fieldChooser.indexPattern.changeLinkTooltip"
                 defaultMessage="Change current index pattern"
               />
             }
           >
             <EuiButtonEmpty
-              aria-label={i18n.translate('discover.fieldChooser.indexPattern.changeLinkAriaLabel', {
+              aria-label={i18n.translate('wazuh.discover.fieldChooser.indexPattern.changeLinkAriaLabel', {
                 defaultMessage: 'Change current index pattern',
               })}
               data-test-subj="indexPattern-switch-link"

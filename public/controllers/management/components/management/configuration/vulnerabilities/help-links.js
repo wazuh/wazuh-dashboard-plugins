@@ -9,16 +9,31 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { i18n } from '@kbn/i18n';
 
-import { webDocumentationLink } from "../../../../../../../common/services/web_documentation";
+import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
 export default [
   {
-    text: 'Vulnerability detection',
-    href: webDocumentationLink('user-manual/capabilities/vulnerability-detection/index.html')
+    text: i18n.translate(
+      'wazuh.public.controller.management.config.vulnerabilities.help.detection',
+      {
+        defaultMessage: 'Vulnerability detection',
+      },
+    ),
+    href: webDocumentationLink(
+      'user-manual/capabilities/vulnerability-detection/index.html',
+    ),
   },
   {
-    text: 'Vulnerability detector reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/vuln-detector.html')
-  }
+    text: i18n.translate(
+      'wazuh.public.controller.management.config.vulnerabilities.help.ref',
+      {
+        defaultMessage: 'Vulnerability detector reference',
+      },
+    ),
+    href: webDocumentationLink(
+      'user-manual/reference/ossec-conf/vuln-detector.html',
+    ),
+  },
 ];

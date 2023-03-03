@@ -9,13 +9,25 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { i18n } from '@kbn/i18n';
+
 export default [
   {
     _id: 'Wazuh-App-Agents-Audit-New-files-metric',
     _source: {
-      title: 'New files metric',
+      title: i18n.translate(
+        'wazuh.server.integrationvis.agent.Newfilesmetric',
+        {
+          defaultMessage: 'New files metric',
+        },
+      ),
       visState: JSON.stringify({
-        title: 'New files metric',
+        title: i18n.translate(
+          'wazuh.server.integrationvis.agent.Newfilesmetric',
+          {
+            defaultMessage: 'New files metric',
+          },
+        ),
         type: 'metric',
         params: {
           addTooltip: true,
@@ -37,7 +49,12 @@ export default [
             labels: { show: true, color: 'black' },
             scale: { show: false, labels: false, color: '#333', width: 2 },
             type: 'simple',
-            style: { fontSize: 20, bgColor: false, labelColor: false, subText: '' },
+            style: {
+              fontSize: 20,
+              bgColor: false,
+              labelColor: false,
+              subText: '',
+            },
           },
         },
         aggs: [
@@ -50,7 +67,9 @@ export default [
           },
         ],
       }),
-      uiStateJSON: JSON.stringify({ vis: { defaultColors: { '0 - 100': 'rgb(0,104,55)' } } }),
+      uiStateJSON: JSON.stringify({
+        vis: { defaultColors: { '0 - 100': 'rgb(0,104,55)' } },
+      }),
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
@@ -93,9 +112,19 @@ export default [
   {
     _id: 'Wazuh-App-Agents-Audit-Read-files-metric',
     _source: {
-      title: 'Read files metric',
+      title: i18n.translate(
+        'wazuh.server.integrationvis.agent.Readfilesmetric',
+        {
+          defaultMessage: 'Read files metric',
+        },
+      ),
       visState: JSON.stringify({
-        title: 'Read files metric',
+        title: i18n.translate(
+          'wazuh.server.integrationvis.agent.Readfilesmetric',
+          {
+            defaultMessage: 'Read files metric',
+          },
+        ),
         type: 'metric',
         params: {
           addTooltip: true,
@@ -117,7 +146,12 @@ export default [
             labels: { show: true, color: 'black' },
             scale: { show: false, labels: false, color: '#333', width: 2 },
             type: 'simple',
-            style: { fontSize: 20, bgColor: false, labelColor: false, subText: '' },
+            style: {
+              fontSize: 20,
+              bgColor: false,
+              labelColor: false,
+              subText: '',
+            },
           },
         },
         aggs: [
@@ -130,7 +164,9 @@ export default [
           },
         ],
       }),
-      uiStateJSON: JSON.stringify({ vis: { defaultColors: { '0 - 100': 'rgb(0,104,55)' } } }),
+      uiStateJSON: JSON.stringify({
+        vis: { defaultColors: { '0 - 100': 'rgb(0,104,55)' } },
+      }),
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
@@ -173,9 +209,19 @@ export default [
   {
     _id: 'Wazuh-App-Agents-Audit-Modified-files-metric',
     _source: {
-      title: 'Modified files metric',
+      title: i18n.translate(
+        'wazuh.server.integrationvis.agent.Modifiedfilesmetric',
+        {
+          defaultMessage: 'Modified files metric',
+        },
+      ),
       visState: JSON.stringify({
-        title: 'Modified files metric',
+        title: i18n.translate(
+          'wazuh.server.integrationvis.agent.Modifiedfilesmetric',
+          {
+            defaultMessage: 'Modified files metric',
+          },
+        ),
         type: 'metric',
         params: {
           addTooltip: true,
@@ -197,7 +243,12 @@ export default [
             labels: { show: true, color: 'black' },
             scale: { show: false, labels: false, color: '#333', width: 2 },
             type: 'simple',
-            style: { fontSize: 20, bgColor: false, labelColor: false, subText: '' },
+            style: {
+              fontSize: 20,
+              bgColor: false,
+              labelColor: false,
+              subText: '',
+            },
           },
         },
         aggs: [
@@ -210,7 +261,9 @@ export default [
           },
         ],
       }),
-      uiStateJSON: JSON.stringify({ vis: { defaultColors: { '0 - 100': 'rgb(0,104,55)' } } }),
+      uiStateJSON: JSON.stringify({
+        vis: { defaultColors: { '0 - 100': 'rgb(0,104,55)' } },
+      }),
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
@@ -259,9 +312,19 @@ export default [
   {
     _id: 'Wazuh-App-Agents-Audit-Removed-files-metric',
     _source: {
-      title: 'Removed files metric',
+      title: i18n.translate(
+        'wazuh.server.integrationvis.agent.Removedfilemetric',
+        {
+          defaultMessage: 'Removed files metric',
+        },
+      ),
       visState: JSON.stringify({
-        title: 'Removed files metric',
+        title: i18n.translate(
+          'wazuh.server.integrationvis.agent.Removedfilesmetric',
+          {
+            defaultMessage: 'Removed files metric',
+          },
+        ),
         type: 'metric',
         params: {
           addTooltip: true,
@@ -283,7 +346,12 @@ export default [
             labels: { show: true, color: 'black' },
             scale: { show: false, labels: false, color: '#333', width: 2 },
             type: 'simple',
-            style: { fontSize: 20, bgColor: false, labelColor: false, subText: '' },
+            style: {
+              fontSize: 20,
+              bgColor: false,
+              labelColor: false,
+              subText: '',
+            },
           },
         },
         aggs: [
@@ -296,7 +364,9 @@ export default [
           },
         ],
       }),
-      uiStateJSON: JSON.stringify({ vis: { defaultColors: { '0 - 100': 'rgb(0,104,55)' } } }),
+      uiStateJSON: JSON.stringify({
+        vis: { defaultColors: { '0 - 100': 'rgb(0,104,55)' } },
+      }),
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
@@ -339,9 +409,13 @@ export default [
   {
     _id: 'Wazuh-App-Agents-Audit-Groups',
     _source: {
-      title: 'Groups',
+      title: i18n.translate('wazuh.server.integrationvis.agent.Groups', {
+        defaultMessage: 'Groups',
+      }),
       visState: JSON.stringify({
-        title: 'Groups',
+        title: i18n.translate('wazuh.server.integrationvis.agent.Groups', {
+          defaultMessage: 'Groups',
+        }),
         type: 'pie',
         params: {
           type: 'pie',
@@ -351,13 +425,24 @@ export default [
           isDonut: true,
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,
             type: 'terms',
             schema: 'segment',
-            params: { field: 'rule.groups', size: 5, order: 'desc', orderBy: '1' },
+            params: {
+              field: 'rule.groups',
+              size: 5,
+              order: 'desc',
+              orderBy: '1',
+            },
           },
         ],
       }),
@@ -377,9 +462,13 @@ export default [
   {
     _id: 'Wazuh-App-Agents-Audit-Files',
     _source: {
-      title: 'Files',
+      title: i18n.translate('wazuh.server.integrationvis.agent.Files', {
+        defaultMessage: 'Files',
+      }),
       visState: JSON.stringify({
-        title: 'Files',
+        title: i18n.translate('wazuh.server.integrationvis.agent.Files', {
+          defaultMessage: 'Files',
+        }),
         type: 'pie',
         params: {
           type: 'pie',
@@ -389,13 +478,24 @@ export default [
           isDonut: true,
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,
             type: 'terms',
             schema: 'segment',
-            params: { field: 'data.audit.file.name', size: 5, order: 'desc', orderBy: '1' },
+            params: {
+              field: 'data.audit.file.name',
+              size: 5,
+              order: 'desc',
+              orderBy: '1',
+            },
           },
         ],
       }),
@@ -415,13 +515,27 @@ export default [
   {
     _id: 'Wazuh-App-Agents-Audit-Alerts-over-time',
     _source: {
-      title: 'Alerts over time',
+      title: i18n.translate(
+        'wazuh.server.integrationvis.agent.Alertsovertime',
+        {
+          defaultMessage: 'Alerts over time',
+        },
+      ),
       visState: JSON.stringify({
-        title: 'Alerts over time',
+        title: i18n.translate(
+          'wazuh.server.integrationvis.agent.Alertsovertime',
+          {
+            defaultMessage: 'Alerts over time',
+          },
+        ),
         type: 'area',
         params: {
           type: 'area',
-          grid: { categoryLines: true, style: { color: '#eee' }, valueAxis: 'ValueAxis-1' },
+          grid: {
+            categoryLines: true,
+            style: { color: '#eee' },
+            valueAxis: 'ValueAxis-1',
+          },
           categoryAxes: [
             {
               id: 'CategoryAxis-1',
@@ -437,7 +551,9 @@ export default [
           valueAxes: [
             {
               id: 'ValueAxis-1',
-              name: 'LeftAxis-1',
+              name: i18n.translate('wazuh.server.integrationvis.agent.', {
+                defaultMessage: 'LeftAxis-1',
+              }),
               type: 'value',
               position: 'left',
               show: true,
@@ -466,7 +582,13 @@ export default [
           addTimeMarker: false,
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '3',
             enabled: true,
@@ -518,9 +640,13 @@ export default [
   {
     _id: 'Wazuh-App-Agents-Audit-Commands',
     _source: {
-      title: 'Commands',
+      title: i18n.translate('wazuh.server.integrationvis.agent.Commands', {
+        defaultMessage: 'Commands',
+      }),
       visState: JSON.stringify({
-        title: 'Commands',
+        title: i18n.translate('wazuh.server.integrationvis.agent.Commands', {
+          defaultMessage: 'Commands',
+        }),
         type: 'pie',
         params: {
           type: 'pie',
@@ -530,13 +656,24 @@ export default [
           isDonut: true,
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,
             type: 'terms',
             schema: 'segment',
-            params: { field: 'data.audit.command', size: 5, order: 'desc', orderBy: '1' },
+            params: {
+              field: 'data.audit.command',
+              size: 5,
+              order: 'desc',
+              orderBy: '1',
+            },
           },
         ],
       }),
@@ -554,9 +691,13 @@ export default [
     _id: 'Wazuh-App-Agents-Audit-Last-alerts',
     _type: 'visualization',
     _source: {
-      title: 'Last alerts',
+      title: i18n.translate('wazuh.server.integrationvis.agent.Lastalerts', {
+        defaultMessage: 'Last alerts',
+      }),
       visState: JSON.stringify({
-        title: 'Last alerts',
+        title: i18n.translate('wazuh.server.integrationvis.agent.Lastalerts', {
+          defaultMessage: 'Last alerts',
+        }),
         type: 'table',
         params: {
           perPage: 10,
@@ -568,7 +709,13 @@ export default [
           totalFunc: 'sum',
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '3',
             enabled: true,

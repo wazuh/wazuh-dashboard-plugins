@@ -13,11 +13,12 @@ import React, { Component } from 'react';
 
 import { EuiComboBox, EuiFormRow } from '@elastic/eui';
 import { connect } from 'react-redux';
+import { i18n } from '@kbn/i18n';
 
 import {
   updateLoadingStatus,
   updateFilters,
-  updateError
+  updateError,
 } from '../../../../../redux/actions/rulesetActions';
 
 import { RulesetHandler, RulesetResources } from './utils/ruleset-handler';
@@ -25,13 +26,25 @@ import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchest
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 
+const label1 = i18n.translate(
+  'wazuh.public.controller.management.ruleset.editor.filter.label1',
+  {
+    defaultMessage: 'Error building selected options:',
+  },
+);
+const label2 = i18n.translate(
+  'wazuh.public.controller.management.ruleset.editor.filter.label2',
+  {
+    defaultMessage: 'Error cleaning current options:',
+  },
+);
 class WzRulesetFilterBar extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
       isInvalid: false,
-      selectedOptions: []
+      selectedOptions: [],
     };
 
     this.rulesetHandler = new RulesetHandler(this.props.state.section);
@@ -46,25 +59,24 @@ class WzRulesetFilterBar extends Component {
         'group',
         'level',
         'path',
-        'file'
+        'file',
       ],
       decoders: ['path', 'file'],
-      lists: []
+      lists: [],
     };
     this.notValidMessage = false;
   }
 
   componentDidMount() {
-      this.buildSelectedOptions(this.props.state.filters); // If there are any filter in the redux store it will be restored when the component was mounted
+    this.buildSelectedOptions(this.props.state.filters); // If there are any filter in the redux store it will be restored when the component was mounted
   }
 
   isValid = value => {
     const { section, showingFiles } = this.props.state;
     if (section === 'lists' || showingFiles) return true; //There are not filters for lists
     const lowerValue = value.toLowerCase();
-    const availableOptions = this.availableOptions[
-      this.props.state.section
-    ].toString();
+    const availableOptions =
+      this.availableOptions[this.props.state.section].toString();
     this.notValidMessage = false;
     const options = this.availableOptions[this.props.state.section];
     const valueSplit = lowerValue.split(':');
@@ -73,9 +85,7 @@ class WzRulesetFilterBar extends Component {
     const notAvailable = !options.includes(valueSplit[0]); // Not include in the available options
     if (moreTwoDots || (oneTwoDots && notAvailable)) {
       if (oneTwoDots) {
-        this.notValidMessage = `${
-          valueSplit[0]
-        } is a not valid filter, the available filters are: ${availableOptions}`;
+        this.notValidMessage = `${valueSplit[0]} is a not valid filter, the available filters are: ${availableOptions}`;
       } else {
         this.notValidMessage = 'Only allow ":" once';
       }
@@ -94,7 +104,7 @@ class WzRulesetFilterBar extends Component {
         const value = filters[key];
         const option = key === 'search' ? value : `${key}:${value}`;
         const newOption = {
-          label: option
+          label: option,
         };
         selectedOptions.push(newOption);
       });
@@ -109,7 +119,7 @@ class WzRulesetFilterBar extends Component {
         error: {
           error: error,
           message: error.message || error,
-          title: `Error building selected options: ${error.message || error}`,
+          title: `${label1} ${error.message || error}`,
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -124,7 +134,8 @@ class WzRulesetFilterBar extends Component {
     try {
       const { section } = this.props.state;
       let fetcher = this.rulesetHandler.getResource;
-      if (section === RulesetResources.LISTS) fetcher = this.rulesetHandler.getFiles; // If the sections is lists the fetcher changes
+      if (section === RulesetResources.LISTS)
+        fetcher = this.rulesetHandler.getFiles; // If the sections is lists the fetcher changes
       this.props.updateLoadingStatus(true);
       const result = await fetcher(filters);
       this.props.updateLoadingStatus(false);
@@ -163,7 +174,7 @@ class WzRulesetFilterBar extends Component {
         severity: UI_ERROR_SEVERITIES.UI,
         error: {
           error: error,
-          message: `Error cleaning current options: ${error.message || error}`,
+          message: `${label2} ${error.message || error}`,
           title: error.name || error,
         },
       };
@@ -198,21 +209,21 @@ class WzRulesetFilterBar extends Component {
   onSearchChange = searchValue => {
     if (!searchValue) {
       this.setState({
-        isInvalid: false
+        isInvalid: false,
       });
 
       return;
     }
 
     this.setState({
-      isInvalid: !this.isValid(searchValue)
+      isInvalid: !this.isValid(searchValue),
     });
   };
 
   onChange = selectedOptions => {
     this.setState({
       selectedOptions,
-      isInvalid: false
+      isInvalid: false,
     });
     this.cleanCurrentOption(selectedOptions);
   };
@@ -229,7 +240,7 @@ class WzRulesetFilterBar extends Component {
 
     return (
       <EuiFormRow
-        className="wz-form-row"
+        className='wz-form-row'
         isInvalid={isInvalid}
         error={this.notValidMessage}
       >
@@ -249,7 +260,7 @@ class WzRulesetFilterBar extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.rulesetReducers
+    state: state.rulesetReducers,
   };
 };
 
@@ -257,11 +268,8 @@ const mapDispatchToProps = dispatch => {
   return {
     updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
     updateFilters: filters => dispatch(updateFilters(filters)),
-    updateError: error => dispatch(updateError(error))
+    updateError: error => dispatch(updateError(error)),
   };
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WzRulesetFilterBar);
+export default connect(mapStateToProps, mapDispatchToProps)(WzRulesetFilterBar);

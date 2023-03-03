@@ -32,6 +32,7 @@ import {
 } from '../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
+import { i18n } from '@kbn/i18n';
 
 export function AgentStatTable({ columns, title, start, end, loading, items, exportCSVFilename }) {
   return (
@@ -42,8 +43,14 @@ export function AgentStatTable({ columns, title, start, end, loading, items, exp
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
           <EuiText>
-            <EuiIcon type="calendar" /> Start:{' '}
-            {loading ? <EuiLoadingSpinner size="s" /> : start ? formatUIDate(start) : '-'} - End:{' '}
+            <EuiIcon type="calendar" /> {
+              i18n.translate("wazuh.components.agent.fim.ivv.lib.Start", {
+                defaultMessage: "Start:",
+              })}{' '}
+            {loading ? <EuiLoadingSpinner size="s" /> : start ? formatUIDate(start) : '-'} - {
+              i18n.translate("wazuh.components.agent.fim.ivv.lib.End", {
+                defaultMessage: "End:",
+              })}{' '}
             {loading ? <EuiLoadingSpinner size="s" /> : end ? formatUIDate(end) : '-'}
           </EuiText>
         </EuiFlexItem>
@@ -57,8 +64,11 @@ export function AgentStatTable({ columns, title, start, end, loading, items, exp
             onClick={() => downloadCsv(columns, items, exportCSVFilename)}
             iconType="importAction"
             isDisabled={loading}
-          >
-            Download CSV
+          >{
+            i18n.translate("wazuh.components.agent.fim.ivv.lib.DownloadCSV", {
+              defaultMessage: "Download CSV",
+            })}
+
           </EuiButtonEmpty>
         </EuiFlexItem>
       </EuiFlexGroup>

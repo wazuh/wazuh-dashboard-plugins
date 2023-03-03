@@ -11,7 +11,10 @@
  */
 import React, { Component } from 'react';
 import './discover.scss';
-import { FilterManager, Filter } from '../../../../../../../src/plugins/data/public/';
+import {
+  FilterManager,
+  Filter,
+} from '../../../../../../../src/plugins/data/public/';
 import { GenericRequest } from '../../../../react-services/generic-request';
 import { AppState } from '../../../../react-services/app-state';
 import { AppNavigate } from '../../../../react-services/app-navigate';
@@ -28,7 +31,7 @@ import _ from 'lodash';
 import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
-
+import { i18n } from '@kbn/i18n';
 import {
   EuiBasicTable,
   EuiLoadingContent,
@@ -52,9 +55,36 @@ import {
   buildEsQuery,
   IFieldType,
 } from '../../../../../../../src/plugins/data/common';
-import { getDataPlugin, getToasts, getUiSettings } from '../../../../kibana-services';
-
-const mapStateToProps = (state) => ({
+import {
+  getDataPlugin,
+  getToasts,
+  getUiSettings,
+} from '../../../../kibana-services';
+const customLabel = i18n.translate(
+  'wazuh.public.components.common.common.modules.discover.customLabel',
+  {
+    defaultMessage: '.hideCreateCustomLabel',
+  },
+);
+const removeColumn1 = i18n.translate(
+  'wazuh.public.components.common.common.modules.discover.removeColumn1',
+  {
+    defaultMessage: 'Remove column',
+  },
+);
+const filter = i18n.translate(
+  'wazuh.public.components.common.common.modules.discover.filter',
+  {
+    defaultMessage: 'Filter',
+  },
+);
+const nameTime = i18n.translate(
+  'wazuh.components.common.module.discover.nameTime',
+  {
+    defaultMessage: 'Time',
+  },
+);
+const mapStateToProps = state => ({
   currentAgentData: state.appStateReducers.currentAgentData,
 });
 
@@ -66,7 +96,7 @@ interface ColumnDefinition {
 export const Discover = compose(
   withErrorBoundary,
   withReduxProvider,
-  connect(mapStateToProps)
+  connect(mapStateToProps),
 )(
   class Discover extends Component {
     _isMount!: boolean;
@@ -156,12 +186,14 @@ export const Discover = compose(
     async componentDidMount() {
       this._isMount = true;
       try {
-        this.timeSubscription = this.timefilter.getTimeUpdate$().subscribe(() => {
-          this.setState({
-            dateRange: this.timefilter.getTime(),
-            dateRangeHistory: this.timefilter._history,
+        this.timeSubscription = this.timefilter
+          .getTimeUpdate$()
+          .subscribe(() => {
+            this.setState({
+              dateRange: this.timefilter.getTime(),
+              dateRangeHistory: this.timefilter._history,
+            });
           });
-        });
         this.setState({ columns: this.getColumns() }); //initial columns
         await this.getIndexPattern();
         await this.getAlerts();
@@ -208,7 +240,9 @@ export const Discover = compose(
         this.props.refreshAngularDiscover !== prevProps.refreshAngularDiscover
       ) {
         this.setState({ pageIndex: 0, tsUpdated: Date.now() });
-        if (!_.isEqual(this.props.shareFilterManager, this.state.searchBarFilters)) {
+        if (
+          !_.isEqual(this.props.shareFilterManager, this.state.searchBarFilters)
+        ) {
           this.setState({
             columns: this.getColumns(),
             searchBarFilters: this.props.shareFilterManager || [],
@@ -218,7 +252,7 @@ export const Discover = compose(
       }
       if (
         ['pageIndex', 'pageSize', 'sortField', 'sortDirection'].some(
-          (field) => this.state[field] !== prevState[field]
+          field => this.state[field] !== prevState[field],
         ) ||
         this.state.tsUpdated !== prevState.tsUpdated
       ) {
@@ -249,10 +283,12 @@ export const Discover = compose(
     }
     getColumns() {
       //Extract array of terms from object
-      return this.getInnitialDefinitions().map((column) => column.field);
+      return this.getInnitialDefinitions().map(column => column.field);
     }
     getLabel(field) {
-      const innitialLabels = this.getInnitialDefinitions().filter((value) => value.field === field);
+      const innitialLabels = this.getInnitialDefinitions().filter(
+        value => value.field === field,
+      );
       if (innitialLabels.length) {
         return innitialLabels[0].label || field;
       } else {
@@ -262,15 +298,19 @@ export const Discover = compose(
 
     async getIndexPattern() {
       this.indexPattern = {
-        ...(await this.PluginPlatformServices.indexPatterns.get(AppState.getCurrentPattern())),
+        ...(await this.PluginPlatformServices.indexPatterns.get(
+          AppState.getCurrentPattern(),
+        )),
       };
       const fields: IFieldType[] = [];
-      Object.keys(this.indexPattern.fields).forEach((item) => {
+      Object.keys(this.indexPattern.fields).forEach(item => {
         if (isNaN(item)) {
           fields.push(this.indexPattern.fields[item]);
         } else if (
           this.props.includeFilters &&
-          this.indexPattern.fields[item].name.includes(this.props.includeFilters)
+          this.indexPattern.fields[item].name.includes(
+            this.props.includeFilters,
+          )
         ) {
           fields.unshift(this.indexPattern.fields[item]);
         } else {
@@ -283,18 +323,20 @@ export const Discover = compose(
     hideCreateCustomLabel = () => {
       try {
         const button = document.querySelector(
-          '.wz-discover #addFilterPopover > div > button > span > span'
+          '.wz-discover #addFilterPopover > div > button > span > span',
         );
         if (!button) return setTimeout(this.hideCreateCustomLabel, 100);
         const findAndHide = () => {
-          const switcher = document.querySelector('#filterEditorCustomLabelSwitch');
+          const switcher = document.querySelector(
+            '#filterEditorCustomLabelSwitch',
+          );
           if (!switcher) return setTimeout(findAndHide, 100);
           switcher.parentElement.style.display = 'none';
         };
         button.onclick = findAndHide;
       } catch (error) {
         const options = {
-          context: `${Discover.name}.hideCreateCustomLabel`,
+          context: `${Discover.name}${customLabel}`,
           level: UI_LOGGER_LEVELS.ERROR,
           severity: UI_ERROR_SEVERITIES.BUSINESS,
           error: {
@@ -318,7 +360,7 @@ export const Discover = compose(
       return result;
     }
 
-    toggleDetails = (item) => {
+    toggleDetails = item => {
       const itemIdToExpandedRowMap = { ...this.state.itemIdToExpandedRowMap };
       const { rowDetailsFields } = this.props;
 
@@ -332,9 +374,9 @@ export const Discover = compose(
             {' '}
             <RowDetails
               item={item}
-              addFilter={(filter) => this.addFilter(filter)}
-              addFilterOut={(filter) => this.addFilterOut(filter)}
-              toggleColumn={(id) => this.addColumn(id)}
+              addFilter={filter => this.addFilter(filter)}
+              addFilterOut={filter => this.addFilterOut(filter)}
+              toggleColumn={id => this.addColumn(id)}
               rowDetailsFields={rowDetailsFields}
             />
           </div>
@@ -344,8 +386,10 @@ export const Discover = compose(
     };
 
     buildFilter() {
-      const dateParse = (ds) =>
-        /\d+-\d+-\d+T\d+:\d+:\d+.\d+Z/.test(ds) ? DateMatch.parse(ds).toDate().getTime() : ds;
+      const dateParse = ds =>
+        /\d+-\d+-\d+T\d+:\d+:\d+.\d+Z/.test(ds)
+          ? DateMatch.parse(ds).toDate().getTime()
+          : ds;
       const { query } = this.state;
       const { hideManagerAlerts } = this.wazuhConfig.getConfig();
       const extraFilters = [];
@@ -368,7 +412,9 @@ export const Discover = compose(
         ? this.props.shareFilterManager.getFilters()
         : [];
       const previousFilters =
-        (this.PluginPlatformServices && this.PluginPlatformServices.query.filterManager.getFilters()) || [];
+        (this.PluginPlatformServices &&
+          this.PluginPlatformServices.query.filterManager.getFilters()) ||
+        [];
       const elasticQuery = buildEsQuery(
         undefined,
         query,
@@ -376,9 +422,9 @@ export const Discover = compose(
           previousFilters,
           filters,
           extraFilters,
-          this.props.shareFilterManagerWithUserAuthorized || []
+          this.props.shareFilterManagerWithUserAuthorized || [],
         ),
-        getEsQueryConfig(getUiSettings())
+        getEsQueryConfig(getUiSettings()),
       );
 
       const { sortField, sortDirection } = this.state;
@@ -395,10 +441,10 @@ export const Discover = compose(
       elasticQuery.bool.must.push(range);
 
       if (this.props.implicitFilters) {
-        this.props.implicitFilters.map((impicitFilter) =>
+        this.props.implicitFilters.map(impicitFilter =>
           elasticQuery.bool.must.push({
             match: impicitFilter,
-          })
+          }),
         );
       }
       if (this.props.currentAgentData.id) {
@@ -410,7 +456,9 @@ export const Discover = compose(
         query: elasticQuery,
         size: this.state.pageSize,
         from: this.state.pageIndex * this.state.pageSize,
-        ...(sortField ? { sort: { [sortField]: { order: sortDirection } } } : {}),
+        ...(sortField
+          ? { sort: { [sortField]: { order: sortDirection } } }
+          : {}),
       };
     }
 
@@ -443,23 +491,35 @@ export const Discover = compose(
 
     removeColumn(id) {
       if (this.state.columns.length < 2) {
-        this.showToast('warning', 'At least one column must be selected', 3000);
+        const title1 = i18n.translate(
+          'wazuh.components.common.modules.oneColumnMustBeSelected',
+          {
+            defaultMessage: 'At least one column must be selected',
+          },
+        );
+        this.showToast('warning', title1, 3000);
         return;
       }
       const columns = this.state.columns;
       columns.splice(
-        columns.findIndex((v) => v === id),
-        1
+        columns.findIndex(v => v === id),
+        1,
       );
       this.setState(columns);
     }
 
     addColumn(id) {
       if (this.state.columns.length > 11) {
-        this.showToast('warning', 'The maximum number of columns is 10', 3000);
+        const maxNumberOfColumn = i18n.translate(
+          'wazuh.components.common.modules.maxNumberOfColumn',
+          {
+            defaultMessage: 'The maximum number of columns is 10',
+          },
+        );
+        this.showToast('warning', maxNumberOfColumn, 3000);
         return;
       }
-      if (this.state.columns.find((element) => element === id)) {
+      if (this.state.columns.find(element => element === id)) {
         this.removeColumn(id);
         return;
       }
@@ -470,16 +530,20 @@ export const Discover = compose(
 
     columns = () => {
       var columnsList = [...this.state.columns];
-      const columns = columnsList.map((item) => {
+      const columns = columnsList.map(item => {
         if (item === 'icon') {
           return {
             width: '2.3%',
             isExpander: true,
-            render: (item) => {
+            render: item => {
               return (
                 <EuiIcon
-                  size="s"
-                  type={this.state.itemIdToExpandedRowMap[item._id] ? 'arrowDown' : 'arrowRight'}
+                  size='s'
+                  type={
+                    this.state.itemIdToExpandedRowMap[item._id]
+                      ? 'arrowDown'
+                      : 'arrowRight'
+                  }
                 />
               );
             },
@@ -488,10 +552,10 @@ export const Discover = compose(
         if (item === 'timestamp') {
           return {
             field: 'timestamp',
-            name: 'Time',
+            name: nameTime,
             width: '10%',
             sortable: true,
-            render: (time) => {
+            render: time => {
               return <span>{formatUIDate(time)}</span>;
             },
           };
@@ -508,7 +572,10 @@ export const Discover = compose(
 
         if (item === 'agent.id') {
           link = (ev, x) => {
-            AppNavigate.navigateToModule(ev, 'agents', { tab: 'welcome', agent: x });
+            AppNavigate.navigateToModule(ev, 'agents', {
+              tab: 'welcome',
+              agent: x,
+            });
           };
           width = '8%';
         }
@@ -520,10 +587,16 @@ export const Discover = compose(
         }
         if (item === 'rule.id') {
           link = (ev, x) =>
-            AppNavigate.navigateToModule(ev, 'manager', { tab: 'rules', redirectRule: x });
+            AppNavigate.navigateToModule(ev, 'manager', {
+              tab: 'rules',
+              redirectRule: x,
+            });
           width = '9%';
         }
-        if (item === 'rule.description' && columnsList.indexOf('syscheck.event') === -1) {
+        if (
+          item === 'rule.description' &&
+          columnsList.indexOf('syscheck.event') === -1
+        ) {
           width = '30%';
         }
         if (item === 'syscheck.event') {
@@ -550,16 +623,20 @@ export const Discover = compose(
             >
               {this.getLabel(item)}{' '}
               {this.state.hover === item && (
-                <EuiToolTip position="top" content={`Remove column`}>
+                <EuiToolTip position='top' content={removeColumn1}>
                   <EuiButtonIcon
-                    style={{ paddingBottom: 12, marginBottom: '-10px', paddingTop: 0 }}
-                    onClick={(e) => {
+                    style={{
+                      paddingBottom: 12,
+                      marginBottom: '-10px',
+                      paddingTop: 0,
+                    }}
+                    onClick={e => {
                       this.removeColumn(item);
                       e.stopPropagation();
                     }}
-                    iconType="cross"
-                    aria-label="Filter"
-                    iconSize="s"
+                    iconType='cross'
+                    aria-label={filter}
+                    iconSize='s'
                   />
                 </EuiToolTip>
               )}
@@ -575,20 +652,22 @@ export const Discover = compose(
           (link && item !== 'rule.mitre.id') ||
           (item === 'rule.mitre.id' && this.props.shareFilterManager)
         ) {
-          column.render = (itemValue) => {
+          column.render = itemValue => {
             return (
               <span>
                 {(item === 'agent.id' && itemValue === '000' && (
-                  <span style={{ fontSize: 14, marginLeft: 8 }}>{itemValue}</span>
+                  <span style={{ fontSize: 14, marginLeft: 8 }}>
+                    {itemValue}
+                  </span>
                 )) ||
                   (item === 'rule.mitre.id' &&
                     Array.isArray(itemValue) &&
-                    itemValue.map((currentItem) => (
+                    itemValue.map(currentItem => (
                       <EuiButtonEmpty
-                        onClick={(ev) => {
+                        onClick={ev => {
                           ev.stopPropagation();
                         }}
-                        onMouseDown={(ev) => {
+                        onMouseDown={ev => {
                           ev.stopPropagation();
                           link(ev, currentItem);
                         }}
@@ -597,10 +676,10 @@ export const Discover = compose(
                       </EuiButtonEmpty>
                     ))) || (
                     <EuiButtonEmpty
-                      onClick={(ev) => {
+                      onClick={ev => {
                         ev.stopPropagation();
                       }}
-                      onMouseDown={(ev) => {
+                      onMouseDown={ev => {
                         ev.stopPropagation();
                         link(ev, itemValue);
                       }}
@@ -647,11 +726,11 @@ export const Discover = compose(
       const key = Object.keys(filter)[0];
       const value = filter[key];
       const valuesArray = Array.isArray(value) ? [...value] : [value];
-      valuesArray.map((item) => {
+      valuesArray.map(item => {
         const formattedFilter = buildPhraseFilter(
           { name: key, type: 'string' },
           item,
-          this.indexPattern
+          this.indexPattern,
         );
         formattedFilter.meta.negate = true;
 
@@ -669,11 +748,11 @@ export const Discover = compose(
       const key = Object.keys(filter)[0];
       const value = filter[key];
       const valuesArray = Array.isArray(value) ? [...value] : [value];
-      valuesArray.map((item) => {
+      valuesArray.map(item => {
         const formattedFilter = buildPhraseFilter(
           { name: key, type: 'string' },
           item,
-          this.indexPattern
+          this.indexPattern,
         );
         if (
           formattedFilter.meta.key === 'manager.name' ||
@@ -686,14 +765,16 @@ export const Discover = compose(
       this.setState({ pageIndex: 0, tsUpdated: Date.now() });
     }
 
-    onQuerySubmit = (payload: { dateRange: TimeRange; query: Query | undefined }) => {
+    onQuerySubmit = (payload: {
+      dateRange: TimeRange;
+      query: Query | undefined;
+    }) => {
       this.setState({ ...payload, tsUpdated: Date.now() });
     };
 
     onFiltersUpdated = (filters: Filter[]) => {
       this.setState({ pageIndex: 0, tsUpdated: Date.now() });
     };
-
 
     openDiscover(e, techniqueID) {
       AppNavigate.navigateToModule(e, 'overview', {
@@ -712,7 +793,12 @@ export const Discover = compose(
     }
 
     openIntelligence(e, redirectTo, itemID) {
-      AppNavigate.navigateToModule(e, 'overview', { "tab": 'mitre', "tabView": "intelligence", "tabRedirect": redirectTo, "idToRedirect": itemID});
+      AppNavigate.navigateToModule(e, 'overview', {
+        tab: 'mitre',
+        tabView: 'intelligence',
+        tabRedirect: redirectTo,
+        idToRedirect: itemID,
+      });
     }
 
     render() {
@@ -724,7 +810,7 @@ export const Discover = compose(
         );
       const { total, itemIdToExpandedRowMap } = this.state;
       const { query = this.state.query } = this.props;
-      const getRowProps = (item) => {
+      const getRowProps = item => {
         const { _id } = item;
         return {
           'data-test-subj': `row-${_id}`,
@@ -748,9 +834,14 @@ export const Discover = compose(
         totalItemCount: this.state.total > 10000 ? 10000 : this.state.total,
         pageSizeOptions: [10, 25, 50],
       };
-      const noResultsText = `No results match for this search criteria`;
+      const noResultsText = i18n.translate(
+        'wazuh.components.common.modules.noResultsMatch',
+        {
+          defaultMessage: 'No results match for this search criteria.',
+        },
+      );
       return (
-        <div className="wz-discover hide-filter-control wz-inventory">
+        <div className='wz-discover hide-filter-control wz-inventory'>
           {this.props.kbnSearchBar && (
             <KbnSearchBar
               indexPattern={this.indexPattern}
@@ -758,7 +849,7 @@ export const Discover = compose(
               timeFilter={{
                 timeFilter: this.state.dateRange,
                 timeHistory: this.state.dateRangeHistory,
-                setTimeFilter: (dateRange) => this.setState({ dateRange }),
+                setTimeFilter: dateRange => this.setState({ dateRange }),
               }}
               onQuerySubmit={this.onQuerySubmit}
               onFiltersUpdated={this.onFiltersUpdated}
@@ -770,9 +861,12 @@ export const Discover = compose(
               <EuiFlexItem>
                 {this.state.alerts.length && (
                   <EuiBasicTable
-                    items={this.state.alerts.map((alert) => ({ ...alert._source, _id: alert._id }))}
-                    className="module-discover-table"
-                    itemId="_id"
+                    items={this.state.alerts.map(alert => ({
+                      ...alert._source,
+                      _id: alert._id,
+                    }))}
+                    className='module-discover-table'
+                    itemId='_id'
                     itemIdToExpandedRowMap={itemIdToExpandedRowMap}
                     isExpandable={true}
                     columns={columns}
@@ -787,13 +881,17 @@ export const Discover = compose(
           ) : (
             <EuiFlexGroup>
               <EuiFlexItem>
-                <EuiSpacer size="s" />
-                <EuiCallOut title={noResultsText} color="warning" iconType="alert" />
+                <EuiSpacer size='s' />
+                <EuiCallOut
+                  title={noResultsText}
+                  color='warning'
+                  iconType='alert'
+                />
               </EuiFlexItem>
             </EuiFlexGroup>
           )}
         </div>
       );
     }
-  }
+  },
 );

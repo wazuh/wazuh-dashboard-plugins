@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import { PromptNoSelectedAgent, PromptNoActiveAgent } from '../prompts';
 import { compose } from 'redux';
 import { withGuard, withUserAuthorizationPrompt, withAgentSupportModule } from '../../common/hocs';
+import { i18n } from '@kbn/i18n';
 
 const mapStateToProps = (state) => ({
   currentAgentData: state.appStateReducers.currentAgentData,
@@ -16,7 +17,10 @@ export const MainVuls = compose(
   withGuard(
     (props) => !((props.currentAgentData && props.currentAgentData.id) && props.agent),
     () => (
-      <PromptNoSelectedAgent body="You need to select an agent to see it's vulnerabilities." />
+      <PromptNoSelectedAgent body={i18n.translate('wazuh.components.agent.main.agentSelectVulnerability', {
+          defaultMessage:
+            "You need to select an agent to see it's vulnerabilities.",
+        })} />
     )
   ),
   withUserAuthorizationPrompt((props) => {

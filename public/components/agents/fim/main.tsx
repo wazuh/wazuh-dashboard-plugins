@@ -4,10 +4,22 @@ import '../../common/modules/module.scss';
 import { connect } from 'react-redux';
 import { PromptNoActiveAgent, PromptNoSelectedAgent } from '../prompts';
 import { compose } from 'redux';
-import { withAgentSupportModule, withGuard, withUserAuthorizationPrompt } from '../../common/hocs';
+import {
+  withAgentSupportModule,
+  withGuard,
+  withUserAuthorizationPrompt,
+} from '../../common/hocs';
 import { API_NAME_AGENT_STATUS } from '../../../../common/constants';
+import { i18n } from '@kbn/i18n';
 
-const mapStateToProps = (state) => ({
+const selectAgent = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.tabs.selectAgent',
+  {
+    defaultMessage:
+      'You need to select an agent to see Integrity Monitoring inventory.',
+  },
+);
+const mapStateToProps = state => ({
   currentAgentData: state.appStateReducers.currentAgentData,
 });
 
@@ -15,41 +27,45 @@ export const MainFim = compose(
   withAgentSupportModule,
   connect(mapStateToProps),
   withGuard(
-    (props) => !(props.currentAgentData && props.currentAgentData.id && props.agent),
-    () => (
-      <PromptNoSelectedAgent body="You need to select an agent to see Integrity Monitoring inventory." />
-    )
+    props =>
+      !(props.currentAgentData && props.currentAgentData.id && props.agent),
+    () => <PromptNoSelectedAgent body={selectAgent} />,
   ),
   withGuard(
-    (props) => {
+    props => {
       const agentData =
-        props.currentAgentData && props.currentAgentData.id ? props.currentAgentData : props.agent;
+        props.currentAgentData && props.currentAgentData.id
+          ? props.currentAgentData
+          : props.agent;
       return agentData.status !== API_NAME_AGENT_STATUS.ACTIVE;
     },
-    () => <PromptNoActiveAgent />
+    () => <PromptNoActiveAgent />,
   ),
-  withUserAuthorizationPrompt((props) => {
+  withUserAuthorizationPrompt(props => {
     const agentData =
-      props.currentAgentData && props.currentAgentData.id ? props.currentAgentData : props.agent;
+      props.currentAgentData && props.currentAgentData.id
+        ? props.currentAgentData
+        : props.agent;
     return [
       [
         { action: 'agent:read', resource: `agent:id:${agentData.id}` },
-        ...(agentData.group || []).map((group) => ({
+        ...(agentData.group || []).map(group => ({
           action: 'agent:read',
           resource: `agent:group:${group}`,
         })),
       ],
       [
         { action: 'syscheck:read', resource: `agent:id:${agentData.id}` },
-        ...(agentData.group || []).map((group) => ({
+        ...(agentData.group || []).map(group => ({
           action: 'syscheck:read',
           resource: `agent:group:${group}`,
         })),
       ],
     ];
-  })
+  }),
 )(function MainFim({ currentAgentData, agent, ...rest }) {
-  const agentData = currentAgentData && currentAgentData.id ? currentAgentData : agent;
+  const agentData =
+    currentAgentData && currentAgentData.id ? currentAgentData : agent;
   return (
     <div>
       <Inventory {...rest} agent={agentData} />

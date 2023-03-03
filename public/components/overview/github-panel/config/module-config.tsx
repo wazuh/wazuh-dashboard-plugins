@@ -11,27 +11,77 @@
  */
 import React from 'react';
 import { Main, Drilldown } from '../views';
-import { MainViewConfig, DrilldownConfigAction, DrilldownConfigActor, DrilldownConfigOrganization, DrilldownConfigRepository } from './';
+import {
+  MainViewConfig,
+  DrilldownConfigAction,
+  DrilldownConfigActor,
+  DrilldownConfigOrganization,
+  DrilldownConfigRepository,
+} from './';
+import { i18n } from '@kbn/i18n';
 
+const title1 = i18n.translate('wazuh.components.addModule.guide.actorActivity', {
+  defaultMessage: 'Actor Activity',
+});
+const title2 = i18n.translate('wazuh.components.addModule.guide.organizationActivity', {
+  defaultMessage: 'Organization Activity',
+});
+const title3 = i18n.translate('wazuh.components.addModule.guide.repositoryActive', {
+  defaultMessage: 'Repository Activity',
+});
+const title4 = i18n.translate('wazuh.components.overview.githubPanel.config.action', {
+  defaultMessage: 'Action Activity',
+});
 export const ModuleConfig = {
   main: {
-    length: () => MainViewConfig.rows.reduce((total, row) => total + row.columns.length, 0),
-    component: (props) => <Main {...{ ...MainViewConfig, ...props }} />
+    length: () =>
+      MainViewConfig.rows.reduce((total, row) => total + row.columns.length, 0),
+    component: props => <Main {...{ ...MainViewConfig, ...props }} />,
   },
   'data.github.actor': {
-    length: () => DrilldownConfigActor.rows.reduce((total, row) => total + row.columns.length, 0),
-    component: (props) => <Drilldown title={"Actor Activity"} {...{ ...DrilldownConfigActor, ...props }} />
+    length: () =>
+      DrilldownConfigActor.rows.reduce(
+        (total, row) => total + row.columns.length,
+        0,
+      ),
+    component: props => (
+      <Drilldown title={title1} {...{ ...DrilldownConfigActor, ...props }} />
+    ),
   },
   'data.github.org': {
-    length: () => DrilldownConfigOrganization.rows.reduce((total, row) => total + row.columns.length, 0),
-    component: (props) => <Drilldown title={"Organization Activity"} {...{ ...DrilldownConfigOrganization, ...props }} />
+    length: () =>
+      DrilldownConfigOrganization.rows.reduce(
+        (total, row) => total + row.columns.length,
+        0,
+      ),
+    component: props => (
+      <Drilldown
+        title={title2}
+        {...{ ...DrilldownConfigOrganization, ...props }}
+      />
+    ),
   },
   'data.github.repo': {
-    length: () => DrilldownConfigRepository.rows.reduce((total, row) => total + row.columns.length, 0),
-    component: (props) => <Drilldown title={"Repository Activity"} {...{ ...DrilldownConfigRepository, ...props }} />
+    length: () =>
+      DrilldownConfigRepository.rows.reduce(
+        (total, row) => total + row.columns.length,
+        0,
+      ),
+    component: props => (
+      <Drilldown
+        title={title3}
+        {...{ ...DrilldownConfigRepository, ...props }}
+      />
+    ),
   },
   'data.github.action': {
-    length: () => DrilldownConfigAction.rows.reduce((total, row) => total + row.columns.length, 0),
-    component: (props) => <Drilldown title={"Action Activity"} {...{ ...DrilldownConfigAction, ...props }} />
+    length: () =>
+      DrilldownConfigAction.rows.reduce(
+        (total, row) => total + row.columns.length,
+        0,
+      ),
+    component: props => (
+      <Drilldown title={title4} {...{ ...DrilldownConfigAction, ...props }} />
+    ),
   },
 };

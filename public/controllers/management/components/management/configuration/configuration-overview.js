@@ -16,8 +16,9 @@ import {
   EuiTitle,
   EuiFlexGroup,
   EuiFlexItem,
-  EuiButtonEmpty
+  EuiButtonEmpty,
 } from '@elastic/eui';
+import { i18n } from '@kbn/i18n';
 
 import WzConfigurationOverviewTable from './util-components/configuration-overview-table';
 import WzHelpButtonPopover from './util-components/help-button-popover';
@@ -34,31 +35,69 @@ import { isString, isFunction } from './utils/utils';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 import { API_NAME_AGENT_STATUS } from '../../../../../../common/constants';
 import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
-
+const name1 = i18n.translate('wazuh.controllers.manage.confi.overview.name1', {
+  defaultMessage: 'Name',
+});
+const name2 = i18n.translate('wazuh.controllers.manage.confi.overview.name2', {
+  defaultMessage: 'Description',
+});
+const text1 = i18n.translate('wazuh.controllers.manage.confi.overview.text1', {
+  defaultMessage: 'Wazuh server administration',
+});
+const text2 = i18n.translate('wazuh.controllers.manage.confi.overview.text2', {
+  defaultMessage: 'Wazuh capabilities',
+});
+const text3 = i18n.translate('wazuh.controllers.manage.confi.overview.text3', {
+  defaultMessage: 'Local configuration reference',
+});
+const action1 = i18n.translate('wazuh.controllers.manage.confi.overview.action1', {
+  defaultMessage: 'cluster:status',
+});
+const action2 = i18n.translate('wazuh.controllers.manage.confi.overview.action2', {
+  defaultMessage: 'cluster:update_config',
+});
+const action3 = i18n.translate('wazuh.controllers.manage.confi.overview.action3', {
+  defaultMessage: 'manager:update_config',
+});
+const action4 = i18n.translate('wazuh.controllers.manage.confi.overview.action4', {
+  defaultMessage: 'edit-configuration',
+});
+const action5 = i18n.translate('wazuh.controllers.manage.confi.overview.action5', {
+  defaultMessage: ' Cluster',
+});
+const action6 = i18n.translate('wazuh.controllers.manage.confi.overview.action6', {
+  defaultMessage: 'Manager',
+});
+const action7 = i18n.translate('wazuh.controllers.manage.confi.overview.action7', {
+  defaultMessage: 'Cron prefix',
+});
+const action8 = i18n.translate('wazuh.controllers.manage.confi.overview.action8', {
+  defaultMessage: 'configuration',
+});
 const columns = [
   {
     field: 'name',
-    name: 'Name'
+    name: name1,
   },
   {
     field: 'description',
-    name: 'Description'
-  }
+    name: name2,
+  },
 ];
 
 const helpLinks = [
   {
-    text: 'Wazuh server administration',
-    href: webDocumentationLink('user-manual/manager/index.html')
+    text: text1,
+    href: webDocumentationLink('user-manual/manager/index.html'),
   },
   {
-    text: 'Wazuh capabilities',
-    href: webDocumentationLink('user-manual/capabilities/index.html')
+    text: text2,
+    href: webDocumentationLink('user-manual/capabilities/index.html'),
   },
   {
-    text: 'Local configuration reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/index.html')
-  }
+    text: text3,
+    href: webDocumentationLink('user-manual/reference/ossec-conf/index.html'),
+  },
 ];
 
 class WzConfigurationOverview extends Component {
@@ -81,7 +120,7 @@ class WzConfigurationOverview extends Component {
           ((isString(setting.when) && setting.when === 'manager') ||
             (isFunction(setting.when) && setting.when(this.props.agent)))) ||
         (isFunction(setting.when) && setting.when(this.props.agent)) ||
-        (!setting.when && true)
+        (!setting.when && true),
     );
   }
   filterSettings(groups) {
@@ -89,7 +128,7 @@ class WzConfigurationOverview extends Component {
       .map(group => {
         return {
           title: group.title,
-          settings: this.filterSettingsIfAgentOrManager(group.settings)
+          settings: this.filterSettingsIfAgentOrManager(group.settings),
         };
       })
       .filter(group => group.settings.length);
@@ -102,7 +141,9 @@ class WzConfigurationOverview extends Component {
           <EuiFlexItem>
             <EuiTitle>
               <span>
-                Configuration{' '}
+                {i18n.translate('wazuh.controllers.mnage.comp.confi.Configuration', {
+                  defaultMessage: 'Configuration',
+                })}{' '}
                 {this.props.agent.id !== '000' && (
                   <WzBadge synchronized={this.props.agentSynchronized} />
                 )}
@@ -110,7 +151,7 @@ class WzConfigurationOverview extends Component {
             </EuiTitle>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
-            <EuiFlexGroup gutterSize="s">
+            <EuiFlexGroup gutterSize='s'>
               {this.props.agent.id === '000' && (
                 <EuiFlexItem grow={false}>
                   <WzRefreshClusterInfoButton />
@@ -120,36 +161,56 @@ class WzConfigurationOverview extends Component {
                 <EuiFlexItem>
                   <WzButtonPermissions
                     buttonType='empty'
-                    permissions={[{action: 'cluster:status', resource: '*:*:*'}, this.props.clusterNodeSelected ? {action: 'cluster:update_config', resource: `node:id:${this.props.clusterNodeSelected}`}: {action: 'manager:update_config', resource: "*:*:*"}]}
-                    iconSide="left"
-                    iconType="pencil"
+                    permissions={[
+                      { action: action1, resource: '*:*:*' },
+                      this.props.clusterNodeSelected
+                        ? {
+                            action: action2,
+                            resource: `node:id:${this.props.clusterNodeSelected}`,
+                          }
+                        : {
+                            action: action3,
+                            resource: '*:*:*',
+                          },
+                    ]}
+                    iconSide='left'
+                    iconType='pencil'
                     onClick={() =>
                       this.updateConfigurationSection(
-                        'edit-configuration',
-                        `${this.props.clusterNodeSelected ? 'Cluster' : 'Manager'} configuration`,
+                        action4,
+                        `${
+                          this.props.clusterNodeSelected ? action5 : action6
+                        } ${action7}`,
                         '',
-                        'Edit configuration'
-                      )}
+                        action8,
+                      )
+                    }
                   >
-                    Edit configuration
+                    {i18n.translate(
+                      'wazuh.controllers..mnage.comp.confi.Editconfiguration',
+                      {
+                        defaultMessage: 'Edit configuration',
+                      },
+                    )}
                   </WzButtonPermissions>
                 </EuiFlexItem>
               )}
-              {this.props.agent.id !== '000' && this.props.agent.status === API_NAME_AGENT_STATUS.ACTIVE && (
-                <EuiFlexItem>
-                  <ExportConfiguration
-                    agent={this.props.agent}
-                    type="agent"
-                    exportConfiguration={enabledComponents => {
-                      this.reportingService.startConfigReport(
-                        this.props.agent,
-                        'agentConfig',
-                        enabledComponents
-                      );
-                    }}
-                  />
-                </EuiFlexItem>
-              )}
+              {this.props.agent.id !== '000' &&
+                this.props.agent.status === API_NAME_AGENT_STATUS.ACTIVE && (
+                  <EuiFlexItem>
+                    <ExportConfiguration
+                      agent={this.props.agent}
+                      type='agent'
+                      exportConfiguration={enabledComponents => {
+                        this.reportingService.startConfigReport(
+                          this.props.agent,
+                          'agentConfig',
+                          enabledComponents,
+                        );
+                      }}
+                    />
+                  </EuiFlexItem>
+                )}
               <EuiFlexItem grow={false}>
                 <WzHelpButtonPopover links={helpLinks} />
               </EuiFlexItem>
@@ -183,7 +244,7 @@ class WzConfigurationOverview extends Component {
 
 const mapStateToProps = state => ({
   clusterNodes: state.configurationReducers.clusterNodes,
-  clusterNodeSelected: state.configurationReducers.clusterNodeSelected
+  clusterNodeSelected: state.configurationReducers.clusterNodeSelected,
 });
 
 export default connect(mapStateToProps)(WzConfigurationOverview);

@@ -34,6 +34,18 @@ import {
 import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
 
+const registry = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.registry.registry',
+  {
+    defaultMessage: 'Registry',
+  },
+);
+const lastModified = i18n.translate(
+  'wazuh.public.components.agents.fim.inventory.registry.lastModified',
+  {
+    defaultMessage: 'Last Modified',
+  },
+);
 export class RegistryTable extends Component {
   state: {
     syscheck: [];
@@ -100,28 +112,36 @@ export class RegistryTable extends Component {
   }
 
   async showFlyout(file, item, redirect = false) {
-    window.location.href = window.location.href.replace(new RegExp('&file=' + '[^&]*', 'g'), '');
+    window.location.href = window.location.href.replace(
+      new RegExp('&file=' + '[^&]*', 'g'),
+      '',
+    );
     let fileData = false;
     if (!redirect) {
-      fileData = this.state.syscheck.filter((item) => {
+      fileData = this.state.syscheck.filter(item => {
         return item.file === file;
       });
     } else {
-      const response = await WzRequest.apiReq('GET', `/syscheck/${this.props.agent.id}`, {
-        params: {
-          file: file,
+      const response = await WzRequest.apiReq(
+        'GET',
+        `/syscheck/${this.props.agent.id}`,
+        {
+          params: {
+            file: file,
+          },
         },
-      });
+      );
       fileData = ((response.data || {}).data || {}).affected_items || [];
     }
-    if (!redirect) window.location.href = window.location.href += `&file=${file}`;
+    if (!redirect)
+      window.location.href = window.location.href += `&file=${file}`;
     //if a flyout is opened, we close it and open a new one, so the components are correctly updated on start.
     const currentFile = {
       file,
       type: item.type,
     };
     this.setState({ isFlyoutVisible: false }, () =>
-      this.setState({ isFlyoutVisible: true, currentFile, syscheckItem: item })
+      this.setState({ isFlyoutVisible: true, currentFile, syscheckItem: item }),
     );
   }
 
@@ -133,8 +153,10 @@ export class RegistryTable extends Component {
       });
 
       this.setState({
-        syscheck: (((syscheck || {}).data || {}).data || {}).affected_items || {},
-        totalItems: (((syscheck || {}).data || {}).data || {}).total_affected_items - 1,
+        syscheck:
+          (((syscheck || {}).data || {}).data || {}).affected_items || {},
+        totalItems:
+          (((syscheck || {}).data || {}).data || {}).total_affected_items - 1,
         isLoading: false,
         error: undefined,
       });
@@ -190,7 +212,7 @@ export class RegistryTable extends Component {
         sortDirection,
         isLoading: true,
       },
-      () => this.getSyscheck()
+      () => this.getSyscheck(),
     );
   };
 
@@ -198,12 +220,12 @@ export class RegistryTable extends Component {
     return [
       {
         field: 'file',
-        name: 'Registry',
+        name: registry,
         sortable: true,
       },
       {
         field: 'mtime',
-        name: 'Last Modified',
+        name: lastModified,
         sortable: true,
         width: '200px',
         render: formatUIDate,
@@ -212,7 +234,7 @@ export class RegistryTable extends Component {
   }
 
   renderRegistryTable() {
-    const getRowProps = (item) => {
+    const getRowProps = item => {
       const { file } = item;
       return {
         'data-test-subj': `row-${file}`,
@@ -255,7 +277,7 @@ export class RegistryTable extends Component {
             onChange={this.onTableChange}
             rowProps={getRowProps}
             sorting={sorting}
-            itemId="file"
+            itemId='file'
             isExpandable={true}
             loading={isLoading}
           />
@@ -276,7 +298,7 @@ export class RegistryTable extends Component {
             item={this.state.syscheckItem}
             closeFlyout={() => this.closeFlyout()}
             type={this.state.currentFile.type}
-            view="inventory"
+            view='inventory'
             {...this.props}
           />
         )}

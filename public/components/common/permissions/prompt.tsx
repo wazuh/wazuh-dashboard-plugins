@@ -11,7 +11,10 @@
  */
 
 import React, { Fragment } from 'react';
-import { useUserPermissionsRequirements, useUserRolesRequirements } from '../hooks';
+import {
+  useUserPermissionsRequirements,
+  useUserRolesRequirements,
+} from '../hooks';
 import { EuiEmptyPrompt, EuiSpacer } from '@elastic/eui';
 import {
   TUserPermissions,
@@ -21,7 +24,7 @@ import {
 } from '../permissions/button';
 import { WzPermissionsFormatted } from './format';
 import { withErrorBoundary } from '../hocs/error-boundary/with-error-boundary';
-
+import { i18n } from '@kbn/i18n';
 interface IEmptyPromptNoPermissions {
   permissions?: TUserPermissions;
   roles?: TUserRoles;
@@ -31,22 +34,36 @@ export const WzEmptyPromptNoPermissions = withErrorBoundary(
   ({ permissions, roles, actions }: IEmptyPromptNoPermissions) => {
     return (
       <EuiEmptyPrompt
-        iconType="securityApp"
-        title={<h2>You have no permissions</h2>}
+        iconType='securityApp'
+        title={
+          <h2>
+            {i18n.translate('wazuh.components.common.premissions.haveNoPermission', {
+              defaultMessage: 'You have no permissions',
+            })}
+          </h2>
+        }
         body={
           <Fragment>
             {permissions && (
               <div>
-                This section requires the {permissions.length > 1 ? 'permissions' : 'permission'}:
+                This section requires the{' '}
+                {permissions.length > 1 ? 'permissions' : 'permission'}:
                 {WzPermissionsFormatted(permissions)}
               </div>
             )}
             {permissions && roles && <EuiSpacer />}
             {roles && (
               <div>
-                This section requires{' '}
+                {i18n.translate(
+                  'wazuh.components.common.premissions.sectionRequires',
+                  { defaultMessage: 'This section requires' },
+                )}{' '}
                 {roles
-                  .map((role) => <strong key={`empty-prompt-no-roles-${role}`}>{role}</strong>)
+                  .map(role => (
+                    <strong key={`empty-prompt-no-roles-${role}`}>
+                      {role}
+                    </strong>
+                  ))
                   .reduce((accum, cur) => [accum, ', ', cur])}{' '}
                 {roles.length > 1 ? 'roles' : 'role'}
               </div>
@@ -56,7 +73,7 @@ export const WzEmptyPromptNoPermissions = withErrorBoundary(
         actions={actions}
       />
     );
-  }
+  },
 );
 interface IPromptNoPermissions {
   permissions?: TUserPermissions | TUserPermissionsFunction;
@@ -71,11 +88,12 @@ export const WzPromptPermissions = ({
   children,
   ...rest
 }: IPromptNoPermissions) => {
-  const [userPermissionRequirements, userPermissions] = useUserPermissionsRequirements(
-    typeof permissions === 'function' ? permissions(rest) : permissions
-  );
+  const [userPermissionRequirements, userPermissions] =
+    useUserPermissionsRequirements(
+      typeof permissions === 'function' ? permissions(rest) : permissions,
+    );
   const [userRolesRequirements, userRoles] = useUserRolesRequirements(
-    typeof roles === 'function' ? roles(rest) : roles
+    typeof roles === 'function' ? roles(rest) : roles,
   );
 
   return userPermissionRequirements || userRolesRequirements ? (

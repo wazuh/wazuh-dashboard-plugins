@@ -9,14 +9,27 @@
  *
  * Find more information about this on the LICENSE file.
  */
+
+import { i18n } from '@kbn/i18n';
+
 export default [
   {
     _id: 'Wazuh-app-Agents-CISCAT-alerts-summary',
     _type: 'visualization',
     _source: {
-      title: 'Alerts summary',
+      title: i18n.translate(
+        'wazuh.server.integrationvis.agent.ciscat.Alertssummary',
+        {
+          defaultMessage: 'Alerts summary',
+        },
+      ),
       visState: JSON.stringify({
-        title: 'Alerts summary',
+        title: i18n.translate(
+          'wazuh.server.integrationvis.agent.ciscat.Alertssummary',
+          {
+            defaultMessage: 'Alerts summary',
+          },
+        ),
         type: 'table',
         params: {
           perPage: 10,
@@ -28,7 +41,13 @@ export default [
           totalFunc: 'count',
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '3',
             enabled: true,
@@ -100,9 +119,19 @@ export default [
     _id: 'Wazuh-app-Agents-CISCAT-last-scan-not-checked',
     _type: 'visualization',
     _source: {
-      title: 'Last scan not checked',
+      title: i18n.translate(
+        'wazuh.server.integrationvis.agent.ciscat.Lastchecked',
+        {
+          defaultMessage: 'Last scan not checked',
+        },
+      ),
       visState: JSON.stringify({
-        title: 'Last scan not checked',
+        title: i18n.translate(
+          'wazuh.server.integrationvis.agent.ciscat.Lastchecked',
+          {
+            defaultMessage: 'Last scan not checked',
+          },
+        ),
         type: 'table',
         params: {
           perPage: 10,
@@ -114,7 +143,13 @@ export default [
           totalFunc: 'sum',
         },
         aggs: [
-          { id: '1', enabled: true, type: 'max', schema: 'metric', params: { field: 'timestamp' } },
+          {
+            id: '1',
+            enabled: true,
+            type: 'max',
+            schema: 'metric',
+            params: { field: 'timestamp' },
+          },
           {
             id: '2',
             enabled: true,
@@ -151,9 +186,19 @@ export default [
     _id: 'Wazuh-app-Agents-CISCAT-last-scan-score',
     _type: 'visualization',
     _source: {
-      title: 'Last scan score',
+      title: i18n.translate(
+        'wazuh.server.integrationvis.agent.ciscat.Lastscanscore',
+        {
+          defaultMessage: 'Last scan score',
+        },
+      ),
       visState: JSON.stringify({
-        title: 'Last scan score',
+        title: i18n.translate(
+          'wazuh.server.integrationvis.agent.ciscat.Lastscanscore',
+          {
+            defaultMessage: 'Last scan score',
+          },
+        ),
         type: 'table',
         params: {
           perPage: 10,
@@ -165,7 +210,13 @@ export default [
           totalFunc: 'sum',
         },
         aggs: [
-          { id: '1', enabled: true, type: 'max', schema: 'metric', params: { field: 'timestamp' } },
+          {
+            id: '1',
+            enabled: true,
+            type: 'max',
+            schema: 'metric',
+            params: { field: 'timestamp' },
+          },
           {
             id: '2',
             enabled: true,
@@ -202,9 +253,19 @@ export default [
     _id: 'Wazuh-app-Agents-CISCAT-last-scan-pass',
     _type: 'visualization',
     _source: {
-      title: 'Last scan pass',
+      title: i18n.translate(
+        'wazuh.server.integrationvis.agent.ciscat.Lastscanpass',
+        {
+          defaultMessage: 'Last scan pass',
+        },
+      ),
       visState: JSON.stringify({
-        title: 'Last scan pass',
+        title: i18n.translate(
+          'wazuh.server.integrationvis.agent.ciscat.Lastscanpass',
+          {
+            defaultMessage: 'Last scan pass',
+          },
+        ),
         type: 'table',
         params: {
           perPage: 10,
@@ -216,7 +277,13 @@ export default [
           totalFunc: 'sum',
         },
         aggs: [
-          { id: '1', enabled: true, type: 'max', schema: 'metric', params: { field: 'timestamp' } },
+          {
+            id: '1',
+            enabled: true,
+            type: 'max',
+            schema: 'metric',
+            params: { field: 'timestamp' },
+          },
           {
             id: '2',
             enabled: true,
@@ -253,9 +320,19 @@ export default [
     _id: 'Wazuh-app-Agents-CISCAT-last-scan-fail',
     _type: 'visualization',
     _source: {
-      title: 'Last scan fail',
+      title: i18n.translate(
+        'wazuh.server.integrationvis.agent.ciscat.Lastscanfail',
+        {
+          defaultMessage: 'Last scan fail',
+        },
+      ),
       visState: JSON.stringify({
-        title: 'Last scan fail',
+        title: i18n.translate(
+          'wazuh.server.integrationvis.agent.ciscat.Lastscanfail',
+          {
+            defaultMessage: 'Last scan fail',
+          },
+        ),
         type: 'table',
         params: {
           perPage: 10,
@@ -267,7 +344,13 @@ export default [
           totalFunc: 'sum',
         },
         aggs: [
-          { id: '1', enabled: true, type: 'max', schema: 'metric', params: { field: 'timestamp' } },
+          {
+            id: '1',
+            enabled: true,
+            type: 'max',
+            schema: 'metric',
+            params: { field: 'timestamp' },
+          },
           {
             id: '2',
             enabled: true,
@@ -304,9 +387,19 @@ export default [
     _id: 'Wazuh-app-Agents-CISCAT-last-scan-timestamp',
     _type: 'visualization',
     _source: {
-      title: 'Last scan timestamp',
+      title: i18n.translate(
+        'wazuh.server.integrationvis.agent.ciscat.timestamp',
+        {
+          defaultMessage: 'Last scan timestamp',
+        },
+      ),
       visState: JSON.stringify({
-        title: 'Last scan timestamp',
+        title: i18n.translate(
+          'wazuh.server.integrationvis.agent.ciscat.timestamp',
+          {
+            defaultMessage: 'Last scan timestamp',
+          },
+        ),
         type: 'table',
         params: {
           perPage: 10,
@@ -318,7 +411,13 @@ export default [
           totalFunc: 'sum',
         },
         aggs: [
-          { id: '1', enabled: true, type: 'max', schema: 'metric', params: { field: 'timestamp' } },
+          {
+            id: '1',
+            enabled: true,
+            type: 'max',
+            schema: 'metric',
+            params: { field: 'timestamp' },
+          },
           {
             id: '2',
             enabled: true,
@@ -355,9 +454,19 @@ export default [
     _id: 'Wazuh-app-Agents-CISCAT-last-scan-error',
     _type: 'visualization',
     _source: {
-      title: 'Last scan error',
+      title: i18n.translate(
+        'wazuh.server.integrationvis.agent.ciscat.Lastscanerror',
+        {
+          defaultMessage: 'Last scan error',
+        },
+      ),
       visState: JSON.stringify({
-        title: 'Last scan error',
+        title: i18n.translate(
+          'wazuh.server.integrationvis.agent.ciscat.Lastscanerror',
+          {
+            defaultMessage: 'Last scan error',
+          },
+        ),
         type: 'table',
         params: {
           perPage: 10,
@@ -369,7 +478,13 @@ export default [
           totalFunc: 'sum',
         },
         aggs: [
-          { id: '1', enabled: true, type: 'max', schema: 'metric', params: { field: 'timestamp' } },
+          {
+            id: '1',
+            enabled: true,
+            type: 'max',
+            schema: 'metric',
+            params: { field: 'timestamp' },
+          },
           {
             id: '2',
             enabled: true,
@@ -406,9 +521,19 @@ export default [
     _id: 'Wazuh-app-Agents-CISCAT-last-scan-benchmark',
     _type: 'visualization',
     _source: {
-      title: 'Last scan benchmark',
+      title: i18n.translate(
+        'wazuh.server.integrationvis.agent.ciscat.Lastscanbenchmark',
+        {
+          defaultMessage: 'Last scan benchmark',
+        },
+      ),
       visState: JSON.stringify({
-        title: 'Last scan benchmark',
+        title: i18n.translate(
+          'wazuh.server.integrationvis.agent.ciscat.Lastscanbenchmark',
+          {
+            defaultMessage: 'Last scan benchmark',
+          },
+        ),
         type: 'table',
         params: {
           perPage: 10,
@@ -420,7 +545,13 @@ export default [
           totalFunc: 'sum',
         },
         aggs: [
-          { id: '1', enabled: true, type: 'max', schema: 'metric', params: { field: 'timestamp' } },
+          {
+            id: '1',
+            enabled: true,
+            type: 'max',
+            schema: 'metric',
+            params: { field: 'timestamp' },
+          },
           {
             id: '2',
             enabled: true,
@@ -457,9 +588,19 @@ export default [
     _id: 'Wazuh-app-Agents-CISCAT-last-scan-unknown',
     _type: 'visualization',
     _source: {
-      title: 'Last scan unknown',
+      title: i18n.translate(
+        'wazuh.server.integrationvis.agent.ciscat.Lastscanunknown',
+        {
+          defaultMessage: 'Last scan unknown',
+        },
+      ),
       visState: JSON.stringify({
-        title: 'Last scan unknown',
+        title: i18n.translate(
+          'wazuh.server.integrationvis.agent.ciscat.Lastscanunknown',
+          {
+            defaultMessage: 'Last scan unknown',
+          },
+        ),
         type: 'table',
         params: {
           perPage: 10,
@@ -471,7 +612,13 @@ export default [
           totalFunc: 'sum',
         },
         aggs: [
-          { id: '1', enabled: true, type: 'max', schema: 'metric', params: { field: 'timestamp' } },
+          {
+            id: '1',
+            enabled: true,
+            type: 'max',
+            schema: 'metric',
+            params: { field: 'timestamp' },
+          },
           {
             id: '2',
             enabled: true,
@@ -508,13 +655,27 @@ export default [
     _id: 'Wazuh-app-Agents-CISCAT-top-5-groups',
     _type: 'visualization',
     _source: {
-      title: 'Top 5 groups',
+      title: i18n.translate(
+        'wazuh.server.integrationvis.agent.ciscat.Top5groups',
+        {
+          defaultMessage: 'Top 5 groups',
+        },
+      ),
       visState: JSON.stringify({
-        title: 'Top 5 groups',
+        title: i18n.translate(
+          'wazuh.server.integrationvis.agent.ciscat.Top5groups',
+          {
+            defaultMessage: 'Top 5 groups',
+          },
+        ),
         type: 'histogram',
         params: {
           type: 'histogram',
-          grid: { categoryLines: false, style: { color: '#eee' }, valueAxis: null },
+          grid: {
+            categoryLines: false,
+            style: { color: '#eee' },
+            valueAxis: null,
+          },
           categoryAxes: [
             {
               id: 'CategoryAxis-1',
@@ -530,7 +691,12 @@ export default [
           valueAxes: [
             {
               id: 'ValueAxis-1',
-              name: 'LeftAxis-1',
+              name: i18n.translate(
+                'wazuh.server.integrationvis.agent.ciscat.LeftAxis-1',
+                {
+                  defaultMessage: 'LeftAxis-1',
+                },
+              ),
               type: 'value',
               position: 'left',
               show: true,
@@ -558,7 +724,13 @@ export default [
           addTimeMarker: false,
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,
@@ -594,9 +766,19 @@ export default [
     _id: 'Wazuh-app-Agents-CISCAT-scan-result-evolution',
     _type: 'visualization',
     _source: {
-      title: 'Scan result evolution',
+      title: i18n.translate(
+        'wazuh.server.integrationvis.agent.ciscat.Scanresultevolution',
+        {
+          defaultMessage: 'Scan result evolution',
+        },
+      ),
       visState: JSON.stringify({
-        title: 'Scan result evolution',
+        title: i18n.translate(
+          'wazuh.server.integrationvis.agent.ciscat.Scanresultevolution',
+          {
+            defaultMessage: 'Scan result evolution',
+          },
+        ),
         type: 'line',
         params: {
           type: 'line',
@@ -616,7 +798,12 @@ export default [
           valueAxes: [
             {
               id: 'ValueAxis-1',
-              name: 'LeftAxis-1',
+              name: i18n.translate(
+                'wazuh.server.integrationvis.agent.ciscat.LeftAxis-1',
+                {
+                  defaultMessage: 'LeftAxis-1',
+                },
+              ),
               type: 'value',
               position: 'left',
               show: true,
@@ -644,7 +831,13 @@ export default [
           addTimeMarker: false,
         },
         aggs: [
-          { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+          {
+            id: '1',
+            enabled: true,
+            type: 'count',
+            schema: 'metric',
+            params: {},
+          },
           {
             id: '2',
             enabled: true,

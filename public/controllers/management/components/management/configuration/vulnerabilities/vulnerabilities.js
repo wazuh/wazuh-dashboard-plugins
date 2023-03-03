@@ -11,10 +11,11 @@
  */
 
 import React, { Component, Fragment } from 'react';
+import { i18n } from '@kbn/i18n';
 
 import withWzConfig from '../util-hocs/wz-config';
 import WzTabSelector, {
-  WzTabSelectorTab
+  WzTabSelectorTab,
 } from '../util-components/tab-selector';
 import WzConfigurationVulnerabilitiesGeneral from './vulnerabilities-general';
 import WzConfigurationVulnerabilitiesProviders from './vulnerabilities-providers';
@@ -25,7 +26,7 @@ class WzConfigurationVulnerabilities extends Component {
     super(props);
     this.wodleConfig = wodleBuilder(
       this.props.currentConfig,
-      'vulnerability-detector'
+      'vulnerability-detector',
     );
   }
   componentDidMount() {
@@ -43,13 +44,27 @@ class WzConfigurationVulnerabilities extends Component {
     return (
       <Fragment>
         <WzTabSelector>
-          <WzTabSelectorTab label="General">
+          <WzTabSelectorTab
+            label={i18n.translate(
+              'wazuh.public.controller.management.config.vulnerabilities.General',
+              {
+                defaultMessage: 'General',
+              },
+            )}
+          >
             <WzConfigurationVulnerabilitiesGeneral
               currentConfig={currentConfig}
               wodleConfig={this.wodleConfig}
             />
           </WzTabSelectorTab>
-          <WzTabSelectorTab label="Providers">
+          <WzTabSelectorTab
+            label={i18n.translate(
+              'wazuh.public.controller.management.config.vulnerabilities.Providers',
+              {
+                defaultMessage: 'Providers',
+              },
+            )}
+          >
             <WzConfigurationVulnerabilitiesProviders
               currentConfig={currentConfig}
               wodleConfig={this.wodleConfig}

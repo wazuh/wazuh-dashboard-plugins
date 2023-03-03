@@ -16,8 +16,28 @@ import RulesServices from '../../rules/services';
 import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
+import { i18n } from '@kbn/i18n';
 
-export const RolesMappingTable = ({ rolesEquivalences, rules, loading, editRule, updateRules }) => {
+const del = i18n.translate(
+  'wazuh.public.components.security.role.mapping.table.del',
+  {
+    defaultMessage: 'Do you want to delete the',
+  },
+);
+const map = i18n.translate(
+  'wazuh.public.components.security.role.mapping.table.map',
+  {
+    defaultMessage: 'role mapping?',
+  },
+);
+
+export const RolesMappingTable = ({
+  rolesEquivalences,
+  rules,
+  loading,
+  editRule,
+  updateRules,
+}) => {
   const getRowProps = item => {
     const { id } = item;
     return {
@@ -26,7 +46,7 @@ export const RolesMappingTable = ({ rolesEquivalences, rules, loading, editRule,
     };
   };
 
-  const onDeleteRoleMapping = (item) => {
+  const onDeleteRoleMapping = item => {
     return async () => {
       try {
         await RulesServices.DeleteRules([item.id]);
@@ -47,36 +67,51 @@ export const RolesMappingTable = ({ rolesEquivalences, rules, loading, editRule,
         getErrorOrchestrator().handleError(options);
       }
     };
-  }
+  };
 
   const columns: EuiBasicTableColumn<any>[] = [
     {
       field: 'id',
-      name: 'ID',
+      name: i18n.translate(
+        'wazuh.public.components.security.role.mapping.table.ID',
+        {
+          defaultMessage: 'ID',
+        },
+      ),
       width: '75',
       sortable: true,
       truncateText: true,
     },
     {
       field: 'name',
-      name: 'Name',
+      name: i18n.translate(
+        'wazuh.public.components.security.role.mapping.table.Name',
+        {
+          defaultMessage: 'Name',
+        },
+      ),
       sortable: true,
       truncateText: true,
     },
     {
       field: 'roles',
-      name: 'Roles',
+      name: i18n.translate(
+        'wazuh.public.components.security.role.mapping.table.Roles',
+        {
+          defaultMessage: 'Roles',
+        },
+      ),
       sortable: true,
       render: item => {
         const tmpRoles = item.map((role, idx) => {
           return (
             <EuiFlexItem key={`role_${idx}`} grow={false}>
-              <EuiBadge color="secondary">{rolesEquivalences[role]}</EuiBadge>
+              <EuiBadge color='secondary'>{rolesEquivalences[role]}</EuiBadge>
             </EuiFlexItem>
           );
         });
         return (
-          <EuiFlexGroup wrap responsive={false} gutterSize="xs">
+          <EuiFlexGroup wrap responsive={false} gutterSize='xs'>
             {tmpRoles}
           </EuiFlexGroup>
         );
@@ -85,21 +120,45 @@ export const RolesMappingTable = ({ rolesEquivalences, rules, loading, editRule,
     },
     {
       field: 'id',
-      name: 'Status',
-      render (item, obj){
-        if(WzAPIUtils.isReservedID(item)){
-          if( (obj.id === 1 || obj.id === 2)){
-            return(
+      name: i18n.translate(
+        'wazuh.public.components.security.role.mapping.table.Status',
+        {
+          defaultMessage: 'Status',
+        },
+      ),
+      render(item, obj) {
+        if (WzAPIUtils.isReservedID(item)) {
+          if (obj.id === 1 || obj.id === 2) {
+            return (
               <EuiFlexGroup>
-              <EuiBadge color="primary">Reserved</EuiBadge>
-                <EuiToolTip position="top" content="wui_ rules belong to wazuh-wui API user">
-                  <EuiBadge color="accent" title="" style={{ marginLeft: 10 }}>wazuh-wui</EuiBadge>
+                <EuiBadge color='primary'>
+                  {i18n.translate('wazuh.components.overview.mitre.Reserved', {
+                    defaultMessage: 'Reserved',
+                  })}
+                </EuiBadge>
+                <EuiToolTip
+                  position='top'
+                  content='wui_ rules belong to wazuh-wui API user'
+                >
+                  <EuiBadge color='accent' title='' style={{ marginLeft: 10 }}>
+                    {i18n.translate(
+                      'wazuh.public.components.security.role.mapping.table.wazuh-wui',
+                      {
+                        defaultMessage: 'wazuh-wui',
+                      },
+                    )}
+                  </EuiBadge>
                 </EuiToolTip>
               </EuiFlexGroup>
             );
-          }
-          else
-            return <EuiBadge color="primary">Reserved</EuiBadge>;
+          } else
+            return (
+              <EuiBadge color='primary'>
+                {i18n.translate('wazuh.components.overview.mitre.Reserved1', {
+                  defaultMessage: 'Reserved',
+                })}
+              </EuiBadge>
+            );
         }
       },
       width: '300',
@@ -108,25 +167,46 @@ export const RolesMappingTable = ({ rolesEquivalences, rules, loading, editRule,
     {
       align: 'right',
       width: '5%',
-      name: 'Actions',
+      name: i18n.translate(
+        'wazuh.public.components.security.role.mapping.table.Actions',
+        {
+          defaultMessage: 'Actions',
+        },
+      ),
       render: item => (
         <div onClick={ev => ev.stopPropagation()}>
           <WzButtonModalConfirm
-            buttonType="icon"
+            buttonType='icon'
             tooltip={{
-              content:
-                WzAPIUtils.isReservedID(item.id) ? "Reserved role mapping can't be deleted" : 'Delete role mapping',
+              content: WzAPIUtils.isReservedID(item.id)
+                ? "Reserved role mapping can't be deleted"
+                : 'Delete role mapping',
               position: 'left',
             }}
             isDisabled={WzAPIUtils.isReservedID(item.id)}
-            modalTitle={`Do you want to delete the ${item.name} role mapping?`}
+            modalTitle={`${del} ${item.name} ${map}`}
             onConfirm={onDeleteRoleMapping(item)}
             modalProps={{ buttonColor: 'danger' }}
-            iconType="trash"
-            color="danger"
-            aria-label="Delete role mapping"
-            modalCancelText="Cancel"
-            modalConfirmText="Confirm"
+            iconType='trash'
+            color='danger'
+            aria-label={i18n.translate(
+              'wazuh.public.components.security.role.mapping.table.deleteMapping',
+              {
+                defaultMessage: 'Delete role mapping',
+              },
+            )}
+            modalCancelText={i18n.translate(
+              'wazuh.public.components.security.role.mapping.table.Cancel',
+              {
+                defaultMessage: 'Cancel',
+              },
+            )}
+            modalConfirmText={i18n.translate(
+              'wazuh.public.components.security.role.mapping.table.Confirm',
+              {
+                defaultMessage: 'Confirm',
+              },
+            )}
           />
         </div>
       ),

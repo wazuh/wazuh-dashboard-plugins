@@ -17,6 +17,39 @@ import { VisCard } from '../../../common/modules/panel';
 import { EuiFlexItem, EuiPanel } from '@elastic/eui';
 import { SecurityAlerts } from '../../../visualize/components';
 
+import { i18n } from '@kbn/i18n';
+
+const label1 = i18n.translate(
+  'wazuh.components.overview.office.panel.config.user.label1',
+  {
+    defaultMessage: 'Description',
+  },
+);
+const label2 = i18n.translate(
+  'wazuh.components.overview.office.panel.config.user.label2',
+  {
+    defaultMessage: 'Client IP',
+  },
+);
+const label3 = i18n.translate(
+  'wazuh.components.overview.office.panel.config.user.label3',
+  {
+    defaultMessage: 'Operation',
+  },
+);
+const label4 = i18n.translate(
+  'wazuh.components.overview.office.panel.config.user.label4',
+  {
+    defaultMessage: 'Level',
+  },
+);
+const label5 = i18n.translate(
+  'wazuh.components.overview.office.panel.config.user.label5',
+  {
+    defaultMessage: 'Rule ID',
+  },
+);
+
 export const drilldownUserConfig = {
   rows: [
     {
@@ -24,22 +57,30 @@ export const drilldownUserConfig = {
       columns: [
         {
           width: 30,
-          component: (props) => (
-            <VisCard id="Wazuh-App-Overview-Office-Metric-Stats" tab="office" {...props} />
+          component: props => (
+            <VisCard
+              id='Wazuh-App-Overview-Office-Metric-Stats'
+              tab='office'
+              {...props}
+            />
           ),
         },
         {
           width: 30,
-          component: (props) => (
-            <VisCard id="Wazuh-App-Overview-Office-Top-Events-Pie" tab="office" {...props} />
+          component: props => (
+            <VisCard
+              id='Wazuh-App-Overview-Office-Top-Events-Pie'
+              tab='office'
+              {...props}
+            />
           ),
         },
         {
           width: 40,
-          component: (props) => (
+          component: props => (
             <VisCard
               id={'Wazuh-App-Overview-Office-Client-IP-Operation-Level-Table'}
-              tab="office"
+              tab='office'
               {...props}
             />
           ),
@@ -51,10 +92,10 @@ export const drilldownUserConfig = {
       columns: [
         {
           width: 100,
-          component: (props) => (
+          component: props => (
             <VisCard
-              id="Wazuh-App-Overview-Office-Alerts-Evolution-By-User"
-              tab="office"
+              id='Wazuh-App-Overview-Office-Alerts-Evolution-By-User'
+              tab='office'
               {...props}
             />
           ),
@@ -72,11 +113,11 @@ export const drilldownUserConfig = {
                   initialColumns={[
                     { field: 'icon' },
                     { field: 'timestamp' },
-                    { field: 'rule.description', label: 'Description' },
-                    { field: 'data.office365.ClientIP', label: 'Client IP' },
-                    { field: 'data.office365.Operation', label: 'Operation' },
-                    { field: 'rule.level', label: 'Level' },
-                    { field: 'rule.id', label: 'Rule ID' },
+                    { field: 'rule.description', label: label1 },
+                    { field: 'data.office365.ClientIP', label: label2 },
+                    { field: 'data.office365.Operation', label: label3 },
+                    { field: 'rule.level', label: label4 },
+                    { field: 'rule.id', label: label5 },
                   ]}
                   useAgentColumns={false}
                 />

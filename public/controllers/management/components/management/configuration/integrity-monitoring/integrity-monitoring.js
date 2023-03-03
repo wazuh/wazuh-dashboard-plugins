@@ -16,7 +16,7 @@ import withWzConfig from '../util-hocs/wz-config';
 import WzNoConfig from '../util-components/no-config';
 import { isString } from '../utils/utils';
 import WzTabSelector, {
-  WzTabSelectorTab
+  WzTabSelectorTab,
 } from '../util-components/tab-selector';
 import helpLinks from './help-links';
 
@@ -27,6 +27,8 @@ import WzConfigurationIntegrityMonitoringNoDiff from './integrity-monitoring-no-
 import WzConfigurationIntegrityMonitoringWhoData from './integrity-monitoring-who-data';
 import WzConfigurationIntegrityMonitoringSynchronization from './integrity-monitoring-synchronization';
 import WzConfigurationIntegrityMonitoringFileLimit from './integrity-monitoring-file-limit';
+
+import { i18n } from '@kbn/i18n';
 
 class WzConfigurationIntegrityMonitoring extends Component {
   constructor(props) {
@@ -58,35 +60,84 @@ class WzConfigurationIntegrityMonitoring extends Component {
         {currentConfig['syscheck-syscheck'] &&
           !isString(currentConfig['syscheck-syscheck']) &&
           !currentConfig['syscheck-syscheck'].syscheck && (
-            <WzNoConfig error="not-present" help={helpLinks} />
+            <WzNoConfig error='not-present' help={helpLinks} />
           )}
         {currentConfig['syscheck-syscheck'] &&
           !isString(currentConfig['syscheck-syscheck']) &&
           currentConfig['syscheck-syscheck'].syscheck && (
             <WzTabSelector>
-              <WzTabSelectorTab label="General">
+              <WzTabSelectorTab
+                label={i18n.translate(
+                  'wazuh.public.controller.management.config.moniterting.integrity.General',
+                  {
+                    defaultMessage: 'General',
+                  },
+                )}
+              >
                 <WzConfigurationIntegrityMonitoringGeneral {...this.props} />
               </WzTabSelectorTab>
-              <WzTabSelectorTab label="Monitored">
+              <WzTabSelectorTab
+                label={i18n.translate(
+                  'wazuh.public.controller.management.config.moniterting.integrity.Monitored',
+                  {
+                    defaultMessage: 'Monitored',
+                  },
+                )}
+              >
                 <WzConfigurationIntegrityMonitoringMonitored {...this.props} />
               </WzTabSelectorTab>
-              <WzTabSelectorTab label="Ignored">
+              <WzTabSelectorTab
+                label={i18n.translate(
+                  'wazuh.public.controller.management.config.moniterting.integrity.Ignored',
+                  {
+                    defaultMessage: 'Ignored',
+                  },
+                )}
+              >
                 <WzConfigurationIntegrityMonitoringIgnored {...this.props} />
               </WzTabSelectorTab>
-              <WzTabSelectorTab label="No diff">
+              <WzTabSelectorTab
+                label={i18n.translate(
+                  'wazuh.public.controller.management.config.moniterting.integrity.No diff',
+                  {
+                    defaultMessage: 'No diff',
+                  },
+                )}
+              >
                 <WzConfigurationIntegrityMonitoringNoDiff {...this.props} />
               </WzTabSelectorTab>
               {agentPlatform !== 'windows' && (
-                <WzTabSelectorTab label="Who-data">
+                <WzTabSelectorTab
+                  label={i18n.translate(
+                    'wazuh.public.controller.management.config.moniterting.integrity.Whodata',
+                    {
+                      defaultMessage: 'Who-data',
+                    },
+                  )}
+                >
                   <WzConfigurationIntegrityMonitoringWhoData {...this.props} />
                 </WzTabSelectorTab>
               )}
-              <WzTabSelectorTab label="Synchronization">
+              <WzTabSelectorTab
+                label={i18n.translate(
+                  'wazuh.public.controller.management.config.moniterting.integrity.Synchronization',
+                  {
+                    defaultMessage: 'Synchronization',
+                  },
+                )}
+              >
                 <WzConfigurationIntegrityMonitoringSynchronization
                   {...this.props}
                 />
               </WzTabSelectorTab>
-              <WzTabSelectorTab label="File limit">
+              <WzTabSelectorTab
+                label={i18n.translate(
+                  'wazuh.public.controller.management.config.moniterting.integrity.Filelimit',
+                  {
+                    defaultMessage: 'File limit',
+                  },
+                )}
+              >
                 <WzConfigurationIntegrityMonitoringFileLimit {...this.props} />
               </WzTabSelectorTab>
             </WzTabSelector>

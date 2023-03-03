@@ -10,7 +10,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component, useState, useEffect } from "react";
+import React, { Component, useState, useEffect } from 'react';
 import {
   EuiFlexItem,
   EuiFlexGroup,
@@ -24,19 +24,23 @@ import {
   EuiTab,
   EuiSpacer,
   EuiSelect,
-  EuiProgress
-} from "@elastic/eui";
+  EuiProgress,
+} from '@elastic/eui';
+import { i18n } from '@kbn/i18n';
 
-import { clusterNodes } from "../configuration/utils/wz-fetch";
-import { WzStatisticsRemoted } from "./statistics-dashboard-remoted";
-import { WzStatisticsAnalysisd } from "./statistics-dashboard-analysisd";
-import { WzDatePicker } from "../../../../../components/wz-date-picker/wz-date-picker";
-import { AppNavigate } from "../../../../../react-services/app-navigate";
+import { clusterNodes } from '../configuration/utils/wz-fetch';
+import { WzStatisticsRemoted } from './statistics-dashboard-remoted';
+import { WzStatisticsAnalysisd } from './statistics-dashboard-analysisd';
+import { WzDatePicker } from '../../../../../components/wz-date-picker/wz-date-picker';
+import { AppNavigate } from '../../../../../react-services/app-navigate';
 import { compose } from 'redux';
-import { withGuard, withGlobalBreadcrumb } from "../../../../../components/common/hocs";
+import {
+  withGuard,
+  withGlobalBreadcrumb,
+} from '../../../../../components/common/hocs';
 import { PromptStatisticsDisabled } from './prompt-statistics-disabled';
 import { PromptStatisticsNoIndices } from './prompt-statistics-no-indices';
-import { WazuhConfig } from "../../../../../react-services/wazuh-config";
+import { WazuhConfig } from '../../../../../react-services/wazuh-config';
 import { WzRequest } from '../../../../../react-services/wz-request';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
@@ -48,28 +52,38 @@ export class WzStatisticsOverview extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      selectedTabId: "remoted",
+      selectedTabId: 'remoted',
       stats: {},
       isLoading: false,
       loadingNode: false,
-      searchvalue: "",
+      searchvalue: '',
       clusterNodeSelected: 'all',
-      refreshVisualizations: Date.now()
+      refreshVisualizations: Date.now(),
     };
     this.tabs = [
       {
-        id: "remoted",
-        name: "Listener Engine",
+        id: 'remoted',
+        name: i18n.translate(
+          'wazuh.controller.manage.staticts.overview.listenerEngine',
+          {
+            defaultMessage: 'Listener Engine',
+          },
+        ),
       },
       {
-        id: "analysisd",
-        name: "Analysis Engine",
+        id: 'analysisd',
+        name: i18n.translate(
+          'wazuh.controller.manage.staticts.overview.analysisEngine',
+          {
+            defaultMessage: 'Analysis Engine',
+          },
+        ),
       },
     ];
 
     this.info = {
       remoted:
-        "Remoted statistics are cumulative, this means that the information shown is since the data exists.",
+        'Remoted statistics are cumulative, this means that the information shown is since the data exists.',
       analysisd:
         "Analysisd statistics refer to the data stored from the period indicated in the variable 'analysisd.state_interval'.",
     };
@@ -79,10 +93,10 @@ export class WzStatisticsOverview extends Component {
     this._isMounted = true;
     try {
       const data = await clusterNodes();
-      const nodes = data.data.data.affected_items.map((item) => {
+      const nodes = data.data.data.affected_items.map(item => {
         return { value: item.name, text: `${item.name} (${item.type})` };
       });
-      nodes.unshift({ value: 'all', text: 'All' })
+      nodes.unshift({ value: 'all', text: 'All' });
       this.setState({
         clusterNodes: nodes,
         clusterNodeSelected: nodes[0].value,
@@ -111,13 +125,11 @@ export class WzStatisticsOverview extends Component {
     this._isMounted = false;
   }
 
-  onSelectedTabChanged = (id) => {
-    this.setState(
-      {
-        selectedTabId: id,
-        searchvalue: "",
-      }
-    );
+  onSelectedTabChanged = id => {
+    this.setState({
+      selectedTabId: id,
+      searchvalue: '',
+    });
   };
 
   renderTabs() {
@@ -132,21 +144,21 @@ export class WzStatisticsOverview extends Component {
     ));
   }
 
-  onSelectNode = (e) => {
+  onSelectNode = e => {
     const newValue = e.target.value;
     this.setState(
       {
-        loadingNode: true
+        loadingNode: true,
       },
       () => {
-        this.setState({ clusterNodeSelected: newValue, loadingNode: false })
-      }
+        this.setState({ clusterNodeSelected: newValue, loadingNode: false });
+      },
     );
   };
 
   refreshVisualizations = () => {
-    this.setState({ refreshVisualizations: Date.now() })
-  }
+    this.setState({ refreshVisualizations: Date.now() });
+  };
 
   render() {
     const search = {
@@ -156,24 +168,36 @@ export class WzStatisticsOverview extends Component {
       },
     };
     return (
-      <EuiPage style={{ background: "transparent" }}>
+      <EuiPage style={{ background: 'transparent' }}>
         <EuiPanel>
           <EuiFlexGroup>
             <EuiFlexItem>
               <EuiFlexGroup>
                 <EuiFlexItem>
                   <EuiTitle>
-                    <h2>Statistics</h2>
+                    <h2>
+                      {i18n.translate(
+                        'wazuh.controllers..mnage.comp.confi.groups.static.Statistics',
+                        {
+                          defaultMessage: 'Statistics',
+                        },
+                      )}
+                    </h2>
                   </EuiTitle>
                 </EuiFlexItem>
               </EuiFlexGroup>
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
               <EuiButtonEmpty
-                iconType="refresh"
+                iconType='refresh'
                 onClick={this.refreshVisualizations}
               >
-                Refresh
+                {i18n.translate(
+                  'wazuh.controllers..mnage.comp.confi.groups.static.Refresh',
+                  {
+                    defaultMessage: 'Refresh',
+                  },
+                )}
               </EuiButtonEmpty>
             </EuiFlexItem>
             {!!(
@@ -181,32 +205,53 @@ export class WzStatisticsOverview extends Component {
               this.state.clusterNodes.length &&
               this.state.clusterNodeSelected
             ) && (
-                <EuiFlexItem grow={false}>
-                  <EuiSelect
-                    id="selectNode"
-                    options={this.state.clusterNodes}
-                    value={this.state.clusterNodeSelected}
-                    onChange={this.onSelectNode}
-                    aria-label="Select node"
-                  />
-                </EuiFlexItem>
-              )}
+              <EuiFlexItem grow={false}>
+                <EuiSelect
+                  id='selectNode'
+                  options={this.state.clusterNodes}
+                  value={this.state.clusterNodeSelected}
+                  onChange={this.onSelectNode}
+                  aria-label={i18n.translate(
+                    'wazuh.public.controller.management.statistics.overview.Selectnode',
+                    {
+                      defaultMessage: 'Select node',
+                    },
+                  )}
+                />
+              </EuiFlexItem>
+            )}
             <EuiFlexItem grow={false}>
-              <WzDatePicker condensed={true} onTimeChange={() => { }} />
+              <WzDatePicker condensed={true} onTimeChange={() => {}} />
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
               <EuiButtonEmpty
-                onMouseDown={e => AppNavigate.navigateToModule(e, 'settings', { tab: 'configuration', category: 'statistics' })}
-                iconType="gear"
-                iconSide="left" >
-                Settings
+                onMouseDown={e =>
+                  AppNavigate.navigateToModule(e, 'settings', {
+                    tab: 'configuration',
+                    category: 'statistics',
+                  })
+                }
+                iconType='gear'
+                iconSide='left'
+              >
+                {i18n.translate(
+                  'wazuh.controllers..mnage.comp.confi.groups.static.Settings',
+                  {
+                    defaultMessage: 'Settings',
+                  },
+                )}
               </EuiButtonEmpty>
             </EuiFlexItem>
           </EuiFlexGroup>
           <EuiFlexGroup>
             <EuiFlexItem>
-              <EuiText color="subdued">
-                From here you can see daemon statistics.
+              <EuiText color='subdued'>
+                {i18n.translate(
+                  'wazuh.controllers..mnage.comp.confi.groups.static.daemon',
+                  {
+                    defaultMessage: 'From here you can see daemon statistics.',
+                  },
+                )}
               </EuiText>
             </EuiFlexItem>
           </EuiFlexGroup>
@@ -215,33 +260,41 @@ export class WzStatisticsOverview extends Component {
               <EuiTabs>{this.renderTabs()}</EuiTabs>
             </EuiFlexItem>
           </EuiFlexGroup>
-          <EuiSpacer size={"m"} />
-          {(
+          <EuiSpacer size={'m'} />
+          {
             <>
-              {this.state.selectedTabId === "remoted" && !this.state.loadingNode && (
-                <div>
-                  <EuiSpacer size={"m"} />
-                  <EuiCallOut
-                    title={this.info[this.state.selectedTabId]}
-                    iconType="iInCircle"
-                  />
-                  <EuiSpacer size={"m"} />
-                  <WzStatisticsRemoted clusterNodeSelected={this.state.clusterNodeSelected} refreshVisualizations={this.state.refreshVisualizations}/>
-                </div>
-              )}
-              {this.state.selectedTabId === "analysisd" && !this.state.loadingNode && (
-                <div>
-                  <EuiSpacer size={"m"} />
-                  <EuiCallOut
-                    title={this.info[this.state.selectedTabId]}
-                    iconType="iInCircle"
-                  />
-                  <EuiSpacer size={"m"} />
-                  <WzStatisticsAnalysisd clusterNodeSelected={this.state.clusterNodeSelected} refreshVisualizations={this.state.refreshVisualizations}/>
-                </div>
-              )}
+              {this.state.selectedTabId === 'remoted' &&
+                !this.state.loadingNode && (
+                  <div>
+                    <EuiSpacer size={'m'} />
+                    <EuiCallOut
+                      title={this.info[this.state.selectedTabId]}
+                      iconType='iInCircle'
+                    />
+                    <EuiSpacer size={'m'} />
+                    <WzStatisticsRemoted
+                      clusterNodeSelected={this.state.clusterNodeSelected}
+                      refreshVisualizations={this.state.refreshVisualizations}
+                    />
+                  </div>
+                )}
+              {this.state.selectedTabId === 'analysisd' &&
+                !this.state.loadingNode && (
+                  <div>
+                    <EuiSpacer size={'m'} />
+                    <EuiCallOut
+                      title={this.info[this.state.selectedTabId]}
+                      iconType='iInCircle'
+                    />
+                    <EuiSpacer size={'m'} />
+                    <WzStatisticsAnalysisd
+                      clusterNodeSelected={this.state.clusterNodeSelected}
+                      refreshVisualizations={this.state.refreshVisualizations}
+                    />
+                  </div>
+                )}
             </>
-          )}
+          }
         </EuiPanel>
       </EuiPage>
     );
@@ -251,44 +304,54 @@ export class WzStatisticsOverview extends Component {
 export default compose(
   withGlobalBreadcrumb([
     { text: '' },
-    { text: 'Management', href: '#/manager' },
-    { text: 'Statistics' }
+    {
+      text: i18n.translate(
+        'wazuh.public.controller.management.statistics.overview.Management',
+        {
+          defaultMessage: 'Management',
+        },
+      ),
+      href: '#/manager',
+    },
+    { text: 'Statistics' },
   ]),
   withGuard(props => {
-    return !((wzConfig.getConfig() || {})['cron.statistics.status']); // if 'cron.statistics.status' is false, then it renders PromptStatisticsDisabled component
-  }, PromptStatisticsDisabled)
-)(
-  props => {
-    const [loading, setLoading] = useState(false);
-    const [existStatisticsIndices, setExistStatisticsIndices] = useState(false);
-    useEffect(() => {
-      const fetchData = async () => {
-        try{
-          setLoading(true);
-          const data = await WzRequest.genericReq('GET', '/elastic/statistics');
-          setExistStatisticsIndices(data.data);
-        }catch(error){
-          setLoading(false);
-          const options = {
-            context: `${WzStatisticsOverview.name}.fetchData`,
-            level: UI_LOGGER_LEVELS.ERROR,
-            severity: UI_ERROR_SEVERITIES.BUSINESS,
-            error: {
-              error: error,
-              message: error.message || error,
-              title: `${error.name}: Error when fetching data`
-            },
-          };
-          getErrorOrchestrator().handleError(options);
-        }
+    return !(wzConfig.getConfig() || {})['cron.statistics.status']; // if 'cron.statistics.status' is false, then it renders PromptStatisticsDisabled component
+  }, PromptStatisticsDisabled),
+)(props => {
+  const [loading, setLoading] = useState(false);
+  const [existStatisticsIndices, setExistStatisticsIndices] = useState(false);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const data = await WzRequest.genericReq('GET', '/elastic/statistics');
+        setExistStatisticsIndices(data.data);
+      } catch (error) {
         setLoading(false);
-      };
-  
-      fetchData();
-    }, []);
-    if(loading){
-      return <EuiProgress size="xs" color="primary" />
-    }
-    return existStatisticsIndices ? <WzStatisticsOverview {...props}/> : <PromptStatisticsNoIndices {...props}/>
+        const options = {
+          context: `${WzStatisticsOverview.name}.fetchData`,
+          level: UI_LOGGER_LEVELS.ERROR,
+          severity: UI_ERROR_SEVERITIES.BUSINESS,
+          error: {
+            error: error,
+            message: error.message || error,
+            title: `${error.name}: Error when fetching data`,
+          },
+        };
+        getErrorOrchestrator().handleError(options);
+      }
+      setLoading(false);
+    };
+
+    fetchData();
+  }, []);
+  if (loading) {
+    return <EuiProgress size='xs' color='primary' />;
   }
-);
+  return existStatisticsIndices ? (
+    <WzStatisticsOverview {...props} />
+  ) : (
+    <PromptStatisticsNoIndices {...props} />
+  );
+});

@@ -19,15 +19,46 @@ import WzNoConfig from '../util-components/no-config';
 import { isString } from '../utils/utils';
 import helpLinks from './help-links';
 import { renderValueYesThenEnabled } from '../utils/utils';
+import { i18n } from '@kbn/i18n';
 
 const mainSettings = [
-  { field: 'enabled', label: 'Vulnerability detector status', render: renderValueYesThenEnabled },
-  { field: 'interval', label: 'Interval between scan executions' },
-  { field: 'run_on_start', label: 'Scan on start' },
+  {
+    field: 'enabled',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.vulnerabilities.gernal.status',
+      {
+        defaultMessage: 'Vulnerability detector status',
+      },
+    ),
+    render: renderValueYesThenEnabled,
+  },
+  {
+    field: 'interval',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.vulnerabilities.gernal.interval',
+      {
+        defaultMessage: 'Interval between scan executions',
+      },
+    ),
+  },
+  {
+    field: 'run_on_start',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.vulnerabilities.gernal.start',
+      {
+        defaultMessage: 'Scan on start',
+      },
+    ),
+  },
   {
     field: 'ignore_time',
-    label: 'Time to ignore already detected vulnerabilities'
-  }
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.vulnerabilities.gernal.time',
+      {
+        defaultMessage: 'Time to ignore already detected vulnerabilities',
+      },
+    ),
+  },
 ];
 
 class WzConfigurationVulnerabilitiesGeneral extends Component {
@@ -48,12 +79,23 @@ class WzConfigurationVulnerabilitiesGeneral extends Component {
         {currentConfig &&
           !wodleConfig['vulnerability-detector'] &&
           !isString(currentConfig['wmodules-wmodules']) && (
-            <WzNoConfig error="not-present" help={helpLinks} />
+            <WzNoConfig error='not-present' help={helpLinks} />
           )}
         {wodleConfig['vulnerability-detector'] && (
           <WzConfigurationSettingsTabSelector
-            title="Main settings"
-            description="General settings applied to the vulnerability detector and its providers"
+            title={i18n.translate(
+              'wazuh.public.controller.management.config.vulnerabilities.gernal.Mainsettings',
+              {
+                defaultMessage: 'Main settings',
+              },
+            )}
+            description={i18n.translate(
+              'wazuh.public.controller.management.config.vulnerabilities.gernal.setting',
+              {
+                defaultMessage:
+                  'General settings applied to the vulnerability detector and its providers',
+              },
+            )}
             currentConfig={wodleConfig}
             minusHeight={320}
             helpLinks={helpLinks}
@@ -70,7 +112,7 @@ class WzConfigurationVulnerabilitiesGeneral extends Component {
 }
 
 WzConfigurationVulnerabilitiesGeneral.propTypes = {
-  currentConfig: PropTypes.object.isRequired
+  currentConfig: PropTypes.object.isRequired,
 };
 
 export default WzConfigurationVulnerabilitiesGeneral;

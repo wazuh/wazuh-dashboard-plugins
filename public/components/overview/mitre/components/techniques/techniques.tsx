@@ -37,10 +37,36 @@ import { WzFieldSearchDelay } from '../../../../common/search';
 import { getDataPlugin, getToasts } from '../../../../../kibana-services';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
+import { i18n } from '@kbn/i18n';
+
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 
 const MITRE_ATTACK = 'mitre-attack';
+const Title1 = i18n.translate('wazuh.components.overview.mitre.title.action', {
+  defaultMessage: 'Actions',
+});
+const Title2 = i18n.translate('wazuh.components.overview.mitre.title2', {
+  defaultMessage: 'Mitre techniques could not be fetched',
+});
+const Title3 = i18n.translate('wazuh.components.overview.mitre.title3', {
+  defaultMessage: 'There are no results.',
+});
 
+const mitireTitle = i18n.translate(
+  'wazuh.components.overview.mitre.techinques.mitireTitle',
+  {
+    defaultMessage: 'Mitre alerts could not be fetched',
+  },
+);
+const Name1 = i18n.translate('wazuh.components.overview.mitre.Name1', {
+  defaultMessage: 'Filter for value',
+});
+const Name2 = i18n.translate('wazuh.components.overview.mitre.Name2', {
+  defaultMessage: 'Filter out value',
+});
+const Name3 = i18n.translate('wazuh.components.overview.mitre.Name3', {
+  defaultMessage: 'View technique details',
+});
 export const Techniques = withWindowSize(
   class Techniques extends Component {
     _isMount = false;
@@ -85,11 +111,21 @@ export const Techniques = withWindowSize(
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-      const { filterParams, indexPattern, selectedTactics, isLoading } = this.props;
+      const { filterParams, indexPattern, selectedTactics, isLoading } =
+        this.props;
       if (nextProps.isLoading !== isLoading) return true;
-      if (JSON.stringify(nextProps.filterParams) !== JSON.stringify(filterParams)) return true;
-      if (JSON.stringify(nextProps.indexPattern) !== JSON.stringify(indexPattern)) return true;
-      if (JSON.stringify(nextState.selectedTactics) !== JSON.stringify(selectedTactics))
+      if (
+        JSON.stringify(nextProps.filterParams) !== JSON.stringify(filterParams)
+      )
+        return true;
+      if (
+        JSON.stringify(nextProps.indexPattern) !== JSON.stringify(indexPattern)
+      )
+        return true;
+      if (
+        JSON.stringify(nextState.selectedTactics) !==
+        JSON.stringify(selectedTactics)
+      )
         return true;
       return false;
     }
@@ -97,9 +133,11 @@ export const Techniques = withWindowSize(
     componentDidUpdate(prevProps) {
       const { isLoading, tacticsObject, filters } = this.props;
       if (
-        JSON.stringify(prevProps.tacticsObject) !== JSON.stringify(tacticsObject) ||
+        JSON.stringify(prevProps.tacticsObject) !==
+          JSON.stringify(tacticsObject) ||
         isLoading !== prevProps.isLoading ||
-        JSON.stringify(prevProps.filterParams) !== JSON.stringify(this.props.filterParams)
+        JSON.stringify(prevProps.filterParams) !==
+          JSON.stringify(this.props.filterParams)
       )
         this.getTechniquesCount();
     }
@@ -108,7 +146,12 @@ export const Techniques = withWindowSize(
       this._isMount = false;
     }
 
-    showToast(color: string, title: string = '', text: string = '', time: number = 3000) {
+    showToast(
+      color: string,
+      title: string = '',
+      text: string = '',
+      time: number = 3000,
+    ) {
       getToasts().add({
         color: color,
         title: title,
@@ -134,9 +177,14 @@ export const Techniques = withWindowSize(
         this._isMount && this.setState({ loadingAlerts: true });
         // TODO: use `status` and `statusText`  to show errors
         // @ts-ignore
-        const { data, status, statusText } = await getElasticAlerts(indexPattern, filters, aggs);
+        const { data, status, statusText } = await getElasticAlerts(
+          indexPattern,
+          filters,
+          aggs,
+        );
         const { buckets } = data.aggregations.techniques;
-        this._isMount && this.setState({ techniquesCount: buckets, loadingAlerts: false });
+        this._isMount &&
+          this.setState({ techniquesCount: buckets, loadingAlerts: false });
       } catch (error) {
         const options = {
           context: `${Techniques.name}.getTechniquesCount`,
@@ -147,7 +195,7 @@ export const Techniques = withWindowSize(
           error: {
             error: error,
             message: error.message || error,
-            title: `Mitre alerts could not be fetched`,
+            title: mitireTitle,
           },
         };
         getErrorOrchestrator().handleError(options);
@@ -159,27 +207,35 @@ export const Techniques = withWindowSize(
       return [
         {
           id: 0,
-          title: 'Actions',
+          title: Title1,
           items: [
             {
-              name: 'Filter for value',
-              icon: <EuiIcon type="magnifyWithPlus" size="m" />,
+              name: Name1,
+              icon: <EuiIcon type='magnifyWithPlus' size='m' />,
               onClick: () => {
                 this.closeActionsMenu();
-                this.addFilter({ key: 'rule.mitre.id', value: techniqueID, negate: false });
+                this.addFilter({
+                  key: 'rule.mitre.id',
+                  value: techniqueID,
+                  negate: false,
+                });
               },
             },
             {
-              name: 'Filter out value',
-              icon: <EuiIcon type="magnifyWithMinus" size="m" />,
+              name: Name2,
+              icon: <EuiIcon type='magnifyWithMinus' size='m' />,
               onClick: () => {
                 this.closeActionsMenu();
-                this.addFilter({ key: 'rule.mitre.id', value: techniqueID, negate: true });
+                this.addFilter({
+                  key: 'rule.mitre.id',
+                  value: techniqueID,
+                  negate: true,
+                });
               },
             },
             {
-              name: 'View technique details',
-              icon: <EuiIcon type="filebeatApp" size="m" />,
+              name: Name3,
+              icon: <EuiIcon type='filebeatApp' size='m' />,
               onClick: () => {
                 this.closeActionsMenu();
                 this.showFlyout(techniqueID);
@@ -192,7 +248,11 @@ export const Techniques = withWindowSize(
 
     techniqueColumnsResponsive() {
       if (this.props && this.props.windowSize) {
-        return this.props.windowSize.width < 930 ? 2 : this.props.windowSize.width < 1200 ? 3 : 4;
+        return this.props.windowSize.width < 930
+          ? 2
+          : this.props.windowSize.width < 1200
+          ? 3
+          : 4;
       } else {
         return 4;
       }
@@ -211,7 +271,7 @@ export const Techniques = withWindowSize(
           error: {
             error: error,
             message: error.message || error,
-            title: `Mitre techniques could not be fetched`,
+            title: Title2,
           },
         };
         getErrorOrchestrator().handleError(options);
@@ -224,10 +284,16 @@ export const Techniques = withWindowSize(
       const params = { limit: limitResults };
       this.setState({ isSearching: true });
       const output = await this.getMitreTechniques(params);
-      const totalItems = (((output || {}).data || {}).data || {}).total_affected_items;
+      const totalItems = (((output || {}).data || {}).data || {})
+        .total_affected_items;
       let mitreTechniques = [];
       mitreTechniques.push(...output.data.data.affected_items);
-      if (totalItems && output.data && output.data.data && totalItems > limitResults) {
+      if (
+        totalItems &&
+        output.data &&
+        output.data.data &&
+        totalItems > limitResults
+      ) {
         const extraResults = await Promise.all(
           Array(Math.ceil((totalItems - params.limit) / params.limit))
             .fill()
@@ -237,7 +303,7 @@ export const Techniques = withWindowSize(
                 offset: limitResults * (1 + index),
               });
               return response.data.data.affected_items;
-            })
+            }),
         );
         mitreTechniques.push(...extraResults.flat());
       }
@@ -246,16 +312,22 @@ export const Techniques = withWindowSize(
 
     buildObjTechniques(techniques) {
       const techniquesObj = [];
-      techniques.forEach((element) => {
-        const mitreObj = this.state.mitreTechniques.find((item) => item.id === element);
+      techniques.forEach(element => {
+        const mitreObj = this.state.mitreTechniques.find(
+          item => item.id === element,
+        );
         if (mitreObj) {
           const mitreTechniqueName = mitreObj.name;
           const mitreTechniqueID =
             mitreObj.source === MITRE_ATTACK
               ? mitreObj.external_id
-              : mitreObj.references.find((item) => item.source === MITRE_ATTACK).external_id;
+              : mitreObj.references.find(item => item.source === MITRE_ATTACK)
+                  .external_id;
           mitreTechniqueID
-            ? techniquesObj.push({ id: mitreTechniqueID, name: mitreTechniqueName })
+            ? techniquesObj.push({
+                id: mitreTechniqueID,
+                name: mitreTechniqueName,
+              })
             : '';
         }
       });
@@ -268,47 +340,59 @@ export const Techniques = withWindowSize(
       let hash = {};
       let tacticsToRender: Array<any> = [];
       const currentTechniques = Object.keys(tacticsObject)
-        .map((tacticsKey) => ({
+        .map(tacticsKey => ({
           tactic: tacticsKey,
-          techniques: this.buildObjTechniques(tacticsObject[tacticsKey].techniques),
+          techniques: this.buildObjTechniques(
+            tacticsObject[tacticsKey].techniques,
+          ),
         }))
-        .filter((tactic) => this.props.selectedTactics[tactic.tactic])
-        .map((tactic) => tactic.techniques)
+        .filter(tactic => this.props.selectedTactics[tactic.tactic])
+        .map(tactic => tactic.techniques)
         .flat()
-        .filter((techniqueID, index, array) => array.indexOf(techniqueID) === index);
+        .filter(
+          (techniqueID, index, array) => array.indexOf(techniqueID) === index,
+        );
       tacticsToRender = currentTechniques
-        .filter((technique) =>
+        .filter(technique =>
           this.state.filteredTechniques
             ? this.state.filteredTechniques.includes(technique.id)
             : technique.id && hash[technique.id]
             ? false
-            : (hash[technique.id] = true)
+            : (hash[technique.id] = true),
         )
-        .map((technique) => {
+        .map(technique => {
           return {
             id: technique.id,
             label: `${technique.id} - ${technique.name}`,
             quantity:
-              (techniquesCount.find((item) => item.key === technique.id) || {}).doc_count || 0,
+              (techniquesCount.find(item => item.key === technique.id) || {})
+                .doc_count || 0,
           };
         })
-        .filter((technique) => (this.state.hideAlerts ? technique.quantity !== 0 : true));
+        .filter(technique =>
+          this.state.hideAlerts ? technique.quantity !== 0 : true,
+        );
       const tacticsToRenderOrdered = tacticsToRender
         .sort((a, b) => b.quantity - a.quantity)
         .map((item, idx) => {
           const tooltipContent = `View details of ${item.label} (${item.id})`;
           const toolTipAnchorClass =
-            'wz-display-inline-grid' + (this.state.hover === item.id ? ' wz-mitre-width' : ' ');
+            'wz-display-inline-grid' +
+            (this.state.hover === item.id ? ' wz-mitre-width' : ' ');
           return (
             <EuiFlexItem
               onMouseEnter={() => this.setState({ hover: item.id })}
               onMouseLeave={() => this.setState({ hover: '' })}
               key={idx}
-              style={{ border: '1px solid #8080804a', maxWidth: 'calc(25% - 8px)', maxHeight: 41 }}
+              style={{
+                border: '1px solid #8080804a',
+                maxWidth: 'calc(25% - 8px)',
+                maxHeight: 41,
+              }}
             >
               <EuiPopover
-                id="techniqueActionsContextMenu"
-                anchorClassName="wz-width-100"
+                id='techniqueActionsContextMenu'
+                anchorClassName='wz-width-100'
                 button={
                   <EuiFacetButton
                     style={{
@@ -322,7 +406,7 @@ export const Techniques = withWindowSize(
                     onClick={() => this.showFlyout(item.id)}
                   >
                     <EuiToolTip
-                      position="top"
+                      position='top'
                       content={tooltipContent}
                       anchorClassName={toolTipAnchorClass}
                     >
@@ -340,25 +424,31 @@ export const Techniques = withWindowSize(
 
                     {this.state.hover === item.id && (
                       <span style={{ float: 'right', position: 'fixed' }}>
-                        <EuiToolTip position="top" content={'Show ' + item.id + ' in Dashboard'}>
+                        <EuiToolTip
+                          position='top'
+                          content={'Show ' + item.id + ' in Dashboard'}
+                        >
                           <EuiIcon
-                            onClick={(e) => {
+                            onClick={e => {
                               this.openDashboard(e, item.id);
                               e.stopPropagation();
                             }}
-                            color="primary"
-                            type="visualizeApp"
+                            color='primary'
+                            type='visualizeApp'
                           ></EuiIcon>
                         </EuiToolTip>{' '}
                         &nbsp;
-                        <EuiToolTip position="top" content={'Inspect ' + item.id + ' in Events'}>
+                        <EuiToolTip
+                          position='top'
+                          content={'Inspect ' + item.id + ' in Events'}
+                        >
                           <EuiIcon
-                            onClick={(e) => {
+                            onClick={e => {
                               this.openDiscover(e, item.id);
                               e.stopPropagation();
                             }}
-                            color="primary"
-                            type="discoverApp"
+                            color='primary'
+                            type='discoverApp'
                           ></EuiIcon>
                         </EuiToolTip>
                       </span>
@@ -367,19 +457,28 @@ export const Techniques = withWindowSize(
                 }
                 isOpen={this.state.actionsOpen === item.id}
                 closePopover={() => this.closeActionsMenu()}
-                panelPaddingSize="none"
+                panelPaddingSize='none'
                 style={{ width: '100%' }}
-                anchorPosition="downLeft"
+                anchorPosition='downLeft'
               >
-                <EuiContextMenu initialPanelId={0} panels={this.buildPanel(item.id)} />
+                <EuiContextMenu
+                  initialPanelId={0}
+                  panels={this.buildPanel(item.id)}
+                />
               </EuiPopover>
             </EuiFlexItem>
           );
         });
-      if (this.state.isSearching || this.state.loadingAlerts || this.props.isLoading) {
+      if (
+        this.state.isSearching ||
+        this.state.loadingAlerts ||
+        this.props.isLoading
+      ) {
         return (
-          <EuiFlexItem style={{ height: 'calc(100vh - 450px)', alignItems: 'center' }}>
-            <EuiLoadingSpinner size="xl" />
+          <EuiFlexItem
+            style={{ height: 'calc(100vh - 450px)', alignItems: 'center' }}
+          >
+            <EuiLoadingSpinner size='xl' />
           </EuiFlexItem>
         );
       }
@@ -387,7 +486,7 @@ export const Techniques = withWindowSize(
         return (
           <EuiFlexGrid
             columns={this.techniqueColumnsResponsive()}
-            gutterSize="s"
+            gutterSize='s'
             style={{
               maxHeight: 'calc(100vh - 420px)',
               overflow: 'overlay',
@@ -400,18 +499,30 @@ export const Techniques = withWindowSize(
         );
       } else {
         return (
-          <EuiCallOut title="There are no results." iconType="help" color="warning"></EuiCallOut>
+          <EuiCallOut
+            title={Title3}
+            iconType='help'
+            color='warning'
+          ></EuiCallOut>
         );
       }
     }
 
     openDiscover(e, techniqueID) {
-      this.addFilter({ key: 'rule.mitre.id', value: techniqueID, negate: false });
+      this.addFilter({
+        key: 'rule.mitre.id',
+        value: techniqueID,
+        negate: false,
+      });
       this.props.onSelectedTabChanged('events');
     }
 
     openDashboard(e, techniqueID) {
-      this.addFilter({ key: 'rule.mitre.id', value: techniqueID, negate: false });
+      this.addFilter({
+        key: 'rule.mitre.id',
+        value: techniqueID,
+        negate: false,
+      });
       this.props.onSelectedTabChanged('dashboard');
     }
 
@@ -438,13 +549,14 @@ export const Techniques = withWindowSize(
       filterManager.addFilters([newFilter]);
     }
 
-    onChange = (searchValue) => {
+    onChange = searchValue => {
       if (!searchValue) {
-        this._isMount && this.setState({ filteredTechniques: false, isSearching: false });
+        this._isMount &&
+          this.setState({ filteredTechniques: false, isSearching: false });
       }
     };
 
-    onSearch = async (searchValue) => {
+    onSearch = async searchValue => {
       try {
         if (searchValue) {
           this._isMount && this.setState({ isSearching: true });
@@ -453,12 +565,18 @@ export const Techniques = withWindowSize(
               search: searchValue,
             },
           });
-          const filteredTechniques = (((response || {}).data || {}).data.affected_items || []).map(
-            (item) => [item].filter((reference) => reference.source === MITRE_ATTACK)[0].external_id
+          const filteredTechniques = (
+            ((response || {}).data || {}).data.affected_items || []
+          ).map(
+            item =>
+              [item].filter(reference => reference.source === MITRE_ATTACK)[0]
+                .external_id,
           );
-          this._isMount && this.setState({ filteredTechniques, isSearching: false });
+          this._isMount &&
+            this.setState({ filteredTechniques, isSearching: false });
         } else {
-          this._isMount && this.setState({ filteredTechniques: false, isSearching: false });
+          this._isMount &&
+            this.setState({ filteredTechniques: false, isSearching: false });
         }
       } catch (error) {
         const options = {
@@ -474,7 +592,8 @@ export const Techniques = withWindowSize(
           },
         };
         getErrorOrchestrator().handleError(options);
-        this._isMount && this.setState({ filteredTechniques: false, isSearching: false });
+        this._isMount &&
+          this.setState({ filteredTechniques: false, isSearching: false });
       }
     };
     async closeActionsMenu() {
@@ -507,8 +626,12 @@ export const Techniques = withWindowSize(
         <div style={{ padding: 10 }}>
           <EuiFlexGroup>
             <EuiFlexItem grow={true}>
-              <EuiTitle size="m">
-                <h1>Techniques</h1>
+              <EuiTitle size='m'>
+                <h1>
+                  {i18n.translate('wazuh.components.overview.Techniques', {
+                    defaultMessage: 'Techniques',
+                  })}
+                </h1>
               </EuiTitle>
             </EuiFlexItem>
 
@@ -516,28 +639,47 @@ export const Techniques = withWindowSize(
               <EuiFlexGroup>
                 <EuiFlexItem grow={false}>
                   <EuiText grow={false}>
-                    <span>Hide techniques with no alerts </span> &nbsp;
+                    <span>
+                      {i18n.translate(
+                        'wazuh.components.overview.Hidetechniques.alerts',
+                        {
+                          defaultMessage: 'Hide techniques with no alerts',
+                        },
+                      )}{' '}
+                    </span>{' '}
+                    &nbsp;
                     <EuiSwitch
-                      label=""
+                      label=''
                       checked={this.state.hideAlerts}
-                      onChange={(e) => this.hideAlerts()}
+                      onChange={e => this.hideAlerts()}
                     />
                   </EuiText>
                 </EuiFlexItem>
               </EuiFlexGroup>
             </EuiFlexItem>
           </EuiFlexGroup>
-          <EuiSpacer size="xs" />
+          <EuiSpacer size='xs' />
 
           <WzFieldSearchDelay
             fullWidth={true}
-            placeholder="Filter techniques of selected tactic/s"
+            placeholder={i18n.translate(
+              'wazuh.public.components.overview.mitre.tech.placeholder',
+              {
+                defaultMessage: 'Filter techniques of selected tactic/s',
+              },
+            )}
             onChange={this.onChange}
             onSearch={this.onSearch}
             isClearable={true}
-            aria-label="Use aria labels when no actual label is in use"
+            aria-label={i18n.translate(
+              'wazuh.public.components.overview.mitre.tech.label',
+              {
+                defaultMessage:
+                  'Use aria labels when no actual label is in use',
+              },
+            )}
           />
-          <EuiSpacer size="s" />
+          <EuiSpacer size='s' />
 
           <div>{this.renderFacet()}</div>
 
@@ -552,5 +694,5 @@ export const Techniques = withWindowSize(
         </div>
       );
     }
-  }
+  },
 );

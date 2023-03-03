@@ -16,14 +16,17 @@ import { getUiSettings } from '../../../../kibana-services';
 import { ReportingService } from '../../../../react-services';
 import $ from 'jquery';
 import { WzButton } from '../../../common/buttons';
+import { i18n } from '@kbn/i18n';
 
-
-export const ButtonModuleGenerateReport = ({agent, moduleID, disabledReport}) => {
+export const ButtonModuleGenerateReport = ({
+  agent,
+  moduleID,
+  disabledReport,
+}) => {
   const action = useAsyncAction(async () => {
     const reportingService = new ReportingService();
     const isDarkModeTheme = getUiSettings().get('theme:darkMode');
     if (isDarkModeTheme) {
-
       //Patch to fix white text in dark-mode pdf reports
       const defaultTextColor = '#DFE5EF';
 
@@ -35,7 +38,7 @@ export const ButtonModuleGenerateReport = ({agent, moduleID, disabledReport}) =>
       try {
         $labels.css('color', 'black');
         $vizBackground.css('background-color', 'transparent');
-        await reportingService.startVis2Png(moduleID, agent?.id || false)
+        await reportingService.startVis2Png(moduleID, agent?.id || false);
         $vizBackground.css('background-color', defaultVizBackground);
         $labels.css('color', defaultTextColor);
       } catch (e) {
@@ -43,10 +46,10 @@ export const ButtonModuleGenerateReport = ({agent, moduleID, disabledReport}) =>
         $vizBackground.css('background-color', defaultVizBackground);
       }
     } else {
-      await reportingService.startVis2Png(moduleID, agent?.id || false)
+      await reportingService.startVis2Png(moduleID, agent?.id || false);
     }
   }, [agent]);
-  
+
   return (
     <WzButton
       buttonType='empty'
@@ -54,10 +57,20 @@ export const ButtonModuleGenerateReport = ({agent, moduleID, disabledReport}) =>
       isLoading={action.running}
       onClick={action.run}
       isDisabled={disabledReport}
-      tooltip={disabledReport ? {position: 'top', content: 'No results match for this search criteria.'} : undefined}
+      tooltip={
+        disabledReport
+          ? {
+              position: 'top',
+              content: i18n.translate('wazuh.components.common.modules.noResultsMatch', {
+                defaultMessage: 'No results match for this search criteria.',
+              })
+            }
+          : undefined
+      }
     >
-      Generate report
+      {i18n.translate('wazuh.components.common.modules.button.gernateReport', {
+        defaultMessage: 'Generate report',
+      })}
     </WzButton>
-  )
-}
-
+  );
+};

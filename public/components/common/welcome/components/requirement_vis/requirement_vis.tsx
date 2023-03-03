@@ -12,12 +12,8 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { useCallback, useState } from 'react'
-import {
-  EuiFlexItem,
-  EuiPanel,
-  euiPaletteColorBlind
-} from '@elastic/eui';
+import React, { useCallback, useState } from 'react';
+import { EuiFlexItem, EuiPanel, euiPaletteColorBlind } from '@elastic/eui';
 import { VisualizationBasicWidgetSelector } from '../../../charts/visualizations/basic';
 import { getRequirementAlerts } from './lib';
 import { useTimeFilter } from '../../../hooks';
@@ -27,79 +23,137 @@ import { getAngularModule } from '../../../../../kibana-services';
 import { getIndexPattern } from '../../../../overview/mitre/lib';
 import { buildPhraseFilter } from '../../../../../../../../src/plugins/data/common';
 import rison from 'rison-node';
+import { i18n } from '@kbn/i18n';
 
+const textCompliance = i18n.translate(
+  'wazuh.components.common.module.welcome.requirement.textCompliance',
+  {
+    defaultMessage: 'Compliance',
+  },
+);
+
+const PCIDSS = i18n.translate(
+  'wazuh.public.components.common.welcome.req.PCIDSS',
+  {
+    defaultMessage: 'PCI DSS',
+  },
+);
+const GDPR = i18n.translate('wazuh.public.components.common.welcome.req.GDPR', {
+  defaultMessage: 'GDPR',
+});
+const NIST800 = i18n.translate(
+  'wazuh.public.components.common.welcome.req.nist',
+  {
+    defaultMessage: 'NIST 800-53',
+  },
+);
+const HIPAA = i18n.translate(
+  'wazuh.public.components.common.welcome.req.HIPAA',
+  {
+    defaultMessage: 'HIPAA',
+  },
+);
+const GPG13 = i18n.translate(
+  'wazuh.public.components.common.welcome.req.GPG13',
+  {
+    defaultMessage: 'GPG13',
+  },
+);
+const TSC = i18n.translate('wazuh.public.components.common.welcome.req.TSC', {
+  defaultMessage: 'TSC',
+});
 const selectionOptionsCompliance = [
-  { value: 'pci_dss', text: 'PCI DSS' },
-  { value: 'gdpr', text: 'GDPR' },
-  { value: 'nist_800_53', text: 'NIST 800-53' },
-  { value: 'hipaa', text: 'HIPAA' },
-  { value: 'gpg13', text: 'GPG13' },
-  { value: 'tsc', text: 'TSC' }
+  { value: 'pci_dss', text: PCIDSS },
+  { value: 'gdpr', text: GDPR },
+  { value: 'nist_800_53', text: NIST800 },
+  { value: 'hipaa', text: HIPAA },
+  { value: 'gpg13', text: GPG13 },
+  { value: 'tsc', text: TSC },
 ];
 
 const requirementNameModuleID = {
-  'pci_dss': 'pci',
-  'gdpr': 'gdpr',
-  'nist_800_53': 'nist',
-  'hipaa': 'hipaa',
-  'gpg13': '',
-  'tsc': 'tsc',
-}
+  pci_dss: 'pci',
+  gdpr: 'gdpr',
+  nist_800_53: 'nist',
+  hipaa: 'hipaa',
+  gpg13: '',
+  tsc: 'tsc',
+};
 
 export function RequirementVis(props) {
   const colors = euiPaletteColorBlind();
-  const {timeFilter} = useTimeFilter();
+  const { timeFilter } = useTimeFilter();
   const dispatch = useDispatch();
 
   const goToDashboardWithFilter = async (requirement, key, agent) => {
-    try{
+    try {
       dispatch(updateCurrentAgentData(agent));
       const $injector = getAngularModule().$injector;
       const route = $injector.get('$route');
-      const indexPattern = getIndexPattern()
-      const filters = [{
-        ...buildPhraseFilter({ name: `rule.${requirement}`, type: 'text' }, key, indexPattern),
-        "$state": { "isImplicit": false, "store": "appState" },
-      }];
+      const indexPattern = getIndexPattern();
+      const filters = [
+        {
+          ...buildPhraseFilter(
+            { name: `rule.${requirement}`, type: 'text' },
+            key,
+            indexPattern,
+          ),
+          $state: { isImplicit: false, store: 'appState' },
+        },
+      ];
       const _w = { filters };
       const params = {
         tab: requirementNameModuleID[requirement],
-        _w: rison.encode(_w)
+        _w: rison.encode(_w),
       };
-      const url = Object.entries(params).map(e => e.join('=')).join('&');
+      const url = Object.entries(params)
+        .map(e => e.join('='))
+        .join('&');
       window.location.href = `#/overview?${url}`;
-      route.reload();  
-    }catch(error){
+      route.reload();
+    } catch (error) {}
+  };
 
-    }
-  }
-
-  const fetchData = useCallback(async (selectedOptionValue, timeFilter, agent) => {
-    const buckets = await getRequirementAlerts(agent.id, timeFilter, selectedOptionValue);
-    return buckets?.length ? buckets.map(({key, doc_count}, index) => ({
-        label: key,
-        value: doc_count,
-        color: colors[index],
-        onClick: selectedOptionValue === 'gpg13' ? undefined : (() => goToDashboardWithFilter(selectedOptionValue, key, agent))
-      })) : null;
-  }, []);
+  const fetchData = useCallback(
+    async (selectedOptionValue, timeFilter, agent) => {
+      const buckets = await getRequirementAlerts(
+        agent.id,
+        timeFilter,
+        selectedOptionValue,
+      );
+      return buckets?.length
+        ? buckets.map(({ key, doc_count }, index) => ({
+            label: key,
+            value: doc_count,
+            color: colors[index],
+            onClick:
+              selectedOptionValue === 'gpg13'
+                ? undefined
+                : () =>
+                    goToDashboardWithFilter(selectedOptionValue, key, agent),
+          }))
+        : null;
+    },
+    [],
+  );
 
   return (
     <EuiFlexItem>
-      <EuiPanel paddingSize="m">
+      <EuiPanel paddingSize='m'>
         <VisualizationBasicWidgetSelector
           type='donut'
-          size={{width: '100%', height: '200px'}}
+          size={{ width: '100%', height: '200px' }}
           showLegend
-          title='Compliance'
+          title={textCompliance}
           selectorOptions={selectionOptionsCompliance}
           onFetch={fetchData}
-          onFetchExtraDependencies={[timeFilter,props.agent]}
+          onFetchExtraDependencies={[timeFilter, props.agent]}
           noDataTitle='No results'
-          noDataMessage={(_, optionRequirement) => `No ${optionRequirement.text} results were found in the selected time range.`}
+          noDataMessage={(_, optionRequirement) =>
+            `No ${optionRequirement.text} results were found in the selected time range.`
+          }
         />
       </EuiPanel>
     </EuiFlexItem>
-  )
+  );
 }
-

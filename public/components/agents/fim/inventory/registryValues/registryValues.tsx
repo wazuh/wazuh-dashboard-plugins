@@ -10,7 +10,11 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { EuiBasicTableColumn, EuiInMemoryTable, SortDirection } from '@elastic/eui';
+import {
+  EuiBasicTableColumn,
+  EuiInMemoryTable,
+  SortDirection,
+} from '@elastic/eui';
 import { WzRequest } from '../../../../../react-services';
 import React, { useEffect, useState } from 'react';
 import { emptyFieldHandler } from '../lib';
@@ -22,9 +26,33 @@ import {
   UILogLevel,
 } from '../../../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
-import { getErrorOrchestrator } from '../../../../../react-services/common-services';
+import { i18n } from '@kbn/i18n';
 
-export const RegistryValues = (props) => {
+import { getErrorOrchestrator } from '../../../../../react-services/common-services';
+const dateName = i18n.translate('wazuh.components.addModule.guide.dateName', {
+  defaultMessage: 'Date',
+});
+const dateField = i18n.translate('wazuh.components.addModule.guide.dateField', {
+  defaultMessage: 'date',
+});
+const valueName = i18n.translate('wazuh.components.addModule.guide.valueName', {
+  defaultMessage: 'Value name',
+});
+const valueField = i18n.translate('wazuh.components.addModule.guide.valueField', {
+  defaultMessage: 'value',
+});
+const valueTypeName = i18n.translate(
+  'wazuh.components.addModule.guide.valueTypeName',
+  {
+    defaultMessage: 'Value type',
+  },
+);
+
+const sha1Name = i18n.translate('wazuh.components.addModule.guide.sha1Name', {
+  defaultMessage: 'sha1',
+});
+
+export const RegistryValues = props => {
   const [values, setValues] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<any>();
@@ -44,7 +72,7 @@ export const RegistryValues = (props) => {
             q: `type=registry_value;file=${currentFile.file}`,
             sort: '-date',
           },
-        }
+        },
       );
 
       setValues((((values || {}).data || {}).data || {}).affected_items || []);
@@ -66,26 +94,26 @@ export const RegistryValues = (props) => {
 
   const columns: EuiBasicTableColumn<any>[] = [
     {
-      field: 'date',
-      name: 'Date',
+      field: dateField,
+      name: dateName,
       sortable: true,
       render: formatUIDate,
     },
     {
-      field: 'value',
-      name: 'Value name',
+      field: valueField,
+      name: valueName,
       sortable: true,
-      render: (item) => emptyFieldHandler()(item.name || ''),
+      render: item => emptyFieldHandler()(item.name || ''),
     },
     {
-      field: 'value',
-      name: 'Value type',
+      field: valueField,
+      name: valueTypeName,
       sortable: true,
-      render: (item) => item.type,
+      render: item => item.type,
     },
     {
-      field: 'sha1',
-      name: 'sha1',
+      field: sha1Name,
+      name: sha1Name,
       sortable: false,
     },
   ];

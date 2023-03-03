@@ -13,10 +13,11 @@
 import React, { Component, Fragment } from 'react';
 
 import WzTabSelector, {
-  WzTabSelectorTab
+  WzTabSelectorTab,
 } from '../util-components/tab-selector';
 import WzConfigurationOpenSCAPGeneral from './open-scap-general';
 import WzConfigurationOpenSCAPEvaluations from './open-scap-evaluations';
+import { i18n } from '@kbn/i18n';
 
 import { connect } from 'react-redux';
 import { compose } from 'redux';
@@ -32,21 +33,35 @@ class WzConfigurationOpenSCAP extends Component {
     this.props.updateBadge(
       this.props.currentConfig &&
         this.props.currentConfig['open-scap'] &&
-        this.props.currentConfig['open-scap'].disabled === 'no'
+        this.props.currentConfig['open-scap'].disabled === 'no',
     );
   }
   render() {
     let { currentConfig } = this.props;
     return (
       <WzTabSelector>
-        <WzTabSelectorTab label="General">
+        <WzTabSelectorTab
+          label={i18n.translate(
+            'wazuh.public.controller.management.config.open.scap1.General',
+            {
+              defaultMessage: 'General',
+            },
+          )}
+        >
           <WzConfigurationOpenSCAPGeneral
             {...this.props}
             currentConfig={currentConfig}
             wodleConfig={this.wodleConfig}
           />
         </WzTabSelectorTab>
-        <WzTabSelectorTab label="Evaluations">
+        <WzTabSelectorTab
+          label={i18n.translate(
+            'wazuh.public.controller.management.config.open.scap1.Evaluations',
+            {
+              defaultMessage: 'Evaluations',
+            },
+          )}
+        >
           <WzConfigurationOpenSCAPEvaluations
             {...this.props}
             currentConfig={currentConfig}
@@ -59,7 +74,7 @@ class WzConfigurationOpenSCAP extends Component {
 }
 
 const mapStateToProps = state => ({
-  wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet
+  wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet,
 });
 
 const sections = [{ component: 'wmodules', configuration: 'wmodules' }];
@@ -70,5 +85,5 @@ WzConfigurationOpenSCAP.propTypes = {
 
 export default compose(
   connect(mapStateToProps),
-  withWzConfig(sections)
+  withWzConfig(sections),
 )(WzConfigurationOpenSCAP);

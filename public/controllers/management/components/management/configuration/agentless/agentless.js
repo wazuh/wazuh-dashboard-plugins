@@ -10,9 +10,10 @@
  * Find more information about this on the LICENSE file.
  */
 
+
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
-
+import { i18n } from '@kbn/i18n';
 import withWzConfig from '../util-hocs/wz-config';
 import WzNoConfig from '../util-components/no-config';
 import WzConfigurationListSelector from '../util-components/configuration-settings-list-selector';
@@ -24,22 +25,77 @@ import { compose } from 'redux';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
 const mainSettings = [
-  { field: 'type', label: 'Agentless monitoring type' },
-  { field: 'frequency', label: 'Interval (in seconds) between checks' },
-  { field: 'host', label: 'Device username and hostname' },
-  { field: 'state', label: 'Device check type' },
-  { field: 'arguments', label: 'Pass these arguments to check' }
-];
-
-const helpLinks = [
   {
-    text: 'How to monitor agentless devices',
-    href: webDocumentationLink('user-manual/capabilities/agentless-monitoring/index.html')
+    field: 'type',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.agentless.type',
+      {
+        defaultMessage: 'Agentless monitoring type',
+      },
+    ),
   },
   {
-    text: 'Agentless reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/agentless.html')
-  }
+    field: 'frequency',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.agentless.interval',
+      {
+        defaultMessage: 'Interval (in seconds) between checks',
+      },
+    ),
+  },
+  {
+    field: 'host',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.agentless.hotname',
+      {
+        defaultMessage: 'Device username and hostname',
+      },
+    ),
+  },
+  {
+    field: 'state',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.agentless.device',
+      {
+        defaultMessage: 'Device check type',
+      },
+    ),
+  },
+  {
+    field: 'arguments',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.agentless.arugments',
+      {
+        defaultMessage: 'Pass these arguments to check',
+      },
+    ),
+  },
+];
+const text2 = i18n.translate(
+  'wazuh.controller.manage.comp.confi.setting.response.agentless.text2',
+  {
+    defaultMessage: 'How to monitor agentless devices',
+  },
+);
+const text3 = i18n.translate(
+  'wazuh.controller.manage.comp.confi.setting.response.agentless.text3',
+  {
+    defaultMessage: 'Agentless reference',
+  },
+);
+const helpLinks = [
+  {
+    text: text2,
+    href: webDocumentationLink(
+      'user-manual/capabilities/agentless-monitoring/index.html',
+    ),
+  },
+  {
+    text: text3,
+    href: webDocumentationLink(
+      'user-manual/reference/ossec-conf/agentless.html',
+    ),
+  },
 ];
 
 class WzConfigurationAgentless extends Component {
@@ -54,7 +110,7 @@ class WzConfigurationAgentless extends Component {
       currentConfig['agentless-agentless'].agentless
         ? currentConfig['agentless-agentless'].agentless.map(item => ({
             label: `${item.type} (${item.state})`,
-            data: item
+            data: item,
           }))
         : false;
     return (
@@ -68,13 +124,24 @@ class WzConfigurationAgentless extends Component {
           )}
         {wazuhNotReadyYet &&
           (!currentConfig || !currentConfig['agentless-agentless']) && (
-            <WzNoConfig error="Wazuh not ready yet" help={helpLinks} />
+            <WzNoConfig error='Wazuh not ready yet' help={helpLinks} />
           )}
         {currentConfig['agentless-agentless'] &&
           !isString(currentConfig['agentless-agentless']) && (
             <WzConfigurationSettingsTabSelector
-              title="Devices list"
-              description="List of monitored devices that don't use the agent"
+              title={i18n.translate(
+                'wazuh.public.controller.management.config.agentless.devices',
+                {
+                  defaultMessage: 'Devices list',
+                },
+              )}
+              description={i18n.translate(
+                'wazuh.public.controller.management.config.agentless.agentUse',
+                {
+                  defaultMessage:
+                    "List of monitored devices that don't use the agent",
+                },
+              )}
               currentConfig={currentConfig}
               minusHeight={260}
               helpLinks={helpLinks}
@@ -93,15 +160,15 @@ class WzConfigurationAgentless extends Component {
 const sections = [{ component: 'agentless', configuration: 'agentless' }];
 
 const mapStateToProps = state => ({
-  wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet
+  wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet,
 });
 
 WzConfigurationAgentless.propTypes = {
   // currentConfig: PropTypes.object.isRequired,
-  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string])
+  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
 };
 
 export default compose(
   withWzConfig(sections),
-  connect(mapStateToProps)
+  connect(mapStateToProps),
 )(WzConfigurationAgentless);

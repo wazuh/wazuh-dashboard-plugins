@@ -90,5 +90,5 @@ export const base64 = {
     }
 
     return result.join('');
-  }
+  },
 };

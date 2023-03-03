@@ -28,7 +28,14 @@ import { getIndexPattern } from '../../../../../components/overview/mitre/lib';
 import { getMitreCount } from './lib';
 import { AppNavigate } from '../../../../../react-services/app-navigate';
 import { getDataPlugin } from '../../../../../kibana-services';
+import { i18n } from '@kbn/i18n';
 
+const tactics = i18n.translate(
+  'wazuh.public.components.common.welcome.mitre.tactics',
+  {
+    defaultMessage: 'Back Top Tactics',
+  },
+);
 export class MitreTopTactics extends Component {
   _isMount = false;
 
@@ -68,12 +75,16 @@ export class MitreTopTactics extends Component {
     this.subscription = this.timefilter
       .getTimeUpdate$()
       .subscribe(
-        () => this._isMount && this.setState({ time: this.timefilter.getTime(), isLoading: true })
+        () =>
+          this._isMount &&
+          this.setState({ time: this.timefilter.getTime(), isLoading: true }),
       );
     this.indexPattern = await getIndexPattern();
-    getMitreCount(this.props.agentId, this.timefilter.getTime(), undefined).then((alertsCount) =>
-      this.setState({ alertsCount, isLoading: false })
-    );
+    getMitreCount(
+      this.props.agentId,
+      this.timefilter.getTime(),
+      undefined,
+    ).then(alertsCount => this.setState({ alertsCount, isLoading: false }));
   }
 
   async componentWillUnmount() {
@@ -85,21 +96,24 @@ export class MitreTopTactics extends Component {
     const { selectedTactic, isLoading, alertsCount } = this.state;
     if (nextState.selectedTactic !== selectedTactic) return true;
     if (!isLoading) return true;
-    if (JSON.stringify(nextState.alertsCount) !== JSON.stringify(alertsCount)) return true;
+    if (JSON.stringify(nextState.alertsCount) !== JSON.stringify(alertsCount))
+      return true;
     return false;
   }
 
   async componentDidUpdate() {
     const { selectedTactic, isLoading } = this.state;
     if (isLoading) {
-      getMitreCount(this.props.agentId, this.timefilter.getTime(), selectedTactic).then(
-        (alertsCount) => {
-          if (alertsCount.length === 0) {
-            this.setState({ selectedTactic: undefined, isLoading: false });
-          }
-          this.setState({ alertsCount, isLoading: false });
+      getMitreCount(
+        this.props.agentId,
+        this.timefilter.getTime(),
+        selectedTactic,
+      ).then(alertsCount => {
+        if (alertsCount.length === 0) {
+          this.setState({ selectedTactic: undefined, isLoading: false });
         }
-      );
+        this.setState({ alertsCount, isLoading: false });
+      });
     }
   }
 
@@ -108,7 +122,7 @@ export class MitreTopTactics extends Component {
     if (!isLoading) return;
     return (
       <div style={{ display: 'block', textAlign: 'center', paddingTop: 100 }}>
-        <EuiLoadingChart size="xl" />
+        <EuiLoadingChart size='xl' />
       </div>
     );
   }
@@ -118,17 +132,22 @@ export class MitreTopTactics extends Component {
     if (isLoading || alertsCount.length === 0) return;
     return (
       <Fragment>
-        <div className="wz-agents-mitre">
-          <EuiText size="xs">
+        <div className='wz-agents-mitre'>
+          <EuiText size='xs'>
             <EuiFlexGroup>
               <EuiFlexItem style={{ margin: 0, padding: '12px 0px 0px 10px' }}>
-                <h3>Top Tactics</h3>
+                <h3>
+                  {i18n.translate(
+                    'wazuh.components.common.welcome.components.mitreTop.topTactics',
+                    { defaultMessage: 'Top Tactics' },
+                  )}
+                </h3>
               </EuiFlexItem>
             </EuiFlexGroup>
           </EuiText>
           <EuiFlexGroup>
             <EuiFlexItem>
-              {alertsCount.map((tactic) => (
+              {alertsCount.map(tactic => (
                 <EuiFacetButton
                   key={tactic.key}
                   quantity={tactic.doc_count}
@@ -154,7 +173,7 @@ export class MitreTopTactics extends Component {
     if (isLoading) return;
     return (
       <Fragment>
-        <EuiText size="xs">
+        <EuiText size='xs'>
           <EuiFlexGroup>
             <EuiFlexItem grow={false}>
               <EuiButtonIcon
@@ -167,8 +186,8 @@ export class MitreTopTactics extends Component {
                     flyoutOn: false,
                   });
                 }}
-                iconType="sortLeft"
-                aria-label="Back Top Tactics"
+                iconType='sortLeft'
+                aria-label={tactics}
               />
             </EuiFlexItem>
             <EuiFlexItem>
@@ -178,7 +197,7 @@ export class MitreTopTactics extends Component {
         </EuiText>
         <EuiFlexGroup>
           <EuiFlexItem>
-            {alertsCount.map((tactic) => (
+            {alertsCount.map(tactic => (
               <EuiFacetButton
                 key={tactic.key}
                 quantity={tactic.doc_count}
@@ -198,18 +217,33 @@ export class MitreTopTactics extends Component {
     if (isLoading) return;
     return (
       <EuiEmptyPrompt
-        iconType="stats"
-        title={<h4>No results</h4>}
+        iconType='stats'
+        title={
+          <h4>
+            {i18n.translate(
+              'wazuh.components.common.welcome.components.mitreTop.noResult',
+              { defaultMessage: 'No results' },
+            )}
+          </h4>
+        }
         body={
           <Fragment>
-            <p>No Mitre results were found in the selected time range.</p>
+            <p>
+              {i18n.translate(
+                'wazuh.components.common.welcome.components.mitreTop.mitreResult',
+                {
+                  defaultMessage:
+                    'No Mitre results were found in the selected time range.',
+                },
+              )}
+            </p>
           </Fragment>
         }
       />
     );
   }
 
-  onChangeFlyout = (flyoutOn) => {
+  onChangeFlyout = flyoutOn => {
     this.setState({ flyoutOn });
   };
 
@@ -241,7 +275,8 @@ export class MitreTopTactics extends Component {
   }
 
   render() {
-    const { flyoutOn, selectedTactic, selectedTechnique, alertsCount } = this.state;
+    const { flyoutOn, selectedTactic, selectedTechnique, alertsCount } =
+      this.state;
     const tacticsTop = this.renderTacticsTop();
     const tecniquesTop = this.renderTechniques();
     const loading = this.renderLoadingStatus();
@@ -249,17 +284,19 @@ export class MitreTopTactics extends Component {
     return (
       <Fragment>
         {loading}
-        {!selectedTactic || alertsCount.length === 0 ? tacticsTop : tecniquesTop}
+        {!selectedTactic || alertsCount.length === 0
+          ? tacticsTop
+          : tecniquesTop}
         {alertsCount.length === 0 && emptyPrompt}
         {flyoutOn && (
-            <FlyoutTechnique
-              openDashboard={(e, itemId) => this.openDashboard(e, itemId)}
-              openDiscover={(e, itemId) => this.openDiscover(e, itemId)}
-              implicitFilters={[{ 'agent.id': this.props.agentId }]}
-              agentId={this.props.agentId}
-              onChangeFlyout={this.onChangeFlyout}
-              currentTechnique={selectedTechnique}
-            />
+          <FlyoutTechnique
+            openDashboard={(e, itemId) => this.openDashboard(e, itemId)}
+            openDiscover={(e, itemId) => this.openDiscover(e, itemId)}
+            implicitFilters={[{ 'agent.id': this.props.agentId }]}
+            agentId={this.props.agentId}
+            onChangeFlyout={this.onChangeFlyout}
+            currentTechnique={selectedTechnique}
+          />
         )}
       </Fragment>
     );

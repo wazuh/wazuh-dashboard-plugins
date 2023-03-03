@@ -22,23 +22,67 @@ import { ButtonModuleGenerateReport } from '../modules/buttons';
 import { OfficePanel } from '../../overview/office-panel';
 import { GitHubPanel } from '../../overview/github-panel';
 import { withModuleNotForAgent } from '../hocs';
+import inventory from '../../../controllers/management/components/management/configuration/inventory/inventory';
+import { i18n } from '@kbn/i18n';
 
+const dashboard = i18n.translate(
+  'wazuh.public.components.common.common.modules.defaults.dashboard',
+  {
+    defaultMessage: 'Dashboard',
+  },
+);
+const events = i18n.translate(
+  'wazuh.public.components.common.common.modules.defaults.events',
+  {
+    defaultMessage: 'Events',
+  },
+);
+const controls = i18n.translate(
+  'wazuh.public.components.common.common.modules.defaults.controls',
+  {
+    defaultMessage: 'Controls',
+  },
+);
+const inventoryText = i18n.translate(
+  'wazuh.public.components.common.common.modules.defaults.inventory',
+  {
+    defaultMessage: 'Inventory',
+  },
+);
+const panel = i18n.translate(
+  'wazuh.public.components.common.common.modules.defaults.panel',
+  {
+    defaultMessage: 'Panel',
+  },
+);
+const intelligence = i18n.translate(
+  'wazuh.public.components.common.common.modules.defaults.intelligence',
+  {
+    defaultMessage: 'Intelligence',
+  },
+);
+const framework = i18n.translate(
+  'wazuh.public.components.common.common.modules.defaults.framework',
+  {
+    defaultMessage: 'Framework',
+  },
+);
 const DashboardTab = {
   id: 'dashboard',
-  name: 'Dashboard',
+  name: dashboard,
   buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
   component: Dashboard,
 };
 const EventsTab = {
   id: 'events',
-  name: 'Events',
+  name: events,
   buttons: [ButtonModuleExploreAgent],
   component: Events,
 };
 const RegulatoryComplianceTabs = [
   {
     id: 'inventory',
-    name: 'Controls',
+    name: controls,
     buttons: [ButtonModuleExploreAgent],
     component: ComplianceTable,
   },
@@ -57,7 +101,7 @@ export const ModulesDefaults = {
     tabs: [
       {
         id: 'inventory',
-        name: 'Inventory',
+        name: inventoryText,
         buttons: [ButtonModuleExploreAgent],
         component: MainFim,
       },
@@ -91,7 +135,7 @@ export const ModulesDefaults = {
     tabs: [
       {
         id: 'inventory',
-        name: 'Inventory',
+        name: inventoryText,
         buttons: [ButtonModuleExploreAgent],
         component: MainSca,
       },
@@ -111,7 +155,7 @@ export const ModulesDefaults = {
       },
       {
         id: 'dashboard',
-        name: 'Dashboard',
+        name: dashboard,
         buttons: [ButtonModuleExploreAgent, ButtonModuleGenerateReport],
         component: withModuleNotForAgent(Dashboard),
       },
@@ -121,8 +165,17 @@ export const ModulesDefaults = {
   },
   github: {
     init: 'dashboard',
-    tabs: [{ id: 'inventory', name: 'Panel', buttons: [ButtonModuleExploreAgent],  component: GitHubPanel }, DashboardTab, EventsTab],
-    availableFor: ['manager', 'agent']
+    tabs: [
+      {
+        id: 'inventory',
+        name: panel,
+        buttons: [ButtonModuleExploreAgent],
+        component: GitHubPanel,
+      },
+      DashboardTab,
+      EventsTab,
+    ],
+    availableFor: ['manager', 'agent'],
   },
   ciscat: {
     init: 'dashboard',
@@ -134,7 +187,7 @@ export const ModulesDefaults = {
     tabs: [
       {
         id: 'inventory',
-        name: 'Inventory',
+        name: inventoryText,
         buttons: [ButtonModuleExploreAgent],
         component: MainVuls,
       },
@@ -146,10 +199,14 @@ export const ModulesDefaults = {
   mitre: {
     init: 'dashboard',
     tabs: [
-      { id: 'intelligence', name: 'Intelligence', component: ModuleMitreAttackIntelligence },
+      {
+        id: 'intelligence',
+        name: intelligence,
+        component: ModuleMitreAttackIntelligence,
+      },
       {
         id: 'inventory',
-        name: 'Framework',
+        name: framework,
         buttons: [ButtonModuleExploreAgent],
         component: MainMitre,
       },

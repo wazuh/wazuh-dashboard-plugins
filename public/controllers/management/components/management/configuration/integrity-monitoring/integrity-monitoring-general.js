@@ -9,6 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { i18n } from '@kbn/i18n';
 
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
@@ -21,7 +22,7 @@ import {
   renderValueOrNoValue,
   renderValueOrYes,
   renderValueOrNo,
-  renderValueNoThenEnabled
+  renderValueNoThenEnabled,
 } from '../utils/utils';
 
 import helpLinks from './help-links';
@@ -29,59 +30,176 @@ import helpLinks from './help-links';
 const mainSettings = [
   {
     field: 'disabled',
-    label: 'Integrity monitoring status',
-    render: renderValueNoThenEnabled
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.monitering.status',
+      {
+        defaultMessage: 'Integrity monitoring status',
+      },
+    ),
+    render: renderValueNoThenEnabled,
   },
   {
     field: 'frequency',
-    label: 'Interval (in seconds) to run the integrity scan'
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.monitering.intervalScan',
+      {
+        defaultMessage: 'Interval (in seconds) to run the integrity scan',
+      },
+    ),
   },
   {
     field: 'scan_time',
-    label: 'Time of day to run integrity scans',
-    render: renderValueOrNoValue
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.monitering.dayscans',
+      {
+        defaultMessage: 'Time of day to run integrity scans',
+      },
+    ),
+    render: renderValueOrNoValue,
   },
   {
     field: 'scan_day',
-    label: 'Day of the week to run integrity scans',
-    render: renderValueOrNoValue
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.monitering.scans',
+      {
+        defaultMessage: 'Day of the week to run integrity scans',
+      },
+    ),
+    render: renderValueOrNoValue,
   },
   {
     field: 'auto_ignore',
-    label: 'Ignore files that change too many times',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.monitering.times',
+      {
+        defaultMessage: 'Ignore files that change too many times',
+      },
+    ),
     render: renderValueOrNo,
-    when: 'manager'
+    when: 'manager',
   },
   {
     field: 'alert_new_files',
-    label: 'Alert when new files are created',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.monitering.created',
+      {
+        defaultMessage: 'Alert when new files are created',
+      },
+    ),
     render: renderValueOrNo,
-    when: 'manager'
+    when: 'manager',
   },
-  { field: 'scan_on_start', label: 'Scan on start' },
-  { field: 'skip_nfs', label: 'Skip scan on CIFS/NFS mounts' },
-  { field: 'skip_dev', label: 'Skip scan of /dev directory' },
-  { field: 'skip_sys', label: 'Skip scan of /sys directory' },
-  { field: 'skip_proc', label: 'Skip scan of /proc directory' },
+  {
+    field: 'scan_on_start',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.monitering.sacnOn',
+      {
+        defaultMessage: 'Scan on start',
+      },
+    ),
+  },
+  {
+    field: 'skip_nfs',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.monitering.cifs',
+      {
+        defaultMessage: 'Skip scan on CIFS/NFS mounts',
+      },
+    ),
+  },
+  {
+    field: 'skip_dev',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.monitering.dev',
+      {
+        defaultMessage: 'Skip scan of /dev directory',
+      },
+    ),
+  },
+  {
+    field: 'skip_sys',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.monitering.sys',
+      {
+        defaultMessage: 'Skip scan of /sys directory',
+      },
+    ),
+  },
+  {
+    field: 'skip_proc',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.monitering.proc',
+      {
+        defaultMessage: 'Skip scan of /proc directory',
+      },
+    ),
+  },
   {
     field: 'remove_old_diff',
-    label: 'Remove old local snapshots',
-    render: renderValueOrYes
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.monitering.screenshots',
+      {
+        defaultMessage: 'Remove old local snapshots',
+      },
+    ),
+    render: renderValueOrYes,
   },
-  { field: 'restart_audit', label: 'Restart the Audit daemon' },
+  {
+    field: 'restart_audit',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.monitering.restart',
+      {
+        defaultMessage: 'Restart the Audit daemon',
+      },
+    ),
+  },
   {
     field: 'windows_audit_interval',
-    label: "Interval (in seconds) to check directories' SACLs",
-    render: renderValueOrDefault('300')
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.monitering.SCALs',
+      {
+        defaultMessage: "Interval (in seconds) to check directories' SACLs",
+      },
+    ),
+    render: renderValueOrDefault('300'),
   },
   {
     field: 'prefilter_cmd',
-    label: 'Command to prevent prelinking',
-    render: renderValueOrNoValue
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.monitering.command',
+      {
+        defaultMessage: 'Command to prevent prelinking',
+      },
+    ),
+    render: renderValueOrNoValue,
   },
-  { field: 'max_eps', label: 'Maximum event reporting throughput' },
-  { field: 'process_priority', label: 'Process priority' },
-  { field: 'database', label: 'Database type' }
+  {
+    field: 'max_eps',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.monitering.throughout',
+      {
+        defaultMessage: 'Maximum event reporting throughput',
+      },
+    ),
+  },
+  {
+    field: 'process_priority',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.monitering.Processpriority',
+      {
+        defaultMessage: 'Process priority',
+      },
+    ),
+  },
+  {
+    field: 'database',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.monitering.Databasetype',
+      {
+        defaultMessage: 'Database type',
+      },
+    ),
+  },
 ];
 
 const mainSettingsOfAgentOrManager = agent =>
@@ -98,8 +216,18 @@ class WzConfigurationIntegrityMonitoringGeneral extends Component {
     return (
       <Fragment>
         <WzConfigurationSettingsTabSelector
-          title="General"
-          description="The settings shown below are applied globally"
+          title={i18n.translate(
+            'wazuh.public.controller.management.config.monitering.General',
+            {
+              defaultMessage: 'General',
+            },
+          )}
+          description={i18n.translate(
+            'wazuh.public.controller.management.config.monitering.globally',
+            {
+              defaultMessage: 'The settings shown below are applied globally',
+            },
+          )}
           currentConfig={currentConfig['syscheck-syscheck']}
           minusHeight={this.props.agent.id === '000' ? 320 : 415}
           helpLinks={helpLinks}
@@ -116,7 +244,7 @@ class WzConfigurationIntegrityMonitoringGeneral extends Component {
 
 WzConfigurationIntegrityMonitoringGeneral.proptTypes = {
   // currentConfig: PropTypes.object.isRequired,
-  agent: PropTypes.object
+  agent: PropTypes.object,
 };
 
 export default WzConfigurationIntegrityMonitoringGeneral;

@@ -11,6 +11,7 @@
  */
 
 import React, { Component, Fragment } from 'react';
+import { i18n } from '@kbn/i18n';
 
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
@@ -21,20 +22,89 @@ import { isString, renderValueNoThenEnabled } from '../utils/utils';
 const mainSettings = [
   {
     field: 'disabled',
-    label: 'CIS-CAT integration status',
-    render: renderValueNoThenEnabled
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.cis.general.status',
+      {
+        defaultMessage: 'CIS-CAT integration status',
+      },
+    ),
+    render: renderValueNoThenEnabled,
   },
-  { field: 'timeout', label: 'Timeout (in seconds) for scan executions' },
-  { field: 'java_path', label: 'Path to Java executable directory' },
-  { field: 'ciscat_path', label: 'Path to CIS-CAT executable directory' }
+  {
+    field: 'timeout',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.cis.general.scans',
+      {
+        defaultMessage: 'Timeout (in seconds) for scan executions',
+      },
+    ),
+  },
+  {
+    field: 'java_path',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.cis.general.java',
+      {
+        defaultMessage: 'Path to Java executable directory',
+      },
+    ),
+  },
+  {
+    field: 'ciscat_path',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.cis.general.directory',
+      {
+        defaultMessage: 'Path to CIS-CAT executable directory',
+      },
+    ),
+  },
 ];
 
 const schedulingSettings = [
-  { field: 'interval', label: 'Interval between scan executions' },
-  { field: 'scan-on-start', label: 'Scan on start' },
-  { field: 'day', label: 'Day of the month to run scans' },
-  { field: 'wday', label: 'Day of the week to run scans' },
-  { field: 'time', label: 'Time of the day to run scans' }
+  {
+    field: 'interval',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.cis.general.executions',
+      {
+        defaultMessage: 'Interval between scan executions',
+      },
+    ),
+  },
+  {
+    field: 'scan-on-start',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.cis.general.ScanOnStart',
+      {
+        defaultMessage: 'Scan on start',
+      },
+    ),
+  },
+  {
+    field: 'day',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.cis.general.dayOfMonth',
+      {
+        defaultMessage: 'Day of the month to run scans',
+      },
+    ),
+  },
+  {
+    field: 'wday',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.cis.general.dayOfWeek',
+      {
+        defaultMessage: 'Day of the week to run scans',
+      },
+    ),
+  },
+  {
+    field: 'time',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.cis.general.timeofDay',
+      {
+        defaultMessage: 'Time of the day to run scans',
+      },
+    ),
+  },
 ];
 
 class WzConfigurationCisCatGeneral extends Component {
@@ -55,12 +125,22 @@ class WzConfigurationCisCatGeneral extends Component {
         {currentConfig &&
           !wodleConfig['cis-cat'] &&
           !isString(currentConfig['wmodules-wmodules']) && (
-            <WzNoConfig error="not-present" help={helpLinks} />
+            <WzNoConfig error='not-present' help={helpLinks} />
           )}
         {wodleConfig['cis-cat'] && (
           <WzConfigurationSettingsTabSelector
-            title="Main settings"
-            description="General settings applied to all benchmarks"
+            title={i18n.translate(
+              'wazuh.public.controller.management.config.cis.general.Main  settings',
+              {
+                defaultMessage: 'Main settings',
+              },
+            )}
+            description={i18n.translate(
+              'wazuh.public.controller.management.config.cis.general.Generalsettings',
+              {
+                defaultMessage: 'General settings applied to all benchmarks',
+              },
+            )}
             currentConfig={wodleConfig}
             minusHeight={this.props.agent.id === '000' ? 320 : 415}
             helpLinks={helpLinks}
@@ -70,8 +150,18 @@ class WzConfigurationCisCatGeneral extends Component {
               items={mainSettings}
             />
             <WzConfigurationSettingsGroup
-              title="Scheduling settings"
-              description="Customize CIS-CAT scans scheduling"
+              title={i18n.translate(
+                'wazuh.public.controller.management.config.cis.general.Schedulingsettings',
+                {
+                  defaultMessage: 'Scheduling settings',
+                },
+              )}
+              description={i18n.translate(
+                'wazuh.public.controller.management.config.cis.general.customize',
+                {
+                  defaultMessage: 'Customize CIS-CAT scans scheduling',
+                },
+              )}
               config={wodleConfig['cis-cat']}
               items={schedulingSettings}
             />

@@ -13,21 +13,35 @@
 import React, { useState, useEffect } from 'react';
 import { EuiEmptyPrompt } from '@elastic/eui';
 import { WazuhConfig } from '../../../../../react-services/wazuh-config';
-
+import { i18n } from '@kbn/i18n';
 
 export const PromptStatisticsNoIndices = () => {
-  const [indexName, setIndexName] = useState("");
+  const [indexName, setIndexName] = useState('');
 
   useEffect(() => {
     const wazuhConfig = new WazuhConfig();
     const config = wazuhConfig.getConfig();
-    setIndexName(`${config["cron.prefix"] || 'wazuh'}-${config["cron.statistics.index.name"] || 'stastistics'}-*`)
+    setIndexName(
+      `${config['cron.prefix'] || 'wazuh'}-${
+        config['cron.statistics.index.name'] || 'stastistics'
+      }-*`,
+    );
   }, []);
 
   return (
     <EuiEmptyPrompt
-      iconType="securitySignalDetected"
-      title={<h2>{indexName} indices were not found.</h2>}
+      iconType='securitySignalDetected'
+      title={
+        <h2>
+          {indexName}{' '}
+          {i18n.translate(
+            'wazuh.controllers..mnage.comp.confi.groups.ruleset.indicate',
+            {
+              defaultMessage: 'indices were not found.',
+            },
+          )}
+        </h2>
+      }
     />
-  )
-}
+  );
+};

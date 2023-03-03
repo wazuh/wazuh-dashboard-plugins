@@ -14,7 +14,8 @@ import { EuiBasicTable, EuiCallOut, EuiSpacer } from '@elastic/eui';
 
 import { connect } from 'react-redux';
 import GroupsHandler from './utils/groups-handler';
-import { getToasts }  from '../../../../../kibana-services';
+import { getToasts } from '../../../../../kibana-services';
+import { i18n } from '@kbn/i18n';
 
 import {
   updateLoadingStatus,
@@ -22,15 +23,23 @@ import {
   updatePageIndexFile,
   updateSortDirectionFile,
   updateSortFieldFile,
-  updateFileContent
+  updateFileContent,
 } from '../../../../../redux/actions/groupsActions';
 import GroupsFilesColumns from './utils/columns-files';
-import { WzSearchBar, filtersToObject } from '../../../../../components/wz-search-bar';
+import {
+  WzSearchBar,
+  filtersToObject,
+} from '../../../../../components/wz-search-bar';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 
-
+const label1 = i18n.translate(
+  'wazuh.public.controller.management.groups.table.label1',
+  {
+    defaultMessage: 'Error loading the groups:',
+  },
+);
 class WzGroupFilesTable extends Component {
   _isMounted = false;
   suggestions = [
@@ -44,7 +53,7 @@ class WzGroupFilesTable extends Component {
       items: [],
       pageSize: 10,
       totalItems: 0,
-      filters: []
+      filters: [],
     };
 
     this.groupsHandler = GroupsHandler;
@@ -76,14 +85,16 @@ class WzGroupFilesTable extends Component {
     try {
       const rawItems = await this.groupsHandler.filesGroup(
         this.props.state.itemDetail.name,
-        { params: this.buildFilter() }
+        { params: this.buildFilter() },
       );
-      const { affected_items, total_affected_items } = ((rawItems || {}).data || {}).data;
+      const { affected_items, total_affected_items } = (
+        (rawItems || {}).data || {}
+      ).data;
 
       this.setState({
         items: affected_items,
         totalItems: total_affected_items,
-        isProcessing: false
+        isProcessing: false,
       });
       this.props.state.isProcessing && this.props.updateIsProcessing(false);
     } catch (error) {
@@ -96,7 +107,7 @@ class WzGroupFilesTable extends Component {
         error: {
           error: error,
           message: error.message || error,
-          title: `Error loading the groups: ${error.message || error}`,
+          title: `${label1} ${error.message || error}`,
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -110,7 +121,7 @@ class WzGroupFilesTable extends Component {
       ...filtersToObject(filters),
       offset: pageIndexFile * pageSize,
       limit: pageSize,
-      sort: this.buildSortFilter()
+      sort: this.buildSortFilter(),
     };
 
     return filter;
@@ -142,7 +153,7 @@ class WzGroupFilesTable extends Component {
       pageIndexFile,
       error,
       sortFieldFile,
-      sortDirectionFile
+      sortDirectionFile,
     } = this.props.state;
     const { items, pageSize, totalItems, filters } = this.state;
     const columns = this.groupsAgentsColumns.columns;
@@ -151,13 +162,13 @@ class WzGroupFilesTable extends Component {
       pageIndex: pageIndexFile,
       pageSize: pageSize,
       totalItemCount: totalItems,
-      pageSizeOptions: [10, 25, 50, 100]
+      pageSizeOptions: [10, 25, 50, 100],
     };
     const sorting = {
       sort: {
         field: sortFieldFile,
-        direction: sortDirectionFile
-      }
+        direction: sortDirectionFile,
+      },
     };
 
     if (!error) {
@@ -166,12 +177,12 @@ class WzGroupFilesTable extends Component {
           <WzSearchBar
             filters={filters}
             suggestions={this.suggestions}
-            onFiltersChange={filters => this.setState({filters})}
+            onFiltersChange={filters => this.setState({ filters })}
             placeholder='Search file'
           />
           <EuiSpacer size='s' />
           <EuiBasicTable
-            itemId="id"
+            itemId='id'
             items={items}
             columns={columns}
             pagination={pagination}
@@ -184,7 +195,7 @@ class WzGroupFilesTable extends Component {
         </Fragment>
       );
     } else {
-      return <EuiCallOut color="warning" title={error} iconType="gear" />;
+      return <EuiCallOut color='warning' title={error} iconType='gear' />;
     }
   }
 
@@ -193,14 +204,14 @@ class WzGroupFilesTable extends Component {
       color: color,
       title: title,
       text: text,
-      toastLifeTimeMs: time
+      toastLifeTimeMs: time,
     });
   };
 }
 
 const mapStateToProps = state => {
   return {
-    state: state.groupsReducers
+    state: state.groupsReducers,
   };
 };
 
@@ -215,11 +226,8 @@ const mapDispatchToProps = dispatch => {
       dispatch(updateSortDirectionFile(sortDirectionFile)),
     updateSortFieldFile: sortFieldFile =>
       dispatch(updateSortFieldFile(sortFieldFile)),
-    updateFileContent: content => dispatch(updateFileContent(content))
+    updateFileContent: content => dispatch(updateFileContent(content)),
   };
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WzGroupFilesTable);
+export default connect(mapStateToProps, mapDispatchToProps)(WzGroupFilesTable);

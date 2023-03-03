@@ -13,21 +13,44 @@
 import React from 'react';
 import { EuiEmptyPrompt, EuiButton } from '@elastic/eui';
 import { AppNavigate } from '../../../../../react-services/app-navigate';
+import { i18n } from '@kbn/i18n';
 
 export const PromptStatisticsDisabled = () => {
   const goToConfigure = e => {
-    AppNavigate.navigateToModule(e, 'settings', { tab: 'configuration', category: 'statistics' })
+    AppNavigate.navigateToModule(e, 'settings', {
+      tab: 'configuration',
+      category: 'statistics',
+    });
   };
 
   return (
     <EuiEmptyPrompt
-      iconType="securitySignalDetected"
-      title={<h2>Statistics is disabled</h2>}
+      iconType='securitySignalDetected'
+      title={
+        <h2>
+          {i18n.translate(
+            'wazuh.controllers..mnage.comp.confi.groups.ruleset.Statisticsdisabled',
+            {
+              defaultMessage: 'Statistics is disabled',
+            },
+          )}
+        </h2>
+      }
       actions={
-        <EuiButton color="primary" fill iconType="gear" onMouseDown={goToConfigure}>
-          Go to configure
-        </EuiButton>  
+        <EuiButton
+          color='primary'
+          fill
+          iconType='gear'
+          onMouseDown={goToConfigure}
+        >
+          {i18n.translate(
+            'wazuh.controllers..mnage.comp.confi.groups.ruleset.Statistics.config',
+            {
+              defaultMessage: ' Go to configure',
+            },
+          )}
+        </EuiButton>
       }
     />
-  )
-}
+  );
+};

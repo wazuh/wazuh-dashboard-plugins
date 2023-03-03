@@ -15,28 +15,125 @@ import {
   EuiFlexItem,
   EuiPopover,
   EuiButton,
-  EuiButtonEmpty
+  EuiButtonEmpty,
 } from '@elastic/eui';
+import { i18n } from '@kbn/i18n';
 
 class WzPopoverFilters extends Component {
   filters: {
-    rules: { label: string; value: string; }[];
-    decoders: { label: string; value: string; }[];
+    rules: { label: string; value: string }[];
+    decoders: { label: string; value: string }[];
   };
 
   constructor(props) {
     super(props);
     this.state = {
-      isPopoverOpen: false
-    }
+      isPopoverOpen: false,
+    };
     this.filters = {
       rules: [
-        { label: 'File', value: 'file' }, { label: 'Path', value: 'path' }, { label: 'Level', value: 'level' },
-        { label: 'Group', value: 'group' }, { label: 'PCI control', value: 'pci' }, { label: 'GDPR', value: 'gdpr' }, { label: 'HIPAA', value: 'hipaa' }, { label: 'NIST-800-53', value: 'nist-800-53' }, { label: 'TSC', value: 'tsc' }
+        {
+          label: i18n.translate(
+            'wazuh.public.controller.management.ruleset.popover.File',
+            {
+              defaultMessage: 'File',
+            },
+          ),
+          value: 'file',
+        },
+        {
+          label: i18n.translate(
+            'wazuh.public.controller.management.ruleset.popover.Path',
+            {
+              defaultMessage: 'Path',
+            },
+          ),
+          value: 'path',
+        },
+        {
+          label: i18n.translate(
+            'wazuh.public.controller.management.ruleset.popover.Level',
+            {
+              defaultMessage: 'Level',
+            },
+          ),
+          value: 'level',
+        },
+        {
+          label: i18n.translate(
+            'wazuh.public.controller.management.ruleset.popover.Group',
+            {
+              defaultMessage: 'Group',
+            },
+          ),
+          value: 'group',
+        },
+        {
+          label: i18n.translate(
+            'wazuh.public.controller.management.ruleset.popover.PCIcontrol',
+            {
+              defaultMessage: 'PCI control',
+            },
+          ),
+          value: 'pci',
+        },
+        {
+          label: i18n.translate(
+            'wazuh.public.controller.management.ruleset.popover.GDPR',
+            {
+              defaultMessage: 'GDPR',
+            },
+          ),
+          value: 'gdpr',
+        },
+        {
+          label: i18n.translate(
+            'wazuh.public.controller.management.ruleset.popover.HIPAA',
+            {
+              defaultMessage: 'HIPAA',
+            },
+          ),
+          value: 'hipaa',
+        },
+        {
+          label: i18n.translate(
+            'wazuh.public.controller.management.ruleset.popover.NIST-800-53',
+            {
+              defaultMessage: 'NIST-800-53',
+            },
+          ),
+          value: 'nist-800-53',
+        },
+        {
+          label: i18n.translate(
+            'wazuh.public.controller.management.ruleset.popover.TSC',
+            {
+              defaultMessage: 'TSC',
+            },
+          ),
+          value: 'tsc',
+        },
       ],
       decoders: [
-        { label: 'File', value: 'file' }, { label: 'Path', value: 'path' }
-      ]
+        {
+          label: i18n.translate(
+            'wazuh.public.controller.management.ruleset.popover.File',
+            {
+              defaultMessage: 'File',
+            },
+          ),
+          value: 'file',
+        },
+        {
+          label: i18n.translate(
+            'wazuh.public.controller.management.ruleset.popover.Path',
+            {
+              defaultMessage: 'Path',
+            },
+          ),
+          value: 'path',
+        },
+      ],
     };
   }
 
@@ -60,27 +157,41 @@ class WzPopoverFilters extends Component {
         style={{ padding: 12 }}
         color='primary'
         onClick={() => this.onButtonClick()}
-        iconType="logstashFilter"
-        aria-label="Filter">
-        Filters
+        iconType='logstashFilter'
+        aria-label={i18n.translate(
+          'wazuh.public.controller.management.ruleset.popover.Filter',
+          {
+            defaultMessage: 'Filter',
+          },
+        )}
+      >
+        {i18n.translate(
+          'wazuh.public.controller.management.ruleset.popover.Filters',
+          {
+            defaultMessage: 'Filters',
+          },
+        )}
       </EuiButton>
     );
 
     return (
       <EuiFlexItem grow={false} style={{ marginLeft: 0 }}>
         <EuiPopover
-          id="trapFocus"
+          id='trapFocus'
           ownFocus
           button={button}
           isOpen={this.state['isPopoverOpen']}
-          anchorPosition="downRight"
-          closePopover={this.closePopover.bind(this)}>
+          anchorPosition='downRight'
+          closePopover={this.closePopover.bind(this)}
+        >
           {this.filters[section].map((filter, idx) => (
             <div key={idx}>
-              <EuiButtonEmpty size="s"
+              <EuiButtonEmpty
+                size='s'
                 iconSide='right'
                 // TODO: Add the logic to applyFilters
-                onClick={() => null}>
+                onClick={() => null}
+              >
                 {filter.label}
               </EuiButtonEmpty>
             </div>
@@ -89,18 +200,16 @@ class WzPopoverFilters extends Component {
       </EuiFlexItem>
     );
   }
-
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
     state: state.rulesetReducers,
   };
 };
 
-const mapDispatchToProps = (dispatch) => {
-  return {
-  };
+const mapDispatchToProps = dispatch => {
+  return {};
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(WzPopoverFilters);

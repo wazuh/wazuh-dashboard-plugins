@@ -13,6 +13,7 @@
 import React, { Component, Fragment } from 'react';
 
 import { EuiBasicTable } from '@elastic/eui';
+import { i18n } from '@kbn/i18n';
 
 import WzNoConfig from '../util-components/no-config';
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
@@ -25,15 +26,54 @@ import { wodleBuilder } from '../utils/builders';
 const securitySettings = [
   {
     field: 'enabled',
-    label: 'Security configuration assessment status',
-    render: renderValueYesThenEnabled
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.policy.monitoring.sca.status',
+      {
+        defaultMessage: 'Security configuration assessment status',
+      },
+    ),
+    render: renderValueYesThenEnabled,
   },
-  { field: 'interval', label: 'Interval' },
-  { field: 'scan_on_start', label: 'Scan on start' },
-  { field: 'skip_nfs', label: 'Skip nfs' }
+  {
+    field: 'interval',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.policy.monitoring.sca.Interval',
+      {
+        defaultMessage: 'Interval',
+      },
+    ),
+  },
+  {
+    field: 'scan_on_start',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.policy.monitoring.sca.Scanonstart',
+      {
+        defaultMessage: 'Scan on start',
+      },
+    ),
+  },
+  {
+    field: 'skip_nfs',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.policy.monitoring.sca.Skipnfs',
+      {
+        defaultMessage: 'Skip nfs',
+      },
+    ),
+  },
 ];
 
-const columns = [{ field: 'policy', name: 'Name' }];
+const columns = [
+  {
+    field: 'policy',
+    name: i18n.translate(
+      'wazuh.public.controller.management.config.policy.monitoring.sca.Name',
+      {
+        defaultMessage: 'Name',
+      },
+    ),
+  },
+];
 
 class WzPolicyMonitoringSCA extends Component {
   constructor(props) {
@@ -44,10 +84,15 @@ class WzPolicyMonitoringSCA extends Component {
     return (
       <Fragment>
         {!this.wodleConfig.sca ? (
-          <WzNoConfig error="not-present" help={helpLinks} />
+          <WzNoConfig error='not-present' help={helpLinks} />
         ) : (
           <WzConfigurationSettingsTabSelector
-            title="Security configuration assessment status"
+            title={i18n.translate(
+              'wazuh.public.controller.management.config.policy.monitoring.sca.asseessment',
+              {
+                defaultMessage: 'Security configuration assessment status',
+              },
+            )}
             currentConfig={this.wodleConfig}
             minusHeight={this.props.agent.id === '000' ? 320 : 415}
             helpLinks={helpLinks}
@@ -56,7 +101,14 @@ class WzPolicyMonitoringSCA extends Component {
               config={this.wodleConfig.sca}
               items={securitySettings}
             />
-            <WzConfigurationSettingsHeader title="Policies" />
+            <WzConfigurationSettingsHeader
+              title={i18n.translate(
+                'wazuh.public.controller.management.config.policy.monitoring.sca.Policies',
+                {
+                  defaultMessage: 'Policies',
+                },
+              )}
+            />
             <EuiBasicTable
               items={this.wodleConfig.sca.policies.map(policy => ({ policy }))}
               columns={columns}

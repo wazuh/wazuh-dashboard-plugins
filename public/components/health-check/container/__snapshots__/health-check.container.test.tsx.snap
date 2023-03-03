@@ -1,5 +1,37 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+import { i18n } from "@kbn/i18n";
+
+const title1 = i18n.translate("wazuh.components.overview.github.panel.title1", {
+  defaultMessage: "Check Wazuh API connection",
+});
+const title2 = i18n.translate("wazuh.components.overview.github.panel.title2", {
+  defaultMessage: "Check Wazuh API version",
+});
+const title3 = i18n.translate("wazuh.components.overview.github.panel.title3", {
+  defaultMessage: "Check alerts index pattern",
+});
+const title4 = i18n.translate("wazuh.components.overview.github.panel.title4", {
+  defaultMessage: "Check monitoring index pattern",
+});
+const title5 = i18n.translate("wazuh.components.overview.github.panel.title5", {
+  defaultMessage: "Check statistics index pattern",
+});
+const title6 = i18n.translate("wazuh.components.overview.github.panel.title6", {
+  defaultMessage: "Check timelion:max_buckets setting",
+});
+const title7 = i18n.translate(
+  "wazuh.components.common.welcome.comp.agent.sections.metaFields",
+  {
+    defaultMessage: "Check metaFields setting",
+  }
+);
+const title8 = i18n.translate(
+  "wazuh.components.common.welcome.comp.agent.sections.title8",
+  {
+    defaultMessage: "Check timepicker:timeDefaults setting",
+  }
+);
 exports[`Health Check container should render a Health check screen 1`] = `
 <div
   className="health-check"
@@ -29,7 +61,7 @@ exports[`Health Check container should render a Health check screen 1`] = `
         name="api"
         shouldCheck={true}
         showLogButton={false}
-        title="Check Wazuh API connection"
+        title={title1}
         validationService={[Function]}
       />
       <CheckResult
@@ -47,7 +79,7 @@ exports[`Health Check container should render a Health check screen 1`] = `
         name="setup"
         shouldCheck={true}
         showLogButton={false}
-        title="Check Wazuh API version"
+        title={title2}
         validationService={[Function]}
       />
       <CheckResult
@@ -62,7 +94,7 @@ exports[`Health Check container should render a Health check screen 1`] = `
         name="pattern"
         shouldCheck={true}
         showLogButton={false}
-        title="Check alerts index pattern"
+        title={title3}
         validationService={[Function]}
       />
       <CheckResult
@@ -77,7 +109,7 @@ exports[`Health Check container should render a Health check screen 1`] = `
         name="patternMonitoring"
         shouldCheck={true}
         showLogButton={false}
-        title="Check monitoring index pattern"
+        title={title4}
         validationService={[Function]}
       />
       <CheckResult
@@ -92,7 +124,7 @@ exports[`Health Check container should render a Health check screen 1`] = `
         name="patternStatistics"
         shouldCheck={true}
         showLogButton={false}
-        title="Check statistics index pattern"
+        title={title5}
         validationService={[Function]}
       />
       <CheckResult
@@ -107,7 +139,7 @@ exports[`Health Check container should render a Health check screen 1`] = `
         name="maxBuckets"
         shouldCheck={true}
         showLogButton={false}
-        title="Check timelion:max_buckets setting"
+        title={title6}
       />
       <CheckResult
         awaitFor={Array []}
@@ -121,7 +153,7 @@ exports[`Health Check container should render a Health check screen 1`] = `
         name="metaFields"
         shouldCheck={true}
         showLogButton={false}
-        title="Check metaFields setting"
+        title={title7}
       />
       <CheckResult
         awaitFor={Array []}
@@ -134,7 +166,7 @@ exports[`Health Check container should render a Health check screen 1`] = `
         key="health_check_check_timeFilter"
         name="timeFilter"
         showLogButton={false}
-        title="Check timepicker:timeDefaults setting"
+        title={title8}
       />
     </EuiDescriptionList>
   </div>

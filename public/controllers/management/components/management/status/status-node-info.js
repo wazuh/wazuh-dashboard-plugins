@@ -14,6 +14,7 @@ import React, { Component } from 'react';
 import { EuiPanel, EuiFlexGroup, EuiFlexItem, EuiTitle } from '@elastic/eui';
 import { formatUIDate } from '../../../../../react-services/time-service';
 import { connect } from 'react-redux';
+import { i18n } from '@kbn/i18n';
 
 export class WzStatusNodeInfo extends Component {
   _isMounted = false;
@@ -32,13 +33,19 @@ export class WzStatusNodeInfo extends Component {
 
   render() {
     const { stats, nodeInfo, selectedNode, clusterEnabled } = this.props.state;
-    const agentsNodeCount = clusterEnabled ? (stats.agentsCountByManagerNodes.find(node => node.node_name === selectedNode) || {}).count || 0 : stats.agentsCount.total;
+    const agentsNodeCount = clusterEnabled
+      ? (
+          stats.agentsCountByManagerNodes.find(
+            node => node.node_name === selectedNode,
+          ) || {}
+        ).count || 0
+      : stats.agentsCount.total;
     const title = selectedNode
       ? selectedNode + ' information'
       : 'Manager information';
 
     const greyStyle = {
-      color: 'grey'
+      color: 'grey',
     };
 
     return (
@@ -47,7 +54,7 @@ export class WzStatusNodeInfo extends Component {
           <EuiFlexItem>
             <EuiFlexGroup>
               <EuiFlexItem>
-                <EuiTitle size="m">
+                <EuiTitle size='m'>
                   <h2>{title}</h2>
                 </EuiTitle>
               </EuiFlexItem>
@@ -55,25 +62,60 @@ export class WzStatusNodeInfo extends Component {
           </EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup>
-          <EuiFlexItem>Version</EuiFlexItem>
+          <EuiFlexItem>
+            {i18n.translate(
+              'wazuh.controllers.mnage.comp.confi.groups.status.agent.Version',
+              {
+                defaultMessage: 'Version',
+              },
+            )}
+          </EuiFlexItem>
           <EuiFlexItem style={greyStyle}>{nodeInfo.version}</EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup>
-          <EuiFlexItem>Compilation date</EuiFlexItem>
+          <EuiFlexItem>
+            {i18n.translate(
+              'wazuh.controllers.mnage.comp.confi.groups.status.agent.Compilationdate',
+              {
+                defaultMessage: 'Compilation date',
+              },
+            )}
+          </EuiFlexItem>
           <EuiFlexItem style={greyStyle}>
             {formatUIDate(nodeInfo.compilation_date)}
           </EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup>
-          <EuiFlexItem>Installation path</EuiFlexItem>
+          <EuiFlexItem>
+            {i18n.translate(
+              'wazuh.controllers.mnage.comp.confi.groups.status.agent.',
+              {
+                defaultMessage: 'Installationpath',
+              },
+            )}
+          </EuiFlexItem>
           <EuiFlexItem style={greyStyle}>{nodeInfo.path}</EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup>
-          <EuiFlexItem>Installation type</EuiFlexItem>
+          <EuiFlexItem>
+            {i18n.translate(
+              'wazuh.controllers.mnage.comp.confi.groups.status.agent.Installationtype',
+              {
+                defaultMessage: 'Installation type',
+              },
+            )}
+          </EuiFlexItem>
           <EuiFlexItem style={greyStyle}>{nodeInfo.type}</EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup>
-          <EuiFlexItem>Agents</EuiFlexItem>
+          <EuiFlexItem>
+            {i18n.translate(
+              'wazuh.controllers.mnage.comp.confi.groups.status.agent',
+              {
+                defaultMessage: 'Agents',
+              },
+            )}
+          </EuiFlexItem>
           <EuiFlexItem style={greyStyle}>{agentsNodeCount}</EuiFlexItem>
         </EuiFlexGroup>
       </EuiPanel>
@@ -83,7 +125,7 @@ export class WzStatusNodeInfo extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.statusReducers
+    state: state.statusReducers,
   };
 };
 

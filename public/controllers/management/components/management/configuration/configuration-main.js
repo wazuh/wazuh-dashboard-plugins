@@ -16,31 +16,43 @@ import {
   withGlobalBreadcrumb,
   withReduxProvider,
 } from '../../../../../components/common/hocs';
-import { compose } from 'redux'
-
+import { compose } from 'redux';
+import { i18n } from '@kbn/i18n';
+const text1 = i18n.translate('wazuh.controller.manage.comp.confi.main.text1', {
+  defaultMessage: 'Management',
+});
+const text2 = i18n.translate('wazuh.controller.manage.comp.confi.main.text2', {
+  defaultMessage: 'Configuration',
+});
+const text3 = i18n.translate('wazuh.controller.manage.comp.confi.main.text3', {
+  defaultMessage: 'Agents',
+});
+const text4 = i18n.translate('wazuh.controller.manage.comp.confi.main.text4', {
+  defaultMessage: 'Configuration',
+});
 export default compose(
   withErrorBoundary,
   withReduxProvider,
-  withGlobalBreadcrumb((props) => {
+  withGlobalBreadcrumb(props => {
     let breadcrumb = false;
     if (props.agent.id === '000') {
       breadcrumb = [
         { text: '' },
-        { text: 'Management', href: '#/manager' },
-        { text: 'Configuration' },
+        { text: text1, href: '#/manager' },
+        { text: text2 },
       ];
     } else {
       breadcrumb = [
         { text: '' },
         {
-          text: 'Agents',
+          text: text3,
           href: '#/agents-preview',
         },
         { agent: props.agent },
-        { text: 'Configuration' },
+        { text: text4 },
       ];
     }
     $('#breadcrumbNoTitle').attr('title', '');
     return breadcrumb;
-  })
+  }),
 )(WzConfigurationSwitch);

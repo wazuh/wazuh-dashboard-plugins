@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-
+import { i18n } from '@kbn/i18n';
 import React, { useEffect, useState } from 'react';
 import {
   EuiFieldSearch,
@@ -191,7 +191,7 @@ export const MultiSelect = ({
               <div className="euiFilterSelect__noteContent">
                 <EuiLoadingChart size="m" />
                 <EuiSpacer size="xs" />
-                <p>Loading filters</p>
+                <p>{ i18n.translate('wazuh.components.common.customSearchBar.loadingFilter', { defaultMessage: 'Loading filters', })}</p>
               </div>
             </div>
           )}
@@ -200,7 +200,7 @@ export const MultiSelect = ({
               <div className="euiFilterSelect__noteContent">
                 <EuiIcon type="minusInCircle" />
                 <EuiSpacer size="xs" />
-                <p>No filters found</p>
+                <p>{ i18n.translate('wazuh.components.common.customSearchBar.filterFound', { defaultMessage: 'No filters found', })}</p>
               </div>
             </div>
           )}

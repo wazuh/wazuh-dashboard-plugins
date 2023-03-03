@@ -12,6 +12,7 @@
 
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { i18n } from '@kbn/i18n';
 
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
@@ -22,71 +23,262 @@ import { webDocumentationLink } from '../../../../../../../common/services/web_d
 
 const helpLinks = [
   {
-    text: 'Global reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/global.html')
+    text: i18n.translate(
+      'wazuh.public.controller.management.config.global.GlobalReference',
+      {
+        defaultMessage: 'Global reference',
+      },
+    ),
+    href: webDocumentationLink('user-manual/reference/ossec-conf/global.html'),
   },
   {
-    text: 'Logging reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/logging.html')
-  }
+    text: i18n.translate(
+      'wazuh.public.controller.management.config.global.LoggingReference',
+      {
+        defaultMessage: 'Logging reference',
+      },
+    ),
+    href: webDocumentationLink('user-manual/reference/ossec-conf/logging.html'),
+  },
 ];
 
 const mainSettings = [
-  { field: 'alerts_log', label: 'Write alerts to alerts.log file' },
+  {
+    field: 'alerts_log',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.global.fileAlert1',
+      {
+        defaultMessage: 'Write alerts to alerts.log file',
+      },
+    ),
+  },
   {
     field: 'jsonout_output',
-    label: 'Write JSON formatted alerts to alerts.json file'
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.global.fileJson',
+      {
+        defaultMessage: 'Write JSON formatted alerts to alerts.json file',
+      },
+    ),
   },
-  { field: 'logall', label: 'Archive all the alerts in plain text format' },
-  { field: 'logall_json', label: 'Archive all the alerts in JSON format' },
+  {
+    field: 'logall',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.global.plainFormat',
+      {
+        defaultMessage: 'Archive all the alerts in plain text format',
+      },
+    ),
+  },
+  {
+    field: 'logall_json',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.global.alertJson',
+      {
+        defaultMessage: 'Archive all the alerts in JSON format',
+      },
+    ),
+  },
   {
     field: 'custom_alert_output',
-    label: 'Customized alerts format for alerts.log file'
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.global.customized',
+      {
+        defaultMessage: 'Customized alerts format for alerts.log file',
+      },
+    ),
   },
-  { field: 'plain', label: 'Write internal logs in plain text' },
-  { field: 'json', label: 'Write internal logs in JSON format' },
-  { field: 'max_output_size', label: 'Size limit of alert files' },
-  { field: 'rotate_interval', label: 'File rotation interval' }
+  {
+    field: 'plain',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.global.write',
+      {
+        defaultMessage: 'Write internal logs in plain text',
+      },
+    ),
+  },
+  {
+    field: 'json',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.global.json',
+      {
+        defaultMessage: 'Write internal logs in JSON format',
+      },
+    ),
+  },
+  {
+    field: 'max_output_size',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.global.sizeLimit',
+      {
+        defaultMessage: 'Size limit of alert files',
+      },
+    ),
+  },
+  {
+    field: 'rotate_interval',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.global.FileRotation',
+      {
+        defaultMessage: 'File rotation interval',
+      },
+    ),
+  },
 ];
 
 const emailSettings = [
-  { field: 'email_notification', label: 'Enable alerts sent by email' },
-  { field: 'email_from', label: 'Sender adress for email alerts' },
-  { field: 'email_to', label: 'Recipient address for email alerts' },
-  { field: 'email_reply_to', label: 'Reply-to address for email alerts' },
-  { field: 'smtp_server', label: 'Address for SMTP mail server' },
+  {
+    field: 'email_notification',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.global.sentEmail',
+      {
+        defaultMessage: 'Enable alerts sent by email',
+      },
+    ),
+  },
+  {
+    field: 'email_from',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.global.sender',
+      {
+        defaultMessage: 'Sender adress for email alerts',
+      },
+    ),
+  },
+  {
+    field: 'email_to',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.global.recipient',
+      {
+        defaultMessage: 'Recipient address for email alerts',
+      },
+    ),
+  },
+  {
+    field: 'email_reply_to',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.global.replytoo',
+      {
+        defaultMessage: 'Reply-to address for email alerts',
+      },
+    ),
+  },
+  {
+    field: 'smtp_server',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.global.SMTP',
+      {
+        defaultMessage: 'Address for SMTP mail server',
+      },
+    ),
+  },
   {
     field: 'email_maxperhour',
-    label: 'Maximum number of email alerts sent per hour'
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.global.alertSent',
+      {
+        defaultMessage: 'Maximum number of email alerts sent per hour',
+      },
+    ),
   },
-  { field: 'email_log_source', label: 'File to read data from' },
-  { field: 'email_idsname', label: 'Name used for email alerts headers' }
+  {
+    field: 'email_log_source',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.global.dataFoam',
+      {
+        defaultMessage: 'File to read data from',
+      },
+    ),
+  },
+  {
+    field: 'email_idsname',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.global.header',
+      {
+        defaultMessage: 'Name used for email alerts headers',
+      },
+    ),
+  },
 ];
 
 const otherSettings = [
   {
     field: 'stats',
-    label: 'Severity level for alerts generated by statistical analysis'
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.global.gernated',
+      {
+        defaultMessage:
+          'Severity level for alerts generated by statistical analysis',
+      },
+    ),
   },
   {
     field: 'host_information',
-    label: 'Severity level for alerts generated by host change monitor'
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.global.moniter',
+      {
+        defaultMessage:
+          'Severity level for alerts generated by host change monitor',
+      },
+    ),
   },
   {
     field: 'memory_size',
-    label: 'Memory size for the alert correlation engine'
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.global.memory',
+      {
+        defaultMessage: 'Memory size for the alert correlation engine',
+      },
+    ),
   },
-  { field: 'white_list', label: 'White-listed IP addresses' },
+  {
+    field: 'white_list',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.global.ipAddress',
+      {
+        defaultMessage: 'White-listed IP addresses',
+      },
+    ),
+  },
   {
     field: 'geoip_db_path',
-    label: 'Full path to MaxMind GeoIP IPv4 database file'
-  }
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.global.datbase',
+      {
+        defaultMessage: 'Full path to MaxMind GeoIP IPv4 database file',
+      },
+    ),
+  },
 ];
 
 const preludeZeroMQOutputSettings = [
-  { field: 'prelude_output', label: 'Enable Prelude output' },
-  { field: 'zeromq_output', label: 'Enable ZeroMQ output' },
-  { field: 'zeromq_uri', label: 'ZeroMQ URI to bind publisher socket' }
+  {
+    field: 'prelude_output',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.global.enable',
+      {
+        defaultMessage: 'Enable Prelude output',
+      },
+    ),
+  },
+  {
+    field: 'zeromq_output',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.global.output',
+      {
+        defaultMessage: 'Enable ZeroMQ output',
+      },
+    ),
+  },
+  {
+    field: 'zeromq_uri',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.global.socket',
+      {
+        defaultMessage: 'ZeroMQ URI to bind publisher socket',
+      },
+    ),
+  },
 ];
 
 const buildHelpLinks = agent =>
@@ -108,12 +300,12 @@ class WzConfigurationGlobalConfigurationGlobal extends Component {
         ? {
             ...currentConfig['analysis-global'].global,
             plain: currentConfig['com-logging'].logging.plain,
-            json: currentConfig['com-logging'].logging.json
+            json: currentConfig['com-logging'].logging.json,
           }
         : currentConfig['com-logging'] && currentConfig['com-logging'].logging
         ? {
             plain: currentConfig['com-logging'].logging.plain,
-            json: currentConfig['com-logging'].logging.json
+            json: currentConfig['com-logging'].logging.json,
           }
         : {};
     const globalSettingsConfig =
@@ -121,7 +313,7 @@ class WzConfigurationGlobalConfigurationGlobal extends Component {
       currentConfig['analysis-global'] &&
       currentConfig['analysis-global'].global
         ? {
-            ...currentConfig['analysis-global'].global
+            ...currentConfig['analysis-global'].global,
           }
         : {};
     return (
@@ -145,19 +337,29 @@ class WzConfigurationGlobalConfigurationGlobal extends Component {
         {currentConfig['analysis-global'] &&
           !isString(currentConfig['analysis-global']) &&
           !currentConfig['analysis-global'].global && (
-            <WzNoConfig error="not-present" help={this.helpLinks} />
+            <WzNoConfig error='not-present' help={this.helpLinks} />
           )}
         {wazuhNotReadyYet &&
           (!currentConfig || !currentConfig['analysis-global']) && (
-            <WzNoConfig error="Wazuh not ready yet" help={this.helpLinks} />
+            <WzNoConfig error='Wazuh not ready yet' help={this.helpLinks} />
           )}
         {((currentConfig['analysis-global'] &&
           currentConfig['analysis-global'].global) ||
           (currentConfig['com-logging'] &&
             currentConfig['com-logging'].logging)) && (
           <WzConfigurationSettingsTabSelector
-            title="Main settings"
-            description="Basic alerts and logging settings"
+            title={i18n.translate(
+              'wazuh.public.controller.management.config.global.Mainsettings',
+              {
+                defaultMessage: 'Main settings',
+              },
+            )}
+            description={i18n.translate(
+              'wazuh.public.controller.management.config.global.loggingSetting',
+              {
+                defaultMessage: 'Basic alerts and logging settings',
+              },
+            )}
             currentConfig={currentConfig}
             minusHeight={agent.id === '000' ? 320 : 355}
             helpLinks={this.helpLinks}
@@ -169,19 +371,46 @@ class WzConfigurationGlobalConfigurationGlobal extends Component {
             {agent.id === '000' && (
               <Fragment>
                 <WzConfigurationSettingsGroup
-                  title="Email settings"
-                  description="Basic email settings (needed for granular email settings)"
+                  title={i18n.translate(
+                    'wazuh.public.controller.management.config.global.Emailsettings1',
+                    {
+                      defaultMessage: 'Email settings',
+                    },
+                  )}
+                  description={i18n.translate(
+                    'wazuh.public.controller.management.config.global.emailSetting',
+                    {
+                      defaultMessage:
+                        'Basic email settings (needed for granular email settings',
+                    },
+                  )}
                   config={globalSettingsConfig}
                   items={emailSettings}
                 />
                 <WzConfigurationSettingsGroup
-                  title="Other settings"
-                  description="Settings not directly related to any specific component"
+                  title={i18n.translate(
+                    'wazuh.public.controller.management.config.global.Othersettings',
+                    {
+                      defaultMessage: 'Other settings',
+                    },
+                  )}
+                  description={i18n.translate(
+                    'wazuh.public.controller.management.config.global.setting',
+                    {
+                      defaultMessage:
+                        'Settings not directly related to any specific component',
+                    },
+                  )}
                   config={globalSettingsConfig}
                   items={otherSettings}
                 />
                 <WzConfigurationSettingsGroup
-                  title="Prelude and ZeroMQ output"
+                  title={i18n.translate(
+                    'wazuh.public.controller.management.config.global.outputPrelude',
+                    {
+                      defaultMessage: 'Prelude and ZeroMQ output',
+                    },
+                  )}
                   config={globalSettingsConfig}
                   items={preludeZeroMQOutputSettings}
                 />
@@ -197,7 +426,7 @@ class WzConfigurationGlobalConfigurationGlobal extends Component {
 WzConfigurationGlobalConfigurationGlobal.propTypes = {
   // currentConfig: PropTypes.object.isRequired,
   agent: PropTypes.object,
-  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string])
+  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
 };
 
 export default WzConfigurationGlobalConfigurationGlobal;

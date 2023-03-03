@@ -12,13 +12,29 @@
 
 import React from 'react';
 import { EuiEmptyPrompt } from '@elastic/eui';
-
-export const PromptAgentFeatureVersion = ({ version = '' }: { version: string }) => {
+import { i18n } from '@kbn/i18n';
+const agentDescp = i18n.translate(
+  'wazuh.components.addModule.guide.agentDescp',
+  {
+    defaultMessage: "Agent doesn't support this feature",
+  },
+);
+const availAgents = i18n.translate(
+  'wazuh.public.components.agents.prompts.feature.',
+  {
+    defaultMessage: 'This feature is only available for agents with',
+  },
+);
+export const PromptAgentFeatureVersion = ({
+  version = '',
+}: {
+  version: string;
+}) => {
   return (
     <EuiEmptyPrompt
-      iconType="watchesApp"
-      title={<h2>{`Agent doesn't support this feature`}</h2>}
-      body={`This feature is only available for agents with ${version}.`}
+      iconType='watchesApp'
+      title={<h2>{agentDescp}</h2>}
+      body={`${availAgents} ${version}.`}
     />
   );
 };

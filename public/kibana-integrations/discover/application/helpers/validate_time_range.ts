@@ -32,10 +32,10 @@ export function validateTimeRange(
   const toMoment = dateMath.parse(to);
   if (!fromMoment || !toMoment || !fromMoment.isValid() || !toMoment.isValid()) {
     toastNotifications.addDanger({
-      title: i18n.translate('discover.notifications.invalidTimeRangeTitle', {
+      title: i18n.translate('wazuh.discover.notifications.invalidTimeRangeTitle', {
         defaultMessage: `Invalid time range`,
       }),
-      text: i18n.translate('discover.notifications.invalidTimeRangeText', {
+      text: i18n.translate('wazuh.discover.notifications.invalidTimeRangeText', {
         defaultMessage: `The provided time range is invalid. (from: '{from}', to: '{to}')`,
         values: {
           from,

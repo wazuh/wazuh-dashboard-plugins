@@ -20,6 +20,7 @@
 import React, { Component, Fragment } from 'react';
 import { FormattedMessage, I18nProvider } from '@kbn/i18n/react';
 import PropTypes from 'prop-types';
+import { i18n } from '@kbn/i18n';
 
 import {
   EuiCallOut,
@@ -48,22 +49,22 @@ export class DiscoverNoResults extends Component {
     if (timeFieldName) {
       timeFieldMessage = (
         <Fragment>
-          <EuiSpacer size="xl" />
+          <EuiSpacer size='xl' />
 
           <EuiText>
-            <h2 data-test-subj="discoverNoResultsTimefilter">
+            <h2 data-test-subj='discoverNoResultsTimefilter'>
               <FormattedMessage
-                id="discover.noResults.expandYourTimeRangeTitle"
-                defaultMessage="Expand your time range"
+                id='wazuh.discover.noResults.expandYourTimeRangeTitle'
+                defaultMessage='Expand your time range'
               />
             </h2>
 
             <p>
               <FormattedMessage
-                id="discover.noResults.queryMayNotMatchTitle"
-                defaultMessage="One or more of the indices you&rsquo;re looking at contains a date field. Your query may
+                id='wazuh.discover.noResults.queryMayNotMatchTitle'
+                defaultMessage='One or more of the indices you&rsquo;re looking at contains a date field. Your query may
                   not match anything in the current time range, or there may not be any data at all in
-                  the currently selected time range. You can try changing the time range to one which contains data."
+                  the currently selected time range. You can try changing the time range to one which contains data.'
               />
             </p>
           </EuiText>
@@ -81,60 +82,97 @@ export class DiscoverNoResults extends Component {
             <EuiText>
               <strong>
                 <FormattedMessage
-                  id="discover.noResults.searchExamples.anyField200StatusCodeExampleTitle"
-                  defaultMessage="Find requests that contain the number 200, in any field"
+                  id='wazuh.discover.noResults.searchExamples.anyField200StatusCodeExampleTitle'
+                  defaultMessage='Find requests that contain the number 200, in any field'
                 />
               </strong>
             </EuiText>
           ),
         },
         {
-          description: <EuiCode>status:200</EuiCode>,
+          description: (
+            <EuiCode>
+              {i18n.translate(
+                'wazuh.kibana-int.discover.app.angular.noresults.status4',
+                {
+                  defaultMessage: 'status:200',
+                },
+              )}
+            </EuiCode>
+          ),
           title: (
             <EuiText>
               <strong>
                 <FormattedMessage
-                  id="discover.noResults.searchExamples.statusField200StatusCodeExampleTitle"
-                  defaultMessage="Find 200 in the status field"
+                  id='wazuh.discover.noResults.searchExamples.statusField200StatusCodeExampleTitle'
+                  defaultMessage='Find 200 in the status field'
                 />
               </strong>
             </EuiText>
           ),
         },
         {
-          description: <EuiCode>status:[400 TO 499]</EuiCode>,
+          description: (
+            <EuiCode>
+              {i18n.translate(
+                'wazuh.kibana-int.discover.app.angular.noresults.status3',
+                {
+                  defaultMessage: 'status:[400 TO 499]',
+                },
+              )}
+            </EuiCode>
+          ),
           title: (
             <EuiText>
               <strong>
                 <FormattedMessage
-                  id="discover.noResults.searchExamples.400to499StatusCodeExampleTitle"
-                  defaultMessage="Find all status codes between 400-499"
+                  id='wazuh.discover.noResults.searchExamples.400to499StatusCodeExampleTitle'
+                  defaultMessage='Find all status codes between 400-499'
                 />
               </strong>
             </EuiText>
           ),
         },
         {
-          description: <EuiCode>status:[400 TO 499] AND extension:PHP</EuiCode>,
+          description: (
+            <EuiCode>
+              {i18n.translate(
+                'wazuh.kibana-int.discover.app.angular.noresults.status2',
+                {
+                  defaultMessage: 'status:[400 TO 499] AND extension:PHP',
+                },
+              )}
+            </EuiCode>
+          ),
           title: (
             <EuiText>
               <strong>
                 <FormattedMessage
-                  id="discover.noResults.searchExamples.400to499StatusCodeWithPhpExtensionExampleTitle"
-                  defaultMessage="Find status codes 400-499 with the extension php"
+                  id='wazuh.discover.noResults.searchExamples.400to499StatusCodeWithPhpExtensionExampleTitle'
+                  defaultMessage='Find status codes 400-499 with the extension php'
                 />
               </strong>
             </EuiText>
           ),
         },
         {
-          description: <EuiCode>status:[400 TO 499] AND (extension:php OR extension:html)</EuiCode>,
+          description: (
+            <EuiCode>
+              {i18n.translate(
+                'wazuh.kibana-int.discover.app.angular.noresults.status1',
+                {
+                  defaultMessage:
+                    'status:[400 TO 499] AND (extension:php OR extension:html)',
+                },
+              )}
+            </EuiCode>
+          ),
           title: (
             <EuiText>
               <strong>
                 <FormattedMessage
-                  id="discover.noResults.searchExamples.400to499StatusCodeWithPhpOrHtmlExtensionExampleTitle"
-                  defaultMessage="Find status codes 400-499 with the extension php or html"
+                  id='wazuh.discover.noResults.searchExamples.400to499StatusCodeWithPhpOrHtmlExtensionExampleTitle'
+                  defaultMessage='Find status codes 400-499 with the extension php or html'
                 />
               </strong>
             </EuiText>
@@ -144,30 +182,32 @@ export class DiscoverNoResults extends Component {
 
       luceneQueryMessage = (
         <Fragment>
-          <EuiSpacer size="xl" />
+          <EuiSpacer size='xl' />
 
           <EuiText>
             <h3>
               <FormattedMessage
-                id="discover.noResults.searchExamples.refineYourQueryTitle"
-                defaultMessage="Refine your query"
+                id='wazuh.discover.noResults.searchExamples.refineYourQueryTitle'
+                defaultMessage='Refine your query'
               />
             </h3>
 
             <p>
               <FormattedMessage
-                id="discover.noResults.searchExamples.howTosearchForWebServerLogsDescription"
-                defaultMessage="The search bar at the top uses Elasticsearch&rsquo;s support for Lucene {queryStringSyntaxLink}.
-                Here are some examples of how you can search for web server logs that have been parsed into a few fields."
+                id='wazuh.discover.noResults.searchExamples.howTosearchForWebServerLogsDescription'
+                defaultMessage='The search bar at the top uses Elasticsearch&rsquo;s support for Lucene {queryStringSyntaxLink}.
+                Here are some examples of how you can search for web server logs that have been parsed into a few fields.'
                 values={{
                   queryStringSyntaxLink: (
                     <EuiLink
-                      target="_blank"
-                      href={getServices().docLinks.links.query.luceneQuerySyntax}
+                      target='_blank'
+                      href={
+                        getServices().docLinks.links.query.luceneQuerySyntax
+                      }
                     >
                       <FormattedMessage
-                        id="discover.noResults.searchExamples.queryStringSyntaxLinkText"
-                        defaultMessage="Query String syntax"
+                        id='wazuh.discover.noResults.searchExamples.queryStringSyntaxLinkText'
+                        defaultMessage='Query String syntax'
                       />
                     </EuiLink>
                   ),
@@ -176,11 +216,11 @@ export class DiscoverNoResults extends Component {
             </p>
           </EuiText>
 
-          <EuiSpacer size="m" />
+          <EuiSpacer size='m' />
 
-          <EuiDescriptionList type="column" listItems={searchExamples} />
+          <EuiDescriptionList type='column' listItems={searchExamples} />
 
-          <EuiSpacer size="xl" />
+          <EuiSpacer size='xl' />
         </Fragment>
       );
     }
@@ -188,20 +228,20 @@ export class DiscoverNoResults extends Component {
     return (
       <I18nProvider>
         <Fragment>
-          <EuiSpacer size="xl" />
+          <EuiSpacer size='xl' />
 
-          <EuiFlexGroup justifyContent="center">
-            <EuiFlexItem grow={false} className="dscNoResults">
+          <EuiFlexGroup justifyContent='center'>
+            <EuiFlexItem grow={false} className='dscNoResults'>
               <EuiCallOut
                 title={
                   <FormattedMessage
-                    id="discover.noResults.searchExamples.noResultsMatchSearchCriteriaTitle"
-                    defaultMessage="No results match your search criteria"
+                    id='wazuh.discover.noResults.searchExamples.noResultsMatchSearchCriteriaTitle'
+                    defaultMessage='No results match your search criteria'
                   />
                 }
-                color="warning"
-                iconType="help"
-                data-test-subj="discoverNoResults"
+                color='warning'
+                iconType='help'
+                data-test-subj='discoverNoResults'
               />
               {timeFieldMessage}
               {luceneQueryMessage}

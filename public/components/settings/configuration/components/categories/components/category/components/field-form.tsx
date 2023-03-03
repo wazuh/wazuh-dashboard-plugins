@@ -18,72 +18,82 @@ import {
   EuiSwitch,
   EuiSelect,
   EuiCodeEditor,
-  EuiTextColor
+  EuiTextColor,
 } from '@elastic/eui';
 import { ISetting } from '../../../../../configuration';
 import 'brace/mode/javascript';
 import 'brace/snippets/javascript';
 import 'brace/ext/language_tools';
-import "brace/ext/searchbox";
+import 'brace/ext/searchbox';
 import {
   UI_ERROR_SEVERITIES,
-  UIErrorLog, UIErrorSeverity,
+  UIErrorLog,
+  UIErrorSeverity,
   UILogLevel,
 } from '../../../../../../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../../../../react-services/common-services';
 import _ from 'lodash';
+import { i18n } from '@kbn/i18n';
 
 interface IFieldForm {
-  item: ISetting
-  updatedConfig: { [field: string]: string | number | boolean | [] }
-  setUpdatedConfig({ }): void
+  item: ISetting;
+  updatedConfig: { [field: string]: string | number | boolean | [] };
+  setUpdatedConfig({}): void;
 }
-export const FieldForm: React.FunctionComponent<IFieldForm> = (props) => {
+export const FieldForm: React.FunctionComponent<IFieldForm> = props => {
   const { item } = props;
   switch (item.form.type) {
     case 'text':
-      return <TextForm {...props} />
+      return <TextForm {...props} />;
     case 'number':
-      return <NumberForm {...props} />
+      return <NumberForm {...props} />;
     case 'boolean':
-      return <BooleanForm {...props} />
+      return <BooleanForm {...props} />;
     case 'list':
-      return <ListForm {...props} />
+      return <ListForm {...props} />;
     case 'array':
-      return <ArrayForm {...props} />
+      return <ArrayForm {...props} />;
     case 'interval':
-      return <IntervalForm {...props} />
+      return <IntervalForm {...props} />;
     default:
       return null;
   }
 };
 
 //#region forms
-const TextForm: React.FunctionComponent<IFieldForm> = (props) => (
+const TextForm: React.FunctionComponent<IFieldForm> = props => (
   <EuiFieldText
     fullWidth
     value={getValue(props)}
-    onChange={e => onChange(e.target.value, props)} />);
+    onChange={e => onChange(e.target.value, props)}
+  />
+);
 
-const NumberForm: React.FunctionComponent<IFieldForm> = (props) => (
+const NumberForm: React.FunctionComponent<IFieldForm> = props => (
   <EuiFieldNumber
     fullWidth
     value={getValue(props)}
-    onChange={e => onChange(e.target.value, props)} />)
-const BooleanForm: React.FunctionComponent<IFieldForm> = (props) => (
+    onChange={e => onChange(e.target.value, props)}
+  />
+);
+const BooleanForm: React.FunctionComponent<IFieldForm> = props => (
   <EuiSwitch
     label={`${getValue(props)}`}
     checked={getValue(props)}
-    onChange={(e) => onChange(e.target.checked, props)} />);
+    onChange={e => onChange(e.target.checked, props)}
+  />
+);
 
-const ListForm: React.FunctionComponent<IFieldForm> = (props) => (
+const ListForm: React.FunctionComponent<IFieldForm> = props => (
   <EuiSelect
     {...props.item.form.params}
     value={getValue(props)}
-    onChange={(e) => onChange(e.target.value, props)} />);
+    onChange={e => onChange(e.target.value, props)}
+  />
+);
 
-const IntervalForm: React.FunctionComponent<IFieldForm> = (props) => {
+const IntervalForm: React.FunctionComponent<IFieldForm> = props => {
   const [interval, setInterval] = useState<string>(getValue(props));
   const [invalid, setInvalid] = useState(false);
   useEffect(() => {
@@ -94,7 +104,7 @@ const IntervalForm: React.FunctionComponent<IFieldForm> = (props) => {
       setInvalid(true);
       deleteChange(props);
     }
-  }, [interval])
+  }, [interval]);
   return (
     <>
       <EuiFieldText
@@ -103,12 +113,21 @@ const IntervalForm: React.FunctionComponent<IFieldForm> = (props) => {
         isInvalid={invalid}
         onChange={e => setInterval(e.target.value)}
       />
-      {invalid && <EuiTextColor color='danger'>Invalid cron schedule expressions</EuiTextColor>}
+      {invalid && (
+        <EuiTextColor color='danger'>
+          {i18n.translate(
+            'wazuh.public.components.setting.config.csate.field.invalidExpression',
+            {
+              defaultMessage: ' Invalid cron schedule expressions',
+            },
+          )}
+        </EuiTextColor>
+      )}
     </>
   );
-}
+};
 
-const ArrayForm: React.FunctionComponent<IFieldForm> = (props) => {
+const ArrayForm: React.FunctionComponent<IFieldForm> = props => {
   const [list, setList] = useState(JSON.stringify(getValue(props)));
 
   useEffect(() => {
@@ -133,7 +152,7 @@ const ArrayForm: React.FunctionComponent<IFieldForm> = (props) => {
 
       getErrorOrchestrator().handleError(options);
     }
-  }
+  };
   return (
     <EuiCodeEditor
       mode='javascript'
@@ -141,35 +160,36 @@ const ArrayForm: React.FunctionComponent<IFieldForm> = (props) => {
       width='100%'
       value={list}
       onChange={setList}
-   />
+    />
   );
-}
+};
 
 //#endregion
 
 //#region Helpers
 
-const getValue = ({ item, updatedConfig }: IFieldForm) => typeof updatedConfig[item.setting] !== 'undefined'
-  ? updatedConfig[item.setting]
-  : item.value;
+const getValue = ({ item, updatedConfig }: IFieldForm) =>
+  typeof updatedConfig[item.setting] !== 'undefined'
+    ? updatedConfig[item.setting]
+    : item.value;
 
 const onChange = (value: string | number | boolean | [], props: IFieldForm) => {
   const { updatedConfig, setUpdatedConfig, item } = props;
-  if(!_.isEqual(item.value,value)){
+  if (!_.isEqual(item.value, value)) {
     setUpdatedConfig({
       ...updatedConfig,
       [item.setting]: value,
-    })
-  }else{
+    });
+  } else {
     deleteChange(props);
   }
-}
+};
 
 const deleteChange = (props: IFieldForm) => {
   const { updatedConfig, setUpdatedConfig, item } = props;
   const newConfig = { ...updatedConfig };
   delete newConfig[item.setting];
   setUpdatedConfig(newConfig);
-}
+};
 
 //#endregion

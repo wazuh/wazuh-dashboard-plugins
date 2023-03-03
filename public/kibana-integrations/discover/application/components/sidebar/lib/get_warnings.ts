@@ -25,7 +25,7 @@ export function getWarnings(field: IndexPatternField) {
   if (field.scripted) {
     warnings.push(
       i18n.translate(
-        'discover.fieldChooser.discoverField.scriptedFieldsTakeLongExecuteDescription',
+        'wazuh.discover.fieldChooser.discoverField.scriptedFieldsTakeLongExecuteDescription',
         {
           defaultMessage: 'Scripted fields can take a long time to execute.',
         }

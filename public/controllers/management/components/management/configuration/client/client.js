@@ -19,54 +19,157 @@ import WzConfigurationSettingsTabSelector from '../util-components/configuration
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 
+import { i18n } from '@kbn/i18n';
+
 import {
   isString,
   renderValueOrDefault,
-  renderValueOrNoValue
+  renderValueOrNoValue,
 } from '../utils/utils';
 import withWzConfig from '../util-hocs/wz-config';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
 const helpLinks = [
   {
-    text: 'Checking connection with manager',
-    href: webDocumentationLink('user-manual/agents/agent-connection.html')
+    text: i18n.translate(
+      'wazuh.public.controller.management.config.cilent.check',
+      {
+        defaultMessage: 'Checking connection with manager',
+      },
+    ),
+    href: webDocumentationLink('user-manual/agents/agent-connection.html'),
   },
   {
-    text: 'Client reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/client.html')
-  }
+    text: i18n.translate(
+      'wazuh.public.controller.management.config.cilent.ref',
+      {
+        defaultMessage: 'Client reference',
+      },
+    ),
+    href: webDocumentationLink('user-manual/reference/ossec-conf/client.html'),
+  },
 ];
 
 const mainSettings = [
-  { field: 'crypto_method', label: 'Method used to encrypt communications' },
-  { field: 'remote_conf', label: 'Remote configuration is enabled' },
+  {
+    field: 'crypto_method',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.cilent.encrypt',
+      {
+        defaultMessage: 'Method used to encrypt communications',
+      },
+    ),
+  },
+  {
+    field: 'remote_conf',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.cilent.remote',
+      {
+        defaultMessage: 'Remote configuration is enabled',
+      },
+    ),
+  },
   {
     field: 'auto_restart',
-    label:
-      'Auto-restart the agent when receiving valid configuration from manager'
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.cilent.maneger',
+      {
+        defaultMessage:
+          'Auto-restart the agent when receiving valid configuration from manager',
+      },
+    ),
   },
   {
     field: 'notify_time',
-    label: 'Time (in seconds) between agent checkings to the manager'
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.cilent.time',
+      {
+        defaultMessage:
+          'Time (in seconds) between agent checkings to the manager',
+      },
+    ),
   },
   {
     field: 'time-reconnect',
-    label: 'Time (in seconds) before attempting to reconnect'
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.cilent.reconnect',
+      {
+        defaultMessage: 'Time (in seconds) before attempting to reconnect',
+      },
+    ),
   },
-  { field: 'config-profile', label: 'Configuration profiles' },
+  {
+    field: 'config-profile',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.cilent.ConfigurationProfiles',
+      {
+        defaultMessage: 'Configuration profiles',
+      },
+    ),
+  },
   {
     field: 'local_ip',
-    label: 'IP address used when the agent has multiple network interfaces'
-  }
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.cilent.network',
+      {
+        defaultMessage:
+          'IP address used when the agent has multiple network interfaces',
+      },
+    ),
+  },
 ];
 
 const columns = [
-  { field: 'address', name: 'Address', render: renderValueOrNoValue },
-  { field: 'port', name: 'Port', render: renderValueOrDefault('1514') },
-  { field: 'protocol', name: 'Protocol', render: renderValueOrDefault('udp') },
-  { field: 'max_retries', name: 'Maximum retries to connect', render: renderValueOrNoValue },
-  { field: 'retry_interval', name: 'Retry interval to connect', render: renderValueOrNoValue },
+  {
+    field: 'address',
+    name: i18n.translate(
+      'wazuh.public.controller.management.config.cilent.Address',
+      {
+        defaultMessage: 'Address',
+      },
+    ),
+    render: renderValueOrNoValue,
+  },
+  {
+    field: 'port',
+    name: i18n.translate(
+      'wazuh.public.controller.management.config.cilent.Port',
+      {
+        defaultMessage: 'Port',
+      },
+    ),
+    render: renderValueOrDefault('1514'),
+  },
+  {
+    field: 'protocol',
+    name: i18n.translate(
+      'wazuh.public.controller.management.config.cilent.Protocol',
+      {
+        defaultMessage: 'Protocol',
+      },
+    ),
+    render: renderValueOrDefault('udp'),
+  },
+  {
+    field: 'max_retries',
+    name: i18n.translate(
+      'wazuh.public.controller.management.config.cilent.maxConnect',
+      {
+        defaultMessage: 'Maximum retries to connect',
+      },
+    ),
+    render: renderValueOrNoValue,
+  },
+  {
+    field: 'retry_interval',
+    name: i18n.translate(
+      'wazuh.public.controller.management.config.cilent.retry',
+      {
+        defaultMessage: 'Retry interval to connect',
+      },
+    ),
+    render: renderValueOrNoValue,
+  },
 ];
 
 class WzConfigurationClient extends Component {
@@ -87,8 +190,18 @@ class WzConfigurationClient extends Component {
         {currentConfig['agent-client'] &&
           !isString(currentConfig['agent-client']) && (
             <WzConfigurationSettingsTabSelector
-              title="Main settings"
-              description="Basic manager-agent communication settings"
+              title={i18n.translate(
+                'wazuh.public.controller.management.config.cilent.mainSetting',
+                {
+                  defaultMessage: 'Main settings',
+                },
+              )}
+              description={i18n.translate(
+                'wazuh.public.controller.management.config.cilent.comminication',
+                {
+                  defaultMessage: 'Basic manager-agent communication settings',
+                },
+              )}
               currentConfig={currentConfig}
               minusHeight={355}
               helpLinks={helpLinks}
@@ -100,8 +213,18 @@ class WzConfigurationClient extends Component {
               {currentConfig['agent-client'].client.server.length && (
                 <Fragment>
                   <WzConfigurationSettingsHeader
-                    title="Server settings"
-                    description="List of managers to connect"
+                    title={i18n.translate(
+                      'wazuh.public.controller.management.config.cilent.server',
+                      {
+                        defaultMessage: 'Server settings',
+                      },
+                    )}
+                    description={i18n.translate(
+                      'wazuh.public.controller.management.config.cilent.connect',
+                      {
+                        defaultMessage: 'List of managers to connect',
+                      },
+                    )}
                   />
                   <EuiBasicTable
                     items={currentConfig['agent-client'].client.server}

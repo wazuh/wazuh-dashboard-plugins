@@ -1,5 +1,13 @@
 import { BehaviorSubject } from 'rxjs';
-import { AppMountParameters, CoreSetup, CoreStart, AppUpdater, Plugin, PluginInitializerContext } from 'kibana/public';
+import {
+  AppMountParameters,
+  CoreSetup,
+  CoreStart,
+  AppUpdater,
+  Plugin,
+  PluginInitializerContext,
+} from 'kibana/public';
+
 import {
   setDataPlugin,
   setHttp,
@@ -30,7 +38,10 @@ import { ErrorOrchestratorService } from './react-services/error-orchestrator/er
 import { getThemeAssetURL, getAssetURL } from './utils/assets';
 import { WzRequest } from './react-services/wz-request';
 const innerAngularName = 'app/wazuh';
-export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlugins, WazuhStartPlugins> {
+export class WazuhPlugin
+  implements
+    Plugin<WazuhSetup, WazuhStart, WazuhSetupPlugins, WazuhStartPlugins>
+{
   constructor(private readonly initializerContext: PluginInitializerContext) {}
   public initializeInnerAngular?: () => void;
   private innerAngularInitialized: boolean = false;
@@ -45,11 +56,13 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
       mount: async (params: AppMountParameters) => {
         try {
           if (!this.initializeInnerAngular) {
-            throw Error('Wazuh plugin method initializeInnerAngular is undefined');
+            throw Error(
+              'Wazuh plugin method initializeInnerAngular is undefined',
+            );
           }
           // hide the telemetry banner.
           // Set the flag in the telemetry saved object as the notice was seen and dismissed
-          this.hideTelemetryBanner && await this.hideTelemetryBanner();
+          this.hideTelemetryBanner && (await this.hideTelemetryBanner());
           setScopedHistory(params.history);
           // Load application bundle
           const { renderApp } = await import('./application');
@@ -58,7 +71,10 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
           setErrorOrchestrator(ErrorOrchestratorService);
           setHttp(core.http);
           setCookies(new Cookies());
-          if(!AppState.checkCookies() || params.history.parentHistory.action === 'PUSH') {
+          if (
+            !AppState.checkCookies() ||
+            params.history.parentHistory.action === 'PUSH'
+          ) {
             window.location.reload();
           }
           await this.initializeInnerAngular();
@@ -66,8 +82,8 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
           const response = await WzRequest.genericReq(
             'GET',
             `/api/check-wazuh`,
-          )
-          
+          );
+
           params.element.classList.add('dscAppWrapper', 'wz-app');
           const unmount = await renderApp(innerAngularName, params.element);
           //Update if user has Wazuh disabled
@@ -81,13 +97,18 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
                 id: 'wazuh',
                 label: 'Wazuh',
                 order: 0,
-                euiIconType: core.http.basePath.prepend(response.data.logoSidebar ? getAssetURL(response.data.logoSidebar) : getThemeAssetURL('icon.svg', UI_THEME)),
-              }}
-          })
+                euiIconType: core.http.basePath.prepend(
+                  response.data.logoSidebar
+                    ? getAssetURL(response.data.logoSidebar)
+                    : getThemeAssetURL('icon.svg', UI_THEME),
+                ),
+              },
+            };
+          });
           return () => {
             unmount();
           };
-        }catch(error){
+        } catch (error) {
           console.debug(error);
         }
       },
@@ -95,21 +116,27 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
         id: 'wazuh',
         label: 'Wazuh',
         order: 0,
-        euiIconType: core.http.basePath.prepend(getThemeAssetURL('icon.svg', UI_THEME)),
+        euiIconType: core.http.basePath.prepend(
+          getThemeAssetURL('icon.svg', UI_THEME),
+        ),
       },
-      updater$: this.stateUpdater
+      updater$: this.stateUpdater,
     });
     return {};
   }
-  public start(core: CoreStart, plugins: AppPluginStartDependencies): WazuhStart {
+  public start(
+    core: CoreStart,
+    plugins: AppPluginStartDependencies,
+  ): WazuhStart {
     // hide security alert
-    if(plugins.securityOss) {
+    if (plugins.securityOss) {
       plugins.securityOss.insecureCluster.hideAlert(true);
-    };
-    if(plugins?.telemetry?.telemetryNotifications?.setOptedInNoticeSeen) {
+    }
+    if (plugins?.telemetry?.telemetryNotifications?.setOptedInNoticeSeen) {
       // assign to a method to hide the telemetry banner used when the app is mounted
-      this.hideTelemetryBanner = () => plugins.telemetry.telemetryNotifications.setOptedInNoticeSeen();
-    };
+      this.hideTelemetryBanner = () =>
+        plugins.telemetry.telemetryNotifications.setOptedInNoticeSeen();
+    }
     // we need to register the application service at setup, but to render it
     // there are some start dependencies necessary, for this reason
     // initializeInnerAngular + initializeServices are assigned at start and used
@@ -124,7 +151,7 @@ export class WazuhPlugin implements Plugin<WazuhSetup, WazuhStart, WazuhSetupPlu
         innerAngularName,
         core,
         plugins,
-        this.initializerContext
+        this.initializerContext,
       );
       setAngularModule(module);
       this.innerAngularInitialized = true;

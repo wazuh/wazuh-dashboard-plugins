@@ -14,6 +14,7 @@ import store from '../redux/store';
 import { updateToastNotificationsModal } from '../redux/actions/appStateActions';
 import { getToasts } from '../kibana-services';
 import { EuiButton } from '@elastic/eui';
+import { i18n } from '@kbn/i18n';
 
 export class ToastNotifications {
   static add(toast) {
@@ -43,14 +44,20 @@ export class ToastNotifications {
       iconType: 'alert',
       text: (
         <Fragment>
-          <p data-test-subj="errorToastMessage">{error.message}</p>
-          <div className="eui-textRight">
+          <p data-test-subj='errorToastMessage'>{error.message}</p>
+          <div className='eui-textRight'>
             <EuiButton
-              color="danger"
-              onClick={() => store.dispatch(updateToastNotificationsModal({ path, error, title }))}
-              size="s"
+              color='danger'
+              onClick={() =>
+                store.dispatch(
+                  updateToastNotificationsModal({ path, error, title }),
+                )
+              }
+              size='s'
             >
-              See the full error
+              {i18n.translate('wazuh.kibana-int.vis.Seethefullerror', {
+                defaultMessage: 'See the full error',
+              })}
             </EuiButton>
           </div>
         </Fragment>

@@ -11,6 +11,7 @@
  */
 
 import React, { Component, Fragment } from 'react';
+import { i18n } from '@kbn/i18n';
 
 import { EuiBasicTable } from '@elastic/eui';
 
@@ -26,30 +27,103 @@ import { webDocumentationLink } from '../../../../../../../common/services/web_d
 const mainSettings = [
   {
     field: 'disabled',
-    label: 'Osquery integration status',
-    render: renderValueNoThenEnabled
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.osquery.status',
+      {
+        defaultMessage: 'Osquery integration status',
+      },
+    ),
+    render: renderValueNoThenEnabled,
   },
-  { field: 'run_daemon', label: 'Auto-run the Osquery daemon' },
-  { field: 'bin_path', label: 'Path to the Osquery executable' },
-  { field: 'log_path', label: 'Path to the Osquery results log file' },
-  { field: 'config_path', label: 'Path to the Osquery configuration file' },
-  { field: 'add_labels', label: 'Use defined labels as decorators' }
+  {
+    field: 'run_daemon',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.osquery.daemon',
+      {
+        defaultMessage: 'Auto-run the Osquery daemon',
+      },
+    ),
+  },
+  {
+    field: 'bin_path',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.osquery.executeable',
+      {
+        defaultMessage: 'Path to the Osquery executable',
+      },
+    ),
+  },
+  {
+    field: 'log_path',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.osquery.resultFile',
+      {
+        defaultMessage: 'Path to the Osquery results log file',
+      },
+    ),
+  },
+  {
+    field: 'config_path',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.osquery.configFile',
+      {
+        defaultMessage: 'Path to the Osquery configuration file',
+      },
+    ),
+  },
+  {
+    field: 'add_labels',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.osquery.labels',
+      {
+        defaultMessage: 'Use defined labels as decorators',
+      },
+    ),
+  },
 ];
 
 const helpLinks = [
   {
-    text: 'Osquery module documentation',
-    href: webDocumentationLink('user-manual/capabilities/osquery.html')
+    text: i18n.translate(
+      'wazuh.public.controller.management.config.osquery.documentation',
+      {
+        defaultMessage: 'Osquery module documentation',
+      },
+    ),
+    href: webDocumentationLink('user-manual/capabilities/osquery.html'),
   },
   {
-    text: 'Osquery module reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/wodle-osquery.html')
-  }
+    text: i18n.translate(
+      'wazuh.public.controller.management.config.osquery.refence',
+      {
+        defaultMessage: 'Osquery module reference',
+      },
+    ),
+    href: webDocumentationLink(
+      'user-manual/reference/ossec-conf/wodle-osquery.html',
+    ),
+  },
 ];
 
 const columns = [
-  { field: 'name', name: 'Name' },
-  { field: 'path', name: 'Path' }
+  {
+    field: 'name',
+    name: i18n.translate(
+      'wazuh.public.controller.management.config.osquery.Name',
+      {
+        defaultMessage: 'Name',
+      },
+    ),
+  },
+  {
+    field: 'path',
+    name: i18n.translate(
+      'wazuh.public.controller.management.config.osquery.Path',
+      {
+        defaultMessage: 'Path',
+      },
+    ),
+  },
 ];
 
 class WzConfigurationOsquery extends Component {
@@ -81,12 +155,22 @@ class WzConfigurationOsquery extends Component {
         {currentConfig &&
           !this.wodleConfig.osquery &&
           !isString(currentConfig['wmodules-wmodules']) && (
-            <WzNoConfig error="not-present" help={helpLinks} />
+            <WzNoConfig error='not-present' help={helpLinks} />
           )}
         {currentConfig && this.wodleConfig && this.wodleConfig.osquery && (
           <WzConfigurationSettingsTabSelector
-            title="Main settings"
-            description="General Osquery integration settings"
+            title={i18n.translate(
+              'wazuh.public.controller.management.config.osquery.Mainsettings',
+              {
+                defaultMessage: 'Main settings',
+              },
+            )}
+            description={i18n.translate(
+              'wazuh.public.controller.management.config.osquery.intergration',
+              {
+                defaultMessage: 'General Osquery integration settings',
+              },
+            )}
             currentConfig={this.wodleConfig}
             minusHeight={this.props.agent.id === '000' ? 260 : 355}
             helpLinks={helpLinks}
@@ -101,8 +185,19 @@ class WzConfigurationOsquery extends Component {
               this.wodleConfig.osquery.packs.length && (
                 <Fragment>
                   <WzConfigurationSettingsHeader
-                    title="Osquery packs"
-                    description="A pack contains multiple queries to quickly retrieve system information"
+                    title={i18n.translate(
+                      'wazuh.public.controller.management.config.osquery.packs',
+                      {
+                        defaultMessage: 'Osquery packs',
+                      },
+                    )}
+                    description={i18n.translate(
+                      'wazuh.public.controller.management.config.osquery.queries',
+                      {
+                        defaultMessage:
+                          'A pack contains multiple queries to quickly retrieve system information',
+                      },
+                    )}
                   />
                   <EuiBasicTable
                     items={this.wodleConfig.osquery.packs}

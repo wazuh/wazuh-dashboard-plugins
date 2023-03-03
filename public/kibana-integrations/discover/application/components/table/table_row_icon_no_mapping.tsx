@@ -21,11 +21,11 @@ import { EuiIconTip } from '@elastic/eui';
 import { i18n } from '@kbn/i18n';
 
 export function DocViewTableRowIconNoMapping() {
-  const ariaLabel = i18n.translate('discover.docViews.table.noCachedMappingForThisFieldAriaLabel', {
+  const ariaLabel = i18n.translate('wazuh.discover.docViews.table.noCachedMappingForThisFieldAriaLabel', {
     defaultMessage: 'Warning',
   });
   const tooltipContent = i18n.translate(
-    'discover.docViews.table.noCachedMappingForThisFieldTooltip',
+    'wazuh.discover.docViews.table.noCachedMappingForThisFieldTooltip',
     {
       defaultMessage:
         'No cached mapping for this field. Refresh field list from the Management > Index Patterns page',

@@ -20,6 +20,7 @@ import {
 import { UI_LOGGER_LEVELS } from '../../common/constants';
 import { UI_ERROR_SEVERITIES } from './error-orchestrator/types';
 import { getErrorOrchestrator } from './common-services';
+import { i18n } from '@kbn/i18n';
 
 /**
  * Retunrs the wazuh app config
@@ -27,7 +28,11 @@ import { getErrorOrchestrator } from './common-services';
 export const loadAppConfig = async () => {
   try {
     store.dispatch(setAppConfigIsLoading());
-    const config = await GenericRequest.request('GET', '/utils/configuration', {});
+    const config = await GenericRequest.request(
+      'GET',
+      '/utils/configuration',
+      {},
+    );
 
     if (!config || !config.data || !config.data.data) {
       throw new Error('No config available');
@@ -38,14 +43,21 @@ export const loadAppConfig = async () => {
   } catch (error) {
     store.dispatch(setAppConfigHasError());
     const options = {
-      context: 'loadAppConfig',
+      context: i18n.translate(
+        'wazuh.public.react.services.load.app.loadAppConfig',
+        {
+          defaultMessage: 'loadAppConfig',
+        },
+      ),
       level: UI_LOGGER_LEVELS.ERROR,
       severity: UI_ERROR_SEVERITIES.BUSINESS,
       store: true,
       error: {
         error: error,
         message: error.message || error,
-        title: `Error parsing wazuh.yml, using default values.`,
+        title: i18n.translate('wazuh.public.react.services.load.app.values', {
+          defaultMessage: 'Error parsing wazuh.yml, using default values.',
+        }),
       },
     };
     getErrorOrchestrator().handleError(options);

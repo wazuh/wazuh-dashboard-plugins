@@ -12,6 +12,7 @@
 
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { i18n } from '@kbn/i18n';
 
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
@@ -22,17 +23,59 @@ import { renderValueYesThenEnabled } from '../utils/utils';
 const mainSettings = [
   {
     field: 'enabled',
-    label: 'Synchronization status',
-    render: renderValueYesThenEnabled
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.moniterting.sync.status',
+      {
+        defaultMessage: 'Synchronization status',
+      },
+    ),
+    render: renderValueYesThenEnabled,
   },
   {
     field: 'max_interval',
-    label: 'Maximum interval (in seconds) between every sync'
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.moniterting.sync.maxInterval',
+      {
+        defaultMessage: 'Maximum interval (in seconds) between every sync',
+      },
+    ),
   },
-  { field: 'interval', label: 'Interval (in seconds) between every sync' },
-  { field: 'response_timeout', label: 'Response timeout (in seconds)' },
-  { field: 'queue_size', label: 'Queue size of the manager responses' },
-  { field: 'max_eps', label: 'Maximum message throughput' }
+  {
+    field: 'interval',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.moniterting.sync.interval',
+      {
+        defaultMessage: 'Interval (in seconds) between every sync',
+      },
+    ),
+  },
+  {
+    field: 'response_timeout',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.moniterting.sync.timeOut',
+      {
+        defaultMessage: 'Response timeout (in seconds)',
+      },
+    ),
+  },
+  {
+    field: 'queue_size',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.moniterting.sync.responses',
+      {
+        defaultMessage: 'Queue size of the manager responses',
+      },
+    ),
+  },
+  {
+    field: 'max_eps',
+    label: i18n.translate(
+      'wazuh.public.controller.management.config.moniterting.sync.message',
+      {
+        defaultMessage: 'Maximum message throughput',
+      },
+    ),
+  },
 ];
 
 class WzConfigurationIntegrityMonitoringSynchronization extends Component {
@@ -48,8 +91,8 @@ class WzConfigurationIntegrityMonitoringSynchronization extends Component {
         currentConfig['syscheck-syscheck'].syscheck &&
         currentConfig['syscheck-syscheck'].syscheck.synchronization ? (
           <WzConfigurationSettingsTabSelector
-            title="Syncronization"
-            description="Database synchronization settings"
+            title='Syncronization'
+            description='Database synchronization settings'
             currentConfig={currentConfig['syscheck-syscheck']}
             minusHeight={this.props.agent.id === '000' ? 320 : 415}
             helpLinks={helpLinks}
@@ -62,7 +105,7 @@ class WzConfigurationIntegrityMonitoringSynchronization extends Component {
             />
           </WzConfigurationSettingsTabSelector>
         ) : (
-          <WzNoConfig error="not-present" help={helpLinks} />
+          <WzNoConfig error='not-present' help={helpLinks} />
         )}
       </Fragment>
     );

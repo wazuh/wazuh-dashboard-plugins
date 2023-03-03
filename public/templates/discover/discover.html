@@ -77,17 +77,17 @@
             </hits-counter>
 
             <section
-              aria-label="{{::'discover.histogramOfFoundDocumentsAriaLabel' | i18n: {defaultMessage: 'Histogram of found documents'} }}"
+              aria-label="{{::'wazuh.discover.histogramOfFoundDocumentsAriaLabel' | i18n: {defaultMessage: 'Histogram of found documents'} }}"
               class="dscTimechart"
               ng-if="opts.timefield"
             >
-              <timechart-header 
+              <timechart-header
                 from="toMoment(timeRange.from)"
-                to="toMoment(timeRange.to)" 
-                options="intervalOptions" 
-                on-change-interval="changeInterval" 
-                state-interval="state.interval"
-                show-scaled-info="bucketInterval.scaled"
+                to="toMoment(timeR ange.to)"
+                options="intervalOptions"
+                on-change-interval="change Interval"
+                state-interval="s tate.interval"
+                show-scaled-info="buck etInterval.scaled"
                 bucket-interval-description="bucketInterval.description"
                 bucket-interval-scale="bucketInterval.scale"
               >
@@ -110,7 +110,7 @@
             >
               <h2 class="euiScreenReaderOnly"
                 id="documentsAriaLabel"
-                i18n-id="discover.documentsAriaLabel"
+                i18n-id="wazuh.discover.documentsAriaLabel"
                 i18n-default-message="Documents"
               ></h2>
               <doc-table
@@ -140,7 +140,7 @@
                 data-test-subj="discoverDocTableFooter"
               >
                 <span
-                  i18n-id="discover.howToSeeOtherMatchingDocumentsDescription"
+                  i18n-id="wazuh.discover.howToSeeOtherMatchingDocumentsDescription"
                   i18n-default-message="These are the first {sampleSize} documents matching
                   your search, refine your search to see others. "
                   i18n-values="{
@@ -150,7 +150,7 @@
                 <a
                   kbn-accessible-click
                   ng-click="scrollToTop()"
-                  i18n-id="discover.backToTopLinkText"
+                  i18n-id="wazuh.discover.backToTopLinkText"
                   i18n-default-message="Back to top."
                 ></a>
               </div>
