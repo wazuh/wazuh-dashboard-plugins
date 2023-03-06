@@ -2,18 +2,37 @@ import { fireEvent, render, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import React, { Component } from 'react';
 import { ErrorHandler } from '../../../error-handler';
-import loglevel from 'loglevel';
 import { AxiosError, AxiosResponse } from 'axios';
-import { getToasts } from '../../../../../kibana-services';
 import { HttpError } from '../../../error-factory';
+import { ErrorOrchestratorService } from '../../../../error-orchestrator/error-orchestrator.service';
 
+// mocked some required kibana-services
 jest.mock('../../../../../kibana-services', () => ({
-  getToasts: () => ({
-    addError: (mockError: string, toast: any) => {},
+  ...(jest.requireActual('../../../../../kibana-services') as object),
+  getHttp: jest.fn().mockReturnValue({
+    basePath: {
+      get: () => {
+        return 'http://localhost:5601';
+      },
+      prepend: (url: string) => {
+        return `http://localhost:5601${url}`;
+      },
+    },
+  }),
+  getCookies: jest.fn().mockReturnValue({
+    set: (name: string, value: string, options: any) => {
+      return true;
+    },
   }),
 }));
 
+jest.mock('../../../../error-orchestrator/error-orchestrator.service');
+jest.mock('loglevel');
+
 describe('Error Handler class example tests', () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
   it('On component when we want to log an error catched in the try-catch block when the error is a native javascript error', () => {
     const errorMocked = new Error('new Error handled');
 
@@ -45,16 +64,17 @@ describe('Error Handler class example tests', () => {
       }
     }
 
-    const { debug, container, getByRole, getByText } = render(
-      <ExampleComponent />,
-    );
-    loglevel.error = jest.fn();
+    const { container, getByRole, getByText } = render(<ExampleComponent />);
+    const spyErrorOrch = jest.spyOn(ErrorOrchestratorService, 'handleError');
     fireEvent.click(getByRole('button'));
     expect(container).toBeInTheDocument();
     expect(getByText('Example component')).toBeInTheDocument();
-    expect(loglevel.error).toHaveBeenCalledWith(
-      '[Unexpected error]',
-      errorMocked,
+    expect(spyErrorOrch).toHaveBeenCalledWith(
+      expect.objectContaining({error: {
+        title: 'An error has occurred',
+        message: errorMocked.message,
+        error: errorMocked,
+      }})
     );
   });
 
@@ -82,9 +102,6 @@ describe('Error Handler class example tests', () => {
     const spyIshttp = jest
       .spyOn(ErrorHandler, 'isHttpError')
       .mockImplementation(() => true);
-
-    //const spyToast = jest.spyOn(getToasts.prototype, 'addError');
-
     class ExampleComponent extends Component {
       constructor(props: any) {
         super(props);
@@ -113,18 +130,17 @@ describe('Error Handler class example tests', () => {
       }
     }
 
-    const { debug, container, getByRole, getByText } = render(
-      <ExampleComponent />,
-    );
-    const createdError = ErrorHandler.handleError(errorMocked) as HttpError;
+    const { container, getByRole, getByText } = render(<ExampleComponent />);
+    const createdError = ErrorHandler.createError(errorMocked) as HttpError;
     fireEvent.click(getByRole('button'));
+    const spyErrorOrch = jest.spyOn(ErrorOrchestratorService, 'handleError');
     expect(container).toBeInTheDocument();
     expect(getByText('Example component')).toBeInTheDocument();
-    /*expect(spyToast).toBeCalledWith(
-      createdError.logOptions.error.title,
-      createdError,
+    expect(spyErrorOrch).toBeCalledTimes(1);
+    expect(spyErrorOrch).toBeCalledWith(
+      expect.objectContaining({ error: createdError.logOptions.error }),
     );
-    expect(spyToast).toBeCalledTimes(1);
-    spyIshttp.mockRestore();*/
+    spyErrorOrch.mockRestore();
+    spyIshttp.mockRestore();
   });
 });

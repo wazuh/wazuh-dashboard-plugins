@@ -123,8 +123,8 @@ export class ErrorHandler {
     // this condition is for the native error classes
     let defaultErrorLog: UIErrorLog = {
       error: {
-        title: customLogOptions?.title || error.message,
-        message: customLogOptions?.message || `[Unexpected error]`,
+        title: customLogOptions?.title || 'An error has occurred',
+        message: customLogOptions?.message || error.message,
         error: error,
       },
       level: 'ERROR',
