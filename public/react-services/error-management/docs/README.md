@@ -156,18 +156,18 @@ By this way, the current solution allows to create new error types and add new e
 For every error type handled we have defined how the error will be showed or not to the user/developer.
 In the next table we have defined how the will be treated.
 
-| Error type          | show                                          | store | display |
-|---------------------|-----------------------------------------------|-------|---------|
-| WazuhApiError       | [toast\|blank-screen\|log(info\|warn\|error)] |       |         |
-| WazuhReportingError | [toast\|blank-screen\|log(info\|warn\|error)] |       |         |
-| IndexerApiError     | [toast\|blank-screen\|log(info\|warn\|error)] |       |         |
-| HttpError           | [toast\|blank-screen\|log(info\|warn\|error)] |       |         |
-| Error               | [toast\|blank-screen\|log(info\|warn\|error)] |       |         |
-| TypeError           | [toast\|blank-screen\|log(info\|warn\|error)] |       |         |
-| EvalError           | [toast\|blank-screen\|log(info\|warn\|error)] |       |         |
-| ReferenceError      | [toast\|blank-screen\|log(info\|warn\|error)] |       |         |
-| SyntaxError         | [toast\|blank-screen\|log(info\|warn\|error)] |       |         |
-| URIError            | [toast\|blank-screen\|log(info\|warn\|error)] |       |         |
+| Error type          | show        | store | display |
+|---------------------|-------------|-------|---------|
+| WazuhApiError       | toast       |       |    ✅   |
+| WazuhReportingError | toast       |       |    ✅   |
+| IndexerApiError     | toast       |       |    ✅   |
+| HttpError           | toast       |       |    ✅   |
+| Error               | log(error)  |       |    ✅   |
+| TypeError           | log(error)  |       |    ✅   |
+| EvalError           | log(error)  |       |    ✅   |
+| ReferenceError      | log(error)  |       |    ✅   |
+| SyntaxError         | log(error)  |       |    ✅   |
+| URIError            | log(error)  |       |    ✅   |
 
 
 # How to use the Error Management
