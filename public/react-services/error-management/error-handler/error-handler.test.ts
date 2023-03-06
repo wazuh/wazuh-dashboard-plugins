@@ -117,6 +117,10 @@ describe('Error Handler', () => {
   });
 
   describe('handleError', () => {
+
+    afterEach(() => {
+      jest.clearAllMocks();
+    })
     it('should send the error to the ERROR ORCHESTRATOR service with custom log options when is defined', () => {
       const mockedError = new Error('Mocked error');
       ErrorHandler.handleError(mockedError, {
@@ -208,17 +212,18 @@ describe('Error Handler', () => {
         let logOptionsExpected: UIErrorLog = {
           error: {
             message: errorHandled.message,
-            title: errorHandled.message,
+            title: 'An error has occurred',
             error: errorHandled,
           },
           level: 'ERROR',
           severity: 'UI',
-          display: false,
+          display: true,
           store: false,
         };
         if (errorHandled instanceof WazuhError) {
           logOptionsExpected = errorHandled.logOptions;
         }
+        expect(spyErrorOrch).toBeCalledTimes(1);
         expect(spyErrorOrch).toHaveBeenCalledWith(logOptionsExpected);
         spyIshttp.mockRestore();
         spyErrorOrch.mockRestore();
