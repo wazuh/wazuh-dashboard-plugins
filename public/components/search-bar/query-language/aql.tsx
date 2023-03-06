@@ -263,9 +263,17 @@ export async function getSuggestionsAPI(tokens: ITokens, options: optionsQL) {
   // Get last token
   const lastToken = getLastTokenWithValue(tokens);
 
-  // If it can't get a token with value, then no return suggestions
+  // If it can't get a token with value, then returns fields and open operator group
   if(!lastToken?.type){
-    return  [];
+    return  [
+      // fields
+      ...(await options.suggestions.field()),
+      {
+        type: 'operator_group',
+        label: '(',
+        description: language.tokens.operator_group.literal['('],
+      }
+    ];
   };
 
   switch (lastToken.type) {
@@ -477,7 +485,7 @@ export const AQL = {
             const lastToken: IToken = getLastTokenWithValue(tokens);
             // if the clicked suggestion is of same type of last token
             if (
-              suggestionMappingLanguageTokenType[lastToken.type].iconType ===
+              lastToken && suggestionMappingLanguageTokenType[lastToken.type].iconType ===
               item.type.iconType
             ) {
               // replace the value of last token
