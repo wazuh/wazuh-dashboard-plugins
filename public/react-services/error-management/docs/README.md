@@ -284,6 +284,7 @@ const ComponentWrapped = withErrorHandler(Component);
 | HOC       | On react lyfecicles methods              |
 | Hook      | On functional component methods called after render (like react custom hook) |
 | Decorator | On component user event methods          |
+| Class | On every method - recommend inside catch block|
 
 
 # Use cases examples documentation
