@@ -37,6 +37,7 @@ import { getDataPlugin, getUiSettings } from '../../../../kibana-services';
 import { RegistryValues } from './registryValues';
 import { formatUIDate } from '../../../../react-services/time-service';
 import { FilterManager } from '../../../../../../../src/plugins/data/public/';
+import { ErrorHandler } from '../../../../react-services/error-management';
 
 export class FileDetails extends Component {
   props!: {
@@ -228,23 +229,28 @@ export class FileDetails extends Component {
   }
 
   async checkFilterManager(filters) {
-    const { filterManager } = getDataPlugin().query;
-    const _filters = filterManager.getFilters();
-    if (_filters && _filters.length) {
-      const syscheckPathFilters = _filters.filter((x) => {
-        return x.meta.key === 'syscheck.path';
-      });
-      syscheckPathFilters.map((x) => {
-        filterManager.removeFilter(x);
-      });
-      filterManager.addFilters([filters]);
-      const scope = await ModulesHelper.getDiscoverScope();
-      scope.updateQueryAndFetch({ query: null });
-    } else {
-      setTimeout(() => {
-        this.checkFilterManager(filters);
-      }, 200);
+    try {
+      const { filterManager } = getDataPlugin().query;
+      const _filters = filterManager.getFilters();
+      if (_filters && _filters.length) {
+        const syscheckPathFilters = _filters.filter((x) => {
+          return x.meta.key === 'syscheck.path';
+        });
+        syscheckPathFilters.map((x) => {
+          filterManager.removeFilter(x);
+        });
+        filterManager.addFilters([filters]);
+        const scope = await ModulesHelper.getDiscoverScope();
+        scope.updateQueryAndFetch && scope.updateQueryAndFetch({ query: null });
+      } else {
+        setTimeout(() => {
+          this.checkFilterManager(filters);
+        }, 200);
+      }
+    }catch(error){
+      ErrorHandler.handleError(error as Error);
     }
+   
   }
 
   addFilter(field, value) {
