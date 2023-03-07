@@ -1,5 +1,5 @@
 import { AQL } from './aql';
-import { UIQL } from './uiql';
+import { HAQL } from './haql';
 
 type SearchBarQueryLanguage = {
   description: string;
@@ -7,14 +7,21 @@ type SearchBarQueryLanguage = {
   id: string;
   label: string;
   getConfiguration?: () => any;
-  run: (input: string | undefined, params: any) => any;
-  transformUnifiedQuery: (unifiedQuery) => any;
+  run: (input: string | undefined, params: any) => Promise<{
+    searchBarProps: any,
+    output: {
+      language: string,
+      unifiedQuery: string,
+      query: string
+    }
+  }>;
+  transformUnifiedQuery: (unifiedQuery: string) => string;
 };
 
 // Register the query languages
 export const searchBarQueryLanguages: {
   [key: string]: SearchBarQueryLanguage;
-} = [AQL, UIQL].reduce((accum, item) => {
+} = [AQL, HAQL].reduce((accum, item) => {
   if (accum[item.id]) {
     throw new Error(`Query language with id: ${item.id} already registered.`);
   }
@@ -22,5 +29,4 @@ export const searchBarQueryLanguages: {
     ...accum,
     [item.id]: item,
   };
-  ['hola'];
 }, {});
