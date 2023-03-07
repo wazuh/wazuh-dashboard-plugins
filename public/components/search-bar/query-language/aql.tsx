@@ -27,12 +27,9 @@ Implemented schema:
 */
 
 // Language definition
-const language = {
+export const language = {
   // Tokens
   tokens: {
-    field: {
-      regex: /[\w.]/,
-    },
     // eslint-disable-next-line camelcase
     operator_compare: {
       literal: {
@@ -72,6 +69,23 @@ const suggestionMappingLanguageTokenType = {
   function_search: { iconType: 'search', color: 'tint5' },
 };
 
+/**
+ * Creator of intermediate interfacte of EuiSuggestItem
+ * @param type 
+ * @returns 
+ */
+function mapSuggestionCreator(type: ITokenType ){
+  return function({...params}){
+    return {
+      type,
+      ...params
+    };
+  };
+};
+
+const mapSuggestionCreatorField = mapSuggestionCreator('field');
+const mapSuggestionCreatorValue = mapSuggestionCreator('value');
+
 
 /**
  * Tokenize the input string. Returns an array with the tokens.
@@ -105,15 +119,15 @@ export function tokenizerAPI(input: string): ITokens{
     // A ( character.
     '(?<operator_group_open>\\()?' +
     // Field name: name of the field to look on DB.
-    '(?<field>[\\w.]+)?' + // Added a optional find
+    '(?<field>[\\w.]+)?' + // Added an optional find
     // Operator: looks for '=', '!=', '<', '>' or '~'.
     // This seems to be a bug because is not searching the literal valid operators.
     // I guess the operator is validated after the regular expression matches
-    `(?<operator_compare>[${Object.keys(language.tokens.operator_compare.literal)}]{1,2})?` + // Added a optional find 
+    `(?<operator_compare>[${Object.keys(language.tokens.operator_compare.literal)}]{1,2})?` + // Added an optional find 
     // Value: A string.
     '(?<value>(?:(?:\\((?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|[\\[\\]\\w _\\-.:?\\/\'"=@%<>{}]*)\\))*' +
     '(?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|[\\[\\]\\w _\\-.:?\\\\/\'"=@%<>{}]+)' +
-    '(?:\\((?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|[\\[\\]\\w _\\-.:?\\\\/\'"=@%<>{}]*)\\))*)+)?' + // Added a optional find
+    '(?:\\((?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|[\\[\\]\\w _\\-.:?\\\\/\'"=@%<>{}]*)\\))*)+)?' + // Added an optional find
     // A ) character.
     '(?<operator_group_close>\\))?' +
     `(?<conjunction>[${Object.keys(language.tokens.conjunction.literal)}])?`,
@@ -124,76 +138,12 @@ export function tokenizerAPI(input: string): ITokens{
     ...input.matchAll(re)]
       .map(
         ({groups}) => Object.entries(groups)
-                        .map(([key, value]) => ({
-                          type: key.startsWith('operator_group') ? 'operator_group' : key,
-                          value})
-                        )
+          .map(([key, value]) => ({
+            type: key.startsWith('operator_group') ? 'operator_group' : key,
+            value})
+          )
       ).flat();
 };
-
-/**
- * Check if the input is valid
- * @param tokens
- * @returns
- */
-export function validate(input: string, options): boolean {
-  // TODO: enhance the validation
-
-  // API regular expression
-  //   self.query_regex = re.compile(
-  //     # A ( character.
-  //     r"(\()?" +
-  //     # Field name: name of the field to look on DB.
-  //     r"([\w.]+)" +
-  //     # Operator: looks for '=', '!=', '<', '>' or '~'.
-  //     rf"([{''.join(self.query_operators.keys())}]{{1,2}})" +
-  //     # Value: A string.
-  //     r"((?:(?:\((?:\[[\[\]\w _\-.,:?\\/'\"=@%<>{}]*]|[\[\]\w _\-.:?\\/'\"=@%<>{}]*)\))*"
-  //     r"(?:\[[\[\]\w _\-.,:?\\/'\"=@%<>{}]*]|[\[\]\w _\-.:?\\/'\"=@%<>{}]+)"
-  //     r"(?:\((?:\[[\[\]\w _\-.,:?\\/'\"=@%<>{}]*]|[\[\]\w _\-.:?\\/'\"=@%<>{}]*)\))*)+)" +
-  //     # A ) character.
-  //     r"(\))?" +
-  //     # Separator: looks for ';', ',' or nothing.
-  //     rf"([{''.join(self.query_separators.keys())}])?"
-  // )
-
-  const re = new RegExp(
-    // A ( character.
-    '(\\()?' +
-    // Field name: name of the field to look on DB.
-    '([\\w.]+)?' +
-    // Operator: looks for '=', '!=', '<', '>' or '~'.
-    // This seems to be a bug because is not searching the literal valid operators.
-    // I guess the operator is validated after the regular expression matches
-    `([${Object.keys(language.tokens.operator_compare.literal)}]{1,2})?` +
-    // Value: A string.
-    '((?:(?:\\((?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|[\\[\\]\\w _\\-.:?\\/\'"=@%<>{}]*)\\))*' +
-    '(?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|[\\[\\]\\w _\\-.:?\\\\/\'"=@%<>{}]+)' +
-    '(?:\\((?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|[\\[\\]\\w _\\-.:?\\\\/\'"=@%<>{}]*)\\))*)+)?' +
-    // '([\\w]+)'+
-    // A ) character.
-    '(\\))?' +
-    `([${Object.keys(language.tokens.conjunction.literal)}])?`,
-    'g'
-  );
-
-  [...input.matchAll(re)].reduce((accum, [_, operator_group_open, field, operator, value, operator_group_close, conjunction ]) => {
-    if(!accum){
-      return accum;
-    };
-
-    return [operator_group_open, field, operator, value, operator_group_close, conjunction]
-  }, true);
-
-  const errors = [];
-
-  for (let [_, operator_group_open, field, operator, value, operator_group_close, conjunction ] in input.matchAll(re)) {
-    if(!options.fields.includes(field)){
-      errors.push(`Field ${field} is not valid.`)
-    };
-  }
-  return errors.length === 0;
-}
 
 type OptionSuggestionHandler = (
   currentValue: string | undefined,
@@ -201,7 +151,7 @@ type OptionSuggestionHandler = (
     previousField,
     previousOperatorCompare,
   }: { previousField: string; previousOperatorCompare: string },
-) => Promise<{ description?: string; label: string; type: string }[]>;
+) => Promise<{ description?: string; label: string }[]>;
 
 type optionsQL = {
   suggestions: {
@@ -267,7 +217,7 @@ export async function getSuggestionsAPI(tokens: ITokens, options: optionsQL) {
   if(!lastToken?.type){
     return  [
       // fields
-      ...(await options.suggestions.field()),
+      ...(await options.suggestions.field()).map(mapSuggestionCreatorField),
       {
         type: 'operator_group',
         label: '(',
@@ -283,7 +233,7 @@ export async function getSuggestionsAPI(tokens: ITokens, options: optionsQL) {
         ...(await options.suggestions.field()).filter(
           ({ label }) =>
             label.startsWith(lastToken.value) && label !== lastToken.value,
-        ),
+        ).map(mapSuggestionCreatorField),
         // operators if the input field is exact
         ...((await options.suggestions.field()).some(
           ({ label }) => label === lastToken.value,
@@ -324,7 +274,7 @@ export async function getSuggestionsAPI(tokens: ITokens, options: optionsQL) {
                 tokens,
                 'operator_compare',
               )!.value,
-            })),
+            })).map(mapSuggestionCreatorValue),
           ]
           : []),
       ];
@@ -346,7 +296,7 @@ export async function getSuggestionsAPI(tokens: ITokens, options: optionsQL) {
             tokens,
             'operator_compare',
           )!.value,
-        })),
+        })).map(mapSuggestionCreatorValue),
         ...Object.entries(language.tokens.conjunction.literal).map(
           ([ conjunction, description]) => ({
             type: 'conjunction',
@@ -379,13 +329,7 @@ export async function getSuggestionsAPI(tokens: ITokens, options: optionsQL) {
           conjunction => conjunction === lastToken.value,
         )
           ? [
-            ...(await options.suggestions.field()).map(
-              ({ label, description }) => ({
-                type: 'field',
-                label,
-                description,
-              }),
-            ),
+            ...(await options.suggestions.field()).map(mapSuggestionCreatorField),
           ]
           : []),
         {
@@ -399,9 +343,7 @@ export async function getSuggestionsAPI(tokens: ITokens, options: optionsQL) {
       if (lastToken.value === '(') {
         return [
           // fields
-          ...(await options.suggestions.field()).map(
-            ({ label, description }) => ({ type: 'field', label, description }),
-          ),
+          ...(await options.suggestions.field()).map(mapSuggestionCreatorField),
         ];
       } else if (lastToken.value === ')') {
         return [
@@ -446,9 +388,11 @@ function transformSuggestionsToUI(
  * @returns
  */
 function getOutput(input: string, options: {implicitQuery?: string} = {}) {
+  const unifiedQuery = `${options?.implicitQuery ?? ''}${input}`;
   return {
     language: AQL.id,
-    query: `${options?.implicitQuery ?? ''}${input}`,
+    query: unifiedQuery,
+    unifiedQuery
   };
 };
 
@@ -502,7 +446,7 @@ export const AQL = {
 
             // Change the input
             params.setInput(tokens
-              .filter(value => value) // Ensure the input is rebuilt using tokens with value.
+              .filter(({ value }) => value) // Ensure the input is rebuilt using tokens with value.
               // The input tokenization can contain tokens with no value due to the used
               // regular expression.
               .map(({ value }) => value)
@@ -553,7 +497,7 @@ export const AQL = {
       output: getOutput(input, params.queryLanguage.parameters),
     };
   },
-  transformUnifiedQuery(unifiedQuery) {
+  transformUnifiedQuery(unifiedQuery: string): string {
     return unifiedQuery;
   },
 };

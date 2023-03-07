@@ -28,6 +28,10 @@ Basic usage:
     {
       id: 'aql',
       // specific query language parameters
+      // implicit query. Optional
+      // Set a implicit query that can't be changed by the user.
+      // Use the UQL (Unified Query Language) syntax.
+      // Each query language implementation must interpret
       implicitQuery: 'id!=000;',
       suggestions: {
         field(currentValue) {
@@ -46,8 +50,7 @@ Basic usage:
             { label: 'os.platform', description: 'Operating system platform' },
             { label: 'status', description: 'Status' },
             { label: 'version', description: 'Version' },
-          ]
-          .map(field => ({ type: 'field', ...field }));
+          ];
         },
         value: async (currentValue, { previousField }) => {
           switch (previousField) {
@@ -165,7 +168,10 @@ Basic usage:
   onSearch={onSearch}
   // Used to define the internal input. Optional.
   // This could be used to change the input text from the external components.
-  input="" 
+  // Use the UQL (Unified Query Language) syntax.
+  input=""
+  // Define the default mode. Optional. If not defined, it will use the first one mode.
+  defaultMode=""
 ></SearchBar>
 ```
 
@@ -188,20 +194,37 @@ type SearchBarQueryLanguage = {
   id: string;
   label: string;
   getConfiguration?: () => any;
-  run: (input: string | undefined, params: any) => any;
-  transformUnifiedQuery: (unifiedQuery) => any;
+  run: (input: string | undefined, params: any) => Promise<{
+    searchBarProps: any,
+    output: {
+      language: string,
+      unifiedQuery: string,
+      query: string
+    }
+  }>;
+  transformUnifiedQuery: (unifiedQuery: string) => string;
 };
 ```
 
 where:
 
-- `description`: It is the description of the query language. This is displayed in a query language popover
+- `description`: is the description of the query language. This is displayed in a query language popover
   on the right side of the search bar. Required.
 - `documentationLink`: URL to the documentation link. Optional.
 - `id`: identification of the query language.
 - `label`: name
 - `getConfiguration`: method that returns the configuration of the language. This allows custom behavior.
-- `run`: method that returns the properties that will used by the base search bar component and the output used when searching
+- `run`: method that returns:
+  - `searchBarProps`: properties to be passed to the search bar component. This allows the
+  customization the properties that will used by the base search bar component and the output used when searching
+  - `output`:
+    - `language`: query language ID
+    - `unifiedQuery`: query in unified query syntax
+    - `query`: current query in the specified language
+- `transformUnifiedQuery`: method that transform the Unified Query Language to the specific query
+  language. This is used when receives a external input in the Unified Query Language, the returned
+  value is converted to the specific query language to set the new input text of the search bar
+  component.
 
 Create a new file located in `public/components/search-bar/query-language` and define the expected interface;
 
@@ -233,3 +256,22 @@ export const searchBarQueryLanguages: {
   };
 }, {});
 ```
+
+## Unified Query Language - UQL
+
+This is an unified syntax used by the search bar component that provides a way to communicate
+with the different query language implementations.
+
+The input and output parameters of the search bar component must use this syntax.
+
+This is used in:
+- input:
+  - `input` component property
+- output:
+  - `onChange` component handler 
+  - `onSearch` component handler
+
+Its syntax is equal to Wazuh API Query Language
+https://wazuh.com/<major_version>.<minor_version>/user-manual/api/queries.html
+
+> The AQL query language is a implementation of this syntax.
