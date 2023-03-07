@@ -148,13 +148,15 @@ export const SearchBar = ({
                   href={
                     searchBarQueryLanguages[queryLanguage.id].documentationLink
                   }
+                  target='__blank'
+                  rel='noopener noreferrer'
                 >
                   Documentation
                 </EuiLink>
               </div>
             </>
           )}
-          {modes?.length && modes.length > 1 && (
+          {modes?.length > 1 && (
             <>
               <EuiSpacer />
               <EuiFormRow label='Select a query language' fullWidth>
