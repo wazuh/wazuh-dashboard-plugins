@@ -40,7 +40,7 @@ describe('Wazuh Error Orchestrator UI', () => {
       errorOrchestratorUI.loadErrorLog(options);
 
       expect(mockLoglevelInfo).toBeCalled();
-      expect(mockLoglevelInfo).toBeCalledWith(mockMessage, mockError);
+      expect(mockLoglevelInfo).toBeCalledWith(options.error.title, mockMessage, mockError);
       expect(mockLoglevelInfo).toBeCalledTimes(1);
     });
   });
@@ -60,7 +60,7 @@ describe('Wazuh Error Orchestrator UI', () => {
       errorOrchestratorUI.loadErrorLog(options);
 
       expect(mockLoglevelWarning).toBeCalled();
-      expect(mockLoglevelWarning).toBeCalledWith(mockMessage, mockError);
+      expect(mockLoglevelWarning).toBeCalledWith(options.error.title, mockMessage, mockError);
       expect(mockLoglevelWarning).toBeCalledTimes(1);
     });
   });
@@ -80,7 +80,7 @@ describe('Wazuh Error Orchestrator UI', () => {
       errorOrchestratorUI.loadErrorLog(options);
 
       expect(mockLoglevelError).toBeCalled();
-      expect(mockLoglevelError).toBeCalledWith(mockMessage, mockError);
+      expect(mockLoglevelError).toBeCalledWith(options.error.title, mockMessage, mockError);
       expect(mockLoglevelError).toBeCalledTimes(1);
     });
   });

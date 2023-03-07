@@ -26,13 +26,13 @@ export class ErrorOrchestratorUI extends ErrorOrchestratorBase {
   public displayError(errorLog: UIErrorLog) {
     switch (errorLog.level) {
       case UI_LOGGER_LEVELS.INFO:
-        loglevel.info(errorLog.error.message, errorLog.error.error);
+        loglevel.info(errorLog.error.title, errorLog.error.message, errorLog.error.error);
         break;
       case UI_LOGGER_LEVELS.WARNING:
-        loglevel.warn(errorLog.error.message, errorLog.error.error);
+        loglevel.warn(errorLog.error.title, errorLog.error.message, errorLog.error.error);
         break;
       case UI_LOGGER_LEVELS.ERROR:
-        loglevel.error(errorLog.error.message, errorLog.error.error);
+        loglevel.error(errorLog.error.title, errorLog.error.message, errorLog.error.error);
         break;
       default:
         console.log('No error level', errorLog.error.message, errorLog.error.error);

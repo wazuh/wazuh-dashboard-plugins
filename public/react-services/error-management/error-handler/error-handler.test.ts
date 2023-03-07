@@ -131,8 +131,8 @@ describe('Error Handler', () => {
 
       let logOptionsExpected = {
         error: {
-          message: 'Custom message',
           title: 'Custom title',
+          message: 'Custom message',
           error: mockedError,
         },
       };
@@ -211,8 +211,8 @@ describe('Error Handler', () => {
 
         let logOptionsExpected: UIErrorLog = {
           error: {
-            message: errorHandled.message,
-            title: 'An error has occurred',
+            title: '[An error has occurred]',
+            message: error.message,
             error: errorHandled,
           },
           level: 'ERROR',

@@ -74,7 +74,7 @@ describe('Error Handler class example tests', () => {
       expect(spyErrorOrch).toHaveBeenCalledWith(
         expect.objectContaining({
           error: {
-            title: 'An error has occurred',
+            title: '[An error has occurred]',
             message: errorMocked.message,
             error: errorMocked,
           },
