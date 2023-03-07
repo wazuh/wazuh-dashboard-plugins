@@ -250,7 +250,6 @@ export class FileDetails extends Component {
     }catch(error){
       ErrorHandler.handleError(error as Error);
     }
-   
   }
 
   addFilter(field, value) {
