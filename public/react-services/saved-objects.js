@@ -286,7 +286,7 @@ export class SavedObject {
   /**
    * Check if it exists the index pattern saved objects using the `GET /api/saved_objects/_find` endpoint.
    * It is usefull to validate if the endpoint works as expected. Related issue: https://github.com/wazuh/wazuh-kibana-app/issues/4293
-   * @param {string[]} indexPatternIDs 
+   * @param {string[]} indexPatternIDs
    */
   static async validateIndexPatternSavedObjectCanBeFound(indexPatternIDs){
     const indexPatternsSavedObjects = await getSavedObjects().client.find({
@@ -299,7 +299,7 @@ export class SavedObject {
 
     if (!indexPatternsSavedObjectsCanBeFound) {
       throw new Error(`Saved object for index pattern not found.
-Restart the ${PLUGIN_PLATFORM_NAME} service to initialize the index. More information in <a href="${webDocumentationLink('user-manual/wazuh-dashboard/troubleshooting.html#saved-object-for-index-pattern-not-found')}" target="_blank">troubleshooting</a>.`
+Restart the ${PLUGIN_PLATFORM_NAME} service to initialize the index. More information in <a href="${webDocumentationLink('user-manual/wazuh-dashboard/troubleshooting.html#saved-object-for-index-pattern-not-found')}" rel="noopener noreferrer" target="_blank">troubleshooting</a>.`
 )};
   }
 }
