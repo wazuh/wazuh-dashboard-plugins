@@ -42,6 +42,7 @@ export function SyscollectorInventory({ agent }) {
                 'user-manual/agents/agent-connection.html',
               )}
               target='_blank'
+              rel='noopener noreferrer'
             >
               Checking connection with the Wazuh server
             </a>
