@@ -26,7 +26,11 @@ export const WzAgentNeverConnectedPrompt = () => (
         <p>
           The agent has been registered but has not yet connected to the manager.
         </p>
-        <a href={documentationLink} target="_blank">
+        <a
+          href={documentationLink}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           Checking connection with the Wazuh server
         </a>
       </Fragment>
