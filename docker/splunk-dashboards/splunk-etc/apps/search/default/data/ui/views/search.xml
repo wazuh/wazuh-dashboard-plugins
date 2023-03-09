@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<view template="pages/search.html" type="html" isDashboard="False">
+    <label>Search</label>
+</view>

@@ -1,0 +1,192 @@
+<endpoint name="data/inputs/registry">
+  <header>Registry monitoring</header>
+  <capabilities>
+      <read>edit_win_regmon</read>
+  </capabilities>
+  <breadcrumb>
+      <parent hidecurrent="False">datainputstats</parent>
+      <name i18ntag="">Registry monitoring</name>
+  </breadcrumb>  
+
+  <elements>
+    <!-- COLLECTION NAME -->
+    <element name="name" type="textfield" label="Collection name">
+      <view name="list"/>
+      <view name="create"/>
+    </element> 
+    
+    <!-- REGISTRY HIVE -->
+    <element name="hive" type="textfield" label="Registry hive">
+      <view name="list"/>
+      <view name="edit"/>
+      <view name="create"/>
+      <key name="displayButton">True</key>
+      <key name="buttonLabel">Browse</key>
+      <key name="processValueList">value if entity['monitorSubnodes'] == '0' else value + '\.*'</key>
+      <onChange>
+        <key name="_action">showTreeView</key>
+        <key name="_triggerOnLoad" type="bool">0</key>
+        <key name="eaiPath">admin/win-reg-explorer</key>
+        <key name="title">Registry hive</key>
+        <key name="selectedText">Qualified name</key>
+        <key name="style">wideTreeviewPopup</key>
+      </onChange>
+    </element>
+
+    <!-- MONITOR SUBNODES -->
+    <element name="monitorSubnodes" type="checkbox" label="Monitor subnodes">
+        <view name="edit"/>
+        <view name="create"/>
+    </element>
+    
+    <!-- EVENT TYPE -->
+    <element name="type" type="hidden" label="Event types">
+      <view name="list"/>
+      <view name="edit"/>
+      <view name="create"/>
+      <key name="processValueList">', '.join(value) if isinstance(value, list) and len(value)>0 else 'None'</key>
+      <key name="submitValueAdd">'|'.join([key[14:] for key, value in form_data.items() if key.startswith('spl-ctrl_type_') and value == '1']) if len([key for key, value in form_data.items() if key.startswith('spl-ctrl_type_') and value == '1'])>0 else None</key>
+      <key name="submitValueEdit">'|'.join([key[14:] for key, value in form_data.items() if key.startswith('spl-ctrl_type_') and value == '1']) if len([key for key, value in form_data.items() if key.startswith('spl-ctrl_type_') and value == '1'])>0 else None</key>
+    </element>
+    
+    <element name="evt_types" type="fieldset">
+        <view name="edit"/>
+        <view name="create"/>
+        <view name="list"/>
+        <key name="legend">Event types</key>
+        <elements>
+            <element name="spl-ctrl_type_set" type="checkbox" label="Set">
+                <view name="edit"/>
+                <view name="create"/>
+                <key name="class">inline</key>
+                <key name="processValueAdd">1 if 'set' in form_defaults['type'] else 0</key>
+                <key name="processValueEdit">1 if 'set' in form_defaults['type'] else 0</key>
+            </element>
+            
+            <element name="spl-ctrl_type_create" type="checkbox" label="Create">
+                <view name="edit"/>
+                <view name="create"/>
+                <key name="class">inline</key>
+                <key name="processValueAdd">1 if 'create' in form_defaults['type'] else 0</key>
+                <key name="processValueEdit">1 if 'create' in form_defaults['type'] else 0</key>
+            </element>
+            
+            <element name="spl-ctrl_type_delete" type="checkbox" label="Delete">
+                <view name="edit"/>
+                <view name="create"/>
+                <key name="class">inline</key>
+                <key name="processValueAdd">1 if 'delete' in form_defaults['type'] else 0</key>
+                <key name="processValueEdit">1 if 'delete' in form_defaults['type'] else 0</key>
+            </element>
+            
+            <element name="spl-ctrl_type_rename" type="checkbox" label="Rename">
+                <view name="edit"/>
+                <view name="create"/>
+                <key name="class">inline</key>
+                <key name="processValueAdd">1 if 'rename' in form_defaults['type'] else 0</key>
+                <key name="processValueEdit">1 if 'rename' in form_defaults['type'] else 0</key>
+            </element>
+
+            <element name="spl-ctrl_type_open" type="checkbox" label="Open">
+                <view name="edit"/>
+                <view name="create"/>
+                <key name="class">inline</key>
+                <key name="processValueAdd">1 if 'open' in form_defaults['type'] else 0</key>
+                <key name="processValueEdit">1 if 'open' in form_defaults['type'] else 0</key>
+            </element>    
+            
+            <element name="spl-ctrl_type_close" type="checkbox" label="Close">
+                <view name="edit"/>
+                <view name="create"/>
+                <key name="class">inline</key>
+                <key name="processValueAdd">1 if 'close' in form_defaults['type'] else 0</key>
+                <key name="processValueEdit">1 if 'close' in form_defaults['type'] else 0</key>
+            </element>    
+            
+            <element name="spl-ctrl_type_query" type="checkbox" label="Query">
+                <view name="edit"/>
+                <view name="create"/>
+                <key name="class">inline</key>
+                <key name="processValueAdd">1 if 'query' in form_defaults['type'] else 0</key>
+                <key name="processValueEdit">1 if 'query' in form_defaults['type'] else 0</key>
+            </element>    
+        </elements>
+    </element>
+    
+    <!-- MORE OPTIONS -->
+    <element name="spl-ctrl_EnableAdvanced" type="checkbox" label="More settings" class="spl-mgr-advanced-switch">
+        <view name="edit"/>
+        <view name="create"/>
+          <onChange>
+              <key name="_action">showonly</key>
+              <key name="0">NONE</key>
+              <key name="1">ALL</key>
+              <group_set>
+                <group name="advanced"/>
+              </group_set>
+          </onChange>
+          <key name="processValueEdit">1</key> <!-- open by default if editing an existing monitor -->
+    </element>
+
+    <element name="advanced" type="fieldset" class="spl-mgr-advanced-options">
+        <view name="edit"/>
+        <view name="create"/>
+        <view name="list"/>
+        <elements>
+            <!-- PROCESS PATH -->
+            <element name="proc" type="textfield" label="Process path">
+              <view name="list"/>
+              <view name="edit"/>
+              <view name="create"/>
+            </element>  
+            
+            <!-- BASELINE INDEX -->
+            <element name="baseline" type="radio" label="Baseline index">
+              <view name="list"/>
+              <view name="edit"/>
+              <view name="create"/>
+              <key name="processValueList">'Yes' if value == '1' else 'No'</key>
+              <key name="exampleText">Scan your registry once for existing key values. This may be an expensive process and could take some time.</key>
+              <options>
+                <opt value="1" label="Yes"/>
+                <opt value="0" label="No"/>
+              </options>
+            </element>
+    
+            <!-- INDEX -->
+            <element name="indexField" type="fieldset">
+                <view name="list"/>
+                <view name="edit"/>
+                <view name="create"/>
+                <key name="legend">Index</key>
+                <key name="helpText">Set the destination index for this source.</key>
+                <elements>
+                    <element name="index" type="select" label="Index">
+                        <view name="list"/>
+                        <view name="edit"/>
+                        <view name="create"/>
+                        <key name="dynamicOptions" type="dict">
+                            <key name="keyName">title</key>
+                            <key name="keyValue">title</key>
+                            <key name="splunkSource">/data/indexes</key>
+                            <key name="splunkSourceParams" type="dict">
+                                <key name="count">"-1"</key>
+                                <key name="datatype">"all"</key>
+                                <key name="search">"isInternal=0 disabled=0 isVirtual=0"</key>
+                            </key>
+                            <key name="prefixOptions" type="list">
+                                <item type="list">
+                                    <item>default</item> <!--value-->
+                                    <item>default</item> <!--label-->
+                                </item>
+                            </key>
+                        </key>
+                        <key name="processValueList">'default' if value is None else value</key>
+                    </element>
+                </elements>
+            </element>
+    </elements>
+    </element>
+        
+  </elements>
+</endpoint>

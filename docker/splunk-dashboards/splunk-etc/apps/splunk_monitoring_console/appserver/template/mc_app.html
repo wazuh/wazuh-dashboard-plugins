@@ -1,0 +1,65 @@
+<%!
+    from splunk.appserver.mrsparkle.lib import util
+    isLite = util.isLite()
+    if isLite:
+        theme = 'lite'
+    else:
+        theme = 'enterprise'
+%>\
+<!doctype html>
+<!--[if lt IE 7]> <html lang="${i18n.current_lang()[0]|h}" class="no-js ie  lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>    <html lang="${i18n.current_lang()[0]|h}" class="no-js ie7 lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>    <html lang="${i18n.current_lang()[0]|h}" class="no-js ie8 lt-ie9"> <![endif]-->
+<!--[if IE 9]>    <html lang="${i18n.current_lang()[0]|h}" class="no-js ie9"> <![endif]-->
+<!--[if gt IE 9]><!--> <html lang="${i18n.current_lang()[0]|h}" class="no-js"> <!--<![endif]-->
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>${_('Loading...')}</title>
+    <meta name="description" content="listen to your data" />
+    <meta name="author" content="Splunk Inc." />
+    <meta name="viewport" content="width=1160, initial-scale=1.0" />
+    <link rel="shortcut icon" href="${util.getFaviconURL()}" />
+    <link rel="apple-touch-icon-precomposed" sizes="57x57" href="${make_url('/static/img/bookmark/apple-icon-57x57-precomposed.png')}" />
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="${make_url('/static/img/bookmark/apple-icon-72x72-precomposed.png')}" />
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="${make_url('/static/img/bookmark/apple-icon-114x114-precomposed.png')}" />
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="${make_url('/static/img/bookmark/apple-icon-144x144-precomposed.png')}" />
+    <meta name="msapplication-TileColor" content="#5cc05c">
+    <meta name="msapplication-TileImage" content="${make_url('/static/img/bookmark/ms-tileicon-144x144.png')}">
+    <% page_css = page.replace('_','-') %>
+    <%
+    css_less_qs = {}
+    if hasattr(cherrypy.request, 'embed') and cherrypy.request.embed:
+        css_less_qs['embed'] = 1
+    %>
+
+    <link rel="stylesheet" type="text/css" href="${make_url('/static/app/splunk_monitoring_console/build/css/bootstrap-%s.css' % (theme), _qs=css_less_qs)}" />
+</head>
+<body class="locale-${i18n.current_lang()[0]|h}">
+    <div class="preload">
+        <div id="placeholder-splunk-bar">
+            <a href="${make_url([])}" class="brand" title="splunk &gt; listen to your data">splunk<strong>&gt;</strong></a>
+        </div>
+    <div id="placeholder-app-bar"></div>
+    <div id="placeholder-main-section-body">
+    ${_('Loading...')}
+    </div>
+</div>
+
+    <!-- live to code, code to live... -->
+    <%
+    config_qs = dict(autoload=1)
+    if hasattr(cherrypy.request, 'embed') and cherrypy.request.embed:
+        config_qs['embed'] = 1
+    %>
+    <script src="${make_url('/config', _qs=config_qs)}" crossorigin="use-credentials"></script>
+    <script src="${make_url('/static/js/i18n.js')}"></script>
+    <script src="${make_url('/i18ncatalog?autoload=1')}"></script>
+    <script>
+    __splunkd_partials__ = ${json_decode(splunkd)};
+    </script>
+    <script src="${make_url('/static/app/splunk_monitoring_console/build/pages/%s/common.js' % (theme))}"></script>
+    <script src="${make_url('/static/app/splunk_monitoring_console/build/pages/%s/%s.js' % (theme,page))}"></script>
+
+</body>
+</html>

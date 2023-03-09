@@ -1,0 +1,2226 @@
+# Translations template for PROJECT.
+# Copyright (C) 2022 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2022-04-04 09:17-0700\n"
+"PO-Revision-Date: 2022-04-15 09:08+0100\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ko\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+"X-Generator: Poedit 3.0.1\n"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:27
+msgid "12:00 midnight"
+msgstr "12:00 자정"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:29
+msgid "12:00 noon"
+msgstr "12:00 정오"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:699
+msgid "A complex, data centric dashboard that pushes the limit in the visual control Dashboard Studio provides"
+msgstr "Dashboard Studio가 제공하는 시각적 제어의 한계를 시험하는 복합적이고 데이터 중심적인 대시보드"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:206
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/index.tsx:107
+msgid "A dashboard was generated for $dashboard.label$"
+msgstr "$dashboard.label$에 대해 대시보드가 생성되었습니다"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:755
+msgid "A data governance dashboard showing high level enterprise metrics"
+msgstr "고수준 엔터프라이즈 메트릭을 표시하는 데이터 거버넌스 대시보드"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:785
+msgid "A detailed version of office capacity metrics by using SVGs to color office floor maps"
+msgstr "SVG를 사용하여 사무실 배치도에 색상을 지정하는 사무실 수용력 메트릭의 상세 버전"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:300
+msgid "A new builder to create visually-rich, customizable dashboards"
+msgstr "시각적으로 풍부한 사용자 지정 대시보드를 만들 수 있는 새 작성기"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:665
+msgid "A simple thematic dashboard with simple complimentary charts"
+msgstr "단순 보완 차트가 있는 단순 테마 대시보드"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:711
+msgid "A strong showcase of how simple visualizations with proper layout make for an effective dashboard"
+msgstr "레이아웃이 적절한 단순 시각화가 어떻게 효과적인 대시보드를 구성하는지 보여주는 좋은 예"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:723
+msgid "A vibrant, thematic dashboard showing e-commerce metrics and use of SVGs"
+msgstr "전자상거래 메트릭과 SVG 사용을 나타내는 생동감이 넘치는 테마 대시보드"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardLayoutGroup/index.jsx:55
+msgid "Absolute"
+msgstr "절대"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/index.tsx:419
+msgid "Active"
+msgstr "활성"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:380
+msgid "Ad Hoc Search"
+msgstr "임시 검색"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/TokenEditor/TokenEditorGroup.tsx:77
+msgid "Add a token"
+msgstr "토큰 추가"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/TokenEditor/TokenEditorGroup.tsx:79
+msgid "Add token"
+msgstr "토큰 추가"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:459
+msgid "Adjust chart scaling properties to help fit your data correctly"
+msgstr "데이터에 올바르게 맞을 수 있게 차트 배율 속성 조정"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:217
+msgid "Adjust coloring for filler gauges"
+msgstr "필러 게이지 색상 조정"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:239
+msgid "Adjust coloring for marker gauges"
+msgstr "마커 게이지 색상 조정"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:489
+msgid "Adjust coloring for punchcard visualizations"
+msgstr "펀치카드 시각화 색상 조정"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:575
+msgid "Adjust coloring for single value icon visualizations to help indicate status at a glance"
+msgstr "상태를 요약하여 표시할 수 있게 단일값 아이콘 시각화의 색상 조정"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:519
+msgid "Adjust column formatting and add sparklines to tables"
+msgstr "열 서식 조정 및 테이블에 sparkline 추가"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:469
+msgid "Adjust how chart properties such as axes and legends frame your data"
+msgstr "축 및 범례 같은 차트 속성이 데이터를 프레이밍하는 방법 조정"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:479
+msgid "Adjust sizing for punchcard visualizations"
+msgstr "펀치카드 시각화 크기 조정"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:167
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:321
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:429
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:441
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:521
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:657
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:703
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:735
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:787
+msgid "Advanced"
+msgstr "고급"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/AdvancedPanelSettings/index.jsx:22
+msgid "Advanced Panel Settings"
+msgstr "고급 패널 설정"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:518
+msgid "Advanced Table Formatting"
+msgstr "고급 테이블 서식"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:105
+msgid "Aggregate metrics over two dimensions to visualize cyclical trends in your data"
+msgstr "두 차원에 걸친 메트릭을 집계하여 데이터의 주기적 추세 시각화"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:648
+msgid "Airport Dashboard Thumbnail"
+msgstr "공항 대시보드 섬네일"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:640
+msgid "Airport KPI's"
+msgstr "공항 KPI"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:765
+msgid "An effective use of icons and coloring to showcase a VPN infrastructure flow"
+msgstr "VPN 인프라 흐름을 쇼케이스하기 위한 효과적인 아이콘 및 색상 사용"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:775
+msgid "An effective use of images, icons, and visualizations to show office capacity metrics"
+msgstr "사무실 수용력 메트릭을 표시하기 위한 효과적인 이미지, 아이콘 및 시각화 사용"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/util/ErrorMessages.js:4
+msgid "An internal error occurred while saving."
+msgstr "저장하는 중에 내부 오류가 발생했습니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:444
+msgid "Annotations Image"
+msgstr "주석 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/util/linkToDashboardHelpers.ts:15
+msgid "App is required"
+msgstr "앱이 필요합니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/ActionDropdown.tsx:187
+msgid "Are you sure you want to delete"
+msgstr "다음을 삭제하시겠습니까?"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:56
+msgid "Area Chart"
+msgstr "영역형 차트"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:64
+msgid "Area Visualization Image"
+msgstr "영역형 시각화 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:660
+msgid "Assembly Dashboard Thumbnail"
+msgstr "어셈블리 대시보드 섬네일"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:652
+msgid "Assembly Line"
+msgstr "어셈블리 라인"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:94
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:109
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:132
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:160
+msgid "At"
+msgstr "매시간"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:147
+msgid "BCC"
+msgstr "BCC"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:186
+msgid "Back"
+msgstr "뒤로"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:34
+msgid "Bar Chart"
+msgstr "막대형 차트"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:42
+msgid "Bar Visualization Image"
+msgstr "막대형 시각화 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:35
+msgid "Bar charts are used to compare data of one period or point in time across multiple categories"
+msgstr "막대형 차트는 단일 기간 또는 시점의 데이터를 여러 범주에 걸쳐 비교하기 위해 사용됩니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:396
+msgid "Base Chain Image"
+msgstr "기본 체인 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:390
+msgid "Base and Chain Searches"
+msgstr "기본 및 체인 검색"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:645
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:667
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:679
+msgid "Basic"
+msgstr "기본"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:150
+msgid "Basic Choropleth SVG"
+msgstr "기본 등치 SVG"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:562
+msgid "Basic Icons"
+msgstr "기본 아이콘"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:270
+msgid "Basic Single Value"
+msgstr "기본 단일 값"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:498
+msgid "Basic Table"
+msgstr "기본 테이블"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/Dashboard.jsx:435
+msgid ""
+"Because the user has navigated away from the dashboard, all running searches have been stopped. Please refresh the "
+"dashboard to rerun the searches."
+msgstr ""
+"사용자가 대시보드에서 멀리 이동했으므로 실행 중인 모든 검색이 중지되었습니다. 검색을 다시 실행하려면 대시보드를 새"
+"로 고치십시오."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:68
+msgid "Bubble Chart"
+msgstr "버블 차트"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:76
+msgid "Bubble Visualization Image"
+msgstr "버블 시각화 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:69
+msgid ""
+"Bubble charts can represent correlation for up to four dimensions of data. The first two dimensions are visualized "
+"as coordinates, the third as size, and the fourth as color"
+msgstr ""
+"버블 차트는 최대 4개의 데이터 차원 간 상관 관계를 나타낼 수 있습니다. 첫 두 차원은 좌표로 시각화되고 세 번째 차원은 "
+"크기, 네 번째 차원은 색상으로 시각화됩니다"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:664
+msgid "Buttercup Games"
+msgstr "Buttercup Games"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:670
+msgid "Buttercup Games Dashboard Thumbnail"
+msgstr "Buttercup Games 대시보드 섬네일"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:135
+msgid "CC"
+msgstr "CC"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CloneDashboard/index.jsx:116
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:141
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/SaveToExistingDashboard/index.jsx:216
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/index.tsx:512
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/ActionDropdown.tsx:191
+msgid "Cancel"
+msgstr "취소"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/util/ErrorMessages.ts:17
+msgid "Cannot create ${parameter} with name \"${name}\"."
+msgstr "\"${name}\" 이름으로 ${parameter}을(를) 만들 수 없습니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:324
+msgid "Cascading Image"
+msgstr "계단식 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:318
+msgid "Cascading Inputs"
+msgstr "계단식 입력"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:436
+msgid "Chart Annotations"
+msgstr "차트 주석"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:448
+msgid "Chart Coloring"
+msgstr "차트 색상"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:454
+msgid "Chart Coloring Image"
+msgstr "차트 색상 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:474
+msgid "Chart Display Image"
+msgstr "차트 표시 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:6
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:26
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:38
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:48
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:60
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:72
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:84
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:96
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:106
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:118
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:130
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:142
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:428
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:440
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:450
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:460
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:470
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:480
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:490
+msgid "Chart Elements"
+msgstr "차트 요소"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:424
+msgid "Chart Overlays"
+msgstr "차트 오버레이"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:458
+msgid "Chart Scaling"
+msgstr "차트 배율"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:464
+msgid "Chart Scaling Image"
+msgstr "차트 배율 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:257
+msgid "Classic Dashboards"
+msgstr "클래식 대시보드"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CloneDashboard/index.jsx:122
+msgid "Clone"
+msgstr "복제"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/ActionDropdown.tsx:249
+msgid "Clone Dashboard"
+msgstr "대시보드 복제"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CloneDashboard/index.jsx:103
+msgid "Clone in Dashboard Studio"
+msgstr "Dashoboard Studio에서 복제"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/AdvancedPanelSettings/index.jsx:52
+msgid ""
+"Clones the report's search string and time range. The inline search exists only in the dashboard and has no "
+"external dependencies."
+msgstr "보고서의 검색 문자열과 시간 범위를 복제합니다. 인라인 검색은 대시보드에만 존재하면 외부 종속성이 없습니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:174
+msgid "Cluster Map"
+msgstr "클러스터 맵"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:195
+msgid "Color a map of the United States with geo data"
+msgstr "지역 데이터가 있는 미국 지도 색상 지정"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:185
+msgid "Color a map of the world with geo data"
+msgstr "지역 데이터가 있는 세계 지도 색상 지정"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:219
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:241
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:263
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:287
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:451
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:491
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:511
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:577
+msgid "Coloring"
+msgstr "색상 지정"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:22
+msgid "Column Chart"
+msgstr "세로막대형 차트"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:30
+msgid "Column Visualization Image"
+msgstr "세로막대형 시각화 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:23
+msgid ""
+"Column charts can be used for time series data when comparing magnitudes over time. They can also be used in a "
+"similar way to bar charts to compare field values across a dataset"
+msgstr ""
+"세로막대형 차트는 시간에 따른 크기를 비교할 때 시계열 데이터에 사용할 수 있습니다. 막대형 차트와 비슷한 방법으로 사"
+"용하여 필드 값을 데이터 집합 간에 비교할 수도 있습니다"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:118
+msgid "Comma separated list of email addresses."
+msgstr "쉼표로 구분된 이메일 주소 리스트."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:39
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:97
+msgid "Comparison"
+msgstr "비교"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:16
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:644
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:656
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:666
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:678
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:690
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:702
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:714
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:724
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:734
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:746
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:756
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:766
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:776
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:786
+msgid "Complete Dashboards"
+msgstr "전체 대시보드"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:653
+msgid "Consistent labelling, multiple charts and dynamic SVGs combine to show a factory management dashboard"
+msgstr "일관성이 있는 레이블, 여러 차트 및 동적 SVG를 합쳐 공장 관리 대시보드를 표시합니다"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:159
+msgid "Continue using the same standard Splunk visualizations and explore additional tools."
+msgstr "동일한 표준 Splunk 시각화를 계속 사용하고 추가 도구를 살펴보십시오."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CloneDashboard/index.jsx:122
+msgid "Convert & Save"
+msgstr "변환 및 저장"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:73
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:85
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:107
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:131
+msgid "Correlation"
+msgstr "상관 관계"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:145
+msgid "Create"
+msgstr "만들기"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:127
+msgid "Create New Dashboard"
+msgstr "새 대시보드 만들기"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:37
+msgid "Critical"
+msgstr "심각함"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/util/ErrorMessages.ts:15
+msgid "Cron expression cannot be empty."
+msgstr "크론 식을 비워둘 수 없습니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:596
+msgid "Custom URL Drilldown"
+msgstr "사용자 지정 URL 드릴다운"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:602
+msgid "Custom URL Image"
+msgstr "사용자 지정 URL 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:164
+msgid "Custom visualizations & Trellis not yet supported"
+msgstr "사용자 지정 시각화 및 격자는 아직 지원되지 않습니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:674
+msgid "Customer Satisfaction"
+msgstr "고객 만족도"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:682
+msgid "Customer Satisfaction Dashboard Thumbnail"
+msgstr "고객 만족도 대시보드 섬네일"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:449
+msgid "Customize chart colors to reflect your preferred aesthetic and branding"
+msgstr "차트 색상을 사용자 지정하여 선호하는 미관과 브랜딩을 나타냅니다"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:134
+msgid "Customize with shapes,"
+msgstr "도형으로 사용자 지정,"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:136
+msgid "Customize with shapes, images, and text without coding with Absolute layout."
+msgstr "절대 레이아웃을 사용하여 코딩하지 않고 도형, 이미지 및 텍스트로 사용자 지정합니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/CustomEditingGroup.jsx:20
+msgid "Dark"
+msgstr "어둡게"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/index.tsx:425
+msgid "Dashboard"
+msgstr "대시보드"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-examples-hub/src/components/ReactBannerComponent.jsx:23
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/index.jsx:13
+msgid "Dashboard Examples Hub"
+msgstr "대시보드 예 허브"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/EditTitleAndId/index.jsx:61
+msgid "Dashboard ID"
+msgstr "대시보드 ID"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-api/src/util/returnUtils.js:19
+msgid "Dashboard ID can only use letters, numbers, dashes, & underscores."
+msgstr "대시보드 ID는 문자, 숫자, 대시 및 밑줄만 사용할 수 있습니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:294
+msgid "Dashboard Studio"
+msgstr "Dashboard Studio"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-conversion/src/util/Constants.ts:14
+msgid "Dashboard Studio does not support Trellis."
+msgstr "Dashboard Studio에서 격자를 지원하지 않습니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-conversion/src/util/Constants.ts:19
+msgid "Dashboard Studio does not support categorical colors in Choropleth Maps."
+msgstr "Dashboard Studio는 단계구분도에서 범주형 색상을 지원하지 않습니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-conversion/src/util/Constants.ts:9
+msgid "Dashboard Studio does not support the selected visualization type."
+msgstr "Dashboard Studio에서 선택한 시각화 유형을 지원하지 않습니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/EditTitleAndId/index.jsx:30
+msgid "Dashboard Title"
+msgstr "대시보드 제목"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/ActionDropdown.tsx:1
+msgid "Dashboard cloned into"
+msgstr "대시보드가 다음에 복제됨"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/util/linkToDashboardHelpers.ts:11
+msgid "Dashboard is required."
+msgstr "대시보드가 필요합니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:698
+msgid "Data Command and Control"
+msgstr "데이터 명령어 및 제어"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:706
+msgid "Data Command and Control Dashboard Thumbnail"
+msgstr "데이터 명령어 및 제어 대시보드 섬네일"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:754
+msgid "Data Governance"
+msgstr "데이터 거버넌스"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:760
+msgid "Data Governance Dashboard Thumbnail"
+msgstr "데이터 거버넌스 대시보드 섬네일"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:710
+msgid "Data Streaming"
+msgstr "데이터 스트리밍"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:718
+msgid "Data Streaming Dashboard Thumbnail"
+msgstr "데이터 스트리밍 대시보드 섬네일"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:619
+msgid ""
+"Data sources of different types can refresh at different intervals, or a global default can be set for all data "
+"sources"
+msgstr ""
+"데이터 원본 유형에 따라 다른 간격으로 새로 고침되도록 설정하거나, 모든 데이터 원본에 대해 전역 기본값을 설정할 수 있"
+"습니다"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:686
+msgid "Datacenter Sensors"
+msgstr "데이터센터 센서"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:694
+msgid "Datacenter Sensors Dashboard Thumbnail"
+msgstr "데이터센터 센서 대시보드 섬네일"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:12
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:382
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:392
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:404
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:416
+msgid "Datasources"
+msgstr "데이터 원본"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:13
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:610
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:622
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:632
+msgid "Defaults"
+msgstr "기본값"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/panels/DataSourcesPanelListItem.jsx:120
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/ActionDropdown.tsx:196
+msgid "Delete"
+msgstr "삭제"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/ActionDropdown.tsx:184
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/ActionDropdown.tsx:284
+msgid "Delete Dashboard"
+msgstr "대시보드 삭제"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/TokenEditor/TokenEditor.tsx:43
+msgid "Delete token"
+msgstr "토큰 삭제"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CloneDashboard/index.jsx:54
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:158
+msgid "Description"
+msgstr "설명"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:11
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:166
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:530
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:542
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:554
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:566
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:576
+msgid "Design Elements"
+msgstr "디자인 요소"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:597
+msgid "Direct users to external or relative URLs from interacting with a visualization"
+msgstr "시각화와 상호작용 시 사용자를 외부 또는 상대 URL로 보냅니다"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:468
+msgid "Display Axes, Labels and Legends"
+msgstr "축, 레이블 및 범례 표시"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:194
+msgid "Done"
+msgstr "완료"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/ActionDropdown.tsx:229
+msgid "Download PDF"
+msgstr "PDF 다운로드"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/ActionDropdown.tsx:236
+msgid "Download PNG"
+msgstr "PNG 다운로드"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/AdvancedPanelSettings/index.jsx:87
+msgid "Drilldown"
+msgstr "드릴다운"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/AdvancedPanelSettings/index.jsx:93
+msgid ""
+"Drilldown is disabled when you save a visualization to a dashboard. After saving, open the dashboard editor to "
+"access configuration options for the visualization."
+msgstr ""
+"시각화를 대시보드에 저장하면 드릴다운이 비활성화됩니다. 저장한 후 대시보드 편집기를 열어 시각화의 설정 옵션에 액세스"
+"합니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:15
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:588
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:598
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:632
+msgid "Drilldowns"
+msgstr "드릴다운"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:328
+msgid "Dropdown"
+msgstr "드롭다운"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:334
+msgid "Dropdown Image"
+msgstr "드롭다운 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:509
+msgid "Dynamically color table elements to contextualize and emphasize data"
+msgstr "테이블 요소에 동적으로 색상을 지정하여 데이터를 관련 짓고 강조합니다"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:259
+msgid "Dynamically color various parts of the Single Value Radial visualization based on your data"
+msgstr "데이터에 따라 단일 값 반지름 시각화의 여러 부분에 동적으로 색상을 지정합니다"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:283
+msgid ""
+"Dynamically color various parts of the Single Value visualization to show overall status and signify positive and "
+"negative change"
+msgstr "단일 값 시각화의 여러 부분에 동적으로 색상을 지정하여 전체적인 상태를 표시하고 양과 음의 변화를 나타냅니다"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:722
+msgid "E-Commerce Monitoring"
+msgstr "전자상거래 모니터링"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:728
+msgid "E-Commerce Monitoring Dashboard Thumbnail"
+msgstr "전자상거래 모니터링 대시보드 섬네일"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/panels/DataSourcesPanelListItem.jsx:112
+msgid "Edit"
+msgstr "편집"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/index.tsx:390
+msgid "Edit Export Schedule"
+msgstr "내보내기 스케줄 편집"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/EditTitleAndId/index.jsx:42
+msgid "Edit ID"
+msgstr "ID 편집"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/EditSourceButton.jsx:16
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/EditSourceButton.jsx:18
+msgid "Edit Source"
+msgstr "원본 편집"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/util/ErrorMessages.ts:10
+msgid "Email Address list is empty."
+msgstr "이메일 주소 리스트가 비어 있습니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/util/ErrorMessages.ts:14
+msgid "Email Address list is invalid"
+msgstr "이메일 주소 리스트가 잘못되었습니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:104
+msgid "Email To"
+msgstr "이메일 전송 대상"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:295
+msgid "Emojis can serve as a good at-a-glance representation of status instead of relying on numbers"
+msgstr "이모지를 사용하면 숫자를 사용하는 경우보다 상태를 더 잘 요약해서 나타낼 수 있습니다"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-examples-hub/src/components/ReactBannerComponent.jsx:24
+msgid "Empowering dashboard creators with a toolkit of examples"
+msgstr "예시 툴키트로 대시보드 작성자에게 능력 부여"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/index.tsx:407
+msgid "Enable"
+msgstr "활성화"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:149
+msgid "Enter BCC addresses"
+msgstr "BCC 주소 입력"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:137
+msgid "Enter CC addresses"
+msgstr "CC 주소 입력"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/TokenEditor/TokenEditor.tsx:73
+msgid "Enter a name"
+msgstr "이름 입력"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/TokenEditor/TokenEditor.tsx:94
+msgid "Enter a value"
+msgstr "값 입력"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:109
+msgid "Enter email addresses"
+msgstr "이메일 주소 입력"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/ActionDropdown.tsx:113
+msgid "Error encountered while downloading"
+msgstr "다운로드 중 오류가 발생했습니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-conversion/src/util/Constants.ts:6
+msgid "Errors occurred during conversion"
+msgstr "변환하는 동안 오류가 발생했습니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:738
+msgid "Europe Telecom Dashboard Thumbnail"
+msgstr "Europe Telecom 대시보드 섬네일"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:732
+msgid "Europe Telecom Network Hub"
+msgstr "Europe Telecom 네트워크 허브"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-examples-hub/src/components/ReactNavComponent.jsx:51
+msgid "Examples"
+msgstr "예"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-examples-hub/src/components/ReactBannerComponent.jsx:20
+msgid "Examples App Logo"
+msgstr "예시 앱 로고"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-api/src/util/returnUtils.js:9
+msgid "Failed to add to existing dashboard"
+msgstr "기존 대시보드에 추가하지 못했습니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-api/src/util/returnUtils.js:13
+msgid "Failed to clone dashboard"
+msgstr "대시보드를 복제하지 못했습니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-api/src/util/returnUtils.js:24
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-api/src/util/returnUtils.js:26
+msgid "Failed to fetch dashboard content for ${id}"
+msgstr "${id}에 대한 대시보드 콘텐츠를 가져오지 못했습니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/LinkToDashboardEditor.tsx:185
+msgid "Failed to load available apps."
+msgstr "사용 가능한 앱을 로드하지 못했습니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-api/src/util/returnUtils.js:11
+msgid "Failed to save to dashboard"
+msgstr "대시보드에 저장하지 못했습니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/TokenEditor/TokenEditor.tsx:22
+msgid "Field name of the value/location clicked"
+msgstr "클릭된 값/위치 필드 이름"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-service/src/kvstore/index.js:81
+msgid "File size must be 16MB or smaller"
+msgstr "파일 크기는 16MB 이하여야 합니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:204
+msgid "Filler Gauge"
+msgstr "필러 게이지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:222
+msgid "Filler Gauge Coloring Image"
+msgstr "필러 게이지 색상 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:216
+msgid "Filler Gauge Coloring Options"
+msgstr "필러 게이지 색상 옵션"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:212
+msgid "Filler Gauge Image"
+msgstr "필러 게이지 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:119
+msgid "Flexible layout options to freely place objects or organize & resize (Absolute and Grid)."
+msgstr "개체를 자유롭게 배치하거나 설정 및 크기 조정(절대값 및 그리드)할 수 있는 유연한 레이아웃 옵션입니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:119
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:143
+msgid "Flow"
+msgstr "흐름"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:23
+msgid "Friday"
+msgstr "금요일"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardLayoutGroup/index.jsx:55
+msgid "Full layout control"
+msgstr "전체 레이아웃 제어"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:7
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:208
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:218
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:230
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:240
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:250
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:262
+msgid "Gauges"
+msgstr "게이지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardLayoutGroup/index.jsx:71
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:679
+msgid "Grid"
+msgstr "그리드"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:742
+msgid "Healthcare Dashboard"
+msgstr "상태 관리 대시보드"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:750
+msgid "Healthcare Dashboard Thumbnail"
+msgstr "상태 관리 대시보드 섬네일"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:36
+msgid "High"
+msgstr "높음"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:219
+msgid "How do you want to build your dashboard?"
+msgstr "대시보드를 어떻게 작성하시겠습니까?"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-service/src/dashboard/index.js:13
+msgid "ID already in use. Edit the ID or choose a different title."
+msgstr "ID가 이미 사용 중입니다. ID를 편집하거나 다른 제목을 선택하십시오."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/util/ErrorMessages.ts:5
+msgid "ID cannot be empty."
+msgstr "ID를 비워둘 수 없습니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:580
+msgid "Icon Coloring Image"
+msgstr "아이콘 색상 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:570
+msgid "Icon Visualization Image"
+msgstr "아이콘 시각화 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:574
+msgid "Icons with Dynamic Coloring and Values"
+msgstr "동적 색상 및 값이 있는 아이콘"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:563
+msgid "Icons without values can be used to indicate change or status without needing to display a metric"
+msgstr "값이 없는 아이콘을 사용하여 메트릭을 표시할 필요 없이 변동 또는 상태를 나타낼 수 있습니다"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/Dashboard.jsx:222
+msgid "Image URL domain missing from predefined allow list. Update allow list to prevent image from being blocked."
+msgstr ""
+"이미지 URL 도메인이 미리 정의된 허용 리스트에서 누락되었습니다. 허용 리스트를 업데이트하여 이미지가 차단되지 않도록 "
+"하십시오."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:534
+msgid "Image Visualization Image"
+msgstr "이미지 시각화 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:528
+msgid "Images"
+msgstr "이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/index.tsx:419
+msgid "Inactive"
+msgstr "비활성"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/AdvancedPanelSettings/index.jsx:31
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/AdvancedPanelSettings/index.jsx:48
+msgid "Inline Search"
+msgstr "인라인 검색"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:14
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:320
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:330
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:340
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:350
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:360
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:372
+msgid "Inputs"
+msgstr "입력"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:691
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:715
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:725
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:747
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:757
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:767
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:777
+msgid "Intermediate"
+msgstr "중간"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:97
+msgid "Introducing Dashboard Studio"
+msgstr "Dashboard Studio 소개"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-api/src/util/returnUtils.js:22
+msgid "Invalid input for ${parameter}. Expected ${expectedType}, but received ${actualType}"
+msgstr "${parameter}에 대한 잘못된 입력. ${expectedType}이(가) 예상되지만 ${actualType}(이)가 수신됨"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-api/src/util/returnUtils.js:17
+msgid "Invalid layout field, requires \"absolute\" or \"grid\""
+msgstr "잘못된 레이아웃 필드입니다. \"절댓값\" 또는 \"그리드\"가 필요합니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:273
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:177
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/SaveToExistingDashboard/index.jsx:201
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:198
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/Dashboard.jsx:179
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/Dashboard.jsx:226
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/TokenEditor/TokenEditorGroup.tsx:88
+msgid "Learn more"
+msgstr "자세히 알아보기"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/CustomEditingGroup.jsx:19
+msgid "Light"
+msgstr "라이트"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:46
+msgid "Line Chart"
+msgstr "꺾은선형 차트"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:52
+msgid "Line Visualization Image"
+msgstr "꺾은선형 시각화 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:138
+msgid "Link Graph"
+msgstr "링크 그래프"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:146
+msgid "Link Graph Image"
+msgstr "링크 그래프 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:139
+msgid ""
+"Link graphs show connections between distinct values in various fields. Certain relationships can be highlighted to "
+"see every link"
+msgstr "링크 그래프는 여러 필드의 개별 값 간 연결을 표시합니다. 특정 관계를 강조 표시하여 모든 링크를 볼 수 있습니다"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/LinkToDashboardEditor.tsx:397
+msgid "Link to dashboard"
+msgstr "대시보드에 연결"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/PanelOptions/index.jsx:68
+msgid "Loaded from report"
+msgstr "보고서에서 로드됨"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:34
+msgid "Low"
+msgstr "낮음"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:180
+msgid "Map Visualization Image"
+msgstr "맵 시각화 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:437
+msgid ""
+"Mark important discrete events on time-series charts. This is useful when providing context behind a visible change "
+"in your data"
+msgstr "시계열 차트의 중요한 개별 이벤트를 표시합니다. 데이터에서 보이는 변화에 대한 컨텍스트를 제공할 때 유용합니다"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:550
+msgid "Markdown Element"
+msgstr "마크다운 요소"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:558
+msgid "Markdown Visualization Image"
+msgstr "마크다운 시각화 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:226
+msgid "Marker Gauge"
+msgstr "마커 게이지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:244
+msgid "Marker Gauge Coloring Image"
+msgstr "마커 게이지 색상 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:238
+msgid "Marker Gauge Coloring Options"
+msgstr "마커 게이지 색상 옵션"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:234
+msgid "Marker Gauge Image"
+msgstr "마커 게이지 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:204
+msgid "Message"
+msgstr "메시지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:209
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:219
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:231
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:241
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:251
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:263
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:275
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:287
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:299
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:311
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:501
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:511
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:521
+msgid "Metric"
+msgstr "메트릭"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:103
+msgid "Minutes past the hour"
+msgstr "분에"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-api/src/util/returnUtils.js:18
+msgid "Missing required parameters: id, simpleXmlDefinition"
+msgstr "필수 매개변수(id, simpleXmlDefinition)가 없습니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-api/src/util/returnUtils.js:16
+msgid "Missing required parameters: id, simpleXmlVizDef"
+msgstr "필수 매개변수(id, simpleXmlVizDef)가 없습니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:19
+msgid "Monday"
+msgstr "월요일"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:162
+msgid "Moving Choropleth SVG"
+msgstr "이동 등치 SVG"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:170
+msgid "Moving SVG Visualization Image"
+msgstr "이동 SVG 시각화 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:338
+msgid "Multiselect"
+msgstr "다중선택"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:344
+msgid "Multiselect Image"
+msgstr "다중선택 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:295
+msgid "NEW"
+msgstr "신규"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:119
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:131
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:143
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:589
+msgid "New"
+msgstr "새로 만들기"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:194
+msgid "Next"
+msgstr "다음"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/AdvancedPanelSettings/index.jsx:89
+msgid "No action"
+msgstr "작업 없음"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:35
+msgid "Normal"
+msgstr "정상"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:358
+msgid "Number"
+msgstr "숫자"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:364
+msgid "Number Input Image"
+msgstr "숫자 입력 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:123
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:146
+msgid "On"
+msgstr "켜기"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/common/ErrorViz.jsx:34
+msgid ""
+"Oops! The dashboard that you tried to convert uses components that are not yet supported in Dashboard Studio. We "
+"apologize for any inconvenience."
+msgstr ""
+"죄송합니다. 변환하려는 대시보드는 Dashboard Studio에서 아직 지원되지 않는 구성 요소를 사용합니다. 불편을 끼쳐 드려 "
+"죄송합니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/ActionDropdown.tsx:156
+msgid "Open dashboard"
+msgstr "대시보드 열기"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/LinkToDashboardEditor.tsx:367
+msgid "Open in new tab"
+msgstr "새 탭에서 열기"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:391
+msgid "Optimize your dashboard by using base and chain searches to remove repitition"
+msgstr "기본 및 체인 검색을 사용해 반복을 제거하여 대시보드를 최적화하십시오"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CloneDashboard/index.jsx:56
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:160
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/PanelOptions/index.jsx:127
+msgid "Optional"
+msgstr "선택 사항"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:432
+msgid "Overlays Image"
+msgstr "이미지 오버레이"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/LinkToDashboardEditor.tsx:1
+msgid "Owner:"
+msgstr "소유자:"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/AdvancedPanelSettings/index.jsx:27
+msgid "Panel Powered By"
+msgstr "패널 제공"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/PanelOptions/index.jsx:125
+msgid "Panel Title"
+msgstr "패널 제목"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:126
+msgid "Parallel Coordinates"
+msgstr "평행 좌표"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:134
+msgid "Parallel Coordinates Visualization Image"
+msgstr "평행 좌표 시각화 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:127
+msgid ""
+"Parallel coordinates are used to depict relationships in high-dimensional datasets. The advantage lies in being "
+"able to compare multiple variables all in a single chart"
+msgstr ""
+"평행 좌표는 고차원 데이터 집합 내 관계를 묘사하는 데 사용됩니다. 이 좌표는 여러 변수를 모두 하나의 차트에서 비교할 "
+"수 있다는 장점이 있습니다"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/util/ErrorMessages.ts:20
+msgid "Parameter \"${parameter}\" must be less than ${length} characters."
+msgstr "매개변수 \"${parameter}\"은(는) ${length}자 미만이어야 합니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/SaveButton.jsx:35
+msgid "Permission"
+msgstr "권한"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CloneDashboard/index.jsx:74
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:177
+msgid "Permissions"
+msgstr "권한"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:92
+msgid "Pie Chart"
+msgstr "원형 차트"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:100
+msgid "Pie Visualization Image"
+msgstr "원형 시각화 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:93
+msgid ""
+"Pie charts are used to show how different field values combine ver an entire data set. The size of the slice "
+"represents relative importance of one category out of a whole"
+msgstr ""
+"원형 차트는 여러 필드 값의 합계를 전체 데이터 집합과 비교하여 표시하는 데 사용됩니다. 조각 크기는 한 범주가 전체에"
+"서 상대적으로 얼마나 중요한지를 나타냅니다"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/index.tsx:188
+msgid "Please fill in this field"
+msgstr "이 필드를 채우십시오"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/index.tsx:212
+msgid "Please select a schedule"
+msgstr "스케줄을 선택하십시오"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:381
+msgid "Populate a visualization with the results of an ad-hoc Splunk search query"
+msgstr "시각화를 임시 Splunk 검색 쿼리 결과로 채웁니다"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:631
+msgid "Populate token-dependent charts on page load by setting a static default value"
+msgstr "정적인 기본값을 설정하여 페이지 로드 시에 토큰 종속 차트를 채웁니다"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:319
+msgid "Power a form input from other input values to further narrow search results"
+msgstr "양식 입력을 다른 입력 값으로 보강하여 검색 결과를 더 좁힙니다"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/ActionDropdown.tsx:92
+msgid "Preparing ${fileType.toUpperCase()} download"
+msgstr "${fileType.toUpperCase()} 다운로드 준비 중"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:158
+msgid "Priority"
+msgstr "우선순위"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CloneDashboard/index.jsx:40
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:60
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/LinkToDashboardEditor.tsx:339
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/SaveButton.jsx:40
+msgid "Private"
+msgstr "비공개"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:606
+msgid "Progress Bar Defaults"
+msgstr "진행률 표시줄 기본값"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:614
+msgid "Progress Bar Defaults Image"
+msgstr "진행률 표시줄 기본값 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:607
+msgid ""
+"Progress bars can be revealed per visualization instance, for every visualization of a certain type, or at a "
+"default global level"
+msgstr ""
+"진행률 표시줄을 시각화 인스턴스별로 표시하거나, 특정 유형의 모든 시각화에 대해 표시하거나 기본 전역 수준에서 표시할 "
+"수 있습니다"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:104
+msgid "Punchcard Chart"
+msgstr "펀치카드 차트"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:488
+msgid "Punchcard Coloring"
+msgstr "펀치카드 색상"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:494
+msgid "Punchcard Coloring Image"
+msgstr "펀치카드 색상 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:478
+msgid "Punchcard Sizing"
+msgstr "펀치카드 크기 지정"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:484
+msgid "Punchcard Sizing Image"
+msgstr "펀치카드 크기 지정 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:110
+msgid "Punchcard Visualization Image"
+msgstr "펀치카드 시각화 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardLayoutGroup/index.jsx:71
+msgid "Quick organization"
+msgstr "빠른 조직"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:266
+msgid "Radial Coloring Image"
+msgstr "방사형 색상 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:254
+msgid "Radial Image"
+msgstr "방사형 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-examples-hub/src/components/ReactBannerComponent.jsx:29
+msgid "Read Documentation"
+msgstr "매뉴얼 읽기"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/Dashboard.jsx:442
+msgid "Refresh"
+msgstr "새로 고침"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:618
+msgid "Refresh Defaults"
+msgstr "기본값 새로 고침"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:626
+msgid "Refresh Defaults Image"
+msgstr "기본값 새로 고침 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/Dashboard.jsx:121
+msgid "Refresh rates of less than 60 seconds might impact search performance."
+msgstr "새로 고침 빈도가 60초 미만일 경우 검색 성능에 영향을 미칠 수 있습니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/panels/DataSourcesPanelListItem.jsx:118
+msgid "Remove"
+msgstr "제거"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/AdvancedPanelSettings/index.jsx:68
+msgid "Report"
+msgstr "보고서"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:271
+msgid ""
+"Represent a discrete metric with the option of also showing the latest trend value and change over time with a "
+"sparkline"
+msgstr "개별 메트릭을 최신 추세 값과 시간에 따른 변화를 sparkline으로 표시하는 옵션과 함께 나타냅니다"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:249
+msgid "Represent a single metric in relation to a radial gauge representing a limit"
+msgstr "메트릭 하나를 제한을 나타내는 방사형 게이지와 비교하여 표시합니다"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:151
+msgid ""
+"Represent values by coloring predefined regions in an SVG. Custom SVG images are great for introducing an extra bit "
+"of design flair to the dashboard"
+msgstr ""
+"SVG에서 미리 정의된 지역의 색상을 지정하여 값을 나타냅니다. 사용자 지정 SVG 이미지는 대시보드에 멋진 디자인을 추가하"
+"는 데 매우 유용합니다"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/EditTitleAndId/index.jsx:49
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/EditTitleAndId/index.jsx:70
+msgid "Required"
+msgstr "필수"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/Dashboard.jsx:562
+msgid "Retry save"
+msgstr "저장 재시도"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:53
+msgid "Run by Cron"
+msgstr "크론 기준 실행"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:41
+msgid "Run every day"
+msgstr "매일 실행"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:37
+msgid "Run every hour"
+msgstr "매시간 실행"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:49
+msgid "Run every month"
+msgstr "매달 실행"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:45
+msgid "Run every week"
+msgstr "매주 실행"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:158
+msgid "SVG Visualization Image"
+msgstr "SVG 시각화 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:114
+msgid "Sankey Diagram"
+msgstr "Sankey 도표"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:115
+msgid "Sankey Diagrams are used to depict flows from a set of elements to another using nodes and links"
+msgstr "Sankey 도표는 노드와 링크를 사용하여 요소 집합 간 흐름을 묘사하는 데 사용됩니다"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:122
+msgid "Sankey Visualization Image"
+msgstr "Sankey 시각화 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:24
+msgid "Saturday"
+msgstr "토요일"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/SaveButton.jsx:23
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/SaveButton.jsx:26
+msgid "Save"
+msgstr "저장"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/index.tsx:527
+msgid "Save & Disable"
+msgstr "저장 후 비활성화"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/index.tsx:527
+msgid "Save & Enable"
+msgstr "저장 후 활성화"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/SaveToExistingDashboard/index.jsx:173
+msgid "Save Panel to Existing Dashboard"
+msgstr "패널을 기존 대시보드에 저장"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:127
+msgid "Save Panel to New Dashboard"
+msgstr "패널을 새 대시보드에 저장"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/Dashboard.jsx:519
+msgid "Save now"
+msgstr "지금 저장"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:145
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/SaveToExistingDashboard/index.jsx:223
+msgid "Save to Dashboard"
+msgstr "대시보드에 저장"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:408
+msgid "Saved Search Image"
+msgstr "저장된 검색 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:400
+msgid "Saved Searches"
+msgstr "저장된 검색"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:80
+msgid "Scatter Chart"
+msgstr "산포도"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:88
+msgid "Scatter Visualization Image"
+msgstr "산포도 시각화 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:81
+msgid ""
+"Scatter charts plot points on a graph, where the data point distribution can represent the correlation across the "
+"two dimensions being shown. Multiple categories can also be compared by using colors"
+msgstr ""
+"산포도는 그래프에 점을 그리고, 여기서 데이터 점 분포는 표시된 두 차원의 상관 관계를 나타낼 수 있습니다. 여러 범주를 "
+"색상을 사용하여 비교할 수도 있습니다"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:193
+msgid "Schedule"
+msgstr "스케줄"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/index.tsx:331
+msgid ""
+"Schedule ${\n"
+"                  this.state.enabled ? 'enabled' : 'disabled'\n"
+"                } and saved"
+msgstr ""
+"스케줄 ${\n"
+"                  this.state.enabled ? 'enabled' : 'disabled'\n"
+"                } 및 저장됨"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/ActionDropdown.tsx:272
+msgid "Scheduled Export"
+msgstr "예약된 내보내기"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/SaveToExistingDashboard/SelectDashboardList.jsx:237
+msgid "Search By Title"
+msgstr "제목을 기준으로 검색"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:386
+msgid "Search Image"
+msgstr "검색 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/LinkToDashboardEditor.tsx:297
+msgid "Select a Dashboard"
+msgstr "대시보드 선택"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/LinkToDashboardEditor.tsx:263
+msgid "Select an App"
+msgstr "앱 선택"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/SaveToExistingDashboard/SelectDashboardList.jsx:210
+msgid "Select an Existing Dashboard"
+msgstr "기존 대시보드 선택"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:242
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardLayoutGroup/index.jsx:39
+msgid "Select layout mode"
+msgstr "레이아웃 모드 선택"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:369
+msgid ""
+"Select the time range used by datasources powering your visualizations. By default, every dashboard comes with a "
+"time range input"
+msgstr ""
+"시각화에 사용되는 데이터 원본에서 사용하는 시간 범위를 선택하십시오. 기본적으로 모든 대시보드에 시간 범위 입력이 있"
+"습니다"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/util/linkToDashboardHelpers.ts:16
+msgid "Selected app is not available. App may have been deleted, or you may not have permissions."
+msgstr "선택한 앱을 사용할 수 없습니다. 앱이 삭제되었거나 권한이 없기 때문일 수 있습니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/util/linkToDashboardHelpers.ts:12
+msgid "Selected dashboard is not available. Dashboard may have been deleted, or you may not have permissions."
+msgstr "선택한 대시보드를 사용할 수 없습니다. 대시보드가 삭제되었거나 권한이 없기 때문일 수 있습니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/index.tsx:518
+msgid "Send Test Email"
+msgstr "테스트 이메일 전송"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/ActionDropdown.tsx:261
+msgid "Set As Home Dashboard"
+msgstr "홈 대시보드로 설정"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/SaveButton.jsx:33
+msgid "Set Permission"
+msgstr "권한 설정"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:592
+msgid "Set Token Image"
+msgstr "토큰 설정 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:584
+msgid "Set Token with Drilldown"
+msgstr "드릴다운으로 토큰 설정"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/TokenEditor/TokenEditorGroup.tsx:72
+msgid "Set Tokens"
+msgstr "토큰 설정"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:329
+msgid "Set a token to a single value by using a form populated with static or dynamic options"
+msgstr "정적 또는 동적 옵션으로 채워진 양식을 사용하여 토큰을 단일 값으로 설정합니다"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:339
+msgid "Set a token to multiple values by using a form populated with static or dynamic options"
+msgstr "정적 또는 동적 옵션으로 채워진 양식을 사용하여 토큰을 여러 값으로 설정합니다"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:585
+msgid ""
+"Set tokens based on certain interactions taking place on a visualization. Setting tokens opens the opportunity for "
+"more dynamic workflows on the dashboard"
+msgstr ""
+"시각화에서 수행되는 특정 상호 작용에 따라 토큰을 설정합니다. 토큰을 설정하면 대시보드에서 동적 워크플로를 늘릴 수 있"
+"는 기회가 제공됩니다"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:349
+msgid "Set tokens based on text entries"
+msgstr "텍스트 항목에 따라 토큰 설정"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:359
+msgid "Set tokens by selecting a number from a dropdown"
+msgstr "드롭다운에서 숫자를 선택하여 토큰 설정"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:546
+msgid "Shape Visualization Image"
+msgstr "모양 시각화 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:538
+msgid "Shapes and Lines"
+msgstr "모양 및 선"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CloneDashboard/index.jsx:46
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:66
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/LinkToDashboardEditor.tsx:335
+msgid "Shared in App"
+msgstr "앱에서 공유됨"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/SaveButton.jsx:45
+msgid "Shared in app"
+msgstr "앱에서 공유됨"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:131
+msgid "Show CC and BCC"
+msgstr "CC 및 BCC 표시"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/CustomLayoutEditor.jsx:63
+msgid "Show Edit Button"
+msgstr "편집 버튼 표시"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/CustomLayoutEditor.jsx:87
+msgid "Show Export Button"
+msgstr "내보내기 버튼 표시"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/CustomLayoutEditor.jsx:74
+msgid "Show Open In Search Button"
+msgstr "검색에서 열기 버튼 표시"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:8
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:274
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:286
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:298
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:310
+msgid "Single Value"
+msgstr "단일 값"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:282
+msgid "Single Value Coloring"
+msgstr "단일 값 색상"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:290
+msgid "Single Value Coloring Image"
+msgstr "단일 값 색상 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:302
+msgid "Single Value Emoji Image"
+msgstr "단일 값 이모지 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:294
+msgid "Single Value Emojis"
+msgstr "단일 값 이모지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:314
+msgid "Single Value Icon Image"
+msgstr "단일 값 아이콘 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:278
+msgid "Single Value Image"
+msgstr "단일 값 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:248
+msgid "Single Value Radial"
+msgstr "단일 값 반지름"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:258
+msgid "Single Value Radial with Dynamic Coloring"
+msgstr "동적 색상이 있는 단일 값 반지름"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:306
+msgid "Single Value with Icons"
+msgstr "아이콘이 있는 단일 값"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:163
+msgid ""
+"Some SVG images can move depending on how they are made. These also work as expected in dashboards, and tokens can "
+"be used to control their movement"
+msgstr ""
+"일부 SVG 이미지는 만들어진 방법에 따라 움직일 수 있습니다. 이런 이미지는 대시보드에서도 올바르게 작동하고, 토큰을 사"
+"용하여 이미지의 움직임을 제어할 수 있습니다"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CloneDashboard/index.jsx:136
+msgid ""
+"Some custom formatting and configurations to your dashboard may be lost during the cloning and conversion process. "
+"Your original dashboard will not be affected."
+msgstr ""
+"복제 및 변환 프로세스 중에 대시보드에 대한 일부 사용자 지정 형식 및 설정이 손실될 수 있습니다. 원래 대시보드는 영향"
+"을 받지 않습니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/SaveToExistingDashboard/SelectDashboardList.jsx:212
+msgid "Sort"
+msgstr "정렬"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:167
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:417
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:429
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:441
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:611
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:623
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:633
+msgid "Source Only"
+msgstr "원본만"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:155
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:177
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:187
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:197
+msgid "Spatial"
+msgstr "공간"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:10
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:154
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:176
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:186
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:196
+msgid "Spatial Elements"
+msgstr "공간 요소"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:425
+msgid ""
+"Specify a field to be represented as an overlay on your chart. This is useful when representing averages or bounds "
+"to your data"
+msgstr "차트에 오버레이로 나타낼 필드를 지정하십시오. 평균이나 데이터 범위를 나타낼 때 유용합니다"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/TokenEditor/TokenEditor.tsx:17
+msgid "Specify a token name and reference the token using the syntax $token_name$"
+msgstr "토큰 이름을 지정하고 구문을 사용하여 토큰을 참조하십시오 $token_name$"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:187
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/index.tsx:106
+msgid "Splunk Dashboard: $dashboard.label$"
+msgstr "Splunk Dashboard: $dashboard.label$"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/PanelOptions/index.jsx:55
+msgid "Statistics Table"
+msgstr "통계 테이블"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:185
+msgid "Subject"
+msgstr "제목"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-examples-hub/src/components/ReactBannerComponent.jsx:32
+msgid "Submit Feature Request"
+msgstr "기능 요청 제출"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-examples-hub/src/components/ReactBannerComponent.jsx:25
+msgid "Submit feedback to: dashboard-studio@splunk.com"
+msgstr "피드백 제출 주소: dashboard-studio@splunk.com"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/Dashboard.jsx:571
+msgid "Success! Dashboard saved."
+msgstr "성공! 대시보드가 저장되었습니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-api/src/util/returnUtils.js:8
+msgid "Successfully added to existing dashboard"
+msgstr "기존 대시보드에 추가했습니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-api/src/util/returnUtils.js:12
+msgid "Successfully cloned dashboard"
+msgstr "대시보드를 복제했습니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-conversion/src/util/Constants.ts:3
+msgid "Successfully converted dashboard"
+msgstr "대시보드를 변환했습니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-conversion/src/util/Constants.ts:4
+msgid "Successfully converted visualization"
+msgstr "시각화를 변환했습니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-api/src/util/returnUtils.js:10
+msgid "Successfully saved to dashboard"
+msgstr "대시보드에 저장했습니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:18
+msgid "Sunday"
+msgstr "일요일"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:9
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:500
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:510
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:520
+msgid "Table"
+msgstr "테이블"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:508
+msgid "Table Coloring"
+msgstr "테이블 색상"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:514
+msgid "Table Coloring Image"
+msgstr "테이블 색상 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:524
+msgid "Table Formatting Image"
+msgstr "테이블 서식 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:504
+msgid "Table Image"
+msgstr "테이블 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:420
+msgid "Test Data Image"
+msgstr "테스트 데이터 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:412
+msgid "Test Data Source"
+msgstr "데이터 원본 테스트"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:348
+msgid "Text"
+msgstr "텍스트"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:354
+msgid "Text Input Image"
+msgstr "텍스트 입력 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/util/ErrorMessages.js:8
+msgid "The Dashboard ID \"${title.replace(/W/g, '_').toLowerCase()}\" is already taken."
+msgstr "대시보드 ID “${title.replace(/W/g, '_').toLowerCase()}”을(를) 이미 가져왔습니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/EditTitleAndId/index.jsx:64
+msgid ""
+"The Dashboard ID is used as the filename on disk.\n"
+"This cannot be changed later."
+msgstr ""
+"대시보드 ID는 디스크에서 파일 이름으로 사용됩니다.\n"
+"나중에 변경할 수 없습니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-service/src/dashboard/index.js:64
+msgid "The dashboard you selected no longer exists."
+msgstr "선택한 대시보드가 더 이상 존재하지 않습니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:193
+msgid "The email subject, recipients, and messages can include tokens that insert text based on the search results."
+msgstr "이메일 제목, 수신인 및 메시지에는 검색 결과에 따라 텍스트를 삽입하는 토큰이 포함될 수 있습니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/AdvancedPanelSettings/index.jsx:35
+msgid "The inline search exists only in the dashboard and has no external dependencies."
+msgstr "인라인 검색은 대시보드에만 존재하면 외부 종속성이 없습니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/index.tsx:340
+msgid "The next scheduled email will send on "
+msgstr "다음으로 예약된 이메일은 다음 시간에 전송됩니다. "
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/index.tsx:443
+msgid "The schedule is set to the timezone of this Splunk instance"
+msgstr "스케줄은 이 Splunk 인스턴스의 시간대로 설정됩니다"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/index.tsx:359
+msgid "The server did not accept your entry; the chosen schedule may not be supported"
+msgstr "서버에서 입력 항목을 받아들이지 않았습니다. 선택된 스케줄이 지원되지 않을 수 있습니다"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-service/src/dashboard/index.js:14
+msgid "The total size of a dashboard must be 7MB or smaller. Please remove some images and icons."
+msgstr "대시보드의 총 크기는 7MB 이하여야 합니다. 일부 이미지와 아이콘을 제거하십시오."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:260
+msgid "The traditional Splunk dashboard builder"
+msgstr "기존 Splunk 대시보드 작성기"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/PanelOptions/index.jsx:72
+msgid ""
+"The visualization and its configuration will be loaded from the report by default. It can be modified later within "
+"the dashboard or in the report itself."
+msgstr ""
+"시각화 및 해당 설정은 기본적으로 보고서에서 로드됩니다. 나중에 대시보드 또는 보고서 자체에서 수정할 수 있습니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/CustomEditingGroup.jsx:18
+msgid "Theme"
+msgstr "테마"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:641
+msgid "This classic example is an excellent use case for background images and simple, colored visualizations"
+msgstr "이 고전적인 예는 배경 이미지와 단순 컬러 시각화의 훌륭한 이용 사례입니다"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/Dashboard.jsx:516
+msgid "This dashboard has unsaved changes."
+msgstr "이 대시보드에 저장되지 않은 변경 사항이 있습니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:687
+msgid "This dashboard shows a thematic example of dynamic SVG options to track server room temperatures"
+msgstr "이 대시보드에는 서버실 온도를 추적하는 동적 SVG 옵션이라는 주제에 맞는 예가 나와 있습니다"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:743
+msgid ""
+"This dashboard shows how effective coloring and layering can combine simple visuals to an effective information flow"
+msgstr ""
+"이 대시보드에는 효과적인 색상 및 레이어로 단순 시각화를 효과적인 정보 흐름에 합칠 수 있는 방법이 나와 있습니다"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/util/ErrorMessages.ts:11
+msgid "This email domain is not approved. To resolve this issue, contact your Splunk Administrator."
+msgstr "이 이메일 도메인은 승인되지 않았습니다. 이 문제를 해결하려면 Splunk 관리자에게 문의하십시오."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:733
+msgid "This example shows one of the most intricate and effective uses of SVG coloring"
+msgstr "이 예에는 SVG 색상의 가장 정교하고 효과적인 용도 중 하나가 나와 있습니다"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:675
+msgid "This example uses grid layout to show colored visualizations to show high level customer KPIs"
+msgstr "이 예에서는 그리드 레이아웃을 사용하여 고수준 고객 KPI를 나타내는 컬러 시각화를 표시합니다"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:22
+msgid "Thursday"
+msgstr "목요일"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:368
+msgid "Timerange"
+msgstr "시간 범위"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:376
+msgid "Timerange Input Image"
+msgstr "시간 범위 입력 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/SaveToExistingDashboard/SelectDashboardList.jsx:31
+msgid "Title (A - Z)"
+msgstr "제목(A - Z)"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/SaveToExistingDashboard/SelectDashboardList.jsx:36
+msgid "Title (Z - A)"
+msgstr "제목(Z - A)"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/util/ErrorMessages.ts:4
+msgid "Title cannot be empty."
+msgstr "제목을 비워둘 수 없습니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-conversion/src/util/Constants.ts:15
+msgid "To continue, remove Trellis."
+msgstr "계속하려면 격자를 제거하십시오."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-conversion/src/util/Constants.ts:20
+msgid "To continue, remove categorical colors or select another visualization such as 'Statistics Table'."
+msgstr "계속하려면 범주형 색상을 제거하거나 '통계 테이블'과 같은 다른 시각화를 선택하십시오."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-conversion/src/util/Constants.ts:10
+msgid "To continue, select another visualization such as 'Statistics Table'."
+msgstr "계속하려면 '통계 테이블'과 같은 다른 시각화를 선택하십시오."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:630
+msgid "Token Defaults"
+msgstr "토큰 기본값"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:636
+msgid "Token Defaults Image"
+msgstr "토큰 기본값 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/TokenEditor/TokenEditor.tsx:64
+msgid "Token Name"
+msgstr "토큰 이름"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/TokenEditor/TokenEditor.tsx:86
+msgid "Token Value"
+msgstr "토큰 값"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/util/linkToDashboardHelpers.ts:21
+msgid "Token name is duplicate."
+msgstr "토큰 이름이 중복됩니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/util/linkToDashboardHelpers.ts:20
+msgid "Token name is empty or contains invalid characters."
+msgstr "토큰 이름이 비어 있거나 잘못된 문자를 포함합니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/util/linkToDashboardHelpers.ts:19
+msgid "Token value is empty or contains invalid characters."
+msgstr "토큰 값이 비어 있거나 잘못된 문자를 포함합니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:321
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:331
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:341
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:351
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:361
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:373
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:589
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:599
+msgid "Tokens"
+msgstr "토큰"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:27
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:49
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:61
+msgid "Trend"
+msgstr "동향"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:20
+msgid "Tuesday"
+msgstr "화요일"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:194
+msgid "US Choropleth Map"
+msgstr "미국 단계구분도"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:200
+msgid "US Choropleth Map Visualization Image"
+msgstr "미국 단계구분도 시각화 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/emailValidation.ts:26
+msgid "Unable to contact the Splunk server for email domain validation"
+msgstr "이메일 도메인 유효성 검사를 위해 Splunk 서버에 연결할 수 없음"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/util/ErrorMessages.js:3
+msgid "Unable to save dashboard: a dashboard title is required."
+msgstr "대시보드를 저장할 수 없습니다. 대시보드 제목이 필요합니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/util/ErrorMessages.js:5
+msgid "Unable to save dashboard: dashboard not found."
+msgstr "대시보드를 저장할 수 없습니다. 대시보드를 찾을 수 없습니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/panels/DataSourcesPanelListItem.jsx:68
+msgid "Unnamed"
+msgstr "이름 없음"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:57
+msgid ""
+"Use Area charts to track values and identify trends over a period of time. Stacked area charts can represent the "
+"accumulation of more than one data series"
+msgstr ""
+"영역형 차트는 특정 기간 동안 값을 추적하고 추세를 확인하기 위해 사용합니다. 스택형 영역형 차트는 한 개보다 많은 데이"
+"터 계열의 누적을 나타낼 수 있습니다"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:307
+msgid "Use Icons to indicate important changes or to provide more context to your Single Value metrics"
+msgstr "아이콘을 사용하여 중요한 변화를 나타내거나 단일 값 메트릭에 대한 컨텍스트를 더 제공합니다"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:529
+msgid "Use Images to add visual context and personalize your dashboard"
+msgstr "이미지를 사용하여 시각적 컨텍스트를 추가하고 대시보드를 개인 설정합니다"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:47
+msgid "Use Line charts to track values and identify trends over a period of time"
+msgstr "꺽은선형 차트를 사용하여 일정 기간 동안 값을 추적하고 추세를 확인합니다"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:499
+msgid "Use Tables to simply display field and row data from your data sources"
+msgstr "테이블을 사용하여 데이터 원본의 표시 필드와 행 데이터를 간소화합니다"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:413
+msgid ""
+"Use a JSON object with static data to populate visualizations without running searches. This is best for testing or "
+"displaying static visualizations for design purposes"
+msgstr ""
+"JSON 개체를 정적 데이터와 함께 사용하여 검색을 실행하지 않고 시각화를 채웁니다. 이 방법은 설계 목적으로 정적 시각화"
+"를 테스트하거나 표시하는 데 가장 효과적입니다"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:401
+msgid "Use saved searches from various apps to use in your Dashboard, such as reports from Search and Reporting"
+msgstr "대시보드에 사용할 여러 앱의 저장된 검색을 사용합니다. 예: 검색 및 보고의 보고서"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:539
+msgid "Use shapes and lines to direct flow, frame visualizations, and tell a story with your data"
+msgstr "도형과 선을 사용하여 흐름 방향을 정하고, 시각화를 프레이밍하고, 데이터로 이야기를 전합니다"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/TokenEditor/TokenEditorGroup.tsx:86
+msgid "Use tokens to set values in the target dashboard. For example: host = row.host.value "
+msgstr "대상 대시보드에서 토큰을 사용하여 값을 설정합니다. 예: host = row.host.value "
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/AdvancedPanelSettings/index.jsx:72
+msgid "Uses the report. Retains all report metadata such as schedule, acceleration, and permissions."
+msgstr "보고서를 사용합니다. 스케줄, 가속, 권한 등 모든 보고서 메타데이터를 유지합니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:770
+msgid "VPN Health Dashboard Thumbnail"
+msgstr "VPN 상태 대시보드 섬네일"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:764
+msgid "VPN Health by Region"
+msgstr "지역별 VPN 상태"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/TokenEditor/TokenEditor.tsx:30
+msgid "Value in the specified series corresponding to the location clicked"
+msgstr "클릭한 위치에 해당하는 지정된 계열의 값"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/TokenEditor/TokenEditor.tsx:26
+msgid "Value of the location clicked"
+msgstr "클릭한 위치의 값"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:33
+msgid "Very Low"
+msgstr "매우 낮음"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/panels/DataSourcesPanelListItem.jsx:108
+msgid "View"
+msgstr "보기"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/LinkToDashboardEditor.tsx:352
+msgid "View Dashboard"
+msgstr "대시보드 보기"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/CustomLayoutEditor.jsx:55
+msgid "View Options"
+msgstr "옵션 보기"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CloneDashboard/index.jsx:41
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:61
+msgid "Visible only to you"
+msgstr "사용자에게만 표시"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CloneDashboard/index.jsx:47
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:67
+msgid "Visible to app users"
+msgstr "앱 사용자에게만 표시"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:175
+msgid "Visit the Splunk Documentation to learn more."
+msgstr "자세한 내용은 Splunk 매뉴얼을 참조하십시오."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/PanelOptions/index.jsx:102
+msgid "Visualization Type"
+msgstr "시각화 유형"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:227
+msgid "Visualize a single numeric value and display it in relation to ranges representing different statuses"
+msgstr "숫자 값 하나를 시각화하고 이 값을 여러 상태를 나타내는 범위와 비교하여 표시합니다"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:205
+msgid "Visualize a single numeric value and represent it in relation to a limit with a filler gauge"
+msgstr "단일 숫자 값을 시각화하고 필터 게이지를 사용하여 제한에 대해 상대적으로 나타냅니다"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:175
+msgid "Visualize geo data on an interactive map area"
+msgstr "지역 데이터를 대화형 맵 영역에 시각화합니다"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/Dashboard.jsx:170
+#, python-format
+msgid ""
+"We are no longer making updates to the %(beta)s. To ensure this dashboard stays supported with the latest features, "
+"please move it out of '%(beta)s' and into '%(search)s' or another app"
+msgstr ""
+"더 이상 %(beta)s에 대한 업데이트를 수행하지 않습니다. 최신 기능과 함께 이 대시보드를 계속 지원하려면 '%(beta)s'에서 "
+"'%(search)s'(으)로 또는 다른 앱으로 이동하십시오."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:21
+msgid "Wednesday"
+msgstr "수요일"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:226
+msgid "What's this?"
+msgstr "이 기능 소개"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/CustomLayoutEditor.jsx:65
+msgid "When disabled, you can access Edit Mode through the primary Dashboards view."
+msgstr "비활성화하면 기본 대시보드 보기를 통해 편집 모드에 액세스할 수 있습니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/CustomLayoutEditor.jsx:89
+msgid "When in View Mode, disabling \"Show Export\" removes the ability to export dashboards."
+msgstr "보기 모드에서 “내보내기 표시”를 비활성화하면 대시보드 내보내기 기능이 제거됩니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/CustomLayoutEditor.jsx:76
+msgid ""
+"When in View Mode, disabling “Show Open in Search” removes the ability to open and edit a query in the full search "
+"experience."
+msgstr "보기 모드에서 “검색에서 열기 표시”를 비활성화하면 전체 검색 경험에서 쿼리를 열고 편집하는 기능이 제거됩니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:190
+msgid "Wolrd Choropleth Map Visualization Image"
+msgstr "세계 단계구분도 시각화 이미지"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:774
+msgid "Workforce Readiness"
+msgstr "인력 준비 상태"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:780
+msgid "Workforce Readiness Dashboard Thumbnail"
+msgstr "인력 준비 상태 대시보드 섬네일"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:784
+msgid "Workforce Readiness Detail"
+msgstr "인력 준비 상태 세부 정보"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:790
+msgid "Workforce Readiness Detail Dashboard Thumbnail"
+msgstr "인력 준비 상태 세부 정보 대시보드 섬네일"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:184
+msgid "World Choropleth Map"
+msgstr "세계 단계구분도"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:551
+msgid "Write Markdown directly in your dashboard to provide descriptions, labels, and additional information"
+msgstr "마크다운을 대시보드 안에 직접 작성하여 설명, 레이블 및 추가 정보를 제공합니다"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/EditTitleAndId/index.jsx:67
+msgid "You can use letters, numbers, dashes, and underscores."
+msgstr "문자, 숫자, 대시 및 밑줄을 사용할 수 있습니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/util/ErrorMessages.ts:6
+msgid "You cannot use < or > in a dashboard name."
+msgstr "< or >을(를) 대시보드 이름에 사용할 수 없습니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-service/src/kvstore/index.js:59
+msgid ""
+"You do not have the permissions or role to perform this action. Only those with the admin or power roles can remove "
+"images"
+msgstr ""
+"이 작업을 수행할 수 있는 권한이나 역할이 없습니다. Admin 또는 Power 역할을 가진 사용자만 이미지를 제거할 수 있습니"
+"다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-service/src/kvstore/index.js:14
+msgid ""
+"You do not have the permissions or role to perform this action. Only those with the admin or power roles can upload "
+"images"
+msgstr ""
+"이 작업을 수행할 수 있는 권한이나 역할이 없습니다. Admin 또는 Power 역할을 가진 사용자만 이미지를 업로드할 수 있습니"
+"다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/SaveToExistingDashboard/SelectDashboardList.jsx:265
+msgid "You have no writable dashboards for the app: ${app}"
+msgstr "앱에 대해 쓰기 가능한 대시보드가 없습니다. ${app}"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/util/ErrorMessages.ts:8
+msgid "You must select a dashboard layout."
+msgstr "대시보드 레이아웃을 선택해야 합니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/util/ErrorMessages.ts:7
+msgid "You must select a dashboard type."
+msgstr "대시보드 유형을 선택해야 합니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/util/ErrorMessages.ts:9
+msgid "You must select an existing dashboard."
+msgstr "기존 대시보드를 선택해야 합니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/ActionDropdown.test.tsx:154
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/ActionDropdown.tsx:108
+msgid "Your download has started"
+msgstr "다운로드가 시작되었습니다."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:185
+msgid "e.g 0 18 * * * (every day at 6:00pm)"
+msgstr "예: 0 18 * * *(매일 오후 6시)."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:156
+msgid "explore additional tools."
+msgstr "추가 도구를 살펴보십시오."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:117
+msgid "freely place objects"
+msgstr "자유롭게 개체 배치"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:134
+msgid "images,"
+msgstr "이미지,"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:110
+msgid "or"
+msgstr "또는"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:117
+msgid "organize & resize"
+msgstr "조직 및 크기 조정"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:155
+msgid "standard Splunk visualizations"
+msgstr "표준 Splunk 시각화"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:134
+msgid "text"
+msgstr "텍스트"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-examples-hub/src/components/ReactBannerComponent.jsx:33
+msgid "to ideas.splunk.com"
+msgstr "ideas.splunk.com으로"

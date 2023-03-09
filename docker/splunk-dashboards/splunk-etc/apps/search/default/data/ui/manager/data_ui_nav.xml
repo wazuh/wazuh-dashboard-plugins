@@ -1,0 +1,57 @@
+<endpoint name="data/ui/nav" showAppContext="1" hideActionsColumn="1">
+  <header>Navigation menus</header>
+  <breadcrumb>
+    <parent hidecurrent="False">ui</parent>
+    <name>Navigation menus</name>
+  </breadcrumb>
+  <!-- not putting this on the homepage menu for now
+  <menu name="app_configurations">
+    <label>Navigation menus</label>
+    <url>/manager/%(namespace)s/data/ui/nav</url>
+    <description>Create and edit navigation menus for your app.</description>
+    <order>55</order>
+  </menu>
+  -->
+  <elements>
+    <element name="savenav" type="fieldset">
+      <view name="list"/>
+      <view name="edit"/>
+      <elements>
+
+        <element name="__ns" type="select" label="Destination app">
+          <view name="create"/>
+          <key name="dynamicOptions" type="dict">
+            <key name="keyName">title</key>
+            <key name="keyValue">title</key>
+            <key name="splunkSource">/apps/local</key>
+            <key name="splunkSourceParams" type="dict">
+              <key name="search">'disabled=false'</key>
+              <key name="count">-1</key>
+            </key>
+          </key>
+        </element>
+
+        <element name="name" label="Nav name">
+          <view name="list"/>
+          <view name="create"/>
+        </element>
+        <element name="eai:data" type="textarea" label="Navigation menu XML">
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="class">huge</key>
+          <key name="spellcheck">False</key>
+          <key name="xmleditor">True</key>
+          <key name="helpText">Enter and edit navigation menu XML configuration.</key>
+        </element>
+      </elements>
+    </element>
+    <element name="eai:acl.owner" label="Owner">
+      <view name="list"/>
+      <key name="processValueList">entity['eai:acl']['owner'] == 'nobody' and _('No owner') or entity['eai:acl']['owner']</key>
+    </element>
+    <element name="eai:acl.app" label="App">
+      <view name="list"/>
+      <key name="processValueList">entity['eai:acl']['app'] or ""</key>
+    </element>
+  </elements>
+</endpoint>

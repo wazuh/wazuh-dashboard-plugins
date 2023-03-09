@@ -1,0 +1,295 @@
+/*  Splunk: Component: Select 2 */
+/*  =========================== */
+/*  styles for select2 form elements */
+
+/*  synthetic select */
+/*  --------------------------- */
+
+/*
+
+	markup missing
+
+*/
+/*  TODO: clean up these selectors */
+.splunk-multidropdown, .splunk-dropdown, .shared-controls-multiinputcontrol, .shared-controls-singleinputcontrol {
+    .select2-container, .select2-container-multi {
+        min-width: 200px;
+
+        &.select2-container-active {
+            .select2-choices {
+                @mixin focus-element;
+            }
+        }
+
+        .select2-choices {
+            min-height: 0px;
+            border-radius: $inputBorderRadius;
+            background: $inputBackground;
+            border: $inputBorder;
+            padding: 2px;
+
+
+            .select2-search-field {
+                height: 26px;
+
+                > input {
+                    height: 24px;
+                }
+            }
+
+            .select2-search-choice {
+                background-image: none !important;
+                @mixin interactive;
+                margin: 2px;
+                border-radius: 2px;
+                border: $interactiveBorder;
+                padding: 0 $buttonPaddingSides;
+                padding-left: calc($spacing + $spacingQuarter);
+
+                .select2-search-choice-close {
+                    background: none !important;
+                    padding: 1px 4px 0 3px;
+                    top: 0;
+                    left: 0;
+                    height: auto;
+                    width: 14px;
+                    text-align: center;
+                    color: $textColor;
+
+                    &:after {
+                        font-family: 'Splunk Icons';
+                        content: "\2717";
+                        display: inline-block;
+                        font-size: $fontSize;
+                        line-height: $lineHeight;
+                    }
+                    &:hover {
+                        color: $accentColor;
+                    }
+                }
+                div {
+                    line-height: $lineHeight;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+                &:hover {
+                    @mixin interactive-hover;
+                }
+                &.select2-search-choice-focus {
+                    @mixin interactive-active;
+                }
+            }
+        }
+
+        /*  synthetic select */
+        .select2-choice {
+            @mixin interactive;
+            height: $inputHeight;
+            line-height: $lineHeight;
+            background-image: none;
+            border-radius: $borderRadius;
+            box-sizing: border-box;
+            padding: $buttonPadding;
+
+
+            &:hover {
+                @mixin interactive-hover;
+            }
+            /*  toggle caret */
+            div {
+                width: auto;
+                padding-left: 8px;
+                padding-right: 8px;
+                background: transparent;
+                border-left: none;
+                /*  generated font icon */
+                &:after {
+                    display: inline-block;
+                    font-family: "Splunk Icons";
+                    content: "\25BE";
+                    font-size: inherit;
+                    opacity: 0.80;
+                }
+                &:hover {
+                    opacity: 1.0;
+                }
+            }
+            /*  hide old caret */
+            div b {
+                display: none;
+            }
+            .select2-arrow {
+                background-image: none;
+                background: none;
+                border-left: $inputBorder;
+                width: $spacing;
+                text-align: center;
+
+                b {
+                    background: none !important;
+
+                    &:after {
+                        display: inline-block;
+                        font-family: "Splunk Icons";
+                        content: "\25BE";
+                        font-size: inherit;
+                        padding: $spacingQuarter;
+                    }
+                }
+            }
+            .select2-search-choice-close {
+                background: none;
+                background-image: none !important;
+                top: 6px;
+                right: $spacingOneAndAHalf;
+
+                &:before {
+                    display: inline-block;
+                    font-family: "Splunk Icons";
+                    content: "\2717";
+                    font-size: $fontSizeXLarge;
+                    opacity: 0.80;
+                }
+                &:hover {
+                    opacity: 1;
+                }
+            }
+        }
+    }
+}
+
+/*  dropdown menu */
+/*  ------------------------- */
+
+/*
+
+	markup missing
+
+*/
+.select2-drop {
+    margin-top: $popdownArrowSize;
+    border: $borderDefault;
+    border-radius: $borderRadius;
+    box-shadow: $overlayBoxShadow;
+
+    /*  generated arrow */
+    &:before, &:after {
+        @mixin arrow;
+        top: -$popdownArrowSize;
+        left: 50%;
+        margin-left: -$popdownArrowSize;
+    }
+    &:before {
+        @mixin arrow up, $borderColor;
+        top: calc(-1 * $popdownArrowSize - 1);
+    }
+
+    .select2-search {
+        /*  style like bs input */
+        padding: 0 $spacingQuarter;
+        input {
+            border-radius: $inputBorderRadius;
+            margin: $spacingQuarter 0;
+        }
+    }
+    /*  ul */
+    .select2-results {
+        /*  style like dropdown */
+        border-radius: $borderRadius;
+        background-color: $white;
+        padding: 0;
+        margin: 0;
+        min-height: 30px;
+        background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgeD0iMHB4IiB5PSIwcHgiIHdpZHRoPSIyMHB4IiBoZWlnaHQ9IjhweCIgdmlld0JveD0iMCAwIDIwIDgiIGVuYWJsZS1iYWNrZ3JvdW5kPSJuZXcgMCAwIDIwIDgiIHhtbDpzcGFjZT0icHJlc2VydmUiPjx0ZXh0IHRyYW5zZm9ybT0ibWF0cml4KDEgMCAwIDEgLTAuMDAyOSA3LjM2NTIpIiBmaWxsPSIjQzNDQUQzIiBmb250LWZhbWlseT0iJ1Byb3hpbWFOb3ZhLVJlZ3VsYXInIiBmb250LXNpemU9IjE0Ij4tIC0gLTwvdGV4dD48L3N2Zz4=);
+        background-repeat: no-repeat;
+        background-position: center;
+
+        /*  li */
+        .select2-result-selectable {
+            background-color: $white;
+
+            &:hover {
+                color: $linkColorHover;
+                background: $pillBackgroundColorHover;
+            }
+            &:last-child {
+                border-bottom-left-radius: $borderRadius;
+                border-bottom-right-radius: $borderRadius;
+            }
+        }
+        .select2-result {
+            div {
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            .select2-result-label {
+                padding: $spacingQuarter $spacingHalf;
+                color: $interactiveTextColor;
+            }
+        }
+    }
+    &.select2-drop-above {
+        margin-top: -$popdownArrowSize;
+        border: $borderDefault;
+        border-radius: $borderRadius;
+        box-shadow: $overlayBoxShadow;
+
+        .select2-results {
+            border-radius: $borderRadius;
+        }
+        &:before, &:after {
+            @mixin arrow down;
+            top: auto;
+            bottom: -$popdownArrowSize;
+            left: 50%;
+            margin-left: -$popdownArrowSize;
+        }
+        &:before {
+            @mixin arrow down, $borderColor;
+            bottom: calc(-1 * $popdownArrowSize - 1);
+        }
+    }
+    /*  no result state */
+    .select2-no-results {
+        text-align: center;
+        color: $errorColor;
+        padding: 5px 0;
+    }
+
+    &.select2-display-none {
+
+    }
+}
+
+.select2-drop-multi.select2-drop-above .select2-results {
+    border-top:none;
+}
+.select2-drop.select2-drop-above.select2-drop-active {
+    border-top: $borderDefault;
+}
+
+/*  Focus state */
+
+.splunk-dropdown .select2-container.select2-container-active,
+.splunk-multidropdown .select2-container-multi.select2-container-active .select2-choices {
+    outline: 0;
+    outline: thin dotted \9; /* IE6-9 */
+}
+
+.select2-drop .select2-results .select2-result-selectable.select2-highlighted .select2-result-label{
+    color: $linkColorHover;
+    background: $pillBackgroundColorHover;
+}
+
+/*  custom "no results" behavior that shows an empty drop-down with no messaging or greyed out colors */
+/*  used by views/shared/controls/MultiInputControl */
+.select2-drop.empty-results-allowed {
+    .select2-no-results {
+        background-color: $white;
+    }
+}
+
+/*  make sure the synthetic container will respect the width of its parent */
+.select2-container {
+    width: 100%;
+}

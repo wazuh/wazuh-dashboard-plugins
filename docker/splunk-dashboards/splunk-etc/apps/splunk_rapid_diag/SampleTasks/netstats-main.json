@@ -1,0 +1,24 @@
+{
+  "__class__": "rapid_diag.task.Task",
+    "collectors": [
+        {
+            "__class__": "rapid_diag.collector.trigger.periodic.Periodic", 
+            "collectors": [
+                {
+                    "__class__": "rapid_diag.collector.netstat.NetStat"
+                } 
+            ], 
+            "sampleCount": 600, 
+            "interval": 1.0
+        },
+        {
+            "__class__": "rapid_diag.collector.diag.Diag"
+        }
+    ],
+  "name": "Network connections",
+  "collector_tool_names": "netstat, splunkdiag",
+  "description": "For investigating issues related to network connection failures and load. The collector monitors and logs network connections on the host it is running on. No network traffic is collected.",
+  "host": "",
+  "task_id": "netstats-main",
+  "symptoms" : [ "slow-search", "high-cpu", "replication-issues", "networking" ]
+}

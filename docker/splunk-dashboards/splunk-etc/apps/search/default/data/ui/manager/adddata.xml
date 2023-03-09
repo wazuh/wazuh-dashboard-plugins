@@ -1,0 +1,5 @@
+<endpoint name="adddata" template="/splunk_gdi:templates/home_template.html" type="html" showOnSearchHeadCluster="0">
+    <capabilities>
+        <read>(edit_upload_and_index AND edit_tcp_stream) OR edit_monitor OR edit_tcp OR edit_udp OR edit_scripted OR edit_token_http OR edit_deployment_server OR edit_win_wmiconf OR edit_win_regmon OR edit_win_eventlogs OR edit_modinput_admon OR edit_modinput_perfmon OR edit_modinput_winhostmon OR edit_modinput_winnetmon OR edit_modinput_winprintmon OR admin_all_objects</read>
+    </capabilities>
+</endpoint>

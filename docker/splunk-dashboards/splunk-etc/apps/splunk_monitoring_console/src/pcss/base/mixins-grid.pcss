@@ -1,0 +1,172 @@
+/*===============================================================================================*/
+/*  SPLUNK: MIXINS GRID SYSTEM                                                                   */
+/*===============================================================================================*/
+/*  Default 940px grid */
+$gridColumns:                               12;
+$gridColumnWidth:                           60px;
+$gridGutterWidth:                           20px;
+$gridRowWidth:                              calc(($gridColumns * $gridColumnWidth) + ($gridGutterWidth * ($gridColumns - 1)));
+
+/*  1200px min */
+$gridColumnWidth1200:                       70px;
+$gridGutterWidth1200:                       30px;
+$gridRowWidth1200:                          calc(($gridColumns * $gridColumnWidth1200) + ($gridGutterWidth1200 * ($gridColumns - 1)));
+
+/*  768px-979px */
+$gridColumnWidth768:                        42px;
+$gridGutterWidth768:                        20px;
+$gridRowWidth768:                           calc(($gridColumns * $gridColumnWidth768) + ($gridGutterWidth768 * ($gridColumns - 1)));
+
+/*************************************************************************************************/
+/*  FLUID GRID                                                                                   */
+/*************************************************************************************************/
+$fluidGridColumnWidth:                      6.382978723%;
+$fluidGridGutterWidth:                      2.127659574%;
+
+/*  1200px min */
+$fluidGridColumnWidth1200:                  calc(100% * $gridColumnWidth1200 / $gridRowWidth1200);
+$fluidGridGutterWidth1200:                  calc(100% * $gridGutterWidth1200 / $gridRowWidth1200);
+
+/*  768px-979px */
+$fluidGridColumnWidth768:                   calc(100% * $gridColumnWidth768 / $gridRowWidth768);
+$fluidGridGutterWidth768:                   calc(100% * $gridGutterWidth768 / $gridRowWidth768);
+
+
+/*  Responsive Variables */
+$responsive-screen-height: 700px;
+
+
+/*  Centered container element */
+@define-mixin container-fixed  {
+  margin-right: auto;
+  margin-left: auto;
+  @mixin clearfix;
+}
+
+/*  Table columns */
+@define-mixin tableColumns $columnSpan: 1 {
+  float: none; /*  undo default grid column styles */
+  width: calc((($gridColumnWidth) * $columnSpan) + ($gridGutterWidth * ($columnSpan - 1px)) - 16px); /*  16 is total padding on left and right of table cells */
+  margin-left: 0; /*  undo default grid column styles */
+}
+
+/*  Make a Grid */
+/*  Use .makeRow and .makeColumn to assign semantic layouts grid system behavior */
+@define-mixin makeRow  {
+  margin-left: calc($gridGutterWidth * -1);
+  @mixin clearfix;
+}
+@define-mixin makeColumn $columns: 1, $offset: 0 {
+  float: left;
+  margin-left: calc(($gridColumnWidth * $offset) + ($gridGutterWidth * ($offset - 1px)) + ($gridGutterWidth * 2));
+  width: calc(($gridColumnWidth * $columns) + ($gridGutterWidth * ($columns - 1)));
+}
+
+/*  The Grid */
+
+
+@define-mixin grid-core-span $columns: $gridColumns {
+    width: calc(($gridColumnWidth * $columns) + ($gridGutterWidth * ($columns - 1)));
+}
+
+@define-mixin grid-core-offset $columns: $gridColumns {
+    margin-left: calc(($gridColumnWidth * $columns) + ($gridGutterWidth * ($columns + 1)));
+}
+
+@define-mixin grid-core $gutterWidth: $gridGutterWidth {
+    @for $index from 1 to 12 {
+        .span$(index) {
+            @mixin grid-core-span $index;
+            float: left;
+            min-height: 1px; /*  prevent collapsing columns */
+            margin-left: $gutterWidth;
+        }
+    }
+
+    @for $index from 1 to 12 {
+        .offset$(index) {
+            @mixin grid-core-offset $index;
+        }
+    }
+
+    .row {
+      margin-left: calc($gutterWidth * -1);
+      @mixin clearfix;
+    }
+
+    /*  Set the container width, and override it for fixed navbars in media queries */
+    .container,
+    .navbar-static-top .container,
+    .navbar-fixed-top .container,
+    .navbar-fixed-bottom .container {
+        @mixin grid-core-span $gridColumns;
+    }
+}
+
+@define-mixin grid-fluid-span $index {
+       width: calc(($fluidGridColumnWidth * $index) + ($fluidGridGutterWidth * ($index - 1)));
+}
+
+@define-mixin grid-fluid-offset $index {
+    margin-left: calc(($fluidGridColumnWidth * $index) + ($fluidGridGutterWidth * ($index - 1)) + ($fluidGridGutterWidth * 2));
+}
+
+@define-mixin grid-fluid-offsetFirstChild $index {
+  margin-left: calc(($fluidGridColumnWidth * $index) + ($fluidGridGutterWidth * ($index - 1)) + ($fluidGridGutterWidth));
+}
+
+@define-mixin grid-fluid $columnWidth: $fluidGridColumnWidth, $gutterWidth: $fluidGridGutterWidth {
+    .row-fluid {
+        width: 100%;
+        @mixin clearfix;
+
+        @for $index from 1 to 12 {
+            .span$(index) {
+                @mixin input-block-level;
+                @mixin grid-fluid-span $index;
+
+                float: left;
+                margin-left: $gutterWidth;
+
+                &:first-child {
+                    margin-left: 0;
+                }
+            }
+        }
+
+        @for $index from 1 to 12 {
+            .offset$(index) {
+                @mixin grid-fluid-offset $index;
+            }
+        }
+
+        /*  Space grid-sized controls properly if multiple per line */
+        .controls-row [class*="span"] + [class*="span"] {
+            margin-left: $gutterWidth;
+        }
+    }
+}
+
+@define-mixin grid-input-span $columns: $gridColumns {
+  width: calc((($gridColumnWidth) * $columns) + ($gridGutterWidth * ($columns - 1)) - 14px);
+}
+
+
+@define-mixin grid-input $gutterWidth: $gridGutterWidth {
+    @for $index from 1 to $gridColumns {
+        .span$(index) {
+            @mixin grid-input-span $index;
+        }
+    }
+
+    input,
+    textarea,
+    .uneditable-input {
+      margin-left: 0; /*  override margin-left from core grid system */
+    }
+
+    /*  Space grid-sized controls properly if multiple per line */
+    .controls-row [class*="span"] + [class*="span"] {
+      margin-left: $gutterWidth;
+    }
+}

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="42px" height="42px" viewBox="0 0 42 42" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <!-- Generator: Sketch 3.0.4 (8054) - http://www.bohemiancoding.com/sketch -->
+    <title>DeploymentServer</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="Deployment" sketch:type="MSLayerGroup" transform="translate(2.000000, 0.000000)" fill="#221F1F">
+            <path d="M28,18 L34,18 L34,24 L28,24 L28,18 Z M34,16 L28,16 C26.902,16 26.002,16.9 26.002,18 L26.002,20 L0.002,20 L2.002,22 L26.002,22 L26.002,24 C26.002,25.1 26.902,26 28,26 L34,26 C35.102,26 36.002,25.1 36.002,24 L36.002,18 C36.002,16.9 35.102,16 34,16 L34,16 Z" id="Fill-3" sketch:type="MSShapeGroup"></path>
+            <path d="M28,2 L34,2 L34,8 L28,8 L28,2 Z M34,0 L28,0 C26.902,0 26.002,0.9 26.002,2 L26.002,8.586 L20.588,14 L0.002,14 L2.002,16 L21.416,16 L27.416,10 L34,10 C35.102,10 36.002,9.1 36.002,8 L36.002,2 C36.002,0.9 35.102,0 34,0 L34,0 Z" id="Fill-4" sketch:type="MSShapeGroup"></path>
+            <path d="M24.002,34 L30.002,34 L30.002,40 L24.002,40 L24.002,34 Z M30.002,32 L23.416,32 L17.416,26 L0.002,26 L2.002,28 L16.588,28 L22,33.414 L22,40 C22,41.1 22.9,42 24.002,42 L30.002,42 C31.102,42 32.002,41.1 32.002,40 L32.002,34 C32.002,32.9 31.102,32 30.002,32 L30.002,32 Z" id="Fill-5" sketch:type="MSShapeGroup"></path>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<view template="pages/error.html" type="redirect" target="error" isDashboard="False">
+<label>Alerts</label>
+</view>

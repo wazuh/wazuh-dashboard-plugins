@@ -1,0 +1,6 @@
+
+The configuration settings here are applicable only if clustering is enabled and set up.
+
+On the master, the contents of this directory will be pushed down to the slaves. Place all the slave-specific configuration settings here. 
+
+

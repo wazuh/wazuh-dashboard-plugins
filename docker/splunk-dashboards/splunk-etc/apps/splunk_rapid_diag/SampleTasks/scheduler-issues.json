@@ -1,0 +1,25 @@
+{
+  "__class__": "rapid_diag.task.Task",
+  "collectors": [
+    {
+      "__class__": "rapid_diag.collector.search_result.SearchResult",
+      "search_query": "| rest /servicesNS/<user>/<app>/saved/searches/<saved search name>/history",
+      "action_needed": "Please change <user>, <app>, and <saved search name> to reflect a search that is struggling"
+    },
+    {
+      "__class__": "rapid_diag.collector.search_result.SearchResult",
+      "search_query": "| rest /servicesNS/<user>/<app>/saved/searches/<saved search name>/history",
+      "action_needed": "Please change <user>, <app>, and <saved search name> to reflect a search that is working fine"
+    },
+    {
+      "__class__": "rapid_diag.collector.diag.Diag"
+    }
+  ],
+  "name": "Search scheduling",
+  "collector_tool_names": "search, splunkdiag",
+  "description": "For investigating and evaluating the Splunk Enterprise search scheduler. The collector monitors and compares the behavior for a selected pair of scheduled searches. Run the template on a search head, or the search head cluster captain. The template requires the name of two saved searches to compare.",
+  "host": "",
+  "task_id": "scheduler-issues",
+  "features" : [ "searches_skipped", "searches_delayed", "search_lag" ],
+  "symptoms" : [ "scheduler-issues" ]
+}

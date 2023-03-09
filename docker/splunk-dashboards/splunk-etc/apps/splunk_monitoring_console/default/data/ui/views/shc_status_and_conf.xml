@@ -1,0 +1,816 @@
+<form version="1.1" hideEdit="True" script="common_control.js" stylesheet="shared.css, health-check.css">
+  <label>Search Head Clustering: Status and Configuration</label>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="dropdown" searchWhenChanged="true" token="group">
+      <label>Search Head Cluster:</label>
+      <showClearButton>false</showClearButton>
+      <populatingSearch fieldForLabel="label" fieldForValue="search_group">
+        | `dmc_get_search_head_cluster_groups`
+      </populatingSearch>
+      <selectFirstChoice>true</selectFirstChoice>
+    </input>
+  </fieldset>
+  <search id="captainSnapshotSearch">
+    <query>
+      | rest splunk_server_group="$group$" splunk_server_group=dmc_group_search_head /services/shcluster/captain/info
+      | dedup peer_scheme_host_port
+      | fields label
+    </query>
+    <finalized>
+      <set token="captain_name">$result.label$</set>
+    </finalized>
+  </search>
+  <search id="membersSnapshotSearch">
+    <query>
+| rest splunk_server=local /services/search/distributed/peers
+| where search_groups="$group$" AND server_roles="search_head"
+| eval label = host
+| join guid type=outer [
+  | rest splunk_server_group="$group$" splunk_server_group=dmc_group_search_head /services/shcluster/member/members count=0
+  | dedup label
+  | eval guid = title
+]
+| join label type=outer [
+  | rest splunk_server=$captain_name|s$ /services/shcluster/captain/members count=0
+  | where splunk_server == label
+  | fields label, last_heartbeat
+  | rename last_heartbeat as last_heartbeat_captain
+]
+| eventstats values(last_heartbeat_captain) as last_heartbeat_captain
+| join label type=outer [
+  | rest splunk_server_group="$group$" splunk_server_group=dmc_group_search_head /services/shcluster/captain/info
+  | where splunk_server == label
+  | eval age = now() - elected_captain
+  | eval captain_age = case(age &lt; 60, "&lt; 1m", age &gt;= 60 AND age &lt; 3600, round(age / 60, 0)."m", age &gt;= 3600 AND age &lt; 86400, round(age / 3600, 0)."h", age &gt;= 86400, round(age / 86400, 0)."d")
+  | `dmc_time_format(elected_captain)`
+  | eval role = "Captain (" . captain_age . ")"
+  | fields label captain_age elected_captain role
+]
+| join label type=outer [
+  | rest /services/replication/configuration/health check_share_baseline=1 splunk_server_group="$group$" splunk_server_group=dmc_group_search_head
+  | stats values(server_name) as baselines, count(server_name) as num_baselines by splunk_server, check_share_baseline
+  | eval shared_common_baseline = if(check_share_baseline == "Yes", baselines, "")
+  | eval no_shared_common_baseline = if(check_share_baseline == "No", baselines, "")
+  | eval unable_to_connect = if(check_share_baseline == "Connection error", baselines, "")
+  | eval num_shared_common_baseline = if(check_share_baseline == "Yes", num_baselines, 0)
+  | eval num_no_shared_common_baseline = if(check_share_baseline == "No", num_baselines, 0)
+  | eval num_unable_to_connect = if(check_share_baseline == "Connection error", num_baselines, 0)
+  | stats sum(num_shared_common_baseline) as total_shared_common_baseline, sum(num_no_shared_common_baseline) as total_no_shared_common_baseline, sum(num_unable_to_connect) as total_unable_to_connect, values(shared_common_baseline) as shared_common_baseline, values(no_shared_common_baseline) as no_shared_common_baseline, values(unable_to_connect) as unable_to_connect by splunk_server
+  | eval ratio = total_shared_common_baseline . "/" . (total_shared_common_baseline+total_no_shared_common_baseline+total_unable_to_connect)
+  | rename splunk_server as label
+]
+| join label type=outer [
+  | rest /services/replication/configuration/health unpublished=1 splunk_server_group="$group$" splunk_server_group=dmc_group_search_head
+  | rename "Number of unpublished changes" as unpublished_changes
+  | eval unpublished_changes=if(unpublished_changes=="0 (this instance is the captain)", 0, unpublished_changes)
+  | rename splunk_server as label
+]
+| eval role = if(isnotnull(role), role, "Member")
+| sort role
+    </query>
+  </search>
+  <row>
+    <!-- this is just a workaround. Replace this by mod viz whenever mod viz is merged to develop. -->
+    <panel>
+      <title>Health Check</title>
+      <search id="members_heartbeat_timeout_base" base="membersSnapshotSearch">
+        <query>
+          fields label, status, last_heartbeat, last_heartbeat_captain, unable_to_connect
+          | join label type=outer [
+            | rest splunk_server_group="$group$" splunk_server_group=dmc_group_search_head /services/configs/conf-server/shclustering
+            | fields splunk_server, heartbeat_timeout
+            | rename splunk_server as label
+          ]
+          | where (status != "Up" OR (last_heartbeat_captain - last_heartbeat) > heartbeat_timeout) OR unable_to_connect != ""
+        </query>
+        <done>
+          <condition match="$job.resultCount$ > 0">
+            <set token="member_heartbeat_text_unhealthy">There are members in this cluster that do not have a healthy heartbeat status.</set>
+          </condition>
+          <condition match="$job.resultCount$ = 0">
+            <set token="member_heartbeat_text_healthy">All members in this cluster have a healthy heartbeat status.</set>
+          </condition>
+        </done>
+      </search>
+      <search id="member_peer_consistency_base">
+        <query>
+          | rest splunk_server_group="$group$" splunk_server_group=dmc_group_search_head /services/search/distributed/peers
+          | fields splunk_server, peerName
+          | stats values(peerName) as peers by splunk_server
+          | nomv peers
+          | stats values(splunk_server) AS search_heads by peers
+          | makemv peers
+          | fields search_heads peers
+          | rename search_heads as "Search Head Cluster Member", peers as "Search Peer List"
+        </query>
+        <done>
+          <condition match="$job.resultCount$ > 1">
+            <set token="member_peer_inconsistency_text">The list of distributed search peers is inconsistent among cluster members. This could result in inconsistent search results within the search head cluster.</set>
+          </condition>
+        </done>
+      </search>
+      <html depends="$member_heartbeat_text_unhealthy$">
+        <div class="dmc-kpi-item">
+          <div class="alert alert-warning">
+            <i class="icon-alert"></i>
+            <h5>$member_heartbeat_text_unhealthy$ <a data-set-token="show_member_heartbeat_detail" data-value="true">click to see more detail.</a></h5>
+          </div>
+        </div>
+      </html>
+      <html depends="$member_heartbeat_text_healthy$">
+        <div class="dmc-kpi-item">
+          <div class="alert alert-success">
+            <i class="icon-alert"></i>
+            <h5>$member_heartbeat_text_healthy$</h5>
+          </div>
+        </div>
+      </html>
+      <html depends="$member_peer_inconsistency_text$">
+        <div class="dmc-kpi-item">
+          <div class="alert alert-warning">
+            <i class="icon-alert"></i>
+            <h5>$member_peer_inconsistency_text$ <a data-set-token="show_member_peer_inconsistency_detail" data-value="true">click to see more detail.</a></h5>
+          </div>
+        </div>
+      </html>
+      <search base="membersSnapshotSearch">
+        <query>
+          where total_no_shared_common_baseline+total_unable_to_connect > 0
+        </query>
+        <done>
+          <condition match="$job.resultCount$ > 0">
+            <set token="common_baseline_text_unhealthy">There are members in this cluster that do not share a common baseline. Action may be required.</set>
+            <unset token="common_baseline_text_healthy"></unset>
+          </condition>
+          <condition match="$job.resultCount$ = 0">
+            <set token="common_baseline_text_healthy">All members in this cluster share a common baseline.</set>
+            <unset token="common_baseline_text_unhealthy"></unset>
+          </condition>
+        </done>
+      </search>
+      <html depends="$common_baseline_text_unhealthy$">
+        <div class="dmc-kpi-item">
+          <div class="alert alert-warning">
+            <i class="icon-alert"></i>
+            <h5>$common_baseline_text_unhealthy$ Scroll down to see member status. <a href="/help?location=learnmore.shc.confreplication" target="_blank" class="external">Learn More</a></h5>
+          </div>
+        </div>
+      </html>
+      <html depends="$common_baseline_text_healthy$">
+      <div class="dmc-kpi-item">
+        <div class="alert alert-success">
+          <i class="icon-alert"></i>
+          <h5>$common_baseline_text_healthy$</h5>
+        </div>
+      </div>
+      </html>
+    </panel>
+    <panel depends="$show_member_heartbeat_detail$">
+      <table>
+        <title>Members that exceeded heartbeat timeout</title>
+        <search base="members_heartbeat_timeout_base">
+          <query>
+            fields label, last_heartbeat, last_heartbeat_captain, heartbeat_timeout, status, unable_to_connect
+            | eval heartbeat_timeout = if(isnotnull(heartbeat_timeout), heartbeat_timeout, "N/A")
+            | `dmc_time_format(last_heartbeat)`
+            | `dmc_time_format(last_heartbeat_captain)`
+            | eval last_heartbeat = if(isnotnull(last_heartbeat), last_heartbeat, "N/A")
+            | rename label as Member, last_heartbeat as "Last Heartbeat Sent to Captain", last_heartbeat_captain as "Last Heartbeat Received by Captain", heartbeat_timeout as "Heartbeat Timeout (sec)", status as "Status", unable_to_connect as "Member Unreachable"
+          </query>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+      <html>
+        <a data-unset-token="show_member_heartbeat_detail">Close this panel</a>
+      </html>
+    </panel>
+    <panel depends="$show_member_peer_inconsistency_detail$">
+      <table>
+        <title>Search Head Cluster Members and Peers</title>
+        <search base="member_peer_consistency_base"></search>
+        <option name="drilldown">none</option>
+      </table>
+      <html>
+        <a data-unset-token="show_member_peer_inconsistency_detail">Close this panel</a>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+        <h2>
+          <span>Select views: </span>
+          <span id="link-switcher-view">
+            <a href="#" class="btn-pill active" data-item="all">All</a>
+            <a href="#" class="btn-pill" data-item="snapshot">Snapshot</a>
+            <a href="#" class="btn-pill" data-item="historical">Historical</a>
+          </span>
+        </h2>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Snapshots</title>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Search Concurrency (Running/Limit)</title>
+      <search id="snapshot_search_concurrency_base">
+        <query>
+          | rest splunk_server_group="$group$" splunk_server_group=dmc_group_search_head /services/server/status/resource-usage/splunk-processes
+          | search search_props.role="head"
+          | dedup search_props.sid
+        </query>
+      </search>
+      <!--<table>--> <!-- table is only for testing purpose -->
+        <search id="search_concurrency_vs_limits_base" base="snapshot_search_concurrency_base">
+          <query>
+            stats count(eval(('search_props.type'=="scheduled" OR 'search_props.type'=="summary indexing" OR 'search_props.type'=="report acceleration" OR 'search_props.type'=="datamodel acceleration" OR 'search_props.type'=="ad-hoc") AND ('search_props.mode'=="historical" OR 'search_props.mode'=="historical batch"))) as count_total_hist,
+            count(eval(('search_props.type'=="scheduled" OR 'search_props.type'=="summary indexing" OR 'search_props.type'=="report acceleration" OR 'search_props.type'=="datamodel acceleration" OR 'search_props.type'=="ad-hoc") AND ('search_props.mode'=="RT" OR 'search_props.mode'=="RT indexed"))) as count_total_rt,
+            count(eval(('search_props.type'=="scheduled" OR 'search_props.type'=="summary indexing" OR 'search_props.type'=="report acceleration" OR 'search_props.type'=="datamodel acceleration") AND ('search_props.mode'=="historical" OR 'search_props.mode'=="historical batch"))) as count_hist_scheduled_search,
+            count(eval(('search_props.type'=="scheduled" OR 'search_props.type'=="summary indexing" OR 'search_props.type'=="report acceleration" OR 'search_props.type'=="datamodel acceleration") AND ('search_props.mode'=="RT" OR 'search_props.mode'=="RT indexed"))) as count_rt_scheduled_search,
+            count(eval(('search_props.type'=="report acceleration" OR 'search_props.type'=="datamodel acceleration"))) as count_auto_summary_search
+            | eval count_total_adhoc_scheduled_search = count_total_hist + count_total_rt
+            | eval count_total_scheduled_search = count_hist_scheduled_search + count_rt_scheduled_search
+            | eval dummy_key = "dummy_key"
+            | fields count_total_hist, count_hist_scheduled_search,
+                     count_total_rt, count_rt_scheduled_search,
+                     count_auto_summary_search,
+                     count_total_adhoc_scheduled_search, count_total_scheduled_search,
+                     dummy_key
+            | join dummy_key type=outer [
+              | rest splunk_server_group="$group$" splunk_server_group=dmc_group_search_head "/services/server/status/limits/search-concurrency?cluster_wide_quota=1"
+              | stats max(max_hist_searches) as max_hist_searches, max(max_hist_scheduled_searches) as max_hist_scheduled_searches, max(max_rt_searches), as max_rt_searches, max(max_rt_scheduled_searches) as max_rt_scheduled_searches, max(max_auto_summary_searches) as max_auto_summary_searches
+              | eval dummy_key = "dummy_key"
+              | fields max_hist_searches, max_hist_scheduled_searches,
+                  max_rt_searches, max_rt_scheduled_searches,
+                  max_auto_summary_searches,
+                  dummy_key
+            ]
+          </query>
+          <preview>
+            <eval token="count_total_adhoc_scheduled_search">if(isnotnull('result.count_total_adhoc_scheduled_search'), 'result.count_total_adhoc_scheduled_search', 0)</eval>
+            <eval token="count_total_scheduled_search">if(isnotnull('result.count_total_scheduled_search'), 'result.count_total_scheduled_search', 0)</eval>
+          </preview>
+        </search>
+      <!--</table>-->
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Ad hoc + Scheduled Searches ($count_total_adhoc_scheduled_search$ Running)</title>
+      <single>
+        <search base="search_concurrency_vs_limits_base">
+          <query>
+            eval total_historical_vs_limit = count_total_hist."/".max_hist_searches
+            | fields total_historical_vs_limit
+          </query>
+        </search>
+        <option name="underLabel">Historical</option>
+        <option name="drilldown">all</option>
+        <drilldown>
+          <set token="show_total_hist_search_details">true</set>
+          <unset token="show_total_rt_search_details"></unset>
+          <unset token="show_hist_search_details"></unset>
+          <unset token="show_rt_search_details"></unset>
+          <unset token="show_summarization_search_details"></unset>
+        </drilldown>
+      </single>
+      <single>
+        <search base="search_concurrency_vs_limits_base">
+          <query>
+            eval total_rt_vs_limit = count_total_rt."/".max_rt_searches
+            | fields total_rt_vs_limit
+          </query>
+        </search>
+        <option name="underLabel">Real-time</option>
+        <option name="drilldown">all</option>
+        <drilldown>
+          <unset token="show_total_hist_search_details"></unset>
+          <set token="show_total_rt_search_details">true</set>
+          <unset token="show_hist_search_details"></unset>
+          <unset token="show_rt_search_details"></unset>
+          <unset token="show_summarization_search_details"></unset>
+        </drilldown>
+      </single>
+    </panel>
+    <panel rejects="$historical$">
+      <title>Scheduled Searches ($count_total_scheduled_search$ Running)</title>
+      <single>
+        <search base="search_concurrency_vs_limits_base">
+          <query>
+            eval scheduled_vs_total_hist_scheduled_search_limit = count_hist_scheduled_search."/".max_hist_scheduled_searches
+            | fields scheduled_vs_total_hist_scheduled_search_limit
+          </query>
+        </search>
+        <option name="underLabel">Historical</option>
+        <option name="drilldown">all</option>
+        <drilldown>
+          <unset token="show_total_hist_search_details"></unset>
+          <unset token="show_total_rt_search_details"></unset>
+          <set token="show_hist_search_details">true</set>
+          <unset token="show_rt_search_details"></unset>
+          <unset token="show_summarization_search_details"></unset>
+        </drilldown>
+      </single>
+      <single>
+        <search base="search_concurrency_vs_limits_base">
+          <query>
+            eval scheduled_vs_total_rt_scheduled_search_limit = count_rt_scheduled_search."/".max_rt_scheduled_searches
+            | fields scheduled_vs_total_rt_scheduled_search_limit
+          </query>
+        </search>
+        <option name="underLabel">Real-time</option>
+        <option name="drilldown">all</option>
+        <drilldown>
+          <unset token="show_total_hist_search_details"></unset>
+          <unset token="show_total_rt_search_details"></unset>
+          <unset token="show_hist_search_details"></unset>
+          <set token="show_rt_search_details">true</set>
+          <unset token="show_summarization_search_details"></unset>
+        </drilldown>
+      </single>
+      <single>
+        <search base="search_concurrency_vs_limits_base">
+          <query>
+            eval scheduled_vs_total_auto_summary_search_limit = count_auto_summary_search."/".max_auto_summary_searches
+            | fields scheduled_vs_total_auto_summary_search_limit
+          </query>
+        </search>
+        <option name="underLabel">Summarization</option>
+        <option name="drilldown">all</option>
+        <drilldown>
+          <unset token="show_total_hist_search_details"></unset>
+          <unset token="show_total_rt_search_details"></unset>
+          <unset token="show_hist_search_details"></unset>
+          <unset token="show_rt_search_details"></unset>
+          <set token="show_summarization_search_details">true</set>
+        </drilldown>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <html>
+        <p>
+          Click to see more details.
+        </p>
+        <p>
+          Search concurrency limits can be set in limits.conf. <a href="/help?location=learnmore.dmc.shc.concurrency" target="_blank" class="external">Learn More</a>
+        </p>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel depends="$show_total_hist_search_details$" rejects="$historical$">
+      <title>Ad hoc + Scheduled Historical Search Concurrency Details</title>
+      <table>
+        <search base="snapshot_search_concurrency_base">
+          <query>
+            where ('search_props.type'=="scheduled" OR 'search_props.type'=="summary indexing" OR 'search_props.type'=="report acceleration" OR 'search_props.type'=="datamodel acceleration" OR 'search_props.type'=="ad-hoc") AND ('search_props.mode'=="historical" OR 'search_props.mode'=="historical batch")
+            | fields search_props.sid, search_props.label, splunk_server, search_props.app, search_props.user, search_props.type, search_props.mode, search_props.role, mem_used, pct_cpu, elapsed
+            | eval mem_used = round(mem_used, 0)
+            | eval pct_cpu = round(pct_cpu, 0)
+            | eval elapsed = round(elapsed, 0)
+            | rename search_props.sid as SID, search_props.label as "Search Name", splunk_server as Member, search_props.app as App, search_props.user as User, search_props.type as Type, search_props.mode as Mode, search_props.role as Role, mem_used as "Memory Used (MB)", pct_cpu as "CPU Usage (%)", elapsed as "Time Elapsed (sec)"
+          </query>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+      <html>
+        <a data-unset-token="show_total_hist_search_details">Close this panel</a>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel depends="$show_total_rt_search_details$" rejects="$historical$">
+      <title>Ad hoc + Scheduled Real-time Search Concurrency Details</title>
+      <table>
+        <search base="snapshot_search_concurrency_base">
+          <query>
+            where ('search_props.type'=="scheduled" OR 'search_props.type'=="summary indexing" OR 'search_props.type'=="report acceleration" OR 'search_props.type'=="datamodel acceleration" OR 'search_props.type'=="ad-hoc") AND ('search_props.mode'=="RT" OR 'search_props.mode'=="RT indexed")
+            | fields search_props.sid, search_props.label, splunk_server, search_props.app, search_props.user, search_props.type, search_props.mode, search_props.role, mem_used, pct_cpu, elapsed
+            | eval mem_used = round(mem_used, 0)
+            | eval pct_cpu = round(pct_cpu, 0)
+            | eval elapsed = round(elapsed, 0)
+            | rename search_props.sid as SID, search_props.label as "Search Name", splunk_server as Member, search_props.app as App, search_props.user as User, search_props.type as Type, search_props.mode as Mode, search_props.role as Role, mem_used as "Memory Used (MB)", pct_cpu as "CPU Usage (%)", elapsed as "Time Elapsed (sec)"
+          </query>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+      <html>
+        <a data-unset-token="show_total_rt_search_details">Close this panel</a>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel depends="$show_hist_search_details$" rejects="$historical$">
+      <title>Scheduled Historical Search Concurrency Details</title>
+      <table>
+        <search base="snapshot_search_concurrency_base">
+          <query>
+            where ('search_props.type'=="scheduled" OR 'search_props.type'=="summary indexing" OR 'search_props.type'=="report acceleration" OR 'search_props.type'=="datamodel acceleration") AND ('search_props.mode'=="historical" OR 'search_props.mode'=="historical batch")
+            | fields search_props.sid, search_props.label, splunk_server, search_props.app, search_props.user, search_props.type, search_props.mode, search_props.role, mem_used, pct_cpu, elapsed
+            | eval mem_used = round(mem_used, 0)
+            | eval pct_cpu = round(pct_cpu, 0)
+            | eval elapsed = round(elapsed, 0)
+            | rename search_props.sid as SID, search_props.label as "Search Name", splunk_server as Member, search_props.app as App, search_props.user as User, search_props.type as Type, search_props.mode as Mode, search_props.role as Role, mem_used as "Memory Used (MB)", pct_cpu as "CPU Usage (%)", elapsed as "Time Elapsed (sec)"
+          </query>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+      <html>
+        <a data-unset-token="show_hist_search_details">Close this panel</a>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel depends="$show_rt_search_details$" rejects="$historical$">
+      <title>Scheduled Real-time Concurrency Search Details</title>
+      <table>
+        <search base="snapshot_search_concurrency_base">
+          <query>
+            where ('search_props.type'=="scheduled" OR 'search_props.type'=="summary indexing" OR 'search_props.type'=="report acceleration" OR 'search_props.type'=="datamodel acceleration") AND ('search_props.mode'=="RT" OR 'search_props.mode'=="RT indexed")
+            | fields search_props.sid, search_props.label, splunk_server, search_props.app, search_props.user, search_props.type, search_props.mode, search_props.role, mem_used, pct_cpu, elapsed
+            | eval mem_used = round(mem_used, 0)
+            | eval pct_cpu = round(pct_cpu, 0)
+            | eval elapsed = round(elapsed, 0)
+            | rename search_props.sid as SID, search_props.label as "Search Name", splunk_server as Member, search_props.app as App, search_props.user as User, search_props.type as Type, search_props.mode as Mode, search_props.role as Role, mem_used as "Memory Used (MB)", pct_cpu as "CPU Usage (%)", elapsed as "Time Elapsed (sec)"
+          </query>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+      <html>
+        <a data-unset-token="show_rt_search_details">Close this panel</a>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel depends="$show_summarization_search_details$" rejects="$historical$">
+      <title>Summarization Search Details</title>
+      <table>
+        <search base="snapshot_search_concurrency_base">
+          <query>
+            where ('search_props.type'=="report acceleration" OR 'search_props.type'=="datamodel acceleration")
+            | fields search_props.sid, search_props.label, splunk_server, search_props.app, search_props.user, search_props.type, search_props.mode, search_props.role, mem_used, pct_cpu, elapsed
+            | eval mem_used = round(mem_used, 0)
+            | eval pct_cpu = round(pct_cpu, 0)
+            | eval elapsed = round(elapsed, 0)
+            | rename search_props.sid as SID, search_props.label as "Search Name", splunk_server as Member, search_props.app as App, search_props.user as User, search_props.type as Type, search_props.mode as Mode, search_props.role as Role, mem_used as "Memory Used (MB)", pct_cpu as "CPU Usage (%)", elapsed as "Time Elapsed (sec)"
+          </query>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+      <html>
+        <a data-unset-token="show_summarization_search_details">Close this panel</a>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Status</title>
+      <table>
+        <title>$totalCountOfMembers$ Members</title>
+        <search base="membersSnapshotSearch">
+          <query>
+fields label role status last_heartbeat ratio unpublished_changes artifact_count
+| eval ratio = if(isnotnull(ratio), ratio, "N/A")
+| eval unpublished_changes = if(isnotnull(unpublished_changes), unpublished_changes, "N/A")
+| eval artifact_count = if(isnotnull(artifact_count), artifact_count, "N/A")
+| `dmc_time_format(last_heartbeat)`
+| `dmc_time_format(last_heartbeat_captain)`
+| eval last_heartbeat = if(isnotnull(last_heartbeat), last_heartbeat, "N/A")
+| rename label as Instance, role as Role, status as Status, last_heartbeat as "Last Heartbeat Sent to Captain", ratio as "Configuration Baseline Consistency", unpublished_changes as "Number of Unpublished Changes", artifact_count as "Artifact Count"
+          </query>
+          <done>
+            <set token="totalCountOfMembers">$job.resultCount$</set>
+          </done>
+          <error>
+            <set token="totalCountOfMembers">N/A</set>
+          </error>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+        <!--<option name="refresh.auto.interval">60</option>-->
+        <option name="refresh.time.visible">false</option>
+        <drilldown>
+          <condition field="Instance">
+            <set token="SHCMemberDrilldown">$click.value2$</set>
+          </condition>
+          <condition field="Configuration Baseline Consistency">
+            <set token="SHCMemberBaselineDrilldown">$row.Instance$</set>
+          </condition>
+          <condition field="*"></condition>
+        </drilldown>
+      </table>
+      <html>
+        <p>Click on instance name to see more details.</p>
+        <p>Click on configuration baseline ratio to see more details about configuration replication. <a href="/help?location=learnmore.shc.replication_sync_issues" target="_blank" class="external">Learn More</a></p>
+      </html>
+    </panel>
+    <panel depends="$SHCMemberDrilldown$">
+      <title>$SHCMemberDrilldown$</title>
+      <table>
+        <search base="membersSnapshotSearch">
+          <query>
+where label == "$SHCMemberDrilldown$"
+| eval elected_captain = if(isnotnull(elected_captain), elected_captain, "N/A")
+| fields - _timediff
+| fields elected_captain guid advertise_restart_required advertise_restart_required_reason delayed_artifacts_to_discard fixup_set pending_job_count replication_count status_counter.Complete status_counter.PendingDiscard peer_scheme_host_port adhoc_searchhead kv_store_host_port replication_port replication_use_ssl site
+| transpose
+| rename column as "Configuration and Status", "row 1" as Value
+          </query>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="count">20</option>
+        <!--<option name="refresh.auto.interval">60</option>-->
+        <option name="refresh.time.visible">false</option>
+      </table>
+      <html>
+        <a data-unset-token="SHCMemberDrilldown">Close this panel</a>
+      </html>
+    </panel>
+    <panel depends="$SHCMemberBaselineDrilldown$">
+      <title>Configuration Baseline Consistency for: $SHCMemberBaselineDrilldown$</title>
+      <table>
+        <search base="membersSnapshotSearch">
+          <query>
+            where label == "$SHCMemberBaselineDrilldown$"
+            | fields shared_common_baseline no_shared_common_baseline unable_to_connect
+            | rename shared_common_baseline as "Shares Common Baseline With", no_shared_common_baseline as "Does Not Share Common Baseline With", unable_to_connect as "No Response From"
+          </query>
+        </search>
+      </table>
+      <html>
+        <a data-unset-token="SHCMemberBaselineDrilldown">Close this panel</a>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Historical Charts</title>
+      <input type="time" searchWhenChanged="true" token="time">
+        <label>Time Range:</label>
+        <default>
+          <earliestTime>-4h@m</earliestTime>
+          <latestTime>now</latestTime>
+        </default>
+      </input>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Search Concurrency</title>
+      <search id="shcSearchConBase">
+        <query>
+        `dmc_set_index_introspection` search_group=dmc_group_search_head search_group="$group$" sourcetype=splunk_resource_usage ((component=PerProcess data.search_props.sid::*) OR component=Hostwide)
+        | `dmc_rename_introspection_fields`
+        | `dmc_set_bin`
+        | stats dc(sid) AS distinct_search_count by provenance, mode, app, type, user, host, _time
+        </query>
+        <earliest>$time.earliest$</earliest>
+        <latest>$time.latest$</latest>
+      </search>
+      <input type="dropdown" token="shcSearchConFunc" searchWhenChanged="true">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <default>Max</default>
+        <choice value="Avg">Average</choice>
+        <choice value="Median">Median</choice>
+        <choice value="Min">Minimum</choice>
+        <choice value="Max">Maximum</choice>
+        <choice value="Perc90">90th Percentile</choice>
+        <choice value="First">Sampled</choice>
+      </input>
+      <input type="dropdown" token="shcSearchConHostScope" searchWhenChanged="true">
+        <label>Instance</label>
+        <showClearButton>false</showClearButton>
+        <default>*</default>
+        <choice value="*">All</choice>
+        <fieldForLabel>host</fieldForLabel>
+        <fieldForValue>host</fieldForValue>
+        <prefix>search host="</prefix>
+        <suffix>"</suffix>
+        <search base="shcSearchConBase">
+          <query>stats count by host</query>
+        </search>
+      </input>
+      <input type="dropdown" token="shcSearchConSplitBy" searchWhenChanged="true">
+        <label>Split by</label>
+        <showClearButton>false</showClearButton>
+        <default>host</default>
+        <choice value="app">app</choice>
+        <choice value="user">user</choice>
+        <choice value="provenance">provenance</choice>
+        <choice value="mode">mode</choice>
+        <choice value="type">type</choice>
+        <choice value="host">host</choice>
+      </input>
+      <input type="radio" token="searchConVizMode" searchWhenChanged="true">
+        <label>Viz Mode</label>
+        <default>line</default>
+        <choice value="line">Line</choice>
+        <choice value="column">Stacked Column</choice>
+      </input>
+      <chart>
+        <search base="shcSearchConBase">
+          <query>
+          $shcSearchConHostScope$
+          | stats sum(distinct_search_count) as total_distinct_search_count by provenance, mode, app, type, user, host, _time
+          | `dmc_timechart` partial=false $shcSearchConFunc$(total_distinct_search_count) as search_count by $shcSearchConSplitBy$
+          </query>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.text">Count</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">$searchConVizMode$</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">zero</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.chart.showLabels">auto</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <search id="captainElectionBaseSearch">
+        <query>
+`dmc_set_index_internal` search_group="$group$" sourcetype=splunkd component=Metrics group=captainstability upgrades_to_captain=1
+| stats count by _time, upgrades_to_captain, host
+        </query>
+        <earliest>$time.earliest$</earliest>
+        <latest>$time.latest$</latest>
+      </search>
+      <title>Captain Election Activity</title>
+      <input type="dropdown" token="captainElectionHostScope" searchWhenChanged="true">
+        <label>Instance</label>
+        <showClearButton>false</showClearButton>
+        <default>*</default>
+        <choice value="*">All</choice>
+        <fieldForLabel>host</fieldForLabel>
+        <fieldForValue>host</fieldForValue>
+        <prefix>search host="</prefix>
+        <suffix>"</suffix>
+        <search base="captainElectionBaseSearch">
+          <query>stats count by host</query>
+        </search>
+      </input>
+      <chart>
+        <search base="captainElectionBaseSearch">
+          <query>
+$captainElectionHostScope$
+| `dmc_timechart_for_metrics_log` count(upgrades_to_captain) as captain_election_event
+          </query>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.text">Count</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.chart.showLabels">auto</option>
+      </chart>
+    </panel>
+    <panel rejects="$snapshot$">
+      <title>Captain Election Details</title>
+      <table>
+        <search base="captainElectionBaseSearch">
+          <query>
+$captainElectionHostScope$
+| eval event = host." was elected as captain."
+| fields _time, event
+| sort - _time
+| rename _time as Time, event as Event
+| `dmc_time_format(Time)`
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="drilldown">off</option>
+      </table>
+      <html>
+        <p>Please use the dropdown menu on the left side panel to select an instance or all instances.</p>
+      </html>
+    </panel>
+  </row>
+  <!-- <row>
+    <panel rejects="$snapshot$">
+      <title>Count of Captain Election Actions</title>
+      <chart>
+        <search>
+          <query>
+`dmc_set_index_internal` search_group="$group$" sourcetype=splunkd component=Metrics group=captainstability (upgrades_to_captain=1 OR downgrades_from_captain=1 OR num_pollled_candidates&gt;0)
+| `dmc_timechart_for_metrics_log` count(num_polled_captain) as candidate sum(upgrades_to_captain) as upgrades_to_captain sum(downgrades_from_captain) as downgrades_from_captain
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.text">Count</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.chart.showLabels">auto</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Captain Stability History</title>
+      <input type="radio" token="captainHistoryFilter" searchWhenChanged="true">
+        <label>Status</label>
+        <prefix>search status="</prefix>
+        <suffix>"</suffix>
+        <default>*</default>
+        <choice value="*">All</choice>
+        <choice value="perturbing">Perturbing</choice>
+      </input>
+      <table>
+        <search>
+          <query>
+`dmc_set_index_internal` search_group="$group$" sourcetype=splunkd component=Metrics group=captainstability
+| `dmc_set_bin_for_metrics_log`
+| eval status=case(
+(upgrades_to_captain=0) AND (downgrades_from_captain=0) AND (num_polled_candidate=0), "stable",
+1=1, "perturbing")
+| eval reason=case(
+upgrades_to_captain=1 AND num_polled_candidate&gt;0, host." became candidate and was elected as captain",
+upgrades_to_captain=0 AND num_polled_candidate&gt;0, host." became candidate",
+upgrades_to_captain=1 AND num_polled_candidate=0, host." was elected as captain",
+downgrades_from_captain=1, host." changed from captain to a member",
+1=1, "")
+| stats count by _time, status, reason
+| sort - _time
+| fields - count
+| $captainHistoryFilter$
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="drilldown">off</option>
+      </table>
+    </panel>
+  </row> -->
+</form>

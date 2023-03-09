@@ -1,0 +1,10 @@
+<endpoint name="fields">
+  <header></header>
+  <menu name="knowledge_configurations">
+    <label>Fields</label>
+    <url>/manager/%(namespace)s/fields</url>
+    <description>View and edit fields. Set permissions. Define event workflow actions and field aliases. Rename sourcetypes.</description>
+    <order>42</order>
+    <id>fields</id>
+  </menu>
+</endpoint>

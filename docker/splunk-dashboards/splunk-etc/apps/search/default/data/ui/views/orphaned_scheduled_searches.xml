@@ -1,0 +1,20 @@
+<dashboard version="1.1" hideEdit="True">
+  <label>Orphaned Scheduled Searches, Reports, and Alerts</label>
+  <row>
+    <panel>
+      <html>
+        <p>These are saved scheduled searches, reports, and alerts with deactivated owners.</p>
+        <p>The scheduler cannot run orphaned scheduled searches. Review these items and disable, delete, or reassign them to a new owner.</p>
+        <a class="external" href="/help?location=learnmore.orphaned_searches" target="_blank">Learn more</a>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>List of Orphaned Scheduled Searches, Reports, and Alerts</title>
+      <table>
+          <search ref="Orphaned scheduled searches" />
+      </table>
+    </panel>
+  </row>
+</dashboard>

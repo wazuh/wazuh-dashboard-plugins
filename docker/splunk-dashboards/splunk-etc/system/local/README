@@ -1,0 +1,8 @@
+
+This directory contains local settings that override all other
+settings, including the default settings, and specific configuration file
+settings.
+
+For details on configuration files, see $SPLUNK_HOME/etc/system/README/ directory
+for specifications and examples.
+

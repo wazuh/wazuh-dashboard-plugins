@@ -1,0 +1,6 @@
+
+This directory contains automatically generated sourcetypes. 
+
+   * sourcetypes.conf -- document models of sourcetype classification.
+   * props.conf -- settings for each discovered sourcetype.
+

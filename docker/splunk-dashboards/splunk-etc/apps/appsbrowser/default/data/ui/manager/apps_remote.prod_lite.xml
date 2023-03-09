@@ -1,0 +1,5 @@
+<endpoint name="unused">
+    <capabilities>
+        <read>nobody</read>
+    </capabilities>
+</endpoint>

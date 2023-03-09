@@ -1,0 +1,32 @@
+<endpoint name="data/inputs/tcp/cooked" showOnSearchHeadCluster="0">
+  <capabilities>
+    <read>list_inputs AND edit_splunktcp</read>
+  </capabilities>
+  <header>Receive data</header>
+  <elements>
+    <element name="receivingFields" type="fieldset">
+      <view name="list"/>
+      <view name="create"/>
+      <elements>
+        <element name="name" label="Listen on this port">
+          <view name="create"/>
+          <key name="exampleText">For example, 9997 will receive data on TCP port 9997.</key>
+        </element>
+        <element name="display-name" label="Listen on this port">
+          <view name="list"/>
+          <key name="processValueList">entity.name</key>
+        </element>
+        <!--
+        <element name="restrictToHost" label="Restrict to host">
+          <view name="list"/>
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="exampleText">Enter name or IP address of host.  &lt;br /&gt; For example, set to myhost to receive data only from myhost.yourdomain.com.</key>
+        </element>
+        -->
+      </elements>
+      <key name="helpText">Set up this Splunk instance to receive data from forwarder(s).</key>
+      <key name="legend">Configure receiving</key>
+    </element>
+  </elements>
+</endpoint>

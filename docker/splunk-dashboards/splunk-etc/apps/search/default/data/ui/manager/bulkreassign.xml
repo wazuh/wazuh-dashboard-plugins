@@ -1,0 +1,6 @@
+<endpoint name="bulkreassign" template="pages/system.html">
+  <capabilities>
+    <read>admin_all_objects</read>
+  </capabilities>
+  <header>Bulk Reassign</header>
+</endpoint>

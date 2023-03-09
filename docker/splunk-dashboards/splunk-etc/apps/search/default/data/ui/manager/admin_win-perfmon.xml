@@ -1,0 +1,206 @@
+<endpoint name="data/inputs/win-perfmon">
+  <capabilities>
+    <read>edit_modinput_perfmon</read>
+  </capabilities>
+  <header>Local performance monitoring</header>
+  <breadcrumb>
+      <parent hidecurrent="False">datainputstats</parent>
+      <name i18ntag="">Local performance monitoring</name>
+  </breadcrumb>  
+  
+  <elements>
+    <element name="basicgroup" type="fieldset">
+      <view name="list"/>
+      <view name="edit"/>
+      <view name="create"/>
+      <elements>
+        
+        <!-- COLLECTION NAME -->
+        <element name="name" type="textfield" label="Collection name">
+          <view name="list"/>
+          <view name="create"/>
+          <key name="exampleText">Enter a unique name for this collection.</key>
+        </element>
+      </elements>
+    </element>
+  
+  
+    <element name="selectorgroup" type="fieldset">
+      <view name="list"/>
+      <view name="edit"/>
+      <view name="create"/>
+      <elements>
+      
+        <!-- OBJECTS -->
+        <element name="object" type="select" label="Available objects">
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="class">long</key>
+          <key name="topItem">-- Select Objects --</key>
+          <key name="dynamicOptions" type="dict">
+            <key name="splunkSource">'/admin/win-perfmon-find-collection/'</key>
+            <key name="splunkSourceEntity">'PERFResult'</key>
+            <key name="entityField">'objects'</key>
+          </key>
+          <key name="exampleText">Select an object to view and add available counters.</key>          
+          <onChange>
+            <key name="_action">triggerElementRefresh</key>
+            <key name="_triggerOnLoad" type="bool">0</key>
+            <key name="target">counters</key>
+              <chained_action>
+                <key name="_action">triggerChangeHandler</key>
+                <key name="target">counterField</key>
+                <key name="makeVisible" type="bool">1</key>
+              </chained_action>
+          </onChange>
+          <onChange>
+            <key name="_action">triggerElementRefresh</key>
+            <key name="_triggerOnLoad" type="bool">0</key>
+            <key name="target">counters</key>
+              <chained_action>
+                <key name="_action">triggerChangeHandler</key>
+                <key name="target">counters</key>
+                <key name="makeVisible" type="bool">1</key>
+              </chained_action>
+          </onChange>
+          <onChange>
+            <key name="_action">triggerElementRefresh</key>
+            <key name="_triggerOnLoad" type="bool">0</key>
+            <key name="target">instances</key>
+              <chained_action>
+                <key name="_action">triggerChangeHandler</key>
+                <key name="target">instanceField</key>
+                <key name="makeVisible" type="bool">1</key>
+              </chained_action>
+          </onChange>
+          <onChange>
+            <key name="_action">triggerElementRefresh</key>
+            <key name="_triggerOnLoad" type="bool">0</key>
+            <key name="target">instances</key>
+              <chained_action>
+                <key name="_action">triggerChangeHandler</key>
+                <key name="target">instances</key>
+                <key name="makeVisible" type="bool">1</key>
+              </chained_action>
+          </onChange>
+        </element>
+
+        <!-- COUNTERS -->
+        <element name="counterField" type="fieldset">
+          <view name="list"/>
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="legend">Counters</key>
+          
+          <elements>
+            <element name="counters" type="accumulator" label="counters">
+              <view name="list"/>
+              <view name="edit"/>
+              <view name="create"/>
+              <key name="labelList">Counters</key>
+              <key name="processValueList">('None' * (not value)) or ('All' * (value == '*')) or (', '.join(value) * (isinstance(value, list)))</key>
+              <key name="caseSensitiveMatch">false</key>                    
+              <key name="nullUnlessFieldSet">object</key>
+              <key name="submitValueAdd">value</key>
+              <key name="submitValueEdit">value</key>
+              <key name="dynamicOptions" type="dict">
+                <key name="splunkSource">'/admin/win-perfmon-find-collection'</key>
+                <key name="splunkSourceParams" type="dict">
+                  <key name="object">form_defaults['object']</key>
+                </key>
+                <key name="splunkSourceEntity">'PERFResult'</key>            
+                <key name="entityField">'counters'</key>
+              </key>
+            </element>
+          </elements>
+        </element>
+
+        <!-- INSTANCES -->        
+        <element name="instanceField" type="fieldset">
+          <view name="list"/>
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="legend">Instances</key>
+          
+          <elements>
+            <element name="instances" type="accumulator" label="instances">
+              <view name="list"/>
+              <view name="edit"/>
+              <view name="create"/>
+              <key name="labelList">Instances</key>
+              <key name="submitValueAdd">value</key>
+              <key name="submitValueEdit">value</key>
+              <key name="processValueList">('*' * (not value)) or ('All' * (value == '*')) or (', '.join(value) * (isinstance(value, list)))</key>
+              <key name="nullUnlessFieldSet">object</key>
+              <key name="caseSensitiveMatch">false</key>          
+              <key name="dynamicOptions" type="dict">
+                <key name="splunkSource">'/admin/win-perfmon-find-collection'</key>
+                <key name="splunkSourceParams" type="dict">
+                  <key name="object">form_defaults['object']</key>
+                </key>
+                <key name="splunkSourceEntity">'PERFResult'</key>            
+                <key name="entityField">'instances'</key>
+              </key>
+            </element>
+          </elements>
+        </element>
+        
+      </elements>
+      <key name="listview">classSelect, serverSelect, objectSelect</key>
+    </element>
+
+    
+    <element name="hostGroup" type="fieldset">
+      <view name="list"/>
+      <view name="edit"/>
+      <view name="create"/>
+      <key name="listview">classSelect, serverSelect, objectSelect</key>      
+      <elements>
+        <!-- INTERVAL -->
+        <element name="interval" type="textfield" label="Polling interval">
+          <view name="list"/>
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="labelList">Polling interval</key>
+          <key name="processValueAdd">10</key>
+          <key name="exampleText">sec</key>
+          <key name="class">short</key>
+        </element>
+
+        <!-- INDEX -->
+        <element name="indexField" type="fieldset">
+          <view name="list"/>
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="legend">Index</key>
+          <key name="helpText">Set the destination index for this source.</key>
+          <elements>
+            <element name="index" type="select" label="Index">
+              <view name="list"/>
+              <view name="edit"/>
+              <view name="create"/>
+              <key name="dynamicOptions" type="dict">
+                <key name="keyName">title</key>
+                <key name="keyValue">title</key>
+                <key name="splunkSource">/data/indexes</key>
+                <key name="splunkSourceParams" type="dict">
+                  <key name="count">"-1"</key>
+                  <key name="datatype">"all"</key>
+                  <key name="search">"isInternal=0 disabled=0 isVirtual=0"</key>
+                </key>
+                <key name="prefixOptions" type="list">
+                  <item type="list">
+                    <item>default</item> <!--value-->
+                    <item>default</item> <!--label-->
+                  </item>
+                </key>
+              </key>
+              <key name="processValueList">'default' if value is None else value</key>
+            </element>
+          </elements>
+        </element>
+
+      </elements>
+    </element>
+  </elements>
+</endpoint>

@@ -1,0 +1,17 @@
+<div class="section-padded section-header">
+	<div class="title-section progress-action-section pull-right">
+	 	<div class="action-module"></div>
+	 	<div class="progress-bar-module"></div>
+ 	</div>
+ 	<h2 class="section-title"><%= _('Health Check').t() %></h2>
+ 	<div class="section-description">
+ 		<%- description %>
+ 		<a href="<%- healthCheckContentLink %>" target="_blank"><%= _('Health Check Items').t() %> <i class="icon-external"></i></a>
+ 	</div>
+ 	<div class="title-section health-check-scope form-horizontal align-left"></div>
+</div>
+<div class="health-check-filters-container" aria-live="assertive" role="status" aria-label="<%= _('Health Check Results updated').t() %>"></div>
+<div class="splunk-health-check-container">
+	<div class="health-check-sidebar-display"></div>
+	<div class="health-check-table-display"></div>
+</div>

@@ -1,0 +1,217 @@
+<form version="1.1" hideEdit="true">
+  <label>Historic License Usage</label>
+  <search>
+    <query>
+      |rest splunk_server=local /servicesNS/nobody/splunk_monitoring_console/saved/searches/DMC%20License%20Usage%20Data%20Cube | fields auto_summarize | eval no_acceleration=if(auto_summarize == 1, NULL, "yes")
+    </query>
+    <finalized>
+      <eval token="no_acceleration">'result.no_acceleration'</eval>
+    </finalized>
+  </search>
+	<fieldset autoRun="true" submitButton="false">
+		<input type="dropdown" searchWhenChanged="true" token="splunk_server">
+			<label>License Managers</label>
+			<showClearButton>false</showClearButton>
+			<fieldForLabel>serverName</fieldForLabel>
+			<fieldForValue>serverName</fieldForValue>
+			<search>
+				<query>
+					|  `dmc_get_instance_info("dmc_group_license_master")`
+					| fields host, serverName
+				</query>
+			</search>
+      <selectFirstChoice>true</selectFirstChoice>
+      <change>
+      	<set token="host">$row.host$</set>
+      </change>
+    </input>
+    <input type="dropdown" searchWhenChanged="true" token="pool">
+      <label>Pool</label>
+      <showClearButton>false</showClearButton>
+      <fieldForLabel>name</fieldForLabel>
+      <fieldForValue>value</fieldForValue>
+      <search>
+        <query>
+          | rest splunk_server=$splunk_server$ /services/licenser/pools | rename title AS pool | search [rest splunk_server=$splunk_server$ /services/licenser/groups | search is_active=1 | eval stack_id=stack_ids | fields stack_id] | eval name=pool | eval value="pool=\"". pool . "\"" | table name value
+        </query>
+      </search>
+      <choice value=" ">All Pools</choice>
+      <default> </default>
+      <change>
+        <condition value=" ">
+          <set token="size_search">dmc_licensing_stack_size_srch</set>
+          <set token="sz_clause">stacksz</set>
+        </condition>
+        <condition value="*">
+          <set token="size_search">dmc_licensing_pool_size_srch</set>
+          <set token="sz_clause">poolsz</set>
+        </condition>
+      </change>
+    </input>
+    <input type="dropdown" searchWhenChanged="true" token="split_by">
+      <label>Split By</label>
+      <showClearButton>false</showClearButton>
+      <choice value="No Split">No split</choice>
+      <choice value="Pool">By pool</choice>
+      <choice value="Indexer">By indexer</choice>
+      <choice value="Source Type">By source type</choice>
+      <choice value="Host">By host</choice>
+      <choice value="Source">By source</choice>
+      <choice value="Index">By index</choice>
+      <default>No Split</default>
+      <change>
+        <condition value="No Split">
+          <set token="base_search">dmc_licensing_base_summary</set>
+          <set token="max_avg_search">dmc_licensing_summary_maxavg_no_split</set>
+          <set token="daily_usage_search">dmc_licensing_summery_no_split</set>
+          <set token="daily_usage_pct_search">dmc_licensing_summery_pct_no_split</set>
+          <set token="split_by_field_name"> </set>
+          <unset token="split_by_hs_info_msg"></unset>
+          <unset token="split_by_index_info_msg"></unset>
+          <unset token="display_accelerated_msg"></unset>
+        </condition>
+        <condition value="Pool">
+          <set token="base_search">dmc_licensing_base_summary</set>
+          <set token="max_avg_search">dmc_licensing_summary_maxavg_pool</set>
+          <set token="daily_usage_search">dmc_licensing_summery_pool</set>
+          <set token="daily_usage_pct_search">dmc_licensing_summery_pct_pool</set>
+          <set token="split_by_field_name"> </set>
+          <unset token="split_by_hs_info_msg"></unset>
+          <unset token="split_by_index_info_msg"></unset>
+          <unset token="display_accelerated_msg"></unset>
+        </condition>
+        <condition value="Indexer">
+          <set token="base_search">dmc_licensing_base_summary</set>
+          <set token="max_avg_search">dmc_licensing_summary_maxavg_indxr</set>
+          <set token="daily_usage_search">dmc_licensing_summery_indxr</set>
+          <set token="daily_usage_pct_search">dmc_licensing_summery_pct_indxr</set>
+          <set token="split_by_field_name"> </set>
+          <unset token="split_by_hs_info_msg"></unset>
+          <unset token="split_by_index_info_msg"></unset>
+          <unset token="display_accelerated_msg"></unset>
+        </condition>
+        <condition value="Source Type">
+          <set token="base_search">dmc_licensing_base_usage</set>
+          <set token="max_avg_search">dmc_licensing_usage_maxavg_all</set>
+          <set token="daily_usage_search">dmc_licensing_usage_all</set>
+          <set token="daily_usage_pct_search">dmc_licensing_usage_pct_all</set>
+          <set token="split_by_field_name">st</set>
+          <unset token="split_by_hs_info_msg"></unset>
+          <unset token="split_by_index_info_msg"></unset>
+          <set token="display_accelerated_msg">true</set>
+          <set token="earliest">-30d@d</set>
+          <set token="latest">-0d@d</set>
+        </condition>
+        <condition value="Host">
+          <set token="base_search">dmc_licensing_base_usage</set>
+          <set token="max_avg_search">dmc_licensing_usage_maxavg_all</set>
+          <set token="daily_usage_search">dmc_licensing_usage_all</set>
+          <set token="daily_usage_pct_search">dmc_licensing_usage_pct_all</set>
+          <set token="split_by_field_name">h</set>
+          <set token="split_by_hs_info_msg">true</set>
+          <unset token="split_by_index_info_msg"></unset>
+          <set token="display_accelerated_msg">true</set>
+          <set token="earliest">-30d@d</set>
+          <set token="latest">-0d@d</set>
+        </condition>
+        <condition value="Source">
+          <set token="base_search">dmc_licensing_base_usage</set>
+          <set token="max_avg_search">dmc_licensing_usage_maxavg_all</set>
+          <set token="daily_usage_search">dmc_licensing_usage_all</set>
+          <set token="daily_usage_pct_search">dmc_licensing_usage_pct_all</set>
+          <set token="split_by_field_name">s</set>
+          <set token="split_by_hs_info_msg">true</set>
+          <unset token="split_by_index_info_msg"></unset>
+          <set token="display_accelerated_msg">true</set>
+          <set token="earliest">-30d@d</set>
+          <set token="latest">-0d@d</set>
+        </condition>
+        <condition value="Index">
+          <set token="base_search">dmc_licensing_base_usage</set>
+          <set token="max_avg_search">dmc_licensing_usage_maxavg_all</set>
+          <set token="daily_usage_search">dmc_licensing_usage_all</set>
+          <set token="daily_usage_pct_search">dmc_licensing_usage_pct_all</set>
+          <set token="split_by_field_name">idx</set>
+          <unset token="split_by_hs_info_msg"></unset>
+          <set token="split_by_index_info_msg">true</set>
+          <set token="display_accelerated_msg">true</set>
+          <set token="earliest">-30d@d</set>
+          <set token="latest">-0d@d</set>
+        </condition>
+      </change>
+    </input>
+    <html depends="$display_accelerated_msg$, $no_acceleration$">
+      <span class="info-message alert alert-warning"><i class="icon-alert"></i> The report that powers these panels is not accelerated.  For faster performance, turn on acceleration for this report. <a href="/help?location=learnmore.DMC.LURV.acceleration" target="_blank" title="Splunk help">Learn more <i class="icon-external"></i></a></span>
+      <br/><br/>
+    </html>
+    <html depends="$split_by_hs_info_msg$">
+      <span class="info-message alert alert-info"><i class="icon-alert"></i>You have selected "host" or "source" from the "Split By" menu. You might see usage reported for a "SQUASHED" series. This is expected behavior if you have many unique hosts or sources. <a href="/help?location=learnmore.license.usage_squashing" target="_blank" title="Splunk help">Learn More <i class="icon-external"></i></a></span>
+    </html>
+    <html depends="$split_by_index_info_msg$">
+      <span class="info-message alert alert-info"><i class="icon-alert"></i>You have selected "index" from the "Split By" menu. If your license peers are running a version of Splunk lower than 6.0, they will not report per index usage and you will see their usage labeled as "UNKNOWN".</span>
+    </html>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Daily License Usage</title>
+      <input type="radio" token="overlay_toggle" searchWhenChanged="true">
+        <showClearButton>false</showClearButton>
+        <label>Show stack/pool size overlay?</label>
+        <choice value="yes">Yes</choice>
+        <choice value="no">No</choice>
+        <change>
+          <condition value="no">
+            <set token="overlay_remove">| fields - "stack size" | fields - "pool size"</set>
+          </condition>
+          <condition value="yes">
+            <set token="overlay_remove"> </set>
+          </condition>
+        </change>
+        <selectFirstChoice>true</selectFirstChoice>
+      </input>
+      <chart>
+        <search>
+          <query>`$base_search$($host$,"$pool$")` | `$daily_usage_search$($splunk_server$, $size_search$, $host$, "$pool$", "$split_by_field_name$")` $overlay_remove$</query>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="refresh.time.visible">true</option>
+        <option name="charting.axisTitleY.text">GB</option>
+        <option name="charting.axisTitleX.text">Date</option>
+        <option name="charting.chart.overlayFields">"stack size","pool size"</option>
+        <option name="charting.lineDashStyle">ShortDash</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.fieldColors">{"stack size": 0xff0000, "pool size": 0xff0000}</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Percentage of Daily License Quota Used</title>
+      <chart>
+        <search>
+          <query>`$base_search$($host$,"$pool$")` | `$daily_usage_pct_search$($splunk_server$, $sz_clause$, $host$, "$split_by_field_name$")`</query>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="refresh.time.visible">true</option>
+        <option name="charting.axisTitleY.text">%</option>
+        <option name="charting.axisTitleX.text">Date</option>
+        <option name="charting.chart.stackMode">stacked</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Average and Peak Daily Volume</title>
+      <chart>
+        <search>
+          <query>`$base_search$($host$,"$pool$")` | `$max_avg_search$($splunk_server$, "$split_by_field_name$", "$split_by$")`</query>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="refresh.time.visible">true</option>
+        <option name="charting.axisTitleY.text">GB</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisEnd</option>
+      </chart>
+    </panel>
+  </row>
+</form>

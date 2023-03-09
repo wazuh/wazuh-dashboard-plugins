@@ -1,0 +1,10 @@
+#   Version 9.0.3
+#
+# This file contains example patterns for the metadata files default.meta and
+# local.meta
+#
+
+# This example would make all of the objects in an app globally accessible to
+# all apps
+[]
+export=system

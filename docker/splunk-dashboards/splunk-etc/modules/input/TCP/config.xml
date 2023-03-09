@@ -1,0 +1,23 @@
+<!--   Version 4.0 -->
+
+<!-- Copy this file to config.xml to enable the module. -->
+
+<!-- This configuration file is used for sending raw TCP log data to the splunk server -->
+<module>                                                                                                      
+<pipeline name="tcp" type="startup">
+	<processor name="tcp" plugin="tcpinputprocessor">
+		<config>
+		        <!-- To configure an input, use inputs.conf -->
+
+			<!-- Arriving events are placed on an input queue of this size -->
+			<queueSize>1000</queueSize>
+		</config>
+	</processor>
+
+	<processor name="sendOut" plugin="queueoutputprocessor">
+		<config>
+			<queueName>parsingQueue</queueName>
+		</config>
+	</processor>
+</pipeline>
+</module>

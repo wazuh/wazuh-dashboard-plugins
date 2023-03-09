@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deployment name="root">
+  <serverClass name="spacecake_apps">
+    <app name="app_0">
+      <repositoryLocation>$SPLUNK_HOME/etc/myapps</repositoryLocation>
+      <!-- Download app_0 from the given location -->
+      <endpoint>splunk.com/spacecake/apps/app_0.tgz</endpoint>
+    </app>
+    <app name="app_1">
+      <repositoryLocation>$SPLUNK_HOME/etc/myapps</repositoryLocation>
+      <!-- Download app_1 from the given location -->
+      <endpoint>splunk.com/spacecake/apps/app_1.tgz</endpoint>
+    </app>
+  </serverClass>
+  <serverClass name="foobar_apps">
+    <!-- construct url for each location based on the scheme below and download each app -->
+    <endpoint>foobar.com:5556/services/streams/deployment?name=$serverClassName$_$appName$.bundle</endpoint>
+    <app name="app_0"/>
+    <app name="app_1"/>
+    <app name="app_2"/>
+  </serverClass>
+  <serverClass name="local_apps">
+    <endpoint>foo</endpoint>
+    <app name="app_0">
+      <!-- app present in local filesystem -->
+      <endpoint>file:/home/johndoe/splunk/ds/service_class_2_app_0.bundle</endpoint>
+    </app>
+    <app name="app_1">
+      <!-- app present in local filesystem -->
+      <endpoint>file:/home/johndoe/splunk/ds/service_class_2_app_1.bundle</endpoint>
+    </app>
+    <app name="app_2">
+      <!-- app present in local filesystem -->
+      <endpoint>file:/home/johndoe/splunk/ds/service_class_2_app_2.bundle</endpoint>
+    </app>
+  </serverClass>
+</deployment>
+

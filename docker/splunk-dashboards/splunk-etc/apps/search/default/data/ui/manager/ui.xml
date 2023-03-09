@@ -1,0 +1,1 @@
+<endpoint name="ui">  <header></header>  <menu name="knowledge_configurations">    <label>User interface</label>    <url>/manager/%(namespace)s/ui</url>    <description>Create, view and edit views, dashboards, and navigation menus.</description>    <order>50</order>    <id>ui</id>  </menu></endpoint>

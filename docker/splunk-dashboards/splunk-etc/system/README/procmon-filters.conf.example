@@ -1,0 +1,19 @@
+#   Version 9.0.3
+#
+# This file contains example registry monitor filters. To create your own
+# filter, use the information in procmon-filters.conf.spec.
+#
+# To use one or more of these configurations, copy the configuration block into
+# procmon-filters.conf in $SPLUNK_HOME/etc/system/local/. You must restart
+# Splunk to enable configurations.
+#
+# To learn more about configuration files (including precedence) please see the
+# documentation located at
+# http://docs.splunk.com/Documentation/Splunk/latest/Admin/Aboutconfigurationfiles
+
+[default]
+hive = .*
+
+[not-splunk-optimize]
+proc = (?<!splunk-optimize.exe)$
+type = create|exit|image

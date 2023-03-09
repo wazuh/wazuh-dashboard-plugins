@@ -1,0 +1,22 @@
+<!--   Version 4.0 -->
+                                                                                                                                       
+
+<!-- Tailing files is now configured in:
+     $SPLUNK_HOME/etc/bundles/*/inputs.conf -->
+<module>
+     <!-- DO NOT EDIT this, well not if you want stuff to work -->
+     <pipeline name="archivePipe" type="startup">
+     	<processor name="archiveProcessor" plugin="archiveprocessor">
+     		<config>
+     			<queueName>TailingQ</queueName>
+     		</config>
+     	</processor>
+
+        <processor name="sendOut" plugin="queueoutputprocessor">
+     		<config>
+     			<queueName>parsingQueue</queueName>
+     		</config>
+     	</processor>
+     </pipeline>
+     <!-- i should have paid attention to that warning. :( -->
+</module>

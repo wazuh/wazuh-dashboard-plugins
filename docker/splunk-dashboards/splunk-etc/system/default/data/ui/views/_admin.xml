@@ -1,0 +1,12 @@
+<view isVisible="false" >
+  <label>Internal Admin Nav</label>
+  <module name="Message" layoutPanel="messaging">
+    <param name="filter">*</param>
+    <param name="clearOnJobDispatch">False</param>
+    <param name="maxSize">1</param>
+  </module>
+  <module name="AccountBar" layoutPanel="appHeader">
+    <param name="mode">lite</param>
+  </module>
+  <module name="LiteBar" layoutPanel="liteHeader"></module>
+</view>

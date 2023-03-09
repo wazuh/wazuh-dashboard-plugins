@@ -1,0 +1,308 @@
+<form version="1.1" hideEdit="True" script="common_control.js">
+  <label>Search Head Clustering: Artifact Replication</label>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="dropdown" searchWhenChanged="true" token="group">
+      <label>Search Head Cluster:</label>
+      <showClearButton>false</showClearButton>
+      <populatingSearch fieldForLabel="label" fieldForValue="search_group">
+        | `dmc_get_search_head_cluster_groups`
+      </populatingSearch>
+      <selectFirstChoice>true</selectFirstChoice>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Warning and Error Patterns</title>
+      <input type="time" searchWhenChanged="true" token="warningErrorTime">
+        <label>Time Range:</label>
+        <default>
+          <earliestTime>-24h</earliestTime>
+          <latestTime>now</latestTime>
+        </default>
+      </input>
+      <table>
+        <search>
+          <query>
+`dmc_get_warnings_and_errors("$group$", *Artifact*)`
+| cluster showcount=t
+| table cluster_count, _time, log_level, component, event_message, punct
+| sort - cluster_count
+| `dmc_time_format(_time)`
+| rename cluster_count AS Count, _time AS "Latest Time", log_level as "Log Level", component as Component, event_message as "Latest Message"
+          </query>
+          <earliest>$warningErrorTime.earliest$</earliest>
+          <latest>$warningErrorTime.latest$</latest>
+        </search>
+        <fields>Count, "Latest Time", "Log Level", Component, "Latest Message"</fields>
+        <option name="drilldown">row</option>
+        <drilldown>
+          <set token="warningErrorPunct">$row.punct$</set>
+        </drilldown>
+      </table>
+      <html>
+        <p>Click on a row to see event details.</p>
+      </html>
+    </panel>
+    <panel depends="$warningErrorPunct$">
+      <title>Event Details</title>
+      <event>
+        <search>
+          <query>
+`dmc_get_warnings_and_errors("$group$", *Artifact*)` punct="$warningErrorPunct$"
+          </query>
+          <earliest>$warningErrorTime.earliest$</earliest>
+          <latest>$warningErrorTime.latest$</latest>
+        </search>
+        <option name="rowNumbers">true</option>
+      </event>
+      <html>
+        <a data-unset-token="warningErrorPunct">Close this panel</a>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+        <h2>
+          <span>Select views: </span>
+          <span id="link-switcher-view">
+            <a href="#" class="btn-pill active" data-item="all">All</a>
+            <a href="#" class="btn-pill" data-item="snapshot">Snapshot</a>
+            <a href="#" class="btn-pill" data-item="historical">Historical</a>
+          </span>
+        </h2>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Snapshots</title>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Count of Artifacts ($countArtifacts$)</title>
+      <search id="artifact_snapshot_base_search">
+        <query>
+          | rest splunk_server_group="$group$" splunk_server_group=dmc_group_search_head /services/shcluster/member/artifacts
+          | fields title, status, splunk_server, label, user, eai:acl.app
+          | rename splunk_server as member, label as search_name, eai:acl.app as app
+        </query>
+        <done>
+          <set token="countArtifacts">$job.resultCount$</set>
+        </done>
+        <error>
+          <set token="countArtifacts">N/A</set>
+        </error>
+      </search>
+      <input type="dropdown" searchWhenChanged="true" token="count_artifact_status_filter">
+        <label>Status</label>
+        <showClearButton>false</showClearButton>
+        <choice value="*">All</choice>
+        <selectFirstChoice>true</selectFirstChoice>
+        <fieldForLabel>status</fieldForLabel>
+        <fieldForValue>status</fieldForValue>
+        <search base="artifact_snapshot_base_search">
+          <query>stats count by status</query>
+        </search>
+        <prefix>search status="</prefix>
+        <suffix>"</suffix>
+      </input>
+      <input type="dropdown" searchWhenChanged="true" token="count_artifact_member_filter">
+        <label>Member</label>
+        <showClearButton>false</showClearButton>
+        <choice value="*">All</choice>
+        <selectFirstChoice>true</selectFirstChoice>
+        <fieldForLabel>member</fieldForLabel>
+        <fieldForValue>member</fieldForValue>
+        <search base="artifact_snapshot_base_search">
+          <query>stats count by member</query>
+        </search>
+        <prefix>search member="</prefix>
+        <suffix>"</suffix>
+      </input>
+      <input type="dropdown" searchWhenChanged="true" token="count_artifact_app_filter">
+        <label>App</label>
+        <showClearButton>false</showClearButton>
+        <choice value="*">All</choice>
+        <selectFirstChoice>true</selectFirstChoice>
+        <fieldForLabel>app</fieldForLabel>
+        <fieldForValue>app</fieldForValue>
+        <search base="artifact_snapshot_base_search">
+          <query>stats count by app</query>
+        </search>
+        <prefix>search app="</prefix>
+        <suffix>"</suffix>
+      </input>
+      <input type="dropdown" searchWhenChanged="true" token="count_artifact_search_name_filter">
+        <label>Search Name</label>
+        <showClearButton>false</showClearButton>
+        <choice value="*">All</choice>
+        <selectFirstChoice>true</selectFirstChoice>
+        <fieldForLabel>search_name</fieldForLabel>
+        <fieldForValue>search_name</fieldForValue>
+        <search base="artifact_snapshot_base_search">
+          <query>stats count by search_name</query>
+        </search>
+        <prefix>search search_name="</prefix>
+        <suffix>"</suffix>
+      </input>
+      <input type="dropdown" searchWhenChanged="true" token="count_artifact_user_filter">
+        <label>User</label>
+        <showClearButton>false</showClearButton>
+        <choice value="*">All</choice>
+        <selectFirstChoice>true</selectFirstChoice>
+        <fieldForLabel>user</fieldForLabel>
+        <fieldForValue>user</fieldForValue>
+        <search base="artifact_snapshot_base_search">
+          <query>stats count by user</query>
+        </search>
+        <prefix>search user="</prefix>
+        <suffix>"</suffix>
+      </input>
+      <input type="dropdown" searchWhenChanged="true" token="count_artifact_split_by">
+        <label>Split by</label>
+        <showClearButton>false</showClearButton>
+        <default>status</default>
+        <choice value="status">Status</choice>
+        <choice value="member">Member</choice>
+        <choice value="app">App</choice>
+        <choice value="search_name">Search Name</choice>
+        <choice value="user">User</choice>
+      </input>
+      <chart>
+        <search base="artifact_snapshot_base_search" id="count_artifact_main_panel_search">
+          <query>
+            $count_artifact_status_filter$
+            | $count_artifact_member_filter$
+            | $count_artifact_app_filter$
+            | $count_artifact_search_name_filter$
+            | $count_artifact_user_filter$
+            | stats count by $count_artifact_split_by$
+          </query>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="refresh.auto.interval">60</option>
+        <option name="refresh.time.visible">false</option>
+        <drilldown>
+          <set token="count_artifact_drilldown_name">$click.name$</set>
+          <set token="count_artifact_drilldown_value">$click.value$</set>
+          <set token="count_artifact_drilldown_value2">$click.value2$</set>
+        </drilldown>
+      </chart>
+      <html>
+        <p>Click on pie chart for more details.</p>
+      </html>
+    </panel>
+    <panel depends="$count_artifact_drilldown_name$, $count_artifact_drilldown_value$, $count_artifact_drilldown_value2$">
+      <title>Artifacts ($count_artifact_drilldown_value2$): $count_artifact_drilldown_name$ = $count_artifact_drilldown_value$</title>
+      <table>
+        <search base="artifact_snapshot_base_search">
+          <query>
+            $count_artifact_status_filter$
+            | $count_artifact_member_filter$
+            | search $count_artifact_drilldown_name$ = "$count_artifact_drilldown_value$"
+          </query>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+      <html>
+        <a data-token-json='{"count_artifact_drilldown_name": null, "count_artifact_drilldown_value": null, "count_artifact_drilldown_value2": null}'>Close this panel</a>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Historical Charts</title>
+      <input type="time" searchWhenChanged="true" token="time">
+        <label>Time Range:</label>
+        <default>
+          <earliestTime>-4h@m</earliestTime>
+          <latestTime>now</latestTime>
+        </default>
+      </input>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Median Count of Artifacts to Replicate</title>
+      <chart>
+        <search>
+          <query>
+`dmc_set_index_internal` sourcetype=splunkd group=subtask_counts name=shccaptain_artifact search_group="$group$"
+| `dmc_timechart_for_metrics_log` median(to_fix_rep_factor) as artifacts
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.axisTitleY.text">Count</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.chart.showLabels">auto</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Artifact Replication Job Activity</title>
+      <chart>
+        <search>
+          <query>
+`dmc_set_index_internal` sourcetype=splunkd group=executor name=poolmember_executor search_group="$group$"
+| eval backlog_change = jobs_added - jobs_finished
+| `dmc_timechart_for_metrics_log` sum(jobs_added) AS "jobs added" sum(jobs_finished) AS "jobs finished" sum(backlog_change) AS "backlog change"
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.axisTitleY.text">Count</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.overlayFields">"backlog change"</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.chart.showLabels">auto</option>
+      </chart>
+    </panel>
+  </row>
+</form>

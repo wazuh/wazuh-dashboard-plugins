@@ -1,0 +1,17 @@
+This add-on is packaged with Splunk; it provides platform instrumentation data.
+
+This data is consumed by splunk_monitoring_console.
+
+ONLY the following configuration parameters may be modified:
+
+*  server.conf / [introspection:generator:disk_objects] / disabled
+*  server.conf / [introspection:generator:disk_objects] / acquireExtra_i_data
+*  server.conf / [introspection:generator:disk_objects] / collectionPeriodInSecs
+*  server.conf / [introspection:generator:resource_usage] / disabled
+*  server.conf / [introspection:generator:resource_usage] / acquireExtra_i_data
+*  server.conf / [introspection:generator:resource_usage] / collectionPeriodInSecs
+*  server.conf / [introspection:generator:resource_usage__iostats] / disabled
+*  server.conf / [introspection:generator:resource_usage__iostats] / collectionPeriodInSecs
+*  server.conf / [introspection:generator:resource_usage__iowait] / disabled
+
+Do NOT modify any other parameters.

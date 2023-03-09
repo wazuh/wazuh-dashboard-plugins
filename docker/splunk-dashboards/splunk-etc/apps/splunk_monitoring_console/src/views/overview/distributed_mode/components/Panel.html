@@ -1,0 +1,18 @@
+<div class="dmc-panel-header">
+  <div class="dmc-panel-title-section">
+    <div class="dmc-panel-title">
+      <a href="monitoringconsole_instances?group=<%= SEARCH_GROUP %>" class="dmc-instance-drilldown"><%= instanceCount %></a>
+      <span class="dmc-instance-role"><%= instanceCount == 1 ? ROLE : ROLE_PLURAL %></span>
+    </div>
+    <div class="dmc-panel-title-description">
+      <span class="dmc-panel-title-description-prefix"><%= _('on').t() %></span>
+      <a href="monitoringconsole_instances?group=<%= SEARCH_GROUP %>" class="dmc-machine-drilldown"><%= machineCount %></a>
+      <span class="dmc-panel-title-description-suffix"><%= machineCount == 1 ? _('Machine').t() : _('Machines').t() %></span>
+    </div>
+  </div>
+  <div class="dmc-panel-icon dmc-svg-icons"><%= ICON %></div>
+</div>
+<a href="monitoringconsole_instances?group=<%= SEARCH_GROUP %>" class="dmc-warning-message">
+  <span class="dmc-down-count"><%= downCount %></span>
+  <span class="dmc-warning-message-suffix"><%= downCount == 1 ? _('instance unreachable').t() : _('instances unreachable').t() %></span>
+</a>

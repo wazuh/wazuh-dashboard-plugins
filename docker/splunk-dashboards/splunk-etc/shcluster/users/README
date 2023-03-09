@@ -1,0 +1,1 @@
+Populate this directory with the configurations to install into each search head cluster member's $SPLUNK_HOME/etc/users directory.

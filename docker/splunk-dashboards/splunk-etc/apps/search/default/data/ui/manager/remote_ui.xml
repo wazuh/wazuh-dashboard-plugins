@@ -1,0 +1,11 @@
+<endpoint name="remote_ui" showOnSearchHeadCluster="1">
+  <capabilities>
+    <read>edit_auto_ui_updates AND rest_properties_get AND rest_properties_set</read>
+  </capabilities>
+  <menu name="system_configurations">
+    <label>Automatic UI updates</label>
+    <order>500</order>
+    <url>#</url>
+    <id>remote_ui</id>
+  </menu>
+</endpoint>

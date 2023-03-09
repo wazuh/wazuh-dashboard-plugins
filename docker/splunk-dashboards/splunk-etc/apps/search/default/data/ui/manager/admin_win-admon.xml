@@ -1,0 +1,93 @@
+<endpoint name="data/inputs/ad">
+  <capabilities>
+    <read>edit_modinput_admon</read>
+  </capabilities>
+  <header>Active Directory monitoring</header>
+  <breadcrumb>
+      <parent hidecurrent="False">datainputstats</parent>
+      <name i18ntag="">Active Directory monitoring</name>
+  </breadcrumb>  
+
+  <elements>
+    <!-- MONITOR NAME -->
+    <element name="name" type="textfield" label="AD monitor name">
+      <view name="list"/>
+      <view name="create"/>
+    </element>
+    
+    <!-- DOMAIN CONTROLLER -->
+    <element name="targetDc" type="textfield" label="Target domain controller">
+      <view name="list"/>
+      <view name="edit"/>
+      <view name="create"/>
+      <key name="exampleText">Provide the host name of the domain controller to monitor, or leave empty and Splunk will discover the nearest domain controller automatically.</key>
+      <key name="processValueList">'Automatic' if value is None else value</key>
+    </element>
+    
+    <!-- STARTING NODE -->
+    <element name="startingNode" type="textfield" label="Starting node">
+      <view name="list"/>
+      <view name="edit"/>
+      <view name="create"/>
+      <key name="exampleText">Select the node that Splunk should begin monitoring from. Leave empty and Splunk will start monitoring from the highest part of the tree it can.</key>
+      <key name="processValueList">'Automatic' if value is None else value</key>
+      <key name="displayButton">True</key>
+      <key name="buttonLabel">Browse</key>
+      <onChange>
+        <key name="_action">showTreeView</key>
+        <key name="_triggerOnLoad" type="bool">0</key>
+        <key name="eaiPath">admin/win-ad-explorer</key>
+        <key name="title">Active Directory</key>
+        <key name="selectedText">Qualified name</key>
+        <key name="style">wideTreeviewPopup</key>
+        <key name="extraDataFields">targetDc</key>
+      </onChange>
+    </element>
+    
+    <!-- MONITOR SUBTREE -->
+    <element name="monitorSubtree" type="checkbox" label="Monitor subtree">
+      <view name="list"/>
+      <view name="edit"/>
+      <view name="create"/>
+      <key name="processValueAdd">1</key>
+      <key name="submitValueEdit">1 if value == '1' else 0</key>
+      <key name="processValueList">'Yes' if value=='1' else 'No'</key>
+      <key name="exampleText">Check this box if Splunk should monitor all child nodes. If the box is unchecked, only the node you specify is monitored.</key>
+    </element>
+    
+    <!-- INDEX -->
+    <element name="indexField" type="fieldset">
+      <view name="list"/>
+      <view name="edit"/>
+      <view name="create"/>
+      <key name="legend">Index</key>
+      <key name="helpText">Set the destination index for this source.</key>
+      <elements>
+        <element name="index" type="select" label="Index">
+          <view name="list"/>
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="dynamicOptions" type="dict">
+            <key name="keyName">title</key>
+            <key name="keyValue">title</key>
+            <key name="splunkSource">/data/indexes</key>
+            <key name="splunkSourceParams" type="dict">
+              <key name="count">"-1"</key>
+              <key name="datatype">"all"</key>
+              <key name="search">"isInternal=0 disabled=0 isVirtual=0"</key>
+            </key>
+            <key name="prefixOptions" type="list">
+              <item type="list">
+                <item>default</item> <!--value-->
+                <item>default</item> <!--label-->
+              </item>
+            </key>
+          </key>
+          <key name="processValueList">'default' if value is None else value</key>
+        </element>
+      </elements>
+    </element>
+    
+  </elements>
+</endpoint>
+

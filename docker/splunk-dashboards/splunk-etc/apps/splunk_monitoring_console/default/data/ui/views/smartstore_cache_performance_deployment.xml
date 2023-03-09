@@ -1,0 +1,191 @@
+<form version="1.1" hideEdit="True" script="cell_fill_gauge.js, common_control.js" stylesheet="index_type.css">
+  <label>SmartStore Cache Performance: Deployment</label>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="dropdown" searchWhenChanged="true" token="search_group">
+      <label>Group</label>
+      <showClearButton>false</showClearButton>
+      <search>
+        <query>
+          | `dmc_get_groups_containing_role(dmc_group_indexer)`
+          | where search_group!="dmc_group_indexer"
+        </query>
+      </search>
+      <fieldForLabel>label</fieldForLabel>
+      <fieldForValue>search_group</fieldForValue>
+      <choice value="*">All Indexers</choice>
+      <default>*</default>
+    </input>
+    <input type="time" token="range">
+      <label>Time Range</label>
+      <default>
+        <earliest>-4h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <single>
+        <title>Minimum Disk Space Conf Setting</title>
+        <search>
+          <query>| REST splunk_server_group=$search_group$ /services/properties/server/diskUsage/minFreeSpace | eval label = IF(match(value,"\%"), value, tostring(value, "commas")."MB") | fields label</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </single>
+      <html>diskUsage.minFreeSpace in server.conf</html>
+    </panel>
+    <panel>
+      <single>
+        <title>Eviction Padding</title>
+        <search>
+          <query>| REST splunk_server_group=$search_group$ /services/properties/server/cachemanager/eviction_padding | fields value</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="unit">MB</option>
+      </single>
+      <html>cachemanager.eviction_padding in server.conf</html>
+    </panel>
+    <panel>
+      <single>
+        <title>Max Cache Size</title>
+        <search>
+          <query>| REST splunk_server_group=$search_group$ /services/properties/server/cachemanager/max_cache_size | eval size=if(value=0, "No Max", tostring(value, "commas")."MB") | fields size</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </single>
+      <html>cachemanager.max_cache_size in server.conf</html>
+    </panel>
+    <panel>
+      <single>
+        <title>Hotlist Recency Seconds</title>
+        <search>
+          <query>| REST splunk_server_group=$search_group$ /services/properties/server/cachemanager/hotlist_recency_secs | appendpipe [stats count | eval value=86500 | where count=0] | fields value</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </single>
+      <html>cachemanager.hotlist_recency_secs in server.conf</html>
+    </panel>
+    <panel>
+      <single>
+        <title>Hotlist Bloom Filter Recency Hours</title>
+        <search>
+          <query>| REST splunk_server_group=$search_group$ /services/properties/server/cachemanager/hotlist_bloom_filter_recency_hours | appendpipe [stats count | eval value=360 | where count=0] | fields value</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </single>
+      <html>cachemanager.hotlist_bloom_filter_recency_hours in server.conf</html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>These are <a href="/help?location=learnmore.server.settings" class="external" target="_blank">server.conf</a> settings that affect SmartStore operations</html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Buckets Evicted</title>
+        <search>
+          <query>`dmc_set_index_internal` search_group=$search_group$ source=*metrics.log | timechart sum(evicted) as Evicted</query>
+          <earliest>$range.earliest$</earliest>
+          <latest>$range.latest$</latest>
+        </search>
+        <option name="charting.axisTitleY.text">Buckets</option>
+        <option name="charting.axisY.abbreviation">none</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+      <html>A steady stream of evictions is expected once the local cache fills up and the oldest data is removed according to the eviction policy. </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Remote Storage Search Overhead</title>
+        <search>
+          <query>
+            <![CDATA[
+             `dmc_set_index_internal` search_group=$search_group$  source=*/splunkd_access.log
+              | rex field=uri "/services/admin/cacheman/bid|(?<bid>[^|]*)|/close"
+              | search uri=*/close*
+              | eval mytime=strftime(_time, "%Y-%m-%d %H:%M:%S")
+              | stats last(_time) as _time count as buckets, sum(miss_ms) as miss_ms sum(search_ms) as search_ms, min(mytime) as issuetime by sid
+              | fillnull value=0 search_ms
+              | eval overheadRatio=(miss_ms/search_ms)
+              | fillnull value=0 overheadRatio
+              | eval searchSpeed=case(overheadRatio > 2,"More than 50%", overheadRatio < .2, "Less than 10%", true(), "10%-50%")
+              | timechart count by searchSpeed
+            ]]>
+          </query>
+          <earliest>$range.earliest$</earliest>
+          <latest>$range.latest$</latest>
+        </search>
+        <option name="charting.axisTitleY.text">Searches</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+      <html>Portion of search time spent downloading buckets from remote storage.</html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Cache Hits/Misses</title>
+        <search>
+          <query>`dmc_set_index_internal` search_group=$search_group$ group=cachemgr_bucket source=*metrics.log | timechart count(cache_hit) as Hits count(cache_miss) as Misses</query>
+          <earliest>$range.earliest$</earliest>
+          <latest>$range.latest$</latest>
+        </search>
+        <option name="charting.axisTitleY.text">Hit/Miss Ratio</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked100</option>
+        <option name="charting.drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+      <html>When a search needs a bucket and it's already in cache, that's a hit. If the bucket needs to be downloaded, that's a miss.</html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Cache Thrash by Index</title>
+        <search>
+          <query>
+            <![CDATA[
+              `dmc_set_index_internal` search_group=$search_group$ source=*splunkd.log CacheManager AND TERM(action=download) AND TERM(status=succeeded) AND download_set="*journal*"
+              | rex field=cache_id ".*\|(?<customer_index>.*)~.*~.*\|"
+              | eval identifier=(cache_id + host)
+              | stats count by identifier, customer_index
+              | stats count(eval(count>1)) as duplicate_downloads, sum(count) as all_downloads count(eval(count>=10)) as excessive_duplicate_downloads by customer_index
+              | eval duplicate_percent=if(all_downloads=0, 0, round((duplicate_downloads/all_downloads)*100, 2))
+              | sort  - duplicate_percent
+              | fields customer_index, duplicate_percent  all_downloads duplicate_downloads excessive_duplicate_downloads 
+              | rename customer_index as Index, duplicate_percent as "Repeat Download Percent",  all_downloads as "All Downloads", duplicate_downloads as "Repeated Downloads", excessive_duplicate_downloads as "Excessively Repeated Downloads"
+            ]]>
+          </query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+        <format type="number" field="Repeat Download Percent">
+          <option name="unit">%</option>
+        </format>
+      </table>
+      <html>This is the percentage of bucket downloads that are repeats. This happens when a bucket is downloaded for a search, evicted based on policy, and then needed by a search again. "Excessively Repeated Downloads" are buckets that have been downloaded more than 10 times.</html>
+    </panel>
+  </row>
+</form>

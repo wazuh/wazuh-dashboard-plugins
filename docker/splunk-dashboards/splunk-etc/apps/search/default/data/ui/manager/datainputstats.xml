@@ -1,0 +1,13 @@
+<endpoint name="datainputstats" showOnSearchHeadCluster="0">
+  <header></header>
+  <capabilities>
+    <read>edit_monitor OR edit_tcp OR edit_udp OR edit_scripted OR edit_token_http OR edit_deployment_server OR edit_win_wmiconf OR edit_win_regmon OR edit_win_eventlogs OR edit_modinput_admon OR edit_modinput_perfmon OR edit_modinput_winhostmon OR edit_modinput_winnetmon OR edit_modinput_winprintmon OR admin_all_objects</read>
+  </capabilities>
+  <menu name="data_configurations">
+    <label>Data inputs</label>
+    <url>/manager/%(namespace)s/datainputstats</url>
+    <description>Add data to Splunk from scripts, files, directories and network ports.</description>
+    <order>40</order>
+    <id>inputs</id>
+  </menu>
+</endpoint>

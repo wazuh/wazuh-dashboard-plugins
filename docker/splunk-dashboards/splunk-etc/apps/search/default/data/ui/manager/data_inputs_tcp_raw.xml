@@ -1,0 +1,213 @@
+<endpoint name="data/inputs/tcp/raw" showOnSearchHeadCluster="0">
+  <header>Data inputs (TCP)</header>
+  <capabilities>
+    <read>edit_tcp</read>
+  </capabilities>
+  <breadcrumb>
+    <parent hidecurrent="False">datainputstats</parent>
+    <name>TCP</name>
+  </breadcrumb>
+  <elements>
+    <element name="sourceFields" type="fieldset">
+      <view name="list"/>
+      <view name="edit"/>
+      <view name="create"/>
+      <elements>
+        <element name="name" label="TCP port">
+          <view name="list"/>
+          <view name="create"/>
+        </element>
+        <element name="spl-ctrl_restrictToHost" type="radio" label="Accept connections from all hosts?">
+          <onChange>
+            <key name="restrictToHost">restrictToHost</key>
+            <key name="_action">showonly</key>
+            <key name="none">NONE</key>
+            <group_set>
+              <group name="restrictToHost"/>
+            </group_set>
+          </onChange>
+          <options>
+            <opt value="none" label="Yes"/>
+            <opt value="restrictToHost" label="No, restrict to one host"/>
+          </options>
+          <view name="create"/>
+          <key name="processValueAdd">'none'</key>
+          <key name="processValueEdit">'restrictToHost' if form_defaults.get('restrictToHost') else 'none'</key>
+        </element>
+        <element name="restrictToHost" type="textfield" label="Host Restriction">
+          <view name="list"/>
+          <view name="create"/>
+          <key name="requiredIfVisible" />
+          <key name="exampleText">Only accept connections from this host.</key>
+          <key name="submitValueAdd">value if form_data.get('spl-ctrl_restrictToHost')=='restrictToHost' else None</key>
+        </element>
+        <element name="source" type="textfield" label="Source name override">
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="exampleText">If set, overrides the default source value for your TCP entry (host:port).</key>
+        </element>
+      </elements>
+      <key name="legend">Source</key>
+    </element>
+    <element name="sourcetypeFields" type="fieldset">
+      <view name="list"/>
+      <view name="edit"/>
+      <view name="create"/>
+      <elements>
+        <element name="spl-ctrl_sourcetypeSelect" type="select" label="Set sourcetype">
+          <onChange>
+            <key name="_action">showonly</key>
+            <group_set>
+              <group name="sourcetype"/>
+              <group name="spl-ctrl_from_list"/>
+            </group_set>
+            <!-- <key name="auto">NONE</key> -->
+            <key name="sourcetype">sourcetype</key>
+            <key name="spl-ctrl_from_list">spl-ctrl_from_list</key>
+          </onChange>
+          <options>
+            <!-- <opt value="auto" label="Automatic"/> -->
+            <opt value="spl-ctrl_from_list" label="From list"/>
+            <opt value="sourcetype" label="Manual"/>
+          </options>
+          <view name="edit"/>
+          <view name="create"/>
+          <!-- <key name="exampleText">When this is set to automatic, Splunk classifies and assigns the sourcetype automatically, and gives unknown sourcetypes placeholder names.</key> -->
+          <key name="processValueEdit">[ e for e in ['sourcetype'] if form_defaults.get(e) ]</key>
+          <key name="processValueAdd">[ e for e in ['sourcetype'] if form_defaults.get(e) ]</key>
+        </element>
+        <element name="sourcetype" type="textfield" label="Source type">
+          <view name="list"/>
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="exampleText">If this field is left blank, the default value of tcp-raw will be used for the source type.</key>
+          <key name="processValueList">_('tcp-raw') if (value==None or value=='') else value</key>
+          <key name="submitValueAdd">form_data.get('spl-ctrl_from_list') if form_data.get('spl-ctrl_sourcetypeSelect')=='spl-ctrl_from_list' else value if form_data.get('spl-ctrl_sourcetypeSelect')=='sourcetype' else None</key>
+          <key name="submitValueEdit">form_data.get('spl-ctrl_from_list') if form_data.get('spl-ctrl_sourcetypeSelect')=='spl-ctrl_from_list' else value if form_data.get('spl-ctrl_sourcetypeSelect')=='sourcetype' else None</key>
+          <key name="labelList">Source type</key>
+        </element>
+        <element name="spl-ctrl_from_list" type="select" label="Select source type from list">
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="exampleText">Select your source type from the list. If you don't see what you're looking for, you can find more source types in the <![CDATA[<a href="../../../../apps/remote">SplunkApps apps browser</a>]]> or online at <![CDATA[<a href="http://apps.splunk.com/" target="_blank">apps.splunk.com</a>]]>.</key>
+          <key name="requiredIfVisible" />
+          <key name="dynamicOptions" type="dict">
+            <key name="keyName">title</key>
+            <key name="keyValue">title</key>
+            <key name="splunkSource">/saved/sourcetypes</key>
+            <key name="splunkSourceParams" type="dict">
+              <key name="count">-1</key>
+              <key name="search">'pulldown_type=true'</key>
+            </key>
+            <key name="prefixOptions" type="list">
+                <item type="list">
+                    <item></item>
+                    <item>Choose...</item>
+                </item>
+            </key>
+          </key>
+        </element>
+      </elements>
+      <key name="legend">Source type</key>
+      <key name="helpText">Set sourcetype field for all events from this source.</key>
+    </element>
+	<element name="spl-ctrl_EnableAdvanced" type="checkbox" label="More settings" class="spl-mgr-advanced-switch">
+        <view name="edit"/>
+        <view name="create"/>
+          <onChange>
+              <key name="_action">showonly</key>
+              <key name="0">NONE</key>
+              <key name="1">ALL</key>
+              <group_set>
+                <group name="advanced"/>
+              </group_set>
+          </onChange>
+    </element>
+	<element name="advanced" type="fieldset" class="spl-mgr-advanced-options">
+        <view name="edit"/>
+        <view name="create"/>
+        <elements>
+		    <element name="hostFields" type="fieldset">
+		      <key name="legend">Host</key>
+		      <view name="edit"/>
+		      <view name="create"/>
+		      <elements>
+		        <element name="connection_host" type="radio" label="Set host">
+		          <view name="edit"/>
+		          <view name="create"/>
+		          <options>
+		            <opt value="ip" label="IP"/>
+		            <opt value="dns" label="DNS"/>
+		            <opt value="none" label="Custom"/>
+		          </options>
+		          <onChange>
+		            <key name="_action">showonly</key>
+		            <group_set>
+		              <group name="dnsHelp"/>
+		              <group name="ipHelp"/>
+		              <group name="host"/>
+		            </group_set>
+		            <key name="ip">ipHelp</key>
+		            <key name="dns">dnsHelp</key>
+		            <key name="none">host</key>
+		          </onChange>
+		          <key name="processValueEdit">value</key>
+		          <key name="submitValueAdd">value</key>
+		          <key name="submitValueEdit">value</key>
+		        </element>
+		        <element name="dnsHelp" type="helpstring">
+		          <key name="helpText">"DNS" sets the host to the DNS entry of the remote server.</key>
+		          <view name="edit"/>
+		          <view name="create"/>
+		        </element>
+		        <element name="ipHelp" type="helpstring">
+		          <key name="helpText">"IP" sets the TCP input processor to rewrite the host with the IP address of the remote server.</key>
+		          <view name="edit"/>
+		          <view name="create"/>
+		        </element>
+		        <element name="host" type="textfield">
+		          <key name="helpText">Set the host with this value.</key>
+		          <view name="edit"/>
+		          <view name="create"/>
+		        </element>
+		      </elements>
+		    </element>
+
+
+            <!-- INDEX -->
+            <element name="indexField" type="fieldset">
+                <view name="list"/>
+                <view name="edit"/>
+                <view name="create"/>
+                <key name="legend">Index</key>
+                <key name="helpText">Set the destination index for this source.</key>
+                <elements>
+                    <element name="index" type="select" label="Index">
+                        <view name="list"/>
+                        <view name="edit"/>
+                        <view name="create"/>
+                        <key name="dynamicOptions" type="dict">
+                            <key name="keyName">title</key>
+                            <key name="keyValue">title</key>
+                            <key name="splunkSource">/data/indexes</key>
+                            <key name="splunkSourceParams" type="dict">
+                                <key name="count">"-1"</key>
+                                <key name="datatype">"all"</key>
+                                <key name="search">"isInternal=0 disabled=0 isVirtual=0"</key>
+                            </key>
+                            <key name="prefixOptions" type="list">
+                                <item type="list">
+                                    <item>default</item> <!--value-->
+                                    <item>default</item> <!--label-->
+                                </item>
+                            </key>
+                        </key>
+                        <key name="processValueList">'default' if value is None else value</key>
+                    </element>
+                </elements>
+            </element>
+            
+ 		</elements>
+	</element>
+  </elements>
+</endpoint>

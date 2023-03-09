@@ -1,0 +1,171 @@
+<form hideEdit="True" version="1.1" theme="dark">
+  <tags>mobile,tv</tags>
+  <label>Subscription Tracing</label>
+  <description>Use this dashboard to troubleshoot a panel that isn’t loading. Select a time range and a panel ID to get troubleshooting logs and a stack trace.</description>
+  <search id="base">
+    <query>index=_internal sourcetype=secure_gateway_app_internal_log ("[create_subscription]" "Subscription created.") OR "Finished process_unsubscribe_request" | fields subscription_id, search_key, request_id, device_id, current_user, type, log_level, count, time_taken, update_id</query>
+    <earliest>$field1.earliest$</earliest>
+    <latest>$field1.latest$</latest>
+  </search>
+  <search base="base" id="base_create">
+    <query>| search "[create_subscription]" "Subscription created."</query>
+  </search>
+  <search id="base_subscription">
+    <query>index=_internal sourcetype=secure_gateway_app_internal_log subscription_id=$subscriptionId$</query>
+  </search>
+  <search id="base_updates">
+    <query>index=_internal sourcetype=secure_gateway_app_internal_log send_subscription_updates subscription_id=$subscriptionId$ | transaction update_id startswith="Sending subscription update" endswith="Subscription Update Sent" | eval latency = duration | fields _time, update_id, type, latency</query>
+  </search>
+  <search base="base_subscription" id="base_unsubscribe">
+    <query>| search "Finished process_unsubscribe_request" | fields count</query>
+  </search>
+  <fieldset submitButton="false">
+    <input type="time" token="field1" searchWhenChanged="true">
+      <label></label>
+      <default>
+        <earliest>-15m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="text" token="subscriptionId" searchWhenChanged="true">
+      <label>Subscription ID</label>
+      <default>$subscriptionId$</default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <title>All Subscriptions</title>
+        <search base="base_create">
+          <query>| table _time, subscription_id, search_key, request_id, device_id, current_user</query>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">row</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <drilldown>
+          <eval token="subscriptionId">$row.subscription_id$</eval>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <single>
+        <title>Subscription Errors for $subscriptionId$</title>
+        <search base="base_subscription">
+          <query>|search log_level=ERROR | stats count as error_count | eval errors = if(error_count &gt; 0, "YES", "NONE") | eval range=if(error_count &gt; 0, "severe", "low") | table errors, range</query>
+        </search>
+        <option name="colorMode">block</option>
+        <option name="drilldown">all</option>
+        <option name="rangeColors">["0x53a051","0xdc4e41"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="useColors">0</option>
+        <drilldown>
+          <link target="_blank">/app/search/search?q=search index=_internal sourcetype=secure_gateway_app_internal_log subscription_id=$subscriptionId$ log_level=ERROR</link>
+        </drilldown>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <single>
+        <title>Type</title>
+        <search base="base_updates">
+          <query>| table type</query>
+        </search>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Current User</title>
+        <search base="base_create">
+          <query>| table current_user</query>
+        </search>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Device ID</title>
+        <search base="base_create">
+          <query>| eval device = substr(device_id, 0, 6) | table device</query>
+        </search>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <single>
+        <title>Total Updates</title>
+        <search base="base_updates">
+          <query>| stats count | table count</query>
+        </search>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Average Update Latency</title>
+        <search base="base_updates">
+          <query>| stats avg(latency) as avg_latency by update_id | table avg_latency</query>
+        </search>
+        <option name="numberPrecision">0.000</option>
+        <option name="rangeColors">["0x53a051","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="rangeValues">[1,5,10]</option>
+        <option name="unit">s</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Currently Subscribed</title>
+        <search base="base_unsubscribe">
+          <query>| stats count as count
+                 | eval ok = if(count &gt; 0, "NO", "YES")
+                 | eval range=if(count &gt; 0, "severe", "low")
+                 | table ok, range
+          </query>
+        </search>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Updates: $subscriptionId$</title>
+        <search base="base_updates">
+          <query>| table _time, update_id, type, latency</query>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <event>
+        <title>Raw Events: $subscriptionId$</title>
+        <search base="base_subscription"></search>
+        <option name="count">10</option>
+        <option name="list.drilldown">none</option>
+        <option name="list.wrap">1</option>
+        <option name="maxLines">5</option>
+        <option name="raw.drilldown">full</option>
+        <option name="rowNumbers">0</option>
+        <option name="table.drilldown">all</option>
+        <option name="table.sortDirection">asc</option>
+        <option name="table.wrap">1</option>
+        <option name="type">list</option>
+      </event>
+    </panel>
+  </row>
+</form>

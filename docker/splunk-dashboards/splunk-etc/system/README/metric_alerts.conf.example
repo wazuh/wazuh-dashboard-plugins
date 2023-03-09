@@ -1,0 +1,30 @@
+#   Version 9.0.3
+#
+# This file contains example metric alerts.
+#
+# To use one or more of these configurations, copy the configuration block into
+# metric_alerts.conf in $SPLUNK_HOME/etc/system/local/. You must restart Splunk
+# to enable configurations.
+#
+# To learn more about configuration files (including precedence) please see the
+# documentation located at
+# http://docs.splunk.com/Documentation/Splunk/latest/Admin/Aboutconfigurationfiles
+
+
+# The following searches are example searches.  To create your own search,
+# modify the values by following the spec outlined in metric_alerts.conf.spec.
+
+
+[alert1]
+groupby = host, app
+filter = region=east
+condition = 'avg(mem.used)' > 50
+action.email = 1
+action.email.to = nonexist@abc.xyz
+ 
+[alert2]
+groupby = host, app
+filter = region=east
+condition = 'max(cpu.util)' > 80
+action.email = 1
+action.email.to = nonexist@abc.xyz

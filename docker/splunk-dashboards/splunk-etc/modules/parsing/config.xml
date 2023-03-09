@@ -1,0 +1,175 @@
+<!--   Version 4.0 -->
+
+<module>
+	<pipeline name="parsing" type="startup">
+		<processor name="readerIn" plugin="queueinputprocessor">
+			   <config>
+		 		<queueName>parsingQueue</queueName>
+		 	   </config>
+		</processor>
+
+		<processor name="utf8" plugin="utf8processor">
+			<config>
+			</config>
+		</processor>
+
+		<processor name="linebreaker" plugin="linebreakingprocessor">
+			<config>
+			</config>
+		</processor>
+
+		<processor name="chunkedlinebreaker" plugin="chunkedlbprocessor">
+			<config>
+			</config>
+		</processor>
+
+		<processor name="header" plugin="headerprocessor">
+			<config>
+			</config>
+		</processor>
+		<processor name="metrics" plugin="metricsprocessor">
+			<config></config>
+		</processor>
+
+		<processor name="sendOut" plugin="queueoutputprocessor">
+			<config>
+				<queueName>aggQueue</queueName>
+			</config>
+		</processor>
+
+        <!-- The following processors are turned off by default but are enabled when the LWF app is on -->
+        <!-- The LWF app will in turn turn off most of the above pipleine -->
+        <processor name="thruput" plugin="thruputprocessor">
+            <config>
+            <key>_raw</key>
+            <timeIntervalSecs>30</timeIntervalSecs>
+            </config>
+        </processor>
+
+		<processor name="httpoutchunkbreaker" plugin="linebreakingprocessor"> <config><httpchunkbreakermode>true</httpchunkbreakermode></config> </processor>
+
+		<processor name="s2soverhttpoutput-light-forwarder" plugin="s2soverhttpoutputprocessor"> <config><fwdtype>lwf</fwdtype></config> </processor>
+
+        <processor name="tcp-output-light-forwarder" plugin="tcpoutputprocessor"> <config><fwdtype>lwf</fwdtype></config> </processor>
+
+        <!-- used to forward control data to indexer needed for clean shutdown -->
+        <processor name="send-out-light-forwarder" plugin="controlqueueoutputprocessor"> 
+                <config> 
+                        <queueName>indexQueue</queueName>
+                </config>
+        </processor>
+
+	</pipeline>
+	<pipeline name="merging" type="startup">
+		<processor name="readerIn" plugin="queueinputprocessor">
+			   <config>
+				<queueName>aggQueue</queueName>
+		 	   </config>
+		</processor>
+
+		<processor name="aggregator" plugin="aggregatorprocessor">
+		           <config>
+		           </config>
+		</processor>
+
+		<processor name="sendOut" plugin="queueoutputprocessor">
+			<config>
+				<queueName>typingQueue</queueName>
+			</config>
+		</processor>
+
+	</pipeline>
+
+	<pipeline name="typing" type="startup">
+		<processor name="readerIn" plugin="queueinputprocessor">
+			   <config>
+		 		<queueName>typingQueue</queueName>
+		 	   </config>
+		</processor>
+
+		<processor name="tee" plugin="teeprocessor">
+			<config></config>
+		</processor>
+
+		<processor name="regexreplacement" plugin="regexextractionprocessor">
+			<config></config>
+		</processor>
+		<processor name="metricschema" plugin="metricschemaprocessor">
+			<config></config>
+		</processor>
+                <processor name="annotator" plugin="annotatorprocessor">
+		           <config>
+		           </config>
+		</processor>
+
+		<processor name="previewOut" plugin="previewoutputprocessor">
+			<config>
+			</config>
+		</processor>
+
+		<processor name="sendOut" plugin="queueoutputprocessor">
+			<config>
+				<queueName>indexQueue</queueName>
+			</config>
+		</processor>
+	</pipeline>
+	
+    <pipeline name="ruleset" type="startup">
+        <processor name="readerIn" plugin="queueinputprocessor">
+            <config>
+                <queueName>rulesetQueue</queueName>
+            </config>
+        </processor>
+
+        <processor name="regexreplacement" plugin="regexextractionprocessor">
+            <config>
+                <rulesetOnly>true</rulesetOnly>
+            </config>
+        </processor>
+
+        <processor name="sendOut" plugin="queueoutputprocessor">
+            <config>
+                <queueName>indexQueue</queueName>
+            </config>
+        </processor>
+    </pipeline>
+
+        <pipeline name="vix"  type="startup">
+                <processor name="readerIn" plugin="queueinputprocessor">
+                           <config>
+                                <queueName>vixQueue</queueName>
+                           </config>
+                </processor>
+
+                <processor name="utf8" plugin="utf8processor">
+                        <config/>
+                </processor>
+
+                <processor name="linebreaker" plugin="linebreakingprocessor">
+                        <config/>
+                </processor>
+
+                <processor name="header" plugin="headerprocessor">
+                        <config/>
+                </processor>
+
+                <processor name="aggregator" plugin="aggregatorprocessor">
+                        <config/>
+                </processor>
+
+                <processor name="regexreplacement" plugin="regexextractionprocessor">
+                        <config/>
+                </processor>
+<!--
+
+                <processor name="annotator" plugin="annotatorprocessor">
+                        <config/>
+                </processor>
+-->
+                <processor name="previewOut" plugin="previewoutputprocessor">
+                        <config/>
+                </processor>
+        </pipeline>
+	
+	
+</module>

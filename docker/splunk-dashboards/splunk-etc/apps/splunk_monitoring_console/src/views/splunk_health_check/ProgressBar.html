@@ -1,0 +1,7 @@
+<div class="progress">
+ 	<div class="bar" style="width: <%= percent %>%;"></div>
+</div>
+<span class="visuallyhidden">
+	<% if(percent > 0 && percent < 100) { %>Running<% } %>
+</span>
+<div aria-hidden="<%= (percent === 100)?false:true %>" class="progress-percent"><%- percent < 100 ? Math.round(percent) + _('% complete').t() : _('Completed ').t() + new Date().toLocaleString() %></div>

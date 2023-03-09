@@ -1,0 +1,98 @@
+<endpoint name="apps/local">
+  <header>Apps</header>
+  <menu name="app_configurations">
+    <label>Apps</label>
+    <url>/manager/%(namespace)s/apps/local</url>
+    <description>Edit permissions for installed apps. Create a new app, or browse SplunkApps for apps created by the community.</description>
+    <id>apps</id>
+    <order>10</order>
+  </menu>
+  <elements>
+    <!-- NAME -->
+    <element name="label" type="textfield" label="Name">
+      <view name="list"/>
+      <view name="edit"/>
+      <view name="create"/>
+      <key name="exampleText">Give your app a friendly name for display in Splunk Web.</key>
+    </element>
+    
+    <!-- FOLDER NAME -->
+    <element name="name" type="textfield" label="Folder name">
+      <view name="list"/>
+      <view name="create"/>
+      <key name="exampleText">This name maps to the app's directory in $SPLUNK_HOME/etc/apps/.</key>
+    </element>
+
+    <!-- VERSION -->
+    <element name="version" type="textfield" label="Version">
+      <view name="list"/>
+      <view name="create"/>
+      <key name="exampleText">App version.</key>
+    </element>
+
+    <!-- UPDATE CHECKING -->
+    <element name="check_for_updates" type="radio" label="Update checking">
+      <view name="list"/>
+      <view name="edit"/>
+      <options>
+        <opt value="0" label="No"/>
+        <opt value="1" label="Yes"/>
+      </options>
+      <key name="processValueAdd">1</key>
+      <key name="processValueList">value=="0" and "No" or "Yes"</key>
+      <key name="exampleText">Check SplunkApps for updates to this app.</key>
+    </element>
+    
+    <!-- VISIBLE -->
+    <element name="visible" type="radio" label="Visible">
+      <view name="list"/>
+      <view name="edit"/>
+      <view name="create"/>
+      <options>
+        <opt value="0" label="No"/>
+        <opt value="1" label="Yes"/>
+      </options>
+      <key name="processValueAdd">1</key>
+      <key name="processValueList">value=="0" and "No" or "Yes"</key>
+      <key name="exampleText">Only apps with views should be made visible.</key>
+    </element>
+
+    <!-- AUTHOR -->
+    <element name="author" type="textfield" label="Author">
+      <view name="create"/>
+      <key name="exampleText">Name of the app's owner.</key>
+    </element>
+    
+    <!-- DESCRIPTION -->
+    <element name="description" type="textarea" label="Description">
+      <view name="create"/>
+      <key name="exampleText">Enter a description for your app.</key>
+    </element>
+    
+    <!-- UPLOAD -->
+    <element name="appupload page" type="fieldset">
+      <view name="edit"/>
+      <view name="create"/>
+      <elements>
+        <element name="template" type="select" label="Template">
+          <view name="create"/>
+          <key name="exampleText">These templates contain example views and searches.</key>
+          <key name="dynamicOptions" type="dict">
+            <key name="keyName">title</key>
+            <key name="keyValue">title</key>
+            <key name="splunkSource">/admin/apptemplates</key>
+            <key name="splunkSourceParams" type="dict">
+              <key name="count">-1</key>
+            </key>
+          </key>
+        </element>
+        
+        <element name="spl-ctrl_upload1" type="fileupload" label="Upload asset">
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="exampleText">Can be any html, js, or other file to add to your app.</key>
+        </element>
+    </elements>
+    </element>
+  </elements>
+</endpoint>

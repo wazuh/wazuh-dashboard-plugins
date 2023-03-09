@@ -1,0 +1,24 @@
+# This file contains possible attributes and values for configuring global
+# telemetry settings. Please note that enabling these settings would enable
+# apps to collect telemetry data about app usage and other properties.
+#
+# There is no global, default telemetry.conf. Instead, a telemetry.conf may
+# exist in each app in Splunk Enterprise.
+#
+# To learn more about configuration files (including precedence) please see
+# the documentation located at
+# http://docs.splunk.com/Documentation/Splunk/latest/Admin/Aboutconfigurationfiles
+
+[general]
+sendLicenseUsage = false
+sendAnonymizedUsage = false
+sendAnonymizedWebAnalytics = false
+precheckSendAnonymizedUsage = false
+precheckSendLicenseUsage = true
+showOptInModal = true
+deprecatedConfig = false
+scheduledHour = 16
+reportStartDate = 2017-10-27
+scheduledDay = 4
+bufferFlushTimeout = 600
+onCloudInstance = false

@@ -1,0 +1,784 @@
+<form version="1.1" hideEdit="true" script="common_control.js, http_event_collector_extension.js" stylesheet="http_event_collector.css">
+  <label>HTTP Event Collector: Deployment</label>
+  <row id="no_token_message_view">
+    <html>
+    </html>
+  </row>
+  <search id="base_time_search">
+    <query>
+      `dmc_set_index_introspection` component="HttpEventCollector" search_group=$role$ search_group="$group$" data.series="$data_series$" $token_clause$ 
+      | timechart minspan=1m sum(data.num_of_events) as events_total, sum(data.num_of_requests) as requests_total, sum(data.num_of_parser_errors) as parser_error_total, sum(data.num_of_requests_to_disabled_token) as requests_to_disabled_token_total, sum(data.num_of_auth_failures) as auth_failures_total, sum(data.num_of_requests_to_incorrect_url) as requests_to_incorrect_url_total, sum(data.total_bytes_indexed) as data_indexed, sum(data.total_bytes_received) as data_received
+      | eval data_received=data_received/pow(1024, 2) 
+      | eval data_indexed=data_indexed/pow(1024, 2) 
+      | eval valid_requests_total = requests_total
+    </query>
+    <earliest>$time.earliest$</earliest>
+    <latest>$time.latest$</latest>
+  </search>
+  <search id="base_snapshot_search">
+    <query>
+      `dmc_set_index_introspection` component="HttpEventCollector" search_group=$role$ search_group="$group$" data.series="$data_series$" $token_clause$
+      | bin _time minspan=1m 
+      | stats sum(data.num_of_events) as events_total, sum(data.num_of_requests) as requests_total, sum(data.num_of_requests_to_disabled_token) as disabled_token_total, sum(data.num_of_requests_to_incorrect_url) as incorrect_url_total, sum(data.num_of_auth_failures) as auth_fail_total, sum(data.num_of_parser_errors) as parser_error_total, sum(data.total_bytes_indexed) as data_indexed, sum(data.total_bytes_received) as data_received by _time
+      | eval incorrect_url_total=if(isnull(incorrect_url_total), 0, incorrect_url_total) 
+      | eval auth_fail_total=if(isnull(auth_fail_total), 0, auth_fail_total)
+      | eval data_indexed=data_indexed/pow(1024, 2) 
+      | eval data_received=data_received/pow(1024, 2) 
+      | eval valid_requests_total = requests_total
+      | eval invalid_requests_total = disabled_token_total + incorrect_url_total + auth_fail_total
+    </query>
+    <earliest>rt-30m</earliest>
+    <latest>rt</latest>
+  </search>
+  <search id="base_historical_search">
+    <query>
+      `dmc_set_index_introspection` component="HttpEventCollector" search_group=$role$ search_group="$group$" data.series="$data_series$" $token_clause$
+      | bin _time minspan=1m 
+      | stats sum(data.num_of_events) as events_total, sum(data.num_of_requests) as requests_total, sum(data.num_of_requests_to_disabled_token) as disabled_token_total, sum(data.num_of_requests_to_incorrect_url) as incorrect_url_total, sum(data.num_of_auth_failures) as auth_fail_total, sum(data.num_of_parser_errors) as parser_error_total, sum(data.total_bytes_indexed) as data_indexed, sum(data.total_bytes_received) as data_received by _time, host
+      | join host [ 
+      | inputlookup dmc_assets 
+      | mvcombine search_group 
+      | search search_group=$role$ OR search_group="$group$" ]
+      | eval incorrect_url_total=if(isnull(incorrect_url_total), 0, incorrect_url_total) 
+      | eval auth_fail_total=if(isnull(auth_fail_total), 0, auth_fail_total)
+      | eval data_indexed=data_indexed/pow(1024, 2) 
+      | eval data_received=data_received/pow(1024, 2) 
+      | eval valid_requests_total = requests_total
+      | eval invalid_requests_total = disabled_token_total + incorrect_url_total + auth_fail_total
+      | stats sum(events_total) as events_total, sum(valid_requests_total) as valid_requests_total, sum(invalid_requests_total) as invalid_requests_total, sum(data_received) as data_received, sum(data_indexed) as data_indexed
+      | appendcols [search `dmc_set_index_introspection` component="HttpEventCollector" search_group=$role$ search_group="$group$" data.series="$data_series$" $token_clause$ | stats count as event_count]
+    </query>
+    <earliest>$time.earliest$</earliest>
+    <latest>$time.latest$</latest>
+  </search>
+ <fieldset autoRun="true" submitButton="false">
+  <input type="dropdown" searchWhenChanged="true" token="role">
+    <label>Role</label>
+    <choice value="*">All</choice>
+    <choice value="dmc_group_indexer">Indexer</choice>
+    <choice value="dmc_group_search_head">Search Head</choice>
+    <selectFirstChoice>true</selectFirstChoice>
+    <showClearButton>false</showClearButton>
+  </input>
+  <input type="dropdown" searchWhenChanged="true" token="group">
+    <label>Group</label>
+    <showClearButton>false</showClearButton>
+    <search>
+      <query>
+        | `dmc_get_groups_containing_role($role$)` 
+        | search search_group!="dmc_group_*"
+      </query>
+    </search>
+    <fieldForLabel>label</fieldForLabel>
+    <fieldForValue>search_group</fieldForValue>
+    <choice value="*">All</choice>
+    <default>*</default>
+  </input>
+  <input type="dropdown" searchWhenChanged="true" token="token_name">
+    <label>Token</label>
+    <showClearButton>false</showClearButton>
+    <search>
+      <query>
+        | rest splunk_server_group=$role$ splunk_server_group="$group$" /services/data/inputs/http 
+        | eval token_name=substr('title', 8)
+      </query>
+    </search>
+    <choice value="*">All Tokens</choice>
+    <default>*</default>
+    <fieldForLabel>token_name</fieldForLabel>
+    <fieldForValue>token_name</fieldForValue>
+    <change>
+      <condition label="All Tokens">
+        <set token="data_series">http_event_collector</set>
+        <set token="token_clause"> </set>
+        <unset token="token_selected" />
+        <set token="allow_split_by_token">true</set>
+      </condition>
+      <condition label="*">
+        <set token="data_series">http_event_collector_token</set>
+        <set token="token_clause" prefix="data.token_name=&quot;" suffix="&quot;">$row.token_name$</set>
+        <set token="token_selected">true</set>
+        <unset token="allow_split_by_token" />
+      </condition>
+    </change>
+  </input>
+</fieldset>
+<row>
+  <panel>
+    <html>
+      <h2>
+        <span>Select views: </span>
+        <span id="link-switcher-view">
+          <a href="#" class="btn-pill active" data-item="all">All</a>
+          <a href="#" class="btn-pill" data-item="snapshot">Snapshot</a>
+          <a href="#" class="btn-pill" data-item="historical">Historical</a>
+        </span>
+      </h2>
+    </html>
+  </panel>
+</row>
+<row>
+  <panel rejects="$historical$">
+    <title>Snapshots</title>
+  </panel>
+</row>
+<row>
+  <panel rejects="$historical$">
+    <title>Current Throughput</title>
+    <html>
+      <h3>Requests</h3>
+    </html>
+    <single id="events_per_second_single_view">
+      <search base="base_snapshot_search">
+        <query>
+          stats sum(events_total) as events_total by _time
+          | stats latest(events_total) as event_latest 
+          | eval event_throughput = event_latest/60 
+          | fields event_throughput
+        </query>
+      </search>
+      <option name="underLabel">Events Per Second</option>
+      <option name="height">80px</option>
+    </single>
+    <single id="valid_requests_per_second_single_view">
+      <search base="base_snapshot_search">
+        <query>
+          stats sum(valid_requests_total) as valid_requests_total by _time
+          | stats latest(valid_requests_total) as valid_request_latest 
+          | eval valid_requests_throughput=valid_request_latest/60 
+          | fields valid_requests_throughput
+        </query>
+      </search>
+      <option name="underLabel">Valid Requests Per Second</option>
+      <option name="height">80px</option>
+    </single>
+    <single id="invalid_requests_per_second_single_view">
+      <search base="base_snapshot_search">
+        <query>
+          stats sum(invalid_requests_total) as invalid_requests_total by _time
+          | stats latest(invalid_requests_total) as invalid_request_latest 
+          | eval invalid_requests_throughput=invalid_request_latest/60 
+          | fields invalid_requests_throughput
+        </query>
+      </search>
+      <option name="underLabel">Invalid Requests Per Second</option>
+      <option name="height">80px</option>
+    </single>
+    <html>
+      <h3>Data</h3>
+    </html>
+    <single id="data_received_per_second_single_view">
+      <search base="base_snapshot_search">
+        <query>
+          stats latest(data_received) as data_received_latest 
+          | eval data_received_throughput = round(data_received_latest/60, 3) 
+          | fields data_received_throughput
+        </query>
+      </search>
+      <option name="underLabel">Data Received (MB) Per Second</option>
+      <option name="numberPrecision">0.000</option>
+      <option name="height">80px</option>
+    </single>
+    <single id="data_indexed_per_second_single_view">
+      <search base="base_snapshot_search">
+        <query>
+          stats latest(data_indexed) as data_indexed_latest 
+          | eval data_indexed_throughput = round(data_indexed_latest/60, 3) 
+          | fields data_indexed_throughput
+        </query>
+      </search>
+      <option name="underLabel">Data Indexed (MB) Per Second</option>
+      <option name="numberPrecision">0.000</option>
+      <option name="height">80px</option>
+    </single>
+    <html>
+      <p>Invalid requests consist of authentication failures, requests to a disabled token, and requests to an incorrect URL.</p>
+    </html>
+  </panel>
+</row>
+<row rejects="$historical$">
+  <panel>
+    <title>Activity (Last 30 Minutes)</title>
+    <chart>
+      <search base="base_snapshot_search">
+        <query>
+          timechart minspan="1m" sum(valid_requests_total) as "Valid Requests" sum(invalid_requests_total) as "Invalid Requests" sum(data_received) as "Data Received"
+        </query>
+      </search>
+      <option name="charting.chart">column</option>
+      <option name="charting.chart.overlayFields">"Data Received"</option>
+      <option name="charting.axisY2.enabled">true</option>
+      <option name="charting.axisY2.fields">"Data Received"</option>
+      <option name="charting.axisTitleY2.text">Data Received (MB)</option>
+      <option name="charting.axisY2.scale">linear</option>
+      <option name="charting.axisTitleX.text">Time</option>
+      <option name="charting.lineDashStyle">solid</option>
+      <option name="charting.chart.stackMode">stacked</option>
+      <option name="charting.axisTitleY.text">Count of Requests</option>
+      <option name="charting.legend.placement">bottom</option>
+    </chart>
+  </panel>
+</row>
+<row rejects="$historical$">
+  <panel>
+    <title>Instances</title>
+    <table>
+      <search>
+        <query>
+          | rest splunk_server_group="$group$" /services/data/inputs/http 
+          | search title="http://$token_name$" 
+          | dedup splunk_server                          
+          | fields splunk_server                          
+          | join type=left splunk_server [|`dmc_get_instance_roles` | rename serverName as splunk_server]                                              
+          | fields host, splunk_server, role                          
+          | join type=left splunk_server [| rest /services/server/status/resource-usage/hostwide
+          | eval mem_used=round(mem_used / mem * 100, 0)  
+          | eval cpu_usage=cpu_system_pct + cpu_user_pct
+          | fields splunk_server, mem_used, cpu_usage]
+          | eval port = if(isnotnull(port), port, 8088)                                 
+          | fields host, cpu_usage, mem_used, role, port
+          | rename host as "Instance", cpu_usage as "CPU Usage (%)", mem_used as "Memory Usage (%)", role as Role, port as "HTTP Event Collector Port Number"
+        </query>
+      </search>
+      <drilldown target="_blank">
+        <link>
+          /app/splunk_monitoring_console/http_event_collector_instance?form.host=$row.Instance$
+        </link>
+      </drilldown>
+    </table>
+  </panel>
+</row>
+<row>
+  <panel rejects="$snapshot$">
+    <title>Historical Charts</title>
+    <input type="time" searchWhenChanged="true" token="time">
+      <label>Time Range:</label>
+      <default>
+        <earliestTime>-4h@m</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+  </panel>
+</row>
+<row>
+  <panel rejects="$snapshot$">
+    <title>Request Overview</title>
+    <single>
+      <search base="base_historical_search">
+        <query>
+          eval events_total = if(event_count==0, 0, events_total)
+          | fields events_total
+          | rename events_total as "Event Count"
+        </query>
+      </search>
+      <option name="underLabel">Event Count</option>
+      <option name="height">80px</option>                  
+    </single>
+    <single>
+      <search base="base_historical_search">
+        <query>
+          eval valid_requests_total = if(event_count==0, 0, valid_requests_total)
+          | fields valid_requests_total
+          | rename valid_requests_total as "Valid Request Count"
+        </query>
+      </search>
+      <option name="underLabel">Valid Request Count</option>
+      <option name="height">80px</option>                  
+    </single>
+    <single>
+      <search base="base_historical_search">
+        <query>
+          eval invalid_requests_total = if(event_count==0, 0, invalid_requests_total)
+          | fields invalid_requests_total
+          | rename invalid_requests_total as "Invalid Request Count"
+        </query>
+      </search>
+      <option name="underLabel">Invalid Request Count</option>
+      <option name="height">80px</option>                  
+    </single>
+    <html depends="$token_selected$">
+      <p>
+        The invalid request count for this token does not include invalid requests due to authentication failures or requests to an incorrect URL because those errors are not associated with any specific token.
+      </p>
+    </html>
+  </panel>
+</row>
+<row>
+  <panel rejects="$snapshot$">
+    <title>Data Overview</title>
+    <single>
+      <search base="base_historical_search">
+        <query>
+          eval data_received = if(event_count==0, 0, data_received)
+          | fields data_received
+          | rename data_received as "Data Received"
+        </query>
+      </search>
+      <option name="underLabel">MB Received</option>
+      <option name="height">80px</option>
+    </single>
+    <single>
+      <search base="base_historical_search">
+        <query>
+          eval data_indexed = if(event_count==0, 0, data_indexed)
+          | fields data_indexed
+          | rename data_indexed as "Data Indexed"
+        </query>
+      </search>
+      <option name="underLabel">MB Indexed</option>
+      <option name="height">80px</option>                  
+    </single>
+  </panel>
+</row>
+<row>
+  <panel rejects="$snapshot$">
+    <title>$activity_chart_label$ Count</title>
+    <input type="dropdown" searchWhenChanged="true" token="event_type">
+      <label>Activity Type</label>
+      <choice value="events_total, valid_requests_total">Events and Valid Requests</choice>
+      <choice value="events_total">Events</choice>
+      <choice value="valid_requests_total">Valid Requests</choice>
+      <change>
+        <condition value="events_total, valid_requests_total">
+          <set token="activity_chart_label">$label$</set>
+          <set token="show_all_activity_chart">true</set>
+          <unset token="show_activity_chart_split_by_token" />
+        </condition>
+        <condition value="*">
+          <set token="activity_chart_label">$label$</set>
+          <set token="show_activity_chart_split_by_token">true</set>
+          <unset token="show_all_activity_chart" />
+        </condition>
+      </change>
+      <selectFirstChoice>true</selectFirstChoice>
+      <showClearButton>false</showClearButton>
+    </input>
+    <input depends="$allow_split_by_token$ $show_activity_chart_split_by_token$" searchWhenChanged="true" type="checkbox" token="activity_chart_split_by_token">
+      <label></label>
+      <choice>Split by Token</choice>
+    </input>
+    <chart depends="$show_all_activity_chart$">
+      <search>
+        <query>
+          `dmc_set_index_introspection` component="HttpEventCollector" search_group=$role$ search_group="$group$" data.series="$data_series$" $token_clause$ 
+          | timechart partial=f minspan=1m sum(data.num_of_events) as events_total, sum(data.num_of_requests) as requests_total, sum(data.num_of_parser_errors) as parser_error_total, sum(data.num_of_requests_to_disabled_token) as requests_to_disabled_token_total, sum(data.num_of_auth_failures) as auth_failures_total, sum(data.num_of_requests_to_incorrect_url) as requests_to_incorrect_url_total, sum(data.total_bytes_indexed) as data_indexed, sum(data.total_bytes_received) as data_received
+          | eval data_received=data_received/pow(1024, 2) 
+          | eval data_indexed=data_indexed/pow(1024, 2) 
+          | eval valid_requests_total = requests_total
+          | fields _time, $event_type$
+          | rename events_total as "Events", valid_requests_total as "Valid Requests"
+        </query>
+        <earliest>$time.earliest$</earliest>
+        <latest>$time.latest$</latest>
+      </search>
+      <option name="charting.chart">line</option>
+      <option name="charting.axisTitleY.text">Count</option>
+      <option name="charting.axisTitleX.text">Time</option>
+      <option name="charting.legend.placement">bottom</option>
+      <option name="charting.axisY.minimumNumber">0</option>
+      <option name="charting.chart.nullValueMode">zero</option>
+    </chart>
+    <chart rejects="$activity_chart_split_by_token$ $token_selected$ $show_all_activity_chart$">
+      <search>
+        <query>
+          `dmc_set_index_introspection` component="HttpEventCollector" search_group=$role$ search_group="$group$" data.series="$data_series$" $token_clause$ 
+          | timechart partial=f minspan=1m sum(data.num_of_events) as events_total, sum(data.num_of_requests) as requests_total, sum(data.num_of_parser_errors) as parser_error_total, sum(data.num_of_requests_to_disabled_token) as requests_to_disabled_token_total, sum(data.num_of_auth_failures) as auth_failures_total, sum(data.num_of_requests_to_incorrect_url) as requests_to_incorrect_url_total, sum(data.total_bytes_indexed) as data_indexed, sum(data.total_bytes_received) as data_received
+          | eval data_received=data_received/pow(1024, 2) 
+          | eval data_indexed=data_indexed/pow(1024, 2) 
+          | eval valid_requests_total = requests_total
+          | fields _time, $event_type$
+          | rename events_total as "Events", valid_requests_total as "Valid Requests"
+        </query>
+        <earliest>$time.earliest$</earliest>
+        <latest>$time.latest$</latest>
+      </search>
+      <option name="charting.chart">line</option>
+      <option name="charting.axisTitleY.text">Count</option>
+      <option name="charting.axisTitleX.text">Time</option>
+      <option name="charting.legend.placement">bottom</option>
+      <option name="charting.axisY.minimumNumber">0</option>
+      <option name="charting.chart.nullValueMode">zero</option>
+    </chart>
+    <chart depends="$token_selected$" rejects="$show_all_activity_chart$">
+      <search>
+        <query>
+          `dmc_set_index_introspection` component="HttpEventCollector" search_group=$role$ search_group="$group$" data.series="$data_series$" $token_clause$ 
+          | timechart partial=f minspan=1m sum(data.num_of_events) as events_total, sum(data.num_of_requests) as requests_total, sum(data.num_of_parser_errors) as parser_error_total, sum(data.num_of_requests_to_disabled_token) as requests_to_disabled_token_total, sum(data.num_of_auth_failures) as auth_failures_total, sum(data.num_of_requests_to_incorrect_url) as requests_to_incorrect_url_total, sum(data.total_bytes_indexed) as data_indexed, sum(data.total_bytes_received) as data_received
+          | eval data_received=data_received/pow(1024, 2) 
+          | eval data_indexed=data_indexed/pow(1024, 2) 
+          | eval valid_requests_total = requests_total
+          | fields _time, $event_type$
+          | rename events_total as "Events", valid_requests_total as "Valid Requests"
+        </query>
+        <earliest>$time.earliest$</earliest>
+        <latest>$time.latest$</latest>
+      </search>
+      <option name="charting.chart">line</option>
+      <option name="charting.axisTitleY.text">Count</option>
+      <option name="charting.axisTitleX.text">Time</option>
+      <option name="charting.legend.placement">bottom</option>
+      <option name="charting.axisY.minimumNumber">0</option>
+      <option name="charting.chart.nullValueMode">zero</option>
+    </chart>
+    <chart depends="$allow_split_by_token$ $activity_chart_split_by_token$" rejects="$show_all_activity_chart$">
+      <search>
+        <query>
+          `dmc_set_index_introspection` component="HttpEventCollector" search_group=$role$ search_group="$group$" data.series="http_event_collector_token" $token_clause$      
+          | bin _time minspan=1m                     
+          | stats sum(data.num_of_events) as events_total, sum(data.num_of_requests) as requests_total, sum(data.num_of_parser_errors) as parser_error_total, values(data.token_name) as token_name by _time
+          | eval valid_requests_total = requests_total
+          | timechart partial=f minspan=1m sum($event_type$) as $event_type$ by token_name
+        </query>
+        <earliest>$time.earliest$</earliest>
+        <latest>$time.latest$</latest>
+      </search>
+      <option name="charting.chart">line</option>
+      <option name="charting.axisTitleY.text">Count</option>
+      <option name="charting.axisTitleX.text">Time</option>
+      <option name="charting.legend.placement">bottom</option>
+      <option name="charting.axisY.minimumNumber">0</option>
+      <option name="charting.chart.nullValueMode">zero</option>
+    </chart>
+  </panel>
+</row>
+<row>
+  <panel rejects="$snapshot$">
+    <title>Errors</title>
+    <input type="dropdown" searchWhenChanged="true" token="invalid_request_reason">
+      <label>Reason</label>
+      <choice value="all_errors">All Errors</choice>
+      <choice value="num_of_auth_failures">Authentication Failures</choice>
+      <choice value="num_of_requests_to_disabled_token">Requests to Disabled Token</choice>
+      <choice value="num_of_requests_to_incorrect_url">Requests to Incorrect URL</choice>
+      <choice value="num_of_parser_errors">Parser Errors</choice>
+      <change>
+        <condition value="all_errors">
+          <set token="all_errors_selected">true</set>
+          <unset token="show_invalid_request_chart_split_by_token" />
+          <unset token="incorrect_url_selected" />
+          <unset token="authentication_failure_selected" />
+        </condition>
+        <condition value="num_of_auth_failures">
+          <set token="show_invalid_request_chart_split_by_token">true</set>
+          <set token="authentication_failure_selected">true</set>
+          <unset token="incorrect_url_selected" />
+          <unset token="all_errors_selected" />
+        </condition>
+        <condition value="num_of_requests_to_incorrect_url">
+          <set token="show_invalid_request_chart_split_by_token">true</set>
+          <set token="incorrect_url_selected">true</set>
+          <unset token="authentication_failure_selected" />
+          <unset token="all_errors_selected" />
+        </condition>
+        <condition value="*">
+          <set token="show_invalid_request_chart_split_by_token">true</set>
+          <unset token="incorrect_url_selected" />
+          <unset token="authentication_failure_selected" />
+          <unset token="all_errors_selected" />
+        </condition>
+      </change>
+      <selectFirstChoice>true</selectFirstChoice>
+      <showClearButton>false</showClearButton>
+    </input>
+    <input depends="$allow_split_by_token$ $show_invalid_request_chart_split_by_token$" searchWhenChanged="true" type="checkbox" token="invalid_request_split_by_token">
+      <label></label>
+      <choice>Split by Token</choice>
+    </input>
+
+
+    <!-- chart for when "All Tokens" is selected -->
+    <chart depends="$all_errors_selected$" rejects="$token_selected$">
+      <search>
+        <query>
+          `dmc_set_index_introspection` component="HttpEventCollector" search_group=$role$ search_group="$group$" data.series="$data_series$" $token_clause$
+          | timechart partial=f minspan=1m sum(data.num_of_auth_failures) as num_of_auth_failures, sum(data.num_of_requests_to_disabled_token) as num_of_requests_to_disabled_token, sum(data.num_of_requests_to_incorrect_url) as num_of_requests_to_incorrect_url, sum(data.num_of_parser_errors) as num_of_parser_errors
+          | fields _time, num_of_auth_failures, num_of_requests_to_disabled_token, num_of_requests_to_incorrect_url, num_of_parser_errors
+          | rename num_of_auth_failures as "Authentication Failures", num_of_requests_to_disabled_token as "Requests to Disabled Token", num_of_requests_to_incorrect_url as "Requests to Incorrect URL", num_of_parser_errors as "Parser Errors"
+        </query>
+        <earliest>$time.earliest$</earliest>
+        <latest>$time.latest$</latest>
+      </search>
+      <option name="charting.chart">line</option>
+      <option name="charting.axisTitleY.text">Count</option>
+      <option name="charting.axisTitleX.text">Time</option>
+      <option name="charting.legend.placement">bottom</option>
+      <option name="charting.axisY.minimumNumber">0</option>
+      <option name="charting.chart.nullValueMode">zero</option>
+    </chart>
+
+    <!-- chart for when "All Tokens" is selected and a "All Errors" is selected -->
+    <!-- exclude errors related to authentication failure or requests to incorrect url -->
+    <chart depends="$all_errors_selected$ $token_selected$">
+      <search>
+        <query>
+          `dmc_set_index_introspection` component="HttpEventCollector" search_group=$role$ search_group="$group$" data.series="$data_series$" $token_clause$
+          | timechart partial=f minspan=1m sum(data.num_of_auth_failures) as num_of_auth_failures, sum(data.num_of_requests_to_disabled_token) as num_of_requests_to_disabled_token, sum(data.num_of_requests_to_incorrect_url) as num_of_requests_to_incorrect_url, sum(data.num_of_parser_errors) as num_of_parser_errors
+          | fields _time, num_of_requests_to_disabled_token, num_of_parser_errors
+          | rename num_of_auth_failures as "Authentication Failures", num_of_requests_to_disabled_token as "Requests to Disabled Token", num_of_requests_to_incorrect_url as "Requests to Incorrect URL", num_of_parser_errors as "Parser Errors"
+        </query>
+        <earliest>$time.earliest$</earliest>
+        <latest>$time.latest$</latest>
+      </search>
+      <option name="charting.chart">line</option>
+      <option name="charting.axisTitleY.text">Count</option>
+      <option name="charting.axisTitleX.text">Time</option>
+      <option name="charting.legend.placement">bottom</option>
+      <option name="charting.axisY.minimumNumber">0</option>
+      <option name="charting.chart.nullValueMode">zero</option>
+    </chart>
+
+    <!-- chart for when every error reason other than "All Error" is selected and token is not selected -->    
+    <chart rejects="$invalid_request_split_by_token$ $all_errors_selected$ $token_selected$">
+      <search>
+        <query>
+          `dmc_set_index_introspection` component="HttpEventCollector" search_group=$role$ search_group="$group$" data.series="$data_series$" $token_clause$
+          | timechart partial=f minspan=1m sum(data.num_of_auth_failures) as num_of_auth_failures, sum(data.num_of_requests_to_disabled_token) as num_of_requests_to_disabled_token, sum(data.num_of_requests_to_incorrect_url) as num_of_requests_to_incorrect_url, sum(data.num_of_parser_errors) as num_of_parser_errors
+          | fields _time, $invalid_request_reason$
+          | rename num_of_auth_failures as "Authentication Failures", num_of_requests_to_disabled_token as "Requests to Disabled Token", num_of_requests_to_incorrect_url as "Requests to Incorrect URL", num_of_parser_errors as "Parser Errors"
+        </query>
+        <earliest>$time.earliest$</earliest>
+        <latest>$time.latest$</latest>
+      </search>
+      <option name="charting.chart">line</option>
+      <option name="charting.axisTitleY.text">Count</option>
+      <option name="charting.axisTitleX.text">Time</option>
+      <option name="charting.legend.placement">bottom</option>
+      <option name="charting.axisY.minimumNumber">0</option>
+      <option name="charting.chart.nullValueMode">zero</option>
+    </chart>
+
+    <!-- chart for when a token is selected and the invalid_request_split_by_token is still set -->
+    <!-- this chart graphs the results of an error or errors for a specified token -->
+    <chart depends="$invalid_request_split_by_token$ $token_selected$" rejects="$all_errors_selected$ $authentication_failure_selected$ $incorrect_url_selected$">
+      <search>
+        <query>
+          `dmc_set_index_introspection` component="HttpEventCollector" search_group=$role$ search_group="$group$" data.series="$data_series$" $token_clause$
+          | timechart partial=f minspan=1m sum(data.num_of_auth_failures) as num_of_auth_failures, sum(data.num_of_requests_to_disabled_token) as num_of_requests_to_disabled_token, sum(data.num_of_requests_to_incorrect_url) as num_of_requests_to_incorrect_url, sum(data.num_of_parser_errors) as num_of_parser_errors
+          | fields _time, $invalid_request_reason$
+          | rename num_of_auth_failures as "Authentication Failures", num_of_requests_to_disabled_token as "Requests to Disabled Token", num_of_requests_to_incorrect_url as "Requests to Incorrect URL", num_of_parser_errors as "Parser Errors"
+        </query>
+        <earliest>$time.earliest$</earliest>
+        <latest>$time.latest$</latest>
+      </search>
+      <option name="charting.chart">line</option>
+      <option name="charting.axisTitleY.text">Count</option>
+      <option name="charting.axisTitleX.text">Time</option>
+      <option name="charting.legend.placement">bottom</option>
+      <option name="charting.axisY.minimumNumber">0</option>
+      <option name="charting.chart.nullValueMode">zero</option>
+    </chart>
+
+    <!-- chart for when a token is selected and the invalid_request_split_by_token is not set -->
+    <!-- this chart graphs the results of an error or errors for a specified token -->
+    <chart depends="$token_selected$" rejects="$authentication_failure_selected$ $all_errors_selected$ $incorrect_url_selected$ $invalid_request_split_by_token$">
+      <search>
+        <query>
+          `dmc_set_index_introspection` component="HttpEventCollector" search_group=$role$ search_group="$group$" data.series="$data_series$" $token_clause$
+          | timechart partial=f minspan=1m sum(data.num_of_auth_failures) as num_of_auth_failures, sum(data.num_of_requests_to_disabled_token) as num_of_requests_to_disabled_token, sum(data.num_of_requests_to_incorrect_url) as num_of_requests_to_incorrect_url, sum(data.num_of_parser_errors) as num_of_parser_errors
+          | fields _time, $invalid_request_reason$
+          | rename num_of_auth_failures as "Authentication Failures", num_of_requests_to_disabled_token as "Requests to Disabled Token", num_of_requests_to_incorrect_url as "Requests to Incorrect URL", num_of_parser_errors as "Parser Errors"
+        </query>
+        <earliest>$time.earliest$</earliest>
+        <latest>$time.latest$</latest>
+      </search>
+      <option name="charting.chart">line</option>
+      <option name="charting.axisTitleY.text">Count</option>
+      <option name="charting.axisTitleX.text">Time</option>
+      <option name="charting.legend.placement">bottom</option>
+      <option name="charting.axisY.minimumNumber">0</option>
+      <option name="charting.chart.nullValueMode">zero</option>
+    </chart>
+
+    <!-- chart for when the split by token box is selected and "All tokens" us selected -->
+    <chart depends="$invalid_request_split_by_token$" rejects="$token_selected$ $authentication_failure_selected$ $incorrect_url_selected$ $all_errors_selected$">
+      <search>
+        <query>
+          `dmc_set_index_introspection` component="HttpEventCollector" search_group=$role$ search_group="$group$" data.series="http_event_collector_token" $token_clause$
+          | bin _time minspan=1m
+          | timechart partial=f minspan=1m sum(data.$invalid_request_reason$) as $invalid_request_reason$ by data.token_name
+        </query>
+        <earliest>$time.earliest$</earliest>
+        <latest>$time.latest$</latest>
+      </search>
+      <option name="charting.chart">line</option>
+      <option name="charting.axisTitleY.text">Count</option>
+      <option name="charting.axisTitleX.text">Time</option>
+      <option name="charting.legend.placement">bottom</option>
+      <option name="charting.axisY.minimumNumber">0</option>
+      <option name="charting.chart.nullValueMode">zero</option>
+    </chart>
+
+    <!-- Error message for when a token is selected and "All Errors" is selected. -->
+    <html depends="$all_errors_selected$ $token_selected$">
+      <p>Errors due to authentication failure or requests to an incorrect URL are excluded from this chart because they are not associated with any specific token.</p>
+    </html>
+
+    <!-- Error message for when a token is selected and the authentication failure or requests to an incorrect url error reason is selected -->
+    <html depends="$token_selected$ $authentication_failure_selected$">
+      <p>There are no results for the selected reason because authentication failures are not associated with any specific token.</p>
+    </html>
+    <html depends="$token_selected$ $incorrect_url_selected$">
+      <p>There are no results for the selected reason because requests to an incorrect url are not associated with any specific token.</p>
+    </html>
+
+    <!-- Error message for when the split-by-token option is selected and the authentication failure or request to incorrect url error reason is selected -->
+    <html depends="$authentication_failure_selected$ $invalid_request_split_by_token$" rejects="$token_selected$">
+      <p>The split by token option for this reason is disabled because authentication failures are not associated with any specific token.</p>
+    </html>
+    <html depends="$incorrect_url_selected$ $invalid_request_split_by_token$" rejects="$token_selected$">
+      <p>The split by token option for this reason is disabled because requests to an incorrect url are not associated with any specific token.</p>
+    </html>
+  </panel>
+</row>
+<row>
+  <panel rejects="$snapshot$">
+    <title>Data $data_ingested_label$</title>
+    <input type="dropdown" searchWhenChanged="true" token="data_type">
+      <label>Data Type</label>
+      <choice value="data_received, data_indexed">Received and Indexed</choice>
+      <choice value="data_received">Received</choice>
+      <choice value="data_indexed">Indexed</choice>
+      <change>
+        <condition value="data_received, data_indexed">
+          <set token="show_all_data_charts">true</set>
+          <set token="data_ingested_label">$label$</set>
+          <unset token="show_data_ingested_split_by_token" />
+        </condition>
+        <condition value="data_received">
+          <unset token="show_all_data_charts" />
+          <set token="data_ingested_label">$label$</set>
+          <set token="show_data_ingested_split_by_token">true</set>
+        </condition>
+        <condition value="data_indexed">
+          <unset token="show_all_data_charts" />
+          <set token="data_ingested_label">$label$</set>
+          <set token="show_data_ingested_split_by_token">true</set>
+        </condition>
+      </change>
+      <selectFirstChoice>true</selectFirstChoice>
+      <showClearButton>false</showClearButton>
+    </input>
+    <input depends="$show_data_ingested_split_by_token$ $allow_split_by_token$" searchWhenChanged="true" type="checkbox" token="data_ingested_split_by_token">
+      <label></label>
+      <choice>Split by Token</choice>
+    </input>
+    <chart depends="$show_all_data_charts$">
+      <search>
+        <query>
+          `dmc_set_index_introspection` component="HttpEventCollector" search_group=$role$ search_group="$group$" data.series="$data_series$" $token_clause$ 
+          | timechart partial=f minspan=1m sum(data.num_of_events) as events_total, sum(data.num_of_requests) as requests_total, sum(data.num_of_parser_errors) as parser_error_total, sum(data.num_of_requests_to_disabled_token) as requests_to_disabled_token_total, sum(data.num_of_auth_failures) as auth_failures_total, sum(data.num_of_requests_to_incorrect_url) as requests_to_incorrect_url_total, sum(data.total_bytes_indexed) as data_indexed, sum(data.total_bytes_received) as data_received
+          | eval data_received=data_received/pow(1024, 2) 
+          | eval data_indexed=data_indexed/pow(1024, 2) 
+          | eval valid_requests_total = requests_total
+          | fields _time, $data_type$
+          | rename data_received as "Data Received", data_indexed as "Data Indexed"
+        </query>
+        <earliest>$time.earliest$</earliest>
+        <latest>$time.latest$</latest>
+      </search>
+      <option name="charting.chart">line</option>
+      <option name="charting.axisTitleY.text">MB</option>
+      <option name="charting.axisTitleX.text">Time</option>
+      <option name="charting.legend.placement">bottom</option>
+      <option name="charting.axisY.minimumNumber">0</option>
+      <option name="charting.chart.nullValueMode">zero</option>
+    </chart>
+    <chart rejects="$data_ingested_split_by_token$ $token_selected$ $show_all_data_charts$">
+      <search>
+        <query>
+          `dmc_set_index_introspection` component="HttpEventCollector" search_group=$role$ search_group="$group$" data.series="$data_series$" $token_clause$ 
+          | timechart partial=f minspan=1m sum(data.num_of_events) as events_total, sum(data.num_of_requests) as requests_total, sum(data.num_of_parser_errors) as parser_error_total, sum(data.num_of_requests_to_disabled_token) as requests_to_disabled_token_total, sum(data.num_of_auth_failures) as auth_failures_total, sum(data.num_of_requests_to_incorrect_url) as requests_to_incorrect_url_total, sum(data.total_bytes_indexed) as data_indexed, sum(data.total_bytes_received) as data_received
+          | eval data_received=data_received/pow(1024, 2) 
+          | eval data_indexed=data_indexed/pow(1024, 2) 
+          | eval valid_requests_total = requests_total
+          | fields _time, $data_type$
+          | rename data_received as "Data Received", data_indexed as "Data Indexed"
+        </query>
+        <earliest>$time.earliest$</earliest>
+        <latest>$time.latest$</latest>
+      </search>
+      <option name="charting.chart">line</option>
+      <option name="charting.axisTitleY.text">MB</option>
+      <option name="charting.axisTitleX.text">Time</option>
+      <option name="charting.legend.placement">bottom</option>
+      <option name="charting.axisY.minimumNumber">0</option>
+      <option name="charting.chart.nullValueMode">zero</option>
+    </chart>
+    <chart depends="$token_selected$" rejects="$show_all_data_charts$">
+      <search>
+        <query>
+          `dmc_set_index_introspection` component="HttpEventCollector" search_group=$role$ search_group="$group$" data.series="$data_series$" $token_clause$ 
+          | timechart partial=f minspan=1m sum(data.num_of_events) as events_total, sum(data.num_of_requests) as requests_total, sum(data.num_of_parser_errors) as parser_error_total, sum(data.num_of_requests_to_disabled_token) as requests_to_disabled_token_total, sum(data.num_of_auth_failures) as auth_failures_total, sum(data.num_of_requests_to_incorrect_url) as requests_to_incorrect_url_total, sum(data.total_bytes_indexed) as data_indexed, sum(data.total_bytes_received) as data_received
+          | eval data_received=data_received/pow(1024, 2) 
+          | eval data_indexed=data_indexed/pow(1024, 2) 
+          | eval valid_requests_total = requests_total
+          | fields _time, $data_type$
+          | rename data_received as "Data Received", data_indexed as "Data Indexed"
+        </query>
+        <earliest>$time.earliest$</earliest>
+        <latest>$time.latest$</latest>
+      </search>
+      <option name="charting.chart">line</option>
+      <option name="charting.axisTitleY.text">MB</option>
+      <option name="charting.axisTitleX.text">Time</option>
+      <option name="charting.legend.placement">bottom</option>
+      <option name="charting.axisY.minimumNumber">0</option>
+      <option name="charting.chart.nullValueMode">zero</option>
+    </chart>
+    <chart depends="$allow_split_by_token$ $data_ingested_split_by_token$" rejects="$show_all_data_charts$">
+      <search>
+        <query>
+          `dmc_set_index_introspection` component="HttpEventCollector" search_group=$role$ search_group="$group$" data.series="http_event_collector_token"
+          | bin _time minspan=1m 
+          | stats sum(data.total_bytes_indexed) as data_indexed, sum(data.total_bytes_received) as data_received, values(data.token_name) as token_name by _time
+          | eval data_received=data_received/pow(1024, 2)
+          | eval data_indexed=data_indexed/pow(1024, 2)
+          | timechart partial=f minspan=1m sum($data_type$) by token_name
+        </query>
+        <earliest>$time.earliest$</earliest>
+        <latest>$time.latest$</latest>
+      </search>
+      <option name="charting.chart">line</option>
+      <option name="charting.axisTitleY.text">MB</option>
+      <option name="charting.axisTitleX.text">Time</option>
+      <option name="charting.legend.placement">bottom</option>
+      <option name="charting.axisY.minimumNumber">0</option>
+      <option name="charting.chart.nullValueMode">zero</option>
+    </chart>
+  </panel>
+</row>
+<row>
+  <panel rejects="$snapshot$">
+    <title>Instances Overview</title>
+    <table>
+      <search>
+        <query>
+          `dmc_set_index_introspection` component="HttpEventCollector" search_group=$role$ search_group="$group$" data.series="$data_series$" $token_clause$
+          | bin _time minspan=1m 
+          | stats sum(data.num_of_events) as events_total, sum(data.num_of_requests) as requests_total, sum(data.num_of_requests_to_disabled_token) as disabled_token_total, sum(data.num_of_requests_to_incorrect_url) as incorrect_url_total, sum(data.num_of_auth_failures) as auth_fail_total, sum(data.num_of_errors) as error_total, sum(data.num_of_parser_errors) as parser_error_total, sum(data.total_bytes_indexed) as data_indexed, sum(data.total_bytes_received) as data_received by _time, host
+          | join host [ 
+          | inputlookup dmc_assets 
+          | mvcombine search_group 
+          | search search_group=$role$ OR search_group="$group$" ]
+          | eval incorrect_url_total=if(isnull(incorrect_url_total), 0, incorrect_url_total) 
+          | eval auth_fail_total=if(isnull(auth_fail_total), 0, auth_fail_total)
+          | eval data_indexed=round(data_indexed/pow(1024, 2), 2)
+          | eval data_received=round(data_received/pow(1024, 2), 2)
+          | eval valid_requests_total = requests_total
+          | eval invalid_requests_total = disabled_token_total + incorrect_url_total + auth_fail_total
+          | stats sum(events_total) as events_total, sum(valid_requests_total) as valid_requests_total, sum(invalid_requests_total) as invalid_requests_total, sum(data_received) as data_received, sum(data_indexed) as data_indexed by host
+          | fields host, events_total, valid_requests_total, invalid_requests_total, data_received, data_indexed
+          | rename host as Instance, events_total as "Event Count", valid_requests_total as "Valid Request Count", invalid_requests_total as "Invalid Request Count", data_received as "Data Received (MB)", data_indexed as "Data Indexed (MB)"
+        </query>
+        <earliest>$time.earliest$</earliest>
+        <latest>$time.latest$</latest>
+      </search>
+      <drilldown target="_blank">
+        <link>
+          /app/splunk_monitoring_console/http_event_collector_instance?form.host=$row.Instance$
+        </link>
+      </drilldown>
+    </table>
+  </panel>
+</row>
+</form>

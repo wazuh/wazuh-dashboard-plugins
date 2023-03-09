@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<endpoint name="ingest_rulesets" template="pages/system.html" showOnSearchHeadCluster="0">
+    <capabilities>
+        <read>list_ingest_rulesets AND edit_ingest_rulesets</read>
+    </capabilities>
+    <menu name="data_configurations">
+        <label>Ingest actions</label>
+        <url>/manager/%(namespace)s/ingest_rulesets</url>
+        <description>View and edit ingest rules.</description>
+        <order>100</order>
+        <id>ingest_rulesets</id>
+    </menu>
+</endpoint>

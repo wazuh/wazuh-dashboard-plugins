@@ -1,0 +1,17 @@
+#   Version 9.0.3
+
+
+# Example: Monitoring console
+# User is administrator of 3 Splunk deployments: US security, Global Security,
+# and US Applications, and wants convenient access to the monitoring console
+# for each.
+
+[bookmarks_mc:US Security]
+url = https://us-security.testcorp.example:8000/en-US/app/splunk_monitoring_console/monitoringconsole_overview
+
+[bookmarks_mc:Global Security]
+url = https://global-security.testcorp.example:8000/en-US/app/splunk_monitoring_console/monitoringconsole_overview
+
+[bookmarks_mc:US Applications]
+url = http://us-applications.testcorp.example:8000/en-US/app/splunk_monitoring_console/monitoringconsole_overview
+

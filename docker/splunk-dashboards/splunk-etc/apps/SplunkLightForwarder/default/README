@@ -1,0 +1,16 @@
+  Version 4.0
+
+SplunkLightForwarder
+==============================================================================================================
+
+Processors in Use:
+=================
+The following processors are instantiated for SplunkLightForwarder app.
+
+queueinputprocessor, bytequotaprocessor, indexprocessor, thruputprocessor, queueinputprocessor, execprocessor, queueoutputprocessor, fschangemanagerprocessor, tailingprocessor, selectprocessor, queueoutputprocessor, archiveprocessor, queueoutputprocessor, schedulerlaunchprocessor, deploymentprocessor.
+
+Config settings:
+=================
+* transforms.conf is not used. 
+* CHARSET, CHECK_FOR_HEADER, NO_BINARY_CHECK, PREFIX_SOURCETYPE, sourcetype properties in props.conf are used.
+

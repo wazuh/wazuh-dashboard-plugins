@@ -1,0 +1,57 @@
+#   Version 9.0.3
+#
+# This is an example times.conf.  Use this file to create custom time ranges
+# that can be used while interacting with the search system.
+#
+# To use one or more of these configurations, copy the configuration block
+# into times.conf in $SPLUNK_HOME/etc/system/local/. You must restart Splunk
+# to enable configurations.
+#
+# To learn more about configuration files (including precedence) please see
+# the documentation located at
+# http://docs.splunk.com/Documentation/Splunk/latest/Admin/Aboutconfigurationfiles
+
+# Note: These are examples.  Replace the values with your own customizations.
+
+
+# The stanza name is an alphanumeric string (no spaces) that uniquely
+# identifies a time range.
+[this_business_week]
+
+# Define the label used in the time range control
+label = This business week
+
+# Define the label to be used in display headers. If omitted the 'label' key
+# will be used with the first letter lowercased.
+header_label = during this business week
+earliest_time = +1d@w1
+latest_time = +6d@w6
+
+# Define the ordering sequence of this time range.  All time ranges are
+# sorted numerically, ascending. If the time range is in a sub menu and not
+# in the main menu, this will determine the position within the sub menu.
+order = 110
+
+
+# a time range that only has a bound on the earliest time
+#
+[last_3_hours]
+label = Last 3 hours
+header_label = in the last 3 hours
+earliest_time = -3h
+order = 30
+
+
+# Use epoch time notation to define the time bounds for the Fall Semester
+# 2013, where earliest_time is 9/4/13 00:00:00 and latest_time is 12/13/13
+# 00:00:00.
+#
+[Fall_2013]
+label = Fall Semester 2013
+earliest_time = 1378278000
+latest_time = 1386921600
+
+#
+# Disable the realtime panel in the time range picker
+[settings]
+show_realtime = false

@@ -1,0 +1,14 @@
+<module>
+    <pipeline name="rfsoutput" type="startup">
+        <processor name="rfsIn" plugin="queueinputprocessor">
+            <config>
+                <queueName>rfsQueue</queueName>
+            </config>
+        </processor>
+        <!-- To configure an blob/object store, use outputs.conf -->
+        <processor name="rfsout" plugin="rfsoutputprocessor">
+            <config>
+            </config>
+        </processor>
+    </pipeline>
+</module>

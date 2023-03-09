@@ -1,0 +1,459 @@
+<form version="1.1" hideEdit="True" script="common_control.js, cell_fill_gauge.js, index_detail_deployment_extension.js" stylesheet="index_type.css">
+    <label>Index Detail: Deployment</label>
+    <search id="index_base_search">
+        <query>
+            | rest splunk_server_group=dmc_group_indexer splunk_server_group="$group$" /services/data/indexes/$index$
+            | join title splunk_server type=outer [| rest splunk_server_group=dmc_group_indexer splunk_server_group="$group$" /services/data/indexes-extended/$index$]
+            | eval bucketCount = coalesce(total_bucket_count, 0)
+            | eval eventCount = coalesce(totalEventCount, 0)
+            | eval coldBucketSize = coalesce('bucket_dirs.cold.bucket_size', 'bucket_dirs.cold.size', 0)
+            | eval coldBucketSizeGB = round(coldBucketSize/ 1024, 2)
+            | eval coldBucketMaxSizeGB = if(isnull('coldPath.maxDataSizeMB') OR 'coldPath.maxDataSizeMB' = 0, "unlimited", round('coldPath.maxDataSizeMB' / 1024, 2))
+            | eval coldBucketUsageGB = coldBucketSizeGB." / ".coldBucketMaxSizeGB
+            | eval homeBucketSizeGB = coalesce(round((total_size - coldBucketSize) / 1024, 2), 0.00)
+            | eval homeBucketMaxSizeGB = round('homePath.maxDataSizeMB' / 1024, 2)
+            | eval homeBucketMaxSizeGB = if(homeBucketMaxSizeGB > 0, homeBucketMaxSizeGB, "unlimited")
+            | eval homeBucketUsageGB = homeBucketSizeGB." / ".homeBucketMaxSizeGB
+            | eval dataAgeDays = coalesce(round((now() - strptime(minTime,"%Y-%m-%dT%H:%M:%S%z")) / 86400, 0), 0)
+            | eval frozenTimePeriodDays = round(frozenTimePeriodInSecs / 86400, 0)
+            | eval frozenTimePeriodDays = if(frozenTimePeriodDays > 0, frozenTimePeriodDays, "unlimited")
+            | eval freezeRatioDays = dataAgeDays." / ".frozenTimePeriodDays
+            | eval indexSizeGB = if(currentDBSizeMB >= 1 AND totalEventCount >=1, round(currentDBSizeMB/1024, 2), 0.00)
+            | eval maxTotalDataSizeGB = round(maxTotalDataSizeMB / 1024, 2)
+            | eval indexMaxSizeGB = if(maxTotalDataSizeGB > 0, maxTotalDataSizeGB, "unlimited")
+            | eval indexSizeUsageGB = indexSizeGB." / ".indexMaxSizeGB
+            | eval indexSizeUsagePerc = if(isNum(indexMaxSizeGB) AND (indexMaxSizeGB > 0), round(indexSizeGB / indexMaxSizeGB * 100, 2)."%", "N/A")
+            | eval total_raw_size = coalesce(total_raw_size, 0)
+        </query>
+        <done>
+            <set token="indexdatatype">$result.datatype$</set>
+        </done>
+    </search>
+    <fieldset autoRun="true" submitButton="false">
+        <input type="radio" searchWhenChanged="true" token="datatype">
+            <label>Index Type</label>
+            <choice value="">Event Indexes Only</choice>
+            <choice value="datatype=all">All Index Types *</choice>
+            <default></default>
+        </input>
+        <input type="dropdown" searchWhenChanged="true" token="group">
+            <label>Group</label>
+            <showClearButton>false</showClearButton>
+            <search>
+                <query>
+                    | `dmc_get_groups_containing_role(dmc_group_indexer)`
+                    | where search_group!="dmc_group_indexer"
+                </query>
+            </search>
+            <fieldForLabel>label</fieldForLabel>
+            <fieldForValue>search_group</fieldForValue>
+            <choice value="*">All Indexers</choice>
+            <default>*</default>
+        </input>
+        <input type="dropdown" searchWhenChanged="true" token="index">
+            <label>Index</label>
+            <showClearButton>false</showClearButton>
+            <selectFirstChoice>true</selectFirstChoice>
+            <fieldForLabel>title</fieldForLabel>
+            <fieldForValue>title</fieldForValue>
+            <search>
+                <query>
+                    | rest splunk_server_group=dmc_group_indexer splunk_server_group="$group$" /services/data/indexes $datatype$
+                    | `dmc_exclude_indexes`
+                    | stats count by title
+                    | fields - count
+                </query>
+            </search>
+        </input>
+        <html id="index_type_disclaimer">
+            <p>The "All Index Types" option is not compatible with indexers running Splunk Enterprise 6.6 or earlier, where only event indexes exist.</p>
+        </html>
+    </fieldset>
+    <row>
+        <panel>
+            <html>
+                <h2>
+                    <span>Select views: </span>
+                    <span id="link-switcher-view">
+                        <a href="#" class="btn-pill active" data-item="all">All</a>
+                        <a href="#" class="btn-pill" data-item="snapshot">Snapshot</a>
+                        <a href="#" class="btn-pill" data-item="historical">Historical</a>
+                    </span>
+                </h2>
+            </html>
+        </panel>
+    </row>
+    <row>
+        <panel rejects="$historical$">
+            <title>Snapshots</title>
+        </panel>
+    </row>
+    <row>
+        <panel rejects="$historical$">
+            <title>Index Structure Overview</title>
+            <single>
+                <option name="underLabel">Indexers</option>
+                <option name="height">80px</option>                   
+                <search base="index_base_search">
+                    <query>
+                        stats dc(splunk_server) as instances
+                    </query>
+                </search>
+            </single>
+            <single>
+                <option name="underLabel">Total Index Size</option>
+                <option name="height">80px</option>                   
+                <search base="index_base_search">
+                    <query>
+                        stats sum(indexSizeGB) as totalIndexSizeGB
+                        | eval totalIndexSizeGB = totalIndexSizeGB." GB"
+                    </query>
+                </search>
+            </single>
+            <single>
+                <option name="underLabel">Total Raw Data Size (Uncompressed)</option>
+                <option name="height">80px</option>                   
+                <search base="index_base_search">
+                    <query>
+                        search title=$index$
+                        | stats sum(eval(total_raw_size / 1024)) as totalRawSizeGB
+                        | eval totalRawSizeGB = round(totalRawSizeGB, 2)." GB"
+                    </query>
+                </search>
+            </single>
+            <single>
+                <option name="underLabel">Raw to Index Size Ratio*</option>
+                <option name="height">80px</option>                   
+                <search base="index_base_search">
+                    <query>
+                        stats sum(indexSizeGB) as totalIndexSizeGB
+                        sum(eval(total_raw_size / 1024)) as totalRawSizeGB
+                        | eval compressionRatio = round(totalRawSizeGB / totalIndexSizeGB, 2).":1"
+                        | fields compressionRatio
+                        | eval compressionRatio = if(isnotnull(compressionRatio), compressionRatio, "N/A")
+                    </query>
+                </search>
+            </single>
+            <html>
+                <p>* This is the ratio of uncompressed raw data size to index size.</p>
+            </html>
+        </panel>
+    </row>
+    <row>
+        <panel rejects="$historical$">
+            <title>Events Overview</title>
+            <single>
+                <option name="underLabel">Total Events</option>
+                <option name="height">80px</option>                   
+                <search base="index_base_search">
+                    <query>
+                        stats sum(eventCount) as totalEventCount
+                        | eval totalEventCount = toString(totalEventCount, "commas")
+                    </query>
+                </search>
+            </single>
+            <single>
+                <option name="underLabel">Earliest Event</option>
+                <option name="height">80px</option>                   
+                <search base="index_base_search">
+                    <query>
+                        stats min(minTime) as oldestEvent
+                        | eval oldestEvent = replace(oldestEvent, "T", " ")
+                    </query>
+                </search>
+            </single>
+            <single>
+                <option name="underLabel">Latest Event</option>
+                <option name="height">80px</option>                   
+                <search base="index_base_search">
+                    <query>
+                        stats max(maxTime) as newestEvent
+                        | eval newestEvent = replace(newestEvent, "T", " ")
+                    </query>
+                </search>
+            </single>
+        </panel>
+    </row>
+    <row>
+        <panel rejects="$historical$">
+            <title>Indexer Averages</title>
+            <single>
+                <option name="underLabel">Average Index Size</option>
+                <option name="height">80px</option>                   
+                <search base="index_base_search">
+                    <query>
+                        stats avg(indexSizeGB) as avgIndexSizeGB
+                        | eval avgIndexSizeGB = round(avgIndexSizeGB, 2)." GB"
+                    </query>
+                </search>
+            </single>
+            <single>
+                <option name="underLabel">Average Event Count</option>
+                <option name="height">80px</option>                   
+                <search base="index_base_search">
+                    <query>
+                        stats avg(eventCount) as avgEventCount
+                        | eval avgEventCount = toString(floor(avgEventCount), "commas")
+                    </query>
+                </search>
+            </single>
+            <single>
+                <option name="underLabel">Median Data Age</option>
+                <option name="height">80px</option>                   
+                <search base="index_base_search">
+                    <query>
+                        eval dataAgeDays = if(isnotnull(dataAgeDays), dataAgeDays, 0)
+                        | stats median(dataAgeDays) as medianDataAge
+                        | eval medianDataAge = medianDataAge." days"
+                    </query>
+                </search>
+            </single>
+            <single>
+                <option name="underLabel">Average Bucket Count</option>
+                <option name="height">80px</option>                   
+                <search base="index_base_search">
+                    <query>
+                        stats avg(bucketCount) as avgBucketCount
+                        | eval avgBucketCount = floor(avgBucketCount)
+                    </query>
+                </search>
+            </single>
+        </panel>
+    </row>
+    <row>
+        <panel rejects="$historical$">
+            <title>Instances ($indexCount$)</title>
+            <table id="table1">
+                <search base="index_base_search">
+                    <query>
+                        eval avgBucketSize = round(indexSizeGB / bucketCount, 2)
+                        | fields splunk_server, freezeRatioDays, indexSizeUsageGB, homeBucketUsageGB, coldBucketUsageGB, eventCount, bucketCount, avgBucketSize
+                        | rename splunk_server as "Indexer"
+                        freezeRatioDays as "Data Age vs Frozen Age (days)"
+                        indexSizeUsageGB as "Index Usage (GB)"
+                        homeBucketUsageGB as "Home Path Usage (GB)"
+                        coldBucketUsageGB as "Cold Path Usage (GB)"
+                        eventCount as "Total Event Count"
+                        bucketCount as "Total Bucket Count"
+                        avgBucketSize as "Average Bucket Size (GB)"
+                    </query>
+                    <done>
+                        <set token="indexCount">$job.resultCount$</set>
+                    </done>
+                </search>
+                <drilldown target="_blank">
+                    <link>
+                        /app/splunk_monitoring_console/index_detail_instance?form.datatype=$datatype$&amp;form.single_index_name=$index$:$indexdatatype$&amp;form.splunk_server=$row.Indexer$
+                    </link>
+                </drilldown>
+            </table>
+            <html>
+                <p>The columns use attributes specified in <a href="/help?location=learnmore.index.settings" class="external" target="_blank">indexes.conf</a>:</p>
+                <ul>
+                    <li><b>Data Age vs Frozen Age:</b> The first value is based on the age of the oldest event in the index. The second value is derived from the attribute frozenTimePeriodInSecs.</li>
+                    <li><b>Index Usage:</b> The first value is the current size of the index. The second value is the index capacity, as specified  in maxTotalDataSizeMB.</li>
+                    <li><b>Home Path Usage:</b> The first value is the current size of the home path portion of the index. The second value is the home path capacity, as specified in homePath.maxDataSizeMB.</li>
+                    <li><b>Cold Path Usage:</b> The first value is the current size of the cold path portion of the index. The second value is the cold path capacity, as specified in coldPath.maxDataSizeMB.</li>
+                </ul>
+            </html>
+        </panel>
+    </row>
+    <row>
+        <panel rejects="$historical$">
+            <title>Event Count by Hosts ($hostCount$)</title>
+            <table>
+                <search>
+                    <query>
+                        | metadata type=hosts index=$index$ splunk_server_group=dmc_group_indexer splunk_server_group="$group$"
+                        | fields host, totalCount
+                        | sort - totalCount
+                        | rename host as Host, totalCount as "Event Count"
+                    </query>
+                    <done>
+                        <set token="hostCount">$job.resultCount$</set>
+                    </done>
+                </search>
+                <option name="dataOverlayMode">heatmap</option>
+                <option name="drilldown">none</option>
+            </table>
+        </panel>
+        <panel rejects="$historical$">
+            <title>Event Count by Sources ($sourceCount$)</title>
+            <table>
+                <search>
+                    <query>
+                        | metadata type=sources index=$index$ splunk_server_group=dmc_group_indexer splunk_server_group="$group$"
+                        | fields source, totalCount
+                        | sort - totalCount
+                        | rename source as Source, totalCount as "Event Count"
+                    </query>
+                    <done>
+                        <set token="sourceCount">$job.resultCount$</set>
+                    </done>
+                </search>
+                <option name="dataOverlayMode">heatmap</option>
+                <option name="drilldown">none</option>
+            </table>
+        </panel>
+        <panel rejects="$historical$">
+            <title>Event Count by Sourcetypes ($sourcetypeCount$)</title>
+            <table>
+≈                <search>
+                    <query>
+                        | metadata type=sourcetypes index=$index$ splunk_server_group=dmc_group_indexer splunk_server_group="$group$"
+                        | fields sourcetype, totalCount
+                        | sort - totalCount
+                        | rename sourcetype as Sourcetype, totalCount as "Event Count"
+                    </query>
+                    <done>
+                        <set token="sourcetypeCount">$job.resultCount$</set>
+                    </done>
+                </search>
+                <option name="dataOverlayMode">heatmap</option>
+                <option name="drilldown">none</option>
+            </table>
+        </panel>
+    </row>
+    <row>
+        <panel rejects="$snapshot$">
+            <title>Historical Charts</title>
+            <input type="time" searchWhenChanged="true" token="time">
+                <label>Time Range:</label>
+                <default>
+                    <earliestTime>-15d@d</earliestTime>
+                    <latestTime>now</latestTime>
+                </default>
+            </input>
+        </panel>
+    </row>
+    <row>
+        <panel rejects="$snapshot$">
+            <title>$IndexUsageChartTitle$ Index Size (GB)</title>
+            <input type="dropdown" searchWhenChanged="true" token="funcDiskSizeUsage">
+                <label>Aggregation</label>
+                <showClearButton>false</showClearButton>
+                <default>Max</default>
+                <choice value="Avg">Average</choice>
+                <choice value="Median">Median</choice>
+                <choice value="Min">Minimum</choice>
+                <choice value="Max">Maximum</choice>
+                <choice value="Perc90">90th Percentile</choice>
+                <choice value="First">Sampled</choice>
+                <change>
+                    <set token="IndexUsageChartTitle">$label$</set>
+                </change>
+            </input>
+            <chart>
+                <search>
+                    <query>
+                        index=_introspection sourcetype=splunk_disk_objects component=Indexes data.name=$index$ search_group=dmc_group_indexer search_group="$group$"
+                        | `dmc_set_bin_for_disk_usage`
+                        | stats latest(data.total_size) as totalSize by host _time
+                        | `dmc_timechart_for_disk_usage` $funcDiskSizeUsage$(eval(totalSize /1024)) as "Index Size"
+                    </query>
+                    <earliest>$time.earliest$</earliest>
+                    <latest>$time.latest$</latest>
+                </search>
+                <option name="charting.chart">area</option>
+                <option name="charting.axisTitleX.text">Time</option>
+                <option name="charting.axisTitleY.text">GB</option>
+                <option name="charting.axisLabelsY.majorUnit">1</option>
+            </chart>
+        </panel>
+    </row>
+    <row>
+        <panel rejects="$snapshot$" id="instances_by_index_usage">
+            <title>Instances by $PercentIndexUsageChartTitle$ Index Usage (%)</title>
+            <input type="dropdown" searchWhenChanged="true" token="funcDiskPercUsage">
+                <label>Aggregation</label>
+                <showClearButton>false</showClearButton>
+                <default>Avg</default>
+                <choice value="Avg">Average</choice>
+                <choice value="Median">Median</choice>
+                <choice value="Min">Minimum</choice>
+                <choice value="Max">Maximum</choice>
+                <choice value="Perc90">90th Percentile</choice>
+                <choice value="First">Sampled</choice>
+                <change>
+                    <set token="PercentIndexUsageChartTitle">$label$</set>
+                </change>
+            </input>
+            <html>
+                <div class="heatmap_toggle"></div>
+            </html>
+            <viz type="splunk_monitoring_console.heatmap">
+                <search>
+                    <query>
+                        index=_introspection sourcetype=splunk_disk_objects component=Indexes data.name=$index$ search_group=dmc_group_indexer search_group="$group$"
+                        | eval pctDiskUsage = 'data.total_size' / 'data.total_capacity'
+                        | bin _time minspan=10min
+                        | stats $funcDiskPercUsage$(pctDiskUsage) as pctDiskUsage by host _time
+                        | rangemap field=pctDiskUsage "0-25%"=0-0.25 "25-50%"=0.2501-0.5 "50-75%"=0.5001-0.75 "75-100%"=0.7501-1 default=abnormal
+                        | `dmc_timechart_for_disk_usage` partial=f dc(host) as host by range
+                        | fields _time, "0-25%", "25-50%", "50-75%", "75-100%"
+                    </query>
+                    <earliest>$time.earliest$</earliest>
+                    <latest>$time.latest$</latest>
+                </search>
+            </viz>
+            <chart>
+                <search>
+                    <query>
+                        index=_introspection sourcetype=splunk_disk_objects component=Indexes data.name=$index$ search_group=dmc_group_indexer search_group="$group$"
+                        | eval pctDiskUsage = 'data.total_size' / 'data.total_capacity'
+                        | bin _time minspan=10min
+                        | stats $funcDiskPercUsage$(pctDiskUsage) as pctDiskUsage by host _time
+                        | rangemap field=pctDiskUsage "0-25%"=0-0.25 "25-50%"=0.2501-0.5 "50-75%"=0.5001-0.75 "75-100%"=0.7501-1 default=abnormal
+                        | `dmc_timechart_for_disk_usage` partial=f dc(host) as host by range
+                        | fields _time, "0-25%", "25-50%", "50-75%", "75-100%"
+                    </query>
+                    <earliest>$time.earliest$</earliest>
+                    <latest>$time.latest$</latest>
+                </search>
+                <option name="charting.chart">column</option>
+                <option name="charting.chart.stackMode">stacked</option>
+                <option name="charting.axisTitleX.text">Time</option>
+                <option name="charting.axisTitleY.text">Instance Count</option>
+                <option name="charting.axisLabelsY.majorUnit">1</option>
+            </chart>
+            <html>
+                <p>Note: An indexer on which the maximum data size of the index is infinite will not be represented here.</p>
+            </html>
+        </panel>
+    </row>
+    <row>
+        <panel rejects="$snapshot$">
+            <title>$DataAgeChartTitle$ Data Age</title>
+            <input type="dropdown" searchWhenChanged="true" token="funcDataAge">
+                <label>Aggregation</label>
+                <showClearButton>false</showClearButton>
+                <default>Median</default>
+                <choice value="Avg">Average</choice>
+                <choice value="Median">Median</choice>
+                <choice value="Min">Minimum</choice>
+                <choice value="Max">Maximum</choice>
+                <choice value="Perc90">90th Percentile</choice>
+                <choice value="First">Sampled</choice>
+                <change>
+                    <set token="DataAgeChartTitle">$label$</set>
+                </change>
+            </input>
+            <chart>
+                <search>
+                    <query>
+                        index=_introspection sourcetype=splunk_disk_objects component=Indexes data.name=$index$ search_group=dmc_group_indexer search_group="$group$"
+                        | eval data_birth_date = if(isnotnull('data.bucket_dirs.cold.event_min_time'), 'data.bucket_dirs.cold.event_min_time', 'data.bucket_dirs.home.event_min_time')
+                        | eval data_age_days = round((_time - data_birth_date) / 86400, 0)
+                        | `dmc_timechart_for_disk_usage` $funcDataAge$(data_age_days) as "Data Age"
+                    </query>
+                    <earliest>$time.earliest$</earliest>
+                    <latest>$time.latest$</latest>
+                </search>
+                <option name="charting.chart">line</option>
+                <option name="charting.axisTitleX.text">Time</option>
+                <option name="charting.axisTitleY.text">Data Age (days)</option>
+                <option name="charting.axisLabelsY.majorUnit">1</option>
+            </chart>
+        </panel>
+    </row>
+</form>

@@ -1,0 +1,76 @@
+<form class="form-horizontal form-complex">
+    <div class="control-group">
+        <label class="control-label" for="logevent_event">Event</label>
+
+        <div class="controls">
+            <textarea name="action.logevent.param.event" id="logevent_event" style="width: 270px; max-width: 270px; height: 60px;"></textarea>
+        </div>
+    </div>
+    <div class="control-group">
+        <div class="controls">
+            <span class="help-block" style="display: block; position: static; width: auto; margin-left: 0;">
+                Specify event text for the logged event.
+                <br />
+                <a href="{{SPLUNKWEB_URL_PREFIX}}/help?location=learnmore.alert.action.logevent" target="_blank"
+                   title="Splunk help">Learn More <i class="icon-external"></i></a>
+                
+            </span>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="logevent_source">Source</label>
+
+        <div class="controls">
+            <input type="text" class="input-xlarge" name="action.logevent.param.source" id="logevent_source" placeholder="alert:$name$"/>
+        </div>
+    </div>
+    <div class="control-group">
+        <div class="controls">
+            <span class="help-block" style="display: block; position: static; width: auto; margin-left: 0;">
+                Value of the <span class="mono-space">source</span> field.
+            </span>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="logevent_sourcetype">Sourcetype</label>
+
+        <div class="controls">
+            <input type="text" class="input-xlarge" name="action.logevent.param.sourcetype" id="logevent_sourcetype" placeholder="generic_single_line"/>
+        </div>
+    </div>
+    <div class="control-group">
+        <div class="controls">
+            <span class="help-block" style="display: block; position: static; width: auto; margin-left: 0;">
+                Value of the <span class="mono-space">sourcetype</span> field.
+            </span>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="logevent_host">Host</label>
+
+        <div class="controls">
+            <input type="text" class="input-xlarge" name="action.logevent.param.host" id="logevent_host" />
+        </div>
+    </div>
+    <div class="control-group">
+        <div class="controls">
+            <span class="help-block" style="display: block; position: static; width: auto; margin-left: 0;">
+                Value of the <span class="mono-space">host</span> field.
+            </span>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="logevent_index">Index</label>
+
+        <div class="controls">
+            <input type="text" class="input-xlarge" name="action.logevent.param.index" id="logevent_index" placeholder="main"/>
+        </div>
+    </div>
+    <div class="control-group">
+        <div class="controls">
+            <span class="help-block" style="display: block; position: static; width: auto; margin-left: 0;">
+                Indicate a destination <span class="mono-space">index</span> for the logged event. Ensure that destination matches an existing index.
+            </span>
+        </div>
+    </div>
+</form>

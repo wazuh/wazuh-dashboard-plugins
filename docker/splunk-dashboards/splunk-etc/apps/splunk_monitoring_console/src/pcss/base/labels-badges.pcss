@@ -1,0 +1,139 @@
+/*===============================================================================================*/
+/*  SPLUNK: LABELS & BADGES OVERRIDES                                                            */
+/*===============================================================================================*/
+
+/*  Base classes */
+.label,
+.badge {
+    display: inline-block;
+    padding: 2px 4px;
+    font-size: calc($fontSize * 0.846);
+    font-weight: bold;
+    line-height: 14px; /*  ensure proper line-height if floated */
+    color: $white;
+    vertical-align: baseline;
+    white-space: nowrap;
+    text-shadow: 0 -1px 0 rgba(0,0,0,.25);
+    background-color: $gray60;
+}
+/*  Set unique padding and border-radii */
+.label {
+    border-radius: 3px;
+}
+.badge {
+    padding-left: 9px;
+    padding-right: 9px;
+    border-radius: 9px;
+}
+
+/*  Empty labels/badges collapse */
+.label,
+.badge {
+    &:empty {
+        display: none;
+    }
+}
+
+/*  Hover/focus state, but only for links */
+a {
+  &.label:hover,
+  &.label:focus,
+  &.badge:hover,
+  &.badge:focus {
+    color: $white;
+    text-decoration: none;
+    cursor: pointer;
+  }
+}
+
+/*  Colors */
+/*  Only give background-color difference to links (and to simplify, we don't qualifty with `a` but [href] attribute) */
+.label,
+.badge {
+  /*  Important (red) */
+  &-important         { background-color: $errorBackground; }
+  &-important[href]   { background-color: rgba(248,220,217,1); }
+  /*  Warnings (orange) */
+  &-warning           { background-color: $alertColor; }
+  &-warning[href]     { background-color: rgba(241,129,63,1); }
+  /*  Success (green) */
+  &-success           { background-color: $successText; }
+  &-success[href]     { background-color: rgba(83,160,81,1); }
+  /*  Info (turquoise) */
+  &-info              { background-color: $infoText; }
+  &-info[href]        { background-color: rgba(0,109,156,1); }
+  /*  Inverse (black) */
+  &-inverse           { background-color: $gray30; }
+  &-inverse[href]     { background-color: rgba(60, 68, 77, 1); }
+}
+
+/*  Quick fix for labels/badges in buttons */
+.btn {
+  .label,
+  .badge {
+    position: relative;
+    top: -1px;
+  }
+}
+.btn-mini {
+  .label,
+  .badge {
+    top: 0;
+  }
+}
+
+
+
+/*  Labels */
+/*  ------ */
+
+/*  TODO: use vars here */
+.label {
+	padding: 1px 4px 0 4px;
+	border-radius: 4px;
+	line-height: 17px;
+	font-size: $fontSizeSmall;
+	font-weight: normal;
+	text-transform: uppercase;
+	color: $textColor;
+	text-shadow: none;
+	background-color: $gray80;
+	border: 1px solid $gray30;;
+	/*  icons in labels */
+	[class*="icon-"]{
+		font-size: 16px;
+		margin-right: 3px;
+		vertical-align: middle;
+	}
+
+	/*  Important (red) */
+	&-important {
+		background-color: $errorBackground;
+		border-color: $errorBorder;
+		color: $errorText;
+	}
+	/*  Warnings (orange) */
+	&-warning {
+		background-color: rgba(255,231,165,1);
+		border-color: $alertColor;
+		color: $alertColor;
+	}
+	/*  Success (green) */
+	&-success {
+		background-color: $successBackground;
+		border-color: $successBorder;
+		color: $successText;
+	}
+	/*  Info (yellow) */
+	&-info {
+		background-color: $warningBackground;
+		border-color: $warningBorder;
+		color: $warningText;
+	}
+	/*  Inverse (black) */
+	&-inverse {
+		background-color: $gray45;
+		border-color: $gray30;
+		color: $white;
+	}
+}

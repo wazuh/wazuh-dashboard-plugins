@@ -1,0 +1,54 @@
+<form class="splunk-formatter-section" section-label="Legend">
+    <splunk-control-group label="Show Legend">
+        <splunk-radio-input name="{{VIZ_NAMESPACE}}.showLegend" value="true">
+            <option value="true">Yes</option>
+            <option value="false">No</option>
+        </splunk-radio-input>
+    </splunk-control-group>
+    <splunk-control-group label="Custom Title">
+        <splunk-text-input name="{{VIZ_NAMESPACE}}.legendTitle"></splunk-text-input>
+    </splunk-control-group>
+</form>
+
+<form class="splunk-formatter-section" section-label="X-Axis">
+    <splunk-control-group label="Show Label">
+        <splunk-radio-input name="{{VIZ_NAMESPACE}}.showXAxis" value="true">
+            <option value="true">Yes</option>
+            <option value="false">No</option>
+        </splunk-radio-input>
+    </splunk-control-group>
+    <splunk-control-group label="Custom Label">
+        <splunk-text-input name="{{VIZ_NAMESPACE}}.xAxis"></splunk-text-input>
+    </splunk-control-group>
+</form>
+
+<form class="splunk-formatter-section" section-label="Y-Axis">
+    <splunk-control-group label="Show Label">
+        <splunk-radio-input name="{{VIZ_NAMESPACE}}.showYAxis" value="true">
+            <option value="true">Yes</option>
+            <option value="false">No</option>
+        </splunk-radio-input>
+    </splunk-control-group>
+    <splunk-control-group label="Custom Label">
+        <splunk-text-input name="{{VIZ_NAMESPACE}}.yAxis"></splunk-text-input>
+    </splunk-control-group>
+</form>
+
+<form class="splunk-formatter-section" section-label="Tooltip">
+    <splunk-control-group label="Show Tooltips">
+        <splunk-radio-input name="{{VIZ_NAMESPACE}}.showTooltip" value="true">
+            <option value="true">Yes</option>
+            <option value="false">No</option>
+        </splunk-radio-input>
+    </splunk-control-group>
+</form>
+
+<form class="splunk-formatter-section" section-label="Color">
+    <splunk-control-group label="Base Color">
+        <splunk-color-picker name="{{VIZ_NAMESPACE}}.baseColor" type= "custom" value="#284774">
+            <splunk-color>#284774</splunk-color>
+            <splunk-color>#a34a41</splunk-color>
+            <splunk-color>#617e49</splunk-color>
+        </splunk-color-picker>
+    </splunk-control-group>
+</form>

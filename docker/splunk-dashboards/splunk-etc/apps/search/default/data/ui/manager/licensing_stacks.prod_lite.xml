@@ -1,0 +1,13 @@
+<endpoint name="unused">
+  <capabilities>
+    <read>license_edit OR license_view_warnings</read>
+  </capabilities>
+  <header>unused</header>
+  <menu name="system_configurations">
+    <label>Licensing</label>
+    <url>/manager/system/licensing</url>
+    <description>Manage license capacity and view license usage history.</description>
+    <order>30</order>
+    <id>licensing</id>
+  </menu>
+</endpoint>

@@ -1,0 +1,105 @@
+<endpoint name="data/props/lookups" showAppContext="1">
+  <header>Automatic lookups</header>
+  <breadcrumb>
+    <parent hidecurrent="False">lookups</parent>
+    <name>Automatic lookups</name>
+  </breadcrumb>
+  <elements>
+
+    <element name="__ns" type="select" label="Destination app">
+      <view name="create"/>
+      <key name="dynamicOptions" type="dict">
+        <key name="keyName">title</key>
+        <key name="keyValue">title</key>
+        <key name="splunkSource">/apps/local</key>
+        <key name="splunkSourceParams" type="dict">
+          <key name="search">'disabled=false'</key>
+          <key name="count">-1</key>
+        </key>
+      </key>
+    </element>
+
+    <element name="name" label="Name">
+      <view name="list"/>
+      <view name="create"/>
+    </element>
+    <element name="value" type="textfield" label="Lookup">
+      <view name="list"/>
+    </element>
+
+    <element name="transform" type="select" label="Lookup table">
+      <view name="create"/>
+      <view name="edit"/>
+      <key name="dynamicOptions" type="dict">
+        <key name="keyName">title</key>
+        <key name="keyValue">title</key>
+        <key name="splunkSource">/data/transforms/lookups</key>
+        <key name="splunkSourceParams" type="dict">
+          <key name="count">-1</key>
+        </key>
+      </key>
+    </element>
+
+    <element name="stanza_prefixer" type="fieldset">
+      <view name="create"/>
+      <key name="multiColumn">True</key>
+      <elements>
+        <element name="spl-ctrl_stanza_prefix" type="select" label="Apply to">
+          <view name="create"/>
+          <key name="class">short</key>
+          <options>
+            <opt value="" label="sourcetype"/>
+            <opt value="source::" label="source"/>
+            <opt value="host::" label="host"/>
+          </options>
+        </element>
+        <element name="stanza" type="textfield" label="named">
+          <view name="create"/>
+          <key name="class">short</key>
+          <key name="submitValueAdd">(form_data.get('spl-ctrl_stanza_prefix') + value) if value else None</key>
+        </element>
+      </elements>
+    </element>
+
+    <element name="inputfields" type="repeatable" label="Lookup input fields">
+      <view name="create"/>
+      <view name="edit"/>
+      <!-- XXX: requiredIfVisible has no effect on things inside repeatable -->
+      <key name="requiredIfVisible"/>
+      <key name="deleteable">True</key> <!-- user can remove items -->
+      <key name="expandable">True</key> <!-- user can add more items -->
+      <key name="fieldprefix">lookup.field.input.</key>
+      <key name="submitDeleted">False</key>
+      <element name="template" type="fieldmapping">
+        <key name="hideLabel">True</key>
+      </element>
+    </element>
+
+    <element name="outputfields" type="repeatable" label="Lookup output fields">
+      <view name="create"/>
+      <view name="edit"/>
+      <key name="deleteable">True</key> <!-- user can remove items -->
+      <key name="expandable">True</key> <!-- user can add more items -->
+      <key name="fieldprefix">lookup.field.output.</key>
+      <key name="submitDeleted">False</key>
+      <element name="template" type="fieldmapping">
+        <key name="hideLabel">True</key>
+      </element>
+    </element>
+
+    <element name="overwrite" type="checkbox" label="Overwrite field values">
+      <view name="create"/>
+      <view name="edit"/>
+    </element>
+
+    <element name="eai:acl.owner" label="Owner">
+      <view name="list"/>
+      <key name="processValueList">entity['eai:acl']['owner'] == 'nobody' and _('No owner') or entity['eai:acl']['owner']</key>
+    </element>
+    <element name="eai:acl.app" label="App">
+      <view name="list"/>
+      <key name="processValueList">entity['eai:acl']['app'] or ""</key>
+    </element>
+  </elements>
+
+</endpoint>

@@ -1,0 +1,40 @@
+<dashboard hideEdit="True" version="1.1">
+
+  <label>Workload Management Enhancements</label>
+
+  <row>
+
+    <panel>
+
+      <html>
+
+        <p><strong>Description</strong></p>
+        <p>Scope: Splunk Enterprise and Splunk Cloud</p>
+
+        <p>Previously, wildcard support existed for only one special case, which was index=*. As part of this change, various combinations of normal characters and wildcards will be supported for predicates like index, user and role. Using the Workload Management feature we can define two types of rules:</p>
+        <ol>
+        <li><strong>Workload rules:</strong> These are used for automatically placing a search in a workload pool or monitoring and performing remediation actions on running searches. E.g. - a rule for putting all time range searches in a low priority pool would look like <code>[condition: search_time_range=alltime]</code>.</li>
+        <li><strong>Admission rules:</strong> Filter out searches automatically based on a condition that you define. E.g. - a rule to abort all searches running for more than 15 minutes except searches from the admin role would look like    
+        <code>[condition = NOT(role=admin)AND runtime>15m, action=Abort]</code>.</li>
+        </ol>
+
+        <p>Wildcard support will be helpful in solving use-cases like the following:</p>
+        <ol>
+        <li>Allow one rule to cover all indexes with a certain naming pattern. E.g. - all product team index names start with “prod_”. So, they can be covered by the rule <code>index=prod_*</code>.</li>
+        <ul>
+                  <div style="margin-left:10px">
+                   <img src="/static/app/splunk_essentials_9_0/images/wlm_1.png" style="margin: 10px 0" width="700px"/>
+                  </div>
+                 </ul>
+        
+        <li>Allow workload management rules to apply on a group of users/roles. E.g. - abort all long-running searches (>5m) that are not from the support team using the rule <code>NOT (role=support*) AND runtime>5m</code>.</li>
+        <ul>
+                  <div style="margin-left:10px">
+                   <img src="/static/app/splunk_essentials_9_0/images/wlm_2.png" style="margin: 10px 0" width="700px"/>
+                  </div>
+                 </ul>
+        </ol>
+        </html>
+    </panel>
+  </row>
+</dashboard>

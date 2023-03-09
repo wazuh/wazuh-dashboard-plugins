@@ -1,0 +1,287 @@
+# Translations template for PROJECT.
+# Copyright (C) 2018 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2018.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2018-08-28 14:28-0700\n"
+"PO-Revision-Date: 2018-08-31 09:11+0100\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.4\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ja_JP\n"
+"X-Generator: Poedit 2.1.1\n"
+
+#: splunk_gdi/appserver/static/js/components/AsyncImage.jsx:59
+msgid "Loading Now..."
+msgstr "ロード中です..."
+
+#: splunk_gdi/appserver/static/js/components/Dots.jsx:7
+msgid "Loading"
+msgstr "ロード中"
+
+#: splunk_gdi/appserver/static/js/pages/home.enterprise.jsx:10
+#: splunk_gdi/appserver/static/js/pages/home.lite.jsx:10
+#: splunk_gdi/appserver/static/js/views/Search/Master.lite.jsx:34
+msgid "Add Data"
+msgstr "データの追加"
+
+#: splunk_gdi/appserver/static/js/utils/messages.js:5
+msgid "No valid data source is found."
+msgstr "無効なデータ ソースが見つかりました。"
+
+#: splunk_gdi/appserver/static/js/utils/messages.js:6
+msgid "The id of this collection method is invalid."
+msgstr "このコレクション方法の ID は無効です。"
+
+#: splunk_gdi/appserver/static/js/utils/messages.js:7
+msgid "Mandatory fields are missing in the conf file."
+msgstr "必須フィールドは設定ファイルにはありません。"
+
+#: splunk_gdi/appserver/static/js/utils/messages.js:8
+msgid ""
+"The definition of resource server is missing in the response from the "
+"web service."
+msgstr "リソース サーバーの定義は Web サービスの応答にはありません。"
+
+#: splunk_gdi/appserver/static/js/utils/messages.js:9
+msgid ""
+"Splunk data onboarding guides are not accessible. Please ensure an "
+"internet connection is available to access these guides."
+msgstr ""
+"Splunk データのオンボードガイドはアクセス不可です。インターネット接続がこ"
+"れらのガイドにアクセス可能であることを確認してください。"
+
+#: splunk_gdi/appserver/static/js/views/Search/DataSourceCard.jsx:13
+#, python-format
+msgid "images for %s"
+msgstr "%sの画像"
+
+#: splunk_gdi/appserver/static/js/views/Search/DataSourceCard.jsx:42
+msgid "Configure now"
+msgstr "今すぐ設定"
+
+#: splunk_gdi/appserver/static/js/views/Search/DataSourceCard.jsx:45
+#, python-format
+msgid "%d data source"
+msgstr "%d のデータ ソース"
+
+#: splunk_gdi/appserver/static/js/views/Search/DataSourceCard.jsx:48
+#, python-format
+msgid "%d data sources"
+msgstr "%d のデータ ソース"
+
+#: splunk_gdi/appserver/static/js/views/Search/DataSourceContainer.jsx:60
+#, python-format
+msgid "%d data sources in total"
+msgstr "%d の合計データ ソース"
+
+#: splunk_gdi/appserver/static/js/views/Search/DataSourceContainer.jsx:61
+#, python-format
+msgid "%d data source in total"
+msgstr "%d の合計データ ソース"
+
+#: splunk_gdi/appserver/static/js/views/Search/Master.Header.jsx:5
+msgid "What data do you want to send to the Splunk platform?"
+msgstr "どのデータを Splunk プラットフォームへ送信しますか？"
+
+#: splunk_gdi/appserver/static/js/views/Search/Master.lite.jsx:35
+msgid "How do you want to add data?"
+msgstr "データの追加方法は？"
+
+#: splunk_gdi/appserver/static/js/views/Search/Master.resolved.jsx:11
+msgid "Or get data in with the following methods"
+msgstr "またはデータを以下の方法で入手します"
+
+#: splunk_gdi/appserver/static/js/views/Search/DataSourceModal/Master.jsx:90
+#: splunk_gdi/appserver/static/js/views/Search/SearchBarAndResult/SearchResult.jsx:72
+msgid ""
+"No guides matching your search were found. We are continuously adding "
+"new guides."
+msgstr ""
+"サーチに一致するガイドが見つかりませんでした。新しいガイドの追加を続けま"
+"す。"
+
+#: splunk_gdi/appserver/static/js/views/Search/LegacyInputMethod/InputMethodsContainer.jsx:33
+msgid "Upload"
+msgstr "アップロード"
+
+#: splunk_gdi/appserver/static/js/views/Search/LegacyInputMethod/InputMethodsContainer.jsx:34
+msgid "files from my computer"
+msgstr "コンピュータのファイルから"
+
+#: splunk_gdi/appserver/static/js/views/Search/LegacyInputMethod/InputMethodsContainer.jsx:35
+msgid "Local log files"
+msgstr "ローカルのログ ファイル"
+
+#: splunk_gdi/appserver/static/js/views/Search/LegacyInputMethod/InputMethodsContainer.jsx:35
+msgid "Local structured files (e.g. CSV)"
+msgstr "ローカルの構造化ファイル (例：CSV)"
+
+#: splunk_gdi/appserver/static/js/views/Search/LegacyInputMethod/InputMethodsContainer.jsx:36
+msgid "Tutorial for adding data"
+msgstr "データ追加のチュートリアル"
+
+#: splunk_gdi/appserver/static/js/views/Search/LegacyInputMethod/InputMethodsContainer.jsx:44
+msgid "Monitor"
+msgstr "モニター"
+
+#: splunk_gdi/appserver/static/js/views/Search/LegacyInputMethod/InputMethodsContainer.jsx:45
+msgid "files and ports on this Splunk platform instance"
+msgstr "この Splunk プラットフォーム インスタンス上のファイルとポート"
+
+#: splunk_gdi/appserver/static/js/views/Search/LegacyInputMethod/InputMethodsContainer.jsx:47
+msgid "Files - HTTP - WMI - TCP/UDP - Scripts"
+msgstr "ファイル - HTTP - WMI - TCP/UDP - スクリプト"
+
+#: splunk_gdi/appserver/static/js/views/Search/LegacyInputMethod/InputMethodsContainer.jsx:48
+msgid "Modular inputs for external data sources"
+msgstr "外部データ ソース用モジュール入力"
+
+#: splunk_gdi/appserver/static/js/views/Search/LegacyInputMethod/InputMethodsContainer.jsx:57
+msgid "Forward"
+msgstr "転送"
+
+#: splunk_gdi/appserver/static/js/views/Search/LegacyInputMethod/InputMethodsContainer.jsx:58
+msgid "data from a Splunk forwarder"
+msgstr "Splunk フォワーダーからのデータ"
+
+#: splunk_gdi/appserver/static/js/views/Search/LegacyInputMethod/InputMethodsContainer.jsx:59
+msgid "Files - TCP/UDP - Scripts"
+msgstr "ファイル - TCP/UDP - スクリプト"
+
+#: splunk_gdi/appserver/static/js/views/Search/SearchBarAndResult/Master.jsx:13
+msgid "Follow guides for onboarding popular data sources"
+msgstr ""
+"一般的なデータ ソースのオンボーディングについては、ガイドに従います"
+
+#: splunk_gdi/appserver/static/js/views/Search/SearchBarAndResult/SearchBar.jsx:57
+msgid "Search bar"
+msgstr "サーチ バー"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepControl.jsx:26
+msgid "Exit"
+msgstr "終了"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepControl.jsx:27
+msgid "Back"
+msgstr "戻る"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepControl.jsx:28
+msgid "Finish"
+msgstr "完了"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepControl.jsx:29
+msgid "Next"
+msgstr "次へ"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepControl.jsx:30
+msgid "No"
+msgstr "いいえ"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepControl.jsx:31
+msgid "Yes"
+msgstr "はい"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepControl.jsx:32
+msgid "Confirm"
+msgstr "確認"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepControl.jsx:33
+msgid "Exit guide?"
+msgstr "ガイドを修了しますか？"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepHeader.jsx:11
+msgid "Collection Method"
+msgstr "コレクション メソッド"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepHeader.jsx:12
+msgid "Configurations"
+msgstr "設定"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepHeader.jsx:13
+msgid "Validation"
+msgstr "認証"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepCollectionMethod/CollectionMethodCard.jsx:28
+msgid "Best Practice"
+msgstr "ベスト プラクティス"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepCollectionMethod/Master.jsx:43
+msgid "Choose collection method"
+msgstr "コレクション方法を選択する"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepTopology/BlankDeployment.jsx:8
+msgid "Please select deployment"
+msgstr "デプロイを選択してください"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepTopology/ConfigurationContainer.jsx:12
+msgid "High level steps"
+msgstr "高度な方法"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepTopology/ConfigurationContainer.jsx:13
+msgid "Full Configuration Documentation"
+msgstr "フル設定のドキュメント"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepTopology/Master.jsx:28
+msgid "Choose your deployment environment"
+msgstr "デプロイ環境を選択してください"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepTopology/Master.jsx:29
+msgid "Overview of required configuration for your environment"
+msgstr "お使いの環境に必要な設定の概要"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepTopology/Master.jsx:30
+msgid "Deployment Diagram"
+msgstr "デプロイ ダイアグラム"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepTopology/Master.jsx:31
+msgid ""
+"Select options on the left describing your distributed deployment "
+"configuration"
+msgstr "分散デプロイ設定を説明する左側のオプションを選択します"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepTopology/Master.jsx:32
+msgid "Select the option above that describes your Splunk deployment"
+msgstr "Splunk デプロイを説明する上記のオプションを選択します"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepTopology/Master.jsx:33
+msgid ""
+"An overview of the configuration required for your deployment will be "
+"shown here"
+msgstr "デプロイに必要な設定の概要はこちらです"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepValidation/Master.jsx:58
+#, python-format
+msgid "From the %s, enter the query below."
+msgstr "%sから、以下のクエリを入力します。"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepValidation/Master.jsx:59
+msgid "Verify your data is being ingested"
+msgstr "データが取り込まれていることを確認します"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepValidation/Master.jsx:60
+msgid ""
+"Use the following SPL query to verify that your data is indexed and "
+"searchable"
+msgstr ""
+"次の SPL クエリを使って、データがインデックス化されサーチ可能なことを確認"
+"します"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepValidation/Master.jsx:61
+msgid "Search & Reporting app"
+msgstr "サーチ & レポート アプリ"
+
+#: splunk_gdi/appserver/templates/home_template.html:21
+msgid "Loading..."
+msgstr "読み込んでいます..."
+
+#: splunk_gdi/default/app.conf:12 splunk_gdi/default/app.conf:17
+msgid "Splunk Get Data In"
+msgstr "Splunk Get Data"

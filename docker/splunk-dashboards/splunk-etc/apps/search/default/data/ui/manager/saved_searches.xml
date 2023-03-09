@@ -1,0 +1,9 @@
+<endpoint name="saved/searches" template="pages/system.html">
+  <menu name="knowledge_configurations">
+    <label>Searches, reports, and alerts</label>
+    <url>/manager/%(namespace)s/saved/searches</url>
+    <description>View and edit saved searches, reports, and alerts. Set permissions. Set up alerts and summary indexing.</description>
+    <order>20</order>
+    <id>searches</id>
+  </menu>
+</endpoint>

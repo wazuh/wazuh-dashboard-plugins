@@ -1,0 +1,40 @@
+<commands>
+  <command>
+    <name>add tcp</name>
+    <method>POST</method>
+    <uri>/services/data/inputs/tcp/raw/_new</uri>
+    <posArg type="number" min="1" max="65535" name="port"/>
+    <qsMap>
+       <map>
+	 <name>port</name>
+	 <optional/>
+       </map>
+    </qsMap>
+  </command>
+  <command>
+    <name>list tcp</name>
+    <method>GET</method>
+    <uri>/services/data/inputs/tcp/raw</uri>
+  </command>
+  <command>
+    <name>start</name>
+    <delegate>
+      <binary>bin/splunk</binary>
+      <arg>start</arg>
+    </delegate>
+  </command>
+  <command>
+    <name>stop</name>
+    <delegate>
+      <binary>bin/splunk</binary>
+      <arg>stop</arg>
+    </delegate>
+  </command>
+  <command>
+    <name>clean</name>
+    <delegate>
+      <binary>bin/splunk</binary>
+      <arg>clean</arg>
+    </delegate>
+  </command>
+</commands>

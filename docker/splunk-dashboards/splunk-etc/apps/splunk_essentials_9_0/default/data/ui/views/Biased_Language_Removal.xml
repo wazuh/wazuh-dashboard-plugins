@@ -1,0 +1,44 @@
+<dashboard hideEdit="True" version="1.1">
+
+  <label>Biased Language Removal</label>
+
+  <row>
+
+    <panel>
+
+      <html>
+
+        <p><strong>Description</strong></p>
+
+       <p> Scope: Splunk Enterprise and Splunk Cloud </p>
+
+       <p> Splunk is committed to removing signs of institutionalized bias in our products, our documentation, and our language. For more on this effort, read this <a href="https://www.splunk.com/en_us/blog/leadership/biased-language-has-no-place-in-tech.html" target="_blank">blog post</a>.</p>
+
+       <p> As an initial step, we’ve removed several major instances of biased language in licensing workflows including the replacement of ‘master’ / ‘slave’ with ‘manager’ / ‘peer’ terms in:</p> 
+         <ol>
+          <li> conf files </li>
+          <li> the CLI </li>
+          <li> REST endpoints </li>
+          <li> the UI including the Licensing Page, Change Master Association Workflow, License Usage Reporting, License Pools, License Alerts </li>
+         </ol>
+
+        <p> We’ve also included a deprecation note in licensing conf files about these old terms, and the relevant documentation updates to reflect these changes for this release. </p>
+
+        <p> Lastly, we’ve removed biased language by changing the terms ‘master’ / ‘slave’ /  ‘whitelist’ / ‘blacklist’ with ‘manager’ / ‘peer’ / ‘allow list’ / ‘deny list’ in the administrative workflows as well by updating the UI, and respective files associated with the following pages and workflows:</p>
+          <ol>
+            <li> Add Data </li>
+            <li> Clustering </li>
+            <li> Data Inputs Monitoring </li>
+            <li> Data Preview </li>
+            <li> Forwarder Management (Deployment Server) </li>
+            <li> Metrics </li>
+            <li> Monitoring Console </li>
+            <li> SSAI </li>
+            <li> Virtual Indexes </li>
+            <li> Viz Controls </li>
+            <li> Distsearch.conf (config file) </li>
+          </ol>
+        </html>
+    </panel>
+  </row>
+</dashboard>

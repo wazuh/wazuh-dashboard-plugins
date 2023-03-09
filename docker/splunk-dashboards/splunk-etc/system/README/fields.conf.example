@@ -1,0 +1,24 @@
+#   Version 9.0.3
+#
+# This file contains an example fields.conf.  Use this file to configure
+# dynamic field extractions.
+#
+# To use one or more of these configurations, copy the configuration block into
+# fields.conf in $SPLUNK_HOME/etc/system/local/. You must restart Splunk to
+# enable configurations.
+#
+# To learn more about configuration files (including precedence) please see the
+# documentation located at
+# http://docs.splunk.com/Documentation/Splunk/latest/Admin/Aboutconfigurationfiles
+#
+# These tokenizers result in the values of To, From and Cc treated as a list,
+# where each list element is an email address found in the raw string of data.
+
+[To]
+TOKENIZER = (\w[\w\.\-]*@[\w\.\-]*\w)
+
+[From]
+TOKENIZER = (\w[\w\.\-]*@[\w\.\-]*\w)
+
+[Cc]
+TOKENIZER = (\w[\w\.\-]*@[\w\.\-]*\w)

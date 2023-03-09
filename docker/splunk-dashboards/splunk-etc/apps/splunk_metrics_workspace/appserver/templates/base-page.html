@@ -1,0 +1,28 @@
+<%!
+from splunk.appserver.mrsparkle.lib import util 
+app_name = 'splunk_metrics_workspace'
+%>\
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="x-ua-compatible" content="ie=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="shortcut icon" href="${util.getFaviconURL()}" />
+        <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+        <link rel="stylesheet" type="text/css" href="${make_url('/static/build/css/bootstrap-enterprise.css', _qs=css_less_qs)}" />
+    </head>
+
+    <body>
+        <script src="${make_url('/config?autoload=1')}"></script>
+        <script src="${make_url('/static/js/i18n.js')}"></script>
+        <script src="${make_url('/i18ncatalog?autoload=1')}"></script>
+        <script>
+            __splunkd_partials__ = ${ json_decode(splunkd) };
+        </script>
+
+        <% page_path = "/static/app/" + app_name + "/pages/" + page + ".js" %>
+
+        <script src="${make_url(page_path)}"></script>
+    </body>
+</html>

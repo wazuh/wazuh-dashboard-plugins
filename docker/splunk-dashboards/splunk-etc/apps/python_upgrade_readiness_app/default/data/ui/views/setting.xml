@@ -1,0 +1,4 @@
+<?xml version="1.1"?>
+<view template="python_upgrade_readiness_app:/templates/setting.html" type="html" isVisible="false">
+	<label>Python Version</label>
+</view>

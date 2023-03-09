@@ -1,0 +1,85 @@
+<endpoint name="data/ui/times" showAppContext="1">
+  <header>Time ranges</header>
+  <breadcrumb>
+    <parent hidecurrent="False">ui</parent>
+    <name>Time ranges</name>
+  </breadcrumb>
+  <elements>
+
+    <element name="__ns" type="select" label="Destination app">
+      <view name="create"/>
+      <key name="dynamicOptions" type="dict">
+        <key name="keyName">title</key>
+        <key name="keyValue">title</key>
+        <key name="splunkSource">/apps/local</key>
+        <key name="splunkSourceParams" type="dict">
+          <key name="search">'disabled=false'</key>
+          <key name="count">-1</key>
+        </key>
+      </key>
+    </element>
+
+    <element name="name" label="Name">
+      <view name="create"/>
+      <view name="list"/>
+      <key name="exampleText">Enter a unique name. This is used for identifying your time range later on within Splunk Settings.</key>
+    </element>
+
+    <element name="label" type="textfield" label="Label">
+      <view name="create"/>
+      <view name="edit"/>
+      <view name="list"/>
+      <key name="exampleText">Enter the label that appears for this time range in the user interface.</key>
+    </element>
+
+    <element name="order" type="textfield" label="Order">
+      <view name="create"/>
+      <view name="edit"/>
+      <view name="list"/>
+      <key name="class">short</key>
+      <key name="exampleText">Enter a number from 0-999 to specify how this time range is sorted in the user interface. Defaults to 0.</key>
+    </element>
+
+
+    <element name="time_range_group" type="fieldset">
+      <view name="create"/>
+      <view name="edit"/>
+      <view name="list"/>
+      <key name="legend">Time range</key>
+      <elements>
+        <element name="time_group" type="fieldset">
+          <view name="create"/>
+          <view name="edit"/>
+          <view name="list"/>
+          <key name="multiColumn">True</key>
+          <elements>
+            <element name="earliest_time" type="textfield" label="Earliest time">
+              <view name="create"/>
+              <view name="edit"/>
+              <view name="list"/>
+              <key name="class">short</key>
+              <key name="exampleText">Enter a relative time range that represents the earliest event to return (inclusive), e.g. '-24h' for the last 24 hours. If omitted, no earliest time bound is used.</key>
+            </element>
+            <element name="latest_time" type="textfield" label="Latest time">
+              <view name="create"/>
+              <view name="edit"/>
+              <view name="list"/>
+              <key name="class">short</key>
+              <key name="exampleText">Enter a relative time range that represents the latest event to return (exclusive). If omitted, no latest time bound is used.</key>
+            </element>
+          </elements>
+        </element>
+      </elements>
+    </element>
+
+    <element name="eai:acl.owner" label="Owner">
+      <view name="list"/>
+      <key name="processValueList">entity['eai:acl']['owner'] == 'nobody' and _('No owner') or entity['eai:acl']['owner']</key>
+    </element>
+    <element name="eai:acl.app" label="App">
+      <view name="list"/>
+      <key name="processValueList">entity['eai:acl']['app'] or ""</key>
+    </element>
+
+  </elements>
+</endpoint>

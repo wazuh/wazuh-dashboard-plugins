@@ -1,0 +1,15 @@
+<% _.each(thresholds, function(threshold) { %>
+<li 
+    <%= threshold.classes ? "class=\"" + threshold.classes + "\"" : "" %>
+    data-range="<%- threshold.rangeName %>"
+    data-toggle="tooltip"
+    data-placement="top"
+    data-title="<%- threshold.rangeLabel %>"
+    data-animation="false"
+    <% if (threshold.classes.indexOf('dmc-status-zero') >= 0) { %>
+    	style="border-color: <%= threshold.color %>; background-color: transparent;"
+    <% } else { %>
+    	style="background-color: <%= threshold.color %>;"
+    <% } %>
+    ><a><%- threshold.count %></a></li>
+<% }) %>

@@ -1,0 +1,1285 @@
+/*===============================================================================================*/
+/*  SPLUNK: FORMS                                                                                */
+/*  Base styles for various input types, form layouts, and states                                */
+/*===============================================================================================*/
+
+@define-mixin formFieldState $textColor: $textColor, $borderColor: $borderColor, $backgroundColor: $gray98 {
+    /*  Set the text color */
+    .control-label,
+    .help-block,
+    .help-inline,
+    .checkbox,
+    .radio {
+        color: $textColor;
+    }
+
+    /*  Style inputs accordingly  */
+    input,
+    select,
+    textarea {
+        color: $textColor;
+        border-color: $borderColor;
+        box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075); /*  Redeclare so transitions work */
+        &:focus {
+            @mixin focus-element;
+            z-index: $zindexFocus;
+        }
+    }
+
+    /*  Give a small background color for input-prepend/-append  */
+    .input-prepend .add-on,
+    .input-append .add-on {
+        color: $textColor;
+        background-color: $backgroundColor;
+        border-color: $textColor;
+    }
+}
+
+/*************************************************************************************************/
+/*  GENERAL STYLES                                                                               */
+/*************************************************************************************************/
+/*  Make all forms have space below them */
+form, form:last-child {
+    margin: 0 0 $lineHeight;
+}
+
+fieldset {
+    padding: 0;
+    margin: 0;
+    border: 0;
+}
+
+/*  Groups of fields with labels on top (legends) */
+legend {
+    display: block;
+    width: 100%;
+    padding: 0;
+    margin-bottom: $lineHeight;
+    font-size: 15px;
+    line-height: calc($lineHeight * 2);
+    color: $gray30;
+    border: 0;
+    border-bottom: 1px solid #e5e5e5;
+
+    /*  Small */
+    small {
+        font-size: calc($lineHeight * .75);
+        color: $gray60;
+    }
+}
+
+/*  Set font for forms */
+label,
+input,
+button,
+select,
+textarea {
+    font-size: $fontSize;
+    font-weight: normal;
+    line-height: $lineHeight;
+}
+input,
+button,
+select,
+textarea {
+    font-family: $fontFamily; /*  And only set font-family here for those that need it (note the missing label element) */
+}
+
+/*  Identify controls by their labels */
+label {
+    display: block;
+    margin-bottom: $spacingQuarter;
+    cursor: default; /* reset pointer */
+}
+
+
+/*************************************************************************************************/
+/*  FORM CONTROLS                                                                                */
+/*************************************************************************************************/
+/*  Shared size and type resets */
+select,
+textarea,
+input[type="text"],
+input[type="password"],
+input[type="datetime"],
+input[type="datetime-local"],
+input[type="date"],
+input[type="month"],
+input[type="time"],
+input[type="week"],
+input[type="number"],
+input[type="email"],
+input[type="url"],
+input[type="search"],
+input[type="tel"],
+input[type="color"],
+.uneditable-input {
+    @mixin base-input;
+    margin-bottom: calc($lineHeight / 2);
+    color: $inputTextColor;
+    border-radius: $inputBorderRadius;
+    vertical-align: middle;
+}
+
+/*  Reset appearance properties for textual inputs and textarea */
+/*  Declare width for legacy (can't be on input[type=*] selectors or it's too specific) */
+input,
+textarea,
+.uneditable-input {
+    width: 206px; /*  plus 12px padding and 2px border */
+    box-sizing: border-box;
+}
+/*  Reset height since textareas have rows */
+textarea {
+    height: auto;
+}
+/*  Everything else */
+textarea,
+input[type="text"],
+input[type="password"],
+input[type="datetime"],
+input[type="datetime-local"],
+input[type="date"],
+input[type="month"],
+input[type="time"],
+input[type="week"],
+input[type="number"],
+input[type="email"],
+input[type="url"],
+input[type="search"],
+input[type="tel"],
+input[type="color"],
+.uneditable-input {
+    background-color: $inputBackground;
+    border: $inputBorder;
+    transition: $transitionBorder, $transitionBoxShadow;
+
+    /*  Focus state */
+    &:focus {
+        @mixin focus-element;
+        z-index: $zindexFocus;
+    }
+
+    &.text-clear {
+       padding-right: 28px;
+    }
+
+    /* Don't show IE clear button when an artificial one is shown. */
+    &.text-clear::-ms-clear {
+        display: none;
+        width: 0;  /* IE 11 on windows 8 */
+        height: 0; /* IE 11 on windows 8 */
+    }
+}
+
+/*  Position radios and checkboxes better */
+input[type="radio"],
+input[type="checkbox"] {
+    margin: 4px 0 0;
+    margin-top: 1px \9; /* IE9 */
+    line-height: normal;
+}
+
+/*  Reset width of input images, buttons, radios, checkboxes */
+input[type="file"],
+input[type="image"],
+input[type="submit"],
+input[type="reset"],
+input[type="button"],
+input[type="radio"],
+input[type="checkbox"] {
+    width: auto; /*  Override of generic input selector */
+}
+
+/*  Set the height of select and file controls to match text inputs */
+select,
+input[type="file"] {
+    height: $inputHeight;
+    line-height: $inputHeight;
+}
+
+/*  Make select elements obey height by applying a border */
+select {
+    width: 220px; /*  default input width + 10px of padding that doesn't get applied */
+    border: $borderDefault;
+    background-color: $inputBackground; /*  Chrome on Linux and Mobile Safari need background-color */
+}
+
+/*  Make multiple select elements height not fixed */
+select[multiple],
+select[size] {
+    height: auto;
+}
+
+/*  Focus for select, file, radio, and checkbox */
+select:focus,
+input[type="file"]:focus,
+input[type="radio"]:focus,
+input[type="checkbox"]:focus {
+    @mixin focus-element;
+}
+
+input[type="radio"]:focus {
+    border-radius: 100%;
+}
+
+
+/*************************************************************************************************/
+/*  UNEDITABLE INPUTS                                                                            */
+/*************************************************************************************************/
+/*  Make uneditable inputs look inactive */
+.uneditable-input,
+.uneditable-textarea {
+    color: $inputDisabledTextColor;
+    background-color: $inputDisabledBackground;
+    border-color: $inputDisabledBorderColor;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,.025);
+    cursor: not-allowed;
+}
+
+/*  For text that needs to appear as an input but should not be an input */
+.uneditable-input {
+    overflow: hidden; /*  prevent text from wrapping, but still cut it off like an input does */
+    white-space: nowrap;
+}
+
+/*  Make uneditable textareas behave like a textarea */
+.uneditable-textarea {
+    width: auto;
+    height: auto;
+}
+
+/*  restrict text area resize */
+textarea {
+    min-height: 2em;
+    resize: vertical;
+}
+
+
+/*************************************************************************************************/
+/*  PLACEHOLDER                                                                                  */
+/*************************************************************************************************/
+/*  Placeholder text gets special styles because when browsers invalidate entire lines if it doesn't understand a selector */
+input,
+textarea {
+    @mixin placeholder;
+}
+
+
+/*************************************************************************************************/
+/*  CHECKBOXES & RADIOS                                                                          */
+/*************************************************************************************************/
+/*  Indent the labels to position radios/checkboxes as hanging */
+.radio,
+.checkbox {
+    min-height: $lineHeight; /*  clear the floating input if there is no label text */
+    padding-left: $spacing;
+}
+.radio input[type="radio"],
+.checkbox input[type="checkbox"] {
+    float: left;
+    margin-left: -$spacing;
+}
+.radio input[type="radio"] {
+    border-radius: 100%;
+}
+
+/*  Move the options list down to align with labels */
+.controls > .radio:first-child,
+.controls > .checkbox:first-child {
+    padding-top: $spacingQuarter; /*  has to be padding because margin collaspes */
+}
+
+/*  Radios and checkboxes on same line */
+/*  TODO v3: Convert .inline to .control-inline */
+.radio.inline,
+.checkbox.inline {
+    display: inline-block;
+    padding-top: $spacingQuarter;
+    margin-bottom: 0;
+    vertical-align: middle;
+}
+.radio.inline + .radio.inline,
+.checkbox.inline + .checkbox.inline {
+    margin-left: $spacingHalf; /*  space out consecutive inline controls */
+}
+
+
+
+
+/*************************************************************************************************/
+/*  DISABLED STATE                                                                               */
+/************************************************************************************************/
+
+/*  Disabled and read-only inputs */
+input[disabled],
+select[disabled],
+textarea[disabled],
+input[readonly],
+select[readonly],
+textarea[readonly] {
+    cursor: not-allowed;
+    background-color: $inputDisabledBackground;
+    border-color: $inputDisabledBorderColor;
+    color: $inputDisabledTextColor;
+}
+/*  Explicitly reset the colors here */
+input[type="radio"][disabled],
+input[type="checkbox"][disabled],
+input[type="radio"][readonly],
+input[type="checkbox"][readonly] {
+    background-color: $inputDisabledBackground;
+}
+
+
+/*************************************************************************************************/
+/*  FORM FIELD FEEDBACK STATES                                                                   */
+/*************************************************************************************************/
+/*  Warning */
+.control-group.warning {
+    @mixin formFieldState $warningText, $warningText, $warningBackground;
+}
+/*  Error */
+.control-group.error {
+    @mixin formFieldState $errorText, $errorText, $errorBackground;
+}
+/*  Success */
+.control-group.success {
+    @mixin formFieldState $successText, $successText, $successBackground;
+}
+/*  Success */
+.control-group.info {
+    @mixin formFieldState $infoText, $infoText, $infoBackground;
+}
+
+/*  HTML5 invalid states */
+/*  Shares styles with the .control-group.error above */
+input:focus:invalid,
+textarea:focus:invalid,
+select:focus:invalid {
+    color: #b94a48;
+    border-color: #ee5f5b;
+    &:focus {
+        border-color: rgba(238,95,91,1);
+        box-shadow: 0 0 6px rgba(255,146,142,1);
+    }
+}
+
+
+/*************************************************************************************************/
+/*  FORM ACTIONS                                                                                 */
+/*************************************************************************************************/
+.form-actions {
+    padding: calc($lineHeight - 1px) $spacing $lineHeight;
+    margin-top: $lineHeight;
+    margin-bottom: $lineHeight;
+    background-color: $formActionsBackground;
+    border-top: 1px solid #e5e5e5;
+    @mixin clearfix; /*  Adding clearfix to allow for .pull-right button containers */
+}
+
+
+/*************************************************************************************************/
+/*  HELP TEXT                                                                                    */
+/*************************************************************************************************/
+.help-block,
+.help-inline {
+    color: $placeholderText;
+
+    > .learn-more-link, > .help-link {
+        white-space: nowrap;
+    }
+}
+
+.help-block {
+    display: block; /*  account for any element using help-block */
+    margin-top: 3px;
+    margin-bottom: calc($lineHeight / 2);
+    line-height: 1.4em;
+    font-size: $fontSizeSmall;
+    word-wrap: break-word;
+}
+
+.help-inline {
+    display: inline-block;
+    vertical-align: middle;
+    padding-left: $spacingQuarter;
+}
+
+
+/*************************************************************************************************/
+/*  INPUT GROUPS                                                                                 */
+/*************************************************************************************************/
+/*  Allow us to put symbols and text within the input field for a cleaner look */
+
+
+/*************************************************************************************************/
+/*  SEARCH FORM                                                                                  */
+/*************************************************************************************************/
+input.search-query {
+    margin-bottom: 0; /*  Remove the default margin on all inputs */
+    transition: $transitionBackgroundColor;
+}
+
+/*************************************************************************************************/
+/*  HORIZONTAL & VERTICAL FORMS                                                                  */
+/*************************************************************************************************/
+/*  Common properties */
+/*  ----------------- */
+
+.form-search,
+.form-inline,
+.form-horizontal {
+    input,
+    textarea,
+    select,
+    .uneditable-input {
+        display: inline-block;
+        margin-bottom: 0;
+        vertical-align: middle;
+    }
+    /*  Re-hide hidden elements due to specifity */
+    .hide {
+        display: none;
+    }
+}
+
+.form-search,
+.form-inline {
+    label,
+    .btn-group {
+        display: inline-block;
+    }
+    .radio,
+    .checkbox {
+        /*  Inline checkbox/radio labels (remove padding on left) */
+        padding-left: 0;
+        margin-bottom: 0;
+        vertical-align: middle;
+    }
+    .radio input[type="radio"],
+    .checkbox input[type="checkbox"] {
+        /*  Remove float and margin, set to inline-block */
+        float: left;
+        margin-right: 3px;
+        margin-left: 0;
+    }
+}
+
+/*  Margin to space out fieldsets */
+.control-group {
+    margin-bottom: $spacingHalf;
+    position: relative;
+
+    &.disabled .control-label {
+        /*  If a control is disabled, also gray out the control label */
+        color: $inputDisabledTextColor;
+        cursor: default;
+    }
+    .tooltip-link {
+        /*  Tooltop link */
+        top: -0.5em;
+        position: relative;
+        font-size: 75%;
+        line-height: 0;
+        vertical-align: baseline;
+        margin: 0 2px;
+        padding: 2px;
+        cursor: default;
+        font-weight: normal;
+    }
+}
+/*  Legend collapses margin, so next element is responsible for spacing */
+/*  Only applies to legends that are not visually hidden for accessibility purposes */
+legend:not(.visuallyhidden) + .control-group {
+    margin-top: $lineHeight;
+    -webkit-margin-top-collapse: separate;
+}
+
+
+/*************************************************************************************************/
+/*  HORIZONTAL SPECIFIC STYLES                                                                   */
+/*************************************************************************************************/
+.form-horizontal {
+    /*  Increase spacing between groups */
+
+    width: 600px;
+    max-width: 100%;
+
+    .control-group {
+        margin-bottom: $spacingHalf;
+        @mixin clearfix;
+    }
+    /*  Float the labels left */
+    .control-label {
+        float: left;
+        width: calc($horizontalComponentOffset - $spacing);
+        padding-top: $spacingQuarter;
+        text-align: right;
+    }
+    /*  Move over all input controls and content */
+    .controls {
+        margin-left: $horizontalComponentOffset;
+
+        > .help-block {
+            margin-left: 0;
+        }
+    }
+    /*  Remove bottom margin on block level help text since that's accounted for on .control-group */
+    .help-block {
+        margin-bottom: 0;
+        margin-left: $horizontalComponentOffset;
+    }
+
+    /*  And apply it only to .help-block instances that follow a form control */
+    input,
+    select,
+    textarea,
+    .uneditable-input {
+        + .help-block {
+            margin-top: calc($lineHeight / 2);
+        }
+    }
+    /*  Move over buttons in .form-actions to align with .controls */
+    .form-actions {
+        padding-left: $horizontalComponentOffset;
+    }
+}
+
+
+/*************************************************************************************************/
+/*  INLINE SPECIFIC STYLES                                                                       */
+/*************************************************************************************************/
+.form-inline {
+    label {
+        line-height: 28px;
+    }
+    .form-value {
+        line-height: 28px;
+        margin-right: $spacingThreeQuarters;
+    }
+    input {
+        width: auto;
+        margin-right: $spacingThreeQuarters;
+    }
+}
+
+/*************************************************************************************************/
+/*  CONTROLS LAYOUT                                                                              */
+/*************************************************************************************************/
+
+.controls {
+    /* Synthetic Radio is always full width */
+    .shared-controls-syntheticradiocontrol,
+    .shared-controls-booleanradiocontrol {
+        display: flex;
+        width: 100%;
+
+        > .btn {
+            flex: 1 1 auto;
+        }
+    }
+}
+
+.controls-join {
+    display: flex;
+
+    /* evenly space controls */
+    .control:not(:only-child) {
+        flex: 1 0 0px;
+        max-width: 100%;
+    }
+    .control:only-child {
+        width: 100%;
+    }
+
+
+    /* Text-inputs should take up any extra space */
+    .shared-controls-textcontrol {
+        flex: 0 1 100%;
+        min-width: 30%;
+    }
+
+    /* If there are three controls, allow the text control to get very small */
+    .shared-controls-textcontrol:nth-last-child(n+3), .control:nth-last-child(n+3) ~ .shared-controls-textcontrol {
+        min-width: calc($inputHeight * 1.5);
+    }
+
+    /* First or in the Middle do not have right corners */
+    .shared-controls-textcontrol:not(:last-child) input,
+    .shared-controls-textcontrol:not(:last-child) .uneditable-input,
+    .shared-controls-syntheticselectcontrol:not(:last-child) .btn {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+
+    /* Last or in the Middle do not have left corners */
+    .shared-controls-textcontrol:not(:first-child) input,
+    .shared-controls-textcontrol:not(:first-child) .uneditable-input,
+    .shared-controls-syntheticselectcontrol:not(:first-child) .btn  {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        border-left: none;
+    }
+
+    /* Control should fill the control div */
+    input,
+    textarea,
+    select,
+    .uneditable-input,
+    .shared-controls-syntheticselectcontrol .btn {
+        width: 100%;
+    }
+
+    /*  Reset width of input images, buttons, radios, checkboxes */
+    input[type="file"],
+    input[type="image"],
+    input[type="submit"],
+    input[type="reset"],
+    input[type="button"],
+    input[type="radio"],
+    input[type="checkbox"] {
+        width: auto; /*  Override of generic input selector */
+    }
+
+}
+
+.controls-wrap {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.controls-separate {
+    display: flex;
+
+    .control + .control {
+        margin-left: 10px;
+    }
+}
+
+.controls-stack {
+    display: flex;
+    flex-direction: column
+}
+
+
+/*************************************************************************************************/
+/*  FORM ELEMENTS                                                                                */
+/*************************************************************************************************/
+.control {
+    position: relative;
+    /*  synthetic placeholder */
+    .placeholder {
+        color: $placeholderText;
+        position: absolute;
+        max-width: 100%;
+        top: 3px;
+        left: 6px;
+        font-size: $fontSize;
+    }
+    ::placeholder {
+        color: $placeholderText;
+        opacity: 1;
+    }
+    /* uneditable-input a read only text field or text area */
+    .uneditable-input {
+        background-color: $inputDisabledBackground;
+        min-height: $inputHeight;
+        &.uneditable-input-multiline {
+            overflow-y: auto;
+            white-space: normal;
+            white-space: pre-wrap;
+            word-break: break-all;
+            word-break: break-word;
+            height: auto;
+            max-height: 100px;
+        }
+    }
+    &.shared-controls-textcontrol {
+        .control-clear, .search-icon {
+            position: absolute;
+            top: calc(50% + 1px);
+            transform: translate(0, -50%);
+            right: $spacingHalf;
+            font-size: 18px;
+            color: $textGray;
+        }
+        .control-clear {
+            display: none;
+        }
+
+        > input {
+            width: 100%;
+        }
+    }
+    &.shared-controls-spinnercontrol {
+        text-align: center;
+        input, .uneditable-input {
+            display: block;
+            padding: 4px 65px 4px 6px;
+
+            transition: $transitionBorder, $transitionBoxShadow;
+        }
+
+        input.corrected-value {
+            border-color: $errorColor;
+            box-shadow: $errorColorL50 0px 0px 8px 0px;
+        }
+
+        .increment-down, .increment-up {
+            position: absolute;
+            right: 1px;
+            top: 1px;
+            width: 30px;
+            line-height: 30px;
+
+            &:focus {
+                @mixin focus-background;
+            }
+
+            &.disabled {
+                color: $inputDisabledTextColor;
+            }
+        }
+
+        .increment-down {
+            right: 31px;
+        }
+    }
+    &.shared-findinput {
+        display: inline-block;
+        margin: 5px 0;
+        input {
+            width: 250px;
+        }
+    }
+}
+
+/* simple text only control (LabelControl) */
+.input-label {
+    @mixin base-input 8px 0 4px 0, auto, 15px;
+    max-width: 100%;
+    word-wrap: break-word;
+    word-break: break-word;
+    font-weight: 500;
+}
+
+/* wrapper for checkbox */
+label.checkbox {
+    padding: 2px 0 2px calc($inputHeight / 2 + 5px);
+    margin-bottom: 0;
+    position: relative;
+
+    &.disabled {
+        color: $inputDisabledTextColor;
+    }
+    >.btn {
+        padding: 0;
+        width: calc($inputHeight / 2);
+        height: calc($inputHeight / 2);
+        border-radius: $borderRadiusSmall;
+        position: absolute;
+        left: 0;
+        top: 3px;
+
+        > [class*="icon-"] {
+            margin: 0;
+            position: relative;
+            bottom: 6px;
+            vertical-align: text-top;
+        }
+    }
+}
+
+/*************************************************************************************************/
+/*  SMALL FORMS                                                                                  */
+/*************************************************************************************************/
+
+
+.control-group-small {
+	.control-label {
+		font-size: $fontSizeSmall;
+	}
+}
+
+.control-small {
+    font-size: $fontSizeSmall;
+
+    input[type="text"],
+    .uneditable-input,
+    textarea {
+        padding-top: 2px;
+        padding-bottom: 2px;
+        font-size: inherit;
+    }
+
+    input[type="text"],
+    .uneditable-input {
+        height: $inputHeightSmall
+    }
+
+    .uneditable-input {
+        min-height: 16px;
+    }
+
+    .btn, &.btn-group > .btn {
+        padding-top: 2px;
+        padding-bottom: 2px;
+        font-size: $fontSizeSmall;
+    }
+
+
+    &.shared-controls-spinnercontrol {
+        input, .uneditable-input {
+            padding-right:  55px;
+        }
+
+        .increment-down, .increment-up {
+            width: 24px;
+            line-height: 24px;
+        }
+
+        .increment-down {
+            right: 25px;
+        }
+    }
+}
+
+/*************************************************************************************************/
+/*  CHECKBOX CONTROLS                                                                            */
+/*************************************************************************************************/
+.shared-controls-checkboxgroup label.checkbox {
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+
+.control-group > .controls > .shared-controls-syntheticcheckboxcontrol:only-child {
+    padding-top: 4px; /* Align to label */
+}
+
+/*************************************************************************************************/
+/*  KEY VALUE CONTROL                                                                            */
+/*************************************************************************************************/
+.shared-controls-keyvaluecontrol {
+    .shared-controls-textcontrol {
+        margin-right: $spacingHalf;
+    }
+
+    .key-text-control-placeholder,
+    .value-text-control-placeholder {
+        float: left;
+    }
+}
+
+
+/*************************************************************************************************/
+/*  ACCUMULATOR CONTROL                                                                          */
+/*************************************************************************************************/
+.accumulator {
+    width: 700px;
+
+    .controls-join & {
+        width: 100%;
+    }
+    .availableOptionsContainer,
+    .selectedOptionsContainer {
+        float: left;
+        width: calc(50% - $spacingHalf);
+        margin: 0px $spacing 0px 0px;
+    }
+    .addAllLink, .removeAllLink {
+        float: right;
+    }
+    .selectedOptionsContainer {
+        margin-right: 0px;
+    }
+    .availableOptionsHeader {
+        font-weight: normal;
+        font-size: $fontSize;
+        width: 200px;
+        margin-right: 22px;
+        padding-bottom: $spacingQuarter;
+        line-height: 0px;
+    }
+    .selectedOptionsHeader {
+        width: 200px;
+        margin-right: 0px;
+    }
+    ul.availableOptions, ul.selectedOptions {
+        border-radius: $borderRadius;
+        height: 100px;
+        overflow: auto;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        border: $borderDefault;
+        clear: left;
+    }
+    .accDisabled ul.availableOptions,
+    .accDisabled ul.selectedOptions {
+        background-color: $gray98;
+    }
+    ul.availableOptions li, ul.selectedOptions li {
+        clear: left;
+        padding: 4px 5px;
+        font-size: $fontSize;
+        cursor: pointer;
+        line-height: 1;
+    }
+    ul.availableOptions li:hover,
+    ul.selectedOptions li:hover {
+        background-color: $pillBackgroundColorHover;
+    }
+    ul.availableOptions li span, ul.selectedOptions li span {
+        margin: 0px 8px 0 0;
+        display: block;
+        float: left;
+    }
+    ul span.splIcon-arrow-e {
+        background-color: $accentColor;
+    }
+    ul.availableOptions li.selected, .accDisabled ul li {
+        color: $textGray;
+    }
+    ul.availableOptions li.selected span.splIcon,
+    .accDisabled ul li span.splIcon {
+        background-color: $gray80;
+    }
+    .selected {
+        background-color: transparent;
+    }
+    .control-group.error & ul {
+        border-color: $errorColor;
+    }
+    .icon-class {
+        color: $textGray;
+    }
+    div.wide {
+        width: 340px;
+    }
+}
+
+/*************************************************************************************************/
+/*  TABLE FORMS                                                                                  */
+/*  TODO: figure out what this is for.                                                           */
+/*************************************************************************************************/
+/*
+<table class="form">
+    <tr>
+        <td>cell</td>
+        <td>
+            <div class="help-block">help-block</div>
+        </td>
+    </tr>
+    <tr>
+        <td>cell</td>
+        <td>
+            <div class="help-block">help-block</div>
+        </td>
+    </tr>
+</table>
+*/
+table.form td {
+    padding-right: $spacingHalf;
+    padding-bottom: $spacingQuarter;
+}
+
+table.form tr:last-child td {
+    padding-bottom: 0;
+}
+
+table.form tr:last-child .help-block {
+    margin-bottom: 0;
+}
+
+
+/*************************************************************************************************/
+/*  FORMAT DIALOGS                                                                               */
+/*************************************************************************************************/
+
+.form-format {
+    .control-label {
+        width: 100px;
+    }
+    /*  remove margin from last group */
+    .control-group:last-child {
+        margin-bottom: 0;
+    }
+    .controls {
+        margin-left: 120px;
+    }
+}
+
+/*  Horizontal form, left-aligned */
+.form-horizontal.align-left {
+    .control-label {
+        width: auto;
+        text-align: left;
+        display: inline-block;
+        float: none;
+    }
+    .controls {
+        margin-left: $spacingThreeQuarters;
+        display: inline-block;
+    }
+}
+
+
+
+/*  Append /Prepend */
+/*  -------------- */
+
+.shared-controls-textcontrol.input-prepend {
+    display: flex;
+
+    > input, .uneditable-input {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        flex: 1 0 auto;
+        width: 0;
+    }
+
+    > .btn:first-child {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+        border-right: none;
+    }
+}
+
+.shared-controls-textcontrol.input-append,
+.shared-controls-textbrowsecontrol {
+    display: flex;
+
+    > input, .uneditable-input {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+        flex: 1 0 auto; /* SPL-122817 */
+        width: 0;
+
+        + .btn {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            border-left: none;
+        }
+    }
+
+    .add-on {
+        @mixin base-input $buttonPadding, auto;
+        @mixin button-padding;
+        margin-bottom: 0; /*  For input.btn */
+        font-weight: $fontWeight;
+        color: $inputTextColor;
+        text-align: center;
+        vertical-align: middle;
+        border: $border;
+        border-left: none;
+        border-top-right-radius: $interactiveBorderRadius;
+        border-bottom-right-radius: $interactiveBorderRadius;
+
+        @mixin interactive; /*  this breaks some bootstrap styles */
+    }
+
+    .add-on[disabled] {
+        color: $inputDisabledTextColor;
+        border-color: $inputDisabledBorderColor;
+        cursor: not-allowed;
+    }
+}
+
+
+/*  Form Complex */
+/*  -------------- */
+/*
+<form class="form-horizontal form-complex">
+    <div class="control-group">
+        <label class="control-label" for="">Email</label>
+        <div class="controls">
+            <input type="text" id="" placeholder="Email">
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="">Password</label>
+        <div class="controls">
+            <input type="password" id="" placeholder="Password">
+            <span class="help-block help-outer">
+                eg. this is some help text <br>
+                that goes outside the form for some reason ;_;
+            </span>
+        </div>
+    </div>
+    <div class="control-group">
+        <div class="controls">
+            <label class="checkbox">
+                <input type="checkbox"> Remember me
+            </label>
+            <button type="submit" class="btn">Sign in</button>
+        </div>
+    </div>
+</form>
+*/
+/*  complex forms? maybe use form-narrow? */
+.form-complex {
+    width: 100%;
+    .controls {
+        position: relative;
+    }
+    .control-group {
+        width: 440px; /*  magic number ;_; maybe move width to container */
+    }
+    .control-heading { /*  like control-label but without the float */
+        padding-top: $spacingQuarter;
+        text-align: right;
+        width: 160px;
+        font-weight: bold;
+    }
+    .help-block, .help-outer {
+        position: absolute;
+        top: 4px;
+        left: 100%;
+        margin-left: $spacingHalf;
+        margin-top: 0 !important; /*  TODO: get rid of important; */
+        width: 280px;
+    }
+    .outline {
+        border: $borderDefault;
+        border-radius: $borderRadius;
+        margin-bottom: $spacingHalf; /*  TOOD: use var here; */
+        margin-top: 0;
+        padding-top: $spacingHalf;
+    }
+    fieldset {
+        border: 1px solid transparent;
+    }
+    .btn-check {
+        @mixin base-input 0, auto;
+        text-align: center;
+        vertical-align: middle;
+        width: $lineHeight;
+    }
+    .control-feedback {
+        display: block;
+        width: 100%;
+    }
+}
+
+/*  feedback for controls */
+.control-feedback {
+    color: $inputTextColor;
+    background-color: $inputBackground;
+    border-radius: $borderRadius;
+    font-size: 85%;
+    text-align: center;
+    margin-top: 3px;
+}
+
+/*************************************************************************************************/
+/*  SYNTHETIC RADIO CONTROL                                                                      */
+/*************************************************************************************************/
+
+.shared-controls-syntheticradiocontrol {
+
+    > .tooltip {
+    	white-space:normal;
+    }
+
+    .btn-radio {
+        @mixin reset block;
+        position: relative;
+        padding: 3px 0 3px 20px;
+        color: $textColor;
+        text-decoration: none;
+
+        &:before {
+            content:'';
+            border: $border;
+            @mixin interactive;
+
+            position: absolute;
+            left: 0;
+            top: 4px;
+            box-sizing: border-box;
+            width: 16px;
+            height: 16px;
+            border-radius: 8px;
+
+        }
+
+        &.disabled {
+            cursor: not-allowed;
+            color: $inputDisabledTextColor;
+            opacity: 0.65;
+
+            &:before {
+                background: $inputDisabledBackground;
+                filter: none;
+                border-color: $inputDisabledBorderColor;
+            }
+        }
+
+        &:not(.disabled):hover:before {
+            @mixin interactive-hover;
+        }
+
+        &:focus:before {
+            @mixin focus-element;
+        }
+
+        &.active:after {
+            content:'';
+            position: absolute;
+            left: 4px;
+            top: 8px;
+            box-sizing: border-box;
+            width: 8px;
+            height: 8px;
+            border-radius: 4px;
+            background-color: currentColor;
+        }
+    }
+}
+
+.radio-control-list {
+    flex-direction: column;
+}
+
+/*************************************************************************************************/
+/*  ERROR STATES                                                                                 */
+/*************************************************************************************************/
+.error {
+    .btn {
+        @mixin interactive-error;
+
+        &.active {
+            @mixin interactive-error-hover;
+            background-image: none;
+        }
+        &:hover {
+            @mixin interactive-error-hover;
+        }
+    }
+}
+
+.required {
+    color: $errorText;
+}
+
+/*  Custom shared form components for color editing */
+/*  ------------------------------------------------------ */
+
+.color-square {
+  display: block;
+  width: $inputHeight;
+  height: $inputHeight;
+  background: $successColor;
+  border: 1px solid $borderDarkColor;
+  border-radius: 2px;
+  box-sizing: border-box;
+
+  &:focus {
+    @mixin focus-element;
+  }
+}
+
+.color-square-standalone {
+	margin-top: 3px;
+}

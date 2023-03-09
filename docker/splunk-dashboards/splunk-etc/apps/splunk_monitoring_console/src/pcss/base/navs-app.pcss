@@ -1,0 +1,375 @@
+/*===============================================================================================*/
+/*  SPLUNK: COMPONENT: APP NAV                                                                   */
+/*  App nav component used on app bar and previously on the home page.                           */
+/*===============================================================================================*/
+
+/*  App Boxes */
+/*  ----------------------------- */
+/* app boxes for home
+    <div data-appid="launcher" class="app-wrapper">
+        <div class="appBox app-nav">
+            <div class="app-title group app-launcher">
+                <a class="app-link" href="#"><span class="app-label">Home</span></a>
+                <a class="app-link link-icon" href="#"><img class="app-icon" src="/static/app/launcher/appIcon.png"></a>
+            </div>
+            <div class="slideNavPlaceHolder group">
+                <div style="display: none;" class="backbutton">
+                    <a class="slidenavback" href="#">Back</a>
+                </div>
+                <div class="auto">
+                    <ul class="slidenavList scroll-group">
+                        <li data-index="0">
+                            <a href="/en-US/app/launcher/home">home</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+*/
+
+/*  .app-wrapper { */
+/*      .app-nav {} */
+/*      .app-title {} */
+/*      .app-link {} */
+/*      .app-label {} */
+/*      .app-icon {} */
+/*      .app-slidenav {} */
+/*      .app-slidenav-back {} */
+/*      .app-slidenav-list {} */
+/*      .app-slidenav-wrapper {} */
+/*  } */
+
+.app-wrapper {
+	width: 300px;
+	float: left;
+	margin-bottom: 20px;
+}
+
+@media screen and (max-width: 1199px) {
+	.app-wrapper {
+		width: 50%;
+	}
+
+	.app-wrapper:nth-child(2n+1) {
+		clear: left;
+	}
+}
+
+@media screen and (min-width: 1200px) and (max-width: 1449px) {
+	.app-wrapper {
+		width: 33%;
+	}
+
+	.app-wrapper:nth-child(3n+1) {
+		clear: left;
+	}
+}
+
+@media screen and (min-width: 1450px) and (max-width: 1699px) {
+	.app-wrapper {
+		width: 25%;
+	}
+
+	.app-wrapper:nth-child(4n+1) {
+		clear: left;
+	}
+}
+
+@media screen and (min-width: 1700px)  {
+	.app-wrapper {
+		width: 20%;
+	}
+
+	.app-wrapper:nth-child(5n+1) {
+		clear: left;
+	}
+}
+
+
+
+.app-placeholder-wrapper {
+	position: relative;
+}
+
+
+.app-placeholder {
+	background-color: $gray92;
+	border: 1px dashed $borderColor;
+	box-sizing: border-box;
+	border-radius: $containerOuterBorderRadius;
+	 position: absolute;
+	 left: 0;
+	 right: 20px;
+	 top: 0;
+	 bottom: 0;
+}
+
+
+
+.app-nav {
+	z-index: 0;
+	line-height: $lineHeight;
+	font-weight: normal;
+	font-size: $fontSize;
+
+
+    color: $textColor;
+
+    margin-bottom: 0;
+    text-align: left;
+    margin-right: 20px;
+
+    .group {
+        border: 1px solid $interactiveBorderColor;
+        border-top: none;
+        border-bottom-color: $interactiveBorderColor;
+        border-radius: $containerBorderRadius;
+    }
+    .group + .group {
+        border-top: $borderDefault;
+    }
+    a.app-title-link {
+        color: $white;
+    }
+    .app-title {
+        padding-right: 50px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        position: relative;
+        border: 1px solid rgba(195,203,212,1);
+        border-top-color: rgba(195,206,215,1);
+        border-bottom-color: rgba(195,208,218,1);
+        z-index: 3;
+        position: relative;
+
+    	cursor: move;
+    	height: 50px;
+        background-image: linear-gradient(to bottom, rgba(147,159,171,1),$gray60);
+        background-color: $gray60;
+
+        font-size: 16px;
+
+        border-radius: $interactiveBorderRadius;
+
+        box-shadow: inset 0px 1px rgba(160,172,184,1);
+
+        &:hover {
+            border: 1px solid rgba(198,206,215,1);
+            border-top-color: rgba(195,203,212,1);
+            border-bottom-color: rgba(195,206,215,1);
+            background-image: linear-gradient(to bottom, rgba(178,190,202,1),rgba(160,172,184,1);
+        }
+    }
+
+    &.app-nav-with-slidenav .app-title {
+        border-bottom-right-radius: 0;
+        border-bottom-left-radius: 0;
+    }
+
+    .app-link {
+    	line-height: 50px;
+    }
+    .app-icon {
+    	margin: 7px;
+        max-height: 36px;
+    }
+    .link-icon {
+        position: absolute;
+        top: 0;
+        right: 0;
+        padding: 0 !important; /*  lame */
+    }
+    .app-slidenav {
+        border-radius: 0;
+        border-bottom-left-radius: $interactiveBorderRadius;
+        border-bottom-right-radius: $interactiveBorderRadius;
+    }
+
+}/*  .app-nav */
+
+
+/*  TMP: clean this up */
+.app-nav > .group > a,
+.app-nav > .sub-menu,
+.app-nav > .group > .sub-menu,
+.app-nav > .info
+{
+	padding: 5px;
+}
+
+.app-nav .group > a,
+.app-nav .group > .sub-menu {
+	text-decoration: none !important;
+	padding-left: 15px;
+}
+/*  prevent long app names from breaking layout */
+.app-nav .app-label {
+	padding-left: 15px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	color: $white;
+}
+
+
+.slideNavPlaceHolder {
+	overflow: hidden;
+	position:relative;
+}
+
+.slidenavList {
+	margin:0;
+	padding:0;
+	list-style-type: none;
+	list-style-image: none;
+	list-style-position: outside;
+	display: block;
+	overflow-y:auto;
+	visibility: visible;
+}
+
+.slidenavList + .slidenavList {
+	border-top-right-radius: 0;
+	border-top-left-radius: 0;
+}
+
+.slidenavList li {
+	border-bottom: 1px dotted $borderColor;
+	background-color: $white;
+	font-size:$fontSize;
+	line-height: 16px;
+	margin:0;
+	list-style-type: none;
+	list-style-image: none;
+	list-style-position: outside;
+	display: block;
+	text-align: left;
+	position: relative;
+}
+
+.slidenavList li:last-child {
+	border-bottom: none;
+}
+
+.slidenavList a {
+	padding:5px;
+	padding-right: 2em;
+	padding-left: 15px;
+	display: block;
+	text-decoration: none;
+	color: $linkColor;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	&:hover {
+		text-decoration: none;
+		background: $pillBackgroundColorHover;
+	}
+
+		/*  items with secondary action icons */
+		&.primary-link {
+			margin-right: 40px;
+			border-top-right-radius: 0;
+			border-bottom-right-radius: 0;
+			border-right: 1px dotted  $borderColor;
+		}
+
+		&.secondary-link {
+			position: absolute;
+			right: 0;
+			top: 0;
+			bottom: 0;
+			width: 40px;
+			padding-left:0;
+			padding-right: 0;
+			font-size: 16px;
+			text-align: center;
+			border-top-left-radius: 0;
+			border-bottom-left-radius: 0;
+		}
+
+}
+
+/*  TODO: divider is used globally, maybe use app-divider */
+.slidenavList .divider {
+	border-top: none;
+	margin-top: -1px;
+	border-bottom: $borderDefault;
+}
+
+.slidenavList .arrow ,
+.slidenavList .icon-triangle-right-small
+{
+	color: $linkColor;
+	position: absolute;
+	right: 10px;
+	top: 5px;
+}
+
+.auto {
+	position:relative;
+	height:100%;
+}
+
+.backbutton {
+	display:none;
+	a {
+		position: relative;
+		padding: 5px 10px 5px 15px;
+		@mixin interactive;
+		border: none;
+		border-bottom: 1px solid $borderColor;
+		border-radius: 4px;
+		border-bottom-right-radius: 0;
+		border-bottom-left-radius: 0;
+
+		&:hover{
+			@mixin interactive-hover;
+		}
+		text-decoration: none;
+		display: block;
+		color: $textColor;
+
+		i {
+			margin: 0;
+			position: absolute;
+			width: 15px;
+			left: 0;
+			top: 5px;
+			text-align: center;
+		}
+	}
+}
+
+.scroll-group {
+	max-height: 170px;
+	overflow-y: auto;
+}
+
+/*  webkit scrollbars */
+.dashboard-panel-apps ::-webkit-scrollbar {
+	width: 7px;
+}
+
+/* Track */
+.dashboard-panel-apps ::-webkit-scrollbar-track {
+	box-shadow: inset 0 0 6px rgba(0,0,0,0.1);
+	border-radius: 10px;
+}
+
+/* Handle */
+.dashboard-panel-apps ::-webkit-scrollbar-thumb {
+	border-radius: 10px;
+	background: rgba(107,107,107,0.4);
+	box-shadow: inset 0 0 6px rgba(0,0,0,0.2);
+}
+
+/*  overrides for app-nav inside app-bar dropdown */
+.dropdown-menu {
+    .slideNavPlaceHolder {
+        border-radius: 4px;
+    }
+    .backbutton, .slidenavList {
+        border: none;
+    }
+}

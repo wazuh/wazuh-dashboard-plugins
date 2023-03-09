@@ -1,0 +1,13 @@
+<endpoint name="forwardreceive">
+  <capabilities>
+    <read>list_inputs AND edit_splunktcp</read>
+  </capabilities>
+  <header></header>
+  <menu name="data_configurations">
+    <label>Data receiving</label>
+    <url>/manager/%(namespace)s/forwardreceive</url>
+    <description>Configure to receive data.</description>
+    <order>60</order>
+    <id>forwarding</id>
+  </menu>
+</endpoint>

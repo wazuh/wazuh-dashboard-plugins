@@ -1,0 +1,148 @@
+Metadata-Version: 2.1
+Name: spacebridge-python-sdk
+Version: 1.6.29
+Summary: python sdk for integrating applications with the cloud gateway/spacebridge service
+Home-page: https://git.splunk.com/projects/MOBILE/repos/spacebridgeappsdk/browse
+Author: Splunk Connected Experiences
+Author-email: mobile-team@splunk.com
+License: UNKNOWN
+Platform: UNKNOWN
+Description-Content-Type: text/markdown
+Requires-Dist: protobuf (==3.17.3)
+Requires-Dist: splapp-protos
+Requires-Dist: spacebridge-protos
+Requires-Dist: aiohttp
+Requires-Dist: requests
+Requires-Dist: certifi
+
+# Spacebridge App SK
+SDK for integrating applications with Spacebridge (formerly called Cloud Gateway)
+
+
+## Developer Setup
+ - Create a virtual environment: `python3 -m venv venv`
+ - Activate virtual environment `source venv/bin/activate` 
+ - `make -B init` will install the necessary test dependencies python dependencies
+ - `make -B build` will build the spacebridge sdk python package and install it as well as it's dependencies in the current virtual environment
+ - `make -B test` will run unit tests
+ 
+## IDE Setup
+- In Pycharm go to `Preferences->Project:SpacebridgeAppSdk->Project Interpreter` and add your newly created virtual environment
+
+
+## Usage 
+If using the production version of the sdk, you can install it via splunk's artifactory: `pip install spacebridge_python_sdk`.
+Splunk's artifactory needs to be already linked in your pip.conf which can be done via `make configure_pip`. 
+
+If making changes to the sdk, build your own custom version of the package using `make package` which will create the python package under `dist`. 
+Install this new package whereever you use the spacebridge sdk (your own virtual envioenment, splunk app, etc.)
+
+
+### Examples
+For end-to-end examples take a look at the examples folder. 
+
+### Registration
+
+The SDK offers the ability to either run from within a Splunk App or run as a standalone component. If you are running within a Splunk 
+App, you can let the SDK handle the persistence of encryption information via Splunk's passwords API. To facilitate this, you need to create
+a SplunkEncryptionContext object for which you need to provide a splunk system session token (this is because the passwords API requires a 
+system level token to access it). This can be done as follows: 
+
+```python
+"""
+This example requires a splunk session token. See the examples folder for an end-to-end example
+"""
+from cloudgateway.registration_api import authenticate_code, pair_device
+from cloudgateway.auth.auth_credentials import SimpleUserCredentials
+from cloudgateway.splunk.encryption import SplunkEncryptionContext
+    
+# Auth code shown on mobile device
+AUTH_CODE = "WS5TREWAE8"
+
+# Get mobile device's public keys 
+encryption_context = SplunkEncryptionContext(session_key)
+device_info = authenticate_code(AUTH_CODE, encryption_context)
+
+# Use the splunk user's login credentials to finish pairing device, The mobile device will then authenticate 
+# with splunk by using the supplied credentials
+user_credentials = SimpleUserCredentials('admin', 'dishdash')
+pair_device(AUTH_CODE, user_credentials, device_info, encryption_context)
+```
+
+Alternatively, you can use the SDK independently of Splunk. In this case,  you can instantiate a generic EncryptionContext object. The 
+EncryptionContext object can take a EncryptionInfo object as a parameter which can be used to inject keys yourself. This will be useful 
+if you want to use previously generated keys (i.e. if you do a system restart). Look at the examples section for a more involved example
+on persisting encryption keys between sessions. 
+
+```python
+"""
+This example is a stand alone example that should work without a splunk instance. 
+"""
+from cloudgateway.registration_api import authenticate_code, pair_device
+from cloudgateway.auth.auth_credentials import SimpleUserCredentials
+from cloudgateway.encryption import SplunkEncryptionContext
+    
+# Auth code shown on mobile device
+AUTH_CODE = "WS5TREWAE8"
+
+# Get mobile device's public keys 
+encryption_context = EncryptionContext()
+def resolve_app_name(app_id):
+    # if you need a human friendly app name, do the mapping here
+    return None
+device_info = authenticate_code(AUTH_CODE, encryption_context, resolve_app_name)
+
+# Use the splunk user's login credentials to finish pairing device, The mobile device will then authenticate 
+# with splunk by using the supplied credentials
+user_credentials = SimpleUserCredentials('admin', 'dishdash')
+pair_device(AUTH_CODE, user_credentials, device_info, encryption_context)
+```
+
+### Connecting to Spacebridge/Cloud Gateway
+The below example demonstrates how to instantiate a websocket client to Cloud Gateway. It
+relies on a Splunk instance to manage the keys. If running as a standalone app, simply change the encryption context object
+to the base EncryptionContext object (like the above example).
+
+In order to initiate a websocket connection to spacebridge, we first have to implement the AbstractMessageHandler interface. We have to implement the `handle_application_message`, `handle_cloudgateway_message` methods which specifies how we want to handle messages coming from the client/server side as well as how to handle messages coming in from Spacebridge itself. 
+
+```python
+
+from cloudgateway.private.util.dev import set_splunk_env
+set_splunk_env()
+import base64
+
+import splunk.rest as rest
+from cloudgateway.websocket import CloudGatewayWsClient, AbstractMessageHandler
+from protocol.splapp_protocol import envelope_pb2
+
+device_info_map = {}
+
+class SimpleMessageHandler(AbstractMessageHandler):
+
+    def handle_application_message(self, msg, sender, rid):
+        client_application_message = envelope_pb2.ClientApplicationMessage()
+        client_application_message.ParseFromString(msg)
+        print client_application_message
+
+    def handle_cloudgateway_message(self, msg):
+        print msg
+
+    def fetch_device_info(self, device_id):
+        return device_info_map[base64.b64encode(device_id)]
+
+
+class DummyLogger(object):
+    def info(self, msg):
+        print msg
+
+    def debug(self, msg):
+        print msg
+
+if __name__ == "__main__":
+    encryption_context = SplunkEncryptionContext(session_key)
+    client = CloudGatewayWsClient(encryption_context, SimpleMessageHandler(session_key), logger=DummyLogger())
+    client.connect()
+
+```
+
+

@@ -1,0 +1,22 @@
+#   Version 9.0.3
+#
+# This is an example transactiontypes.conf.  Use this file as a template to
+# configure transactions types.
+#
+# To use one or more of these configurations, copy the configuration block into
+# transactiontypes.conf in $SPLUNK_HOME/etc/system/local/.
+#
+# To learn more about configuration files (including precedence) please see the
+# documentation located at
+# http://docs.splunk.com/Documentation/Splunk/latest/Admin/Aboutconfigurationfiles
+
+[default]
+maxspan = 5m
+maxpause = 2s
+match = closest
+
+[purchase]
+maxspan  = 10m
+maxpause = 5m
+fields  = userid
+

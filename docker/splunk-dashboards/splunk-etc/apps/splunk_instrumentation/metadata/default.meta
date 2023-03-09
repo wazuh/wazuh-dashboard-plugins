@@ -1,0 +1,17 @@
+[]
+access = read : [ * ], write : [ admin ]
+
+[searchbnf]
+export = system
+
+[commands]
+export = system
+
+[alert_actions]
+export = system
+
+[alerts]
+export = system
+
+[restmap/validation:savedsearch]
+export = system

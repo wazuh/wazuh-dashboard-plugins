@@ -1,0 +1,67 @@
+<endpoint name="search/distributed/peers">
+  <header>Search peers</header>
+  <breadcrumb>
+    <parent hidecurrent="False">distsearch</parent>
+    <name i18ntag="">Search peers</name>
+  </breadcrumb>
+  <elements>
+    <element name="peerpage" type="fieldset">
+      <view name="list"/>
+      <view name="create"/>
+      <elements>
+        <element name="name" type="textfield" label="Peer URI">
+          <view name="list"/>
+          <view name="create"/>
+          <key name="exampleText">Specify the search peer as servername:mgmt_port or URI:mgmt_port. You must prefix the URI with its scheme. For example: 'https://sp1.example.com:8089'.</key>
+          <key name="processValueList">value.trim()</key>
+        </element>
+      </elements>
+      <key name="helpText">Use this page to explicitly add distributed search peers. Enable distributed search through the Distributed search setup page in Splunk Settings.</key>
+      <key name="legend">Add search peers</key>
+    </element>
+
+    <element name="fieldset-password" type="fieldset">
+      <view name="edit"/>
+      <view name="create"/>
+      <elements>
+        <element name="remoteUsername" type="textfield" label="Remote username">
+          <view name="edit"/>
+          <view name="create"/>
+        </element>
+        <element name="remotePassword" type="password" label="Remote password">
+          <view name="edit"/>
+          <view name="create"/>
+        </element>
+      </elements>
+      <key name="legend">Distributed search authentication</key>
+      <key name="helpText">To share a public key for distributed authentication, enter a username and password for an admin user on the remote search peer.</key>
+    </element>
+    <element name="peerName" type="textfield" label="Splunk instance name">
+      <view name="list"/>
+      <view name="edit"/>
+      <key name="disabled">1</key>
+    </element>
+    <element name="status" type="textfield" label="State">
+      <view name="list"/>
+      <view name="edit"/>
+      <key name="disabled">1</key>
+    </element>
+    <element name="replicationStatus" type="textfield" label="Replication status">
+      <view name="list"/>
+      <view name="edit"/>
+      <key name="disabled">1</key>
+      <key name="exampleText">&lt;a href="[[?manager.search_peer.status]]" class="spl-external-link spl-icon-external-link-sm" target="_blank"&gt;Learn more&lt;/a&gt;</key>
+    </element>
+    <element name="cluster_label" type="textfield" label="Cluster label">
+      <view name="list"/>
+      <key name="processValueList">(', '.join(value) if len(value)>0 else _('None')) if isinstance(value, list) else value</key>
+    </element>
+    <element name="health_status" type="textfield" label="Health status">
+      <view name="list"/>
+    </element>
+    <element name="health_check_failures" type="textfield" label="Health check failures">
+      <view name="list"/>
+      <key name="processValueList">(', '.join(value) if len(value)>0 else _('None')) if isinstance(value, list) else value</key>
+    </element>
+  </elements>
+</endpoint>

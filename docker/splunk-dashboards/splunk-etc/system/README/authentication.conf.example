@@ -1,0 +1,280 @@
+#   Version 9.0.3
+#
+# This is an example authentication.conf. authentication.conf is used to
+# configure LDAP, Scripted, SAML and Proxy SSO authentication in addition 
+# to Splunk's native authentication.
+#
+# To use one of these configurations, copy the configuration block into
+# authentication.conf in $SPLUNK_HOME/etc/system/local/.  You must reload
+# auth in manager or restart Splunk to enable configurations.
+#
+# To learn more about configuration files (including precedence) please see
+# the documentation located at
+# http://docs.splunk.com/Documentation/Splunk/latest/Admin/Aboutconfigurationfiles
+
+##### Use just Splunk's built-in authentication (default):
+[authentication]
+authType = Splunk
+
+
+##### LDAP examples
+
+#### Basic LDAP configuration example
+[authentication]
+authType = LDAP
+authSettings = ldaphost
+
+[ldaphost]
+host = ldaphost.domain.com
+port = 389
+SSLEnabled = 0
+bindDN = cn=Directory Manager
+bindDNpassword = password
+userBaseDN = ou=People,dc=splunk,dc=com
+userBaseFilter = (objectclass=splunkusers)
+groupBaseDN = ou=Groups,dc=splunk,dc=com
+groupBaseFilter = (objectclass=splunkgroups)
+userNameAttribute = uid
+realNameAttribute = givenName
+groupMappingAttribute = dn
+groupMemberAttribute = uniqueMember
+groupNameAttribute = cn
+timelimit = 10
+network_timeout = 15
+
+# This stanza maps roles you have created in authorize.conf to LDAP Groups
+[roleMap_ldaphost]
+admin = SplunkAdmins
+
+#### Example using the same server as 'ldaphost', but treating each user as
+#### their own group
+[authentication]
+authType = LDAP
+authSettings = ldaphost_usergroups
+
+[ldaphost_usergroups]
+host = ldaphost.domain.com
+port = 389
+SSLEnabled = 0
+bindDN = cn=Directory Manager
+bindDNpassword = password
+userBaseDN = ou=People,dc=splunk,dc=com
+userBaseFilter = (objectclass=splunkusers)
+groupBaseDN = ou=People,dc=splunk,dc=com
+groupBaseFilter = (objectclass=splunkusers)
+userNameAttribute = uid
+realNameAttribute = givenName
+groupMappingAttribute = uid
+groupMemberAttribute = uid
+groupNameAttribute = uid
+timelimit = 10
+network_timeout = 15
+
+[roleMap_ldaphost_usergroups]
+admin = admin_user1;admin_user2;admin_user3;admin_user4
+power = power_user1;power_user2
+user = user1;user2;user3
+
+#### Sample Configuration for Active Directory (AD)
+[authentication]
+authSettings = AD
+authType = LDAP
+
+[AD]
+SSLEnabled = 1
+bindDN = ldap_bind@splunksupport.kom
+bindDNpassword = ldap_bind_user_password
+groupBaseDN = CN=Groups,DC=splunksupport,DC=kom
+groupBaseFilter =
+groupMappingAttribute = dn
+groupMemberAttribute = member
+groupNameAttribute = cn
+host = ADbogus.splunksupport.kom
+port = 636
+realNameAttribute = cn
+userBaseDN = CN=Users,DC=splunksupport,DC=kom
+userBaseFilter =
+userNameAttribute = sAMAccountName
+timelimit = 15
+network_timeout = 20
+anonymous_referrals = 0
+
+[roleMap_AD]
+admin = SplunkAdmins
+power = SplunkPowerUsers
+user = SplunkUsers
+
+#### Sample Configuration for Sun LDAP Server
+[authentication]
+authSettings = SunLDAP
+authType = LDAP
+
+[SunLDAP]
+SSLEnabled = 0
+bindDN = cn=Directory Manager
+bindDNpassword = Directory_Manager_Password
+groupBaseDN = ou=Groups,dc=splunksupport,dc=com
+groupBaseFilter =
+groupMappingAttribute = dn
+groupMemberAttribute = uniqueMember
+groupNameAttribute = cn
+host = ldapbogus.splunksupport.com
+port = 389
+realNameAttribute = givenName
+userBaseDN = ou=People,dc=splunksupport,dc=com
+userBaseFilter =
+userNameAttribute = uid
+timelimit = 5
+network_timeout = 8
+
+[roleMap_SunLDAP]
+admin = SplunkAdmins
+power = SplunkPowerUsers
+user = SplunkUsers
+
+#### Sample Configuration for OpenLDAP
+[authentication]
+authSettings = OpenLDAP
+authType = LDAP
+
+[OpenLDAP]
+bindDN = uid=directory_bind,cn=users,dc=osx,dc=company,dc=com
+bindDNpassword = directory_bind_account_password
+groupBaseFilter =
+groupNameAttribute = cn
+SSLEnabled = 0
+port = 389
+userBaseDN = cn=users,dc=osx,dc=company,dc=com
+host = hostname_OR_IP
+userBaseFilter =
+userNameAttribute = uid
+groupMappingAttribute = uid
+groupBaseDN = dc=osx,dc=company,dc=com
+groupMemberAttribute = memberUid
+realNameAttribute = cn
+timelimit = 5
+network_timeout = 8
+dynamicGroupFilter = (objectclass=groupOfURLs)
+dynamicMemberAttribute = memberURL
+nestedGroups = 1
+
+[roleMap_OpenLDAP]
+admin = SplunkAdmins
+power = SplunkPowerUsers
+user = SplunkUsers
+
+
+##### Scripted Auth examples
+
+#### The following example is for RADIUS authentication:
+[authentication]
+authType = Scripted
+authSettings = script
+
+[script]
+scriptPath = "$SPLUNK_HOME/bin/python" "$SPLUNK_HOME/share/splunk/authScriptSamples/radiusScripted.py"
+
+# Cache results for 1 second per call
+[cacheTiming]
+userLoginTTL    = 1
+userInfoTTL     = 1
+
+
+#### The following example works with PAM authentication:
+[authentication]
+authType = Scripted
+authSettings = script
+
+[script]
+scriptPath = "$SPLUNK_HOME/bin/python" "$SPLUNK_HOME/share/splunk/authScriptSamples/pamScripted.py"
+
+# Cache results for different times per function
+[cacheTiming]
+userLoginTTL    = 30s
+userInfoTTL     = 1min
+
+
+##### SAML auth example
+
+[authentication]
+authSettings = samlv2
+authType = SAML
+
+[samlv2]
+attributeQuerySoapPassword = changeme
+attributeQuerySoapUsername = test
+entityId = test-splunk
+idpAttributeQueryUrl = https://exsso/idp/attrsvc.ssaml2
+idpCertPath = /home/splunk/etc/auth/idp.crt
+idpSSOUrl = https://exsso/idp/SSO.saml2
+idpSLOUrl = https://exsso/idp/SLO.saml2
+signAuthnRequest = true
+signedAssertion = true
+attributeQueryRequestSigned = true
+attributeQueryResponseSigned = true
+redirectPort = 9332
+cipherSuite = TLSv1 MEDIUM:@STRENGTH
+nameIdFormat = urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
+
+[roleMap_SAML]
+admin = SplunkAdmins
+power = SplunkPowerUsers
+user = all
+
+[userToRoleMap_SAML]
+samluser = user::Saml Real Name::samluser@domain.com
+
+[authenticationResponseAttrMap_SAML]
+role = "http://schemas.microsoft.com/ws/2008/06/identity/claims/groups"
+mail = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"
+realName = "http://schemas.microsoft.com/identity/claims/displayname"
+
+# Multifactor authentication example
+[authentication]
+externalTwoFactorAuthVendor = duo
+externalTwoFactorAuthSettings = duo-mfa
+
+# Duo specific authentication setting example
+[duo-mfa]
+apiHostname = api-xyz.duosecurity.com
+appSecretKey = mustBeARandomStringOfSize40OrLonger
+integrationKey = mustBeADuoProvidedStringOfSize20
+secretKey = mustBeADuoProvidedStringOfSize40
+enableMfaAuthRest = true
+
+##### Proxy SSO auth example
+
+[authentication]
+authSettings = my_proxy
+authType = ProxySSO
+
+[my_proxy]
+excludedUsers = user1,user2
+excludedAutoMappedRoles = admin
+defaultRoleIfMissing = user
+
+[roleMap_proxySSO]
+admin = group1;group2
+user = group1;group3
+
+[userToRoleMap_proxySSO]
+proxy_user1 = user
+proxy_user2 = power;can_delete
+
+[splunk_auth]
+minPasswordLength = 8
+minPasswordUppercase = 1
+minPasswordLowercase = 1
+minPasswordSpecial = 1
+minPasswordDigit = 0
+expirePasswordDays = 90
+expireAlertDays = 15
+expireUserAccounts = true
+forceWeakPasswordChange = false
+lockoutUsers = true
+lockoutAttempts = 5
+lockoutThresholdMins = 5
+lockoutMins = 30
+enablePasswordHistory = false
+passwordHistoryCount = 24
+

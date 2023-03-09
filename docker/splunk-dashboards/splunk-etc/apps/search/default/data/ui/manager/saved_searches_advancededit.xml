@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<endpoint name="saved/searches/advancededit" template="pages/system.html">
+    <capabilities>
+        <read>schedule_search</read>
+    </capabilities>
+</endpoint>

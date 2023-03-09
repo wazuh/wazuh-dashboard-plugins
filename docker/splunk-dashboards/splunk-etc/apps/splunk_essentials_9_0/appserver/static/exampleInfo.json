@@ -1,0 +1,68 @@
+[
+    {
+        "id": "Ingest_Actions",
+        "title": "Ingest Actions",
+        "short-description": "Simply author and deploy Ingest Actions.",
+        "category": "Search and Ingestion"
+    },
+    {
+        "id": "Federated_Search_Enhancements",
+        "title": "Federated Search Enhancements",
+        "short-description": "Enhancements include support for new provider mode called 'Transparent' to enable hybrid search migration to federated search, support for running federated search that leverages data models and DMA on remote deployments, and Windows support for on-prem to on-prem environments.",
+        "category": "Search and Ingestion"
+    },
+    {
+        "id": "Configuration_Change_Tracker_Index",
+        "title": "Configuration Change Tracker Index",
+        "short-description": "Splunking your .conf file changes just got a whole lot easier.",
+        "category": "Administration"
+    },
+    {
+        "id": "Smartstore_Support_On_Azure",
+        "title": "SmartStore Support on Azure",
+        "short-description": "With growing customer requests to include Azure Remote Storage, we are extending native Azure support as part of SmartStore.",
+        "category": "Administration"
+    },
+    {
+        "id": "Cluster_Manager_Redundancy",
+        "title": "Cluster Manager Redundancy",
+        "short-description": "This feature removes the single point of failure nature of cluster manager with the support of additional \"standby\" cluster manager node(s), while allowing for seamless search and indexing services during cluster manager failure or maintenance activities.",
+        "category": "Administration"
+    },
+    {
+        "id": "Workload_Management_Enhancements",
+        "title": "Workload Management Enhancements",
+        "short-description": "This heavily-requested feature adds support for wildcard characters (*) in the workload management framework. With this change, we are supporting the presence of wildcard characters in Workloads rules and Admission rules for the following predicates - index, user and role.",
+        "category": "Administration"
+    },
+    {
+        "id": "Health_Manager_UI_Improvements",
+        "title": "Health Manager UI Improvements",
+        "short-description": "The health manager page continues to make UI improvements to help admins manage the frequency of alerts.",
+        "category": "Administration"
+    },
+    {
+        "id": "Splunk_Assist",
+        "title": "Splunk Assist",
+        "short-description": "Splunk Assist brings cloud-powered security and management insights to your Splunk Enterprise deployments.",
+        "category": "Platform"
+    },
+    {
+        "id": "Dashboard_Studio_Improvements",
+        "title": "Dashboard Studio Improvements",
+        "short-description": "New major features include interactivity enhancements, updated visualizations from viz.type to splunk.type, and better options to customize your editing vs. viewing experiences.",
+        "category": "Platform"
+    },
+    {
+        "id": "RapidDiag_Performance_Improvements",
+        "title": "RapidDiag Performance Improvements",
+        "short-description": "Backend improvements reduce latency and improve search performance.",
+        "category": "Platform"
+    },
+    {
+        "id": "Biased_Language_Removal",
+        "title": "Biased Language Removal",
+        "short-description": "Splunk is committed to removing signs of institutionalized bias in our products, our documentation, our language and our actions.",
+        "category": "Platform"
+    }
+]

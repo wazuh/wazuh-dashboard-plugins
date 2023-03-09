@@ -1,0 +1,2304 @@
+# Translations template for PROJECT.
+# Copyright (C) 2022 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2022-04-04 09:17-0700\n"
+"PO-Revision-Date: 2022-04-15 09:53+0100\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: zh\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+"X-Generator: Poedit 3.0.1\n"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:27
+msgid "12:00 midnight"
+msgstr "午夜 12:00"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:29
+msgid "12:00 noon"
+msgstr "中午 12:00"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:699
+msgid ""
+"A complex, data centric dashboard that pushes the limit in the visual control "
+"Dashboard Studio provides"
+msgstr ""
+"一个复杂的、以数据为中心的仪表板，在 Dashboard Studio 提供的可视控制中突破极限"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:206
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/index.tsx:107
+msgid "A dashboard was generated for $dashboard.label$"
+msgstr "为 $dashboard.label$ 生成仪表板"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:755
+msgid "A data governance dashboard showing high level enterprise metrics"
+msgstr "显示高级企业指标的数据管理仪表板"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:785
+msgid ""
+"A detailed version of office capacity metrics by using SVGs to color office "
+"floor maps"
+msgstr "通过使用 SVG 为办公室楼层地图着色的办公室容量指标的详细版本"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:300
+msgid "A new builder to create visually-rich, customizable dashboards"
+msgstr "一个新的构建器，用于创建视觉效果丰富、可自定义的仪表板"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:665
+msgid "A simple thematic dashboard with simple complimentary charts"
+msgstr "简单的主题仪表板，带简单的免费图表"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:711
+msgid ""
+"A strong showcase of how simple visualizations with proper layout make for an "
+"effective dashboard"
+msgstr "有力地展示具有适当布局的简单可视化如何使仪表板有效"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:723
+msgid "A vibrant, thematic dashboard showing e-commerce metrics and use of SVGs"
+msgstr "一个充满活力的主题仪表板，显示电子商务指标和 SVG 的使用情况"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardLayoutGroup/index.jsx:55
+msgid "Absolute"
+msgstr "绝对值"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/index.tsx:419
+msgid "Active"
+msgstr "活动"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:380
+msgid "Ad Hoc Search"
+msgstr "临时搜索"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/TokenEditor/TokenEditorGroup.tsx:77
+msgid "Add a token"
+msgstr "添加标记"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/TokenEditor/TokenEditorGroup.tsx:79
+msgid "Add token"
+msgstr "添加标记"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:459
+msgid "Adjust chart scaling properties to help fit your data correctly"
+msgstr "调整图表缩放属性以帮助正确拟合数据"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:217
+msgid "Adjust coloring for filler gauges"
+msgstr "调整塞尺着色"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:239
+msgid "Adjust coloring for marker gauges"
+msgstr "调整标记仪表的着色"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:489
+msgid "Adjust coloring for punchcard visualizations"
+msgstr "调整打孔卡可视化的着色"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:575
+msgid ""
+"Adjust coloring for single value icon visualizations to help indicate status at "
+"a glance"
+msgstr "调整单值图标可视化的着色，以帮助一目了然地指示状态"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:519
+msgid "Adjust column formatting and add sparklines to tables"
+msgstr "调整列格式并为表格添加迷你图"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:469
+msgid "Adjust how chart properties such as axes and legends frame your data"
+msgstr "调整图表属性(如轴和图例)对表示数据的方式"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:479
+msgid "Adjust sizing for punchcard visualizations"
+msgstr "调整打孔卡可视化的大小"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:167
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:321
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:429
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:441
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:521
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:657
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:703
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:735
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:787
+msgid "Advanced"
+msgstr "高级"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/AdvancedPanelSettings/index.jsx:22
+msgid "Advanced Panel Settings"
+msgstr "高级面板设置"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:518
+msgid "Advanced Table Formatting"
+msgstr "高级表格格式"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:105
+msgid ""
+"Aggregate metrics over two dimensions to visualize cyclical trends in your data"
+msgstr "在两个维度上聚合指标，以可视化数据中的周期性趋势"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:648
+msgid "Airport Dashboard Thumbnail"
+msgstr "机场仪表板缩略图"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:640
+msgid "Airport KPI's"
+msgstr "机场 KPI 的"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:765
+msgid ""
+"An effective use of icons and coloring to showcase a VPN infrastructure flow"
+msgstr "有效使用图标和着色来展示 VPN 基础架构流程"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:775
+msgid ""
+"An effective use of images, icons, and visualizations to show office capacity "
+"metrics"
+msgstr "有效使用图像、图标和可视化来显示办公室容量指标"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/util/ErrorMessages.js:4
+msgid "An internal error occurred while saving."
+msgstr "保存时发生内部错误。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:444
+msgid "Annotations Image"
+msgstr "注释图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/util/linkToDashboardHelpers.ts:15
+msgid "App is required"
+msgstr "应用为必填项"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/ActionDropdown.tsx:187
+msgid "Are you sure you want to delete"
+msgstr "确定要删除"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:56
+msgid "Area Chart"
+msgstr "面积图"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:64
+msgid "Area Visualization Image"
+msgstr "区域可视化图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:660
+msgid "Assembly Dashboard Thumbnail"
+msgstr "组装仪表板缩略图"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:652
+msgid "Assembly Line"
+msgstr "组装路线"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:94
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:109
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:132
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:160
+msgid "At"
+msgstr "时间"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:147
+msgid "BCC"
+msgstr "密件抄送"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:186
+msgid "Back"
+msgstr "上一步"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:34
+msgid "Bar Chart"
+msgstr "条形图"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:42
+msgid "Bar Visualization Image"
+msgstr "条形图可视化图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:35
+msgid ""
+"Bar charts are used to compare data of one period or point in time across "
+"multiple categories"
+msgstr "条形图用于比较多个类别中一个时间段或时间点的数据"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:396
+msgid "Base Chain Image"
+msgstr "基本链式图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:390
+msgid "Base and Chain Searches"
+msgstr "基本搜索和链搜索"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:645
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:667
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:679
+msgid "Basic"
+msgstr "基本"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:150
+msgid "Basic Choropleth SVG"
+msgstr "基本分级统计 SVG"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:562
+msgid "Basic Icons"
+msgstr "基本图标"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:270
+msgid "Basic Single Value"
+msgstr "基本单值"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:498
+msgid "Basic Table"
+msgstr "基本表格"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/Dashboard.jsx:435
+msgid ""
+"Because the user has navigated away from the dashboard, all running searches "
+"have been stopped. Please refresh the dashboard to rerun the searches."
+msgstr "由于用户已离开仪表板，所有运行的搜索均已停止。请刷新仪表板以返回搜索。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:68
+msgid "Bubble Chart"
+msgstr "气泡图"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:76
+msgid "Bubble Visualization Image"
+msgstr "气泡图可视化图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:69
+msgid ""
+"Bubble charts can represent correlation for up to four dimensions of data. The "
+"first two dimensions are visualized as coordinates, the third as size, and the "
+"fourth as color"
+msgstr ""
+"气泡图可以表示最多四个维度数据的相关性。前两个维度可视化为坐标，第三个维度可视化"
+"为大小，第四个维度可视化为颜色"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:664
+msgid "Buttercup Games"
+msgstr "Buttercup 游戏"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:670
+msgid "Buttercup Games Dashboard Thumbnail"
+msgstr "Buttercup 游戏仪表板缩略图"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:135
+msgid "CC"
+msgstr "抄送"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CloneDashboard/index.jsx:116
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:141
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/SaveToExistingDashboard/index.jsx:216
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/index.tsx:512
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/ActionDropdown.tsx:191
+msgid "Cancel"
+msgstr "取消"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/util/ErrorMessages.ts:17
+msgid "Cannot create ${parameter} with name \"${name}\"."
+msgstr "无法创建名为 \"${name}\" 的 ${parameter}。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:324
+msgid "Cascading Image"
+msgstr "级联图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:318
+msgid "Cascading Inputs"
+msgstr "级联输入"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:436
+msgid "Chart Annotations"
+msgstr "图表注释"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:448
+msgid "Chart Coloring"
+msgstr "图表着色"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:454
+msgid "Chart Coloring Image"
+msgstr "图表颜色着色"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:474
+msgid "Chart Display Image"
+msgstr "图表显示图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:6
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:26
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:38
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:48
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:60
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:72
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:84
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:96
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:106
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:118
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:130
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:142
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:428
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:440
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:450
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:460
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:470
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:480
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:490
+msgid "Chart Elements"
+msgstr "图表元素"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:424
+msgid "Chart Overlays"
+msgstr "图表叠加"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:458
+msgid "Chart Scaling"
+msgstr "图表比例"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:464
+msgid "Chart Scaling Image"
+msgstr "图表比例图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:257
+msgid "Classic Dashboards"
+msgstr "典型仪表板"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CloneDashboard/index.jsx:122
+msgid "Clone"
+msgstr "复制"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/ActionDropdown.tsx:249
+msgid "Clone Dashboard"
+msgstr "复制仪表板"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CloneDashboard/index.jsx:103
+msgid "Clone in Dashboard Studio"
+msgstr "克隆到 Dashboard Studio"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/AdvancedPanelSettings/index.jsx:52
+msgid ""
+"Clones the report's search string and time range. The inline search exists only "
+"in the dashboard and has no external dependencies."
+msgstr ""
+"复制报表的搜索字符串和时间范围。内联搜索仅存在于仪表板中，且没有外部相关项。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:174
+msgid "Cluster Map"
+msgstr "群集地图"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:195
+msgid "Color a map of the United States with geo data"
+msgstr "使用地理数据为美国地图着色"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:185
+msgid "Color a map of the world with geo data"
+msgstr "使用地理数据为世界地图着色"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:219
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:241
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:263
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:287
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:451
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:491
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:511
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:577
+msgid "Coloring"
+msgstr "着色"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:22
+msgid "Column Chart"
+msgstr "柱形图"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:30
+msgid "Column Visualization Image"
+msgstr "柱形图可视化图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:23
+msgid ""
+"Column charts can be used for time series data when comparing magnitudes over "
+"time. They can also be used in a similar way to bar charts to compare field "
+"values across a dataset"
+msgstr ""
+"在比较一段时间内的幅度时，柱形图可用于时间序列数据。它们还可以以与条形图类似的方"
+"式使用，以比较数据集中的字段值"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:118
+msgid "Comma separated list of email addresses."
+msgstr "用逗号分隔的电子邮件地址列表。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:39
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:97
+msgid "Comparison"
+msgstr "比较"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:16
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:644
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:656
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:666
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:678
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:690
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:702
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:714
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:724
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:734
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:746
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:756
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:766
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:776
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:786
+msgid "Complete Dashboards"
+msgstr "完整仪表板"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:653
+msgid ""
+"Consistent labelling, multiple charts and dynamic SVGs combine to show a "
+"factory management dashboard"
+msgstr "一致的标签、多个图表和动态 SVG 相结合以显示工厂管理仪表板"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:159
+msgid ""
+"Continue using the same standard Splunk visualizations and explore additional "
+"tools."
+msgstr "继续使用相同的标准 Splunk 可视化并浏览其他工具。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CloneDashboard/index.jsx:122
+msgid "Convert & Save"
+msgstr "转换并保存"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:73
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:85
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:107
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:131
+msgid "Correlation"
+msgstr "相关性"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:145
+msgid "Create"
+msgstr "新建"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:127
+msgid "Create New Dashboard"
+msgstr "新建新仪表板"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:37
+msgid "Critical"
+msgstr "严重"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/util/ErrorMessages.ts:15
+msgid "Cron expression cannot be empty."
+msgstr "Cron 表达式不能为空。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:596
+msgid "Custom URL Drilldown"
+msgstr "自定义 URL 钻取"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:602
+msgid "Custom URL Image"
+msgstr "自定义 URL 图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:164
+msgid "Custom visualizations & Trellis not yet supported"
+msgstr "尚不支持自定义可视化和棚架"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:674
+msgid "Customer Satisfaction"
+msgstr "客户满意度"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:682
+msgid "Customer Satisfaction Dashboard Thumbnail"
+msgstr "自定义满意度仪表板缩略图"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:449
+msgid "Customize chart colors to reflect your preferred aesthetic and branding"
+msgstr "自定义图表颜色以反映您偏爱的美感和品牌"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:134
+msgid "Customize with shapes,"
+msgstr "通过形状进行自定义，"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:136
+msgid ""
+"Customize with shapes, images, and text without coding with Absolute layout."
+msgstr "通过形状、图像和文本进行自定义，而无需使用 Absolute layout 进行编码。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/CustomEditingGroup.jsx:20
+msgid "Dark"
+msgstr "暗"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/index.tsx:425
+msgid "Dashboard"
+msgstr "仪表板"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-examples-hub/src/components/ReactBannerComponent.jsx:23
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/index.jsx:13
+msgid "Dashboard Examples Hub"
+msgstr "仪表板示例中心"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/EditTitleAndId/index.jsx:61
+msgid "Dashboard ID"
+msgstr "仪表板 ID"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-api/src/util/returnUtils.js:19
+msgid "Dashboard ID can only use letters, numbers, dashes, & underscores."
+msgstr "仪表板 ID 只能包含字母、数字、短划线和下划线。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:294
+msgid "Dashboard Studio"
+msgstr "Dashboard Studio"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-conversion/src/util/Constants.ts:14
+msgid "Dashboard Studio does not support Trellis."
+msgstr "Dashboard Studio 不支持棚架。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-conversion/src/util/Constants.ts:19
+msgid "Dashboard Studio does not support categorical colors in Choropleth Maps."
+msgstr "Dashboard Studio 不支持分级统计地图中的分类颜色。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-conversion/src/util/Constants.ts:9
+msgid "Dashboard Studio does not support the selected visualization type."
+msgstr "Dashboard Studio 不支持所选可视化类型。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/EditTitleAndId/index.jsx:30
+msgid "Dashboard Title"
+msgstr "仪表板标题"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/ActionDropdown.tsx:1
+msgid "Dashboard cloned into"
+msgstr "仪表板复制到"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/util/linkToDashboardHelpers.ts:11
+msgid "Dashboard is required."
+msgstr "需要仪表板。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:698
+msgid "Data Command and Control"
+msgstr "数据命令和控制"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:706
+msgid "Data Command and Control Dashboard Thumbnail"
+msgstr "数字命令和控制仪表板缩略图"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:754
+msgid "Data Governance"
+msgstr "数据管理"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:760
+msgid "Data Governance Dashboard Thumbnail"
+msgstr "数据管理仪表板缩略图"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:710
+msgid "Data Streaming"
+msgstr "数据流"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:718
+msgid "Data Streaming Dashboard Thumbnail"
+msgstr "数据流仪表板缩略图"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:619
+msgid ""
+"Data sources of different types can refresh at different intervals, or a global "
+"default can be set for all data sources"
+msgstr ""
+"不同类型的数据源可以按不同的时间间隔刷新，也可以为所有数据源设置全局默认值"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:686
+msgid "Datacenter Sensors"
+msgstr "数据中心传感器"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:694
+msgid "Datacenter Sensors Dashboard Thumbnail"
+msgstr "数据中心传感器仪表板缩略图"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:12
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:382
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:392
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:404
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:416
+msgid "Datasources"
+msgstr "数据源"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:13
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:610
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:622
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:632
+msgid "Defaults"
+msgstr "默认值"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/panels/DataSourcesPanelListItem.jsx:120
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/ActionDropdown.tsx:196
+msgid "Delete"
+msgstr "删除"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/ActionDropdown.tsx:184
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/ActionDropdown.tsx:284
+msgid "Delete Dashboard"
+msgstr "删除仪表板"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/TokenEditor/TokenEditor.tsx:43
+msgid "Delete token"
+msgstr "删除标记"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CloneDashboard/index.jsx:54
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:158
+msgid "Description"
+msgstr "描述"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:11
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:166
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:530
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:542
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:554
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:566
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:576
+msgid "Design Elements"
+msgstr "设计元素"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:597
+msgid ""
+"Direct users to external or relative URLs from interacting with a visualization"
+msgstr "通过与可视化交互将用户定向到外部或相对 URL"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:468
+msgid "Display Axes, Labels and Legends"
+msgstr "显示轴、标签和图例"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:194
+msgid "Done"
+msgstr "完成"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/ActionDropdown.tsx:229
+msgid "Download PDF"
+msgstr "下载 PDF"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/ActionDropdown.tsx:236
+msgid "Download PNG"
+msgstr "下载 PNG"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/AdvancedPanelSettings/index.jsx:87
+msgid "Drilldown"
+msgstr "钻取"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/AdvancedPanelSettings/index.jsx:93
+msgid ""
+"Drilldown is disabled when you save a visualization to a dashboard. After "
+"saving, open the dashboard editor to access configuration options for the "
+"visualization."
+msgstr ""
+"将可视化保存到仪表板时钻取为禁用状态。保存之后，打开仪表板编辑器访问可视化配置选"
+"项。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:15
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:588
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:598
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:632
+msgid "Drilldowns"
+msgstr "钻取"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:328
+msgid "Dropdown"
+msgstr "下拉"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:334
+msgid "Dropdown Image"
+msgstr "下拉图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:509
+msgid "Dynamically color table elements to contextualize and emphasize data"
+msgstr "动态为表格元素着色，以在上下文中理解数据并强调数据"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:259
+msgid ""
+"Dynamically color various parts of the Single Value Radial visualization based "
+"on your data"
+msgstr "根据您的数据动态着色单值径向可视化的各个部分"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:283
+msgid ""
+"Dynamically color various parts of the Single Value visualization to show "
+"overall status and signify positive and negative change"
+msgstr "动态着色单值可视化的各个部分，以显示整体状态并指示正负变化"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:722
+msgid "E-Commerce Monitoring"
+msgstr "电子商务监视"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:728
+msgid "E-Commerce Monitoring Dashboard Thumbnail"
+msgstr "电子商务监视仪表板缩略图"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/panels/DataSourcesPanelListItem.jsx:112
+msgid "Edit"
+msgstr "编辑"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/index.tsx:390
+msgid "Edit Export Schedule"
+msgstr "编辑导出计划"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/EditTitleAndId/index.jsx:42
+msgid "Edit ID"
+msgstr "编辑 ID"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/EditSourceButton.jsx:16
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/EditSourceButton.jsx:18
+msgid "Edit Source"
+msgstr "编辑来源"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/util/ErrorMessages.ts:10
+msgid "Email Address list is empty."
+msgstr "电子邮件地址列表为空。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/util/ErrorMessages.ts:14
+msgid "Email Address list is invalid"
+msgstr "电子邮件地址列表无效"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:104
+msgid "Email To"
+msgstr "发送电子邮件至"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:295
+msgid ""
+"Emojis can serve as a good at-a-glance representation of status instead of "
+"relying on numbers"
+msgstr "表情符号可以一目了然地表示状态，而不是依赖于数字"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-examples-hub/src/components/ReactBannerComponent.jsx:24
+msgid "Empowering dashboard creators with a toolkit of examples"
+msgstr "为仪表板创建者提供示例工具包"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/index.tsx:407
+msgid "Enable"
+msgstr "启用"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:149
+msgid "Enter BCC addresses"
+msgstr "输入 BCC 地址"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:137
+msgid "Enter CC addresses"
+msgstr "输入 CC 地址"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/TokenEditor/TokenEditor.tsx:73
+msgid "Enter a name"
+msgstr "输入名称"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/TokenEditor/TokenEditor.tsx:94
+msgid "Enter a value"
+msgstr "输入值"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:109
+msgid "Enter email addresses"
+msgstr "输入电子邮件地址"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/ActionDropdown.tsx:113
+msgid "Error encountered while downloading"
+msgstr "下载时出现错误"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-conversion/src/util/Constants.ts:6
+msgid "Errors occurred during conversion"
+msgstr "转换期间出错"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:738
+msgid "Europe Telecom Dashboard Thumbnail"
+msgstr "欧洲电信仪表板缩略图"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:732
+msgid "Europe Telecom Network Hub"
+msgstr "欧洲电信网络枢纽"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-examples-hub/src/components/ReactNavComponent.jsx:51
+msgid "Examples"
+msgstr "示例"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-examples-hub/src/components/ReactBannerComponent.jsx:20
+msgid "Examples App Logo"
+msgstr "示例应用徽标"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-api/src/util/returnUtils.js:9
+msgid "Failed to add to existing dashboard"
+msgstr "无法添加到现有仪表板"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-api/src/util/returnUtils.js:13
+msgid "Failed to clone dashboard"
+msgstr "无法克隆仪表板"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-api/src/util/returnUtils.js:24
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-api/src/util/returnUtils.js:26
+msgid "Failed to fetch dashboard content for ${id}"
+msgstr "无法获取 ${id} 的仪表板内容"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/LinkToDashboardEditor.tsx:185
+msgid "Failed to load available apps."
+msgstr "无法加载可用应用。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-api/src/util/returnUtils.js:11
+msgid "Failed to save to dashboard"
+msgstr "无法保存到仪表板"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/TokenEditor/TokenEditor.tsx:22
+msgid "Field name of the value/location clicked"
+msgstr "值/位置的字段名称已勾选"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-service/src/kvstore/index.js:81
+msgid "File size must be 16MB or smaller"
+msgstr "文件大小必须小于等于 16MB"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:204
+msgid "Filler Gauge"
+msgstr "塞尺"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:222
+msgid "Filler Gauge Coloring Image"
+msgstr "塞尺着色图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:216
+msgid "Filler Gauge Coloring Options"
+msgstr "塞尺着色选项"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:212
+msgid "Filler Gauge Image"
+msgstr "塞尺图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:119
+msgid ""
+"Flexible layout options to freely place objects or organize & resize (Absolute "
+"and Grid)."
+msgstr "灵活的布局选项，可自由放置对象并进行组织和重新调整大小(绝对和网格)。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:119
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:143
+msgid "Flow"
+msgstr "流"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:23
+msgid "Friday"
+msgstr "星期五"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardLayoutGroup/index.jsx:55
+msgid "Full layout control"
+msgstr "完整的布局控制"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:7
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:208
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:218
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:230
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:240
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:250
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:262
+msgid "Gauges"
+msgstr "仪表"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardLayoutGroup/index.jsx:71
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:679
+msgid "Grid"
+msgstr "网格"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:742
+msgid "Healthcare Dashboard"
+msgstr "医疗保健仪表板"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:750
+msgid "Healthcare Dashboard Thumbnail"
+msgstr "医疗保健仪表板缩略图"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:36
+msgid "High"
+msgstr "高"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:219
+msgid "How do you want to build your dashboard?"
+msgstr "您要如何构建仪表板?"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-service/src/dashboard/index.js:13
+msgid "ID already in use. Edit the ID or choose a different title."
+msgstr "ID 已被占用。编辑 ID 或选择其他标题。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/util/ErrorMessages.ts:5
+msgid "ID cannot be empty."
+msgstr "ID 不能为空。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:580
+msgid "Icon Coloring Image"
+msgstr "图标着色图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:570
+msgid "Icon Visualization Image"
+msgstr "图标可视化图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:574
+msgid "Icons with Dynamic Coloring and Values"
+msgstr "带动态着色和值的图标"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:563
+msgid ""
+"Icons without values can be used to indicate change or status without needing "
+"to display a metric"
+msgstr "没有值的图标可用于指示变化或状态，无需显示指标"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/Dashboard.jsx:222
+msgid ""
+"Image URL domain missing from predefined allow list. Update allow list to "
+"prevent image from being blocked."
+msgstr "预定义允许列表中缺少图像 URL 域。更新允许列表以防止阻止图像。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:534
+msgid "Image Visualization Image"
+msgstr "图像可视化图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:528
+msgid "Images"
+msgstr "图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/index.tsx:419
+msgid "Inactive"
+msgstr "停用"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/AdvancedPanelSettings/index.jsx:31
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/AdvancedPanelSettings/index.jsx:48
+msgid "Inline Search"
+msgstr "内联搜索"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:14
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:320
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:330
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:340
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:350
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:360
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:372
+msgid "Inputs"
+msgstr "输入"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:691
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:715
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:725
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:747
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:757
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:767
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:777
+msgid "Intermediate"
+msgstr "中间"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:97
+msgid "Introducing Dashboard Studio"
+msgstr "Dashboard Studio 介绍"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-api/src/util/returnUtils.js:22
+msgid ""
+"Invalid input for ${parameter}. Expected ${expectedType}, but received "
+"${actualType}"
+msgstr "${parameter} 的无效输入。需要 ${expectedType}，但收到 ${actualType}"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-api/src/util/returnUtils.js:17
+msgid "Invalid layout field, requires \"absolute\" or \"grid\""
+msgstr "无效布局字段，需要 \"absolute\" 或 \"grid\""
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:273
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:177
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/SaveToExistingDashboard/index.jsx:201
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:198
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/Dashboard.jsx:179
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/Dashboard.jsx:226
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/TokenEditor/TokenEditorGroup.tsx:88
+msgid "Learn more"
+msgstr "了解更多信息"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/CustomEditingGroup.jsx:19
+msgid "Light"
+msgstr "轻量"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:46
+msgid "Line Chart"
+msgstr "折线图"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:52
+msgid "Line Visualization Image"
+msgstr "行可视化图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:138
+msgid "Link Graph"
+msgstr "链接图"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:146
+msgid "Link Graph Image"
+msgstr "链接图"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:139
+msgid ""
+"Link graphs show connections between distinct values in various fields. Certain "
+"relationships can be highlighted to see every link"
+msgstr "链接图显示各字段中不同值之间的连接。可以突出显示某些关系以查看每个链接"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/LinkToDashboardEditor.tsx:397
+msgid "Link to dashboard"
+msgstr "链接到仪表板"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/PanelOptions/index.jsx:68
+msgid "Loaded from report"
+msgstr "从报表加载"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:34
+msgid "Low"
+msgstr "低"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:180
+msgid "Map Visualization Image"
+msgstr "映射可视化图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:437
+msgid ""
+"Mark important discrete events on time-series charts. This is useful when "
+"providing context behind a visible change in your data"
+msgstr ""
+"在时间序列图表上标记重要的离散事件。在提供数据中可见更改背后的上下文时，这很有用"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:550
+msgid "Markdown Element"
+msgstr "Markdown 元素"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:558
+msgid "Markdown Visualization Image"
+msgstr "Markdown 可视化图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:226
+msgid "Marker Gauge"
+msgstr "标记规"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:244
+msgid "Marker Gauge Coloring Image"
+msgstr "标记规着色图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:238
+msgid "Marker Gauge Coloring Options"
+msgstr "标记规着色选项"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:234
+msgid "Marker Gauge Image"
+msgstr "标记规图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:204
+msgid "Message"
+msgstr "消息"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:209
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:219
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:231
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:241
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:251
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:263
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:275
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:287
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:299
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:311
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:501
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:511
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:521
+msgid "Metric"
+msgstr "指标"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:103
+msgid "Minutes past the hour"
+msgstr "分钟(整点后)"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-api/src/util/returnUtils.js:18
+msgid "Missing required parameters: id, simpleXmlDefinition"
+msgstr "缺少所需参数: id、simpleXmlDefinition"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-api/src/util/returnUtils.js:16
+msgid "Missing required parameters: id, simpleXmlVizDef"
+msgstr "缺少所需参数: id、simpleXmlVizDef"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:19
+msgid "Monday"
+msgstr "星期一"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:162
+msgid "Moving Choropleth SVG"
+msgstr "移动分级统计 SVG"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:170
+msgid "Moving SVG Visualization Image"
+msgstr "移动 SVG 可视化图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:338
+msgid "Multiselect"
+msgstr "多选"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:344
+msgid "Multiselect Image"
+msgstr "多选图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:295
+msgid "NEW"
+msgstr "新"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:119
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:131
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:143
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:589
+msgid "New"
+msgstr "新建"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:194
+msgid "Next"
+msgstr "下一步"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/AdvancedPanelSettings/index.jsx:89
+msgid "No action"
+msgstr "无操作"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:35
+msgid "Normal"
+msgstr "正常"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:358
+msgid "Number"
+msgstr "数字"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:364
+msgid "Number Input Image"
+msgstr "数字输入图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:123
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:146
+msgid "On"
+msgstr "开"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/common/ErrorViz.jsx:34
+msgid ""
+"Oops! The dashboard that you tried to convert uses components that are not yet "
+"supported in Dashboard Studio. We apologize for any inconvenience."
+msgstr ""
+"糟糕! 您尝试转换的仪表板使用的组件不受 Dashboard Studio 支持。给您带来不便，我们"
+"深表歉意。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/ActionDropdown.tsx:156
+msgid "Open dashboard"
+msgstr "打开仪表板"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/LinkToDashboardEditor.tsx:367
+msgid "Open in new tab"
+msgstr "打开新选项卡"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:391
+msgid ""
+"Optimize your dashboard by using base and chain searches to remove repitition"
+msgstr "通过使用基础搜索和链搜索删除重复项来优化仪表板"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CloneDashboard/index.jsx:56
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:160
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/PanelOptions/index.jsx:127
+msgid "Optional"
+msgstr "可选"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:432
+msgid "Overlays Image"
+msgstr "叠加图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/LinkToDashboardEditor.tsx:1
+msgid "Owner:"
+msgstr "所有者:"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/AdvancedPanelSettings/index.jsx:27
+msgid "Panel Powered By"
+msgstr "面板支持"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/PanelOptions/index.jsx:125
+msgid "Panel Title"
+msgstr "面板标题"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:126
+msgid "Parallel Coordinates"
+msgstr "平行坐标"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:134
+msgid "Parallel Coordinates Visualization Image"
+msgstr "平行坐标可视化图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:127
+msgid ""
+"Parallel coordinates are used to depict relationships in high-dimensional "
+"datasets. The advantage lies in being able to compare multiple variables all in "
+"a single chart"
+msgstr "平行坐标用于描绘高维数据集中的关系。优点在于能够在单个图表中比较多个变量"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/util/ErrorMessages.ts:20
+msgid "Parameter \"${parameter}\" must be less than ${length} characters."
+msgstr "参数 \"${parameter}\" 必须少于 ${length} 个字符。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/SaveButton.jsx:35
+msgid "Permission"
+msgstr "权限"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CloneDashboard/index.jsx:74
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:177
+msgid "Permissions"
+msgstr "权限"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:92
+msgid "Pie Chart"
+msgstr "饼图"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:100
+msgid "Pie Visualization Image"
+msgstr "饼图可视化图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:93
+msgid ""
+"Pie charts are used to show how different field values combine ver an entire "
+"data set. The size of the slice represents relative importance of one category "
+"out of a whole"
+msgstr ""
+"饼图用于显示不同的字段值如何组合整个数据集。扇区的大小表示整个类别中一个类别的相"
+"对重要性"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/index.tsx:188
+msgid "Please fill in this field"
+msgstr "请填充此字段"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/index.tsx:212
+msgid "Please select a schedule"
+msgstr "请选择计划"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:381
+msgid "Populate a visualization with the results of an ad-hoc Splunk search query"
+msgstr "使用临时 Splunk 搜索查询的结果填充可视化"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:631
+msgid ""
+"Populate token-dependent charts on page load by setting a static default value"
+msgstr "通过设置静态默认值，在页面加载时填充与标记相关的图表"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:319
+msgid ""
+"Power a form input from other input values to further narrow search results"
+msgstr "从其他输入值为表单输入提供支持，以进一步缩小搜索结果"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/ActionDropdown.tsx:92
+msgid "Preparing ${fileType.toUpperCase()} download"
+msgstr "正在准备 ${fileType.toUpperCase()} 下载"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:158
+msgid "Priority"
+msgstr "优先级"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CloneDashboard/index.jsx:40
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:60
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/LinkToDashboardEditor.tsx:339
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/SaveButton.jsx:40
+msgid "Private"
+msgstr "专用"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:606
+msgid "Progress Bar Defaults"
+msgstr "进度条默认值"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:614
+msgid "Progress Bar Defaults Image"
+msgstr "进度条默认值图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:607
+msgid ""
+"Progress bars can be revealed per visualization instance, for every "
+"visualization of a certain type, or at a default global level"
+msgstr "可以为每个可视化实例、每个特定类型的可视化或在默认全局级别显示进度条"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:104
+msgid "Punchcard Chart"
+msgstr "打孔卡图表"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:488
+msgid "Punchcard Coloring"
+msgstr "打孔卡着色"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:494
+msgid "Punchcard Coloring Image"
+msgstr "打孔卡着色图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:478
+msgid "Punchcard Sizing"
+msgstr "打孔卡大小"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:484
+msgid "Punchcard Sizing Image"
+msgstr "打孔卡大小图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:110
+msgid "Punchcard Visualization Image"
+msgstr "打孔卡可视化图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardLayoutGroup/index.jsx:71
+msgid "Quick organization"
+msgstr "快速整理"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:266
+msgid "Radial Coloring Image"
+msgstr "径向着色图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:254
+msgid "Radial Image"
+msgstr "径向图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-examples-hub/src/components/ReactBannerComponent.jsx:29
+msgid "Read Documentation"
+msgstr "读取文档"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/Dashboard.jsx:442
+msgid "Refresh"
+msgstr "刷新"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:618
+msgid "Refresh Defaults"
+msgstr "刷新默认值"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:626
+msgid "Refresh Defaults Image"
+msgstr "刷新默认值图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/Dashboard.jsx:121
+msgid "Refresh rates of less than 60 seconds might impact search performance."
+msgstr "刷新频率小于 60 秒可能影响搜索性能。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/panels/DataSourcesPanelListItem.jsx:118
+msgid "Remove"
+msgstr "删除"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/AdvancedPanelSettings/index.jsx:68
+msgid "Report"
+msgstr "报表"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:271
+msgid ""
+"Represent a discrete metric with the option of also showing the latest trend "
+"value and change over time with a sparkline"
+msgstr "表示离散指标，其中选项还可以通过迷你图显示最新的趋势值和随时间变化的更改"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:249
+msgid ""
+"Represent a single metric in relation to a radial gauge representing a limit"
+msgstr "表示与表示极限的径向仪表相关的单个指标"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:151
+msgid ""
+"Represent values by coloring predefined regions in an SVG. Custom SVG images "
+"are great for introducing an extra bit of design flair to the dashboard"
+msgstr ""
+"通过对 SVG 中的预定义区域着色来表示值。自定义 SVG 图像非常适合为仪表板引入额外的"
+"设计风格"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/EditTitleAndId/index.jsx:49
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/EditTitleAndId/index.jsx:70
+msgid "Required"
+msgstr "必填"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/Dashboard.jsx:562
+msgid "Retry save"
+msgstr "重新尝试保存"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:53
+msgid "Run by Cron"
+msgstr "由 Cron 运行"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:41
+msgid "Run every day"
+msgstr "每天运行"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:37
+msgid "Run every hour"
+msgstr "每小时运行"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:49
+msgid "Run every month"
+msgstr "每月运行"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:45
+msgid "Run every week"
+msgstr "每周运行"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:158
+msgid "SVG Visualization Image"
+msgstr "SVG 可视化图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:114
+msgid "Sankey Diagram"
+msgstr "Sankey 图"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:115
+msgid ""
+"Sankey Diagrams are used to depict flows from a set of elements to another "
+"using nodes and links"
+msgstr "Sankey 图用于使用节点和链接来描述从一组元素到另一组元素的流"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:122
+msgid "Sankey Visualization Image"
+msgstr "Sankey 图可视化图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:24
+msgid "Saturday"
+msgstr "星期六"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/SaveButton.jsx:23
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/SaveButton.jsx:26
+msgid "Save"
+msgstr "保存"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/index.tsx:527
+msgid "Save & Disable"
+msgstr "保存并禁用"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/index.tsx:527
+msgid "Save & Enable"
+msgstr "保存并启用"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/SaveToExistingDashboard/index.jsx:173
+msgid "Save Panel to Existing Dashboard"
+msgstr "将面板保存到现有仪表板"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:127
+msgid "Save Panel to New Dashboard"
+msgstr "将面板保存到新仪表板"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/Dashboard.jsx:519
+msgid "Save now"
+msgstr "立即保存"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:145
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/SaveToExistingDashboard/index.jsx:223
+msgid "Save to Dashboard"
+msgstr "保存到仪表板"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:408
+msgid "Saved Search Image"
+msgstr "已保存搜索图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:400
+msgid "Saved Searches"
+msgstr "已保存搜索"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:80
+msgid "Scatter Chart"
+msgstr "散点图"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:88
+msgid "Scatter Visualization Image"
+msgstr "散点图可视化图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:81
+msgid ""
+"Scatter charts plot points on a graph, where the data point distribution can "
+"represent the correlation across the two dimensions being shown. Multiple "
+"categories can also be compared by using colors"
+msgstr ""
+"散点图在图形上绘制点，其中数据点分布可以表示所显示的两个维度之间的相关性。还可以"
+"使用颜色比较多个类别"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:193
+msgid "Schedule"
+msgstr "计划"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/index.tsx:331
+msgid ""
+"Schedule ${\n"
+"                  this.state.enabled ? 'enabled' : 'disabled'\n"
+"                } and saved"
+msgstr ""
+"计划 ${\n"
+"                  this.state.enabled ? 'enabled' : 'disabled'\n"
+"                } 并已保存"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/ActionDropdown.tsx:272
+msgid "Scheduled Export"
+msgstr "计划导出"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/SaveToExistingDashboard/SelectDashboardList.jsx:237
+msgid "Search By Title"
+msgstr "按标题搜索"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:386
+msgid "Search Image"
+msgstr "搜索图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/LinkToDashboardEditor.tsx:297
+msgid "Select a Dashboard"
+msgstr "选择仪表板"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/LinkToDashboardEditor.tsx:263
+msgid "Select an App"
+msgstr "选择应用"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/SaveToExistingDashboard/SelectDashboardList.jsx:210
+msgid "Select an Existing Dashboard"
+msgstr "选择现有仪表板"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:242
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardLayoutGroup/index.jsx:39
+msgid "Select layout mode"
+msgstr "选择布局模式"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:369
+msgid ""
+"Select the time range used by datasources powering your visualizations. By "
+"default, every dashboard comes with a time range input"
+msgstr ""
+"选择支持可视化的数据源使用的时间范围。默认情况下，每个仪表板都附带一个时间范围输"
+"入"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/util/linkToDashboardHelpers.ts:16
+msgid ""
+"Selected app is not available. App may have been deleted, or you may not have "
+"permissions."
+msgstr "所选应用不可用。应用可能已被删除，或者您可能没有权限。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/util/linkToDashboardHelpers.ts:12
+msgid ""
+"Selected dashboard is not available. Dashboard may have been deleted, or you "
+"may not have permissions."
+msgstr "所选仪表板不可用。仪表板可能已被删除，或者您可能没有权限。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/index.tsx:518
+msgid "Send Test Email"
+msgstr "发送测试电子邮件"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/ActionDropdown.tsx:261
+msgid "Set As Home Dashboard"
+msgstr "设置为主页仪表板"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/SaveButton.jsx:33
+msgid "Set Permission"
+msgstr "设置权限"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:592
+msgid "Set Token Image"
+msgstr "设置标记图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:584
+msgid "Set Token with Drilldown"
+msgstr "使用钻取设置标记"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/TokenEditor/TokenEditorGroup.tsx:72
+msgid "Set Tokens"
+msgstr "设置标记"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:329
+msgid ""
+"Set a token to a single value by using a form populated with static or dynamic "
+"options"
+msgstr "使用用静态或动态选项填充的表单将标记设置为单值"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:339
+msgid ""
+"Set a token to multiple values by using a form populated with static or dynamic "
+"options"
+msgstr "使用用静态或动态选项填充的表单将标记设置为多值"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:585
+msgid ""
+"Set tokens based on certain interactions taking place on a visualization. "
+"Setting tokens opens the opportunity for more dynamic workflows on the dashboard"
+msgstr "根据可视化上发生的某些交互设置标记。设置标记使得仪表板上的工作流更灵活"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:349
+msgid "Set tokens based on text entries"
+msgstr "根据文本条目设置标记"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:359
+msgid "Set tokens by selecting a number from a dropdown"
+msgstr "从下拉列表中选择一个数字来设置标记"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:546
+msgid "Shape Visualization Image"
+msgstr "形状可视化图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:538
+msgid "Shapes and Lines"
+msgstr "形状和行"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CloneDashboard/index.jsx:46
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:66
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/LinkToDashboardEditor.tsx:335
+msgid "Shared in App"
+msgstr "在应用中共享"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/SaveButton.jsx:45
+msgid "Shared in app"
+msgstr "在应用中共享"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:131
+msgid "Show CC and BCC"
+msgstr "显示抄送和密件抄送"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/CustomLayoutEditor.jsx:63
+msgid "Show Edit Button"
+msgstr "显示编辑按钮"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/CustomLayoutEditor.jsx:87
+msgid "Show Export Button"
+msgstr "显示导出按钮"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/CustomLayoutEditor.jsx:74
+msgid "Show Open In Search Button"
+msgstr "显示在搜索中打开按钮"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:8
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:274
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:286
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:298
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:310
+msgid "Single Value"
+msgstr "单值"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:282
+msgid "Single Value Coloring"
+msgstr "单值着色"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:290
+msgid "Single Value Coloring Image"
+msgstr "单值着色图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:302
+msgid "Single Value Emoji Image"
+msgstr "单值表情图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:294
+msgid "Single Value Emojis"
+msgstr "单值表情"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:314
+msgid "Single Value Icon Image"
+msgstr "单值图标图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:278
+msgid "Single Value Image"
+msgstr "单值图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:248
+msgid "Single Value Radial"
+msgstr "单值径向"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:258
+msgid "Single Value Radial with Dynamic Coloring"
+msgstr "带动态着色的单值径向"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:306
+msgid "Single Value with Icons"
+msgstr "带图标的单值"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:163
+msgid ""
+"Some SVG images can move depending on how they are made. These also work as "
+"expected in dashboards, and tokens can be used to control their movement"
+msgstr ""
+"某些 SVG 图像可以根据其制作方式移动。这些也按预期在仪表板中工作，标记可用于控制"
+"其移动"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CloneDashboard/index.jsx:136
+msgid ""
+"Some custom formatting and configurations to your dashboard may be lost during "
+"the cloning and conversion process. Your original dashboard will not be "
+"affected."
+msgstr ""
+"克隆和转换过程中，某些自定义格式和仪表板配置可能丢失。不会影响您的原始仪表板。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/SaveToExistingDashboard/SelectDashboardList.jsx:212
+msgid "Sort"
+msgstr "排序"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:167
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:417
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:429
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:441
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:611
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:623
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:633
+msgid "Source Only"
+msgstr "仅限来源"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:155
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:177
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:187
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:197
+msgid "Spatial"
+msgstr "空间"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:10
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:154
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:176
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:186
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:196
+msgid "Spatial Elements"
+msgstr "空间元素"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:425
+msgid ""
+"Specify a field to be represented as an overlay on your chart. This is useful "
+"when representing averages or bounds to your data"
+msgstr "指定要在图表上表示为叠加的字段。这在表示数据的平均值或边界时很有用"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/TokenEditor/TokenEditor.tsx:17
+msgid "Specify a token name and reference the token using the syntax $token_name$"
+msgstr "使用语法 $token_name$ 指定标记名称并引用标记"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:187
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/index.tsx:106
+msgid "Splunk Dashboard: $dashboard.label$"
+msgstr "Splunk 仪表板: $dashboard.label$"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/PanelOptions/index.jsx:55
+msgid "Statistics Table"
+msgstr "统计表"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:185
+msgid "Subject"
+msgstr "主题"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-examples-hub/src/components/ReactBannerComponent.jsx:32
+msgid "Submit Feature Request"
+msgstr "提交功能请求"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-examples-hub/src/components/ReactBannerComponent.jsx:25
+msgid "Submit feedback to: dashboard-studio@splunk.com"
+msgstr "提交反馈至: dashboard-studio@splunk.com"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/Dashboard.jsx:571
+msgid "Success! Dashboard saved."
+msgstr "成功！已保存仪表板。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-api/src/util/returnUtils.js:8
+msgid "Successfully added to existing dashboard"
+msgstr "已成功添加到现有仪表板"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-api/src/util/returnUtils.js:12
+msgid "Successfully cloned dashboard"
+msgstr "已成功克隆仪表板"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-conversion/src/util/Constants.ts:3
+msgid "Successfully converted dashboard"
+msgstr "已成功转换仪表板"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-conversion/src/util/Constants.ts:4
+msgid "Successfully converted visualization"
+msgstr "已成功转换可视化"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-api/src/util/returnUtils.js:10
+msgid "Successfully saved to dashboard"
+msgstr "已成功保存到仪表板"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:18
+msgid "Sunday"
+msgstr "星期日"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:9
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:500
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:510
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:520
+msgid "Table"
+msgstr "表格"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:508
+msgid "Table Coloring"
+msgstr "表格着色"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:514
+msgid "Table Coloring Image"
+msgstr "表格着色图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:524
+msgid "Table Formatting Image"
+msgstr "表格格式图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:504
+msgid "Table Image"
+msgstr "表格图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:420
+msgid "Test Data Image"
+msgstr "测试数据图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:412
+msgid "Test Data Source"
+msgstr "测试数据源"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:348
+msgid "Text"
+msgstr "文本"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:354
+msgid "Text Input Image"
+msgstr "文本输入图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/util/ErrorMessages.js:8
+msgid ""
+"The Dashboard ID \"${title.replace(/W/g, '_').toLowerCase()}\" is already taken."
+msgstr "仪表板 ID \"${title.replace(/W/g, '_').toLowerCase()}\" 已被占用。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/EditTitleAndId/index.jsx:64
+msgid ""
+"The Dashboard ID is used as the filename on disk.\n"
+"This cannot be changed later."
+msgstr ""
+"仪表板 ID 已被用作磁盘上的文件名。\n"
+"之后无法更改。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-service/src/dashboard/index.js:64
+msgid "The dashboard you selected no longer exists."
+msgstr "选定的仪表板不再存在。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:193
+msgid ""
+"The email subject, recipients, and messages can include tokens that insert text "
+"based on the search results."
+msgstr "电子邮件主题、收件人和消息可包含根据搜索结果插入文本的标记。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/AdvancedPanelSettings/index.jsx:35
+msgid ""
+"The inline search exists only in the dashboard and has no external dependencies."
+msgstr "内联搜索仅存在于仪表板中，且没有外部相关项。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/index.tsx:340
+msgid "The next scheduled email will send on "
+msgstr "下一个计划电子邮件将发送于"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/index.tsx:443
+msgid "The schedule is set to the timezone of this Splunk instance"
+msgstr "计划设置为此 Splunk 实例的时区"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/index.tsx:359
+msgid ""
+"The server did not accept your entry; the chosen schedule may not be supported"
+msgstr "服务器不接受您的条目，所选的计划可能不受支持"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-service/src/dashboard/index.js:14
+msgid ""
+"The total size of a dashboard must be 7MB or smaller. Please remove some images "
+"and icons."
+msgstr "仪表板总大小必须小于等于 7MB。请移除某些图像和图标。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:260
+msgid "The traditional Splunk dashboard builder"
+msgstr "传统的 Splunk 仪表板构建器"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/PanelOptions/index.jsx:72
+msgid ""
+"The visualization and its configuration will be loaded from the report by "
+"default. It can be modified later within the dashboard or in the report itself."
+msgstr "默认将从报表加载可视化及其配置。之后可以在仪表板或报表中进行修改。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/CustomEditingGroup.jsx:18
+msgid "Theme"
+msgstr "主题"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:641
+msgid ""
+"This classic example is an excellent use case for background images and simple, "
+"colored visualizations"
+msgstr "这个经典示例是背景图像和简单彩色可视化的绝佳用例"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/Dashboard.jsx:516
+msgid "This dashboard has unsaved changes."
+msgstr "此仪表板有未保存的更改。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:687
+msgid ""
+"This dashboard shows a thematic example of dynamic SVG options to track server "
+"room temperatures"
+msgstr "此仪表板显示动态 SGV 选项的主题示例以跟踪服务器房间温度"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:743
+msgid ""
+"This dashboard shows how effective coloring and layering can combine simple "
+"visuals to an effective information flow"
+msgstr "此仪表板显示了有效的着色和分层如何将简单的视觉效果与有效的信息流相结合"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/util/ErrorMessages.ts:11
+msgid ""
+"This email domain is not approved. To resolve this issue, contact your Splunk "
+"Administrator."
+msgstr "未批准此电子邮件域。要解决此问题，请联系 Splunk 管理员。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:733
+msgid ""
+"This example shows one of the most intricate and effective uses of SVG coloring"
+msgstr "此示例显示了 SVG 着色最复杂、最有效的用法之一"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:675
+msgid ""
+"This example uses grid layout to show colored visualizations to show high level "
+"customer KPIs"
+msgstr "此示例使用网格布局显示彩色可视化，以显示高级客户 KPI"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:22
+msgid "Thursday"
+msgstr "星期四"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:368
+msgid "Timerange"
+msgstr "时间范围"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:376
+msgid "Timerange Input Image"
+msgstr "时间范围输入图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/SaveToExistingDashboard/SelectDashboardList.jsx:31
+msgid "Title (A - Z)"
+msgstr "标题(A - Z)"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/SaveToExistingDashboard/SelectDashboardList.jsx:36
+msgid "Title (Z - A)"
+msgstr "标题(Z - A)"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/util/ErrorMessages.ts:4
+msgid "Title cannot be empty."
+msgstr "标题不能为空。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-conversion/src/util/Constants.ts:15
+msgid "To continue, remove Trellis."
+msgstr "要继续，需移除棚架。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-conversion/src/util/Constants.ts:20
+msgid ""
+"To continue, remove categorical colors or select another visualization such as "
+"'Statistics Table'."
+msgstr "要继续，需移除分类颜色或选择其他可视化，例如”统计表”。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-conversion/src/util/Constants.ts:10
+msgid "To continue, select another visualization such as 'Statistics Table'."
+msgstr "要继续，需选择其他可视化，例如”统计表”。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:630
+msgid "Token Defaults"
+msgstr "标记默认值"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:636
+msgid "Token Defaults Image"
+msgstr "标记默认值图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/TokenEditor/TokenEditor.tsx:64
+msgid "Token Name"
+msgstr "标记名称"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/TokenEditor/TokenEditor.tsx:86
+msgid "Token Value"
+msgstr "标记值"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/util/linkToDashboardHelpers.ts:21
+msgid "Token name is duplicate."
+msgstr "标记名称是重复项。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/util/linkToDashboardHelpers.ts:20
+msgid "Token name is empty or contains invalid characters."
+msgstr "标记名称是空值或包含无效字符。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/util/linkToDashboardHelpers.ts:19
+msgid "Token value is empty or contains invalid characters."
+msgstr "标记值是空值或包含无效字符。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:321
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:331
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:341
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:351
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:361
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:373
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:589
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:599
+msgid "Tokens"
+msgstr "标记"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:27
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:49
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:61
+msgid "Trend"
+msgstr "趋势"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:20
+msgid "Tuesday"
+msgstr "星期二"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:194
+msgid "US Choropleth Map"
+msgstr "美国分级统计地图"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:200
+msgid "US Choropleth Map Visualization Image"
+msgstr "美国分级统计地图可视化图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/emailValidation.ts:26
+msgid "Unable to contact the Splunk server for email domain validation"
+msgstr "无法联系 Splunk 服务器进行电子域验证"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/util/ErrorMessages.js:3
+msgid "Unable to save dashboard: a dashboard title is required."
+msgstr "无法保存仪表板: 仪表板标题是必填项。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/util/ErrorMessages.js:5
+msgid "Unable to save dashboard: dashboard not found."
+msgstr "无法保存仪表板: 未找到仪表板。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/panels/DataSourcesPanelListItem.jsx:68
+msgid "Unnamed"
+msgstr "未命名"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:57
+msgid ""
+"Use Area charts to track values and identify trends over a period of time. "
+"Stacked area charts can represent the accumulation of more than one data series"
+msgstr ""
+"使用面积图跟踪值并识别一段时间内的趋势。堆积面积图可以表示多个数据序列的累积"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:307
+msgid ""
+"Use Icons to indicate important changes or to provide more context to your "
+"Single Value metrics"
+msgstr "使用图标指示重要更改或为单值指标提供更多上下文"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:529
+msgid "Use Images to add visual context and personalize your dashboard"
+msgstr "使用图像添加可视上下文并个性化仪表板"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:47
+msgid "Use Line charts to track values and identify trends over a period of time"
+msgstr "使用折线图跟踪值并识别一段时间内的趋势"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:499
+msgid "Use Tables to simply display field and row data from your data sources"
+msgstr "使用表格仅显示数据源中的字段和行数据"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:413
+msgid ""
+"Use a JSON object with static data to populate visualizations without running "
+"searches. This is best for testing or displaying static visualizations for "
+"design purposes"
+msgstr ""
+"使用具有静态数据的 JSON 对象来填充可视化，无需运行搜索。这最适合测试或显示用于设"
+"计的静态可视化"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:401
+msgid ""
+"Use saved searches from various apps to use in your Dashboard, such as reports "
+"from Search and Reporting"
+msgstr "使用来自各种应用的已保存搜索以在仪表板中使用，例如“搜索和报表”中的报表"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:539
+msgid ""
+"Use shapes and lines to direct flow, frame visualizations, and tell a story "
+"with your data"
+msgstr "使用形状和线条来引导流、构建可视化框架，并使用数据讲述故事"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/TokenEditor/TokenEditorGroup.tsx:86
+msgid ""
+"Use tokens to set values in the target dashboard. For example: host = row.host."
+"value "
+msgstr "使用标记在目标仪表板中设置值。例如: host = row.host.value"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/AdvancedPanelSettings/index.jsx:72
+msgid ""
+"Uses the report. Retains all report metadata such as schedule, acceleration, "
+"and permissions."
+msgstr "使用报表。保留所有报表元数据，如计划、加速和权限。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:770
+msgid "VPN Health Dashboard Thumbnail"
+msgstr "VPN 运行状况仪表板缩略图"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:764
+msgid "VPN Health by Region"
+msgstr "按区域划分的 VPN 运行状况"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/TokenEditor/TokenEditor.tsx:30
+msgid "Value in the specified series corresponding to the location clicked"
+msgstr "指定系列中与单击的位置相对应的值"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/TokenEditor/TokenEditor.tsx:26
+msgid "Value of the location clicked"
+msgstr "单击位置的值"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:33
+msgid "Very Low"
+msgstr "非常低"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/panels/DataSourcesPanelListItem.jsx:108
+msgid "View"
+msgstr "查看"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/LinkToDashboardEditor.tsx:352
+msgid "View Dashboard"
+msgstr "查看仪表板"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/CustomLayoutEditor.jsx:55
+msgid "View Options"
+msgstr "查看选项"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CloneDashboard/index.jsx:41
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:61
+msgid "Visible only to you"
+msgstr "仅对您可见"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CloneDashboard/index.jsx:47
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:67
+msgid "Visible to app users"
+msgstr "对应用用户可见"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:175
+msgid "Visit the Splunk Documentation to learn more."
+msgstr "访问 Splunk 文档了解更多信息。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/PanelOptions/index.jsx:102
+msgid "Visualization Type"
+msgstr "可视化类型"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:227
+msgid ""
+"Visualize a single numeric value and display it in relation to ranges "
+"representing different statuses"
+msgstr "可视化单个数值，按表示不同状态的范围显示"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:205
+msgid ""
+"Visualize a single numeric value and represent it in relation to a limit with a "
+"filler gauge"
+msgstr "可视化单个数值，并使用塞尺表示其与极限的关系"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:175
+msgid "Visualize geo data on an interactive map area"
+msgstr "在交互式地图区域上可视化地理数据"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/Dashboard.jsx:170
+#, python-format
+msgid ""
+"We are no longer making updates to the %(beta)s. To ensure this dashboard stays "
+"supported with the latest features, please move it out of '%(beta)s' and into "
+"'%(search)s' or another app"
+msgstr ""
+"我们不再更新 %(beta)s。为确保最新功能仍支持此仪表板，请将其移出 '%(beta)s' 并移"
+"进 '%(search)s' 或其他应用"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:21
+msgid "Wednesday"
+msgstr "星期三"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:226
+msgid "What's this?"
+msgstr "这是什么?"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/CustomLayoutEditor.jsx:65
+msgid ""
+"When disabled, you can access Edit Mode through the primary Dashboards view."
+msgstr "禁用后，您可以通过主仪表板视图访问编辑模式。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/CustomLayoutEditor.jsx:89
+msgid ""
+"When in View Mode, disabling \"Show Export\" removes the ability to export "
+"dashboards."
+msgstr "在视图模式下，禁用“显示导出”会删除导出仪表板的功能。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/CustomLayoutEditor.jsx:76
+msgid ""
+"When in View Mode, disabling “Show Open in Search” removes the ability to open "
+"and edit a query in the full search experience."
+msgstr ""
+"在视图模式下，禁用“在搜索中显示打开”会删除在完整搜索体验中打开和编辑查询的功能。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:190
+msgid "Wolrd Choropleth Map Visualization Image"
+msgstr "世界分级统计地图可视化图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:774
+msgid "Workforce Readiness"
+msgstr "工作人员就绪情况"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:780
+msgid "Workforce Readiness Dashboard Thumbnail"
+msgstr "工作人员就绪情况仪表板缩略图"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:784
+msgid "Workforce Readiness Detail"
+msgstr "工作人员就绪情况详细信息"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:790
+msgid "Workforce Readiness Detail Dashboard Thumbnail"
+msgstr "工作人员就绪情况详细信息仪表板缩略图"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:184
+msgid "World Choropleth Map"
+msgstr "世界分级统计地图"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:551
+msgid ""
+"Write Markdown directly in your dashboard to provide descriptions, labels, and "
+"additional information"
+msgstr "直接在仪表板中写下 Markdown 以提供描述、标签和其他信息"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/EditTitleAndId/index.jsx:67
+msgid "You can use letters, numbers, dashes, and underscores."
+msgstr "您可以使用字母、数字、短划线和下划线。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/util/ErrorMessages.ts:6
+msgid "You cannot use < or > in a dashboard name."
+msgstr "不可以在仪表板名称中使用 < or >。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-service/src/kvstore/index.js:59
+msgid ""
+"You do not have the permissions or role to perform this action. Only those with "
+"the admin or power roles can remove images"
+msgstr "您没有执行此操作的权限或角色。仅管理员或有权利的角色可以移除图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-service/src/kvstore/index.js:14
+msgid ""
+"You do not have the permissions or role to perform this action. Only those with "
+"the admin or power roles can upload images"
+msgstr "您没有执行此操作的权限或角色。仅管理员或有权利的角色可以上载图像"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/SaveToExistingDashboard/SelectDashboardList.jsx:265
+msgid "You have no writable dashboards for the app: ${app}"
+msgstr "没有适用于应用的可写入仪表板: ${app}"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/util/ErrorMessages.ts:8
+msgid "You must select a dashboard layout."
+msgstr "必须选择仪表板布局。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/util/ErrorMessages.ts:7
+msgid "You must select a dashboard type."
+msgstr "必须选择仪表板类型。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/util/ErrorMessages.ts:9
+msgid "You must select an existing dashboard."
+msgstr "您必须选择现有仪表板。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/ActionDropdown.test.tsx:154
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/ActionDropdown.tsx:108
+msgid "Your download has started"
+msgstr "已启动下载"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:185
+msgid "e.g 0 18 * * * (every day at 6:00pm)"
+msgstr "如 0 18 * * *(每天下午 6 点)"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:156
+msgid "explore additional tools."
+msgstr "浏览其他工具。"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:117
+msgid "freely place objects"
+msgstr "自由放置对象"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:134
+msgid "images,"
+msgstr "图像，"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:110
+msgid "or"
+msgstr "或"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:117
+msgid "organize & resize"
+msgstr "组织和重新调整大小"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:155
+msgid "standard Splunk visualizations"
+msgstr "标准 Splunk 可视化"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:134
+msgid "text"
+msgstr "文本"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-examples-hub/src/components/ReactBannerComponent.jsx:33
+msgid "to ideas.splunk.com"
+msgstr "至 ideas.splunk.com"

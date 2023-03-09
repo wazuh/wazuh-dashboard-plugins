@@ -1,0 +1,980 @@
+# Translations template for PROJECT.
+# Copyright (C) 2022 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2022-03-31 17:30-0700\n"
+"PO-Revision-Date: 2022-04-07 13:50+0100\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: zh_TW\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.6.0\n"
+"X-Generator: Poedit 3.0.1\n"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/SetSchedule/SetScheduleModal.jsx:134
+msgid " at "
+msgstr " 於 "
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/LogsReportView.jsx:461
+msgid " next to \"Usage Data\""
+msgstr " 前往「用量資料」"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/SetSchedule/SetScheduleModal.jsx:112
+msgid " on "
+msgstr " 於 "
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:255
+msgid "\"Full\" includes bucket manifests and metadata files, if the index_files component is selected."
+msgstr "若選取 index_files 元件，則「Full」包括索引分集資訊清單和中繼資料檔案。"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:279
+msgid "\"Light\" lists only hot buckets, if the index_listing component is selected."
+msgstr "若選取 index_listing 元件，則「Light」僅列出熱門索引分集。"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInStatus.jsx:97
+#, python-format
+msgid "%s"
+msgstr "%s"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/LogsReportView.jsx:406
+#, python-format
+msgid "%s Data"
+msgstr "%s 資料"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/SettingsPage/LicenseDataOptOutModal.jsx:52
+#, python-format
+msgid "%s Usage Data"
+msgstr "%s 用量資料"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInDropdown.jsx:422
+msgid ". For  examples, see our "
+msgstr ". 例如，請參閱我們的"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:355
+msgid "1 GB"
+msgstr "1 GB"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:369
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:317
+msgid "1 MB"
+msgstr "1 MB"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:373
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:318
+msgid "10 MB"
+msgstr "10 MB"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:351
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:377
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:319
+msgid "100 MB"
+msgstr "100 MB"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:359
+msgid "5 GB"
+msgstr "5 GB"
+
+#: ../../apps/splunk_instrumentation/default/data/ui/alerts/outputtelemetry.html
+msgid ""
+"<form class=\"form-horizontal form-complex\">\n"
+"    <div class=\"control-group\">\n"
+"        <label class=\"control-label\" for=\"outputtelemetry_component\">Name</label>\n"
+"\n"
+"        <div class=\"controls\">\n"
+"            <input type=\"text\" class=\"input-xlarge\" name=\"action.outputtelemetry.param.component\" id="
+"\"outputtelemetry_component\" placeholder=\"component.name\"/>\n"
+"        </div>\n"
+"    </div>\n"
+"    <div class=\"control-group\">\n"
+"        <label class=\"control-label\" for=\"outputtelemetry_input\">Input field</label>\n"
+"\n"
+"        <div class=\"controls\">\n"
+"            <input type=\"text\" class=\"input-xlarge\" name=\"action.outputtelemetry.param.input\" id=\"outputtelemetry_component"
+"\" placeholder=\"field name\"/>\n"
+"        </div>\n"
+"    </div>\n"
+"    <div class=\"control-group\">\n"
+"        <label class=\"control-label\" for=\"outputtelemetry_type\">Data type</label>\n"
+"\n"
+"        <div class=\"controls\">\n"
+"            <label class=\"radio\" for=\"outputtelemetry_type_event\">\n"
+"                <input id=\"outputtelemetry_type_event\" type=\"radio\" name=\"action.outputtelemetry.param.type\" value=\"event"
+"\"/>\n"
+"                Event\n"
+"            </label>\n"
+"            <label class=\"radio\" for=\"outputtelemetry_type_aggregate\">\n"
+"                <input id=\"outputtelemetry_type_aggregate\" type=\"radio\" name=\"action.outputtelemetry.param.type\" value="
+"\"aggregate\"/>\n"
+"                Aggregate\n"
+"            </label>\n"
+"        </div>\n"
+"    </div>\n"
+"    <div class=\"control-group\">\n"
+"        <label class=\"control-label\">Categories (at least 1):</label>\n"
+"        <div class=\"controls\">\n"
+"            <label class=\"checkbox\" for=\"outputtelemetry_anonymous\">\n"
+"                <input type=\"checkbox\" name=\"action.outputtelemetry.param.anonymous\" id=\"outputtelemetry_anonymous\" value="
+"\"1\"/>\n"
+"                Anonymized usage data\n"
+"            </label>\n"
+"        </div>\n"
+"        <div class=\"controls\">\n"
+"            <label class=\"checkbox\" for=\"outputtelemetry_support\">\n"
+"                <input type=\"checkbox\" name=\"action.outputtelemetry.param.support\" id=\"outputtelemetry_support\" value=\"1\"/"
+">\n"
+"                Support usage data\n"
+"            </label>\n"
+"        </div>\n"
+"        <div class=\"controls\">\n"
+"            <label class=\"checkbox\" for=\"outputtelemetry_license\">\n"
+"                <input type=\"checkbox\" name=\"action.outputtelemetry.param.license\" id=\"outputtelemetry_license\" value=\"1\"/"
+">\n"
+"                License usage data\n"
+"            </label>\n"
+"        </div>\n"
+"    </div>\n"
+"    <div class=\"control-group\">\n"
+"        <label class=\"control-label\" for=\"outputtelemetry_optinrequired\">Required opt-in</label>\n"
+"\n"
+"        <div class=\"controls\">\n"
+"            <select id=\"outputtelemetry_optinrequired\" name=\"action.outputtelemetry.param.optinrequired\">\n"
+"                <option value=\"1\">1 - Splunk 6.5</option>\n"
+"                <option value=\"2\">2 - Splunk 6.6</option>\n"
+"                <option value=\"3\">3 - Splunk 7.0</option>\n"
+"            </select>\n"
+"        </div>\n"
+"    </div>\n"
+"</form>\n"
+msgstr ""
+"<form class=\"form-horizontal form-complex\">\n"
+"    <div class=\"control-group\">\n"
+"        <label class=\"control-label\" for=\"outputtelemetry_component\">名稱</label>\n"
+"\n"
+"        <div class=\"controls\">\n"
+"            <input type=\"text\" class=\"input-xlarge\" name=\"action.outputtelemetry.param.component\" id="
+"\"outputtelemetry_component\" placeholder=\"component.name\"/>\n"
+"        </div>\n"
+"    </div>\n"
+"    <div class=\"control-group\">\n"
+"        <label class=\"control-label\" for=\"outputtelemetry_input\">輸入欄位</label>\n"
+"\n"
+"        <div class=\"controls\">\n"
+"            <input type=\"text\" class=\"input-xlarge\" name=\"action.outputtelemetry.param.input\" id=\"outputtelemetry_component"
+"\" placeholder=\"field name\"/>\n"
+"        </div>\n"
+"    </div>\n"
+"    <div class=\"control-group\">\n"
+"        <label class=\"control-label\" for=\"outputtelemetry_type\">資料類型</label>\n"
+"\n"
+"        <div class=\"controls\">\n"
+"            <label class=\"radio\" for=\"outputtelemetry_type_event\">\n"
+"                <input id=\"outputtelemetry_type_event\" type=\"radio\" name=\"action.outputtelemetry.param.type\" value=\"event"
+"\"/>\n"
+"                事件\n"
+"            </label>\n"
+"            <label class=\"radio\" for=\"outputtelemetry_type_aggregate\">\n"
+"                <input id=\"outputtelemetry_type_aggregate\" type=\"radio\" name=\"action.outputtelemetry.param.type\" value="
+"\"aggregate\"/>\n"
+"                彙總\n"
+"            </label>\n"
+"        </div>\n"
+"    </div>\n"
+"    <div class=\"control-group\">\n"
+"        <label class=\"control-label\">類別 (至少 1 個)：</label>\n"
+"        <div class=\"controls\">\n"
+"            <label class=\"checkbox\" for=\"outputtelemetry_anonymous\">\n"
+"                <input type=\"checkbox\" name=\"action.outputtelemetry.param.anonymous\" id=\"outputtelemetry_anonymous\" value="
+"\"1\"/>\n"
+"                匿名化用量資料\n"
+"            </label>\n"
+"        </div>\n"
+"        <div class=\"controls\">\n"
+"            <label class=\"checkbox\" for=\"outputtelemetry_support\">\n"
+"                <input type=\"checkbox\" name=\"action.outputtelemetry.param.support\" id=\"outputtelemetry_support\" value=\"1\"/"
+">\n"
+"                支援用量資料\n"
+"            </label>\n"
+"        </div>\n"
+"        <div class=\"controls\">\n"
+"            <label class=\"checkbox\" for=\"outputtelemetry_license\">\n"
+"                <input type=\"checkbox\" name=\"action.outputtelemetry.param.license\" id=\"outputtelemetry_license\" value=\"1\"/"
+">\n"
+"                授權用量資料\n"
+"            </label>\n"
+"        </div>\n"
+"    </div>\n"
+"    <div class=\"control-group\">\n"
+"        <label class=\"control-label\" for=\"outputtelemetry_optinrequired\">必須選擇加入</label>\n"
+"\n"
+"        <div class=\"controls\">\n"
+"            <select id=\"outputtelemetry_optinrequired\" name=\"action.outputtelemetry.param.optinrequired\">\n"
+"                <option value=\"1\">1 - Splunk 6.5</option>\n"
+"                <option value=\"2\">2 - Splunk 6.6</option>\n"
+"                <option value=\"3\">3 - Splunk 7.0</option>\n"
+"            </select>\n"
+"        </div>\n"
+"    </div>\n"
+"</form>\n"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:418
+msgid "Actions"
+msgstr "動作"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagNodeListPanel.jsx:238
+msgid "All Roles"
+msgstr "全部角色"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:195
+msgid ""
+"All files matching the given patterns will be excluded. To exclude multiple files, use wildcards, or provide a comma-separated "
+"list of files or patterns."
+msgstr "所有符合指定樣式的檔案將被排除。可使用萬用字元或提供檔案或樣式的逗號分隔清單來排除多個檔案。"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/SettingsPage/LicenseDataOptOutModal.jsx:62
+#, python-format
+msgid "Are you sure you want to disable %s usage data sharing?"
+msgstr "您確定要停用 %s 用量資料分享？"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:401
+msgid "Attempt to redact search terms from logs that may be private or personally identifying."
+msgstr "嘗試回應來自可能為私人或個人識別記錄的搜尋字彙。"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInStatus.jsx:119
+msgid "Automatically enabled"
+msgstr "自動啟用"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagModalView.jsx:171
+msgid "Back"
+msgstr "上一步"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:177
+msgid "Business week to date"
+msgstr "工作週迄今"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagModalView.jsx:233
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/SetSchedule/SetScheduleModal.jsx:165
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/common/ExampleHeaderTableUseView.jsx:92
+msgid "Cancel"
+msgstr "取消"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/services/DiagService.es:37
+#, python-format
+msgid "Cannot delete diag with status: %s"
+msgstr "無法刪除以下狀態的診斷：%s"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/services/DiagService.es:59
+#, python-format
+msgid "Cannot download diag with status: %s"
+msgstr "無法下載以下狀態的診斷：%s"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/LogsReportView.jsx:459
+msgid "Change your settings by clicking the "
+msgstr "按一下下列按鈕以變更您的設定："
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/ExportSendModalView.jsx:155
+msgid "Close"
+msgstr "關閉"
+
+#: ../../apps/splunk_instrumentation/default/searchbnf.conf:20
+msgid "Combines specified fields into a stringified JSON"
+msgstr "將指定欄位合併為字串化 JSON"
+
+#: ../../apps/splunk_instrumentation/default/searchbnf.conf:22
+msgid ""
+"Combines the specified set of field names, or field name patterns, \\\n"
+"and creates an field with the output name."
+msgstr ""
+"合併欄位名稱的指定設定或欄位名稱樣式，\\ \n"
+"並以輸出名稱建立欄位。"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/BaseLayout.jsx:19
+msgid ""
+"Configure automated reporting settings, view collected data, export data to file, work with diagnostic files, and send data to "
+"Splunk. "
+msgstr "設定自動回報設定、檢視收集的資料、將資料匯出成檔案、使用診斷檔案，並將資料傳送至 Splunk。"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInDropdown.jsx:357
+msgid "Configure automated reporting settings."
+msgstr "設定自動回報設定。"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:450
+msgid "Configure bundle settings to be applied to all instances. "
+msgstr "設定要套用到全部執行個體的設定包設定。"
+
+#. description
+#: ../../apps/splunk_instrumentation/default/data/ui/manager/instrumentation_index.xml:8
+msgid "Configure instrumentation."
+msgstr "設定檢測。"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagModalView.jsx:186
+msgid "Create"
+msgstr "建立"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/common/ExampleHeaderTableUseView.jsx:50
+msgid "Create New"
+msgstr "建立新的"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagReportView.jsx:594
+msgid "Create New Diags using the button above"
+msgstr "使用上方按鈕建立新診斷"
+
+#: ../../apps/splunk_instrumentation/default/searchbnf.conf:24
+msgid ""
+"Create a stringified JSON: { \"name\": \"<value of name>\", \"data\": { \"count\": <value of data.count>, \"metrics\": [values of "
+"data.metrics] }}"
+msgstr ""
+"建立字串化 JSON：{ \"name\": \"<value of name>\", \"data\": { \"count\": <value of data.count>, \"metrics\": [data.metrics 的"
+"值] }}"
+
+#: ../../apps/splunk_instrumentation/default/alert_actions.conf:4
+msgid "Custom action to output results to telemetry endpoint"
+msgstr "自訂遙測端點的輸出結果動作"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:421
+msgid "Data"
+msgstr "資料"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInDropdown.jsx:432
+msgid "Data Transmission Schedule"
+msgstr "資料傳輸排程"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/ExportSendModalView.jsx:135
+msgid "Data Type"
+msgstr "資料類型"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:417
+msgid "Date Range"
+msgstr "日期範圍"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/ExportSendModalView.jsx:128
+msgid "Date range"
+msgstr "日期範圍"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:148
+msgid "Date ranges more than 1 year are truncated to a year from latest"
+msgstr "超過 1 年的資料範圍會擷取最近 1 年的資料"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:144
+msgid "Date ranges must be less than 1 year"
+msgstr "資料範圍必須少於 1 年"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:439
+msgid "Delete"
+msgstr "刪除"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:260
+msgid "Deleted"
+msgstr "已刪除"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagReportView.jsx:563
+msgid "Diagnostic Log"
+msgstr "診斷記錄"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagReportView.jsx:564
+msgid ""
+"Diagnostic files contain information about your Splunk deployment, such as configuration files and logs, to help Splunk Support "
+"diagnose and resolve problems. "
+msgstr "診斷檔案含有設定檔和記錄等與您的 Splunk 部署相關的資訊，可協助 Splunk 支援診斷並解決問題。"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/common/ExampleHeaderTableUseView.jsx:47
+msgid "Diagnostics Log"
+msgstr "診斷記錄"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/common/ExampleHeaderTableUseView.jsx:48
+msgid "Diagnostics contain configuration files and logs that help Splunk support help diagnose and resolve your deployment issues."
+msgstr "診斷包含設定檔和記錄，可協助 Splunk 支援協助診斷並解決部署問題。"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:363
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:381
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:320
+msgid "Disable limit"
+msgstr "停用限制"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInStatus.jsx:86
+msgid "Disabled"
+msgstr "已停用"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInDropdown.jsx:101
+msgid "Disabling this may hinder troubleshooting and support for your implementation. "
+msgstr "停用此功能可能會妨礙疑難排解和針對您實作的支援。"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInDropdown.jsx:87
+msgid ""
+"Disabling this will exclude your usage data from the data Splunk considers when making improvements to our products and services. "
+msgstr "停用此功能會將您的用量資料從 Splunk 在改善產品和服務時考慮的資料中排除。"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInDropdown.jsx:424
+msgid "Documentation."
+msgstr "說明文件。"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:261
+msgid "Does not exist"
+msgstr "不存在"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:438
+msgid "Download"
+msgstr "下載"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:178
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:227
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInDropdown.jsx:439
+msgid "Edit"
+msgstr "編輯"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/SetSchedule/SetScheduleModal.jsx:92
+msgid "Edit Data Transmission Schedule"
+msgstr "編輯資料傳輸排程"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInStatus.jsx:86
+msgid "Enabled"
+msgstr "已啟用"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:80
+msgid "Error communicating with Splunk. Please check your network connection and try again."
+msgstr "與 Splunk 通訊時發生錯誤。請檢查您的網路連線並再試一次。"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagReportView.jsx:69
+msgid "Error fetching list of servers"
+msgstr "擷取伺服器清單時發生錯誤"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagReportView.jsx:421
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagReportView.jsx:437
+#, python-format
+msgid "Error: %s"
+msgstr "錯誤：%s"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInDropdown.jsx:435
+#, python-format
+msgid "Every %s at %s"
+msgstr "每 %s 的 %s"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:306
+msgid "Exclude etc files larger than"
+msgstr "排除大於下列容量的 etc 檔："
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:357
+msgid "Exclude log files larger than"
+msgstr "排除大於下列容量的記錄檔："
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:380
+msgid "Exclude log files older than"
+msgstr "排除早於下列時間的記錄檔："
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:202
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:221
+msgid "Exclude patterns"
+msgstr "排除樣式"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:302
+msgid "Excludes large files in the Splunk etc directory."
+msgstr "排除 Splunk etc 目錄的大型檔案。"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:351
+msgid "Excludes large files in the Splunk var/log directory, if the log component is selected."
+msgstr "若選取 log 元件，則會排除 Splunk var/log 目錄中的大型檔案。"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:375
+msgid "Excludes log files beyond an age given in days. 0 disables this filter."
+msgstr "排除超過所給天數的記錄檔案。0 停用此篩選。"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/ExportSendModalView.jsx:161
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/LogsReportView.jsx:478
+msgid "Export"
+msgstr "匯出"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/ExportSendModalView.jsx:125
+msgid "Export/Send Usage Data"
+msgstr "匯出/傳送用量資料"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/ExportSendModalView.jsx:96
+msgid "Exporting instrumentation data"
+msgstr "匯出檢測資料"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:259
+msgid "Failed"
+msgstr "已失敗"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagNodeListPanel.jsx:248
+msgid "Filter"
+msgstr "篩選器"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:406
+msgid "Filter search terms"
+msgstr "篩選搜尋詞彙"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInDropdown.jsx:416
+msgid ""
+"For more information about these data types, including what information might be collected and how it might be used, see our "
+msgstr "有關這些資料類型的更多資訊，包括可能收集哪些資訊以及如何使用這些資訊，請參閱我們的"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:48
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/SetSchedule/SetScheduleModal.jsx:128
+msgid "Friday"
+msgstr "週五"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:335
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:345
+msgid "Full"
+msgstr "完整"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:333
+msgid "Get every crash .dmp file"
+msgstr "取得每個損毀的 .dmp 檔"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:327
+msgid "If \"No\", gathers at most three Windows .dmp files, if the log component is selected."
+msgstr "若「否」，且已選取記錄元件，則會收集最多三個 Windows .dmp 檔。"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:262
+msgid "In progress"
+msgstr "進行中"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:153
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:174
+msgid "Include components"
+msgstr "包含元件"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:424
+msgid "Include lookup files in the etc & pool components."
+msgstr "包含 etc 和集區元件中的查閱檔案。"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:428
+msgid "Include lookups"
+msgstr "包含查閱"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:285
+msgid "Index directory listing level"
+msgstr "索引目錄清單層級"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:261
+msgid "Index files"
+msgstr "索引檔"
+
+#. label
+#: ../../apps/splunk_instrumentation/default/app.conf:11
+#: ../../apps/splunk_instrumentation/default/data/ui/manager/instrumentation_index.xml:6
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/BaseLayout.jsx:18
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/ErrorPage.jsx:12
+msgid "Instrumentation"
+msgstr "檢測"
+
+#: ../../apps/splunk_instrumentation/appserver/templates/splunk_instrumentation.html:16
+msgid "Instrumentation | Splunk"
+msgstr "檢測 | Splunk"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:217
+msgid "Last 24 hours"
+msgstr "前 24 小時"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:227
+msgid "Last 30 days"
+msgstr "最近 30 天"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:222
+msgid "Last 7 days"
+msgstr "最近 7 天"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/BaseLayout.jsx:45
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/SettingsPage/LicenseDataOptOutModal.jsx:60
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/common/CommonHeaderView.jsx:65
+msgid "Learn More"
+msgstr "進一步瞭解"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:451
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInStatus.jsx:129
+msgid "Learn more"
+msgstr "進一步瞭解"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:341
+msgid "Light"
+msgstr "Light"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:331
+msgid "Manifests"
+msgstr "資訊清單"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/common/ExampleHeaderTableUseView.jsx:87
+msgid "Modal Header"
+msgstr "強制回應標頭"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:44
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/SetSchedule/SetScheduleModal.jsx:124
+msgid "Monday"
+msgstr "週一"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:182
+msgid "Month to date"
+msgstr "月迄今"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagNodeListPanel.jsx:281
+msgid "Name"
+msgstr "名稱"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagReportView.jsx:606
+msgid "New Diag"
+msgstr "新診斷"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagModalView.jsx:161
+msgid "Next"
+msgstr "下一步"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:325
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:418
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:440
+msgid "No"
+msgstr "否"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagReportView.jsx:590
+msgid "No Diags found"
+msgstr "找不到診斷"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:140
+msgid "No data available for selected time range"
+msgstr "所選取時間範圍沒有可用的資料"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/LogsReportView.jsx:455
+msgid "No data sent in the last 30 days"
+msgstr "過去 30 天內沒有已傳送的資料"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/common/CommonTableView.jsx:44
+msgid "No results found."
+msgstr "找不到結果。"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:422
+msgid "Nodes"
+msgstr "節點"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/common/ExampleHeaderTableUseView.jsx:93
+msgid "OK"
+msgstr "確認"
+
+#: ../../apps/splunk_instrumentation/default/alert_actions.conf:3
+msgid "Output results to telemetry endpoint"
+msgstr "遙測端點的輸出結果"
+
+#: ../../apps/splunk_instrumentation/default/searchbnf.conf:13
+msgid ""
+"Output search results to the telemetry endpoint, using the field named \"data.\"\" Each will be \\\n"
+"named \"my.telemetry\" and is described as a singular \"event\" type. The telemetry event will only be \\\n"
+"sent if the deployment has been opted in to share Anonymized usage data, with opt-in version of 2."
+msgstr ""
+"遙測端點的輸出搜尋結果，使用名稱為「資料」的欄位。每個欄位將命名為「my.telemetry」，且描述為單一「事件」類型。只有在部署已選擇加入"
+"來分享匿名用量資料時 (選擇加入版本 2)，遙測事件才會傳送。"
+
+#: ../../apps/splunk_instrumentation/default/searchbnf.conf:3
+msgid "Outputs search results to telemetry endpoint."
+msgstr "遙測端點的輸出搜尋結果。"
+
+#: ../../apps/splunk_instrumentation/default/searchbnf.conf:9
+msgid ""
+"Outputs search results to telemetry endpoint. \\\n"
+"Required field “input” will have the endpoint payload. \\\n"
+"The other fields “component”, “type”, “optinrequired” \\\n"
+"are optional fields but the endpoint expects them to be supplied either with the search command \\\n"
+"or to be found in the event data.\\\n"
+"Visibility fields \"anonymous\", \"license\" and \"support\" are optional."
+msgstr ""
+"遙測端點的輸出搜尋結果。必填欄位「輸入」會有端點裝載。其他的「元件」、「類型」、「必須加入」欄位為可選欄位，但端點預期這些欄位由搜"
+"尋命令提供或可在事件資料中尋找。可見度欄位「匿名」、「授權」和「支援」為可選。"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:202
+msgid "Previous business week"
+msgstr "上個工作週"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:207
+msgid "Previous month"
+msgstr "上個月"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:197
+msgid "Previous week"
+msgstr "上週"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:212
+msgid "Previous year"
+msgstr "去年"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInDropdown.jsx:420
+msgid "Privacy Policy"
+msgstr "隱私權政策"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:263
+msgid "Queued"
+msgstr "已排入佇列"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:437
+msgid "Recreate"
+msgstr "重新建立"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagModalView.jsx:228
+msgid "Revert to default"
+msgstr "還原為預設值"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagNodeListPanel.jsx:282
+msgid "Roles"
+msgstr "角色"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:49
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/SetSchedule/SetScheduleModal.jsx:129
+msgid "Saturday"
+msgstr "週六"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/SetSchedule/SetScheduleModal.jsx:171
+msgid "Save"
+msgstr "儲存"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/SetSchedule/SetScheduleModal.jsx:97
+msgid "Scheduled "
+msgstr "已排程 "
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/TimeRangeModal.jsx:76
+msgid "Select Time Range"
+msgstr "選擇時間範圍"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagNodeListPanel.jsx:230
+msgid "Select instance you want to collect data from."
+msgstr "選取您想收集資料的執行個體。"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/ExportSendModalView.jsx:168
+msgid "Send"
+msgstr "傳送"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/ExportSendModalView.jsx:98
+msgid "Sending instrumentation data"
+msgstr "傳送檢測資料"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInDropdown.jsx:413
+msgid ""
+"Sharing your software usage data helps Splunk Inc. optimize your deployment, prioritize our features, improve your experience, "
+"notify you of patches, and develop high quality product functionality. "
+msgstr ""
+"分享您的軟體用量資料協助 Splunk Inc. 來最佳化您的部署、排定功能的優先順序、改善您的體驗、修補程式通知，並開發高品質的產品功能。"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:423
+msgid "Size"
+msgstr "大小"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:420
+msgid "Status"
+msgstr "狀態"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:258
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/common/CommonTableView.jsx:120
+msgid "Success"
+msgstr "成功"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:50
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/SetSchedule/SetScheduleModal.jsx:130
+msgid "Sunday"
+msgstr "週日"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:425
+msgid "TestHeader1"
+msgstr "TestHeader1"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:426
+msgid "TestHeader2"
+msgstr "TestHeader2"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:427
+msgid "TestHeader3"
+msgstr "TestHeader3"
+
+#: ../../apps/splunk_instrumentation/default/app.conf:16
+msgid "This application connects the hosting Splunk instance to Splunk's usage data collection services."
+msgstr "此應用程式將裝載的 Splunk 執行個體和 Splunk 用量資料收集服務連線。"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagNodeListPanel.jsx:223
+msgid ""
+"This list shows the instances connected to this search head. If you have configured Monitoring Console in distributed mode, use "
+"that instance to collect data from any instances not listed here."
+msgstr "此清單顯示連線至此搜尋頭端點的執行個體。若您已在分散模式設置監控主控台，使用該執行個體來收集未列於此的執行個體的資料。"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:47
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/SetSchedule/SetScheduleModal.jsx:127
+msgid "Thursday"
+msgstr "週四"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:424
+msgid "Time Created"
+msgstr "已建立時間"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:419
+msgid "Time Sent"
+msgstr "已傳送時間"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInDropdown.jsx:108
+msgid ""
+"To ensure compliance with your purchased offering, we collect data about your license consumption. This data is linked to your "
+"account using your license GUID. "
+msgstr "為了確保您的採購合約符合法規遵循，我們會收集與您授權消費相關的資料。此資料會使用您的授權 GUID 來與您的帳戶連結。"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInDropdown.jsx:83
+msgid ""
+"To improve our products and offerings, we collect information about your operating environment and configuration, user and "
+"product interactions, and sessions. This information might include feature usage, performance, deployment topology, and "
+"infrastructure. We do not associate this data with your account. "
+msgstr ""
+"為了改善我們的產品和合約，我們會收集與作業環境和設定、使用者和產品互動以及工作階段相關的資料。此資訊可能包括功能使用、效能、部署拓"
+"撲和基礎建設。我們不會將此資料與您的帳戶連結。"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInDropdown.jsx:96
+msgid ""
+"To provide enhanced support and help you troubleshoot and improve your implementation and configurations, we collect Usage Data, "
+"including information on feature usage, performance, topology, infrastructure, and operating environment for this deployment. We "
+"link this data to your account using your license's globally unique identifier (GUID). "
+msgstr ""
+"為了提供有效的支援、協助您疑難排解並改善您的實作和設定，我們會收集用量資料，包括與此部署相關的功能使用、效能、部署拓撲、基礎建設和"
+"作業環境資料。我們會使用您授權的全域唯一識別碼 (GUID) 將此資料與您的帳戶連結。"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInDropdown.jsx:116
+msgid "To understand the number of customers using older versions of Splunk software, we collect aggregated software version data. "
+msgstr "為了瞭解使用舊版 Splunk 軟體的顧客數，我們會收集彙總軟體版本資料。"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:167
+msgid "Today"
+msgstr "今天"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:45
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/SetSchedule/SetScheduleModal.jsx:125
+msgid "Tuesday"
+msgstr "週二"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/LogsReportView.jsx:390
+msgid "Usage Data"
+msgstr "用量資料"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/LogsReportView.jsx:398
+msgid "View in Search: "
+msgstr "在搜尋中檢視："
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/LogsReportView.jsx:466
+msgid ""
+"View license usage, anonymized usage, and support usage data that has been collected (does not include browser session data). "
+msgstr "檢視已收集的授權用量、匿名用量和支援用量資料 (不包含瀏覽器工作階段資料)。"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:46
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/SetSchedule/SetScheduleModal.jsx:126
+msgid "Wednesday"
+msgstr "週三"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:172
+msgid "Week to date"
+msgstr "週迄今"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:187
+msgid "Year to date"
+msgstr "年迄今"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:321
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:417
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:439
+msgid "Yes"
+msgstr "是"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:192
+msgid "Yesterday"
+msgstr "昨天"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/SetSchedule/SetScheduleModal.jsx:157
+msgid "am"
+msgstr "am"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:288
+msgid "conf_replication_summary"
+msgstr "conf_replication_summary"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:287
+msgid "consensus"
+msgstr "共識"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:43
+msgid "day"
+msgstr "天"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:282
+msgid "dispatch"
+msgstr "發送"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:209
+msgid "e.g. *.csv to exclude all csv files"
+msgstr "例如，*.csv 排除全部 csv 檔"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:283
+msgid "etc"
+msgstr "etc"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/SetSchedule/SetScheduleModal.jsx:107
+msgid "every day"
+msgstr "每天"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/SetSchedule/SetScheduleModal.jsx:108
+msgid "every week"
+msgstr "每週"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:291
+msgid "file_validate"
+msgstr "file_validate"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:280
+msgid "index_files"
+msgstr "index_files"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:281
+msgid "index_listing"
+msgstr "index_listing"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagNodeListPanel.jsx:222
+msgid "instance"
+msgstr "執行個體"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagNodeListPanel.jsx:222
+msgid "instances"
+msgstr "執行個體"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:289
+msgid "kvstore"
+msgstr "kvstore"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:284
+msgid "log"
+msgstr "記錄"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/SetSchedule/SetScheduleModal.jsx:158
+msgid "pm"
+msgstr "pm"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:285
+msgid "pool"
+msgstr "集區"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:290
+msgid "rest"
+msgstr "rest"
+
+#: ../../apps/splunk_instrumentation/default/searchbnf.conf:27
+msgid "results::filter"
+msgstr "結果::篩選器"
+
+#: ../../apps/splunk_instrumentation/default/searchbnf.conf:16
+msgid "results::write"
+msgstr "結果::寫入"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:286
+msgid "searchpeers"
+msgstr "searchpeers"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagNodeListPanel.jsx:120
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagSelectedNodeListView.jsx:55
+msgid "selected"
+msgstr "已選取"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:153
+msgid "unknown error"
+msgstr "未知錯誤"

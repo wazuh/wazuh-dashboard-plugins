@@ -1,0 +1,27 @@
+#events_per_second_single_view .shared-reportvisualizer.ui-resizable {
+  display: block !important;
+}
+
+#valid_requests_per_second_single_view .shared-reportvisualizer.ui-resizable {
+  display: block !important;
+}
+
+#invalid_requests_per_second_single_view .shared-reportvisualizer.ui-resizable {
+  display: block !important;
+}
+
+#data_received_per_second_single_view .shared-reportvisualizer.ui-resizable {
+  display: block !important;
+}
+
+#data_indexed_per_second_single_view .shared-reportvisualizer.ui-resizable {
+  display: block !important;
+}
+
+.msg.waiting {
+  display: none;
+}
+
+.hidden {
+  display: none !important;
+}

@@ -1,0 +1,46 @@
+#   Version 9.0.3
+#
+# The following are example app.conf configurations. Configure properties for
+# your custom application.
+#
+# There is NO DEFAULT app.conf.
+#
+# To use one or more of these configurations, copy the configuration block into
+# app.conf in $SPLUNK_HOME/etc/system/local/. You must restart Splunk to
+# enable configurations.
+#
+# To learn more about configuration files (including precedence) please see the
+# documentation located at
+# http://docs.splunk.com/Documentation/Splunk/latest/Admin/Aboutconfigurationfiles
+
+[launcher]
+author=<author of app>
+description=<textual description of app>
+version=<version of app>
+
+[triggers]
+########## Conf-level reload triggers ##########
+# Do not force a restart of Splunk Enterprise for state changes of MyApp
+# Do not run special code to tell MyApp to reload myconffile.conf
+# Apps with custom config files usually pick this option:
+reload.myconffile = simple
+
+# Do not force a restart of Splunk Enterprise for state changes of MyApp.
+# Splunk Enterprise calls the /admin/myendpoint/_reload method in my custom
+# EAI handler.
+# Use this advanced option only if MyApp requires custom code to reload
+# its configuration when its state changes
+reload.myotherconffile = access_endpoints /admin/myendpoint
+
+########## Stanza-level reload triggers ##########
+# For any changed inputs.conf stanzas in the newly pushed cluster
+# bundle that start with the "monitor" stanza prefix, e.g.
+# [monitor://*], invoke the corresponding monitor input reload handler 
+# as specified, i.e. /data/inputs/monitor/_reload
+#
+# NOTE: The scripted input reload handler and the http input reload
+# will NOT be invoked if the only changed inputs stanzas in the
+# newly pushed cluster bundle are monitor inputs.
+reload.inputs.monitor = access_endpoints /data/inputs/monitor
+reload.inputs.script  = access_endpoints /data/inputs/script
+reload.inputs.http    = access_endpoints /data/inputs/http

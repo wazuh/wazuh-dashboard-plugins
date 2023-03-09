@@ -1,0 +1,10 @@
+<!--   Version 4.0 -->
+
+<pipeline name="scheduler" type="startup">
+     <processor name="LiveSplunks" plugin="schedulerlaunchprocessor">
+     	<config>
+		<!-- Start the saved splunk scheduler -->
+		<savedSplunker> </savedSplunker>
+	</config>
+     </processor>
+</pipeline>

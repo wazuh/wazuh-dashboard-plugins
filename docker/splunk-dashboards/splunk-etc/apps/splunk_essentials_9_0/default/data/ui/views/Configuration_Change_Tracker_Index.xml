@@ -1,0 +1,44 @@
+<dashboard hideEdit="True" version="1.1">
+
+  <label>Configuration Change Tracker Index</label>
+
+  <row>
+
+    <panel>
+
+      <html>
+
+        <p><strong>Description</strong></p>
+
+        <p> Scope: Splunk Enterprise Only </p>
+        <p> Splunk Enterprise now enables you to track .conf file changes at the filesystem level with the new index <code>_configtracker</code>. The new capability includes the tracking of .conf files, as well as their underlying stanzas and key-value pairs. </p>
+        <p> Configuration change monitoring is enabled by default but can be disabled using the <code>[config_change_tracker]</code> stanza in server.conf. </p>
+        <p> The monitored file paths are: </p>
+          <ul>
+          <li> <pre>$SPLUNK_HOME/etc/peer-apps/_cluster/local</pre> </li>
+          <li> <pre>$SPLUNK_HOME/etc/peer-apps/_cluster/default</pre> </li>
+          <li> <pre>$SPLUNK_HOME/etc/peer-apps/app_name/local</pre> </li>
+          <li> <pre>$SPLUNK_HOME/etc/peer-apps/app_name/default</pre> </li>
+          <li> <pre>$SPLUNK_HOME/etc/system/local</pre> </li>
+          <li> <pre>$SPLUNK_HOME/etc/system/default</pre> </li>
+          <li> <pre>$SPLUNK_HOME/etc/apps/app_name/local</pre> </li>
+          <li> <pre>$SPLUNK_HOME/etc/apps/app_name/default</pre> </li>
+          <li> <pre>$SPLUNK_HOME/etc/users/user_name/app_name/local</pre> </li>
+          <li> <pre>$SPLUNK_HOME/etc/users/user_name/app_name/default</pre> </li>
+          <li> <pre>$SPLUNK_HOME/etc/instance.cfg</pre> </li>
+          </ul> 
+        <p> If logs are noisy in a particular environment, admins have the option of adding files and file paths to a <code>denylist</code>. This denylist includes regex support as well. </p>
+        <p> Additionally, if the admin wants to exclude more fine-grained stanzas or kv-pairs from showing up in logs, they can utilize the <code>exclude_fields</code> feature to accomplish a similar goal.</p>
+
+        <ul>
+                  <div style="margin-left:10px">
+                   <img src="/static/app/splunk_essentials_9_0/images/config_tracker_1.png" style="margin: 10px 0" width="700px"/>
+                  </div>
+                  <br/>
+                 </ul>
+
+        <p> More details about this feature <a href="https://docs.splunk.com/Documentation/Splunk/9.0.0/Admin/Serverconf#Configuration_Change_Tracker" target="_blank">here</a> and <a href="https://docs.splunk.com/Documentation/Splunk/9.0.0/Troubleshooting/WhatSplunklogsaboutitself#Configuration_Change_Tracker" target="_blank">here</a>. </p>
+        </html>
+    </panel>
+  </row>
+</dashboard>

@@ -1,0 +1,99 @@
+#   Version 9.0.3
+#
+# This is an example wmi.conf.  These settings are used to control inputs
+# from WMI providers. Refer to wmi.conf.spec and the documentation at
+# splunk.com for more information about this file.
+#
+# To use one or more of these configurations, copy the configuration block
+# into wmi.conf in $SPLUNK_HOME\etc\system\local\.  You must restart Splunk
+# to enable configurations.
+#
+# To learn more about configuration files (including precedence) please see
+# the documentation located at
+# http://docs.splunk.com/Documentation/Splunk/latest/Admin/Aboutconfigurationfiles
+
+# This stanza specifies runtime parameters.
+
+[settings]
+initial_backoff = 5
+max_backoff = 20
+max_retries_at_max_backoff = 2
+checkpoint_sync_interval = 2
+
+# Pull events from the Application, System and Security event logs from the
+# local system every 10 seconds. Store the events in the "wmi_eventlog"
+# Splunk index.
+
+[WMI:LocalApplication]
+interval = 10
+event_log_file = Application
+disabled = 0
+index = wmi_eventlog
+
+[WMI:LocalSystem]
+interval = 10
+event_log_file = System
+disabled = 0
+index = wmi_eventlog
+
+[WMI:LocalSecurity]
+interval = 10
+event_log_file = Security
+disabled = 0
+index = wmi_eventlog
+
+# Gather disk and memory performance metrics from the local system every
+# second.  Store event in the "wmi_perfmon" Splunk index.
+
+[WMI:LocalPhysicalDisk]
+interval = 1
+wql = select Name, DiskBytesPerSec, PercentDiskReadTime, PercentDiskWriteTime, PercentDiskTime from Win32_PerfFormattedData_PerfDisk_PhysicalDisk
+disabled = 0
+index = wmi_perfmon
+
+[WMI:LocalMainMemory]
+interval = 10
+wql = select CommittedBytes, AvailableBytes, PercentCommittedBytesInUse, Caption from Win32_PerfFormattedData_PerfOS_Memory
+disabled = 0
+index = wmi_perfmon
+
+# Collect all process-related performance metrics for the splunkd process,
+# every second.  Store those events in the "wmi_perfmon" index.
+[WMI:LocalSplunkdProcess]
+interval = 1
+wql = select * from Win32_PerfFormattedData_PerfProc_Process where Name = "splunkd"
+disabled = 0
+index = wmi_perfmon
+
+# Listen from three event log channels, capturing log events that occur only
+# while Splunk is running, every 10 seconds.  Gather data from three remote
+# servers srv1, srv2 and srv3.
+
+[WMI:TailApplicationLogs]
+interval = 10
+event_log_file = Application, Security, System
+server = srv1, srv2, srv3
+disabled = 0
+current_only = 1
+batch_size = 10
+
+# Listen for process-creation events on a remote machine, once a second.
+
+[WMI:ProcessCreation]
+interval = 1
+server = remote-machine
+wql = select * from __InstanceCreationEvent within 1 where TargetInstance isa 'Win32_Process'
+disabled = 0
+current_only = 1
+batch_size = 10
+
+# Receive events whenever someone connects or removes a USB device on
+# the computer, once a second.
+
+[WMI:USBChanges]
+interval = 1
+wql = select * from __InstanceOperationEvent within 1 where TargetInstance ISA 'Win32_PnPEntity' and TargetInstance.Description='USB Mass Storage Device'
+disabled = 0
+current_only = 1
+batch_size = 10
+

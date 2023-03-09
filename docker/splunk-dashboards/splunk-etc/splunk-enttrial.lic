@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<license>
+  <signature>I81ms3/suKcaOY+BGJ8UPDJ8Xmf4tw8+k46smxpcHqzJ6WPtg6NA6tMUHXuQ6K9250S74eyXNhXx8VV19YZE5SF5puNHLGgBHMf7l5JtGr4l+f2fdRKl8fm7h1v1LE+SEDpomC1heGrSsfrD+RF0IBJKo7ORzCa5X0S6Q8cgrb+fjQ2omiIzL30tIfFeQnKCjunDUTeHfKsstg0Yh/eR8zFjUBVXQMu2Gu4tAXGmVcDmDgMog0EsrxWHXHiP2aRo70pinLSSxjLwaU0K/WuVmY1uK5TXTgho1xC11vNouQhbRk8yl1SNRDLjVhf0gHvfrXcz3WQjsmugp0R+18oJmA==</signature>
+  <payload>
+    <type>download-trial</type>
+    <group_id>Trial</group_id>
+    <quota>524288000</quota>
+    <max_violations>5</max_violations>
+    <window_period>30</window_period>
+    <creation_time>1571036400</creation_time>
+    <label>Splunk Enterprise   Splunk Analytics for Hadoop Download Trial</label>
+    <relative_expiration_interval>5184000</relative_expiration_interval>
+    <absolute_expiration_time>1886741999</absolute_expiration_time>
+    <features>
+      <feature>Auth</feature>
+      <feature>FwdData</feature>
+      <feature>RcvData</feature>
+      <feature>LocalSearch</feature>
+      <feature>DistSearch</feature>
+      <feature>RcvSearch</feature>
+      <feature>ScheduledSearch</feature>
+      <feature>Alerting</feature>
+      <feature>DeployClient</feature>
+      <feature>DeployServer</feature>
+      <feature>SplunkWeb</feature>
+      <feature>SigningProcessor</feature>
+      <feature>SyslogOutputProcessor</feature>
+      <feature>AllowDuplicateKeys</feature>
+    </features>
+    <add_ons>
+      <add_on name="hadoop" type="external_results_provider">
+        <parameter key="erp_type" value="report"/>
+        <parameter key="maxNodes" value="200"/>
+      </add_on>
+    </add_ons>
+    <sourcetypes/>
+    <guid>6F416E61-B40E-461C-A782-CBC186E98133</guid>
+  </payload>
+</license>

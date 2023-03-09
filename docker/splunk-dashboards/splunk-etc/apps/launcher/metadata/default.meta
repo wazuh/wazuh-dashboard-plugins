@@ -1,0 +1,9 @@
+# Application-level permissions
+
+[]
+access = read : [ * ], write : [ power ]
+
+### VIEWSTATES: even normal users should be able to create shared viewstates
+
+[viewstates]
+access = read : [ * ], write : [ * ]

@@ -1,0 +1,43 @@
+<endpoint name="deployment/client" showOnSearchHeadCluster="0">
+  <capabilities>
+    <read>list_deployment_client AND edit_deployment_client</read>
+  </capabilities>
+  <header>Deployment client</header>
+  <breadcrumb> 
+          <noentity>True</noentity> 
+          <parent hidecurrent="False">systemsettings</parent> 
+          <name>Deployment client</name> 
+  </breadcrumb>
+  <!-- not putting this on the homepage menu for now
+  <menu name="system_configurations">
+    <label>Deployment Client</label>
+    <url>/manager/%(namespace)s/deployment/client</url>
+    <description>View Deployment Client status/configuration</description>
+    <order>70</order>
+  </menu>
+  -->
+  <elements>
+    <element name="indexPage" type="fieldset">
+      <view name="list"/>
+      <view name="edit"/>
+      <view name="create"/>
+
+      <elements>
+
+        <element name="targetUri" type="textfield" label="Deployment server">
+          <view name="list"/>
+          <view name="create"/>
+          <key name="exampleText">splunk_deployserver.acme.org:8089</key>
+        </element>
+
+        <element name="serverClasses" type="list" label="Server classes/apps">
+          <view name="list"/>
+          <key name="processValueList">'\n'.join(value) if isinstance(value, list) else value</key>
+        </element>
+
+      </elements>
+
+      <key name="legend">Deployment settings</key>
+    </element>
+  </elements>
+</endpoint>

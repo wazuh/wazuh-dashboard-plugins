@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<endpoint name="clustering_bucket_details" template="pages/system.html">
+  <capabilities>
+    <read>edit_indexer_cluster</read>
+  </capabilities>
+  <header>unused</header>
+</endpoint>

@@ -1,0 +1,8 @@
+<nav search_view="search" color="#3C444D">
+  <view name="search" default="true" />
+  <view name="assist" />
+  <view name="datasets" />
+  <view name="reports" />
+  <view name="alerts" />
+  <view name="dashboards" />
+</nav>

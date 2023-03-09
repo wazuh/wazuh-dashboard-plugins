@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<view template="/splunk_monitoring_console:/template/mc_app.html" type="html">
+    <label>Forwarder Monitoring Setup</label>
+</view>

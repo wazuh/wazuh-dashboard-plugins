@@ -1,0 +1,18 @@
+
+This bundle enables metrics information to be routed from all DeploymentClient(s) (i.e. 'deployable' Splunks) to the DeploymentServer.
+
+outputs.conf
+------------
+This configuration will establish a tcpout route by the name of 'RouteMetricsToDeploymentServer'. Make sure you change the server_name:port information. Any event with a _TCP_ROUTING field will be forwarder to the specified server. Our intention is to add this field to all events in metrics.log - see inputs.conf below.
+
+[tcpout:RouteMetricsToDeploymentServer]
+server=YourDeploymentServerHostname:9997
+
+
+inputs.conf
+-----------
+The following configuration will cause all metrics.log events to be routed to a tcpout group named 'RouteMetricsToDeploymentServer'. See outputs.conf above on how that happens.
+
+[monitor://$SPLUNK_HOME/var/log/splunk/metrics.log]
+_TCP_ROUTING = RouteMetricsToDeploymentServer
+

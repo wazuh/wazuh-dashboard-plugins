@@ -1,0 +1,56 @@
+<endpoint name="data/ui/views" showAppContext="1">
+  <header>Views</header>
+  <breadcrumb>
+    <parent hidecurrent="False">ui</parent>
+    <name>Views</name>
+  </breadcrumb>
+  <elements>
+    <element name="saveview" type="fieldset">
+      <view name="list"/>
+      <view name="edit"/>
+      <view name="create"/>
+      <elements>
+
+        <element name="__ns" type="select" label="Destination app">
+          <view name="create"/>
+          <key name="dynamicOptions" type="dict">
+            <key name="keyName">title</key>
+            <key name="keyValue">title</key>
+            <key name="splunkSource">/apps/local</key>
+            <key name="splunkSourceParams" type="dict">
+              <key name="search">'disabled=false'</key>
+              <key name="count">-1</key>
+            </key>
+          </key>
+        </element>
+
+        <element name="name" label="View name">
+          <view name="list"/>
+          <view name="create"/>
+        </element>
+        <element name="eai:type" label="View type:">
+          <key name="readonly">True</key>
+          <key name="disabled">True</key>
+          <view name="edit"/>
+          <key name="processValueEdit">'XML' if value=="views" else 'HTML'</key>
+        </element>
+        <element name="eai:data" type="textarea" label="View">
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="class">huge</key>
+          <key name="spellcheck">False</key>
+          <key name="xmleditor">True</key>
+          <key name="helpText">Enter and edit view configuration.</key>
+        </element>
+      </elements>
+    </element>
+    <element name="eai:acl.owner" label="Owner">
+      <view name="list"/>
+      <key name="processValueList">entity['eai:acl']['owner'] == 'nobody' and _('No owner') or entity['eai:acl']['owner']</key>
+    </element>
+    <element name="eai:acl.app" label="App">
+      <view name="list"/>
+      <key name="processValueList">entity['eai:acl']['app'] or ""</key>
+    </element>
+  </elements>
+</endpoint>

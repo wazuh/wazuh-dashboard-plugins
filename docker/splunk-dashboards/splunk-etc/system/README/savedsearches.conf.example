@@ -1,0 +1,53 @@
+#   Version 9.0.3
+#
+# This file contains example saved searches and alerts.
+#
+# To use one or more of these configurations, copy the configuration block into
+# savedsearches.conf in $SPLUNK_HOME/etc/system/local/. You must restart Splunk
+# to enable configurations.
+#
+# To learn more about configuration files (including precedence) please see the
+# documentation located at
+# http://docs.splunk.com/Documentation/Splunk/latest/Admin/Aboutconfigurationfiles
+
+
+# The following searches are example searches.  To create your own search,
+# modify the values by following the spec outlined in savedsearches.conf.spec.
+
+
+[Daily indexing volume by server]
+search = index=_internal todaysBytesIndexed LicenseManager-Audit NOT source=*web_service.log NOT source=*web_access.log | eval Daily
+_Indexing_Volume_in_MBs = todaysBytesIndexed/1024/1024 | timechart avg(Daily_Indexing_Volume_in_MBs) by host
+dispatch.earliest_time = -7d
+
+[Errors in the last 24 hours]
+search = error OR failed OR severe OR ( sourcetype=access_* ( 404 OR 500 OR 503 ) )
+dispatch.earliest_time = -1d
+
+[Errors in the last hour]
+search = error OR failed OR severe OR ( sourcetype=access_* ( 404 OR 500 OR 503 ) )
+dispatch.earliest_time = -1h
+
+[KB indexed per hour last 24 hours]
+search = index=_internal metrics group=per_index_thruput NOT debug NOT sourcetype=splunk_web_access | timechart fixedrange=t span=1h
+ sum(kb) | rename sum(kb) as totalKB
+dispatch.earliest_time = -1d
+
+[Messages by minute last 3 hours]
+search = index=_internal eps "group=per_source_thruput" NOT filetracker | eval events=eps*kb/kbps | timechart fixedrange=t span=1m s
+um(events) by series
+dispatch.earliest_time = -3h
+
+[Splunk errors last 24 hours]
+search = index=_internal " error " NOT debug source=*/splunkd.log*
+dispatch.earliest_time = -24h
+
+[stats with durable search]
+search = index=_internal eps | stats avg(eps) as avg, max(eps) as max, min(eps) as min
+dispatch.indexed_earliest = -30m
+dispatch.indexed_latest   = now
+
+durable.track_time_type   = _indextime
+durable.lag_time          = 60
+durable.backfill_type     = time_interval
+durable.max_backfill_intervals = 100

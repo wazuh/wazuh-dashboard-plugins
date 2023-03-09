@@ -1,0 +1,69 @@
+/*===============================================================================================*/
+/*  SPLUNK: POPDOWN                                                                              */
+/*===============================================================================================*/
+/*  TODO: review how this works with dropdown */
+
+/* popdown for variable content
+	<div class="popdown">
+		<div class="popdown-dialog open">
+			<div class="arrow"></div>
+			<div class="popdown-dialog-body">
+				content ...
+			</div>
+		</div>
+	</div>
+*/
+
+/*  Popdown wrapper */
+.popdown {
+	position: relative
+}
+
+/*  popdown container */
+.popdown-dialog {
+	@mixin popdown-dialog;
+}
+
+/*  SPL-68751 - IE10 box shadow animation artifacts fix */
+.popdown-dialog:after
+{
+    content: "";
+    font-size: 0;
+    display: inline;
+    overflow: hidden;
+}
+
+/*  popdown body */
+.popdown-dialog-body {
+	@mixin popdown-dialog-body;
+}
+
+/*  popdown body */
+.popdown-dialog-footer {
+    border-top: 1px solid $borderColor;
+	padding: 5px;
+	border-bottom-left-radius: $containerInnerBorderRadius;
+	border-bottom-right-radius: $containerInnerBorderRadius;
+	@mixin clearfix;
+}
+
+/*  variations */
+/*  ------------ */
+
+/* extends popdown-dialog, adds extra padding
+
+	<div class="popdown">
+		<div class="popdown-dialog popdown-dialog-padded open">
+			<div class="arrow"></div>
+			<div class="popdown-dialog-body">
+				content ...
+			</div>
+		</div>
+	</div>
+
+*/
+.popdown-dialog-padded {
+	padding: 10px;
+}
+
+

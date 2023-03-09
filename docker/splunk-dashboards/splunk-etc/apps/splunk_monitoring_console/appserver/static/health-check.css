@@ -1,0 +1,16 @@
+.dmc-kpi-item .alert {
+    margin-bottom: 0;
+}
+
+.dmc-kpi-item h5 {
+    font-size: 12px;
+}
+
+.dmc-kpi-item .alert-success .icon-alert {
+    color: #9ac23c;
+}
+
+.dmc-kpi-item .alert-success .icon-alert:before {
+    content: '\ECD3';
+}
+

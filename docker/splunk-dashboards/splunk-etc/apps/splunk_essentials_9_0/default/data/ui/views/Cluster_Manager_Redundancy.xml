@@ -1,0 +1,46 @@
+<dashboard hideEdit="True" version="1.1">
+
+  <label>Cluster Manager Redundancy</label>
+
+  <row>
+
+    <panel>
+
+      <html>
+
+        <p><strong>Description</strong></p>
+        <p>Scope: Splunk Enterprise Only</p>
+        
+        <p>Key features as part of the cluster manager redundancy include:</p>
+        <ol>
+        <li>Configuring cluster manager in both active / standby mode and also the ability to configure failover automatically or manually.</li>
+        <li>This can be achieved by either using load balancer or DNS.</li>
+        <li>Search generation will be synchronized to keep searches unaffected.</li>
+        <li>Heartbeats will carry necessary high availability (HA) information on startup.</li>
+        </ol>
+
+        <p><strong>Screenshots</strong></p>
+        <p>The cluster manager's cluster status:</p>
+        <ul>
+                  <div style="margin-left:10px">
+                   <img src="/static/app/splunk_essentials_9_0/images/cluster_manager_1.png" style="margin: 10px 0" width="700px"/>
+                  </div>
+                 </ul>
+
+        <p>The cluster manager in standby mode:</p>
+        <ul>
+                  <div style="margin-left:10px">
+                   <img src="/static/app/splunk_essentials_9_0/images/cluster_manager_2.png" style="margin: 10px 0" width="700px"/>
+                  </div>
+                 </ul>
+        <p>Switching to active mode:</p>
+        <ul>
+                  <div style="margin-left:10px">
+                   <img src="/static/app/splunk_essentials_9_0/images/cluster_manager_3.png" style="margin: 10px 0" width="700px"/>
+                  </div>
+                  </ul> 
+                  
+        </html>
+    </panel>
+  </row>
+</dashboard>

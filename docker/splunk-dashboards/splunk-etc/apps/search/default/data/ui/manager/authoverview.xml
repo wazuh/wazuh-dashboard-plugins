@@ -1,0 +1,13 @@
+<endpoint name="authoverview" showOnSearchHeadCluster="1">
+  <capabilities>
+      <read>change_authentication</read>
+  </capabilities>
+  <header>Authentication Methods</header>
+  <menu name="auth_configurations">
+     <label>Authentication Methods</label>
+     <url>/manager/%(namespace)s/authoverview</url>
+     <order>110</order>
+     <description>Select authentication methods.</description>
+     <id>authoverview</id>
+   </menu>
+</endpoint>

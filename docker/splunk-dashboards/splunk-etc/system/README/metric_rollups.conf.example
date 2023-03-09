@@ -1,0 +1,36 @@
+#   Version 9.0.3
+#
+# This file contains example saved searches and alerts.
+#
+# To use one or more of these configurations, copy the configuration block into
+# metric_rollups.conf in $SPLUNK_HOME/etc/system/local/. You must restart Splunk
+# to enable configurations.
+#
+# To learn more about configuration files (including precedence) please see the
+# documentation located at
+# http://docs.splunk.com/Documentation/Splunk/latest/Admin/Aboutconfigurationfiles
+
+
+# The following searches are example searches.  To create your own search,
+# modify the values by following the spec outlined in metric_rollups.conf.spec.
+
+[index:mySourceMetricIndex]
+# defaultAggregation is applied to all the measures/metric names unless overided
+defaultAggregation = avg
+# Override metric_name_1 aggregation from avg to min
+aggregation.metric_name_1 = min
+# Override metric_name_2 aggregation from avg to count
+aggregation.metric_name_2 = count
+# Exclude dimension_1 and dimension_2 during rollup
+dimensionList = dimension_1, dimension_2
+dimensionListType = excluded
+# All the above settings applies globally to all the summary definitions below
+# Each summary here specifies the target index and span
+# Two summaries definied, need to define each summary as rollup.<0, 1, 2..>...
+rollup.0.rollupIndex = myTargetMetricIndex_0
+rollup.0.span = 1h
+rollup.1.rollupIndex = myTargetMetricIndex_1
+rollup.1.span = 1d
+# Exclude metric_1 and metric_2 during rollup
+metricList = metric_1, metric_2
+metricListType = excluded

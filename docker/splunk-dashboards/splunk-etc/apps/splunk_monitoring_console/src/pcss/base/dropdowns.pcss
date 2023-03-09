@@ -1,0 +1,440 @@
+/*===============================================================================================*/
+/*  SPLUNK: DROP DOWN ARROW/CARET                                                                */
+/*===============================================================================================*/
+.dropup,
+.dropdown {
+    position: relative;
+}
+
+.dropdown-toggle:active,
+.open .dropdown-toggle {
+    outline: 0;
+}
+
+
+/*************************************************************************************************/
+/*  CARET / ARROW                                                                                */
+/*  Icon for caret.                                                                              */
+/*************************************************************************************************/
+/*
+    <span class="caret"></span>
+*/
+.caret {
+    display: inline-block;
+    content: "";
+    border: none;
+    width: auto;
+    height: auto;
+    line-height: $lineHeight;
+    font-size: inherit;
+    margin: 0;
+    padding-left: 0.3em;
+    text-decoration: none;
+    vertical-align: baseline;
+    font-family: "Splunk Icons";
+    font-weight: normal;
+
+    /*  generated font icon */
+    &:before {
+        content: "\25BE";
+        font-size: inherit;
+        text-decoration: none;
+    }
+    .icon-no-underline + & {
+        padding-left: 0;
+    }
+}
+.caret-char {
+    font-weight: normal;
+    font-family: "Splunk Icons";
+    font-weight: normal;
+    &:before {
+        content: "\25BE";
+    }
+}
+
+
+/*************************************************************************************************/
+/*  DROPDOWNS                                                                                    */
+/*************************************************************************************************/
+.dropdown-menu  {
+    float: left;
+    min-width: 160px;
+    list-style: none;
+    word-wrap: break-word;
+    width: 20em;
+    line-height: calc(1em * 4 / 3);
+    padding: 0;
+    background-clip: padding-box;
+
+    .open > & {
+            display: block;
+    }
+
+    @mixin popdown-dialog;
+
+    /*  Dividers (basically an hr) within the dropdown */
+    .divider {
+        @mixin nav-divider;
+    }
+
+    /* link info style */
+    .info, .title {
+        color: $textGray;
+    }
+
+    ul li.info:not(:first-child) {
+        border-top: 1px solid $interactiveBorderColor;
+    }
+
+    /*  menu lists */
+    ul {
+        list-style: none;
+        @mixin popdown-dialog-body; /*  FIXME: this should be separate from popdown */
+        overflow-x: hidden;
+        overflow-y: auto;
+        /* in rare cases that long strings increase the container size, this will minimize the issues */
+        max-width: 100%;
+        max-height: 270px;
+        box-sizing: border-box;
+        border-radius:0;
+
+        /*  give spacing to double lists */
+        + ul {
+            margin-top: -1px;
+
+            li:first-child > a, li.title:first-child {
+                border-top: $borderDefault;
+            }
+        }
+    }
+
+    /*  rounding for first and last items */
+    .arrow + ul, .arrow + ul > li:first-child > a {
+        border-top-left-radius: $containerInnerBorderRadius;
+        border-top-right-radius: $containerInnerBorderRadius;
+        border-top: none;
+    }
+    ul:last-of-type, ul:last-of-type > li:last-of-type > a {
+        border-bottom-left-radius: $containerInnerBorderRadius;
+        border-bottom-right-radius: $containerInnerBorderRadius;
+    }
+
+    /*  for selectable lists */
+    a .icon-check {
+        position: absolute;
+        left: 5px;
+        top: 5px;
+        color: $accentColorL10;
+    }
+    [class^="icon-"], [class*=" icon-"] {
+        width: 1.25em;
+        text-align: center;
+    }
+
+    li {
+        position: relative;
+
+        &.info {
+            padding: 5px 10px;
+        }
+        &.title {
+            text-transform: uppercase;
+            padding: 3px 10px;
+        }
+        &.message {
+            padding: 5px 10px;
+        }
+        > span.field-value {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: block;
+            word-wrap: normal;
+        }
+        /*  link style */
+        > a {
+            display: block;
+            clear: both;
+            font-weight: normal;
+            line-height: $lineHeight;
+            position: relative;
+            color: $interactiveTextColor;
+            padding: $spacingQuarter $spacingHalf;
+            white-space: normal;
+            text-decoration: none;
+
+            > .info  {
+                display: block;
+                font-size: $fontSizeSmall;
+            }
+            /*  focus state */
+            &:focus {
+                @mixin focus-element-inset $menuItemBackgroundColor;
+            }
+            /*  hover state */
+            &:hover {
+                color: $interactiveTextColor;
+                background: $menuItemBackgroundColorHover;
+            }
+            /*  items with secondary action icons */
+            &.primary-link {
+                margin-right: 40px;
+                border-top-right-radius: 0;
+                border-bottom-right-radius: 0;
+            }
+            &.secondary-link {
+                position: absolute;
+                right: 0;
+                top: 0;
+                bottom: 0;
+                width: 40px;
+                padding-left:0;
+                padding-right: 0;
+                font-size: 16px;
+                text-align: center;
+                border-top-left-radius: 0;
+                border-bottom-left-radius: 0;
+            }
+            > .link-description {
+                color: $textGray;
+                display: block;
+                font-size: 0.85em;
+            }
+        }
+    }
+    /*  disabled state */
+    > .disabled > a,
+    li > a.disabled {
+        &,
+        &:hover,
+        &:focus {
+            color: $textDisabledColor;
+            cursor: not-allowed;
+            text-decoration: none;
+            background-color: transparent;
+            background-image: none; /*  Remove CSS gradient */
+            box-shadow: none;
+        }
+    }
+    /*  divider style */
+    .divider {
+        margin: 0;
+        border: none;
+        border-top: $borderDefault;
+        margin-top: 0;
+        height: 0;
+    }
+    /*  remove top border when there is already a divider */
+    .divider + li > a {
+        border-top: none;
+    }
+
+    /* select menus with find */
+    .input-container {
+        .shared-findinput {
+            width: 100%;
+            box-sizing: border-box;
+            padding: $spacingQuarter;
+            margin:0;
+        }
+        .search-query {
+            width: 100%;
+        }
+    }
+}
+
+/*  truncated dropdown text */
+.dropdown-truncated li > a {
+    /*  wrapping */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+/*************************************************************************************************/
+/*  DROPDOWN SIZES                                                                               */
+/*************************************************************************************************/
+.dropdown-menu-narrow {
+    width: 10em;
+}
+.dropdown-menu-medium {
+    width: 25em;
+}
+.dropdown-menu-wide {
+    width: 30em;
+}
+.dropdown-menu-width-auto {
+    width: auto;
+    max-width: 20em;
+
+    &.dropdown-menu-narrow {
+        max-width: 10em;
+    }
+    &.dropdown-menu-medium {
+        max-width: 25em;
+    }
+    &.dropdown-menu-wide {
+        max-width: 30em;
+    }
+}
+
+
+/*************************************************************************************************/
+/*  SELECTABLE DROPDOWN                                                                          */
+/*************************************************************************************************/
+.dropdown-menu-selectable li > a { /*   BS 2.2 scoped */
+    padding-left: 24px;
+}
+
+
+/*************************************************************************************************/
+/*  BOOTSTRAP OVERRIDE                                                                           */
+/*************************************************************************************************/
+.navbar .nav > li > .dropdown-menu {
+    &:before, &:after {
+        display: none;
+    }
+}
+.dropdown-header {
+    display: block;
+    padding: 3px 20px;
+    font-size: 12px;
+    line-height: 1.42857143;
+    color: $textGray;
+}
+
+
+/*************************************************************************************************/
+/*  FIXED HEIGHT DROPDOWNS & POPDOWNS                                                            */
+/*************************************************************************************************/
+.dropdown-menu-tall ul {
+    max-height: 20em;
+    overflow: auto;
+}
+
+.dropdown-menu-short ul {
+    max-height: 10em;
+    overflow: auto;
+}
+
+/*  disable scrolling */
+.dropdown-menu-noscroll ul {
+    max-height: none;
+}
+
+
+/*  Allow for dropdowns to go bottom up (aka, dropup-menu) */
+/*  ------------------------------------------------------ */
+/*  Just add .dropup after the standard .dropdown class and you're set, bro. */
+/*  TODO: abstract this so that the navbar fixed styles are not placed here? */
+.dropup,
+.navbar-fixed-bottom .dropdown {
+    /*  Reverse the caret */
+    .caret {
+        border-top: 0;
+        border-bottom: 4px solid $black;
+        content: "";
+    }
+    /*  Different positioning for bottom up menu */
+    .dropdown-menu {
+        top: auto;
+        bottom: 100%;
+        margin-bottom: 1px;
+    }
+}
+
+/*************************************************************************************************/
+/*  SUBMENUS                                                                                     */
+/*************************************************************************************************/
+.dropdown-submenu {
+    position: relative;
+
+    /*  Default dropdowns */
+    > .dropdown-menu {
+        top: 0;
+        left: 100%;
+        margin-top: -6px;
+        margin-left: -1px;
+        border-radius: $containerOuterBorderRadius $containerOuterBorderRadius $containerOuterBorderRadius $containerOuterBorderRadius;
+    }
+    &:hover > .dropdown-menu {
+        display: block;
+    }
+    /*  hover state of dropdown submenu */
+    &:hover > a,
+    &:focus > a {
+        text-decoration: none;
+        color: $linkColorHover;
+        background: $pillBackgroundColorHover;
+    }
+    > a {
+        paddin-right: 20px;
+    }
+
+    /*  Caret to indicate there is a submenu */
+    > a:after {
+        display: block;
+        content: "";
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 0;
+        height: 0;
+        border-color: transparent;
+        border-style: solid;
+        border-width: 5px 0 5px 5px;
+        border-left-color: rgba(248,248,255,1);
+    }
+    > ul {
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+    /*  Left aligned submenus */
+    &.pull-left {
+        /*  Undo the float */
+        /*  Yes, this is awkward since .pull-left adds a float, but it sticks to our conventions elsewhere. */
+        float: none;
+
+        /*  Positioning the submenu */
+        > .dropdown-menu {
+            left: -100%;
+            margin-left: 10px;
+            border-radius: 6px 0 6px 6px;
+        }
+    }
+}
+
+
+/*************************************************************************************************/
+/*  DROPUPS                                                                                      */
+/*************************************************************************************************/
+.dropup .dropdown-submenu > .dropdown-menu {
+    top: auto;
+    bottom: 0;
+    margin-top: 0;
+    margin-bottom: -2px;
+    border-radius: 5px 5px 5px 0;
+}
+
+
+/*************************************************************************************************/
+/*  TWEAK NAV HEADERS                                                                            */
+/*************************************************************************************************/
+/*  Increase padding from 15px to 20px on sides */
+.dropdown .dropdown-menu .nav-header {
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+
+/*************************************************************************************************/
+/*  TYPEAHEAD                                                                                    */
+/*************************************************************************************************/
+.typeahead {
+    z-index: 1051;
+    margin-top: 2px; /*  give it some space to breathe */
+    border-radius: $borderRadius;
+}

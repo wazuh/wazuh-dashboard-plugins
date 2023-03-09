@@ -1,0 +1,37 @@
+# Version 9.0.3
+#
+# ** FOR USE IN SPLUNK LIGHT ONLY
+#
+# This file contains the settings and keywords available for the Splunk Livetail feature.
+# The livetail.conf isn't necessary to use Livetail but is used as a storage
+# of any keywords and the settings for each keyword.
+#
+# There is a default livetail.conf in $SPLUNK_HOME/etc/system/default that is
+# is used to include the 3 default sounds for each keyword.
+#
+# To learn more about configuration files (including precedence) see the
+# documentation located at
+# http://docs.splunk.com/Documentation/Splunk/latest/Admin/Aboutconfigurationfiles
+#
+# GLOBAL SETTINGS
+# Use the [default] stanza to define any global settings.
+#   * You can also define global settings outside of any stanza, at the top of
+#     the file.
+#   * If an attribute is defined at both the global level and in a specific
+#     stanza, the value in the specific stanza takes precedence.
+#   * There will be 3 default sounds (sound-ding, sound-airhorn, sound-alarm) in base64 encoding.
+#     They will be included as defaults for any keywords as a map for the sound a user chooses.
+
+
+sound-ding = SUQzBAAAAA
+sound-airhorn = SUQzBAAAAAE
+sound-alarm = SUQzBAAAAAEFd
+
+[keyword-id-1234]
+threshold = 450
+playsound = 0
+sound = horn
+flash = false
+enabled = 1
+keyphrase = GET
+color = 0xFFF

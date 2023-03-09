@@ -1,0 +1,269 @@
+<form version="1.1" script="get_html_dashboard_count.js" hideEdit="true">
+  <label>jQuery Upgrade</label>
+  <description>The following list of dashboards might be affected by a security update that requires jQuery 3.5 or higher. Version 1.0 Simple XML dashboards use jQuery 2.1 and need to be upgraded to jQuery 3.5 by using version 1.1 of Simple XML dashboards. HTML dashboards also depend on jQuery 2.1, but they cannot be upgraded. Instead, recreate them with Dashboard Studio.
+
+Version 1.0 Simple XML dashboards and HTML dashboards will soon no longer be available in future versions of Splunk software.</description>
+  <fieldset submitButton="false">
+    <input type="time" token="field1">
+      <label>Select Time Range</label>
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown" token="field2">
+      <label>Owner</label>
+      <fieldForLabel>owner</fieldForLabel>
+      <fieldForValue>owner</fieldForValue>
+      <default>*</default>
+      <search>
+        <query>index=_internal sourcetype=splunk_web_service TERM(dashboard_migrate_type=v1.0_load) | table owner
+| append [
+	| rest splunk_server=local /servicesNS/-/-/data/ui/views search="eai:type=html" count=0
+	| rename eai:acl.owner as owner
+	| table owner]
+| append [
+    | rest splunk_server=local /servicesNS/-/-/data/ui/views search="rootNode=form OR rootNode=dashboard" count=0
+	| rename eai:data as xml eai:acl.owner as owner
+    ``` include only dashboards with customjs ```
+    | regex xml="^&lt;(dashboard|form)(.|\n)*script[ ]*=[ ]*(?:\'|\").*\.js(?:\'|\")(.|\n)*&gt;(.|\n)*"
+    ``` filter out dashboards with version="1.1" explicitly set ```
+    | regex xml!="^&lt;(dashboard|form)(.|\n)*version[ ]*=[ ]*(?:\'|\")1.1(?:\'|\")(.|\n)*&gt;(.|\n)*"
+	| table owner]
+| dedup owner</query>
+        <earliest>$field1.earliest$</earliest>
+        <latest>$field1.latest$</latest>
+      </search>
+    </input>
+    <input type="dropdown" token="field3">
+      <label>App</label>
+      <fieldForLabel>app_dropdown</fieldForLabel>
+      <fieldForValue>app</fieldForValue>
+      <default>*</default>
+      <search>
+        <query>index=_internal sourcetype=splunk_web_service TERM(dashboard_migrate_type=v1.0_load)
+| fields app
+| append [
+	| rest splunk_server=local /servicesNS/-/-/data/ui/views search="eai:type=html" count=0
+	| rename eai:acl.app as app
+	| table app]
+| append [
+	| rest splunk_server=local /servicesNS/-/-/data/ui/views search="rootNode=form OR rootNode=dashboard" count=0
+	| rename eai:data as xml eai:acl.app as app
+    ``` include only dashboards with customjs ```
+    | regex xml="^&lt;(dashboard|form)(.|\n)*script[ ]*=[ ]*(?:\'|\").*\.js(?:\'|\")(.|\n)*&gt;(.|\n)*"
+    ``` filter out dashboards with version="1.1" explicitly set ```
+    | regex xml!="^&lt;(dashboard|form)(.|\n)*version[ ]*=[ ]*(?:\'|\")1.1(?:\'|\")(.|\n)*&gt;(.|\n)*"
+	| table app]
+| dedup app
+| join type=inner app
+	[ | rest splunk_server=local /servicesNS/-/-/apps/local count=0
+	| rename title as app label as app_label
+	| table app app_label]
+| strcat app_label " (" app ")" app_dropdown</query>
+        <earliest>$field1.earliest$</earliest>
+        <latest>$field1.latest$</latest>
+      </search>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Number of v1.0 dashboard views</title>
+      <single>
+        <title>Trend of v1.0 dashboard views over time</title>
+        <search>
+          <query>index=_internal sourcetype=splunk_web_service TERM(dashboard_migrate_type=v1.0_load) owner=$field2$ app=$field3$ | timechart count</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="colorBy">trend</option>
+        <option name="colorMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="rangeValues">[0,30,70,100]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trendColorInterpretation">inverse</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+    <panel>
+      <title>List of v1.0 dashboards viewed</title>
+      <table>
+        <title>Version 1.0 Simple XML dashboards will no longer be available in future versions of Splunk software</title>
+        <search>
+          <query>index=_internal sourcetype=splunk_web_service TERM(dashboard_migrate_type=v1.0_load) owner=$field2$ app=$field3$
+| join type=inner app
+	[ | rest splunk_server=local /servicesNS/-/-/apps/local count=0
+	| rename title as app label as app_label
+	| table app app_label]
+| stats count by view_name, owner, app, app_label
+| sort - count</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <drilldown>
+          <link target="_blank">/app/$row.app$/$row.view_name$</link>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Number of Simple XML dashboards with CustomJS</title>
+      <single>
+        <search>
+          <query>| rest splunk_server=local /servicesNS/-/-/data/ui/views search="rootNode=form OR rootNode=dashboard" count=0
+| rename eai:data as xml
+  title as view_name
+  eai:acl.app as app
+  eai:acl.owner as owner
+| search owner=$field2$ app=$field3$
+``` include only dashboards with customjs ```
+| regex xml="^&lt;(dashboard|form)(.|\n)*script[ ]*=[ ]*(?:\'|\").*\.js(?:\'|\")(.|\n)*&gt;(.|\n)*"
+``` filter out dashboards with version="1.1" explicitly set ```
+| regex xml!="^&lt;(dashboard|form)(.|\n)*version[ ]*=[ ]*(?:\'|\")1.1(?:\'|\")(.|\n)*&gt;(.|\n)*"
+| stats count</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="colorBy">trend</option>
+        <option name="colorMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="rangeValues">[0,30,70,100]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trendColorInterpretation">inverse</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">0</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+    <panel>
+      <title>List of Simple XML dashboards with Custom JS</title>
+      <table>
+        <title>Dashboards with CustomJS depend on jQuery and require a manual update to jQuery version 3.5</title>
+        <search>
+          <query>| rest splunk_server=local /servicesNS/-/-/data/ui/views search="rootNode=form OR rootNode=dashboard" count=0
+| rename eai:data as xml
+  title as view_name
+  eai:acl.app as app
+  eai:acl.owner as owner
+| search owner=$field2$ app=$field3$
+``` include only dashboards with customjs ```
+| regex xml="^&lt;(dashboard|form)(.|\n)*script[ ]*=[ ]*(?:\'|\").*\.js(?:\'|\")(.|\n)*&gt;(.|\n)*"
+``` filter out dashboards with version="1.1" explicitly set ```
+| regex xml!="^&lt;(dashboard|form)(.|\n)*version[ ]*=[ ]*(?:\'|\")1.1(?:\'|\")(.|\n)*&gt;(.|\n)*"
+| table view_name, owner, app
+| join type=inner app
+	[ | rest splunk_server=local /servicesNS/-/-/apps/local count=0
+	| rename title as app label as app_label
+	| table app app_label]</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <drilldown>
+          <link target="_blank">/app/$row.app$/$row.view_name$</link>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel id="num_html">
+      <title>Number of HTML dashboards</title>
+      <single>
+        <search>
+          <query>| rest splunk_server=local /servicesNS/-/-/data/ui/views search="eai:type=html" count=0
+          | rename eai:acl.app as app eai:acl.owner as owner
+          | search owner=$field2$ app=$field3$
+          | stats count</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="colorBy">trend</option>
+        <option name="colorMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="rangeValues">[0,30,70,100]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trendColorInterpretation">inverse</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">0</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+    <panel>
+      <title>List of HTML dashboards</title>
+      <table>
+        <title>HTML files in the data/ui/html directory will no longer be available in future versions of Splunk software</title>
+        <search>
+          <query>| rest splunk_server=local /servicesNS/-/-/data/ui/views search="eai:type=html" count=0
+| rename title as view_name eai:acl.app as app eai:acl.owner as owner
+| search owner=$field2$ app=$field3$
+| table view_name, owner, app
+| join type=inner app
+	[ | rest splunk_server=local /servicesNS/-/-/apps/local count=0
+	| rename title as app label as app_label
+	| table app app_label]</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <drilldown>
+          <link target="_blank">/app/$row.app$/$row.view_name$</link>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+</form>

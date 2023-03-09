@@ -1,0 +1,244 @@
+<form version="1.1" hideEdit="True" script="cell_fill_gauge.js, common_control.js">
+  <label>Workload Management Monitoring: Instance</label>
+
+  <fieldset autoRun="true" submitButton="false">
+    <input type="radio" searchWhenChanged="true" token="role">
+      <label>Role</label>
+      <choice value="dmc_group_search_head">Search Heads</choice>
+      <choice value="dmc_group_indexer">Indexers</choice>
+      <default>dmc_group_search_head</default>
+    </input>
+    <input type="dropdown" searchWhenChanged="true" token="dmc_group">
+      <label>Group</label>
+      <showClearButton>false</showClearButton>
+      <search>
+        <query>
+          | `dmc_get_groups_containing_role($role$)`
+          | search search_group!="dmc_group_*"
+        </query>
+      </search>
+      <fieldForLabel>label</fieldForLabel>
+      <fieldForValue>search_group</fieldForValue>
+      <choice value="*">All</choice>
+      <selectFirstChoice>true</selectFirstChoice>
+    </input>
+    <input type="dropdown" searchWhenChanged="true" token="host">
+      <label>Instance</label>
+      <showClearButton>false</showClearButton>
+      <populatingSearch fieldForLabel="serverName" fieldForValue="serverName">
+        | `dmc_get_instance_info($dmc_group$)`
+        | where search_group="$role$"
+      </populatingSearch>
+      <change>
+        <condition value="*">
+          <set token="host">$row.host$</set>
+        </condition>
+      </change>
+      <selectFirstChoice>true</selectFirstChoice>
+    </input>
+  </fieldset>
+
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Historical Charts</title>
+      <input type="time" searchWhenChanged="true" token="time">
+        <label>Time Range:</label>
+        <default>
+          <earliestTime>-4h@m</earliestTime>
+          <latestTime>now</latestTime>
+        </default>
+      </input>
+      <input type="dropdown" token="SplitByVariable">
+        <label>Split by</label>
+        <showClearButton>false</showClearButton>
+        <default>Rule</default>
+        <choice value="wlm_action">Action</choice>
+        <choice value="wlm_triggered_rule">Rule</choice>
+        <choice value="user">User</choice>
+        <choice value="app">App</choice>
+        <choice value="search_type">Search Type</choice>
+        <set token="searchBy">by $SplitByVariable$</set>
+        <change>
+            <condition value="wlm_action">
+                <set token="isAction">true</set>
+                <unset token="isNotAction"></unset>
+            </condition>
+            <condition>
+                <set token="isNotAction">true</set>
+                <unset token="isAction"></unset>
+            </condition>
+        </change>
+    </input>
+  </panel>
+  </row>
+
+  <search id="base_total_search_count">
+      <query>
+	  `dmc_set_index_internal` host=$host$ sourcetype=wlm_*
+	  | stats dc(search_id) as "search_count" by wlm_action
+      </query>
+      <earliest>$time.earliest$</earliest>
+      <latest>$time.latest$</latest>
+  </search>
+
+  <row>
+    <panel>
+      <title>Number of searches aborted</title>
+      <single>
+	<search base="base_total_search_count">
+          <query>
+             | where wlm_action = "abort" | fields search_count
+          </query>
+        </search>
+        <option name="height">80px</option>
+      </single>
+    </panel>
+
+    <panel>
+      <title>Number of searches moved to alternate pools</title>
+      <single>
+	<search base="base_total_search_count">
+          <query>
+             | where wlm_action = "move" | fields search_count
+          </query>
+        </search>
+        <option name="height">80px</option>
+      </single>
+    </panel>
+
+    <panel>
+      <title>Number of searches triggering an alert</title>
+      <single>
+	<search base="base_total_search_count">
+          <query>
+             | where wlm_action = "alert" | fields search_count
+          </query>
+        </search>
+        <option name="height">80px</option>
+      </single>
+    </panel>
+  </row>
+
+  <row>
+    <panel depends="$isAction$">
+      <title>Number of searches per action triggered</title>
+      <chart>
+        <searchString>
+           `dmc_set_index_internal` sourcetype=wlm_* host=$host$ |
+           chart dc(search_id) AS search_count over wlm_action 
+        </searchString>
+        <earliestTime>$time.earliest$</earliestTime>
+        <latestTime>$time.latest$</latestTime>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart">bar</option>
+	<option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.axisTitleY.text">Total # of searches</option>
+        <option name="charting.axisTitleX.text">Action triggered</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <drilldown target="_blank">
+          <condition series="*">
+              <link target="_blank"><![CDATA[search?q=`dmc_set_index_internal` sourcetype=wlm_* host=$host$ wlm_action=$click.value$&earliest=$earliest$&latest=$latest$]]></link>
+          </condition>
+        </drilldown>
+      </chart>
+    </panel>
+  </row>
+
+  <row>
+    <panel depends="$isNotAction$">
+      <title>Number of searches per action triggered</title>
+      <chart>
+        <searchString>
+            `dmc_set_index_internal` sourcetype=wlm_* host=$host$ | chart dc(search_id) over wlm_action by $SplitByVariable$
+        </searchString>
+        <earliestTime>$time.earliest$</earliestTime>
+        <latestTime>$time.latest$</latestTime>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart">bar</option>
+	<option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.axisTitleY.text">Total # of searches</option>
+        <option name="charting.axisTitleX.text">Action triggered</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <drilldown target="_blank">
+          <condition series="*">
+              <link target="_blank"><![CDATA[search?q=`dmc_set_index_internal` sourcetype=wlm_* host=$host$ $SplitByVariable$=$click.name2$&earliest=$earliest$&latest=$latest$]]></link>
+          </condition>
+        </drilldown>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Number of searches per action triggered over time</title>
+      <chart>
+        <searchString>
+           `dmc_set_index_internal` host=$host$ sourcetype=wlm_*
+              | `dmc_timechart` partial=f bins=200 dc(search_id) AS "Search count" by $SplitByVariable$
+        </searchString>
+        <earliestTime>$time.earliest$</earliestTime>
+        <latestTime>$time.latest$</latestTime>
+
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text"># of searches</option>
+        <option name="list.drilldown">full</option>
+        <option name="list.wrap">1</option>
+        <option name="maxLines">5</option>
+        <option name="raw.drilldown">full</option>
+        <option name="rowNumbers">false</option>
+        <option name="table.drilldown">all</option>
+        <option name="table.wrap">1</option>
+        <option name="type">list</option>
+        <option name="wrap">true</option>
+        <option name="dataOverlayMode">none</option>
+        <!-- <option name="refresh.auto.interval">300</option> -->
+        <drilldown target="_blank">
+          <condition series="*">
+              <link target="_blank"><![CDATA[search?q=`dmc_set_index_internal` sourcetype=wlm_* host=$host$ $SplitByVariable$=$click.name2$&earliest=$earliest$&latest=$latest$]]></link>
+          </condition>
+        </drilldown>
+      </chart>
+    </panel>
+  </row>
+
+   <row>
+     <panel>
+      <title>Overview of scheduled searches triggering rules</title>
+      <table>
+        <searchString>
+          `dmc_set_index_internal` host=$host$ sourcetype=wlm_* search_type="scheduled*"
+          | stats count(eval(wlm_action = "alert")) AS alert count(eval(wlm_action = "move")) AS move count(eval(wlm_action = "abort")) AS abort by search_id
+          | join type=outer search_id
+               [ search `dmc_set_index_introspection` host=$host$ sourcetype=splunk_resource_usage
+                 data.search_props.label::*  NOT data.search_props.type::ad-hoc
+                 | rename data.search_props.sid as search_id, data.search_props.label as search_name
+		 | stats latest(search_name) AS search_name by search_id
+               ]
+          | stats sum(alert) as "searches triggering an alert", sum(move) as "searches reclassified", sum(abort) as "searches aborted" by search_name
+        </searchString>
+        <earliestTime>$time.earliest$</earliestTime>
+        <latestTime>$time.latest$</latestTime>
+      </table>
+    </panel>
+  </row>
+
+</form>

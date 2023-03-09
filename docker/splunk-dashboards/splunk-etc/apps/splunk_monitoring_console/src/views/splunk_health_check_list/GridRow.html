@@ -1,0 +1,35 @@
+<% if (hasMoreInfo) { %>
+    <td class="expands">
+        <a href="#"><i class="icon-triangle-right-small"></i></a>
+    </td>
+<% } %>
+<td class="cell-title">
+    <a href="<%- editLinkHref %>" class="model-title entity-edit-link"><%- name %></a>
+    <% if (description) { %>
+        <div class="model-description"><%- description %></div>
+    <% } %>
+</td>
+<td class="cell-actions">
+    <div class="action-cell-placeholder"></div>
+</td>
+<td class="cell-category">
+    <%- entity.entry.content.get('category') %>
+</td>
+<td class="cell-app">
+    <%- entity.entry.acl.get('app') %>
+</td>
+<% if (isDistributed) { %>
+    <td class="cell-applicable_to_groups">
+        <%- groupColumn %>
+    </td>
+<% } %>
+<td class="cell-tags">
+    <%- tagsColumn %>
+</td>
+<td class="cell-status">
+    <% if (isDisabled) { %>
+    <i class="icon-lock disable-icon"></i> <span class="enable-text"><%= _("Disabled").t() %></span>
+    <% } else { %>
+    <i class="icon-check enable-icon"></i> <span class="enable-text"><%= _("Enabled").t() %></span>
+    <% } %>
+</td>

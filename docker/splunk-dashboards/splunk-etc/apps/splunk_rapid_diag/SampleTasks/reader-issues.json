@@ -1,0 +1,60 @@
+{
+  "__class__": "rapid_diag.task.Task",
+  "collectors": [
+    {
+      "__class__": "rapid_diag.collector.trigger.periodic.Periodic",
+      "collectors": [
+        {
+          "__class__": "rapid_diag.collector.stack_trace.StackTrace",
+          "process": {
+            "__class__": "rapid_diag.process_abstraction.Process",
+            "pid": 0,
+            "name": "splunkd",
+            "args": "splunkd",
+            "process_type": "splunkd server",
+            "ppid": 0,
+            "default_value_description": "By default, the main splunkd process is selected."
+          }
+        }
+      ],
+      "sampleCount": 1000,
+      "interval": 0.5
+    },
+    {
+      "collection_time": 600,
+      "__class__": "rapid_diag.collector.iops.IOPS"
+    },
+    {
+      "collection_time": 600,
+      "__class__": "rapid_diag.collector.system_call_trace.SystemCallTrace",
+      "process": {
+        "__class__": "rapid_diag.process_abstraction.Process",
+        "ppid": 0,
+        "args": "splunkd",
+        "pid": 0,
+        "process_type": "splunkd server",
+        "name": "splunkd"
+      }
+    },
+    {
+      "__class__": "rapid_diag.collector.trigger.periodic.Periodic",
+      "collectors": [
+        {
+          "__class__": "rapid_diag.collector.ps.PS"
+        }
+      ],
+      "sampleCount": 60,
+      "interval": 1.0
+    },
+    {
+      "__class__": "rapid_diag.collector.diag.Diag"
+    }
+  ],
+  "name": "File reading",
+  "collector_tool_names": "iops, ps, pstack, splunkdiag, strace",
+  "description": "For investigating issues when reading events from a file (e.g. batchreader or tailreader).",
+  "host": "",
+  "task_id": "reader-issues",
+  "features" : [ "batchreader", "tailreader"],
+  "symptoms" : [ "blocked-queues" ]
+}

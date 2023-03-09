@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<view template="pages/app.html" type="html" isDashboard="False">
+    <label>Job Manager</label>
+</view>

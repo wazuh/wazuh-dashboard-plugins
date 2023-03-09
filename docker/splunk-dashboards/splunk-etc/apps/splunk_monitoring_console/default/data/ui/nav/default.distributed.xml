@@ -1,0 +1,102 @@
+<nav color="#3C444D">
+  <view name="monitoringconsole_overview" default="true" />
+  <view name="monitoringconsole_landing" />
+  <view name="assist" />
+  <view name="monitoringconsole_check" />
+  <view name="monitoringconsole_instances" />
+  <collection label="Indexing">
+    <collection label="Performance">
+      <view name="indexing_performance_instance" />
+      <view name="indexing_performance_advanced" />
+      <view name="indexing_performance_deployment" />
+    </collection>
+    <collection label="Indexer Clustering">
+        <!--<a href="Clustering">Indexer Clustering: Status</a>-->
+      <view name="indexer_clustering_status" />
+      <view name="indexer_clustering_service_activity" />
+    </collection>
+    <collection label="Indexes and Volumes">
+      <view name="indexes_and_volumes_instance" />
+      <view name="indexes_and_volumes_deployment" />
+      <view name="index_detail_instance" />
+      <view name="index_detail_deployment" />
+      <view name="volume_detail_instance" />
+      <view name="volume_detail_deployment" />
+    </collection>
+    <collection label="Inputs">
+      <view name="http_event_collector_instance" />
+      <view name="http_event_collector_deployment" />
+      <view name="splunk_tcpin_performance_instance" />
+      <view name="splunk_tcpin_performance_deployment" />
+      <view name="data_quality" />
+    </collection>
+    <collection label="License Usage">
+      <view name="license_usage_today" />
+      <view name="license_usage_historic" />
+    </collection>
+    <collection label="SmartStore">
+      <view name="smartstore_activity_instance" />
+      <view name="smartstore_activity_deployment" />
+      <view name="smartstore_cache_performance_instance" />
+      <view name="smartstore_cache_performance_deployment" />
+    </collection>
+  </collection>
+  <collection label="Search">
+    <collection label="Activity">
+      <view name="search_activity_instance" />
+      <view name="search_activity_deployment" />
+      <view name="search_usage_statistics_instance" />
+      <view name="search_usage_statistics_deployment" />
+    </collection>
+    <collection label="Distributed Search">
+      <view name="distributed_search_instance" />
+      <view name="distributed_search_deployment" />
+    </collection>
+    <collection label="Search Head Clustering">
+      <view name="shc_status_and_conf" />
+      <view name="shc_conf_rep" />
+      <view name="shc_artifact_replication" />
+      <view name="shc_scheduler_delegation_statistics" />
+      <view name="shc_app_deployment" />
+    </collection>
+    <collection label="Scheduler Activity">
+      <view name="scheduler_activity_instance" />
+      <view name="scheduler_activity_deployment" />
+    </collection>
+    <collection label="KV Store">
+      <view name="kv_store_instance" />
+      <view name="kv_store_deployment" />
+    </collection>
+    <collection label="Knowledge Bundle Replication">
+      <view name="bundle_replication" />
+      <view name="cascading_replication" />
+    </collection>
+  </collection>
+  <collection label="Resource Usage">
+    <view name="resource_usage_instance" />
+    <view name="resource_usage_machine" />
+    <view name="resource_usage_deployment" />
+    <view name="resource_usage_cpu_instance" />
+    <view name="resource_usage_cpu_deployment" />
+    <collection label="Workload Management">
+      <view name="workload_management" />
+      <view name="workload_management_per_pool_instance" />
+      <view name="workload_management_per_pool_deployment" />
+      <view name="workload_management_monitoring_distributed" />
+      <view name="admission_control_monitoring_instance" />
+      <view name="admission_control_monitoring_distributed" />
+    </collection>
+  </collection>
+  <collection label="Forwarders">
+    <view name="forwarder_instance" />
+    <view name="forwarder_deployment" />
+  </collection>
+  <collection label="Settings">
+    <view name="monitoringconsole_configure" />
+    <view name="monitoringconsole_forwarder_setup" />
+    <view name="monitoringconsole_alerts_setup" />
+    <view name="monitoringconsole_overview_preferences"/>
+    <view name="monitoringconsole_check_list" />
+  </collection>
+  <a href="search">Run a Search</a>
+</nav>

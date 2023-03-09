@@ -1,0 +1,637 @@
+<form version="1.1" hideEdit="True" script="cell_fill_gauge.js, common_control.js" stylesheet="index_type.css">
+  <label>Index Detail: Instance</label>
+  <search id="indexes_base_search">
+    <query>
+| rest splunk_server=$splunk_server$ /services/data/indexes $datatype$
+  | join type=outer title [
+    | rest splunk_server=$splunk_server$ /services/data/indexes-extended $datatype$
+  ]
+| `dmc_exclude_indexes`
+| eval warm_bucket_size = coalesce('bucket_dirs.home.warm_bucket_size', 'bucket_dirs.home.size')
+| eval cold_bucket_size = coalesce('bucket_dirs.cold.bucket_size', 'bucket_dirs.cold.size')
+| eval hot_bucket_size = if(isnotnull(cold_bucket_size), total_size - cold_bucket_size - warm_bucket_size, total_size - warm_bucket_size)
+| eval thawed_bucket_size = coalesce('bucket_dirs.thawed.bucket_size', 'bucket_dirs.thawed.size')
+| eval warm_bucket_size_gb = coalesce(round(warm_bucket_size / 1024, 2), 0.00)
+| eval hot_bucket_size_gb = coalesce(round(hot_bucket_size / 1024, 2), 0.00)
+| eval cold_bucket_size_gb = coalesce(round(cold_bucket_size / 1024, 2), 0.00)
+| eval thawed_bucket_size_gb = coalesce(round(thawed_bucket_size / 1024, 2), 0.00)
+
+| eval warm_bucket_count = coalesce('bucket_dirs.home.warm_bucket_count', 0)
+| eval hot_bucket_count = coalesce('bucket_dirs.home.hot_bucket_count', 0)
+| eval cold_bucket_count = coalesce('bucket_dirs.cold.bucket_count', 0)
+| eval thawed_bucket_count = coalesce('bucket_dirs.thawed.bucket_count', 0)
+| eval home_event_count = coalesce('bucket_dirs.home.event_count', 0)
+| eval cold_event_count = coalesce('bucket_dirs.cold.event_count', 0)
+| eval thawed_event_count = coalesce('bucket_dirs.thawed.event_count', 0)
+
+| eval home_bucket_size_gb = coalesce(round((warm_bucket_size + hot_bucket_size) / 1024, 2), 0.00)
+| eval homeBucketMaxSizeGB = coalesce(round('homePath.maxDataSizeMB' / 1024, 2), 0.00)
+| eval home_bucket_capacity_gb = if(homeBucketMaxSizeGB > 0, homeBucketMaxSizeGB, "unlimited")
+| eval home_bucket_usage_gb = home_bucket_size_gb." / ".home_bucket_capacity_gb
+| eval cold_bucket_capacity_gb = coalesce(round('coldPath.maxDataSizeMB' / 1024, 2), 0.00)
+| eval cold_bucket_capacity_gb = if(cold_bucket_capacity_gb > 0, cold_bucket_capacity_gb, "unlimited")
+| eval cold_bucket_usage_gb = cold_bucket_size_gb." / ".cold_bucket_capacity_gb
+
+| eval currentDBSizeGB = round(currentDBSizeMB / 1024, 2)
+| eval maxTotalDataSizeGB = if((maxTotalDataSizeMB > 0) AND isNull(remotePath), round(maxTotalDataSizeMB / 1024, 2), "unlimited")
+| eval disk_usage_gb = currentDBSizeGB." / ".maxTotalDataSizeGB
+
+| eval currentTimePeriodDay = coalesce(round((now() - strptime(minTime,"%Y-%m-%dT%H:%M:%S%z")) / 86400, 0), 0)
+| eval frozenTimePeriodDay = coalesce(round(frozenTimePeriodInSecs / 86400, 0), 0)
+| eval frozenTimePeriodDay = if(frozenTimePeriodDay > 0, frozenTimePeriodDay, "unlimited")
+| eval freeze_period_viz_day = currentTimePeriodDay." / ".frozenTimePeriodDay
+
+| eval total_bucket_count = toString(coalesce(total_bucket_count, 0), "commas")
+| eval totalEventCount = toString(coalesce(totalEventCount, 0), "commas")
+| eval total_raw_size_gb = round(total_raw_size / 1024, 2)
+| eval avg_bucket_size_gb = round(currentDBSizeGB / total_bucket_count, 2)
+| eval compress_ratio = round(total_raw_size_gb / currentDBSizeGB, 2)." : 1"
+
+| fields title, datatype
+    currentDBSizeGB, totalEventCount, total_bucket_count,  avg_bucket_size_gb,
+    total_raw_size_gb, compress_ratio, minTime, maxTime
+    freeze_period_viz_day, disk_usage_gb, home_bucket_usage_gb, cold_bucket_usage_gb,
+    hot_bucket_size_gb, warm_bucket_size_gb, cold_bucket_size_gb, thawed_bucket_size_gb,
+    hot_bucket_count,   warm_bucket_count,   cold_bucket_count,   thawed_bucket_count,
+    home_event_count,   cold_event_count,    thawed_event_count,
+    homePath, homePath_expanded, coldPath, coldPath_expanded, thawedPath, thawedPath_expanded, summaryHomePath_expanded, tstatsHomePath, tstatsHomePath_expanded,
+    maxTotalDataSizeMB, frozenTimePeriodInSecs, homePath.maxDataSizeMB, coldPath.maxDataSizeMB,
+    maxDataSize, maxHotBuckets, maxWarmDBCount
+    </query>
+  </search>
+  <search id="index_historical_base_search">
+    <query>
+      index=_introspection host=$host$ sourcetype=splunk_disk_objects component=Indexes data.name=$single_index_name$
+      | eval data_birth_date = if(isnotnull('data.bucket_dirs.cold.event_min_time'), 'data.bucket_dirs.cold.event_min_time', 'data.bucket_dirs.home.event_min_time')
+      | eval data_age_days = round((_time - data_birth_date) / 86400, 0)
+      | eval data.total_capacity = if(isnotnull('data.total_capacity'), 'data.total_capacity', 500000)
+      | eval disk_usage = round('data.total_size' / 1024, 2)
+      | eval disk_capacity = round('data.total_capacity' / 1024, 2)
+      | `dmc_timechart_for_disk_usage` $funcDataAge$(data_age_days) as data_age_days, $funcDiskUsage$(disk_usage) as disk_usage, $funcDiskUsage$(disk_capacity) as disk_capacity
+    </query>
+    <earliest>$time.earliest$</earliest>
+    <latest>$time.latest$</latest>
+  </search>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="radio" searchWhenChanged="true" token="datatype">
+      <label>Index Type</label>
+      <choice value="">Event Indexes Only</choice>
+      <choice value="datatype=all">All Index Types *</choice>
+      <default></default>
+    </input>
+    <input type="dropdown" searchWhenChanged="true" token="dmc_group">
+      <label>Group</label>
+      <showClearButton>false</showClearButton>
+      <search>
+        <query>
+          | `dmc_get_groups_containing_role(dmc_group_indexer)`
+          | search search_group!="dmc_group_*"
+        </query>
+      </search>
+      <fieldForLabel>label</fieldForLabel>
+      <fieldForValue>search_group</fieldForValue>
+      <choice value="dmc_group_indexer">All Indexers</choice>
+      <default>dmc_group_indexer</default>
+    </input>
+    <input type="dropdown" searchWhenChanged="true" token="splunk_server">
+      <label>Instance</label>
+      <showClearButton>false</showClearButton>
+      <populatingSearch fieldForLabel="serverName" fieldForValue="serverName">
+        | `dmc_get_instance_info($dmc_group$)`
+        | where search_group="dmc_group_indexer"
+      </populatingSearch>
+      <selectFirstChoice>true</selectFirstChoice>
+      <change>
+        <condition value="*">
+          <set token="host">$row.host$</set>
+        </condition>
+      </change>
+    </input>
+    <input type="dropdown" searchWhenChanged="true" token="single_index_name">
+      <label>Index</label>
+      <showClearButton>false</showClearButton>
+      <fieldForValue>index_data_type_combined</fieldForValue>
+      <fieldForLabel>title</fieldForLabel>
+      <search base="indexes_base_search">
+        <query>| eval index_data_type_combined = title.":".datatype | stats count by title index_data_type_combined
+        </query>
+      </search>
+      <selectFirstChoice>true</selectFirstChoice>
+      <change>
+        <set token="single_index_name">$label$</set>
+        <eval token="index_type_value">mvindex(split($value$, ":"),1)</eval>
+      </change>
+    </input>
+    <html id="index_type_disclaimer">
+      <p>The "All Index Types" option is not compatible with indexers running Splunk Enterprise 6.6 or earlier, where only event indexes exist.</p>
+    </html>
+  </fieldset>
+  <row>
+    <panel>
+      <html>
+        <h2>
+          <span>Select views: </span>
+          <span id="link-switcher-view">
+            <a href="#" class="btn-pill active" data-item="all">All</a>
+            <a href="#" class="btn-pill" data-item="snapshot">Snapshot</a>
+            <a href="#" class="btn-pill" data-item="historical">Historical</a>
+          </span>
+        </h2>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Snapshots</title>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Overview</title>
+      <single>
+        <option name="height">80px</option>
+        <search base="indexes_base_search">
+          <query>search title=$single_index_name$ | fields currentDBSizeGB | eval currentDBSizeGB = currentDBSizeGB." GB"</query>
+        </search>
+        <done>
+          <set token="currentDBSizeGB">$result.currentDBSizeGB$</set>
+        </done>
+        <option name="underLabel">Index Size</option>
+        <option name="refresh.time.visible">false</option>
+      </single>
+      <single>
+        <option name="height">80px</option>
+        <search base="indexes_base_search">
+          <query>search title=$single_index_name$ | fields total_raw_size_gb | eval total_raw_size_gb = total_raw_size_gb." GB"</query>
+        </search>
+        <option name="underLabel">Uncompressed Raw Data Size</option>
+        <option name="refresh.time.visible">false</option>
+      </single>
+      <single>
+        <option name="height">80px</option>
+        <search base="indexes_base_search">
+          <query>search title=$single_index_name$ | fields compress_ratio</query>
+        </search>
+        <option name="underLabel">Raw to Index Size Ratio*</option>
+        <option name="refresh.time.visible">false</option>
+      </single>
+      <html>
+        <p>* This is the ratio of uncompressed raw data size to index size.</p>
+      </html>
+      <single>
+        <option name="height">80px</option>
+        <search base="indexes_base_search">
+          <query>search title=$single_index_name$ | fields total_bucket_count</query>
+        </search>
+        <done>
+          <set token="total_bucket_count">$result.total_bucket_count$</set>
+        </done>
+        <option name="underLabel">Total Bucket Count</option>
+        <option name="refresh.time.visible">false</option>
+      </single>
+      <single>
+        <option name="height">80px</option>
+        <search base="indexes_base_search">
+          <query>search title=$single_index_name$ | fields avg_bucket_size_gb | eval avg_bucket_size_gb = avg_bucket_size_gb." GB"</query>
+        </search>
+        <option name="underLabel">Average Bucket Size</option>
+        <option name="refresh.time.visible">false</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Events</title>
+      <single>
+        <option name="height">80px</option>
+        <search base="indexes_base_search">
+          <query>search title=$single_index_name$ | fields totalEventCount</query>
+        </search>
+        <option name="underLabel">Total Event Count</option>
+        <option name="refresh.time.visible">false</option>
+      </single>
+      <single>
+        <option name="height">80px</option>
+        <search base="indexes_base_search">
+          <query>search title=$single_index_name$ | fields minTime | eval minTime = replace(minTime, "T", " ")</query>
+        </search>
+        <option name="underLabel">Earliest Event</option>
+        <option name="refresh.time.visible">false</option>
+      </single>
+      <single>
+        <option name="height">80px</option>
+        <search base="indexes_base_search">
+          <query>search title=$single_index_name$ | fields maxTime | eval maxTime = replace(maxTime, "T", " ")</query>
+        </search>
+        <option name="underLabel">Latest Event</option>
+        <option name="refresh.time.visible">false</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Status</title>
+      <table id="table1">
+        <search base="indexes_base_search">
+          <query>
+search title=$single_index_name$
+| fields freeze_period_viz_day, disk_usage_gb, home_bucket_usage_gb, cold_bucket_usage_gb
+| rename freeze_period_viz_day as "Data Age vs Frozen Age (days)", disk_usage_gb as "Index Usage (GB)", home_bucket_usage_gb as "Home Path Usage (GB)", cold_bucket_usage_gb as "Cold Path Usage (GB)"
+          </query>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.time.visible">false</option>
+      </table>
+      <html>
+        <p>The columns use attributes specified in <a href="/help?location=learnmore.index.settings" class="external" target="_blank">indexes.conf</a>:</p>
+        <ul>
+          <li><b>Data Age vs Frozen Age:</b> The first value is based on the age of the oldest event in the index. The second value is derived from the attribute frozenTimePeriodInSecs.</li>
+          <li><b>Index Usage:</b> The first value is the current size of the index. The second value is the index capacity, as specified  in maxTotalDataSizeMB.</li>
+          <li><b>Home Path Usage:</b> The first value is the current size of the home path portion of the index. The second value is the home path capacity, as specified in homePath.maxDataSizeMB.</li>
+          <li><b>Cold Path Usage:</b> The first value is the current size of the cold path portion of the index. The second value is the cold path capacity, as specified in coldPath.maxDataSizeMB.</li>
+        </ul>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Volumes</title>
+      <table id="index_volumes">
+        <search>
+          <query>
+            <![CDATA[
+            | rest splunk_server=$splunk_server$ /services/data/indexes/$single_index_name$
+            | `dmc_exclude_indexes`
+            | rex field=homePath "volume:(?<home_vol_name>[^/\\\]*)(?:/|\\\)"
+            | rex field=coldPath "volume:(?<cold_vol_name>[^/\\\]*)(?:/|\\\)"
+            | fields home_vol_name cold_vol_name
+            | eval home_vol_name = if(isnull(home_vol_name), "N/A", home_vol_name)
+            | eval cold_vol_name = if(isnull(cold_vol_name), "N/A", cold_vol_name)
+            | rename home_vol_name as "home" cold_vol_name as "cold"
+            | transpose | rename column as "Index Directory" "row 1" as title
+
+            | join type=outer title [
+              | rest splunk_server=$splunk_server$ /services/data/index-volumes
+              | fields title, total_size, max_size, volume_path
+              | `dmc_exclude_volumes`
+              | eval total_size_gb = if(isnull(total_size), "-", round(total_size / 1024, 2))
+              | eval max_size_gb = if(isnull(max_size) OR max_size = "infinite", "unlimited", round(max_size / 1024, 2))
+              | eval disk_usage_gb = total_size_gb." / ".max_size_gb
+              | eval remaining_capacity_pct = (max_size_gb - total_size_gb) / max_size_gb
+              | fields title, disk_usage_gb, remaining_capacity_pct
+            ]
+
+            | eval disk_usage_gb = if(isnull(disk_usage_gb), "N/A", disk_usage_gb)
+            | eval "Volume Freezing Due to Size" = if(isnull(remaining_capacity_pct), "N/A", if(remaining_capacity_pct < 0.05, "Yes", "No"))
+            | rename title as "Volume Name" disk_usage_gb as "Volume Usage / Capacity (GB)"
+            | fields - remaining_capacity_pct
+            ]]>
+          </query>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.time.visible">false</option>
+      </table>
+      <html>
+        <p>A volume is considered to be freezing or about to freeze data at 95% or more of configured disk usage capacity.</p>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <chart>
+        <title>Bucket Size (GB)</title>
+        <search base="indexes_base_search">
+          <query>
+search title=$single_index_name$
+| fields hot_bucket_size_gb, warm_bucket_size_gb, cold_bucket_size_gb, thawed_bucket_size_gb
+| rename hot_bucket_size_gb as Hot, warm_bucket_size_gb as Warm, cold_bucket_size_gb as Cold, thawed_bucket_size_gb as Thawed
+| eval bucket_dir = ""
+| fields bucket_dir, Hot, Warm, Cold, Thawed
+          </query>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="charting.chart">column</option>
+        <option name="refresh.time.visible">false</option>
+        <option name="charting.axisTitleX.text">Bucket Directory</option>
+        <option name="charting.fieldColors">
+          {"Hot": 0xd85d3c, "Warm": 0xf7902b, "Cold":0x6ab7c7, "Thawed":0x5379af, "Home": 0xfac51c}
+        </option>
+      </chart>
+    </panel>
+    <panel rejects="$historical$">
+      <chart>
+        <title>Bucket Event Count</title>
+        <search base="indexes_base_search">
+          <query>
+            search title=$single_index_name$
+            | fields home_event_count, cold_event_count, thawed_event_count
+            | rename home_event_count as Home, cold_event_count as Cold, thawed_event_count as Thawed
+            | eval bucket_dir = ""
+            | fields bucket_dir, Home, Cold, Thawed
+          </query>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="charting.chart">column</option>
+        <option name="refresh.time.visible">false</option>
+        <option name="charting.axisTitleX.text">Bucket Directory</option>
+        <option name="charting.fieldColors">
+          {"Hot": 0xd85d3c, "Warm": 0xf7902b, "Cold":0x6ab7c7, "Thawed":0x5379af, "Home": 0xfac51c}
+        </option>
+      </chart>
+    </panel>
+    <panel rejects="$historical$">
+      <chart>
+        <title>Bucket Count</title>
+        <search base="indexes_base_search">
+          <query>
+            search title=$single_index_name$
+            | fields hot_bucket_count, warm_bucket_count, cold_bucket_count, thawed_bucket_count
+            | rename hot_bucket_count as Hot, warm_bucket_count as Warm, cold_bucket_count as Cold, thawed_bucket_count as Thawed
+            | eval bucket_dir = ""
+            | fields bucket_dir, Hot, Warm, Cold, Thawed
+          </query>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="charting.chart">column</option>
+        <option name="refresh.time.visible">false</option>
+        <option name="charting.axisTitleX.text">Bucket Directory</option>
+        <option name="charting.fieldColors">
+          {"Hot": 0xd85d3c, "Warm": 0xf7902b, "Cold":0x6ab7c7, "Thawed":0x5379af, "Home": 0xfac51c}
+        </option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <table>
+        <title>Event Count by Hosts ($hostCount$)</title>
+        <search>
+          <query>
+| metadata type=hosts index=$single_index_name$ splunk_server=$splunk_server$ datatype=$index_type_value$
+| fields host, totalCount
+| sort - totalCount
+| rename host as Host, totalCount as "Event Count"
+          </query>
+          <done>
+            <set token="hostCount">$job.resultCount$</set>
+          </done>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="dataOverlayMode">heatmap</option>
+        <option name="refresh.time.visible">false</option>
+      </table>
+    </panel>
+    <panel rejects="$historical$">
+      <table>
+        <title>Event Count by Sources ($sourceCount$)</title>
+        <search>
+          <query>
+| metadata type=sources index=$single_index_name$ splunk_server=$splunk_server$ datatype=$index_type_value$
+| fields source, totalCount
+| sort - totalCount
+| rename source as Source, totalCount as "Event Count"
+          </query>
+          <done>
+            <set token="sourceCount">$job.resultCount$</set>
+          </done>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="dataOverlayMode">heatmap</option>
+        <option name="refresh.time.visible">false</option>
+      </table>
+    </panel>
+    <panel rejects="$historical$">
+      <table>
+        <title>Event Count by Sourcetypes ($sourcetypeCount$)</title>
+        <search>
+          <query>
+| metadata type=sourcetypes index=$single_index_name$ splunk_server=$splunk_server$ datatype=$index_type_value$
+| fields sourcetype, totalCount
+| sort - totalCount
+| rename sourcetype as Sourcetype, totalCount as "Event Count"
+          </query>
+          <done>
+            <set token="sourcetypeCount">$job.resultCount$</set>
+          </done>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="dataOverlayMode">heatmap</option>
+        <option name="refresh.time.visible">false</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Settings</title>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <table>
+        <title>Paths</title>
+        <search base="indexes_base_search">
+          <query>
+            search title=$single_index_name$
+            | fields homePath, homePath_expanded, coldPath, coldPath_expanded, thawedPath, thawedPath_expanded, summaryHomePath_expanded, tstatsHomePath, tstatsHomePath_expanded
+            | transpose
+            | where column != "_timediff" AND column != "_dmc_title"
+            | rename column as Setting, "row 1" as Value
+          </query>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.time.visible">false</option>
+      </table>
+    </panel>
+    <panel rejects="$historical$">
+      <table>
+        <title>Retention policies</title>
+        <search base="indexes_base_search">
+          <query>
+            search title=$single_index_name$
+            | fields maxTotalDataSizeMB, frozenTimePeriodInSecs, homePath.maxDataSizeMB, coldPath.maxDataSizeMB
+            | transpose
+            | where column != "_timediff" AND column != "_dmc_title"
+            | rename column as Setting, "row 1" as Value
+          </query>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.time.visible">false</option>
+      </table>
+    </panel>
+    <panel rejects="$historical$">
+      <table>
+        <title>Index Structure &amp; Bucket Configuration</title>
+        <search base="indexes_base_search">
+          <query>
+            search title=$single_index_name$
+            | fields maxDataSize, maxHotBuckets, maxWarmDBCount
+            | transpose
+            | where column != "_timediff" AND column != "_dmc_title"
+            | rename column as Setting, "row 1" as Value
+          </query>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.time.visible">false</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <html>
+        <p>Refer to <a href="/help?location=learnmore.index.settings" class="external" target="_blank">indexes.conf</a> for more details about configuring indexes.</p>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Historical Charts</title>
+      <input type="time" searchWhenChanged="true" token="time">
+        <label>Time Range:</label>
+        <default>
+          <earliestTime>-15d@d</earliestTime>
+          <latestTime>now</latestTime>
+        </default>
+      </input>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Index Size Over Time</title>
+      <input type="dropdown" searchWhenChanged="true" token="funcDiskUsage">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <default>latest</default>
+        <choice value="latest">Latest</choice>
+        <choice value="avg">Average</choice>        
+        <choice value="min">Minimum</choice>
+        <choice value="max">Maximum</choice>
+      </input>
+      <input type="radio" searchWhenChanged="true" token="capacityOverlay">
+        <label>Index Capacity Overlay</label>
+        <choice value="disk_capacity">show</choice>
+        <choice value=" ">hide</choice>
+        <default>disk_capacity</default>
+      </input>
+      <chart>
+        <search base="index_historical_base_search">
+          <query>fields _time, disk_usage $capacityOverlay$</query>
+        </search>
+        <option name="charting.chart">area</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Index Size (GB)</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.chart.overlayFields">disk_capacity</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Data Age Over Time</title>
+      <input type="dropdown" searchWhenChanged="true" token="funcDataAge">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <default>avg</default>
+        <choice value="latest">Latest</choice>
+        <choice value="avg">Average</choice>        
+        <choice value="min">Minimum</choice>
+        <choice value="max">Maximum</choice>
+      </input>
+      <chart>
+        <search base="index_historical_base_search">
+          <query>fields _time, data_age_days</query>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Data Age (days)</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.legend.placement">none</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Bucket Properties Over Time</title>
+      <input type="dropdown" searchWhenChanged="true" token="single_index_metric">
+        <label>Metric</label>
+        <showClearButton>false</showClearButton>
+        <choice value="bucket_total_size_gb">Total Bucket Size</choice>
+        <choice value="bucket_avg_size_gb">Average Bucket Size</choice>
+        <choice value="bucket_count">Bucket Count</choice>
+        <choice value="event_count">Event Count</choice>
+        <default>bucket_total_size_gb</default>
+        <change>
+          <condition value="bucket_total_size_gb">
+            <set token="single_index_y_label">Total Bucket Size (GB)</set>
+          </condition>
+          <condition value="bucket_avg_size_gb">
+            <set token="single_index_y_label">Average Bucket Size (GB)</set>
+          </condition>
+          <condition value="bucket_count">
+            <set token="single_index_y_label">Bucket Count</set>
+          </condition>
+          <condition value="event_count">
+            <set token="single_index_y_label">Event Count</set>
+          </condition>
+        </change>
+      </input>
+      <input type="dropdown" searchWhenChanged="true" token="funcBucket">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <default>latest</default>
+        <choice value="latest">Latest</choice>
+        <choice value="avg">Average</choice>        
+        <choice value="min">Minimum</choice>
+        <choice value="max">Maximum</choice>
+      </input>
+      <chart>
+        <search>
+          <query>
+            index=_introspection host=$host$ sourcetype=splunk_disk_objects component=Indexes data.name=$single_index_name$
+
+            | eval warm_bucket_total_size       = if(isnotnull('data.bucket_dirs.home.warm_bucket_size'), 'data.bucket_dirs.home.warm_bucket_size', 'data.bucket_dirs.home.size')
+            | eval cold_bucket_total_size       = if(isnotnull('data.bucket_dirs.cold.bucket_size'), 'data.bucket_dirs.cold.bucket_size', 'data.bucket_dirs.cold.size')
+            | eval thawed_bucket_total_size     = if(isnotnull('data.bucket_dirs.thawed.bucket_size'), 'data.bucket_dirs.thawed.bucket_size', 'data.bucket_dirs.thawed.size')
+            | eval hot_bucket_total_size        = if(isnotnull(cold_bucket_total_size), 'data.total_size' - cold_bucket_total_size - warm_bucket_total_size, 'data.total_size' - warm_bucket_total_size)
+
+            | eval warm_bucket_total_size_gb    = round(warm_bucket_total_size / 1024, 2)
+            | eval cold_bucket_total_size_gb    = round(cold_bucket_total_size / 1024, 2)
+            | eval thawed_bucket_total_size_gb  = round(thawed_bucket_total_size / 1024, 2)
+            | eval hot_bucket_total_size_gb     = round(hot_bucket_total_size / 1024, 2)
+
+            | eval warm_bucket_count            = 'data.bucket_dirs.home.warm_bucket_count'
+            | eval hot_bucket_count             = 'data.bucket_dirs.home.hot_bucket_count'
+            | eval cold_bucket_count            = 'data.bucket_dirs.cold.bucket_count'
+            | eval thawed_bucket_count          = 'data.bucket_dirs.thawed.bucket_count'
+
+            | eval home_event_count             = 'data.bucket_dirs.home.event_count'
+            | eval cold_event_count             = 'data.bucket_dirs.cold.event_count'
+            | eval thawed_event_count           = 'data.bucket_dirs.thawed.event_count'
+
+            | eval hot_bucket_avg_size_gb       = round(hot_bucket_total_size_gb / hot_bucket_count, 2)
+            | eval warm_bucket_avg_size_gb      = round(warm_bucket_total_size_gb / warm_bucket_count, 2)
+            | eval cold_bucket_avg_size_gb      = round(cold_bucket_total_size_gb / cold_bucket_count, 2)
+            | eval thawed_bucket_avg_size_gb    = round(thawed_bucket_total_size_gb / thawed_bucket_count, 2)
+
+            | fields
+            hot_bucket_total_size_gb, warm_bucket_total_size_gb, cold_bucket_total_size_gb, thawed_bucket_total_size_gb,
+            hot_bucket_count, warm_bucket_count, cold_bucket_count, thawed_bucket_count,
+            home_event_count, cold_event_count, thawed_event_count,
+            hot_bucket_avg_size_gb, warm_bucket_avg_size_gb, cold_bucket_avg_size_gb, thawed_bucket_avg_size_gb
+
+            | `dmc_timechart_for_disk_usage` $funcBucket$(*_$single_index_metric$) as "* bucket"
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">$single_index_y_label$</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.fieldColors">
+          {"hot bucket": 0xd85d3c, "warm bucket": 0xf7902b, "cold bucket":0x6ab7c7, "thawed bucket":0x5379af, "home bucket": 0xfac51c}
+        </option>
+      </chart>
+    </panel>
+  </row>
+</form>

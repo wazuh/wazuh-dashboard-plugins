@@ -1,0 +1,273 @@
+$buttonTranslateY: 21px;
+
+.grouptag {
+	border: 1px solid $borderColor;
+	border-radius: 8px;
+	background: $gray92;
+	padding: 0 3px;
+	margin-right: 5px;
+	margin-bottom: 0px;
+	display: inline-block;
+}
+
+.col-name.col-name-no-border-right {
+	border-right: none;
+}
+
+.col-select-all {
+  	width: 20px;
+}
+
+.col-cores, .col-ram, .col-version {
+	width: 50px;
+}
+
+.col-name {
+	width: 140px;
+}
+
+.col-serv-name {
+	width: 140px;
+}
+
+.col-mach-name {
+	width: 80px;
+}
+
+.col-server-roles {
+	width: 80px;
+}
+
+.col-tags {
+	width: 100px;
+}
+
+.col-indexer-cluster {
+	width: 100px;
+}
+
+.col-searchhead-cluster {
+	width: 130px;
+}
+
+.col-status, .col-state {
+	width: 80px;
+}
+
+.col-problems {
+	width: 60px;
+}
+
+.col-actions {
+	width: 50px;
+}
+
+a.column-tooltip.tooltip-link {
+  	top: -0.5em;
+  	font-size:75%;
+	color: $linkColor;
+  	position: relative;
+  &:hover {
+	color: $linkColorHover
+  }
+}
+
+.list-dotted {
+  margin-left: 25px;
+}
+
+.problems span.icon-alert {
+	width: 100%;
+	text-align: center;
+    top: 3px;
+}
+
+.splunkmonitoringconsole-views-table-tablerow td.problems.expands {
+	border-right: none;
+}
+
+.splunkmonitoringconsole-views-table-tablerow td.state {
+  	.enabled {
+	  	color: $successColor;
+	}
+  	.disabled {
+	  	color: $errorColor;
+	}
+}
+
+.table-row-expanding > tbody > tr > td.title > span {
+    white-space: normal;
+    text-overflow: clip;
+}
+
+.section-header .standalone-switch {
+  	margin-top: 5px;
+}
+
+.section-header .mode {
+	float: left;
+  	margin-top: 10px;
+  	height: 30px;
+}
+
+.section-header .mode .input-label {
+	font-size: $fontSizeLarge;
+}
+
+.section-header .mode-label {
+  	float: left;
+  	margin: 10px 15px 0 0;
+  	font-size: $fontSizeLarge;
+}
+
+.section-header .apply-changes {
+  	margin-top: -15px;
+	float: right;
+	position: relative;
+}
+
+.section-header .btn-apply-changes {
+	float: right;
+	transform: translate(0, $buttonTranslateY);
+}
+
+.section-header .btn-reset-to-factory {
+	float: right;
+	transform: translate(-25px, $buttonTranslateY);
+}
+
+.section-header .control-group {
+	float: left;
+}
+
+.divider {
+	clear: both;
+}
+.help-link {
+	margin: 10px;
+  	width: 80px;
+  	display: block;
+}
+
+.splunkmonitoringconsole-views-table-controls-editinstancedialog .control-label {
+	width: initial;
+  	text-align: center;
+}
+
+.splunkmonitoringconsole-views-table-controls-editinstancedialog .controls {
+  	display: inline;
+  	margin: 0;
+  	text-align: center;
+}
+
+h3.smc-subtitle {
+	padding-left: 10px;
+	padding-top: 10px;
+}
+
+h4.instance-name {
+  margin: 10px;
+  font-weight: normal;
+  text-align: left;
+  display: inline;
+}
+
+h4.instance-name + a.help-link {
+  display: inline;
+}
+
+.form.form-horizontal {
+  margin: 10px;
+}
+
+.table-caption {
+	border-top: solid 1px rgba(0, 0, 0, 0.20);
+}
+
+.splunkmonitoringconsole-views-table {
+    overflow: auto;
+	position: relative;
+	background: $gray92;
+	z-index: 15;
+}
+
+.splunkmonitoringconsole-views-table tbody td {
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.splunkmonitoringconsole-views-table-controls-editserverrolesdialog, .splunkmonitoringconsole-views-table-controls-editallserverrolesdialog {
+	width: 350px;
+}
+
+.modal-body {
+	padding: 10px 20px 10px 20px;
+}
+
+.table-chrome > thead > tr > th.hacky-col-width-adjustment {
+  width: 15px;
+  border-left: none;
+}
+
+.splunkmonitoringconsole-views-table-controls-editgroupsdialog,
+.splunkmonitoringconsole-views-table-controls-editallgroupsdialog {
+	width: 400px;
+}
+
+.splunkmonitoringconsole-views-table-controls-editgroupsdialog,
+.splunkmonitoringconsole-views-table-controls-editallgroupsdialog {
+	.modal-body .instance-name {
+		text-align: center;
+	}
+}
+
+.splunkmonitoringconsole-views-table-controls-editgroupsdialog,
+.splunkmonitoringconsole-views-table-controls-editallgroupsdialog {
+	.form-horizontal .control-label {
+		width: initial !important;
+		text-align: initial !important;
+	}
+}
+
+.splunkmonitoringconsole-views-table-controls-editgroupsdialog,
+.splunkmonitoringconsole-views-table-controls-editallgroupsdialog {
+	.form-horizontal .controls {
+		margin-left: 70px;
+	}
+}
+
+.splunkmonitoringconsole-views-table-controls-editgroupsdialog,
+.splunkmonitoringconsole-views-table-controls-editallgroupsdialog {
+	.form-horizontal .controls .control {
+		margin-left: 10px;
+	}
+}
+
+.splunkmonitoringconsole-views-table-controls-editgroupsdialog,
+.splunkmonitoringconsole-views-table-controls-editallgroupsdialog {
+	.form-horizontal .controls .select2-container .select2-choices .select2-search-choice {
+		margin: 7px 0px 3px 8px;
+	}
+}
+
+.table-caption.edit-div .shared-controls-syntheticselectcontrol {
+	float: left;
+	margin-top: 5px;
+}
+
+.table-row-expanding {
+	margin-bottom: 0;
+}
+
+.table-head th {
+  overflow: hidden;
+}
+
+.alert {
+	margin-bottom: 0px !important;
+}
+
+.message-generic-warning-learn-more {
+	margin-top: 8px;
+	margin-bottom: 40px;
+}

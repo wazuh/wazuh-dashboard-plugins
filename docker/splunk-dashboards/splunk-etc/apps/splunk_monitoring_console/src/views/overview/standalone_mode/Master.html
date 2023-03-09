@@ -1,0 +1,87 @@
+<div class="dashboard-body container-fluid main-section-body" data-role="main">
+  <div class="dashboard-header clearfix">
+    <div class="smc-headings">
+      <h1 class="section-title" ><%= _("Splunk Enterprise Server").t() %> <span class="splunk-version"></span></h1>
+      <h2 class="os-details"></h2>
+      <h2><span class="do-i18n"><%= _("Mode: Standalone").t() %> </span></h2>
+    </div>
+  </div>
+  <div>
+    <div class="row-fluid smc-standalone-row">
+      <div class="span6 smc-standalone-cell">
+        <div class="smc-panel-label do-i18n"><%= _("INDEXING RATE").t() %></div>
+        <div id="indexing-rate-element" class="smc-single-value smc-standalone-single-value smc-tooltip-link" data-toggle="tooltip" data-delay=<%= DMC_TOOLTIP_DELAY %> title="<%= DMC_INDEXING_RATE_DOC %>"></div>
+      </div>
+      <div class="span6 smc-standalone-cell">
+        <div class="smc-panel-label do-i18n"><%= _("LICENSE USAGE").t() %></div>
+        <div id="license-usage-element">
+          <div class="row-fluid smc-viz-row">
+            <div class="do-i18n span3 smc-viz-before-label"><%= _("Today").t() %></div>
+            <div class="smc-viz-bar span6">
+              <div class="smc-progress">
+                <div class="smc-progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">
+                  <span class="smc-sr-only">0%</span>
+                </div>
+              </div>
+            </div>
+            <div class="smc-percent-used span3 smc-viz-after-label"></div>
+          </div>
+        </div>
+        <div class="smc-panel-label do-i18n"><%= _("DISK USAGE").t() %></div>
+        <div id="disk-usage-element" class="smc-tooltip-link" data-toggle="tooltip" data-delay=<%= DMC_TOOLTIP_DELAY %> title="<%= DMC_DISK_USAGE_DOC %>">
+          <div class="row-fluid smc-viz-row">
+            <div class="do-i18n span3 smc-viz-before-label"><%= _("Disk").t() %></div>
+            <div class="smc-viz-bar span6">
+              <div class="smc-progress">
+                <div class="smc-progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0;">
+                  <span class="smc-sr-only">0%</span>
+                </div>
+              </div>
+            </div>
+            <div class="smc-percent-used span3 smc-viz-after-label"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row-fluid smc-standalone-row">
+      <div class="span6 smc-standalone-cell">
+        <div class="smc-panel-label do-i18n"><%= _("CONCURRENT SEARCHES").t() %></div>
+        <div id="concurrent-searches-element" class="smc-single-value smc-standalone-single-value smc-tooltip-link" data-toggle="tooltip" data-delay=<%= DMC_TOOLTIP_DELAY %> title="<%= DMC_SEARCH_CONCURRENCY_DOC %>"></div>
+      </div>
+      <div class="span6 smc-standalone-cell">
+        <div class="smc-panel-label do-i18n"><%= _("CONCURRENT SEARCHES BY TYPE").t() %></div>
+        <div id="searches-by-type-element" class="smc-chart"></div>
+      </div>
+    </div>
+    <div class="row-fluid smc-standalone-row">
+      <div class="span6 smc-standalone-cell">
+        <div class="smc-panel-label do-i18n smc-tooltip-link" data-toggle="tooltip" data-delay=<%= DMC_TOOLTIP_DELAY %> title="<%= DMC_CPU_USAGE_DOC %>"><%= _("CPU USAGE").t() %></div>
+        <div id="splunk-cpu-usage-element" class="smc-single-value smc-standalone-single-value smc-tooltip-link" data-toggle="tooltip" data-delay=<%= DMC_TOOLTIP_DELAY %> title="<%= DMC_SPLUNK_CPU_USAGE_DOC %>"></div>
+        <div id="cpu-usage-element" class="smc-single-value smc-standalone-single-value smc-tooltip-link" data-toggle="tooltip" data-delay=<%= DMC_TOOLTIP_DELAY %> title="<%= DMC_ALL_PROCESS_CPU_USAGE_DOC %>"></div>
+      </div>
+      <div class="span6 smc-standalone-cell">
+        <div class="smc-panel-label do-i18n smc-tooltip-link" data-toggle="tooltip" data-delay=<%= DMC_TOOLTIP_DELAY %> title="<%= DMC_CPU_USAGE_DOC %>"><%= _("CPU USAGE BY PROCESS").t() %></div>
+        <div id="cpu-usage-by-process-element" class="smc-chart"></div>
+      </div>
+    </div>
+    <div class="row-fluid smc-standalone-row">
+      <div class="span6 smc-standalone-cell">
+        <div class="smc-panel-label do-i18n smc-tooltip-link" data-toggle="tooltip" data-delay=<%= DMC_TOOLTIP_DELAY %> title="<%= DMC_MEMORY_USAGE_DOC %>"><%= _("MEMORY USAGE").t() %></div>
+        <div id="splunk-mem-usage-element" class="smc-single-value smc-standalone-single-value smc-tooltip-link" data-toggle="tooltip" data-delay=<%= DMC_TOOLTIP_DELAY %> title="<%= DMC_SPLUNK_MEMORY_USAGE_DOC %>"></div>
+        <div id="mem-usage-element" class="smc-single-value smc-standalone-single-value smc-tooltip-link" data-toggle="tooltip" data-delay=<%= DMC_TOOLTIP_DELAY %> title="<%= DMC_ALL_PROCESS_MEMORY_USAGE_DOC %>"></div>
+      </div>
+      <div class="span6 smc-standalone-cell">
+        <div class="smc-panel-label do-i18n smc-tooltip-link" data-toggle="tooltip" data-delay=<%= DMC_TOOLTIP_DELAY %> title="<%= DMC_MEMORY_USAGE_DOC %>"><%= _("MEMORY USAGE BY PROCESS").t() %></div>
+        <div id="mem-usage-by-process-element" class="smc-chart"></div>
+      </div>
+    </div>
+    <div class="row-fluid smc-standalone-row smc-standalone-kv-store-panel">
+      <div class="span12 smc-standalone-cell">
+        <div class="smc-panel-label do-i18n"><%= _("KV STORE").t() %></div>
+        <div id="kv-store-size" class="smc-single-value smc-standalone-single-value smc-tooltip-link" data-toggle="tooltip" data-delay=<%= DMC_TOOLTIP_DELAY %> title="<%= DMC_KV_STORE_COLLECTION_SIZE_DOC %>"></div>
+        <div id="kv-store-collections" class="smc-single-value smc-standalone-single-value smc-tooltip-link" data-toggle="tooltip" data-delay=<%= DMC_TOOLTIP_DELAY %> title="<%= DMC_KV_STORE_COLLECTION_COUNT_DOC %>"></div>
+      </div>
+    </div>
+  </div>
+  <div class="smc-alerts-view-standalone-container"></div>
+</div>

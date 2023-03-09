@@ -1,0 +1,47 @@
+<endpoint name="saved/fvtags" showAppContext="1">
+  <header>List by field value pair</header>
+  <breadcrumb>
+    <parent hidecurrent="False">tags</parent>
+    <name>List by field value pair</name>
+  </breadcrumb>
+  <elements>
+    <!--
+      XXX: is it possible to have two textfields, one for field and one
+      for value, that are combined to form field::value pair? when i try
+      to do this using submitValueAdd directive, client-side arg checking
+      complains about missing 'name' arg.
+    -->
+    <!-- Name = field::value pair -->
+    <element name="name" type="textfield" label="Field value pair">
+      <key name="exampleText">example: host=splunk.com</key>
+      <view name="list"/>
+      <view name="create"/>
+    </element>
+    <!-- Tags on given field::value -->
+    <element name="fieldset-tags" type="fieldset">
+      <view name="list"/>
+      <view name="edit"/>
+      <view name="create"/>
+      <elements>
+        <element name="tags" type="repeatable" label="Tag name">
+          <view name="list"/>
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="exampleText">Enter one tag per textfield</key>
+          <!-- For listing, display tags in a single comma-delimited list -->
+          <key name="processValueList">', '.join(value) if isinstance(value, list) else value</key>
+          <key name="deleteable">True</key> <!-- user can remove items -->
+          <key name="expandable">True</key> <!-- user can add more items -->
+          <key name="fieldprefix">tag.</key>
+          <element name="template" type="textfield">
+            <key name="hideLabel">True</key>
+          </element>
+        </element>
+      </elements>
+    </element>
+    <element name="eai:acl.app" label="App">
+       <view name="list"/>
+       <key name="processValueList">entity['eai:acl']['app'] or ""</key>
+    </element>
+  </elements>
+</endpoint>

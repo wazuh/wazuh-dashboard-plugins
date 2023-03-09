@@ -1,0 +1,213 @@
+#   Version 9.0.3
+#
+# This is an example inputs.conf. Use this file to configure data inputs.
+#
+# To use one or more of these configurations, copy the configuration block into
+# inputs.conf in $SPLUNK_HOME/etc/system/local/. You must restart Splunk to
+# enable configurations.
+#
+# To learn more about configuration files (including precedence) please see the
+# documentation located at
+# http://docs.splunk.com/Documentation/Splunk/latest/Admin/Aboutconfigurationfiles
+
+
+# The following configuration reads all the files in the directory /var/log.
+
+[monitor:///var/log]
+
+
+# The following configuration reads all the files under /var/log/httpd and
+# classifies them as sourcetype::access_common.
+#
+# When checking a file for new data, if the file's modification time is from
+# before seven days ago, the file will no longer be checked for changes
+# until you restart the software.
+
+[monitor:///var/log/httpd]
+sourcetype = access_common
+ignoreOlderThan = 7d
+
+
+# The following configuration reads all the
+# files under /mnt/logs. When the path is /mnt/logs/<host>/... it
+# sets the hostname (by file) to <host>.
+
+[monitor:///mnt/logs]
+host_segment = 3
+
+
+# The following configuration listens on TCP port 9997 for raw
+# data from ANY remote server (not just a Splunk instance). The host of the
+# data is set to the IP address of the remote server.
+
+[tcp://:9997]
+
+
+# The following configuration listens on TCP port 9995 for raw
+# data from ANY remote server. The host of the data is set as the host name of
+# the remote server.  All data will also be assigned the sourcetype "log4j" and
+# the source "tcp:9995".
+
+[tcp://:9995]
+connection_host = dns
+sourcetype = log4j
+source = tcp:9995
+
+
+# The following configuration listens on TCP port 9995 for raw
+# data from 10.1.1.10.
+# All data is assigned the host "webhead-1", the sourcetype "access_common" and
+# the the source "//10.1.1.10/var/log/apache/access.log".
+
+[tcp://192.0.2.10:9995]
+host = webhead-1
+sourcetype = access_common
+source = //192.0.2.10/var/log/apache/access.log
+
+
+# The following configuration listens on TCP port 9996 for
+# Splunk cooked event data from ANY splunk forwarder.
+# The host of the data is set to the host name of the remote server ONLY IF the
+# remote data has no host set, or if it is set to "localhost".
+
+[splunktcp://:9996]
+connection_host = dns
+
+
+# The following configuration listens on TCP port 9996 for
+# distributed search data from 10.1.1.100. The data is processed the same as
+# locally indexed data.
+
+[splunktcp://192.0.2.100:9996]
+
+
+# The following configuration listens on TCP port 514 for data
+# from syslog.corp.company.net. The data is assigned the sourcetype "syslog"
+# and the host is set to the host name of the remote server.
+
+[tcp://syslog.corp.example.net:514]
+sourcetype = syslog
+connection_host = dns
+
+# Following configuration limits the acceptance of data to forwarders
+# that have been configured with the token value specified in 'token' field.
+# NOTE: The token value is encrypted. The REST endpoint encrypts the token
+# while saving it.
+
+[splunktcptoken://tok1]
+token = $7$ifQTPTzHD/BA8VgKvVcgO1KQAtr3N1C8S/1uK3nAKIE9dd9e9g==
+
+# Set up Secure Sockets Layer (SSL):
+
+[SSL]
+serverCert=$SPLUNK_HOME/etc/auth/server.pem
+password=password
+requireClientCert=false
+
+[splunktcp-ssl:9996]
+
+# Use file system change monitor:
+
+[fschange:/etc/]
+fullEvent=true
+pollPeriod=60
+recurse=true
+sendEventMaxSize=100000
+index=main
+
+# Monitor the Security Windows Event Log channel, getting the most recent
+# events first, then older, and finally continuing to gather newly arriving events
+
+[WinEventLog://Security]
+disabled = 0
+start_from = newest
+evt_dc_name =
+evt_dns_name =
+evt_resolve_ad_ds =
+evt_resolve_ad_obj = 1
+checkpointInterval = 5
+
+# Monitor the ForwardedEvents Windows Event Log channel, only gathering the
+# events that arrive after monitoring starts, going forward in time.
+
+[WinEventLog://ForwardedEvents]
+disabled = 0
+start_from = oldest
+current_only = 1
+batch_size = 10
+checkpointInterval = 5
+
+[tcp://9994]
+queueSize=50KB
+persistentQueueSize=100MB
+
+# Perfmon: Windows performance monitoring examples
+
+# You must specify the names of objects, counters and instances
+# exactly as they are shown in the Performance Monitor application. Splunk Web
+# is the recommended interface to use to configure performance monitor inputs.
+
+# These stanzas gather performance data from the local system only.
+# Use wmi.conf for performance monitor metrics on remote systems.
+
+# Query the PhysicalDisk performance object and gather disk access data for
+# all physical drives installed in the system. Store this data in the
+# "perfmon" index.
+
+[perfmon://LocalPhysicalDisk]
+interval = 10
+object = PhysicalDisk
+counters = Disk Bytes/sec; % Disk Read Time; % Disk Write Time; % Disk Time
+instances = *
+disabled = 0
+index = PerfMon
+
+# Gather common memory statistics using the Memory performance object, every
+# 5 seconds. Store the data in the "main" index. Since none of the counters
+# specified have applicable instances, the instances attribute is not required.
+
+[perfmon://LocalMainMemory]
+interval = 5
+object = Memory
+counters = Committed Bytes; Available Bytes; % Committed Bytes In Use
+disabled = 0
+index = main
+
+# Gather data on USB activity levels every 10 seconds. Store this data in the
+# default index.
+
+[perfmon://USBChanges]
+interval = 10
+object = USB
+counters = Usb Control Data Bytes/Sec
+instances = *
+disabled = 0
+
+# Admon: Windows Active Directory monitoring examples
+
+# Monitor the default domain controller (DC) for the domain that the computer
+# running Splunk belongs to. Start monitoring at the root node of Active
+# Directory.
+[admon://NearestDC]
+targetDc =
+startingNode =
+
+# Monitor a specific DC, with a specific starting node. Store the events in
+# the "admon" Splunk index. Do not print Active Directory schema. Do not
+# index baseline events.
+
+[admon://DefaultTargetDC]
+targetDc = pri01.eng.ad.splunk.com
+startingNode = OU=Computers,DC=eng,DC=ad,DC=splunk,DC=com
+index = admon
+printSchema = 0
+baseline = 0
+
+# Monitor two different DCs with different starting nodes.
+[admon://DefaultTargetDC]
+targetDc = pri01.eng.ad.splunk.com
+startingNode = OU=Computers,DC=eng,DC=ad,DC=splunk,DC=com
+
+[admon://SecondTargetDC]
+targetDc = pri02.eng.ad.splunk.com
+startingNode = OU=Computers,DC=hr,DC=ad,DC=splunk,DC=com

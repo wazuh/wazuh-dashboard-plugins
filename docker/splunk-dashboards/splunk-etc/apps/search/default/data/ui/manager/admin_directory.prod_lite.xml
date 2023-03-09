@@ -1,0 +1,28 @@
+<endpoint name="admin/directory" showAppContext="1" hideActionsColumn="1">
+  <header>All configurations</header>
+  <!-- Hide the menu for Lite mode
+  <menu name="knowledge_configurations">
+    <label>All configurations</label>
+    <url>/manager/%(namespace)s/admin/directory</url>
+    <description>See all configurations across all apps.</description>
+    <order>100</order>
+    <id>all-config</id>
+  </menu>
+  -->
+  <elements>
+    <element name="name" label="Name">
+      <view name="list"/>
+    </element>
+    <element name="eai:type" label="Config type">
+      <view name="list"/>
+    </element>
+    <element name="eai:acl.owner" label="Owner">
+      <view name="list"/>
+      <key name="processValueList">entity['eai:acl']['owner'] == 'nobody' and _('No owner') or entity['eai:acl']['owner']</key>
+    </element>
+    <element name="eai:acl.app" label="App">
+      <view name="list"/>
+      <key name="processValueList">entity['eai:acl']['app'] or ""</key>
+    </element>
+  </elements>
+</endpoint>

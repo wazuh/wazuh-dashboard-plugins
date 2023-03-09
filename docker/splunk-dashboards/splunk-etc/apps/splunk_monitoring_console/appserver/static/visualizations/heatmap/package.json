@@ -1,0 +1,22 @@
+{
+  "name": "heatmap",
+  "version": "1.0.0",
+  "description": "Splunk Visualization",
+  "main": "visualization.js",
+  "scripts": {
+    "build": "PROD=1 $SPLUNK_HOME/bin/splunk cmd node ./node_modules/webpack/bin/webpack.js",
+    "devbuild": "$SPLUNK_HOME/bin/splunk cmd node ./node_modules/webpack/bin/webpack.js --progress",
+    "watch": "$SPLUNK_HOME/bin/splunk cmd node ./node_modules/webpack/bin/webpack.js -d --watch --progress"
+  },
+  "author": "Splunk",
+  "license": "MIT",
+  "devDependencies": {
+    "imports-loader": "^0.6.5",
+    "webpack": "^1.12.6"
+  },
+  "dependencies": {
+    "d3": "^3.5.16",
+    "jquery": "^3.5.0",
+    "underscore": "^1.13.1"
+  }
+}

@@ -1,0 +1,15 @@
+<div class="results-reason-count">
+	<% if(isDone) { %>
+		<% _.each(reasonSummary, function(summary) { %>
+            <div class="reason-count">
+				<span class="status-icon <%= utils.SEVERITY_LEVEL_ICON_CLASS_NAME[summary.level].icon %> health-tooltip-link" 
+					  rel="tooltip" 
+					  data-title="<%= utils.SEVERITY_LEVEL_ICON_CLASS_NAME[summary.level].tooltip %>" style="display: inline;">
+				</span>
+				<%= summary.count %> <%= splunkUtils.sprintf(_("(%s%%)").t(), summary.perc) %>
+			</div>
+	  	<% }) %>
+	<% } else { %>
+		<span class="status-icon pull-right <%= utils.ICON_CLASS_NAME.rotate %>" style="display: inline;"></span>
+	<% } %>
+</div>

@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<view template="licensing/usage.html" type="html" isVisible="False" isDashboard="False">
+    <label>License Usage</label>
+</view>

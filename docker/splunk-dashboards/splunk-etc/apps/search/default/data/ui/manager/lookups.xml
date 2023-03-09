@@ -1,0 +1,10 @@
+<endpoint name="lookups">
+  <header></header>
+  <menu name="knowledge_configurations">
+    <label>Lookups</label>
+    <url>/manager/%(namespace)s/lookups</url>
+    <description>Create, view and edit lookup definitions. Create and list lookup tables. Set permissions.</description>
+    <order>44</order>
+    <id>lookups</id>
+  </menu>
+</endpoint>

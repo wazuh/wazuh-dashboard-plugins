@@ -1,0 +1,87 @@
+<form version="1.1" hideEdit="true">
+	<label>License Usage - Today</label>
+	<fieldset autoRun="true" submitButton="false">
+		<input type="dropdown" searchWhenChanged="true" token="splunk_server">
+			<label>License Managers</label>
+			<showClearButton>false</showClearButton>
+			<fieldForLabel>serverName</fieldForLabel>
+			<fieldForValue>serverName</fieldForValue>
+			<search>
+				<query>
+					|  `dmc_get_instance_info("dmc_group_license_master")`
+					| fields host, serverName
+				</query>
+			</search>
+      <selectFirstChoice>true</selectFirstChoice>
+      <change>
+      	<set token="host">$row.host$</set>
+      </change>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Today's License Usage (GB)</title>
+      <chart>
+        <search>
+          <query>
+            | rest splunk_server=$splunk_server$ /services/licenser/pools | rename title AS Pool | search [rest splunk_server=$splunk_server$ /services/licenser/groups | search is_active=1 | eval stack_id=stack_ids | fields stack_id] | join type=outer stack_id [rest splunk_server=$splunk_server$ /services/licenser/stacks | eval stack_id=title | eval stack_quota=quota | fields stack_id stack_quota] | stats sum(used_bytes) as used max(stack_quota) as total | eval usedGB=round(used/1024/1024/1024,3) | eval totalGB=round(total/1024/1024/1024,3) | eval gauge_base=0 | eval gauge_danger=totalGB*0.8 | eval gauge_top=totalGB+0.001 | gauge usedGB gauge_base gauge_danger totalGB gauge_top
+          </query>
+        </search>
+        <option name="charting.chart">fillerGauge</option>
+        <option name="refresh.time.visible">true</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Today's License Usage per Pool</title>
+      <chart>
+        <search>
+          <query>
+            | rest splunk_server=$splunk_server$ /services/licenser/pools | rename title AS Pool | search [rest splunk_server=$splunk_server$ /services/licenser/groups | search is_active=1 | eval stack_id=stack_ids | fields stack_id] | eval quota=if(isnull(effective_quota),quota,effective_quota) | eval "Used"=round(used_bytes/1024/1024/1024, 3) | eval "Quota"=round(quota/1024/1024/1024, 3) | fields Pool "Used" "Quota"
+          </query>
+        </search>
+        <option name="charting.chart">bar</option>
+        <option name="refresh.time.visible">true</option>
+        <option name="charting.axisTitleX.text">Pool</option>
+        <option name="charting.axisTitleY.text">GB</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Today's Percentage of Daily License Quota Used per Pool</title>
+      <chart>
+        <search>
+          <query>
+            | rest splunk_server=$splunk_server$ /services/licenser/pools | rename title AS Pool | search [rest splunk_server=$splunk_server$ /services/licenser/groups | search is_active=1 | eval stack_id=stack_ids | fields stack_id] | eval quota=if(isnull(effective_quota),quota,effective_quota) | eval "% used"=round(used_bytes/quota*100,2) | fields Pool "% used"
+          </query>
+        </search>
+        <option name="charting.chart">bar</option>
+        <option name="refresh.time.visible">true</option>
+        <option name="charting.axisTitleX.text">Pool</option>
+        <option name="charting.axisTitleY.text">%</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.axisY.scale">log</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Pool Usage Warnings</title>
+      <table>
+        <search>
+          <query>
+            | rest splunk_server=$splunk_server$ /services/licenser/messages | where (category=="license_window" OR category=="pool_over_quota") AND create_time >= now() - (30 * 86400) | rename pool_id AS pool | eval warning_day=if(category=="pool_over_quota","(".strftime(create_time,"%B %e, %Y").")",strftime(create_time-43200,"%B %e, %Y")) | fields pool warning_day | join outer pool [rest splunk_server=$splunk_server$ /services/licenser/slaves | mvexpand active_pool_ids | eval slave_name=label | eval pool=active_pool_ids | fields pool slave_name | stats values(slave_name) as "members" by pool] | join outer pool [rest splunk_server=$splunk_server$ /services/licenser/pools | eval pool=title | eval quota=if(isnull(effective_quota),quota,effective_quota) | eval quotaGB=round(quota/1024/1024/1024,3) | fields pool stack_id, quotaGB] | stats first(pool) as "Pool" first(stack_id) as "Stack ID" first(members) as "Current Members" first(quotaGB) as "Curent Quota (GB)" values(warning_day) AS "Warning Days - (Soft)/Hard" by pool | fields - pool
+          </query>
+        </search>
+      </table>
+    </panel>
+    <panel>
+      <title>Slave Usage Warnings</title>
+      <table>
+        <search>
+          <query>
+            | rest splunk_server=$splunk_server$ /services/licenser/slaves | mvexpand active_pool_ids | where warning_count>0 | eval pool=active_pool_ids | join type=outer pool [rest splunk_server=$splunk_server$ /services/licenser/pools | eval pool=title | fields pool stack_id] | eval in_violation=if(warning_count>4 OR (warning_count>2 AND stack_id=="free"),"yes","no") | fields label, title, pool, warning_count, in_violation | fields - _timediff | rename label as "Slave" title as "GUID" pool as "Pool" warning_count as "Hard Warnings" in_violation AS "In Violation?"
+          </query>
+        </search>
+      </table>
+    </panel>
+  </row>
+</form>

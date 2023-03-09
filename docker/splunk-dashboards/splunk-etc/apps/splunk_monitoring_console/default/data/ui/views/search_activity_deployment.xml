@@ -1,0 +1,513 @@
+<form version="1.1" hideEdit="True" script="common_control.js, drilldown_action_extension.js, search_activity_deployment_extension.js">
+  <label>Search Activity: Deployment</label>
+  <description/>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="radio" searchWhenChanged="true" token="role">
+      <label>Role</label>
+      <choice value="dmc_group_search_head">Search Heads</choice>
+      <choice value="dmc_group_indexer">Indexers</choice>
+      <default>dmc_group_search_head</default>
+    </input>
+    <input type="dropdown" searchWhenChanged="true" token="group">
+      <label>Group</label>
+      <showClearButton>false</showClearButton>
+      <search fieldForValue="search_group">
+        <query>| `dmc_get_groups_containing_role($role$)` | search search_group!="dmc_group_*"</query>
+      </search>
+      <fieldForLabel>label</fieldForLabel>
+      <fieldForValue>search_group</fieldForValue>
+      <choice value="*">All</choice>
+      <selectFirstChoice>true</selectFirstChoice>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <html>
+        <h2>
+          <span>Select views: </span>
+          <span id="link-switcher-view">
+            <a href="#" class="btn-pill active" data-item="all">All</a>
+            <a href="#" class="btn-pill" data-item="snapshot">Snapshot</a>
+            <a href="#" class="btn-pill" data-item="historical">Historical</a>
+          </span>
+        </h2>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Snapshots</title>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Search Activity by Instance</title>
+      <table>
+        <title>$totalCountOfSearchHeads$ instances</title>
+        <search>
+          <query>
+| rest splunk_server_group=$role$ splunk_server_group="$group$" /services/server/status/limits/search-concurrency
+| join splunk_server type=outer [
+| rest splunk_server_group=$role$ splunk_server_group="$group$" /services/server/status/resource-usage/splunk-processes
+| eval search_pct_cpu  = if(isnotnull('search_props.sid'), pct_cpu, 0)
+| eval search_mem_used = if(isnotnull('search_props.sid'), mem_used, 0)
+| eventstats sum(search_pct_cpu) as search_pct_cpu, sum(search_mem_used) as search_mem_used by search_props.sid
+| dedup search_props.sid
+| stats dc(search_props.sid) as search_count, sum(search_pct_cpu) as sum_pct_cpu, sum(search_mem_used) as sum_mem_used, sum(eval(('search_props.type'=="report acceleration" OR 'search_props.type'=="datamodel acceleration"))) as sum_auto_summary_search, sum(eval('search_props.type'=="ad-hoc" AND ('search_props.mode'=="RT" OR 'search_props.mode'=="RT indexed"))) as sum_rt_search, sum(eval('search_props.type'=="ad-hoc" AND ('search_props.mode'=="historical" OR 'search_props.mode'=="historical batch"))) as sum_hist_search, sum(eval(('search_props.type'=="scheduled" OR 'search_props.type'=="summary indexing" OR 'search_props.type'=="report acceleration" OR 'search_props.type'=="datamodel acceleration") AND ('search_props.mode'=="RT" OR 'search_props.mode'=="RT indexed"))) as sum_rt_scheduled_search, sum(eval(('search_props.type'=="scheduled" OR 'search_props.type'=="summary indexing" OR 'search_props.type'=="report acceleration" OR 'search_props.type'=="datamodel acceleration") AND ('search_props.mode'=="historical" OR 'search_props.mode'=="historical batch"))) as sum_hist_scheduled_search by splunk_server]
+| eval sum_pct_cpu  = round(sum_pct_cpu, 2)
+| eval sum_mem_used = round(sum_mem_used, 2)
+| sort -search_count, -sum_pct_cpu
+| eval search_count = if(isnull(search_count) OR search_count=="", 0, search_count)
+| eval sum_auto_summary_search = if(isnull(sum_auto_summary_search) OR sum_auto_summary_search=="", 0, sum_auto_summary_search)
+| eval sum_hist_scheduled_search = if(isnull(sum_hist_scheduled_search) OR sum_hist_scheduled_search=="", 0, sum_hist_scheduled_search)
+| eval sum_hist_search = if(isnull(sum_hist_search) OR sum_hist_search=="", 0, sum_hist_search)
+| eval sum_rt_scheduled_search = if(isnull(sum_rt_scheduled_search) OR sum_rt_scheduled_search=="", 0, sum_rt_scheduled_search)
+| eval sum_rt_search = if(isnull(sum_rt_search) OR sum_rt_search=="", 0, sum_rt_search)
+| eval sum_pct_cpu = if(isnull(sum_pct_cpu) OR sum_pct_cpu=="", 0, sum_pct_cpu)
+| eval count_cpu = round(sum_pct_cpu / 100.0, 2)
+| eval sum_mem_used = if(isnull(sum_mem_used) OR search_count=="", 0, sum_mem_used)
+| eval scheduled_vs_total_auto_summary_search_limit = sum_auto_summary_search."/".max_auto_summary_searches
+| eval scheduled_vs_total_hist_scheduled_search_limit = sum_hist_scheduled_search."/".max_hist_scheduled_searches
+| eval scheduled_vs_total_hist_search_limit = sum_hist_search."/".max_hist_searches
+| eval scheduled_vs_total_rt_scheduled_search_limit = sum_rt_scheduled_search."/".max_rt_scheduled_searches
+| eval scheduled_vs_total_rt_search_limit = sum_rt_search."/".max_rt_searches
+| fields splunk_server, search_count, scheduled_vs_total_auto_summary_search_limit, scheduled_vs_total_hist_scheduled_search_limit, scheduled_vs_total_hist_search_limit, scheduled_vs_total_rt_scheduled_search_limit, scheduled_vs_total_rt_search_limit, count_cpu, sum_mem_used
+| rename splunk_server as Instance, search_count as "Count of Searches", scheduled_vs_total_auto_summary_search_limit as "Summarization", scheduled_vs_total_hist_scheduled_search_limit as "Historical Schedule Report", scheduled_vs_total_hist_search_limit  as "Historical Search", scheduled_vs_total_rt_scheduled_search_limit as "Real-time Schedule Report",  scheduled_vs_total_rt_search_limit  as "Real-time Search", count_cpu as "CPU Usage (# cores)", sum_mem_used as "Memory Usage (MB)"
+          </query>
+          <done>
+            <set token="totalCountOfSearchHeads">$job.resultCount$</set>
+          </done>
+        </search>
+        <option name="refresh.auto.interval">60</option>
+        <option name="refresh.time.visible">false</option>
+        <drilldown>
+          <condition field="Instance">
+            <link target="_blank">
+              <![CDATA[search_activity_instance?form.splunk_server=$click.value2$]]>
+            </link>
+          </condition>
+          <condition field="*"></condition>
+        </drilldown>
+      </table>
+      <html>
+        <p>Click on instance name for more details.</p>
+		<p>CPU usage is expressed in total number of CPU cores cumulatively used by search processes.</p>
+      </html>     
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Historical Charts</title>
+      <input type="time" searchWhenChanged="true" token="time">
+        <label>Time Range:</label>
+        <default>
+          <earliestTime>-4h@m</earliestTime>
+          <latestTime>now</latestTime>
+        </default>
+      </input>
+      <input type="checkbox" searchWhenChanged="true" token="split_by_host">
+        <label></label>
+        <choice>Split by host</choice>
+      </input>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$, $split_by_host$" id="instances_by_search_concurrency">
+      <title>Instances By $searchConcurrencyAggrLabel$ Search Concurrency</title>
+      <input type="dropdown" token="searchConcurrencyAggrFunc" searchWhenChanged="true">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <default>Median</default>
+        <choice value="Avg">Average</choice>
+        <choice value="Median">Median</choice>
+        <choice value="Min">Minimum</choice>
+        <choice value="Max">Maximum</choice>
+        <choice value="Perc90">90th Percentile</choice>
+        <choice value="First">Sampled</choice>
+        <change>
+          <set token="searchConcurrencyAggrLabel">$label$</set>
+        </change>
+      </input>
+        <html>
+            <div class="heatmap_toggle"></div>
+        </html>
+        <viz type="splunk_monitoring_console.heatmap">
+            <search>
+                <query>
+                    `dmc_set_index_introspection` search_group=$role$ search_group="$group$" sourcetype=splunk_resource_usage ((component=PerProcess data.search_props.sid::*) OR component=Hostwide)
+                    | `dmc_set_bin`
+                    | stats dc(data.search_props.sid) AS distinct_search_count by host, _time
+                    | bin _time minspan=10s
+                    | stats $searchConcurrencyAggrFunc$(distinct_search_count) as search_count by host, _time
+                    | `dmc_search_count_rangemap_and_timechart`
+                </query>
+                <earliest>$time.earliest$</earliest>
+                <latest>$time.latest$</latest>
+            </search>
+            <option name="height">375</option>
+            <drilldown>
+                <condition match="isnotnull('row._span')">
+                    <set token="drilldown_search_concurrency">true</set>
+                    <set token="drilldown_search_concurrency_span">$row._span$</set>
+                    <set token="drilldown_search_concurrency_earliest">$row.earliest$</set>
+                    <eval token="drilldown_search_concurrency_earliest_label">$row.earliest_label$</eval>
+                    <set token="drilldown_search_concurrency_latest">$row.latest$</set>
+                    <eval token="drilldown_search_concurrency_latest_label">$row.latest_label$</eval>
+                    <set token="drilldown_search_concurrency_metric">$row.drilldown_indexing_rate_metric$</set>
+                    <set token="drilldown_search_concurrency_count">$row.numInstances$</set>
+                </condition>
+                <condition />
+            </drilldown>
+        </viz>
+      <chart>
+        <search>
+          <query>
+          `dmc_set_index_introspection` search_group=$role$ search_group="$group$" sourcetype=splunk_resource_usage ((component=PerProcess data.search_props.sid::*) OR component=Hostwide)
+          | `dmc_rename_introspection_fields`
+          | `dmc_set_bin`
+          | stats dc(sid) AS distinct_search_count by host, _time
+          | bin _time minspan=10s
+          | stats $searchConcurrencyAggrFunc$(distinct_search_count) as search_count by host, _time
+          | `dmc_search_count_rangemap_and_timechart`
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Instance count</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.fieldColors">
+          {"0": 0xedf1f6, 
+           "1-5": 0xdbe3ee, 
+           "6-10": 0xc9d4e5,
+           "11-15": 0xb7c6dc,
+           "16-20": 0xa5b8d4,
+           "21-30": 0x92aacb,
+           "31-40": 0x809cc3,
+           "41-50": 0x6e8eba,
+           "51-75": 0x5c7fb1,
+           "76-100": 0x4a71a9,
+           "101+": 0x3863a0
+           }
+        </option>
+        <drilldown>
+          <condition match="isnotnull('row._span')">
+            <set token="drilldown_search_concurrency">true</set>
+            <set token="drilldown_search_concurrency_span">$row._span$</set>
+            <set token="drilldown_search_concurrency_earliest">$earliest$</set>
+            <eval token="drilldown_search_concurrency_earliest_label">strftime(earliest, "%m/%d/%Y %H:%M:%S")</eval>
+            <set token="drilldown_search_concurrency_latest">$latest$</set>
+            <eval token="drilldown_search_concurrency_latest_label">strftime(latest, "%m/%d/%Y %H:%M:%S")</eval>
+            <set token="drilldown_search_concurrency_metric">$click.name2$</set>
+            <set token="drilldown_search_concurrency_count">$click.value2$</set>
+          </condition>
+          <condition />
+        </drilldown>
+      </chart>
+      <html rejects="$split_by_host$">
+        <p>Count of instances grouped by $searchConcurrencyAggrLabel$ number of concurrent searches over time.</p>
+      </html>
+      <table depends="$drilldown_search_concurrency$" id="drilldown_search_concurrency">
+        <title>Time range: $drilldown_search_concurrency_earliest_label$ ~ $drilldown_search_concurrency_latest_label$. Metric: search count range: $drilldown_search_concurrency_metric$. ($drilldown_search_concurrency_count$ instances)</title>
+        <search>
+          <query>`dmc_drilldown_search_activity_deployment_search_concurrency("$role$", "$group$", $searchConcurrencyAggrFunc$, $drilldown_search_concurrency_metric$)`</query>
+          <earliest>$drilldown_search_concurrency_earliest$</earliest>
+          <latest>$drilldown_search_concurrency_latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+      <html depends="$drilldown_search_concurrency$">
+        <a data-unset-token="drilldown_search_concurrency">Close this drilldown table</a>
+      </html>
+    </panel>
+    <panel rejects="$snapshot$" depends="$split_by_host$">
+      <title>$searchConcurrencyAggrLabel$ Search Concurrency By Instance</title>
+      <input type="dropdown" token="searchConcurrencyAggrFunc" searchWhenChanged="true">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <default>Median</default>
+        <choice value="Avg">Average</choice>
+        <choice value="Median">Median</choice>
+        <choice value="Min">Minimum</choice>
+        <choice value="Max">Maximum</choice>
+        <choice value="Perc90">90th Percentile</choice>
+        <choice value="First">Sampled</choice>
+        <change>
+          <set token="searchConcurrencyAggrLabel">$label$</set>
+        </change>
+      </input>      
+      <chart>
+        <search>
+          <query>
+          `dmc_set_index_introspection` search_group=$role$ search_group="$group$" sourcetype=splunk_resource_usage ((component=PerProcess data.search_props.sid::*) OR component=Hostwide)
+          | `dmc_rename_introspection_fields`
+          | `dmc_set_bin`
+          | stats dc(sid) AS distinct_search_count by host, _time
+          | `dmc_timechart` partial=f limit=25 $searchConcurrencyAggrFunc$(distinct_search_count) as search_count by host
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Search Count</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+      </chart>
+      <html depends="$split_by_host$">
+        <p>$searchConcurrencyAggrLabel$ number of concurrent searches over time by instance.</p>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel reject="$snapshot$">
+      <title>Deployment-Wide $aggrSearchConcurLabel$ Search Concurrency Per Instance Over Time</title>
+      <input type="dropdown" token="aggrSearchConcurFunc" searchWhenChanged="true">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <default>Median</default>
+        <choice value="Avg">Average</choice>
+        <choice value="Median">Median</choice>
+        <choice value="Min">Minimum</choice>
+        <choice value="Max">Maximum</choice>
+        <choice value="Perc90">90th Percentile</choice>
+        <choice value="First">Sampled</choice>
+        <change>
+          <set token="aggrSearchConcurLabel">$label$</set>
+        </change>
+      </input>
+      <chart>
+        <search>
+          <query>
+          `dmc_set_index_introspection` search_group="$role$" search_group="$group$" sourcetype=splunk_resource_usage ((component=PerProcess data.search_props.sid::*) OR component=Hostwide)
+          | `dmc_set_bin`
+          | stats dc(data.search_props.sid) AS distinct_search_count by host, _time
+          | timechart minspan=10s bins=200 partial=f $aggrSearchConcurFunc$(distinct_search_count) AS distinct_search_count_per_host
+          | eval distinct_search_count_per_host = round(distinct_search_count_per_host, 2)
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">area</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Search Count</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$, $split_by_host$" id="instances_by_search_usage">
+      <title>Instances By $resourceAggrLabel$ Search $resourceTypeLabel$ Usage</title>
+      <input type="dropdown" token="resourceType" searchWhenChanged="true">
+        <label>Resource Type</label>
+        <showClearButton>false</showClearButton>
+        <default>pct_cpu</default>
+        <choice value="pct_cpu">CPU</choice>
+        <choice value="mem_used">Memory</choice>
+        <change>
+          <condition value="pct_cpu">
+            <set token="resourceTypeLabel">CPU</set>
+            <set token="cpuDocumentationNote">CPU usage is expressed in total number of CPU cores cumulatively used by search processes.</set>
+          </condition>
+          <condition value="mem_used">
+            <set token="resourceTypeLabel">Memory</set>
+            <set token="cpuDocumentationNote"> </set>
+          </condition>
+        </change>
+      </input>
+      <input type="dropdown" token="resourceAggrFunc" searchWhenChanged="true">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <default>Median</default>
+        <choice value="Avg">Average</choice>
+        <choice value="Median">Median</choice>
+        <choice value="Min">Minimum</choice>
+        <choice value="Max">Maximum</choice>
+        <choice value="Perc90">90th Percentile</choice>
+        <choice value="First">Sampled</choice>
+        <change>
+          <set token="resourceAggrLabel">$label$</set>
+        </change>
+      </input>
+        <html>
+            <div class="heatmap_toggle"></div>
+        </html>
+        <viz type="splunk_monitoring_console.heatmap">
+            <search>
+                <query>
+                    `dmc_set_index_introspection` search_group=$role$ search_group="$group$" sourcetype=splunk_resource_usage ((component=PerProcess data.search_props.sid::*) OR component=Hostwide)
+                    | `dmc_set_bin`
+                    | eval data.search_props.sid = if(component=="Hostwide", "n/a", 'data.search_props.sid')
+                    | eval data.pid = if(component=="Hostwide", "n/a", 'data.pid')
+                    | eval data.$resourceType$ = if(component=="Hostwide", 0, 'data.$resourceType$')
+                    | stats latest(data.$resourceType$) AS resource_usage_dedup by _time, data.search_props.sid, data.pid, host
+                    | stats sum(resource_usage_dedup) AS sum_resource_usage by _time, host
+                    | eval sum_resource_usage = if("data.$resourceType$" == "data.pct_cpu", round(sum_resource_usage / 100.0, 2), sum_resource_usage)
+                    | bin _time minspan=10s
+                    | stats $resourceAggrFunc$(sum_resource_usage) as resource_usage by _time, host
+                    | `dmc_$resourceType$_rangemap_and_timechart`
+                </query>
+                <earliest>$time.earliest$</earliest>
+                <latest>$time.latest$</latest>
+            </search>
+            <option name="height">375</option>
+            <drilldown>
+                <condition match="isnotnull('row._span')">
+                    <set token="drilldown_resource_usage">true</set>
+                    <set token="drilldown_resource_usage_span">$row._span$</set>
+                    <set token="drilldown_resource_usage_earliest">$row.earliest$</set>
+                    <eval token="drilldown_resource_usage_earliest_label">$row.earliest_label$</eval>
+                    <set token="drilldown_resource_usage_latest">$row.latest$</set>
+                    <eval token="drilldown_resource_usage_latest_label">$row.latest_label$</eval>
+                    <set token="drilldown_resource_usage_metric">$row.drilldown_indexing_rate_metric$</set>
+                    <set token="drilldown_resource_usage_count">$row.numInstances$</set>
+                </condition>
+                <condition/>
+            </drilldown>
+        </viz>
+      <chart>
+        <search>
+          <query>
+          `dmc_set_index_introspection` search_group=$role$ search_group="$group$" sourcetype=splunk_resource_usage ((component=PerProcess data.search_props.sid::*) OR component=Hostwide)
+          | `dmc_rename_introspection_fields`
+          | `dmc_set_bin`
+          | eval sid = if(component=="Hostwide", "n/a", sid)
+          | eval pid = if(component=="Hostwide", "n/a", pid)
+          | eval $resourceType$ = if(component=="Hostwide", 0, $resourceType$)
+          | stats latest($resourceType$) AS resource_usage_dedup by _time, sid, pid, host
+          | stats sum(resource_usage_dedup) AS sum_resource_usage by _time, host
+          | eval sum_resource_usage = if("$resourceType$" == "pct_cpu", round(sum_resource_usage / 100.0, 2), sum_resource_usage)
+          | `dmc_set_bin_for_timechart`
+          | stats $resourceAggrFunc$(sum_resource_usage) as resource_usage by _time, host
+          | `dmc_$resourceType$_rangemap_and_timechart`
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Instance count</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <drilldown>
+          <condition match="isnotnull('row._span')">
+            <set token="drilldown_resource_usage">true</set>
+            <set token="drilldown_resource_usage_span">$row._span$</set>
+            <set token="drilldown_resource_usage_earliest">$earliest$</set>
+            <eval token="drilldown_resource_usage_earliest_label">strftime(earliest, "%m/%d/%Y %H:%M:%S")</eval>
+            <set token="drilldown_resource_usage_latest">$latest$</set>
+            <eval token="drilldown_resource_usage_latest_label">strftime(latest, "%m/%d/%Y %H:%M:%S")</eval>
+            <set token="drilldown_resource_usage_metric">$click.name2$</set>
+            <set token="drilldown_resource_usage_count">$click.value2$</set>
+          </condition>
+          <condition/>
+        </drilldown>
+      </chart>
+      <html>
+        <p>$cpuDocumentationNote$</p>
+      </html>      
+      <table depends="$drilldown_resource_usage$" id="drilldown_resource_usage">
+        <title>Time range: $drilldown_resource_usage_earliest_label$ ~ $drilldown_resource_usage_latest_label$. Metric: $resourceType$ usage range: $drilldown_resource_usage_metric$. ($drilldown_resource_usage_count$ instances)</title>
+        <search>
+          <query>`dmc_drilldown_search_activity_deployment_resource_usage("$role$", "$group$", $resourceType$, $resourceAggrFunc$, $drilldown_resource_usage_metric$)`</query>
+          <earliest>$drilldown_resource_usage_earliest$</earliest>
+          <latest>$drilldown_resource_usage_latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+      <html depends="$drilldown_resource_usage$">
+        <a data-unset-token="drilldown_resource_usage">Close this drilldown table</a>
+      </html>
+    </panel>
+    <panel rejects="$snapshot$" depends="$split_by_host$">
+      <title>$resourceAggrLabel$ Search $resourceTypeLabel$ Usage By Instance</title>
+      <input type="dropdown" token="resourceType" searchWhenChanged="true">
+        <label>Resource Type</label>
+        <showClearButton>false</showClearButton>
+        <default>pct_cpu</default>
+        <choice value="pct_cpu">CPU</choice>
+        <choice value="mem_used">Memory</choice>
+        <change>
+          <condition value="pct_cpu">
+            <set token="resourceTypeLabel">CPU</set>
+            <set token="resourceTypeYLabel">CPU Usage (# cores)</set>
+            <set token="cpuDocumentationNote">CPU usage is expressed in total number of CPU cores cumulatively used by search processes.</set>
+          </condition>
+          <condition value="mem_used">
+            <set token="resourceTypeLabel">Memory</set>
+            <set token="resourceTypeYLabel">Memory Usage (MB)</set>
+            <set token="cpuDocumentationNote"> </set>
+          </condition>
+        </change>
+      </input>
+      <input type="dropdown" token="resourceAggrFunc" searchWhenChanged="true">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <default>Median</default>
+        <choice value="Avg">Average</choice>
+        <choice value="Median">Median</choice>
+        <choice value="Min">Minimum</choice>
+        <choice value="Max">Maximum</choice>
+        <choice value="Perc90">90th Percentile</choice>
+        <choice value="First">Sampled</choice>
+        <change>
+          <set token="resourceAggrLabel">$label$</set>
+        </change>
+      </input>          
+      <chart>
+        <search>
+          <query>
+          `dmc_set_index_introspection` search_group=$role$ search_group="$group$" sourcetype=splunk_resource_usage ((component=PerProcess data.search_props.sid::*) OR component=Hostwide)
+          | `dmc_rename_introspection_fields`
+          | `dmc_set_bin`
+          | stats latest($resourceType$) AS resource_usage by _time, sid, pid, host
+          | eval resource_usage = if("$resourceType$" == "pct_cpu", round(resource_usage / 100.0, 2), resource_usage)
+          | `dmc_timechart_for_metrics_log` partial=f limit=25 $resourceAggrFunc$(resource_usage) AS resource_usage by host
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">$resourceTypeYLabel$</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+      </chart>  
+      <html>
+        <p>$cpuDocumentationNote$</p>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Top 20 Memory-Consuming Searches</title>
+      <table>
+        <search>
+          <query>
+            `dmc_set_index_introspection` search_group=$role$ search_group="$group$" sourcetype=splunk_resource_usage data.search_props.sid::* data.search_props.mode!=RT
+            | `dmc_rename_introspection_fields`
+            | stats max(elapsed) as runtime max(mem_used) as mem_used earliest(_time) as _time by sid, label, provenance, type, mode, app, role, user, host
+            | eval mem_used = round(mem_used, 2)
+            | sort 20 - mem_used, runtime
+            | fields sid, label, provenance, mem_used, host, runtime, _time, type, mode, app, user, role
+            | eval _time=strftime(_time,"%+")
+            | rename sid as SID, label as Name, provenance as Provenance, mem_used as "Memory Usage (MB)", host as Instance, runtime as Runtime, _time as Started, type as Type, mode as Mode, app as App, user as User, role as Role
+            | fieldformat Runtime = `dmc_convert_runtime(Runtime)`
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="rowNumbers">true</option>
+      </table>
+    </panel>
+  </row>
+</form>

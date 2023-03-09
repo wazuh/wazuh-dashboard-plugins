@@ -1,0 +1,27 @@
+#   Version 9.0.3
+#
+# This is an example user-prefs.conf.  Use this file to configure settings
+# on a per-user basis for use by the Splunk Web UI.
+#
+# To use one or more of these configurations, copy the configuration block
+# into user-prefs.conf in $SPLUNK_HOME/etc/system/local/. You must restart
+# Splunk to enable configurations.
+#
+# To learn more about configuration files (including precedence) please see
+# the documentation located at
+# http://docs.splunk.com/Documentation/Splunk/latest/Admin/Aboutconfigurationfiles
+
+# Note: These are examples.  Replace the values with your own
+# customizations.
+
+
+# EXAMPLE: Setting the default timezone to GMT for all Power and User role
+# members, and setting a different language preference for each.
+
+[role_power]
+tz = GMT
+lang = en-US
+
+[role_user]
+tz = GMT
+lang = fr-FR,fr-CA;q=0

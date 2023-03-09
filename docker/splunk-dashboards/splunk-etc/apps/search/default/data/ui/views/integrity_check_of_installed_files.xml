@@ -1,0 +1,79 @@
+<form version="1.1" hideEdit="True">
+  <label>Integrity Check of Installed Files</label>
+  <fieldset submitButton="false" autoRun="true"></fieldset>
+  <row>
+    <panel>
+      <html>
+        <p>The file integrity check can identify when Splunk software files have been modified in a way that is not valid. This view queries the file integrity check endpoint for the selected instance (by default, the local instance). It reports on the status of this feature (is it enabled, disabled, or unavailable) and shows the results of the latest file integrity check if those are available.</p>
+        <p><a class="external" href="/help?location=learnmore.validate.files" target="_blank">Learn more</a>.</p>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <input type="text" token="splunk_server" searchWhenChanged="true">
+        <label>Instance</label>
+        <default>local</default>
+        <initialValue>local</initialValue>
+      </input>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Status of file integrity check</title>
+      <table>
+        <search>
+          <query>| rest splunk_server=$splunk_server$ /services/server/info
+| fields splunk_server version
+| join type=outer splunk_server [rest splunk_server=$splunk_server$ /services/server/status/installed-file-integrity
+    | fields splunk_server check_ready check_failures.fail]
+| eval check_status = case(isnull('check_failures.fail') AND isnotnull(check_ready), "enabled", 'check_failures.fail' == "check_disabled", "disabled", isnull(check_ready), "feature unavailable")
+| eval check_ready = if(check_status == "enabled", check_ready, "N/A")
+| fields version check_status check_ready
+| rename version AS "Splunk version" check_status AS "Check status" check_ready AS "Results ready?"</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">100</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+      <html>
+      <p>NOTE: Results for this check are available only from instances running version 6.5 or later of Splunk Enterprise or Splunk Light.</p>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>List of installed files presenting integrity check failures</title>
+      <html>
+        <p>The table below shows files that were installed by the Splunk Enterprise package and have been improperly modified or are missing. <a class="external" href="/help?location=learnmore.validate.files.results" target="_blank">Learn more</a>.</p>
+      </html>
+      <table>
+        <search>
+          <query>| rest splunk_server=$splunk_server$ /services/server/status/installed-file-integrity
+| fields check_failures.*
+| untable splunk_server file_path check_result
+| replace "check_failures.*" WITH "*" IN file_path
+| fields file_path check_result
+| rename file_path AS "File path" check_result AS "Check result"</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">100</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+</form>

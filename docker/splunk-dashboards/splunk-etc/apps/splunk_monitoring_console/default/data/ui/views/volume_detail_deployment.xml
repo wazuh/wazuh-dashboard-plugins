@@ -1,0 +1,239 @@
+<form version="1.1" hideEdit="True" script="common_control.js, cell_fill_gauge.js, volume_detail_deployment_extension.js">
+  <search id="volumes_base_search">
+    <query>
+      | rest splunk_server_group=dmc_group_indexer splunk_server_group="$group$" /services/data/index-volumes/$volume$
+      | eval volumeSizeGB = if(total_size > 1, round(total_size / 1024, 2), 0)
+      | eval maxSizeGB = if(isNum(max_size), round(max_size / 1024, 2), "unlimited")
+      | eval diskUsageGB = if(volumeSizeGB == 0, "-", volumeSizeGB)." / ".maxSizeGB
+    </query>
+    <earliest>0</earliest>
+    <latest>now</latest>
+    <preview>
+      <eval token="instanceCount">if(isnotnull('job.resultCount'), 'job.resultCount', 0)</eval>
+    </preview>
+    <done>
+      <eval token="instanceCount">if(isnotnull('job.resultCount'), 'job.resultCount', 0)</eval>
+    </done>
+  </search>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="dropdown" searchWhenChanged="true" token="group">
+      <label>Group</label>
+      <showClearButton>false</showClearButton>
+      <search>
+        <query>
+          | `dmc_get_groups_containing_role(dmc_group_indexer)`
+          | where search_group!="dmc_group_indexer"
+        </query>
+      </search>
+      <fieldForLabel>label</fieldForLabel>
+      <fieldForValue>search_group</fieldForValue>
+      <choice value="*">All Indexers</choice>
+      <default>*</default>
+    </input>
+    <input type="dropdown" searchWhenChanged="true" token="volume">
+      <label>Volume</label>
+      <showClearButton>false</showClearButton>
+      <selectFirstChoice>true</selectFirstChoice>
+      <fieldForLabel>title</fieldForLabel>
+      <fieldForValue>title</fieldForValue>
+      <search>
+        <query>
+          | rest splunk_server_group=dmc_group_indexer splunk_server_group="$group$" /services/data/index-volumes
+          | `dmc_exclude_volumes`
+          | fields title
+          | dedup title
+        </query>
+      </search>
+    </input>
+  </fieldset>
+  <label>Volume Detail: Deployment</label>
+  <row>
+    <panel>
+      <html>
+        <h2>
+          <span>Select views:</span>
+          <span id="link-switcher-view">
+            <a href="#" class="btn-pill active" data-item="all">All</a>
+            <a href="#" class="btn-pill" data-item="snapshot">Snapshot</a>
+            <a href="#" class="btn-pill" data-item="historical">Historical</a>
+          </span>
+        </h2>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Snapshots</title>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Volume Structure Overview</title>
+      <single>
+        <option name="height">80px</option>
+        <search base="volumes_base_search">
+          <query>
+            stats dc(splunk_server) as Indexers
+          </query>
+        </search>
+        <option name="underLabel">Indexers</option>
+      </single>
+      <single>
+        <option name="height">80px</option>
+        <search base="volumes_base_search">
+          <query>
+            stats sum(volumeSizeGB) as totalVolumeSizeGB
+            | eval totalVolumeSizeGB = round(totalVolumeSizeGB, 2)." GB"
+          </query>
+        </search>
+        <option name="underLabel">Total Volume Size</option>
+      </single>
+      <single>
+        <option name="height">80px</option>
+        <search base="volumes_base_search">
+          <query>
+            stats avg(volumeSizeGB) as avgVolumeSizeGB
+            | eval avgVolumeSizeGB = round(avgVolumeSizeGB, 2)." GB"
+          </query>
+        </search>
+        <option name="underLabel">Average Volume Size Per Indexer</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Instances ($instanceCount$)</title>
+      <table id="table1">
+        <search base="volumes_base_search">
+          <query>
+            fields splunk_server, diskUsageGB, maxSizeGB, volume_path
+            | rename splunk_server as "Instance", diskUsageGB as "Volume Usage (GB)", maxSizeGB as "Volume Capacity (GB)", volume_path as "Volume Path"
+          </query>
+        </search>
+        <drilldown target="_blank">
+          <link>
+            /app/splunk_monitoring_console/volume_detail_instance?form.single_volume_name=$volume$&amp;form.splunk_server=$row.Instance$
+          </link>
+        </drilldown>
+      </table>
+      <html>
+        <p>
+          <b>Volume Usage:</b>
+          The first value is the current size of the volume. The second value is the volume capacity, as specified by the maxVolumeDataSizeMB attribute in
+          <a href="/help?location=learnmore.index.settings" class="external" target="_blank">indexes.conf</a>.
+        </p>
+        <p>
+          <b>Note:</b>
+          if the volume is "unlimited", it is not possible to determine the disk usage for the volume.
+        </p>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Historical Charts</title>
+      <input type="time" searchWhenChanged="true" token="time">
+        <label>Time Range:</label>
+        <default>
+          <earliestTime>-15d@d</earliestTime>
+          <latestTime>now</latestTime>
+        </default>
+      </input>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>$VolumeUsageChartTitle$ Volume Size (GB)</title>
+      <input type="dropdown" searchWhenChanged="true" token="funcDiskSizeUsage">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <default>Max</default>
+        <choice value="Avg">Average</choice>
+        <choice value="Median">Median</choice>
+        <choice value="Min">Minimum</choice>
+        <choice value="Max">Maximum</choice>
+        <choice value="Perc90">90th Percentile</choice>
+        <choice value="First">Sampled</choice>
+        <change>
+          <set token="VolumeUsageChartTitle">$label$</set>
+        </change>
+      </input>
+      <chart>
+        <search>
+          <query>
+            index=_introspection sourcetype=splunk_disk_objects component=Volumes data.name=$volume$ search_group=dmc_group_indexer search_group="$group$"
+            | `dmc_set_bin_for_disk_usage`
+            | stats latest(data.total_size) as totalSize by host _time
+            | `dmc_timechart_for_disk_usage` $funcDiskSizeUsage$(eval(totalSize /1024)) as "Volume Size"
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">area</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">GB</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$" id="instances_by_volume_usage">
+      <title>Instances by $PercentVolumeUsageChartTitle$ Volume Usage (%)</title>
+      <input type="dropdown" searchWhenChanged="true" token="funcDiskPercUsage">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <default>Avg</default>
+        <choice value="Avg">Average</choice>
+        <choice value="Median">Median</choice>
+        <choice value="Min">Minimum</choice>
+        <choice value="Max">Maximum</choice>
+        <choice value="Perc90">90th Percentile</choice>
+        <choice value="First">Sampled</choice>
+        <change>
+          <set token="PercentVolumeUsageChartTitle">$label$</set>
+        </change>
+      </input>
+      <html>
+        <div class="heatmap_toggle"></div>
+      </html>
+      <viz type="splunk_monitoring_console.heatmap">
+        <search>
+          <query>
+            index=_introspection sourcetype=splunk_disk_objects component=Volumes data.name=$volume$ search_group=dmc_group_indexer search_group="$group$"
+            | eval pctDiskUsage = 'data.total_size' / 'data.max_size'
+            | bin _time minspan=10min
+            | stats $funcDiskPercUsage$(pctDiskUsage) as pctDiskUsage by host _time
+            | rangemap field=pctDiskUsage "0-25%"=0-0.25 "25-50%"=0.2501-0.5 "50-75%"=0.5001-0.75 "75-100%"=0.7501-1 default=abnormal
+            | `dmc_timechart_for_disk_usage` partial=f dc(host) as host by range
+            | fields _time, "0-25%", "25-50%", "50-75%", "75-100%"
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+      </viz>
+      <chart>
+        <search>
+          <query>
+            index=_introspection sourcetype=splunk_disk_objects component=Volumes data.name=$volume$ search_group=dmc_group_indexer search_group="$group$"
+            | eval pctDiskUsage = 'data.total_size' / 'data.max_size'
+            | bin _time minspan=10min
+            | stats $funcDiskPercUsage$(pctDiskUsage) as pctDiskUsage by host _time
+            | rangemap field=pctDiskUsage "0-25%"=0-0.25 "25-50%"=0.2501-0.5 "50-75%"=0.5001-0.75 "75-100%"=0.7501-1 default=abnormal
+            | `dmc_timechart_for_disk_usage` partial=f dc(host) as host by range
+            | fields _time, "0-25%", "25-50%", "50-75%", "75-100%"
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Instance Count</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+      </chart>
+      <html>
+        <p>* Note: An indexer on which the maximum data size of the volume is infinite will not be represented here.</p>
+      </html>
+    </panel>
+  </row>
+</form>

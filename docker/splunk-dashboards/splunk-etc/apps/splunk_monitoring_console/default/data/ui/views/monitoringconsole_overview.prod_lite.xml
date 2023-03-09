@@ -1,0 +1,228 @@
+<form version="1.1" hideEdit="True" isVisible="true" onUnloadCancelJobs="true" script="common_control_lite.js">
+    <label>Resource Usage</label>
+
+    <row>
+        <panel>
+            <title>Snapshots</title>
+        </panel>
+    </row>
+
+    <row>
+        <panel>
+            <title>Indexing Rate</title>
+            <single>
+                <search>
+                    <query>
+| rest /services/server/introspection/indexer
+| eval average_KBps = round(average_KBps, 0)
+| stats sum(average_KBps)
+                    </query>
+                </search>
+                <option name="afterLabel">KB/s</option>
+                <option name="refresh.time.visible">false</option>
+                <option name="refresh.auto.interval">30</option>
+                <option name="height">200px</option>
+            </single>
+        </panel>
+
+        <panel>
+            <title>Data Volume Indexed Today</title>
+            <single>
+                <search>
+                    <query>
+| rest splunk_server=local /services/licenser/usage
+| eval used=round(slaves_usage_bytes/1024/1024/1024,1)
+| eval quota=round(quota/1024/1024/1024,1)
+| eval fullFlavor = used."/".quota
+| fields fullFlavor
+                    </query>
+                </search>
+                <option name="afterLabel">GB</option>
+                <option name="refresh.time.visible">true</option>
+                <option name="refresh.auto.interval">30</option>
+                <option name="height">200px</option>
+            </single>
+        </panel>
+
+        <panel>
+            <title>Search Concurrency</title>
+            <table>
+                <searchString>
+| rest /services/server/status/resource-usage/splunk-processes
+| search search_props.sid=*
+| stats count(search_props.type) as Count, sum(mem_used) as "Memory Usage(MB)", sum(normalized_pct_cpu) as "CPU Usage(%)" by search_props.type
+| rename search_props.type as Type
+                </searchString>
+                <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+                <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+                <option name="charting.axisTitleX.visibility">collapsed</option>
+                <option name="charting.axisTitleY.visibility">visible</option>
+                <option name="charting.axisTitleY2.visibility">visible</option>
+                <option name="charting.axisX.scale">linear</option>
+                <option name="charting.axisY.scale">linear</option>
+                <option name="charting.axisY2.enabled">false</option>
+                <option name="charting.axisY2.scale">inherit</option>
+                <option name="charting.chart">table</option>
+                <option name="charting.chart.bubbleMaximumSize">50</option>
+                <option name="charting.chart.bubbleMinimumSize">10</option>
+                <option name="charting.chart.bubbleSizeBy">area</option>
+                <option name="charting.chart.nullValueMode">gaps</option>
+                <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+                <option name="charting.chart.stackMode">default</option>
+                <option name="charting.chart.style">shiny</option>
+                <option name="charting.drilldown">all</option>
+                <option name="charting.layout.splitSeries">0</option>
+                <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+                <option name="charting.legend.placement">right</option>
+                <option name="charting.axisLabelsY.majorUnit">1</option>
+                <option name="charting.axisTitleX.text">Count</option>
+                <option name="charting.axisTitleY.text">Count</option>
+                <option name="refresh.auto.interval">60</option>
+                <option name="refresh.time.visible">false</option>
+                <option name="wrap">true</option>
+                <option name="rowNumbers">false</option>
+                <option name="dataOverlayMode">none</option>
+                <option name="drilldown">none</option>
+                <option name="height">200px</option>
+                <drilldown>
+                  <condition field="*"></condition>
+                </drilldown>
+            </table>
+        </panel>
+    </row>
+
+    <row>
+        <panel>
+            <title>Historical</title>
+            <input type="dropdown" searchWhenChanged="true" token="time">
+                <label>Time Range</label>
+                <showClearButton>false</showClearButton>
+                <choice value="-24h@h">Last Day</choice>
+                <choice value="@w">Week to date</choice>
+                <choice value="-7d@d">Last 7 days</choice>
+                <choice value="@mon">Month to date</choice>
+                <choice value="-30d@d">Last Month</choice>
+                <choice value="@y">Year to date</choice>
+                <default>-24h@h</default>
+            </input>
+        </panel>
+    </row>
+
+    <row>
+        <panel>
+            <title>Indexing Rate by Time</title>
+            <chart>
+                <searchString>
+`dmc_set_index_internal` sourcetype=splunkd group=per_Index_thruput
+| `dmc_timechart_for_metrics_log` per_second(kb) by series useother=false
+| fields - VALUE_*
+| addtotals
+| eval Total = round(Total,2)
+| fields _time, Total
+                </searchString>
+                <earliestTime>$time$</earliestTime>
+                <latestTime>now</latestTime>
+                <option name="charting.chart.stackMode">stacked</option>
+                <option name="charting.axisTitleX.text">Time</option>
+                <option name="charting.axisTitleY.text">Indexing Rate (KB/s)</option>
+                <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+                <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+                <option name="charting.axisTitleX.visibility">visible</option>
+                <option name="charting.axisTitleY.visibility">visible</option>
+                <option name="charting.axisTitleY2.visibility">visible</option>
+                <option name="charting.axisX.scale">linear</option>
+                <option name="charting.axisY.scale">linear</option>
+                <option name="charting.axisY2.enabled">false</option>
+                <option name="charting.axisY2.scale">inherit</option>
+                <option name="charting.chart">column</option>
+                <option name="charting.chart.nullValueMode">gaps</option>
+                <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+                <option name="charting.drilldown">all</option>
+                <option name="charting.layout.splitSeries">0</option>
+                <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+                <option name="charting.legend.placement">none</option>
+            </chart>
+        </panel>
+
+        <panel>
+            <title>Daily Indexed Data Volume by Time</title>
+            <chart>
+                <search>
+                    <query>
+index=_internal source=*license_usage.log* type="Usage" earliest=$time$ latest=@d
+| eval _time=_time - 43200
+| eval h=if(len(h)=0 OR isnull(h),"(SQUASHED)",h)
+| eval s=if(len(s)=0 OR isnull(s),"(SQUASHED)",s)
+| eval idx=if(len(idx)=0 OR isnull(idx),"(UNKNOWN)",idx)
+| bin _time span=1d
+| stats sum(b) as b by _time, pool, s, st, h, idx
+| append [ rest /services/licenser/usage/license_usage
+| stats sum(slaves_usage_bytes) as b
+| eval _time=relative_time(now(), "@d")]
+| eval GB=round(b/1024/1024/1024, 2)
+| timechart span=1d sum(GB) AS "GB indexed"
+| eval "Sum GB" = round(GB,2)
+| fields - _timediff
+                    </query>
+                </search>
+                <earliestTime>$time$</earliestTime>
+                <latestTime>now</latestTime>
+                <option name="charting.chart">column</option>
+                <option name="refresh.time.visible">true</option>
+                <option name="charting.axisTitleY.text">Indexed Data (GB)</option>
+                <option name="charting.axisTitleX.text">Time</option>
+                <option name="charting.chart.overlayFields">"stack size","pool size"</option>
+                <option name="charting.lineDashStyle">ShortDash</option>
+                <option name="charting.chart.stackMode">stacked</option>
+                <option name="charting.fieldColors">{"stack size": 0xff0000, "pool size": 0xff0000}</option>
+                <option name="charting.chart.nullValueMode">connect</option>
+                <option name="charting.legend.placement">none</option>
+            </chart>
+        </panel>
+
+        <panel>
+            <title>Search Concurrency by Time</title>
+            <chart>
+                <searchString>
+index=_internal source=*metrics.log group=search_concurrency user=*
+| eval total = active_hist_searches + active_realtime_searches
+| timechart max(total) by user agg=max useother=f
+| fields - splunk-system-user
+| addtotals
+| fields _time, Total
+                </searchString>
+                <earliestTime>$time$</earliestTime>
+                <latestTime>now</latestTime>
+                <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+                <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+                <option name="charting.axisTitleX.visibility">visible</option>
+                <option name="charting.axisTitleY.visibility">visible</option>
+                <option name="charting.axisTitleY2.visibility">visible</option>
+                <option name="charting.axisX.scale">linear</option>
+                <option name="charting.axisY.scale">linear</option>
+                <option name="charting.axisY2.enabled">false</option>
+                <option name="charting.axisY2.scale">inherit</option>
+                <option name="charting.chart">column</option>
+                <option name="charting.chart.nullValueMode">connect</option>
+                <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+                <option name="charting.chart.stackMode">stacked</option>
+                <option name="charting.drilldown">all</option>
+                <option name="charting.layout.splitSeries">0</option>
+                <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+                <option name="charting.legend.placement">none</option>
+                <option name="charting.axisTitleX.text">Time</option>
+                <option name="charting.axisTitleY.text">Count of Searches</option>
+                <drilldown target="_blank">
+                    <condition series="*">
+                        <link target="_blank"><![CDATA[search?q=`dmc_search_activity_instance_drilldown($host$, $concurrencySplitBy$, $click.name2$)`&earliest=$earliest$&latest=$latest$]]></link>
+                    </condition>
+                </drilldown>
+            </chart>
+        </panel>
+    </row>
+    <row>
+        <panel id="alertsPanel">
+            <title>Triggered Platform Alerts</title>
+        </panel>
+    </row>
+</form>

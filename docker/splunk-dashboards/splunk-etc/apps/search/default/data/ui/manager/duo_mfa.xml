@@ -1,0 +1,67 @@
+<endpoint name="admin/Duo-MFA" hidePermissionsColumn="True">
+  <breadcrumb>
+    <parent hidecurrent="True">authoverview</parent>
+    <name>Multifactor Authentication - Duo Security</name>
+  </breadcrumb>
+  <elements>
+    <element name="outputhelp" type="helpstring">
+        <key name="helpText"> </key>
+      <view name="edit"/>
+    </element>
+    <element name="name" type="hidden" label="Name">
+      <view name="list"/>
+      <view name="create"/>
+      <key name="processValueAdd">'duo-mfa'</key>
+    </element>
+    <element name="appSecretKey" type="simplepassword" label="Application Secret Key">
+      <view name="edit"/>
+      <view name="create"/>
+      <key name="exampleText">Should be 40 characters long. Splunk auto generates it, but you can create your own.</key>
+      <key name="processValueAdd">hashlib.sha1(os.urandom(32)).hexdigest()</key>
+    </element>
+    <element name="integrationKey" type="simplepassword" label="Integration Key">
+      <view name="edit"/>
+      <view name="create"/>
+    </element>
+    <element name="secretKey" type="simplepassword" label="Secret Key">
+      <view name="edit"/>
+      <view name="create"/>
+    </element>
+    <element name="apiHostname" type="textfield" label="API Hostname">
+      <view name="edit"/>
+      <view name="create"/>
+    </element>
+    <element name="failOpen" type="radio" label="Authentication behavior when Duo Security is unavailable">
+      <view name="edit"/>
+      <view name="create"/>
+      <options>
+        <opt value="1" label="Let users login"/>
+        <opt value="0" label="Do not let users login"/>
+      </options>
+      <key name="format">list</key>
+      <key name="processValueAdd">0</key>
+    </element>
+    <element name="enableMfaAuthRest" type="checkbox" label="Enable 2FA for REST endpoints">
+      <view name="edit"/>
+      <view name="create"/>
+      <key name="processValueAdd">0</key>
+      <key name="submitValueEdit">value</key>
+      <key name="submitValueAdd">value</key>
+    </element>
+    <element name="timeout" type="textfield" label="Connection Timeout">
+      <view name="edit"/>
+      <view name="create"/>
+      <key name="exampleText">Positive integer in seconds.</key>
+      <key name="processValueAdd">15 if not form_defaults['timeout'] else form_defaults['timeout']</key>
+      <key name="processValueEdit">15 if not form_defaults['timeout'] else form_defaults['timeout']</key>
+      <key name="submitValueAdd">15 if not value.strip() else value.strip()</key>
+      <key name="submitValueEdit">15 if not value.strip() else value.strip()</key>
+    </element>
+    <element name="spl-ctrl_redirectionPath" type="hidden">
+      <view name="edit"/>
+      <view name="create"/>
+      <key name="processValueAdd">'authoverview'</key>
+      <key name="processValueEdit">'authoverview'</key>
+    </element>
+  </elements>
+</endpoint>

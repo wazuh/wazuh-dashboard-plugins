@@ -1,0 +1,48 @@
+#   Version 9.0.3
+#
+# These are example configurations for distsearch.conf. Use this file to
+# configure distributed search.  For all available attribute/value pairs, see
+# distsearch.conf.spec.
+#
+# There is NO DEFAULT distsearch.conf.
+#
+# To use one or more of these configurations, copy the configuration block into
+# distsearch.conf in $SPLUNK_HOME/etc/system/local/.  You must restart Splunk
+# to enable configurations.
+#
+# To learn more about configuration files (including precedence) please see the
+# documentation located at
+# http://docs.splunk.com/Documentation/Splunk/latest/Admin/Aboutconfigurationfiles
+
+[distributedSearch]
+servers = https://192.168.1.1:8059,https://192.168.1.2:8059
+
+# This entry distributes searches to 192.168.1.1:8059,192.168.1.2:8059.
+# These machines will be contacted on port 8059 using https
+# Attributes not set here will use the defaults listed in distsearch.conf.spec.
+
+# this stanza controls the timing settings for connecting to a remote peer and
+# the send timeout
+[replicationSettings]
+connectionTimeout = 10
+sendRcvTimeout = 60
+
+# this stanza controls what files are replicated to the other peer each is a
+# regex
+[replicationAllowlist]
+allConf = *.conf
+
+# Mounted bundles example.
+# This example shows two distsearch.conf configurations, one for the search
+# head and another for each of the search head's search peers. It shows only
+# the attributes necessary to implement mounted bundles.
+
+# On a search head whose Splunk server name is "searcher01":
+[replicationSettings]
+...
+replicationPolicy = mounted
+
+# On each search peer:
+[searchhead:searcher01]
+mounted_bundles = true
+bundles_location = /opt/shared_bundles/searcher01

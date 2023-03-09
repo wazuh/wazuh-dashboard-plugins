@@ -1,0 +1,13 @@
+.smc-alerts-title-section {
+    padding: 15px;
+    height: 47px;
+
+}
+.smc-alerts-title-section #smc-alerts-count,
+.smc-alerts-title-section #smc-alerts-title {
+    font-size: 24px;
+}
+
+.dmc-svg-icons {
+    float: right;
+}

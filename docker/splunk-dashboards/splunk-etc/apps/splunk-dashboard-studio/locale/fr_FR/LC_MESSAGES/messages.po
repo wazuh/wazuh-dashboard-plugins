@@ -1,0 +1,2108 @@
+# Translations template for PROJECT.
+# Copyright (C) 2022 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2022-04-04 09:17-0700\n"
+"PO-Revision-Date: 2022-04-15 08:05+0100\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+"X-Generator: Poedit 3.0.1\n"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:27
+msgid "12:00 midnight"
+msgstr "00 h 00 minuit"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:29
+msgid "12:00 noon"
+msgstr "12 h 00 midi"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:699
+msgid "A complex, data centric dashboard that pushes the limit in the visual control Dashboard Studio provides"
+msgstr "Un tableau de bord complexe et centré sur les données qui repousse les limites du contrôle visuel fourni par Dashboard Studio"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:206
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/index.tsx:107
+msgid "A dashboard was generated for $dashboard.label$"
+msgstr "Un tableau de bord a été généré pour $dashboard.label$"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:755
+msgid "A data governance dashboard showing high level enterprise metrics"
+msgstr "Un tableau de bord de gouvernance des données affichant des métriques d’entreprise de haut niveau"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:785
+msgid "A detailed version of office capacity metrics by using SVGs to color office floor maps"
+msgstr "Une version détaillée des mesures de la capacité des bureaux, qui utilise des SVG pour colorer les plans d’étage des bureaux"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:300
+msgid "A new builder to create visually-rich, customizable dashboards"
+msgstr "Un nouvel éditeur pour créer des tableaux de bord visuellement riches et personnalisables"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:665
+msgid "A simple thematic dashboard with simple complimentary charts"
+msgstr "Un tableau de bord thématique simple avec des graphiques complémentaires lisibles"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:711
+msgid "A strong showcase of how simple visualizations with proper layout make for an effective dashboard"
+msgstr "Une illustration parlante de la façon dont des visualisations simples et bien mises en page produisent un tableau de bord efficace"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:723
+msgid "A vibrant, thematic dashboard showing e-commerce metrics and use of SVGs"
+msgstr "Un tableau de bord dynamique et thématique présentant des métriques d’e-commerce et utilisant des SVG"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardLayoutGroup/index.jsx:55
+msgid "Absolute"
+msgstr "Absolu"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/index.tsx:419
+msgid "Active"
+msgstr "Actif"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:380
+msgid "Ad Hoc Search"
+msgstr "Recherche ad hoc"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/TokenEditor/TokenEditorGroup.tsx:77
+msgid "Add a token"
+msgstr "Ajouter un token"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/TokenEditor/TokenEditorGroup.tsx:79
+msgid "Add token"
+msgstr "Ajouter un token"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:459
+msgid "Adjust chart scaling properties to help fit your data correctly"
+msgstr "Ajustez les dimensions du graphique pour adapter correctement vos données"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:217
+msgid "Adjust coloring for filler gauges"
+msgstr "Ajustez la coloration des jauges de remplissage"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:239
+msgid "Adjust coloring for marker gauges"
+msgstr "Ajustez la coloration des jauges de marqueur"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:489
+msgid "Adjust coloring for punchcard visualizations"
+msgstr "Ajustez la coloration des visualisations en cartes perforées"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:575
+msgid "Adjust coloring for single value icon visualizations to help indicate status at a glance"
+msgstr "Ajustez la coloration des visualisations d’icônes à valeur unique pour indiquer l’état en un coup d’œil"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:519
+msgid "Adjust column formatting and add sparklines to tables"
+msgstr "Ajustez la mise en forme des colonnes et ajoutez des sparklines aux tableaux"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:469
+msgid "Adjust how chart properties such as axes and legends frame your data"
+msgstr "Ajustez la façon dont les propriétés du graphique (axes, légendes, etc.) encadrent vos données"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:479
+msgid "Adjust sizing for punchcard visualizations"
+msgstr "Ajustez la taille des visualisations en cartes perforées"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:167
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:321
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:429
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:441
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:521
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:657
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:703
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:735
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:787
+msgid "Advanced"
+msgstr "Avancé"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/AdvancedPanelSettings/index.jsx:22
+msgid "Advanced Panel Settings"
+msgstr "Paramètres de panneau avancés"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:518
+msgid "Advanced Table Formatting"
+msgstr "Mise en forme de tableau avancée"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:105
+msgid "Aggregate metrics over two dimensions to visualize cyclical trends in your data"
+msgstr "Agrégez des métriques sur deux dimensions pour visualiser les tendances cycliques de vos données"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:648
+msgid "Airport Dashboard Thumbnail"
+msgstr "Vignette du tableau de bord Aéroport"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:640
+msgid "Airport KPI's"
+msgstr "KPI de l’aéroport"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:765
+msgid "An effective use of icons and coloring to showcase a VPN infrastructure flow"
+msgstr "Une utilisation efficace des icônes et des colorations mettant en évidence les flux d’une infrastructure VPN"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:775
+msgid "An effective use of images, icons, and visualizations to show office capacity metrics"
+msgstr "Une utilisation efficace des images, des icônes et des visualisations pour présenter les mesures de capacité des bureaux"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/util/ErrorMessages.js:4
+msgid "An internal error occurred while saving."
+msgstr "Une erreur interne s’est produite lors de l’enregistrement."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:444
+msgid "Annotations Image"
+msgstr "Image d’annotation"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/util/linkToDashboardHelpers.ts:15
+msgid "App is required"
+msgstr "L’app est requise"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/ActionDropdown.tsx:187
+msgid "Are you sure you want to delete"
+msgstr "Voulez-vous vraiment supprimer"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:56
+msgid "Area Chart"
+msgstr "Graphique en aires"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:64
+msgid "Area Visualization Image"
+msgstr "Image de visualisation de graphique en aires"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:660
+msgid "Assembly Dashboard Thumbnail"
+msgstr "Vignette du tableau de bord Ligne de montage"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:652
+msgid "Assembly Line"
+msgstr "Ligne de montage"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:94
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:109
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:132
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:160
+msgid "At"
+msgstr "À"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:147
+msgid "BCC"
+msgstr "CCI"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:186
+msgid "Back"
+msgstr "Retour"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:34
+msgid "Bar Chart"
+msgstr "Graphique à barres"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:42
+msgid "Bar Visualization Image"
+msgstr "Image de visualisation du graphique à barres"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:35
+msgid "Bar charts are used to compare data of one period or point in time across multiple categories"
+msgstr "Les graphiques à barres sont utilisés pour comparer les données d’une période ou d’un point dans le temps dans plusieurs catégories."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:396
+msgid "Base Chain Image"
+msgstr "Image de la chaîne de base"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:390
+msgid "Base and Chain Searches"
+msgstr "Recherches de base et de chaîne"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:645
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:667
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:679
+msgid "Basic"
+msgstr "Basique"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:150
+msgid "Basic Choropleth SVG"
+msgstr "SVG choroplèthe basique"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:562
+msgid "Basic Icons"
+msgstr "Icônes basiques"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:270
+msgid "Basic Single Value"
+msgstr "Valeur unique basique"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:498
+msgid "Basic Table"
+msgstr "Tableau basique"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/Dashboard.jsx:435
+msgid "Because the user has navigated away from the dashboard, all running searches have been stopped. Please refresh the dashboard to rerun the searches."
+msgstr "Comme l’utilisateur a quitté le tableau de bord, toutes les recherches en cours d’exécution ont été arrêtées. Veuillez actualiser le tableau de bord pour exécuter à nouveau les recherches."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:68
+msgid "Bubble Chart"
+msgstr "Graphique à bulles"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:76
+msgid "Bubble Visualization Image"
+msgstr "Image de visualisation de graphique à bulles"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:69
+msgid "Bubble charts can represent correlation for up to four dimensions of data. The first two dimensions are visualized as coordinates, the third as size, and the fourth as color"
+msgstr "Les graphiques à bulles peuvent représenter des corrélations pour quatre dimensions de données maximum. Les deux premières dimensions sont visualisées sous forme de coordonnées, la troisième par la taille de la bulle et la quatrième par sa couleur."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:664
+msgid "Buttercup Games"
+msgstr "Buttercup Games"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:670
+msgid "Buttercup Games Dashboard Thumbnail"
+msgstr "Vignette du tableau de bord Buttercup Games"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:135
+msgid "CC"
+msgstr "CC"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CloneDashboard/index.jsx:116 /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:141
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/SaveToExistingDashboard/index.jsx:216 /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/index.tsx:512
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/ActionDropdown.tsx:191
+msgid "Cancel"
+msgstr "Annuler"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/util/ErrorMessages.ts:17
+msgid "Cannot create ${parameter} with name \"${name}\"."
+msgstr "Impossible de créer ${parameter} avec le nom « ${name} »."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:324
+msgid "Cascading Image"
+msgstr "Image en cascade"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:318
+msgid "Cascading Inputs"
+msgstr "Entrées en cascade"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:436
+msgid "Chart Annotations"
+msgstr "Annotations de graphique"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:448
+msgid "Chart Coloring"
+msgstr "Coloration du graphique"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:454
+msgid "Chart Coloring Image"
+msgstr "Image de coloration du graphique"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:474
+msgid "Chart Display Image"
+msgstr "Image d’affichage du graphique"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:6
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:26
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:38
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:48
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:60
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:72
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:84
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:96
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:106
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:118
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:130
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:142
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:428
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:440
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:450
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:460
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:470
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:480
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:490
+msgid "Chart Elements"
+msgstr "Éléments du graphique"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:424
+msgid "Chart Overlays"
+msgstr "Superpositions de graphiques"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:458
+msgid "Chart Scaling"
+msgstr "Dimensions du graphique"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:464
+msgid "Chart Scaling Image"
+msgstr "Image de dimensions du graphique"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:257
+msgid "Classic Dashboards"
+msgstr "Tableaux de bord classiques"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CloneDashboard/index.jsx:122
+msgid "Clone"
+msgstr "Cloner"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/ActionDropdown.tsx:249
+msgid "Clone Dashboard"
+msgstr "Cloner le tableau de bord"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CloneDashboard/index.jsx:103
+msgid "Clone in Dashboard Studio"
+msgstr "Cloner dans Dashboard Studio"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/AdvancedPanelSettings/index.jsx:52
+msgid "Clones the report's search string and time range. The inline search exists only in the dashboard and has no external dependencies."
+msgstr "Clone la chaîne de recherche et la période du rapport. La recherche intégrée existe uniquement dans le tableau de bord et n’a aucune dépendance externe."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:174
+msgid "Cluster Map"
+msgstr "Carte de clusters"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:195
+msgid "Color a map of the United States with geo data"
+msgstr "Colorier une carte des États-Unis avec des données géographiques"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:185
+msgid "Color a map of the world with geo data"
+msgstr "Colorier une carte du monde avec des données géographiques"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:219
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:241
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:263
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:287
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:451
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:491
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:511
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:577
+msgid "Coloring"
+msgstr "Coloration"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:22
+msgid "Column Chart"
+msgstr "Histogramme"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:30
+msgid "Column Visualization Image"
+msgstr "Image de visualisation en colonnes"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:23
+msgid "Column charts can be used for time series data when comparing magnitudes over time. They can also be used in a similar way to bar charts to compare field values across a dataset"
+msgstr "Les histogrammes peuvent être utilisés avec des données de séries chronologiques pour comparer des quantités dans le temps. Ils peuvent également être utilisés de la même manière que les graphiques à barres, pour comparer les valeurs de champ dans un ensemble de données."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:118
+msgid "Comma separated list of email addresses."
+msgstr "Liste d’adresses e-mail séparées par des virgules."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:39
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:97
+msgid "Comparison"
+msgstr "Comparaison"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:16
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:644
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:656
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:666
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:678
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:690
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:702
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:714
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:724
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:734
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:746
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:756
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:766
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:776
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:786
+msgid "Complete Dashboards"
+msgstr "Tableaux de bord terminés"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:653
+msgid "Consistent labelling, multiple charts and dynamic SVGs combine to show a factory management dashboard"
+msgstr "Un étiquetage cohérent, plusieurs graphiques et des SVG dynamiques se combinent pour former un tableau de bord de gestion d’usine."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:159
+msgid "Continue using the same standard Splunk visualizations and explore additional tools."
+msgstr "Continuez d’utiliser les mêmes visualisations Splunk standard et explorez des outils supplémentaires."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CloneDashboard/index.jsx:122
+msgid "Convert & Save"
+msgstr "Convertir et enregistrer"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:73
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:85
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:107
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:131
+msgid "Correlation"
+msgstr "Corrélations"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:145
+msgid "Create"
+msgstr "Créer"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:127
+msgid "Create New Dashboard"
+msgstr "Créer un nouveau tableau de bord"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:37
+msgid "Critical"
+msgstr "Critique"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/util/ErrorMessages.ts:15
+msgid "Cron expression cannot be empty."
+msgstr "L’expression Cron ne peut être vide."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:596
+msgid "Custom URL Drilldown"
+msgstr "URL d’exploration personnalisée"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:602
+msgid "Custom URL Image"
+msgstr "Image d’URL personnalisée"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:164
+msgid "Custom visualizations & Trellis not yet supported"
+msgstr "Les treillis et les visualisations personnalisés ne sont pas encore pris en charge"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:674
+msgid "Customer Satisfaction"
+msgstr "Satisfaction client"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:682
+msgid "Customer Satisfaction Dashboard Thumbnail"
+msgstr "Vignette du tableau de bord Satisfaction client"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:449
+msgid "Customize chart colors to reflect your preferred aesthetic and branding"
+msgstr "Personnalisez les couleurs du graphique en fonction de votre esthétique et de votre image de marque"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:134
+msgid "Customize with shapes,"
+msgstr "Personnalisez avec des formes,"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:136
+msgid "Customize with shapes, images, and text without coding with Absolute layout."
+msgstr "Personnalisez avec des formes, des images et du texte sans code avec l’agencement Absolu."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/CustomEditingGroup.jsx:20
+msgid "Dark"
+msgstr "Sombre"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/index.tsx:425
+msgid "Dashboard"
+msgstr "Tableau de bord"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-examples-hub/src/components/ReactBannerComponent.jsx:23
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/index.jsx:13
+msgid "Dashboard Examples Hub"
+msgstr "Centre d’exemples de tableaux de bord"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/EditTitleAndId/index.jsx:61
+msgid "Dashboard ID"
+msgstr "ID du tableau de bord"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-api/src/util/returnUtils.js:19
+msgid "Dashboard ID can only use letters, numbers, dashes, & underscores."
+msgstr "L’ID du tableau de bord ne peut contenir que des lettres, des chiffres, des tirets et des tirets bas."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:294
+msgid "Dashboard Studio"
+msgstr "Dashboard Studio"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-conversion/src/util/Constants.ts:14
+msgid "Dashboard Studio does not support Trellis."
+msgstr "Dashboard Studio ne prend pas en charge les treillis."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-conversion/src/util/Constants.ts:19
+msgid "Dashboard Studio does not support categorical colors in Choropleth Maps."
+msgstr "Dashboard Studio ne prend pas en charge les couleurs catégoriques dans les cartes choroplèthes."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-conversion/src/util/Constants.ts:9
+msgid "Dashboard Studio does not support the selected visualization type."
+msgstr "Dashboard Studio ne prend pas en charge le type de visualisation sélectionné."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/EditTitleAndId/index.jsx:30
+msgid "Dashboard Title"
+msgstr "Titre du tableau de bord"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/ActionDropdown.tsx:1
+msgid "Dashboard cloned into"
+msgstr "Tableau de bord cloné dans"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/util/linkToDashboardHelpers.ts:11
+msgid "Dashboard is required."
+msgstr "Le tableau de bord est requis."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:698
+msgid "Data Command and Control"
+msgstr "Commande et contrôle des données"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:706
+msgid "Data Command and Control Dashboard Thumbnail"
+msgstr "Vignette du tableau de bord Commande et contrôle des données"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:754
+msgid "Data Governance"
+msgstr "Gouvernance des données"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:760
+msgid "Data Governance Dashboard Thumbnail"
+msgstr "Vignette du tableau de bord Gouvernance des données"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:710
+msgid "Data Streaming"
+msgstr "Diffusion de données"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:718
+msgid "Data Streaming Dashboard Thumbnail"
+msgstr "Vignette du tableau de bord Diffusion de données"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:619
+msgid "Data sources of different types can refresh at different intervals, or a global default can be set for all data sources"
+msgstr "Des sources de données de différents types peuvent être actualisées à des intervalles différents, mais il est aussi possible de définir une valeur par défaut globale pour toutes les sources de données."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:686
+msgid "Datacenter Sensors"
+msgstr "Capteurs de datacenter"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:694
+msgid "Datacenter Sensors Dashboard Thumbnail"
+msgstr "Vignette du tableau de bord Capteurs de datacenter"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:12
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:382
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:392
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:404
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:416
+msgid "Datasources"
+msgstr "Sources de données"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:13
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:610
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:622
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:632
+msgid "Defaults"
+msgstr "Valeurs par défaut"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/panels/DataSourcesPanelListItem.jsx:120
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/ActionDropdown.tsx:196
+msgid "Delete"
+msgstr "Supprimer"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/ActionDropdown.tsx:184 /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/ActionDropdown.tsx:284
+msgid "Delete Dashboard"
+msgstr "Supprimer le tableau de bord"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/TokenEditor/TokenEditor.tsx:43
+msgid "Delete token"
+msgstr "Supprimer le jeton"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CloneDashboard/index.jsx:54 /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:158
+msgid "Description"
+msgstr "Description"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:11
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:166
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:530
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:542
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:554
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:566
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:576
+msgid "Design Elements"
+msgstr "Éléments de conception"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:597
+msgid "Direct users to external or relative URLs from interacting with a visualization"
+msgstr "Dirigez les utilisateurs vers des URL externes ou relatives suite à une interaction avec une visualisation"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:468
+msgid "Display Axes, Labels and Legends"
+msgstr "Affichez les axes, les étiquettes et les légendes"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:194
+msgid "Done"
+msgstr "Terminé"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/ActionDropdown.tsx:229
+msgid "Download PDF"
+msgstr "Télécharger le PDF"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/ActionDropdown.tsx:236
+msgid "Download PNG"
+msgstr "Télécharger le PNG"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/AdvancedPanelSettings/index.jsx:87
+msgid "Drilldown"
+msgstr "Exploration"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/AdvancedPanelSettings/index.jsx:93
+msgid "Drilldown is disabled when you save a visualization to a dashboard. After saving, open the dashboard editor to access configuration options for the visualization."
+msgstr "L’exploration est désactivée lorsque vous enregistrez une visualisation dans un tableau de bord. Après enregistrement, ouvrez l’éditeur de tableau de bord pour accéder aux options de configuration de la visualisation."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:15
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:588
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:598
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:632
+msgid "Drilldowns"
+msgstr "Explorations"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:328
+msgid "Dropdown"
+msgstr "Liste déroulante"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:334
+msgid "Dropdown Image"
+msgstr "Image de menu déroulant"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:509
+msgid "Dynamically color table elements to contextualize and emphasize data"
+msgstr "Colorez dynamiquement les éléments du tableau pour contextualiser et mettre en avant les données"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:259
+msgid "Dynamically color various parts of the Single Value Radial visualization based on your data"
+msgstr "Colorez dynamiquement diverses parties de la visualisation radiale à valeur unique en fonction de vos données"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:283
+msgid "Dynamically color various parts of the Single Value visualization to show overall status and signify positive and negative change"
+msgstr "Colorez dynamiquement diverses parties de la visualisation de valeur unique pour afficher l’état général et signaler les changements positifs et négatifs"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:722
+msgid "E-Commerce Monitoring"
+msgstr "Supervision e-commerce"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:728
+msgid "E-Commerce Monitoring Dashboard Thumbnail"
+msgstr "Vignette du tableau de bord Supervision e-commerce"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/panels/DataSourcesPanelListItem.jsx:112
+msgid "Edit"
+msgstr "Modifier"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/index.tsx:390
+msgid "Edit Export Schedule"
+msgstr "Modifier la planification d’exportation"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/EditTitleAndId/index.jsx:42
+msgid "Edit ID"
+msgstr "Modifier l’ID"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/EditSourceButton.jsx:16
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/EditSourceButton.jsx:18
+msgid "Edit Source"
+msgstr "Modifier la source"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/util/ErrorMessages.ts:10
+msgid "Email Address list is empty."
+msgstr "La liste d’adresses e-mail est vide"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/util/ErrorMessages.ts:14
+msgid "Email Address list is invalid"
+msgstr "La liste d’adresses e-mail est non valide"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:104
+msgid "Email To"
+msgstr "Envoyer un e-mail à"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:295
+msgid "Emojis can serve as a good at-a-glance representation of status instead of relying on numbers"
+msgstr "Les emojis peuvent servir à représenter rapidement un état, plus efficacement que des chiffres."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-examples-hub/src/components/ReactBannerComponent.jsx:24
+msgid "Empowering dashboard creators with a toolkit of examples"
+msgstr "Donnez des moyens supplémentaires aux créateurs de tableaux de bord avec une boîte à outils d’exemples"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/index.tsx:407
+msgid "Enable"
+msgstr "Activer"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:149
+msgid "Enter BCC addresses"
+msgstr "Saisissez les adresses en CCI"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:137
+msgid "Enter CC addresses"
+msgstr "Saisissez les adresses en CC"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/TokenEditor/TokenEditor.tsx:73
+msgid "Enter a name"
+msgstr "Saisissez un nom"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/TokenEditor/TokenEditor.tsx:94
+msgid "Enter a value"
+msgstr "Saisissez une valeur"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:109
+msgid "Enter email addresses"
+msgstr "Saisissez des adresses e-mail"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/ActionDropdown.tsx:113
+msgid "Error encountered while downloading"
+msgstr "Une erreur s’est produite pendant le téléchargement"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-conversion/src/util/Constants.ts:6
+msgid "Errors occurred during conversion"
+msgstr "Des erreurs sont survenues pendant la conversion"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:738
+msgid "Europe Telecom Dashboard Thumbnail"
+msgstr "Vignette du tableau de bord Europe Telecom"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:732
+msgid "Europe Telecom Network Hub"
+msgstr "Hub de réseau de télécommunications Europe"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-examples-hub/src/components/ReactNavComponent.jsx:51
+msgid "Examples"
+msgstr "Exemples"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-examples-hub/src/components/ReactBannerComponent.jsx:20
+msgid "Examples App Logo"
+msgstr "Exemples de logo d’application"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-api/src/util/returnUtils.js:9
+msgid "Failed to add to existing dashboard"
+msgstr "L’ajout au tableau de bord existant a échoué"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-api/src/util/returnUtils.js:13
+msgid "Failed to clone dashboard"
+msgstr "Le clonage du tableau de bord a échoué"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-api/src/util/returnUtils.js:24 /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-api/src/util/returnUtils.js:26
+msgid "Failed to fetch dashboard content for ${id}"
+msgstr "La récupération du contenu du tableau de bord de ${id} a échoué"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/LinkToDashboardEditor.tsx:185
+msgid "Failed to load available apps."
+msgstr "Échec du chargement des applications disponibles."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-api/src/util/returnUtils.js:11
+msgid "Failed to save to dashboard"
+msgstr "L’enregistrement dans le tableau de bord a échoué"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/TokenEditor/TokenEditor.tsx:22
+msgid "Field name of the value/location clicked"
+msgstr "Nom du champ de la valeur/emplacement cliqué"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-service/src/kvstore/index.js:81
+msgid "File size must be 16MB or smaller"
+msgstr "La taille maximale du fichier est de 16 Mo"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:204
+msgid "Filler Gauge"
+msgstr "Jauge d’épaisseur"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:222
+msgid "Filler Gauge Coloring Image"
+msgstr "Image de coloration de la jauge de remplissage"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:216
+msgid "Filler Gauge Coloring Options"
+msgstr "Options de coloration de la jauge de remplissage"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:212
+msgid "Filler Gauge Image"
+msgstr "Image de jauge de remplissage"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:119
+msgid "Flexible layout options to freely place objects or organize & resize (Absolute and Grid)."
+msgstr "Options de mise en page flexibles permettant de placer librement des objets, ou de les organiser et les redimensionner (Absolu et Grille)."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:119
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:143
+msgid "Flow"
+msgstr "Flux"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:23
+msgid "Friday"
+msgstr "Vendredi"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardLayoutGroup/index.jsx:55
+msgid "Full layout control"
+msgstr "Contrôle total sur la mise en page"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:7
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:208
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:218
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:230
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:240
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:250
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:262
+msgid "Gauges"
+msgstr "Jauges"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardLayoutGroup/index.jsx:71
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:679
+msgid "Grid"
+msgstr "Grille"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:742
+msgid "Healthcare Dashboard"
+msgstr "Tableau de bord Santé"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:750
+msgid "Healthcare Dashboard Thumbnail"
+msgstr "Vignette du tableau de bord Santé"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:36
+msgid "High"
+msgstr "Élevée"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:219
+msgid "How do you want to build your dashboard?"
+msgstr "Comment voulez-vous créer votre tableau de bord ?"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-service/src/dashboard/index.js:13
+msgid "ID already in use. Edit the ID or choose a different title."
+msgstr "ID déjà utilisé. Modifiez l’ID ou choisissez un autre titre."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/util/ErrorMessages.ts:5
+msgid "ID cannot be empty."
+msgstr "L’ID ne peut pas être vide."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:580
+msgid "Icon Coloring Image"
+msgstr "Image de coloration d’icône"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:570
+msgid "Icon Visualization Image"
+msgstr "Image de visualisation en icône"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:574
+msgid "Icons with Dynamic Coloring and Values"
+msgstr "Icônes avec coloration dynamique et valeurs"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:563
+msgid "Icons without values can be used to indicate change or status without needing to display a metric"
+msgstr "Des icônes sans valeurs peuvent être utilisées pour indiquer un changement ou un état sans qu’il faille afficher une métrique"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/Dashboard.jsx:222
+msgid "Image URL domain missing from predefined allow list. Update allow list to prevent image from being blocked."
+msgstr "Domaine d’URL d’image manquant dans la liste d’autorisations prédéfinie. Mettez à jour la liste d’autorisations pour empêcher le blocage de l’image."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:534
+msgid "Image Visualization Image"
+msgstr "Image de visualisation en image"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:528
+msgid "Images"
+msgstr "Images"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/index.tsx:419
+msgid "Inactive"
+msgstr "Inactif"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/AdvancedPanelSettings/index.jsx:31 /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/AdvancedPanelSettings/index.jsx:48
+msgid "Inline Search"
+msgstr "Recherche intégrée"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:14
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:320
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:330
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:340
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:350
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:360
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:372
+msgid "Inputs"
+msgstr "Entrées"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:691
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:715
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:725
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:747
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:757
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:767
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:777
+msgid "Intermediate"
+msgstr "Intermédiaire"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:97
+msgid "Introducing Dashboard Studio"
+msgstr "Introduction à Dashboard Studio"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-api/src/util/returnUtils.js:22
+msgid "Invalid input for ${parameter}. Expected ${expectedType}, but received ${actualType}"
+msgstr "Entrée non valide pour ${parameter}. Attendu : ${expectedType}, reçu : ${actualType}"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-api/src/util/returnUtils.js:17
+msgid "Invalid layout field, requires \"absolute\" or \"grid\""
+msgstr "Champ de mise en page non valide, doit être « absolu » ou « grille »"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:273 /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:177
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/SaveToExistingDashboard/index.jsx:201
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:198 /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/Dashboard.jsx:179
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/Dashboard.jsx:226
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/TokenEditor/TokenEditorGroup.tsx:88
+msgid "Learn more"
+msgstr "En savoir plus"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/CustomEditingGroup.jsx:19
+msgid "Light"
+msgstr "Léger"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:46
+msgid "Line Chart"
+msgstr "Graphique en courbes"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:52
+msgid "Line Visualization Image"
+msgstr "Image de visualisation en courbe"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:138
+msgid "Link Graph"
+msgstr "Graphique de lien"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:146
+msgid "Link Graph Image"
+msgstr "Image de graphique de lien"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:139
+msgid "Link graphs show connections between distinct values in various fields. Certain relationships can be highlighted to see every link"
+msgstr "Les graphiques de liens montrent les connexions entre des valeurs distinctes dans divers champs. Il est possible de mettre en évidence certaines relations pour voir chaque lien."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/LinkToDashboardEditor.tsx:397
+msgid "Link to dashboard"
+msgstr "Lien vers le tableau de bord"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/PanelOptions/index.jsx:68
+msgid "Loaded from report"
+msgstr "Chargé à partir du rapport"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:34
+msgid "Low"
+msgstr "Faible"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:180
+msgid "Map Visualization Image"
+msgstr "Image de visualisation en carte"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:437
+msgid "Mark important discrete events on time-series charts. This is useful when providing context behind a visible change in your data"
+msgstr "Marquez les événements individuels importants sur des graphiques de séries chronologiques. C’est utile pour fournir du contexte à un changement visible dans vos données."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:550
+msgid "Markdown Element"
+msgstr "Élément markdown"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:558
+msgid "Markdown Visualization Image"
+msgstr "Image de visualisation en markdown"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:226
+msgid "Marker Gauge"
+msgstr "Jauge de marqueur"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:244
+msgid "Marker Gauge Coloring Image"
+msgstr "Image de coloration de la jauge de marqueur"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:238
+msgid "Marker Gauge Coloring Options"
+msgstr "Options de coloration de la jauge de marqueur"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:234
+msgid "Marker Gauge Image"
+msgstr "Image de jauge de marqueur"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:204
+msgid "Message"
+msgstr "Message"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:209
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:219
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:231
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:241
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:251
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:263
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:275
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:287
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:299
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:311
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:501
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:511
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:521
+msgid "Metric"
+msgstr "Métrique"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:103
+msgid "Minutes past the hour"
+msgstr "Minutes après l’heure"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-api/src/util/returnUtils.js:18
+msgid "Missing required parameters: id, simpleXmlDefinition"
+msgstr "Paramètres requis manquants : id, simpleXmlDefinition"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-api/src/util/returnUtils.js:16
+msgid "Missing required parameters: id, simpleXmlVizDef"
+msgstr "Paramètres requis manquants : id, simpleXmlVizDef"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:19
+msgid "Monday"
+msgstr "Lundi"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:162
+msgid "Moving Choropleth SVG"
+msgstr "SVG choroplèthe animé"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:170
+msgid "Moving SVG Visualization Image"
+msgstr "Image de visualisation SVG animée"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:338
+msgid "Multiselect"
+msgstr "Multi-sélection"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:344
+msgid "Multiselect Image"
+msgstr "Image de sélection multiple"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:295
+msgid "NEW"
+msgstr "NOUVEAU"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:119
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:131
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:143
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:589
+msgid "New"
+msgstr "Nouveau"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:194
+msgid "Next"
+msgstr "Suivant"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/AdvancedPanelSettings/index.jsx:89
+msgid "No action"
+msgstr "Aucune action"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:35
+msgid "Normal"
+msgstr "Normal(e)"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:358
+msgid "Number"
+msgstr "Nombre"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:364
+msgid "Number Input Image"
+msgstr "Image de saisie de nombre"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:123
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:146
+msgid "On"
+msgstr "Activé"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/common/ErrorViz.jsx:34
+msgid "Oops! The dashboard that you tried to convert uses components that are not yet supported in Dashboard Studio. We apologize for any inconvenience."
+msgstr "Oups ! Le tableau de bord que vous avez essayé de convertir utilise des composants qui ne sont pas encore pris en charge dans Dashboard Studio. Nous nous excusons pour ce désagrément."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/ActionDropdown.tsx:156
+msgid "Open dashboard"
+msgstr "Ouvrir le tableau de bord"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/LinkToDashboardEditor.tsx:367
+msgid "Open in new tab"
+msgstr "Ouvrir dans un nouvel onglet"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:391
+msgid "Optimize your dashboard by using base and chain searches to remove repitition"
+msgstr "Optimisez votre tableau de bord en utilisant des recherches de base et de chaîne pour éliminer les répétitions"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CloneDashboard/index.jsx:56 /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:160
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/PanelOptions/index.jsx:127
+msgid "Optional"
+msgstr "Facultatif"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:432
+msgid "Overlays Image"
+msgstr "Image de superpositions"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/LinkToDashboardEditor.tsx:1
+msgid "Owner:"
+msgstr "Propriétaire :"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/AdvancedPanelSettings/index.jsx:27
+msgid "Panel Powered By"
+msgstr "Panneau géré par"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/PanelOptions/index.jsx:125
+msgid "Panel Title"
+msgstr "Titre du panneau"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:126
+msgid "Parallel Coordinates"
+msgstr "Coordonnées parallèles"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:134
+msgid "Parallel Coordinates Visualization Image"
+msgstr "Image de visualisation de coordonnées parallèles"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:127
+msgid "Parallel coordinates are used to depict relationships in high-dimensional datasets. The advantage lies in being able to compare multiple variables all in a single chart"
+msgstr "Les coordonnées parallèles sont utilisées pour représenter des relations au sein d’ensembles de données de grande dimension. Leur avantage est qu’elles permettent de comparer plusieurs variables dans un seul graphique."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/util/ErrorMessages.ts:20
+msgid "Parameter \"${parameter}\" must be less than ${length} characters."
+msgstr "Le paramètre « ${parameter} » doit compter moins de ${length} caractères."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/SaveButton.jsx:35
+msgid "Permission"
+msgstr "Permission"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CloneDashboard/index.jsx:74 /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:177
+msgid "Permissions"
+msgstr "Permissions"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:92
+msgid "Pie Chart"
+msgstr "Graphique à secteurs"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:100
+msgid "Pie Visualization Image"
+msgstr "Image de visualisation en graphique à secteurs"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:93
+msgid "Pie charts are used to show how different field values combine ver an entire data set. The size of the slice represents relative importance of one category out of a whole"
+msgstr "Les graphiques à secteurs servent à montrer comment différentes valeurs de champ se combinent dans un ensemble de données complet. La taille du secteur représente l’importance relative d’une catégorie sur un ensemble."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/index.tsx:188
+msgid "Please fill in this field"
+msgstr "Veuillez remplir ce champ"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/index.tsx:212
+msgid "Please select a schedule"
+msgstr "Veuillez sélectionner une planification"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:381
+msgid "Populate a visualization with the results of an ad-hoc Splunk search query"
+msgstr "Remplissez une visualisation avec les résultats d’une requête de recherche Splunk ad hoc"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:631
+msgid "Populate token-dependent charts on page load by setting a static default value"
+msgstr "Remplissez les graphiques dépendants des jetons lors du chargement de la page en définissant une valeur par défaut statique"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:319
+msgid "Power a form input from other input values to further narrow search results"
+msgstr "Alimentez une entrée de formulaire à partir d’autres valeurs d’entrée pour affiner davantage les résultats de recherche"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/ActionDropdown.tsx:92
+msgid "Preparing ${fileType.toUpperCase()} download"
+msgstr "Préparation du téléchargement de ${fileType.toUpperCase()}"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:158
+msgid "Priority"
+msgstr "Priorité"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CloneDashboard/index.jsx:40 /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:60
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/LinkToDashboardEditor.tsx:339
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/SaveButton.jsx:40
+msgid "Private"
+msgstr "Privé"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:606
+msgid "Progress Bar Defaults"
+msgstr "Valeurs par défaut de la barre de progression"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:614
+msgid "Progress Bar Defaults Image"
+msgstr "Image des valeurs par défaut de la barre de progression"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:607
+msgid "Progress bars can be revealed per visualization instance, for every visualization of a certain type, or at a default global level"
+msgstr "Les barres de progression peuvent être révélées par instance de visualisation, pour chaque visualisation d’un certain type, ou à un niveau global par défaut."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:104
+msgid "Punchcard Chart"
+msgstr "Carte perforée"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:488
+msgid "Punchcard Coloring"
+msgstr "Coloration de carte perforée"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:494
+msgid "Punchcard Coloring Image"
+msgstr "Image de coloration de carte perforée"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:478
+msgid "Punchcard Sizing"
+msgstr "Taille de la carte perforée"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:484
+msgid "Punchcard Sizing Image"
+msgstr "Image de taille de carte perforée"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:110
+msgid "Punchcard Visualization Image"
+msgstr "Image de visualisation de carte perforée"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardLayoutGroup/index.jsx:71
+msgid "Quick organization"
+msgstr "Organisation rapide"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:266
+msgid "Radial Coloring Image"
+msgstr "Image de coloration de visualisation radiale"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:254
+msgid "Radial Image"
+msgstr "Image de visualisation radiale"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-examples-hub/src/components/ReactBannerComponent.jsx:29
+msgid "Read Documentation"
+msgstr "Lire la documentation"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/Dashboard.jsx:442
+msgid "Refresh"
+msgstr "Actualiser"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:618
+msgid "Refresh Defaults"
+msgstr "Actualiser les valeurs par défaut"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:626
+msgid "Refresh Defaults Image"
+msgstr "Image d’actualisation des valeurs par défaut"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/Dashboard.jsx:121
+msgid "Refresh rates of less than 60 seconds might impact search performance."
+msgstr "Un intervalle d’actualisation inférieur à 60 secondes peut affecter la performance de la recherche."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/panels/DataSourcesPanelListItem.jsx:118
+msgid "Remove"
+msgstr "Retirer"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/AdvancedPanelSettings/index.jsx:68
+msgid "Report"
+msgstr "Rapport"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:271
+msgid "Represent a discrete metric with the option of also showing the latest trend value and change over time with a sparkline"
+msgstr "Représentez une métrique discrète avec la possibilité d’afficher également la dernière valeur de tendance et son évolution dans le temps avec un graphique sparkline"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:249
+msgid "Represent a single metric in relation to a radial gauge representing a limit"
+msgstr "Représentez une métrique unique par rapport à une jauge radiale représentant une limite"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:151
+msgid "Represent values by coloring predefined regions in an SVG. Custom SVG images are great for introducing an extra bit of design flair to the dashboard"
+msgstr "Représenter des valeurs en coloriant des régions prédéfinies dans un SVG. Les images SVG personnalisées sont idéales pour ajouter une touche de design supplémentaire dans le tableau de bord."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/EditTitleAndId/index.jsx:49 /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/EditTitleAndId/index.jsx:70
+msgid "Required"
+msgstr "Requis"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/Dashboard.jsx:562
+msgid "Retry save"
+msgstr "Réessayer d’enregistrer"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:53
+msgid "Run by Cron"
+msgstr "Exécuter selon Cron"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:41
+msgid "Run every day"
+msgstr "Exécuter chaque jour"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:37
+msgid "Run every hour"
+msgstr "Exécuter chaque heure"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:49
+msgid "Run every month"
+msgstr "Exécuter chaque mois"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:45
+msgid "Run every week"
+msgstr "Exécuter chaque semaine"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:158
+msgid "SVG Visualization Image"
+msgstr "Image de visualisation SVG"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:114
+msgid "Sankey Diagram"
+msgstr "Graphique Sankey"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:115
+msgid "Sankey Diagrams are used to depict flows from a set of elements to another using nodes and links"
+msgstr "Les graphiques Sankey sont utilisés pour représenter les flux d’un ensemble d’éléments à un autre à l’aide de nœuds et de liens"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:122
+msgid "Sankey Visualization Image"
+msgstr "Image de visualisation en graphique Sankey"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:24
+msgid "Saturday"
+msgstr "Samedi"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/SaveButton.jsx:23 /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/SaveButton.jsx:26
+msgid "Save"
+msgstr "Enregistrer"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/index.tsx:527
+msgid "Save & Disable"
+msgstr "Enregistrer et désactiver"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/index.tsx:527
+msgid "Save & Enable"
+msgstr "Enregistrer et activer"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/SaveToExistingDashboard/index.jsx:173
+msgid "Save Panel to Existing Dashboard"
+msgstr "Enregistrer le panneau dans le tableau de bord existant"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:127
+msgid "Save Panel to New Dashboard"
+msgstr "Enregistrer le panneau dans un nouveau tableau de bord"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/Dashboard.jsx:519
+msgid "Save now"
+msgstr "Enregistrer maintenant"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:145
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/SaveToExistingDashboard/index.jsx:223
+msgid "Save to Dashboard"
+msgstr "Enregistrer dans le tableau de bord"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:408
+msgid "Saved Search Image"
+msgstr "Image de recherche enregistrée"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:400
+msgid "Saved Searches"
+msgstr "Recherches enregistrées"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:80
+msgid "Scatter Chart"
+msgstr "Graphique à nuages de points"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:88
+msgid "Scatter Visualization Image"
+msgstr "Image de visualisation en nuage de points"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:81
+msgid "Scatter charts plot points on a graph, where the data point distribution can represent the correlation across the two dimensions being shown. Multiple categories can also be compared by using colors"
+msgstr "Dans un nuage de points, la distribution des points de données peut représenter la corrélation entre les deux dimensions affichées. Il est également possible de comparer plusieurs catégories à l’aide de couleurs."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:193
+msgid "Schedule"
+msgstr "Planification"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/index.tsx:331
+msgid ""
+"Schedule ${\n"
+"                  this.state.enabled ? 'enabled' : 'disabled'\n"
+"                } and saved"
+msgstr ""
+"Planification ${\n"
+"                  this.state.enabled ? 'enabled' : 'disabled'\n"
+"                } et enregistrée"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/ActionDropdown.tsx:272
+msgid "Scheduled Export"
+msgstr "Export planifié"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/SaveToExistingDashboard/SelectDashboardList.jsx:237
+msgid "Search By Title"
+msgstr "Rechercher par titre"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:386
+msgid "Search Image"
+msgstr "Image de recherche"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/LinkToDashboardEditor.tsx:297
+msgid "Select a Dashboard"
+msgstr "Sélectionner un tableau de bord"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/LinkToDashboardEditor.tsx:263
+msgid "Select an App"
+msgstr "Sélectionner une application"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/SaveToExistingDashboard/SelectDashboardList.jsx:210
+msgid "Select an Existing Dashboard"
+msgstr "Sélectionner un tableau de bord existant"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:242 /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardLayoutGroup/index.jsx:39
+msgid "Select layout mode"
+msgstr "Sélectionner un mode de mise en page"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:369
+msgid "Select the time range used by datasources powering your visualizations. By default, every dashboard comes with a time range input"
+msgstr "Sélectionner la plage de temps utilisée par les sources de données alimentant vos visualisations. Par défaut, tous les tableaux de bord sont fournis avec une entrée de plage de temps"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/util/linkToDashboardHelpers.ts:16
+msgid "Selected app is not available. App may have been deleted, or you may not have permissions."
+msgstr "L’application sélectionnée n’est pas disponible. L’application peut avoir été supprimée, ou bien vous n’avez pas les permissions nécessaires."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/util/linkToDashboardHelpers.ts:12
+msgid "Selected dashboard is not available. Dashboard may have been deleted, or you may not have permissions."
+msgstr "Le tableau de bord sélectionné n’est pas disponible. Il se peut que le tableau de bord ait été supprimé ou que vous n’ayez pas les permissions."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/index.tsx:518
+msgid "Send Test Email"
+msgstr "Envoyer l’e-mail test"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/ActionDropdown.tsx:261
+msgid "Set As Home Dashboard"
+msgstr "Définir comme tableau de bord d’accueil"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/SaveButton.jsx:33
+msgid "Set Permission"
+msgstr "Définir la permission"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:592
+msgid "Set Token Image"
+msgstr "Image de définition de jeton"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:584
+msgid "Set Token with Drilldown"
+msgstr "Définir un jeton avec exploration"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/TokenEditor/TokenEditorGroup.tsx:72
+msgid "Set Tokens"
+msgstr "Définir des jetons"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:329
+msgid "Set a token to a single value by using a form populated with static or dynamic options"
+msgstr "Définissez un jeton comme valeur unique à l’aide d’un formulaire rempli avec des options statiques ou dynamiques"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:339
+msgid "Set a token to multiple values by using a form populated with static or dynamic options"
+msgstr "Définissez un jeton avec plusieurs valeurs à l’aide d’un formulaire rempli avec des options statiques ou dynamiques"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:585
+msgid "Set tokens based on certain interactions taking place on a visualization. Setting tokens opens the opportunity for more dynamic workflows on the dashboard"
+msgstr "Définissez des jetons en fonction de certaines interactions sur une visualisation. Définir des jetons offre la possibilité de créer des workflows plus dynamiques sur le tableau de bord."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:349
+msgid "Set tokens based on text entries"
+msgstr "Définissez des jetons en fonction d’entrées de texte"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:359
+msgid "Set tokens by selecting a number from a dropdown"
+msgstr "Définissez des jetons en sélectionnant un nombre dans une liste déroulante"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:546
+msgid "Shape Visualization Image"
+msgstr "Image de visualisation en forme"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:538
+msgid "Shapes and Lines"
+msgstr "Formes et lignes"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CloneDashboard/index.jsx:46 /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:66
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/LinkToDashboardEditor.tsx:335
+msgid "Shared in App"
+msgstr "Partagé dans l’app"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/SaveButton.jsx:45
+msgid "Shared in app"
+msgstr "Partagé dans l’app"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:131
+msgid "Show CC and BCC"
+msgstr "Afficher CC et BCC"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/CustomLayoutEditor.jsx:63
+msgid "Show Edit Button"
+msgstr "Afficher le bouton Modifier"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/CustomLayoutEditor.jsx:87
+msgid "Show Export Button"
+msgstr "Afficher le bouton Exporter"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/CustomLayoutEditor.jsx:74
+msgid "Show Open In Search Button"
+msgstr "Afficher le bouton Ouvrir dans la recherche"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:8
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:274
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:286
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:298
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:310
+msgid "Single Value"
+msgstr "Valeur unique"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:282
+msgid "Single Value Coloring"
+msgstr "Coloration de valeur unique"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:290
+msgid "Single Value Coloring Image"
+msgstr "Image de coloration de valeur unique"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:302
+msgid "Single Value Emoji Image"
+msgstr "Image d’emoji à valeur unique"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:294
+msgid "Single Value Emojis"
+msgstr "Emojis de valeur unique"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:314
+msgid "Single Value Icon Image"
+msgstr "Image d’icône de valeur unique"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:278
+msgid "Single Value Image"
+msgstr "Image de valeur unique"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:248
+msgid "Single Value Radial"
+msgstr "Valeur unique (radial)"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:258
+msgid "Single Value Radial with Dynamic Coloring"
+msgstr "Radial à valeur unique avec coloration dynamique"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:306
+msgid "Single Value with Icons"
+msgstr "Valeur unique avec icônes"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:163
+msgid "Some SVG images can move depending on how they are made. These also work as expected in dashboards, and tokens can be used to control their movement"
+msgstr "Certaines images SVG peuvent être animées selon la façon dont elles sont créées. Elles fonctionnent également comme prévu dans les tableaux de bord, et les jetons peuvent être utilisés pour contrôler leur mouvement."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CloneDashboard/index.jsx:136
+msgid "Some custom formatting and configurations to your dashboard may be lost during the cloning and conversion process. Your original dashboard will not be affected."
+msgstr "Certaines mises en forme et configurations de votre tableau de bord peuvent être perdues lors du processus de clonage et de conversion. Votre tableau de bord d’origine n’en sera pas affecté."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/SaveToExistingDashboard/SelectDashboardList.jsx:212
+msgid "Sort"
+msgstr "Trier"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:167
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:417
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:429
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:441
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:611
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:623
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:633
+msgid "Source Only"
+msgstr "Source uniquement"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:155
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:177
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:187
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:197
+msgid "Spatial"
+msgstr "Spatial"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:10
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:154
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:176
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:186
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:196
+msgid "Spatial Elements"
+msgstr "Éléments spatiaux"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:425
+msgid "Specify a field to be represented as an overlay on your chart. This is useful when representing averages or bounds to your data"
+msgstr "Spécifiez un champ à représenter en superposition sur votre graphique. C’est particulièrement utile lorsque vous représentez des moyennes ou des limites dans vos données."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/TokenEditor/TokenEditor.tsx:17
+msgid "Specify a token name and reference the token using the syntax $token_name$"
+msgstr "Spécifiez un nom de jeton et référencez le jeton à l’aide de la syntaxe $token_name$"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:187
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/index.tsx:106
+msgid "Splunk Dashboard: $dashboard.label$"
+msgstr "Tableau de bord Splunk : $dashboard.label$"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/PanelOptions/index.jsx:55
+msgid "Statistics Table"
+msgstr "Tableau de statistiques"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:185
+msgid "Subject"
+msgstr "Objet"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-examples-hub/src/components/ReactBannerComponent.jsx:32
+msgid "Submit Feature Request"
+msgstr "Soumettre une demande de fonctionnalité"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-examples-hub/src/components/ReactBannerComponent.jsx:25
+msgid "Submit feedback to: dashboard-studio@splunk.com"
+msgstr "Envoyez vos commentaires à : dashboard-studio@splunk.com"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/Dashboard.jsx:571
+msgid "Success! Dashboard saved."
+msgstr "Bravo ! Tableau de bord enregistré."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-api/src/util/returnUtils.js:8
+msgid "Successfully added to existing dashboard"
+msgstr "L’ajout à un tableau de bord existant a réussi"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-api/src/util/returnUtils.js:12
+msgid "Successfully cloned dashboard"
+msgstr "Le clonage du tableau de bord a réussi"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-conversion/src/util/Constants.ts:3
+msgid "Successfully converted dashboard"
+msgstr "La conversion du tableau de bord a réussi"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-conversion/src/util/Constants.ts:4
+msgid "Successfully converted visualization"
+msgstr "La conversion de la visualisation a réussi"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-api/src/util/returnUtils.js:10
+msgid "Successfully saved to dashboard"
+msgstr "L’enregistrement du tableau de bord a réussi"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:18
+msgid "Sunday"
+msgstr "Dimanche"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:9
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:500
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:510
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:520
+msgid "Table"
+msgstr "Tableau"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:508
+msgid "Table Coloring"
+msgstr "Coloration de tableau"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:514
+msgid "Table Coloring Image"
+msgstr "Image de coloration de tableau"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:524
+msgid "Table Formatting Image"
+msgstr "Image de mise en forme de tableau"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:504
+msgid "Table Image"
+msgstr "Image de tableau"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:420
+msgid "Test Data Image"
+msgstr "Image de données de test"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:412
+msgid "Test Data Source"
+msgstr "Tester la source de données"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:348
+msgid "Text"
+msgstr "Texte"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:354
+msgid "Text Input Image"
+msgstr "Image de saisie de texte"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/util/ErrorMessages.js:8
+msgid "The Dashboard ID \"${title.replace(/W/g, '_').toLowerCase()}\" is already taken."
+msgstr "L’ID de tableau de bord « ${title.replace(/W/g, '_').toLowerCase()} » est déjà utilisée."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/EditTitleAndId/index.jsx:64
+msgid ""
+"The Dashboard ID is used as the filename on disk.\n"
+"This cannot be changed later."
+msgstr ""
+"L’ID de tableau de bord est utilisé comme nom de fichier sur le disque. \n"
+"Impossible de le modifier ultérieurement."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-service/src/dashboard/index.js:64
+msgid "The dashboard you selected no longer exists."
+msgstr "Le tableau de bord sélectionné n’existe plus."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:193
+msgid "The email subject, recipients, and messages can include tokens that insert text based on the search results."
+msgstr "L’objet et le message de l’e-mail peuvent inclure des jetons qui insèrent du texte en fonction des résultats de la recherche."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/AdvancedPanelSettings/index.jsx:35
+msgid "The inline search exists only in the dashboard and has no external dependencies."
+msgstr "La recherche intégrée existe uniquement dans le tableau de bord et n’a aucune dépendance externe."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/index.tsx:340
+msgid "The next scheduled email will send on "
+msgstr "Le prochain e-mail programmé sera envoyé le "
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/index.tsx:443
+msgid "The schedule is set to the timezone of this Splunk instance"
+msgstr "La planification est définie sur le fuseau horaire de cette instance Splunk"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/index.tsx:359
+msgid "The server did not accept your entry; the chosen schedule may not be supported"
+msgstr "Le serveur n’a pas accepté votre entrée ; il se peut que la planification choisie ne soit pas prise en charge"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-service/src/dashboard/index.js:14
+msgid "The total size of a dashboard must be 7MB or smaller. Please remove some images and icons."
+msgstr "La taille totale du tableau de bord ne peut dépasser 7 Mo. Veuillez supprimer des images et des icônes."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:260
+msgid "The traditional Splunk dashboard builder"
+msgstr "L’éditeur de tableau de bord traditionnel de Splunk."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/PanelOptions/index.jsx:72
+msgid "The visualization and its configuration will be loaded from the report by default. It can be modified later within the dashboard or in the report itself."
+msgstr "La visualisation et sa configuration seront chargées à partir du rapport par défaut. Elles peuvent être modifiées ultérieurement au sein du tableau de bord ou dans le rapport lui-même."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/CustomEditingGroup.jsx:18
+msgid "Theme"
+msgstr "Thème"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:641
+msgid "This classic example is an excellent use case for background images and simple, colored visualizations"
+msgstr "Cet exemple classique est un excellent cas d’utilisation d’images d’arrière-plan et de visualisations simples et colorées."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/Dashboard.jsx:516
+msgid "This dashboard has unsaved changes."
+msgstr "Ce tableau de bord contient des modifications qui n’ont pas été enregistrées."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:687
+msgid "This dashboard shows a thematic example of dynamic SVG options to track server room temperatures"
+msgstr "Ce tableau de bord montre un exemple thématique d’options SVG dynamiques servant à suivre la température dans les salles de serveurs."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:743
+msgid "This dashboard shows how effective coloring and layering can combine simple visuals to an effective information flow"
+msgstr "Ce tableau de bord montre comment une coloration et une superposition bien conçues peuvent combiner des visuels simples à un flux d’informations efficace."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/util/ErrorMessages.ts:11
+msgid "This email domain is not approved. To resolve this issue, contact your Splunk Administrator."
+msgstr "Ce domaine de courrier n’est pas approuvé. Pour résoudre ce problème, contactez votre administrateur Splunk."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:733
+msgid "This example shows one of the most intricate and effective uses of SVG coloring"
+msgstr "Cet exemple montre l’une des utilisations les plus complexes et les plus efficaces de la coloration SVG."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:675
+msgid "This example uses grid layout to show colored visualizations to show high level customer KPIs"
+msgstr "Cet exemple utilise une disposition en grille avec des visualisations colorées pour afficher les KPI client de haut niveau."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:22
+msgid "Thursday"
+msgstr "Jeudi"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:368
+msgid "Timerange"
+msgstr "Plage de temps"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:376
+msgid "Timerange Input Image"
+msgstr "Image de plage de temps"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/SaveToExistingDashboard/SelectDashboardList.jsx:31
+msgid "Title (A - Z)"
+msgstr "Titre (A–Z)"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/SaveToExistingDashboard/SelectDashboardList.jsx:36
+msgid "Title (Z - A)"
+msgstr "Titre (Z–A)"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/util/ErrorMessages.ts:4
+msgid "Title cannot be empty."
+msgstr "Le titre ne peut pas être vide."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-conversion/src/util/Constants.ts:15
+msgid "To continue, remove Trellis."
+msgstr "Pour continuer, retirer le treillis."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-conversion/src/util/Constants.ts:20
+msgid "To continue, remove categorical colors or select another visualization such as 'Statistics Table'."
+msgstr "Pour continuer, retirez les couleurs catégoriques ou sélectionnez une autre visualisation comme « Tableau de statistiques »."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-conversion/src/util/Constants.ts:10
+msgid "To continue, select another visualization such as 'Statistics Table'."
+msgstr "Pour continuer, sélectionnez une autre visualisation comme « Tableau de statistiques »."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:630
+msgid "Token Defaults"
+msgstr "Valeurs par défaut du jeton"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:636
+msgid "Token Defaults Image"
+msgstr "Image des valeurs par défaut du jeton"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/TokenEditor/TokenEditor.tsx:64
+msgid "Token Name"
+msgstr "Nom du jeton"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/TokenEditor/TokenEditor.tsx:86
+msgid "Token Value"
+msgstr "Valeur du Token"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/util/linkToDashboardHelpers.ts:21
+msgid "Token name is duplicate."
+msgstr "Le nom du jeton existe déjà."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/util/linkToDashboardHelpers.ts:20
+msgid "Token name is empty or contains invalid characters."
+msgstr "Le nom du jeton est vide ou contient des caractères non valides."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/util/linkToDashboardHelpers.ts:19
+msgid "Token value is empty or contains invalid characters."
+msgstr "La valeur du jeton est vide ou contient des caractères non valides."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:321
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:331
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:341
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:351
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:361
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:373
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:589
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:599
+msgid "Tokens"
+msgstr "Jetons"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:27
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:49
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:61
+msgid "Trend"
+msgstr "Tendance"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:20
+msgid "Tuesday"
+msgstr "Mardi"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:194
+msgid "US Choropleth Map"
+msgstr "Carte choroplèthe des États-Unis"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:200
+msgid "US Choropleth Map Visualization Image"
+msgstr "Image de visualisation en carte choroplèthe des États-Unis"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/emailValidation.ts:26
+msgid "Unable to contact the Splunk server for email domain validation"
+msgstr "Impossible de contacter le serveur Splunk pour la validation du domaine d’e-mail."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/util/ErrorMessages.js:3
+msgid "Unable to save dashboard: a dashboard title is required."
+msgstr "Impossible d’enregistrer le tableau de bord : le titre du tableau de bord est requis."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/util/ErrorMessages.js:5
+msgid "Unable to save dashboard: dashboard not found."
+msgstr "Impossible d’enregistrer le tableau de bord : le tableau de bord est introuvable."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/panels/DataSourcesPanelListItem.jsx:68
+msgid "Unnamed"
+msgstr "Sans nom"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:57
+msgid "Use Area charts to track values and identify trends over a period of time. Stacked area charts can represent the accumulation of more than one data series"
+msgstr "Utilisez les graphiques en aires pour suivre les valeurs et identifier les tendances sur une période donnée. Les graphiques en aires empilées peuvent représenter l’accumulation de plus d’une série de données."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:307
+msgid "Use Icons to indicate important changes or to provide more context to your Single Value metrics"
+msgstr "Utilisez des icônes pour indiquer des changements importants ou apporter davantage de contexte à vos métriques de valeur unique."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:529
+msgid "Use Images to add visual context and personalize your dashboard"
+msgstr "Utilisez des images pour ajouter du contexte visuel et personnaliser votre tableau de bord."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:47
+msgid "Use Line charts to track values and identify trends over a period of time"
+msgstr "Utilisez les courbes pour suivre les valeurs et identifier les tendances sur une période donnée."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:499
+msgid "Use Tables to simply display field and row data from your data sources"
+msgstr "Utilisez les tableaux pour afficher simplement les données de champ et de ligne de vos sources de données."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:413
+msgid "Use a JSON object with static data to populate visualizations without running searches. This is best for testing or displaying static visualizations for design purposes"
+msgstr "Utilisez un objet JSON avec des données statiques pour remplir des visualisations sans exécuter de recherches. C’est la meilleure façon de tester ou afficher des visualisations statiques pour des questions de design."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:401
+msgid "Use saved searches from various apps to use in your Dashboard, such as reports from Search and Reporting"
+msgstr "Utilisez les recherches enregistrées issues de diverses applications dans votre tableau de bord, telles que les rapports de Search and Reporting."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:539
+msgid "Use shapes and lines to direct flow, frame visualizations, and tell a story with your data"
+msgstr "Utilisez des formes et des lignes pour orienter le flux, encadrer les visualisations et ajouter une dimension narrative à vos données."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/TokenEditor/TokenEditorGroup.tsx:86
+msgid "Use tokens to set values in the target dashboard. For example: host = row.host.value "
+msgstr "Utilisez des jetons pour définir des valeurs dans le tableau de bord cible. Par exemple : host = row.host.value."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/AdvancedPanelSettings/index.jsx:72
+msgid "Uses the report. Retains all report metadata such as schedule, acceleration, and permissions."
+msgstr "Utilise le rapport. Conserve toutes les métadonnées du rapport telles que la planification, l’accélération et les permissions."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:770
+msgid "VPN Health Dashboard Thumbnail"
+msgstr "Vignette du tableau de bord Santé du VPN"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:764
+msgid "VPN Health by Region"
+msgstr "Santé du VPN par région"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/TokenEditor/TokenEditor.tsx:30
+msgid "Value in the specified series corresponding to the location clicked"
+msgstr "Valeur dans la série spécifiée correspondant à l’emplacement cliqué"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/TokenEditor/TokenEditor.tsx:26
+msgid "Value of the location clicked"
+msgstr "Valeur de l’emplacement cliqué"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/EmailControlGroups.tsx:33
+msgid "Very Low"
+msgstr "Très bas"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/panels/DataSourcesPanelListItem.jsx:108
+msgid "View"
+msgstr "Afficher"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/LinkToDashboardEditor.tsx:352
+msgid "View Dashboard"
+msgstr "Vue Tableau de bord"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/CustomLayoutEditor.jsx:55
+msgid "View Options"
+msgstr "Afficher les options"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CloneDashboard/index.jsx:41 /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:61
+msgid "Visible only to you"
+msgstr "Visible uniquement pour vous"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CloneDashboard/index.jsx:47 /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:67
+msgid "Visible to app users"
+msgstr "Visible pour les utilisateurs de l’application"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:175
+msgid "Visit the Splunk Documentation to learn more."
+msgstr "Visitez la Documentation Splunk pour en savoir plus."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/PanelOptions/index.jsx:102
+msgid "Visualization Type"
+msgstr "Type de visualisation"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:227
+msgid "Visualize a single numeric value and display it in relation to ranges representing different statuses"
+msgstr "Visualisez une valeur numérique unique et affichez-la par rapport à des plages représentant différents statuts"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:205
+msgid "Visualize a single numeric value and represent it in relation to a limit with a filler gauge"
+msgstr "Visualisez une valeur numérique unique et représentez-la par rapport à une limite avec une jauge de remplissage"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:175
+msgid "Visualize geo data on an interactive map area"
+msgstr "Visualisez les données géographiques sur une zone de carte interactive"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/Dashboard.jsx:170
+#, python-format
+msgid "We are no longer making updates to the %(beta)s. To ensure this dashboard stays supported with the latest features, please move it out of '%(beta)s' and into '%(search)s' or another app"
+msgstr "Nous ne mettons plus %(beta)s à jour. Pour que votre tableau de bord reste pris en charge avec les fonctionnalités les plus récentes, veuillez le faire passer de « %(beta)s » à « %(search)s » ou à une autre application."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:21
+msgid "Wednesday"
+msgstr "Mercredi"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/CreateNewDashboard/index.jsx:226
+msgid "What's this?"
+msgstr "Qu’est-ce que c’est ?"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/CustomLayoutEditor.jsx:65
+msgid "When disabled, you can access Edit Mode through the primary Dashboards view."
+msgstr "Lorsque l’option est désactivée, vous pouvez accéder au mode d’édition via la vue principale des tableaux de bord."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/CustomLayoutEditor.jsx:89
+msgid "When in View Mode, disabling \"Show Export\" removes the ability to export dashboards."
+msgstr "En mode Affichage, la désactivation de l’option « Afficher l’exportation » supprime la possibilité d’exporter des tableaux de bord."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/components/CustomLayoutEditor.jsx:76
+msgid "When in View Mode, disabling “Show Open in Search” removes the ability to open and edit a query in the full search experience."
+msgstr "En mode Affichage, la désactivation de l’option « Afficher Ouvrir dans la recherche » supprime la possibilité d’ouvrir et de modifier une requête dans l’expérience de recherche complète."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:190
+msgid "Wolrd Choropleth Map Visualization Image"
+msgstr "Image de visualisation en carte choroplèthe du monde"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:774
+msgid "Workforce Readiness"
+msgstr "Préparation du personnel"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:780
+msgid "Workforce Readiness Dashboard Thumbnail"
+msgstr "Vignette du tableau de bord Préparation du personnel"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:784
+msgid "Workforce Readiness Detail"
+msgstr "Détail de la préparation du personnel"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:790
+msgid "Workforce Readiness Detail Dashboard Thumbnail"
+msgstr "Vignette du tableau de bord détaillé Préparation du personnel"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:184
+msgid "World Choropleth Map"
+msgstr "Carte choroplèthe du monde"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/examples-hub/example-hub-nav-visualizations/contents.js:551
+msgid "Write Markdown directly in your dashboard to provide descriptions, labels, and additional information"
+msgstr "Ajoutez du Markdown directement dans votre tableau de bord pour ajouter des descriptions, des étiquettes et des informations supplémentaires."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/EditTitleAndId/index.jsx:67
+msgid "You can use letters, numbers, dashes, and underscores."
+msgstr "Vous pouvez utiliser des lettres, des chiffres, des tirets et des tirets bas."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/util/ErrorMessages.ts:6
+msgid "You cannot use < or > in a dashboard name."
+msgstr "Vous ne pouvez pas utiliser < or > dans un nom de tableau de bord."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-service/src/kvstore/index.js:59
+msgid "You do not have the permissions or role to perform this action. Only those with the admin or power roles can remove images"
+msgstr "Vous n’avez pas les permissions ou le rôle requis pour effectuer cette opération. Seules les personnes ayant un rôle d’administrateur ou de super utilisateur peuvent supprimer des images."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-service/src/kvstore/index.js:14
+msgid "You do not have the permissions or role to perform this action. Only those with the admin or power roles can upload images"
+msgstr "Vous n’avez pas les permissions ou le rôle requis pour effectuer cette opération. Seules les personnes ayant un rôle d’administrateur ou de super utilisateur peuvent importer des images."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/SaveToExistingDashboard/SelectDashboardList.jsx:265
+msgid "You have no writable dashboards for the app: ${app}"
+msgstr "Vous n’avez aucun tableau de bord accessible en écriture pour l’app : ${app}"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/util/ErrorMessages.ts:8
+msgid "You must select a dashboard layout."
+msgstr "Vous devez sélectionner un agencement de tableau de bord."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/util/ErrorMessages.ts:7
+msgid "You must select a dashboard type."
+msgstr "Vous devez sélectionner un type de tableau de bord."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/util/ErrorMessages.ts:9
+msgid "You must select an existing dashboard."
+msgstr "Vous devez sélectionner un tableau de bord existant."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/ActionDropdown.test.tsx:154
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/splunk-dashboard-studio/src/web/pages/dashboard/toolbar/ActionDropdown.tsx:108
+msgid "Your download has started"
+msgstr "Votre téléchargement a commencé"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/ScheduledExport/SchedulerControlGroup.tsx:185
+msgid "e.g 0 18 * * * (every day at 6:00pm)"
+msgstr "par ex. 0 18 * * * (tous les jours à 18 h 00)"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:156
+msgid "explore additional tools."
+msgstr "explorer d’autres outils."
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:117
+msgid "freely place objects"
+msgstr "placer librement des objets"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:134
+msgid "images,"
+msgstr "images,"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:110
+msgid "or"
+msgstr "ou"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:117
+msgid "organize & resize"
+msgstr "organiser et redimensionner"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:155
+msgid "standard Splunk visualizations"
+msgstr "visualisations Splunk standard"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-dialogs/src/components/DashboardStudioTooltip/index.jsx:134
+msgid "text"
+msgstr "texte"
+
+#: /Users/yzeng/builds/main/etc/apps/dashboard-studio/packages/enterprise-dashboard-examples-hub/src/components/ReactBannerComponent.jsx:33
+msgid "to ideas.splunk.com"
+msgstr "sur ideas.splunk.com"

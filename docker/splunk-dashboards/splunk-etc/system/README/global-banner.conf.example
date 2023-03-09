@@ -1,0 +1,19 @@
+#   Version 9.0.3
+#
+# The following are example global-banner.conf configurations. Configure properties for
+# your custom application.
+#
+# To use one or more of these configurations, copy the configuration block into
+# app.conf in $SPLUNK_HOME/etc/system/local/. You must restart Splunk to
+# enable configurations.
+#
+# To learn more about configuration files (including precedence) please see the
+# documentation located at
+# http://docs.splunk.com/Documentation/Splunk/latest/Admin/Aboutconfigurationfiles
+
+[BANNER_MESSAGE_SINGLETON]
+global_banner.visible = false
+global_banner.message = Sample banner notification text. Please replace with your own message.
+global_banner.background_color = blue
+global_banner.hyperlink = https://www.splunk.com/
+global_banner.hyperlink_text = Splunk

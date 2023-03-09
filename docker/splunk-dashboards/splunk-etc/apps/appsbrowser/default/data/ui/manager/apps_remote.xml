@@ -1,0 +1,5 @@
+<endpoint name="appsremote" template="pages/system.html" showOnSearchHeadCluster="1">
+    <capabilities>
+        <read>rest_apps_view</read>
+    </capabilities>
+</endpoint>

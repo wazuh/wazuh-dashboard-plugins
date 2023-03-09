@@ -1,0 +1,218 @@
+$thresholdBlue: $infoColor;
+$thresholdBlueLight: $infoColorL20;
+$thresholdBlueLighter: $infoColorL40;
+
+$dmcPanelTitleFontSize: 24px;
+
+.smc-headings {
+  h1 {
+    font-size: 18px;
+  }
+
+  h2 {
+    font-size: 16px;
+  }
+}
+
+.smc-panel-title {
+  font-size: 24px;
+  line-height: 26px;
+}
+
+.smc-panel-label {
+  color: $gray45 !important;
+  text-align: center;
+  padding: 20px 20px 5px 20px;
+}
+.smc-alerts-title-section {
+  bottom-border: initial !important;
+  padding: 15px;
+  height: 47px;
+
+  #smc-alerts-count,#smc-alerts-title {
+    font-size: $dmcPanelTitleFontSize;
+  }
+}
+
+.control-options {
+  #enable-disable-link {
+    padding-right: 20px;
+  }
+
+  #triggered-alerts-link {
+    padding-right: 10px;
+  }
+}
+
+.smc-distributed-mode-alerts-panel {
+  background-color: $white;
+  border-radius: 2px;
+  min-height: initial !important;
+}
+.dmc-distributed-mode-view #smc-alerts-view-container .smc-distributed-mode-alerts-panel{
+  margin: 0 20px 20px 20px;
+}
+.smc-alerts-view-standalone-container #smc-alerts-view-container .smc-distributed-mode-alerts-panel{
+  margin: 5px 0 20px 0;
+  width: 100%;
+}
+.alert-description {
+  text-align: left;
+  width: 320px;
+  font-size: 10px;
+  font-weight: lighter;
+  font-style: italic;
+  margin-bottom: 15px;
+}
+
+.smc-distributed-mode-alerts-panel .details-row h3 {
+  padding-bottom: 50px;
+}
+
+/* Standalone styles */
+.smc-alerts-view-standalone-container {
+  width: 100%;
+  max-width: 1100px;
+  margin: auto;
+  margin-bottom: 5px;
+}
+.smc-alerts-view-standalone-container .smc-distributed-mode-alerts-panel {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.smc-standalone-cell {
+  display: inline-block;
+  width: 40%;
+}
+
+.smc-standalone-row:first-child {
+  border-top: 1px solid $gray80 !important;
+}
+.smc-standalone-row {
+  width: 100%;
+  max-width: 1100px;
+  border-top: 1px dashed $gray80;
+  border-left: 1px solid $gray80;
+  border-right: 1px solid $gray80;
+  background-color: white;
+  margin: auto;
+}
+.smc-standalone-row:last-child {
+  border-bottom: 1px solid $gray80;
+  margin-bottom: 5px;
+}
+
+.smc-chart {
+  width: 100%;
+  position: relative;
+}
+
+.smc-standalone-single-value {
+  display: inline-block;
+  text-align: center;
+  width: 100%;
+  margin-top: 35px;
+}
+
+.smc-standalone-single-value .single-value .under-label {
+  text-transform: none;
+  color: $gray30;
+  font-size: 15px;
+  line-height: 25px;
+}
+
+/* Shared styles */
+.dashboard-header .edit-dashboard-menu {
+  display: none;
+}
+
+.smc-viz-before-label {
+  line-height: 20px;
+  text-align: right;
+}
+.smc-viz-after-label {
+  line-height: 20px;
+  text-align: left;
+}
+.smc-progress {
+  height: 20px;
+  overflow: hidden;
+  background-color: $gray92;
+  border-radius: 4px;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
+}
+.smc-progress-bar {
+  float: left;
+  width: 0;
+  height: 100%;
+  font-size: 12px;
+  line-height: 20px;
+  color: $white;
+  text-align: center;
+  background-color: $successColor;
+  box-shadow: inset 0 -1px 0 rgba(0,0,0,.15);
+  transition: width .6s ease;
+}
+.smc-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  border: 0;
+}
+#edit-alerts-dialog .edit-alerts-modal-title {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+
+#edit-alerts-dialog .edit-alerts-modal-title span.alert-name-title {
+  position: relative;
+  left:125px;
+}
+
+#edit-alerts-dialog .edit-alerts-modal-title span.enabled-title {
+  position: relative;
+  left: 310px;
+}
+
+#edit-alerts-dialog p.alert-description {
+  text-align: left;
+  width: 320px;
+  font-size: 10px;
+  font-weight: lighter;
+  font-style: italic;
+  margin-bottom: 5px;
+}
+
+#edit-alerts-dialog .form-horizontal .controls {
+  margin-left: 380px;
+  position: relative;
+}
+
+#edit-alerts-dialog .form-horizontal .control-label {
+  width: 320px;
+  text-align: left;
+}
+
+#edit-alerts-dialog .modal-header {
+  padding: 15px 0 10px 20px;
+}
+
+#edit-alerts-dialog  .modal-body {
+  padding-top: 10px;
+}
+
+
+.spinner {
+  background: url('/static/img/skins/default/loading_white.gif') no-repeat;
+}
+
+.dmc-svg-icons {
+  display: inline-block;
+  float: right;
+}

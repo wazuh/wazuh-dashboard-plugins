@@ -1,0 +1,2058 @@
+# Translations template for PROJECT.
+# Copyright (C) 2021 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2021.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2021-03-05 19:32+0000\n"
+"PO-Revision-Date: 2021-03-19 15:46+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.6.0\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: zh_TW\n"
+"X-Generator: Poedit 2.4.2\n"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardPanel.jsx:89
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/UdfDashboard/SaveUdfDashboardPanel.jsx:90
+msgid " You may now view the dashboard."
+msgstr " 您現在可以檢視儀表板。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/Frequency.jsx:41
+msgid " minutes past the hour"
+msgstr " 分鐘"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/splunk_metrics_workspace/src/main/webapp/pages/home/ConfigurationCheck.jsx:22
+#, python-format
+msgid ""
+"# %(app_name)s Setup\n"
+"\n"
+"The **%(app_name)s** is used within your existing apps, you need to configure "
+"the %(app_name)s app view to use it.\n"
+"\n"
+"For more information see [%(base_url)s%(app_doc_link)s](%(base_url)s"
+"%(app_doc_link)s)"
+msgstr ""
+"# %(app_name)s 設定\n"
+"\n"
+"**%(app_name)s** 用於現有應用套件中，您需要設定 %(app_name)s 應用套件檢視才能使"
+"用。\n"
+"\n"
+"如需詳細資訊，請參閱 [%(base_url)s%(app_doc_link)s](%(base_url)s"
+"%(app_doc_link)s)"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/splunk_metrics_workspace/src/main/webapp/pages/version_check/index.jsx:16
+#, python-format
+msgid ""
+"# Unable to launch app\n"
+"\n"
+"The %(app_name)s requires Splunk Enterprise version **%(splunk_req_version)s** "
+"or higher. You are currently using version %(splunk_curr_version)s.\n"
+"\n"
+"To use the %(app_name)s, you must upgrade Splunk.\n"
+"See [%(app_upgrade_url)s](%(app_upgrade_url)s) for more information."
+msgstr ""
+"# 無法啟動應用套件\n"
+"\n"
+"%(app_name)s 需要 Splunk Enterprise 版本 **%(splunk_req_version)s** 或更高版"
+"本。您目前正在使用版本 %(splunk_curr_version)s。\n"
+"\n"
+"若要使用 %(app_name)s，您必須升級 Splunk。\n"
+"如需詳細資訊，請參閱 [%(app_upgrade_url)s](%(app_upgrade_url)s)。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/splunk_metrics_workspace/src/main/webapp/pages/home/index.jsx:18
+#, python-format
+msgid ""
+"# Welcome!\n"
+"\n"
+"The **%(app_name)s** is used within your existing apps, please navigate to the "
+"**%(app_view)s** view to use it.\\\n"
+"%(base_url)s/app/{app-name}/%(app_view)s\n"
+"\n"
+"If you are already in the %(parent_app_name)s app, click the **Analytics** tab "
+"to launch the %(app_name)s.\\\n"
+"For more information see [%(base_url)s%(app_doc_link)s](%(base_url)s"
+"%(app_doc_link)s)"
+msgstr ""
+"# 歡迎使用！\n"
+"\n"
+"已在您現有的應用套件中使用 **%(app_name)s**，請瀏覽至**%(app_view)s** 檢視以便"
+"使用。\\\n"
+"%(base_url)s/app/{app-name}/%(app_view)s\n"
+"\n"
+"如果您已經在 %(parent_app_name)s 應用套件中，請按一下 **Analytics** 標籤以便啟"
+"動 %(app_name)s。\\\n"
+"如需詳細資訊，請參閱 [%(base_url)s%(app_doc_link)s](%(base_url)s"
+"%(app_doc_link)s)"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/redux/alerting/alerting-actions.js:79
+#, python-format
+msgid "%(alert)s created successfully."
+msgstr "成功建立 %(alert)s。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Report/SaveAsReportForm.jsx:124
+#, python-format
+msgid "%(chartType)s Chart and Statistics Table"
+msgstr "%(chartType)s 圖表和統計表格"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/ChartPanel/Legend/Legend.jsx:196
+#, python-format
+msgid "%(itemName)s, Line color: %(itemColor)s"
+msgstr "%(itemName)s， 線條顏色：%(itemColor)s"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/YAxisLabel.jsx:80
+#, python-format
+msgid "%(minString)s to %(maxString)s"
+msgstr "%(minString)s 至 %(maxString)s"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/DataPanel.jsx:336
+#, python-format
+msgid "%(number)s matches found"
+msgstr "找到 %(number)s 個符合項目"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/YAxisLabel.jsx:92
+#, python-format
+msgid "%(sideString)s = %(yAxisString)s"
+msgstr "%(sideString)s = %(yAxisString)s"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/Section.jsx:16
+#, python-format
+msgid "%(title)s section"
+msgstr "%(title)s 區段"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/YAxisLabel.jsx:87
+#, python-format
+msgid "%(valuesString)s, Log"
+msgstr "%(valuesString)s, 對數"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/GlobalControls/RefreshControl.jsx:29
+#, python-format
+msgid "(%(duration)s to refresh)"
+msgstr "(%(duration)s 重新整理)"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/GlobalControls/RefreshControl.jsx:37
+#, python-format
+msgid "(%(timePassed)s ago)"
+msgstr "(%(timePassed)s前)"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/GlobalControls/RefreshControl.jsx:28
+msgid "(Refreshing)"
+msgstr "(正在重新整理)"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertPanel/AlertPanel.jsx:23
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/ChartPanel/ChartPanel.jsx:255
+#, python-format
+msgid "(Time span=%(span)s)"
+msgstr "(時間跨距=%(span)s)"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/lib/index.js:1
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/HierarchyMenuItem.jsx:21
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:57
+msgid "(default)"
+msgstr "(預設)"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/Threshold.jsx:69
+#, python-format
+msgid "(over %(span)s intervals)"
+msgstr "(經過 %(span)s 個間隔)"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/Multiselect/Compact.jsx:600
+msgid ", "
+msgstr ", "
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/DataPanel.jsx:335
+msgid "1 match found"
+msgstr "找到 1 個符合項目"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/TimeShift/TimeShift.jsx:24
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/view-utils.js:13
+msgid "2 days ago"
+msgstr "2 天前"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/TimeShift/TimeShift.jsx:22
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/view-utils.js:11
+msgid "2 hours ago"
+msgstr "2 小時前"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/TimeShift/TimeShift.jsx:23
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/view-utils.js:12
+msgid "24 hours ago"
+msgstr "24 小時前"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/TimeShift/TimeShift.jsx:20
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/view-utils.js:9
+msgid "30 minutes ago"
+msgstr "30 分鐘前"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/TimeShift/TimeShift.jsx:21
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/view-utils.js:10
+msgid "60 minutes ago"
+msgstr "60 分鐘前"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/TimeShift/TimeShift.jsx:25
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/view-utils.js:14
+msgid "7 days ago"
+msgstr "7 天前"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/GlobalControls/RefreshControl.jsx:137
+msgid "AUTO REFRESH"
+msgstr "自動重新整理"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/UdfDashboard/SaveUdfDashboardForm.jsx:19
+msgid "Absolute"
+msgstr "絕對"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/FilterPanel/FilterPanel.jsx:59
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ReferenceLinePanel/ReferenceLinePanel.jsx:245
+msgid "Add"
+msgstr "新增"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/FilterList/FilterList.jsx:56
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/FilterPanel/FilterPanel.jsx:78
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/FilterPanel/FilterPanel.jsx:79
+msgid "Add New Filter"
+msgstr "新增篩選"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ReferenceLineList/ReferenceLineList.jsx:42
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ReferenceLinePanel/ReferenceLinePanel.jsx:251
+msgid "Add New Reference Line"
+msgstr "新增參考線"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/SeriesPanel.jsx:176
+msgid "Add a horizontal line to indicate significant values or thresholds."
+msgstr "新增水平線以指示有效值或臨界值。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/FilterPanel/DimensionFilterSection/DimensionFilterSection.jsx:128
+msgid "Add dimension filter"
+msgstr "新增維度篩選"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardForm.jsx:282
+msgid "Add interactive time control"
+msgstr "新增互動式時間控制"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/DataPanel.jsx:309
+msgid "Add new filter"
+msgstr "新增篩選"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/splunk_metrics_workspace/src/main/webapp/pages/home/ConfigurationCheck.jsx:206
+msgid "Add the ${VIEW_TITLE} view to the ${PARENT_APP_NAME} app"
+msgstr "將 ${VIEW_TITLE} 檢視新增至 ${PARENT_APP_NAME} 應用套件"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/containers/UnifiedAnalysisApp/AddMeasureAction.jsx:28
+msgid "Add to selected chart"
+msgstr "新增至選取的圖表"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/Throttle.jsx:23
+msgid ""
+"After an alert is triggered, subsequent alerts will not be triggered until "
+"after the throttle period."
+msgstr "在觸發警示之後不會觸發後續的警示，直到節流期間結束後為止。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/SeriesPanel.jsx:205
+msgid "Aggregation"
+msgstr "彙總"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:1
+msgid "Alert level"
+msgstr "警示層級"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/Threshold.jsx:63
+msgid "Alert when"
+msgstr "警示時間"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:47
+msgid "Alerts"
+msgstr "警示"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/containers/UnifiedAnalysisApp/GlobalControlsContainer.jsx:57
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/containers/UnifiedAnalysisApp/GlobalControlsContainer.jsx:63
+msgid "Alerts cannot be saved to a dashboard."
+msgstr "警示無法儲存至儀表板。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardPanel.jsx:101
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/UdfDashboard/SaveUdfDashboardPanel.jsx:102
+msgid "Alerts will not be saved to the Dashboard"
+msgstr "警示將不會儲存至儀表板"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/selector-utils.js:29
+msgid "All Charts"
+msgstr "全部圖表"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardPanel.jsx:79
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/UdfDashboard/SaveUdfDashboardPanel.jsx:80
+#, python-format
+msgid "All charts have been added to %(id)s."
+msgstr "全部圖表已新增至 %(id)s。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/ChartingGrid/ChartingGrid.jsx:124
+msgid "All charts loaded."
+msgstr "全部圖表已載入。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/timeranges.js:18
+msgid "All time"
+msgstr "所有時間"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/containers/UnifiedAnalysisApp/UnifiedAnalysisApp.jsx:441
+msgid "Analysis"
+msgstr "分析"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/GlobalSplitPicker/GlobalSplitPicker.jsx:48
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/TimePickerDialog.jsx:26
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TransientPanel/TransientPanel.jsx:29
+msgid "Apply"
+msgstr "套用"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/DeleteAlertDialog.jsx:26
+msgid "Are you sure you want to delete"
+msgstr "是否確定要刪除"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/ChartSettingsPanel.jsx:107
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Report/SaveAsReportForm.jsx:83
+msgid "Area"
+msgstr "區域圖"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/Frequency.jsx:51
+msgid "At "
+msgstr "於整點後的 "
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/YAxisLabel.jsx:79
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/containers/UnifiedAnalysisApp/MultiSeriesPanelContainer.jsx:77
+msgid "Auto"
+msgstr "自動"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/CustomSelect/CustomSelect.jsx:42
+msgid "Auto refresh settings"
+msgstr "自動重新整理設定"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/GlobalControls/RefreshControl.jsx:121
+msgid "Auto-refresh"
+msgstr "自動重新整理"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:8
+msgid "Avg"
+msgstr "平均"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/EmptyState/EmptyState.jsx:41
+msgid "Build"
+msgstr "建立"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/timeranges.js:8
+msgid "Business week to date"
+msgstr "工作週迄今"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ReferenceLinePanel/ReferenceLinePanel.jsx:258
+msgid "Calculation"
+msgstr "計算"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardForm.jsx:252
+msgid "Can only contain letters, numbers and underscores."
+msgstr "只能包含字母、數字和底線。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/AlertFormModal.jsx:44
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/DeleteAlertDialog.jsx:30
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardPanel.jsx:141
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/GlobalSplitPicker/GlobalSplitPicker.jsx:43
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/TimeSpanPicker.jsx:139
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/YAxisForm.jsx:145
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Report/SaveAsReportModal.jsx:78
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/TimePickerDialog.jsx:21
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TransientPanel/TransientPanel.jsx:58
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/UdfDashboard/SaveUdfDashboardPanel.jsx:140
+msgid "Cancel"
+msgstr "取消"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/ChartSettingsPanel.jsx:62
+msgid "Categorical Charts"
+msgstr "類別圖表"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Report/SaveAsReportForm.jsx:1
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/selector-utils.js:1
+msgid "Chart"
+msgstr "圖表"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/ChartPanel/ChartOptionsDropdown.jsx:10
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/ChartPanel/ChartOptionsDropdown.jsx:12
+msgid "Chart Actions"
+msgstr "圖表動作"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/MultiSeriesPanel.jsx:373
+msgid "Chart Settings"
+msgstr "圖表設定"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/ChartSettingsPanel.jsx:94
+msgid "Chart Type"
+msgstr "圖表類型"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/ChartingGrid/ChartingGrid.jsx:135
+msgid "Charting grid"
+msgstr "圖表網格"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/selector-utils.js:1
+msgid "Charts"
+msgstr "圖表"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/TimePickerForm.jsx:235
+msgid "Choose the type of time range"
+msgstr "選擇時間範圍的類型"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/Multiselect/Compact.jsx:385
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/icons/ClearAll.jsx:10
+msgid "Clear All"
+msgstr "全部清除"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/Multiselect/Compact.jsx:385
+msgid "Clear All Matches"
+msgstr "清除所有相符項目"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DimensionFilterPanel/MemberExplorer.jsx:59
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DimensionFilterPanel/MemberExplorer.jsx:67
+msgid "Clear Selections"
+msgstr "清除選取"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/ClearAllButton/ClearAllButton.jsx:28
+msgid "Clear all"
+msgstr "全部清除"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/SeriesButtons.jsx:29
+msgid "Clone"
+msgstr "複製"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/panel-utils.js:285
+msgid "Clone this Panel"
+msgstr "複製此面板"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/ChartSettingsPanel.jsx:64
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/ChartSettingsPanel.jsx:112
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Report/SaveAsReportForm.jsx:87
+msgid "Column"
+msgstr "柱狀圖"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/FilterPanel/FilterPanel.jsx:130
+msgid "Complete the highlighted rows"
+msgstr "完成反白列"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:68
+msgid "Condition"
+msgstr "條件"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ReferenceLinePanel/ReferenceLinePanel.jsx:271
+msgid "Constant Value"
+msgstr "常數值"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Report/SaveAsReportForm.jsx:114
+msgid "Content"
+msgstr "內容"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/splunk_metrics_workspace/src/main/webapp/pages/analytics_workspace/utils/consumer-config.js:4
+msgid "Context to Console"
+msgstr "控制台內容"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/WarningDialog/WarningDialog.jsx:59
+msgid "Continue"
+msgstr "繼續"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/StateRestoreControl/StateRestoreControl.jsx:19
+msgid "Continue where you left off, or select new data."
+msgstr "從上次停止處繼續，或選取新資料。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/ChartingGrid/LegendPopupContainer.jsx:117
+msgid "Copy Series Name"
+msgstr "複寫系列名稱"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:9
+msgid "Count"
+msgstr "數量"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/FilterPanel/FilterPanel.jsx:300
+msgid "Create New Filter"
+msgstr "建立新篩選"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-enterprise/src/index.jsx:79
+msgid "Critical"
+msgstr "關鍵"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ReferenceLinePanel/ReferenceTimeRange.jsx:28
+msgid "Current chart"
+msgstr "目前圖表"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/DataRangeSelector.jsx:46
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/TimeShift/TimeShift.jsx:26
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/view-utils.js:15
+msgid "Custom"
+msgstr "自訂"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/DataPanelTimePicker.jsx:20
+msgid "Custom Data Time Range"
+msgstr "自訂資料時間範圍"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/CustomTimePicker/CustomTimePicker.jsx:14
+msgid "Custom Time Range"
+msgstr "自訂時間範圍"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/DataRangeSelector.jsx:29
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ReferenceLinePanel/ReferenceTimeRange.jsx:29
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Time/TimeRange.jsx:39
+msgid "Custom..."
+msgstr "自訂..."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ReferenceLinePanel/ReferenceLinePanel.jsx:277
+msgid "Customize the label (optional)."
+msgstr "自訂標籤 (選用)。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardForm.jsx:328
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardPanel.jsx:91
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/UdfDashboard/SaveUdfDashboardPanel.jsx:92
+msgid "Dashboard"
+msgstr "儀表板"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardForm.jsx:274
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/UdfDashboard/SaveUdfDashboardForm.jsx:160
+msgid "Dashboard Description"
+msgstr "儀表板說明"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardForm.jsx:265
+msgid "Dashboard ID"
+msgstr "儀表板 ID"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardForm.jsx:256
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/UdfDashboard/SaveUdfDashboardForm.jsx:152
+msgid "Dashboard Title"
+msgstr "儀表板標題"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/containers/UnifiedAnalysisApp/UnifiedAnalysisApp.jsx:345
+msgid "Data"
+msgstr "資料"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TreeControl/TreeControl.jsx:172
+msgid "Data tree"
+msgstr "資料樹狀"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:45
+msgid "Datasets"
+msgstr "資料集"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/TimePickerForm.jsx:213
+msgid "Date & Time Range"
+msgstr "日期和時間範圍"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/TimeSpanPicker.jsx:32
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:37
+msgid "Days"
+msgstr "天"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/RelativeTimeInput.jsx:71
+msgid "Days Ago"
+msgstr "幾天前"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/TimeShift/CustomTimeShift.jsx:13
+msgid "Days ago"
+msgstr "幾天前"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/DeleteAlertDialog.jsx:35
+msgid "Delete"
+msgstr "刪除"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/DeleteAlertDialog.jsx:23
+msgid "Delete Alert"
+msgstr "刪除警示"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/DataPanel.jsx:88
+msgid "Delete alert"
+msgstr "刪除警示"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:120
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/ScheduledAlertForm.jsx:183
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/StreamingAlertForm.jsx:169
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Report/SaveAsReportForm.jsx:104
+msgid "Description"
+msgstr "說明"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:200
+msgid "Details"
+msgstr "詳細資訊"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/SplitBy/SplitBy.jsx:141
+msgid "Dimension"
+msgstr "維度"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/GlobalSplitPicker/GlobalSplitPicker.jsx:95
+msgid "Display"
+msgstr "顯示"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/SeriesPanel.jsx:271
+msgid "Display an earlier time range."
+msgstr "顯示更早的時間範圍。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:10
+msgid "Dist count"
+msgstr "距離計數"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/WarningDialog/WarningDialog.jsx:52
+msgid "Do not show this again"
+msgstr "請勿再次顯示。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/TimePickerForm.jsx:76
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/TimePickerForm.jsx:114
+msgid "Earliest"
+msgstr "最早"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/timePickerValidation.js:50
+msgid "Earliest and Latest times must be different."
+msgstr "最早時間和最晚時間必須不同。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/timePickerValidation.js:37
+msgid "Earliest field cannot be empty."
+msgstr "最早欄位不可為空白。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/timePickerValidation.js:54
+msgid "Earliest must be before latest."
+msgstr "最早必須早於最晚。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/FilterList/FilterList.jsx:65
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/FilterPanel/FilterPanel.jsx:64
+#, python-format
+msgid "Edit %(dimension)s filter"
+msgstr "編輯 %(dimension)s 篩選"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/ScheduledAlertDialogContainer.jsx:247
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/StreamingAlertDialogContainer.jsx:245
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/panel-utils.js:225
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/panel-utils.js:235
+msgid "Edit Alert"
+msgstr "編輯警示"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/TimeSpanPicker.jsx:46
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/TimeSpanPicker.jsx:168
+msgid "Edit Span"
+msgstr "編輯跨距"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/YAxisLabel.jsx:33
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/YAxisLabel.jsx:58
+msgid "Edit Y-Axis"
+msgstr "編輯 Y 軸"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/DataPanel.jsx:315
+msgid "Edit metric filter"
+msgstr "編輯度量篩選"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ReferenceLineList/ReferenceLineList.jsx:48
+#, python-format
+msgid "Edit reference line %(label)s"
+msgstr "編輯參考線 %(label)s"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/ChartingGrid/ChartingGridConnector.jsx:81
+msgid "Empty State"
+msgstr "空白狀態"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/dashboard-utils.js:8
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/dashboard-utils.test.js:7
+msgid "Enter a Dashboard ID"
+msgstr "輸入儀表板 ID"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/dashboard-utils.js:15
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/dashboard-utils.test.js:6
+msgid "Enter a valid Dashboard ID"
+msgstr "輸入有效的儀表板 ID"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:127
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/Frequency.jsx:70
+msgid "Evaluate every"
+msgstr "評估間隔"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/EventExplorer/EventTable.jsx:138
+msgid "Event"
+msgstr "事件"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:46
+msgid "Events"
+msgstr "事件"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DimensionFilterPanel/MemberExplorer.jsx:217
+msgid "Exclude"
+msgstr "排除"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/ChartingGrid/LegendPopupContainer.jsx:102
+#, python-format
+msgid "Exclude %(name)s"
+msgstr "排除 %(name)s"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/validation.js:58
+msgid "Execution frequency must be a valid whole number."
+msgstr "執行頻率必須是有效的整數。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardForm.jsx:338
+msgid "Existing"
+msgstr "現有"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/panel-utils.js:361
+msgid "Export as CSV"
+msgstr "匯出為 CSV"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/panel-utils.js:353
+msgid "Export as PNG"
+msgstr "匯出為 PNG"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/redux/views/views-saga.js:143
+msgid "Failed to fetch measure."
+msgstr "無法擷取測量。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/redux/measure/measure-actions.js:47
+#, python-format
+msgid "Failed to load dimensions: %(error)s"
+msgstr "無法載入維度: %(error)s"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/redux/datasource-filter-metadata/datasource-filter-metadata-actions.js:41
+#, python-format
+msgid "Failed to load indexes: %(error)s"
+msgstr "無法載入索引: %(error)s"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/icons/FieldFilter.jsx:10
+msgid "Field Filter"
+msgstr "欄位篩選"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/Multiselect/Compact.jsx:406
+msgid "Filter"
+msgstr "篩選器"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/FilterPanel/FilterPanel.jsx:230
+msgid "Filter by index"
+msgstr "依索引篩選"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/FilterPanel/FilterPanel.jsx:299
+msgid "Filter by indexes and other fields"
+msgstr "依索引和其他欄位篩選"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/FilterPanel/FilterPanel.jsx:272
+msgid "Filter by other fields"
+msgstr "依其他欄位篩選"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/PanelFilter/PanelFilterToken.jsx:64
+msgid "Filtered"
+msgstr "已篩選"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:163
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/SeriesPanel.jsx:148
+msgid "Filters"
+msgstr "篩選器"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/EventExplorer/EventExplorer.jsx:116
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/EventExplorer/EventExplorer.jsx:117
+msgid "Find"
+msgstr "尋找"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/DataPanel.jsx:1
+msgid "Find Data to Analyze"
+msgstr "尋找要分析的資料"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/EmptyState/EmptyState.jsx:34
+msgid "Find something interesting? Save it to a dashboard, or create an alert."
+msgstr "找到需要關注的資料? 將資料儲存至儀表板，或建立警示。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/validation.js:54
+msgid "Frequency cannot be empty."
+msgstr "頻率不可為空白。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/utils/timepicker-utils.js:77
+#, python-format
+msgid "From %(datetime)s"
+msgstr "從 %(datetime)s"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/utils/timepicker-utils.js:37
+#, python-format
+msgid "From %(datetimeEarliest)s to %(datetimeLatest)s"
+msgstr "從 %(datetimeEarliest)s 到 %(datetimeLatest)s"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/GlobalActions/GlobalActions.jsx:21
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/GlobalActions/GlobalActions.jsx:22
+msgid "Global Actions"
+msgstr "全域動作"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/GlobalControls/GlobalControls.jsx:145
+msgid "Global controls"
+msgstr "全域控制"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/splunk_metrics_workspace/src/main/webapp/pages/version_check/index.jsx:56
+msgid "Go to Search"
+msgstr "前往搜尋"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/splunk_metrics_workspace/src/main/webapp/pages/home/index.jsx:42
+#, python-format
+msgid "Go to the %(VIEW_TITLE)s in Search"
+msgstr "前往搜尋中的 %(VIEW_TITLE)s"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/UdfDashboard/SaveUdfDashboardForm.jsx:19
+msgid "Grid"
+msgstr "網格"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/LayoutControl/LayoutControl.jsx:15
+msgid "Grid Layout"
+msgstr "網格配置"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/ChartSettingsPanel.jsx:78
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/icons/Heatmap.jsx:10
+msgid "Heatmap"
+msgstr "熱圖"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Report/SaveAsReportModal.jsx:44
+msgid "Heatmap will be saved to the Report as a column chart "
+msgstr "熱圖將以柱狀圖儲存至報告中"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/WarningDialog/WarningDialog.jsx:41
+msgid "Heatmap will open as a column chart in Search."
+msgstr "熱圖將在搜尋中作為柱狀圖開啟。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardPanel.jsx:108
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/UdfDashboard/SaveUdfDashboardPanel.jsx:109
+msgid "Heatmaps will be saved to the Dashboard as column charts "
+msgstr "熱圖將儲存至儀表板成為柱狀圖"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/icons/HideLeft.jsx:8
+msgid "Hide Left"
+msgstr "隱藏左側"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/icons/HideRight.jsx:10
+msgid "Hide Right"
+msgstr "隱藏右側"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/redux/data-sources/data-sources-reducer.js:142
+#, python-format
+msgid "Hierarchy not found: %(sourceName)s"
+msgstr "找不到階層: %(sourceName)s"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-enterprise/src/index.jsx:73
+msgid "High"
+msgstr "高"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/GlobalSplitPicker/GlobalSplitPicker.jsx:104
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/SplitBy/SplitBy.jsx:161
+msgid "Highest"
+msgstr "最高"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/TimeSpanPicker.jsx:31
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:36
+msgid "Hours"
+msgstr "小時"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/RelativeTimeInput.jsx:70
+msgid "Hours Ago"
+msgstr "幾小時前"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/TimeShift/CustomTimeShift.jsx:12
+msgid "Hours ago"
+msgstr "小時前"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/validation.js:68
+msgid "Hours must be from 1 to 24."
+msgstr "小時必須是 1 到 24。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/Lookback.jsx:29
+msgid "In the last"
+msgstr "在上一個"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DimensionFilterPanel/MemberExplorer.jsx:214
+msgid "Include"
+msgstr "包含"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ReferenceLinePanel/ReferenceLinePanel.jsx:292
+msgid "Include Value"
+msgstr "包含值"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/SeriesPanel.jsx:149
+msgid "Include or exclude values from specific dimensions."
+msgstr "包括或排除特定維度中的值。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-enterprise/src/index.jsx:55
+msgid "Info"
+msgstr "資訊"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/TimePickerForm.jsx:43
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/utils/timepicker-utils.js:78
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/utils/timepicker-utils.js:81
+msgid "Invalid Value"
+msgstr "無效值"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/Threshold.jsx:78
+msgid "Is"
+msgstr "是"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/ChartingGrid/LegendPopupContainer.jsx:91
+#, python-format
+msgid "Keep Only %(name)s"
+msgstr "僅保留 %(name)s"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ReferenceLinePanel/ReferenceLinePanel.jsx:277
+msgid "Label"
+msgstr "標籤"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/timeranges.js:12
+msgid "Last 4 hours"
+msgstr "前 4 小時"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/timeranges.js:11
+msgid "Last 60 minutes"
+msgstr "前 60 分鐘"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/TimePickerForm.jsx:91
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/TimePickerForm.jsx:133
+msgid "Latest"
+msgstr "最晚"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/UdfDashboard/SaveUdfDashboardForm.jsx:169
+msgid "Layout Option"
+msgstr "配置選項"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/Hierarchy.jsx:239
+msgid "Learn more"
+msgstr "進一步瞭解"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/YAxisLabel.jsx:76
+msgid "Left"
+msgstr "左方"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/StateRestoreControl/StateRestoreControl.jsx:14
+msgid "Let's bring you up to speed!"
+msgstr "讓我們加快速度！"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/GlobalSplitPicker/GlobalSplitPicker.jsx:112
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/SplitBy/SplitBy.jsx:173
+msgid "Limit"
+msgstr "限制"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/GlobalSplitPicker/GlobalSplitPicker.jsx:102
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/SplitBy/SplitBy.jsx:159
+msgid "Limit Type"
+msgstr "限制類型"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/ChartSettingsPanel.jsx:102
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Report/SaveAsReportForm.jsx:79
+msgid "Line"
+msgstr "折線圖"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/YAxisForm.jsx:134
+msgid "Linear"
+msgstr "線性"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DimensionFilterPanel/MemberExplorer.jsx:298
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DimensionFilterPanel/MemberExplorer.jsx:299
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DimensionFilterPanel/MemberExplorer.jsx:301
+msgid "Load more..."
+msgstr "載入更多..."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/ChartingGrid/ChartingGrid.jsx:127
+msgid "Loading ${numPanelsLoading} ${numPanelsLoading > 1 ? 'charts' : 'chart'}."
+msgstr ""
+"正在載入 ${numPanelsLoading} ${numPanelsLoading > 1 ? 'charts' : 'chart'}。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/DataPanel.jsx:422
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/DataPanelTree.jsx:51
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/Hierarchy.jsx:208
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Panel/LoadingBody.jsx:24
+msgid "Loading..."
+msgstr "正在載入..."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/YAxisForm.jsx:139
+msgid "Log"
+msgstr "對數"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:134
+msgid "Lookback"
+msgstr "回溯"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/validation.js:77
+msgid "Lookback cannot be empty"
+msgstr "回溯不可為空白"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/validation.js:81
+msgid "Lookback must be a valid whole number"
+msgstr "回溯必須是有效的整數"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/validation.js:86
+msgid "Lookback must be greater than 0"
+msgstr "回溯必須大於 0"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-enterprise/src/index.jsx:61
+msgid "Low"
+msgstr "低"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/GlobalSplitPicker/GlobalSplitPicker.jsx:105
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/SplitBy/SplitBy.jsx:162
+msgid "Lowest"
+msgstr "最低"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/YAxisLabel.jsx:74
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:11
+msgid "Max"
+msgstr "最大值"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/YAxisForm.jsx:116
+msgid "Max Value"
+msgstr "最大值"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/yAxisValidation.js:6
+msgid "Max must be greater than min"
+msgstr "最大值必須大於最小值"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/yAxisValidation.js:5
+msgid "Max must be valid number"
+msgstr "最大值必須是有效數字"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/FullscreenControl/FullscreenControl.jsx:13
+msgid "Maximize panel"
+msgstr "最大化面板"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:113
+msgid "Measure"
+msgstr "測量"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-enterprise/src/index.jsx:67
+msgid "Medium"
+msgstr "中"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:44
+msgid "Metrics"
+msgstr "度量"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/YAxisLabel.jsx:73
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:12
+msgid "Min"
+msgstr "最小值"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/YAxisForm.jsx:102
+msgid "Min Value"
+msgstr "最小值"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/yAxisValidation.js:4
+msgid "Min must be valid number"
+msgstr "最小值必須是有效數字"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/FullscreenControl/FullscreenControl.jsx:11
+msgid "Minimize panel"
+msgstr "最小化面板"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/TimeSpanPicker.jsx:30
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:35
+msgid "Minutes"
+msgstr "分鐘"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/RelativeTimeInput.jsx:69
+msgid "Minutes Ago"
+msgstr "幾分鐘前"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/TimeShift/CustomTimeShift.jsx:11
+msgid "Minutes ago"
+msgstr "幾分鐘前"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/validation.js:64
+msgid "Minutes must be from 1 to 60."
+msgstr "分鐘必須是 1 到 60。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/timeranges.js:9
+msgid "Month to date"
+msgstr "月迄今"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/TimeSpanPicker.jsx:34
+msgid "Months"
+msgstr "月"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/RelativeTimeInput.jsx:73
+msgid "Months Ago"
+msgstr "幾個月前"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:4
+msgid "N/A"
+msgstr "N/A"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardForm.jsx:334
+msgid "New"
+msgstr "新增"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/messages.js:1
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Report/SaveAsReportForm.jsx:157
+msgid "No"
+msgstr "否"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/Aggregation/Aggregation.jsx:148
+msgid "No aggregations"
+msgstr "無彙總"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/ChartPanel/Viz/tooltips.js:37
+msgid "No data available"
+msgstr "沒有資料可用"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:196
+msgid "No details found for this alert."
+msgstr "找不到此警示的詳細資訊。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/Multiselect/Compact.jsx:143
+msgid "No matches"
+msgstr "無相符項目"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/FilterSelect/FilterSelect.jsx:416
+msgid "No options"
+msgstr "沒有選項"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:218
+msgid "No thresholds found for this alert"
+msgstr "找不到此警示的臨界值"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/SplitBy/SplitBy.jsx:108
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/TimeShift/TimeShift.jsx:19
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/view-utils.js:8
+msgid "None"
+msgstr "無"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/Hierarchy.jsx:217
+msgid "Not all metrics listed. Contact your admin to increase the metrics limit."
+msgstr "並非全部度量均列出。請聯絡管理員增加度量限制。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/TimePickerForm.jsx:92
+msgid "Now"
+msgstr "現在"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/StateRestoreControl/StateRestoreControl.jsx:21
+msgid "Open Charts"
+msgstr "開啟圖表"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/panel-utils.js:253
+msgid "Open in Search"
+msgstr "在搜尋中開啟"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/StateRestoreControl/StateRestoreControl.jsx:15
+msgid "Open your latest charts, or start by selecting data."
+msgstr "開啟最新的圖表，或先選取資料。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/ScheduledAlertForm.jsx:191
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/StreamingAlertForm.jsx:177
+msgid "Optional"
+msgstr "選用"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/Axis/Axis.jsx:29
+msgid "Overlay on right axis"
+msgstr "右軸重疊"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardForm.jsx:313
+msgid "Panel Title"
+msgstr "面板標題"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ButtonPanel/ButtonPanel.jsx:72
+#, python-format
+msgid "Panel is closed %(title)s %(subtitle)s"
+msgstr "面板已關閉 %(title)s %(subtitle)s"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ButtonPanel/ButtonPanel.jsx:71
+#, python-format
+msgid "Panel is open %(title)s %(subtitle)s"
+msgstr "面板已開啟 %(title)s %(subtitle)s"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/ScheduledAlertForm.jsx:194
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/StreamingAlertForm.jsx:180
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardForm.jsx:293
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/UdfDashboard/SaveUdfDashboardForm.jsx:178
+msgid "Permissions"
+msgstr "權限"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/TimeSpanPicker.jsx:194
+msgid "Please reference the time range to set an appropriate time span."
+msgstr "請參考時間範圍設定適當的時間跨距。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/ChartPreview.jsx:74
+msgid "Preview"
+msgstr "預覽"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/timeranges.js:15
+msgid "Previous business week"
+msgstr "上個工作週"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/timeranges.js:16
+msgid "Previous month"
+msgstr "上個月"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/timeranges.js:14
+msgid "Previous week"
+msgstr "上週"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/timeranges.js:17
+msgid "Previous year"
+msgstr "去年"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardForm.jsx:23
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/UdfDashboard/SaveUdfDashboardForm.jsx:21
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/constants.js:12
+msgid "Private"
+msgstr "私人"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/RelativeTimeInput.jsx:74
+msgid "Quarters Ago"
+msgstr "幾季前"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:13
+msgid "Rate"
+msgstr "速率"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:17
+msgid "Rate (Avg)"
+msgstr "速率 (平均)"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:16
+msgid "Rate (Sum)"
+msgstr "速率 (總和)"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ReferenceLinePanel/ReferenceLinePanel.jsx:265
+msgid "Raw Data"
+msgstr "原始資料"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ReferenceLineTimePicker/ReferenceLineTimePicker.jsx:14
+msgid "Reference Line Time Range"
+msgstr "參考線時間範圍"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/SeriesPanel.jsx:175
+msgid "Reference Lines"
+msgstr "參考線"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/GlobalControls/RefreshControl.jsx:109
+msgid "Refresh"
+msgstr "重新整理"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/GlobalControls/RefreshControl.jsx:108
+msgid "Refresh Chart Data"
+msgstr "重新整理圖表資料"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/TimePickerForm.jsx:216
+msgid "Relative"
+msgstr "相對"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/FilterPanel/FilterPanel.jsx:55
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/SeriesButtons.jsx:43
+msgid "Remove"
+msgstr "移除"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/FilterList/FilterList.jsx:68
+#, python-format
+msgid "Remove %(dimension)s filter"
+msgstr "移除 %(dimension)s 篩選"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/DataPanel.jsx:316
+msgid "Remove metric filter"
+msgstr "移除度量篩選"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/ChartPanel/ChartButtons.jsx:48
+msgid "Remove panel"
+msgstr "移除面板"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ReferenceLineList/ReferenceLineList.jsx:51
+#, python-format
+msgid "Remove reference line %(label)s"
+msgstr "移除參考線 %(label)s"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Report/SaveAsReportModal.jsx:55
+msgid "Report"
+msgstr "報告"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Report/SaveAsReportModal.jsx:51
+#, python-format
+msgid "Report %(reportName)s has been created. You may now view the report."
+msgstr "已建立報告 %(reportName)s。您現在可以檢視報告。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/ScheduledAlertForm.jsx:148
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/StreamingAlertForm.jsx:134
+msgid "Required"
+msgstr "必要"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/containers/UnifiedAnalysisApp/GlobalControlsContainer.jsx:82
+msgid "Reset zoom to enable auto-refresh"
+msgstr "重設縮放以啟用自動重新整理"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/containers/UnifiedAnalysisApp/GlobalControlsContainer.jsx:83
+msgid "Reset zoom to enable refresh"
+msgstr "重設縮放以啟用重新整理"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/ErrorPanel/ErrorPanel.jsx:39
+msgid "Retry"
+msgstr "重試"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/TimeSpanPicker.jsx:44
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/TimeSpanPicker.jsx:160
+msgid "Revert Span"
+msgstr "還原跨距"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/YAxisLabel.jsx:32
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/YAxisLabel.jsx:50
+msgid "Revert Y-Axis"
+msgstr "還原 Y 軸"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/YAxisLabel.jsx:76
+msgid "Right"
+msgstr "右方"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/AlertFormModal.jsx:50
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardPanel.jsx:147
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Report/SaveAsReportModal.jsx:90
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/UdfDashboard/SaveUdfDashboardPanel.jsx:146
+msgid "Save"
+msgstr "儲存"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardPanel.jsx:116
+msgid "Save All To Dashboard"
+msgstr "全部儲存至儀表板"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/UdfDashboard/SaveUdfDashboardPanel.jsx:117
+msgid "Save All To Dashboard Studio"
+msgstr "全部儲存至儀表板工作室"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardPanel.jsx:115
+msgid "Save As Dashboard Panel"
+msgstr "另存為儀表板面板"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Report/SaveAsReportModal.jsx:65
+msgid "Save As Report"
+msgstr "另存為報告"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/containers/UnifiedAnalysisApp/UnifiedAnalysisApp.jsx:129
+msgid "Save all charts to Dashboard (XML)"
+msgstr "將全部圖表儲存至儀表板 (XML)"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/containers/UnifiedAnalysisApp/UnifiedAnalysisApp.jsx:137
+msgid "Save all charts to Dashboard Studio"
+msgstr "將全部圖表儲存至儀表板工作室"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/panel-utils.js:347
+msgid "Save as Report"
+msgstr "另存為報告"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/ScheduledAlertDialogContainer.jsx:247
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/panel-utils.js:307
+msgid "Save as Scheduled Alert"
+msgstr "另存為已排程警示"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/StreamingAlertDialogContainer.jsx:245
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/panel-utils.js:317
+msgid "Save as Streaming Alert"
+msgstr "另存為串流警示"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/panel-utils.js:327
+msgid "Save to Dashboard (XML)"
+msgstr "儲存至儀表板 (XML)"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/UdfDashboard/SaveUdfDashboardPanel.jsx:116
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/panel-utils.js:337
+msgid "Save to Dashboard Studio"
+msgstr "儲存至儀表板工作室"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/YAxisForm.jsx:129
+msgid "Scale"
+msgstr "刻度"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/constants.js:21
+msgid "Scheduled"
+msgstr "已排程"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DimensionFilterPanel/SearchBox.jsx:15
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DimensionFilterPanel/SearchBox.jsx:16
+msgid "Search"
+msgstr "搜尋"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/panel-utils.js:292
+msgid "Search Related Events"
+msgstr "搜尋相關事件"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/TimeSpanPicker.jsx:29
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:34
+msgid "Seconds"
+msgstr "秒"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/RelativeTimeInput.jsx:68
+msgid "Seconds Ago"
+msgstr "幾秒鐘前"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/Multiselect/Compact.jsx:378
+msgid "Select All"
+msgstr "全部選取"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/Multiselect/Compact.jsx:378
+msgid "Select All Matches"
+msgstr "選取所有相符項目"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/FilterPanel/DimensionFilterSection/DimensionsDropdown.jsx:89
+msgid "Select a dimension"
+msgstr "選取維度"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ReferenceLinePanel/ReferenceLinePanel.jsx:216
+msgid "Select a time range."
+msgstr "選取時間範圍。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/containers/UnifiedAnalysisApp/AddMeasureAction.jsx:23
+msgid "Select a valid chart to add this series"
+msgstr "選取有效的圖表以新增此系列"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/redux/views/views-saga.js:138
+msgid "Select an aggregation."
+msgstr "選取彙總。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/FilterPanel/DimensionFilterSection/DimensionValuesDropdown.jsx:87
+msgid "Select dimension values"
+msgstr "選取維度值"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/FilterDropdown/FilterDropdown.jsx:59
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/FilterDropdown/FilterDropdown.jsx:66
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/FilterPanel/FilterPanel.jsx:238
+msgid "Select index filters"
+msgstr "選取索引篩選"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ReferenceLinePanel/ReferenceLinePanel.jsx:172
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/SeriesPanel.jsx:206
+msgid "Select or type an aggregation."
+msgstr "選取或輸入彙總。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/Multiselect/Compact.jsx:146
+msgid "Select..."
+msgstr "選擇..."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/Hierarchies.jsx:80
+msgid "Selected Index:"
+msgstr "選取的索引:"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/ChartSettingsPanel.jsx:86
+#, python-format
+msgid "Set the min and max value of the y-axis. (for example: %(exampleText)s)"
+msgstr "設定 Y 軸的最小和最大值。(例如: %(exampleText)s)"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:262
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/ScheduledAlertForm.jsx:174
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/StreamingAlertForm.jsx:160
+msgid "Settings"
+msgstr "設定"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:77
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/Threshold.jsx:49
+msgid "Severity"
+msgstr "嚴重性"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardForm.jsx:23
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/UdfDashboard/SaveUdfDashboardForm.jsx:21
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/constants.js:13
+msgid "Shared in App"
+msgstr "在應用套件中共用"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/redux/alerting/alerting-actions.js:82
+msgid "Show Alert"
+msgstr "顯示警示"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:247
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:249
+msgid "Show triggered instances"
+msgstr "顯示觸發的執行個體"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/icons/SortAZ.jsx:10
+msgid "Sort A to Z"
+msgstr "排序從 A 到 Z"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DimensionFilterPanel/SortToggle.jsx:10
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DimensionFilterPanel/SortToggle.jsx:25
+msgid "Sort Ascending"
+msgstr "遞增排序"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DimensionFilterPanel/SortToggle.jsx:10
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DimensionFilterPanel/SortToggle.jsx:25
+msgid "Sort Descending"
+msgstr "遞減排序"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/icons/SortZA.jsx:10
+msgid "Sort Z to A"
+msgstr "排序從 Z 到 A"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/ScheduledAlertForm.jsx:165
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/StreamingAlertForm.jsx:151
+msgid "Source"
+msgstr "來源"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/redux/data-sources/data-sources-reducer.js:109
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/redux/data-sources/data-sources-reducer.js:128
+#, python-format
+msgid "Source not found: %(sourceName)s"
+msgstr "找不到來源: %(sourceName)s"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:182
+msgid "Span"
+msgstr "跨距"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/TimeSpanPicker.jsx:114
+msgid "Span Period"
+msgstr "跨距期間"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/GlobalControls/GlobalSplitButton.jsx:9
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/SeriesPanel.jsx:247
+msgid "Split By"
+msgstr "分割依據"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/GlobalSplitPicker/GlobalSplitPicker.jsx:184
+msgid "Split Metrics by a Dimension"
+msgstr "依據維度分割度量"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:175
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/GlobalSplitPicker/GlobalSplitPicker.jsx:75
+msgid "Split by"
+msgstr "分割依據"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/SeriesPanel.jsx:248
+msgid "Split this series into separate values."
+msgstr "將此系列分割為個別的值。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/icons/StackColumn.jsx:10
+msgid "Stack Column"
+msgstr "堆疊欄"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/LayoutControl/LayoutControl.jsx:19
+msgid "Stack Layout"
+msgstr "堆疊配置"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/ChartSettingsPanel.jsx:69
+msgid "Stacked Column"
+msgstr "堆疊欄"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/FilterPanel/FilterPanel.jsx:233
+msgid "Start by adding index filters"
+msgstr "透過新增索引篩選開始"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/EmptyState/EmptyState.jsx:32
+msgid "Start by selecting data."
+msgstr "透過選取資料開始。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Report/SaveAsReportForm.jsx:144
+msgid "Statistics Table"
+msgstr "統計資料表格"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:14
+msgid "Std dev"
+msgstr "標準開發"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertPanel/StreamingSeverityIcon.jsx:11
+msgid "Stream Bell"
+msgstr "串流鈴聲"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/constants.js:22
+msgid "Streaming"
+msgstr "串流"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:15
+msgid "Sum"
+msgstr "總和"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/Throttle.jsx:60
+msgid "Suppress Triggering for"
+msgstr "隱藏觸發:"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/splunk_metrics_workspace/src/main/webapp/pages/version_check/index.jsx:14
+#, python-format
+msgid ""
+"The %(app_name)s requires Splunk Enterprise version **%(splunk_req_version)s** "
+"or higher. You are currently using version %(splunk_curr_version)s.\n"
+"Contact your administrator for assistance."
+msgstr ""
+"%(app_name)s 需要版本 **%(splunk_req_version)s** 或更高版本。您目前正在使用版"
+"本 %(splunk_curr_version)s。\n"
+"請聯絡管理員尋求協助。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/validation.js:117
+#, python-format
+msgid ""
+"The %(invalidActionsStr)s action is not supported for streaming alerts. Please "
+"delete the action and save again."
+msgstr "對於串流警示不支援 %(invalidActionsStr)s 動作。請刪除動作，並再次儲存。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/validation.js:111
+#, python-format
+msgid ""
+"The %(invalidActionsStr)s actions are not supported for streaming alerts. "
+"Please delete the actions and save again."
+msgstr "對於串流警示不支援 %(invalidActionsStr)s 動作。請刪除動作，並再次儲存。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardForm.jsx:191
+msgid "The ID is used as the filename on disk. Cannot be changed later"
+msgstr "此 ID 在磁碟中作為檔案名稱使用。之後無法再變更"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/timePickerValidation.js:41
+msgid "The earliest time is invalid."
+msgstr "最早時間無效。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/timePickerValidation.js:46
+msgid "The latest time is invalid."
+msgstr "最晚時間無效。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DimensionFilterPanel/MemberExplorer.jsx:252
+msgid ""
+"There are no members for ${dimension} available. Expand the time range to see "
+"available members."
+msgstr "${dimension} 沒有可用的成員。展開時間範圍以檢視可用的成員。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/FilterDropdown/FilterDropdown.jsx:72
+msgid "There are no metric indexes"
+msgstr "沒有度量索引"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/ChartPanel/ChartPanel.jsx:77
+msgid ""
+"There are not enough data points within the current time range. Select a wider "
+"time range to expand your results."
+msgstr "目前時間範圍內沒有足夠的資料點。選取較寬的時間範圍以展開結果。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/ChartPanel/ChartPanel.jsx:70
+msgid ""
+"There are too many data points within the current time range. Select a shorter "
+"time range to refine your results."
+msgstr "目前時間範圍內的資料點過多。選取較短的時間範圍以精簡結果。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/ChartPanel/ChartPanel.jsx:61
+#, python-format
+msgid ""
+"There is no data available for %(measures)s. To see data on the chart, select "
+"a different time range, edit filters, or check with your administrator about "
+"user permissions."
+msgstr ""
+"%(measures)s 沒有可用的資料。若要檢視圖表上的資料，請選取其他時間範圍、編輯篩"
+"選，或向管理員諮詢使用者權限。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/ScheduledAlertDialogContainer.jsx:192
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/StreamingAlertDialogContainer.jsx:192
+msgid ""
+"There was a problem opening the Save as Alert dialog. Close the dialog and try "
+"again."
+msgstr "開啟「另存為警示」對話方塊時發生問題。關閉對話方塊並再試一次。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/SeriesPanel.jsx:225
+msgid "This aggregation should only be used with accumulating counter metrics."
+msgstr "此彙總僅應與彙總計數器度量一起使用。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardPanel.jsx:82
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/UdfDashboard/SaveUdfDashboardPanel.jsx:83
+#, python-format
+msgid "This panel has been created and added to %(id)s."
+msgstr "此面板已建立並新增至 %(id)s 中。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/validation.js:24
+msgid "Threshold value is too large. Enter a smaller threshold."
+msgstr "臨界值太大。輸入較小的臨界值。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/validation.js:26
+msgid "Threshold value is too small. Enter a bigger threshold."
+msgstr "臨界值太小。輸入更大的臨界值。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:238
+msgid "Thresholds"
+msgstr "臨界值"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:141
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/Throttle.jsx:75
+msgid "Throttle"
+msgstr "節流"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/validation.js:37
+msgid "Throttle period cannot be empty"
+msgstr "節流期間不可為空白"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/validation.js:40
+msgid "Throttle period must be a valid whole number"
+msgstr "節流期間必須是有效的整數"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/validation.js:44
+msgid "Throttle period must be greater than 0"
+msgstr "節流期間必須大於 0"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/EventExplorer/EventTable.jsx:137
+msgid "Time"
+msgstr "時間"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/ChartSettingsPanel.jsx:100
+msgid "Time Charts"
+msgstr "時間圖表"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/icons/TimeColumn.jsx:10
+msgid "Time Column"
+msgstr "時間欄"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ReferenceLinePanel/ReferenceLinePanel.jsx:216
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ReferenceLinePanel/ReferenceTimeRange.jsx:91
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/TimeShift/TimeShift.jsx:111
+msgid "Time Range"
+msgstr "時間範圍"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Report/SaveAsReportForm.jsx:151
+msgid "Time Range Picker"
+msgstr "時間範圍挑選器"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/SeriesPanel.jsx:270
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/TimePickerForm.jsx:48
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/TimePickerForm.jsx:210
+msgid "Time Shift"
+msgstr "時間偏移"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/TimeSpanPicker.jsx:198
+msgid "Time Span"
+msgstr "時間跨距"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/TimeSpanPicker.jsx:95
+msgid "Time Span must be a positive number"
+msgstr "時間跨距必須為正數"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/TimeShift/CustomTimeShift.jsx:103
+msgid "Time Unit"
+msgstr "時間單位"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/TimeShift/CustomTimeShift.jsx:93
+msgid "Time Value"
+msgstr "時間值"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Time/TimeRange.jsx:81
+msgid "Time range Menu"
+msgstr "時間範圍功能表"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/timePickerValidation.js:62
+msgid "Time shift must be a numeric value."
+msgstr "時間偏移必須是數值。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/TimeSpanPicker.jsx:180
+#, python-format
+msgid "Time span = %(display)s"
+msgstr "時間跨距 = %(display)s"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/ScheduledAlertForm.jsx:177
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/StreamingAlertForm.jsx:163
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Report/SaveAsReportForm.jsx:93
+msgid "Title"
+msgstr "標題"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/validation.js:10
+msgid "Title cannot be empty"
+msgstr "標題不可為空白"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/utils/timepicker-utils.js:80
+#, python-format
+msgid "To %(datetime)s"
+msgstr "至 %(datetime)s"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/timeranges.js:6
+msgid "Today"
+msgstr "今天"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:155
+msgid "Trigger Actions"
+msgstr "觸發動作"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/ScheduledAlertForm.jsx:212
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/StreamingAlertForm.jsx:189
+msgid "Trigger Conditions"
+msgstr "觸發條件"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/validation.js:20
+msgid "Trigger threshold cannot be empty"
+msgstr "觸發臨界值不可為空白"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/validation.js:22
+msgid "Trigger threshold must be a valid number"
+msgstr "觸發臨界值必須為有效數字"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ReferenceLinePanel/ReferenceLinePanel.jsx:148
+msgid "Type a constant here"
+msgstr "在此處輸入常數"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/splunk_metrics_workspace/src/main/webapp/pages/version_check/index.jsx:51
+msgid "Unable to launch app"
+msgstr "無法啟動應用套件"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/splunk_metrics_workspace/src/main/webapp/pages/analytics_workspace/index.jsx:209
+msgid "Unable to load panel."
+msgstr "無法載入面板。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/containers/UnifiedAnalysisApp/UnifiedAnalysisApp.jsx:86
+msgid "Unable to process the chart's time range. Using default time range"
+msgstr "無法處理圖表的時間範圍。使用預設時間範圍"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-enterprise/src/index.jsx:85
+msgid "Unknown"
+msgstr "未知"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/TimeSpanPicker.jsx:144
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/YAxisForm.jsx:150
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/FilterPanel/FilterPanel.jsx:57
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ReferenceLinePanel/ReferenceLinePanel.jsx:243
+msgid "Update"
+msgstr "更新"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/FilterPanel/FilterPanel.jsx:276
+msgid ""
+"Use dimension = value(s) pairs to filter your data further. Example: ip=10.1*, "
+"10.2*"
+msgstr "使用維度 = 值配對來進一步篩選您的資料。例如: ip=10.1*, 10.2*"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ReferenceLinePanel/ReferenceLinePanel.jsx:154
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ReferenceLinePanel/ReferenceLinePanel.jsx:185
+msgid "Value"
+msgstr "值"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/format-number.js:12
+msgid "Value cannot be empty"
+msgstr "值不可為空白"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/format-number.js:13
+msgid "Value must be a valid number"
+msgstr "值必須是有效數字"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/format-number.js:15
+msgid "Value must be greater than or equal to -5.4e306"
+msgstr "值必須大於或等於 -5.4e306"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/format-number.js:14
+msgid "Value must be less than or equal to 5.4e306"
+msgstr "值必須小於或等於 5.4e306"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/SuccessDialog/SuccessDialog.jsx:35
+#, python-format
+msgid "View %(type)s"
+msgstr "檢視 %(type)s"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/timeranges.js:7
+msgid "Week to date"
+msgstr "週迄今"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/TimeSpanPicker.jsx:33
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:38
+msgid "Weeks"
+msgstr "週"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/RelativeTimeInput.jsx:72
+msgid "Weeks Ago"
+msgstr "幾週前"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/TimeShift/CustomTimeShift.jsx:14
+msgid "Weeks ago"
+msgstr "幾週前"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DimensionFilterPanel/MemberExplorer.jsx:381
+msgid "Wildcards:"
+msgstr "萬用字元:"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-enterprise/lib/test-ready.js:1
+msgid "Wrong index!"
+msgstr "索引有誤!"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-enterprise/lib/test-ready.js:1
+msgid "Wrong length!"
+msgstr "長度有誤!"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-enterprise/lib/test-ready.js:1
+msgid "Wrong offset!"
+msgstr "位移有誤!"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/ChartSettingsPanel.jsx:135
+msgid "Y-Axis"
+msgstr "Y 軸"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/timeranges.js:10
+msgid "Year to date"
+msgstr "年迄今"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/RelativeTimeInput.jsx:75
+msgid "Years Ago"
+msgstr "幾年前"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Report/SaveAsReportForm.jsx:156
+msgid "Yes"
+msgstr "是"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/timeranges.js:13
+msgid "Yesterday"
+msgstr "昨天"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardForm.jsx:235
+msgid "You do not have any dashboards yet. Try saving to a new dashboard."
+msgstr "您仍然沒有任何儀表板。嘗試儲存至新的儀表板。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardForm.jsx:209
+msgid "You have no writable dashboards"
+msgstr "您沒有可寫入的儀表板"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/SuccessDialog/SuccessDialog.jsx:24
+#, python-format
+msgid "Your %(type)s Has Been Created"
+msgstr "已建立您的 %(type)s"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/StateRestoreControl/StateRestoreControl.jsx:18
+msgid "Your work has been recovered."
+msgstr "已復原您的工作。"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/icons/ZoomOut.jsx:10
+msgid "Zoom Out"
+msgstr "縮小"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Time/TimeRange.jsx:85
+msgid "Zoom out"
+msgstr "縮小"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/messages.js:1
+msgid "accelerated "
+msgstr "已加速"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-enterprise/lib/test-ready.js:1
+msgid "ajax error"
+msgstr "ajax 錯誤"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-enterprise/lib/test-ready.js:1
+msgid "ajax error "
+msgstr "ajax 錯誤"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:51
+msgid "alerts"
+msgstr "警示"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:98
+#, python-format
+msgid "at %(timePoint)s"
+msgstr "在 %(timePoint)s"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:100
+#, python-format
+msgid "at %(timePoint)s minutes past the hour"
+msgstr "在一小時後的 %(timePoint)s 分鐘"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/messages.js:3
+msgid "available"
+msgstr "可用"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:21
+msgid "average"
+msgstr "平均"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesLegend/OptionA.jsx:26
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesLegend/OptionB.jsx:26
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesLegend/OptionC.jsx:20
+msgid "by"
+msgstr "依"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/redux/views/views-series.js:188
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/series.js:40
+#, python-format
+msgid "by %(dimension)s"
+msgstr "依 %(dimension)s"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:22
+msgid "count"
+msgstr "數量"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:50
+msgid "data"
+msgstr "資料"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:49
+msgid "datasets"
+msgstr "資料集"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:23
+msgid "distinct count"
+msgstr "獨特計數"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/utils/timepicker-utils.js:20
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/utils/timepicker-utils.js:26
+#, python-format
+msgid "eg. %(firstExample)s or %(secondExample)s"
+msgstr "例如 %(firstExample)s 或 %(secondExample)s"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-enterprise/lib/test-ready.js:1
+msgid "entries"
+msgstr "項目"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/EventExplorer/EventExplorer.jsx:1
+msgid "event"
+msgstr "事件"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/EventExplorer/EventExplorer.jsx:1
+msgid "events"
+msgstr "事件"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/Threshold.jsx:23
+msgid "greater than"
+msgstr "大於"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-enterprise/lib/test-ready.js:1
+msgid "keys"
+msgstr "金鑰"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/Threshold.jsx:24
+msgid "less than"
+msgstr "少於"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:24
+msgid "max"
+msgstr "最大值"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:48
+msgid "metrics"
+msgstr "度量"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:25
+msgid "min"
+msgstr "最小值"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:147
+msgid "no"
+msgstr "否"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/Hierarchy.jsx:232
+msgid "not found"
+msgstr "找不到"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/GlobalControls/RefreshControl.jsx:140
+msgid "off"
+msgstr "關"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/GlobalControls/RefreshControl.jsx:142
+msgid "on"
+msgstr "於"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardForm.jsx:258
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardForm.jsx:276
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardForm.jsx:315
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Report/SaveAsReportForm.jsx:109
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/UdfDashboard/SaveUdfDashboardForm.jsx:162
+msgid "optional"
+msgstr "選用"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:183
+#, python-format
+msgid "over %(span)s intervals"
+msgstr "經過 %(span)s 個間隔"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:1
+msgid "over the last"
+msgstr "在上一個"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:26
+msgid "rate"
+msgstr "速率"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:27
+msgid "standard deviation"
+msgstr "標準差"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:28
+msgid "sum"
+msgstr "總和"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DimensionFilterPanel/MemberExplorer.jsx:290
+msgid "value remaining"
+msgstr "剩餘值"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-enterprise/lib/test-ready.js:1
+msgid "values"
+msgstr "值"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DimensionFilterPanel/MemberExplorer.jsx:291
+msgid "values remaining"
+msgstr "剩餘值"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:144
+#, python-format
+msgid "yes, suppressed for %(duration)s"
+msgstr "是，已對於 %(duration)s 隱藏"

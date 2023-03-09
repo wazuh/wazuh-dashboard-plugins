@@ -1,0 +1,10 @@
+<endpoint name="tags">
+  <header></header>
+  <menu name="knowledge_configurations">
+    <label>Tags</label>
+    <url>/manager/%(namespace)s/tags</url>
+    <description>Create, view and edit tags. Set permissions.</description>
+    <order>35</order>
+    <id>tags</id>
+  </menu>
+</endpoint>

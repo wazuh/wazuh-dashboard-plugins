@@ -1,0 +1,62 @@
+<form class="form-horizontal form-complex">
+    <div class="control-group">
+        <label class="control-label" for="outputtelemetry_component">Name</label>
+
+        <div class="controls">
+            <input type="text" class="input-xlarge" name="action.outputtelemetry.param.component" id="outputtelemetry_component" placeholder="component.name"/>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="outputtelemetry_input">Input field</label>
+
+        <div class="controls">
+            <input type="text" class="input-xlarge" name="action.outputtelemetry.param.input" id="outputtelemetry_component" placeholder="field name"/>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="outputtelemetry_type">Data type</label>
+
+        <div class="controls">
+            <label class="radio" for="outputtelemetry_type_event">
+                <input id="outputtelemetry_type_event" type="radio" name="action.outputtelemetry.param.type" value="event"/>
+                Event
+            </label>
+            <label class="radio" for="outputtelemetry_type_aggregate">
+                <input id="outputtelemetry_type_aggregate" type="radio" name="action.outputtelemetry.param.type" value="aggregate"/>
+                Aggregate
+            </label>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label">Categories (at least 1):</label>
+        <div class="controls">
+            <label class="checkbox" for="outputtelemetry_anonymous">
+                <input type="checkbox" name="action.outputtelemetry.param.anonymous" id="outputtelemetry_anonymous" value="1"/>
+                Anonymized usage data
+            </label>
+        </div>
+        <div class="controls">
+            <label class="checkbox" for="outputtelemetry_support">
+                <input type="checkbox" name="action.outputtelemetry.param.support" id="outputtelemetry_support" value="1"/>
+                Support usage data
+            </label>
+        </div>
+        <div class="controls">
+            <label class="checkbox" for="outputtelemetry_license">
+                <input type="checkbox" name="action.outputtelemetry.param.license" id="outputtelemetry_license" value="1"/>
+                License usage data
+            </label>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="outputtelemetry_optinrequired">Required opt-in</label>
+
+        <div class="controls">
+            <select id="outputtelemetry_optinrequired" name="action.outputtelemetry.param.optinrequired">
+                <option value="1">1 - Splunk 6.5</option>
+                <option value="2">2 - Splunk 6.6</option>
+                <option value="3">3 - Splunk 7.0</option>
+            </select>
+        </div>
+    </div>
+</form>

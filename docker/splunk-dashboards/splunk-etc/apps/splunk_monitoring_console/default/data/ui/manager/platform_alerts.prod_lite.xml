@@ -1,0 +1,9 @@
+<endpoint name="unused">
+    <menu name="system_configurations">
+        <label>Platform alerts setup</label>
+        <url>/app/splunk_monitoring_console/monitoringconsole_alerts_setup</url>
+        <description>Overview of Platform Alerts in Splunk</description>
+        <order>32</order>
+        <id>platform_alerts</id>
+    </menu>
+</endpoint>

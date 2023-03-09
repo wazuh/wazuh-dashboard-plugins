@@ -1,0 +1,27 @@
+
+<div class="section-header section-padded">
+	<h2 class="section-title"><%= _("Forwarder Monitoring Setup").t() %></h2>
+	<div class="section-description">
+		<p><%= _('Forwarder monitoring dashboards provide information on forwarder activity and throughput. If you turn on forwarder monitoring, Splunk Enterprise enables a scheduled search named ').t() %><a href="<%- savedSearchLink %>" class="external" target="_blank">"DMC Forwarder - Build Asset Table"</a><%= _(' that relies on internal network input metrics that your indexers record. If you have many forwarders, this search can significantly affect the search workload of the indexers.').t() %></p>
+		<p><%= _('To mitigate the cost of this search, increase the data collection interval so that the search runs less frequently. ').t() %><a href="<%- learnMoreLink %>" class="external" target="_blank"><%= _('Learn More').t() %></a></p>
+	</div>
+</div>
+
+<div class="section-padded">
+	<div class="form form-horizontal forwarder-monitoring-settings"></div>
+
+	<div class="dmc-forwarder-setup-button-section">
+		<a class="btn btn-restore-forwarder-setup disabled" title="restore to previous settings"><%= _('Cancel').t() %></a>
+		<a class="btn btn-primary btn-save-forwarder-setup disabled"><%= _('Save').t() %></a>
+	</div>
+
+	<div class="divider"></div>
+	<div class="rebuild-forwarder-section">
+		<a class="btn btn-rebuild-dmc-forwarder-assets"><%= _('Rebuild forwarder assets ...').t() %></a>
+		<div class="rebuild-dmc-forwarder-assets-explanation">
+			<p><%= _('The Monitoring Console tags as “missing” any forwarders that do not report status within 15 minutes. This includes forwarders you might have decommissioned. ').t() %></p>
+			<p><%= _('You can rebuild the list of forwarder assets to remove decommissioned forwarders from the status page. Click "Rebuild forwarder assets" and select the time range from which you want to rebuild the asset table. The Monitoring Console deletes the existing table and uses input metrics from indexers to create a new table.').t() %></p>
+			<p style="font-weight: bold;"><%= _('Caution: Rebuilding forwarder assets can affect performance on indexers and can take a significant amount of time, depending on the number of forwarders you have in your deployment.').t() %></p>
+		</div>
+	</div>
+</div>

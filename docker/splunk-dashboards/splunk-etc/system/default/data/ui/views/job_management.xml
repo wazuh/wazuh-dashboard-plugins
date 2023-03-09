@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<view isVisible="false" template="jobs.html" type="redirect" target="job_manager">
+    <label>Jobs</label>
+</view>

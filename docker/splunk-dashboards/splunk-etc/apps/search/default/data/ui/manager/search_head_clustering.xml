@@ -1,0 +1,13 @@
+<endpoint name="search_head_clustering" template="pages/system.html" showOnSearchHeadCluster="only">
+  <header>Search head clustering</header>
+  <capabilities>
+    <read>list_search_head_clustering AND edit_search_head_clustering</read>
+  </capabilities>
+  <menu name="deployment_configurations">
+    <label>Search head clustering</label>
+    <url>/manager/system/search_head_clustering</url>
+    <description>View and perform actions on your search head cluster.</description>
+    <order>1</order>
+    <id>search_head_clustering</id>
+  </menu>
+</endpoint>

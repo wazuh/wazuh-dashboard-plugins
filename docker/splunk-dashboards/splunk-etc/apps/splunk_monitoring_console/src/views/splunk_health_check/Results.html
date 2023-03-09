@@ -1,0 +1,37 @@
+<div class="check-result-header">
+  <div class="instance-count" ><%= instanceCount %></div>
+  <% if (showExpand) { %>
+    <a class="expand-results pull-right btn-pill tooltip-link" href="#" title="<%- _("Expand").t() %>" data-check-item-id="<%= taskId %>"><i class="icon-fullscreen"></i></a>
+  <% } %>
+</div>
+<div class="check-result-table">
+  <table class="table table-chrome">
+    <thead>
+    <tr>
+      <th><%= _("severity").t() %></th>
+      <% fields.forEach(function(field, i) { %>
+        <% if (i !== sevLvlIdx ) { %>
+          <th><%= field %></th>
+        <% } %>
+      <% }) %>
+    </tr>
+    </thead>
+    <tbody>
+    <% rows.forEach(function(row) { %>
+    <% var severityLevel = (!_.isUndefined(row[sevLvlIdx]) && !_.isNull(row[sevLvlIdx])) ? row[sevLvlIdx] : -1; %>
+    <tr class="drilldown-result">
+      <td><span class="status-icon <%= SEVERITY_LEVEL_ICON_CLASS_NAME[severityLevel].icon %> health-tooltip-link" rel="tooltip" data-title="<%= SEVERITY_LEVEL_ICON_CLASS_NAME[severityLevel].tooltip %>" style="display: inline;"></span></td>
+      <% row.forEach(function(value, i) { %>
+        <% if (i !== sevLvlIdx ) { %>
+          <% if (i === idIndex) { %>
+            <td><a href="<%= createDrilldown(app, drilldown, row[idIndex]) %>" target="_blank" role="link"><%= renderMVField(value) %></a></td>
+          <% } else { %>
+            <td><%= renderMVField(value) %></td>
+          <% } %>
+        <% } %>
+      <% }) %>
+    </tr>
+    <% }) %>
+    </tbody>
+  </table>
+</div>

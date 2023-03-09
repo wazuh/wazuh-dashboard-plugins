@@ -1,0 +1,174 @@
+<form hideEdit="True" version="1.1" theme="dark">
+  <tags>mobile,tv</tags>
+  <label>Request Tracing</label>
+  <description>Troubleshoot and trace a particular request. Select a time range and a request ID to get troubleshooting logs and a stack trace. </description>
+  <search id="base">
+    <query>
+      index=_internal sourcetype=secure_gateway_app_internal_log | transaction request_id startswith="Incoming message" endswith="message=SENT_BACK" | eval latency = duration | fields request_id, type, current_user, device_id, latency
+    </query>
+    <earliest>$field1.earliest$</earliest>
+    <latest>$field1.latest$</latest>
+  </search>
+  <search id="base_request">
+    <query>index=_internal sourcetype=secure_gateway_app_internal_log request_id=$requestId$ | fields log_level, count, time_taken</query>
+    <earliest>$field1.earliest$</earliest>
+    <latest>$field1.latest$</latest>
+  </search>
+  <fieldset submitButton="false" autoRun="true">
+    <input type="time" token="field1" searchWhenChanged="true">
+      <label></label>
+      <default>
+        <earliest>-15m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="text" token="requestId" searchWhenChanged="true">
+      <label>Request ID</label>
+      <default>$requestId$</default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <title>All Requests: Click on row to trace particular request</title>
+        <search base="base">
+          <query>| table _time, request_id, type, current_user, device_id, latency</query>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">row</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <format type="number" field="duration">
+          <option name="precision">3</option>
+          <option name="unit">s</option>
+        </format>
+        <format type="number" field="latency">
+          <option name="precision">3</option>
+          <option name="unit">s</option>
+        </format>
+        <format type="color" field="latency">
+          <colorPalette type="list">[#53A051,#F8BE34,#F1813F,#DC4E41]</colorPalette>
+          <scale type="threshold">1,5,10</scale>
+        </format>
+        <drilldown>
+          <eval token="requestId">$row.request_id$</eval>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <single>
+        <title>Request Errors for $requestId$</title>
+        <search base="base_request">
+          <query>|search log_level=ERROR | stats count as error_count | eval errors = if(error_count &gt; 0, "YES", "NONE") | eval range=if(error_count &gt; 0, "severe", "low") | table errors, range</query>
+        </search>
+        <option name="colorMode">block</option>
+        <option name="drilldown">all</option>
+        <option name="rangeColors">["0x53a051","0xdc4e41"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="useColors">0</option>
+        <drilldown>
+          <link target="_blank">/app/search/search?q=search index=_internal sourcetype=secure_gateway_app_internal_log request_id=$requestId$ log_level=ERROR</link>
+        </drilldown>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <single>
+        <title>Type</title>
+        <search base="base">
+          <query>|search request_id=$requestId$ | table type</query>
+        </search>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Current User</title>
+        <search base="base">
+          <query>|search request_id=$requestId$ | table current_user</query>
+        </search>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Device ID</title>
+        <search base="base">
+          <query>|search request_id=$requestId$ | eval device = substr(device_id, 0, 6) | table device</query>
+        </search>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Rest API Call Timing</title>
+        <search base="base_request">
+          <query>  | rex field=_raw "(?&lt;uri&gt;(GET|POST|DELETE) uri=https.*?), " | chart sum(time_taken) over uri</query>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">all</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <single>
+        <title>Total Latency</title>
+        <search base="base">
+          <query>|search request_id=$requestId$ | table latency</query>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0.000</option>
+        <option name="rangeColors">["0x53a051","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="rangeValues">[1,5,10]</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="unit">s</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+    <panel>
+      <chart>
+        <title>HTTP Call Response Time Buckets (seconds)</title>
+        <search base="base_request">
+          <query>| bucket time_taken | stats count by time_taken</query>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <event>
+        <title>Raw Events: $requestId$</title>
+        <search base="base_request"></search>
+        <option name="count">10</option>
+        <option name="list.drilldown">none</option>
+        <option name="list.wrap">1</option>
+        <option name="maxLines">5</option>
+        <option name="raw.drilldown">full</option>
+        <option name="rowNumbers">0</option>
+        <option name="table.drilldown">all</option>
+        <option name="table.sortDirection">asc</option>
+        <option name="table.wrap">1</option>
+        <option name="type">list</option>
+      </event>
+    </panel>
+  </row>
+</form>

@@ -1,0 +1,81 @@
+<!--   Version 4.0 -->
+                                                                                                                                       
+
+<!-- splunkd.xml -->
+<!-- This file is the default main configuration file for the Splunk server  -->
+<!-- Customers should not change this file without contacting Splunk Support first. -->
+
+<componentConfig>
+	<common>
+		<name>Splunk Main</name>
+		<type>pipeline</type>
+	</common>
+
+	<component>
+		<!-- NOTE: serverName is not set in this file anymore.  Instead, -->
+		<!--       set serverName under [general] in server.conf.        -->
+
+		<pipeline name="indexerPipe"> 
+                         <processor name="indexIn" plugin="queueinputprocessor">
+                         	   <config>
+                         		<queueName>indexQueue</queueName>
+                         	   </config>
+                         </processor>
+
+                         <processor name="latencytracker" plugin="latencytrackerprocessor">
+                               <config></config>
+                           </processor>
+
+                         <processor name="destination-key-processor" plugin="destinationkeyprocessor">
+                               <config>
+                               </config>
+                         </processor>
+
+                         <processor name="index_thruput" plugin="thruputprocessor">
+                               <config>
+                                <key>_raw</key>
+                                <timeIntervalSecs>30</timeIntervalSecs>
+                               </config>
+                         </processor>
+
+                         <processor name="s2soverhttpoutput" plugin="s2soverhttpoutputprocessor">
+                               <config>
+                               </config>
+                         </processor>
+
+                          <processor name="tcp-output-generic-processor" plugin="tcpoutputprocessor">
+                             <config>
+                             </config>
+                          </processor>
+
+                          <processor name="syslog-output-generic-processor" plugin="syslogoutputprocessor">
+                             <config>
+                             </config>
+                          </processor>
+
+
+                          <processor name="indexandforward" plugin="indexandforwardprocessor">
+                             <config>
+                             </config>
+                          </processor>
+
+                        <processor name="signing" plugin="signingprocessor">
+                            <config>
+                            </config>
+                        </processor>
+
+                         <processor name="indexer" plugin="indexprocessor">
+			           <config></config>
+                         </processor>
+                </pipeline>      
+                                
+                <!-- this pipeline will throw away any events passed to it -->
+                <pipeline name="dev-null">
+                        <processor name="nullQueue" plugin="queueinputprocessor">
+                        	   <config>
+                         		<queueName>nullQueue</queueName>
+                         	   </config>
+                        </processor>
+                </pipeline>
+	</component>
+</componentConfig>

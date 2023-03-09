@@ -1,0 +1,118 @@
+/*===============================================================================================*/
+/*  SPLUNK: ACCORDION                                                                            */
+/*  Accordion for expanding content.                                                             */
+/*===============================================================================================*/
+/*
+<div class="accordion" id="accordion2">
+    <div class="accordion-group">
+        <div class="accordion-heading">
+            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
+                <i class="icon-accordion-arrow"></i>
+                Collapsible Group Item #1</a>
+        </div>
+        <div id="collapseOne" class="accordion-body collapse in">
+            <div class="accordion-inner">
+                Anim pariatur cliche...
+            </div>
+        </div>
+    </div><!-- /.accordion-group -->
+    <div class="accordion-group">
+        <div class="accordion-heading">
+            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo">
+                <i class="icon-accordion-arrow"></i>
+                Collapsible Group Item #2</a>
+        </div>
+        <div id="collapseTwo" class="accordion-body collapse">
+            <div class="accordion-inner">
+                Anim pariatur cliche...
+            </div>
+        </div>
+    </div><!-- /.accordion-group -->
+</div><!-- /.accordion -->
+*/
+
+/*  Parent container */
+.accordion {
+    margin-bottom: 0;
+    background: $accordionBackgroundColor;
+}
+
+/*  Heading */
+.accordion-heading {
+    border-bottom: 0;
+    position: relative;
+
+    /*  Heading Toggle */
+    .accordion-toggle {
+        display: block;
+        padding: $buttonPadding;
+        padding-left: $spacingOneAndAHalf;
+        line-height: $lineHeight;
+        background-color: $accordionToggleBackgroundColor;
+        color: $interactiveTextColor;
+        text-decoration: none;
+        transition: $transitionInteractive;
+        filter: none;
+        cursor: pointer;
+
+        .icon-triangle-right-small:before {
+            content: "\203A";
+        }
+        .icon-triangle-down-small:before {
+            content: "\02C5";
+        }
+    }
+}
+
+/*  Group == heading + body */
+.accordion-group {
+    margin-bottom: 2px;
+    border: none;
+    border-radius: 0;
+
+    &:first-child .accordion-toggle {
+        border-top: none;
+    }
+    &:last-child .accordion-toggle,
+    &.active:last-child .accordion-body {
+        border-bottom: none;
+    }
+    .accordion-toggle:focus {
+        @mixin focus-element-inset $accordionToggleBackgroundColor;
+    }
+    &.active {
+        .accordion-toggle {
+            background: $accordionToggleBackgroundColorSelected;
+            border-bottom: none;
+            cursor: default;
+            &:focus {
+                @mixin focus-element-inset $accordionToggleBackgroundColorSelected;
+            }
+        }
+    }
+    &:not(.active) .accordion-toggle:hover {
+        background-color: $accordionToggleBackgroundColorHover;
+        box-shadow: none;
+        &:focus {
+            @mixin focus-element-inset $accordionToggleBackgroundColorHover;
+        }
+    }
+}
+
+/*  Heading Toggle Icon */
+.icon-accordion-toggle {
+    position: absolute;
+    left: $spacingHalf;
+}
+
+/*  Body */
+.accordion-body {
+    background-color: $accordionBodyBackgroundColor;
+}
+
+.accordion-inner {
+    padding: $spacingHalf $spacing $spacing $spacing;
+    border: none;
+    @mixin clearfix;
+    position: relative;
+}

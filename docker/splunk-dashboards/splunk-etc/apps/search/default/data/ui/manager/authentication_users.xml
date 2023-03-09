@@ -1,0 +1,15 @@
+<endpoint name="authentication/users" showAppContext="1" template="pages/system.html">
+   <header>Users</header>
+   <capabilities>
+   <read>edit_user</read>
+   </capabilities>
+   <menu name="auth_configurations">
+     <label>Users</label>
+     <url>/manager/%(namespace)s/authentication/users</url>
+     <order>70</order>
+     <description>Create new users and manage user preferences.</description>
+     <id>users</id>
+   </menu>
+</endpoint>
+
+

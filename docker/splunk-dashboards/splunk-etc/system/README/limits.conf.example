@@ -1,0 +1,199 @@
+#   Version 9.0.3
+# CAUTION: Do not alter the settings in limits.conf unless you know what you are doing.
+# Improperly configured limits may result in splunkd crashes and/or memory overuse.
+
+
+[searchresults]
+maxresultrows = 50000
+# maximum number of times to try in the atomic write operation (1 = no retries)
+tocsv_maxretry = 5
+# retry period is 1/2 second (500 milliseconds)
+tocsv_retryperiod_ms = 500
+
+[subsearch]
+# maximum number of results to return from a subsearch
+maxout = 100
+# maximum number of seconds to run a subsearch before finalizing
+maxtime = 10
+# time to cache a given subsearch's results
+ttl = 300
+
+[anomalousvalue]
+maxresultrows = 50000
+# maximum number of distinct values for a field
+maxvalues = 100000
+# maximum size in bytes of any single value (truncated to this size if larger)
+maxvaluesize = 1000
+
+[associate]
+maxfields = 10000
+maxvalues = 10000
+maxvaluesize = 1000
+
+# for the contingency, ctable, and counttable commands
+[ctable]
+maxvalues = 1000
+
+[correlate]
+maxfields = 1000
+
+# for bin/bucket/discretize
+[discretize]
+maxbins = 50000
+# if maxbins not specified or = 0, defaults to searchresults::maxresultrows
+
+[inputcsv]
+# maximum number of retries for creating a tmp directory (with random name in
+# SPLUNK_HOME/var/run/splunk)
+mkdir_max_retries = 100
+
+[kmeans]
+maxdatapoints = 100000000
+
+[kv]
+# when non-zero, the point at which kv should stop creating new columns
+maxcols = 512
+
+[rare]
+maxresultrows = 50000
+# maximum distinct value vectors to keep track of
+maxvalues = 100000
+maxvaluesize = 1000
+
+[restapi]
+# maximum result rows to be returned by /events or /results getters from REST
+# API
+maxresultrows = 50000
+
+[search]
+# how long searches should be stored on disk once completed
+ttl = 86400
+
+# the approximate maximum number of timeline buckets to maintain
+status_buckets = 300
+
+# the last accessible event in a call that takes a base and bounds
+max_count = 10000
+
+# the minimum length of a prefix before a * to ask the index about
+min_prefix_len = 1
+
+# the length of time to persist search cache entries (in seconds)
+cache_ttl = 300
+
+# By default, we will not retry searches in the event of indexer
+# failures with indexer clustering enabled.
+# Hence, the default value for search_retry here is false.
+search_retry = false
+
+# Timeout value for checking search marker files like hotbucketmarker or backfill
+# marker.
+check_search_marker_done_interval = 60
+
+# Time interval of sleeping between subsequent search marker files checks.
+check_search_marker_sleep_interval = 1
+
+# The total number of concurrent searches is set to 10 manually. 
+total_search_concurrency_limit = 100
+
+# If number of cpu's in your machine is 14 then total system wide number of
+# concurrent searches this machine can handle is 20.
+# which is base_max_searches + max_searches_per_cpu x num_cpus = 6 + 14 x 1 = 20
+base_max_searches = 6
+max_searches_per_cpu = 1
+
+# Whether maximum number of concurrent searches are enforced cluster-wide
+# for admission of adhoc searches
+shc_adhoc_quota_enforcement = on
+
+# Enable throttling on both CPU and memory
+remote_search_requests_throttling_type = per_cpu, physical_ram
+
+# If the peer node has 48 cores, the following setting allows a maximum of 720 
+# concurrent searches.
+[search_throttling::per_cpu]
+max_concurrent = 13
+
+# If the peer has 64 GB of RAM, the following setting allows a maximum of 512 
+# concurrent searches.
+[search_throttling::physical_ram]
+min_memory_per_search = 134217728
+
+[scheduler]
+
+# Percent of total concurrent searches that will be used by scheduler is
+# total concurrency x max_searches_perc = 20 x 60% = 12 scheduled searches
+# User default value (needed only if different from system/default value) when
+# no max_searches_perc.<n>.when (if any) below matches.
+max_searches_perc = 60
+
+# Increase the value between midnight-5AM.
+max_searches_perc.0 = 75
+max_searches_perc.0.when = * 0-5 * * *
+
+# More specifically, increase it even more on weekends.
+max_searches_perc.1 = 85
+max_searches_perc.1.when = * 0-5 * * 0,6
+
+# Maximum number of concurrent searches is enforced cluster-wide by the
+# captain for scheduled searches. For a 3 node SHC total concurrent
+# searches = 3 x 20 = 60. The total searches (adhoc + scheduled) = 60, then
+# no more scheduled searches can start until some slots are free.
+shc_syswide_quota_enforcement = true
+
+[slc]
+# maximum number of clusters to create
+maxclusters = 10000
+
+[findkeywords]
+#events to use in findkeywords command (and patterns UI)
+maxevents = 50000
+
+[stats]
+maxresultrows = 50000
+maxvalues = 10000
+maxvaluesize = 1000
+
+[top]
+maxresultrows = 50000
+# maximum distinct value vectors to keep track of
+maxvalues = 100000
+maxvaluesize = 1000
+
+[search_optimization]
+enabled = true
+
+[search_optimization::predicate_split]
+enabled = true
+
+[search_optimization::predicate_push]
+enabled = true
+
+[search_optimization::predicate_merge]
+enabled = true
+inputlookup_merge = true
+merge_to_base_search = true
+
+[search_optimization::projection_elimination]
+enabled = true
+cmds_black_list = eval, rename
+
+[search_optimization::search_flip_normalization]
+enabled = true
+
+[search_optimization::reverse_calculated_fields]
+enabled = true
+
+[search_optimization::search_sort_normalization]
+enabled = true
+
+[search_optimization::replace_table_with_fields]
+enabled = true
+
+[search_optimization::replace_stats_cmds_with_tstats]
+enabled = true
+detect_search_time_field_collisions = true
+
+[search_optimization::replace_datamodel_stats_cmds_with_tstats]
+enabled = true
+

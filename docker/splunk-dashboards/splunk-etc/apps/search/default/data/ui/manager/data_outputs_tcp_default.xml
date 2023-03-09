@@ -1,0 +1,32 @@
+<endpoint name="data/outputs/tcp/default" showOnSearchHeadCluster="0">
+  <capabilities>
+    <read>list_forwarders AND edit_forwarders</read>
+  </capabilities>
+  <header>Forwarding defaults</header>
+  <breadcrumb>
+      <parent hidecurrent="True">forwardreceive</parent>
+      <entityname i18ntag="">Forwarding defaults</entityname>
+  </breadcrumb>
+  <elements>
+    <element name="forwardingSetupFields" type="fieldset">
+      <view name="list"/>
+      <view name="edit"/>
+      <elements>
+        <element name="indexAndForward" type="radio" label="Store a local copy of forwarded events?">
+          <options>
+            <opt value="1" label="Yes"/>
+            <opt value="0" label="No"/>
+          </options>
+          <view name="list"/>
+          <view name="edit"/>
+          <key name="exampleText">This saves a copy of all indexed data on this Splunk instance and forwards copies to other instances.</key>
+          <key name="processValueList">value=="0" and "No" or "Yes"</key>
+        </element>
+      </elements>
+    </element>
+    <element name="spl-ctrl_redirectionPath" type="hidden">
+      <view name="edit"/>
+      <key name="processValueEdit">'forwardreceive'</key>
+    </element>
+  </elements>
+</endpoint>

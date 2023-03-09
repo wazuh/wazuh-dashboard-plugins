@@ -1,0 +1,14 @@
+[commands]
+access = read : [ admin ], write : [ admin ]
+export = system
+
+[props]
+export = system
+
+[views/splunk_archiver_dashboard]
+access = read : [ * ], write : [ admin ]
+export = system
+
+[searchbnf]
+export = system
+

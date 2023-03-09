@@ -1,0 +1,333 @@
+<form version="1.1" hideEdit="True" onUnloadCancelJobs="true" script="common_control.js, indexer_clustering_status_extension.js" stylesheet="indexer_clustering_status_extension.css, shared.css">
+  <label>Indexer Clustering: Status</label>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="dropdown" searchWhenChanged="true" token="group">
+      <label>Indexer Cluster</label>
+      <showClearButton>false</showClearButton>
+      <search>
+        <query>| `dmc_get_indexer_cluster_groups`</query>
+      </search>
+      <fieldForLabel>label</fieldForLabel>
+      <fieldForValue>search_group</fieldForValue>
+      <selectFirstChoice>true</selectFirstChoice>
+    </input>
+  </fieldset>
+  <search id="peers_base_search">
+    <query>| rest splunk_server_group=dmc_group_cluster_master splunk_server_group="$group$" /services/cluster/master/peers</query>
+  </search>
+  <search id="indexes_base_search">
+    <query>| rest splunk_server_group=dmc_group_cluster_master splunk_server_group="$group$" /services/cluster/master/indexes</query>
+  </search>
+  <search id="statusSummaryBaseSearch">
+    <query>
+      | rest splunk_server_group=dmc_group_cluster_master splunk_server_group="$group$" /services/cluster/master/generation/master
+      | fields pending_last_reason, search_factor_met, replication_factor_met
+      | eval all_data_searchable_icon = if(isnull(pending_last_reason) or pending_last_reason=="", "icon-check", "icon-alert")
+      | eval all_data_searchable = if (isnull(pending_last_reason) or pending_last_reason=="", "All Data Searchable", "Some Data Not Searchable")
+      | eval search_factor_met_icon = if(search_factor_met == 1 or search_factor_met == "1", "icon-check", "icon-alert")
+      | eval search_factor_met = if (search_factor_met == 1 or search_factor_met == "1", "Search Factor Met", "Search Factor Not Met")
+      | eval replication_factor_met_icon = if(replication_factor_met == 1 or replication_factor_met == "1", "icon-check", "icon-alert")
+      | eval replication_factor_met = if (replication_factor_met == 1 or replication_factor_met == "1", "Replication Factor Met", "Replication Factor Not Met")
+    </query>
+    <finalized>
+      <set token="searchable_icon">$result.all_data_searchable_icon$</set>
+      <set token="searchable_indicator">$result.all_data_searchable$</set>
+      <set token="search_factor_icon">$result.search_factor_met_icon$</set>
+      <set token="search_factor_indicator">$result.search_factor_met$</set>
+      <set token="replication_factor_icon">$result.replication_factor_met_icon$</set>
+      <set token="replication_factor_indicator">$result.replication_factor_met$</set>
+    </finalized>
+  </search>
+  <search id="cluster_master_base_search">
+    <query>
+      | rest splunk_server_group=dmc_group_cluster_master splunk_server_group="$group$" /services/server/info
+      | stats count
+      | eval cluster_master_icon = if(count==1, "icon-check", "icon-alert")
+      | eval cluster_master_indicator = if(count==1, "Cluster Manager Reachable", "Cluster Manager Not Reachable")
+    </query>
+    <finalized>
+      <set token="cluster_master_icon">$result.cluster_master_icon$</set>
+      <set token="cluster_master_indicator">$result.cluster_master_indicator$</set>
+    </finalized>
+  </search>
+  <row>
+    <panel rejects="$historical$">
+      <search base="peers_base_search">
+        <query>
+          where is_searchable == 1 or is_searchable == "1"
+          | stats count
+        </query>
+        <finalized>
+          <set token="searchable_peer_count">$result.count$</set>
+        </finalized>
+      </search>
+      <search base="peers_base_search">
+        <query>
+          where is_searchable == 0 or is_searchable == "0"
+          | stats count
+        </query>
+        <finalized>
+          <set token="not_searchable_peer_count">$result.count$</set>
+        </finalized>
+      </search>
+      <search base="indexes_base_search">
+        <query>
+          where is_searchable == 1 or is_searchable == "1"
+          | stats count
+        </query>
+        <finalized>
+          <set token="searchable_index_count">$result.count$</set>
+        </finalized>
+      </search>
+      <search base="indexes_base_search">
+        <query>
+          where is_searchable == 0 or is_searchable == "0"
+          | stats count
+        </query>
+        <finalized>
+          <set token="not_searchable_index_count">$result.count$</set>
+        </finalized>
+      </search>
+      <html depends="$searchable_indicator$">
+        <div class="indexer-cluster-summary">
+          <div class="indexer-cluster-summary-single-value"><i class="$cluster_master_icon$"></i>$cluster_master_indicator$</div>
+          <div class="indexer-cluster-summary-single-value"><i class="$searchable_icon$"></i>$searchable_indicator$</div>
+          <div class="indexer-cluster-summary-single-value"><i class="$search_factor_icon$"></i>$search_factor_indicator$</div>
+          <div class="indexer-cluster-summary-single-value"><i class="$replication_factor_icon$"></i>$replication_factor_indicator$</div>
+        </div>
+        <div class="indexer-cluster-count clearfix">
+          <div class="indexer-cluster-count-value">
+            <span class="indexer-cluster-count-value-searchable-peer">$searchable_peer_count$</span> searchable <span  class="indexer-cluster-count-value-not-searchable-peer">$not_searchable_peer_count$</span> not searchable</div>
+          <div class="indexer-cluster-count-value">
+            <span class="indexer-cluster-count-value-searchable-index">$searchable_index_count$</span> searchable <span class="indexer-cluster-count-value-not-searchable-index">$not_searchable_index_count$</span> not searchable</div>
+        </div>
+        <div class="index-cluster-count-under-label clearfix">
+          <div class="index-cluster-count-under-label-value-peer">Peers</div>
+          <div class="index-cluster-count-under-label-value-index">Indexes</div>
+        </div>
+      </html>
+    </panel>
+  </row>
+  <row rejects="$historical$">
+    <panel>
+      <title>Peers ($peerCount$)</title>
+      <input type="text" searchWhenChanged="true" token="peerNameFilter">
+        <label>Peer</label>
+        <default>*</default>
+        <prefix>search label="*</prefix>
+        <suffix>*"</suffix>
+      </input>
+      <input type="dropdown" searchWhenChanged="true" token="peerSearchableFilter">
+        <label>Fully Searchable</label>
+        <showClearButton>false</showClearButton>
+        <choice value="*">All</choice>
+        <selectFirstChoice>true</selectFirstChoice>
+        <fieldForLabel>is_searchable</fieldForLabel>
+        <fieldForValue>is_searchable</fieldForValue>
+        <search base="peers_base_search">
+          <query>
+            stats count by is_searchable
+            | eval is_searchable = if(is_searchable == 1 or is_searchable == "1", "Yes", "No")
+          </query>
+        </search>
+        <prefix>search is_searchable="</prefix>
+        <suffix>"</suffix>
+      </input>
+      <input type="dropdown" searchWhenChanged="true" token="peerStatusFilter">
+        <label>Status</label>
+        <showClearButton>false</showClearButton>
+        <choice value="*">All</choice>
+        <selectFirstChoice>true</selectFirstChoice>
+        <fieldForLabel>status</fieldForLabel>
+        <fieldForValue>status</fieldForValue>
+        <search base="peers_base_search">
+          <query>stats count by status</query>
+        </search>
+        <prefix>search status="</prefix>
+        <suffix>"</suffix>
+      </input>
+      <input type="dropdown" searchWhenChanged="true" token="peerSiteFilter">
+        <label>Site</label>
+        <showClearButton>false</showClearButton>
+        <choice value="*">All</choice>
+        <selectFirstChoice>true</selectFirstChoice>
+        <fieldForLabel>site</fieldForLabel>
+        <fieldForValue>site</fieldForValue>
+        <search base="peers_base_search">
+          <query>stats count by site</query>
+        </search>
+        <prefix>search site="</prefix>
+        <suffix>"</suffix>
+      </input>
+      <table id="peersTable">
+        <search base="peers_base_search">
+          <query>
+            fields label, is_searchable, status, site, bucket_count, host_port_pair, last_heartbeat, replication_port, base_generation_id, title, bucket_count_by_index.*
+            | eval is_searchable = if(is_searchable == 1 or is_searchable == "1", "Yes", "No")
+            | `dmc_time_format(last_heartbeat)`
+            | sort - last_heartbeat
+            | $peerNameFilter$
+            | $peerSearchableFilter$
+            | $peerStatusFilter$
+            | $peerSiteFilter$
+            | fields label, is_searchable, status, site, bucket_count
+            | rename label as Peer, is_searchable as "Fully Searchable", status as Status, site as Site, bucket_count as Buckets
+          </query>
+          <done>
+            <set token="peerCount">$job.resultCount$</set>
+          </done>
+        </search>
+        <option name="drilldown">row</option>
+        <drilldown>
+          <set token="peerDrilldown">$row.Peer$</set>
+        </drilldown>
+      </table>
+      <html>
+        <p>Click on each peer to see more details. </p>
+      </html>
+    </panel>
+    <panel depends="$peerDrilldown$">
+      <title>$peerDrilldown$</title>
+      <table>
+        <search base="peers_base_search">
+          <query>
+            search label = $peerDrilldown$
+            | `dmc_time_format(last_heartbeat)`
+            | fields host_port_pair, last_heartbeat, replication_port, base_generation_id, title
+            | rename host_port_pair as Location, last_heartbeat as "Last Heartbeat", replication_port as "Replication Port", base_generation_id as "Base Generation ID", title as GUID
+            | transpose
+            | rename column as Property, "row 1" as Value
+          </query>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+      <table>
+        <search base="peers_base_search">
+          <query>
+            search label = $peerDrilldown$
+            | fields bucket_count_by_index.*
+            | transpose
+            | rename column as Index, "row 1" as Buckets
+            | eval Index=replace(Index, "bucket_count_by_index.", "")
+            | where isnotnull(Buckets) AND isnotnull(Index)
+          </query>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+      <html>
+        <a data-unset-token="peerDrilldown">Close this panel</a>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Indexes ($indexCount$)</title>
+      <input type="text" searchWhenChanged="true" token="indexNameFilter">
+        <label>Index</label>
+        <default>*</default>
+        <prefix>search title="*</prefix>
+        <suffix>*"</suffix>
+      </input>
+      <input type="dropdown" searchWhenChanged="true" token="indexSearchableFilter">
+        <label>Fully Searchable</label>
+        <showClearButton>false</showClearButton>
+        <choice value="*">All</choice>
+        <selectFirstChoice>true</selectFirstChoice>
+        <fieldForLabel>is_searchable</fieldForLabel>
+        <fieldForValue>is_searchable</fieldForValue>
+        <search base="indexes_base_search">
+          <query>
+            stats count by is_searchable
+            | eval is_searchable = if((is_searchable == 1) or (is_searchable == "1"), "Yes", "No")
+          </query>
+        </search>
+        <prefix>search is_searchable="</prefix>
+        <suffix>"</suffix>
+      </input>
+      <table id="indexesTable">
+        <search base="indexes_base_search">
+          <query>
+            fields title, is_searchable, replicated_copies_tracker*, searchable_copies_tracker*, num_buckets, index_size
+            | rename replicated_copies_tracker.*.* as rp**, searchable_copies_tracker.*.* as sb**
+            | eval replicated_data_copies = ""
+            | foreach rp*actual_copies_per_slot [eval replicated_data_copies = replicated_data_copies." ".rp&lt;&lt;MATCHSTR&gt;&gt;actual_copies_per_slot."/".rp&lt;&lt;MATCHSTR&gt;&gt;expected_total_per_slot]
+            | makemv replicated_data_copies
+            | eval searchable_data_copies = ""
+            | foreach sb*actual_copies_per_slot [eval searchable_data_copies = searchable_data_copies." ".sb&lt;&lt;MATCHSTR&gt;&gt;actual_copies_per_slot."/".sb&lt;&lt;MATCHSTR&gt;&gt;expected_total_per_slot]
+            | makemv searchable_data_copies
+            | eval is_searchable = if((is_searchable == 1) or (is_searchable == "1"), "Yes", "No")
+            | eval index_size = round(index_size / 1024 / 1024 / 1024, 2)." GB"
+            | fields title, is_searchable, searchable_data_copies, replicated_data_copies, num_buckets, index_size
+            | $indexNameFilter$
+            | $indexSearchableFilter$
+            | rename title as "Index Name", is_searchable as "Fully Searchable", searchable_data_copies as "Searchable Data Copies", replicated_data_copies as "Replicated Data Copies", num_buckets as Buckets, index_size as "Cumulative Raw Data Size"
+          </query>
+          <done>
+            <set token="indexCount">$job.resultCount$</set>
+          </done>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+      <html>
+        <a class="btn" href="indexer_clustering_service_activity?form.group=$group$">Bucket Status</a>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Search Heads ($searchHeadCount$)</title>
+      <search id="searchHeadBaseSearch">
+        <query>
+          | rest splunk_server_group=dmc_group_cluster_master splunk_server_group="$group$" /services/cluster/master/searchheads
+          | fields label, status, site, host_port_pair, title
+          </query>
+        <done>
+          <set token="searchHeadCount">$job.resultCount$</set>
+        </done>
+      </search>
+      <input type="text" searchWhenChanged="true" token="searchHeadNameFilter">
+        <label>Search Head</label>
+        <default>*</default>
+        <prefix>search label="*</prefix>
+        <suffix>*"</suffix>
+      </input>
+      <input type="dropdown" searchWhenChanged="true" token="searchHeadStatusFilter">
+        <label>Status</label>
+        <showClearButton>false</showClearButton>
+        <choice value="*">All</choice>
+        <selectFirstChoice>true</selectFirstChoice>
+        <fieldForLabel>status</fieldForLabel>
+        <fieldForValue>status</fieldForValue>
+        <search base="searchHeadBaseSearch">
+          <query>stats count by status</query>
+        </search>
+        <prefix>search status="</prefix>
+        <suffix>"</suffix>
+      </input>
+      <input type="dropdown" searchWhenChanged="true" token="searchHeadSiteFilter">
+        <label>Site</label>
+        <showClearButton>false</showClearButton>
+        <choice value="*">All</choice>
+        <selectFirstChoice>true</selectFirstChoice>
+        <fieldForLabel>site</fieldForLabel>
+        <fieldForValue>site</fieldForValue>
+        <search base="searchHeadBaseSearch">
+          <query>stats count by site</query>
+        </search>
+        <prefix>search site="</prefix>
+        <suffix>"</suffix>
+      </input>
+      <table id="searchHeadsTable">
+        <search base="searchHeadBaseSearch">
+          <query>
+            $searchHeadNameFilter$
+            | $searchHeadStatusFilter$
+            | $searchHeadSiteFilter$
+            | rename label as "Search Head", status as Status, site as Site, host_port_pair as URI, title as GUID
+          </query>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+</form>

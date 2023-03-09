@@ -1,0 +1,257 @@
+<form version="1.1" hideEdit="True" script="cell_fill_gauge.js, common_control.js">
+  <label>Workload Management Admission Control: Distributed</label>
+
+  <fieldset autoRun="true" submitButton="false">
+    <input type="radio" searchWhenChanged="true" token="role">
+      <label>Role</label>
+      <choice value="dmc_group_search_head">Search Heads</choice>
+      <choice value="dmc_group_indexer">Indexers</choice>
+      <default>dmc_group_search_head</default>
+    </input>
+    <input type="dropdown" searchWhenChanged="true" token="dmc_group">
+      <label>Group</label>
+      <showClearButton>false</showClearButton>
+      <search>
+        <query>
+          | `dmc_get_groups_containing_role($role$)`
+          | search search_group!="dmc_group_*"
+        </query>
+      </search>
+      <fieldForLabel>label</fieldForLabel>
+      <fieldForValue>search_group</fieldForValue>
+      <choice value="*">All</choice>
+      <selectFirstChoice>true</selectFirstChoice>
+    </input>
+  </fieldset>
+
+  <search id="base_search_prefiltered">
+      <query>
+        `dmc_set_index_internal` search_group=$role$ search_group=$dmc_group$ sourcetype=wlm_* prefilter_action=filter
+        | stats count by search_type
+      </query>
+      <earliest>-60m</earliest>
+      <latest>now</latest>
+  </search>
+
+  <search base="base_search_prefiltered">
+    <query> stats sum(count) as total_prefiltered</query>
+    <preview>
+      <eval token="total_prefiltered">if(isnotnull('result.total_prefiltered'), 'result.total_prefiltered', 0)</eval>
+    </preview>
+    <finalized>
+      <eval token="total_prefiltered">if(isnotnull('result.total_prefiltered'), 'result.total_prefiltered', 0)</eval>
+    </finalized>
+  </search>
+
+  <row>
+    <panel>
+      <title>Total Searches Prefiltered (Last Hour)</title>
+      <single>
+        <search>
+          <query>
+            `dmc_event_local_search_dispatch`
+            | stats dc(search_id) as total_dispatched
+            | eval output_with_percentage = "$total_prefiltered$"." (".round($total_prefiltered$/($total_prefiltered$ + total_dispatched) * 100, 2)." %)"
+            | fields output_with_percentage
+          </query>
+        </search>
+        <option name="height">80px</option>
+      </single>
+    </panel>
+
+    <panel>
+      <title>Adhoc Searches Prefiltered (Last Hour)</title>
+      <single>
+        <search base="base_search_prefiltered">
+          <query>
+            | where search_type="adhoc"
+            | fields count
+          </query>
+        </search>
+        <option name="height">80px</option>
+      </single>
+    </panel>
+
+    <panel>
+      <title>Scheduled Searches Prefiltered (Last Hour)</title>
+      <single>
+        <search base="base_search_prefiltered">
+          <query>
+            | where search_type="scheduled"
+            | fields count
+          </query>
+        </search>
+        <option name="height">80px</option>
+      </single>
+    </panel>
+  </row>
+
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Historical Charts</title>
+      <input type="time" searchWhenChanged="true" token="time">
+        <label>Time Range:</label>
+        <default>
+          <earliestTime>-4h@m</earliestTime>
+          <latestTime>now</latestTime>
+        </default>
+      </input>
+    </panel>
+  </row>
+
+  <row>
+    <panel rejects="$hide_activity$">
+      <title>Count of Prefiltered Searches</title>
+      <input type="dropdown" token="SplitByVariable">
+        <label>Group by</label>
+        <showClearButton>false</showClearButton>
+        <default>Rule</default>
+        <choice value="prefilter_rule">Rule</choice>
+        <choice value="user">User</choice>
+        <choice value="app">App</choice>
+        <choice value="search_type">Search Type</choice>
+        <choice value="search_name">Search Name</choice>
+        <choice value="host">Instance</choice>
+        <set token="searchBy">by $SplitByVariable$</set>
+      </input>
+      <!-- here we use a pattern:
+       - base search: get counts grouped by metrics
+       - post-process-1: get total count, generate a token to store total
+       - post-process-2: use the $total$ token to calculate percent
+       -->
+      <search id="prefiltered_searches_count_base">
+        <query>
+          `dmc_set_index_internal` search_group=$role$ search_group=$dmc_group$ sourcetype=wlm_* prefilter_action=filter
+          | stats count by $SplitByVariable$
+        </query>
+        <earliest>$time.earliest$</earliest>
+        <latest>$time.latest$</latest>
+      </search>
+      <search base="prefiltered_searches_count_base">
+        <query>stats sum(count) as total</query>
+        <preview>
+          <eval token="total_prefiltered_searches">if(isnotnull('result.total'), 'result.total', 0)</eval>
+        </preview>
+        <finalized>
+          <eval token="total_prefiltered_searches">if(isnotnull('result.total'), 'result.total', 0)</eval>
+        </finalized>
+      </search>
+      <table>
+        <title>Total: $total_prefiltered_searches$</title>
+        <search base="prefiltered_searches_count_base">
+          <query>
+            sort - count
+            | eval percent = round(count / $total_prefiltered_searches$ * 100, 2)." %"
+            | rename prefilter_rule as Rule, user as User, app as App, search_type as "Search Type", search_name as "Search Name", host as Instance, count as Count, percent as "Percent of Total"
+          </query>
+        </search>
+        <option name="dataOverlayMode">heatmap</option>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+
+  <row>
+    <panel>
+      <title>Count of Prefiltered Searches Over Time</title>
+      <input type="dropdown" token="TimechartSplitByVariable">
+        <label>Group by</label>
+        <showClearButton>false</showClearButton>
+        <default>Rule</default>
+        <choice value="prefilter_rule">Rule</choice>
+        <choice value="user">User</choice>
+        <choice value="app">App</choice>
+        <choice value="search_type">Search Type</choice>
+        <choice value="search_name">Search Name</choice>
+        <choice value="host">Instance</choice>
+        <set token="searchBy">by $TimechartSplitByVariable$</set>
+      </input>
+      <chart>
+        <searchString>
+          `dmc_set_index_internal` search_group=$role$ search_group=$dmc_group$ sourcetype=wlm_* prefilter_action=filter
+          | `dmc_timechart` partial=f bins=200 count by $TimechartSplitByVariable$
+        </searchString>
+        <earliestTime>$time.earliest$</earliestTime>
+        <latestTime>$time.latest$</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text"># of searches</option>
+        <option name="list.drilldown">full</option>
+        <option name="list.wrap">1</option>
+        <option name="maxLines">5</option>
+        <option name="raw.drilldown">full</option>
+        <option name="rowNumbers">false</option>
+        <option name="table.drilldown">all</option>
+        <option name="table.wrap">1</option>
+        <option name="type">list</option>
+        <option name="wrap">true</option>
+        <option name="dataOverlayMode">none</option>
+        <!-- <option name="refresh.auto.interval">300</option> -->
+        <drilldown target="_blank">
+          <condition series="*">
+            <link target="_blank"><![CDATA[search?q=`dmc_set_index_internal` search_group=$role$ search_group=$dmc_group$ sourcetype=wlm_* $TimechartSplitByVariable$=$click.name2$&earliest=$earliest$&latest=$latest$]]></link>
+          </condition>
+        </drilldown>
+      </chart>
+    </panel>
+  </row>
+
+  <row>
+    <panel>
+      <title>Scheduled Searches Prefiltered</title>
+      <table id="prefiltered_scheduled_searches">
+        <search>
+          <query>
+            `dmc_set_index_internal` search_group=$role$ search_group=$dmc_group$ sourcetype=wlm_* search_type="scheduled*" prefilter_action=filter
+            | stats count as prefiltered_count by prefilter_rule, user, app, host, search_name
+            | fields search_name, app, user, host, prefilter_rule, prefiltered_count
+            | sort - prefiltered_count
+            | rename search_name as "Search Name", app as App, user as User, host as Instance, prefilter_rule as "Prefiltering Rule Triggered", prefiltered_count as "Prefiltered Count"
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="drilldown">row</option>
+        <drilldown>
+          <set token="scheduled_search_drilldown">$row.Search Name$</set>
+          <set token="scheduled_search_host_drilldown">$row.Instance$</set>
+        </drilldown>
+      </table>
+    </panel>
+    <panel depends="$scheduled_search_drilldown$">
+      <title>Scheduled Searches Prefiltered Drilldown: $scheduled_search_drilldown$</title>
+      <table>
+        <search>
+          <query>
+            | rest [inputlookup dmc_assets | where host = $scheduled_search_host_drilldown|s$ | rename serverName AS splunk_server | return splunk_server] "/servicesNS/-/-/saved/searches/$scheduled_search_drilldown$" earliest_time=`time_modifier(-0s@s)` latest_time=`time_modifier(+8d@d)` search="is_scheduled=1" search="disabled=0"
+            | fields cron_schedule, next_scheduled_time, search 
+            | rename cron_schedule as "Cron Schedule", next_scheduled_time as "Next Scheduled Time", search as "Search"
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+      </table>
+      <html>
+        <a data-unset-token="scheduled_search_drilldown">Close this panel</a>
+      </html>
+    </panel>
+  </row>
+
+</form>

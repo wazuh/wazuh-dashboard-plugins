@@ -1,0 +1,293 @@
+<form version="1.1" hideEdit="True" script="common_control.js, forwarder_monitoring_extension.js" stylesheet="forwarder_monitoring_extension.css">
+  <label>Forwarders: Deployment</label>
+  <fieldset autoRun="true" submitButton="false">
+    <input id="show_instances_input" type="checkbox" searchWhenChanged="true" token="show_instances_forwarding_logs">
+      <label></label>
+      <choice>Show instances forwarding internal logs</choice>
+    </input>
+  </fieldset>
+  <search id="loadForwarderAssetsSearch">
+    <query>
+| inputlookup dmc_forwarder_assets
+| makemv delim=" " avg_tcp_kbps_sparkline
+| eval sum_kb = if (status == "missing", "N/A", sum_kb)
+| eval avg_tcp_kbps_sparkline = if (status == "missing", "N/A", avg_tcp_kbps_sparkline)
+| eval avg_tcp_kbps = if (status == "missing", "N/A", avg_tcp_kbps)
+| eval avg_tcp_eps = if (status == "missing", "N/A", avg_tcp_eps)
+| `dmc_rename_forwarder_type(forwarder_type)`
+| `dmc_time_format(last_connected)`
+    </query>
+  </search>
+  <search base="loadForwarderAssetsSearch" id="loadForwarderExcludingInternalAssetsSearch">
+    <query>
+| search NOT [| inputlookup dmc_assets | dedup serverName | rename serverName as hostname | fields hostname]
+    </query>
+  </search>
+  <search>
+    <query>
+      | rest splunk_server=local /servicesNS/nobody/splunk_monitoring_console/saved/searches/DMC%20Forwarder%20-%20Build%20Asset%20Table/history
+      | eval endtime = strptime(updated, "%Y-%m-%dT%H:%M:%S")
+      | sort 1 -endtime
+      | fields updated
+      | rename updated AS last_run_time
+      | eval last_run_time = if(isnotnull(last_run_time), " - As of ".replace(last_run_time, "T", " "), " ")
+    </query>
+    <finalized>
+      <set token="last_run_time">$result.last_run_time$</set>
+    </finalized>
+  </search>
+  <row id="forwarder_monitoring_extension">
+    <panel>
+      <html>
+        <h3>Forwarder Monitoring is <b>disabled</b>. Go to the <a href="monitoringconsole_forwarder_setup" target="_blank">setup<span class="icon-external"></span></a> page to enable it.</h3>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Forwarders by $forwarderCountSplitByLabel$</title>
+      <input type="dropdown" token="forwarderCountSplitBy" searchWhenChanged="true">
+        <label>Split by</label>
+        <showClearButton>false</showClearButton>
+        <default>status</default>
+        <choice value="status">Status</choice>
+        <choice value="forwarder_type">Forwarder Type</choice>
+        <choice value="version">Splunk Version</choice>
+        <choice value="os">OS</choice>
+        <choice value="arch">Architecture</choice>
+        <change>
+          <set token="forwarderCountSplitByLabel">$label$</set>
+        </change>
+      </input>
+      <html>
+        <p><b>Note:</b> A forwarder is "missing" if it does not connect to indexers for 15 minutes. Forwarder status takes 30 minutes minimum to reflect a monitoring data collection interval of 15 minutes, and higher intervals can take longer.</p>
+      </html>
+      <chart depends="$show_instances_forwarding_logs$">
+        <title>Total: $forwarder_count_including_internal_logs$</title>
+        <search base="loadForwarderAssetsSearch">
+          <query>stats dc(guid) as "count" by $forwarderCountSplitBy$</query>
+        </search>
+        <option name="charting.chart">pie</option>
+      </chart>
+      <search base="loadForwarderAssetsSearch">
+        <query>stats dc(guid) as count</query>
+        <finalized>
+          <set token="forwarder_count_including_internal_logs">$result.count$</set>
+        </finalized>
+      </search>
+      <chart rejects="$show_instances_forwarding_logs$">
+        <title>Total: $true_forwarder_count$</title>
+        <search base="loadForwarderExcludingInternalAssetsSearch">
+          <query>stats dc(guid) as "count" by $forwarderCountSplitBy$</query>
+        </search>
+        <option name="charting.chart">pie</option>
+      </chart>
+      <search base="loadForwarderExcludingInternalAssetsSearch">
+        <query>stats dc(guid) as count</query>
+        <finalized>
+          <set token="true_forwarder_count">$result.count$</set>
+        </finalized>
+      </search>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Status and Configuration $last_run_time$</title>
+      <input type="text" searchWhenChanged="true" token="forwarderNameFilter">
+        <label>Instance</label>
+        <default>*</default>
+        <prefix>search hostname="*</prefix>
+        <suffix>*"</suffix>
+      </input>
+      <input type="dropdown" searchWhenChanged="true" token="forwarderStatusFilter">
+        <label>Status</label>
+        <default>*</default>
+        <showClearButton>false</showClearButton>
+        <choice value="*">All</choice>
+        <choice value="active">active</choice>
+        <choice value="missing">missing</choice>
+        <prefix>search status="</prefix>
+        <suffix>"</suffix>
+      </input>
+      <table depends="$show_instances_forwarding_logs$">
+        <title>Total: $forwarder_count_including_internal_logs$</title>
+        <search base="loadForwarderAssetsSearch">
+          <query>
+| fields hostname, forwarder_type, version, os, arch, status, last_connected, sum_kb, avg_tcp_kbps_sparkline, avg_tcp_kbps, avg_tcp_eps
+| $forwarderNameFilter$
+| $forwarderStatusFilter$
+| rename hostname as Instance, forwarder_type as Type, version as Version, os as OS, arch as Architecture, status as Status, last_connected as "Last Connected to Indexers", sum_kb as "Total KB", avg_tcp_kbps_sparkline as "Average KB/s Over Time", avg_tcp_kbps as "Average KB/s", avg_tcp_eps as "Average Events/s"
+          </query>
+          <finalized>
+            <set token="forwarder_count_including_internal_logs">$job.resultCount$</set>
+          </finalized>
+        </search>
+        <option name="drilldown">row</option>
+        <format type="sparkline" field="Average KB/s Over Time">
+          <option name="type">bar</option>
+          <option name="height">20px</option>
+          <option name="barColor">#006d9c</option>
+          <option name="barWidth">5px</option>
+        </format>
+        <drilldown>
+          <link target="_blank">forwarder_instance?form.hostname=$row.Instance$</link>
+        </drilldown>
+      </table>
+      <table rejects="$show_instances_forwarding_logs$">
+        <title>Total: $true_forwarder_count$</title>
+        <search base="loadForwarderAssetsSearch">
+          <query>
+ search NOT [| inputlookup dmc_assets | dedup serverName | rename serverName as hostname | fields hostname]
+| fields hostname, forwarder_type, version, os, arch, status, last_connected, sum_kb, avg_tcp_kbps_sparkline, avg_tcp_kbps, avg_tcp_eps
+| $forwarderNameFilter$
+| $forwarderStatusFilter$
+| rename hostname as Instance, forwarder_type as Type, version as Version, os as OS, arch as Architecture, status as Status, last_connected as "Last Connected to Indexers", sum_kb as "Total KB", avg_tcp_kbps_sparkline as "Average KB/s Over Time", avg_tcp_kbps as "Average KB/s", avg_tcp_eps as "Average Events/s"
+          </query>
+          <finalized>
+            <!-- this doesn't include the splunk instances forwarding internal logs -->
+            <set token="true_forwarder_count">$job.resultCount$</set>
+          </finalized>
+        </search>
+        <option name="drilldown">row</option>
+        <format type="sparkline" field="Average KB/s Over Time">
+          <option name="type">bar</option>
+          <option name="height">20px</option>
+          <option name="barColor">#006d9c</option>
+          <option name="barWidth">5px</option>
+        </format>
+        <drilldown>
+          <link target="_blank">forwarder_instance?form.hostname=$row.Instance$</link>
+        </drilldown>
+      </table>
+      <html>
+        <p>Click on a forwarder to see more details.</p>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Historical Charts</title>
+      <input type="time" searchWhenChanged="true" token="time">
+        <label>Time Range:</label>
+        <default>
+          <earliestTime>-60m@m</earliestTime>
+          <latestTime>now</latestTime>
+        </default>
+      </input>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Total Count of Forwarders and Receivers</title>
+      <search id="forwarderReceiverCountBaseSearch">
+        <query>
+          `dmc_get_forwarder_tcpin`
+          | eval forwarder = guid
+          | eval receiver = host.":".destPort
+          | stats dc(forwarder) as count_forwarder, dc(receiver) as count_receiver
+        </query>
+        <earliest>$time.earliest$</earliest>
+        <latest>$time.latest$</latest>
+      </search>
+      <search id="forwarderReceiverExcludingInternalCountBaseSearch">
+        <query>
+          `dmc_get_forwarder_tcpin`
+           | eval forwarder = guid
+           | eval receiver = host.":".destPort
+           | search NOT [| inputlookup dmc_assets | dedup serverName | rename serverName as hostname | fields hostname]
+           | stats dc(forwarder) as count_forwarder, dc(receiver) as count_receiver
+        </query>
+        <earliest>$time.earliest$</earliest>
+        <latest>$time.latest$</latest>
+      </search>
+      <single depends="$show_instances_forwarding_logs$">
+        <option name="height">80px</option>
+        <search base="forwarderReceiverCountBaseSearch">
+          <query>fields count_forwarder</query>
+        </search>
+        <option name="underLabel">Forwarders</option>
+      </single>
+      <single rejects="$show_instances_forwarding_logs$">
+        <option name="height">80px</option>
+        <search base="forwarderReceiverExcludingInternalCountBaseSearch">
+          <query>fields count_forwarder</query>
+        </search>
+        <option name="underLabel">Forwarders</option>
+      </single>
+      <single>
+        <option name="height">80px</option>
+        <search base="forwarderReceiverCountBaseSearch">
+          <query>fields count_receiver</query>
+        </search>
+        <option name="underLabel">Receivers</option>
+      </single>
+      <html>
+        <p><b>Note:</b> "Forwarder" is the GUID. "Receiver" is "serverName:port" combination.</p>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Forwarder Connection Count Over Time</title>
+      <input type="dropdown" searchWhenChanged="true" token="funcForwarderCountOverlay">
+        <label>Overlay</label>
+        <showClearButton>false</showClearButton>
+        <default>kb</default>
+        <choice value="kb">KB/s</choice>
+        <choice value="event_count">Events/s</choice>
+        <change>
+          <condition value="kb">
+            <set token="forwarderCountOverlayLabel">KB/s</set>
+          </condition>
+          <condition value="event_count">
+            <set token="forwarderCountOverlayLabel">Events/s</set>
+          </condition>
+        </change>
+      </input>
+      <chart>
+        <search>
+          <query>
+`dmc_get_forwarder_tcpin`
+| eval connection = hostname.":".sourcePort."->".host.":".destPort
+| eval event_count = tcp_eps * 30
+| `dmc_timechart_for_metrics_log` dc(connection) as connection_count, per_second($funcForwarderCountOverlay$) as $funcForwarderCountOverlay$
+| rename connection_count as "Connections", $funcForwarderCountOverlay$ as $forwarderCountOverlayLabel$
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">true</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.chart.showLabels">auto</option>
+        <option name="charting.chart.overlayFields">$forwarderCountOverlayLabel$</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.axisLabelsY2.majorUnit">1</option>
+        <option name="charting.axisTitleY.text">Count</option>
+        <option name="charting.axisTitleY2.text">Average $forwarderCountOverlayLabel$</option>
+        <option name="charting.axisTitleX.text">Time</option>
+      </chart>
+      <html>
+        <p><b>Note:</b> "Forwarder connection count" is the total number of connections between forwarders and receivers. For example, if a forwarder connects to three receivers, its count is three.</p>
+      </html>
+    </panel>
+  </row>
+</form>

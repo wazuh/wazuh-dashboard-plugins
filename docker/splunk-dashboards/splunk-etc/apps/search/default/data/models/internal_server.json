@@ -1,0 +1,1892 @@
+{
+    "objectSummary": {
+        "Search-Based": 0,
+        "Transaction-Based": 0,
+        "Event-Based": 21,
+        "Interfaces": 0,
+        "Interface Implementations": 0
+    },
+    "description": "Splunk's Internal Server Logs record information about system usage and performance.",
+    "objects": [
+        {
+            "constraints": [
+                {
+                    "search": "index=_internal source=*scheduler.log* OR source=*metrics.log* OR source=*splunkd.log* OR source=*license_usage.log* OR source=*splunkd_access.log*"
+                }
+            ],
+            "calculations": [],
+            "parentName": "BaseEvent",
+            "fields": [
+                {
+                    "multivalue": false,
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "fieldName": "alert_actions",
+                    "displayName": "alert actions",
+                    "comment": ""
+                },
+                {
+                    "multivalue": false,
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "fieldName": "app",
+                    "displayName": "app",
+                    "comment": ""
+                },
+                {
+                    "multivalue": false,
+                    "type": "number",
+                    "hidden": true,
+                    "required": false,
+                    "fieldName": "result_count",
+                    "displayName": "result count",
+                    "comment": ""
+                },
+                {
+                    "multivalue": false,
+                    "type": "number",
+                    "hidden": true,
+                    "required": false,
+                    "fieldName": "run_time",
+                    "displayName": "run time (seconds)",
+                    "comment": ""
+                },
+                {
+                    "multivalue": false,
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "fieldName": "savedsearch_name",
+                    "displayName": "search name",
+                    "comment": ""
+                },
+                {
+                    "multivalue": false,
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "fieldName": "sid",
+                    "displayName": "SID (search ID)",
+                    "comment": ""
+                },
+                {
+                    "multivalue": false,
+                    "type": "number",
+                    "hidden": true,
+                    "required": false,
+                    "fieldName": "status",
+                    "displayName": "status",
+                    "comment": ""
+                },
+                {
+                    "multivalue": false,
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "fieldName": "user",
+                    "displayName": "user",
+                    "comment": ""
+                },
+                {
+                    "multivalue": false,
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "fieldName": "message",
+                    "displayName": "message",
+                    "comment": ""
+                },
+                {
+                    "multivalue": false,
+                    "type": "number",
+                    "hidden": true,
+                    "required": false,
+                    "fieldName": "total_run_time",
+                    "displayName": "search run time (seconds)",
+                    "comment": ""
+                },
+                {
+                    "multivalue": false,
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "fieldName": "h",
+                    "displayName": "Host",
+                    "comment": ""
+                },
+                {
+                    "multivalue": false,
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "fieldName": "idx",
+                    "displayName": "Index",
+                    "comment": ""
+                },
+                {
+                    "multivalue": false,
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "fieldName": "pool",
+                    "displayName": "Pool",
+                    "comment": ""
+                },
+                {
+                    "multivalue": false,
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "fieldName": "s",
+                    "displayName": "Source",
+                    "comment": ""
+                },
+                {
+                    "multivalue": false,
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "fieldName": "st",
+                    "displayName": "Sourcetype",
+                    "comment": ""
+                },
+                {
+                    "multivalue": false,
+                    "type": "number",
+                    "hidden": true,
+                    "required": false,
+                    "fieldName": "warnct",
+                    "displayName": "warn count",
+                    "comment": ""
+                },
+                {
+                    "multivalue": false,
+                    "type": "number",
+                    "hidden": true,
+                    "required": false,
+                    "fieldName": "winsz",
+                    "displayName": "window size (days)",
+                    "comment": ""
+                },
+                {
+                    "multivalue": false,
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "fieldName": "stack",
+                    "displayName": "stack ID",
+                    "comment": ""
+                },
+                {
+                    "multivalue": false,
+                    "type": "number",
+                    "hidden": true,
+                    "required": false,
+                    "fieldName": "cpu_seconds",
+                    "displayName": "cpu seconds",
+                    "comment": ""
+                },
+                {
+                    "multivalue": false,
+                    "type": "number",
+                    "hidden": true,
+                    "required": false,
+                    "fieldName": "executes",
+                    "displayName": "executes",
+                    "comment": ""
+                },
+                {
+                    "multivalue": false,
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "fieldName": "name",
+                    "displayName": "name",
+                    "comment": ""
+                },
+                {
+                    "multivalue": false,
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "fieldName": "processor",
+                    "displayName": "processor",
+                    "comment": ""
+                },
+                {
+                    "multivalue": false,
+                    "type": "number",
+                    "hidden": true,
+                    "required": false,
+                    "fieldName": "current_size_kb",
+                    "displayName": "current size (KB)",
+                    "comment": ""
+                },
+                {
+                    "multivalue": false,
+                    "type": "number",
+                    "hidden": true,
+                    "required": false,
+                    "fieldName": "active_hist_searches",
+                    "displayName": "historical searches",
+                    "comment": ""
+                },
+                {
+                    "multivalue": false,
+                    "type": "number",
+                    "hidden": true,
+                    "required": false,
+                    "fieldName": "active_realtime_searches",
+                    "displayName": "realtime searches",
+                    "comment": ""
+                },
+                {
+                    "multivalue": false,
+                    "type": "number",
+                    "hidden": true,
+                    "required": false,
+                    "fieldName": "kb",
+                    "displayName": "total flow of data (KB)",
+                    "comment": ""
+                },
+                {
+                    "multivalue": false,
+                    "type": "number",
+                    "hidden": true,
+                    "required": false,
+                    "fieldName": "load_average",
+                    "displayName": "load average on system - CPU/IO",
+                    "comment": ""
+                },
+                {
+                    "multivalue": false,
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "fieldName": "clientip",
+                    "displayName": "clientip",
+                    "comment": ""
+                },
+                {
+                    "multivalue": false,
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "fieldName": "method",
+                    "displayName": "method",
+                    "comment": ""
+                },
+                {
+                    "multivalue": false,
+                    "type": "number",
+                    "hidden": true,
+                    "required": false,
+                    "fieldName": "spent",
+                    "displayName": "spent (milliseconds)",
+                    "comment": ""
+                },
+                {
+                    "multivalue": false,
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "fieldName": "uri_path",
+                    "displayName": "uri_path",
+                    "comment": ""
+                },
+                {
+                    "multivalue": false,
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "fieldName": "uri_query",
+                    "displayName": "uri_query",
+                    "comment": ""
+                }
+            ],
+            "objectName": "server",
+            "displayName": "Splunk Server",
+            "comment": ""
+        },
+        {
+            "constraints": [
+                {
+                    "search": "source=*scheduler.log*"
+                }
+            ],
+            "calculations": [],
+            "parentName": "server",
+            "fields": [
+                {
+                    "type": "string",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "user",
+                    "displayName": "user",
+                    "comment": ""
+                },
+                {
+                    "type": "number",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "status",
+                    "displayName": "status",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "sid",
+                    "displayName": "SID (search ID)",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "savedsearch_name",
+                    "displayName": "search name",
+                    "comment": ""
+                },
+                {
+                    "type": "number",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "result_count",
+                    "displayName": "result count",
+                    "comment": ""
+                },
+                {
+                    "type": "number",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "run_time",
+                    "displayName": "run time (seconds)",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "app",
+                    "displayName": "app",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "owner": "BaseEvent",
+                    "multivalue": false,
+                    "fieldName": "source",
+                    "displayName": "source",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "owner": "BaseEvent",
+                    "multivalue": false,
+                    "fieldName": "sourcetype",
+                    "displayName": "sourcetype",
+                    "comment": ""
+                }
+            ],
+            "objectName": "scheduler",
+            "displayName": "Scheduler",
+            "comment": ""
+        },
+        {
+            "constraints": [
+                {
+                    "search": "alert_actions=* NOT alert_actions=summary_index"
+                }
+            ],
+            "calculations": [],
+            "parentName": "scheduler",
+            "fields": [
+                {
+                    "type": "string",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "alert_actions",
+                    "displayName": "alert actions",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "user",
+                    "displayName": "user",
+                    "comment": ""
+                },
+                {
+                    "type": "number",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "status",
+                    "displayName": "status",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "sid",
+                    "displayName": "SID (search ID)",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "savedsearch_name",
+                    "displayName": "search name",
+                    "comment": ""
+                },
+                {
+                    "type": "number",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "result_count",
+                    "displayName": "result count",
+                    "comment": ""
+                },
+                {
+                    "type": "number",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "run_time",
+                    "displayName": "run time (seconds)",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "app",
+                    "displayName": "app",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "owner": "BaseEvent",
+                    "multivalue": false,
+                    "fieldName": "source",
+                    "displayName": "source",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "owner": "BaseEvent",
+                    "multivalue": false,
+                    "fieldName": "sourcetype",
+                    "displayName": "sourcetype",
+                    "comment": ""
+                }
+            ],
+            "objectName": "alerts",
+            "displayName": "Alerts",
+            "comment": ""
+        },
+        {
+            "constraints": [
+                {
+                    "search": "alert_actions=\"\""
+                }
+            ],
+            "calculations": [
+                {
+                    "calculationType": "Eval",
+                    "expression": "strftime(scheduled_time,\"%H:%M:%S %m-%d-%y\")",
+                    "comment": "",
+                    "outputFields": [
+                        {
+                            "multivalue": false,
+                            "type": "string",
+                            "hidden": false,
+                            "required": false,
+                            "fieldName": "scheduled_time",
+                            "displayName": "scheduled time",
+                            "comment": ""
+                        }
+                    ],
+                    "calculationID": "d97zs8wv90sh5mi"
+                },
+                {
+                    "calculationType": "Eval",
+                    "expression": "strftime(dispatch_time,\"%H:%M:%S %m-%d-%y\")",
+                    "comment": "",
+                    "outputFields": [
+                        {
+                            "multivalue": false,
+                            "type": "string",
+                            "hidden": false,
+                            "required": false,
+                            "fieldName": "dispatch_time",
+                            "displayName": "dispatched time",
+                            "comment": ""
+                        }
+                    ],
+                    "calculationID": "adfivjywdmvuc8fr"
+                }
+            ],
+            "parentName": "scheduler",
+            "fields": [
+                {
+                    "type": "string",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "user",
+                    "displayName": "user",
+                    "comment": ""
+                },
+                {
+                    "type": "number",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "status",
+                    "displayName": "status",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "sid",
+                    "displayName": "SID (search ID)",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "savedsearch_name",
+                    "displayName": "search name",
+                    "comment": ""
+                },
+                {
+                    "type": "number",
+                    "hidden": true,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "result_count",
+                    "displayName": "result count",
+                    "comment": ""
+                },
+                {
+                    "type": "number",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "run_time",
+                    "displayName": "run time (seconds)",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "app",
+                    "displayName": "app",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "owner": "BaseEvent",
+                    "multivalue": false,
+                    "fieldName": "source",
+                    "displayName": "source",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "owner": "BaseEvent",
+                    "multivalue": false,
+                    "fieldName": "sourcetype",
+                    "displayName": "sourcetype",
+                    "comment": ""
+                }
+            ],
+            "objectName": "scheduled_reports",
+            "displayName": "Scheduled Reports",
+            "comment": ""
+        },
+        {
+            "constraints": [
+                {
+                    "search": "alert_actions=summary_index"
+                }
+            ],
+            "calculations": [],
+            "parentName": "scheduler",
+            "fields": [
+                {
+                    "type": "string",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "user",
+                    "displayName": "user",
+                    "comment": ""
+                },
+                {
+                    "type": "number",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "status",
+                    "displayName": "status",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "sid",
+                    "displayName": "SID (search ID)",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "savedsearch_name",
+                    "displayName": "search name",
+                    "comment": ""
+                },
+                {
+                    "type": "number",
+                    "hidden": true,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "result_count",
+                    "displayName": "result count",
+                    "comment": ""
+                },
+                {
+                    "type": "number",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "run_time",
+                    "displayName": "run time (seconds)",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "app",
+                    "displayName": "app",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "owner": "BaseEvent",
+                    "multivalue": false,
+                    "fieldName": "source",
+                    "displayName": "source",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "owner": "BaseEvent",
+                    "multivalue": false,
+                    "fieldName": "sourcetype",
+                    "displayName": "sourcetype",
+                    "comment": ""
+                }
+            ],
+            "objectName": "summaryindexing",
+            "displayName": "Summary Indexing Searches",
+            "comment": ""
+        },
+        {
+            "constraints": [
+                {
+                    "search": "source=*splunkd.log* *_ACCELERATE_* "
+                }
+            ],
+            "calculations": [],
+            "parentName": "server",
+            "fields": [
+                {
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "owner": "BaseEvent",
+                    "multivalue": false,
+                    "fieldName": "source",
+                    "displayName": "source",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "owner": "BaseEvent",
+                    "multivalue": false,
+                    "fieldName": "sourcetype",
+                    "displayName": "sourcetype",
+                    "comment": ""
+                }
+            ],
+            "objectName": "acceleration",
+            "displayName": "Acceleration",
+            "comment": ""
+        },
+        {
+            "constraints": [
+                {
+                    "search": "*_ACCELERATE_DM_* \"DispatchReaper:SearchStatus - completed\""
+                }
+            ],
+            "calculations": [
+                {
+                    "expression": "_ACCELERATE_DM_(?<appname>[^A-Z]*)_(?<dm_name>[A-Z]+[^(_ACCELERATE_)]*)_ACCELERATE_",
+                    "outputFields": [
+                        {
+                            "multivalue": false,
+                            "type": "string",
+                            "hidden": false,
+                            "required": false,
+                            "fieldName": "dm_name",
+                            "displayName": "data model name",
+                            "comment": ""
+                        },
+                        {
+                            "multivalue": false,
+                            "type": "string",
+                            "hidden": false,
+                            "required": false,
+                            "fieldName": "appname",
+                            "displayName": "app name",
+                            "comment": ""
+                        }
+                    ],
+                    "calculationID": "gja1xtefeqfo5hfr",
+                    "calculationType": "Rex",
+                    "inputField": "savedsearch_name",
+                    "comment": ""
+                }
+            ],
+            "parentName": "acceleration",
+            "fields": [
+                {
+                    "type": "number",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "total_run_time",
+                    "displayName": "total run time (seconds)",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "owner": "BaseEvent",
+                    "multivalue": false,
+                    "fieldName": "source",
+                    "displayName": "source",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "owner": "BaseEvent",
+                    "multivalue": false,
+                    "fieldName": "sourcetype",
+                    "displayName": "sourcetype",
+                    "comment": ""
+                }
+            ],
+            "objectName": "dm_acceleration",
+            "displayName": "Data Model Acceleration",
+            "comment": ""
+        },
+        {
+            "constraints": [
+                {
+                    "search": "(*_ACCELERATE_* AND NOT *_ACCELERATE_DM_*) OR *_AUTOSUMMARY_* \"DispatchReaper:SearchStatus - completed\""
+                }
+            ],
+            "calculations": [
+                {
+                    "expression": "(?<summaryid>[^_]+)_ACCELERATE",
+                    "outputFields": [
+                        {
+                            "multivalue": false,
+                            "type": "string",
+                            "hidden": false,
+                            "required": false,
+                            "fieldName": "summaryid",
+                            "displayName": "summary ID",
+                            "comment": ""
+                        }
+                    ],
+                    "calculationID": "fammi4qe49m5cdi",
+                    "calculationType": "Rex",
+                    "inputField": "savedsearch_name",
+                    "comment": ""
+                }
+            ],
+            "parentName": "acceleration",
+            "fields": [
+                {
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "owner": "BaseEvent",
+                    "multivalue": false,
+                    "fieldName": "source",
+                    "displayName": "source",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "owner": "BaseEvent",
+                    "multivalue": false,
+                    "fieldName": "sourcetype",
+                    "displayName": "sourcetype",
+                    "comment": ""
+                }
+            ],
+            "objectName": "report_acceleration",
+            "displayName": "Report Acceleration",
+            "comment": ""
+        },
+        {
+            "constraints": [
+                {
+                    "search": "source=*license_usage.log*"
+                }
+            ],
+            "calculations": [
+                {
+                    "calculationType": "Eval",
+                    "expression": "coalesce(i,slave,slaveid)",
+                    "comment": "",
+                    "outputFields": [
+                        {
+                            "multivalue": false,
+                            "type": "string",
+                            "hidden": false,
+                            "required": false,
+                            "fieldName": "slaveGUID",
+                            "displayName": "slave GUID",
+                            "comment": ""
+                        }
+                    ],
+                    "calculationID": "yrsbrv22lin3ik9"
+                }
+            ],
+            "parentName": "server",
+            "fields": [
+                {
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "owner": "BaseEvent",
+                    "multivalue": false,
+                    "fieldName": "host",
+                    "displayName": "host",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "owner": "BaseEvent",
+                    "multivalue": false,
+                    "fieldName": "source",
+                    "displayName": "source",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "owner": "BaseEvent",
+                    "multivalue": false,
+                    "fieldName": "sourcetype",
+                    "displayName": "sourcetype",
+                    "comment": ""
+                }
+            ],
+            "objectName": "licenser",
+            "displayName": "Licenser",
+            "comment": ""
+        },
+        {
+            "constraints": [
+                {
+                    "search": "type=RolloverSummary"
+                }
+            ],
+            "calculations": [
+                {
+                    "calculationType": "Eval",
+                    "expression": "poolsz/1024/1024/1024",
+                    "comment": "",
+                    "outputFields": [
+                        {
+                            "multivalue": false,
+                            "type": "number",
+                            "hidden": false,
+                            "required": false,
+                            "fieldName": "poolsize",
+                            "displayName": "Pool Size (GB)",
+                            "comment": ""
+                        }
+                    ],
+                    "calculationID": "6j7hpi3xiy2mlsor"
+                },
+                {
+                    "calculationType": "Eval",
+                    "expression": "b/1024/1024/1024",
+                    "comment": "",
+                    "outputFields": [
+                        {
+                            "multivalue": false,
+                            "type": "number",
+                            "hidden": false,
+                            "required": false,
+                            "fieldName": "gb",
+                            "displayName": "License Used (GB)",
+                            "comment": ""
+                        }
+                    ],
+                    "calculationID": "nk0k5uof9614te29"
+                },
+                {
+                    "calculationType": "Eval",
+                    "expression": "stacksz/1024/1024/1024",
+                    "comment": "",
+                    "outputFields": [
+                        {
+                            "multivalue": false,
+                            "type": "number",
+                            "hidden": false,
+                            "required": false,
+                            "fieldName": "stackszgb",
+                            "displayName": "stack size (GB)",
+                            "comment": ""
+                        }
+                    ],
+                    "calculationID": "3kk21ckm77am7vi"
+                }
+            ],
+            "parentName": "licenser",
+            "fields": [
+                {
+                    "type": "string",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "stack",
+                    "displayName": "stack ID",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "pool",
+                    "displayName": "Pool",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "owner": "BaseEvent",
+                    "multivalue": false,
+                    "fieldName": "host",
+                    "displayName": "host",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "owner": "BaseEvent",
+                    "multivalue": false,
+                    "fieldName": "source",
+                    "displayName": "source",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "owner": "BaseEvent",
+                    "multivalue": false,
+                    "fieldName": "sourcetype",
+                    "displayName": "sourcetype",
+                    "comment": ""
+                }
+            ],
+            "objectName": "daily_usage",
+            "displayName": "Daily Usage Summary",
+            "comment": ""
+        },
+        {
+            "constraints": [
+                {
+                    "search": "type=SlaveWarnSummary"
+                }
+            ],
+            "calculations": [
+                {
+                    "calculationType": "Eval",
+                    "expression": "strftime(lastwarn,\"%H:%M:%S %m-%d-%y\")",
+                    "comment": "",
+                    "outputFields": [
+                        {
+                            "multivalue": false,
+                            "type": "string",
+                            "hidden": false,
+                            "required": false,
+                            "fieldName": "lastwarn",
+                            "displayName": "last warning",
+                            "comment": ""
+                        }
+                    ],
+                    "calculationID": "ru83jp0wlogeewmi"
+                }
+            ],
+            "parentName": "licenser",
+            "fields": [
+                {
+                    "type": "number",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "winsz",
+                    "displayName": "window size (days)",
+                    "comment": ""
+                },
+                {
+                    "type": "number",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "warnct",
+                    "displayName": "warn count",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "owner": "BaseEvent",
+                    "multivalue": false,
+                    "fieldName": "host",
+                    "displayName": "host",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "owner": "BaseEvent",
+                    "multivalue": false,
+                    "fieldName": "source",
+                    "displayName": "source",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "owner": "BaseEvent",
+                    "multivalue": false,
+                    "fieldName": "sourcetype",
+                    "displayName": "sourcetype",
+                    "comment": ""
+                }
+            ],
+            "objectName": "slave_warn_summary",
+            "displayName": "Daily Slave Warning Summary",
+            "comment": ""
+        },
+        {
+            "constraints": [
+                {
+                    "search": "type=Usage"
+                }
+            ],
+            "calculations": [
+                {
+                    "calculationType": "Eval",
+                    "expression": "b/1024/1024/1024",
+                    "comment": "",
+                    "outputFields": [
+                        {
+                            "multivalue": false,
+                            "type": "number",
+                            "hidden": false,
+                            "required": false,
+                            "fieldName": "gb",
+                            "displayName": "GB indexed",
+                            "comment": ""
+                        }
+                    ],
+                    "calculationID": "ym4vhp3okjdr6bt9"
+                },
+                {
+                    "calculationType": "Eval",
+                    "expression": "poolsz/1024/1024/1024",
+                    "comment": "",
+                    "outputFields": [
+                        {
+                            "multivalue": false,
+                            "type": "number",
+                            "hidden": false,
+                            "required": false,
+                            "fieldName": "poolsize",
+                            "displayName": "Pool Size (GB)",
+                            "comment": ""
+                        }
+                    ],
+                    "calculationID": "75ow1076ihvkj4i"
+                }
+            ],
+            "parentName": "licenser",
+            "fields": [
+                {
+                    "type": "string",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "pool",
+                    "displayName": "Pool",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "st",
+                    "displayName": "Sourcetype",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "s",
+                    "displayName": "Source",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "idx",
+                    "displayName": "Index",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "h",
+                    "displayName": "Host",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "owner": "BaseEvent",
+                    "multivalue": false,
+                    "fieldName": "host",
+                    "displayName": "host",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "owner": "BaseEvent",
+                    "multivalue": false,
+                    "fieldName": "source",
+                    "displayName": "source",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "owner": "BaseEvent",
+                    "multivalue": false,
+                    "fieldName": "sourcetype",
+                    "displayName": "sourcetype",
+                    "comment": ""
+                }
+            ],
+            "objectName": "quota",
+            "displayName": "Quota Usage",
+            "comment": ""
+        },
+        {
+            "constraints": [
+                {
+                    "search": "type=WarningIssued"
+                }
+            ],
+            "calculations": [
+                {
+                    "calculationType": "Eval",
+                    "expression": "poolsize/1024/1024/1024",
+                    "comment": "",
+                    "outputFields": [
+                        {
+                            "multivalue": false,
+                            "type": "number",
+                            "hidden": false,
+                            "required": false,
+                            "fieldName": "poolsize",
+                            "displayName": "Pool Size (GB)",
+                            "comment": ""
+                        }
+                    ],
+                    "calculationID": "tn1kxvfk2tvs4i"
+                }
+            ],
+            "parentName": "licenser",
+            "fields": [
+                {
+                    "type": "string",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "stack",
+                    "displayName": "stack ID",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "pool",
+                    "displayName": "Pool",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "owner": "BaseEvent",
+                    "multivalue": false,
+                    "fieldName": "host",
+                    "displayName": "host",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "owner": "BaseEvent",
+                    "multivalue": false,
+                    "fieldName": "source",
+                    "displayName": "source",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "owner": "BaseEvent",
+                    "multivalue": false,
+                    "fieldName": "sourcetype",
+                    "displayName": "sourcetype",
+                    "comment": ""
+                }
+            ],
+            "objectName": "pool_warnings",
+            "displayName": "Pool Warnings",
+            "comment": ""
+        },
+        {
+            "constraints": [
+                {
+                    "search": "source=*metrics.log*"
+                }
+            ],
+            "calculations": [],
+            "parentName": "server",
+            "fields": [
+                {
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "owner": "BaseEvent",
+                    "multivalue": false,
+                    "fieldName": "source",
+                    "displayName": "source",
+                    "comment": ""
+                }
+            ],
+            "objectName": "metrics",
+            "displayName": "Performance and System Data",
+            "comment": ""
+        },
+        {
+            "constraints": [
+                {
+                    "search": "source=*splunkd_access.log*"
+                }
+            ],
+            "calculations": [],
+            "parentName": "server",
+            "fields": [
+                {
+                    "type": "number",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "status",
+                    "displayName": "status",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "clientip",
+                    "displayName": "clientip",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "method",
+                    "displayName": "method",
+                    "comment": ""
+                },
+                {
+                    "type": "number",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "spent",
+                    "displayName": "spent (milliseconds)",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "uri_path",
+                    "displayName": "uri_path",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "uri_query",
+                    "displayName": "uri_query",
+                    "comment": ""
+                }
+            ],
+            "objectName": "splunkdaccess",
+            "displayName": "REST API Calls",
+            "comment": ""
+        },
+        {
+            "constraints": [
+                {
+                    "search": "group=pipeline"
+                }
+            ],
+            "calculations": [],
+            "parentName": "metrics",
+            "fields": [
+                {
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "owner": "BaseEvent",
+                    "multivalue": false,
+                    "fieldName": "sourcetype",
+                    "displayName": "sourcetype",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "owner": "BaseEvent",
+                    "multivalue": false,
+                    "fieldName": "source",
+                    "displayName": "source",
+                    "comment": ""
+                },
+                {
+                    "type": "number",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "cpu_seconds",
+                    "displayName": "cpu seconds",
+                    "comment": ""
+                },
+                {
+                    "type": "number",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "executes",
+                    "displayName": "executes",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "name",
+                    "displayName": "name",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "processor",
+                    "displayName": "processor",
+                    "comment": ""
+                }
+            ],
+            "objectName": "pipeline",
+            "displayName": "Pipeline",
+            "comment": ""
+        },
+        {
+            "constraints": [
+                {
+                    "search": "group=queue"
+                }
+            ],
+            "calculations": [],
+            "parentName": "metrics",
+            "fields": [
+                {
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "owner": "BaseEvent",
+                    "multivalue": false,
+                    "fieldName": "sourcetype",
+                    "displayName": "sourcetype",
+                    "comment": ""
+                },
+                {
+                    "type": "number",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "current_size_kb",
+                    "displayName": "current size (KB)",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "name",
+                    "displayName": "name",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "owner": "BaseEvent",
+                    "multivalue": false,
+                    "fieldName": "source",
+                    "displayName": "source",
+                    "comment": ""
+                }
+            ],
+            "objectName": "queue",
+            "displayName": "Queue",
+            "comment": ""
+        },
+        {
+            "constraints": [
+                {
+                    "search": "group=search_concurrency \"system total\" NOT user=*"
+                }
+            ],
+            "calculations": [],
+            "parentName": "metrics",
+            "fields": [
+                {
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "owner": "BaseEvent",
+                    "multivalue": false,
+                    "fieldName": "sourcetype",
+                    "displayName": "sourcetype",
+                    "comment": ""
+                },
+                {
+                    "type": "number",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "active_hist_searches",
+                    "displayName": "historical searches",
+                    "comment": ""
+                },
+                {
+                    "type": "number",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "active_realtime_searches",
+                    "displayName": "realtime searches",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "owner": "BaseEvent",
+                    "multivalue": false,
+                    "fieldName": "source",
+                    "displayName": "source",
+                    "comment": ""
+                }
+            ],
+            "objectName": "systemwide_search_load_",
+            "displayName": "Search Load - Systemwide",
+            "comment": ""
+        },
+        {
+            "constraints": [
+                {
+                    "search": "group=search_concurrency user=*"
+                }
+            ],
+            "calculations": [],
+            "parentName": "metrics",
+            "fields": [
+                {
+                    "type": "string",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "user",
+                    "displayName": "user",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "owner": "BaseEvent",
+                    "multivalue": false,
+                    "fieldName": "sourcetype",
+                    "displayName": "sourcetype",
+                    "comment": ""
+                },
+                {
+                    "type": "number",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "active_hist_searches",
+                    "displayName": "historical searches",
+                    "comment": ""
+                },
+                {
+                    "type": "number",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "active_realtime_searches",
+                    "displayName": "realtime searches",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "owner": "BaseEvent",
+                    "multivalue": false,
+                    "fieldName": "source",
+                    "displayName": "source",
+                    "comment": ""
+                }
+            ],
+            "objectName": "user_search_load",
+            "displayName": "Search Load - Users",
+            "comment": ""
+        },
+        {
+            "constraints": [
+                {
+                    "search": "group=thruput"
+                }
+            ],
+            "calculations": [],
+            "parentName": "metrics",
+            "fields": [
+                {
+                    "type": "number",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "kb",
+                    "displayName": "total flow of data (KB)",
+                    "comment": ""
+                },
+                {
+                    "type": "number",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "load_average",
+                    "displayName": "load average on system - CPU/IO",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": true,
+                    "required": false,
+                    "owner": "BaseEvent",
+                    "multivalue": false,
+                    "fieldName": "source",
+                    "displayName": "source",
+                    "comment": ""
+                }
+            ],
+            "objectName": "Thruput",
+            "displayName": "Thruput",
+            "comment": ""
+        },
+        {
+            "constraints": [
+                {
+                    "search": "uri_path=/services/search/jobs*"
+                }
+            ],
+            "calculations": [],
+            "parentName": "splunkdaccess",
+            "fields": [
+                {
+                    "type": "number",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "status",
+                    "displayName": "status",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "clientip",
+                    "displayName": "clientip",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "method",
+                    "displayName": "method",
+                    "comment": ""
+                },
+                {
+                    "type": "number",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "spent",
+                    "displayName": "spent (milliseconds)",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "uri_path",
+                    "displayName": "uri_path",
+                    "comment": ""
+                },
+                {
+                    "type": "string",
+                    "hidden": false,
+                    "required": false,
+                    "owner": "server",
+                    "multivalue": false,
+                    "fieldName": "uri_query",
+                    "displayName": "uri_query",
+                    "comment": ""
+                }
+            ],
+            "objectName": "job_endpoint",
+            "displayName": "Job Endpoint",
+            "comment": ""
+        }
+    ],
+    "objectNameList": [
+        "server",
+        "scheduler",
+        "alerts",
+        "scheduled_reports",
+        "summaryindexing",
+        "acceleration",
+        "dm_acceleration",
+        "report_acceleration",
+        "licenser",
+        "daily_usage",
+        "slave_warn_summary",
+        "quota",
+        "pool_warnings",
+        "metrics",
+        "splunkdaccess",
+        "pipeline",
+        "queue",
+        "systemwide_search_load_",
+        "user_search_load",
+        "Thruput",
+        "job_endpoint"
+    ],
+    "displayName": "Splunk's Internal Server Logs - SAMPLE",
+    "modelName": "internal_server"
+}

@@ -1,0 +1,13 @@
+<endpoint name="alert_actions" template="pages/system.html">
+  <header>unused</header>
+  <capabilities>
+    <read>admin_all_objects</read>
+  </capabilities>
+  <menu name="knowledge_configurations">
+    <label>Alert actions</label>
+    <url>/manager/%(namespace)s/alert_actions</url>
+    <description>Manage, permission, and configure available alert actions.</description>
+    <order>55</order>
+    <id>alert_actions</id>
+  </menu>
+</endpoint>

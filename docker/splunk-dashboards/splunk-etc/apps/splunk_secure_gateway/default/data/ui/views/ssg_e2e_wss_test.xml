@@ -1,0 +1,146 @@
+<form hideEdit="True" theme="dark" version="1.1">
+  <tags>mobile,tv</tags>
+  <label>End-to-End Websocket Test</label>
+  <description>Initiate a sample request to run an end-to-end websocket test for Splunk Secure Gateway, device authentication, and Spacebridge messaging. This dashboard requires JSON Web Tokens (JWT) to be enabled.</description>
+  <search id="e2e_test">
+    <query>| rest "services/ssg/test_websocket" request_type=$request_type$ request_mode=$request_mode$</query>
+    <earliest>-15m</earliest>
+    <latest>now</latest>
+    <done>
+      <set token="rid">$result.wss_rid$</set>
+    </done>
+  </search>
+  <fieldset submitButton="true" autoRun="false">
+    <input type="dropdown" token="request_mode">
+      <label>Mode</label>
+      <choice value="clientSingleRequest">Single Request</choice>
+      <choice value="clientSubscriptionMessage">Subscription Message</choice>
+      <initialValue>clientSingleRequest</initialValue>
+    </input>
+    <input type="dropdown" token="request_type">
+      <label>Request Type</label>
+      <choice value="&quot;{\&quot;versionGetRequest\&quot;: {}}&quot;">Version Get Request</choice>
+      <choice value="&quot;{\&quot;appListRequest\&quot;: {}}&quot;">App List Request</choice>
+      <choice value="&quot;{\&quot;dashboardListRequest\&quot;:{\&quot;minimalList\&quot;: true}}&quot;">Minimal Dashboard List</choice>
+      <choice value="&quot;{\&quot;alertsListRequest\&quot;: {}}&quot;">Alerts List Request</choice>
+      <choice value="&quot;{\&quot;genericMessage\&quot;: {\&quot;namespace\&quot;:\&quot;com.splunk.app.tv\&quot;, \&quot;message\&quot;:\&quot;hello world\&quot;}}&quot;">Generic Message Request</choice>
+      <choice value="&quot;{\&quot;dashboardListRequest\&quot;:     {\&quot;dashboardIds\&quot;: [\&quot;nobody/splunk_secure_gateway/secure_gateway_status_dashboard\&quot;]} }&quot;">Dashboard List Request</choice>
+      <choice value="&quot;{ \&quot;clientSubscribeRequest\&quot; :{ \&quot;ttlSeconds\&quot;: 120,       \&quot;dashboardVisualizationSubscribe\&quot;: {         \&quot;dashboardVisualizationId\&quot;: {           \&quot;dashboardId\&quot;:\&quot;nobody/splunk_secure_gateway/secure_gateway_status_dashboard\&quot;,           \&quot;visualizationId\&quot;: \&quot;41cf0df3785e27534660e0cb5c55e55959f847d6563675484c99e3c348e84607/0/0\&quot; } } } }&quot;">Client Subscribe Request</choice>
+      <initialValue>"{\"versionGetRequest\": {}}"</initialValue>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Auth Code Validation</title>
+      <single>
+        <search base="e2e_test">
+          <query>| eval status=if(auth_code_status="200", "Success", if(auth_code_status="0", "Did not run", "Failure"))
+| eval range=if(status="Success", "low", "severe")
+| table  status range</query>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">block</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="rangeValues">[0,30,70,100]</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">0</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Server Side Registration</title>
+      <single>
+        <search base="e2e_test">
+          <query>| eval status=if(server_registration_status="201", "Success", if(server_registration_status="0", "Did not run", "Failure"))
+| eval range=if(status="Success", "low",  if(status="Failure", "severe", "guarded"))
+| table status range</query>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">block</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="rangeValues">[0,30,70,100]</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">0</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Websocket Test</title>
+      <single>
+        <search base="e2e_test">
+          <query>| eval status=if(wss_response="0", "Did Not Run", if(wss_response!="[]", "Success", "Failure"))
+| eval range=if(status="Success", "low",  if(status="Failure", "severe", "guarded"))
+| table status range</query>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">block</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="rangeValues">[0,30,70,100]</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">0</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Error Message</title>
+      <single>
+        <search base="e2e_test">
+          <query>| table  error | eval message=if(LEN(error) &gt; 1, error, "N/A") | table message</query>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Websocket Response</title>
+      <table>
+        <title>(Click on panel to get full trace of request)</title>
+        <search base="e2e_test">
+          <query>
+| table wss_response </query>
+        </search>
+        <option name="drilldown">cell</option>
+        <drilldown>
+          <link target="_blank">/app/splunk_secure_gateway/request_tracing_dashboard?requestId=$rid$</link>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+</form>

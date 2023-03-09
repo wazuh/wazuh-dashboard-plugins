@@ -1,0 +1,71 @@
+{
+  "__class__": "rapid_diag.task.Task",
+  "collectors": [
+   {
+            "__class__": "rapid_diag.collector.trigger.periodic.Periodic",
+            "collectors": [
+                {
+                    "__class__": "rapid_diag.collector.stack_trace.StackTrace",
+                    "process": {
+                        "__class__": "rapid_diag.process_abstraction.Process",
+                        "pid": 0,
+                        "name": "splunkd",
+                        "args": "splunkd",
+                        "process_type": "splunkd server",
+                        "ppid": 0,
+                        "default_value_description": "By default, the main splunkd process is selected."
+                    }
+                }
+            ],
+            "sampleCount": 1000,
+            "interval": 0.5
+   },
+    {
+        "__class__": "rapid_diag.collector.trigger.periodic.Periodic",
+        "collectors": [
+            {
+                "__class__": "rapid_diag.collector.netstat.NetStat"
+            }
+        ],
+        "sampleCount": 600,
+        "interval": 1.0
+   },
+    {
+        "__class__": "rapid_diag.collector.lsof.LSOF",
+        "process": {
+          "name": "splunkd",
+          "pid": 0,
+          "ppid": 0,
+          "__class__": "rapid_diag.process_abstraction.Process",
+          "process_type": "splunkd server",
+          "args": "splunkd"
+        }
+    },
+    {
+            "collection_time": 600,
+            "__class__": "rapid_diag.collector.iops.IOPS"
+    },
+    {
+            "collection_time": 600,
+            "__class__": "rapid_diag.collector.system_call_trace.SystemCallTrace",
+            "process": {
+                "__class__": "rapid_diag.process_abstraction.Process",
+                "ppid": 0,
+                "args": "splunkd",
+                "pid": 0,
+                "process_type": "splunkd server",
+                "name": "splunkd"
+            }
+        },
+    {
+      "__class__": "rapid_diag.collector.diag.Diag"
+    }
+  ],
+  "name": "Data reliability",
+  "collector_tool_names": "iops, lsof, netstat, pstack, splunkdiag, strace",
+  "description": "For investigating issues related to data durability and data searchability. Run this template on the host where the issue is reported by Health Report.",
+  "host": "",
+  "task_id": "data-issues",
+  "features" : [ "cluster_bundles", "data_durability", "data_searchable", "splunkoptimize_processes", "buckets", "disk_space", "daa_archived_buckets" ],
+  "symptoms" : [ "slow-search", "replication-issues", "blocked-queues" ]
+}

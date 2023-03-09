@@ -1,0 +1,13 @@
+{
+  "collections/test_bookmarks": "collections/Bookmarks",
+  "collections/test_metrics": "collections/Metrics",
+  "views/landing/bookmark/test_bookmark": "views/landing/bookmark/Bookmark",
+  "views/landing/bookmark/test_bookmark_modal": "views/landing/bookmark/BookmarkModal",
+  "views/landing/bookmark/test_utils": "views/landing/bookmark/Utils",
+  "views/landing/deployment_panels/test_components_panel": "views/landing/deploymentPanels/ComponentsPanel",
+  "views/landing/deployment_panels/test_metrics_panel": "views/landing/deploymentPanels/MetricsPanel",
+  "views/landing/deployment_panels/test_metrics_panel_modal": "views/landing/deploymentPanels/MetricsPanelModal",
+  "views/landing/deployment_panels/test_topology_panel": "views/landing/deploymentPanels/TopologyPanel",
+  "views/landing/test_anomalies": "views/landing/Anomalies",
+  "views/landing/test_landing": "views/landing/Landing"
+}

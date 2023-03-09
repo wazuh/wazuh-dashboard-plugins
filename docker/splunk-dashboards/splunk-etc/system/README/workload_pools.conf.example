@@ -1,0 +1,45 @@
+#   Version 9.0.3
+# CAUTION: Do not alter the settings in workload_pools.conf unless you know what you are doing.
+# Improperly configured workloads may result in splunkd crashes and/or memory overuse.
+
+[general]
+enabled = false
+default_pool = pool_1
+ingest_pool = pool_2
+workload_pool_base_dir_name = splunk
+
+[workload_category:search]
+cpu_weight = 70
+mem_weight = 70
+
+[workload_category:ingest]
+cpu_weight = 20
+mem_weight = 20
+
+[workload_category:misc]
+cpu_weight = 10
+mem_weight = 10
+
+[workload_pool:pool_1]
+cpu_weight = 40
+mem_weight = 40
+category = search
+default_category_pool = 1
+
+[workload_pool:pool_2]
+cpu_weight = 30
+mem_weight = 30
+category = ingest
+default_category_pool = 1
+
+[workload_pool:pool_3]
+cpu_weight = 20
+mem_weight = 20
+category = misc
+default_category_pool = 1
+
+[workload_pool:pool_4]
+cpu_weight = 10
+mem_weight = 10
+category = search
+default_category_pool = 0

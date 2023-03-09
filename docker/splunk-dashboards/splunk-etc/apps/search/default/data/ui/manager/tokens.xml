@@ -1,0 +1,13 @@
+<endpoint name="authorization/tokens" showAppContext="1" template="pages/system.html">
+   <header>Tokens</header>
+   <capabilities>
+     <read>edit_tokens_all OR edit_tokens_own OR list_tokens_all OR list_tokens_own OR edit_tokens_settings</read>
+   </capabilities>
+   <menu name="auth_configurations">
+     <label>Tokens</label>
+     <url>/manager/%(namespace)s/authorization/tokens</url>
+     <order>80</order>
+     <description>Create new authentication tokens and manage token settings.</description>
+     <id>tokens</id>
+   </menu>
+</endpoint>

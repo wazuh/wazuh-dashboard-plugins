@@ -1,0 +1,1 @@
+Populate this directory with the apps to install into each search head cluster member's $SPLUNK_HOME/etc/apps directory.

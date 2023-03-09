@@ -1,0 +1,2047 @@
+# Translations template for PROJECT.
+# Copyright (C) 2021 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2021.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2021-03-05 19:32+0000\n"
+"PO-Revision-Date: 2021-03-19 15:37+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.6.0\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ko\n"
+"X-Generator: Poedit 2.4.2\n"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardPanel.jsx:89
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/UdfDashboard/SaveUdfDashboardPanel.jsx:90
+msgid " You may now view the dashboard."
+msgstr " 이제 대시보드를 볼 수 있습니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/Frequency.jsx:41
+msgid " minutes past the hour"
+msgstr " 분에"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/splunk_metrics_workspace/src/main/webapp/pages/home/ConfigurationCheck.jsx:22
+#, python-format
+msgid ""
+"# %(app_name)s Setup\n"
+"\n"
+"The **%(app_name)s** is used within your existing apps, you need to configure the %(app_name)s app view "
+"to use it.\n"
+"\n"
+"For more information see [%(base_url)s%(app_doc_link)s](%(base_url)s%(app_doc_link)s)"
+msgstr ""
+"# %(app_name)s 설정\n"
+"\n"
+"**%(app_name)s**은(는) 기존 앱 안에서 사용되고, %(app_name)s 앱 뷰를 설정해야만 사용할 수 있습니다.\n"
+"\n"
+"자세한 내용은 [%(base_url)s%(app_doc_link)s](%(base_url)s%(app_doc_link)s)을(를) 참조하십시오."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/splunk_metrics_workspace/src/main/webapp/pages/version_check/index.jsx:16
+#, python-format
+msgid ""
+"# Unable to launch app\n"
+"\n"
+"The %(app_name)s requires Splunk Enterprise version **%(splunk_req_version)s** or higher. You are "
+"currently using version %(splunk_curr_version)s.\n"
+"\n"
+"To use the %(app_name)s, you must upgrade Splunk.\n"
+"See [%(app_upgrade_url)s](%(app_upgrade_url)s) for more information."
+msgstr ""
+"# 앱을 실행할 수 없음\n"
+"\n"
+"%(app_name)s을(를) 실행하려면 Splunk Enterprise **%(splunk_req_version)s** 버전 이상이 필요합니다. 현재 "
+"사용 중인 버전은 %(splunk_curr_version)s입니다.\n"
+"\n"
+"%(app_name)s을 사용하려면 Splunk를 업그레이드해야 합니다.\n"
+"자세한 내용은 [%(app_upgrade_url)s](%(app_upgrade_url)s)을(를) 참조하십시오."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/splunk_metrics_workspace/src/main/webapp/pages/home/index.jsx:18
+#, python-format
+msgid ""
+"# Welcome!\n"
+"\n"
+"The **%(app_name)s** is used within your existing apps, please navigate to the **%(app_view)s** view to "
+"use it.\\\n"
+"%(base_url)s/app/{app-name}/%(app_view)s\n"
+"\n"
+"If you are already in the %(parent_app_name)s app, click the **Analytics** tab to launch the "
+"%(app_name)s.\\\n"
+"For more information see [%(base_url)s%(app_doc_link)s](%(base_url)s%(app_doc_link)s)"
+msgstr ""
+"# 환영합니다!\n"
+"\n"
+"**%(app_name)s**은(는) 기존 앱 안에서 사용됩니다. 사용하려면 **%(app_view)s** 뷰로 이동하십시오.\\\n"
+"%(base_url)s/app/{app-name}/%(app_view)s\n"
+"\n"
+"이미 %(parent_app_name)s 앱에 있는 경우 **애널리틱스** 탭을 클릭하여 %(app_name)s을(를) 실행하십시오.\\\n"
+"자세한 내용은 [%(base_url)s%(app_doc_link)s](%(base_url)s%(app_doc_link)s)을(를) 참조하십시오."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/redux/alerting/alerting-actions.js:79
+#, python-format
+msgid "%(alert)s created successfully."
+msgstr "%(alert)s이(가) 성공적으로 작성되었습니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Report/SaveAsReportForm.jsx:124
+#, python-format
+msgid "%(chartType)s Chart and Statistics Table"
+msgstr "%(chartType)s 차트 및 통계 테이블"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/ChartPanel/Legend/Legend.jsx:196
+#, python-format
+msgid "%(itemName)s, Line color: %(itemColor)s"
+msgstr "%(itemName)s, 선 색상: %(itemColor)s"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/YAxisLabel.jsx:80
+#, python-format
+msgid "%(minString)s to %(maxString)s"
+msgstr "%(minString)s ~ %(maxString)s"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/DataPanel.jsx:336
+#, python-format
+msgid "%(number)s matches found"
+msgstr "%(number)s개의 일치 항목 검색됨"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/YAxisLabel.jsx:92
+#, python-format
+msgid "%(sideString)s = %(yAxisString)s"
+msgstr "%(sideString)s = %(yAxisString)s"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/Section.jsx:16
+#, python-format
+msgid "%(title)s section"
+msgstr "%(title)s 섹션"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/YAxisLabel.jsx:87
+#, python-format
+msgid "%(valuesString)s, Log"
+msgstr "%(valuesString)s, 로그"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/GlobalControls/RefreshControl.jsx:29
+#, python-format
+msgid "(%(duration)s to refresh)"
+msgstr "(%(duration)s후 새로 고침)"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/GlobalControls/RefreshControl.jsx:37
+#, python-format
+msgid "(%(timePassed)s ago)"
+msgstr "(%(timePassed)s전)"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/GlobalControls/RefreshControl.jsx:28
+msgid "(Refreshing)"
+msgstr "(새로 고침)"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertPanel/AlertPanel.jsx:23
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/ChartPanel/ChartPanel.jsx:255
+#, python-format
+msgid "(Time span=%(span)s)"
+msgstr "(시간 범위=%(span)s)"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/lib/index.js:1
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/HierarchyMenuItem.jsx:21
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:57
+msgid "(default)"
+msgstr "(기본값)"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/Threshold.jsx:69
+#, python-format
+msgid "(over %(span)s intervals)"
+msgstr "(%(span)s 간격 동안)"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/Multiselect/Compact.jsx:600
+msgid ", "
+msgstr ", "
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/DataPanel.jsx:335
+msgid "1 match found"
+msgstr "1개의 일치 항목 검색됨"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/TimeShift/TimeShift.jsx:24
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/view-utils.js:13
+msgid "2 days ago"
+msgstr "2일 전"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/TimeShift/TimeShift.jsx:22
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/view-utils.js:11
+msgid "2 hours ago"
+msgstr "2시간 전"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/TimeShift/TimeShift.jsx:23
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/view-utils.js:12
+msgid "24 hours ago"
+msgstr "24시간 전"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/TimeShift/TimeShift.jsx:20
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/view-utils.js:9
+msgid "30 minutes ago"
+msgstr "30분 전"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/TimeShift/TimeShift.jsx:21
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/view-utils.js:10
+msgid "60 minutes ago"
+msgstr "60분 전"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/TimeShift/TimeShift.jsx:25
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/view-utils.js:14
+msgid "7 days ago"
+msgstr "7일 전"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/GlobalControls/RefreshControl.jsx:137
+msgid "AUTO REFRESH"
+msgstr "자동 새로 고침"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/UdfDashboard/SaveUdfDashboardForm.jsx:19
+msgid "Absolute"
+msgstr "절대"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/FilterPanel/FilterPanel.jsx:59
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ReferenceLinePanel/ReferenceLinePanel.jsx:245
+msgid "Add"
+msgstr "추가"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/FilterList/FilterList.jsx:56
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/FilterPanel/FilterPanel.jsx:78
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/FilterPanel/FilterPanel.jsx:79
+msgid "Add New Filter"
+msgstr "새 필터 추가"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ReferenceLineList/ReferenceLineList.jsx:42
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ReferenceLinePanel/ReferenceLinePanel.jsx:251
+msgid "Add New Reference Line"
+msgstr "새 기준선 추가"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/SeriesPanel.jsx:176
+msgid "Add a horizontal line to indicate significant values or thresholds."
+msgstr "가로 선을 추가하여 유의미한 값이나 임계값을 표시합니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/FilterPanel/DimensionFilterSection/DimensionFilterSection.jsx:128
+msgid "Add dimension filter"
+msgstr "차원 필터 추가"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardForm.jsx:282
+msgid "Add interactive time control"
+msgstr "인터랙티브 시간 컨트롤 추가"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/DataPanel.jsx:309
+msgid "Add new filter"
+msgstr "새 필터 추가"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/splunk_metrics_workspace/src/main/webapp/pages/home/ConfigurationCheck.jsx:206
+msgid "Add the ${VIEW_TITLE} view to the ${PARENT_APP_NAME} app"
+msgstr "${VIEW_TITLE} 뷰를 ${PARENT_APP_NAME} 앱에 추가"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/containers/UnifiedAnalysisApp/AddMeasureAction.jsx:28
+msgid "Add to selected chart"
+msgstr "선택된 차트에 추가"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/Throttle.jsx:23
+msgid ""
+"After an alert is triggered, subsequent alerts will not be triggered until after the throttle period."
+msgstr "경고가 트리거된 후 경보 조절 기간이 지날 때까지 후속 경고가 트리거되지 않습니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/SeriesPanel.jsx:205
+msgid "Aggregation"
+msgstr "집계"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:1
+msgid "Alert level"
+msgstr "경고 수준"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/Threshold.jsx:63
+msgid "Alert when"
+msgstr "경고 시기"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:47
+msgid "Alerts"
+msgstr "경고"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/containers/UnifiedAnalysisApp/GlobalControlsContainer.jsx:57
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/containers/UnifiedAnalysisApp/GlobalControlsContainer.jsx:63
+msgid "Alerts cannot be saved to a dashboard."
+msgstr "경고를 대시보드에 저장할 수 없습니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardPanel.jsx:101
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/UdfDashboard/SaveUdfDashboardPanel.jsx:102
+msgid "Alerts will not be saved to the Dashboard"
+msgstr "경고가 대시보드에 저장되지 않습니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/selector-utils.js:29
+msgid "All Charts"
+msgstr "모든 차트"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardPanel.jsx:79
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/UdfDashboard/SaveUdfDashboardPanel.jsx:80
+#, python-format
+msgid "All charts have been added to %(id)s."
+msgstr "모든 차트가 %(id)s에 추가되었습니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/ChartingGrid/ChartingGrid.jsx:124
+msgid "All charts loaded."
+msgstr "모든 차트가 로드됩니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/timeranges.js:18
+msgid "All time"
+msgstr "전체 시간"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/containers/UnifiedAnalysisApp/UnifiedAnalysisApp.jsx:441
+msgid "Analysis"
+msgstr "분석"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/GlobalSplitPicker/GlobalSplitPicker.jsx:48
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/TimePickerDialog.jsx:26
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TransientPanel/TransientPanel.jsx:29
+msgid "Apply"
+msgstr "적용"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/DeleteAlertDialog.jsx:26
+msgid "Are you sure you want to delete"
+msgstr "다음을 삭제하시겠습니까?"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/ChartSettingsPanel.jsx:107
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Report/SaveAsReportForm.jsx:83
+msgid "Area"
+msgstr "영역형"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/Frequency.jsx:51
+msgid "At "
+msgstr "매시간 "
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/YAxisLabel.jsx:79
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/containers/UnifiedAnalysisApp/MultiSeriesPanelContainer.jsx:77
+msgid "Auto"
+msgstr "자동"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/CustomSelect/CustomSelect.jsx:42
+msgid "Auto refresh settings"
+msgstr "자동 새로 고침 설정"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/GlobalControls/RefreshControl.jsx:121
+msgid "Auto-refresh"
+msgstr "자동 새로 고침"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:8
+msgid "Avg"
+msgstr "평균"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/EmptyState/EmptyState.jsx:41
+msgid "Build"
+msgstr "빌드"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/timeranges.js:8
+msgid "Business week to date"
+msgstr "영업일 기준 주간 누계"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ReferenceLinePanel/ReferenceLinePanel.jsx:258
+msgid "Calculation"
+msgstr "계산"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardForm.jsx:252
+msgid "Can only contain letters, numbers and underscores."
+msgstr "문자, 숫자 및 밑줄만 포함할 수 있습니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/AlertFormModal.jsx:44
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/DeleteAlertDialog.jsx:30
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardPanel.jsx:141
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/GlobalSplitPicker/GlobalSplitPicker.jsx:43
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/TimeSpanPicker.jsx:139
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/YAxisForm.jsx:145
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Report/SaveAsReportModal.jsx:78
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/TimePickerDialog.jsx:21
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TransientPanel/TransientPanel.jsx:58
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/UdfDashboard/SaveUdfDashboardPanel.jsx:140
+msgid "Cancel"
+msgstr "취소"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/ChartSettingsPanel.jsx:62
+msgid "Categorical Charts"
+msgstr "범주형 차트"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Report/SaveAsReportForm.jsx:1
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/selector-utils.js:1
+msgid "Chart"
+msgstr "차트"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/ChartPanel/ChartOptionsDropdown.jsx:10
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/ChartPanel/ChartOptionsDropdown.jsx:12
+msgid "Chart Actions"
+msgstr "차트 작업"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/MultiSeriesPanel.jsx:373
+msgid "Chart Settings"
+msgstr "차트 설정"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/ChartSettingsPanel.jsx:94
+msgid "Chart Type"
+msgstr "차트 유형"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/ChartingGrid/ChartingGrid.jsx:135
+msgid "Charting grid"
+msgstr "차트 작성 그리드"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/selector-utils.js:1
+msgid "Charts"
+msgstr "차트"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/TimePickerForm.jsx:235
+msgid "Choose the type of time range"
+msgstr "시간 범위 유형을 선택하십시오."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/Multiselect/Compact.jsx:385
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/icons/ClearAll.jsx:10
+msgid "Clear All"
+msgstr "모두 지우기"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/Multiselect/Compact.jsx:385
+msgid "Clear All Matches"
+msgstr "모든 일치 항목 지우기"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DimensionFilterPanel/MemberExplorer.jsx:59
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DimensionFilterPanel/MemberExplorer.jsx:67
+msgid "Clear Selections"
+msgstr "선택 항목 지우기"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/ClearAllButton/ClearAllButton.jsx:28
+msgid "Clear all"
+msgstr "모두 지우기"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/SeriesButtons.jsx:29
+msgid "Clone"
+msgstr "복제"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/panel-utils.js:285
+msgid "Clone this Panel"
+msgstr "이 패널 복제"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/ChartSettingsPanel.jsx:64
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/ChartSettingsPanel.jsx:112
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Report/SaveAsReportForm.jsx:87
+msgid "Column"
+msgstr "세로막대형"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/FilterPanel/FilterPanel.jsx:130
+msgid "Complete the highlighted rows"
+msgstr "강조 표시된 행 작성"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:68
+msgid "Condition"
+msgstr "조건"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ReferenceLinePanel/ReferenceLinePanel.jsx:271
+msgid "Constant Value"
+msgstr "상수 값"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Report/SaveAsReportForm.jsx:114
+msgid "Content"
+msgstr "콘텐츠"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/splunk_metrics_workspace/src/main/webapp/pages/analytics_workspace/utils/consumer-config.js:4
+msgid "Context to Console"
+msgstr "콘솔 컨텍스트"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/WarningDialog/WarningDialog.jsx:59
+msgid "Continue"
+msgstr "계속"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/StateRestoreControl/StateRestoreControl.jsx:19
+msgid "Continue where you left off, or select new data."
+msgstr "중단했던 위치부터 계속하거나 새 데이터를 선택하십시오."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/ChartingGrid/LegendPopupContainer.jsx:117
+msgid "Copy Series Name"
+msgstr "계열 이름 복사"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:9
+msgid "Count"
+msgstr "개수"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/FilterPanel/FilterPanel.jsx:300
+msgid "Create New Filter"
+msgstr "새 필터 만들기"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-enterprise/src/index.jsx:79
+msgid "Critical"
+msgstr "심각함"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ReferenceLinePanel/ReferenceTimeRange.jsx:28
+msgid "Current chart"
+msgstr "현재 차트"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/DataRangeSelector.jsx:46
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/TimeShift/TimeShift.jsx:26
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/view-utils.js:15
+msgid "Custom"
+msgstr "사용자 지정"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/DataPanelTimePicker.jsx:20
+msgid "Custom Data Time Range"
+msgstr "사용자 지정 데이터 시간 범위"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/CustomTimePicker/CustomTimePicker.jsx:14
+msgid "Custom Time Range"
+msgstr "사용자 지정 시간 범위"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/DataRangeSelector.jsx:29
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ReferenceLinePanel/ReferenceTimeRange.jsx:29
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Time/TimeRange.jsx:39
+msgid "Custom..."
+msgstr "사용자 지정..."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ReferenceLinePanel/ReferenceLinePanel.jsx:277
+msgid "Customize the label (optional)."
+msgstr "레이블을 사용자 지정하십시오(선택 사항)."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardForm.jsx:328
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardPanel.jsx:91
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/UdfDashboard/SaveUdfDashboardPanel.jsx:92
+msgid "Dashboard"
+msgstr "대시보드"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardForm.jsx:274
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/UdfDashboard/SaveUdfDashboardForm.jsx:160
+msgid "Dashboard Description"
+msgstr "대시보드 설명"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardForm.jsx:265
+msgid "Dashboard ID"
+msgstr "대시보드 ID"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardForm.jsx:256
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/UdfDashboard/SaveUdfDashboardForm.jsx:152
+msgid "Dashboard Title"
+msgstr "대시보드 제목"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/containers/UnifiedAnalysisApp/UnifiedAnalysisApp.jsx:345
+msgid "Data"
+msgstr "데이터"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TreeControl/TreeControl.jsx:172
+msgid "Data tree"
+msgstr "데이터 트리"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:45
+msgid "Datasets"
+msgstr "데이터 집합"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/TimePickerForm.jsx:213
+msgid "Date & Time Range"
+msgstr "날짜 및 시간 범위"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/TimeSpanPicker.jsx:32
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:37
+msgid "Days"
+msgstr "일"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/RelativeTimeInput.jsx:71
+msgid "Days Ago"
+msgstr "일 전"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/TimeShift/CustomTimeShift.jsx:13
+msgid "Days ago"
+msgstr "일 전"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/DeleteAlertDialog.jsx:35
+msgid "Delete"
+msgstr "삭제"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/DeleteAlertDialog.jsx:23
+msgid "Delete Alert"
+msgstr "경고 삭제"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/DataPanel.jsx:88
+msgid "Delete alert"
+msgstr "경고 삭제"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:120
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/ScheduledAlertForm.jsx:183
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/StreamingAlertForm.jsx:169
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Report/SaveAsReportForm.jsx:104
+msgid "Description"
+msgstr "설명"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:200
+msgid "Details"
+msgstr "세부정보"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/SplitBy/SplitBy.jsx:141
+msgid "Dimension"
+msgstr "차원"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/GlobalSplitPicker/GlobalSplitPicker.jsx:95
+msgid "Display"
+msgstr "표시"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/SeriesPanel.jsx:271
+msgid "Display an earlier time range."
+msgstr "이전 시간 범위를 표시합니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:10
+msgid "Dist count"
+msgstr "개별 개수"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/WarningDialog/WarningDialog.jsx:52
+msgid "Do not show this again"
+msgstr "다시 표시하지 않음"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/TimePickerForm.jsx:76
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/TimePickerForm.jsx:114
+msgid "Earliest"
+msgstr "시작"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/timePickerValidation.js:50
+msgid "Earliest and Latest times must be different."
+msgstr "시작 및 종료 시간은 서로 달라야 합니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/timePickerValidation.js:37
+msgid "Earliest field cannot be empty."
+msgstr "시작 필드를 비워둘 수 없습니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/timePickerValidation.js:54
+msgid "Earliest must be before latest."
+msgstr "시작은 종료 전이어야 합니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/FilterList/FilterList.jsx:65
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/FilterPanel/FilterPanel.jsx:64
+#, python-format
+msgid "Edit %(dimension)s filter"
+msgstr "%(dimension)s 필터 편집"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/ScheduledAlertDialogContainer.jsx:247
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/StreamingAlertDialogContainer.jsx:245
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/panel-utils.js:225
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/panel-utils.js:235
+msgid "Edit Alert"
+msgstr "경고 편집"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/TimeSpanPicker.jsx:46
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/TimeSpanPicker.jsx:168
+msgid "Edit Span"
+msgstr "간격 편집"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/YAxisLabel.jsx:33
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/YAxisLabel.jsx:58
+msgid "Edit Y-Axis"
+msgstr "Y축 편집"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/DataPanel.jsx:315
+msgid "Edit metric filter"
+msgstr "메트릭 필터 편집"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ReferenceLineList/ReferenceLineList.jsx:48
+#, python-format
+msgid "Edit reference line %(label)s"
+msgstr "기준선 %(label)s 편집"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/ChartingGrid/ChartingGridConnector.jsx:81
+msgid "Empty State"
+msgstr "빈 상태"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/dashboard-utils.js:8
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/dashboard-utils.test.js:7
+msgid "Enter a Dashboard ID"
+msgstr "대시보드 ID를 입력하십시오."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/dashboard-utils.js:15
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/dashboard-utils.test.js:6
+msgid "Enter a valid Dashboard ID"
+msgstr "유효한 대시보드 ID를 입력하십시오."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:127
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/Frequency.jsx:70
+msgid "Evaluate every"
+msgstr "평가 주기"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/EventExplorer/EventTable.jsx:138
+msgid "Event"
+msgstr "이벤트"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:46
+msgid "Events"
+msgstr "이벤트"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DimensionFilterPanel/MemberExplorer.jsx:217
+msgid "Exclude"
+msgstr "제외"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/ChartingGrid/LegendPopupContainer.jsx:102
+#, python-format
+msgid "Exclude %(name)s"
+msgstr "%(name)s 제외"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/validation.js:58
+msgid "Execution frequency must be a valid whole number."
+msgstr "실행 주기는 유효한 정수여야 합니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardForm.jsx:338
+msgid "Existing"
+msgstr "기존"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/panel-utils.js:361
+msgid "Export as CSV"
+msgstr "CSV로 내보내기"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/panel-utils.js:353
+msgid "Export as PNG"
+msgstr "PNG로 내보내기"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/redux/views/views-saga.js:143
+msgid "Failed to fetch measure."
+msgstr "측정값을 가져오지 못했습니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/redux/measure/measure-actions.js:47
+#, python-format
+msgid "Failed to load dimensions: %(error)s"
+msgstr "차원을 로드하지 못했습니다. %(error)s"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/redux/datasource-filter-metadata/datasource-filter-metadata-actions.js:41
+#, python-format
+msgid "Failed to load indexes: %(error)s"
+msgstr "인덱스를 로드하지 못했습니다. %(error)s"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/icons/FieldFilter.jsx:10
+msgid "Field Filter"
+msgstr "필드 필터"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/Multiselect/Compact.jsx:406
+msgid "Filter"
+msgstr "필터"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/FilterPanel/FilterPanel.jsx:230
+msgid "Filter by index"
+msgstr "인덱스 기준 필터링"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/FilterPanel/FilterPanel.jsx:299
+msgid "Filter by indexes and other fields"
+msgstr "인덱스 및 기타 필드 기준 필터링"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/FilterPanel/FilterPanel.jsx:272
+msgid "Filter by other fields"
+msgstr "기타 필드 기준 필터링"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/PanelFilter/PanelFilterToken.jsx:64
+msgid "Filtered"
+msgstr "필터됨"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:163
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/SeriesPanel.jsx:148
+msgid "Filters"
+msgstr "필터"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/EventExplorer/EventExplorer.jsx:116
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/EventExplorer/EventExplorer.jsx:117
+msgid "Find"
+msgstr "찾기"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/DataPanel.jsx:1
+msgid "Find Data to Analyze"
+msgstr "분석할 데이터 찾기"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/EmptyState/EmptyState.jsx:34
+msgid "Find something interesting? Save it to a dashboard, or create an alert."
+msgstr "흥미로운 것을 찾으셨나요? 대시보드에 저장하거나 경고를 만드십시오."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/validation.js:54
+msgid "Frequency cannot be empty."
+msgstr "주기를 비워둘 수 없습니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/utils/timepicker-utils.js:77
+#, python-format
+msgid "From %(datetime)s"
+msgstr "시작: %(datetime)s"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/utils/timepicker-utils.js:37
+#, python-format
+msgid "From %(datetimeEarliest)s to %(datetimeLatest)s"
+msgstr "%(datetimeEarliest)s ~ %(datetimeLatest)s"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/GlobalActions/GlobalActions.jsx:21
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/GlobalActions/GlobalActions.jsx:22
+msgid "Global Actions"
+msgstr "전역 작업"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/GlobalControls/GlobalControls.jsx:145
+msgid "Global controls"
+msgstr "전역 컨트롤"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/splunk_metrics_workspace/src/main/webapp/pages/version_check/index.jsx:56
+msgid "Go to Search"
+msgstr "검색으로 이동"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/splunk_metrics_workspace/src/main/webapp/pages/home/index.jsx:42
+#, python-format
+msgid "Go to the %(VIEW_TITLE)s in Search"
+msgstr "검색에서 %(VIEW_TITLE)s(으)로 이동"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/UdfDashboard/SaveUdfDashboardForm.jsx:19
+msgid "Grid"
+msgstr "그리드"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/LayoutControl/LayoutControl.jsx:15
+msgid "Grid Layout"
+msgstr "그리드 레이아웃"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/ChartSettingsPanel.jsx:78
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/icons/Heatmap.jsx:10
+msgid "Heatmap"
+msgstr "히트맵"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Report/SaveAsReportModal.jsx:44
+msgid "Heatmap will be saved to the Report as a column chart "
+msgstr "히트맵이 보고서에 세로막대형 차트로 저장됩니다 "
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/WarningDialog/WarningDialog.jsx:41
+msgid "Heatmap will open as a column chart in Search."
+msgstr "히트맵이 검색에 세로막대형 차트로 열립니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardPanel.jsx:108
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/UdfDashboard/SaveUdfDashboardPanel.jsx:109
+msgid "Heatmaps will be saved to the Dashboard as column charts "
+msgstr "히트맵이 대시보드에 세로막대형 차트로 저장됩니다 "
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/icons/HideLeft.jsx:8
+msgid "Hide Left"
+msgstr "왼쪽 숨기기"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/icons/HideRight.jsx:10
+msgid "Hide Right"
+msgstr "오른쪽 숨기기"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/redux/data-sources/data-sources-reducer.js:142
+#, python-format
+msgid "Hierarchy not found: %(sourceName)s"
+msgstr "계층 구조를 찾을 수 없음. %(sourceName)s"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-enterprise/src/index.jsx:73
+msgid "High"
+msgstr "높음"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/GlobalSplitPicker/GlobalSplitPicker.jsx:104
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/SplitBy/SplitBy.jsx:161
+msgid "Highest"
+msgstr "최고"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/TimeSpanPicker.jsx:31
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:36
+msgid "Hours"
+msgstr "시간"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/RelativeTimeInput.jsx:70
+msgid "Hours Ago"
+msgstr "시간 전"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/TimeShift/CustomTimeShift.jsx:12
+msgid "Hours ago"
+msgstr "시간 전"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/validation.js:68
+msgid "Hours must be from 1 to 24."
+msgstr "시간은 1과 24 사이여야 합니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/Lookback.jsx:29
+msgid "In the last"
+msgstr "최근"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DimensionFilterPanel/MemberExplorer.jsx:214
+msgid "Include"
+msgstr "포함"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ReferenceLinePanel/ReferenceLinePanel.jsx:292
+msgid "Include Value"
+msgstr "값 포함"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/SeriesPanel.jsx:149
+msgid "Include or exclude values from specific dimensions."
+msgstr "특정 차원의 값을 포함하거나 제외합니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-enterprise/src/index.jsx:55
+msgid "Info"
+msgstr "정보"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/TimePickerForm.jsx:43
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/utils/timepicker-utils.js:78
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/utils/timepicker-utils.js:81
+msgid "Invalid Value"
+msgstr "잘못된 값"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/Threshold.jsx:78
+msgid "Is"
+msgstr "은(는)"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/ChartingGrid/LegendPopupContainer.jsx:91
+#, python-format
+msgid "Keep Only %(name)s"
+msgstr "%(name)s만 유지"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ReferenceLinePanel/ReferenceLinePanel.jsx:277
+msgid "Label"
+msgstr "레이블"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/timeranges.js:12
+msgid "Last 4 hours"
+msgstr "최근 4시간"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/timeranges.js:11
+msgid "Last 60 minutes"
+msgstr "최근 60분"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/TimePickerForm.jsx:91
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/TimePickerForm.jsx:133
+msgid "Latest"
+msgstr "종료"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/UdfDashboard/SaveUdfDashboardForm.jsx:169
+msgid "Layout Option"
+msgstr "레이아웃 옵션"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/Hierarchy.jsx:239
+msgid "Learn more"
+msgstr "자세히 알아보기"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/YAxisLabel.jsx:76
+msgid "Left"
+msgstr "왼쪽"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/StateRestoreControl/StateRestoreControl.jsx:14
+msgid "Let's bring you up to speed!"
+msgstr "최신 정보를 알려드리겠습니다!"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/GlobalSplitPicker/GlobalSplitPicker.jsx:112
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/SplitBy/SplitBy.jsx:173
+msgid "Limit"
+msgstr "제한"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/GlobalSplitPicker/GlobalSplitPicker.jsx:102
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/SplitBy/SplitBy.jsx:159
+msgid "Limit Type"
+msgstr "제한 유형"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/ChartSettingsPanel.jsx:102
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Report/SaveAsReportForm.jsx:79
+msgid "Line"
+msgstr "꺾은선형"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/YAxisForm.jsx:134
+msgid "Linear"
+msgstr "선형"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DimensionFilterPanel/MemberExplorer.jsx:298
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DimensionFilterPanel/MemberExplorer.jsx:299
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DimensionFilterPanel/MemberExplorer.jsx:301
+msgid "Load more..."
+msgstr "더 많은 항목 로드..."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/ChartingGrid/ChartingGrid.jsx:127
+msgid "Loading ${numPanelsLoading} ${numPanelsLoading > 1 ? 'charts' : 'chart'}."
+msgstr "${numPanelsLoading} ${numPanelsLoading > 1 ? 'charts' : 'chart'} 로드 중입니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/DataPanel.jsx:422
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/DataPanelTree.jsx:51
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/Hierarchy.jsx:208
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Panel/LoadingBody.jsx:24
+msgid "Loading..."
+msgstr "로드 중..."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/YAxisForm.jsx:139
+msgid "Log"
+msgstr "로그"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:134
+msgid "Lookback"
+msgstr "되돌아보기"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/validation.js:77
+msgid "Lookback cannot be empty"
+msgstr "되돌아보기를 비워둘 수 없습니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/validation.js:81
+msgid "Lookback must be a valid whole number"
+msgstr "되돌아보기는 유효한 정수여야 합니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/validation.js:86
+msgid "Lookback must be greater than 0"
+msgstr "되돌아보기는 0보다 커야 합니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-enterprise/src/index.jsx:61
+msgid "Low"
+msgstr "낮음"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/GlobalSplitPicker/GlobalSplitPicker.jsx:105
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/SplitBy/SplitBy.jsx:162
+msgid "Lowest"
+msgstr "최저"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/YAxisLabel.jsx:74
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:11
+msgid "Max"
+msgstr "최대"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/YAxisForm.jsx:116
+msgid "Max Value"
+msgstr "최대값"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/yAxisValidation.js:6
+msgid "Max must be greater than min"
+msgstr "최대값은 최소값보다 커야 합니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/yAxisValidation.js:5
+msgid "Max must be valid number"
+msgstr "최대값은 유효한 숫자여야 합니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/FullscreenControl/FullscreenControl.jsx:13
+msgid "Maximize panel"
+msgstr "패널 최대화"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:113
+msgid "Measure"
+msgstr "측정"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-enterprise/src/index.jsx:67
+msgid "Medium"
+msgstr "중간"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:44
+msgid "Metrics"
+msgstr "메트릭"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/YAxisLabel.jsx:73
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:12
+msgid "Min"
+msgstr "최소"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/YAxisForm.jsx:102
+msgid "Min Value"
+msgstr "최소값"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/yAxisValidation.js:4
+msgid "Min must be valid number"
+msgstr "최소값은 유효한 숫자여야 합니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/FullscreenControl/FullscreenControl.jsx:11
+msgid "Minimize panel"
+msgstr "패널 최소화"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/TimeSpanPicker.jsx:30
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:35
+msgid "Minutes"
+msgstr "분"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/RelativeTimeInput.jsx:69
+msgid "Minutes Ago"
+msgstr "분 전"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/TimeShift/CustomTimeShift.jsx:11
+msgid "Minutes ago"
+msgstr "분 전"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/validation.js:64
+msgid "Minutes must be from 1 to 60."
+msgstr "분은 1에서 60 사이여야 합니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/timeranges.js:9
+msgid "Month to date"
+msgstr "월간 누계"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/TimeSpanPicker.jsx:34
+msgid "Months"
+msgstr "개월"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/RelativeTimeInput.jsx:73
+msgid "Months Ago"
+msgstr "개월 전"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:4
+msgid "N/A"
+msgstr "해당 사항 없음"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardForm.jsx:334
+msgid "New"
+msgstr "새로 만들기"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/messages.js:1
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Report/SaveAsReportForm.jsx:157
+msgid "No"
+msgstr "아니요"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/Aggregation/Aggregation.jsx:148
+msgid "No aggregations"
+msgstr "집계 없음"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/ChartPanel/Viz/tooltips.js:37
+msgid "No data available"
+msgstr "사용 가능한 데이터 없음"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:196
+msgid "No details found for this alert."
+msgstr "이 경고에 대한 세부 정보를 찾을 수 없습니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/Multiselect/Compact.jsx:143
+msgid "No matches"
+msgstr "일치 항목 없음"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/FilterSelect/FilterSelect.jsx:416
+msgid "No options"
+msgstr "옵션 없음"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:218
+msgid "No thresholds found for this alert"
+msgstr "이 경고에 대한 임계값을 찾을 수 없습니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/SplitBy/SplitBy.jsx:108
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/TimeShift/TimeShift.jsx:19
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/view-utils.js:8
+msgid "None"
+msgstr "없음"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/Hierarchy.jsx:217
+msgid "Not all metrics listed. Contact your admin to increase the metrics limit."
+msgstr "모든 메트릭이 나열되지는 않습니다. 메트릭 한도를 높이려면 관리자에게 문의하십시오."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/TimePickerForm.jsx:92
+msgid "Now"
+msgstr "지금"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/StateRestoreControl/StateRestoreControl.jsx:21
+msgid "Open Charts"
+msgstr "차트 열기"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/panel-utils.js:253
+msgid "Open in Search"
+msgstr "검색에서 열기"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/StateRestoreControl/StateRestoreControl.jsx:15
+msgid "Open your latest charts, or start by selecting data."
+msgstr "최근 차트를 열거나, 데이터를 선택하여 시작하십시오."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/ScheduledAlertForm.jsx:191
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/StreamingAlertForm.jsx:177
+msgid "Optional"
+msgstr "선택 사항"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/Axis/Axis.jsx:29
+msgid "Overlay on right axis"
+msgstr "오른쪽 축에 오버레이"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardForm.jsx:313
+msgid "Panel Title"
+msgstr "패널 제목"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ButtonPanel/ButtonPanel.jsx:72
+#, python-format
+msgid "Panel is closed %(title)s %(subtitle)s"
+msgstr "패널이 닫힘 %(title)s %(subtitle)s"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ButtonPanel/ButtonPanel.jsx:71
+#, python-format
+msgid "Panel is open %(title)s %(subtitle)s"
+msgstr "패널이 열림 %(title)s %(subtitle)s"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/ScheduledAlertForm.jsx:194
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/StreamingAlertForm.jsx:180
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardForm.jsx:293
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/UdfDashboard/SaveUdfDashboardForm.jsx:178
+msgid "Permissions"
+msgstr "권한"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/TimeSpanPicker.jsx:194
+msgid "Please reference the time range to set an appropriate time span."
+msgstr "시간 범위를 참조하여 적절한 시간 간격을 설정하십시오."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/ChartPreview.jsx:74
+msgid "Preview"
+msgstr "미리보기"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/timeranges.js:15
+msgid "Previous business week"
+msgstr "이전 영업 주"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/timeranges.js:16
+msgid "Previous month"
+msgstr "이전 월"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/timeranges.js:14
+msgid "Previous week"
+msgstr "이전 주"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/timeranges.js:17
+msgid "Previous year"
+msgstr "이전 연도"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardForm.jsx:23
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/UdfDashboard/SaveUdfDashboardForm.jsx:21
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/constants.js:12
+msgid "Private"
+msgstr "비공개"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/RelativeTimeInput.jsx:74
+msgid "Quarters Ago"
+msgstr "분기 전"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:13
+msgid "Rate"
+msgstr "속도"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:17
+msgid "Rate (Avg)"
+msgstr "속도(평균)"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:16
+msgid "Rate (Sum)"
+msgstr "속도(합)"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ReferenceLinePanel/ReferenceLinePanel.jsx:265
+msgid "Raw Data"
+msgstr "원시 데이터"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ReferenceLineTimePicker/ReferenceLineTimePicker.jsx:14
+msgid "Reference Line Time Range"
+msgstr "기준선 시간 범위"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/SeriesPanel.jsx:175
+msgid "Reference Lines"
+msgstr "기준선"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/GlobalControls/RefreshControl.jsx:109
+msgid "Refresh"
+msgstr "새로 고침"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/GlobalControls/RefreshControl.jsx:108
+msgid "Refresh Chart Data"
+msgstr "차트 데이터 새로 고침"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/TimePickerForm.jsx:216
+msgid "Relative"
+msgstr "상대"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/FilterPanel/FilterPanel.jsx:55
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/SeriesButtons.jsx:43
+msgid "Remove"
+msgstr "제거"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/FilterList/FilterList.jsx:68
+#, python-format
+msgid "Remove %(dimension)s filter"
+msgstr "%(dimension)s 필터 제거"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/DataPanel.jsx:316
+msgid "Remove metric filter"
+msgstr "메트릭 필터 제거"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/ChartPanel/ChartButtons.jsx:48
+msgid "Remove panel"
+msgstr "패널 제거"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ReferenceLineList/ReferenceLineList.jsx:51
+#, python-format
+msgid "Remove reference line %(label)s"
+msgstr "기준선 %(label)s 제거"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Report/SaveAsReportModal.jsx:55
+msgid "Report"
+msgstr "보고서"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Report/SaveAsReportModal.jsx:51
+#, python-format
+msgid "Report %(reportName)s has been created. You may now view the report."
+msgstr "%(reportName)s 보고서가 작성되었습니다. 이제 보고서를 볼 수 있습니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/ScheduledAlertForm.jsx:148
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/StreamingAlertForm.jsx:134
+msgid "Required"
+msgstr "필수"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/containers/UnifiedAnalysisApp/GlobalControlsContainer.jsx:82
+msgid "Reset zoom to enable auto-refresh"
+msgstr "확대/축소를 재설정하여 자동 새로 고침 활성화"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/containers/UnifiedAnalysisApp/GlobalControlsContainer.jsx:83
+msgid "Reset zoom to enable refresh"
+msgstr "확대/축소를 재설정하여 새로 고침 활성화"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/ErrorPanel/ErrorPanel.jsx:39
+msgid "Retry"
+msgstr "재시도"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/TimeSpanPicker.jsx:44
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/TimeSpanPicker.jsx:160
+msgid "Revert Span"
+msgstr "간격 되돌리기"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/YAxisLabel.jsx:32
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/YAxisLabel.jsx:50
+msgid "Revert Y-Axis"
+msgstr "Y축 되돌리기"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/YAxisLabel.jsx:76
+msgid "Right"
+msgstr "오른쪽"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/AlertFormModal.jsx:50
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardPanel.jsx:147
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Report/SaveAsReportModal.jsx:90
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/UdfDashboard/SaveUdfDashboardPanel.jsx:146
+msgid "Save"
+msgstr "저장"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardPanel.jsx:116
+msgid "Save All To Dashboard"
+msgstr "대시보드에 모두 저장"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/UdfDashboard/SaveUdfDashboardPanel.jsx:117
+msgid "Save All To Dashboard Studio"
+msgstr "Dashboard Studio에 모두 저장"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardPanel.jsx:115
+msgid "Save As Dashboard Panel"
+msgstr "대시보드 패널로 저장"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Report/SaveAsReportModal.jsx:65
+msgid "Save As Report"
+msgstr "보고서로 저장"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/containers/UnifiedAnalysisApp/UnifiedAnalysisApp.jsx:129
+msgid "Save all charts to Dashboard (XML)"
+msgstr "대시보드(XML)에 모든 차트 저장"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/containers/UnifiedAnalysisApp/UnifiedAnalysisApp.jsx:137
+msgid "Save all charts to Dashboard Studio"
+msgstr "Dashboard Studio에 모든 차트 저장"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/panel-utils.js:347
+msgid "Save as Report"
+msgstr "보고서로 저장"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/ScheduledAlertDialogContainer.jsx:247
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/panel-utils.js:307
+msgid "Save as Scheduled Alert"
+msgstr "예약된 경고로 저장"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/StreamingAlertDialogContainer.jsx:245
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/panel-utils.js:317
+msgid "Save as Streaming Alert"
+msgstr "스트리밍 경고로 저장"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/panel-utils.js:327
+msgid "Save to Dashboard (XML)"
+msgstr "대시보드(XML)에 저장"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/UdfDashboard/SaveUdfDashboardPanel.jsx:116
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/panel-utils.js:337
+msgid "Save to Dashboard Studio"
+msgstr "Dashboard Studio에 저장"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/YAxisForm.jsx:129
+msgid "Scale"
+msgstr "눈금"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/constants.js:21
+msgid "Scheduled"
+msgstr "예약됨"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DimensionFilterPanel/SearchBox.jsx:15
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DimensionFilterPanel/SearchBox.jsx:16
+msgid "Search"
+msgstr "검색"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/panel-utils.js:292
+msgid "Search Related Events"
+msgstr "관련 이벤트 검색"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/TimeSpanPicker.jsx:29
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:34
+msgid "Seconds"
+msgstr "초"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/RelativeTimeInput.jsx:68
+msgid "Seconds Ago"
+msgstr "초 전"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/Multiselect/Compact.jsx:378
+msgid "Select All"
+msgstr "모두 선택"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/Multiselect/Compact.jsx:378
+msgid "Select All Matches"
+msgstr "모든 일치 항목 선택"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/FilterPanel/DimensionFilterSection/DimensionsDropdown.jsx:89
+msgid "Select a dimension"
+msgstr "차원 선택"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ReferenceLinePanel/ReferenceLinePanel.jsx:216
+msgid "Select a time range."
+msgstr "시간 범위를 선택하십시오."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/containers/UnifiedAnalysisApp/AddMeasureAction.jsx:23
+msgid "Select a valid chart to add this series"
+msgstr "이 계열을 추가할 유효한 차트를 선택하십시오."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/redux/views/views-saga.js:138
+msgid "Select an aggregation."
+msgstr "집계를 선택하십시오."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/FilterPanel/DimensionFilterSection/DimensionValuesDropdown.jsx:87
+msgid "Select dimension values"
+msgstr "차원 값 선택"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/FilterDropdown/FilterDropdown.jsx:59
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/FilterDropdown/FilterDropdown.jsx:66
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/FilterPanel/FilterPanel.jsx:238
+msgid "Select index filters"
+msgstr "인덱스 필터 선택"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ReferenceLinePanel/ReferenceLinePanel.jsx:172
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/SeriesPanel.jsx:206
+msgid "Select or type an aggregation."
+msgstr "집계를 선택하거나 입력하십시오."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/Multiselect/Compact.jsx:146
+msgid "Select..."
+msgstr "선택..."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/Hierarchies.jsx:80
+msgid "Selected Index:"
+msgstr "선택된 인덱스:"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/ChartSettingsPanel.jsx:86
+#, python-format
+msgid "Set the min and max value of the y-axis. (for example: %(exampleText)s)"
+msgstr "Y축의 최소값과 최대값 설정(예: %(exampleText)s)"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:262
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/ScheduledAlertForm.jsx:174
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/StreamingAlertForm.jsx:160
+msgid "Settings"
+msgstr "설정"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:77
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/Threshold.jsx:49
+msgid "Severity"
+msgstr "심각도"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardForm.jsx:23
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/UdfDashboard/SaveUdfDashboardForm.jsx:21
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/constants.js:13
+msgid "Shared in App"
+msgstr "앱에서 공유됨"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/redux/alerting/alerting-actions.js:82
+msgid "Show Alert"
+msgstr "경고 표시"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:247
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:249
+msgid "Show triggered instances"
+msgstr "트리거된 인스턴스 표시"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/icons/SortAZ.jsx:10
+msgid "Sort A to Z"
+msgstr "A-Z 순으로 정렬"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DimensionFilterPanel/SortToggle.jsx:10
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DimensionFilterPanel/SortToggle.jsx:25
+msgid "Sort Ascending"
+msgstr "오름차순 정렬"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DimensionFilterPanel/SortToggle.jsx:10
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DimensionFilterPanel/SortToggle.jsx:25
+msgid "Sort Descending"
+msgstr "내림차순 정렬"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/icons/SortZA.jsx:10
+msgid "Sort Z to A"
+msgstr "Z-A 순으로 정렬"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/ScheduledAlertForm.jsx:165
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/StreamingAlertForm.jsx:151
+msgid "Source"
+msgstr "원본"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/redux/data-sources/data-sources-reducer.js:109
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/redux/data-sources/data-sources-reducer.js:128
+#, python-format
+msgid "Source not found: %(sourceName)s"
+msgstr "원본을 찾을 수 없습니다. %(sourceName)s"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:182
+msgid "Span"
+msgstr "범위"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/TimeSpanPicker.jsx:114
+msgid "Span Period"
+msgstr "범위 기간"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/GlobalControls/GlobalSplitButton.jsx:9
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/SeriesPanel.jsx:247
+msgid "Split By"
+msgstr "분할 기준"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/GlobalSplitPicker/GlobalSplitPicker.jsx:184
+msgid "Split Metrics by a Dimension"
+msgstr "차원 기준으로 메트릭 분할"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:175
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/GlobalSplitPicker/GlobalSplitPicker.jsx:75
+msgid "Split by"
+msgstr "분할 기준"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/SeriesPanel.jsx:248
+msgid "Split this series into separate values."
+msgstr "이 계열을 개별 값으로 분할합니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/icons/StackColumn.jsx:10
+msgid "Stack Column"
+msgstr "정적 컬럼"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/LayoutControl/LayoutControl.jsx:19
+msgid "Stack Layout"
+msgstr "정적 레이아웃"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/ChartSettingsPanel.jsx:69
+msgid "Stacked Column"
+msgstr "정적 컬럼"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/FilterPanel/FilterPanel.jsx:233
+msgid "Start by adding index filters"
+msgstr "인덱스 필터를 추가하여 시작"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/EmptyState/EmptyState.jsx:32
+msgid "Start by selecting data."
+msgstr "데이터를 선택하여 시작하십시오."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Report/SaveAsReportForm.jsx:144
+msgid "Statistics Table"
+msgstr "통계 테이블"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:14
+msgid "Std dev"
+msgstr "표준 편차"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertPanel/StreamingSeverityIcon.jsx:11
+msgid "Stream Bell"
+msgstr "스트림 벨"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/constants.js:22
+msgid "Streaming"
+msgstr "스트리밍"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:15
+msgid "Sum"
+msgstr "합계"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/Throttle.jsx:60
+msgid "Suppress Triggering for"
+msgstr "트리거 억제"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/splunk_metrics_workspace/src/main/webapp/pages/version_check/index.jsx:14
+#, python-format
+msgid ""
+"The %(app_name)s requires Splunk Enterprise version **%(splunk_req_version)s** or higher. You are "
+"currently using version %(splunk_curr_version)s.\n"
+"Contact your administrator for assistance."
+msgstr ""
+"%(app_name)s에는 Splunk Enterprise **%(splunk_req_version)s** 버전 이상이 필요합니다. 현재 "
+"%(splunk_curr_version)s 버전을 사용 중입니다.\n"
+"도움이 필요하면 관리자에게 문의하십시오."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/validation.js:117
+#, python-format
+msgid ""
+"The %(invalidActionsStr)s action is not supported for streaming alerts. Please delete the action and "
+"save again."
+msgstr ""
+"%(invalidActionsStr)s 작업은 스트리밍 경고에서 지원되지 않습니다. 작업을 삭제하고 다시 저장하십시오."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/validation.js:111
+#, python-format
+msgid ""
+"The %(invalidActionsStr)s actions are not supported for streaming alerts. Please delete the actions and "
+"save again."
+msgstr ""
+"%(invalidActionsStr)s 작업은 스트리밍 경고에서 지원되지 않습니다. 작업을 삭제하고 다시 저장하십시오."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardForm.jsx:191
+msgid "The ID is used as the filename on disk. Cannot be changed later"
+msgstr "ID는 디스크에서 파일 이름으로 사용됩니다. 나중에 변경할 수 없습니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/timePickerValidation.js:41
+msgid "The earliest time is invalid."
+msgstr "시작 시간이 잘못되었습니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/timePickerValidation.js:46
+msgid "The latest time is invalid."
+msgstr "종료 시간이 잘못되었습니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DimensionFilterPanel/MemberExplorer.jsx:252
+msgid "There are no members for ${dimension} available. Expand the time range to see available members."
+msgstr ""
+"사용 가능한 ${dimension}의 구성원이 없습니다. 사용 가능한 구성원을 보려면 시간 범위를 확장하십시오."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/FilterDropdown/FilterDropdown.jsx:72
+msgid "There are no metric indexes"
+msgstr "메트릭 인덱스 없음"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/ChartPanel/ChartPanel.jsx:77
+msgid ""
+"There are not enough data points within the current time range. Select a wider time range to expand your "
+"results."
+msgstr ""
+"현재 시간 범위 안에 충분한 데이터 포인트가 없습니다. 더 넓은 시간 범위를 선택하여 결과를 확장하십시오."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/ChartPanel/ChartPanel.jsx:70
+msgid ""
+"There are too many data points within the current time range. Select a shorter time range to refine your "
+"results."
+msgstr ""
+"현재 시간 범위 안에 데이터 포인트가 너무 많습니다. 더 짧은 시간 범위를 선택하여 결과를 간추리십시오."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/ChartPanel/ChartPanel.jsx:61
+#, python-format
+msgid ""
+"There is no data available for %(measures)s. To see data on the chart, select a different time range, "
+"edit filters, or check with your administrator about user permissions."
+msgstr ""
+"%(measures)s에 대해 사용 가능한 데이터가 없습니다. 데이터를 차트에서 보려면 다른 시간 범위 또는 편집 필터"
+"를 선택하거나 관리자에게 관리자 권한에 대해 문의하십시오."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/ScheduledAlertDialogContainer.jsx:192
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/StreamingAlertDialogContainer.jsx:192
+msgid "There was a problem opening the Save as Alert dialog. Close the dialog and try again."
+msgstr "경고로 저장 대화상자를 여는 중에 문제가 발생했습니다. 대화상자를 닫고 다시 시도하십시오."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/SeriesPanel.jsx:225
+msgid "This aggregation should only be used with accumulating counter metrics."
+msgstr "누적 카운터 메트릭만 이 집계와 함께 사용해야 합니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardPanel.jsx:82
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/UdfDashboard/SaveUdfDashboardPanel.jsx:83
+#, python-format
+msgid "This panel has been created and added to %(id)s."
+msgstr "이 패널이 생성되어 %(id)s에 추가되었습니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/validation.js:24
+msgid "Threshold value is too large. Enter a smaller threshold."
+msgstr "임계값이 너무 큽니다. 더 작은 임계값을 입력하십시오."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/validation.js:26
+msgid "Threshold value is too small. Enter a bigger threshold."
+msgstr "임계값이 너무 작습니다. 더 큰 임계값을 입력하십시오."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:238
+msgid "Thresholds"
+msgstr "임계값"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:141
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/Throttle.jsx:75
+msgid "Throttle"
+msgstr "경보 조절"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/validation.js:37
+msgid "Throttle period cannot be empty"
+msgstr "조절 기간을 비워둘 수 없습니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/validation.js:40
+msgid "Throttle period must be a valid whole number"
+msgstr "조절 기간은 유효한 정수여야 합니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/validation.js:44
+msgid "Throttle period must be greater than 0"
+msgstr "조절 기간은 0보다 커야 합니다"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/EventExplorer/EventTable.jsx:137
+msgid "Time"
+msgstr "시간"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/ChartSettingsPanel.jsx:100
+msgid "Time Charts"
+msgstr "시간 차트"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/icons/TimeColumn.jsx:10
+msgid "Time Column"
+msgstr "시간 컬럼"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ReferenceLinePanel/ReferenceLinePanel.jsx:216
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ReferenceLinePanel/ReferenceTimeRange.jsx:91
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/TimeShift/TimeShift.jsx:111
+msgid "Time Range"
+msgstr "시간 범위"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Report/SaveAsReportForm.jsx:151
+msgid "Time Range Picker"
+msgstr "시간 범위 선택기"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/SeriesPanel.jsx:270
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/TimePickerForm.jsx:48
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/TimePickerForm.jsx:210
+msgid "Time Shift"
+msgstr "시간 이동"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/TimeSpanPicker.jsx:198
+msgid "Time Span"
+msgstr "시간 범위"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/TimeSpanPicker.jsx:95
+msgid "Time Span must be a positive number"
+msgstr "범위는 양수여야 합니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/TimeShift/CustomTimeShift.jsx:103
+msgid "Time Unit"
+msgstr "시간 단위"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/TimeShift/CustomTimeShift.jsx:93
+msgid "Time Value"
+msgstr "시간 값"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Time/TimeRange.jsx:81
+msgid "Time range Menu"
+msgstr "시간 범위 메뉴"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/timePickerValidation.js:62
+msgid "Time shift must be a numeric value."
+msgstr "시간 이동은 숫자값이어야 합니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/TimeSpanPicker.jsx:180
+#, python-format
+msgid "Time span = %(display)s"
+msgstr "시간 범위 = %(display)s"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/ScheduledAlertForm.jsx:177
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/StreamingAlertForm.jsx:163
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Report/SaveAsReportForm.jsx:93
+msgid "Title"
+msgstr "제목"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/validation.js:10
+msgid "Title cannot be empty"
+msgstr "제목을 비워둘 수 없습니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/utils/timepicker-utils.js:80
+#, python-format
+msgid "To %(datetime)s"
+msgstr "종료: %(datetime)s"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/timeranges.js:6
+msgid "Today"
+msgstr "오늘"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:155
+msgid "Trigger Actions"
+msgstr "트리거 작업"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/ScheduledAlertForm.jsx:212
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/StreamingAlertForm.jsx:189
+msgid "Trigger Conditions"
+msgstr "트리거 조건"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/validation.js:20
+msgid "Trigger threshold cannot be empty"
+msgstr "트리거 임계값을 비워둘 수 없습니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/validation.js:22
+msgid "Trigger threshold must be a valid number"
+msgstr "트리거 임계값은 올바른 숫자여야 합니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ReferenceLinePanel/ReferenceLinePanel.jsx:148
+msgid "Type a constant here"
+msgstr "여기에 상수를 입력하십시오."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/splunk_metrics_workspace/src/main/webapp/pages/version_check/index.jsx:51
+msgid "Unable to launch app"
+msgstr "앱을 실행할 수 없습니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/splunk_metrics_workspace/src/main/webapp/pages/analytics_workspace/index.jsx:209
+msgid "Unable to load panel."
+msgstr "패널을 로드할 수 없습니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/containers/UnifiedAnalysisApp/UnifiedAnalysisApp.jsx:86
+msgid "Unable to process the chart's time range. Using default time range"
+msgstr "차트의 시간 범위를 처리할 수 없습니다. 기본 시간 범위를 사용합니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-enterprise/src/index.jsx:85
+msgid "Unknown"
+msgstr "알 수 없음"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/TimeSpanPicker.jsx:144
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/YAxisForm.jsx:150
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/FilterPanel/FilterPanel.jsx:57
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ReferenceLinePanel/ReferenceLinePanel.jsx:243
+msgid "Update"
+msgstr "업데이트"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/FilterPanel/FilterPanel.jsx:276
+msgid "Use dimension = value(s) pairs to filter your data further. Example: ip=10.1*, 10.2*"
+msgstr "차원 = 값 쌍을 사용하여 데이터를 추가로 필터링하십시오*(예: ip=10.1*, 10.2*)."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ReferenceLinePanel/ReferenceLinePanel.jsx:154
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ReferenceLinePanel/ReferenceLinePanel.jsx:185
+msgid "Value"
+msgstr "값"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/format-number.js:12
+msgid "Value cannot be empty"
+msgstr "값을 비워둘 수 없습니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/format-number.js:13
+msgid "Value must be a valid number"
+msgstr "값은 유효한 숫자여야 합니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/format-number.js:15
+msgid "Value must be greater than or equal to -5.4e306"
+msgstr "값은 -5.4e306보다 크거나 같아야 합니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/format-number.js:14
+msgid "Value must be less than or equal to 5.4e306"
+msgstr "값은 -5.4e306보다 작거나 같아야 합니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/SuccessDialog/SuccessDialog.jsx:35
+#, python-format
+msgid "View %(type)s"
+msgstr "%(type)s 보기"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/timeranges.js:7
+msgid "Week to date"
+msgstr "주간 누계"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/TimeSpanPicker.jsx:33
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:38
+msgid "Weeks"
+msgstr "주"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/RelativeTimeInput.jsx:72
+msgid "Weeks Ago"
+msgstr "주 전"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/TimeShift/CustomTimeShift.jsx:14
+msgid "Weeks ago"
+msgstr "주 전"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DimensionFilterPanel/MemberExplorer.jsx:381
+msgid "Wildcards:"
+msgstr "와일드카드:"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-enterprise/lib/test-ready.js:1
+msgid "Wrong index!"
+msgstr "잘못된 인덱스입니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-enterprise/lib/test-ready.js:1
+msgid "Wrong length!"
+msgstr "잘못된 길이입니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-enterprise/lib/test-ready.js:1
+msgid "Wrong offset!"
+msgstr "잘못된 오프셋입니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesPanel/ChartSettingsPanel/ChartSettingsPanel.jsx:135
+msgid "Y-Axis"
+msgstr "Y축"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/timeranges.js:10
+msgid "Year to date"
+msgstr "연간 누계"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/RelativeTimeInput.jsx:75
+msgid "Years Ago"
+msgstr "년 전"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Report/SaveAsReportForm.jsx:156
+msgid "Yes"
+msgstr "예"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/timeranges.js:13
+msgid "Yesterday"
+msgstr "어제"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardForm.jsx:235
+msgid "You do not have any dashboards yet. Try saving to a new dashboard."
+msgstr "대시보드가 아직 없습니다. 새 대시보드에 저장해 보십시오."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardForm.jsx:209
+msgid "You have no writable dashboards"
+msgstr "쓰기 가능한 대시보드가 없습니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/SuccessDialog/SuccessDialog.jsx:24
+#, python-format
+msgid "Your %(type)s Has Been Created"
+msgstr "%(type)s이(가) 작성되었습니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/StateRestoreControl/StateRestoreControl.jsx:18
+msgid "Your work has been recovered."
+msgstr "작업이 복구되었습니다."
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/icons/ZoomOut.jsx:10
+msgid "Zoom Out"
+msgstr "축소"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Time/TimeRange.jsx:85
+msgid "Zoom out"
+msgstr "축소"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/messages.js:1
+msgid "accelerated "
+msgstr "가속된 "
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-enterprise/lib/test-ready.js:1
+msgid "ajax error"
+msgstr "ajax 오류"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-enterprise/lib/test-ready.js:1
+msgid "ajax error "
+msgstr "ajax 오류 "
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:51
+msgid "alerts"
+msgstr "경고"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:98
+#, python-format
+msgid "at %(timePoint)s"
+msgstr "%(timePoint)s에"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:100
+#, python-format
+msgid "at %(timePoint)s minutes past the hour"
+msgstr "%(timePoint)s분에"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/messages.js:3
+msgid "available"
+msgstr "사용 가능"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:21
+msgid "average"
+msgstr "평균"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesLegend/OptionA.jsx:26
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesLegend/OptionB.jsx:26
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/MultiSeriesLegend/OptionC.jsx:20
+msgid "by"
+msgstr "기준"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/redux/views/views-series.js:188
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/series.js:40
+#, python-format
+msgid "by %(dimension)s"
+msgstr "%(dimension)s 기준"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:22
+msgid "count"
+msgstr "개수"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:50
+msgid "data"
+msgstr "데이터"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:49
+msgid "datasets"
+msgstr "데이터 집합"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:23
+msgid "distinct count"
+msgstr "개별 수"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/utils/timepicker-utils.js:20
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/TimePicker/utils/timepicker-utils.js:26
+#, python-format
+msgid "eg. %(firstExample)s or %(secondExample)s"
+msgstr "예: %(firstExample)s 또는 %(secondExample)s"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-enterprise/lib/test-ready.js:1
+msgid "entries"
+msgstr "개 항목"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/EventExplorer/EventExplorer.jsx:1
+msgid "event"
+msgstr "이벤트"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/EventExplorer/EventExplorer.jsx:1
+msgid "events"
+msgstr "이벤트"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/Threshold.jsx:23
+msgid "greater than"
+msgstr "보다 큼"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-enterprise/lib/test-ready.js:1
+msgid "keys"
+msgstr "키"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDialog/Threshold.jsx:24
+msgid "less than"
+msgstr "보다 작음"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:24
+msgid "max"
+msgstr "최대값"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:48
+msgid "metrics"
+msgstr "메트릭"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:25
+msgid "min"
+msgstr "최소값"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:147
+msgid "no"
+msgstr "아니요"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DataPanel/Hierarchy.jsx:232
+msgid "not found"
+msgstr "찾을 수 없음"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/GlobalControls/RefreshControl.jsx:140
+msgid "off"
+msgstr "끄기"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/GlobalControls/RefreshControl.jsx:142
+msgid "on"
+msgstr "켜기"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardForm.jsx:258
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardForm.jsx:276
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Dashboard/SaveDashboardForm.jsx:315
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/Report/SaveAsReportForm.jsx:109
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/UdfDashboard/SaveUdfDashboardForm.jsx:162
+msgid "optional"
+msgstr "선택 사항"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:183
+#, python-format
+msgid "over %(span)s intervals"
+msgstr "%(span)s 간격 동안"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:1
+msgid "over the last"
+msgstr "최근 기간"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:26
+msgid "rate"
+msgstr "속도"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:27
+msgid "standard deviation"
+msgstr "표준 편차"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/utils/internationalized-names.js:28
+msgid "sum"
+msgstr "합계"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DimensionFilterPanel/MemberExplorer.jsx:290
+msgid "value remaining"
+msgstr "개의 값 남음"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-enterprise/lib/test-ready.js:1
+msgid "values"
+msgstr "값"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/DimensionFilterPanel/MemberExplorer.jsx:291
+msgid "values remaining"
+msgstr "개의 값 남음"
+
+#: /opt/splunk/etc/apps/splunk_metrics_workspace/build/data-analysis/packages/analysis-workspace-core/src/components/AlertDetails/AlertDetails.jsx:144
+#, python-format
+msgid "yes, suppressed for %(duration)s"
+msgstr "예, %(duration)s에 대해 억제됨"

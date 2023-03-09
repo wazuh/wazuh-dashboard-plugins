@@ -1,0 +1,26 @@
+<dashboard hideEdit="True" version="1.1">
+
+  <label>Splunk Assist</label>
+
+  <row>
+
+    <panel>
+
+      <html>
+
+        <p><strong>Description</strong></p>
+        <p>Scope: Splunk Enterprise Only</p>
+        
+        <p>Splunk has introduced Splunk Assist, a managed service that uses Splunk Cloud Platform technology to provide deep insight into the security, management, and configuration postures of Splunk Enterprise deployments. With Splunk Assist, as a Splunk Enterprise administrator, you can easily analyze and manage your deployments according to best practices for security and configuration in Splunk Cloud Platform deployments. As your deployments grow, Assist continually evaluates them and provides recommendations that are tailored to the needs of your deployment and your business. You remain fully in control of your deployments and can act on those recommendations at any time.</p>
+        <p>With Splunk Assist, you can access, review, and act on key security, performance, upgrade, and configuration indicators to bring your Splunk Enterprise deployments into compliance with best practices for Splunk Cloud Platform deployments.</p>
+      
+        <ul>
+                  <div style="margin-left:10px">
+                   <img src="/static/app/splunk_essentials_9_0/images/assist_1.png" style="margin: 10px 0" width="700px"/>
+                  </div>
+                 </ul>
+
+        </html>
+    </panel>
+  </row>
+</dashboard>

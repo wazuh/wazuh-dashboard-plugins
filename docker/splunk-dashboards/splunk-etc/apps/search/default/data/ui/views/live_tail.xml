@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<view template="pages/blank.html" type="html" isDashboard="False">
+    <label>Live Tail</label>
+</view>

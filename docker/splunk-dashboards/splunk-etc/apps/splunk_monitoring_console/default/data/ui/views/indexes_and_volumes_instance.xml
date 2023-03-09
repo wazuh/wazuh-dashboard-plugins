@@ -1,0 +1,310 @@
+<form version="1.1" hideEdit="True" script="cell_fill_gauge.js, common_control.js" stylesheet="index_type.css">
+  <label>Indexes and Volumes: Instance</label>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="radio" searchWhenChanged="true" token="datatype">
+      <label>Index Type</label>
+      <choice value="">Event Indexes Only</choice>
+      <choice value="datatype=all">All Index Types *</choice>
+      <default></default>
+    </input>
+    <input type="dropdown" searchWhenChanged="true" token="dmc_group">
+      <label>Group</label>
+      <showClearButton>false</showClearButton>
+      <search>
+        <query>
+          | `dmc_get_groups_containing_role(dmc_group_indexer)`
+          | search search_group!="dmc_group_*"
+        </query>
+      </search>
+      <fieldForLabel>label</fieldForLabel>
+      <fieldForValue>search_group</fieldForValue>
+      <choice value="dmc_group_indexer">All Indexers</choice>
+      <default>dmc_group_indexer</default>
+    </input>
+    <input type="dropdown" searchWhenChanged="true" token="splunk_server">
+      <label>Instance</label>
+      <showClearButton>false</showClearButton>
+      <populatingSearch fieldForLabel="serverName" fieldForValue="serverName">
+        | `dmc_get_instance_info($dmc_group$)`
+        | where search_group="dmc_group_indexer"
+      </populatingSearch>
+      <selectFirstChoice>true</selectFirstChoice>
+      <change>
+        <condition value="*">
+          <set token="host">$row.host$</set>
+        </condition>
+      </change>
+    </input>
+    <html id="index_type_disclaimer">
+      <p>The "All Index Types" option is not compatible with indexers running Splunk Enterprise 6.6 or earlier, where only event indexes exist.</p>
+    </html>
+  </fieldset>
+  <search id="indexes_base_search">
+    <query>
+| rest splunk_server=$splunk_server$ /services/data/indexes $datatype$
+  | join title type=outer [
+  | rest splunk_server=$splunk_server$ /services/data/indexes-extended $datatype$
+  | eval cold_bucket_size = if(isnotnull('bucket_dirs.cold.bucket_size'), 'bucket_dirs.cold.bucket_size', 'bucket_dirs.cold.size')
+  | fields title, cold_bucket_size, total_size, total_bucket_count]
+| `dmc_exclude_indexes`
+| fields title datatype maxTotalDataSizeMB currentDBSizeMB frozenTimePeriodInSecs minTime coldPath.maxDataSizeMB homePath.maxDataSizeMB, homePath, coldPath, cold_bucket_size, total_size, total_bucket_count, totalEventCount
+| eval currentDBSizeGB = if(isnotnull(currentDBSizeMB), round(currentDBSizeMB / 1024, 2), 0)
+| eval maxTotalDataSizeGB = if((maxTotalDataSizeMB == 0) OR isnull(maxTotalDataSizeMB), "unlimited", round(maxTotalDataSizeMB / 1024, 2))
+| eval disk_usage_gb = currentDBSizeGB." / ".maxTotalDataSizeGB
+| eval currentTimePeriodDay = round((now() - strptime(minTime,"%Y-%m-%dT%H:%M:%S%z")) / 86400, 0)
+| eval currentTimePeriodDay = if(isnull(currentTimePeriodDay), 0, currentTimePeriodDay)
+| eval frozenTimePeriodDay = round(frozenTimePeriodInSecs / 86400, 0)
+| eval frozenTimePeriodDay = if(isnull(frozenTimePeriodDay) OR frozenTimePeriodDay == 0, "unlimited", frozenTimePeriodDay)
+| eval freeze_period_viz = currentTimePeriodDay." / ".frozenTimePeriodDay
+| eval total_bucket_count = if(isnotnull(total_bucket_count), total_bucket_count, 0)
+| eval totalEventCount = if(isnotnull(totalEventCount), totalEventCount, 0)
+| eval home_bucket_size_gb = round((total_size - if(isnull(cold_bucket_size), 0, cold_bucket_size)) / 1024, 2)
+| eval home_bucket_size_gb = if(isnull(home_bucket_size_gb), 0, home_bucket_size_gb)
+| eval home_bucket_capacity_gb = if(isnull('homePath.maxDataSizeMB') OR 'homePath.maxDataSizeMB' = 0, "unlimited", round('homePath.maxDataSizeMB' / 1024, 2))
+| eval home_bucket_usage_gb = home_bucket_size_gb." / ".home_bucket_capacity_gb
+| eval cold_bucket_size_gb = if(isnull(cold_bucket_size), 0, round(cold_bucket_size / 1024, 2))
+| eval cold_bucket_capacity_gb = if(isnull('coldPath.maxDataSizeMB') OR 'coldPath.maxDataSizeMB' = 0, "unlimited", round('coldPath.maxDataSizeMB' / 1024, 2))
+| eval cold_bucket_usage_gb = cold_bucket_size_gb." / ".cold_bucket_capacity_gb
+| fields title, datatype, freeze_period_viz, disk_usage_gb, home_bucket_usage_gb, cold_bucket_usage_gb, total_bucket_count, totalEventCount, currentDBSizeGB,
+      cold_bucket_size_gb, home_bucket_size_gb, homePath, coldPath
+    </query>
+    <done>
+      <set token="indexCount">$job.resultCount$</set>
+    </done>
+  </search>
+  <row>
+    <panel>
+      <html>
+        <h2>
+          <span>Select views: </span>
+          <span id="link-switcher-view">
+            <a href="#" class="btn-pill active" data-item="all">All</a>
+            <a href="#" class="btn-pill" data-item="snapshot">Snapshot</a>
+            <a href="#" class="btn-pill" data-item="historical">Historical</a>
+          </span>
+        </h2>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Snapshots</title>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <single>
+        <option name="height">80px</option>
+        <search base="indexes_base_search">
+          <query>
+            stats sum(currentDBSizeGB) as total_gb
+            | eval total_gb = case(
+                total_gb > 1000, round(total_gb / 1024, 2)." TB",
+                1 = 1, total_gb." GB"
+              )
+            </query>
+        </search>
+        <option name="underLabel">Total Index Size</option>
+      </single>
+      <single>
+        <option name="height">80px</option>
+        <search base="indexes_base_search">
+          <query>
+            stats sum(totalEventCount) as totalEventCount
+            | eval totalEventCount = tostring(totalEventCount, "commas")
+          </query>
+        </search>
+        <option name="underLabel">Total Event Count</option>
+      </single>
+      <single>
+        <option name="height">80px</option>
+        <search base="indexes_base_search">
+          <query>
+            stats sum(total_bucket_count) as total_bucket_count
+            | eval total_bucket_count = tostring(total_bucket_count, "commas")
+          </query>
+        </search>
+        <option name="underLabel">Total Bucket Count</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Indexes ($indexCount$)</title>
+      <table id="table1">
+        <search base="indexes_base_search">
+          <query>
+            fields title, datatype, freeze_period_viz, disk_usage_gb, home_bucket_usage_gb, cold_bucket_usage_gb, totalEventCount, total_bucket_count
+            | eval total_bucket_count=tostring(total_bucket_count, "commas")
+            | eval totalEventCount=tostring(totalEventCount, "commas")
+            | rename title as Index, datatype as "Data Type", disk_usage_gb as "Index Usage (GB)", freeze_period_viz as "Data Age vs Frozen Age (days)", home_bucket_usage_gb as "Home Path Usage (GB)", cold_bucket_usage_gb as "Cold Path Usage (GB)", total_bucket_count as "Total Bucket Count", totalEventCount as "Total Event Count"
+          </query>
+        </search>
+        <option name="drilldown">row</option>
+        <drilldown>
+          <link target="_blank">index_detail_instance?form.datatype=$datatype$&amp;form.dmc_group=$dmc_group$&amp;form.splunk_server=$splunk_server$&amp;form.single_index_name=$row.Index$:$row.Data Type$</link>
+        </drilldown>
+      </table>
+      <html>
+        <p>The columns use attributes specified in <a href="/help?location=learnmore.index.settings" class="external" target="_blank">indexes.conf</a>:</p>
+        <ul>
+          <li><b>Data Age vs Frozen Age:</b> The first value is based on the age of the oldest event in the index. The second value is derived from the attribute frozenTimePeriodInSecs.</li>
+          <li><b>Index Usage:</b> The first value is the current size of the index. The second value is the index capacity, as specified  in maxTotalDataSizeMB.</li>
+          <li><b>Home Path Usage:</b> The first value is the current size of the home path portion of the index. The second value is the home path capacity, as specified in homePath.maxDataSizeMB.</li>
+          <li><b>Cold Path Usage:</b> The first value is the current size of the cold path portion of the index. The second value is the cold path capacity, as specified in coldPath.maxDataSizeMB.</li>
+        </ul>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Volumes ($volumeCount$)</title>
+      <table id="table2">
+        <search>
+          <query>
+            | rest splunk_server=$splunk_server$ /services/data/index-volumes
+            | fields title, total_size, max_size, volume_path
+            | `dmc_exclude_volumes`
+            | eval total_size_gb = if(isnull(total_size), "-", round(total_size / 1024, 2))
+            | eval max_size_gb = if(isnull(max_size) OR max_size = "infinite", "unlimited", round(max_size / 1024, 2))
+            | eval disk_usage_gb = total_size_gb." / ".max_size_gb
+            | fields title, disk_usage_gb, max_size_gb, volume_path
+            | rename title as Volume, disk_usage_gb as "Volume Usage (GB)", max_size_gb as "Volume Capacity (GB)", volume_path as "Volume Path"
+          </query>
+          <done>
+            <set token="volumeCount">$job.resultCount$</set>
+          </done>
+        </search>
+        <option name="drilldown">row</option>
+        <drilldown>
+          <link target="_blank">volume_detail_instance?form.datatype=$datatype$&amp;form.dmc_group=$dmc_group$&amp;form.splunk_server=$splunk_server$&amp;form.volume_name=$row.Volume$</link>
+        </drilldown>
+      </table>
+      <html>
+        <p><b>Volume Usage:</b> The first value is the current size of the volume. The second value is the volume capacity, as specified by the maxVolumeDataSizeMB attribute in <a href="/help?location=learnmore.index.settings" class="external" target="_blank">indexes.conf</a>.</p>
+        <p><b>Note: </b>if the volume is "unlimited", it is not possible to determine the disk usage for the volume. </p>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Volume Usage by Indexes and Directories</title>
+      <chart>
+        <search base="indexes_base_search">
+          <query>
+fields title, cold_bucket_size_gb, home_bucket_size_gb, homePath, coldPath
+| rex field=homePath "volume:(?&lt;home_vol_name&gt;[^/\\\]*)(?:/|\\\)"
+| rex field=coldPath "volume:(?&lt;cold_vol_name&gt;[^/\\\]*)(?:/|\\\)"
+| eval dir = "home,cold"
+| makemv dir delim=","
+| mvexpand dir
+| eval dir_size = case(dir == "home", home_bucket_size_gb, dir == "cold", cold_bucket_size_gb)
+| eval vol_name = case(dir == "home", home_vol_name, dir == "cold", cold_vol_name)
+| fields title dir dir_size vol_name
+| where isnotnull(vol_name) AND isnotnull(dir_size) AND dir_size > 0
+| eval index_dir_name = title.":".dir
+| chart sum(dir_size) AS dir_size over vol_name by index_dir_name
+          </query>
+        </search>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.axisTitleX.text">Volume Names</option>
+        <option name="charting.axisTitleY.text">Volume Usage (GB)</option>
+        <option name="drilldown">none</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Historical Charts</title>
+      <input type="time" searchWhenChanged="true" token="time">
+        <label>Time Range:</label>
+        <default>
+          <earliestTime>-15d@d</earliestTime>
+          <latestTime>now</latestTime>
+        </default>
+      </input>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>$index_metric_label$ of Indexes Over Time</title>
+      <input type="dropdown" searchWhenChanged="true" token="index_metric">
+        <label>Metric</label>
+        <showClearButton>false</showClearButton>
+        <choice value="data.total_size">Size</choice>
+        <choice value="data.total_bucket_count">Bucket Count</choice>
+        <choice value="data.total_event_count">Event Count</choice>
+        <default>data.total_size</default>
+        <change>
+          <condition value="data.total_size">
+            <set token="index_metric_label">Size</set>
+            <set token="index_y_label">Size (GB)</set>
+          </condition>
+          <condition value="data.total_bucket_count">
+            <set token="index_metric_label">Bucket Count</set>
+            <set token="index_y_label">Bucket Count</set>
+          </condition>
+          <condition value="data.total_event_count">
+            <set token="index_metric_label">Event Count</set>
+            <set token="index_y_label">Event Count</set>
+          </condition>
+        </change>
+      </input>
+      <input type="dropdown" searchWhenChanged="true" token="funcIndex">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <default>latest</default>        
+        <choice value="latest">Latest</choice>
+        <choice value="avg">Average</choice>
+        <choice value="min">Minimum</choice>
+        <choice value="max">Maximum</choice>
+      </input>
+      <chart>
+        <search>
+          <query>
+            index=_introspection host=$host$ sourcetype=splunk_disk_objects component=Indexes
+            | `dmc_exclude_indexes`
+            | eval data.total_size = round('data.total_size' / 1024, 2)
+            | `dmc_timechart_for_disk_usage` $funcIndex$($index_metric$) as total by data.name
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">$index_y_label$</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Volume Size Over Time</title>
+      <input type="dropdown" searchWhenChanged="true" token="funcVolume">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <default>latest</default>
+        <choice value="latest">Latest</choice>
+        <choice value="avg">Average</choice>
+        <choice value="min">Minimum</choice>
+        <choice value="max">Maximum</choice>
+      </input>
+      <chart>
+        <search>
+          <query>
+            index=_introspection host=$host$ sourcetype=splunk_disk_objects component=Volumes
+            | eval data.total_size = round('data.total_size' / 1024, 2)
+            | `dmc_timechart_for_disk_usage` $funcVolume$(data.total_size) as total_size by data.name
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Size (GB)</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+      </chart>
+    </panel>
+  </row>
+</form>

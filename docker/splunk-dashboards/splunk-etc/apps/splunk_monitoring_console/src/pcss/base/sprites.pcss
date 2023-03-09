@@ -1,0 +1,329 @@
+/*===============================================================================================*/
+/*  SPLUNK: ICONS                                                                                */
+/*  Override bootstrap glyph icons and replace with custom font icons loosely based on           */
+/*  [FontAwesome](http://fortawesome.github.com/Font-Awesome/) see splunk                        */
+/*  [styleguide](http://localhost:8000/static/style-guide.html) for more details                 */
+/*===============================================================================================*/
+
+/*----------------------------------------------*/
+/*  Make Icon Class:                            */
+/*  .icon-[icon name]                           */
+/*  @params:                                    */
+/*      Icon Name                               */
+/*      Content                                 */
+/*----------------------------------------------*/
+@define-mixin make-icon $iconName, $content {
+    .icon-$(iconName):before {
+        content: $content;
+    }
+}
+
+/*----------------------------------------------*/
+/*  Make Icon Class + Font Smoothing            */
+/*----------------------------------------------*/
+@define-mixin make-icon-smooth $iconName, $content {
+    .icon-$(iconName):before {
+        content: $content;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+}
+
+/*----------------------------------------------*/
+/*  Make Icon Class + Margin Right              */
+/*----------------------------------------------*/
+@define-mixin make-icon-mr $iconName, $content, $margin: 0.25em {
+    .icon-$(iconName):before {
+        content: $content;
+        margin-right: $margin
+    }
+}
+
+/*----------------------------------------------*/
+/*  Make Icon Class + Font Family Inherit       */
+/*----------------------------------------------*/
+@define-mixin make-icon-inherit $iconName, $content, $font: inherit {
+    .icon-$(iconName):before {
+        content: $content;
+        font-family: $font
+    }
+}
+
+/*************************************************************************************************/
+/*  ICON FONT FACE                                                                               */
+/*************************************************************************************************/
+[class^="icon-"]:before,
+[class*=" icon-"]:before {
+    font-family: "Splunk Icons";
+    font-style: normal;
+    font-weight: normal;
+    text-decoration: inherit;
+    line-height: inherit;
+}
+
+a [class^="icon-"],
+a [class*=" icon-"] {
+    display: inline-block;
+    text-decoration: none;
+    line-height: inherit;
+}
+
+ /* makes the font 33% larger relative to the icon container */
+.icon-large {
+    font-size: 1.3333333333333333em;
+    vertical-align: middle;
+}
+
+
+/*************************************************************************************************/
+/*  UTILS & HELPERS                                                                              */
+/*************************************************************************************************/
+/*  utility for setting font-family */
+/*  TODO: is this used? or needed? */
+.font-icon {
+    font-family: "Splunk Icons";
+    font-size: inherit;
+    line-height: inherit;
+}
+
+.icon-no-underline {
+    &:first-child {
+        padding-right: 0.3em;
+    }
+    &:last-child {
+        padding-left: 0.3em;
+    }
+    &:first-child:last-child {
+        padding-right: 0;
+        padding-left: 0;
+    }
+    &:before {
+        text-decoration: none;
+    }
+}
+
+.padded-icon {
+    margin-right: 0.5em;
+}
+
+/*image replace helper*/
+.ir {
+    position: relative;
+    display: inline-block;
+    min-width: 0.5em;
+    text-indent: -9999px;
+    outline:none;
+    /*  vertical-align:middle; */
+
+    &:before {
+        position: absolute;
+        top: 0;
+        left: 0;  /* Firefox needs to be explicit here */
+        text-indent: 0;
+    }
+}
+
+
+/*************************************************************************************************/
+/*  FONT ICONS                                                                                   */
+/*  When possible we should use the Unicode Private Use Area (PUA) to ensure screen readers do   */
+/*  not read off random characters that represent icons.                                         */
+/*      convert this ...                                                                         */
+/*          .icon-share:before {                                                                 */
+/*              content: "\EC83 ";                                                               */
+/*          }                                                                                    */
+/*      into this                                                                                */
+/*          <li class="icon-share"></li>                                                         */
+/*      Search:                                                                                  */
+/*          \.(icon-[^:]+).*                                                                     */
+/*      Replace:                                                                                 */
+/*          <li class="$1"></li>                                                                 */
+/*************************************************************************************************/
+/* example
+    <a href="#" class="icon-check">Check</a> -
+    <a href="#" class="icon-check ir">Check</a>
+*/
+
+/*  Splunk logo  */
+@mixin make-icon splunk,         "splunk";
+@mixin make-icon greater,        "\003E";
+@mixin make-icon hunk,           "\F000";
+@mixin make-icon enterprise,     "\F001";
+@mixin make-icon cloud-logo,     "\F002";
+@mixin make-icon splunk-light,   "\F003";
+
+/*  Shapes  */
+@mixin make-icon circle,                "\ECD0";
+@mixin make-icon circle-filled,         "\25CF";
+@mixin make-icon box-filled,            "\25A0";
+@mixin make-icon triangle-up-small,     "\25B4";
+@mixin make-icon triangle-right,        "\25B6";
+@mixin make-icon triangle-right-small,  "\25B8";
+@mixin make-icon triangle-down,         "\25BC";
+@mixin make-icon triangle-down-small,   "\25BE";
+@mixin make-icon triangle-left,         "\25C0";
+@mixin make-icon triangle-left-small,   "\25C2";
+
+/*  Arrows & Pointers  */
+@mixin make-icon arrow-up,          "\EC01";
+@mixin make-icon arrow-right,       "\27A1";
+@mixin make-icon arrow-down,        "\EC02";
+@mixin make-icon arrow-left,        "\EC00";
+
+@mixin make-icon two-arrows-cycle,  "\EC12";
+@mixin make-icon external,          "\EC13";
+@mixin make-icon rotate-counter,    "\21BA";
+@mixin make-icon rotate,            "\21BB";
+@mixin make-icon location,          "\EC80";
+
+@mixin make-icon chevron-left,      "\2039";
+@mixin make-icon chevron-right,     "\203A";
+@mixin make-icon chevron-up,        "\02C4";
+@mixin make-icon chevron-down,      "\02C5";
+
+/*  Actions  */
+@mixin make-icon trash,             "\EC66";
+@mixin make-icon share,             "\27A6";
+@mixin make-icon export,            "\EC68";
+@mixin make-icon print,             "\EC89";
+@mixin make-icon search,            "\EC9B";
+@mixin make-icon search-thin,       "\ECC2";
+@mixin make-icon pivot,             "\EC12";
+@mixin make-icon clone,             "\ECE8";
+
+@mixin make-icon pause,             "\EC50";
+@mixin make-icon stop,              "\25A0";
+@mixin make-icon play,              "\25B6";
+
+@mixin make-icon sort,              "\2195";
+@mixin make-icon sorted-up,         "\21A5";
+@mixin make-icon sorted-down,       "\21A7";
+
+@mixin make-icon minus,             "\2212";
+@mixin make-icon-mr minus-circle,   "\2296";
+@mixin make-icon plus,              "\002B";
+@mixin make-icon plus-circle,       "\2295";
+@mixin make-icon x,                 "\2717";
+@mixin make-icon x-circle,          "\2297";
+
+@mixin make-icon close,             "\2717";
+@mixin make-icon cancel,            "\2717";
+
+@mixin make-icon collapse-left,     "\ECE0";
+@mixin make-icon expand-right,      "\ECE1";
+
+/*  Concepts  */
+@mixin make-icon activity,                "\ECAE";
+@mixin make-icon string,                  "a";
+@mixin make-icon number,                  "\0023";
+@mixin make-icon text,                    "\ECD9";
+@mixin make-icon not-allowed,             "\EC9E";
+@mixin make-icon data,                    "\ECA4";
+@mixin make-icon data-input,              "\ECA3";
+@mixin make-icon settings,                "\ECA5";
+@mixin make-icon distributed-environment, "\ECA6";
+@mixin make-icon visible,                 "\ECC0";
+@mixin make-icon hidden,                  "\ECC1";
+@mixin make-icon boolean,                 "\ECD2";
+@mixin make-icon menu,                    "\EC56";
+@mixin make-icon rows,                    "\EC56";
+@mixin make-icon tiles,                   "\ECF0";
+@mixin make-icon metric,                  "\ECF5";
+@mixin make-icon event,                   "\ECF6";
+@mixin make-icon rollup,                  "\ECF8";
+
+/*  Misc  */
+@mixin make-icon info,              "\0069";
+@mixin make-icon info-circle,       "\0049";
+@mixin make-icon-inherit question,  "\003F";
+@mixin make-icon question-circle,   "\EC9D";
+@mixin make-icon box-unchecked,     "\2610";
+@mixin make-icon box-checked,       "\2611";
+@mixin make-icon check-circle,      "\ECD3";
+@mixin make-icon alert-circle,      "\ECD4";
+@mixin make-icon code,              "\ECD7";
+@mixin make-icon code-thin,         "\ECD6";
+@mixin make-icon alert,             "\26A0";
+@mixin make-icon error,             "\ECE2";
+@mixin make-icon warning,           "\26A0";
+@mixin make-icon fullscreen,        "\ECF3";
+
+/*  Objects  */
+@mixin make-icon bell,          "\EC9C";
+@mixin make-icon bookmark,      "\ECA1";
+@mixin make-icon bulb,          "\EC98";
+@mixin make-icon calendar,      "\EC9A";
+@mixin make-icon check,         "\2713";
+@mixin make-icon clock,         "\231A";
+@mixin make-icon cloud,         "\2601";
+@mixin make-icon flag,          "\2691";
+@mixin make-icon gear,          "\2699";
+@mixin make-icon lightning,     "\2301";
+@mixin make-icon link,          "\ECF1";
+@mixin make-icon lock,          "\EC9F";
+@mixin make-icon lock-unlocked, "\ECA0";
+@mixin make-icon mail,          "\2709";
+@mixin make-icon pencil,        "\270F";
+@mixin make-icon speech-bubble, "\EC99";
+@mixin make-icon star,          "\2605";
+@mixin make-icon user,          "\EC84";
+@mixin make-icon clipboard,     "\ECD5";
+@mixin make-icon paintbrush,    "\ECCA";
+@mixin make-icon warning-sign,  "\26A0";
+
+/*  Results and Visualizations  */
+@mixin make-icon chart-area,             "\ECA9";
+@mixin make-icon chart-bar,              "\ECAA";
+@mixin make-icon chart-column,           "\ECAB";
+@mixin make-icon chart-pie,              "\ECAC";
+@mixin make-icon chart-scatter,          "\ECAD";
+@mixin make-icon chart-bubble,           "\ECB8";
+@mixin make-icon chart-line,             "\ECAE";
+@mixin make-icon single-value,           "\ECAF";
+@mixin make-icon gauge-radial,           "\ECA2";
+@mixin make-icon gauge-marker,           "\ECB0";
+@mixin make-icon gauge-filler,           "\ECB1";
+@mixin make-icon-smooth choropleth-map,  "\ECB9";
+@mixin make-icon external-viz,           "\ECF2";
+@mixin make-icon label-rotation--90,     "\ECE3";
+@mixin make-icon label-rotation--45,     "\ECE4";
+@mixin make-icon label-rotation-0,       "\ECE5";
+@mixin make-icon label-rotation-45,      "\ECE6";
+@mixin make-icon label-rotation-90,      "\ECE7";
+@mixin make-icon trellis-layout,         "\F004";
+
+@mixin make-icon chart-area-plus-table,             "\ECA9  \002B  \ECA8";
+@mixin make-icon chart-bar-plus-table,              "\ECAA  \002B  \ECA8";
+@mixin make-icon chart-column-plus-table,           "\ECAB  \002B  \ECA8";
+@mixin make-icon chart-pie-plus-table,              "\ECAC  \002B  \ECA8";
+@mixin make-icon chart-scatter-plus-table,          "\ECAD  \002B  \ECA8";
+@mixin make-icon chart-bubble-plus-table,           "\ECB8  \002B  \ECA8";
+@mixin make-icon chart-line-plus-table,             "\ECAE  \002B  \ECA8";
+@mixin make-icon single-value-plus-table,           "\ECAF  \002B  \ECA8";
+@mixin make-icon gauge-radial-plus-table,           "\ECA2  \002B  \ECA8";
+@mixin make-icon gauge-marker-plus-table,           "\ECB0  \002B  \ECA8";
+@mixin make-icon gauge-filler-plus-table,           "\ECB1  \002B  \ECA8";
+@mixin make-icon location-plus-table,               "\EC80  \002B  \ECA8";
+@mixin make-icon-smooth choropleth-map-plus-table,  "\ECB9  \002B  \ECA8";
+@mixin make-icon external-viz-plus-table,           "\ECF2  \002B  \ECA8";
+
+/*  Formatting  */
+@mixin make-icon list,                   "\ECA7";
+@mixin make-icon table,                  "\ECA8";
+@mixin make-icon bar-beside,             "\ECB2";
+@mixin make-icon bar-stacked,            "\ECB3";
+@mixin make-icon bar-stacked-100,        "\ECB4";
+@mixin make-icon missing-value-skipped,  "\ECB5";
+@mixin make-icon missing-value-zero,     "\ECB6";
+@mixin make-icon missing-value-join,     "\ECB7";
+
+/*  Documents  */
+@mixin make-icon folder,                 "\ECE9";
+@mixin make-icon document,               "\ECC3";
+@mixin make-icon report,                 "\ECC3";
+@mixin make-icon report-search,          "\ECC4";
+@mixin make-icon report-pivot,           "\ECc5";
+@mixin make-icon dashboard,              "\ECC6";
+@mixin make-icon panel,                  "\ECC7";
+@mixin make-icon panel-search,           "\ECC8";
+@mixin make-icon panel-pivot,            "\ECC9";

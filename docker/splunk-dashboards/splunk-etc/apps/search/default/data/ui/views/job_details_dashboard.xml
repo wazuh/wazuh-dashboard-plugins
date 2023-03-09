@@ -1,0 +1,538 @@
+<form version="1.1" hideEdit="True">
+    <label>Job Details Dashboard</label>
+    <fieldset submitButton="false"></fieldset>
+    <row>
+        <panel>
+            <html>
+                <p>This dashboard displays properties of a search job. Use it to gain insight into search job performance and troubleshoot search efficiency issues. Provide a Search ID for a job that has not expired.</p>
+                <p><a class="external" href="/help?location=learnmore.job.details" target="_blank">Learn more</a>.</p>
+            </html>
+        </panel>
+    </row>
+
+    <row>
+        <panel>
+            <input type="text" token="sid">
+                <label>Search ID (SID)</label>
+            </input>
+        </panel>
+    </row>
+
+    <search id="baseSearch">
+        <query>
+            | rest /services/search/jobs/$sid$ splunk_server=local
+        </query>
+        <earliest>-4h</earliest>
+        <latest></latest>
+        <refresh>60s</refresh>
+    </search>
+
+    <row>
+        <panel>
+            <html>
+                <h1>Summary</h1>
+            </html>
+        </panel>
+    </row>
+    <row>
+        <panel>
+            <title>Search Duration</title>
+            <html>
+                <style type="text/css">
+                    #search_duration .single-value .single-result {
+                    font-size: 50px !important;
+                    }
+                    #search_duration .single-value .single-result-unit {
+                    font-size: 30%;
+                    }
+                </style>
+            </html>
+            <single id="search_duration">
+                <search base="baseSearch">
+                    <query>fields runDuration</query>
+                </search>
+                <option name="drilldown">none</option>
+                <option name="numberPrecision">0.00</option>
+                <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+                <option name="refresh.display">progressbar</option>
+                <option name="unit">s</option>
+            </single>
+        </panel>
+        <panel>
+            <title>Total Events Scanned</title>
+            <html>
+                <style type="text/css">
+                    #events_scanned .single-value .single-result {
+                    font-size: 50px !important;
+                    }
+                </style>
+            </html>
+            <single id="events_scanned">
+                <search base="baseSearch">
+                    <query>fields scanCount</query>
+                </search>
+                <option name="drilldown">none</option>
+                <option name="refresh.display">progressbar</option>
+            </single>
+        </panel>
+        <panel>
+            <title>Total Events Matched</title>
+            <html>
+                <style type="text/css">
+                    #events_matched .single-value .single-result {
+                    font-size: 50px !important;
+                    }
+                </style>
+            </html>
+            <single id="events_matched">
+                <search base="baseSearch">
+                    <query>fields eventCount</query>
+                </search>
+                <option name="drilldown">none</option>
+                <option name="refresh.display">progressbar</option>
+            </single>
+        </panel>
+        <panel>
+            <title>Result Count</title>
+            <html>
+                <style type="text/css">
+                    #result_count .single-value .single-result {
+                    font-size: 50px !important;
+                    }
+                </style>
+            </html>
+            <single id="result_count">
+                <search base="baseSearch">
+                    <query>fields resultCount</query>
+                </search>
+                <option name="drilldown">none</option>
+                <option name="refresh.display">progressbar</option>
+            </single>
+        </panel>
+        <panel>
+            <title>Events Scanned Per Second</title>
+            <html>
+                <style type="text/css">
+                    #events_scanned_per_sec .single-value .single-result {
+                    font-size: 50px !important;
+                    }
+                </style>
+            </html>
+            <single id="events_scanned_per_sec">
+                <search base="baseSearch">
+                    <query>eval eventsScannedPerSec=scanCount / exact(runDuration) | fields eventsScannedPerSec</query>
+                </search>
+                <option name="drilldown">none</option>
+                <option name="numberPrecision">0</option>
+                <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+                <option name="refresh.display">progressbar</option>
+            </single>
+        </panel>
+    </row>
+    <row>
+        <panel>
+            <title>Search Status</title>
+            <html>
+                <style type="text/css">
+                    #search_status .single-value .single-result {
+                    font-size: 50px !important;
+                    }
+                </style>
+            </html>
+            <single id="search_status">
+                <search base="baseSearch">
+                    <query>fields dispatchState | eval dispatchState=lower(dispatchState)</query>
+                </search>
+                <option name="drilldown">none</option>
+                <option name="refresh.display">progressbar</option>
+            </single>
+        </panel>
+        <panel>
+            <title>Search User</title>
+            <html>
+                <style type="text/css">
+                    #search_user .single-value .single-result {
+                    font-size: 50px !important;
+                    }
+                </style>
+            </html>
+            <single id="search_user">
+                <search base="baseSearch">
+                    <query>fields author</query>
+                </search>
+                <option name="drilldown">none</option>
+                <option name="refresh.display">progressbar</option>
+            </single>
+        </panel>
+        <panel>
+            <title>Search Mode</title>
+            <html>
+                <style type="text/css">
+                    #search_mode .single-value .single-result {
+                    font-size: 50px !important;
+                    }
+                </style>
+                <a class="external" href="/help?location=learnmore.search.mode" target="_blank">Learn more</a>
+            </html>
+            <single id="search_mode">
+                <search base="baseSearch">
+                    <query>eval searchMode=if (isnull('custom.display.page.search.mode'), "smart", 'custom.display.page.search.mode') | fields searchMode</query>
+                </search>
+                <option name="drilldown">none</option>
+                <option name="refresh.display">progressbar</option>
+            </single>
+        </panel>
+    </row>
+    <row>
+        <panel>
+            <title>Server Info</title>
+            <html>
+                <style type="text/css">
+                    #server_info .single-value .single-result {
+                    font-size: 50px !important;
+                    }
+                </style>
+            </html>
+            <single id="server_info">
+                <search base="baseSearch">
+                    <query>fields splunk_server</query>
+                </search>
+                <option name="drilldown">none</option>
+                <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+                <option name="refresh.display">progressbar</option>
+            </single>
+        </panel>
+    </row>
+
+    <row>
+        <panel>
+            <html>
+                <h1>Search Strings</h1>
+            </html>
+        </panel>
+    </row>
+    <row>
+        <panel>
+            <title>Search String</title>
+            <table>
+                <search base="baseSearch">
+                    <query>fields search</query>
+                </search>
+                <option name="count">20</option>
+                <option name="dataOverlayMode">none</option>
+                <option name="drilldown">none</option>
+                <option name="percentagesRow">false</option>
+                <option name="rowNumbers">false</option>
+                <option name="totalsRow">false</option>
+                <option name="wrap">true</option>
+            </table>
+        </panel>
+    </row>
+    <row>
+        <panel>
+            <title>Optimized Search String</title>
+            <table>
+                <search base="baseSearch">
+                    <query>fields optimizedSearch</query>
+                </search>
+                <option name="count">20</option>
+                <option name="dataOverlayMode">none</option>
+                <option name="drilldown">none</option>
+                <option name="percentagesRow">false</option>
+                <option name="rowNumbers">false</option>
+                <option name="totalsRow">false</option>
+                <option name="wrap">true</option>
+            </table>
+        </panel>
+    </row>
+    <row>
+        <panel>
+            <title>Map Phase Search String</title>
+            <table>
+                <search base="baseSearch">
+                    <query>fields remoteSearch</query>
+                </search>
+                <option name="count">20</option>
+                <option name="dataOverlayMode">none</option>
+                <option name="drilldown">none</option>
+                <option name="percentagesRow">false</option>
+                <option name="rowNumbers">false</option>
+                <option name="totalsRow">false</option>
+                <option name="wrap">true</option>
+            </table>
+        </panel>
+    </row>
+    <row>
+        <panel>
+            <title>Reduce Phase Search String</title>
+            <table>
+                <search base="baseSearch">
+                    <query>fields reduceSearch | eval reduceSearch=if (isnull(reduceSearch), "N/A", reduceSearch)</query>
+                </search>
+                <option name="count">20</option>
+                <option name="dataOverlayMode">none</option>
+                <option name="drilldown">none</option>
+                <option name="percentagesRow">false</option>
+                <option name="rowNumbers">false</option>
+                <option name="totalsRow">false</option>
+                <option name="wrap">true</option>
+            </table>
+        </panel>
+    </row>
+
+    <row>
+        <panel>
+            <html>
+                <h1>Search Costs</h1>
+            </html>
+        </panel>
+    </row>
+    <row>
+        <panel>
+            <title>Search Costs by Command</title>
+            <chart>
+                <search>
+                    <query>index="_introspection" sourcetype=search_telemetry search_id=*$sid$* | spath path=search_commands{}.name output=command | spath path=search_commands{}.duration output=duration | eval fields=mvzip(command, duration, ",") | mvexpand fields | rex field=fields "(?&lt;Command&gt;[^,]+),(?&lt;Duration&gt;.+)$"
+                        | table Command, Duration</query>
+                    <earliest>-4h</earliest>
+                    <latest></latest>
+                    <refresh>60s</refresh>
+                </search>
+                <option name="charting.axisTitleX.text">Command</option>
+                <option name="charting.axisTitleY.text">Duration (s)</option>
+                <option name="charting.chart">bar</option>
+                <option name="charting.chart.showDataLabels">all</option>
+                <option name="charting.drilldown">none</option>
+                <option name="refresh.display">progressbar</option>
+            </chart>
+        </panel>
+    </row>
+    <row>
+        <panel>
+            <title>Approximate Time Spent in Map Phase</title>
+            <html>
+                <style type="text/css">
+                    #map_phase_time .dashboard-element-title {
+                    font-weight: normal !important;
+                    font-size: 90% !important;
+                    }
+                    #map_phase_time .single-value .single-result {
+                    font-size: 50px !important;
+                    }
+                    #map_phase_time .single-value .single-result-unit {
+                    font-size: 30%;
+                    }
+                </style>
+            </html>
+            <single id="map_phase_time">
+                <title>Click on the time to see a detailed breakdown of the search costs by command for the map phase.</title>
+                <search base="baseSearch">
+                    <query>fields performance.dispatch.stream.remote.*.duration_secs, performance.dispatch.stream.local.duration_secs | transpose | rename column as Indexer "row 1" as Duration | stats max(Duration)</query>
+                </search>
+                <option name="drilldown">all</option>
+                <option name="numberPrecision">0.00</option>
+                <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+                <option name="refresh.display">progressbar</option>
+                <option name="unit">s</option>
+                <drilldown>
+                    <set token="map_phase_drilldown">$click.value$</set>
+                </drilldown>
+            </single>
+        </panel>
+        <panel>
+            <title>Approximate Time Spent in Reduce Phase</title>
+            <html>
+                <style type="text/css">
+                    #reduce_phase_time .dashboard-element-title {
+                    font-weight: normal !important;
+                    font-size: 90% !important;
+                    }
+                    #reduce_phase_time .single-value .single-result {
+                    font-size: 50px !important;
+                    }
+                    #reduce_phase_time .single-value .single-result-unit {
+                    font-size: 30%;
+                    }
+                </style>
+            </html>
+            <single id="reduce_phase_time">
+                <title>Click on the time to see a detailed breakdown of the search costs by command for the reduce phase.</title>
+                <search base="baseSearch">
+                    <query>fields reduceSearch | rex field=reduceSearch max_match=0 "(^(?&lt;first&gt;\w+){1})|((\| (?&lt;command&gt;\w+)))" | eval Command = mvappend(first, command) | mvexpand Command | fields Command | eval Command=if(like(Command, "%stats%"), "stats", Command) | eval Command=if(like(Command, "%bin%"), "prebin", Command) | join Command [| search index="_introspection" sourcetype=search_telemetry search_id=*$sid$* | spath path=search_commands{}.name output=command | spath path=search_commands{}.duration output=duration | eval tempField= mvzip(command, duration) | stats count by tempField | eval Command = mvindex(split(tempField,","),0), Duration= mvindex(split(tempField,","),1) | fields Command, Duration] | stats sum(Duration)</query>
+                </search>
+                <option name="drilldown">all</option>
+                <option name="numberPrecision">0.00</option>
+                <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+                <option name="refresh.display">progressbar</option>
+                <option name="unit">s</option>
+                <drilldown>
+                    <set token="reduce_phase_drilldown">$click.value$</set>
+                </drilldown>
+            </single>
+        </panel>
+    </row>
+    <row>
+        <panel depends="$map_phase_drilldown$">
+            <title>Map Phase Search Costs by Command</title>
+            <chart>
+                <search base="baseSearch">
+                    <query>fields remoteSearch | rex field=remoteSearch max_match=0 "(^(?&lt;first&gt;\w+){1})|((\| (?&lt;command&gt;\w+)))" | eval Command = mvappend(first, command) | mvexpand Command | fields Command | join Command [| search index="_introspection" sourcetype=search_telemetry search_id=*$sid$* | spath path=search_commands{}.name output=command | spath path=search_commands{}.duration output=duration | eval tempField= mvzip(command, duration) | stats count by tempField | eval Command = mvindex(split(tempField,","),0), Duration= mvindex(split(tempField,","),1) | fields Command, Duration] | table Command, Duration</query>
+                </search>
+                <option name="charting.axisTitleX.text">Command</option>
+                <option name="charting.axisTitleY.text">Duration (s)</option>
+                <option name="charting.axisY.abbreviation">none</option>
+                <option name="charting.axisY.scale">linear</option>
+                <option name="charting.chart">bar</option>
+                <option name="charting.chart.showDataLabels">all</option>
+                <option name="charting.chart.stackMode">default</option>
+                <option name="charting.drilldown">all</option>
+                <option name="charting.layout.splitSeries">0</option>
+                <option name="charting.legend.placement">none</option>
+                <drilldown>
+                    <unset token="map_phase_drilldown"></unset>
+                </drilldown>
+            </chart>
+        </panel>
+    </row>
+    <row>
+        <panel depends="$reduce_phase_drilldown$">
+            <title>Reduce Phase Search Costs by Command</title>
+            <chart>
+                <search base="baseSearch">
+                    <query>fields reduceSearch | rex field=reduceSearch max_match=0 "(^(?&lt;first&gt;\w+){1})|((\| (?&lt;command&gt;\w+)))" | eval Command = mvappend(first, command) | mvexpand Command | fields Command | eval Command=if(like(Command, "%stats%"), "stats", Command) | eval Command=if(like(Command, "%bin%"), "prebin", Command) | join Command [| search index="_introspection" sourcetype=search_telemetry source=*$sid$* | spath path=search_commands{}.name output=command | spath path=search_commands{}.duration output=duration | eval tempField= mvzip(command, duration) | stats count by tempField | eval Command = mvindex(split(tempField,","),0), Duration= mvindex(split(tempField,","),1) | fields Command, Duration] | table Command, Duration</query>
+                </search>
+                <option name="charting.axisTitleX.text">Command</option>
+                <option name="charting.axisTitleY.text">Duration (s)</option>
+                <option name="charting.chart">bar</option>
+                <option name="charting.chart.showDataLabels">all</option>
+                <option name="charting.drilldown">all</option>
+                <drilldown>
+                    <unset token="reduce_phase_drilldown"></unset>
+                </drilldown>
+                <option name="refresh.display">progressbar</option>
+            </chart>
+        </panel>
+    </row>
+    <row>
+        <panel>
+            <title>Startup Handoff Time</title>
+            <html>
+                <style type="text/css">
+                    #startup_handoff .dashboard-element-title {
+                    font-weight: normal !important;
+                    font-size: 90% !important;
+                    }
+                    #startup_handoff .single-value .single-result {
+                    font-size: 50px !important;
+                    }
+                    #startup_handoff .single-value .single-result-unit {
+                    font-size: 30%;
+                    }
+                </style>
+            </html>
+            <single id="startup_handoff">
+                <title>Time between the forking of a separate search process and the beginning of useful work of the forked search processes. This is cumulative across all involved peers. A large value could indicate I/O issues with .conf files or the dispatch directory.</title>
+                <search base="baseSearch">
+                    <query>fields performance.startup.handoff.duration_secs</query>
+                </search>
+                <option name="drilldown">none</option>
+                <option name="numberPrecision">0.00</option>
+                <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+                <option name="refresh.display">progressbar</option>
+                <option name="unit">s</option>
+            </single>
+        </panel>
+    </row>
+
+    <row>
+        <panel>
+            <html>
+                <h1>Indexers</h1>
+            </html>
+        </panel>
+    </row>
+    <row>
+        <panel>
+            <title>Number of Indexers</title>
+            <html>
+                <style type="text/css">
+                    #num_of_indexers .single-value .single-result {
+                    font-size: 50px !important;
+                    }
+                </style>
+            </html>
+            <single id="num_of_indexers">
+                <search base="baseSearch">
+                    <query>fields performance.dispatch.stream.remote.*.duration_secs | transpose | rename column as Indexer "row 1" as Duration | stats count(Indexer)</query>
+                </search>
+                <option name="drilldown">none</option>
+                <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+                <option name="refresh.display">progressbar</option>
+            </single>
+        </panel>
+        <panel>
+            <title>Average Indexer Time</title>
+            <html>
+                <style type="text/css">
+                    #avg_indexer_time .single-value .single-result {
+                    font-size: 50px !important;
+                    }
+                    #avg_indexer_time .single-value .single-result-unit {
+                    font-size: 30%;
+                    }
+                </style>
+            </html>
+            <single id="avg_indexer_time">
+                <search base="baseSearch">
+                    <query>fields performance.dispatch.stream.remote.*.duration_secs | transpose | rename column as Indexer "row 1" as Duration | stats avg(Duration)</query>
+                </search>
+                <option name="drilldown">none</option>
+                <option name="numberPrecision">0.00</option>
+                <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+                <option name="refresh.display">progressbar</option>
+                <option name="unit">s</option>
+            </single>
+        </panel>
+    </row>
+    <row>
+        <panel>
+            <title>Time Spent Running Search Per Indexer</title>
+            <html>
+                <style type="text/css">
+                    #time_per_indexer .dashboard-element-title {
+                    font-weight: normal !important;
+                    font-size: 90% !important;
+                    }
+                </style>
+            </html>
+            <table id="time_per_indexer">
+                <title>Click on an indexer name to see detailed metrics for that indexer. Note that more shaded duration values indicate slower indexers.</title>
+                <search base="baseSearch">
+                    <query>fields performance.dispatch.stream.remote.*.duration_secs | transpose | rename column as Indexer "row 1" as "Duration (seconds)" | rex field=Indexer "performance.dispatch.stream.remote.(?&lt;Indexer&gt;.*).duration_secs"</query>
+                </search>
+                <option name="count">10</option>
+                <option name="dataOverlayMode">heatmap</option>
+                <option name="drilldown">cell</option>
+                <option name="refresh.display">progressbar</option>
+                <option name="rowNumbers">true</option>
+                <drilldown>
+                    <set token="indexer">$row.Indexer$</set>
+                </drilldown>
+            </table>
+        </panel>
+        <panel depends="$indexer$">
+            <title>Drilldown Details For Indexer $indexer$</title>
+            <table>
+                <search base="baseSearch">
+                    <query>fields performance.dispatch.stream.remote.$indexer$.* | transpose | rename column as Field "row 1" as Value | rex field=Field "performance.dispatch.stream.remote.$indexer$.(?&lt;Field&gt;.*)$"</query>
+                </search>
+                <option name="count">10</option>
+                <option name="drilldown">row</option>
+                <option name="refresh.display">progressbar</option>
+                <drilldown>
+                    <unset token="indexer"></unset>
+                </drilldown>
+            </table>
+        </panel>
+    </row>
+</form>

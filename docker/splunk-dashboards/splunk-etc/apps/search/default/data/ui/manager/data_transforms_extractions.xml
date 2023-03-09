@@ -1,0 +1,109 @@
+<endpoint name="data/transforms/extractions" showAppContext="1">
+  <header>Field transformations</header>
+  <breadcrumb>
+    <parent hidecurrent="False">fields</parent>
+    <name>Field transformations</name>
+  </breadcrumb>
+  <elements>
+
+    <element name="__ns" type="select" label="Destination app">
+      <view name="create"/>
+      <key name="dynamicOptions" type="dict">
+        <key name="keyName">title</key>
+        <key name="keyValue">title</key>
+        <key name="splunkSource">/apps/local</key>
+        <key name="splunkSourceParams" type="dict">
+          <key name="search">'disabled=false'</key>
+          <key name="count">-1</key>
+        </key>
+      </key>
+    </element>
+
+    <element name="name" label="Name">
+      <view name="create"/>
+      <view name="list"/>
+    </element>
+
+    <element name="spl-ctrl_transforms_type" type="select" label="Type">
+      <view name="create"/>
+      <view name="edit"/>
+      <options>
+        <opt value="regularexpression" label="regex-based"/>
+        <opt value="delimiters" label="delimiter-based"/>
+      </options>
+      <onChange>
+        <key name="regularexpression">regex_group</key>
+        <key name="delimiters">delims_group</key>
+        <key name="_action">showonly</key>
+        <group_set>
+          <group name="regex_group"/>
+          <group name="delims_group"/>
+        </group_set>
+      </onChange>
+      <key name="processValueEdit">'delimiters' if entity['DELIMS'] else 'regularexpression'</key>
+    </element>
+
+    <element name="regex_group" type="fieldset">
+      <view name="create"/>
+      <view name="edit"/>
+      <elements>
+        <element name="REGEX" type="textfield" label="Regular expression">
+          <view name="create"/>
+          <view name="edit"/>
+          <key name="submitValueEdit">value if form_data.get('spl-ctrl_transforms_type') == 'regularexpression' else None</key>
+          <key name="submitValueAdd">value if form_data.get('spl-ctrl_transforms_type') == 'regularexpression' else None</key>
+        </element>
+        <element name="FORMAT" type="textfield" label="Format">
+          <view name="create"/>
+          <view name="edit"/>
+          <key name="exampleText"><![CDATA[Specify the event format in terms of field names and values. <br> Use $n (such as $1, $2, and so on) to specify regex match outputs. Default is &lt;transform_stanza_name&gt;::$1]]></key>
+        </element>
+      </elements>
+    </element>
+
+    <element name="delims_group" type="fieldset">
+      <view name="create"/>
+      <view name="edit"/>
+      <elements>
+        <element name="DELIMS" type="textfield" label="Delimiters">
+          <view name="create"/>
+          <view name="edit"/>
+          <key name="submitValueEdit">value if form_data.get('spl-ctrl_transforms_type') == 'delimiters' else None</key>
+          <key name="submitValueAdd">value if form_data.get('spl-ctrl_transforms_type') == 'delimiters' else None</key>
+        </element>
+        <element name="FIELDS" type="textfield" label="Field list">
+          <view name="create"/>
+          <view name="edit"/>
+          <key name="exampleText"><![CDATA[Specify the comma separated list of field names.]]></key>
+        </element>
+      </elements>
+    </element>
+
+    <element name="SOURCE_KEY" type="textfield" label="Source Key">
+      <view name="create"/>
+      <view name="edit"/>
+      <key name="exampleText">Specify the key the transforms extraction  applies to. Default is _raw.</key>
+    </element>
+
+    <element name="MV_ADD" type="checkbox" label="Create multivalued fields">
+      <view name="create"/>
+      <view name="edit"/>
+      <key name="exampleText">If checked the extractor will create multivalued fields if the field is already extracted.</key>
+    </element>
+
+    <element name="CLEAN_KEYS" type="checkbox" label="Automatically clean field names">
+      <view name="create"/>
+      <view name="edit"/>
+      <key name="exampleText">If checked the field names will be cleaned such that they only contain: a-zA-Z0-9_</key>
+    </element>
+
+    <element name="eai:acl.owner" label="Owner">
+      <view name="list"/>
+      <key name="processValueList">entity['eai:acl']['owner'] == 'nobody' and _('No owner') or entity['eai:acl']['owner']</key>
+    </element>
+    <element name="eai:acl.app" label="App">
+      <view name="list"/>
+      <key name="processValueList">entity['eai:acl']['app'] or ""</key>
+    </element>
+  </elements>
+</endpoint>

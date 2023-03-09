@@ -1,0 +1,49 @@
+#   Version 9.0.3
+#
+# This file contains example REST endpoint configurations.
+#
+# To use one or more of these configurations, copy the configuration block into
+# restmap.conf in $SPLUNK_HOME/etc/system/local/. You must restart Splunk to
+# enable configurations.
+#
+# To learn more about configuration files (including precedence) please see the
+# documentation located at
+# http://docs.splunk.com/Documentation/Splunk/latest/Admin/Aboutconfigurationfiles
+
+
+# The following are default REST configurations.  To create your own endpoints,
+# modify the values by following the spec outlined in restmap.conf.spec.
+
+
+# /////////////////////////////////////////////////////////////////////////////
+#  global settings
+# /////////////////////////////////////////////////////////////////////////////
+
+[global]
+
+# indicates if auths are allowed via GET params
+allowGetAuth=false
+
+#The default handler (assuming that we have PYTHONPATH set)
+pythonHandlerPath=$SPLUNK_HOME/bin/rest_handler.py
+
+
+
+# /////////////////////////////////////////////////////////////////////////////
+#  internal C++ handlers
+# NOTE: These are internal Splunk-created endpoints. 3rd party developers can
+# only use script or search can be used as handlers.
+# (Please see restmap.conf.spec for help with configurations.)
+# /////////////////////////////////////////////////////////////////////////////
+
+[SBA:sba]
+match=/properties
+capability=get_property_map
+
+[asyncsearch:asyncsearch]
+match=/search
+capability=search
+
+[indexing-preview:indexing-preview]
+match=/indexing/preview
+capability=(edit_monitor or edit_sourcetypes) and (edit_user and edit_tcp)

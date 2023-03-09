@@ -1,0 +1,48 @@
+/*===============================================================================================*/
+/*  SPLUNK: PAGER PAGINATION                                                                     */
+/*===============================================================================================*/
+.pager {
+    margin: $lineHeight 0;
+    list-style: none;
+    text-align: center;
+    @mixin clearfix;
+
+    li {
+        display: inline;
+
+        > a,
+        > span {
+            display: inline-block;
+            padding: 5px 14px;
+            background-color: $white;
+            border: $borderDefault;
+            border-radius: 15px;
+        }
+        > a:hover,
+        > a:focus {
+            text-decoration: none;
+            background-color: $gray98;
+        }
+    }
+    .next {
+        > a,
+        > span {
+            float: right;
+        }
+    }
+    .previous {
+        > a,
+        > span {
+            float: left;
+        }
+    }
+    .disabled {
+        > a,
+        > a:hover,
+        > a:focus,
+        > span {
+            text-decoration: none;
+            background-color: $gray98;
+        }
+    }
+}

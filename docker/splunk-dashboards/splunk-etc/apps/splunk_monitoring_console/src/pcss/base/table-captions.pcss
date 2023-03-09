@@ -1,0 +1,71 @@
+/*===============================================================================================*/
+/*  SPLUNK: TABLE CAPTIONS                                                                       */
+/*  The count, filters and pagination that appear above a listing.                               */
+/*===============================================================================================*/
+
+$tableCaptionHeight: calc($inputHeight + $spacingHalf);
+.table-caption,
+.table-caption-inner {
+    min-height: $tableCaptionHeight;
+    text-align: center;
+    margin-bottom: $spacingQuarter;
+}
+.table-caption-inner.affix-top {
+    left: 0;
+    top: 0;
+    right: 0;
+    background-color: $gray96;
+    z-index: $zindexHeaderTable;
+    position: fixed;
+}
+.table-caption {
+    h3, span.shared-collectioncount {
+        font-size: $fontSize;
+        font-weight: normal;
+        float: left;
+        padding-left: $spacing;
+        line-height: $tableCaptionHeight;
+        margin: 0;
+        min-width: 140px;
+        text-align: left;
+    }
+    .shared-waitspinner {
+        float: left;
+        width: 14px;
+        height: 14px;
+        margin: 12px 5px 2px 0;
+    }
+    form.shared-tablecaption-input {
+        display: inline-block;
+        margin: $spacingQuarter 0;
+        input {
+            width: 250px;
+        }
+    }
+    .btn-group {
+        display: inline-block;
+        margin-right: $spacingHalf;
+    }
+    .pagination {
+        min-width: 150px;
+        margin: $spacingQuarter $spacing 0 $spacing;
+    }
+}
+
+
+/*************************************************************************************************/
+/*  FILTER FORMS                                                                                 */
+/*************************************************************************************************/
+.shared-tablecaption-input {
+    position: relative;
+}
+
+.table-caption div.shared-controls-controlgroup {
+    display: inline-block;
+    margin: 0px 10px 0px 0;
+}
+
+.table-caption .pagination {
+    min-width: 150px;
+    margin: 5px 20px 0 20px;
+}

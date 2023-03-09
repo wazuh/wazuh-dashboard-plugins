@@ -1,0 +1,27 @@
+{
+  "__class__": "rapid_diag.task.Task",
+  "collectors": [
+    {
+      "__class__": "rapid_diag.collector.search_result.SearchResult",
+      "search_query": "| rest splunk_server=local /services/shcluster/status"
+    },
+    {
+      "__class__": "rapid_diag.collector.search_result.SearchResult",
+      "search_query": "| rest splunk_server=local /services/shcluster/member/info"
+    },
+    {
+      "__class__": "rapid_diag.collector.search_result.SearchResult",
+      "search_query": "| rest splunk_server=local /services/shcluster/member/members"
+    },
+    {
+      "__class__": "rapid_diag.collector.diag.Diag"
+    }
+  ],
+  "name": "Search head cluster issues",
+  "collector_tool_names": "search, splunkdiag",
+  "description": "For investigating search head cluster issues. The collector monitors and logs the cluster status and known cluster members on the host it is running on. Run the template on all search head cluster members, and the search head cluster captain.",
+  "host": "",
+  "task_id": "search-head-cluster-issues",
+  "features" : [ "shc_members_overview", "shc_captain_election_overview", "shc_captain_connection", "shc_captain_common_baseline", "shc_snapshot_creation" ],
+  "symptoms" : [ "networking", "replication-issues", "cluster-issues" ]
+}

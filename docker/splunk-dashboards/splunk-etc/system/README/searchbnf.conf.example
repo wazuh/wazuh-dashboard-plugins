@@ -1,0 +1,28 @@
+#   Version 9.0.3
+#
+# The following are example stanzas for searchbnf.conf configurations.
+#
+
+##################
+# selfjoin
+##################
+[selfjoin-command]
+syntax = selfjoin (<selfjoin-options>)* <field-list>
+shortdesc = Join results with itself.
+description = Join results with itself.  Must specify at least one field to join on.
+usage = public
+example1 = selfjoin id
+comment1 = Joins results with itself on 'id' field.
+related = join
+tags = join combine unite
+
+[selfjoin-options]
+syntax = overwrite=<bool> | max=<int> | keepsingle=<int>
+description = The selfjoin joins each result with other results that\
+  have the same value for the join fields.  'overwrite' controls if\
+  fields from these 'other' results should overwrite fields of the\
+  result used as the basis for the join (default=true).  max indicates\
+  the maximum number of 'other' results each main result can join with.\
+  (default = 1, 0 means no limit).  'keepsingle' controls whether or not\
+  results with a unique value for the join fields (and thus no other\
+  results to join with) should be retained.  (default = false)

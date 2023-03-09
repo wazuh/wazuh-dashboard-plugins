@@ -1,0 +1,13 @@
+<endpoint name="unused" showOnSearchHeadCluster="0">
+  <capabilities>
+    <read>license_edit</read>
+  </capabilities>
+  <header>unused</header>
+  <menu name="system_configurations">
+    <label>Licensing</label>
+    <url>/manager/system/licensing</url>
+    <description>Manage license volume, stacking, and pooling. View licensing alerts. Designate this host as the license manager or a license slave.</description>
+    <order>30</order>
+    <id>licensing</id>
+  </menu>
+</endpoint>

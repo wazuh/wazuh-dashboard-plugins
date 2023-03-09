@@ -1,0 +1,73 @@
+#   Version 9.0.3
+#
+# This is an example alert_actions.conf.  Use this file to configure alert
+# actions for saved searches.
+#
+# To use one or more of these configurations, copy the configuration block into
+# alert_actions.conf in $SPLUNK_HOME/etc/system/local/.  You must restart
+# Splunk to enable configurations.
+#
+# To learn more about configuration files (including precedence) please see the
+# documentation located at
+# http://docs.splunk.com/Documentation/Splunk/latest/Admin/Aboutconfigurationfiles
+
+[email]
+# keep the search artifacts around for 24 hours
+ttl = 86400
+
+# if no @ is found in the address the hostname of the current machine is appended
+from = splunk
+
+format = table
+
+inline = false
+
+sendresults = true
+
+hostname = CanAccessFromTheWorld.com
+
+command = sendemail "to=$action.email.to$" "server=$action.email.mailserver{default=localhost}$" "from=$action.email.from{default=splunk@localhost}$" "subject=$action.email.subject{recurse=yes}$" "format=$action.email.format{default=csv}$" "sssummary=Saved Search [$name$]: $counttype$($results.count$)" "sslink=$results.url$" "ssquery=$search$" "ssname=$name$" "inline=$action.email.inline{default=False}$" "sendresults=$action.email.sendresults{default=False}$" "sendpdf=$action.email.sendpdf{default=False}$" "pdfview=$action.email.pdfview$" "searchid=$search_id$" "graceful=$graceful{default=True}$" maxinputs="$maxinputs{default=1000}$" maxtime="$action.email.maxtime{default=5m}$"
+
+use_tls = 1
+sslVersions = tls1.2
+sslVerifyServerCert = true
+sslCommonNameToCheck = host1, host2
+
+[rss]
+# at most 30 items in the feed
+items_count=30
+
+# keep the search artifacts around for 24 hours
+ttl = 86400
+
+command = createrss "path=$name$.xml" "name=$name$" "link=$results.url$" "descr=Alert trigger: $name$, results.count=$results.count$ " "count=30" "graceful=$graceful{default=1}$" maxtime="$action.rss.maxtime{default=1m}$"
+
+[summary_index]
+# don't need the artifacts anytime after they're in the summary index
+ttl = 120
+
+# make sure the following keys are not added to marker (command, ttl, maxresults, _*)
+command = summaryindex addtime=true index="$action.summary_index._name{required=yes}$" file="$name$_$#random$.stash" name="$name$" marker="$action.summary_index*{format=$KEY=\\\"$VAL\\\", key_regex="action.summary_index.(?!(?:command|maxresults|ttl|(?:_.*))$)(.*)"}$"
+
+[summary_metric_index]
+# don't need the artifacts anytime after they're in the summary index
+ttl = 120
+
+# make sure that "mcollect" is the SPL command and has the option "split=allnums"
+command = mcollect index="$action.summary_index._name{required=yes}$" file="$name_hash$_$#random$.stash" name="$name$" marker="$action.summary_index*{format=$KEY=\\\"$VAL\\\", key_regex="action.summary_index.(?!(?:command|forceCsvResults|inline|maxresults|maxtime|python\\.version|ttl|track_alert|(?:_.*))$)(.*)"}$" split=allnums $action.summary_index._metric_dims$
+
+[custom_action]
+# flag the action as custom alert action
+is_custom = 1
+
+# configure appearance in the UI
+label = Custom Alert Action
+description = Triggers a custom alert action
+icon_path = custom_alert.png
+
+# override default script execution
+# java.path is a path pointer file in <app>/bin pointing to the actual java executable
+alert.execute.cmd = java.path
+alert.execute.cmd.arg.1 = -jar
+alert.execute.cmd.arg.2 = $SPLUNK_HOME/etc/apps/myapp/bin/custom.jar
+alert.execute.cmd.arg.3 = --execute 

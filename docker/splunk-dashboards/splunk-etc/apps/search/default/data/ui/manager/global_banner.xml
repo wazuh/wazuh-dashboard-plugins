@@ -1,0 +1,6 @@
+<endpoint name="global_banner" template="pages/system.html">
+    <capabilities>
+        <read>edit_global_banner</read>
+    </capabilities>
+    <header>Global Banner Settings</header>
+</endpoint>

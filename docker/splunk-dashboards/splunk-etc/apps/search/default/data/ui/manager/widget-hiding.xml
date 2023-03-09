@@ -1,0 +1,65 @@
+<endpoint name="widget-hiding">
+  <header>Hidable widgets demo</header>
+  <elements>
+    <element name="checktoggle" type="checkbox" label="Hide All">
+      <onChange>
+        <key name="0">fieldgroup</key>
+        <key name="1">NONE</key>
+        <key name="_action">showonly</key>
+        <group_set>
+          <group name="fieldgroup"/>
+        </group_set>
+      </onChange>
+    </element>
+    <element name="radiotoggle" type="radio" label="Radio Toggle">
+      <onChange>
+        <key name="none">NONE</key>
+        <key name="options">options</key>
+        <key name="name">name</key>
+        <key name="_action">showonly</key>
+        <key name="all">ALL</key>
+        <group_set>
+          <group name="name"/>
+          <group name="options"/>
+        </group_set>
+      </onChange>
+      <options>
+        <opt value="all" label="Show All"/>
+        <opt value="name" label="Show Name Only"/>
+        <opt value="options" label="Show Options Only"/>
+        <opt value="none" label="Show None"/>
+      </options>
+    </element>
+    <element name="selecttoggle" type="select" label="Select Toggle">
+      <onChange>
+        <key name="none">NONE</key>
+        <key name="options">options</key>
+        <key name="name">name</key>
+        <key name="_action">showonly</key>
+        <key name="all">ALL</key>
+        <group_set>
+          <group name="name"/>
+          <group name="options"/>
+        </group_set>
+      </onChange>
+      <options>
+        <opt value="all" label="Show All"/>
+        <opt value="name" label="Show Name Only"/>
+        <opt value="options" label="Show Options Only"/>
+        <opt value="none" label="Show None"/>
+      </options>
+    </element>
+    <element name="fieldgroup" type="fieldset">
+      <elements>
+        <element name="name" type="textfield" label="Name"/>
+        <element name="options" type="radio" label="Options">
+          <options>
+            <opt value="nap" label="Take a nap"/>
+            <opt value="tv" label="Watch TV"/>
+            <opt value="cheerleader" label="Save the cheerleader"/>
+          </options>
+        </element>
+      </elements>
+    </element>
+  </elements>
+</endpoint>

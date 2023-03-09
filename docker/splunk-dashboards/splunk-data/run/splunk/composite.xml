@@ -1,0 +1,443 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<componentConfig>
+   <component>
+      <!-- NOTE: serverName is not set in this file anymore.  Instead, -->
+      <!--       set serverName under [general] in server.conf.        -->
+      <pipeline name="indexerPipe">
+         <processor name="indexIn" plugin="queueinputprocessor">
+            <config>
+               <queueName>indexQueue</queueName>
+            </config>
+         </processor>
+         <processor name="latencytracker" plugin="latencytrackerprocessor">
+            <config/>
+         </processor>
+         <processor name="destination-key-processor" plugin="destinationkeyprocessor">
+            <config>
+                               </config>
+         </processor>
+         <processor name="index_thruput" plugin="thruputprocessor">
+            <config>
+               <key>_raw</key>
+               <timeIntervalSecs>30</timeIntervalSecs>
+            </config>
+         </processor>
+         <processor name="s2soverhttpoutput" plugin="s2soverhttpoutputprocessor">
+            <config>
+                               </config>
+         </processor>
+         <processor name="tcp-output-generic-processor" plugin="tcpoutputprocessor">
+            <config>
+                             </config>
+         </processor>
+         <processor name="syslog-output-generic-processor" plugin="syslogoutputprocessor">
+            <config>
+                             </config>
+         </processor>
+         <processor name="indexandforward" plugin="indexandforwardprocessor">
+            <config>
+                             </config>
+         </processor>
+         <processor name="signing" plugin="signingprocessor">
+            <config>
+                            </config>
+         </processor>
+         <processor name="indexer" plugin="indexprocessor">
+            <config/>
+         </processor>
+      </pipeline>
+      <!-- this pipeline will throw away any events passed to it -->
+      <pipeline name="dev-null">
+         <processor name="nullQueue" plugin="queueinputprocessor">
+            <config>
+               <queueName>nullQueue</queueName>
+            </config>
+         </processor>
+      </pipeline>
+      <pipeline name="fifo" type="startup">
+         <processor name="fifo" plugin="fifoinputprocessor">
+            <config>
+					</config>
+         </processor>
+         <processor name="sendOut" plugin="queueoutputprocessor">
+            <config>
+               <queueName>parsingQueue</queueName>
+            </config>
+         </processor>
+      </pipeline>
+      <pipeline name="remotequeueinput" type="startup">
+         <processor name="remotequeueinput" plugin="remotequeueinputprocessor">
+            <config>
+		</config>
+         </processor>
+         <processor name="sendOut" plugin="queueoutputprocessor">
+            <config>
+               <!-- Data retrieved from remote queue is parsed pdata so it's sent
+			     directly to indexQueue -->
+               <queueName>indexQueue</queueName>
+            </config>
+         </processor>
+      </pipeline>
+      <pipeline name="tcp" type="startup">
+         <processor name="tcp" plugin="tcpinputprocessor">
+            <config>
+               <!-- To configure an input, use inputs.conf -->
+               <!-- Arriving events are placed on an input queue of this size -->
+               <queueSize>1000</queueSize>
+            </config>
+         </processor>
+         <processor name="sendOut" plugin="queueoutputprocessor">
+            <config>
+               <queueName>parsingQueue</queueName>
+            </config>
+         </processor>
+      </pipeline>
+      <pipeline name="udp" type="startup">
+         <processor name="udp" plugin="udpinputprocessor">
+            <config>
+			</config>
+         </processor>
+         <processor name="residentSendOut" plugin="queueoutputprocessor">
+            <config>
+               <queueName>parsingQueue</queueName>
+            </config>
+         </processor>
+      </pipeline>
+      <pipeline name="exec" type="startup">
+         <processor name="exec" plugin="execprocessor">
+            <config>
+			</config>
+         </processor>
+         <processor name="sendOut" plugin="queueoutputprocessor">
+            <config>
+               <queueName>parsingQueue</queueName>
+            </config>
+         </processor>
+      </pipeline>
+      <pipeline name="fschangemanager" type="startup">
+         <processor name="fschangemanager" plugin="fschangemanagerprocessor">
+            <config>
+             </config>
+         </processor>
+         <processor name="sendIndex" plugin="queueoutputprocessor">
+            <config>
+               <queueName>parsingQueue</queueName>
+            </config>
+         </processor>
+      </pipeline>
+      <pipeline name="stashparsing" type="startup">
+         <processor name="readerIn" plugin="queueinputprocessor">
+            <config>
+               <queueName>stashparsing</queueName>
+            </config>
+         </processor>
+         <processor name="utf8" plugin="utf8processor">
+            <config/>
+         </processor>
+         <processor name="linebreaker" plugin="linebreakingprocessor">
+            <config/>
+         </processor>
+         <processor name="header" plugin="headerprocessor">
+            <config/>
+         </processor>
+         <!-- stash_new doesn't need aggregation, but aggregatorprocessor does timestamping 
+                     so we need to aggregate before changing the sourcetype -->
+         <processor name="aggregator" plugin="aggregatorprocessor">
+            <config> </config>
+         </processor>
+         <!-- we need this here to rename the sourcetype to stash -->
+         <processor name="regexreplacement" plugin="regexextractionprocessor">
+            <config/>
+         </processor>
+         <processor name="sendOut" plugin="queueoutputprocessor">
+            <config>
+               <queueName>indexQueue</queueName>
+            </config>
+         </processor>
+      </pipeline>
+      <pipeline name="structuredparsing" type="startup">
+         <processor name="readerIn" plugin="queueinputprocessor">
+            <config>
+               <queueName>structuredParsingQueue</queueName>
+            </config>
+         </processor>
+         <processor name="utf8" plugin="utf8processor">
+            <config/>
+         </processor>
+         <processor name="linebreaker" plugin="linebreakingprocessor">
+            <config/>
+         </processor>
+         <processor name="metrics" plugin="metricsprocessor">
+            <config/>
+         </processor>
+         <processor name="aggregator" plugin="aggregatorprocessor">
+            <config/>
+         </processor>
+         <processor name="latencytracker" plugin="latencytrackerprocessor">
+            <config/>
+         </processor>
+         <processor name="regexreplacement" plugin="regexextractionprocessor">
+            <config/>
+         </processor>
+         <!-- SPL-162303: Adding metricschema processor in UF -->
+         <processor name="metricschema" plugin="metricschemaprocessor">
+            <config/>
+         </processor>
+         <processor name="sendOut" plugin="queueoutputprocessor">
+            <config>
+               <queueName>parsingQueue</queueName>
+            </config>
+         </processor>
+      </pipeline>
+      <pipeline name="archivePipe" type="startup">
+         <processor name="archiveProcessor" plugin="archiveprocessor">
+            <config>
+               <queueName>TailingQ</queueName>
+            </config>
+         </processor>
+         <processor name="sendOut" plugin="queueoutputprocessor">
+            <config>
+               <queueName>parsingQueue</queueName>
+            </config>
+         </processor>
+      </pipeline>
+      <pipeline name="scheduler" type="startup">
+         <processor name="LiveSplunks" plugin="schedulerlaunchprocessor">
+            <config>
+               <!-- Start the saved splunk scheduler -->
+               <savedSplunker> </savedSplunker>
+            </config>
+         </processor>
+      </pipeline>
+      <pipeline name="remotequeuetyping" type="startup">
+         <processor name="readerIn" plugin="queueinputprocessor">
+            <config>
+               <queueName>typingQueue</queueName>
+            </config>
+         </processor>
+         <processor name="regexreplacement" plugin="regexextractionprocessor">
+            <config/>
+         </processor>
+         <processor name="metricschema" plugin="metricschemaprocessor">
+            <config/>
+         </processor>
+         <processor name="annotator" plugin="annotatorprocessor">
+            <config/>
+         </processor>
+         <processor name="previewOut" plugin="previewoutputprocessor">
+            <config/>
+         </processor>
+         <processor name="sendOut" plugin="queueoutputprocessor">
+            <config>
+               <queueName>remoteOutputQueue</queueName>
+            </config>
+         </processor>
+      </pipeline>
+      <pipeline name="remotequeueruleset" type="startup">
+         <processor name="readerIn" plugin="queueinputprocessor">
+            <config>
+               <queueName>rulesetQueue</queueName>
+            </config>
+         </processor>
+         <processor name="regexreplacement" plugin="regexextractionprocessor">
+            <config>
+               <rulesetOnly>true</rulesetOnly>
+            </config>
+         </processor>
+         <processor name="sendOut" plugin="queueoutputprocessor">
+            <config>
+               <queueName>remoteOutputQueue</queueName>
+            </config>
+         </processor>
+      </pipeline>
+      <pipeline name="remotequeueoutput" type="startup">
+         <processor name="readerIn" plugin="queueinputprocessor">
+            <config>
+               <queueName>remoteOutputQueue</queueName>
+            </config>
+         </processor>
+         <processor name="destination-key-processor" plugin="destinationkeyprocessor">
+            <config/>
+         </processor>
+         <processor name="remotequeueoutput" plugin="remotequeueoutputprocessor">
+            <config/>
+         </processor>
+         <processor name="sendOut" plugin="queueoutputprocessor">
+            <config>
+               <queueName>indexQueue</queueName>
+            </config>
+         </processor>
+      </pipeline>
+      <pipeline name="rfsoutput" type="startup">
+         <processor name="rfsIn" plugin="queueinputprocessor">
+            <config>
+               <queueName>rfsQueue</queueName>
+            </config>
+         </processor>
+         <!-- To configure an blob/object store, use outputs.conf -->
+         <processor name="rfsout" plugin="rfsoutputprocessor">
+            <config>
+            </config>
+         </processor>
+      </pipeline>
+      <pipeline name="parsing" type="startup">
+         <processor name="readerIn" plugin="queueinputprocessor">
+            <config>
+               <queueName>parsingQueue</queueName>
+            </config>
+         </processor>
+         <processor name="utf8" plugin="utf8processor">
+            <config>
+			</config>
+         </processor>
+         <processor name="linebreaker" plugin="linebreakingprocessor">
+            <config>
+			</config>
+         </processor>
+         <processor name="chunkedlinebreaker" plugin="chunkedlbprocessor">
+            <config>
+			</config>
+         </processor>
+         <processor name="header" plugin="headerprocessor">
+            <config>
+			</config>
+         </processor>
+         <processor name="metrics" plugin="metricsprocessor">
+            <config/>
+         </processor>
+         <processor name="sendOut" plugin="queueoutputprocessor">
+            <config>
+               <queueName>aggQueue</queueName>
+            </config>
+         </processor>
+         <!-- The following processors are turned off by default but are enabled when the LWF app is on -->
+         <!-- The LWF app will in turn turn off most of the above pipleine -->
+         <processor name="thruput" plugin="thruputprocessor">
+            <config>
+               <key>_raw</key>
+               <timeIntervalSecs>30</timeIntervalSecs>
+            </config>
+         </processor>
+         <processor name="httpoutchunkbreaker" plugin="linebreakingprocessor">
+            <config>
+               <httpchunkbreakermode>true</httpchunkbreakermode>
+            </config>
+         </processor>
+         <processor name="s2soverhttpoutput-light-forwarder" plugin="s2soverhttpoutputprocessor">
+            <config>
+               <fwdtype>lwf</fwdtype>
+            </config>
+         </processor>
+         <processor name="tcp-output-light-forwarder" plugin="tcpoutputprocessor">
+            <config>
+               <fwdtype>lwf</fwdtype>
+            </config>
+         </processor>
+         <!-- used to forward control data to indexer needed for clean shutdown -->
+         <processor name="send-out-light-forwarder" plugin="controlqueueoutputprocessor">
+            <config>
+               <queueName>indexQueue</queueName>
+            </config>
+         </processor>
+      </pipeline>
+      <pipeline name="merging" type="startup">
+         <processor name="readerIn" plugin="queueinputprocessor">
+            <config>
+               <queueName>aggQueue</queueName>
+            </config>
+         </processor>
+         <processor name="aggregator" plugin="aggregatorprocessor">
+            <config>
+		           </config>
+         </processor>
+         <processor name="sendOut" plugin="queueoutputprocessor">
+            <config>
+               <queueName>typingQueue</queueName>
+            </config>
+         </processor>
+      </pipeline>
+      <pipeline name="typing" type="startup">
+         <processor name="readerIn" plugin="queueinputprocessor">
+            <config>
+               <queueName>typingQueue</queueName>
+            </config>
+         </processor>
+         <processor name="tee" plugin="teeprocessor">
+            <config/>
+         </processor>
+         <processor name="regexreplacement" plugin="regexextractionprocessor">
+            <config/>
+         </processor>
+         <processor name="metricschema" plugin="metricschemaprocessor">
+            <config/>
+         </processor>
+         <processor name="annotator" plugin="annotatorprocessor">
+            <config>
+		           </config>
+         </processor>
+         <processor name="previewOut" plugin="previewoutputprocessor">
+            <config>
+			</config>
+         </processor>
+         <processor name="sendOut" plugin="queueoutputprocessor">
+            <config>
+               <queueName>indexQueue</queueName>
+            </config>
+         </processor>
+      </pipeline>
+      <pipeline name="ruleset" type="startup">
+         <processor name="readerIn" plugin="queueinputprocessor">
+            <config>
+               <queueName>rulesetQueue</queueName>
+            </config>
+         </processor>
+         <processor name="regexreplacement" plugin="regexextractionprocessor">
+            <config>
+               <rulesetOnly>true</rulesetOnly>
+            </config>
+         </processor>
+         <processor name="sendOut" plugin="queueoutputprocessor">
+            <config>
+               <queueName>indexQueue</queueName>
+            </config>
+         </processor>
+      </pipeline>
+      <pipeline name="vix" type="startup">
+         <processor name="readerIn" plugin="queueinputprocessor">
+            <config>
+               <queueName>vixQueue</queueName>
+            </config>
+         </processor>
+         <processor name="utf8" plugin="utf8processor">
+            <config/>
+         </processor>
+         <processor name="linebreaker" plugin="linebreakingprocessor">
+            <config/>
+         </processor>
+         <processor name="header" plugin="headerprocessor">
+            <config/>
+         </processor>
+         <processor name="aggregator" plugin="aggregatorprocessor">
+            <config/>
+         </processor>
+         <processor name="regexreplacement" plugin="regexextractionprocessor">
+            <config/>
+         </processor>
+         <!--
+
+                <processor name="annotator" plugin="annotatorprocessor">
+                        <config/>
+                </processor>
+-->
+         <processor name="previewOut" plugin="previewoutputprocessor">
+            <config/>
+         </processor>
+      </pipeline>
+      <common>
+         <name>Splunk Main</name>
+         <type>pipeline</type>
+      </common>
+   </component>
+</componentConfig>

@@ -1,0 +1,11 @@
+Store the Certificate Revocation Lists (CRLs) in this directory. The CRL file
+must be in PEM format with the .pem file extension.
+
+It is the user's responsibility to keep CRLs up to date. The files are
+loaded at Splunk startup and are automatically updated at restart. To
+update CRL info while Splunk is running, run 'splunk reload crl' in
+the CLI. You must have 'edit_server_crl' capability to run this command.
+By default 'edit_server_crl' is only assigned to the 'admin' role.
+
+NOTE: Currently, the ability to use CRLs is on by default in Common Criteria
+      mode. It is disabled by default.

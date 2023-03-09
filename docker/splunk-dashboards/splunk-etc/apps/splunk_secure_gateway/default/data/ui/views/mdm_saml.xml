@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<view template="splunk_secure_gateway:/templates/mdm_saml.html" type="html">
+	<label>MDM with SAML</label>
+</view>

@@ -1,0 +1,21 @@
+#   Version 9.0.3
+#
+# This is an example user-seed.conf.  Use this file to create an initial login.
+#
+# NOTE: When starting Splunk for first time, hash of password is stored in
+# $SPLUNK_HOME/etc/system/local/user-seed.conf and password file is seeded
+# with this hash. This file can also be used to set default username and
+# password, if $SPLUNK_HOME/etc/passwd is not present. If the $SPLUNK_HOME/etc/passwd
+# file is present, the settings in this file (user-seed.conf) 
+# are not used.
+#
+# To use this configuration, copy the configuration block into user-seed.conf 
+# in $SPLUNK_HOME/etc/system/local/. You must restart Splunk to enable configurations.
+#
+# To learn more about configuration files (including precedence) please see the documentation 
+# located at http://docs.splunk.com/Documentation/Splunk/latest/Admin/Aboutconfigurationfiles
+
+
+[user_info]
+USERNAME = admin
+HASHED_PASSWORD = $6$TOs.jXjSRTCsfPsw$2St.t9lH9fpXd9mCEmCizWbb67gMFfBIJU37QF8wsHKSGud1QNMCuUdWkD8IFSgCZr5.W6zkjmNACGhGafQZj1

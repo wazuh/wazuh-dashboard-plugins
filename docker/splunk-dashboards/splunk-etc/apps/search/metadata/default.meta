@@ -1,0 +1,209 @@
+
+# Application-level permissions
+
+[]
+access = read : [ * ], write : [ admin, power ]
+
+### MANAGER
+
+[manager]
+access = read : [ * ], write : [ admin ]
+export = system
+
+
+
+
+### VIEWS
+
+[views/search_status]
+access = read : [ admin ], write : [ admin ]
+
+[views/search_detail_activity]
+access = read : [ admin ], write : [ admin ]
+
+[views/search_activity_by_user]
+access = read : [ admin ], write : [ admin ]
+
+[views/scheduler_status]
+access = read : [ admin ], write : [ admin ]
+
+[views/scheduler_status_errors]
+access = read : [ admin ], write : [ admin ]
+
+[views/scheduler_savedsearch]
+access = read : [ admin ], write : [ admin ]
+
+[views/scheduler_user_app]
+access = read : [ admin ], write : [ admin ]
+
+[views/status_index]
+access = read : [ admin ], write : [ admin ]
+
+[views/splunkclouduf]
+access = read : [ admin ], write : [ admin ]
+
+[views/flashtimeline]
+export = system
+
+[views/basic_charting]
+export = system
+
+[views/show_source]
+export = system
+
+[views/show_source.prod_lite]
+export = system
+
+[views/charting]
+export = system
+
+[views/report_builder_define_data]
+export = system
+
+[views/report_builder_display]
+export = system
+
+[views/report_builder_format_report]
+export = system
+
+[views/report_builder_print]
+export = system
+
+[views/search]
+export = system
+
+[views/dashboards]
+export = system
+
+[views/alert]
+export = system
+
+[views/alerts]
+export = system
+
+[views/reports]
+export = system
+
+[views/report]
+export = system
+
+[views/pivot]
+export = system
+
+[views/data_models]
+export = system
+
+[views/show_sources]
+export = system
+
+[views/data_model_explorer]
+export = system
+
+[views/data_model_editor]
+export = system
+
+[views/data_model_manager]
+export = system
+
+[views/field_extractor]
+export = system
+
+[views/datasets]
+export = system
+
+[views/dataset]
+export = system
+
+[views/job_manager]
+export = system
+
+[views/orphaned_scheduled_searches]
+access = read : [ admin ], write : [ admin ]
+
+[views/integrity_check_of_installed_files]
+access = read : [ admin ], write : [ admin ]
+
+[views/job_details_dashboard]
+access = read : [ * ], write : [ admin ]
+
+[views/mod_setup]
+export = system
+
+[views/table]
+export = system
+
+[views/jquery_upgrade]
+access = read : [ admin ], write : [ admin ]
+
+### VIEWSTATES: even normal users should be able to create shared viewstates
+
+[viewstates]
+access = read : [ * ], write : [ * ]
+export = system
+
+### EVENT TYPES
+
+[eventtypes]
+export = system
+
+
+### PROPS
+
+[props]
+export = system
+
+
+### TRANSFORMS
+
+[transforms]
+export = system
+
+
+### TAGS
+
+[tags]
+export = system
+
+### SAVED SEARCHES
+
+[savedsearches/Errors%20in%20the%20last%2024%20hours]
+access = read : [ * ], write : [ admin ]
+
+[savedsearches/Errors%20in%20the%20last%20hour]
+access = read : [ * ], write : [ admin ]
+
+[savedsearches/Messages%20by%20minute%20last%203%20hours]
+access = read : [ admin ], write : [ admin ]
+
+[savedsearches/Splunk%20errors%20last%2024%20hours]
+access = read : [ admin ], write : [ admin ]
+
+### Alert Actions
+[alert_actions]
+access = read : [ * ], write : [ admin, power ]
+export = system
+
+### COMMANDS
+
+[commands]
+access = read : [ * ], write : [ admin ]
+export = system
+
+[commands/mappy]
+access = read : [ admin ], write : [ admin ]
+
+[commands/reducepy]
+access = read : [ admin ], write : [ admin ]
+
+
+
+### LOOKUP TABLES
+
+[lookups]
+export = system
+
+### SEARCH SCRIPTS
+
+[searchscripts]
+access = read : [ * ], write : [ admin ]
+export = system

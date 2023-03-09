@@ -1,0 +1,242 @@
+@import "./Master.pcss";
+
+.splunkmonitoringconsole-views-overview-distributedmode-classic {
+    padding: 0 15px 0 20px;
+
+}
+
+.dmc-distributed-panel {
+  background-color: $white;
+  min-height: 380px;
+  margin-right: 5px;
+  margin-bottom: 5px;
+  display: inline-block;
+  vertical-align: top;
+  width: calc(33.3333% - 5px);
+
+  &.dmc-panel-loading {
+    background-color: $gray80;
+  }
+
+  .dmc-panel-loading-icon {
+    width: 32px;
+    height: 32px;
+    transform: translate(0, 150px);
+    background-image: url("./loading_white.gif");
+    margin: auto;
+  }
+
+  .dmc-panel-loading-text {
+    text-align: center;
+    transform: translate(0, 150px);
+  }
+
+  .dmc-panel-header {
+    border-bottom: 1px solid $borderLightColor;
+    padding: 15px;
+
+    .dmc-panel-title-section {
+      display: inline-block;
+      .dmc-panel-title {
+        font-size: $dmcPanelTitleFontSize;
+        line-height: 26px;
+      }
+
+      .dmc-panel-title-description {
+        font-size: 14px;
+        line-height: 16px;
+      }
+    }
+  }
+
+  .dmc-warning-message {
+    background-color: $errorColor;
+    color: $white;
+    padding: 10px 20px;
+    display: none;
+
+    a {
+      color: $white;
+    }
+  }
+
+  .dmc-warning-message.active {
+    display: block;
+  }
+
+  .dmc-single-values-section {
+    /*  a section with a label and multiple single value fields, for example, the indexing rate section */
+    text-align: center;
+
+    .dmc-single-values-section-label {
+      padding: 20px 20px 10px 20px;
+      color: $textGray;
+      text-transform: uppercase;
+    }
+  }
+
+  .dmc-span-50 {
+    /* customized grid system */
+    display: inline-block;
+    width: 49.5%;
+  }
+
+  .dmc-span-60 {
+    width: 59.5%;
+    margin-left: auto;
+    margin-right: auto;
+    min-width: 300px
+  }
+
+  .dmc-span-25 {
+    /* customized grid system */
+    display: inline-block;
+    width: 24.5%;
+  }
+
+  .dmc-span-80 {
+    /* this means there's one element in a row, which will be in the center of the row and has width of 86% */
+    width: 86%;
+    margin-left: auto;
+    margin-right: auto;
+    min-width: 300px
+  }
+
+  .dmc-span-90 {
+    width: 90%;
+    padding-left: 5%;
+    padding-right: 5%;
+  }
+
+  .dmc-span-30 {
+    width: 30%;
+    padding-left: 35.5%;
+    padding-right: 7%;
+  }
+
+  .dmc-single-values-row {
+    display: inline-block;
+
+    .dmc-peers-searchable {
+      display: inline-block;
+    }
+
+    .dmc-indexes-searchable {
+      display: inline-block;
+    }
+
+    .dmc-bucket-copies {
+      display: inline-block;
+    }
+
+    .dmc-raw-data-size {
+      display: inline-block;
+    }
+  }
+
+  .dmc-single-value {
+    display: inline-block;
+    padding: 2px 10px;
+    vertical-align: top;
+
+    .dmc-single-value-result {
+      font-size: 24px;
+      line-height: 26px;
+      font-weight: bold;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .dmc-single-value-under-lable {
+      font-size: $fontSizeSmall;
+      text-transform: uppercase;
+    }
+  }
+
+  .dmc-resource-usage-thresholds {
+    display: block;
+    clear: both;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+    margin-bottom: 5px;
+
+    .dmc-resource-usage-before-label {
+      display: inline-block;
+      position: relative;
+      text-align: right;
+      transform: translateY(-80%);
+      width: 50px;
+    }
+    .dmc-resource-usage-content {
+      display: inline-block;
+      position: relative;
+    }
+
+    .dmc-resource-usage-after-label {
+      display: inline-block;
+      position: relative;
+      transform: translateY(-20%);
+      text-align: left;
+    }
+  }
+
+  .dmc-progress-viz {
+    display: block;
+    padding: 10px 0 5px 0;
+
+    .dmc-progress-bar-container {
+      display: inline-block;
+      width: 50%;
+      height: 20px;
+      overflow: hidden;
+      background-color: $gray96;
+      border-radius: 4px;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
+
+      .dmc-progress-bar {
+        float: left;
+        width: 0;
+        height: 100%;
+        font-size: 12px;
+        line-height: 20px;
+        color: $white;
+        text-align: center;
+        background-color: $brandColor;
+        box-shadow: inset 0 -1px 0 rgba(0,0,0,.15);
+        transition: width .6s ease;
+      }
+    }
+
+    .dmc-progress-bar-before-label {
+      display: inline-block;
+      padding-right: 1%;
+      vertical-align: top;
+      line-height: 20px;
+      text-align: right;
+      width: 23%
+    }
+
+    .dmc-progress-bar-after-label {
+      display: inline-block;
+      padding-left: 1%;
+      vertical-align: top;
+      line-height: 20px;
+      text-align: left;
+      width: 23%
+    }
+  }
+
+  a.dmc-single-value,a.dmc-progress-viz {
+    color: $textColor;
+
+    &:hover {
+      color: $linkColor;
+      text-decoration: none;
+      background-color: $gray92;
+      border-radius: $borderRadius;
+      cursor: pointer;
+    }
+  }
+}

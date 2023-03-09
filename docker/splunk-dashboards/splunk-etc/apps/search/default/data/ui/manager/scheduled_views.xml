@@ -1,0 +1,164 @@
+<endpoint name="scheduled/views" showAppContext="1">
+  <header>View PDF scheduling</header>
+  <breadcrumb>
+    <parent hidecurrent="False">ui</parent>
+    <name>View PDF scheduling</name>
+  </breadcrumb>
+
+  <elements>
+    <element name="basicgroup" type="fieldset">
+      <view name="list"/>
+      <view name="edit"/>
+      <view name="create"/>
+      <view name="modal"/>
+      <elements>
+        <element name="name" label="Name">
+          <view name="list"/>
+        </element>
+        <element name="next_scheduled_time" label="Scheduled Time">
+          <view name="list"/>
+        </element>
+        <element name="schedulenalert" type="fieldset">
+          <view name="edit"/>
+          <view name="create"/>
+          <view name="modal"/>
+          <key name="legend">Schedule and alert</key>
+          <elements>
+            <element name="is_scheduled" type="checkbox" label="Schedule Emailed PDFs of this view">
+              <onChange>
+                <key name="0">NONE</key>
+                <key name="1">ALL</key>
+                <key name="_action">showonly</key>
+                <group_set>
+                  <group name="schedulegroup"/>
+                  <group name="alertgroup"/>
+                  <group name="summarygroup"/>
+                </group_set>
+              </onChange>
+              <view name="list"/>
+              <view name="edit"/>
+              <view name="create"/>
+              <view name="modal"/>
+              <key name="submitValueAdd">1 if form_data.get('is_scheduled') == '1' else 0</key>
+              <key name="submitValueEdit">1 if form_data.get('is_scheduled') == '1' else 0</key>
+              <key name="processValueList">value=="1" and "Enabled" or "Disabled"</key>
+              <key name="processValueEdit">0 if element.get("disabled") else value</key>
+              <key name="disableIfNotInEAIAttributes" />
+            </element>
+            <element name='edit_email_link' type='savedsearchredirectlink'>
+              <view name="edit"/>
+            </element>
+          </elements>
+        </element>
+        <element name="schedulegroup" type="fieldset">
+          <view name="list"/>
+          <view name="edit"/>
+          <view name="create"/>
+          <view name="modal"/>
+          <elements>
+            <element name="spl-ctrl_schedType" type="select" label="Schedule type">
+              <onChange>
+                <key name="_action">showonly</key>
+                <key name="basic_cron">spl-ctrl_basic_cron</key>
+                <group_set>
+                  <group name="spl-ctrl_basic_cron"/>
+                  <group name="cron_schedule"/>
+                </group_set>
+                <key name="cron_schedule">cron_schedule</key>
+              </onChange>
+              <options>
+                <opt value="basic_cron" label="Basic"/>
+                <opt value="cron_schedule" label="Cron"/>
+              </options>
+              <view name="create"/>
+              <view name="edit"/>
+              <view name="modal"/>
+              <key name="processValueEdit">form_defaults.get('cron_schedule') and form_defaults['cron_schedule'] in [ '* * * * *', '*/5 * * * *', '*/30 * * * *', '0 * * * *' ,'0 */12 * * *', '0 0 * * *', '0 18 * * *', '0 0 * * 6' ] and (form_defaults.__setitem__('spl-ctrl_basic_cron', form_defaults['cron_schedule']) or True) and 'basic_cron' or 'cron_schedule'</key>
+              <key name="processValueAdd">'basic_cron'</key>
+            </element>
+            <element name="spl-ctrl_basic_cron" type="select" label="Run every">
+              <options>
+                <opt value="" label="choose..."/>
+                <opt value="* * * * *" label="minute"/>
+                <opt value="*/5 * * * *" label="5 minutes"/>
+                <opt value="*/30 * * * *" label="30 minutes"/>
+                <opt value="0 * * * *" label="hour"/>
+                <opt value="0 */12 * * *" label="12 hours"/>
+                <opt value="0 0 * * *" label="day at midnight"/>
+                <opt value="0 18 * * *" label="day at 6pm"/>
+                <opt value="0 0 * * 6" label="week (every Saturday at midnight)"/>
+              </options>
+              <view name="edit"/>
+              <view name="create"/>
+              <view name="modal"/>
+            </element>
+            <element name="cron_schedule" type="textfield" label="Cron schedule">
+              <view name="edit"/>
+              <view name="create"/>
+              <view name="modal"/>
+              <key name="submitValueAdd">value if form_data['spl-ctrl_schedType']=='cron_schedule' else form_data['spl-ctrl_basic_cron']</key>
+              <key name="submitValueEdit">value if form_data['spl-ctrl_schedType']=='cron_schedule' else form_data['spl-ctrl_basic_cron']</key>
+              <key name="exampleText">Enter a cron-style schedule. &lt;br /&gt; For example '*/5 * * * *' (every 5 minutes) or '0 21 * * *' (every day at 9 PM).</key>
+              <key name="disableIfNotInEAIAttributes" />
+              <key name="disableClientSideRequire" />
+            </element>
+        <element name="action.email.to" type="textfield" label="To">
+          <view name="list"/>
+          <view name="edit"/>
+          <view name="create"/>
+          <view name="modal"/>
+          <key name="exampleText">Enter a comma-separated list of email addresses. &lt;br /&gt; You must use a valid MTA to send email.  Set this in Email settings.</key>
+          <key name="disableIfNotInEAIAttributes" />
+        </element>
+        <element name="action.email.cc" type="textfield" label="CC">
+          <view name="edit"/>
+          <view name="create"/>
+          <view name="modal"/>
+          <key name="exampleText">Enter a comma-separated list of email addresses. &lt;br /&gt; You must use a valid MTA to send email.  Set this in Email settings.</key>  
+          <key name="disableIfNotInEAIAttributes" />        
+        </element>
+        <element name="action.email.bcc" type="textfield" label="BCC">
+          <view name="edit"/>
+          <view name="create"/>
+          <view name="modal"/>
+          <key name="exampleText">Enter a comma-separated list of email addresses. &lt;br /&gt; You must use a valid MTA to send email.  Set this in Email settings.</key> 
+          <key name="disableIfNotInEAIAttributes" />         
+        </element>
+        <element name="action.email.papersize" type="select" label="Paper Size">
+            <options>
+                <opt value="letter" label="Letter"/>
+                <opt value="legal" label="Legal"/>
+                <opt value="a2" label="A2"/>
+                <opt value="a3" label="A3"/>
+                <opt value="a4" label="A4"/>
+                <opt value="a5" label="A5"/>
+            </options>
+            <view name="list"/>
+            <view name="edit"/>
+            <view name="create"/>
+            <view name="modal"/>
+        </element>
+        <element name="action.email.paperorientation" type="select" label="Orientation">
+            <options>
+                <opt value="portrait" label="Portrait"/>
+                <opt value="landscape" label="Landscape"/>
+            </options>
+            <view name="list"/>
+            <view name="edit"/>
+            <view name="create"/>
+            <view name="modal"/>
+        </element>
+          </elements>
+        </element>
+        <element name="eai:acl.owner" label="Owner">
+          <view name="list"/>
+          <key name="processValueList">entity['eai:acl']['owner'] == 'nobody' and _('No owner') or entity['eai:acl']['owner']</key>
+        </element>
+        <element name="eai:acl.app" label="App">
+          <view name="list"/>
+          <key name="processValueList">entity['eai:acl']['app'] or ""</key>
+        </element>
+      </elements>
+    </element>
+  </elements>
+</endpoint>

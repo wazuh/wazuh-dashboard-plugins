@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="42px" height="42px" viewBox="0 0 42 42" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <!-- Generator: Sketch 3.0.4 (8054) - http://www.bohemiancoding.com/sketch -->
+    <title>LicenseServer</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <path d="M27.34,15.016 L26.94,15.886 L26.09,15.444 L25.996,16.396 L25.048,16.256 L25.268,17.19 L24.324,17.362 L24.836,18.172 L24,18.642 L24.748,19.242 L24.108,19.958 L25.01,20.284 L24.64,21.168 L25.598,21.184 L25.534,22.14 L26.446,21.844 L26.696,22.77 L27.462,22.192 L28,22.986 L28.538,22.192 L29.304,22.77 L29.554,21.844 L30.466,22.14 L30.402,21.184 L31.36,21.168 L30.99,20.284 L31.892,19.958 L31.252,19.242 L32,18.642 L31.164,18.172 L31.676,17.362 L30.732,17.19 L30.952,16.256 L30.004,16.396 L29.912,15.444 L29.06,15.886 L28.662,15.016 L28,15.708 L27.34,15.016 L27.34,15.016 Z M8,39 L34,39 L34,11 L8,11 L8,39 Z M10,7 L28,7 L28,5 L10,5 L10,7 Z M36,3 L36,39 C36,40.102 35.1,41 34,41 L8,41 C6.9,41 6,40.102 6,39 L6,3 C6,1.9 6.9,1 8,1 L34,1 C35.1,1 36,1.9 36,3 L36,3 Z M10,35 L26,35 L26,33 L10,33 L10,35 Z M10,29 L30,29 L30,27 L10,27 L10,29 Z M10,23 L22,23 L22,21 L10,21 L10,23 Z M10,15 L22,15 L22,17 L10,17 L10,15 Z" id="LicenseServer-3" fill="#1B1A19" sketch:type="MSShapeGroup"></path>
+    </g>
+</svg>

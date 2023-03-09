@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<view type="redirect" target="pivot" isDashboard="False">
+    <label>Datasets</label>
+</view>

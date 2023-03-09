@@ -1,0 +1,327 @@
+#   Version 9.0.3
+#
+# This is an example transforms.conf.  Use this file to create regexes and
+# rules for transforms.  Use this file in tandem with props.conf.
+#
+# To use one or more of these configurations, copy the configuration block
+# into transforms.conf in $SPLUNK_HOME/etc/system/local/. You must restart
+# Splunk to enable configurations.
+#
+# To learn more about configuration files (including precedence) please see
+# the documentation located at
+# http://docs.splunk.com/Documentation/Splunk/latest/Admin/Aboutconfigurationfiles
+
+# Note: These are examples.  Replace the values with your own customizations.
+
+
+# Indexed field:
+
+[netscreen-error]
+REGEX =  device_id=\[w+\](?<err_code>[^:]+)
+FORMAT = err_code::$1
+WRITE_META = true
+
+
+# Override host:
+
+[hostoverride]
+DEST_KEY = MetaData:Host
+REGEX = \s(\w*)$
+FORMAT = host::$1
+
+
+# Extracted fields:
+
+[netscreen-error-field]
+REGEX = device_id=\[w+\](?<err_code>[^:]+)
+FORMAT = err_code::$1
+
+# Index-time evaluations:
+
+[discard-long-lines]
+INGEST_EVAL = queue=if(length(_raw) > 500, "nullQueue", "indexQueue")
+
+[split-into-sixteen-indexes-for-no-good-reason]
+INGEST_EVAL = index="split_" . substr(md5(_raw),1,1)
+
+[add-two-numeric-fields]
+INGEST_EVAL = loglen_raw=ln(length(_raw)), loglen_src=ln(length(source))
+
+# In this example the Splunk platform only creates the new index-time field if 
+# the hostname has a dot in it; assigning null() to a new field is a no-op:
+
+[add-hostdomain-field]
+INGEST_EVAL = hostdomain=if(host LIKE "%.%", replace(host,"^[^\\.]+\\.",""), null())
+
+# Static lookup table
+
+[mylookuptable]
+filename = mytable.csv
+
+# One-to-one lookup guarantees that the Splunk platform outputs a single 
+# lookup value for each input value. When no match exists, the Splunk platform 
+# uses the value for "default_match", which by default is nothing.
+
+[mylook]
+filename = mytable.csv
+max_matches = 1
+min_matches = 1
+default_match = 
+
+# Lookup and filter results:
+
+[myfilteredlookup]
+filename = mytable.csv
+filter = id<500 AND color="red"
+
+# external command lookup table:
+
+[myexternaltable]
+external_cmd = testadapter.py blah
+fields_list = foo bar
+
+# Temporal based static lookup table:
+
+[staticwtime]
+filename = mytable.csv
+time_field = timestamp
+time_format = %d/%m/%y %H:%M:%S
+
+# Mask sensitive data:
+
+[session-anonymizer]
+REGEX = (?m)^(.*)SessionId=\w+(\w{4}[&"].*)$
+FORMAT = $1SessionId=########$2
+DEST_KEY = _raw
+
+# Route to an alternate index:
+
+[AppRedirect]
+REGEX = (Application)
+DEST_KEY = _MetaData:Index
+FORMAT = Verbose
+
+# Extract comma-delimited values into fields:
+# This example assigns extracted values that do not have file names 
+# from _raw to field1, field2 and field3, in the order that the 
+# fields are extracted. 
+#If the Splunk platform extracts more than three values that do not 
+# have field names, then the Splunk platform ignores those values.
+
+[extract_csv]
+DELIMS = ","
+FIELDS = "field1", "field2", "field3"
+
+# This example extracts key-value pairs which are separated by '|'
+# while the key is delimited from value by '='
+
+[pipe_eq]
+DELIMS = "|", "="
+
+# This example extracts key-value pairs which are separated by '|' or
+# ';', while the key is delimited from value by '=' or ':'
+
+[multiple_delims]
+DELIMS = "|;", "=:"
+
+
+###### BASIC MODULAR REGULAR EXPRESSIONS DEFINITION START ###########
+# When you add a new basic modular regex you must add a comment that 
+# lists the fields that it extracts as named capturing groups. 
+# If there are no field names, note the placeholders 
+# for the group name as: Extracts: field1, field2....
+
+[all_lazy]
+REGEX = .*?
+
+[all]
+REGEX = .*
+
+[nspaces]
+# Matches one or more NON space characters:
+REGEX = \S+
+
+[alphas]
+# Matches a string containing only letters a-zA-Z:
+REGEX = [a-zA-Z]+
+
+[alnums]
+# Matches a string containing letters + digits:
+REGEX = [a-zA-Z0-9]+
+
+[qstring]
+# Matches a quoted "string" and extracts an unnamed variable
+# Name MUST be provided as: [[qstring:name]]
+# Extracts: empty-name-group (needs name)
+REGEX = "(?<>[^"]*+)"
+
+[sbstring]
+# Matches a string enclosed in [] and extracts an unnamed variable
+# Name must be provided as: [[sbstring:name]]
+# Extracts: empty-name-group (needs name)
+REGEX = \[(?<>[^\]]*+)\]
+
+[digits]
+REGEX = \d+
+
+[int]
+# Matches an integer or a hex number:
+REGEX = 0x[a-fA-F0-9]+|\d+
+
+[float]
+# Matches a float (or an int):
+REGEX = \d*\.\d+|[[int]]
+
+[octet]
+# Matches only numbers from 0-255 (one octet in an ip):
+REGEX = (?:2(?:5[0-5]|[0-4][0-9])|[0-1][0-9][0-9]|[0-9][0-9]?)
+
+[ipv4]
+# Matches a valid IPv4 optionally followed by :port_num. The octets in the IP
+# are also be validated in the 0-255 range.
+# Extracts: ip, port
+REGEX = (?<ip>[[octet]](?:\.[[octet]]){3})(?::[[int:port]])?
+
+[simple_url]
+# Matches a url of the form proto://domain.tld/uri
+# Extracts: url, domain
+REGEX = (?<url>\w++://(?<domain>[a-zA-Z0-9\-.:]++)(?:/[^\s"]*)?)
+
+[url]
+# Matches a url in the form of: proto://domain.tld/uri
+# Extracts: url, proto, domain, uri
+REGEX = (?<url>[[alphas:proto]]://(?<domain>[a-zA-Z0-9\-.:]++)(?<uri>/[^\s"]*)?)
+
+[simple_uri]
+# Matches a uri in the form of: /path/to/resource?query
+# Extracts: uri, uri_path, uri_query
+REGEX = (?<uri>(?<uri_path>[^\s\?"]++)(?:\\?(?<uri_query>[^\s"]+))?)
+
+[uri]
+# uri  = path optionally followed by query [/this/path/file.js?query=part&other=var]
+# path = root part followed by file        [/root/part/file.part]
+# Extracts: uri, uri_path, uri_root, uri_file, uri_query, uri_domain (optional if in proxy mode)
+REGEX = (?<uri>(?:\w++://(?<uri_domain>[^/\s]++))?(?<uri_path>(?<uri_root>/+(?:[^\s\?;=/]*+/+)*)(?<uri_file>[^\s\?;=?/]*+))(?:\?(?<uri_query>[^\s"]+))?)
+
+[hide-ip-address]
+# When you make a clone of an event with the sourcetype masked_ip_address, the clone's 
+# text is changed to mask the IP address.
+# The cloned event is further processed by index-time transforms and
+# SEDCMD expressions according to its new sourcetype.
+# In most scenarios an additional transform directs the
+# masked_ip_address event to a different index than the original data.
+REGEX = ^(.*?)src=\d+\.\d+\.\d+\.\d+(.*)$
+FORMAT = $1src=XXXXX$2
+DEST_KEY = _raw
+CLONE_SOURCETYPE = masked_ip_addresses
+
+# Set repeat_match to true to repeatedly match the regex in the data.
+# When repeat_match is set to true, regex is added as indexed 
+# fields: a, b, c, d, e, etc. For example: 1483382050 a=1 b=2 c=3 d=4 e=5
+# If repeat_match is not set, the match stops at a=1.
+[repeat_regex]
+REGEX = ([a-z])=(\d+)
+FORMAT = $1::$2
+REPEAT_MATCH = true
+WRITE_META = true
+
+###### BASIC MODULAR REGULAR EXPRESSIONS DEFINITION END ###########
+
+# Statsd dimensions extraction:
+
+# In most cases the Splunk platform needs only one regex to run per 
+# sourcetype. By default the Splunk platform would look for the sourcetype 
+# name in transforms.conf. There there is no need to provide 
+# the STATSD-DIM-TRANSFORMS setting in props.conf.
+
+# For example, these two stanzas would extract dimensions as ipv4=10.2.3.4
+# and os=windows from statsd data=mem.percent.used.10.2.3.4.windows:33|g
+[statsd-dims:regex_stanza1]
+REGEX = (?<ipv4>\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3})
+REMOVE_DIMS_FROM_METRIC_NAME = true
+
+[statsd-dims:regex_stanza2]
+REGEX = \S+\.(?<os>\w+):
+REMOVE_DIMS_FROM_METRIC_NAME = true
+
+
+
+[statsd-dims:metric_sourcetype_name]
+# In this example, we extract both ipv4 and os dimension using a single regex:
+REGEX = (?<ipv4>\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3})\.(?<os>\w+):
+REMOVE_DIMS_FROM_METRIC_NAME = true
+
+
+# In this metrics example, we start with this log line:
+#
+# 01-26-2018 07:49:49.030 -0800 INFO  Metrics - group=queue, name=aggqueue, max_size_kb=1024, current_size_kb=1,
+# current_size=3, largest_size=49, smallest_size=0, dc_latitude=37.3187706, dc_longitude=-121.9515042
+#
+# The following stanza converts that single event into multiple metrics at
+# index-time. It deny lists the "dc_latitude" and "dc_longitude" dimensions,
+# which means they are omitted from the generated metric data points. It also
+# allow lists the "name" and "dc_latitude" dimensions, which means that those
+# dimensions potentially are the only dimensions that appear in the
+# generated metric data points. 
+# When a log-to-metrics configuration simultaneously includes allow list and 
+# deny list dimensions, the Splunk platform includes the dimensions that
+# appear in the allow list and also do not appear in the deny list 
+# for the generated metric data points. For example, "dc_latitude" appears in
+# the allow list, but also in the deny list, so it is not included in the generated
+# metric data points. The metric data points generated by this configuration
+# have "name" as their sole dimension.
+[metric-schema:logtometrics]
+METRIC-SCHEMA-MEASURES-queue = max_size_kb,current_size_kb,current_size,largest_size,smallest_size
+METRIC-SCHEMA-BLACKLIST-DIMS-queue = dc_latitude,dc_longitude
+METRIC-SCHEMA-WHITELIST-DIMS-queue = name,dc_latitude
+
+# Here are the metrics generated by that stanza:
+# {'metric_name' : 'queue.max_size_kb',    '_value' : 1024, 'name': 'aggqueue'},
+# {'metric_name' : 'queue.current_size_kb, '_value' : 1,    'name': 'aggqueue'},
+# {'metric_name' : 'queue.current_size',   '_value' : 3,    'name': 'aggqueue'},
+# {'metric_name' : 'queue.largest_size',   '_value' : 49,   'name': 'aggqueue'},
+# {'metric_name' : 'queue.smallest_size',  '_value' : 0,    'name': 'aggqueue'}
+
+# You can use wildcard characters ('*') in METRIC-SCHEMA configurations. In
+# the preceding example, '*_size' matches 'current_size', 'largest_size', and
+# 'smallest_size'. The following configuration uses a wildcard to include all
+# three of those fields without individually listing each one.
+# METRIC-SCHEMA-MEASURES-queue = max_size_kb,current_size_kb,*_size
+
+# In the sample log above, group=queue represents the unique metric name prefix. Hence, it needs to be
+# formatted and saved as metric_name::queue for Splunk to identify queue as a metric name prefix.
+[extract_group]
+REGEX = group=(\w+)
+FORMAT = metric_name::$1
+WRITE_META = true
+
+[extract_name]
+REGEX = name=(\w+)
+FORMAT = name::$1
+WRITE_META = true
+
+[extract_max_size_kb]
+REGEX = max_size_kb=(\w+)
+FORMAT = max_size_kb::$1
+WRITE_META = true
+
+[extract_current_size_kb]
+REGEX = current_size_kb=(\w+)
+FORMAT = current_size_kb::$1
+WRITE_META = true
+
+[extract_current_size]
+REGEX = max_size_kb=(\w+)
+FORMAT = max_size_kb::$1
+WRITE_META = true
+
+[extract_largest_size]
+REGEX = largest_size=(\w+)
+FORMAT = largest_size::$1
+WRITE_META = true
+
+[extract_smallest_size]
+REGEX = smallest_size=(\w+)
+FORMAT = smallest_size::$1
+WRITE_META = true
+

@@ -1,0 +1,13 @@
+#   Version 9.0.3 
+#
+
+# re-enable the udp input on a SplunkLightForwarder
+
+[pipeline:udp]
+disabled = false
+
+# re-enable the tcp input on a SplunkLightForwarder
+
+[pipeline:tcp]
+disabled = false
+

@@ -1,0 +1,33 @@
+stages:
+    - test
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# Global variables
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+variables:
+  BUILDER: docker.repo.splunkdev.net/splunk-monitoring-console/splunk-monitoring-console/builder:1.0.0
+  SPLUNK_SOURCE: $CI_PROJECT_DIR
+
+MC Unit and lint tests:
+    rules:
+        - when: always
+    image: ${BUILDER}
+    stage: test
+    script:
+        - exec > >(tee mc_ui_test.log) 2>&1
+        - mkdir ${SPLUNK_SOURCE}/cfg/bundles/splunk_monitoring_console/ci_ui_xml_mc
+        - cd ${SPLUNK_SOURCE}/cfg/bundles/splunk_monitoring_console
+        - node ci_ui_runner_mc.js
+
+    artifacts:
+        when: always
+        paths:
+            - mc_ui_test.log
+            - ${SPLUNK_SOURCE}/cfg/bundles/splunk_monitoring_console/ci_ui_xml_mc/test_splunk_monitoring_console.xml
+            - ${SPLUNK_SOURCE}/cfg/bundles/splunk_monitoring_console/ci_ui_xml_mc/lint_splunk_monitoring_console.xml
+            - ${SPLUNK_SOURCE}/cfg/bundles/splunk_monitoring_console/ci_ui_xml_mc/lint_splunk_monitoring_console_jsx.xml
+        reports:
+            junit:
+            - ${SPLUNK_SOURCE}/cfg/bundles/splunk_monitoring_console/ci_ui_xml_mc/test_splunk_monitoring_console.xml
+            - ${SPLUNK_SOURCE}/cfg/bundles/splunk_monitoring_console/ci_ui_xml_mc/lint_splunk_monitoring_console.xml
+            - ${SPLUNK_SOURCE}/cfg/bundles/splunk_monitoring_console/ci_ui_xml_mc/lint_splunk_monitoring_console_jsx.xml

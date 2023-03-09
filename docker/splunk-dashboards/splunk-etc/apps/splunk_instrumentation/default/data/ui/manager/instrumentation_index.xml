@@ -1,0 +1,12 @@
+<endpoint name="instrumentation_index" template="/splunk_instrumentation:/templates/splunk_instrumentation.html" type="html" showOnSearchHeadCluster="1">
+    <capabilities>
+        <read>edit_telemetry_settings OR get_diag</read>
+    </capabilities>
+    <menu name="system_configurations">
+      <label>Instrumentation</label>
+      <url>/manager/splunk_instrumentation/instrumentation_index</url>
+      <description>Configure instrumentation.</description>
+      <order>29</order>
+      <id>instrumentation</id>
+    </menu>
+</endpoint>

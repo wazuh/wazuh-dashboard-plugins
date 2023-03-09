@@ -1,0 +1,109 @@
+{
+    "multistr": true,
+    "undef": true,
+    "expr": true,
+    "es5": true,
+    "globals": {
+        "window": false,
+        "document": false,
+        "JSON": false,
+        "alert": false,
+        "process": false,
+        "sinon": false,
+        "define": false,
+        "require": false,
+        "setTimeout": false,
+        "setInterval": false,
+        "clearTimeout": false,
+        "clearInterval": false,
+        "DateTime": false,
+        "start": false,
+        "stop": false,
+        "ok": false,
+        "equal": false,
+        "deepEqual": false,
+        "strictEqual": false,
+        "navigator": false,
+        "gettext": false,
+        "locale_uses_day_before_month": false,
+        "locale_name": false,
+        "format_datetime_microseconds": false,
+        "format_datetime": false,
+        "format_date": false,
+        "format_time": false,
+        "format_percent": false,
+        "format_number": false,
+        "format_datetime_range": false,
+        "mockModuleLocationsGen": false,
+        "module": false,
+        "localStorage": false,
+        "confirm": false,
+        "splunkjs": false,
+        "XMLSerializer": false,
+        "Image": false,
+        "google": false,
+        "screen": false,
+        "__splunkd_partials__": false,
+        "__error_status__": false,
+        "QUnit": false,
+        "FileReader": false,
+        "location": false,
+        "FormData": false,
+        "HTMLDivElement": false,
+        "SVGElement": false,
+        "Audio": false,
+        "Promise": false
+    },
+
+    // !! trick
+    "-W018": false,
+
+    // indentation off
+    "-W015": false,
+
+    // construct without ()
+    "-W058": false,
+
+    // initializing to undefined
+    "-W080": false,
+
+    // using new Object()
+    "-W010": false,
+
+    // using new Array()
+    "-W009": false,
+
+    // function declarations in blocks
+    "-W082": false,
+
+    // assignment in a return
+    "-W093": false,
+
+
+    // let's come back and fix these...
+
+    // == comparisons to 0, ''
+    "-W041": false,
+
+    // better written with dot notation
+    "-W069": false,
+
+    // mixing spaces and tabs
+    "-W099": false,
+
+    // used out of scope
+    "-W038": false,
+
+    // line break before &&
+    "-W014": false,
+
+    // bad escaping
+    "-W044": false,
+
+    // functions within a loop
+    "-W083": false,
+
+    // script URL
+    "-W107": false
+
+}

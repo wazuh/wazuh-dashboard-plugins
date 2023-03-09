@@ -1,0 +1,3 @@
+[console_scripts]
+editorconfig = editorconfig.__main__:main
+

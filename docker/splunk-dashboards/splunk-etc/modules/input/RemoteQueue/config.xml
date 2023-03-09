@@ -1,0 +1,22 @@
+<!--   Version 4.0 -->
+
+<!-- Copy this file to config.xml to enable the module. -->
+
+<!-- This configuration file is used for pulling parsed PData from the remote queue
+     into the splunk server -->
+<module>                                                                                                      
+<pipeline name="remotequeueinput" type="startup">
+	<processor name="remotequeueinput" plugin="remotequeueinputprocessor">
+		<config>
+		</config>
+	</processor>
+
+	<processor name="sendOut" plugin="queueoutputprocessor">
+		<config>
+			<!-- Data retrieved from remote queue is parsed pdata so it's sent
+			     directly to indexQueue -->
+			<queueName>indexQueue</queueName>
+		</config>
+	</processor>
+</pipeline>
+</module>

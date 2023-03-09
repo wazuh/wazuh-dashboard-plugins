@@ -1,0 +1,352 @@
+<dashboard version="1.1" hideEdit="True" script="common_control.js">
+  <label>Data Quality</label>
+  <description>
+      This dashboard helps you assess the quality of your incoming data by revealing issues that
+      occur when the data is being indexed. These issues appear as warnings and errors in your splunkd.log.
+  </description>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="time" searchWhenChanged="true" token="time">
+      <label>Time Range</label>
+      <default>
+        <earliestTime>-15m@m</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+      <change>
+         <!-- 
+          This condition is satisfied for any time selection which doesn't have empty value for
+          token $time.latest$ i.e. e.g. "All Time".
+         -->
+         <condition match="len($time.latest$)!=0">
+           <set token="latest_time">$time.latest$</set>
+         </condition>
+         <!-- 
+          This condition is satisfied when "All Time" is selected.
+          In this case, $time.latest$ will be set to empty string by the component.
+          This causes issue if token is used in a search for comparison value e.g. 'search field=$time.latest$ '  gets evaled as 'search field= '
+          To eliminate this issue, we use the $latest_time$ token set here e.g. 'search field=$latest_time$ '  gets evaled as 'search field="" '
+          This makes the search query complete and works fine.
+         -->
+         <condition  match="len($time.latest$)==0">
+           <set token="latest_time">""</set>
+         </condition>
+         <!-- 
+          This condition is satisfied for any time selection which doesn't meet above condition.
+          We set it to now, because the default component value for latestTime is now.
+         -->
+         <condition>
+          <set token="latest_time">now</set>
+         </condition>
+      </change>
+    </input>
+    <input type="dropdown" searchWhenChanged="true" token="dmc_group">
+      <label>Group</label>
+      <showClearButton>false</showClearButton>
+      <search>
+        <query>
+          | `dmc_get_groups_containing_role(dmc_group_indexer)`
+          | search search_group!="dmc_group_*"
+        </query>
+      </search>
+      <fieldForLabel>label</fieldForLabel>
+      <fieldForValue>search_group</fieldForValue>
+      <choice value="dmc_group_indexer">All indexers</choice>
+      <default>dmc_group_indexer</default>
+    </input>
+    <input type="dropdown" searchWhenChanged="true" token="splunk_server">
+      <label>Instance</label>
+      <showClearButton>false</showClearButton>
+      <search>
+        <query>
+          | `dmc_get_instance_info($dmc_group$)`
+          | search search_group=dmc_group_indexer
+        </query>
+      </search>
+      <fieldForLabel>serverName</fieldForLabel>
+      <fieldForValue>serverName</fieldForValue>
+      <choice value="*">All indexers of selected group</choice>
+      <default>*</default>
+    </input>
+  </fieldset>
+  <init>
+    <unset token="sourcetype"/>
+    <unset token="host"/>
+    <unset token="source"/>
+    <unset token="sourcetype_text"/>
+    <unset token="host_and_source_text"/>
+    <!-- If this is not set, it will remain an unset token $latest_time$ on first page load and query will not execute -->
+    <set token="latest_time">now</set>
+  </init>
+    <search id="distribution_base">
+    <query>
+      (index=* OR index=_*) host=$host$ source=$source$ sourcetype=$sourcetype$ _index_earliest=$time.earliest$ _index_latest=$latest_time$
+      | search splunk_server=*
+      | eval event_size = len(_raw)
+      | eval time_disparity = (_indextime - _time) / 36000
+      | stats count by linecount, event_size, time_disparity
+    </query>
+    <earliest>$time.earliest$</earliest>
+    <latest>$time.latest$</latest>
+  </search>
+  <row>
+    <panel>
+      <table id="sourcetypes_table">
+        <title>Event Processing Issues by Source Type</title>
+        <search id="sourcetypes_search">
+          <query>
+            <![CDATA[
+            `dmc_set_index_internal` search_group=dmc_group_indexer splunk_server=$splunk_server$ source=*splunkd.log*
+            (component=AggregatorMiningProcessor OR component=LineBreakingProcessor OR component=DateParserVerbose OR component=MetricSchemaProcessor OR component=MetricsProcessor)
+            (log_level=WARN OR log_level=ERROR)
+            | rex field=event_message "Context: source(::|=)(?<context_source>[^\|]*?)\|host(::|=)(?<context_host>[^\|]*?)\|(?<context_sourcetype>[^\|]*?)\|"
+            | eval data_source = if(isnull(data_source) AND isnotnull(context_source), context_source, data_source)
+            | eval data_host = if(isnull(data_host) AND isnotnull(context_host), context_host, data_host)
+            | eval data_sourcetype = if(isnull(data_sourcetype) AND isnotnull(context_sourcetype), context_sourcetype, data_sourcetype)
+            | stats
+              count(eval(component=="LineBreakingProcessor" OR component=="DateParserVerbose" OR component=="AggregatorMiningProcessor" OR component=="MetricSchemaProcessor" OR component=="MetricsProcessor")) as total_issues
+              dc(data_host) AS "Host Count"
+              dc(data_source) AS "Source Count"
+              count(eval(component=="LineBreakingProcessor")) AS "Line Breaking Issues"
+              count(eval(component=="DateParserVerbose")) AS "Timestamp Parsing Issues"
+              count(eval(component=="AggregatorMiningProcessor")) AS "Aggregation Issues"
+              count(eval(component=="MetricSchemaProcessor")) AS "Metric Schema Issues"
+              count(eval(component=="MetricsProcessor")) AS "Metrics Issues" by data_sourcetype
+            | sort - total_issues
+            | rename
+              data_sourcetype as Sourcetype
+              total_issues as "Total Issues"
+            ]]>
+          </query>
+          <progress>
+            <set token="sourcetype_search_string">$job.eventSearch$</set>
+          </progress>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <drilldown target="_blank">
+          <condition field="Sourcetype">
+            <set token="sourcetype">$row.Sourcetype$</set>
+          </condition>
+          <condition field="Line Breaking Issues">
+            <link target="_blank">search?q=$sourcetype_search_string|u$ | search data_sourcetype=$row.Sourcetype$ component=LineBreakingProcessor &amp;earliest=$time.earliest$&amp;latest=$time.latest$</link>
+          </condition>
+          <condition field="Timestamp Parsing Issues">
+            <link target="_blank">search?q=$sourcetype_search_string|u$ | search data_sourcetype=$row.Sourcetype$ component=DateParserVerbose &amp;earliest=$time.earliest$&amp;latest=$time.latest$</link>
+          </condition>
+          <condition field="Aggregation Issues">
+            <link target="_blank">search?q=$sourcetype_search_string|u$ | search data_sourcetype=$row.Sourcetype$ component=AggregatorMiningProcessor &amp;earliest=$time.earliest$&amp;latest=$time.latest$</link>
+          </condition>
+          <condition field="Metric Schema Issues">
+            <link target="_blank">search?q=$sourcetype_search_string|u$ | search data_sourcetype=$row.Sourcetype$ component=MetricSchemaProcessor &amp;earliest=$time.earliest$&amp;latest=$time.latest$</link>
+          </condition>
+          <condition field="Metrics Issues">
+            <link target="_blank">search?q=$sourcetype_search_string|u$ | search data_sourcetype=$row.Sourcetype$ component=MetricsProcessor &amp;earliest=$time.earliest$&amp;latest=$time.latest$</link>
+          </condition>
+          <condition field="*">
+	            <link target="_blank">search?q=$sourcetype_search_string|u$ | search data_sourcetype=$row.Sourcetype$ &amp;earliest=$time.earliest$&amp;latest=$time.latest$</link>
+          </condition>
+        </drilldown>
+      </table>
+      <html rejects="$sourcetype_text$">
+        <p>Clicking a source type shows issues by host and source, helping you locate the origin of this data.
+          <a href="#" data-set-token="sourcetype_text" data-value="true">[Show more info]</a>
+        </p>
+      </html>
+      <html depends="$sourcetype_text$">
+        <p>Clicking a source type shows issues by host and source, helping you locate the origin of this data.
+          <a href="#" data-unset-token="sourcetype_text">[Show less info]</a>
+        </p>
+      </html>
+      <html depends="$sourcetype_text$">
+        <p>This table shows errors and warnings emitted when the index-time settings in place do not allow for the
+          proper processing of ingested data. Issues in this table indicate the presence of one or more of these scenarios:
+        </p>
+        <ul>
+          <li>
+            Line Breaking Issues -  Lines in the event are too long and exceed the TRUNCATE setting in props.conf.
+            <a href="/help?location=learnmore.monitoringconsole.dataquality.linebreak" class="external" target="_blank">Learn More.</a>
+          </li>
+          <li>
+            Timestamp Parsing Issues - The extraction of event time stamps was partially or completely unsuccessful.
+            <a href="/help?location=learnmore.monitoringconsole.dataquality.timestamp" class="external" target="_blank">Learn More.</a>
+          </li>
+          <li>
+            Aggregation Issues - The number of lines per event exceeds the MAX_EVENTS setting in props.conf.
+            <a href="/help?location=learnmore.monitoringconsole.dataquality.aggregation" class="external" target="_blank">Learn More.</a>
+          </li>
+          <li>
+            Metric Schema Issues - The conversion of log events to metric data was partially or completely unsuccessful.
+            <a href="/help?location=settings.sourcetype.logtometrics" class="external" target="_blank">Learn More.</a>
+          </li>
+          <li>
+            Metrics Issues - The collection of metric data was partially or completely unsuccessful.
+            <a href="/help?location=learnmore.monitoringconsole.dataquality.metrics" class="external" target="_blank">Learn More.</a>
+          </li>
+        </ul>
+      </html>
+    </panel>
+  </row>
+  <row depends="$sourcetype$">
+    <panel>
+      <table id="sourcetype_table">
+        <title>Issues for source type $sourcetype$ by host and source</title>
+        <search id="sourcetype_search">
+          <query>
+            <![CDATA[
+            `dmc_set_index_internal` search_group=dmc_group_indexer splunk_server=$splunk_server$ source=*splunkd.log*
+            (component=AggregatorMiningProcessor OR component=LineBreakingProcessor OR component=DateParserVerbose OR component=MetricSchemaProcessor OR component=MetricsProcessor)
+            (log_level=WARN OR log_level=ERROR)
+            | rex field=event_message "Context: source(::|=)(?<context_source>[^\|]*?)\|host(::|=)(?<context_host>[^\|]*?)\|(?<context_sourcetype>[^\|]*?)\|"
+            | eval data_source = if(isnull(data_source) AND isnotnull(context_source), context_source, data_source)
+            | eval data_host = if(isnull(data_host) AND isnotnull(context_host), context_host, data_host)
+            | eval data_sourcetype = if(isnull(data_sourcetype) AND isnotnull(context_sourcetype), context_sourcetype, data_sourcetype)
+            | search data_sourcetype=$sourcetype$
+            | stats
+              count(eval(component=="LineBreakingProcessor" OR component=="DateParserVerbose" OR component=="AggregatorMiningProcessor" OR component=="MetricSchemaProcessor" OR component="MetricsProcessor")) as total_issues
+              count(eval(component=="LineBreakingProcessor")) AS "Line Breaking Issues"
+              count(eval(component=="DateParserVerbose")) AS "Timestamp Parsing Issues"
+              count(eval(component=="AggregatorMiningProcessor")) AS "Aggregation Issues"
+              count(eval(component=="MetricSchemaProcessor")) AS "Metric Schema Issues"
+              count(eval(component=="MetricsProcessor")) AS "Metrics Issues" by data_host, data_source
+            | sort - total_issues
+            | rename
+              data_host as Host
+              data_source as Source
+              total_issues as "Total Issues"
+            ]]>
+          </query>
+          <progress>
+            <set token="host_and_source_search_string">$job.eventSearch$</set>
+          </progress>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <drilldown target="_blank">
+          <condition field="Host">
+            <set token="host">$row.Host$</set>
+            <set token="source">$row.Source$</set>
+          </condition>
+          <condition field="Source">
+            <set token="host">$row.Host$</set>
+            <set token="source">$row.Source$</set>
+          </condition>
+          <condition field="Line Breaking Issues">
+            <link target="_blank">search?q=$host_and_source_search_string|u$ | search data_host=$row.Host$ data_source=$row.Source$ component=LineBreakingProcessor &amp;earliest=$time.earliest$&amp;latest=$time.latest$</link>
+          </condition>
+          <condition field="Timestamp Parsing Issues">
+            <link target="_blank">search?q=$host_and_source_search_string|u$ | search data_host=$row.Host$ data_source=$row.Source$ component=DateParserVerbose &amp;earliest=$time.earliest$&amp;latest=$time.latest$</link>
+          </condition>
+          <condition field="Aggregation Issues">
+            <link target="_blank">search?q=$host_and_source_search_string|u$ | search data_host=$row.Host$ data_source=$row.Source$ component=AggregatorMiningProcessor &amp;earliest=$time.earliest$&amp;latest=$time.latest$</link>
+          </condition>
+          <condition field="Metric Schema Issues">
+            <link target="_blank">search?q=$sourcetype_search_string|u$ | search data_sourcetype=$row.Sourcetype$ component=MetricSchemaProcessor &amp;earliest=$time.earliest$&amp;latest=$time.latest$</link>
+          </condition>
+          <condition field="Metrics Issues">
+            <link target="_blank">search?q=$sourcetype_search_string|u$ | search data_sourcetype=$row.Sourcetype$ component=MetricsProcessor &amp;earliest=$time.earliest$&amp;latest=$time.latest$</link>
+          </condition>
+          <condition field="*">
+            <link target="_blank">search?q=$host_and_source_search_string|u$ | search data_host=$row.Host$ data_source=$row.Source$ &amp;earliest=$time.earliest$&amp;latest=$time.latest$</link>
+          </condition>
+        </drilldown>
+      </table>
+      <html rejects="$host_and_source_text$">
+        <p>
+          Clicking a host or source shows statistics for events from that host and source.
+          <a href="#" data-set-token="host_and_source_text" data-value="true">[Show more info]</a>
+        </p>
+      </html>
+      <html depends="$host_and_source_text$">
+        <p>
+          Clicking a host or source shows statistics for events from that host and source.
+          <a href="#" data-unset-token="host_and_source_text">[Show less info]</a>
+        </p>
+      </html>
+      <html depends="$host_and_source_text$">
+        <p>This table shows errors and warnings emitted when the index-time settings in place do not allow for the
+          proper processing of ingested data. Issues in this table indicate the presence of one or more of these scenarios:
+        </p>
+        <ul>
+          <li>
+            Line Breaking Issues -  Lines in the event are too long and exceed the TRUNCATE setting in props.conf.
+            <a href="/help?location=learnmore.monitoringconsole.dataquality.linebreak" class="external" target="_blank">Learn More.</a>
+          </li>
+          <li>
+            Timestamp Parsing Issues - The extraction of event time stamps was partially or completely unsuccessful.
+              <a href="/help?location=learnmore.monitoringconsole.dataquality.timestamp" class="external" target="_blank">Learn More.</a>
+          </li>
+          <li>
+            Aggregation Issues - The number of lines per event exceeds the MAX_EVENTS setting in props.conf.
+            <a href="/help?location=learnmore.monitoringconsole.dataquality.aggregation" class="external" target="_blank">Learn More.</a>
+          </li>
+          <li>
+            Metric Schema Issues - The conversion of log events to metric data was partially or completely unsuccessful.
+            <a href="/help?location=settings.sourcetype.logtometrics" class="external" target="_blank">Learn More.</a>
+          </li>
+          <li>
+            Metrics Issues - The collection of metric data was partially or completely unsuccessful.
+            <a href="/help?location=learnmore.monitoringconsole.dataquality.metrics" class="external" target="_blank">Learn More.</a>
+          </li>
+        </ul>
+      </html>
+      <html>
+        <a href="#" data-unset-token="sourcetype">[Close this panel]</a>
+      </html>
+    </panel>
+  </row>
+  <row depends="$host$, $source$, $sourcetype$">
+    <panel>
+      <table id="line_count_distribution_chart">
+        <title>Event Line Count</title>
+        <search base="distribution_base" id="line_count_distribution_search">
+          <query>
+            | stats sum(count) as "Event Count" by linecount
+            | rename linecount as "Line Count"
+          </query>
+        </search>
+      </table>
+      <html>
+        <p>
+          <a href="/help?location=learnmore.monitoringconsole.dataquality.linecount" class="external" target="_blank">Learn More.</a>
+        </p>
+        <p>
+          <a href="#" data-unset-token="host">[Close these panels]</a>
+        </p>
+      </html>
+    </panel>
+    <panel>
+      <chart id="event_size_distribution_chart">
+        <title>Event Size</title>
+        <search base="distribution_base" id="event_size_distribution_search">
+          <query>
+            | bin event_size span=log2
+            | stats sum(count) as "Event Count" by event_size
+            | rename event_size as "Event Size (bytes)"
+            </query>
+        </search>
+        <option name="charting.legend.placement">none</option>
+      </chart>
+      <html>
+        <a href="/help?location=learnmore.monitoringconsole.dataquality.eventsize" class="external" target="_blank">Learn More.</a>
+      </html>
+    </panel>
+    <panel>
+      <chart id="time_disparity_distribution_chart">
+        <title>Event Time Disparity</title>
+        <search base="distribution_base" id="time_disparity_distribution_search">
+          <query>
+            | bin time_disparity span=1 start=-24 end=-24
+            | stats sum(count) as "Event Count" by time_disparity
+            | rename time_disparity as "Observed Latency (hours)"
+          </query>
+        </search>
+         <option name="charting.legend.placement">none</option>
+      </chart>
+      <html>
+        <p>Latency = _indextime - _time.</p>
+        <p>If the latency is off by multiples of approximately an hour, you might have a timezone configuration issue.</p>
+        <p>If the latency is suspiciously large, there is a possibility the timestamp is extracted incorrectly.</p>
+        <a href="/help?location=learnmore.monitoringconsole.dataquality.delay" class="external" target="_blank">Learn More.</a>
+      </html>
+    </panel>
+  </row>
+</dashboard>

@@ -1,0 +1,14 @@
+<endpoint name="authentication/users" template="pages/system.html">
+  <capabilities>
+  <!-- Light Users see different UI based on actual capability -->
+  <read>edit_user OR change_own_password</read>
+  </capabilities>
+  <header>Manage Accounts</header>
+  <!-- For Lite put this under System menu -->
+  <menu name="system_configurations">
+    <label>Manage accounts</label>
+    <url>/manager/%(namespace)s/authentication/users</url>
+    <description>Manage user settings, including password and email address.</description>
+    <order>110</order>
+  </menu>
+</endpoint>

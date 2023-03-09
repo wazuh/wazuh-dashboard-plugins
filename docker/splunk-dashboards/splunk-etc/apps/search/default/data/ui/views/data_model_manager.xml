@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<view template="pages/system.html" type="html" isVisible="False" isDashboard="False">
+    <label>Data Model Manager</label>
+</view>

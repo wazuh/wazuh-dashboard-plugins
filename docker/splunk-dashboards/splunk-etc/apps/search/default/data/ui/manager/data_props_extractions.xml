@@ -1,0 +1,69 @@
+<endpoint name="data/props/extractions" showAppContext="1">
+  <header>Field extractions</header>
+  <breadcrumb>
+    <parent hidecurrent="False">fields</parent>
+    <name>Field extractions</name>
+  </breadcrumb>
+  <elements>
+
+    <element name="__ns" type="select" label="Destination app">
+      <view name="create"/>
+      <key name="dynamicOptions" type="dict">
+        <key name="keyName">title</key>
+        <key name="keyValue">title</key>
+        <key name="splunkSource">/apps/local</key>
+        <key name="splunkSourceParams" type="dict">
+          <key name="search">'disabled=false'</key>
+          <key name="count">-1</key>
+        </key>
+      </key>
+    </element>
+
+    <element name="name" label="Name">
+      <view name="list"/>
+      <view name="create"/>
+    </element>
+    <element name="stanza_prefixer" type="fieldset">
+      <view name="create"/>
+      <key name="multiColumn">True</key>
+      <elements>
+        <element name="spl-ctrl_stanza_prefix" type="select" label="Apply to">
+          <view name="create"/>
+          <key name="class">short</key>
+          <options>
+            <opt value="" label="sourcetype"/>
+            <opt value="source::" label="source"/>
+            <opt value="host::" label="host"/>
+          </options>
+        </element>
+        <element name="stanza" type="textfield" label="named">
+          <view name="create"/>
+          <key name="class">short</key>
+          <key name="submitValueAdd">(form_data.get('spl-ctrl_stanza_prefix') + value) if value else None</key>
+        </element>
+      </elements>
+    </element>
+    <element name="type" type="select" label="Type">
+      <view name="list"/>
+      <view name="create"/>
+      <options>
+        <opt value="EXTRACT" label="Inline"/>
+        <opt value="REPORT" label="Uses transform"/>
+      </options>
+    </element>
+    <element name="value" type="textfield" label="Extraction/Transform">
+      <view name="list"/>
+      <view name="edit"/>
+      <view name="create"/>
+      <key name="exampleText">If the field extraction is inline, provide the regular expression. If the field extraction uses a transform, specify the transform name.</key>
+    </element>
+    <element name="eai:acl.owner" label="Owner">
+      <view name="list"/>
+      <key name="processValueList">entity['eai:acl']['owner'] == 'nobody' and _('No owner') or entity['eai:acl']['owner']</key>
+    </element>
+    <element name="eai:acl.app" label="App">
+      <view name="list"/>
+      <key name="processValueList">entity['eai:acl']['app'] or ""</key>
+    </element>
+  </elements>
+</endpoint>

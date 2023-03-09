@@ -1,0 +1,351 @@
+<form hideEdit="True" version="1.1" theme="dark">
+  <tags>mobile,tv</tags>
+  <label>Recent SSG Dashboard Activity</label>
+  <description>Use this dashboard to troubleshoot a Dashboard that isn’t loading. Select a time range to get a list of most recently viewed Dashboards.</description>
+  <search id="base_create">
+    <query>index=_internal sourcetype="secure_gateway_app_internal_log" "Dashboard Source Subscription Created" | eval temp=split(dashboard_id, "/") 
+| eval dashboard_user=mvindex(temp,0)| eval dashboard_app=mvindex(temp,1) 
+| eval dashboard_name=mvindex(temp,2) | fields _time, search_key, request_id, device_id, current_user, dashboard_id, shard_id, is_alert, subscription_id, search_type_id, dashboard_user, dashboard_app, dashboard_name</query>
+    <earliest>$field1.earliest$</earliest>
+    <latest>$field1.latest$</latest>
+  </search>
+  <search id="base_dashboard_view">
+    <query>| rest "servicesNS/$dashboardUser$/$dashboardApp$/data/ui/views/$dashboardName$?output_mode=json" 
+| fields label, name, tags</query>
+  </search>
+  <search id="base_device_reg">
+    <query>| rest "services/ssg/kvstore_client" 
+method=get
+app=splunk_secure_gateway
+collection=registered_devices
+owner=$currentUser$
+sort=_key
+limit=1000
+post_data="{}" | spath input=result path={}. output=data 
+| mvexpand data
+| spath input=data 
+| search device_id="$deviceId$"
+| fields app_id, app_name, auth_method, device_management_method, device_name, device_registered_timestamp, device_type, platform, registration_method, device_id, user</query>
+  </search>
+  <search id="base_dashboard_subscriptions">
+    <query>index=_internal sourcetype="secure_gateway_app_internal_log" [search index=_internal sourcetype="secure_gateway_app_internal_log" "Dashboard Source Subscription Created" dashboard_id="$dashboardId$" | dedup subscription_id | fields subscription_id | format] | fields log_level subscription_id</query>
+    <earliest>$field1.earliest$</earliest>
+    <latest>$field1.latest$</latest>
+  </search>
+  <search id="base_subscription">
+    <query>index=_internal sourcetype="secure_gateway_app_internal_log" subscription_id=$subscriptionId$ | fields log_level, type, _time</query>
+    <earliest>$field1.earliest$</earliest>
+    <latest>$field1.latest$</latest>
+  </search>
+  <search id="base_updates_sent">
+    <query>index=_internal sourcetype=secure_gateway_app_internal_log subscription_id=$subscriptionId$ | transaction update_id startswith=("Sending subscription update" OR "Start Post Process Single Subscription Update") endswith=("Subscription Update Sent" OR "Send Post Process Single Subscription Update") | eval latency = duration | eval dispatch_state_enum=case(dispatch_state==0, "NONE", dispatch_state==1, "QUEUED", dispatch_state==2, "PARSING", dispatch_state==3, "RUNNING", dispatch_state==4, "FINALIZING", dispatch_state==5, "DONE", dispatch_state==6, "FAILED", dispatch_state==7, "PAUSED") | table _time, update_id, type, latency, done_progress, dispatch_state_enum</query>
+    <earliest>$field1.earliest$</earliest>
+    <latest>$field1.latest$</latest>
+  </search>
+  <search base="base_subscription" id="base_unsubscribe">
+    <query>| search "Finished process_unsubscribe_request" | fields count</query>
+  </search>
+  <fieldset submitButton="false">
+    <input type="time" token="field1" searchWhenChanged="true">
+      <label></label>
+      <default>
+        <earliest>-15m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <title>Recent Dashboards Requested by Device</title>
+        <search base="base_create">
+          <query>| stats latest(_time) as _time, values(subscription_id) as subscription_ids, values(search_key) as search_keys by dashboard_user dashboard_app dashboard_name dashboard_id device_id current_user | stats count(search_keys) as search_count, latest(_time) as _time by dashboard_user dashboard_app dashboard_name dashboard_id device_id current_user| sort - _time</query>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">row</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <drilldown>
+          <eval token="dashboardId">$row.dashboard_id$</eval>
+          <eval token="dashboardName">$row.dashboard_name$</eval>
+          <eval token="dashboardApp">$row.dashboard_app$</eval>
+          <eval token="dashboardUser">$row.dashboard_user$</eval>
+          <eval token="deviceId">$row.device_id$</eval>
+          <eval token="currentUser">$row.current_user$</eval>
+          <unset token="subscriptionId"></unset>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <single>
+        <title>Dashboard</title>
+        <search base="base_dashboard_view">
+          <query>| table label</query>
+        </search>
+        <option name="drilldown">all</option>
+        <drilldown>
+          <link target="_blank">/app/$dashboardApp$/$dashboardName$</link>
+        </drilldown>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Dashboard Tags</title>
+        <search base="base_dashboard_view">
+          <query>| table tags</query>
+        </search>
+        <option name="drilldown">all</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <single>
+        <title>Current User</title>
+        <search base="base_device_reg">
+          <query>| table user</query>
+        </search>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Device Name</title>
+        <search base="base_device_reg">
+          <query>| eval device_name_str = if(device_name=="", "None", device_name)| table device_name_str</query>
+        </search>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Device Type</title>
+        <search base="base_device_reg">
+          <query>| table device_type</query>
+        </search>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Device ID</title>
+        <search base="base_device_reg">
+          <query>| eval device = substr(device_id, 0, 6) | table device</query>
+        </search>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <single>
+        <title>Platform</title>
+        <search base="base_device_reg">
+          <query>| table platform</query>
+        </search>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Auth Method</title>
+        <search base="base_device_reg">
+          <query>| table auth_method</query>
+        </search>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Registration Method</title>
+        <search base="base_device_reg">
+          <query>| table registration_method</query>
+        </search>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>MDM</title>
+        <search base="base_device_reg">
+          <query>| eval mdm = if(device_management_method == "not_mdm", "NO", "YES") | table mdm</query>
+        </search>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <single>
+        <title>Subscription Errors for ($dashboardId$)</title>
+        <search base="base_dashboard_subscriptions">
+          <query>|search log_level=ERROR | stats count as error_count | eval errors = if(error_count &gt; 0, "YES", "NONE") | eval range=if(error_count &gt; 0, "severe", "low") | table errors, range</query>
+        </search>
+        <option name="colorMode">block</option>
+        <option name="drilldown">all</option>
+        <option name="rangeColors">["0x53a051","0xdc4e41"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="useColors">0</option>
+        <drilldown>
+          <link target="_blank">/app/search/search?q=index=_internal sourcetype="secure_gateway_app_internal_log" [search index=_internal sourcetype="secure_gateway_app_internal_log" "Dashboard Source Subscription Created" dashboard_id="$dashboardId$" | dedup subscription_id | fields subscription_id | format] log_level=ERROR</link>
+        </drilldown>
+      </single>
+    </panel>
+    <panel>
+      <table>
+        <title>Error Count by ($dashboardId$) Subscriptions</title>
+        <search base="base_dashboard_subscriptions">
+          <query>| search log_level=ERROR | stats count by subscription_id</query>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">row</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <drilldown>
+          <eval token="subscriptionId">$row.subscription_id$</eval>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Subscriptions ($dashboardId$)</title>
+        <search base="base_create">
+          <query>| search dashboard_id="$dashboardId$" device_id="$deviceId$" current_user="$currentUser$" | table _time, search_type_id, subscription_id, search_key, request_id</query>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">row</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <drilldown>
+          <eval token="subscriptionId">$row.subscription_id$</eval>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <single>
+        <title>Subscription Errors for $subscriptionId$</title>
+        <search base="base_subscription">
+          <query>| search log_level=ERROR | stats count as error_count | eval errors = if(error_count &gt; 0, "YES", "NONE") | eval range=if(error_count &gt; 0, "severe", "low") | table errors, range</query>
+        </search>
+        <option name="colorMode">block</option>
+        <option name="drilldown">all</option>
+        <option name="rangeColors">["0x53a051","0xdc4e41"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="useColors">0</option>
+        <drilldown>
+          <link target="_blank">/app/search/search?q=search index=_internal sourcetype=secure_gateway_app_internal_log subscription_id=$subscriptionId$ log_level=ERROR</link>
+        </drilldown>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <single>
+        <title>Type</title>
+        <search base="base_subscription">
+          <query>| search "Subscription Update Sent" OR "Skipping subscription update" OR "Send Post Process Single Subscription Update" | head 1 | table type</query>
+        </search>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Currently Subscribed</title>
+        <search base="base_unsubscribe">
+          <query>| stats count as count
+                 | eval ok = if(count &gt; 0, "NO", "YES")
+                 | eval range=if(count &gt; 0, "severe", "low")
+                 | table ok, range
+          </query>
+        </search>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <single>
+        <title>Total Updates</title>
+        <search base="base_updates_sent">
+          <query>|stats count| table count</query>
+        </search>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Updates Skipped</title>
+        <search base="base_subscription">
+          <query>| search "Skipping subscription update" | stats count | table count</query>
+        </search>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Average Update Latency</title>
+        <search base="base_updates_sent">
+          <query>| stats avg(latency) as avg_latency by update_id | table avg_latency</query>
+        </search>
+        <option name="numberPrecision">0.000</option>
+        <option name="rangeColors">["0x53a051","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="rangeValues">[1,5,10]</option>
+        <option name="unit">s</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Total Processing Time</title>
+        <search base="base_subscription">
+          <query>| stats max(_time) as maxtime min(_time) as mintime | eval difference=maxtime-mintime | table difference</query>
+        </search>
+        <option name="numberPrecision">0.000</option>
+        <option name="rangeColors">["0x53a051","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="rangeValues">[1,5,10]</option>
+        <option name="unit">s</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Updates: $subscriptionId$</title>
+        <search base="base_updates_sent"></search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <event>
+        <title>Raw Events: $subscriptionId$</title>
+        <search base="base_subscription"></search>
+        <option name="count">10</option>
+        <option name="list.drilldown">none</option>
+        <option name="list.wrap">1</option>
+        <option name="maxLines">5</option>
+        <option name="raw.drilldown">full</option>
+        <option name="rowNumbers">0</option>
+        <option name="table.drilldown">all</option>
+        <option name="table.sortDirection">asc</option>
+        <option name="table.wrap">1</option>
+        <option name="type">list</option>
+      </event>
+    </panel>
+  </row>
+</form>

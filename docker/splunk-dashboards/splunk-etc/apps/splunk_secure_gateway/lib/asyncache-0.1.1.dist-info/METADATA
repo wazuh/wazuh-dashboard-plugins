@@ -1,0 +1,80 @@
+Metadata-Version: 2.1
+Name: asyncache
+Version: 0.1.1
+Summary: Helpers to use cachetools with async functions
+Home-page: https://github.com/hephex/asyncache
+Author: Hephex
+Author-email: UNKNOWN
+License: MIT
+Keywords: cache caching memoize memoizing memoization async
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: Other Environment
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Programming Language :: Python :: Implementation :: PyPy
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Dist: cachetools (>=2.1)
+
+asyncache
+#########
+
+Helpers to use cachetools with asyncio.
+
+.. image:: https://travis-ci.org/hephex/asyncache.svg?branch=master
+    :target: https://travis-ci.org/hephex/asyncache
+
+.. image:: https://coveralls.io/repos/github/hephex/asyncache/badge.svg?branch=master
+    :target: https://coveralls.io/github/hephex/asyncache?branch=master
+
+.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
+    :target: https://github.com/ambv/black
+
+Example
+=======
+
+.. code-block:: python
+
+    from asyncache import cached
+    from cachetools import TTLCache
+
+    pool = ...
+
+    @cached(TTLCache(1024, 60))
+    async def get_username(user_id):
+        rec = await pool.fetchrow(
+            """
+            SELECT
+                username
+            FROM
+                users
+            WHERE
+                id = $1
+            """,
+            user_id,
+        )
+        return rec and rec["username"]
+
+License
+=======
+
+This project is licensed under the MIT License - see the LICENSE_ file for details.
+
+
+Acknowledgments
+===============
+
+- `cachetools`_
+
+
+.. _LICENSE: LICENSE
+.. _cachetools: https://github.com/tkem/cachetools
+
+
+
+
+

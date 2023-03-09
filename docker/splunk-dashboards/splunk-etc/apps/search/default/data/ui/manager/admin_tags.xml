@@ -1,0 +1,36 @@
+<endpoint name="admin/tags" showAppContext="1" displayNameField="tag_name">
+  <header>Tags by unique ID</header>
+  <breadcrumb>
+    <parent hidecurrent="False">tags</parent>
+    <name>All unique tag objects</name>
+  </breadcrumb>
+  <elements>
+  
+    <!-- Name = tag name -->
+    <element name="name" type="textfield" label="Tag name">
+      <view name="create"/>
+    </element>
+    <element name="tag_name" type="textfield" label="Tag name">
+      <view name="list"/>
+    </element>
+    <element name="field_name_value" type="textfield" label="Field value pair">
+      <view name="list" />
+    </element>
+    <element name="eai:acl.owner" label="Owner">
+       <view name="list"/>
+       <key name="processValueList">entity['eai:acl']['owner'] or ""</key>
+    </element>
+    <element name="eai:acl.app" label="App">
+       <view name="list"/>
+       <key name="processValueList">entity['eai:acl']['app'] or ""</key>
+    </element>
+          <element name="field_name" type="textfield" label="Field name">
+             <view name="create"/>
+             <key name="processValueEdit">form_defaults['field_name_value'].split('=')[0] if 'field_name_value' in form_defaults else ''</key>
+           </element>
+           <element name="field_value" type="textfield" label="Field value">
+             <view name="create"/>
+             <key name="processValueEdit">form_defaults['field_name_value'].split('=')[1] if 'field_name_value' in form_defaults else ''</key>
+          </element>
+  </elements>
+</endpoint>

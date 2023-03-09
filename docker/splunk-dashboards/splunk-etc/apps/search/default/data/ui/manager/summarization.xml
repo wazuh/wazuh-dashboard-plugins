@@ -1,0 +1,14 @@
+<endpoint name="summarization" showOnSearchHeadCluster="1">
+  <header></header>
+  <capabilities>
+    <read>accelerate_search AND schedule_search</read>
+  </capabilities>
+  <menu name="data_configurations">
+    <label>Report acceleration summaries</label>
+    <url>/manager/system/summarization</url>
+    <description>Manage saved search summaries</description>
+    <order>80</order>
+    <icon>bolt.png</icon>
+    <id>summarization</id>
+  </menu>
+</endpoint>

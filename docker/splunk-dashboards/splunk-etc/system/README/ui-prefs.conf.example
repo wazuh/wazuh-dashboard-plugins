@@ -1,0 +1,18 @@
+#   Version 9.0.3
+#
+# This file contains example of ui preferences for a view.
+#
+# To use one or more of these configurations, copy the configuration block into
+# ui-prefs.conf in $SPLUNK_HOME/etc/system/local/. You must restart Splunk to
+# enable configurations.
+#
+# To learn more about configuration files (including precedence) please see the
+# documentation located at
+# http://docs.splunk.com/Documentation/Splunk/latest/Admin/Aboutconfigurationfiles
+#
+# The following ui preferences will default timerange picker on the search page
+# from All time to Today We will store this ui-prefs.conf in
+# $SPLUNK_HOME/etc/apps/search/local/ to only update search view of search app.
+[search]
+dispatch.earliest_time = @d
+dispatch.latest_time = now

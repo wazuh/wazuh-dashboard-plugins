@@ -1,0 +1,21 @@
+<form class="form-horizontal form-complex">
+    <div class="control-group">
+        <label class="control-label" for="webhook_url">URL</label>
+
+        <div class="controls">
+            <input type="text" class="input-xlarge" name="action.webhook.param.url" id="webhook_url" placeholder="https://your.server.com/foo/bar" />
+        </div>
+    </div>
+    <div class="control-group">
+        <div class="controls">
+            <span class="help-block" style="display: block; position: static; width: auto; margin-left: 0;">
+                Specified URL to send JSON payload via HTTP POST
+                (ex., https://your.server.com/api/v1/webhook). 
+                <br />
+                <a href="{{SPLUNKWEB_URL_PREFIX}}/help?location=learnmore.alert.action.webhook" target="_blank"
+                   title="Splunk help">Learn More <i class="icon-external"></i></a>
+                
+            </span>
+        </div>
+    </div>
+</form>

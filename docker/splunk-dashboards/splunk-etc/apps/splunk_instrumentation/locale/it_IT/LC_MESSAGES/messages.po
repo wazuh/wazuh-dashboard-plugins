@@ -1,0 +1,907 @@
+# Translations template for PROJECT.
+# Copyright (C) 2022 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2022-03-31 17:30-0700\n"
+"PO-Revision-Date: 2022-04-07 13:49+0100\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.6.0\n"
+"X-Generator: Poedit 3.0.1\n"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/SetSchedule/SetScheduleModal.jsx:134
+msgid " at "
+msgstr " alle "
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/LogsReportView.jsx:461
+msgid " next to \"Usage Data\""
+msgstr " accanto a \"Dati di utilizzo\""
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/SetSchedule/SetScheduleModal.jsx:112
+msgid " on "
+msgstr " su "
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:255
+msgid "\"Full\" includes bucket manifests and metadata files, if the index_files component is selected."
+msgstr "\"Full\" include manifesti di bucket e file di metadati, se è selezionato il componente index_files."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:279
+msgid "\"Light\" lists only hot buckets, if the index_listing component is selected."
+msgstr "\"Light\" include solo i bucket hot, se è selezionato il componente index_listing."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInStatus.jsx:97
+#, python-format
+msgid "%s"
+msgstr "%s"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/LogsReportView.jsx:406
+#, python-format
+msgid "%s Data"
+msgstr "%s dati"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/SettingsPage/LicenseDataOptOutModal.jsx:52
+#, python-format
+msgid "%s Usage Data"
+msgstr "%s dati di utilizzo"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInDropdown.jsx:422
+msgid ". For  examples, see our "
+msgstr ". Per gli esempi, consulta la nostra "
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:355
+msgid "1 GB"
+msgstr "1 GB"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:369 ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:317
+msgid "1 MB"
+msgstr "1 MB"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:373 ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:318
+msgid "10 MB"
+msgstr "10 MB"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:351 ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:377 ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:319
+msgid "100 MB"
+msgstr "100 MB"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:359
+msgid "5 GB"
+msgstr "5 GB"
+
+#: ../../apps/splunk_instrumentation/default/data/ui/alerts/outputtelemetry.html
+msgid ""
+"<form class=\"form-horizontal form-complex\">\n"
+"    <div class=\"control-group\">\n"
+"        <label class=\"control-label\" for=\"outputtelemetry_component\">Name</label>\n"
+"\n"
+"        <div class=\"controls\">\n"
+"            <input type=\"text\" class=\"input-xlarge\" name=\"action.outputtelemetry.param.component\" id=\"outputtelemetry_component\" placeholder=\"component.name\"/>\n"
+"        </div>\n"
+"    </div>\n"
+"    <div class=\"control-group\">\n"
+"        <label class=\"control-label\" for=\"outputtelemetry_input\">Input field</label>\n"
+"\n"
+"        <div class=\"controls\">\n"
+"            <input type=\"text\" class=\"input-xlarge\" name=\"action.outputtelemetry.param.input\" id=\"outputtelemetry_component\" placeholder=\"field name\"/>\n"
+"        </div>\n"
+"    </div>\n"
+"    <div class=\"control-group\">\n"
+"        <label class=\"control-label\" for=\"outputtelemetry_type\">Data type</label>\n"
+"\n"
+"        <div class=\"controls\">\n"
+"            <label class=\"radio\" for=\"outputtelemetry_type_event\">\n"
+"                <input id=\"outputtelemetry_type_event\" type=\"radio\" name=\"action.outputtelemetry.param.type\" value=\"event\"/>\n"
+"                Event\n"
+"            </label>\n"
+"            <label class=\"radio\" for=\"outputtelemetry_type_aggregate\">\n"
+"                <input id=\"outputtelemetry_type_aggregate\" type=\"radio\" name=\"action.outputtelemetry.param.type\" value=\"aggregate\"/>\n"
+"                Aggregate\n"
+"            </label>\n"
+"        </div>\n"
+"    </div>\n"
+"    <div class=\"control-group\">\n"
+"        <label class=\"control-label\">Categories (at least 1):</label>\n"
+"        <div class=\"controls\">\n"
+"            <label class=\"checkbox\" for=\"outputtelemetry_anonymous\">\n"
+"                <input type=\"checkbox\" name=\"action.outputtelemetry.param.anonymous\" id=\"outputtelemetry_anonymous\" value=\"1\"/>\n"
+"                Anonymized usage data\n"
+"            </label>\n"
+"        </div>\n"
+"        <div class=\"controls\">\n"
+"            <label class=\"checkbox\" for=\"outputtelemetry_support\">\n"
+"                <input type=\"checkbox\" name=\"action.outputtelemetry.param.support\" id=\"outputtelemetry_support\" value=\"1\"/>\n"
+"                Support usage data\n"
+"            </label>\n"
+"        </div>\n"
+"        <div class=\"controls\">\n"
+"            <label class=\"checkbox\" for=\"outputtelemetry_license\">\n"
+"                <input type=\"checkbox\" name=\"action.outputtelemetry.param.license\" id=\"outputtelemetry_license\" value=\"1\"/>\n"
+"                License usage data\n"
+"            </label>\n"
+"        </div>\n"
+"    </div>\n"
+"    <div class=\"control-group\">\n"
+"        <label class=\"control-label\" for=\"outputtelemetry_optinrequired\">Required opt-in</label>\n"
+"\n"
+"        <div class=\"controls\">\n"
+"            <select id=\"outputtelemetry_optinrequired\" name=\"action.outputtelemetry.param.optinrequired\">\n"
+"                <option value=\"1\">1 - Splunk 6.5</option>\n"
+"                <option value=\"2\">2 - Splunk 6.6</option>\n"
+"                <option value=\"3\">3 - Splunk 7.0</option>\n"
+"            </select>\n"
+"        </div>\n"
+"    </div>\n"
+"</form>\n"
+msgstr ""
+"<form class=\"form-horizontal form-complex\">\n"
+"    <div class=\"control-group\">\n"
+"        <label class=\"control-label\" for=\"outputtelemetry_component\">Nome</label>\n"
+"\n"
+"        <div class=\"controls\">\n"
+"            <input type=\"text\" class=\"input-xlarge\" name=\"action.outputtelemetry.param.component\" id=\"outputtelemetry_component\" placeholder=\"component.name\"/>\n"
+"        </div>\n"
+"    </div>\n"
+"    <div class=\"control-group\">\n"
+"        <label class=\"control-label\" for=\"outputtelemetry_input\">Campo di input</label>\n"
+"\n"
+"        <div class=\"controls\">\n"
+"            <input type=\"text\" class=\"input-xlarge\" name=\"action.outputtelemetry.param.input\" id=\"outputtelemetry_component\" placeholder=\"field name\"/>\n"
+"        </div>\n"
+"    </div>\n"
+"    <div class=\"control-group\">\n"
+"        <label class=\"control-label\" for=\"outputtelemetry_type\">Tipo di dati</label>\n"
+"\n"
+"        <div class=\"controls\">\n"
+"            <label class=\"radio\" for=\"outputtelemetry_type_event\">\n"
+"                <input id=\"outputtelemetry_type_event\" type=\"radio\" name=\"action.outputtelemetry.param.type\" value=\"event\"/>\n"
+"                Evento\n"
+"            </label>\n"
+"            <label class=\"radio\" for=\"outputtelemetry_type_aggregate\">\n"
+"                <input id=\"outputtelemetry_type_aggregate\" type=\"radio\" name=\"action.outputtelemetry.param.type\" value=\"aggregate\"/>\n"
+"                Aggregato\n"
+"            </label>\n"
+"        </div>\n"
+"    </div>\n"
+"    <div class=\"control-group\">\n"
+"        <label class=\"control-label\">Categorie (almeno 1):</label>\n"
+"        <div class=\"controls\">\n"
+"            <label class=\"checkbox\" for=\"outputtelemetry_anonymous\">\n"
+"                <input type=\"checkbox\" name=\"action.outputtelemetry.param.anonymous\" id=\"outputtelemetry_anonymous\" value=\"1\"/>\n"
+"                Dati di utilizzo anonimi\n"
+"            </label>\n"
+"        </div>\n"
+"        <div class=\"controls\">\n"
+"            <label class=\"checkbox\" for=\"outputtelemetry_support\">\n"
+"                <input type=\"checkbox\" name=\"action.outputtelemetry.param.support\" id=\"outputtelemetry_support\" value=\"1\"/>\n"
+"                Dati di utilizzo supporto\n"
+"            </label>\n"
+"        </div>\n"
+"        <div class=\"controls\">\n"
+"            <label class=\"checkbox\" for=\"outputtelemetry_license\">\n"
+"                <input type=\"checkbox\" name=\"action.outputtelemetry.param.license\" id=\"outputtelemetry_license\" value=\"1\"/>\n"
+"                Dati di utilizzo licenza\n"
+"            </label>\n"
+"        </div>\n"
+"    </div>\n"
+"    <div class=\"control-group\">\n"
+"        <label class=\"control-label\" for=\"outputtelemetry_optinrequired\">Consenso richiesto</label>\n"
+"\n"
+"        <div class=\"controls\">\n"
+"            <select id=\"outputtelemetry_optinrequired\" name=\"action.outputtelemetry.param.optinrequired\">\n"
+"                <option value=\"1\">1 - Splunk 6.5</option>\n"
+"                <option value=\"2\">2 - Splunk 6.6</option>\n"
+"                <option value=\"3\">3 - Splunk 7.0</option>\n"
+"            </select>\n"
+"        </div>\n"
+"    </div>\n"
+"</form>\n"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:418
+msgid "Actions"
+msgstr "Azioni"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagNodeListPanel.jsx:238
+msgid "All Roles"
+msgstr "Tutti i ruoli"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:195
+msgid "All files matching the given patterns will be excluded. To exclude multiple files, use wildcards, or provide a comma-separated list of files or patterns."
+msgstr "Tutti i file che corrispondono ai pattern forniti verranno esclusi. Per escludere più file, utilizzare i caratteri jolly oppure fornire un elenco separato da virgole di file o pattern."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/SettingsPage/LicenseDataOptOutModal.jsx:62
+#, python-format
+msgid "Are you sure you want to disable %s usage data sharing?"
+msgstr "Disabilitare la condivisione dei dati di utilizzo %s?"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:401
+msgid "Attempt to redact search terms from logs that may be private or personally identifying."
+msgstr "Tentare di oscurare i termini di ricerca dai log che possono essere privati o consentire l'identificazione personale."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInStatus.jsx:119
+msgid "Automatically enabled"
+msgstr "Abilitato automaticamente"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagModalView.jsx:171
+msgid "Back"
+msgstr "Indietro"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:177
+msgid "Business week to date"
+msgstr "Inizio settimana lavorativa a oggi"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagModalView.jsx:233 ../../apps/splunk_instrumentation/src/Instrumentation/views/SetSchedule/SetScheduleModal.jsx:165 ../../apps/splunk_instrumentation/src/Instrumentation/views/common/ExampleHeaderTableUseView.jsx:92
+msgid "Cancel"
+msgstr "Annulla"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/services/DiagService.es:37
+#, python-format
+msgid "Cannot delete diag with status: %s"
+msgstr "Impossibile eliminare diagnosi con stato: %s"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/services/DiagService.es:59
+#, python-format
+msgid "Cannot download diag with status: %s"
+msgstr "Impossibile scaricare diagnosi con stato: %s"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/LogsReportView.jsx:459
+msgid "Change your settings by clicking the "
+msgstr "Modificare le impostazioni facendo clic su "
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/ExportSendModalView.jsx:155
+msgid "Close"
+msgstr "Chiudi"
+
+#: ../../apps/splunk_instrumentation/default/searchbnf.conf:20
+msgid "Combines specified fields into a stringified JSON"
+msgstr "Combina i campi specificati in un JSON di stringhe"
+
+#: ../../apps/splunk_instrumentation/default/searchbnf.conf:22
+msgid ""
+"Combines the specified set of field names, or field name patterns, \\\n"
+"and creates an field with the output name."
+msgstr ""
+"Combina la serie specificata di nomi di campo, o pattern di nomi di campo, \\\n"
+"e crea un campo con il nome di output."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/BaseLayout.jsx:19
+msgid "Configure automated reporting settings, view collected data, export data to file, work with diagnostic files, and send data to Splunk. "
+msgstr "Configura le impostazioni dei report automatici, visualizza i dati raccolti, esporta i dati su file, esegui i file diagnostici e invia i dati a Splunk. "
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInDropdown.jsx:357
+msgid "Configure automated reporting settings."
+msgstr "Configura le impostazioni dei report automatici."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:450
+msgid "Configure bundle settings to be applied to all instances. "
+msgstr "Configura le impostazioni del bundle da applicare a tutte le istanze. "
+
+#. description
+#: ../../apps/splunk_instrumentation/default/data/ui/manager/instrumentation_index.xml:8
+msgid "Configure instrumentation."
+msgstr "Configura la strumentazione."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagModalView.jsx:186
+msgid "Create"
+msgstr "Crea"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/common/ExampleHeaderTableUseView.jsx:50
+msgid "Create New"
+msgstr "Crea nuova"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagReportView.jsx:594
+msgid "Create New Diags using the button above"
+msgstr "Crea nuove diagnosi utilizzando il pulsante in alto"
+
+#: ../../apps/splunk_instrumentation/default/searchbnf.conf:24
+msgid "Create a stringified JSON: { \"name\": \"<value of name>\", \"data\": { \"count\": <value of data.count>, \"metrics\": [values of data.metrics] }}"
+msgstr "Crea un JSON di stringhe: { \"name\": \"<value of name>\", \"data\": { \"count\": <value of data.count>, \"metrics\": [valori di data.metrics] }}"
+
+#: ../../apps/splunk_instrumentation/default/alert_actions.conf:4
+msgid "Custom action to output results to telemetry endpoint"
+msgstr "Azione personalizzata per trasferire i risultati all'endpoint telemetria"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:421
+msgid "Data"
+msgstr "Dati"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInDropdown.jsx:432
+msgid "Data Transmission Schedule"
+msgstr "Pianificazione di trasmissione dati"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/ExportSendModalView.jsx:135
+msgid "Data Type"
+msgstr "Tipo di dati"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:417
+msgid "Date Range"
+msgstr "Intervallo di date"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/ExportSendModalView.jsx:128
+msgid "Date range"
+msgstr "Intervallo di date"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:148
+msgid "Date ranges more than 1 year are truncated to a year from latest"
+msgstr "Gli intervalli di date superiori a 1 anno vengono troncati a decorrere da un anno dall'ultima data"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:144
+msgid "Date ranges must be less than 1 year"
+msgstr "Gli intervalli di date devono essere inferiori a 1 anno"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:439
+msgid "Delete"
+msgstr "Elimina"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:260
+msgid "Deleted"
+msgstr "Eliminato"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagReportView.jsx:563
+msgid "Diagnostic Log"
+msgstr "Log diagnostico"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagReportView.jsx:564
+msgid "Diagnostic files contain information about your Splunk deployment, such as configuration files and logs, to help Splunk Support diagnose and resolve problems. "
+msgstr "I file diagnostici contengono informazioni sul proprio deployment di Splunk, quali file di configurazione e log, per aiutare il Supporto Splunk a diagnosticare e risolvere eventuali problemi. "
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/common/ExampleHeaderTableUseView.jsx:47
+msgid "Diagnostics Log"
+msgstr "Log diagnostiche"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/common/ExampleHeaderTableUseView.jsx:48
+msgid "Diagnostics contain configuration files and logs that help Splunk support help diagnose and resolve your deployment issues."
+msgstr "Le diagnostiche contengono file di configurazione e log che aiutano il supporto di Splunk a diagnosticare e risolvere i problemi relativi al deployment."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:363 ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:381 ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:320
+msgid "Disable limit"
+msgstr "Disabilita limite"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInStatus.jsx:86
+msgid "Disabled"
+msgstr "Disabilitato"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInDropdown.jsx:101
+msgid "Disabling this may hinder troubleshooting and support for your implementation. "
+msgstr "Disabilitare questa opzione può impedire la risoluzione dei problemi e l'assistenza per l'implementazione in uso. "
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInDropdown.jsx:87
+msgid "Disabling this will exclude your usage data from the data Splunk considers when making improvements to our products and services. "
+msgstr "Disabilitare questa opzione esclude i dati di utilizzo dai dati che Splunk considera quando esegue migliorie ai prodotti e ai servizi. "
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInDropdown.jsx:424
+msgid "Documentation."
+msgstr "Documentazione."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:261
+msgid "Does not exist"
+msgstr "Non esiste"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:438
+msgid "Download"
+msgstr "Download"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:178 ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:227 ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInDropdown.jsx:439
+msgid "Edit"
+msgstr "Modifica"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/SetSchedule/SetScheduleModal.jsx:92
+msgid "Edit Data Transmission Schedule"
+msgstr "Modifica pianificazione di trasmissione dati"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInStatus.jsx:86
+msgid "Enabled"
+msgstr "Abilitato"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:80
+msgid "Error communicating with Splunk. Please check your network connection and try again."
+msgstr "Errore durante la comunicazione con Splunk. Verificare la connessione di rete e riprovare."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagReportView.jsx:69
+msgid "Error fetching list of servers"
+msgstr "Errore durante il recupero degli elenchi di server"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagReportView.jsx:421 ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagReportView.jsx:437
+#, python-format
+msgid "Error: %s"
+msgstr "Errore: %s"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInDropdown.jsx:435
+#, python-format
+msgid "Every %s at %s"
+msgstr "Ogni %s alle %s"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:306
+msgid "Exclude etc files larger than"
+msgstr "Escludi file etc di dimensione superiore a"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:357
+msgid "Exclude log files larger than"
+msgstr "Escludi file di log di dimensione superiore a"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:380
+msgid "Exclude log files older than"
+msgstr "Escludi file di log più vecchi di"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:202 ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:221
+msgid "Exclude patterns"
+msgstr "Escludi pattern"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:302
+msgid "Excludes large files in the Splunk etc directory."
+msgstr "Esclude i file di grandi dimensioni nella directory etc di Splunk."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:351
+msgid "Excludes large files in the Splunk var/log directory, if the log component is selected."
+msgstr "Esclude i file di grandi dimensioni nella directory var/log di Splunk, se è selezionato il componente log."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:375
+msgid "Excludes log files beyond an age given in days. 0 disables this filter."
+msgstr "Esclude i file di log oltre un'età predefinita, indicata in giorni. 0 disabilita questo filtro."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/ExportSendModalView.jsx:161 ../../apps/splunk_instrumentation/src/Instrumentation/views/LogsReportView.jsx:478
+msgid "Export"
+msgstr "Esporta"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/ExportSendModalView.jsx:125
+msgid "Export/Send Usage Data"
+msgstr "Esporta/Invia dati di utilizzo"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/ExportSendModalView.jsx:96
+msgid "Exporting instrumentation data"
+msgstr "Esportazione dei dati di strumentazione in corso"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:259
+msgid "Failed"
+msgstr "Non riuscito"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagNodeListPanel.jsx:248
+msgid "Filter"
+msgstr "Filtro"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:406
+msgid "Filter search terms"
+msgstr "Filtra i termini della ricerca"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInDropdown.jsx:416
+msgid "For more information about these data types, including what information might be collected and how it might be used, see our "
+msgstr "Per maggiori informazioni su questi tipi di dati, incluso il tipo di informazioni che potrebbe essere raccolto e il modo in cui potrebbero essere usate tali informazioni, consulta la nostra "
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:48 ../../apps/splunk_instrumentation/src/Instrumentation/views/SetSchedule/SetScheduleModal.jsx:128
+msgid "Friday"
+msgstr "Venerdì"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:335 ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:345
+msgid "Full"
+msgstr "Intera"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:333
+msgid "Get every crash .dmp file"
+msgstr "Ottieni ogni file di crash .dmp"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:327
+msgid "If \"No\", gathers at most three Windows .dmp files, if the log component is selected."
+msgstr "Se \"No\", acquisisce al massimo tre file .dmp di Windows, se è selezionato il componente log."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:262
+msgid "In progress"
+msgstr "In corso"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:153 ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:174
+msgid "Include components"
+msgstr "Includi componenti"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:424
+msgid "Include lookup files in the etc & pool components."
+msgstr "Includi file di lookup nei componenti etc e gruppo."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:428
+msgid "Include lookups"
+msgstr "Includi lookup"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:285
+msgid "Index directory listing level"
+msgstr "Livello di elenco directory dell'indice"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:261
+msgid "Index files"
+msgstr "File di indice"
+
+#. label
+#: ../../apps/splunk_instrumentation/default/app.conf:11 ../../apps/splunk_instrumentation/default/data/ui/manager/instrumentation_index.xml:6 ../../apps/splunk_instrumentation/src/Instrumentation/views/BaseLayout.jsx:18 ../../apps/splunk_instrumentation/src/Instrumentation/views/ErrorPage.jsx:12
+msgid "Instrumentation"
+msgstr "Strumentazione"
+
+#: ../../apps/splunk_instrumentation/appserver/templates/splunk_instrumentation.html:16
+msgid "Instrumentation | Splunk"
+msgstr "Strumentazione | Splunk"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:217
+msgid "Last 24 hours"
+msgstr "Ultime 24 ore"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:227
+msgid "Last 30 days"
+msgstr "Ultimi 30 giorni"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:222
+msgid "Last 7 days"
+msgstr "Ultimi 7 giorni"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/BaseLayout.jsx:45 ../../apps/splunk_instrumentation/src/Instrumentation/views/SettingsPage/LicenseDataOptOutModal.jsx:60 ../../apps/splunk_instrumentation/src/Instrumentation/views/common/CommonHeaderView.jsx:65
+msgid "Learn More"
+msgstr "Ulteriori informazioni"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:451 ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInStatus.jsx:129
+msgid "Learn more"
+msgstr "Ulteriori informazioni"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:341
+msgid "Light"
+msgstr "Light"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:331
+msgid "Manifests"
+msgstr "Manifesti"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/common/ExampleHeaderTableUseView.jsx:87
+msgid "Modal Header"
+msgstr "Intestazione modale"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:44 ../../apps/splunk_instrumentation/src/Instrumentation/views/SetSchedule/SetScheduleModal.jsx:124
+msgid "Monday"
+msgstr "Lunedì"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:182
+msgid "Month to date"
+msgstr "Inizio mese a oggi"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagNodeListPanel.jsx:281
+msgid "Name"
+msgstr "Nome"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagReportView.jsx:606
+msgid "New Diag"
+msgstr "Nuova diagnosi"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagModalView.jsx:161
+msgid "Next"
+msgstr "Avanti"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:325 ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:418 ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:440
+msgid "No"
+msgstr "No"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagReportView.jsx:590
+msgid "No Diags found"
+msgstr "Nessuna diagnosi trovata"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:140
+msgid "No data available for selected time range"
+msgstr "Nessun dato disponibile per l'intervallo temporale selezionato"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/LogsReportView.jsx:455
+msgid "No data sent in the last 30 days"
+msgstr "Nessun dato inviato negli ultimi 30 giorni"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/common/CommonTableView.jsx:44
+msgid "No results found."
+msgstr "Nessun risultato trovato."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:422
+msgid "Nodes"
+msgstr "Nodi"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/common/ExampleHeaderTableUseView.jsx:93
+msgid "OK"
+msgstr "OK"
+
+#: ../../apps/splunk_instrumentation/default/alert_actions.conf:3
+msgid "Output results to telemetry endpoint"
+msgstr "Trasferisci risultati all'endpoint telemetria"
+
+#: ../../apps/splunk_instrumentation/default/searchbnf.conf:13
+msgid ""
+"Output search results to the telemetry endpoint, using the field named \"data.\"\" Each will be \\\n"
+"named \"my.telemetry\" and is described as a singular \"event\" type. The telemetry event will only be \\\n"
+"sent if the deployment has been opted in to share Anonymized usage data, with opt-in version of 2."
+msgstr ""
+"Trasferire i risultati della ricerca all'endpoint telemetria, utilizzando il campo denominato \"data.\"\" Ciascuno verrà \\\n"
+"nominato \"my.telemetry\" e descritto come un tipo singolare di \"event\". L'evento di telemetria verrà \\\n"
+"inviato solo se il deployment prevede il consenso alla condivisione dei Dati di utilizzo anonimi, con versione 2 del modulo di consenso esplicito."
+
+#: ../../apps/splunk_instrumentation/default/searchbnf.conf:3
+msgid "Outputs search results to telemetry endpoint."
+msgstr "Trasferisce i risultati della ricerca all'endpoint telemetria."
+
+#: ../../apps/splunk_instrumentation/default/searchbnf.conf:9
+msgid ""
+"Outputs search results to telemetry endpoint. \\\n"
+"Required field “input” will have the endpoint payload. \\\n"
+"The other fields “component”, “type”, “optinrequired” \\\n"
+"are optional fields but the endpoint expects them to be supplied either with the search command \\\n"
+"or to be found in the event data.\\\n"
+"Visibility fields \"anonymous\", \"license\" and \"support\" are optional."
+msgstr ""
+"Trasferisce i risultati della ricerca all'endpoint telemetria. \\\n"
+"Il campo obbligatorio “input” avrà il payload dell'endpoint. \\\n"
+"Gli altri campi, “component”, “type”, “optinrequired”, \\\n"
+"sono facoltativi, ma l'endpoint si attende che vengano forniti mediante il comando di ricerca \\\n"
+"o che si trovino nei dati dell'evento.\\\n"
+"I campi di visibilità \"anonymous\", \"license\" e \"support\" sono facoltativi."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:202
+msgid "Previous business week"
+msgstr "Settimana lavorativa precedente"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:207
+msgid "Previous month"
+msgstr "Mese precedente"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:197
+msgid "Previous week"
+msgstr "Settimana precedente"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:212
+msgid "Previous year"
+msgstr "Anno precedente"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInDropdown.jsx:420
+msgid "Privacy Policy"
+msgstr "Informativa sulla privacy"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:263
+msgid "Queued"
+msgstr "In coda"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:437
+msgid "Recreate"
+msgstr "Ricrea"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagModalView.jsx:228
+msgid "Revert to default"
+msgstr "Ritorna ai valori di default"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagNodeListPanel.jsx:282
+msgid "Roles"
+msgstr "Ruoli"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:49 ../../apps/splunk_instrumentation/src/Instrumentation/views/SetSchedule/SetScheduleModal.jsx:129
+msgid "Saturday"
+msgstr "Sabato"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/SetSchedule/SetScheduleModal.jsx:171
+msgid "Save"
+msgstr "Salva"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/SetSchedule/SetScheduleModal.jsx:97
+msgid "Scheduled "
+msgstr "Pianificato "
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/TimeRangeModal.jsx:76
+msgid "Select Time Range"
+msgstr "Selezionare intervallo temporale"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagNodeListPanel.jsx:230
+msgid "Select instance you want to collect data from."
+msgstr "Selezionare l'istanza dalla quale acquisire i dati."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/ExportSendModalView.jsx:168
+msgid "Send"
+msgstr "Invia"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/ExportSendModalView.jsx:98
+msgid "Sending instrumentation data"
+msgstr "Invio dei dati di strumentazione in corso"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInDropdown.jsx:413
+msgid "Sharing your software usage data helps Splunk Inc. optimize your deployment, prioritize our features, improve your experience, notify you of patches, and develop high quality product functionality. "
+msgstr "La condivisione dei dati di utilizzo del software aiuta Splunk Inc. a ottimizzare il tuo deployment, stabilire una priorità tra le funzioni, migliorare la tua esperienza, informarti delle patch disponibili e sviluppare funzionalità di elevata qualità per i prodotti. "
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:423
+msgid "Size"
+msgstr "Dimensioni"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:420
+msgid "Status"
+msgstr "Stato"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:258 ../../apps/splunk_instrumentation/src/Instrumentation/views/common/CommonTableView.jsx:120
+msgid "Success"
+msgstr "Successo"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:50 ../../apps/splunk_instrumentation/src/Instrumentation/views/SetSchedule/SetScheduleModal.jsx:130
+msgid "Sunday"
+msgstr "Domenica"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:425
+msgid "TestHeader1"
+msgstr "TestHeader1"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:426
+msgid "TestHeader2"
+msgstr "TestHeader2"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:427
+msgid "TestHeader3"
+msgstr "TestHeader3"
+
+#: ../../apps/splunk_instrumentation/default/app.conf:16
+msgid "This application connects the hosting Splunk instance to Splunk's usage data collection services."
+msgstr "Questa applicazione connette l'istanza che ospita Splunk ai servizi di raccolta dei dati di utilizzo di Splunk."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagNodeListPanel.jsx:223
+msgid "This list shows the instances connected to this search head. If you have configured Monitoring Console in distributed mode, use that instance to collect data from any instances not listed here."
+msgstr "Questo elenco mostra le istanze collegate a questa search head. Se hai configurato la Console di monitoraggio in modalità distribuita, utilizza tale istanza per raccogliere dati da qualsiasi istanza non contenuta nell'elenco."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:47 ../../apps/splunk_instrumentation/src/Instrumentation/views/SetSchedule/SetScheduleModal.jsx:127
+msgid "Thursday"
+msgstr "Giovedì"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:424
+msgid "Time Created"
+msgstr "Ora di creazione"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:419
+msgid "Time Sent"
+msgstr "Ora di invio"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInDropdown.jsx:108
+msgid "To ensure compliance with your purchased offering, we collect data about your license consumption. This data is linked to your account using your license GUID. "
+msgstr "Per garantire la conformità all'offerta acquistata, raccogliamo dati sul consumo della licenza. Questi dati sono collegati al tuo account mediante il GUID della licenza. "
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInDropdown.jsx:83
+msgid "To improve our products and offerings, we collect information about your operating environment and configuration, user and product interactions, and sessions. This information might include feature usage, performance, deployment topology, and infrastructure. We do not associate this data with your account. "
+msgstr "Per migliorare i nostri prodotti e offerte, raccogliamo informazioni sul sistema operativo e la configurazione, sulle interazioni con i prodotti e gli utenti e sulle sessioni. Queste informazioni potrebbero includere l'utilizzo delle funzioni, le performance, la topologia di deployment e l'infrastruttura. Questi dati non vengono associati al tuo account. "
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInDropdown.jsx:96
+msgid "To provide enhanced support and help you troubleshoot and improve your implementation and configurations, we collect Usage Data, including information on feature usage, performance, topology, infrastructure, and operating environment for this deployment. We link this data to your account using your license's globally unique identifier (GUID). "
+msgstr "Per fornire un supporto eccellente e aiutarti a risolvere i problemi e migliorare l'implementazione e le configurazioni in uso, raccogliamo Dati di utilizzo, incluse informazioni sull'utilizzo delle funzioni, performance, topologia, infrastruttura e ambiente operativo di questo deployment. Questi dati sono collegati al tuo account mediante il GUID (Globally Unique Identifier) della licenza. "
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInDropdown.jsx:116
+msgid "To understand the number of customers using older versions of Splunk software, we collect aggregated software version data. "
+msgstr "Per conoscere il numero di clienti che utilizza versioni meno recenti del software Splunk, raccogliamo dati aggregati sulle versioni del software. "
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:167
+msgid "Today"
+msgstr "Oggi"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:45 ../../apps/splunk_instrumentation/src/Instrumentation/views/SetSchedule/SetScheduleModal.jsx:125
+msgid "Tuesday"
+msgstr "Martedì"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/LogsReportView.jsx:390
+msgid "Usage Data"
+msgstr "Dati di utilizzo"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/LogsReportView.jsx:398
+msgid "View in Search: "
+msgstr "Visualizza in Ricerca: "
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/LogsReportView.jsx:466
+msgid "View license usage, anonymized usage, and support usage data that has been collected (does not include browser session data). "
+msgstr "Visualizza i dati di utilizzo licenza, anonimi e di supporto che sono stati raccolti (non include i dati relativi alle sessioni del browser). "
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:46 ../../apps/splunk_instrumentation/src/Instrumentation/views/SetSchedule/SetScheduleModal.jsx:126
+msgid "Wednesday"
+msgstr "Mercoledì"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:172
+msgid "Week to date"
+msgstr "Inizio settimana a oggi"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:187
+msgid "Year to date"
+msgstr "Inizio anno a oggi"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:321 ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:417 ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:439
+msgid "Yes"
+msgstr "Sì"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:192
+msgid "Yesterday"
+msgstr "Ieri"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/SetSchedule/SetScheduleModal.jsx:157
+msgid "am"
+msgstr "am"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:288
+msgid "conf_replication_summary"
+msgstr "conf_replication_summary"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:287
+msgid "consensus"
+msgstr "consensus"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:43
+msgid "day"
+msgstr "giorno"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:282
+msgid "dispatch"
+msgstr "invio"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:209
+msgid "e.g. *.csv to exclude all csv files"
+msgstr "ad es. *.csv per escludere tutti i file csv"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:283
+msgid "etc"
+msgstr "etc"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/SetSchedule/SetScheduleModal.jsx:107
+msgid "every day"
+msgstr "ogni giorno"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/SetSchedule/SetScheduleModal.jsx:108
+msgid "every week"
+msgstr "ogni settimana"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:291
+msgid "file_validate"
+msgstr "file_validate"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:280
+msgid "index_files"
+msgstr "index_files"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:281
+msgid "index_listing"
+msgstr "index_listing"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagNodeListPanel.jsx:222
+msgid "instance"
+msgstr "istanza"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagNodeListPanel.jsx:222
+msgid "instances"
+msgstr "istanze"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:289
+msgid "kvstore"
+msgstr "kvstore"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:284
+msgid "log"
+msgstr "log"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/SetSchedule/SetScheduleModal.jsx:158
+msgid "pm"
+msgstr "pm"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:285
+msgid "pool"
+msgstr "gruppo"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:290
+msgid "rest"
+msgstr "rest"
+
+#: ../../apps/splunk_instrumentation/default/searchbnf.conf:27
+msgid "results::filter"
+msgstr "risultati::filtra"
+
+#: ../../apps/splunk_instrumentation/default/searchbnf.conf:16
+msgid "results::write"
+msgstr "risultati::scrivi"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:286
+msgid "searchpeers"
+msgstr "peer di ricerca"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagNodeListPanel.jsx:120 ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagSelectedNodeListView.jsx:55
+msgid "selected"
+msgstr "selezionato"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:153
+msgid "unknown error"
+msgstr "errore sconosciuto"

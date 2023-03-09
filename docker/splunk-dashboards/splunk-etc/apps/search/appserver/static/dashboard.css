@@ -1,0 +1,15 @@
+.SingleValueHolder {
+    background-image: none;
+    -moz-box-shadow: none;
+}
+
+#SingleValue_0_1_0 .SingleValueHolder {
+    background: none;
+    text-align: left;
+    font-weight: normal;
+    width: auto;
+    padding-top: 0;
+    padding-left: 0;
+    font-size: 14px;
+    -moz-box-shadow: none;
+}

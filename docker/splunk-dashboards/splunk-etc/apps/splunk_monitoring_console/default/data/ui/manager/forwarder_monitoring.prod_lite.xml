@@ -1,0 +1,9 @@
+<endpoint name="unused">
+    <menu name="system_configurations">
+        <label>Forwarder monitoring</label>
+        <url>/app/splunk_monitoring_console/monitoringconsole_forwarder_setup</url>
+        <description>Monitor forwarders.</description>
+        <order>29</order>
+        <id>forwarder_monitoring</id>
+    </menu>
+</endpoint>

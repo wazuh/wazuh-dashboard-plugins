@@ -1,0 +1,4 @@
+<?xml version="1.1"?>
+<view template="python_upgrade_readiness_app:/templates/jquery_scan.html" type="html">
+	<label>jQuery Scan</label>
+</view>

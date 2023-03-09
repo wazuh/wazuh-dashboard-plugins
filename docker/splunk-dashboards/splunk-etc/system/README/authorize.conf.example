@@ -1,0 +1,43 @@
+#   Version 9.0.3
+#
+# This is an example authorize.conf.  Use this file to configure roles and
+# capabilities.
+#
+# To use one or more of these configurations, copy the configuration block
+# into authorize.conf in $SPLUNK_HOME/etc/system/local/.  You must reload
+# auth or restart Splunk to enable configurations.
+#
+# To learn more about configuration files (including precedence) please see
+# the documentation located at
+# http://docs.splunk.com/Documentation/Splunk/latest/Admin/Aboutconfigurationfiles
+
+[role_ninja]
+rtsearch = enabled
+importRoles = user
+srchFilter = host=foo
+srchIndexesAllowed = *
+srchIndexesDefault = mail;main
+srchJobsQuota   = 8
+rtSrchJobsQuota = 8
+srchDiskQuota   = 500
+srchTimeWin = 86400
+srchTimeEarliest = 2592000
+
+# This creates the role 'ninja', which inherits capabilities from the 'user'
+# role.  ninja has almost the same capabilities as power, except cannot
+# schedule searches.
+#
+# The search filter limits ninja to searching on host=foo.
+#
+# ninja is allowed to search all public indexes (those that do not start
+# with underscore), and will search the indexes mail and main if no index is
+# specified in the search.
+#
+# ninja is allowed to run 8 search jobs and 8 real time search jobs
+# concurrently (these counts are independent).
+#
+# ninja is allowed to take up 500 megabytes total on disk for all their jobs.
+#
+# ninja is allowed to run searches that span a maximum of one day
+#
+# ninja is allowed to run searches on data that is newer than 30 days ago

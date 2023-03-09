@@ -1,0 +1,495 @@
+<form version="1.1" hideEdit="True" script="common_control.js" stylesheet="health-check.css">
+  <label>Search Head Clustering: Configuration Replication</label>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="dropdown" searchWhenChanged="true" token="group">
+      <label>Search Head Cluster:</label>
+      <showClearButton>false</showClearButton>
+      <populatingSearch fieldForLabel="label" fieldForValue="search_group">
+        | `dmc_get_search_head_cluster_groups`
+      </populatingSearch>
+      <selectFirstChoice>true</selectFirstChoice>
+    </input>
+  </fieldset>
+  <search id="confOpSearch">
+    <query>
+`dmc_set_index_internal` sourcetype=splunkd_conf search_group="$group$" component=ConfOp data.task=*addCommit
+| stats count by _time, host, optype_desc, object_name, object_type, app, owner
+    </query>
+    <earliest>$time.earliest$</earliest>
+    <latest>$time.latest$</latest>
+  </search>
+  <row>
+    <panel>
+      <title>Health Check</title>
+      <search id="common_baseline_search">
+        <query>
+          | rest splunk_server_group="$group$" splunk_server_group=dmc_group_search_head /services/shcluster/member/members
+          | join label type=outer [
+            | rest /services/replication/configuration/health check_share_baseline=1 splunk_server_group="$group$" splunk_server_group=dmc_group_search_head
+            | stats values(server_name) as baselines, count(server_name) as num_baselines by splunk_server, check_share_baseline
+            | eval shared_common_baseline = if(check_share_baseline == "Yes", baselines, "")
+            | eval no_shared_common_baseline = if(check_share_baseline == "No", baselines, "")
+            | eval unable_to_connect = if(check_share_baseline == "Connection error", baselines, "")
+            | eval num_shared_common_baseline = if(check_share_baseline == "Yes", num_baselines, 0)
+            | eval num_no_shared_common_baseline = if(check_share_baseline == "No", num_baselines, 0)
+            | eval num_unable_to_connect = if(check_share_baseline == "Connection error", num_baselines, 0)
+            | stats sum(num_shared_common_baseline) as total_shared_common_baseline, sum(num_no_shared_common_baseline) as total_no_shared_common_baseline, sum(num_unable_to_connect) as total_unable_to_connect, values(shared_common_baseline) as shared_common_baseline, values(no_shared_common_baseline) as no_shared_common_baseline, values(unable_to_connect) as unable_to_connect by splunk_server
+            | eval ratio = total_shared_common_baseline . "/" . (total_shared_common_baseline+total_no_shared_common_baseline+total_unable_to_connect)
+            | rename splunk_server as label
+          ]
+          | where total_no_shared_common_baseline+total_unable_to_connect > 0
+        </query>
+        <preview>
+          <condition match="$job.resultCount$ = 0">
+            <set token="common_baseline_text_healthy">All members in this cluster share a common baseline.</set>
+            <unset token="common_baseline_text_unhealthy"></unset>
+          </condition>
+          <condition match="$job.resultCount$ > 0">
+            <set token="common_baseline_text_unhealthy">There are members in this cluster that do not share a common baseline. Action may be required.</set>
+            <unset token="common_baseline_text_healthy"></unset>
+          </condition>
+        </preview>
+      </search>
+      <html depends="$common_baseline_text_unhealthy$">
+        <div class="dmc-kpi-item">
+          <div class="alert alert-warning">
+            <i class="icon-alert"></i>
+            <h5>$common_baseline_text_unhealthy$ <a href="shc_status_and_conf?form.group=$group$">click to see more details.</a> <a href="/help?location=learnmore.shc.confreplication" target="_blank" class="external">Learn More</a></h5>
+          </div>
+        </div>
+      </html>
+      <html depends="$common_baseline_text_healthy$">
+        <div class="dmc-kpi-item">
+          <div class="alert alert-success">
+            <i class="icon-alert"></i>
+            <h5>$common_baseline_text_healthy$</h5>
+          </div>
+        </div>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Warning and Error Patterns</title>
+      <input type="time" searchWhenChanged="true" token="warningErrorTime">
+        <label>Time Range:</label>
+        <default>
+          <earliestTime>-24h</earliestTime>
+          <latestTime>now</latestTime>
+        </default>
+      </input>
+      <table>
+        <search>
+          <query>
+`dmc_get_warnings_and_errors("$group$", ConfReplication*)`
+| cluster showcount=t
+| table cluster_count, _time, log_level, component, event_message, punct
+| sort - cluster_count
+| `dmc_time_format(_time)`
+| rename cluster_count AS Count, _time AS "Latest Time", log_level as "Log Level", component as Component, event_message as "Latest Message"
+          </query>
+          <earliest>$warningErrorTime.earliest$</earliest>
+          <latest>$warningErrorTime.latest$</latest>
+        </search>
+        <fields>Count, "Latest Time", "Log Level", Component, "Latest Message"</fields>
+        <option name="drilldown">row</option>
+        <drilldown>
+          <set token="warningErrorPunct">$row.punct$</set>
+        </drilldown>
+      </table>
+      <html>
+        <p>Click on a row to see event details.</p>
+      </html>
+    </panel>
+    <panel depends="$warningErrorPunct$">
+      <title>Event Details</title>
+      <event>
+        <search>
+          <query>
+`dmc_get_warnings_and_errors("$group$", ConfReplication*)` punct="$warningErrorPunct$"
+          </query>
+          <earliest>$warningErrorTime.earliest$</earliest>
+          <latest>$warningErrorTime.latest$</latest>
+        </search>
+        <option name="rowNumbers">true</option>
+      </event>
+      <html>
+        <a data-unset-token="warningErrorPunct">Close this panel</a>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Historical Charts</title>
+      <input type="time" searchWhenChanged="true" token="time">
+        <label>Time Range:</label>
+        <default>
+          <earliestTime>-4h@m</earliestTime>
+          <latestTime>now</latestTime>
+        </default>
+      </input>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Configuration Replication Activity</title>
+      <input type="dropdown" token="confOpHostScope" searchWhenChanged="true">
+        <label>Member</label>
+        <showClearButton>false</showClearButton>
+        <default>where 1==1</default>
+        <choice value="where 1==1">All</choice>
+        <fieldForLabel>host</fieldForLabel>
+        <fieldForValue>host_scope</fieldForValue>
+        <search base="confOpSearch">
+          <query>
+            | stats count by host
+            | eval host_scope = "where host == \"".host."\""
+          </query>
+        </search>
+      </input>
+      <input type="dropdown" token="confOpAppScope" searchWhenChanged="true">
+        <label>App Context</label>
+        <showClearButton>false</showClearButton>
+        <default>where 1==1</default>
+        <choice value="where 1==1">All</choice>
+        <fieldForLabel>app</fieldForLabel>
+        <fieldForValue>app_scope</fieldForValue>
+        <search base="confOpSearch">
+          <query>
+            | stats count by app
+            | eval app_scope = "where app == \"".app."\""
+          </query>
+        </search>
+      </input>
+      <input type="dropdown" token="confOpOperationTypeScope" searchWhenChanged="true">
+        <label>Operation Type</label>
+        <showClearButton>false</showClearButton>
+        <default>where 1==1</default>
+        <choice value="where 1==1">All</choice>
+        <fieldForLabel>optype_desc</fieldForLabel>
+        <fieldForValue>optype_desc_scope</fieldForValue>
+        <search base="confOpSearch">
+          <query>
+            | stats count by optype_desc
+            | eval optype_desc_scope = "where optype_desc == \"".optype_desc."\""
+          </query>
+        </search>
+      </input>
+      <input type="dropdown" token="confOpObjTypeScope" searchWhenChanged="true">
+        <label>Object Type</label>
+        <showClearButton>false</showClearButton>
+        <default>where 1==1</default>
+        <choice value="where 1==1">All</choice>
+        <fieldForLabel>object_type</fieldForLabel>
+        <fieldForValue>object_type_scope</fieldForValue>
+        <search base="confOpSearch">
+          <query>
+            | stats count by object_type
+            | eval object_type_scope = "where object_type == \"".object_type."\""
+          </query>
+        </search>
+      </input>
+      <input type="dropdown" token="confOpObjNameScope" searchWhenChanged="true">
+        <label>Object Name</label>
+        <showClearButton>false</showClearButton>
+        <default>where 1==1</default>
+        <choice value="where 1==1">All</choice>
+        <fieldForLabel>object_name</fieldForLabel>
+        <fieldForValue>object_name_scope</fieldForValue>
+        <search base="confOpSearch">
+          <query>
+            | stats count by object_name
+            | eval object_name_scope = "where object_name == \"".object_name."\""
+          </query>
+        </search>
+      </input>
+      <input type="dropdown" token="confOpOwnerScope" searchWhenChanged="true">
+        <label>User Context</label>
+        <showClearButton>false</showClearButton>
+        <default>where 1==1</default>
+        <choice value="where 1==1">All</choice>
+        <fieldForLabel>owner</fieldForLabel>
+        <fieldForValue>owner_scope</fieldForValue>
+        <search base="confOpSearch">
+          <query>
+            | stats count by owner
+            | eval owner_scope = "where owner == \"".owner."\""
+          </query>
+        </search>
+      </input>
+      <input type="dropdown" token="confOpBy" searchWhenChanged="true">
+        <label>Group by</label>
+        <showClearButton>false</showClearButton>
+        <default>object_type</default>
+        <choice value="optype_desc">Operation Type</choice>
+        <choice value="object_type">Object Type</choice>
+        <choice value="object_name">Object Name</choice>
+        <choice value="owner">Owner</choice>
+        <choice value="app">App</choice>
+        <choice value="host">Member</choice>
+      </input>
+      <chart>
+        <title>Replicated Configuration Operations</title>
+        <search base="confOpSearch">
+          <query>
+            $confOpAppScope$
+            | $confOpOperationTypeScope$
+            | $confOpObjTypeScope$
+            | $confOpObjNameScope$
+            | $confOpOwnerScope$
+            | $confOpHostScope$
+            | timechart count by $confOpBy$ usenull=f
+          </query>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.axisTitleY.text">Operation Count</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+      </chart>
+      <table>
+        <title>Configuration Replication History</title>
+        <search base="confOpSearch">
+          <query>
+            fields - count
+| $confOpOperationTypeScope$
+| $confOpObjTypeScope$
+| $confOpObjNameScope$
+| $confOpOwnerScope$
+| $confOpHostScope$
+| sort - _time
+| rename _time as Time, host as Instance, optype_desc as "Operation Type", object_name as "Object Name", object_type as "Object Type", app as App, owner as Owner
+| `dmc_time_format(Time)`
+          </query>
+        </search>
+        <option name="drilldown">off</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Configuration Replication Performance</title>
+      <search id="confRepPerfSearch">
+        <query>
+`dmc_set_index_internal` sourcetype=splunkd search_group="$group$" group=conf
+| `dmc_set_bin_for_metrics_log`
+| stats sum(count) as count, sum(wallclock_ms_total) as sum_total_time, max(wallclock_ms_max) as max_max_time by _time, action, host
+        </query>
+        <earliest>$time.earliest$</earliest>
+        <latest>$time.latest$</latest>
+      </search>
+      <chart>
+        <search base="confRepPerfSearch">
+          <query>
+`dmc_timechart_for_metrics_log` sum(count) as count latest(eval(sum_total_time / count)) as avg_time_per_action latest(max_max_time) as max_time_per_action
+          </query>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisLabelsY2.majorUnit">1</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">true</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.overlayFields">count</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.chart.showLabels">auto</option>
+        <option name="charting.axisTitleY2.text">Count of Actions</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.axisTitleY.text">Time Spent (ms)</option>
+        <option name="charting.axisTitleX.text">Time</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Count of Actions Over Time</title>
+      <input type="dropdown" token="confRepPerfCountHostScope" searchWhenChanged="true">
+        <label>Host</label>
+        <showClearButton>false</showClearButton>
+        <default>*</default>
+        <choice value="*">All</choice>
+        <fieldForLabel>host</fieldForLabel>
+        <fieldForValue>host</fieldForValue>
+        <search base="confRepPerfSearch">
+          <query>stats count by host</query>
+        </search>
+        <prefix>search host="</prefix>
+        <suffix>"</suffix>
+      </input>
+      <input type="dropdown" token="confRepPerfCountActionScope" searchWhenChanged="true">
+        <label>Action</label>
+        <showClearButton>false</showClearButton>
+        <default>*</default>
+        <choice value="*">All</choice>
+        <fieldForLabel>action</fieldForLabel>
+        <fieldForValue>action</fieldForValue>
+        <search base="confRepPerfSearch">
+          <query>stats count by action</query>
+        </search>
+        <prefix>search action="</prefix>
+        <suffix>"</suffix>
+      </input>
+      <input type="dropdown" token="confRepPerfCountSplitBy" searchWhenChanged="true">
+        <label>Split by</label>
+        <showClearButton>false</showClearButton>
+        <default>action</default>
+        <choice value="action">action</choice>
+        <choice value="host">host</choice>
+      </input>
+      <chart>
+        <search base="confRepPerfSearch">
+          <query>
+$confRepPerfCountHostScope$
+| $confRepPerfCountActionScope$
+| `dmc_timechart_for_metrics_log` sum(count) by $confRepPerfCountSplitBy$
+          </query>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.axisLabelsY2.majorUnit">1</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.text">Count</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.chart.showLabels">auto</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Time Spent on Actions Over Time</title>
+      <input type="dropdown" token="confRepPerfMetric" searchWhenChanged="true">
+        <label>Metric</label>
+        <showClearButton>false</showClearButton>
+        <default>max(max_max_time) as max_time</default>
+        <choice value="latest(eval(sum_total_time/count)) as avg_time">Average Time</choice>
+        <choice value="max(max_max_time) as max_time">Max Time</choice>
+      </input>
+      <input type="dropdown" token="confRepPerfTimeHostScope" searchWhenChanged="true">
+        <label>Host</label>
+        <showClearButton>false</showClearButton>
+        <default>*</default>
+        <choice value="*">All</choice>
+        <fieldForLabel>host</fieldForLabel>
+        <fieldForValue>host</fieldForValue>
+        <search base="confRepPerfSearch">
+          <query>stats count by host</query>
+        </search>
+        <prefix>search host="</prefix>
+        <suffix>"</suffix>
+      </input>
+      <input type="dropdown" token="confRepPerfTimeActionScope" searchWhenChanged="true">
+        <label>Action</label>
+        <showClearButton>false</showClearButton>
+        <default>*</default>
+        <choice value="*">All</choice>
+        <fieldForLabel>action</fieldForLabel>
+        <fieldForValue>action</fieldForValue>
+        <search base="confRepPerfSearch">
+          <query>stats count by action</query>
+        </search>
+        <prefix>search action="</prefix>
+        <suffix>"</suffix>
+      </input>
+      <input type="dropdown" token="confRepPerfTimeSplitBy" searchWhenChanged="true">
+        <label>Split by</label>
+        <showClearButton>false</showClearButton>
+        <default>action</default>
+        <choice value="action">action</choice>
+        <choice value="host">host</choice>
+      </input>
+      <chart>
+        <search base="confRepPerfSearch">
+          <query>
+$confRepPerfTimeHostScope$
+| $confRepPerfTimeActionScope$
+| `dmc_timechart_for_metrics_log` $confRepPerfMetric$ by $confRepPerfTimeSplitBy$
+          </query>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.axisLabelsY2.majorUnit">1</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.text">Time Spent (ms)</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.chart.showLabels">auto</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+        <p>Definitions for these actions are available in our online documentation. <a class="external" href="/help?location=learnmore.shclustering.actions" target="_blank">Learn more</a>.</p>
+      </html>
+    </panel>
+  </row>
+</form>

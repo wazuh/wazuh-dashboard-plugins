@@ -1,0 +1,18 @@
+<dashboard hideEdit="True" version="1.1" theme="dark">
+  <tags>mobile,tv</tags>
+  <label>Single Value Test</label>
+  <description>This single-value panel is a test to check if a simple dashboard loads in Splunk Secure Gateway. It helps identify possible causes for issues during troubleshooting.</description>
+  <row>
+    <panel>
+      <title>Single Value</title>
+      <single>
+        <title>Single Value</title>
+        <search>
+          <query>| makeresults | eval testValue=random() | table testValue</query>
+          <refresh>15s</refresh>
+        </search>
+        <option name="drilldown">none</option>
+      </single>
+    </panel>
+  </row>
+</dashboard>

@@ -1,0 +1,28 @@
+<endpoint name="view-widgets">
+  <header>View widgets</header>
+  <elements>
+    <element type="fieldset">
+      <elements>
+        <element name="fieldset_test1" type="textfield" label="Fieldset Textfield"/>
+        <element name="fieldset_test2" type="checkbox" label="Fieldset Checkbox"/>
+      </elements>
+      <key name="legend">Legend goes here</key>
+    </element>
+    <element name="test_password" type="password" label="Test password"/>
+    <element name="test_radio" type="radio" label="Test radio">
+      <options>
+        <opt value="0" label="Option 1"/>
+        <opt value="1" label="Option 2"/>
+      </options>
+    </element>
+    <element name="test_multiselect" type="multiselect" label="Share with role">
+      <options>
+        <opt value="" label="Nobody at all"/>
+        <opt value="admin" label="Boss of me"/>
+        <opt value="power" label="Guy is Strong"/>
+        <opt value="user" label="Lowly Peon Green"/>
+        <opt value="Everybody" label="The whole world"/>
+      </options>
+    </element>
+  </elements>
+</endpoint>

@@ -1,0 +1,44 @@
+{
+  "__class__": "rapid_diag.task.Task",
+  "collectors": [
+    {
+      "__class__": "rapid_diag.collector.trigger.periodic.Periodic",
+      "collectors": [
+        {
+          "__class__": "rapid_diag.collector.stack_trace.StackTrace",
+          "process": {
+            "__class__": "rapid_diag.process_abstraction.Process",
+            "pid": 0,
+            "name": "splunkd",
+            "args": "splunkd",
+            "process_type": "splunkd server",
+            "ppid": 0,
+            "default_value_description": "By default, the main splunkd process is selected."
+          }
+        }
+      ],
+      "sampleCount": 1000,
+      "interval": 0.5
+    },
+    {
+      "__class__": "rapid_diag.collector.trigger.periodic.Periodic",
+      "collectors": [
+        {
+          "__class__": "rapid_diag.collector.netstat.NetStat"
+        }
+      ],
+      "sampleCount": 600,
+      "interval": 1.0
+    },
+    {
+      "__class__": "rapid_diag.collector.diag.Diag"
+    }
+  ],
+  "name": "Cluster peer health",
+  "collector_tool_names": "netstat, pstack, splunkdiag",
+  "description": "For investigating issues related to a cluster peer state.",
+  "host": "",
+  "task_id": "slave-issues",
+  "features" : [ "slave_state", "slave_version" ],
+  "symptoms" : [ "cluster-issues", "version-mismatch" ]
+}

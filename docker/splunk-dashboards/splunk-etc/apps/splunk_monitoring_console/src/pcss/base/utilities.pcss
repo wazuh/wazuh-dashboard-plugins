@@ -1,0 +1,53 @@
+/*===============================================================================================*/
+/*  SPLUNK: UTILITY CLASSES                                                                      */
+/*===============================================================================================*/
+
+/*  Quick floats */
+.pull-right {
+    float: right;
+}
+.pull-left {
+    float: left;
+}
+
+/*  Toggling content */
+.hide {
+    display: none;
+}
+.show {
+    display: block;
+}
+
+/*  Visibility */
+.invisible {
+    visibility: hidden;
+}
+
+/*  For Affix plugin */
+.affix {
+    position: fixed;
+}
+
+/* Proxy mixin s */
+.clearfix {
+    @mixin clearfix;
+}
+
+.hide-text {
+    @mixin hide-text;
+}
+
+.input-block-level {
+    @mixin input-block-level;
+}
+
+/* 508 helper class - Hide only visually, but have it available for screenreaders */
+.visuallyhidden {
+    clip: rect(0 0 0 0);
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    border: 0;
+}

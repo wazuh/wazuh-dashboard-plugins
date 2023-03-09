@@ -1,0 +1,149 @@
+<form version="1.1" hideEdit="True" script="cell_fill_gauge.js, common_control.js">
+  <label>Workload Management Overview</label>
+  <row>
+    <panel rejects="$historical$">
+      <title>Workload Management Status</title>
+      <table>
+        <searchString>
+          | inputlookup dmc_assets
+          | rename serverName AS splunk_server
+          | where (match(search_group, "dmc_group_"))
+          | `dmc_set_group_label_and_sort(search_group)`
+          | stats values(label) AS roles by splunk_server
+          | makemv roles
+          | join type=outer splunk_server [rest splunk_server=* /services/server/info
+              | fields splunk_server, os_name, os_version]
+          | eval OS = 'os_name'." ".'os_version'
+          | join type=outer splunk_server [rest splunk_server=* /services/workloads/status/workload-management-status
+              | fields splunk_server, general.isSupported, general.enabled, general.error_message]
+          | eval Status = case('general.isSupported' = 0 OR isnull('general.isSupported'), "Unsupported", 'general.isSupported' = 1, "Supported")." / ".case('general.enabled' = 0, "Disabled", 'general.enabled' = 1, "Enabled", isnull('general.enabled'), "N/A")
+          | fields splunk_server, roles, OS, Status, general.error_message
+          | rename splunk_server AS "Instance", roles AS Roles, general.error_message AS "Error Messages"
+        </searchString>
+      </table>
+    </panel>
+  </row>
+
+  <row>
+    <panel rejects="$historical$">
+      <title>Workload Pool Configuration</title>
+      <table>
+        <searchString>
+          | inputlookup dmc_assets
+          | rename serverName AS splunk_server
+          | where (match(search_group, "dmc_group_"))
+          | `dmc_set_group_label_and_sort(search_group)`
+          | stats values(label) AS roles by splunk_server
+          | makemv roles
+          | join type=outer splunk_server [rest splunk_server=* /services/workloads/pools
+              | eval default_pool=if(category=="search" and default_category_pool=="1",(if(isNull('title'), "Not Configured", 'title')),NULL)
+              | eval ingest_pool=if(category=="ingest" and default_category_pool=="1",(if(isNull('title'), "Not Configured", 'title')),NULL)
+              | stats values(eval(if(title!="general",title,NULL))) as pools values(default_pool) AS default_pool values(ingest_pool) AS ingest_pool by splunk_server]
+          | fields splunk_server, roles, default_pool, ingest_pool, pools
+          | rename splunk_server AS "Instance", roles AS Roles, default_pool AS "Default Search Pool", ingest_pool AS "Default Ingest Pool" pools AS "All Pools"
+        </searchString>
+      </table>
+    </panel>
+  </row>
+
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Historical Charts</title>
+      <input type="time" searchWhenChanged="true" token="time">
+        <label>Time Range:</label>
+        <default>
+          <earliestTime>-4h@m</earliestTime>
+          <latestTime>now</latestTime>
+        </default>
+      </input>
+
+      <input type="radio" searchWhenChanged="true" token="role">
+        <label>Role</label>
+        <choice value="dmc_group_search_head">Search Heads</choice>
+        <choice value="dmc_group_indexer">Indexers</choice>
+        <choice value="*">All</choice>
+        <default>dmc_group_search_head</default>
+      </input>
+    </panel>
+  </row>
+
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Deployment-Wide $CPUFunctionLabel$ CPU Usage by Workload Pool</title>
+      <input type="dropdown" token="CPUFunction" searchWhenChanged="true">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <default>Median</default>
+        <choice value="Avg">Average</choice>
+        <choice value="Median">Median</choice>
+        <choice value="Min">Minimum</choice>
+        <choice value="Max">Maximum</choice>
+        <choice value="Perc90">90th Percentile</choice>
+        <choice value="First">Sampled</choice>
+        <change>
+          <set token="CPUFunctionLabel">$label$</set>
+        </change>
+      </input>
+
+      <chart>
+        <search>
+          <query>
+             `dmc_set_index_introspection` search_group="$role$" sourcetype=splunk_resource_usage component=PerProcess
+             | `dmc_rename_introspection_fields`
+             | `dmc_set_bin`
+             | stats sum(pct_cpu) as pct_cpu by host, workload_pool, _time
+             | `dmc_timechart` $CPUFunction$(pct_cpu) as pct_cpu by workload_pool
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">CPU Usage (%)</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+      </chart>
+    </panel>
+</row>
+
+<row>
+    <panel rejects="$snapshot$">
+      <title>Deployment-Wide $MemFuncLabel$ Physical Memory Usage by Workload Pool </title>
+      <input type="dropdown" token="MemFunc" searchWhenChanged="true">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <default>Median</default>
+        <choice value="Avg">Average</choice>
+        <choice value="Median">Median</choice>
+        <choice value="Min">Minimum</choice>
+        <choice value="Max">Maximum</choice>
+        <choice value="Perc90">90th Percentile</choice>
+        <choice value="First">Sampled</choice>
+        <change>
+          <set token="MemFuncLabel">$label$</set>
+        </change>
+      </input>
+
+      <chart>
+        <search>
+          <query>
+             `dmc_set_index_introspection` search_group="$role$" sourcetype=splunk_resource_usage component=PerProcess
+             | `dmc_rename_introspection_fields`
+             | `dmc_set_bin`
+             | stats sum(mem_used) as mem_used by host, workload_pool _time
+             | `dmc_timechart` $MemFunc$(mem_used) as mem_used by workload_pool
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Memory Usage (MB)</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+      </chart>
+    </panel>
+</row>
+</form>

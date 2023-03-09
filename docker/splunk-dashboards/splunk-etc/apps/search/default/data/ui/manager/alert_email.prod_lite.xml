@@ -1,0 +1,256 @@
+<endpoint name="admin/alert_actions">
+  <capabilities>
+    <read>admin_all_objects</read>
+  </capabilities>
+  <header>Email settings</header>
+  <breadcrumb>
+    <noentity>True</noentity>
+    <parent hidecurrent="False">systemsettings</parent>
+    <name>Email settings</name>
+  </breadcrumb>
+  <!-- not putting this on the homepage menu for now
+  <menu name="system_configurations">
+    <label>Email settings</label>
+    <url>/manager/%(namespace)s/admin/alert_actions/email/?action=edit</url>
+    <description>Specify settings for all emailed alerts, such as email server and format.</description>
+    <order>60</order>
+  </menu>
+  -->
+  <elements>
+    <element name="spl-ctrl_redirectionPath" type="hidden">
+      <view name="edit"/>
+      <key name="processValueEdit">'systemsettings'</key>
+    </element>
+    
+    <element name="mailserv" type="fieldset">
+      <view name="edit"/>
+      <key name="legend">Mail Server Settings</key>
+      <elements>    
+         <element name="mailserver" type="textfield" label="Mail host">
+            <view name="edit"/>
+            <key name="exampleText">Set the host that sends mail for this Splunk instance.</key>
+         </element>
+         <element name="ssl_or_tls" type="radio" label="Email security">
+             <view name="edit"/>
+             <key name="processValueEdit">'tls' if form_defaults.get('use_tls') == '1'  else ('ssl' if form_defaults.get('use_ssl') == '1'else 'none')</key>
+             <key name="submitValueEdit">None</key>
+             <key name="submitValueAdd">None</key>
+             <key name="exampleText">Check with SMTP server admin.  When SSL is enabled, mail host should include the port. IE: smtp.splunk.com:465</key>
+             <options>
+               <opt value="none" label="none"/>
+               <opt value="ssl" label="Enable SSL"/>
+               <opt value="tls" label="Enable TLS"/>
+             </options>
+             <onChange>
+               <key name="_action">setElementValue</key>
+               <key name="target">use_ssl</key>
+               <value_map>
+                   <key name="none">0</key>
+                   <key name="ssl">1</key>
+                   <key name="tls">0</key>
+               </value_map>
+             </onChange>
+             <onChange>
+               <key name="_action">setElementValue</key>
+               <key name="target">use_tls</key>
+               <value_map>
+                   <key name="none">0</key>
+                   <key name="ssl">0</key>
+                   <key name="tls">1</key>
+               </value_map>
+             </onChange>
+         </element>
+         <element name="use_ssl" type="hidden">
+           <view name="edit"/>
+         </element>
+         <element name="use_tls" type="hidden">
+           <view name="edit"/>
+         </element>
+        <element name="auth_username" type="textfield" label="Username">
+          <view name="edit"/>
+          <key name="exampleText">Username to use when authenticating with the SMTP server. Leave empty for no authentication.</key>
+        </element>
+        <element name="auth_password" type="password" label="Password">
+          <view name="edit"/>
+          <key name="exampleText">Password to use when authenticating with the SMTP server.</key>
+        </element>
+      </elements>
+    </element>
+    <element name="email_domain" type="fieldset">
+      <view name="edit"/>
+      <key name="legend">Email Domains</key>
+      <elements>
+        <element name="allowedDomainList" type="expando_textarea" label="Allowed Domains">
+          <view name="edit"/>
+          <key name="exampleText">Provide a comma-separated list of allowed email domains. Leave empty for no restriction.</key>
+          <key name="submitValueEdit">value.strip()</key>
+        </element>
+      </elements>
+    </element>
+    <element name="body_settings" type="fieldset">
+      <view name="edit"/>
+      <key name="legend">Email Format</key>
+      <elements>
+        <element name="hostname" type="textfield" label="Link hostname">
+          <view name="edit"/>
+          <key name="exampleText">Set a hostname for generating URLs in outgoing notifications. Enclose IPv6 addresses in square brackets (eg. [2001:db8:0:1]).  Leave empty to autodetect.</key>
+        </element>
+        <element name="from" type="textfield" label="Send emails as">
+            <view name="edit"/>
+        </element>
+        <element name="footer.text" type="expando_textarea" label="Email footer">
+            <view name="edit"/>
+            <key name="submitValueEdit">value.strip()</key>
+        </element>
+       </elements>
+    </element>
+    <element name="pdf" type="fieldset">
+      <view name="edit"/>
+      <key name="legend">PDF Report Settings</key>
+      <elements>
+        <element name="reportPaperSize" type="select" label="Report Paper Size">
+          <view name="edit"/>
+          <options>
+            <opt value="letter" label="Letter" />
+            <opt value="legal" label="Legal" />
+            <opt value="a2" label="A2" />
+            <opt value="a3" label="A3" />
+            <opt value="a4" label="A4" />
+            <opt value="a5" label="A5" />
+          </options>
+        </element>
+        <element name="reportPaperOrientation" type="select" label="Report Paper Orientation">
+          <view name="edit"/>
+          <options>
+            <opt value="portrait" label="Portrait" />
+            <opt value="landscape" label="Landscape" />
+          </options>
+        </element>
+        <element name="pdf.logo_path" type="textfield" label="Path to your logo image:">
+          <view name="edit"/>
+          <key name="exampleText">Please give the file path of your logo image relative to the  $SPLUNK_HOME/etc/apps/{app_name}/appserver/static folder.&lt;br/&gt;
+            Define pdf logo by syntax: &amp;lt;app&amp;gt;:&amp;lt;path&amp;gt;&lt;br/&gt;
+            If set, PDF will be rendered with this logo instead of Splunk one.&lt;br/&gt;
+            If not set, Splunk logo will be used by default.&lt;br/&gt;
+            Logo will be read from $SPLUNK_HOME/etc/apps/&amp;lt;app&amp;gt;/appserver/static/&amp;lt;path-to-image&amp;gt; if &amp;lt;app&amp;gt; is provided.&lt;br/&gt;
+            Current app will be used if &amp;lt;app&amp;gt; is not provided.&lt;br/&gt;
+          </key>
+          <key name="submitValueEdit">value.strip()</key>
+        </element>
+        <element name="pdf.footer_enabled" type="checkbox" label="Show PDF footer">
+          <view name="edit"/>
+          <key name="0">False</key>
+          <key name="1">True</key>
+          <key name="exampleText">Check this box if you want Splunk to add footer to your generated PDF document.</key>
+          <onChange>
+            <key name="_action">showonly</key>
+            <key name="_triggerOnLoad" type="bool">1</key>
+            <key name="0">NONE</key>
+            <key name="1">ALL</key>
+            <group_set>
+              <group name="pdf.footer_left"/>
+              <group name="pdf.footer_center"/>
+              <group name="pdf.footer_right"/>
+            </group_set>
+          </onChange>
+        </element>
+        <element name="pdf.footer_left" type="select" label="What do you want to place on the LEFT side of your PDF FOOTER?">
+          <view name="edit"/>
+          <key name="processValueEdit">','.join([member.strip() for member in value.split(',') if member.strip() in ('logo','title','description','pagination','timestamp')]) if value and [member.strip() for member in value.split(',') if member.strip() in ('logo','title','description','pagination','timestamp')] else 'none'</key>
+          <options>
+            <opt value="logo" label="Logo" />
+            <opt value="title" label="Title" />
+            <opt value="description" label="Description" />
+            <opt value="timestamp" label="Timestamp" />
+            <opt value="pagination" label="Page Number" />
+            <opt value="none" label="None" />
+          </options>
+        </element>
+        <element name="pdf.footer_center" type="select" label="What do you want to place on the CENTER of your PDF FOOTER?">
+          <view name="edit"/>
+          <key name="processValueEdit">','.join([member.strip() for member in value.split(',') if member.strip() in ('logo','title','description','pagination','timestamp')]) if value and [member.strip() for member in value.split(',') if member.strip() in ('logo','title','description','pagination','timestamp')] else 'none'</key>
+          <options>
+            <opt value="logo" label="Logo" />
+            <opt value="title" label="Title" />
+            <opt value="description" label="Description" />
+            <opt value="timestamp" label="Timestamp" />
+            <opt value="pagination" label="Page Number" />
+            <opt value="none" label="None" />
+          </options>
+        </element>
+        <element name="pdf.footer_right" type="select" label="What do you want to place on the RIGHT side of your PDF FOOTER?">
+          <view name="edit"/>
+          <key name="processValueEdit">','.join([member.strip() for member in value.split(',') if member.strip() in ('logo','title','description','pagination','timestamp')]) if value and [member.strip() for member in value.split(',') if member.strip() in ('logo','title','description','pagination','timestamp')] else 'none'</key>
+          <options>
+            <opt value="logo" label="Logo" />
+            <opt value="title" label="Title" />
+            <opt value="description" label="Description" />
+            <opt value="timestamp" label="Timestamp" />
+            <opt value="pagination" label="Page Number" />
+            <opt value="none" label="None" />
+          </options>
+        </element>
+        <element name="pdf.header_enabled" type="checkbox" label="Show PDF header">
+          <view name="edit"/>
+          <key name="0">False</key>
+          <key name="1">True</key>
+          <key name="exampleText">Check this box if you want Splunk to add header to your generated PDF document.</key>
+          <onChange>
+            <key name="_action">showonly</key>
+            <key name="_triggerOnLoad" type="bool">1</key>
+            <key name="0">NONE</key>
+            <key name="1">ALL</key>
+            <key name="Flase">NONE</key>
+            <key name="True">ALL</key>
+            <group_set>
+              <group name="pdf.header_left"/>
+              <group name="pdf.header_center"/>
+              <group name="pdf.header_right"/>
+            </group_set>
+          </onChange>
+        </element>
+        <element name="pdf.header_left" type="select" label="What do you want to place on the LEFT side of your PDF HEADER?">
+          <view name="edit"/>
+          <key name="processValueEdit">','.join([member.strip() for member in value.split(',') if member.strip() in ('logo','title','description','pagination','timestamp')]) if value and [member.strip() for member in value.split(',') if member.strip() in ('logo','title','description','pagination','timestamp')] else 'none'</key>
+          <options>
+            <opt value="logo" label="Logo" />
+            <opt value="title" label="Title" />
+            <opt value="description" label="Description" />
+            <opt value="timestamp" label="Timestamp" />
+            <opt value="pagination" label="Page Number" />
+            <opt value="none" label="None" />
+          </options>
+        </element>
+        <element name="pdf.header_center" type="select" label="What do you want to place on the CENTER of your PDF HEADER?">
+          <view name="edit"/>
+          <key name="processValueEdit">','.join([member.strip() for member in value.split(',') if member.strip() in ('logo','title','description','pagination','timestamp')]) if value and [member.strip() for member in value.split(',') if member.strip() in ('logo','title','description','pagination','timestamp')] else 'none'</key>
+          <options>
+            <opt value="logo" label="Logo" />
+            <opt value="title" label="Title" />
+            <opt value="description" label="Description" />
+            <opt value="timestamp" label="Timestamp" />
+            <opt value="pagination" label="Page Number" />
+            <opt value="none" label="None" />
+          </options>
+        </element>
+        <element name="pdf.header_right" type="select" label="What do you want to place on the RIGHT side of your PDF HEADER?">
+          <view name="edit"/>
+          <key name="processValueEdit">','.join([member.strip() for member in value.split(',') if member.strip() in ('logo','title','description','pagination','timestamp')]) if value and [member.strip() for member in value.split(',') if member.strip() in ('logo','title','description','pagination','timestamp')] else 'none'</key>
+          <options>
+            <opt value="logo" label="Logo" />
+            <opt value="title" label="Title" />
+            <opt value="description" label="Description" />
+            <opt value="timestamp" label="Timestamp" />
+            <opt value="pagination" label="Page Number" />
+            <opt value="none" label="None" />
+          </options>
+        </element>
+        <element name="pdf.html_image_rendering" type="checkbox" label="Do you want to render the image in the HTML to your PDF?">
+          <view name="edit"/>
+          <key name="submitValueEdit">0 if value in ('0', 'False', 'false') else 1</key>
+          <key name="exampleText">Check this box if you do not want to miss the image in your PDF</key>
+        </element>
+      </elements>
+     </element>
+  </elements>
+</endpoint>

@@ -1,0 +1,13 @@
+<endpoint name="deploymentserver" template="pages/system.html">
+  <header>unused</header>
+  <capabilities>
+    <read>list_deployment_server AND edit_deployment_server</read>
+  </capabilities>
+  <menu name="system_configurations">
+    <label>Forwarder management</label>
+    <url>/manager/system/deploymentserver</url>
+    <description>Distribute configurations, apps, and content updates to Splunk forwarders and other Splunk components.</description>
+    <order>29</order>
+    <id>deploymentserver</id>
+  </menu>
+</endpoint>
