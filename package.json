@@ -54,7 +54,7 @@
     "loglevel": "^1.7.1",
     "markdown-it-link-attributes": "^4.0.1",
     "md5": "^2.3.0",
-    "needle": "^2.0.1",
+    "needle": "^3.2.0",
     "node-cron": "^1.1.2",
     "pdfmake": "0.2.7",
     "querystring-browser": "1.0.4",
