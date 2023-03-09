@@ -1,0 +1,1 @@
+<endpoint name="advancedsearch">  <header></header>  <menu name="knowledge_configurations">    <label>Advanced search</label>    <url>/manager/%(namespace)s/advancedsearch</url>    <description>Create, view and edit search macros. Set permission for search macros and search commands.</description>    <order>60</order>    <id>advanced-search</id>  </menu></endpoint>

@@ -1,0 +1,145 @@
+/*===============================================================================================*/
+/*  SPLUNK: PROGRESS BARS                                                                        */
+/*===============================================================================================*/
+
+@define-mixin gradient-striped $color: #555, $angle: 45deg {
+    background-color: $color;
+    background-image: linear-gradient($angle, rgba(255,255,255,.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,.15) 50%, rgba(255,255,255,.15) 75%, transparent 75%, transparent);
+}
+
+/*  ANIMATIONS */
+/*  ---------- */
+
+@keyframes progress-bar-stripes {
+  from  { background-position: 40px 0; }
+  to    { background-position: 0 0; }
+}
+
+
+
+/*  Spinners */
+/*  ---------------------------- */
+
+.spinner-small {
+	background-image: url("$(staticImagePath)/skins/default/loading_small.png");
+	background-position: left top;
+	width: 14px;
+	height: 14px;
+	background-size: 280px 14px;
+}
+
+
+
+.spinner-medium {
+	background-image: url("$(staticImagePath)/skins/default/loading_medium.png");
+	background-position: left top;
+	width: 19px;
+	height: 19px;
+	background-size: 380px 19px;
+}
+
+
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+	.spinner-small {
+		background-image: url("$(staticImagePath)/skins/default/loading_small_2x.png");
+	}
+
+	.spinner-medium {
+		background-image: url("$(staticImagePath)/skins/default/loading_medium_2x.png");
+	}
+}
+
+
+/*  Progress */
+/*  ---------------------------- */
+/* This is suppose to match Bootstrap, but it doesn't. */
+.progress {
+    overflow: hidden;
+    height: $lineHeight;
+    margin-bottom: $lineHeight;
+    background-image: linear-gradient(to bottom, #f5f5f5, #f9f9f9);
+	box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
+	background-color: $gray98;
+	border-radius: $interactiveBorderRadius;
+
+    /* Bootstrap uses the .bar class, but our standard components use .progress-bar */
+    .bar,
+    .progress-bar {
+        width: 0%;
+        height: 100%;
+        color: $white;
+        float: left;
+        font-size: 12px;
+        text-align: center;
+        transition: width .6s ease;
+    }
+
+    .bar {
+        background-color: $accentColor;
+        box-shadow: inset 0 -1px 0 rgba(0,0,0,.15);
+        box-sizing: border-box;
+    }
+
+    .bar + .bar {
+        box-shadow: inset 1px 0 0 rgba(0,0,0,.15), inset 0 -1px 0 rgba(0,0,0,.15);
+    }
+
+	.progress-bar {
+		line-height: $lineHeight;
+        background-color: $gray80;
+	}
+
+    .progress-striped.progress-bar {
+        @mixin gradient-striped $gray80;
+        background-size: 40px 40px;
+    }
+
+}
+
+/*  Striped bars */
+.progress-striped .bar {
+    @mixin gradient-striped $accentColor;
+    background-size: 40px 40px;
+}
+
+/*  Call animation for the active one */
+.progress.active .bar,
+.active.progress-bar {
+    animation: progress-bar-stripes 2s linear infinite;
+}
+
+/*  PROGRESS STATES */
+/*  --------------- */
+/*  These have been inherited from Bootstrap and are not used on Core. */
+
+/*  Danger (red) */
+.progress-danger .bar, .progress .bar-danger {
+    background: $errorColor;
+}
+.progress-danger.progress-striped .bar, .progress-striped .bar-danger {
+    @mixin gradient-striped $errorColor;
+}
+
+/*  Success (green) */
+.progress-success .bar, .progress .bar-success {
+    background: $successColor;
+}
+.progress-success.progress-striped .bar, .progress-striped .bar-success {
+    @mixin gradient-striped $successColor;
+}
+
+/*  Info (teal) */
+.progress-info .bar, .progress .bar-info {
+    background: $infoColor;
+}
+.progress-info.progress-striped .bar, .progress-striped .bar-info {
+    @mixin gradient-striped $infoColor;
+}
+
+/*  Warning (orange) */
+.progress-warning .bar, .progress .bar-warning {
+    background: $alertColor;
+}
+.progress-warning.progress-striped .bar, .progress-striped .bar-warning {
+    @mixin gradient-striped $alertColor;
+}

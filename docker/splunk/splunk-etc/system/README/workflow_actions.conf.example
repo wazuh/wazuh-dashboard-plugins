@@ -1,0 +1,88 @@
+#   Version 9.0.3
+#
+# This is an example workflow_actions.conf.  These settings are used to
+# create workflow actions accessible in an event viewer.  Refer to
+# workflow_actions.conf.spec and the documentation at splunk.com for more
+# information about this file.
+#
+# To use one or more of these configurations, copy the configuration block
+# into workflow_actions.conf in $SPLUNK_HOME/etc/system/local/, or into your
+# application's local/ folder.  You must restart Splunk to enable
+# configurations.
+#
+# To learn more about configuration files (including precedence) please see
+# the documentation located at
+# http://docs.splunk.com/Documentation/Splunk/latest/Admin/Aboutconfigurationfiles
+
+# These are the default workflow actions and make extensive use of the
+# special parameters: $@namespace$, $@sid$, etc.
+
+[show_source]
+type=link
+fields = _cd, source, host, index
+display_location = event_menu
+label = Show Source
+link.uri = /app/$@namespace$/show_source?sid=$@sid$&offset=$@offset$&latest_time=$@latest_time$
+
+[ifx]
+type = link
+display_location = event_menu
+label = Extract Fields
+link.uri = /ifx?sid=$@sid$&offset=$@offset$&namespace=$@namespace$
+
+[etb]
+type = link
+display_location = event_menu
+label = Build Eventtype
+link.uri = /etb?sid=$@sid$&offset=$@offset$&namespace=$@namespace$
+
+# This is an example workflow action which will be displayed in a specific
+# field menu (clientip).
+
+[whois]
+display_location = field_menu
+fields = clientip
+label = Whois: $clientip$
+link.method = get
+link.target = blank
+link.uri = http://ws.arin.net/whois/?queryinput=$clientip$
+type = link
+
+# This is an example field action which will allow a user to search every
+# field value in Google.
+
+[Google]
+display_location = field_menu
+fields = *
+label = Google $@field_name$
+link.method = get
+link.uri = http://www.google.com/search?q=$@field_value$
+type = link
+
+# This is an example post link that will send its field name and field value
+# to a  fictional bug tracking system.
+
+[Create JIRA issue]
+display_location = field_menu
+fields = error_msg
+label = Create JIRA issue for $error_class$
+link.method = post
+link.postargs.1.key = error
+link.postargs.1.value = $error_msg$
+link.target = blank
+link.uri = http://127.0.0.1:8000/jira/issue/create
+type = link
+
+# This is an example search workflow action that will be displayed in an
+# event's menu, but requires the field "controller" to exist in the event in
+# order for the workflow action to be available for that event.
+
+[Controller req over time]
+display_location = event_menu
+fields = controller
+label = Requests over last day for $controller$
+search.earliest = -3d
+search.search_string = sourcetype=rails_app controller=$controller$ | timechart span=1h count
+search.target = blank
+search.view = charting
+type = search

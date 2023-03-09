@@ -1,0 +1,12 @@
+<endpoint name="virtual_indexes" template="pages/system.html" showOnSearchHeadCluster="0">
+  <capabilities>
+    <read>indexes_edit</read>
+  </capabilities>
+  <menu name="data_configurations">
+    <label>Virtual indexes</label>
+    <url>/manager/system/virtual_indexes</url>
+    <description>Configure a virtual index for data residing in your Hadoop cluster.</description>
+    <order>80</order>
+    <id>virtual_indexes</id>
+  </menu>
+</endpoint>

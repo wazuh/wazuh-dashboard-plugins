@@ -1,0 +1,96 @@
+/*===============================================================================================*/
+/*  SPLUNK: MESSAGES                                                                             */
+/*  Messages appears in Splunk Bar and Lite Bar.                                                 */
+/*===============================================================================================*/
+
+.shared-globalnav-messages > a.dropdown-toggle.disabled {
+    color: $textGray;
+
+    &:hover {
+        color: $textGray;
+        background: none;
+        border-right-color: transparent;
+    }
+    > .label {
+        background-color: $gray45;
+        color: $textGray;
+    }
+    > .caret {
+        display: none;
+    }
+}
+.no-messages {
+    @mixin popdown-dialog-body; /*  FIXME: this should be separate from popdown */
+    padding: 5px;
+    color: $textColor;
+    text-align: center;
+}
+.message-list {
+    max-height: 400px;
+
+    li {
+        position: relative;
+        padding: 5px 30px 5px 35px;
+        border-bottom: 1px dotted $borderColor;
+        background: none;
+    }
+    li:last-child {
+        border-bottom: none;
+    }
+    .message-content {
+        color: $textColor;
+    }
+    .message-time {
+        color: $textGray;
+        font-size: $fontSizeSmall;
+        display: block;
+    }
+    .message-icon {
+        position: absolute;
+        top: 5px;
+        left: 10px;
+        font-size: 150%;
+
+        &.icon-info:before {
+            content: "\0049";
+            color: $infoColor;
+        }
+        &.icon-warn:before {
+            content: "\ECE2";
+            color: $warningColor;
+        }
+        &.icon-important:before,
+        &.icon-error:before
+        {
+            content: "\26A0";
+            color: $errorColor;
+        }
+    }
+    .info-message .message-icon {color: $infoColor;}
+    .warn-message .message-icon {color: $warningColor;}
+    .error-message .message-icon, .important .message-icon {color: $errorColor;}
+
+    /*  close icon */
+    .delete-message {
+        position: absolute !important;
+        top: 0;
+        right: 0;
+        color: $textGray;
+        padding: 5px;
+        height: 15px;
+        font-size: 120%;
+        border: none;
+        /*  need to override some inherited menu styles */
+        &:hover, &:focus, &:active {
+            position: absolute !important;
+            background:transparent !important;
+            color: $textColor;
+            border: none;
+        }
+    }
+}
+
+/*  messages dialog overrides */
+.popdown-dialog-footer .delete-all-messages {
+    margin: 0;
+}

@@ -1,0 +1,15 @@
+Metadata-Version: 2.1
+Name: spacebridge-protos
+Version: 1.33.0
+Summary: Add a short description here!
+Home-page: https://cd.splunkdev.com/mobile/spacebridge-protobuf
+Author: Splunk
+Author-email: Mobile-Team@splunk.com
+License: mit
+Platform: any
+Classifier: Development Status :: 4 - Beta
+Classifier: Programming Language :: Python
+Description-Content-Type: text/x-rst; charset=UTF-8
+
+UNKNOWN
+

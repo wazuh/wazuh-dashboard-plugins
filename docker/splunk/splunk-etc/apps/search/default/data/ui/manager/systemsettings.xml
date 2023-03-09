@@ -1,0 +1,13 @@
+<endpoint name="systemsettings" showOnSearchHeadCluster="0">
+  <capabilities>
+      <read>admin_all_objects OR edit_server OR (list_deployment_client AND edit_deployment_client) OR edit_global_banner</read>
+  </capabilities>
+  <header></header>
+  <menu name="system_configurations">
+    <label>Server settings</label>
+    <url>/manager/%(namespace)s/systemsettings</url>
+    <description>Manage server settings including ports, host name, index path, email server, and system logging.</description>
+    <order>1</order>
+    <id>system-settings</id>
+  </menu>
+</endpoint>

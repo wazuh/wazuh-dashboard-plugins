@@ -1,0 +1,319 @@
+{
+    "objects": [
+        {
+            "calculations": [],
+            "constraints": [
+                {
+                    "search": "index=_audit"
+                }
+            ],
+            "comment": "",
+            "objectName": "Audit",
+            "displayName": "Audit",
+            "parentName": "BaseEvent",
+            "fields": [
+                {
+                    "fieldName": "action",
+                    "multivalue": false,
+                    "comment": "",
+                    "displayName": "action",
+                    "hidden": false,
+                    "required": false,
+                    "type": "string"
+                },
+                {
+                    "fieldName": "info",
+                    "multivalue": false,
+                    "comment": "",
+                    "displayName": "info",
+                    "hidden": false,
+                    "required": false,
+                    "type": "string"
+                },
+                {
+                    "fieldName": "object",
+                    "multivalue": false,
+                    "comment": "",
+                    "displayName": "object",
+                    "hidden": true,
+                    "required": false,
+                    "type": "string"
+                },
+                {
+                    "fieldName": "operation",
+                    "multivalue": false,
+                    "comment": "",
+                    "displayName": "operation",
+                    "hidden": true,
+                    "required": false,
+                    "type": "string"
+                },
+                {
+                    "fieldName": "path",
+                    "multivalue": false,
+                    "comment": "",
+                    "displayName": "path",
+                    "hidden": true,
+                    "required": false,
+                    "type": "string"
+                },
+                {
+                    "fieldName": "user",
+                    "multivalue": false,
+                    "comment": "",
+                    "displayName": "user",
+                    "hidden": false,
+                    "required": false,
+                    "type": "string"
+                },
+                {
+                    "fieldName": "exec_time",
+                    "multivalue": false,
+                    "comment": "",
+                    "displayName": "execution time",
+                    "hidden": true,
+                    "required": false,
+                    "type": "number"
+                },
+                {
+                    "fieldName": "result_count",
+                    "multivalue": false,
+                    "comment": "",
+                    "displayName": "result count",
+                    "hidden": true,
+                    "required": false,
+                    "type": "number"
+                },
+                {
+                    "fieldName": "savedsearch_name",
+                    "multivalue": false,
+                    "comment": "",
+                    "displayName": "savedsearch name",
+                    "hidden": true,
+                    "required": false,
+                    "type": "string"
+                },
+                {
+                    "fieldName": "scan_count",
+                    "multivalue": false,
+                    "comment": "",
+                    "displayName": "scan count",
+                    "hidden": true,
+                    "required": false,
+                    "type": "number"
+                },
+                {
+                    "fieldName": "total_run_time",
+                    "multivalue": false,
+                    "comment": "",
+                    "displayName": "total run time",
+                    "hidden": true,
+                    "required": false,
+                    "type": "number"
+                }
+            ]
+        },
+        {
+            "calculations": [
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "is_realtime",
+                            "multivalue": false,
+                            "comment": "",
+                            "displayName": "Realtime?",
+                            "hidden": false,
+                            "required": false,
+                            "type": "boolean"
+                        }
+                    ],
+                    "calculationID": "42on2o5518vbzkt9",
+                    "comment": "",
+                    "calculationType": "Eval",
+                    "expression": "case(is_realtime == 0, \"false\", is_realtime == 1, \"true\", is_realtime == \"N/A\", \"false\")"
+                },
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "search_id",
+                            "multivalue": false,
+                            "comment": "",
+                            "displayName": "search_id",
+                            "hidden": false,
+                            "required": false,
+                            "type": "string"
+                        }
+                    ],
+                    "calculationID": "i69cygcgck5wxw29",
+                    "comment": "",
+                    "calculationType": "Eval",
+                    "expression": "replace(search_id,\"'\",\"\")"
+                },
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "search",
+                            "multivalue": false,
+                            "comment": "",
+                            "displayName": "search",
+                            "hidden": false,
+                            "required": false,
+                            "type": "string"
+                        }
+                    ],
+                    "calculationID": "8q76efc4bulerk9",
+                    "comment": "",
+                    "calculationType": "Eval",
+                    "expression": "replace(search,\"'\",\"\")"
+                },
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "search_type",
+                            "multivalue": false,
+                            "comment": "",
+                            "displayName": "search type",
+                            "hidden": false,
+                            "required": false,
+                            "type": "string"
+                        }
+                    ],
+                    "calculationID": "lnnoqwo7qi8p8pvi",
+                    "comment": "",
+                    "calculationType": "Eval",
+                    "expression": "case((id LIKE \"DM_%\" OR savedsearch_name LIKE \"_ACCELERATE_DM%\"), \"dm_acceleration\", search_id LIKE \"scheduler%\", \"scheduled\", search_id LIKE \"rt%\", \"realtime\", search_id LIKE \"subsearch%\", \"subsearch\", (search_id LIKE \"SummaryDirector%\" OR search_id LIKE \"summarize_SummaryDirector%\"), \"summary_director\", 1=1, \"adhoc\") "
+                }
+            ],
+            "constraints": [
+                {
+                    "search": "action=search NOT dmauditsearch"
+                }
+            ],
+            "comment": "",
+            "objectName": "searches",
+            "displayName": "Searches",
+            "parentName": "Audit",
+            "fields": [
+                {
+                    "comment": "",
+                    "displayName": "action",
+                    "fieldName": "action",
+                    "hidden": true,
+                    "required": false,
+                    "multivalue": false,
+                    "owner": "Audit",
+                    "type": "string"
+                },
+                {
+                    "comment": "",
+                    "displayName": "execution time",
+                    "fieldName": "exec_time",
+                    "hidden": false,
+                    "required": false,
+                    "multivalue": false,
+                    "owner": "Audit",
+                    "type": "number"
+                },
+                {
+                    "comment": "",
+                    "displayName": "result count",
+                    "fieldName": "result_count",
+                    "hidden": false,
+                    "required": false,
+                    "multivalue": false,
+                    "owner": "Audit",
+                    "type": "number"
+                },
+                {
+                    "comment": "",
+                    "displayName": "savedsearch name",
+                    "fieldName": "savedsearch_name",
+                    "hidden": false,
+                    "required": false,
+                    "multivalue": false,
+                    "owner": "Audit",
+                    "type": "string"
+                },
+                {
+                    "comment": "",
+                    "displayName": "scan count",
+                    "fieldName": "scan_count",
+                    "hidden": false,
+                    "required": false,
+                    "multivalue": false,
+                    "owner": "Audit",
+                    "type": "number"
+                },
+                {
+                    "comment": "",
+                    "displayName": "total run time",
+                    "fieldName": "total_run_time",
+                    "hidden": false,
+                    "required": false,
+                    "multivalue": false,
+                    "owner": "Audit",
+                    "type": "number"
+                }
+            ]
+        },
+        {
+            "calculations": [],
+            "constraints": [
+                {
+                    "search": "action=edit_user OR action=edit_roles OR action=update"
+                }
+            ],
+            "comment": "",
+            "objectName": "modify",
+            "displayName": "Modify Splunk Configs",
+            "parentName": "Audit",
+            "fields": [
+                {
+                    "comment": "",
+                    "displayName": "operation",
+                    "fieldName": "operation",
+                    "hidden": false,
+                    "required": false,
+                    "multivalue": false,
+                    "owner": "Audit",
+                    "type": "string"
+                },
+                {
+                    "comment": "",
+                    "displayName": "path",
+                    "fieldName": "path",
+                    "hidden": false,
+                    "required": false,
+                    "multivalue": false,
+                    "owner": "Audit",
+                    "type": "string"
+                },
+                {
+                    "comment": "",
+                    "displayName": "object",
+                    "fieldName": "object",
+                    "hidden": false,
+                    "required": false,
+                    "multivalue": false,
+                    "owner": "Audit",
+                    "type": "string"
+                }
+            ]
+        }
+    ],
+    "objectSummary": {
+        "Interfaces": 0,
+        "Interface Implementations": 0,
+        "Search-Based": 0,
+        "Transaction-Based": 0,
+        "Event-Based": 3
+    },
+    "description": "Splunk's Internal Audit Logs record user activity, including searches and configuration changes.",
+    "modelName": "internal_audit_logs",
+    "displayName": "Splunk's Internal Audit Logs - SAMPLE",
+    "objectNameList": [
+        "Audit",
+        "searches",
+        "modify"
+    ]
+}

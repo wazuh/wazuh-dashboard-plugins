@@ -1,0 +1,74 @@
+<form hideEdit="True" theme="dark" version="1.1">
+  <tags>mobile,tv</tags>
+  <label>KV Store Collections Status</label>
+  <description>If you’re running into issues with the Connected Experiences apps, Splunk Support might ask you to use this dashboard to check the KV Store status.</description>
+  <search id="kvstore">
+    <query>| rest "services/ssg/kvstore_client"
+app=$app$
+collection=$collection$
+owner=$owner$
+sort=$sort$
+limit=$limit$
+</query>
+    <earliest>-15m</earliest>
+    <latest>now</latest>
+  </search>
+  <fieldset submitButton="true" autoRun="false">
+    <input type="dropdown" token="app">
+      <label>App</label>
+      <fieldForLabel>label</fieldForLabel>
+      <fieldForValue>title</fieldForValue>
+      <search>
+        <query>| rest /services/apps/local | search disabled=0 | table label title</query>
+        <earliest>-15m</earliest>
+        <latest>now</latest>
+      </search>
+      <initialValue>splunk_secure_gateway</initialValue>
+    </input>
+    <input type="dropdown" token="collection">
+      <label>Collection</label>
+      <fieldForLabel>title</fieldForLabel>
+      <fieldForValue>title</fieldForValue>
+      <search>
+        <query>| rest /servicesNS/nobody/$app$/storage/collections/config |   table title eai:acl.app | rename eai:acl.app as acl | where acl != "system"</query>
+        <earliest>-15m</earliest>
+        <latest>now</latest>
+      </search>
+    </input>
+    <input type="dropdown" token="owner">
+      <label>Owner</label>
+      <fieldForLabel>username</fieldForLabel>
+      <fieldForValue>username</fieldForValue>
+      <search>
+        <query>| stats count
+| fields - count
+| eval username="nobody"
+| append [|rest /services/authentication/current-context/context | table username]</query>
+      </search>
+      <initialValue>admin</initialValue>
+    </input>
+    <input type="text" token="limit">
+      <label>Max Number of Results</label>
+      <default>10</default>
+      <initialValue>10</initialValue>
+    </input>
+    <input type="text" token="sort">
+      <label>Sort By</label>
+      <initialValue>_key</initialValue>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>KV Store Response</title>
+      <table>
+        <search base="kvstore">
+          <query> | table result</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </table>
+    </panel>
+  </row>
+</form>

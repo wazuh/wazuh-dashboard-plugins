@@ -1,0 +1,17 @@
+#   Version 9.0.3
+#
+# You can configure properties for your custom application.
+#
+# To use one or more of these configurations, copy the configuration block into
+# the app.conf file located in $SPLUNK_HOME/etc/system/local/. You must restart
+# Splunk software after you make changes to this setting to enable configurations.
+#
+# For more information on configuration files, including precedence, search for
+# "Use Splunk Web to manage configuration files" in the Admin Manual in the Splunk Docs.
+
+[feature:quarantine_files]
+enable_jQuery2 = false
+enable_unsupported_hotlinked_imports = false
+
+[feature:dashboard_inputs_localization]
+enable_dashboard_inputs_localization = false

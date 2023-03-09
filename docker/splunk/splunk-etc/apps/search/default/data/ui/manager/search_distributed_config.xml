@@ -1,0 +1,74 @@
+<endpoint name="search/distributed/config">
+  <header></header>
+  <breadcrumb>
+      <parent hidecurrent="True">distsearch</parent>
+      <entityname i18ntag="">Distributed search setup</entityname>
+  </breadcrumb>
+  <elements>
+    <element name="distsearchsetup" type="fieldset">
+      <view name="list"/>
+      <view name="edit"/>
+      <view name="create"/>
+      <elements>
+        <element name="name" type="textfield">
+          <view name="list"/>
+          <view name="create"/>
+        </element>
+
+        <element name="dist_search_enabled" type="textfield" label="Turn on distributed search?">
+          <view name="list"/>
+          <key name="exampleText">You must restart your Splunk instance for these settings to take effect.</key>
+        </element>
+
+        <element name="disabled" type="radio" label="Turn on distributed search?">
+          <options>
+            <opt value="0" label="Yes"/>
+            <opt value="1" label="No"/>
+          </options>
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="exampleText">You must restart your Splunk instance for these settings to take effect.</key>
+        </element>
+        <element name="timeout" type="fieldset">
+          <view name="list"/>
+          <view name="edit"/>
+          <view name="create"/>
+          <elements>
+            <element name="statusTimeout" type="textfield" label="Status timeout (in seconds)">
+              <view name="edit"/>
+              <view name="create"/>
+              <key name="class">short</key>
+              <key name="exampleText">Set how long to wait for a server to return before removing it from the peers list.</key>
+            </element>
+            <element name="connectionTimeout" type="textfield" label="Connection timeout (in seconds)">
+              <view name="edit"/>
+              <view name="create"/>
+              <key name="class">short</key>
+              <key name="exampleText">The maximum amount of time to wait when attempting to establish a connection to the search peer.</key>
+            </element>
+            <element name="sendTimeout" type="textfield" label="Send timeout (in seconds)">
+              <view name="edit"/>
+              <view name="create"/>
+              <key name="class">short</key>
+              <key name="exampleText">The maximum amount of time to wait when attempting to write or send data to a search peer.</key>
+            </element>
+            <element name="receiveTimeout" type="textfield" label="Receive timeout (in seconds)">
+              <view name="edit"/>
+              <view name="create"/>
+              <key name="class">short</key>
+              <key name="exampleText">The maximum amount of time to wait when attempting to read or receive data from a search peer.</key>
+            </element>
+          </elements>
+          <key name="helpText">Set timeout for distributed search peers.</key>
+          <key name="legend">Timeout settings</key>
+        </element>
+      </elements>
+      <key name="helpText">Set up distributed search on this page.  To view or edit the list of distributed search peers, use the Distributed search peers page in Splunk Settings.</key>
+      <key name="legend">Distributed search set up</key>
+    </element>
+    <element name="spl-ctrl_redirectionPath" type="hidden">
+      <view name="edit"/>
+      <key name="processValueEdit">'distsearch'</key>
+    </element>
+  </elements>
+</endpoint>

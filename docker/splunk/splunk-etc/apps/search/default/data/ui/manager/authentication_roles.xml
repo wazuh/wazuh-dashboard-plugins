@@ -1,0 +1,13 @@
+<endpoint name="authorization/roles" showAppContext="1" template="pages/system.html">
+   <header>Roles</header>
+   <capabilities>
+   <read>edit_roles OR edit_roles_grantable</read>
+   </capabilities>
+   <menu name="auth_configurations">
+     <label>Roles</label>
+     <url>/manager/%(namespace)s/authorization/roles</url>
+     <order>60</order>
+     <description>Create new roles and manage role preferences.</description>
+     <id>auth_roles</id>
+   </menu>
+</endpoint>

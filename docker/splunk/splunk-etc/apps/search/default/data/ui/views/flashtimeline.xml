@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<view onunloadCancelJobs="False" autoCancelInterval="100" isDashboard="False" type="redirect" target="search">
+    <!-- autoCancelInterval is set here to 100 -->
+    <label>Search</label>
+</view>

@@ -1,0 +1,250 @@
+/*===============================================================================================*/
+/*  SPLUNK: TYPOGRAPHY                                                                           */
+/*  Headings, body text, lists, code, and more for a versatile and durable typography system.    */
+/*===============================================================================================*/
+
+/*************************************************************************************************/
+/*  BODY TEXT                                                                                    */
+/*************************************************************************************************/
+p {
+    margin: 0 0 calc($lineHeight / 2);
+}
+.lead {
+    margin-bottom: $lineHeight;
+    font-size: calc($fontSize * 1.5);
+    font-weight: 200;
+    line-height: calc($lineHeight * 1.5);
+}
+
+
+/*************************************************************************************************/
+/*  EMPHASIS & MISC                                                                              */
+/*************************************************************************************************/
+small               { font-size: 85%; }             /*  Ex: 14px base font * 85% = about 12px */
+strong              { font-weight: bold; }
+em                  { font-style: italic; }
+cite                { font-style: normal; }
+
+/*  Utility classes */
+.text-left           { text-align: left; }
+.text-right          { text-align: right; }
+.text-center         { text-align: center; }
+
+@define-mixin text-emphasis $class, $textColor {
+    .$class {
+        color: $textColor;
+        a&:hover, a&:focus {
+            color: rgba(60,68,77,1);
+        }
+    }
+}
+
+@mixin text-emphasis muted, $textGray;                /* .muted */
+@mixin text-emphasis text-warning, $warningText;    /* .text-warning */
+@mixin text-emphasis text-error, $errorText;        /* .text-error */
+@mixin text-emphasis text-info, $infoText;          /* .text-info */
+@mixin text-emphasis text-success, $successText;    /* .text-success */
+
+
+/*************************************************************************************************/
+/*  FONT FAMILIES                                                                                */
+/*************************************************************************************************/
+/* monospace for code and raw
+    <p>normal</p>
+    <p class="mono-space">mono space</p>
+*/
+.mono-space {
+    font-family: $monoFontFamily;
+}
+
+
+/*************************************************************************************************/
+/*  HEADINGS                                                                                     */
+/*************************************************************************************************/
+h1 {
+    @mixin create-heading-extra-large;
+    small { font-size: calc($fontSizeXXLarge * 0.9); }
+}
+h2 {
+    @mixin create-heading;
+    small { font-size: calc($fontSizeXLarge * 0.9); }
+}
+h3 {
+    @mixin create-heading-medium;
+    small { font-size: $fontSize; }
+}
+h4 {
+    @mixin create-heading-small;
+    font-size: $fontSize;
+}
+h5 {
+    @mixin create-heading;
+    font-size: $fontSizeSmall;
+}
+h6 {
+    @mixin create-heading;
+    font-size: $fontSizeXSmall;
+}
+
+.section-heading {
+    @mixin create-section-heading;
+}
+.section-heading-small {
+    @mixin create-section-heading $fontSizeSmall;
+}
+
+
+/*************************************************************************************************/
+/*  PAGE HEADER                                                                                  */
+/*************************************************************************************************/
+.page-header {
+    padding-bottom: calc(($lineHeight / 2) - 1px);
+    margin: $lineHeight 0 calc($lineHeight * 1.5);
+    border-bottom: $borderLight;
+}
+
+
+/*************************************************************************************************/
+/*  LISTS                                                                                        */
+/*************************************************************************************************/
+/*  Unordered and Ordered lists */
+ul, ol {
+    padding: 0;
+    margin: 0 0 calc($lineHeight / 2) 25px;
+
+    ul, ol {
+        margin-bottom: 0;
+    }
+    /*  Remove default list styles */
+    &.unstyled {
+        margin-left: 0;
+        list-style: none;
+    }
+    /*  Single-line list items */
+    &.inline {
+        margin-left: 0;
+        list-style: none;
+
+        > li {
+            display: inline-block;
+            padding-left: $spacingQuarter;
+            padding-right: $spacingQuarter;
+        }
+    }
+}
+li {
+    line-height: $lineHeight;
+}
+
+/*  Description Lists */
+dl {
+    margin-bottom: $lineHeight;
+}
+dt,
+dd {
+    line-height: $lineHeight;
+}
+dt {
+    font-weight: bold;
+}
+dd {
+    margin-left: calc($lineHeight / 2);
+}
+
+/*  Horizontal layout (like forms) */
+.dl-horizontal {
+    @mixin clearfix; /*  Ensure dl clears floats if empty dd elements present */
+    dt {
+        float: left;
+        width: calc($horizontalComponentOffset - 20px);
+        clear: left;
+        text-align: right;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    dd {
+        margin-left: $horizontalComponentOffset;
+    }
+}
+
+/*************************************************************************************************/
+/*  MISC                                                                                         */
+/*************************************************************************************************/
+/*  Horizontal rules */
+hr {
+    margin: $lineHeight 0;
+    border: 0;
+    border-top: $borderLight;
+    border-bottom: $borderWhite;
+}
+
+/*  Abbreviations and acronyms */
+abbr[title],
+    /*  Added data-* attribute to help out our tooltip plugin, per https://github.com/twitter/bootstrap/issues/5257 */
+abbr[data-original-title] {
+    cursor: help;
+    border-bottom: 1px dotted $gray60;
+}
+
+abbr.initialism {
+    font-size: 90%;
+    text-transform: uppercase;
+}
+
+/*  Blockquotes */
+blockquote {
+    padding: 0 0 0 $spacingThreeQuarters;
+    margin: 0 0 $lineHeight;
+    border-left: 5px solid $gray92;
+    p {
+        margin-bottom: 0;
+        font-size: calc($fontSize * 1.25);
+        font-weight: 300;
+        line-height: 1.25;
+    }
+    small {
+        display: block;
+        line-height: $lineHeight;
+        color: $gray60;
+        &:before {
+            content: '\2014 \00A0';
+        }
+    }
+    /*  Float right with text-align: right */
+    &.pull-right {
+        float: right;
+        padding-right: $spacingThreeQuarters;
+        padding-left: 0;
+        border-right: 5px solid $gray92;
+        border-left: 0;
+        p,
+        small {
+            text-align: right;
+        }
+        small {
+            &:before {
+                content: '';
+            }
+            &:after {
+                content: '\00A0 \2014';
+            }
+        }
+    }
+}
+
+/*  Quotes */
+q:before,
+q:after,
+blockquote:before,
+blockquote:after {
+    content: "";
+}
+
+/*  Addresses */
+address {
+    display: block;
+    margin-bottom: $lineHeight;
+    font-style: normal;
+    line-height: $lineHeight;
+}

@@ -1,0 +1,444 @@
+<form version="1.1" hideEdit="True" isVisible="true" script="common_control.js">
+    <label>Knowledge Bundle Replication</label>
+    
+    <fieldset autoRun="true" submitButton="false">
+        <input type="dropdown" searchWhenChanged="true" token="dmc_group">
+          <label>Group</label>
+          <showClearButton>false</showClearButton>
+          <search>
+            <query>
+              | `dmc_get_groups_containing_role(dmc_group_search_head)` 
+              | search search_group!="dmc_group_*"
+            </query>
+          </search>
+          <fieldForLabel>label</fieldForLabel>
+          <fieldForValue>search_group</fieldForValue>
+          <choice value="dmc_group_search_head">All Search Heads</choice>
+          <default>dmc_group_search_head</default>
+        </input>
+        <input type="dropdown" searchWhenChanged="true" token="splunk_server">
+          <label>Instance</label>
+          <showClearButton>false</showClearButton>
+          <populatingSearch fieldForLabel="serverName" fieldForValue="serverName">
+            | `dmc_get_instance_info($dmc_group$)`
+            | where search_group="dmc_group_search_head"
+          </populatingSearch>
+          <selectFirstChoice>true</selectFirstChoice>
+          <change>
+            <condition value="*">
+              <set token="host">$row.host$</set>
+            </condition>
+          </change>
+        </input>
+    </fieldset>
+    
+    <row>
+       <html>
+          <p>"Replication Time" measures the elapsed time from the creation of a knowledge bundle 
+            on the search head until the bundle has been sent to all peers. This does not include 
+            any time spent indexing lookup files in the bundle.</p>
+       </html>
+    </row>
+    
+    <row>
+      <panel rejects="$historical$">
+        <title>Snapshots</title>
+      </panel>
+    </row>
+    
+    <row>
+      <panel>
+          <search id="replication_config_api_base">
+            <query>
+              | rest splunk_server=$splunk_server$ /services/search/distributed/bundle/replication/config
+            </query>
+          </search>
+          <single>
+            <search base="replication_config_api_base">
+              <query>
+                | fields replicationPolicy
+                | eval replicationPolicy = upper(substr(replicationPolicy,1,1)).substr(replicationPolicy,2)
+              </query>
+            </search>
+            <option name="underLabel">Replication Policy</option>
+            <option name="height">80px</option>
+          </single>
+          <single>
+            <search base="replication_config_api_base">
+              <query>
+                | eval replicationThreads = case(isnull(replicationThreads), "N/A", isnotnull(replicationThreads), replicationThreads)
+                | fields replicationThreads
+              </query>
+            </search>
+            <option name="underLabel">Replication Threads</option>
+            <option name="height">80px</option>
+          </single>
+      </panel>
+    </row> 
+
+    <row>
+        <panel>
+          <single>
+              <search>
+                <query>
+                  `dmc_set_index_internal` host=$host$ source=*/metrics.log* group=bundles_uploads name=peer_dispatch
+                  bundle_type=full_bundle
+                  | eval repl_sec = replication_time_msec/1000
+                  | stats avg(repl_sec)
+                </query>
+              </search>
+              <option name="underLabel">Average Full Bundle Replication Time</option>
+              <option name="afterLabel">sec</option>
+              <option name="height">80px</option>
+          </single>
+          <single>
+              <search>
+                <query>
+                  `dmc_set_index_internal` host=$host$ source=*/metrics.log* group=bundles_uploads name=peer_dispatch
+                  bundle_type=delta_bundle
+                  | eval repl_sec = replication_time_msec/1000
+                  | stats avg(repl_sec)
+                </query>
+              </search>
+              <option name="underLabel">Average Delta Bundle Replication Time</option>
+              <option name="afterLabel">sec</option>
+              <option name="height">80px</option>
+          </single>
+        </panel>
+        <panel>
+          <single>
+              <search>
+                <query>
+                  `dmc_set_index_internal` host=$host$ source=*/metrics.log* group=bundle_replication name=bundle_metadata
+                  bundle_type=full_bundle
+                  | eval size_mb = round(bundle_bytes /1024 / 1024, 2)
+                  | stats avg(size_mb)
+                  </query>
+              </search>
+              <option name="underLabel">Average Full Bundle Size</option>
+              <option name="afterLabel">MB</option>
+              <option name="height">80px</option>
+          </single>
+          <single>
+              <search>
+                <query>
+                  `dmc_set_index_internal` host=$host$ source=*/metrics.log* group=bundle_replication name=bundle_metadata
+                  bundle_type=delta_bundle
+                  | eval size_mb = round(bundle_bytes /1024 / 1024, 2)
+                  | stats avg(size_mb)
+                </query>
+              </search>
+              <option name="underLabel">Average Delta Bundle Size</option>
+              <option name="afterLabel">MB</option>
+              <option name="height">80px</option>
+          </single>
+        </panel>  
+    </row>
+
+    <row>
+      <panel>
+        <title>Latest Common Bundle Across All Peers</title>
+            <search id="common_bundle_base">
+              <query>
+                | rest splunk_server_group=dmc_group_indexer /services/admin/bundles/$splunk_server$
+                | fields bundle_name, checksum, id, splunk_server, upload_time
+                | mvcombine splunk_server
+                | sort upload_time desc
+                | eval latest_common=case(mvcount(splunk_server)==[
+                  | rest splunk_server_group=dmc_group_indexer /services/admin/bundles/$splunk_server$
+                  | stats dc(splunk_server) AS total_server_count
+                  | return $total_server_count], 
+                "found", mvcount(splunk_server)!=[
+                  | rest splunk_server_group=dmc_group_indexer /services/admin/bundles/$splunk_server$
+                  | stats dc(splunk_server) AS total_server_count
+                  | return $total_server_count],
+                "none")
+                | where latest_common=="found"
+                | head 1
+              </query>
+            </search>
+            <single depends="$show_panel$">
+              <search base="common_bundle_base">
+                <query>
+                  | eval upload_time="Created at: ".(strftime(upload_time, "%m/%d/%Y %H:%M:%S %p"))
+                  | fields upload_time
+                </query>
+              </search>
+              <option name="height">50%</option>
+            </single>
+            <single depends="$show_panel$">
+              <search base="common_bundle_base">
+                <query>
+                  | rex field=id "(?&lt;id&gt;([^\/]+$))"
+                  | eval id = "Bundle Id: ".tostring(id)
+                  | fields id
+                </query>
+              </search>
+              <option name="height">50%</option>
+            </single>
+            <html depends="$show_panel$">
+            </html>
+            <single depends="$show_panel$">
+              <search base="common_bundle_base">
+                <query>
+                  | eval checksum = "Checksum: ".tostring(checksum)
+                  | fields checksum
+                </query>
+                <progress>
+                   <condition match="$job.resultCount$ != 0">
+                     <set token="show_panel">true</set>
+                   </condition>
+                   <condition>
+                      <unset token="show_panel"/>
+                  </condition>
+                </progress>
+              </search>
+              <option name="height">50%</option>
+            </single>
+            <single rejects="$show_panel$">
+              <search base="common_bundle_base">
+                <query>
+                  | appendpipe [
+                    stats count
+                    | eval checksum="No common knowledge bundle found across all peers"
+                    | where count=0]
+                  | fields checksum
+                </query>
+              </search>
+            </single>
+      </panel>
+    </row>
+
+    <row>
+        <panel rejects="$snapshot$">
+          <title>Historical Charts</title>
+          <input type="time" searchWhenChanged="true" token="time">
+            <label>Time Range:</label>
+            <default>
+              <earliestTime>-4h@m</earliestTime>
+              <latestTime>now</latestTime>
+            </default>
+          </input>
+        </panel>
+    </row>
+    
+    <row>
+      <html>
+        <p>A bundle replication cycle corresponds to one round of replication initiated by the search head, which 
+          includes sending at least one bundle to a set of search peers.</p>
+      </html>
+    </row>
+    
+    <row>
+        <panel rejects="$snapshot$">
+          <title>Replication Cycle Count</title>
+          <html>
+          </html>
+          <html>
+          </html>
+           <single>
+            <search>
+              <query>
+                `dmc_set_index_internal` host=$host$ source=*/metrics.log* group=bundle_replication name=cycle_dispatch
+                | stats count
+              </query>
+              <earliest>$time.earliest$</earliest>
+              <latest>$time.latest$</latest>
+            </search>
+            <option name="height">100%</option>
+         </single>
+         <html>
+         </html>
+         <html>
+         </html>
+         <html>
+         </html>
+         <html>
+            <p>The number of cycles dispatched from the search head.</p>
+         </html>
+        </panel>
+        <panel rejects="$snapshot$">
+         <title>Replication Cycle Count by Peer Success Ratio</title>
+         <chart>
+            <search>
+              <query>
+                `dmc_set_index_internal` host=$host$ source=*/metrics.log* group=bundle_replication name=cycle_dispatch
+                | eval ratio = round((peer_success_count/peer_count)*100, 2)
+                | stats count by ratio
+                | rename ratio as "Peer Success Ratio"
+              </query>
+              <earliest>$time.earliest$</earliest>
+              <latest>$time.latest$</latest>
+            </search>
+            <option name="charting.chart">bar</option>
+            <option name="height">200px</option>
+            <option name="charting.legend.placement">none</option>
+         </chart>
+         <html>
+            <p>Peer success ratio is the ratio of peers that received the bundles in a cycle successfully, to all intended peers.</p>
+         </html>
+        </panel>
+    </row>
+
+    <row>
+      <panel rejects="$snapshot$">
+        <title>Average Bundle Replication Time by Bundle Type</title>
+        <chart>
+          <search>
+            <query>
+             `dmc_set_index_internal` host=$host$ source=*/metrics.log* group=bundles_uploads name=peer_dispatch
+              | eval repl_sec = replication_time_msec/1000
+              | `dmc_timechart_for_metrics_log` avg(repl_sec) by bundle_type
+            </query>
+            <earliest>$time.earliest$</earliest>
+            <latest>$time.latest$</latest>
+          </search>
+          <option name="charting.chart">column</option>
+          <option name="charting.axisTitleX.text">Time</option>
+          <option name="charting.axisTitleY.text">Replication Time (sec)</option>
+        </chart>
+      </panel>
+    </row>
+
+    <row>
+      <panel rejects="$snapshot$">
+        <title>Average Bundle Size by Bundle Type</title>
+        <chart>
+          <search>
+            <query>
+               `dmc_set_index_internal` host=$host$ source=*/metrics.log* group=bundle_replication name=bundle_metadata
+                | eval size_mb = round(bundle_bytes /1024 / 1024, 2)
+                | `dmc_timechart_for_metrics_log` avg(size_mb) by bundle_type
+            </query>
+            <earliest>$time.earliest$</earliest>
+            <latest>$time.latest$</latest>
+          </search>
+          <option name="charting.chart">column</option>
+          <option name="charting.axisTitleX.text">Time</option>
+          <option name="charting.axisTitleY.text">Bundle Size (MB)</option>
+        </chart>
+      </panel>
+    </row>
+
+    <row>
+        <panel rejects="$snapshot$">
+            <title rejects="$split_by_peer$">Bundle Replication Activity</title>
+            <input type="checkbox" searchWhenChanged="true" token="split_by_peer">
+              <label></label>
+              <choice>Split by peer</choice>
+            </input>
+            <chart rejects="$split_by_peer$">
+                <search>
+                  <query>
+                     `dmc_set_index_internal` host=$host$ source=*/metrics.log* group=bundles_uploads name=peer_dispatch
+                     | eval repl_sec = replication_time_msec/1000
+                     | `dmc_timechart_for_metrics_log` avg(repl_sec) AS avg_repl_time p90(repl_sec) AS 90th_perc_repl_time p10(repl_sec) AS 10th_perc_repl_time
+                  </query>
+                  <earliest>$time.earliest$</earliest>
+                  <latest>$time.latest$</latest>
+                </search>
+                <option name="charting.chart">line</option>
+                <option name="charting.axisTitleX.text">Time</option>
+                <option name="charting.axisTitleY.text">Replication Time (sec)</option>
+            </chart>
+            <html rejects="$split_by_peer$">
+              <p>Average, 90th percentile, and 10th percentile of bundle replication time, in seconds.</p>
+            </html>
+            <title depends="$split_by_peer$">Bundle Replication Activity (Per-Peer)</title>
+            <chart depends="$split_by_peer$">
+                <search>
+                  <query>
+                     `dmc_set_index_internal` host=$host$ source=*/metrics.log* group=bundles_uploads name=peer_dispatch
+                     | eval repl_sec = replication_time_msec/1000
+                     | `dmc_timechart_for_metrics_log` limit=50 avg(repl_sec) AS avg_repl_time by peer_name
+                  </query>
+                  <earliest>$time.earliest$</earliest>
+                  <latest>$time.latest$</latest>
+                </search>
+                <option name="charting.chart">line</option>
+                <option name="charting.axisTitleX.text">Time</option>
+                <option name="charting.axisTitleY.text">Replication Time (sec)</option>
+            </chart>
+            <html depends="$split_by_peer$">
+              <p>Average bundle replication time, in seconds, grouped by peer. Only 50 peers are visible.</p>
+            </html>
+        </panel>
+    </row>
+    
+    <row>
+        <panel rejects="$snapshot$">
+         <title>Average Bundle Replication Time and Size</title>
+         <table>
+            <searchString>
+                `dmc_set_index_internal` host=$host$ source=*/metrics.log* group=bundles_uploads name=peer_dispatch
+                | stats avg(replication_time_msec) AS avg_time by peer_name
+                | eval avg_time=round(avg_time/1000, 2)
+                | rename avg_time AS "Replication Time (sec)"
+                | appendcols [
+                  search `dmc_set_index_internal` host=$host$ source=*/metrics.log* group=bundles_uploads name=peer_dispatch
+                  | join type=inner bundle_id [
+                    search `dmc_set_index_internal` source=*/metrics.log* group=bundle_replication name=bundle_metadata]
+                  | stats avg(bundle_bytes) AS avg_size by peer_name
+                  | eval avg_size = round(avg_size /1024 / 1024, 2)
+                  | rename avg_size AS "Bundle Size (MB)"]
+                | rename peer_name AS "Peer"
+              <earliest>$time.earliest$</earliest>
+              <latest>$time.latest$</latest>
+            </searchString>
+         </table>
+        </panel>
+    </row>
+    
+    <row>
+      <panel rejects="$snapshot$">
+        <title>Knowledge Bundle Replication Warnings and Errors Over Time</title>
+        <chart>
+          <search>
+            <query>
+              `dmc_set_index_internal` (search_group=dmc_group_indexers OR search_group=dmc_group_search_head) source=*splunkd.log*
+              (component=BundlesAdminHandler OR  component=BundleDataProcessor OR component=BundleDeltaHandler OR
+              component=BundleReplicationProvider OR component=BundleStatusManager OR component=BundleTransaction OR
+              component=CascadePlan OR component=CascadeReplicationReaper OR component=CascadingBundleReplicationProvider OR
+              component=CascadingReplicationManager OR component=CascadingReplicationTransaction OR 
+              component=CascadingReplicationStatusActor OR component=CascadingUploadHandler OR component=ClassicBundleReplicationProvider OR
+              component=DistBundleRestHandler OR component=DistributedBundleReplicationManager OR
+              component=GetCascadingReplicationStatusTransaction OR component=RFSManager OR component=RFSBundleReplicationProvider)
+              (log_level=WARN OR log_level=ERROR)
+              | timechart bins=200 partial=f count by component
+            </query>
+            <earliest>$time.earliest$</earliest>
+            <latest>$time.latest$</latest>
+          </search>
+          <option name="charting.chart">column</option>
+          <option name="charting.chart.stackMode">stacked</option>
+          <option name="charting.axisTitleX.text">Time</option>
+          <option name="charting.axisTitleY.text">Event Count</option>
+        </chart>
+      </panel>
+      <panel rejects="$snapshot$">
+        <title>Knowledge Bundle Replication Warnings and Errors By Component</title>
+        <chart>
+          <search>
+            <query>
+              `dmc_set_index_internal` (search_group=dmc_group_indexers OR search_group=dmc_group_search_head) source=*splunkd.log*
+              (component=BundlesAdminHandler OR  component=BundleDataProcessor OR component=BundleDeltaHandler  OR
+              component=BundleReplicationProvider OR component=BundleStatusManager OR component=BundleTransaction OR
+              component=CascadePlan OR component=CascadeReplicationReaper OR component=CascadingBundleReplicationProvider OR component=CascadingReplicationManager OR component=CascadingReplicationTransaction OR component=CascadingReplicationStatusActor OR component=CascadingUploadHandler OR component=ClassicBundleReplicationProvider OR component=DistBundleRestHandler OR
+              component=DistributedBundleReplicationManager OR component=GetCascadingReplicationStatusTransaction OR
+              component=RFSManager OR component=RFSBundleReplicationProvider)
+              (log_level=WARN OR log_level=ERROR)
+              | chart count by component, log_level
+              | sort - ERROR, WARN
+            </query>
+            <earliest>$time.earliest$</earliest>
+            <latest>$time.latest$</latest>
+          </search>
+          <option name="charting.chart">bar</option>
+          <option name="charting.axisTitleX.text">Component</option>
+          <option name="charting.axisTitleY.text">Event Count</option>
+          <option name="charting.fieldColors">{"WARN": 0xF2B827, "ERROR": 0xAF575A}</option>
+        </chart>
+      </panel>
+    </row>
+
+</form>              

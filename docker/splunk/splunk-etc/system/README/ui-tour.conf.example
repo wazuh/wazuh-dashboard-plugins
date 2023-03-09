@@ -1,0 +1,39 @@
+#   Version 9.0.3
+#
+# This file contains the tours available for Splunk Onboarding
+#
+# To update tours, copy the configuration block into
+# ui-tour.conf in $SPLUNK_HOME/etc/system/local/. Restart the Splunk software to
+# see the changes.
+#
+# To learn more about configuration files (including precedence) see the
+# documentation located at
+# http://docs.splunk.com/Documentation/Splunk/latest/Admin/Aboutconfigurationfiles
+#
+
+# Image Tour
+[tour-name]
+type = image
+imageName1 = TourStep1.png
+imageCaption1 = This is the first caption
+imageName2 = TourStep2.png
+imageCaption2 = This is the second caption
+imgPath = /testtour
+context = system
+doneText = Continue to Tour Page
+doneURL = app/toursapp/home
+
+# Interactive Tour
+[test-interactive-tour]
+type = interactive
+tourPage = reports
+urlData = data=foo&moredata=bar
+label = Interactive Tour Test
+stepText1 = Welcome to this test tour
+stepText2 = This is the first step in the tour
+stepElement2 = .test-selector
+stepText3 = This is the second step in the tour
+stepElement3 = .test-selector
+stepClickEvent3 = mousedown
+stepClickElement3 = .test-click-element
+forceTour = 1

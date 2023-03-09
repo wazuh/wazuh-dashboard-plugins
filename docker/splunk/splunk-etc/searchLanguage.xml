@@ -1,0 +1,632 @@
+<!--   Version 4.0 -->
+                                                                                                                                       
+
+<language>
+    <options>
+       <useAdvancedQuery>false</useAdvancedQuery>
+    </options>
+
+    <controls>
+        <control>
+            <token>SEARCH</token>
+                <modules>
+
+                    <module>
+                        <name>savedSplunkLoader</name>
+                        <requiredArgs>
+                            <arg>savedsplunk</arg>
+                        </requiredArgs>                        
+                    </module>
+
+                    <module>
+                        <name>savedSplunkLoader</name>
+                        <requiredArgs>
+                            <arg>savedsearch</arg>
+                        </requiredArgs>                        
+                    </module>
+
+                    <module>
+                        <name>time</name>
+                        <requiredArgs>
+                            <arg>startdaysago</arg> 
+                        </requiredArgs>
+                        <defaults>
+                            <startdaysago>1</startdaysago>
+                        </defaults>
+                    </module>
+
+                    <module>
+		        <name>sortmeta</name>
+                        <requiredArgs>
+                            <arg>sort</arg> 
+                        </requiredArgs>
+                        <optionalArgs>
+                            <arg>order</arg>
+                        </optionalArgs>
+                    </module>
+
+                    <module>
+		        <name>lastby</name>
+                        <requiredArgs>
+                            <arg>lastby</arg> 
+                        </requiredArgs>
+                    </module>
+
+                    <module>
+		        <name>readtimeout</name>
+                        <requiredArgs>
+                            <arg>readtimeout</arg> 
+                        </requiredArgs>
+                        <defaults>
+                            <readtimeout>5</readtimeout>
+                        </defaults>
+                    </module>
+
+                    <module>
+		        <name>queryid</name>
+                        <requiredArgs>
+                            <arg>queryid</arg> 
+                        </requiredArgs>
+                    </module>
+
+                    <module>
+                        <name>sortorder</name>
+                        <requiredArgs>
+                            <arg>!resultsetsortby</arg> 
+                        </requiredArgs>                      
+                    </module>
+
+                    <module>
+                        <name>readlevel</name>
+                        <requiredArgs>
+                            <arg>readlevel</arg> 
+                        </requiredArgs>                      
+                    </module>
+
+                    <module>
+                        <name>readlimit</name>
+                        <requiredArgs>
+                            <arg>readlimit</arg> 
+                        </requiredArgs>                      
+                    </module>
+
+                    <module>
+                        <name>time</name>
+                        <requiredArgs>
+                            <arg>startminutesago</arg> 
+                        </requiredArgs>
+                        <defaults>
+                            <startminutesago>1</startminutesago>
+                        </defaults>
+                    </module>
+
+                    <module>
+                        <name>time</name>
+                        <requiredArgs>
+                            <arg>starthoursago</arg> 
+                        </requiredArgs>
+                        <defaults>
+                            <starthoursago>1</starthoursago>
+                        </defaults>
+                    </module>
+
+                    <module>
+                        <name>time</name>
+                        <requiredArgs>
+                            <arg>startmonthsago</arg> 
+                        </requiredArgs>
+                        <defaults>
+                            <startmonthsago>1</startmonthsago>
+                        </defaults>
+                    </module>
+
+                    <module>
+                        <name>time</name>
+                        <requiredArgs>
+                            <arg>enddaysago</arg> 
+                        </requiredArgs>
+                        <defaults>
+                            <enddaysago>1</enddaysago>
+                        </defaults>
+                    </module>
+
+                    <module>
+                        <name>time</name>
+                        <requiredArgs>
+                            <arg>endminutesago</arg> 
+                        </requiredArgs>
+                        <defaults>
+                            <endminutesago>1</endminutesago>
+                        </defaults>
+                    </module>
+
+                    <module>
+                        <name>time</name>
+                        <requiredArgs>
+                            <arg>endhoursago</arg> 
+                        </requiredArgs>
+                        <defaults>
+                            <endhoursago>1</endhoursago>
+                        </defaults>
+                    </module>
+
+                    <module>
+                        <name>time</name>
+                        <requiredArgs>
+                            <arg>endmonthsago</arg> 
+                        </requiredArgs>
+                        <defaults>
+                            <endmonthsago>1</endmonthsago>
+                        </defaults>
+                    </module>
+
+                    <module>
+                        <name>time</name>
+                        <requiredArgs>
+                            <arg>searchtimespanhours</arg> 
+                        </requiredArgs>
+                        <defaults>
+                            <searchtimespanhours>1</searchtimespanhours>
+                        </defaults>
+                    </module>
+
+                    <module>
+                        <name>time</name>
+                        <requiredArgs>
+                            <arg>searchtimespanminutes</arg> 
+                        </requiredArgs>
+                        <defaults>
+                            <searchtimespanminutes>1</searchtimespanminutes>
+                        </defaults>
+                    </module>
+
+                    <module>
+                        <name>time</name>
+                        <requiredArgs>
+                            <arg>searchtimespandays</arg> 
+                        </requiredArgs>
+                        <defaults>
+                            <searchtimespandays>1</searchtimespandays>
+                        </defaults>
+                    </module>
+
+                    <module>
+                        <name>time</name>
+                        <requiredArgs>
+                            <arg>searchtimespanmonths</arg> 
+                        </requiredArgs>
+                        <defaults>
+                            <searchtimespanmonths>1</searchtimespanmonths>
+                        </defaults>
+                    </module>
+
+
+
+                    <module>
+                        <name>time</name>
+                        <requiredArgs>
+                            <arg>starttime</arg>
+                        </requiredArgs>
+                        <optionalArgs>
+                            <arg>timeformat</arg>
+                        </optionalArgs>
+                        <defaults>
+                            <starttime>12/31/1969:16:00:00</starttime>
+                            <timeformat>%m/%d/%Y:%H:%M:%S</timeformat>
+                        </defaults>
+                    </module>
+
+                    <module>
+                        <name>time</name>
+                        <requiredArgs>
+                            <arg>endtime</arg>
+                        </requiredArgs>
+                        <optionalArgs>
+                            <arg>timeformat</arg>
+                        </optionalArgs>
+                        <defaults>
+                            <endtime>12/31/2022:16:00:00</endtime>
+                            <timeformat>%m/%d/%Y:%H:%M:%S</timeformat>
+                        </defaults>
+                    </module>
+
+                    <module>
+                        <name>time</name>
+                        <requiredArgs>
+                            <arg>starttimeu</arg>
+                        </requiredArgs>
+                        <defaults>
+                            <starttimeu>0</starttimeu>
+                        </defaults>
+                    </module>
+
+                    <module>
+                        <name>time</name>
+                        <requiredArgs>
+                            <arg>endtimeu</arg>
+                        </requiredArgs>
+                        <defaults>
+                            <endtimeu>1672531200</endtimeu>
+                        </defaults>
+                    </module>
+
+
+                    <module>
+                        <name>time</name>
+                        <requiredArgs>
+                            <arg>daysago</arg>
+                         </requiredArgs>
+                        <defaults>
+                            <daysago>1</daysago>
+                        </defaults>
+                    </module>
+
+
+                    <module>
+                        <name>time</name>
+                        <requiredArgs>
+                             <arg>minutesago</arg>
+                        </requiredArgs>
+                        <defaults>
+                            <minutesago>1</minutesago>
+                        </defaults>
+                    </module>
+
+                    <module>
+                        <name>time</name>
+                        <requiredArgs>
+                             <arg>hoursago</arg>
+                        </requiredArgs>
+                        <defaults>
+                            <hoursago>1</hoursago>
+                        </defaults>
+                    </module>
+
+                    <module>
+                        <name>time</name>
+                        <requiredArgs>
+                            <arg>monthsago</arg>
+                         </requiredArgs>
+                        <defaults>
+                            <monthsago>1</monthsago>
+                        </defaults>
+                    </module>
+
+                    <module>
+                        <name>maxtime</name>
+                        <requiredArgs>
+                            <arg>maxtime</arg>
+                         </requiredArgs>
+                        <defaults>
+                            <maxtime>60</maxtime>
+                        </defaults>
+                    </module>
+
+                    <module>
+                        <name>countSetter</name>
+                        <requiredArgs>
+                            <arg>maxevents</arg>
+                        </requiredArgs>
+                        <defaults>
+                            <maxevents>typeahead_suppress</maxevents>
+                        </defaults>
+                    </module>
+
+                    <module>
+                        <name>eventtypeResolver</name>
+                        <requiredArgs>
+                            <arg>eventtype</arg>
+                        </requiredArgs>
+                    </module>
+
+                    <module>
+                        <name>eventtypeResolver</name>
+                        <requiredArgs>
+                            <arg>tag</arg>
+                        </requiredArgs>
+                    </module>
+
+
+                    <module>
+                        <name>eventtypeResolver</name>
+                        <requiredArgs>
+                            <arg>typetag</arg>
+                        </requiredArgs>
+                    </module>
+
+                    <module>
+                        <name>eventtypeResolver</name>
+                        <requiredArgs>
+                            <arg>eventtypetag</arg>
+                        </requiredArgs>
+                    </module>
+
+                    <module>
+                        <name>hosttagResolver</name>
+                        <requiredArgs>
+                            <arg>hosttag</arg>
+                        </requiredArgs>
+                    </module>
+
+                    <module>
+                        <name>sourcetypeResolver</name>
+                        <requiredArgs>
+                            <arg>sourcetype</arg>
+                        </requiredArgs>
+                    </module>
+               
+                    <module>
+                        <name>domainFinder</name>
+                        <requiredArgs>
+                            <arg>index</arg>
+                        </requiredArgs>
+                    </module>
+
+
+                    <module>
+                        <name>connectedbytype</name>
+                        <requiredArgs>
+                            <arg>relatedbytype</arg>
+                        </requiredArgs>
+                        <optionalArgs>      
+                            <arg>minrelationbytype</arg>
+                        </optionalArgs>
+                    </module>
+
+                    <module>
+                        <name>historyuser</name>
+                        <requiredArgs>
+                           <arg>user</arg>
+                        </requiredArgs>
+                    </module>
+
+                    <module>
+                       <name>regexFilter</name>
+                        <requiredArgs>
+                           <arg>grep</arg>
+                        </requiredArgs>                       
+                    </module>
+
+
+                    <module>
+                        <name>debugCommand</name>
+                        <requiredArgs>
+                           <arg>!++cmd++</arg>
+                        </requiredArgs>
+                        <optionalArgs>      
+                            <arg>!++param1++</arg>
+                            <arg>!++param2++</arg>
+                        </optionalArgs>
+                   </module>
+
+               </modules>
+        </control>
+
+        <control>
+            <token>GET</token>
+            <modules>
+
+                <module>
+                    <name>eventGetter</name>
+                    <requiredArgs>
+                        <arg>events</arg>
+                    </requiredArgs>
+                    <optionalArgs>
+                        <arg>summarize</arg>
+                    </optionalArgs>
+                    <requiredControls>
+                        <token>SEARCH</token>
+                    </requiredControls>
+                </module>
+
+                <module>
+                    <name>timebucketsGetter</name>
+                    <requiredArgs>
+                        <arg>timebuckets</arg>
+                    </requiredArgs>
+                    <requiredControls>
+                        <token>SEARCH</token>
+                    </requiredControls>
+                </module>
+
+                <module>
+                    <name>reportGetter</name>
+                    <requiredArgs>
+                        <arg>report</arg>
+                    </requiredArgs>
+                </module>                
+
+                <module>
+                    <name>typeGetter</name>
+                    <requiredArgs>
+                        <arg>types</arg>
+                    </requiredArgs>
+                    <optionalArgs>
+                        <arg>samplesfortypes</arg>
+                    </optionalArgs>
+                </module>
+
+                <module>
+                    <name>searchGetter</name>
+                    <requiredArgs>
+                        <arg>searches</arg>
+                    </requiredArgs>
+                    <optionalArgs>
+                        <arg>samplesfortypes</arg>
+                    </optionalArgs>
+                </module>
+
+                <module>
+                    <name>hostGetter</name>
+                    <requiredArgs>
+                        <arg>hosts</arg>
+                    </requiredArgs>
+                </module>
+
+                <module>
+                    <name>sourceTypeGetter</name>
+                    <requiredArgs>
+                        <arg>sourcetypes</arg>
+                    </requiredArgs>
+                </module>
+
+                <module>
+                    <name>eventTagGetter</name>
+                    <requiredArgs>
+                        <arg>eventtags</arg>
+                    </requiredArgs>
+                </module>
+
+                <module>
+                    <name>hostTagGetter</name>
+                    <requiredArgs>
+                        <arg>hosttags</arg>
+                    </requiredArgs>
+                </module>
+
+                <module>
+                    <name>sourceTypeTagGetter</name>
+                    <requiredArgs>
+                        <arg>sourcetypetags</arg>
+                    </requiredArgs>
+                </module>
+
+                <module>
+                    <name>sourceGetter</name>
+                    <requiredArgs>
+                        <arg>sources</arg>
+                    </requiredArgs>
+                </module>
+
+                <module>
+                    <name>reportGetter</name>
+                    <requiredArgs>
+                        <arg>report</arg>
+                    </requiredArgs>
+                </module>
+
+                <module>
+                    <name>formatGetter</name>
+                    <requiredArgs>
+                        <arg>formats</arg>
+                    </requiredArgs>
+                </module>
+
+            </modules>
+        </control>
+
+        <control>
+            <token>OUTPUT</token>
+            <modules>
+    
+                <module>
+                    <name>emailOut</name>
+                    <requiredArgs>
+                        <arg>email</arg>
+                    </requiredArgs>
+                    <optionalArgs>
+                        <arg>format</arg>
+                    </optionalArgs>
+                    <requiredControls>
+                        <token>GET</token>
+                    </requiredControls>
+                </module>
+    
+
+                <module>
+                   <name>schedOut</name>
+                   <requiredArgs>
+                       <arg>scheduler</arg>
+                   </requiredArgs>
+                    <optionalArgs>
+                        <arg>resolveids</arg>
+                    </optionalArgs>
+                </module>
+                         
+                <module>
+                   <name>schedOut</name>
+                   <requiredArgs>
+                       <arg>summary</arg>
+                   </requiredArgs>
+                    <optionalArgs>
+                        <arg>resolveids</arg>
+                    </optionalArgs>
+                </module>     
+
+                <module>
+                    <name>rssOut</name>
+                    <requiredArgs>
+                        <arg>rssfeed</arg>                            
+                    </requiredArgs>
+                    <requiredControls>
+                        <token>GET</token>
+                    </requiredControls>
+                </module>
+    
+                <module>
+                    <name>splunkUIOut</name>
+                    <requiredArgs>
+                        <arg>splunkui</arg>                            
+                    </requiredArgs>
+                    <optionalArgs>
+                        <arg>format</arg>
+                        <arg>idcount</arg>
+                        <arg>maxlines</arg>
+                        <arg>timeformat</arg>
+                    </optionalArgs>                        
+                    <requiredControls>
+                        <token>GET</token>
+                    </requiredControls>
+                </module>
+                  
+    
+                <module>
+                    <name>exportOut</name>
+                    <requiredArgs>
+                        <arg>exportto</arg>
+                    </requiredArgs>
+                    <optionalArgs>
+                        <arg>format</arg>
+                    </optionalArgs>
+                    <requiredControls>
+                        <token>GET</token>
+                    </requiredControls>
+                </module>
+
+                <module>
+                    <name>raweventsOut</name>
+                    <requiredArgs>
+                        <arg>rawevents</arg>
+                    </requiredArgs>
+                    <requiredControls>
+                        <token>GET</token>
+                    </requiredControls>
+                </module>
+
+
+                <module>
+                    <name>magicgraph</name>
+                    <requiredArgs>
+                        <arg>magicgraph</arg>
+                    </requiredArgs>
+                    <requiredControls>
+                        <token>GET</token>
+                    </requiredControls>
+                </module>
+            </modules>   
+        </control>
+    </controls>
+
+    <!--
+    Examples :
+
+    Running a normal splunk ui query
+        SEARCH get NOT post NOT( eventtype::error OR connected::foo:1:123544 ) count::100000 domain::splunkdb1 
+        GET events::0-20 types::all sourcetypes::all timebuckets::all 
+        OUTPUT splunkui::ajax format::heavy  
+
+    Running a query to email all the sources in the system to brian@splunk.com with html email format
+        GET sources::all 
+        OUTPUT email::brian@splunk.com format::htmlmail
+    -->
+</language>

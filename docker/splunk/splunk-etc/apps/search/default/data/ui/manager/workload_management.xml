@@ -1,0 +1,13 @@
+<endpoint name="workload_management" template="pages/system.html" showOnSearchHeadCluster="1">
+  <header>Workload Management</header>
+  <capabilities>
+    <read>list_workload_pools AND list_workload_rules</read>
+  </capabilities>
+  <menu name="system_configurations">
+    <label>Workload management</label>
+    <url>/manager/system/workload_management</url>
+    <description>View, edit, and apply configurations for admission control and workload management.</description>
+    <order>75</order>
+    <id>workload_management</id>
+  </menu>
+</endpoint>

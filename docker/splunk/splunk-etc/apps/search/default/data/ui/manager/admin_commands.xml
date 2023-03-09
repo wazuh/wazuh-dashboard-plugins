@@ -1,0 +1,39 @@
+<endpoint name="admin/commandsconf" showAppContext="1">
+  <header>Search commands</header>
+  <breadcrumb>
+    <parent hidecurrent="False">advancedsearch</parent>
+    <name>Search commands</name>
+  </breadcrumb>
+  <!-- not putting this on the homepage menu for now
+  <menu name="app_configurations">
+    <label>Search commands</label>
+    <url>/manager/%(namespace)s/admin/commands</url>
+    <description>Set permissions on python-based search commands.</description>
+    <order>60</order>
+  </menu>
+  -->
+  <elements>
+    <element name="savecommand" type="fieldset">
+      <view name="list"/>
+      <view name="edit"/>
+      <elements>
+        <element name="name" type="textfield" label="Command name">
+          <view name="list"/>
+        </element>
+        <element name="filename" type="textfield" label="Command script filename">
+          <view name="list"/>
+          <view name="edit"/>
+        </element>
+      </elements>
+      <key name="legend">Command details</key>
+    </element>
+    <element name="eai:acl.owner" label="Owner">
+      <view name="list"/>
+      <key name="processValueList">entity['eai:acl']['owner'] == 'nobody' and _('No owner') or entity['eai:acl']['owner']</key>
+    </element>
+    <element name="eai:acl.app" label="App">
+      <view name="list"/>
+      <key name="processValueList">entity['eai:acl']['app'] or ""</key>
+    </element>
+  </elements>
+</endpoint>

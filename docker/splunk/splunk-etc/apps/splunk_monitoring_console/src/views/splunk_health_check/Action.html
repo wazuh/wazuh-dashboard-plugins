@@ -1,0 +1,11 @@
+<% if (conductor.get('state') === 'running') { %>
+  <button class="btn btn-stop-check"><%- _('Stop').t() %></button>
+<% } else { %>
+  <% if (conductor.get('checked') > 0 && conductor.get('checked') < conductor.get('total')) { %>
+    <button class="btn btn-primary btn-continue-check"><%- _('Continue').t() %></button><button class="btn btn-secondary btn-reset-check"><%- _('Reset').t() %></button>
+  <% } else if (conductor.get('checked') >= conductor.get('total')) { %>
+    <button class="btn btn-primary btn-reset-check"><%- _('Start Over').t() %></button>
+  <% } else { %>
+    <button class="btn btn-primary btn-start-check"><%- _('Start').t() %></button>
+  <% } %>
+<% } %>

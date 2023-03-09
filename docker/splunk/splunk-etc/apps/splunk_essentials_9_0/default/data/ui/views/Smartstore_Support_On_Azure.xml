@@ -1,0 +1,46 @@
+<dashboard hideEdit="True" version="1.1">
+
+  <label>SmartStore Support on Azure</label>
+  <row>
+    <panel>
+      <html>      
+
+        <p><strong>Description</strong></p>
+        <p>Scope: Splunk Enterprise Only</p>
+        <p>Key Features as part of the Azure SmartStore Support include:</p>
+        <p>1. Support for standalone and multisite indexer clusters.</p>
+        <p>2. Native support for basic functionalities like `put`, `delete`, and `get` operations.</p>
+        <p>3. Currently supports the following Remote Storage Encryptions:</p>
+        <ul> 
+          <li>Microsoft Managed Keys (azure-sse-ms)</li>
+          <li>Customer Managed Keys (azure-sse-kv)</li>
+        </ul>
+
+        <p><strong>Screenshots</strong></p>
+        <p> 1. Prior to setting up Azure SmartStore, cache manager does not index any data: </p>
+        <ul>
+                  <div style="margin-left:10px">
+                   <img src="/static/app/splunk_essentials_9_0/images/azure_smart_store_1.png" style="margin: 10px 0" width="700px"/>
+                  </div>
+                  <br/>
+                 </ul>
+        <p> 2. After setting up Azure SmartStore, cache manager starts indexing data: </p>
+        <ul>
+                  <div style="margin-left:10px">
+                   <img src="/static/app/splunk_essentials_9_0/images/azure_smart_store_2.png" style="margin: 10px 0" width="700px"/>
+                  </div>
+                  <br/>
+                 </ul>
+        <p> 3. Buckets in Azure!: </p>
+        <ul>
+                  <div style="margin-left:10px">
+                   <img src="/static/app/splunk_essentials_9_0/images/azure_smart_store_3.png" style="margin: 10px 0" width="700px"/>
+                  </div>
+                  <br/>
+                 </ul>
+        <p> More details about this feature <a href="https://docs.splunk.com/Documentation/Splunk/9.0.0/Indexer/SmartStoresystemrequirements" target="_blank">here</a>.</p>
+        
+        </html>
+    </panel>
+  </row>
+</dashboard>

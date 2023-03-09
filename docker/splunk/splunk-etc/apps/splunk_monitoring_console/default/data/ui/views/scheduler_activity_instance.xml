@@ -1,0 +1,829 @@
+<form version="1.1" hideEdit="True" script="common_control.js, scheduler_activity_extension.js">
+  <label>Scheduler Activity: Instance</label>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="dropdown" searchWhenChanged="true" token="dmc_group">
+      <label>Group</label>
+      <showClearButton>false</showClearButton>
+      <search>
+        <query>
+          | `dmc_get_groups_containing_role(dmc_group_search_head)`
+          | search search_group!="dmc_group_*"
+        </query>
+      </search>
+      <fieldForLabel>label</fieldForLabel>
+      <fieldForValue>search_group</fieldForValue>
+      <choice value="dmc_group_search_head">All Search Heads</choice>
+      <default>dmc_group_search_head</default>
+    </input>
+    <input type="dropdown" searchWhenChanged="true" token="splunk_server">
+      <label>Instance</label>
+      <showClearButton>false</showClearButton>
+      <populatingSearch fieldForLabel="serverName" fieldForValue="serverName">
+        | `dmc_get_instance_info($dmc_group$)`
+        | where search_group="dmc_group_search_head"
+      </populatingSearch>
+      <selectFirstChoice>true</selectFirstChoice>
+      <change>
+        <condition value="*">
+          <set token="host">$row.host$</set>
+        </condition>
+      </change>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <html>
+        <h2>
+          <span>Select views: </span>
+          <span id="link-switcher-view">
+            <a href="#" class="btn-pill active" data-token-json='{"hide_status": null, "hide_activity": null, "hide_performance": null, "hide_time_range_picker": null}'>All</a>
+            <a href="#" class="btn-pill" data-token-json='{"hide_status": null, "hide_activity": true, "hide_performance": true, "hide_time_range_picker": true}'>Status</a>
+            <a href="#" class="btn-pill" data-token-json='{"hide_status": true, "hide_activity": null, "hide_performance": true, "hide_time_range_picker": null}'>Activity</a>
+            <a href="#" class="btn-pill" data-token-json='{"hide_status": true, "hide_activity": true, "hide_performance": null, "hide_time_range_picker": null}'>Performance</a>
+          </span>
+        </h2>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$hide_status$">
+      <title>Hardware Information</title>
+      <single>
+        <search>
+          <query>
+            | rest splunk_server=$splunk_server$ /services/server/info
+            | eval core_info = if(isnull(numberOfCores), "N/A", numberOfCores)."/".if(isnull(numberOfVirtualCores), "N/A", numberOfVirtualCores)
+            | fields core_info
+          </query>
+        </search>
+        <option name="underLabel">CPU Cores (Physical / Virtual)</option>
+        <option name="height">80px</option>
+      </single>
+    </panel>
+    <panel rejects="$hide_status$">
+      <title>Concurrency of Scheduled Reports (Running/Limit)</title>
+      <search id="snapshot_search_concurreny_base">
+        <query>
+          | rest splunk_server=$splunk_server$ /services/server/status/resource-usage/splunk-processes
+          | dedup search_props.sid
+          | search `dmc_match_all_scheduled_search_types`
+        </query>
+      </search>
+      <search base="snapshot_search_concurreny_base">
+        <query>
+          stats count(eval('search_props.mode'=="historical batch" OR 'search_props.mode'=="historical")) as count_hist_scheduled_search, count(eval('search_props.mode'=="RT" OR 'search_props.mode'=="RT indexed")) as count_rt_scheduled_search by splunk_server
+        </query>
+        <finalized>
+          <eval token="count_hist_scheduled_search">if(isnotnull('result.count_hist_scheduled_search'), 'result.count_hist_scheduled_search', 0)</eval>
+          <eval token="count_rt_scheduled_search">if(isnotnull('result.count_rt_scheduled_search'), 'result.count_rt_scheduled_search', 0)</eval>
+        </finalized>
+      </search>
+      <search id="search_concurrency_limits_base">
+        <query>
+          | rest splunk_server=$splunk_server$ /services/server/status/limits/search-concurrency
+          | fields max_hist_scheduled_searches, max_rt_scheduled_searches
+        </query>
+        <finalized>
+          <set token="max_hist_scheduled_searches">$result.max_hist_scheduled_searches$</set>
+          <set token="max_rt_scheduled_searches">$result.max_rt_scheduled_searches$</set>
+        </finalized>
+      </search>
+      <single>
+        <search base="search_concurrency_limits_base">
+          <query>
+            eval scheduled_vs_total_hist_search_limit = "$count_hist_scheduled_search$"."/".max_hist_scheduled_searches
+            | fields scheduled_vs_total_hist_search_limit
+          </query>
+        </search>
+        <option name="underLabel">Historical</option>
+        <option name="height">80px</option>
+        <option name="drilldown">all</option>
+        <drilldown>
+          <set token="show_snapshot_concurrency_detail_historical">true</set>
+        </drilldown>
+      </single>
+      <single>
+        <search base="search_concurrency_limits_base">
+          <query>
+            eval scheduled_vs_total_rt_search_limit = "$count_rt_scheduled_search$"."/".max_rt_scheduled_searches
+            | fields scheduled_vs_total_rt_search_limit
+          </query>
+        </search>
+        <option name="underLabel">Real-time</option>
+        <option name="height">80px</option>
+        <option name="drilldown">all</option>
+        <drilldown>
+          <set token="show_snapshot_concurrency_detail_rt">true</set>
+        </drilldown>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel depends="$show_snapshot_concurrency_detail_historical$" rejects="$hide_status$">
+      <title>Running Historical Scheduled Reports</title>
+      <table>
+        <search base="snapshot_search_concurreny_base">
+          <query>
+            where 'search_props.mode'=="historical batch" OR 'search_props.mode'=="historical"
+            | fields search_props.name, search_props.app, search_props.user, search_props.type, search_props.mode, search_props.role, mem_used, pct_cpu, elapsed, search_props.sid
+            | eval mem_used = round(mem_used, 0)
+            | eval pct_cpu = round(pct_cpu, 0)
+            | eval elapsed = round(elapsed, 0)
+            | rename search_props.name as "Scheduled Report Name", search_props.app as App, search_props.user as User, search_props.type as Type, search_props.mode as Mode, search_props.role as Role, mem_used as "Memory Used (MB)", pct_cpu as "CPU Usage (%)", elapsed as "Time Spent (sec)", search_props.sid as "SID"
+          </query>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+      <html>
+        <a data-unset-token="show_snapshot_concurrency_detail_historical">Close this panel</a>
+      </html>
+    </panel>
+    <panel depends="$show_snapshot_concurrency_detail_rt$" rejects="$hide_status$">
+      <title>Running Real-time Scheduled Reports</title>
+      <table>
+        <search base="snapshot_search_concurreny_base">
+          <query>
+            where 'search_props.mode'=="RT" OR 'search_props.mode'=="RT indexed"
+            | fields search_props.name, search_props.app, search_props.user, search_props.type, search_props.mode, search_props.role, mem_used, pct_cpu, elapsed, search_props.sid
+            | eval mem_used = round(mem_used, 0)
+            | eval pct_cpu = round(pct_cpu, 0)
+            | eval elapsed = round(elapsed, 0)
+            | rename search_props.name as "Scheduled Report Name", search_props.app as App, search_props.user as User, search_props.type as Type, search_props.mode as Mode, search_props.role as Role, mem_used as "Memory Used (MB)", pct_cpu as "CPU Usage (%)", elapsed as "Time Spent (sec)", search_props.sid as "SID"
+          </query>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+      <html>
+        <a data-unset-token="show_snapshot_concurrency_detail_rt">Close this panel</a>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$hide_status$">
+      <title>Unique Scheduled Reports</title>
+      <single>
+        <search base="inventory_base">
+          <query>stats count</query>
+        </search>
+        <option name="underLabel">Click to show full inventory</option>
+        <option name="height">80px</option>
+        <option name="drilldown">all</option>
+        <drilldown>
+          <set token="show_inventory">true</set>
+        </drilldown>
+      </single>
+    </panel>
+    <panel rejects="$hide_status$">
+      <title>Count of Reports Scheduled</title>
+      <single>
+        <search>
+          <query>
+            | rest splunk_server=$splunk_server$ "/servicesNS/-/-/saved/searches/" earliest_time=`time_modifier(-0s@s)` latest_time=`time_modifier(+8d@d)` search="is_scheduled=1" search="disabled=0"
+            | table splunk_server eai:acl.app eai:acl.owner cron_schedule title scheduled_times
+            | mvexpand scheduled_times
+            | rename scheduled_times as _time eai:acl.app as app eai:acl.owner as user title as search
+            | stats count
+            | eval count = `dmc_convert_count_unit(count)`
+          </query>
+        </search>
+        <option name="underLabel">in next 7 days</option>
+        <option name="height">80px</option>
+      </single>
+    </panel>
+    <panel rejects="$hide_status$">
+      <title>Skip Ratio (Last Hour)</title>
+      <search id="skip_ratio_and_exec_latency_base">
+        <query>
+          `dmc_set_index_internal` host=$host$ sourcetype=scheduler (status="completed" OR status="skipped" OR status="deferred")
+          | eval window_time = if(isnotnull(window_time), window_time, 0)
+          | eval execution_latency = max(dispatch_time - (scheduled_time + window_time), 0)
+          | timechart span=1h partial=f avg(execution_latency) AS avg_exec_latency, count(eval(status=="completed" OR status=="skipped")) AS total_exec, count(eval(status=="skipped")) AS skipped_exec
+          | eval skip_ratio = round(skipped_exec / total_exec * 100, 2)
+          | eval avg_exec_latency = round(avg_exec_latency, 2)
+        </query>
+        <earliest>-24h@m</earliest>
+        <latest>now</latest>
+      </search>
+      <single>
+        <search base="skip_ratio_and_exec_latency_base">
+          <query>fields _time, skip_ratio</query>
+        </search>
+        <option name="afterLabel">%</option>
+        <option name="colorBy">trend</option>
+        <option name="numberPrecision">0.00</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trendColorInterpretation">inverse</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="trendInterval">-1h</option>
+        <option name="useColors">1</option>
+        <option name="height">80px</option>
+      </single>
+    </panel>
+    <panel rejects="$hide_status$">
+      <title>Average Execution Latency (Last Hour)</title>
+      <single>
+        <search base="skip_ratio_and_exec_latency_base">
+          <query>fields _time, avg_exec_latency</query>
+        </search>
+        <option name="afterLabel">sec</option>
+        <option name="numberPrecision">0.00</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="trendInterval">-1h</option>
+        <option name="height">80px</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$hide_status$">
+      <html>
+        <p><b>Skip Ratio and Execution Latency</b>: The single values show data in the past full hour. Trends compare to 1 hour before that. Sparklines show data over past 24 hours.</p>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel depends="$show_inventory$" rejects="$hide_status$">
+      <title>Inventory of Scheduled Reports ($scheduled_search_count$)</title>
+      <search id="inventory_base">
+        <query>
+          | rest splunk_server=$splunk_server$ "/servicesNS/-/-/saved/searches/" search="is_scheduled=1" search="disabled=0"
+          | fields title, eai:acl.app, eai:acl.owner, cron_schedule, dispatch.earliest_time, dispatch.latest_time,
+          schedule_window, actions
+        </query>
+        <done>
+          <set token="scheduled_search_count">$job.resultCount$</set>
+        </done>
+      </search>
+      <input type="dropdown" searchWhenChanged="true" token="inventory_app_filter">
+        <label>App</label>
+        <showClearButton>false</showClearButton>
+        <choice value="*">ALL</choice>
+        <selectFirstChoice>true</selectFirstChoice>
+        <search base="inventory_base">
+          <query>stats count by eai:acl.app</query>
+        </search>
+        <fieldForLabel>eai:acl.app</fieldForLabel>
+        <fieldForValue>eai:acl.app</fieldForValue>
+        <prefix>search eai:acl.app="</prefix>
+        <suffix>"</suffix>
+      </input>
+      <input type="dropdown" searchWhenChanged="true" token="inventory_user_filter">
+        <label>User</label>
+        <showClearButton>false</showClearButton>
+        <choice value="*">ALL</choice>
+        <selectFirstChoice>true</selectFirstChoice>
+        <search base="inventory_base">
+          <query>stats count by eai:acl.owner</query>
+        </search>
+        <fieldForLabel>eai:acl.owner</fieldForLabel>
+        <fieldForValue>eai:acl.owner</fieldForValue>
+        <prefix>search eai:acl.owner="</prefix>
+        <suffix>"</suffix>
+      </input>
+      <table>
+        <search base="inventory_base">
+          <query>
+            $inventory_app_filter$
+            | $inventory_user_filter$
+            | eval dispatch.earliest_time = if(isnull('dispatch.earliest_time') OR 'dispatch.earliest_time' == "0" OR
+            'dispatch.earliest_time'=="", "not set", 'dispatch.earliest_time')
+            | eval dispatch.latest_time = if(isnull('dispatch.latest_time') OR 'dispatch.latest_time' == "", "not set",
+            'dispatch.latest_time')
+            | eval actions = if(isnull(actions) OR actions == "", "none", actions)
+            | rename title as "Report Name", eai:acl.app as App, eai:acl.owner as User, cron_schedule as "Cron
+            Schedule", dispatch.earliest_time as "Earliest Time", dispatch.latest_time as "Latest Time", schedule_window as "Schedule Window (minutes)", actions as Actions
+          </query>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+      <html>
+        <a data-unset-token="show_inventory">Close this panel</a>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$hide_time_range_picker$">
+      <title>Historical Charts</title>
+      <input type="time" searchWhenChanged="true" token="time">
+        <label>Time Range:</label>
+        <default>
+          <earliestTime>-4h@m</earliestTime>
+          <latestTime>now</latestTime>
+        </default>
+      </input>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$hide_activity$">
+      <title>Count of Scheduler Executions</title>
+      <input type="dropdown" searchWhenChanged="true" token="scheduler_execution_split_by">
+        <label>Group by</label>
+        <showClearButton>false</showClearButton>
+        <choice value="status">Status</choice>
+        <choice value="app">App</choice>
+        <choice value="user">User</choice>
+        <choice value="savedsearch_name">Report Name</choice>
+        <choice value="alert_actions">Alert Actions</choice>
+        <default>status</default>
+      </input>
+      <!-- here we use a pattern:
+       - base search: get counts grouped by metrics
+       - post-process-1: get total count, generate a token to store total
+       - post-process-2: use the $total$ token to calculate percent
+       -->
+      <search id="scheduler_execution_count_base">
+        <query>
+          `dmc_set_index_internal` host=$host$ sourcetype=scheduler (status="completed" OR status="skipped" OR
+          status="deferred")
+          | eval alert_actions = if(isnull(alert_actions) OR alert_actions == "", "none", alert_actions)
+          | stats count by $scheduler_execution_split_by$
+        </query>
+        <earliest>$time.earliest$</earliest>
+        <latest>$time.latest$</latest>
+      </search>
+      <search base="scheduler_execution_count_base">
+        <query>stats sum(count) as total</query>
+        <preview>
+          <eval token="total_scheduler_execution">if(isnotnull('result.total'), 'result.total', 0)</eval>
+        </preview>
+        <finalized>
+          <eval token="total_scheduler_execution">if(isnotnull('result.total'), 'result.total', 0)</eval>
+        </finalized>
+      </search>
+      <table>
+        <title>Total: $total_scheduler_execution$</title>
+        <search base="scheduler_execution_count_base">
+          <query>
+            sort - count
+            | eventstats sum(count) AS total
+            | eval percent = round(count / total * 100, 2)." %"
+            | fields - total
+            | rename status as Status, app as App, user as User, savedsearch_name as "Report Name", alert_actions as "Alert Actions", count as Count, percent as "Percent of Total"
+          </query>
+        </search>
+        <option name="dataOverlayMode">heatmap</option>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+    <panel rejects="$hide_activity$">
+      <title>Count of Scheduler Executions Over Time</title>
+      <input type="dropdown" searchWhenChanged="true" token="scheduler_execution_timechart_split_by">
+        <label>Group by</label>
+        <showClearButton>false</showClearButton>
+        <choice value="status">Status</choice>
+        <choice value="app">App</choice>
+        <choice value="user">User</choice>
+        <choice value="savedsearch_name">Report Name</choice>
+        <choice value="alert_actions">Alert Actions</choice>
+        <default>status</default>
+      </input>
+      <chart>
+        <search>
+          <query>
+            `dmc_set_index_internal` host=$host$ sourcetype=scheduler (status="completed" OR status="skipped" OR
+            status="deferred")
+            | eval alert_actions = if(isnull(alert_actions) OR alert_actions == "", "none", alert_actions)
+            | timechart partial=f count by $scheduler_execution_timechart_split_by$
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Count</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.fieldColors">{"completed": 0xa2cc3e, "deferred": 0xf2b827, "skipped":0xd6563c}</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$hide_activity$">
+      <title>Scheduled Report Completions</title>
+      <input type="dropdown" searchWhenChanged="true" token="scheduler_completion_runtime_aggregation">
+        <label>Runtime aggregation</label>
+        <showClearButton>false</showClearButton>
+        <choice value="Sum">Sum</choice>
+        <choice value="Avg">Average</choice>
+        <choice value="Median">Median</choice>
+        <choice value="Min">Minimum</choice>
+        <choice value="Max">Maximum</choice>
+        <choice value="Perc90">90th Percentile</choice>
+        <choice value="First">Sampled</choice>
+        <default>Sum</default>
+      </input>
+      <chart>
+        <search>
+          <query>
+            `dmc_set_index_internal` sourcetype=splunkd group="searchscheduler" host=$host$
+            | `dmc_timechart_for_metrics_log` sum(completed) as completed_count,
+            $scheduler_completion_runtime_aggregation$(total_runtime) as total_runtime
+            | eval total_runtime=round(total_runtime, 0)
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.chart.overlayFields">total_runtime</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Count</option>
+        <option name="charting.axisTitleY2.text">Total Runtime (seconds)</option>
+        <option name="charting.axisY2.enabled">true</option>
+        <option name="charting.legend.placement">bottom</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$hide_activity$">
+      <title>$concurrencyFuncLabel$ Concurrency of Scheduled Reports</title>
+      <input type="dropdown" token="concurrencyFunction" searchWhenChanged="true">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <default>Median</default>
+        <choice value="Avg">Average</choice>
+        <choice value="Median">Median</choice>
+        <choice value="Min">Minimum</choice>
+        <choice value="Max">Maximum</choice>
+        <choice value="Perc90">90th Percentile</choice>
+        <choice value="First">Sampled</choice>
+        <change>
+          <set token="concurrencyFuncLabel">$label$</set>
+        </change>
+      </input>
+      <input type="dropdown" token="searchMode" searchWhenChanged="true">
+        <label>Search Mode</label>
+        <showClearButton>false</showClearButton>
+        <default>historical*</default>
+        <choice value="historical*">Historical</choice>
+        <choice value="RT*">Real-time</choice>
+        <choice value="*">All</choice>
+      </input>
+      <input type="dropdown" token="concurrencySplitBy" searchWhenChanged="true">
+        <label>Group by</label>
+        <showClearButton>false</showClearButton>
+        <default>app</default>
+        <choice value="app">App</choice>
+        <choice value="user">User</choice>
+        <choice value="role">Role</choice>
+        <choice value="label">Report Name</choice>
+        <choice value="type">Type</choice>
+        <choice value="workload_pool">Workload Pool</choice>
+      </input>
+      <chart>
+        <search>
+          <query>
+            `dmc_set_index_introspection` host=$host$ sourcetype=splunk_resource_usage component=PerProcess data.search_props.role="head" data.search_props.mode="$searchMode$" data.search_props.sid::* `dmc_match_all_scheduled_search_types`
+            | `dmc_rename_introspection_fields`
+            | `dmc_set_bin`
+            | stats dc(sid) AS distinct_search_count by _time, $concurrencySplitBy$
+            | `dmc_timechart` $concurrencyFunction$(distinct_search_count) AS "$concurrencyFunction$ of search
+            concurrency" by $concurrencySplitBy$
+            | eval search_mode = "$searchMode$"
+            | eval scheduled_search_limit = case(match(search_mode, "historical"), $max_hist_scheduled_searches$,
+            match(search_mode, "RT"), $max_rt_scheduled_searches$, true(), NULL)
+            | fields - search_mode
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Count</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.chart.overlayFields">scheduled_search_limit</option>
+        <option name="charting.legend.placement">bottom</option>
+        <drilldown target="_blank">
+          <condition match="$click.name2$!=&quot;scheduled_search_limit&quot;">
+            <link target="_blank">
+              <![CDATA[search?q=`dmc_scheduler_instance_search_concurrency_drilldown($host$, $concurrencySplitBy$, $click.name2$)`&earliest=$earliest$&latest=$latest$]]></link>
+          </condition>
+          <condition>
+            <!-- Do nothing for other cases  -->
+          </condition>
+        </drilldown>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$hide_activity$">
+      <title>Aggregate Scheduled Search Runtime</title>
+      <input type="dropdown" token="runtimeSplitBy" searchWhenChanged="true">
+        <label>Group by</label>
+        <showClearButton>false</showClearButton>
+        <default>app</default>
+        <choice value="app">App</choice>
+        <choice value="user">User</choice>
+        <choice value="mode">Mode</choice>
+        <choice value="role">Role</choice>
+        <choice value="label">Report Name</choice>
+        <choice value="type">Type</choice>
+        <choice value="workload_pool">Workload Pool</choice>
+        <change>
+          <condition value="mode">
+            <set token="runtimeModeDoc">true</set>
+          </condition>
+          <condition value="*">
+            <unset token="runtimeModeDoc"></unset>
+          </condition>
+        </change>
+      </input>
+      <chart>
+        <search>
+          <query>
+            `dmc_set_index_introspection` host=$host$ sourcetype=splunk_resource_usage component=PerProcess data.search_props.sid::* data.search_props.role="head" `dmc_match_all_scheduled_search_types`
+            | `dmc_set_bin`
+            | `dmc_rename_introspection_fields`
+            | stats max(elapsed) as ELAPSED by sid $runtimeSplitBy$ _time
+            | streamstats current=t global=f window=2 earliest(ELAPSED) as prev_ELAPSED latest(ELAPSED) as curr_ELAPSED by sid $runtimeSplitBy$
+            | eval `dmc_collection_interval`
+            | eval delta_ELAPSED = curr_ELAPSED - prev_ELAPSED
+            | eval runtime = if(delta_ELAPSED = 0, min(curr_ELAPSED, collection_interval), delta_ELAPSED)
+            | `dmc_timechart` sum(runtime) by $runtimeSplitBy$
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.axisTitleY.text">Runtime (seconds)</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <drilldown target="_blank">
+          <condition series="*">
+              <link target="_blank"><![CDATA[search?q=`dmc_search_activity_instance_drilldown($host$, $concurrencySplitBy$, $click.name2$)`&earliest=$earliest$&latest=$latest$]]></link>
+          </condition>
+        </drilldown>
+      </chart>
+      <html depends="$runtimeModeDoc$">
+        <p>Mode can be historical, historical batch, RT, or RT indexed.</p>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$hide_performance$">
+      <title>Runtime Statistics</title>
+      <table id="runtime_statistics">
+        <search>
+          <query>
+            `dmc_set_index_internal` host=$host$ sourcetype=scheduler (status="completed" OR status="skipped" OR
+            status="deferred")
+            | eval window_time = if(isnotnull(window_time), window_time, 0)
+            | eval execution_latency = max(dispatch_time - (scheduled_time + window_time), 0)
+            | stats avg(run_time) as runtime, avg(execution_latency) AS avg_exec_latency, count(eval(status=="completed" OR status=="skipped")) AS total_exec, count(eval(status=="skipped")) AS skipped_exec count(eval(status=="deferred")) AS deferred_exec by app, savedsearch_name, user, savedsearch_id
+            | join savedsearch_id type=outer [
+            | rest splunk_server=$splunk_server$ "/servicesNS/-/-/saved/searches/" earliest_time=`time_modifier(-0s@s)` latest_time=`time_modifier(+8d@d)` search="is_scheduled=1" search="disabled=0"
+            | search NOT (dispatch.earliest_time=rt* OR dispatch.latest_time=rt*)
+            | stats dc(scheduled_times) as count max(scheduled_times) as max_t min(scheduled_times) as min_t by title, eai:acl.app, eai:acl.owner cron_schedule
+            | eval schedule_interval=round((max_t-min_t)/(count-1), 0)
+            | eval savedsearch_id = 'eai:acl.owner'.";".'eai:acl.app'.";".title
+            | fields savedsearch_id, cron_schedule, schedule_interval ]
+            | eval runtime = round(runtime, 0)
+            | eval avg_exec_latency = round(avg_exec_latency, 0)
+            | eval search_workload = round(runtime / schedule_interval * 100, 2)." %"
+            | eval skip_ratio = round(skipped_exec / total_exec * 100, 2)." %"
+            | fields savedsearch_name, app, user, cron_schedule, schedule_interval, runtime, search_workload, total_exec, skipped_exec, skip_ratio, deferred_exec, avg_exec_latency
+            | sort - search_workload
+            | rename savedsearch_name as "Report Name", app as App, user as User, cron_schedule as "Cron Schedule", runtime as "Average Runtime (sec)", total_exec as "Total Executions", skip_ratio as "Skip Ratio", skipped_exec as "Skipped Executions", deferred_exec AS "Deferred Executions", schedule_interval as "Schedule Interval (sec)", search_workload as "Interval Load Factor", avg_exec_latency AS "Average Execution Latency (sec)"
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="drilldown">row</option>
+        <drilldown>
+          <set token="runtime_statistics_drilldown">$row.Report Name$</set>
+        </drilldown>
+      </table>
+      <html>
+        <p><b>Interval Load Factor</b> = Average Runtime / Schedule Interval * 100</p>
+      </html>
+    </panel>
+    <panel depends="$runtime_statistics_drilldown$">
+      <title>Runtime Statistics Drilldown: $runtime_statistics_drilldown$</title>
+      <event>
+        <search>
+          <query>
+            `dmc_set_index_internal` host=$host$ sourcetype=scheduler (status="completed" OR status="skipped" OR
+            status="deferred") savedsearch_name=$runtime_statistics_drilldown|s$
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="rowNumbers">true</option>
+      </event>
+      <html>
+        <a data-unset-token="runtime_statistics_drilldown">Close this panel</a>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$hide_performance$">
+      <title>Execution Latency Over Time</title>
+      <input type="dropdown" searchWhenChanged="true" token="exe_lag_split_by">
+        <label>Group by</label>
+        <showClearButton>false</showClearButton>
+        <choice value="savedsearch_name">Report Name</choice>
+        <choice value="alert_actions">Alert Actions</choice>
+        <choice value="app">App</choice>
+        <choice value="user">User</choice>
+        <default>app</default>
+      </input>
+      <input type="dropdown" searchWhenChanged="true" token="exe_lag_agg">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <default>avg</default>
+        <choice value="avg">Average</choice>
+        <choice value="min">Minimum</choice>
+        <choice value="max">Maximum</choice>
+      </input>
+      <chart>
+        <search>
+          <query>
+            `dmc_set_index_internal` host=$host$ sourcetype=scheduler status="completed"
+            | eval alert_actions = if(isnull(alert_actions) OR alert_actions == "", "none", alert_actions)
+            | eval window_time = if(isnotnull(window_time), window_time, 0)
+            | eval execution_latency = max(dispatch_time - (scheduled_time + window_time), 0)
+            | timechart eval(round($exe_lag_agg$(execution_latency), 0)) as latency by $exe_lag_split_by$
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Latency (seconds)</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.legend.placement">bottom</option>
+      </chart>
+      <html>
+        <p><b>Execution Latency</b> = Dispatch Time - (Scheduled Time + Schedule Window Time)</p>
+        <p>The execution latency expresses the delay in seconds between the planned dispatch time of a search and its actual dispatch time. It takes into account a schedule window if one is configured for this search. <a href="/help?location=learnmore.report.scheduled" target="_blank" class="external">Learn More</a></p>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$hide_performance$">
+      <title>Count of Skipped Scheduled Reports</title>
+      <input type="dropdown" searchWhenChanged="true" token="count_skipped_split_by">
+        <label>Group by</label>
+        <showClearButton>false</showClearButton>
+        <choice value="reason">Reason</choice>
+        <choice value="savedsearch_name">Report Name</choice>
+        <choice value="alert_actions">Alert Actions</choice>
+        <choice value="app">App</choice>
+        <choice value="user">User</choice>
+        <default>reason</default>
+      </input>
+      <search id="count_skipped_search_base">
+        <query>
+          `dmc_set_index_internal` host=$host$ sourcetype=scheduler status="skipped"
+          | eval alert_actions = if(isnull(alert_actions) OR alert_actions == "", "none", alert_actions)
+          | eval reason = if(isnull(reason) OR reason == "", "none", reason)
+          | stats count by $count_skipped_split_by$
+        </query>
+        <earliest>$time.earliest$</earliest>
+        <latest>$time.latest$</latest>
+      </search>
+      <search base="count_skipped_search_base">
+        <query>stats sum(count) as total</query>
+        <preview>
+          <eval token="total_skipped_searches">if(isnotnull('result.total'), 'result.total', 0)</eval>
+        </preview>
+        <finalized>
+          <eval token="total_skipped_searches">if(isnotnull('result.total'), 'result.total', 0)</eval>
+        </finalized>
+      </search>
+      <table>
+        <title>Total: $total_skipped_searches$</title>
+        <search base="count_skipped_search_base">
+          <query>
+            sort - count
+            | eventstats sum(count) AS total
+            | eval percent = round(count / total * 100, 2)." %"
+            | fields - total
+            | rename reason as Reason, savedsearch_name as "Report Name", alert_actions as "Alert Actions", app as App, user as User, count as Count, percent as "Percent of Total"
+          </query>
+        </search>
+        <option name="dataOverlayMode">heatmap</option>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+    <panel rejects="$hide_performance$">
+      <title>Count of Skipped Reports Over Time</title>
+      <input type="dropdown" searchWhenChanged="true" token="count_skipped_timechart_split_by">
+        <label>Group by</label>
+        <showClearButton>false</showClearButton>
+        <choice value="reason">Reason</choice>
+        <choice value="savedsearch_name">Report Name</choice>
+        <choice value="alert_actions">Alert Actions</choice>
+        <choice value="app">App</choice>
+        <choice value="user">User</choice>
+        <default>reason</default>
+      </input>
+      <chart>
+        <search>
+          <query>
+            `dmc_set_index_internal` host=$host$ sourcetype=scheduler status="skipped"
+            | eval alert_actions = if(isnull(alert_actions) OR alert_actions == "", "none", alert_actions)
+            | eval reason = if(isnull(reason) OR reason == "", "none", reason)
+            | timechart count by $count_skipped_timechart_split_by$
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Count</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.legend.placement">bottom</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$hide_performance$">
+      <title>Count of Skipped Reports by Name and Reason</title>
+      <table>
+        <title>Total: $total_skipped_searches$</title>
+        <search>
+          <query>
+            `dmc_set_index_internal` host=$host$ sourcetype=scheduler status="skipped"
+            | eval alert_actions = if(isnull(alert_actions) OR alert_actions == "", "none", alert_actions)
+            | eval reason = if(isnull(reason) OR reason == "", "none", reason)
+            | stats count AS count values(alert_actions) AS alert_actions by savedsearch_name, reason
+            | eval reason_and_count = reason." (".count.")"
+            | stats values(reason_and_count) AS reasons first(alert_actions) AS alert_actions by savedsearch_name
+            | rename reasons AS "Skip Reason (Skip Count)" alert_actions AS "Alert Actions" savedsearch_name AS "Report
+            Name"
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+    <panel rejects="$hide_performance$">
+      <title>Scheduler Errors and Warnings</title>
+      <search id="count_error_warning_base">
+        <query>
+          `dmc_set_index_internal` host=$host$ sourcetype=scheduler (log_level="ERROR" OR log_level="WARN*")
+          | eval event_message=coalesce(event_message, message)
+          | cluster t=0.7 field=event_message showcount=t countfield=count
+          | table event_message, count, punct
+        </query>
+        <earliest>$time.earliest$</earliest>
+        <latest>$time.latest$</latest>
+      </search>
+      <search base="count_error_warning_base">
+        <query>stats sum(count) as total</query>
+        <preview>
+          <eval token="total_error_warning">if(isnotnull('result.total'), 'result.total', 0)</eval>
+        </preview>
+        <finalized>
+          <eval token="total_error_warning">if(isnotnull('result.total'), 'result.total', 0)</eval>
+        </finalized>
+      </search>
+      <table>
+        <title>Total: $total_error_warning$</title>
+        <search base="count_error_warning_base">
+          <query>
+            sort - count
+            | eventstats sum(count) AS total
+            | eval percent = round(count / total * 100, 2)." %"
+            | fields - total
+            | rename event_message as Message, count as Count, percent as "Percent of Total"
+          </query>
+        </search>
+        <fields>Message, Count, "Percent of Total"</fields>
+        <option name="dataOverlayMode">heatmap</option>
+        <option name="drilldown">row</option>
+        <drilldown>
+          <set token="warningErrorPunct">$row.punct$</set>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel depends="$warningErrorPunct$">
+      <title>Scheduler Errors and Warnings Event Details</title>
+      <event>
+        <search>
+          <query>
+            `dmc_set_index_internal` host=$host$ sourcetype=scheduler (log_level="ERROR" OR log_level="WARN*") punct=$warningErrorPunct|s$
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="rowNumbers">true</option>
+      </event>
+      <html>
+        <a data-unset-token="warningErrorPunct">Close this panel</a>
+      </html>
+    </panel>
+  </row>
+</form>

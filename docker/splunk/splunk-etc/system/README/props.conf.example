@@ -1,0 +1,197 @@
+#   Version 9.0.3
+#
+# The following are example props.conf configurations. Configure properties for
+# your data.
+#
+# To use one or more of these configurations, copy the configuration block into
+# props.conf in $SPLUNK_HOME/etc/system/local/. You must restart Splunk to
+# enable configurations.
+#
+# To learn more about configuration files (including precedence) please see the
+# documentation located at
+# http://docs.splunk.com/Documentation/Splunk/latest/Admin/Aboutconfigurationfiles
+
+
+########
+# Line merging settings
+########
+
+# The following example line-merges source data into multi-line events for
+# apache_error sourcetype.
+
+[apache_error]
+SHOULD_LINEMERGE = True
+
+
+
+########
+# Settings for tuning
+########
+
+# The following example limits the amount of characters indexed per event from
+# host::small_events.
+
+[host::small_events]
+TRUNCATE = 256
+
+# The following example turns off DATETIME_CONFIG (which can speed up indexing)
+# from any path that ends in /mylogs/*.log.
+#
+# In addition, the default splunk behavior of finding event boundaries
+# via per-event timestamps can't work with NONE, so we disable
+# SHOULD_LINEMERGE, essentially declaring that all events in this file are
+# single-line.
+
+[source::.../mylogs/*.log]
+DATETIME_CONFIG = NONE
+SHOULD_LINEMERGE = false
+
+
+
+########
+# Timestamp extraction configuration
+########
+
+# The following example sets Eastern Time Zone if host matches nyc*.
+
+[host::nyc*]
+TZ = US/Eastern
+
+
+# The following example uses a custom datetime.xml that has been created and
+# placed in a custom app directory. This sets all events coming in from hosts
+# starting with dharma to use this custom file.
+
+[host::dharma*]
+DATETIME_CONFIG = <etc/apps/custom_time/datetime.xml>
+
+########
+## Timezone alias configuration
+########
+
+# The following example uses a custom alias to disambiguate the Australian
+# meanings of EST/EDT
+
+TZ_ALIAS = EST=GMT+10:00,EDT=GMT+11:00
+
+# The following example gives a sample case wherein, one timezone field is
+# being replaced by/interpreted as another.
+
+TZ_ALIAS = EST=AEST,EDT=AEDT
+
+########
+# Transform configuration
+########
+
+# The following example creates a search field for host::foo if tied to a
+# stanza in transforms.conf.
+
+[host::foo]
+TRANSFORMS-foo=foobar
+
+# The following stanza extracts an ip address from _raw
+[my_sourcetype]
+EXTRACT-extract_ip = (?<ip>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})
+
+# The following example shows how to configure lookup tables
+[my_lookuptype]
+LOOKUP-foo = mylookuptable userid AS myuserid OUTPUT username AS myusername
+
+# The following shows how to specify field aliases
+FIELDALIAS-foo = user AS myuser id AS myid
+
+
+########
+# Sourcetype configuration
+########
+
+# The following example sets a sourcetype for the file web_access.log for a
+# unix path.
+
+[source::.../web_access.log]
+sourcetype = splunk_web_access
+
+# The following example sets a sourcetype for the Windows file iis6.log.  Note:
+# Backslashes within Windows file paths must be escaped.
+
+[source::...\\iis\\iis6.log]
+sourcetype = iis_access
+
+# The following example extracts data from a .Z archive
+
+[preprocess-Z]
+invalid_cause = archive
+is_valid = False
+LEARN_MODEL = false
+
+[source::....Z(.\d+)?]
+unarchive_cmd = gzip -cd -
+sourcetype = preprocess-Z 
+NO_BINARY_CHECK = true
+
+# The following example learns a custom sourcetype and limits the range between
+# different examples with a smaller than default maxDist.
+
+[custom_sourcetype]
+LEARN_MODEL = true
+maxDist = 30
+
+
+# rule:: and delayedrule:: configuration
+# The following examples create sourcetype rules for custom sourcetypes with
+# regex.
+
+
+[rule::bar_some]
+sourcetype = source_with_lots_of_bars
+MORE_THAN_80 = ----
+
+
+[delayedrule::baz_some]
+sourcetype = my_sourcetype
+LESS_THAN_70 = ####
+
+
+########
+# File configuration
+########
+
+# Binary file configuration
+# The following example eats binary files from the sourcetype
+# "imported_records".
+
+[imported_records]
+NO_BINARY_CHECK = true
+
+
+# File checksum configuration
+# The following example checks the entirety of every file in the web_access 
+# directory rather than skipping files that appear to be the same.
+
+[source::.../web_access/*]
+CHECK_METHOD = entire_md5
+
+########
+# Metric configuration
+########
+
+# A metric sourcetype of type statsd with 'regex_stanza1', 'regex_stanza2' to
+# extract dimensions
+[metric_sourcetype_name]
+METRICS_PROTOCOL = statsd
+STATSD-DIM-TRANSFORMS = regex_stanza1, regex_stanza2
+
+#Convert a single log event into multiple metrics using METRIC-SCHEMA-TRANSFORMS
+#and index time extraction feature.
+[logtometrics]
+METRIC-SCHEMA-TRANSFORMS = metric-schema:logtometrics
+TRANSFORMS-group = extract_group
+TRANSFORMS-name = extract_name
+TRANSFORMS-max_size_kb = extract_max_size_kb
+TRANSFORMS-current_size_kb = extract_current_size_kb
+TRANSFORMS-current_size = extract_current_size
+TRANSFORMS-largest_size = extract_largest_size
+TRANSFORMS-smallest_size = extract_smallest_size
+category = metrics
+should_linemerge = false
+

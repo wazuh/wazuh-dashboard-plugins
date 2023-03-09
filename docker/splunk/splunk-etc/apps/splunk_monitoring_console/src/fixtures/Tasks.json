@@ -1,0 +1,933 @@
+{
+    "links":{
+    "create":"/servicesNS/-/splunk_monitoring_console/configs/conf-checklist/_new",
+        "_reload":"/servicesNS/-/splunk_monitoring_console/configs/conf-checklist/_reload",
+        "_acl":"/servicesNS/-/splunk_monitoring_console/configs/conf-checklist/_acl"
+},
+    "origin":"https://localhost:8000/servicesNS/-/splunk_monitoring_console/configs/conf-checklist",
+    "updated":"2017-01-02T17:25:12-08:00",
+    "generator":{
+    "build":"f08fd620d35b61c9772d254cfc60551df0e7749f",
+        "version":"20170102"
+},
+    "entry":[
+    {
+        "name":"assessment_of_server_ulimits",
+        "id":"https://localhost:8000/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/assessment_of_server_ulimits",
+        "updated":"2017-01-02T17:25:12-08:00",
+        "links":{
+            "alternate":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/assessment_of_server_ulimits",
+            "list":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/assessment_of_server_ulimits",
+            "_reload":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/assessment_of_server_ulimits/_reload",
+            "edit":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/assessment_of_server_ulimits",
+            "disable":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/assessment_of_server_ulimits/disable"
+        },
+        "author":"nobody",
+        "acl":{
+            "app":"splunk_monitoring_console",
+            "can_change_perms":true,
+            "can_list":true,
+            "can_share_app":true,
+            "can_share_global":true,
+            "can_share_user":false,
+            "can_write":true,
+            "modifiable":true,
+            "owner":"nobody",
+            "perms":{
+                "read":[
+                    "admin"
+                ],
+                "write":[
+                    "admin"
+                ]
+            },
+            "removable":false,
+            "sharing":"app"
+        },
+        "content":{
+            "applicable_to_groups":"",
+            "category":"System and Environment",
+            "description":"This checks whether the machine is provisioned with ulimit settings (file descriptors, user processes, and data segment size) that are adequate for running Splunk software.",
+            "disabled":false,
+            "doc_link":"healthcheck.software.ulimit",
+            "doc_title":"Splunk software ulimit requirements",
+            "eai:acl":null,
+            "eai:appName":"splunk_monitoring_console",
+            "eai:userName":"nobody",
+            "failure_text":"One or more Splunk instances is running on a host that has one or more resource limits set below official recommendations.",
+            "search":"| rest $rest_scope$ /services/server/info \n| join type=outer splunk_server [rest $rest_scope$ /services/server/sysinfo | fields splunk_server ulimits.data_segment_size ulimits.open_files ulimits.user_processes] \n| eval ulimits.data_segment_size = if(isnotnull('ulimits.data_segment_size'), 'ulimits.data_segment_size', \"unknown\") \n| eval ulimits.open_files = if(isnotnull('ulimits.open_files'), 'ulimits.open_files', \"unknown\") \n| eval ulimits.user_processes = if(isnotnull('ulimits.user_processes'), 'ulimits.user_processes', \"unknown\") \n| eval sev_segment_size = case('ulimits.data_segment_size' == -1 OR 'ulimits.data_segment_size' >= 1073741824, 0, 'ulimits.data_segment_size' == \"unknown\", 1, True(), 2) \n| eval sev_open_files = case('ulimits.open_files' == -1 OR 'ulimits.open_files' >= 8192, 0, 'ulimits.open_files' == \"unknown\", 1, True(), 2) \n| eval sev_user_processes = case('ulimits.user_processes' == -1 OR 'ulimits.user_processes' >= 8192, 0, 'ulimits.user_processes' == \"unknown\", 1, True(), 2) \n| eval severity_level = max(sev_segment_size, sev_open_files, sev_user_processes) \n| fields splunk_server ulimits.data_segment_size ulimits.open_files ulimits.user_processes severity_level \n| rename splunk_server AS instance \n| fields - _timediff",
+            "suggested_action":"Persistently modify resource limits per documented best practices.",
+            "tags":"best_practices, operating_system",
+            "title":"Assessment of server ulimits"
+        }
+    },
+    {
+        "name":"distributed_search_health_assessment",
+        "id":"https://localhost:8000/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/distributed_search_health_assessment",
+        "updated":"2017-01-02T17:25:12-08:00",
+        "links":{
+            "alternate":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/distributed_search_health_assessment",
+            "list":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/distributed_search_health_assessment",
+            "_reload":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/distributed_search_health_assessment/_reload",
+            "edit":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/distributed_search_health_assessment",
+            "disable":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/distributed_search_health_assessment/disable"
+        },
+        "author":"nobody",
+        "acl":{
+            "app":"splunk_monitoring_console",
+            "can_change_perms":true,
+            "can_list":true,
+            "can_share_app":true,
+            "can_share_global":true,
+            "can_share_user":false,
+            "can_write":true,
+            "modifiable":true,
+            "owner":"nobody",
+            "perms":{
+                "read":[
+                    "admin"
+                ],
+                "write":[
+                    "admin"
+                ]
+            },
+            "removable":false,
+            "sharing":"app"
+        },
+        "content":{
+            "applicable_to_groups":"dmc_group_search_head",
+            "category":"Data Search",
+            "description":"This checks the status of the search peers (indexers) of each search head. It assesses the overall health of distributed search on a per search head basis.",
+            "disabled":false,
+            "doc_link":"healthcheck.distributedsearch",
+            "doc_title":"Splunk distributed search",
+            "drilldown":"/app/splunk_monitoring_console/distributed_search_instance?form.splunk_server=$search_head$",
+            "eai:acl":null,
+            "eai:appName":"splunk_monitoring_console",
+            "eai:userName":"nobody",
+            "environments_to_exclude":"standalone",
+            "failure_text":"One or more search heads are reporting unhealthy search peers.",
+            "search":"| rest $rest_scope$ splunk_server_group=dmc_group_search_head /services/search/distributed/peers \n| fields splunk_server peerName server_roles status status_details \n| eval peer_health = case(status == \"Up\" AND isnull(status_details), \"optimal\", status != \"Down\" AND isnotnull(status_details), \"degraded\", status == \"Down\" , \"down\", status!= \"Up\" OR status != \"Down\", \"inconclusive\") \n| stats count AS peer_count count(eval(peer_health == \"optimal\")) AS peer_count_optimal count(eval(peer_health == \"degraded\")) AS peer_count_degraded,  count(eval(peer_health == \"down\")) AS peer_count_down, count(eval(peer_health == \"inconclusive\")) AS peer_count_inconclusive, by splunk_server \n| eval severity_level = case(peer_count_down > 0, 3, peer_count_degraded > 0, 2, peer_count_inconclusive > 0, 1, peer_count_optimal > 0, 0, True(), -1) \n| rename splunk_server AS search_head",
+            "suggested_action":"Check the Monitoring Console Distributed Search: Instance view for more information. Review resource usage and general instance health of the unhealthy peers.",
+            "tags":"distributed_search",
+            "title":"Distributed search health assessment"
+        }
+    },
+    {
+        "name":"event_processing_issues",
+        "id":"https://localhost:8000/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/event_processing_issues",
+        "updated":"2017-01-02T17:25:12-08:00",
+        "links":{
+            "alternate":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/event_processing_issues",
+            "list":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/event_processing_issues",
+            "_reload":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/event_processing_issues/_reload",
+            "edit":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/event_processing_issues",
+            "disable":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/event_processing_issues/disable"
+        },
+        "author":"nobody",
+        "acl":{
+            "app":"splunk_monitoring_console",
+            "can_change_perms":true,
+            "can_list":true,
+            "can_share_app":true,
+            "can_share_global":true,
+            "can_share_user":false,
+            "can_write":true,
+            "modifiable":true,
+            "owner":"nobody",
+            "perms":{
+                "read":[
+                    "admin"
+                ],
+                "write":[
+                    "admin"
+                ]
+            },
+            "removable":false,
+            "sharing":"app"
+        },
+        "content":{
+            "applicable_to_groups":"",
+            "category":"Data Collection",
+            "description":"This checks for warnings emitted when the index-time settings in place do not allow for the proper processing of recently ingested data (in the last hour).",
+            "disabled":false,
+            "doc_link":"healthcheck.eventprocess.linebreak, healthcheck.eventprocess.timestamp",
+            "doc_title":"event processing issues caused by line breaks, event processing issues caused by timestamps",
+            "drilldown":"`dmc_set_index_internal` host=$instance$ earliest=-60m source=*splunkd.log* (component=AggregatorMiningProcessor OR component= LineBreakingProcessor OR component=DateParserVerbose) (log_level=WARN OR log_level=ERROR) \n| rex field=message \"Context: source::(?<context_source>[^\\|]*?)\\|host::(?<context_host>[^\\|]*?)\\|(?<context_sourcetype>[^\\|]*?)\\|\" \n| eval data_source = if(isnull(data_source) AND isnotnull(context_source), context_source, data_source) \n| eval data_host = if(isnull(data_host) AND isnotnull(context_host), context_host, data_host) \n| eval data_sourcetype = if(isnull(data_sourcetype) AND isnotnull(context_sourcetype), context_sourcetype, data_sourcetype) \n| stats count AS processing_errors count(eval(component==\"AggregatorMiningProcessor\")) AS aggregation_issues count(eval(component==\"LineBreakingProcessor\")) AS line_breaking_issues count(eval(component==\"DateParserVerbose\")) AS date_parsing_issues dc(data_host) AS host_count dc(data_source) AS source_count by data_sourcetype \n| sort - processing_errors",
+            "eai:acl":null,
+            "eai:appName":"splunk_monitoring_console",
+            "eai:userName":"nobody",
+            "failure_text":"Some recently ingested events are triggering event-processing warnings and indicate the presence of one or more of these scenarios:  \n 1. Lines in the event are too long, exceeding props.conf / TRUNCATE  \n 2. There are too many lines per event, exceeding props.conf / MAX_EVENTS  \n 3. The extraction of event time stamps was partially or completely unsuccessful  \nThese event-processing issues can have a negative impact on the performance of data ingestion.",
+            "search":"`dmc_set_index_internal` $rest_scope$ search_group=dmc_group_indexer earliest=-60m (source=*splunkd.log* (component=AggregatorMiningProcessor OR component= LineBreakingProcessor OR component=DateParserVerbose) (log_level=WARN OR log_level=ERROR)) OR (source=*metrics.log* group=thruput name=index_thruput) \n| stats sum(eval(round(ev,0))) AS event_count count(eval(component==\"AggregatorMiningProcessor\")) AS aggregation_issues count(eval(component==\"LineBreakingProcessor\")) AS line_breaking_issues count(eval(component==\"DateParserVerbose\")) AS date_parsing_issues by host \n| eval crap_score = round((aggregation_issues + line_breaking_issues + date_parsing_issues) / event_count * 1000, 3) \n| eval severity_level = case(crap_score == 0, 0, crap_score > 0 AND crap_score < 1, 1, True(), 2) \n| rename host AS instance \n| fields - crap_score",
+            "suggested_action":"Check the events that are triggering these warnings. Adjust event-processing settings as needed to ensure their proper ingestion.",
+            "tags":"event_breaking, indexing, timestamp_extraction",
+            "title":"Event-processing issues"
+        }
+    },
+    {
+        "name":"excessive_physical_memory_usage",
+        "id":"https://localhost:8000/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/excessive_physical_memory_usage",
+        "updated":"2017-01-02T17:25:12-08:00",
+        "links":{
+            "alternate":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/excessive_physical_memory_usage",
+            "list":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/excessive_physical_memory_usage",
+            "_reload":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/excessive_physical_memory_usage/_reload",
+            "edit":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/excessive_physical_memory_usage",
+            "disable":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/excessive_physical_memory_usage/disable"
+        },
+        "author":"nobody",
+        "acl":{
+            "app":"splunk_monitoring_console",
+            "can_change_perms":true,
+            "can_list":true,
+            "can_share_app":true,
+            "can_share_global":true,
+            "can_share_user":false,
+            "can_write":true,
+            "modifiable":true,
+            "owner":"nobody",
+            "perms":{
+                "read":[
+                    "admin"
+                ],
+                "write":[
+                    "admin"
+                ]
+            },
+            "removable":false,
+            "sharing":"app"
+        },
+        "content":{
+            "applicable_to_groups":"",
+            "category":"Splunk Miscellaneous",
+            "description":"This check assesses system-wide physical memory usage and raises a warning for those servers where it is > 90%.",
+            "disabled":false,
+            "doc_link":"healthcheck.hardware.highmem",
+            "doc_title":"high memory usage",
+            "drilldown":"/app/splunk_monitoring_console/resource_usage_machine?form.machine=$machine$",
+            "eai:acl":null,
+            "eai:appName":"splunk_monitoring_console",
+            "eai:userName":"nobody",
+            "failure_text":"One or more machines are using more than 90% of installed physical memory and may be at risk of an outage.",
+            "search":"| rest $rest_scope$ /services/server/status/resource-usage/hostwide \n| eval percentage = round(mem_used/mem,3)*100 \n| eval severity_level = if(percentage >= 90, 2, 0) \n| lookup local=true dmc_assets serverName AS splunk_server OUTPUT machine \n| eval machine = mvdedup(machine) \n| fields splunk_server, machine, mem_used, mem, percentage, severity_level \n| rename splunk_server AS instance, mem AS \"Physical memory installed (MB)\", percentage AS \"Memory used (%)\", mem_used AS \"Memory used (MB)\"",
+            "suggested_action":"Check individual machines to identify the source of the excessive memory usage with the Monitoring Console Resource Usage: Machine or Resource Usage: Instance pages.",
+            "tags":"resource_usage",
+            "title":"Excessive physical memory usage"
+        }
+    },
+    {
+        "name":"expiring_or_expired_licenses",
+        "id":"https://localhost:8000/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/expiring_or_expired_licenses",
+        "updated":"2017-01-02T17:25:12-08:00",
+        "links":{
+            "alternate":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/expiring_or_expired_licenses",
+            "list":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/expiring_or_expired_licenses",
+            "_reload":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/expiring_or_expired_licenses/_reload",
+            "edit":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/expiring_or_expired_licenses",
+            "disable":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/expiring_or_expired_licenses/disable"
+        },
+        "author":"nobody",
+        "acl":{
+            "app":"splunk_monitoring_console",
+            "can_change_perms":true,
+            "can_list":true,
+            "can_share_app":true,
+            "can_share_global":true,
+            "can_share_user":false,
+            "can_write":true,
+            "modifiable":true,
+            "owner":"nobody",
+            "perms":{
+                "read":[
+                    "admin"
+                ],
+                "write":[
+                    "admin"
+                ]
+            },
+            "removable":false,
+            "sharing":"app"
+        },
+        "content":{
+            "applicable_to_groups":"dmc_group_license_master",
+            "category":"Data Indexing",
+            "description":"This checks for licenses that are about to expire or have already expired.",
+            "disabled":false,
+            "doc_link":"healthcheck.expired.license",
+            "doc_title":"expired licenses",
+            "eai:acl":null,
+            "eai:appName":"splunk_monitoring_console",
+            "eai:userName":"nobody",
+            "failure_text":"One or more licenses installed on your license manager(s) have expired or will expire soon.",
+            "search":"| rest $rest_scope$ splunk_server_group=dmc_group_license_master /services/licenser/licenses \n| join type=outer group_id splunk_server [ \n    rest $rest_scope$ splunk_server_group=dmc_group_license_master /services/licenser/groups \n    | where is_active = 1 \n    | rename title AS group_id \n    | fields is_active group_id splunk_server] \n| where is_active = 1 \n| eval days_left = floor((expiration_time - now()) / 86400) \n| where NOT (quota = 1048576 OR label == \"Splunk Enterprise Reset Warnings\" OR label == \"Splunk Lite Reset Warnings\") \n| eval status = case(days_left >= 14, days_left.\" days left\", days_left < 14 AND days_left >= 0, \"Expires soon: \".days_left.\" days left\", days_left < 0, \"Expired\") \n| eval size_gb = round(quota/1024/1024/1024,3) \n| fields splunk_server label license_hash size_gb days_left status \n| eval license_info = label.\" (size = \".size_gb.\" GB ; hash = \".license_hash.\") - \".status \n| eval severity_level = case(days_left >= 14, 0, days_left < 14 AND days_left >= 0, 2, days_left < 0, 3) \n| stats values(license_info) AS license_information max(severity_level) AS severity_level by splunk_server \n| rename splunk_server AS instance",
+            "suggested_action":"Contact your sales representative if you need a new license. Make sure to delete already expired licenses on the license manager page.",
+            "tags":"licensing",
+            "title":"Expiring or expired licenses"
+        }
+    },
+    {
+        "name":"indexing_status",
+        "id":"https://localhost:8000/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/indexing_status",
+        "updated":"2017-01-02T17:25:12-08:00",
+        "links":{
+            "alternate":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/indexing_status",
+            "list":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/indexing_status",
+            "_reload":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/indexing_status/_reload",
+            "edit":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/indexing_status",
+            "disable":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/indexing_status/disable"
+        },
+        "author":"nobody",
+        "acl":{
+            "app":"splunk_monitoring_console",
+            "can_change_perms":true,
+            "can_list":true,
+            "can_share_app":true,
+            "can_share_global":true,
+            "can_share_user":false,
+            "can_write":true,
+            "modifiable":true,
+            "owner":"nobody",
+            "perms":{
+                "read":[
+                    "admin"
+                ],
+                "write":[
+                    "admin"
+                ]
+            },
+            "removable":false,
+            "sharing":"app"
+        },
+        "content":{
+            "applicable_to_groups":"dmc_group_indexer",
+            "category":"Data Indexing",
+            "description":"This tests the current status of the indexer processor on indexer instances.",
+            "disabled":false,
+            "doc_link":"healthcheck.indexing.status",
+            "doc_title":"Splunk indexing status",
+            "drilldown":"/app/splunk_monitoring_console/indexing_performance_instance?form.splunk_server=$instance$",
+            "eai:acl":null,
+            "eai:appName":"splunk_monitoring_console",
+            "eai:userName":"nobody",
+            "failure_text":"One or more of your indexers reports an abnormal state. Those indexers might be blocked or causing delays in data acquisition.",
+            "search":"| rest $rest_scope$ splunk_server_group=dmc_group_indexer /services/server/introspection/indexer \n| fields splunk_server, status, reason \n| eval severity_level = if(status == \"normal\", 0, 2) \n| rename splunk_server as instance",
+            "suggested_action":"Investigate affected indexers with the Monitoring Console Indexing Performance: Instance view. You might need to restart the affected indexers.",
+            "tags":"indexing",
+            "title":"Indexing status"
+        }
+    },
+    {
+        "name":"integrity_check_installed_files",
+        "id":"https://localhost:8000/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/integrity_check_installed_files",
+        "updated":"2017-01-02T17:25:12-08:00",
+        "links":{
+            "alternate":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/integrity_check_installed_files",
+            "list":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/integrity_check_installed_files",
+            "_reload":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/integrity_check_installed_files/_reload",
+            "edit":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/integrity_check_installed_files",
+            "disable":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/integrity_check_installed_files/disable"
+        },
+        "author":"nobody",
+        "acl":{
+            "app":"splunk_monitoring_console",
+            "can_change_perms":true,
+            "can_list":true,
+            "can_share_app":true,
+            "can_share_global":true,
+            "can_share_user":false,
+            "can_write":true,
+            "modifiable":true,
+            "owner":"nobody",
+            "perms":{
+                "read":[
+                    "admin"
+                ],
+                "write":[
+                    "admin"
+                ]
+            },
+            "removable":false,
+            "sharing":"app"
+        },
+        "content":{
+            "applicable_to_groups":"",
+            "category":"Splunk Miscellaneous",
+            "description":"Verifies the integrity of files that were installed by Splunk.",
+            "disabled":false,
+            "doc_link":"healthcheck.validate.files",
+            "doc_title":"validating installed files",
+            "drilldown":"/app/search/integrity_check_of_installed_files?form.splunk_server=$instance$",
+            "eai:acl":null,
+            "eai:appName":"splunk_monitoring_console",
+            "eai:userName":"nobody",
+            "failure_text":"One or more files that were originally installed by Splunk have been unexpectedly modified or are missing.",
+            "search":"| rest $rest_scope$ /services/server/info \n| join type=outer splunk_server [rest $rest_scope$ /services/server/status/installed-file-integrity \n    | fields splunk_server check_ready check_failures.* \n    | untable splunk_server file_path check_result \n    | replace \"check_failures.*\" WITH \"*\" IN file_path \n    | eval check_ready = if(file_path == \"check_ready\", check_result, NULL) \n    | eval file_path = if(file_path == \"check_ready\", NULL, file_path) \n    | eval checker_not_working = if(file_path == \"fail\", check_result, NULL) \n    | stats count(eval(isnotnull(file_path))) AS file_integrity_failures max(check_ready) AS check_ready first(checker_not_working) AS checker_not_working by splunk_server] \n| fields splunk_server check_ready file_integrity_failures checker_not_working \n| eval severity_level = case(check_ready != \"true\", -1, file_integrity_failures = 0, 0, isnull(file_integrity_failures), 1, checker_not_working == \"check_disabled\", 1, file_integrity_failures > 0, 2, True(), -1) \n| eval file_integrity_failures = if(isnotnull(checker_not_working), checker_not_working, file_integrity_failures) \n| eval file_integrity_failures = if(isnotnull(file_integrity_failures), file_integrity_failures, \"integrity check not available\") \n| eval check_ready = if(isnotnull(check_ready), check_ready, \"integrity check not available\") \n| rename splunk_server AS instance \n| fields - checker_not_working _timediff",
+            "suggested_action":"Review the list of files that failed the integrity check. Make sure that no default configuration files have been modified. Consider restoring non-configuration files from backup or from the Splunk package.",
+            "tags":"configuration, installation",
+            "title":"Integrity check of installed files"
+        }
+    },
+    {
+        "name":"license_warnings_and_violations",
+        "id":"https://localhost:8000/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/license_warnings_and_violations",
+        "updated":"2017-01-02T17:25:12-08:00",
+        "links":{
+            "alternate":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/license_warnings_and_violations",
+            "list":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/license_warnings_and_violations",
+            "_reload":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/license_warnings_and_violations/_reload",
+            "edit":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/license_warnings_and_violations",
+            "disable":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/license_warnings_and_violations/disable"
+        },
+        "author":"nobody",
+        "acl":{
+            "app":"splunk_monitoring_console",
+            "can_change_perms":true,
+            "can_list":true,
+            "can_share_app":true,
+            "can_share_global":true,
+            "can_share_user":false,
+            "can_write":true,
+            "modifiable":true,
+            "owner":"nobody",
+            "perms":{
+                "read":[
+                    "admin"
+                ],
+                "write":[
+                    "admin"
+                ]
+            },
+            "removable":false,
+            "sharing":"app"
+        },
+        "content":{
+            "applicable_to_groups":"dmc_group_license_master",
+            "category":"Data Indexing",
+            "description":"This checks whether any license peers have incurred license warnings in the current licensing window and whether any are in violation.",
+            "disabled":false,
+            "doc_link":"healthcheck.license.warnings.violation",
+            "doc_title":"license warnings and violations",
+            "drilldown":"/app/splunk_monitoring_console/license_usage_today?form.splunk_server=$instance$",
+            "eai:acl":null,
+            "eai:appName":"splunk_monitoring_console",
+            "eai:userName":"nobody",
+            "failure_text":"One or more license peers have warnings or are in violation. An indexer in violation is not capable of serving searches.",
+            "search":"| rest $rest_scope$ splunk_server_group=dmc_group_license_master /services/licenser/slaves \n| fields label splunk_server warning_count \n| eval in_violation = if(warning_count >= 5, 1, 0) \n| eval severity_level = case(in_violation == 1, 3, warning_count > 0 AND warning_count < 5, 2, warning_count == 0, 0) \n| rename label AS instance splunk_server AS license_master",
+            "suggested_action":"Check the Monitoring Console license usage dashboards to understand how warnings were accrued. \nTo clear violations, request a reset license from Splunk Support.",
+            "tags":"indexing, licensing",
+            "title":"License warnings and violations"
+        }
+    },
+    {
+        "name":"linux_kernel_transparent_huge_pages",
+        "id":"https://localhost:8000/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/linux_kernel_transparent_huge_pages",
+        "updated":"2017-01-02T17:25:12-08:00",
+        "links":{
+            "alternate":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/linux_kernel_transparent_huge_pages",
+            "list":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/linux_kernel_transparent_huge_pages",
+            "_reload":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/linux_kernel_transparent_huge_pages/_reload",
+            "edit":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/linux_kernel_transparent_huge_pages",
+            "disable":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/linux_kernel_transparent_huge_pages/disable"
+        },
+        "author":"nobody",
+        "acl":{
+            "app":"splunk_monitoring_console",
+            "can_change_perms":true,
+            "can_list":true,
+            "can_share_app":true,
+            "can_share_global":true,
+            "can_share_user":false,
+            "can_write":true,
+            "modifiable":true,
+            "owner":"nobody",
+            "perms":{
+                "read":[
+                    "admin"
+                ],
+                "write":[
+                    "admin"
+                ]
+            },
+            "removable":false,
+            "sharing":"app"
+        },
+        "content":{
+            "applicable_to_groups":"",
+            "category":"System and Environment",
+            "description":"This attempts to determine whether Splunk is running on a Linux server where kernel transparent huge pages are enabled. NOTE: This check is relevant only for Linux. NOTE: This check yields results only for instances that are running Splunk Enterprise 6.5 or higher. Instances running an older version produce search errors that can be ignored.",
+            "disabled":false,
+            "doc_link":"healthcheck.hardware.thp",
+            "doc_title":"transparent huge pages",
+            "eai:acl":null,
+            "eai:appName":"splunk_monitoring_console",
+            "eai:userName":"nobody",
+            "failure_text":"One or more Splunk instances are running on a host that has kernel transparent huge pages enabled. This can significantly reduce performance and is against best practice.",
+            "search":"| rest $rest_scope$ /services/server/info \n| join type=outer splunk_server [rest $rest_scope$ /services/server/sysinfo | fields splunk_server transparent_hugepages.*] \n| eval transparent_hugepages.effective_state = if(isnotnull('transparent_hugepages.effective_state'), 'transparent_hugepages.effective_state', \"unknown\") \n| eval transparent_hugepages.enabled = case(len('transparent_hugepages.enabled') > 0, 'transparent_hugepages.enabled', 'transparent_hugepages.effective_state' == \"ok\" AND (isnull('transparent_hugepages.enabled') OR len('transparent_hugepages.enabled') = 0), \"feature not available\", 'transparent_hugepages.effective_state' == \"unknown\" AND isnull('transparent_hugepages.enabled'), \"unknown\") \n| eval transparent_hugepages.defrag = case(len('transparent_hugepages.defrag') > 0, 'transparent_hugepages.defrag', 'transparent_hugepages.effective_state' == \"ok\" AND (isnull('transparent_hugepages.defrag') OR len('transparent_hugepages.defrag') = 0), \"feature not available\", 'transparent_hugepages.effective_state' == \"unknown\" AND isnull('transparent_hugepages.defrag'), \"unknown\") \n| eval severity_level = case('transparent_hugepages.effective_state' == \"unavailable\", -1, 'transparent_hugepages.effective_state' == \"ok\", 0, 'transparent_hugepages.effective_state' == \"unknown\", 1, 'transparent_hugepages.effective_state' == \"bad\", 2) \n| fields splunk_server transparent_hugepages.enabled transparent_hugepages.defrag transparent_hugepages.effective_state severity_level \n| rename splunk_server AS instance \n| fields - _timediff",
+            "suggested_action":"Turn off kernel transparent huge pages.",
+            "tags":"best_practices, operating_system",
+            "title":"Linux kernel transparent huge pages"
+        }
+    },
+    {
+        "name":"local_indexing_on_non-indexer_instances",
+        "id":"https://localhost:8000/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/local_indexing_on_non-indexer_instances",
+        "updated":"2017-01-02T17:25:12-08:00",
+        "links":{
+            "alternate":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/local_indexing_on_non-indexer_instances",
+            "list":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/local_indexing_on_non-indexer_instances",
+            "_reload":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/local_indexing_on_non-indexer_instances/_reload",
+            "edit":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/local_indexing_on_non-indexer_instances",
+            "disable":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/local_indexing_on_non-indexer_instances/disable"
+        },
+        "author":"nobody",
+        "acl":{
+            "app":"splunk_monitoring_console",
+            "can_change_perms":true,
+            "can_list":true,
+            "can_share_app":true,
+            "can_share_global":true,
+            "can_share_user":false,
+            "can_write":true,
+            "modifiable":true,
+            "owner":"nobody",
+            "perms":{
+                "read":[
+                    "admin"
+                ],
+                "write":[
+                    "admin"
+                ]
+            },
+            "removable":false,
+            "sharing":"app"
+        },
+        "content":{
+            "applicable_to_groups":"",
+            "category":"Data Indexing",
+            "description":"This checks whether any non-indexer instances (search heads, indexer cluster manager nodes, license managers, deployment servers, search head cluster deployers) are indexing their own events locally, instead of forwarding the data to the indexers, per best practices.",
+            "disabled":false,
+            "doc_link":"healthcheck.internallogs.sh, healthcheck.internallogs.cm",
+            "doc_title":"indexing on search heads, indexing on cluster managers",
+            "eai:acl":null,
+            "eai:appName":"splunk_monitoring_console",
+            "eai:userName":"nobody",
+            "environments_to_exclude":"standalone",
+            "failure_text":"One or more non-indexer instances is not forwarding their events to the indexers. This can isolate some of your data and prevent some Monitoring Console dashboards from working.",
+            "search":"| rest $rest_scope$ /services/server/info \n| fields splunk_server isForwarding server_roles \n| where (server_roles==\"search_head\" OR server_roles==\"cluster_master\" OR server_roles==\"license_master\" OR server_roles==\"shc_deployer\" OR server_roles==\"deployment_server\" OR isNull(server_roles)) \n| eval severity_level = case( isForwarding==1, 0, isForwarding == 0, 2, true(), -1) \n| rename splunk_server AS instance",
+            "suggested_action":"Make sure that all non-indexer instances are forwarding their internal events to the indexers, per best practices.",
+            "tags":"best_practices, forwarding, indexing",
+            "title":"Local indexing on non-indexer instances"
+        }
+    },
+    {
+        "name":"missing_forwarders",
+        "id":"https://localhost:8000/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/missing_forwarders",
+        "updated":"2017-01-02T17:25:12-08:00",
+        "links":{
+            "alternate":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/missing_forwarders",
+            "list":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/missing_forwarders",
+            "_reload":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/missing_forwarders/_reload",
+            "edit":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/missing_forwarders",
+            "disable":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/missing_forwarders/disable"
+        },
+        "author":"nobody",
+        "acl":{
+            "app":"splunk_monitoring_console",
+            "can_change_perms":true,
+            "can_list":true,
+            "can_share_app":true,
+            "can_share_global":true,
+            "can_share_user":false,
+            "can_write":true,
+            "modifiable":true,
+            "owner":"nobody",
+            "perms":{
+                "read":[
+                    "admin"
+                ],
+                "write":[
+                    "admin"
+                ]
+            },
+            "removable":false,
+            "sharing":"app"
+        },
+        "content":{
+            "applicable_to_groups":"dmc_group_indexer",
+            "category":"Data Indexing",
+            "description":"This checks whether any forwarders have not connected to indexers for >15 minutes in the recent past. \nNOTE: This check requires the Monitoring Console forwarder monitoring feature to be enabled.",
+            "disabled":false,
+            "doc_link":"healthcheck.forwarders.setup, healthcheck.forwarders.troubleshoot",
+            "doc_title":"forwarder setup, forwarder troubleshooting",
+            "drilldown":"/app/splunk_monitoring_console/forwarder_deployment",
+            "eai:acl":null,
+            "eai:appName":"splunk_monitoring_console",
+            "eai:userName":"nobody",
+            "failure_text":"One or more forwarders that previously communicated with your indexers have not been seen for more than 15 minutes.",
+            "search":"| inputlookup dmc_forwarder_assets \n| stats count AS forwarder_count by status \n| eval severity_level = case(status==\"active\", 0, status==\"missing\", 2, true(), -1) \n| eventstats max(severity_level) AS max_severity_level \n| where severity_level = max_severity_level \n| fields status forwarder_count severity_level",
+            "suggested_action":"Check the Forwarder Monitoring: Deployment dashboard to get a full list of the impacted forwarders.",
+            "tags":"forwarding",
+            "title":"Missing forwarders"
+        }
+    },
+    {
+        "name":"near_critical_disk_usage",
+        "id":"https://localhost:8000/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/near_critical_disk_usage",
+        "updated":"2017-01-02T17:25:12-08:00",
+        "links":{
+            "alternate":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/near_critical_disk_usage",
+            "list":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/near_critical_disk_usage",
+            "_reload":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/near_critical_disk_usage/_reload",
+            "edit":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/near_critical_disk_usage",
+            "disable":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/near_critical_disk_usage/disable"
+        },
+        "author":"nobody",
+        "acl":{
+            "app":"splunk_monitoring_console",
+            "can_change_perms":true,
+            "can_list":true,
+            "can_share_app":true,
+            "can_share_global":true,
+            "can_share_user":false,
+            "can_write":true,
+            "modifiable":true,
+            "owner":"nobody",
+            "perms":{
+                "read":[
+                    "admin"
+                ],
+                "write":[
+                    "admin"
+                ]
+            },
+            "removable":false,
+            "sharing":"app"
+        },
+        "content":{
+            "applicable_to_groups":"",
+            "category":"System and Environment",
+            "description":"This checks the disk usage of partitions that Splunk Enterprise reads or writes to.",
+            "disabled":false,
+            "doc_link":"healthcheck.disk.usage.indexer, healthcheck.disk.usage.searchhead",
+            "doc_title":"disk usage on indexers, disk usage on search heads",
+            "drilldown":"/app/splunk_monitoring_console/resource_usage_machine?form.machine=$machine$",
+            "eai:acl":null,
+            "eai:appName":"splunk_monitoring_console",
+            "eai:userName":"nobody",
+            "failure_text":"At least one partition, on at least one instance, was found with disk usage above 90%.",
+            "search":"| rest $rest_scope$ /services/server/status/partitions-space \n| eval free = if(isnotnull(available), available, free) \n| eval usage = capacity - free \n| eval pct_usage = floor(usage / capacity * 100) \n| stats first(pct_usage) AS pct_usage by splunk_server, mount_point \n| eval severity_level = case(pct_usage < 90, 0, pct_usage >= 90, 2) \n| eval mount_info = mount_point.\": \".pct_usage.\"%\" \n| stats values(mount_info) AS mount_information max(severity_level) AS severity_level by splunk_server \n| lookup local=true dmc_assets serverName AS splunk_server OUTPUT machine \n| eval machine = mvdedup(machine) \n| fields splunk_server machine mount_information severity_level \n| rename splunk_server AS instance",
+            "suggested_action":"Check the data retention policies on the affected instances to ensure that the disk doesn't fill up. Alternatively, provision more disk space. You can also enable a platform alert for this condition. Go to the Monitoring Console's alert setup page and enable the \"Near-critical Disk Usage\" platform alert.",
+            "tags":"capacity, storage",
+            "title":"Near-critical disk usage"
+        }
+    },
+    {
+        "name":"orphaned_scheduled_searches",
+        "id":"https://localhost:8000/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/orphaned_scheduled_searches",
+        "updated":"2017-01-02T17:25:12-08:00",
+        "links":{
+            "alternate":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/orphaned_scheduled_searches",
+            "list":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/orphaned_scheduled_searches",
+            "_reload":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/orphaned_scheduled_searches/_reload",
+            "edit":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/orphaned_scheduled_searches",
+            "disable":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/orphaned_scheduled_searches/disable"
+        },
+        "author":"nobody",
+        "acl":{
+            "app":"splunk_monitoring_console",
+            "can_change_perms":true,
+            "can_list":true,
+            "can_share_app":true,
+            "can_share_global":true,
+            "can_share_user":false,
+            "can_write":true,
+            "modifiable":true,
+            "owner":"nobody",
+            "perms":{
+                "read":[
+                    "admin"
+                ],
+                "write":[
+                    "admin"
+                ]
+            },
+            "removable":false,
+            "sharing":"app"
+        },
+        "content":{
+            "applicable_to_groups":"dmc_group_search_head",
+            "category":"Splunk Miscellaneous",
+            "description":"This looks for scheduled searches that have become orphaned after their owner was deactivated. Typically, a search is orphaned when a user is removed from the external authentication system (LDAP or AD) that Splunk software relies on.",
+            "disabled":false,
+            "doc_link":"learnmore.orphaned_searches",
+            "doc_title":"orphaned searches",
+            "drilldown":"| rest splunk_server=$instance$ /servicesNS/-/-/saved/searches add_orphan_field=yes count=0 \n| search orphan=1 disabled=0 is_scheduled=1 \n| eval status = if(disabled = 0, \"enabled\", \"disabled\") \n| fields title eai:acl.owner eai:acl.app eai:acl.sharing orphan status is_scheduled cron_schedule next_scheduled_time next_scheduled_time actions \n| rename title AS \"search name\" eai:acl.owner AS owner eai:acl.app AS app eai:acl.sharing AS sharing",
+            "eai:acl":null,
+            "eai:appName":"splunk_monitoring_console",
+            "eai:userName":"nobody",
+            "failure_text":"One or more scheduled searches are orphaned, meaning that they are no longer associated with valid owners. The scheduler will not run orphaned scheduled searches.",
+            "search":"| rest $rest_scope$ /servicesNS/-/-/saved/searches add_orphan_field=yes count=0 \n| where disabled=0 AND is_scheduled=1 \n| stats count(eval(orphan=1)) AS orphaned_search_count by splunk_server \n| eval severity_level = if(orphaned_search_count > 0, 3, 0) \n| rename splunk_server AS instance",
+            "suggested_action":"Identify the impacted searches by using the provided drill-down search or by consulting the \"Orphaned Scheduled Searches\" dashboard on reported instances. Disable, delete, or reassign ownership of the affected searches, as appropriate.",
+            "tags":"configuration, search",
+            "title":"Orphaned scheduled searches"
+        }
+    },
+    {
+        "name":"saturation_of_event_processing_queues",
+        "id":"https://localhost:8000/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/saturation_of_event_processing_queues",
+        "updated":"2017-01-02T17:25:12-08:00",
+        "links":{
+            "alternate":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/saturation_of_event_processing_queues",
+            "list":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/saturation_of_event_processing_queues",
+            "_reload":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/saturation_of_event_processing_queues/_reload",
+            "edit":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/saturation_of_event_processing_queues",
+            "disable":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/saturation_of_event_processing_queues/disable"
+        },
+        "author":"nobody",
+        "acl":{
+            "app":"splunk_monitoring_console",
+            "can_change_perms":true,
+            "can_list":true,
+            "can_share_app":true,
+            "can_share_global":true,
+            "can_share_user":false,
+            "can_write":true,
+            "modifiable":true,
+            "owner":"nobody",
+            "perms":{
+                "read":[
+                    "admin"
+                ],
+                "write":[
+                    "admin"
+                ]
+            },
+            "removable":false,
+            "sharing":"app"
+        },
+        "content":{
+            "applicable_to_groups":"dmc_group_indexer",
+            "category":"Data Indexing",
+            "description":"This checks if queues on your indexers have been saturated (i.e: 90% full or more) consistently in the past 15 minutes.",
+            "disabled":false,
+            "doc_link":"healthcheck.indexer.highqueuefillpct",
+            "doc_title":"saturation of event processing queues",
+            "drilldown":"/app/splunk_monitoring_console/indexing_performance_instance?form.splunk_server=$instance$",
+            "eai:acl":null,
+            "eai:appName":"splunk_monitoring_console",
+            "eai:userName":"nobody",
+            "failure_text":"One or more of the indexer queues on this instance is reporting an averaged fill percentage of 90 or more over the last 15 minutes. This might affect how quickly this instance indexes events.",
+            "search":"| rest $rest_scope$ /services/server/introspection/queues \n| search title=parsingQueue* OR title=aggQueue* OR title=typingQueue* OR title=indexQueue* \n| eval fill_perc = round(current_size_bytes / max_size_bytes * 100,2) \n| rex field=title \"(?<queue_name>^\\w+)(?:\\.(?<pipeline_number>\\d+))?\" \n| fields splunk_server fill_perc queue_name pipeline_number \n| eval severity_level = if( fill_perc > 90, 2, 0) \n| eval fill_perc = if(isnotnull(pipeline_number), \"pset\".pipeline_number.\": \".fill_perc, fill_perc) \n| chart values(fill_perc) AS fill_perc max(severity_level) AS severity_level over splunk_server by queue_name \n| rename \"fill_perc: *\" AS * \"severity_level: *\" AS \"sev_*\" \n| eval severity_level = max(sev_parsingQueue, sev_aggQueue, sev_typingQueue, sev_indexQueue) \n| fields splunk_server severity_level parsingQueue aggQueue typingQueue indexQueue \n| rename splunk_server AS instance parsingQueue as \"Parsing Queue Fill Ratio (%)\", aggQueue as \"Aggregation Queue Fill Ratio (%)\", \"typingQueue\" as \"Typing Queue Fill Ratio (%)\", indexQueue as \"Indexing Queue Fill Ratio (%)\"",
+            "suggested_action":"Check the Monitoring Console indexing performance view for the affected indexers.",
+            "tags":"indexing, queues",
+            "title":"Saturation of event-processing queues"
+        }
+    },
+    {
+        "name":"search_scheduler_skip_ratio",
+        "id":"https://localhost:8000/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/search_scheduler_skip_ratio",
+        "updated":"2017-01-02T17:25:12-08:00",
+        "links":{
+            "alternate":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/search_scheduler_skip_ratio",
+            "list":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/search_scheduler_skip_ratio",
+            "_reload":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/search_scheduler_skip_ratio/_reload",
+            "edit":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/search_scheduler_skip_ratio",
+            "disable":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/search_scheduler_skip_ratio/disable"
+        },
+        "author":"nobody",
+        "acl":{
+            "app":"splunk_monitoring_console",
+            "can_change_perms":true,
+            "can_list":true,
+            "can_share_app":true,
+            "can_share_global":true,
+            "can_share_user":false,
+            "can_write":true,
+            "modifiable":true,
+            "owner":"nobody",
+            "perms":{
+                "read":[
+                    "admin"
+                ],
+                "write":[
+                    "admin"
+                ]
+            },
+            "removable":false,
+            "sharing":"app"
+        },
+        "content":{
+            "applicable_to_groups":"dmc_group_search_head",
+            "category":"Data Search",
+            "description":"This checks whether scheduled searches were skipped in the past hour.",
+            "disabled":false,
+            "doc_link":"healthcheck.scheduler.skip",
+            "doc_title":"skipping scheduled searches",
+            "drilldown":"/app/splunk_monitoring_console/scheduler_activity_instance?form.splunk_server=$instance$",
+            "eai:acl":null,
+            "eai:appName":"splunk_monitoring_console",
+            "eai:userName":"nobody",
+            "failure_text":"Scheduled searches are being skipped on one or more search heads.",
+            "search":"earliest=-60m `dmc_set_index_internal` search_group=dmc_group_search_head sourcetype=scheduler (status=\"completed\" OR status=\"skipped\") \n| stats count(eval(status==\"completed\" OR status==\"skipped\")) AS total_executions, count(eval(status==\"skipped\")) AS skipped_executions by host \n| eval skip_ratio = skipped_executions/total_executions * 100 \n| eval severity_level = case(skip_ratio == 0, 0, skip_ratio > 0, 2) \n| eval skip_ratio = round(skip_ratio, 2).\"%\" \n| rename host AS instance \n| fields instance total_executions skipped_executions skip_ratio severity_level",
+            "suggested_action":"Check the Monitoring Console Scheduler Activity: Instance dashboard for each affected search head to determine the problem.",
+            "tags":"scheduler",
+            "title":"Search scheduler skip ratio"
+        }
+    },
+    {
+        "name":"SHP_to_SHC_upgrade_opportunity",
+        "id":"https://localhost:8000/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/SHP_to_SHC_upgrade_opportunity",
+        "updated":"2017-01-02T17:25:12-08:00",
+        "links":{
+            "alternate":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/SHP_to_SHC_upgrade_opportunity",
+            "list":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/SHP_to_SHC_upgrade_opportunity",
+            "_reload":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/SHP_to_SHC_upgrade_opportunity/_reload",
+            "edit":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/SHP_to_SHC_upgrade_opportunity",
+            "disable":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/SHP_to_SHC_upgrade_opportunity/disable"
+        },
+        "author":"nobody",
+        "acl":{
+            "app":"splunk_monitoring_console",
+            "can_change_perms":true,
+            "can_list":true,
+            "can_share_app":true,
+            "can_share_global":true,
+            "can_share_user":false,
+            "can_write":true,
+            "modifiable":true,
+            "owner":"nobody",
+            "perms":{
+                "read":[
+                    "admin"
+                ],
+                "write":[
+                    "admin"
+                ]
+            },
+            "removable":false,
+            "sharing":"app"
+        },
+        "content":{
+            "applicable_to_groups":"dmc_group_search_head",
+            "category":"Splunk Miscellaneous",
+            "description":"If you are using search head pooling and running Splunk Enterprise 6.2 or higher, we strongly recommend that you migrate to search head clustering, a feature designed to replace search head pooling that removes the dependency on shared storage and offers other advantages.",
+            "disabled":false,
+            "doc_link":"healthcheck.shp.upgradenag",
+            "doc_title":"upgrading from search head pooling",
+            "eai:acl":null,
+            "eai:appName":"splunk_monitoring_console",
+            "eai:userName":"nobody",
+            "environments_to_exclude":"standalone",
+            "failure_text":"This instance is part of a search head pool and is running Splunk Enterprise 6.2 or higher.",
+            "search":"| rest $rest_scope$ /services/properties/server/pooling/state \n| where value=enabled \n| eval shpooling = 1 \n| join type=outer splunk_server [rest $rest_scope$ /services/server/info | fields version, splunk_server] \n| stats max(shpooling) AS shpooling_state max(version) AS version by splunk_server \n| fields splunk_server version shpooling_state \n| eval severity_level = if(shpooling_state = 1 AND match(version,\"^(6\\.[234]|[7-9]\\.)\"), 1, 0) \n| rename splunk_server AS instance \n| fields - _timediff",
+            "suggested_action":"Consult the procedure to migrate from search head pooling to search head clustering",
+            "tags":"best_practices, configuration",
+            "title":"Upgrade opportunity from search head pooling to search head clustering"
+        }
+    },
+    {
+        "name":"system_hardware_provisioning_assessment",
+        "id":"https://localhost:8000/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/system_hardware_provisioning_assessment",
+        "updated":"2017-01-02T17:25:12-08:00",
+        "links":{
+            "alternate":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/system_hardware_provisioning_assessment",
+            "list":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/system_hardware_provisioning_assessment",
+            "_reload":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/system_hardware_provisioning_assessment/_reload",
+            "edit":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/system_hardware_provisioning_assessment",
+            "disable":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/system_hardware_provisioning_assessment/disable"
+        },
+        "author":"nobody",
+        "acl":{
+            "app":"splunk_monitoring_console",
+            "can_change_perms":true,
+            "can_list":true,
+            "can_share_app":true,
+            "can_share_global":true,
+            "can_share_user":false,
+            "can_write":true,
+            "modifiable":true,
+            "owner":"nobody",
+            "perms":{
+                "read":[
+                    "admin"
+                ],
+                "write":[
+                    "admin"
+                ]
+            },
+            "removable":false,
+            "sharing":"app"
+        },
+        "content":{
+            "applicable_to_groups":"dmc_group_search_head,dmc_group_indexer",
+            "category":"System and Environment",
+            "description":"This evaluates the hardware specifications of Splunk instances tasked with indexing and/or searching data, using reference hardware.",
+            "disabled":false,
+            "doc_link":"healthcheck.hardware.reference",
+            "doc_title":"recommended minimum hardware",
+            "eai:acl":null,
+            "eai:appName":"splunk_monitoring_console",
+            "eai:userName":"nobody",
+            "failure_text":"One or more hosts has returned CPU or memory specifications that fall below reference hardware recommendations. This might adversely affect indexing or search performance.",
+            "search":"| rest $rest_scope$ /services/server/info \n| eval cpu_core_count = if(isnotnull(numberOfVirtualCores), numberOfVirtualCores, numberOfCores) \n| eval physical_memory_GB = round(physicalMemoryMB / 1024, 0) \n| fields splunk_server cpu_core_count physical_memory_GB \n| eval severity_level = case(cpu_core_count <= 4 OR physical_memory_GB <= 4, 2, cpu_core_count < 12 OR physical_memory_GB < 12, 1, cpu_core_count >= 12 AND physical_memory_GB >= 12, 0, true(), -1) \n| rename splunk_server AS instance",
+            "suggested_action":"If you are experiencing performance issues, consider upgrading hosts to meet or exceed the recommended hardware specs.",
+            "tags":"best_practices, capacity, scalability",
+            "title":"System hardware provisioning assessment"
+        }
+    },
+    {
+        "name":"test",
+        "id":"https://localhost:8000/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/test",
+        "updated":"2017-01-02T17:25:12-08:00",
+        "links":{
+            "alternate":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/test",
+            "list":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/test",
+            "_reload":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/test/_reload",
+            "edit":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/test",
+            "remove":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/test",
+            "move":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/test/move",
+            "disable":"/servicesNS/nobody/splunk_monitoring_console/configs/conf-checklist/test/disable"
+        },
+        "author":"admin",
+        "acl":{
+            "app":"splunk_monitoring_console",
+            "can_change_perms":true,
+            "can_list":true,
+            "can_share_app":true,
+            "can_share_global":true,
+            "can_share_user":true,
+            "can_write":true,
+            "modifiable":true,
+            "owner":"admin",
+            "perms":{
+                "read":[
+                    "admin"
+                ],
+                "write":[
+                    "admin"
+                ]
+            },
+            "removable":true,
+            "sharing":"app"
+        },
+        "content":{
+            "category":"monkey",
+            "disabled":false,
+            "eai:acl":null,
+            "eai:appName":"splunk_monitoring_console",
+            "eai:userName":"nobody",
+            "search":"asdf",
+            "tags":"Monkey",
+            "title":"Test"
+        }
+    }
+],
+    "paging":{
+    "total":18,
+        "perPage":30,
+        "offset":0
+},
+    "messages":[
+
+]
+}

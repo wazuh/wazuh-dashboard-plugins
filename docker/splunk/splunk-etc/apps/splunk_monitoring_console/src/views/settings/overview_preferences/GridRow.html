@@ -1,0 +1,14 @@
+<td class="cell-name">
+    <a href="#" class="model-title thresholdConfig-edit-link"><%- name %></a>
+</td>
+
+<td class="cell-actions">
+    <a href="#" class="edit-action"><%= _("Edit").t() %></a>
+</td>
+
+<td class="cell-definition">
+	<% _.each(thresholds, function(value, key) { %>
+		<div class="status-cube" style="background-color: <%- thresholds[key]['color'] %>;"><%- thresholds[key]['formattedRange'] %></div>
+	<% }) %>
+    <br/><br/>
+</td>

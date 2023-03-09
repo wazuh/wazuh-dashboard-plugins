@@ -1,0 +1,410 @@
+<form version="1.1" hideEdit="True" script="common_control.js">
+  <label>Search Head Clustering: App Deployment</label>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="dropdown" searchWhenChanged="true" token="group">
+      <label>Search Head Cluster:</label>
+      <showClearButton>false</showClearButton>
+      <populatingSearch fieldForLabel="label" fieldForValue="search_group">
+        | `dmc_get_search_head_cluster_groups`
+      </populatingSearch>
+      <selectFirstChoice>true</selectFirstChoice>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <html>
+        <h2>
+          <span>Select views: </span>
+          <span id="link-switcher-view">
+            <a href="#" class="btn-pill active" data-item="all">All</a>
+            <a href="#" class="btn-pill" data-item="snapshot">Snapshot</a>
+            <a href="#" class="btn-pill" data-item="historical">Historical</a>
+          </span>
+        </h2>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Snapshots</title>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Apps Status</title>
+      <table>
+        <title>$countApps$ apps</title>
+        <search>
+          <query>
+| rest /services/apps/local splunk_server_group="$group$" splunk_server_group=dmc_group_search_head
+| search install_source_checksum=*
+| fields title, label, splunk_server, install_source_checksum
+| rename title as app_name, install_source_checksum as checksum
+  | append [ | rest /services/apps/deploy splunk_server_group="$group$" splunk_server_group=dmc_group_shc_deployer
+  | fields title, splunk_server, checksum
+| rename title as app_name]
+| stats values(checksum) as checksum, values(label) as label by app_name
+| eval status = if(mvcount(checksum) > 1, "Out of Synchronization!", "Synchronized")
+| fields label status app_name
+| rename label as App, status as "Status"
+| sort status
+          </query>
+          <done>
+            <set token="countApps">$job.resultCount$</set>
+          </done>
+          <error>
+            <set token="countApps">N/A</set>
+          </error>
+        </search>
+        <option name="drilldown">row</option>
+        <fields>App, Status</fields>
+        <drilldown>
+          <set token="appLocalDrilldown">$row.app_name$</set>
+          <set token="appLocalDrilldownLabel">$row.App$</set>
+        </drilldown>
+      </table>
+      <html>
+        <p>This panel shows the status of apps pushed by deployer to search head cluster members.</p>
+        <p><b>Synchronized:</b> all members have the latest version of the app.</p>
+        <p><b>Out of Synchronization:</b> one or more members does not have the latest version of the app.</p>
+        <p>Click on a row to see more details.</p>
+      </html>
+    </panel>
+    <panel depends="$appLocalDrilldown$">
+      <title>$appLocalDrilldownLabel$</title>
+      <table>
+        <title>Checksum on Search Head Cluster Members</title>
+        <search>
+          <query>
+| rest /services/apps/local splunk_server_group="$group$" splunk_server_group=dmc_group_search_head
+| search install_source_checksum=* AND title="$appLocalDrilldown$"
+| fields splunk_server, install_source_checksum
+| rename splunk_server as Instance, install_source_checksum as Checksum
+          </query>
+        </search>
+      </table>
+      <table>
+        <title>Checksum on Search Head Cluster Deployer</title>
+        <search>
+          <query>
+| rest /services/apps/deploy splunk_server_group="$group$" splunk_server_group=dmc_group_shc_deployer
+| search title="$appLocalDrilldown$"
+| fields splunk_server, checksum
+| rename splunk_server as Instance, checksum as Checksum
+          </query>
+        </search>
+      </table>
+      <html>
+        <a data-unset-token="appLocalDrilldown">Close this panel</a>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Historical Charts</title>
+      <input type="time" searchWhenChanged="true" token="time">
+        <label>Time Range:</label>
+        <default>
+          <earliestTime>-4h@m</earliestTime>
+          <latestTime>now</latestTime>
+        </default>
+      </input>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>App Deployment Requests</title>
+      <search id="deploymentRequestBaseSearch">
+        <query>
+`dmc_set_index_internal` search_group=dmc_group_shc_deployer sourcetype=splunkd_access uri_path="/services/apps/deploy" method=POST
+| stats values(spent) as spent by _time, user, status
+        </query>
+        <earliest>$time.earliest$</earliest>
+        <latest>$time.latest$</latest>
+      </search>
+      <input type="dropdown" token="deploymentRequestStatusScope" searchWhenChanged="true">
+        <label>Http Status Code</label>
+        <choice value="*">All</choice>
+        <showClearButton>false</showClearButton>
+        <selectFirstChoice>true</selectFirstChoice>
+        <fieldForLabel>status</fieldForLabel>
+        <fieldForValue>status</fieldForValue>
+        <search base="deploymentRequestBaseSearch">
+          <query>stats count by status</query>
+        </search>
+        <prefix>search status="</prefix>
+        <suffix>"</suffix>
+      </input>
+      <input type="dropdown" token="deploymentRequestUserScope" searchWhenChanged="true">
+        <label>User</label>
+        <choice value="*">All</choice>
+        <showClearButton>false</showClearButton>
+        <selectFirstChoice>true</selectFirstChoice>
+        <fieldForLabel>user</fieldForLabel>
+        <fieldForValue>user</fieldForValue>
+        <search base="deploymentRequestBaseSearch">
+          <query>stats count by user</query>
+        </search>
+        <prefix>search user="</prefix>
+        <suffix>"</suffix>
+      </input>
+      <input type="dropdown" token="deploymentRequestMetric" searchWhenChanged="true">
+        <label>Metric</label>
+        <showClearButton>false</showClearButton>
+        <default>count</default>
+        <choice value="count">count</choice>
+        <choice value="avg(spent)">average response time</choice>
+        <choice value="max(spent)">maximum response time</choice>
+        <change>
+          <condition value="count">
+            <set token="deploymentRequestYLabel">Count</set>
+          </condition>
+          <condition value="*">
+            <set token="deploymentRequestYLabel">Time (ms)</set>
+          </condition>
+        </change>
+      </input>
+      <input type="dropdown" token="deploymentRequestSplitBy" searchWhenChanged="true">
+        <label>Split by</label>
+        <showClearButton>false</showClearButton>
+        <default>status</default>
+        <choice value="user">user</choice>
+        <choice value="status">status</choice>
+        <prefix>by </prefix>
+      </input>
+      <chart>
+        <search base="deploymentRequestBaseSearch">
+          <query>
+$deploymentRequestStatusScope$
+| $deploymentRequestStatusScope$
+| `dmc_timechart` $deploymentRequestMetric$ $deploymentRequestSplitBy$
+          </query>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.text">$deploymentRequestYLabel$</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.chart.showLabels">auto</option>
+      </chart>
+      <html>
+        <p>This panel shows the number of app push requests made by user.</p>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Count of App Deployment Actions on the Deployer</title>
+      <search id="sendDeployableAppsStatusBaseSearch">
+        <query>
+`dmc_set_index_internal` search_group=dmc_group_shc_deployer sourcetype=splunkd_conf component=ConfDeployment data.task=sendDeployableApps
+| stats count by _time, data.target_label, data.status
+        </query>
+        <earliest>$time.earliest$</earliest>
+        <latest>$time.latest$</latest>
+      </search>
+      <input type="dropdown" token="sendDeployableAppsStatusFilter" searchWhenChanged="true">
+        <label>Status</label>
+        <showClearButton>false</showClearButton>
+        <choice value="*">All</choice>
+        <fieldForValue>data.status</fieldForValue>
+        <fieldForLabel>data.status</fieldForLabel>
+        <search base="sendDeployableAppsStatusBaseSearch">
+          <query>stats count by data.status</query>
+        </search>
+        <selectFirstChoice>true</selectFirstChoice>
+        <prefix>search data.status="</prefix>
+        <suffix>"</suffix>
+      </input>
+      <input type="dropdown" token="sendDeployableAppsTargetFilter" searchWhenChanged="true">
+        <label>Target Member</label>
+        <showClearButton>false</showClearButton>
+        <selectFirstChoice>true</selectFirstChoice>
+        <choice value="*">All</choice>
+        <fieldForLabel>data.target_label</fieldForLabel>
+        <fieldForValue>data.target_label</fieldForValue>
+        <search base="sendDeployableAppsStatusBaseSearch">
+          <query>stats count by data.target_label</query>
+        </search>
+        <prefix>search data.target_label="</prefix>
+        <suffix>"</suffix>
+      </input>
+      <input type="dropdown" token="sendDeployableAppsSplitBy" searchWhenChanged="true">
+        <label>Split by</label>
+        <showClearButton>false</showClearButton>
+        <default>data.status</default>
+        <choice value="data.status">Status</choice>
+        <choice value="data.target_label">Target</choice>
+      </input>
+      <chart>
+        <search base="sendDeployableAppsStatusBaseSearch">
+          <query>
+$sendDeployableAppsStatusFilter$
+| $sendDeployableAppsTargetFilter$
+| `dmc_timechart` count by $sendDeployableAppsSplitBy$
+          </query>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.text">Count</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.chart.showLabels">auto</option>
+      </chart>
+      <html>
+        <p>This panel shows the activities on the deployer.</p>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Count of App Deployment Actions by Search Head Cluster Members</title>
+      <input type="dropdown" token="actionFilter" searchWhenChanged="true">
+        <label>Action</label>
+        <showClearButton>false</showClearButton>
+        <default>*</default>
+        <choice value="*">All</choice>
+        <choice value="deleted">deleted</choice>
+        <choice value="failed">failed</choice>
+        <choice value="installed">installed</choice>
+        <choice value="matched">matched</choice>
+        <prefix>search action="</prefix>
+        <suffix>"</suffix>
+      </input>
+      <input type="dropdown" token="appNameFilter" searchWhenChanged="true">
+        <label>App</label>
+        <showClearButton>false</showClearButton>
+        <selectFirstChoice>true</selectFirstChoice>
+        <choice value="*">All</choice>
+        <fieldForLabel>app_name</fieldForLabel>
+        <fieldForValue>app_name</fieldForValue>
+        <search>
+          <query>
+            `dmc_set_index_internal` search_group="$group$" sourcetype=splunkd_conf component=ConfDeployment data.task=downloadDeployableApps
+            | table data.apps{}.action, data.apps{}.name
+            | eval apps = mvzip('data.apps{}.action', 'data.apps{}.name', ",")
+            | fields - data.apps{}.action, data.apps{}.name
+            | mvexpand apps
+            | rex field=apps "(?&lt;action&gt;\w+),(?&lt;app_name&gt;.+)"
+            | fields action, app_name
+            | where action!="preserved"
+            | stats count by app_name
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <prefix>search app_name="</prefix>
+        <suffix>"</suffix>
+      </input>
+      <input type="dropdown" token="hostFilter" searchWhenChanged="true">
+        <label>Host</label>
+        <showClearButton>false</showClearButton>
+        <search>
+          <query>
+            `dmc_set_index_internal` search_group="$group$" sourcetype=splunkd_conf component=ConfDeployment data.task=downloadDeployableApps
+            | stats count by host
+          </query>
+        </search>
+        <fieldForValue>host</fieldForValue>
+        <fieldForLabel>host</fieldForLabel>
+        <choice value="*">All</choice>
+        <default>*</default>
+        <prefix>search host="</prefix>
+        <suffix>"</suffix>
+      </input>
+      <input type="dropdown" token="appDeploymentSplitBy" searchWhenChanged="true">
+        <label>Split by</label>
+        <showClearButton>false</showClearButton>
+        <default>host</default>
+        <choice value="app_name">app</choice>
+        <choice value="host">host</choice>
+        <choice value="action">action</choice>
+      </input>
+      <chart>
+        <search>
+          <query>
+            `dmc_set_index_internal` search_group="$group$" sourcetype=splunkd_conf component=ConfDeployment data.task=downloadDeployableApps
+            | table _time, data.apps{}.action, data.apps{}.name, host
+            | eval apps = mvzip('data.apps{}.action', 'data.apps{}.name', ",")
+            | mvexpand apps
+            | rex field=apps "(?&lt;action&gt;\w+),(?&lt;app_name&gt;.+)"
+            | fields _time, host, action, app_name
+            | where action!="preserved"
+            | $actionFilter$
+            | $appNameFilter$
+            | $hostFilter$
+            | timechart count(action) as count_action by $appDeploymentSplitBy$
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.text">Count</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.chart.showLabels">auto</option>
+      </chart>
+      <html>
+        <p>This panel shows the activities by search head cluster members.</p>
+      </html>
+    </panel>
+  </row>
+</form>

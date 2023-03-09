@@ -1,0 +1,34 @@
+<dashboard hideEdit="True" version="1.1">
+
+  <label>Health Manager UI Improvements</label>
+
+  <row>
+
+    <panel>
+
+      <html>
+
+        <p><strong>Description</strong></p>
+        <p>Scope: Splunk Enterprise Only</p>
+        <p>1. Splunk has introduced a snooze feature in the health report manager page that allows admins to adjust the appearance of specific alerts. Admins can snooze an alert by 1 hour, 24 hours, or a custom time duration.</p>
+        <ul>
+                  <div style="margin-left:10px">
+                   <img src="/static/app/splunk_essentials_9_0/images/health_report_1.png" style="margin: 10px 0" width="700px"/>
+                  </div>
+                 </ul>
+        <ul>
+                  <div style="margin-left:10px">
+                   <img src="/static/app/splunk_essentials_9_0/images/health_report_2.png" style="margin: 10px 0" width="700px"/>
+                  </div>
+                 </ul>
+        <ul>
+                  <div style="margin-left:10px">
+                   <img src="/static/app/splunk_essentials_9_0/images/health_report_3.png" style="margin: 10px 0" width="700px"/>
+                  </div>
+                 </ul>
+        
+        <p>2. If an alert is snoozed, the admin has the option to unsnooze. The alert status is also updated with the time at which the feature will unsnooze.</p>
+        </html>
+    </panel>
+  </row>
+</dashboard>

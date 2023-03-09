@@ -1,0 +1,149 @@
+/*  --- start of copy from less/sourcetypes/sourcetypes.pcss --- */
+.main-section {
+    background: $bodyBackgroundColor;
+
+    .table-toolbar {
+        padding-top: $spacingHalf;
+
+        > * {
+            min-height: 28px;
+            padding: 0 0 4px;
+
+            > * {
+                display: inline-block;
+            }
+        }
+        .filter-container {
+            border-top: 1px solid $gray80;
+            padding-top: 10px;
+
+            .collection-count {
+                margin-left: 13px;
+                margin-right: 13px;
+            }
+
+            .select-page-count {
+              float: right;
+            }
+        }
+
+        .paginator-container {
+          min-height: initial;
+        }
+    }
+    .alerts-grid {
+        clear: both;
+
+        .col-actions {
+            white-space: nowrap;
+            width: 220px;
+        }
+        tr.list-item {
+            td {
+                transition: background, 0.2s;
+            }
+            &:hover td {
+                background-color: $tableRowHoverColor;
+                transition: background, 0.02s;
+            }
+            .cell-name {
+                word-break: break-all;
+            }
+        }
+        .message-single {
+            margin-left: 10px;
+        }
+        .model-description {
+            color: $textGray;
+            font-size: .85em;
+        }
+        i {
+            width: 14px;
+            color: $successColor;
+            font-size: 1.2em;
+            display: inline-block;
+
+            &.disable-icon {
+                color: $errorColor;
+            }
+        }
+    }
+}
+
+/*  Space between inline actions */
+.alert-action {
+  padding-right: 5px;
+}
+
+/*  Shift error box */
+.shared-flashmessages {
+  padding-left: 15px;
+}
+/*  --- end copy --- */
+
+.disabled-action {
+  color: $textDisabledColor;
+}
+
+.label-block {
+  float: left;
+  width: 160px;
+  padding-top: 5px;
+  text-align: right;
+}
+
+.value-block {
+  positiion: relative;
+  display: block;
+  margin-left: 180px;
+  padding-right: 25px;
+}
+
+.value-block.text {
+  padding-top: 5px;
+}
+
+.value-block input[type=text] {
+  margin-bottom: 0px;
+}
+
+.header-text {
+  margin-top: -10px;
+  padding: 0px 15px 6px 20px;
+  font-weight: bold;
+}
+
+.help-text-block {
+  margin-top: 4px;
+  padding: 0;
+  margin-bottom: 0px;
+  color: $textGray;
+  font-size: 85%;
+  word-wrap: break-word;
+}
+
+.invalid {
+  color: $errorColor;
+}
+
+.params-container {
+  margin-top: 15px;
+}
+
+.value-placeholder {
+  color: $brandColor;
+}
+
+@if $theme == lite {
+  .main-section .grid-placeholder {
+    margin: 0 15px;
+  }
+
+  .params-container {
+    margin-bottom: 15px;
+  }
+
+  .header-text {
+    margin-left: 42px;
+  }
+}

@@ -1,0 +1,117 @@
+#   Version 9.0.3
+#
+# Example 1
+# Matches all clients and includes all apps in the server class
+
+[global]
+whitelist.0=*
+# whitelist matches all clients.
+[serverClass:AllApps]
+[serverClass:AllApps:app:*]
+# a server class that encapsulates all apps in the repositoryLocation
+
+
+# Example 2
+# Assign server classes based on dns names.
+
+[global]
+
+[serverClass:AppsForOps]
+whitelist.0=*.ops.yourcompany.com
+[serverClass:AppsForOps:app:unix]
+[serverClass:AppsForOps:app:SplunkLightForwarder]
+
+[serverClass:AppsForDesktops]
+filterType=blacklist
+# exclude everybody except the Windows desktop machines.
+blacklist.0=*
+whitelist.0=*.desktops.yourcompany.com
+[serverClass:AppsForDesktops:app:SplunkDesktop]
+
+
+# Example 3
+# Deploy server class based on machine types
+
+[global]
+
+[serverClass:AppsByMachineType]
+# Ensure this server class is matched by all clients. It is IMPORTANT to
+# have a general filter here, and a more specific filter at the app level.
+# An app is matched _only_ if the server class it is contained in was
+# successfully matched!
+whitelist.0=*
+
+[serverClass:AppsByMachineType:app:SplunkDesktop]
+# Deploy this app only to Windows boxes.
+machineTypesFilter=windows-*
+
+[serverClass:AppsByMachineType:app:unix]
+# Deploy this app only to unix boxes - 32/64 bit.
+machineTypesFilter=linux-i686, linux-x86_64
+
+# Example 4
+# Specify app update exclusion list.
+
+[global]
+
+# The local/ subdirectory within every app will not be touched upon update.
+excludeFromUpdate=$app_root$/local
+
+[serverClass:MyApps]
+
+[serverClass:MyApps:app:SpecialCaseApp]
+# For the SpecialCaseApp, both the local/ and lookups/ subdirectories will
+# not be touched upon update.
+excludeFromUpdate=$app_root$/local,$app_root$/lookups
+
+# Example 5
+# Control client reloads/restarts
+
+[global]
+restartSplunkd=false
+restartSplunkWeb=true
+
+# For this serverclass, we attempt to only reload the configuration files
+# within the app, if we fail to reload ie if there's a conf in the app that
+# requires a restart, the admin must restart the instance themselves
+[serverClass:ReloadOnly]
+issueReload=true
+
+# This is an example of a best effort reloadable serverClass. ie we try to
+# reload the app, but if there are files that require a restart, only then 
+# do we restart
+[serverClass:tryReloadThenRestart]
+issueReload=true
+restartIfNeeded=true
+
+# Example 6a
+# Use (allow list|deny list) text file import.
+[serverClass:MyApps]
+whitelist.from_pathname = etc/system/local/clients.txt
+
+# Example 6b
+# Use (allow list|deny list) CSV file import to read all values from the Client
+# field (ignoring all other fields).
+[serverClass:MyApps]
+whitelist.select_field = Client
+whitelist.from_pathname = etc/system/local/clients.csv
+
+# Example 6c
+# Use (allow list|deny list) CSV file import to read some values from the Client
+# field (ignoring all other fields) where ServerType is one of T1, T2, or
+# starts with dc.
+[serverClass:MyApps]
+whitelist.select_field = Client
+whitelist.from_pathname = etc/system/local/server_list.csv
+whitelist.where_field = ServerType
+whitelist.where_equals = T1, T2, dc*
+
+# Example 6d
+# Use (allow list|deny list) CSV file import to read some values from field 2
+# (ignoring all other fields) where field 1 is one of T1, T2, or starts with
+# dc.
+[serverClass:MyApps]
+whitelist.select_field = 2
+whitelist.from_pathname = etc/system/local/server_list.csv
+whitelist.where_field = 1
+whitelist.where_equals = T1, T2, dc*

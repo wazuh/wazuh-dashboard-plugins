@@ -1,0 +1,46 @@
+<endpoint name="server/logger" hideEnabledColumn="1" hideActionsColumn="1" showOnSearchHeadCluster="0">
+  <capabilities>
+    <read>edit_server</read>
+  </capabilities>
+  <header>System logging</header>
+  <breadcrumb>
+    <parent hidecurrent="False">systemsettings</parent>
+    <name>Server logging</name>
+  </breadcrumb>
+  <!-- not putting this on the homepage menu for now
+  <menu name="system_configurations">
+    <label>System logging</label>
+    <url>/manager/%(namespace)s/server/logger</url>
+    <description>Adjust Splunk logging verbosity.</description>
+    <order>50</order>
+  </menu>
+  -->
+  <elements>
+    <element name="outputhelp" type="helpstring">
+        <key name="helpText">Set the logging level for this process. This setting persists until you restart Splunk. To make logging settings persist through a restart, modify log.cfg directly. &lt;a href="[[?learnmore.troubleshooting.enabledebuglogging]]" target="_blank"&gt;Learn more.&lt;/a&gt;</key>
+      <view name="edit"/>
+    </element>
+
+    <element name="name" type="textfield" label="Log channel">
+      <view name="list"/>
+    </element>
+    <element name="level" type="select" label="Logging level">
+      <view name="list"/>
+      <view name="edit"/>
+      <options>
+        <opt value="DEBUG" label="DEBUG"/>
+        <opt value="INFO" label="INFO"/>
+        <opt value="WARN" label="WARN"/>
+        <opt value="ERROR" label="ERROR"/>
+        <opt value="CRIT" label="CRIT"/>
+        <opt value="FATAL" label="FATAL"/>
+      </options>
+    </element>
+    <element name="buffering" type="checkbox" label="Log channel buffering">
+      <view name="list"/>
+      <view name="edit"/>
+      <key name="readonly">True</key>
+      <key name="disabled">True</key>
+    </element>
+  </elements>
+</endpoint>

@@ -1,0 +1,99 @@
+<endpoint name="saved/eventtypes" showAppContext="1">
+  <header>Event types</header>
+  <menu name="knowledge_configurations">
+    <label>Event types</label>
+    <url>/manager/%(namespace)s/saved/eventtypes</url>
+    <description>View and edit event types. Set permissions.</description>
+    <order>30</order>
+    <id>eventtypes</id>
+  </menu>
+  <elements>
+    <element name="saveeventtype" type="fieldset">
+      <view name="list"/>
+      <view name="edit"/>
+      <view name="create"/>
+      <view name="modal"/>
+      <elements>
+
+        <element name="__ns" type="select" label="Destination App">
+          <view name="create"/>
+          <key name="dynamicOptions" type="dict">
+            <key name="keyName">title</key>
+            <key name="keyValue">title</key>
+            <key name="splunkSource">/apps/local</key>
+            <key name="splunkSourceParams" type="dict">
+              <key name="search">'disabled=false'</key>
+              <key name="count">-1</key>
+            </key>
+          </key>
+        </element>
+
+        <element name="name" label="Name">
+          <view name="list"/>
+          <view name="create"/>
+          <view name="modal"/>
+        </element>
+        <element name="search" type="textarea" label="Search string">
+          <view name="list"/>
+          <view name="edit"/>
+          <view name="create"/>
+          <view name="modal"/>
+          <key name="validation">string</key>
+        </element>
+        <element name="tags" label="Tag(s)">
+          <view name="list"/>
+          <view name="edit"/>
+          <view name="create"/>
+          <view name="modal"/>
+          <key name="validation">string</key>
+          <key name="processValueList">' '.join(value) if isinstance(value, list) else value</key>
+          <key name="processValueEdit">' '.join(value) if isinstance(value, list) else value</key>
+          <key name="processValueAdd">' '.join(value) if isinstance(value, list) else value</key>
+          <key name="exampleText">Enter a comma-separated list of tags.</key>
+        </element>
+        <element name="color" type="select" label="Color">
+          <options>
+            <opt value="none" label="none"/>
+            <opt value="et_blue" label="blue"/>
+            <opt value="et_green" label="green"/>
+            <opt value="et_magenta" label="magenta"/>
+            <opt value="et_orange" label="orange"/>
+            <opt value="et_purple" label="purple"/>
+            <opt value="et_red" label="red"/>
+            <opt value="et_sky" label="sky"/>
+            <opt value="et_teal" label="teal"/>
+            <opt value="et_yellow" label="yellow"/>
+          </options>
+          <view name="edit"/>
+          <view name="create"/>
+        </element>
+
+        <element name="eai:acl.owner" label="Owner">
+          <view name="list"/>
+          <key name="processValueList">entity['eai:acl']['owner'] == 'nobody' and _('No owner') or entity['eai:acl']['owner']</key>
+        </element>
+        <element name="eai:acl.app" label="App">
+          <view name="list"/>
+          <key name="processValueList">entity['eai:acl']['app'] or ""</key>
+        </element>
+        <element name="priority" type="select" label="Priority">
+          <options>
+            <opt value="1" label="1 (Highest)"/>
+            <opt value="2" label="2"/>
+            <opt value="3" label="3"/>
+            <opt value="4" label="4"/>
+            <opt value="5" label="5"/>
+            <opt value="6" label="6"/>
+            <opt value="7" label="7"/>
+            <opt value="8" label="8"/>
+            <opt value="9" label="9"/>
+            <opt value="10" label="10 (Lowest)"/>
+          </options>
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="exampleText">Highest priority shows up first in a result.</key>
+        </element>
+      </elements>
+    </element>
+  </elements>
+</endpoint>

@@ -1,0 +1,14 @@
+<dashboard hideEdit="True" version="1.1">
+
+  <label>RapidDiag Performance Improvements</label>
+  <row>
+    <panel>
+      <html>
+      <p><strong>Description</strong></p>
+       <p> Scope: Splunk Enterprise Only </p>
+       <p> In this release for RapidDiag, we introduced a non-search based backend, as well as a couple other minor enhancements like the grouping of Task Manager tasks, and basic WatchDog enhancements.</p>
+       <p> Previously, when Splunk used a search-based backend, if the system was maxed out, searches would be queued. With the introduction of the new REST endpoint remote-proxy we are no longer waiting on search quota, which reduces latency and improves the running of searches. Additionally, with the new REST remote proxy we can collect information and also specify search heads and peers inside of a cluster. This enables the distribution of tasks to remote peer/nodes, and opens up more exposure for search head clusters.</p>
+        </html>
+    </panel>
+  </row>
+</dashboard>

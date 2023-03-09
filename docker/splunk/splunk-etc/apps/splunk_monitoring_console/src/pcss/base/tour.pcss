@@ -1,0 +1,642 @@
+/*===============================================================================================*/
+/*  SPLUNK: STANDARD TOUR                                                                        */
+/*===============================================================================================*/
+.tourbar {
+    background-color: $gray20;
+    min-height: 46px;
+    position: relative;
+
+    .info-container {
+        margin: 0px 200px;
+        padding: 10px;
+        background-color: $gray30;
+        min-height: 26px;
+
+        .info {
+            font-size: 14px;
+            color: $gray92;
+        }
+    }
+    .btn {
+        background: transparent;
+        filter: none;
+        border-color: $borderDarkColor;
+        color: $gray92;
+        text-shadow: none;
+        box-shadow: none;
+        top: 50%;
+        margin-top: -13px;
+        position: absolute;
+
+        &.next {
+            right: 158px;
+        }
+
+        &.previous {
+            left: 158px;
+        }
+
+        &.close-btn {
+            right: 10px;
+        }
+    }
+    .close-container {
+        float: right;
+        margin: 10px 25px 10px 25px;
+    }
+    .next-container {
+        float: right;
+        margin: 10px 0px 10px 25px;
+    }
+    .previous-container {
+        float: left;
+        margin: 10px 25px;
+    }
+}
+
+.tour-highlight {
+    position: relative;
+
+    &::after {
+        content: "";
+        position: absolute;
+        right: -20px;
+        top: -20px;
+        height: 30px;
+        width: 30px;
+        z-index: 99999;
+
+        background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cjxzdmcgd2lkdGg9IjIwcHgiIGhlaWdodD0iMjBweCIgdmlld0JveD0iMCAwIDIwIDIwIiB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHhtbG5zOnNrZXRjaD0iaHR0cDovL3d3dy5ib2hlbWlhbmNvZGluZy5jb20vc2tldGNoL25zIj4KICAgIDx0aXRsZT5VbnRpdGxlZCAyPC90aXRsZT4KICAgIDxkZXNjcmlwdGlvbj5DcmVhdGVkIHdpdGggU2tldGNoIChodHRwOi8vd3d3LmJvaGVtaWFuY29kaW5nLmNvbS9za2V0Y2gpPC9kZXNjcmlwdGlvbj4KICAgIDxkZWZzPjwvZGVmcz4KICAgIDxnIGlkPSJQYWdlLTEiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIHNrZXRjaDp0eXBlPSJNU1BhZ2UiPgogICAgICAgIDxwYXRoIGQ9Ik02LjcxNDQ2NjA5LDYuNzE0NDY2MDkgTDAsMCBMMCwyMCBMMjAsMjAgTDEzLjc4NTUzMzksMTMuNzg1NTMzOSBMMjAuMDQ1OTQxNSw3LjUyNTEyNjI3IEwxMi45NzQ4NzM3LDAuNDU0MDU4NDU0IEw2LjcxNDQ2NjA5LDYuNzE0NDY2MDkgWiIgaWQ9IlRyaWFuZ2xlLTEiIGZpbGw9IiNEODVEM0MiIHNrZXRjaDp0eXBlPSJNU1NoYXBlR3JvdXAiPjwvcGF0aD4KICAgIDwvZz4KPC9zdmc+);
+
+        background-size: 30px 30px;
+        animation: highlightedElementAnimation 2s infinite alternate;
+    }
+}
+
+@keyframes highlightedElementAnimationFrames  {
+    from { right: -20px; top: -20px; }
+    to   { right: -30px; top: -30px; }
+}
+
+
+/*  IMAGE TOUR CAROUSEL */
+.image-tour-container {
+    .carousel {
+        width: 960px;
+        height: 718px;
+        background: $gray30;
+        margin-bottom: 0;
+        .carousel-control {
+            top: 52%;
+            background: none;
+            border: none;
+            color: $brandColor;
+            opacity: 1;
+            left: 45px;
+            font-size: 48px;
+            z-index: 60;
+            polygon {
+                fill: $brandColor;
+            }
+            &:hover polygon{
+                fill: $brandColorL10;
+            }
+            &.disabled {
+                display: none;
+            }
+            &:focus {
+                box-shadow: none;
+            }
+            &.right {
+                right: 45px;
+                left: auto;
+            }
+        }
+        .carousel-indicators {
+            bottom: 18px;
+            top: inherit;
+            right: 50%;
+            transform: translate(50%, 0);
+            z-index: 60;
+            li {
+                height: 6px;
+                width: 6px;
+                cursor: pointer;
+                background: $gray60;
+                border: none;
+                margin-left: 10px;
+                margin-bottom: 0px;
+                &.active {
+                    background-color: $brandColor;
+                }
+                &:first-child {
+                    margin-left: 0;
+                }
+            }
+        }
+        .item {
+            width: 960px;
+            height: 716px;
+            img {
+                width:100%;
+            }
+            &.active img:hover {
+                cursor: pointer;
+            }
+        }
+        .help-link {
+            position: absolute;
+            width: 150px;
+            height: 30px;
+            top: 122px;
+            left: 563px;
+        }
+        a#splunk-answers {
+            top: 160px;
+            left: 504px;
+            width: 140px;
+        }
+    }
+    .tour-links {
+        position: absolute;
+        top: 15px;
+        right: 5px;
+        padding: 5px;
+        text-align: right;
+        z-index: 50;
+        font-size: 12px;
+        a {
+            color: $white;
+            margin-left: 15px;
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+    }
+    .welcome-slide {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 100;
+    }
+    .tour-btn {
+        background: rgba(0,0,0,0.3);
+        position: absolute;
+        top: 300px;
+        left: 50%;
+        padding: 30px 40px;
+        font-size: 30px;
+        color: $white;
+        cursor: pointer;
+        transform: translate(-50%, 0);
+    }
+    .start-tour,
+    .exit-tour {
+        color: $brandColor;
+    }
+    .tour-gutter {
+        background: rgba(0,0,0,0.9);
+        height: 132px;
+        width: 962px;
+        font-size: 16px;
+        color: $white;
+        position: absolute;
+        bottom: 0px;
+        z-index: 50;
+        left: 50%;
+        transform: translate(-50%, 0);
+        div.gutter-text {
+            transform: translate(0, -50%);
+            margin: 0 auto;
+            position: relative;
+            top: 50%;
+            line-height: 150%;
+            width: 720px;
+            text-align: center;
+        }
+        a {
+            color: $white;
+            text-decoration: underline;
+        }
+    }
+    .carousel-assets {
+        position: absolute;
+        height: 132px;
+        width: 960px;
+        bottom: 0;
+    }
+    .next-tour,
+    .try-it-now {
+        display: none;
+    }
+    .try-it-now {
+        position: absolute;
+        right: 30px;
+        z-index: 500;
+        bottom: 50px;
+    }
+}
+@media only screen and (max-height: 750px) {
+    .image-tour-container {
+        .carousel-assets,
+        .tour-gutter {
+            position: fixed;
+        }
+        .carousel-assets {
+            bottom: -132px;
+            z-index: 60;
+            .carousel-control {
+                top: inherit;
+                bottom: 175px;
+            }
+            .carousel-indicators {
+                bottom: 150px;
+            }
+            .tour-links {
+                top: inherit;
+                bottom: 220px;
+            }
+            .try-it-now {
+                top: inherit;
+                bottom: 180px;
+            }
+        }
+    }
+}
+
+/*  IMAGE TOUR MODAL */
+.image-tour .tour-modal {
+    width: 960px;
+    margin-left: -480px;
+    height: 716px;
+    background: $gray30;
+    z-index: calc($zindexPopdown + 2);
+    &.fade.in {
+        top: 15px;
+    }
+}
+.modal-backdrop.tour-backdrop.fade {
+    background: $gray30;
+    z-index: calc($zindexPopdown + 1);
+    &.in {
+        opacity: 1;
+        background: $gray30;
+    }
+}
+.shared-tour-producttours, .shared-tour-imagetour, .shard-interactivetour {
+    &.modal {
+        background-clip: border-box;
+        .modal-header {
+            padding-bottom: $spacingHalf;
+        }
+        .modal-body {
+            padding: 0 $spacingHalf $spacingHalf;
+            border-top: 0;
+            &:last-child {
+                max-height: none;
+            }
+        }
+    }
+}
+
+/*  INTERACTIVE TOUR */
+
+.introjs-overlay {
+    position: absolute;
+    z-index: 999999;
+    background-color: $black;
+    opacity: 0;
+    background: radial-gradient(center,ellipse cover,rgba(0,0,0,0.4) 0,rgba(0,0,0,0.9) 100%);
+}
+.introjs-fixParent {
+    z-index: auto !important;
+    opacity: 1.0 !important;
+    position: absolute !important;
+    transform: none !important;
+    display: block !important;
+}
+.introjs-showElement,
+tr.introjs-showElement > td,
+tr.introjs-showElement > th {
+    z-index: 9999999 !important;
+}
+.introjs-disableInteraction {
+    z-index: 99999999 !important;
+    position: absolute;
+}
+a.introjs-showElement {
+    display: inline-block !important;
+}
+.introjs-relativePosition,
+tr.introjs-showElement > td,
+tr.introjs-showElement > th {
+    position: relative;
+}
+.introjs-helperLayer {
+    position: absolute;
+    z-index: 9999998;
+    background-color: rgba(255,255,255,0.9);
+    border: 1px solid rgba(0,0,0,0.5);
+    border-radius: 4px;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.4);
+}
+.introjs-tooltipReferenceLayer {
+    position: absolute;
+    z-index: 10000000;
+    background-color: transparent;
+}
+.introjs-helperLayer *,
+.introjs-helperLayer *:before,
+.introjs-helperLayer *:after {
+    box-sizing: content-box;
+}
+.introjs-helperNumberLayer {
+    position: absolute;
+    top: -16px;
+    left: -16px;
+    z-index: 9999999999 !important;
+    padding: 2px;
+    font-size: 13px;
+    font-weight: bold;
+    color: white;
+    text-align: center;
+    text-shadow: 1px 1px 1px rgba(0,0,0,0.3);
+    background: linear-gradient(to bottom, $errorColor 0%, $interactiveBackgroundColor 100%);
+    width: 20px;
+    height:20px;
+    line-height: 20px;
+    border: 3px solid white;
+    border-radius: 50%;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+}
+
+$introJSBackground: rgba(60,68,77,0.9);
+
+.introjs-arrow {
+    border: 8px solid $introJSBackground;
+    content:'';
+    position: absolute;
+}
+.introjs-arrow.top {
+    top: -15px;
+    border-top-color:transparent;
+    border-right-color:transparent;
+    border-bottom-color: $introJSBackground;
+    border-left-color:transparent;
+}
+.introjs-arrow.top-right {
+    top: -15px;
+    right: 10px;
+    border-top-color:transparent;
+    border-right-color:transparent;
+    border-bottom-color: $introJSBackground;
+    border-left-color:transparent;
+}
+.introjs-arrow.top-middle {
+    top: -15px;
+    left: 50%;
+    margin-left: -5px;
+    border-top-color:transparent;
+    border-right-color:transparent;
+    border-bottom-color: $introJSBackground;
+    border-left-color:transparent;
+}
+.introjs-arrow.right {
+    right: -15px;
+    top: 15px;
+    border-top-color:transparent;
+    border-right-color:transparent;
+    border-bottom-color:transparent;
+    border-left-color: $introJSBackground;
+}
+.introjs-arrow.right-bottom {
+    bottom:10px;
+    right: -15px;
+    border-top-color:transparent;
+    border-right-color:transparent;
+    border-bottom-color:transparent;
+    border-left-color: $introJSBackground;
+}
+.introjs-arrow.bottom {
+    bottom: -15px;
+    border-top-color: $introJSBackground;
+    border-right-color:transparent;
+    border-bottom-color:transparent;
+    border-left-color:transparent;
+}
+.introjs-arrow.left {
+    left: -15px;
+    top: 10px;
+    border-top-color:transparent;
+    border-right-color: $introJSBackground;
+    border-bottom-color:transparent;
+    border-left-color:transparent;
+}
+.introjs-arrow.left-bottom {
+    left: -15px;
+    bottom:10px;
+    border-top-color:transparent;
+    border-right-color: $introJSBackground;
+    border-bottom-color:transparent;
+    border-left-color:transparent;
+}
+.introjs-tooltip {
+    position: absolute;
+    padding: 40px 60px 10px;
+    text-align: center;
+    color: $white;
+    background-color: $introJSBackground;
+    min-width: 400px;
+    max-width: 500px;
+    border-radius: 0;
+    box-shadow: 0 1px 10px rgba(0,0,0,0.4);
+}
+.introjs-tooltiptext a {
+    color: $white;
+    text-decoration: underline;
+}
+.introjs-tooltipbuttons {
+    text-align: right;
+    white-space: nowrap;
+}
+.introjs-button {
+    overflow: visible;
+    padding: 5px;
+    margin: 0;
+    color: $brandColor;
+    fill: $brandColor;
+    text-decoration: none;
+    font-size: 25px;
+    cursor: pointer;
+    outline: none;
+    position: absolute;
+    top: 50%;
+    transform: translate(0, -45%);
+    &:hover polygon{
+        fill: rgba(118,218,118,1);
+    }
+    &.introjs-disabled {
+        display: none;
+    }
+    &:focus {
+        box-shadow: none;
+        background: none;
+    }
+}
+.introjs-tooltiplinks {
+    position: absolute;
+    top: 10px;
+    right: 5px;
+}
+.introjs-skipbutton,
+.introjs-nexttourbutton {
+    font-size: 12px;
+    color: $white;
+    position: relative;
+    &:hover {
+        color: $white;
+    }
+    &:focus {
+        color: $white;
+    }
+}
+.introjs-skipbutton.done {
+    color: $brandColor;
+}
+.introjs-prevbutton {
+    left: 10px;
+}
+.introjs-nextbutton {
+   right: 10px;
+}
+.introjs-disabled,
+.introjs-disabled:hover,
+.introjs-disabled:focus {
+    color: $gray60;
+    box-shadow: none;
+    cursor: default;
+    background-image: none;
+    text-decoration: none;
+}
+.introjs-bullets {
+    text-align: center;
+    padding-top: 30px;
+}
+.introjs-bullets ul {
+    clear: both;
+    margin: 15px auto 0;
+    padding: 0;
+    display: inline-block;
+    li {
+        list-style: none;
+        float: left;
+        margin: 0 5px;
+        a {
+            display: block;
+            width: 6px;
+            height: 6px;
+            background: $gray80;
+            border-radius: 10px;
+            text-decoration: none;
+            &.active {
+                background: $brandColor;
+            }
+        }
+    }
+}
+.introjs-progress {
+    overflow: hidden;
+    height: 10px;
+    margin: 10px 0 5px 0;
+    border-radius: 4px;
+    background-color: $gray92;
+}
+.introjs-progressbar {
+    float: left;
+    width: 0%;
+    height: 100%;
+    font-size: 10px;
+    line-height: 10px;
+    text-align: center;
+    background-color: $infoColor;
+}
+.introjsFloatingElement {
+    position: absolute;
+    height: 0;
+    width: 0;
+    left: 50%;
+    top: 50%;
+}
+.introjs-tooltiptext {
+    font-size: 16px;
+    line-height: 24px;
+}
+
+/*  tour links in product tours modal */
+$tourModalImageSize: 84px;
+.tours-links {
+    text-align: center;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+
+    li {
+        position: relative;
+        list-style: none;
+        margin-bottom: 20px;
+        display: inline-block;
+        text-align: center;
+    }
+    .mask {
+        position:absolute;
+        top:0;
+        bottom:0;
+        left: 0;
+        right: 0;
+        opacity:0;
+        border-radius: $borderRadius;
+        cursor: pointer;
+        background-color: $brandColor;
+        transition: opacity 0.15s linear;
+        &:hover {
+            opacity:0.1;
+        }
+    }
+    .svg-wrapper {
+        height: $tourModalImageSize;
+        padding: $spacingHalf;
+        box-sizing: border-box;
+        svg {
+            width: $tourModalImageSize;
+            fill: $brandColor;
+        }
+    }
+}
+.tour-link {
+    position: relative;
+    padding: 10px;
+    margin: $spacingHalf;
+    display: inline-block;
+    color: $largeIconLinkColor !important;
+    font-weight: $fontWeightSemiBold;
+    flex: 1 1 0;
+    max-width: 25%;
+    transition: $transitionLargeIcon;
+
+    &:hover {
+        background: $largeIconBackgroundColorHover;
+        text-decoration: none;
+    }
+    &:focus {
+        @mixin focus-element;
+    }
+    i {
+        height: $tourModalImageSize;
+        padding: 32px 40px;
+        box-sizing: border-box;
+        font-size: 76px;
+        line-height: 60px;
+        color: $brandColor;
+    }
+}

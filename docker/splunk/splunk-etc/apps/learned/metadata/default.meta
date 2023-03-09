@@ -1,0 +1,24 @@
+
+### export: eventtypes, savedsearches, transforms and props
+
+[eventtypes]
+access = read : [ * ], write : [ admin, power ]
+export = system
+
+[savedsearches]
+access = read : [ * ], write : [ admin, power ]
+export = system
+
+[transforms]
+access = read : [ * ], write : [ admin, power ]
+export = system
+
+[props]
+access = read : [ * ], write : [ admin, power ]
+export = system
+
+### VIEWSTATES: even normal users should be able to create shared viewstates
+
+[viewstates]
+access = read : [ * ], write : [ * ]
+

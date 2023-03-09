@@ -1,0 +1,5 @@
+<endpoint name="http-eventcollector" template="pages/system.html" showOnSearchHeadCluster="0">
+    <capabilities>
+        <read>edit_token_http</read>
+    </capabilities>
+</endpoint>

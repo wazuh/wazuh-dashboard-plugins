@@ -1,0 +1,20 @@
+.splunk-heatmap rect.bordered {
+  stroke: #E6E6E6;
+  stroke-width:2px;   
+}
+
+.splunk-heatmap text.mono {
+  font-size: 9pt;
+  font-family: "Lucida Grande", "Lucida Sans Unicode", Arial, Helvetica, sans-serif;
+  fill: #555555;
+}
+
+.heatmap.tooltip {
+   color: white;
+   background: black;   
+   height: 60px;
+   width: 175px;
+   padding-top: 10px;
+   text-align: center;
+   border-radius: 2px;
+}

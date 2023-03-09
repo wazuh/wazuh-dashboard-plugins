@@ -1,0 +1,70 @@
+<endpoint name="data/macros" showAppContext="1">
+  <header>Search macros</header>
+  <breadcrumb>
+    <parent hidecurrent="False">advancedsearch</parent>
+    <name>Search macros</name>
+  </breadcrumb>
+  <elements>
+    <element name="extractions" type="fieldset">
+      <view name="list"/>
+      <view name="edit"/>
+      <view name="create"/>
+      <elements>
+
+        <element name="__ns" type="select" label="Destination app">
+          <view name="create"/>
+          <key name="dynamicOptions" type="dict">
+            <key name="keyName">title</key>
+            <key name="keyValue">title</key>
+            <key name="splunkSource">/apps/local</key>
+            <key name="splunkSourceParams" type="dict">
+              <key name="search">'disabled=false'</key>
+              <key name="count">-1</key>
+            </key>
+          </key>
+        </element>
+
+        <element name="name" label="Name">
+          <view name="list"/>
+          <view name="create"/>
+          <key name="helpText">Enter the name of the macro.  If the search macro takes an argument, indicate this by appending the number of arguments to the name.  For example: mymacro(2)</key>
+        </element>
+        <element name="definition" type="textarea" label="Definition">
+          <view name="list"/>
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="helpText">Enter the string the search macro expands to when it is referenced in another search. If arguments are included, enclose them in dollar signs. For example: $arg1$</key>
+        </element>
+        <element name="iseval" type="checkbox" label="Use eval-based definition?">
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="helpText">When selected, the definition is expected to be an eval expression that returns a string representing the macro expansion.</key>
+        </element>
+        <element name="args" type="textfield" label="Arguments">
+          <view name="list"/>
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="helpText">Enter a comma-delimited string of argument names. Argument names may only contain alphanumeric, '_' and '-' characters.</key>
+        </element>
+        <element name="validation" type="textfield" label="Validation Expression">
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="helpText">Enter an eval or boolean expression that runs over macro arguments.</key>
+        </element>
+        <element name="errormsg" type="textfield" label="Validation Error Message">
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="helpText">Enter a message to display when the validation expression returns 'false'.</key>
+        </element>
+        <element name="eai:acl.owner" label="Owner">
+          <view name="list"/>
+          <key name="processValueList">entity['eai:acl']['owner'] == 'nobody' and _('No owner') or entity['eai:acl']['owner']</key>
+        </element>
+        <element name="eai:acl.app" label="App">
+          <view name="list"/>
+          <key name="processValueList">entity['eai:acl']['app'] or ""</key>
+        </element>
+      </elements>
+    </element>
+  </elements>
+</endpoint>

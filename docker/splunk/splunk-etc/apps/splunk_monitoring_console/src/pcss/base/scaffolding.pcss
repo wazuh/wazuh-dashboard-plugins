@@ -1,0 +1,368 @@
+/*===============================================================================================*/
+/*  SPLUNK: SCAFFOLDING                                                                          */
+/*===============================================================================================*/
+
+/*************************************************************************************************/
+/*  DEFAULT & STRUCTURE                                                                          */
+/*************************************************************************************************/
+body {
+    margin: 0;
+    background: $bodyBackgroundColor;
+    color: $textColor;
+    min-width: $bodyMinWidth;
+    font-family: $fontFamily;
+    font-size: $fontSize;
+    font-weight: $fontWeight;
+    line-height: $lineHeight;
+    transition: $transitionMargin;
+
+    &.open {
+        margin-left: $sideNavWidth;
+        margin-right: -$sideNavWidth;
+    }
+}
+
+.shared-page {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+
+/*************************************************************************************************/
+/*  LINKS                                                                                        */
+/*************************************************************************************************/
+a {
+    @mixin link;
+
+    &.external:after {
+        font-family: "Splunk Icons";
+        content: "\EC13";
+        display: inline-block;
+        padding-left: 0.5em;
+    }
+}
+
+
+/*************************************************************************************************/
+/*  IMAGES                                                                                       */
+/*************************************************************************************************/
+/*  Rounded corners */
+.img-rounded {
+    border-radius: $borderRadius;
+}
+
+/*  Add polaroid-esque trim */
+.img-polaroid {
+    padding: 4px;
+    background-color: $white;
+    border: $borderDefault;
+    border: 1px solid rgba(0,0,0,.2);
+    box-shadow: 0 1px 3px rgba(0,0,0,.1);
+}
+
+/*  Perfect circle */
+.img-circle {
+    border-radius: 500px; /*  crank the border-radius so it works with most reasonably sized images */
+}
+
+
+/*************************************************************************************************/
+/*  SECTIONS                                                                                     */
+/*************************************************************************************************/
+/* add padding to a section
+    <div class="section-padded">
+        padded content
+    </div>
+*/
+.section-padded {
+    padding: $spacing;
+}
+
+/*  section-header extends section-padded */
+.section-header {
+    position: relative;
+
+    .section-title {
+        margin-top: 0;
+        font-size: $fontSizeXXLarge;
+        font-weight: $fontWeightSemiBold;
+        line-height: $lineHeightLarge;
+    }
+    &.page-heading {
+        padding: $spacing $spacing $spacingHalf $spacing;
+    }
+}
+
+
+/*  default container */
+.main-section-body {
+    color: $textColor;
+    display: flex;
+    flex-grow: 1;
+    flex-direction: column;
+
+    > :first-child {
+        flex-grow: 1;
+    }
+
+    /*  using three color so we can set color stop even though its only 2 colors */
+    h2 i[class^="icon-"],
+    h2 i[class*=" icon-"]  {
+        color: $textGray;
+    }
+    .divider {
+        border-top: $borderDefault;
+        margin: 0;
+    }
+
+    /*  huh? */
+    > .pull-right {
+        margin-right: $spacing;
+    }
+    .loading-message {
+        padding-top: 100px;
+        min-height: 400px;
+        text-align: center;
+    }
+    .main-section {
+        padding: 0 $spacing;
+    }
+    .card {
+        @mixin create-card;
+    }
+}
+
+
+/*************************************************************************************************/
+/*  UTILITY CLASSES                                                                              */
+/*************************************************************************************************/
+/* for full width unpadded content
+    TODO: this should probably also remove width and margin: auto
+    <div class="container container-full-width">
+        content here ...
+    </div>
+*/
+.container-full-width {
+    padding: 0;
+}
+
+/* force full width even in padded container
+    <div class="container section-padded">
+        padded content here ...
+        <div class="push-margins">
+            expanded content here ...
+        </div>
+    </div>
+*/
+.push-margins {
+    margin-left: -$spacing;
+    margin-right: -$spacing;
+}
+
+/* new image replacement
+    <span class="hide-text">hidden</span>
+*/
+.hide-text {
+    text-indent: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+
+/*************************************************************************************************/
+/*  PANELS                                                                                       */
+/*************************************************************************************************/
+/* panels for dashboards?
+    <div class="panel">
+        panel content ...
+    </div>
+    <div class="panel">
+        panel content ...
+    </div>
+    <div class="panel">
+        panel content ...
+    </div>
+*/
+.panel {
+    position: relative;
+    border: $borderDefault;
+    background-color: $white;
+    padding: $spacing;
+    margin-right: $spacing;
+    border-radius: $containerBorderRadius;
+
+    &:last-child {
+        margin-right: 0;
+    }
+}
+
+/* panel rows?
+    <div class="panel-row">
+        <div class="panel">
+            panel content ...
+        </div>
+        <div class="panel">
+            panel content ...
+        </div>
+    </div>
+    <div class="panel-row">
+        <div class="panel">
+            panel content ...
+        </div>
+        <div class="panel">
+            panel content ...
+        </div>
+    </div>
+*/
+.panel-row {
+    padding: 0 $spacing;
+    margin-bottom: $spacing;
+}
+
+
+/*************************************************************************************************/
+/*  SIMPLE LAYOUT COLUMNS                                                                        */
+/*************************************************************************************************/
+.section-content {
+    background-color: $white;
+    min-height: 400px;
+    border-top: $borderDefault;
+}
+.column {
+    position: relative;
+    padding: $spacing;
+    margin-right: $spacing;
+}
+
+
+/*************************************************************************************************/
+/*  508 ACCESSIBILITY                                                                            */
+/*************************************************************************************************/
+.navSkip {
+    position: absolute;
+    margin: 1px 0px 0px 10px;
+    top: 0;
+    left: -1000px;
+    width: 150px;
+    height: 32px;
+    text-align: center;
+    line-height: 32px;
+    background-color: $navbarBackground;
+    color: $gray80;
+    z-index: calc($zindexFixedNavbar + 10);
+    &:focus {
+        left: 0px;
+    }
+}
+
+
+/*************************************************************************************************/
+/*  PAYWALL                                                                                      */
+/*************************************************************************************************/
+.shared-paywall {
+    padding-top: 30px;
+}
+
+
+/*************************************************************************************************/
+/*  DEFINITION LISTS                                                                             */
+/*************************************************************************************************/
+.list-dotted {
+    line-height: $lineHeight;
+    margin-top: 0;
+
+    dt {
+        float: left;
+        width: 120px;
+        overflow: hidden;
+        white-space: nowrap;
+        margin-right: 5px;
+        font-weight: normal;
+        line-height: $lineHeight;
+        /*  SPL-69719 - fix IE10 when in dropdown */
+        word-wrap: normal;
+
+        &:after {
+            content: " ............................................";
+        }
+    }
+    dd {
+        line-height: $lineHeight;
+        margin-left: 125px;
+    }
+}
+
+
+/*************************************************************************************************/
+/*  PAGE LOAD PLACEHOLDER                                                                        */
+/*************************************************************************************************/
+#placeholder-splunk-bar {
+    padding: 0 ;
+    background-color: $navbarBackground;
+    text-rendering: geometricPrecision;
+
+    .brand, .brand:hover {
+        font-family: "Splunk Icons";
+        font-weight: normal;
+        color: $white;
+        padding: 0 $spacing;
+        height: $navbarHeight;
+        font-size: $fontSizeXLarge;
+        line-height: $navbarHeight;
+        text-shadow: none;
+        text-decoration: none;
+        text-rendering: geometricPrecision;
+        margin-left: 0;
+    }
+    .brand strong {
+        color: $gray60;
+        font-weight: normal;
+        /*  reg symbol */
+        &:after {
+            content: '\00AE';
+            color: $gray60;
+            font-weight: normal;
+        }
+    }
+}
+#placeholder-app-bar {
+    color: $white;
+    background-color: $appBarBackground;
+    height: $appBarHeight;
+}
+#placeholder-main-section-body {
+    color: $textColor;
+    padding-top: 100px;
+    min-height: 400px;
+    text-align: center;
+}
+
+
+/*************************************************************************************************/
+/*  LITE UI                                                                                      */
+/*************************************************************************************************/
+@if $theme == lite {
+    #placeholder-app-bar {
+        height: $litebarHeight;
+        background: $gray20;
+    }
+}
+
+
+/*************************************************************************************************/
+/*  PRINT                                                                                        */
+/*************************************************************************************************/
+@media print {
+    body,
+    .main-section-body {
+        @mixin print-no-background;
+    }
+    @page {
+        margin: 1.27cm;
+    }
+
+    .navSkip {
+        @mixin print-hide;
+    }
+}

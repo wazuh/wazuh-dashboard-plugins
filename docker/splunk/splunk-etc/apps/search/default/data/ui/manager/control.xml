@@ -1,0 +1,13 @@
+<endpoint name="control" showOnSearchHeadCluster="0">
+  <header>Splunk controls</header>
+  <capabilities>
+    <read>restart_splunkd AND edit_server</read>
+  </capabilities>
+  <menu name="system_configurations">
+    <label>Server controls</label>
+    <url>/manager/%(namespace)s/control</url>
+    <description>Restart Splunk.</description>
+    <order>20</order>
+    <id>server-controls</id>
+  </menu>
+</endpoint>

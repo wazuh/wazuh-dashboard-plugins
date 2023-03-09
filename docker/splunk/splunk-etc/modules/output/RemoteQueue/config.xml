@@ -1,0 +1,79 @@
+<!--   Version 4.0 -->
+
+<!-- Copy this file to config.xml to enable the module. -->
+
+<!-- This configuration file is used for putting parsed PData from the splunk
+     server into the remote queue. Used only if smartbus is enabled. -->
+<module>
+	<pipeline name="remotequeuetyping" type="startup">
+		<processor name="readerIn" plugin="queueinputprocessor">
+				<config>
+					<queueName>typingQueue</queueName>
+				</config>
+		</processor>
+
+		<processor name="regexreplacement" plugin="regexextractionprocessor">
+			<config></config>
+		</processor>
+
+		<processor name="metricschema" plugin="metricschemaprocessor">
+			<config></config>
+		</processor>
+
+		<processor name="annotator" plugin="annotatorprocessor">
+			<config></config>
+		</processor>
+
+		<processor name="previewOut" plugin="previewoutputprocessor">
+			<config></config>
+		</processor>
+
+		<processor name="sendOut" plugin="queueoutputprocessor">
+			<config>
+				<queueName>remoteOutputQueue</queueName>
+			</config>
+		</processor>
+	</pipeline>
+
+	<pipeline name="remotequeueruleset" type="startup">
+		<processor name="readerIn" plugin="queueinputprocessor">
+			<config>
+				<queueName>rulesetQueue</queueName>
+			</config>
+		</processor>
+
+		<processor name="regexreplacement" plugin="regexextractionprocessor">
+			<config>
+				<rulesetOnly>true</rulesetOnly>
+			</config>
+		</processor>
+
+		<processor name="sendOut" plugin="queueoutputprocessor">
+			<config>
+				<queueName>remoteOutputQueue</queueName>
+			</config>
+		</processor>
+	</pipeline>
+
+	<pipeline name="remotequeueoutput" type="startup">
+		<processor name="readerIn" plugin="queueinputprocessor">
+				<config>
+					<queueName>remoteOutputQueue</queueName>
+				</config>
+		</processor>
+
+		<processor name="destination-key-processor" plugin="destinationkeyprocessor">
+				<config></config>
+		</processor>
+
+		<processor name="remotequeueoutput" plugin="remotequeueoutputprocessor">
+			<config></config>
+		</processor>
+
+		<processor name="sendOut" plugin="queueoutputprocessor">
+			<config>
+				<queueName>indexQueue</queueName>
+			</config>
+		</processor>
+	</pipeline>
+</module>

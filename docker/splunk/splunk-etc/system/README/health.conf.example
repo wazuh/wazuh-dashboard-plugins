@@ -1,0 +1,151 @@
+#   Version 9.0.3
+#
+# This file contains an example health.conf.  Use this file to configure thresholds
+# for Splunk Enterprise's built in Health Report.
+#
+# To use one or more of these configurations, copy the configuration block
+# into health.conf in $SPLUNK_HOME/etc/system/local/. You must restart
+# Splunk to enable configurations.
+
+[health_reporter]
+# Every 30 seconds a new ‘PeriodicHealthReporter=INFO’ log entry will be created.
+full_health_log_interval = 30
+# If an indicator’s health status changes before 600 milliseconds elapses,
+# the status change will be suppressed.
+suppress_status_update_ms = 600
+# Alerting for all features is enabled.
+# You can disable alerting for each feature by setting 'alert.disabled' to 1.
+alert.disabled = 0
+
+# If you don't want to send alerts too frequently, you can define a minimum
+# time period that must elapse before another alert is fired. Alerts triggered
+# during the suppression period are sent after the period expires as a batch.
+# The suppress_period value can be in seconds, minutes, hours, and days, and
+# uses the format: 60s, 60m, 60h and 60d.
+# Default is 10 minutes.
+alert.suppress_period = 30m
+
+
+[alert_action:email]
+# Enable email alerts for the health report.
+# Before you can send an email alert, you must configure the email notification
+# settings on the email settings page.
+# In the 'Search and Reporting' app home page, click Settings > Server settings
+# > Email settings, and specify values for the settings.
+# After you configure email settings, click Settings > Alert actions.
+# Make sure that the 'Send email' option is enabled.
+disabled = 0
+
+# Define recipients when an email alert is triggered.
+# You can define 'to', 'cc', and 'bcc' recipients.
+# For multiple recipients in a list, separate email addresses with commas.
+# If there is no recipient for a certain recipient type (e.g. bcc), leave the value blank.
+action.to = admin_1@testcorp.example, admin_2@testcorp.example
+action.cc = admin_3@testcorp.example, admin_4@testcorp.example
+action.bcc =
+
+[alert_action:pagerduty]
+# Enable Pager Duty alerts for the health report.
+# Before you can send an alert to PagerDuty, you must configure some settings
+# on both the PagerDuty side and the Splunk Enterprise side.
+# In PagerDuty, you must add a service to save your new integration.
+# From the Integrations tab of the created service, copy the Integration Key
+# string to the 'action.integration_url_override' below.
+# On the Splunk side, you must install the PagerDuty Incidents app from
+# Splunkbase.
+# After you install the app, in Splunk Web, click Settings > Alert actions.
+# Make sure that the PagerDuty app is enabled.
+disabled = 0
+action.integration_url_override = 123456789012345678901234567890ab
+
+[alert_action:mobile]
+# Enable Splunk Mobile alerts for the health report.
+# You need to configure the 'alert_recipients' under this stanza in order to
+# send health report alerts to the Splunk Mobile app on your phone.
+#
+# Steps to setup the health report mobile alert:
+# * Download the Splunk Mobile App on your phone and open the app.
+# * Download the Cloud Gateway App from Splunkbase to your splunk instance.
+# * In Splunk Web, click Settings > Alert actions and make sure the Cloud
+#   Gateway App is enabled.
+# * In Splunk Web, click Cloud Gateway App > Configure and enable Splunk
+#   Mobile.
+# * In Splunk Web, click Cloud Gateway App > Register and copy the activation
+#   code displayed in the Splunk Mobile App to register your device(phone).
+# * In health.conf configure 'alert_recipients' under the [alert_action:mobile]
+#   stanza, e.g. action.alert_recipients = admin
+#
+# Details of how to install and use the Cloud Gateway App please refer to
+# https://docs.splunk.com/Documentation/Gateway
+disabled = 0
+action.alert_recipients = admin
+
+[alert_action:victorops]
+# Enable VictorOps alerts for the health report.
+# Before you can send an alert to VictorOps, you must configure some settings
+# on both the VictorOps side and the Splunk Enterprise side.
+# In VictorOps, you must create an API key and can optionally create a routing key.
+# On the Splunk side, you must install the VictorOps App from Splunkbase.
+# After you install the app, in Splunk Web, click Settings > Alert actions.
+# Make sure that the VictorOps app is enabled and the API key is properly configured.
+disabled = 0
+# alert message type in VictorOps.
+# Valid alert message types in VictorOps:
+#  * CRITICAL - Triggers an incident.
+#  * WARNING - May trigger an incident, depending on your settings in VictorOps.
+#  * ACKNOWLEDGEMENT - Acknowledges an incident. This value is unlikely to be useful.
+#  * INFO - Creates a timeline event, but does not trigger an incident.
+#  * RECOVERY - Resolves an incident. This value is unlikely to be useful.
+action.message_type = CRITICAL
+# ID of the incident in VictorOps.
+* Optional.
+action.entity_id =
+# Use this field to choose one of the API keys configured in passwords.conf
+# under victorops_app.
+# Leave this field empty if you want to use the default API key.
+* Optional.
+action.record_id =
+# Use this field to overwrite the default routing key.
+* Optional.
+action.routing_key_override =
+
+[clustering]
+# Clustering health report will run in every 20 seconds.
+health_report_period = 20
+# Enable the clustering feature health check.
+disabled = 0
+
+[feature:s2s_autolb]
+# If more than 20% of forwarding destinations have failed, health status changes to yellow.
+indicator:s2s_connections:yellow = 20
+# If more than 70% of forwarding destinations have failed, health status changes to red.
+indicator:s2s_connections:red = 70
+# Alerting for all indicators is disabled.
+alert.disabled = 1
+
+[feature:batchreader]
+# Enable alerts for feature:batchreader. If there is no 'alert.disabled' value
+# specified in a feature stanza, then the alert is enabled for the feature by
+# default.
+# You can also enable/disable alerts at the indicator level, using the setting:
+# 'alert:<indicator name>.disabled'.
+alert.disabled = 0
+
+# You can define which color triggers an alert.
+# If the value is yellow, both yellow and red trigger an alert.
+# If the value is red, only red triggers an alert.
+# Default value is red.
+# You can also define the threshold_color for each indicator using the setting:
+# 'alert:<indicator name>.threshold_color'.
+# Indicator level setting overrides the feature level threshold_color setting.
+alert.threshold_color = red
+
+# You can define the duration that an unhealthy status persists before the alert fires.
+# Default value is 60 seconds.
+# You can also define the min_duration_sec for each indicator using the setting:
+# 'alert:<indicator name>.min_duration_sec'.
+# Indicator level setting overrides feature level min_duration_sec setting.
+alert.min_duration_sec = 30
+
+# Suppresses color changes for this feature until March 25, 2021 8:00:00 PM GMT.
+snooze_end_time = 1616702400

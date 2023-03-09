@@ -1,0 +1,15 @@
+<!--   Version 4.0 -->
+<module>
+		<pipeline name="fifo" type="startup">
+			<processor name="fifo" plugin="fifoinputprocessor">
+					<config>
+					</config>
+				</processor>
+
+			<processor name="sendOut" plugin="queueoutputprocessor">
+			<config>
+				<queueName>parsingQueue</queueName>
+			</config>
+			</processor>
+		</pipeline>
+</module>

@@ -1,0 +1,26 @@
+<endpoint name="messages" showAppContext="0">
+  <header>Bulletin Messages</header>
+  <breadcrumb>
+    <parent hidecurrent="False">ui</parent>
+    <name>Bulletin Messages</name>
+  </breadcrumb>
+
+  <elements>
+
+    <element name="saveview" type="fieldset">
+      <view name="list"/>
+        <elements>
+         <element name="name" type="textfield" label="Name">
+            <view name="list"/>
+         </element>
+         <element name="message" type="textfield" label="Message">
+            <view name="list"/>
+         </element>
+         <element name="value" type="textfield" label="Message">
+         </element>
+        </elements>
+    </element>
+
+ </elements>
+
+</endpoint>

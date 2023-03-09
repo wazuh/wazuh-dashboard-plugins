@@ -1,0 +1,65 @@
+{
+  "schemaVersion": "2.0.0",
+  "info": {
+    "id": {
+      "group": null,
+      "name": "splunk_secure_gateway",
+      "version": "3.0.14"
+    },
+    "title": "Splunk Secure Gateway",
+    "author": [
+      {
+        "name": "Splunk Inc.",
+        "email": null,
+        "company": null
+      }
+    ],
+    "releaseDate": null,
+    "description": "Splunk Secure Gateway",
+    "classification": null,
+    "commonInformationModels": null,
+    "license": {
+      "name": null,
+      "text": "LICENSE.TXT",
+      "uri": null
+    },
+    "privacyPolicy": {
+      "name": null,
+      "text": null,
+      "uri": null
+    },
+    "releaseNotes": {
+      "name": null,
+      "text": null,
+      "uri": null
+    }
+  },
+  "tasks": [
+    "secure_gateway_modular_input://default",
+    "ssg_alerts_ttl_modular_input://default",
+    "ssg_subscription_modular_input://default",
+    "ssg_subscription_clean_up_modular_input://default",
+    "ssg_metrics_modular_input://default",
+    "ssg_device_role_modular_input://default",
+    "ssg_registered_users_list_modular_input://default",
+    "ssg_delete_tokens_modular_input://default",
+    "ssg_registered_devices_modular_input://default",
+    "ssg_enable_modular_input://default",
+    "secure_gateway_modular_input",
+    "ssg_alerts_ttl_modular_input",
+    "ssg_subscription_modular_input",
+    "ssg_subscription_clean_up_modular_input",
+    "ssg_metrics_modular_input",
+    "ssg_device_role_modular_input",
+    "ssg_registered_users_list_modular_input",
+    "ssg_delete_tokens_modular_input",
+    "ssg_registered_devices_modular_input",
+    "ssg_enable_modular_input"
+  ],
+  "dependencies": null,
+  "inputGroups": null,
+  "incompatibleApps": null,
+  "platformRequirements": null,
+  "supportedDeployments": ["*"],
+  "targetWorkloads": ["_search_heads"]
+}

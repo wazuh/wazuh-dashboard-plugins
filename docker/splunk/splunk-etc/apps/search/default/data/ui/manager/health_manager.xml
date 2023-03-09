@@ -1,0 +1,12 @@
+<endpoint name="health/manager" template="pages/system.html">
+    <capabilities>
+        <read>(edit_health OR edit_health_subset) AND (list_health OR list_health_subset)</read>
+    </capabilities>
+    <menu name="system_configurations">
+        <label>Health report manager</label>
+        <url>/manager/system/health/manager</url>
+        <description>Configure Health Report.</description>
+        <order>20</order>
+        <id>health-manager</id>
+    </menu>
+</endpoint>

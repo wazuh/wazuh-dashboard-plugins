@@ -1,0 +1,47 @@
+<!--   Version 4.2 -->
+<!-- 
+    Defines a pipeline responsible for doing minimal parsing of summary index .stash 
+    files. In 4.2 the format of the files changed, in order to support forwarding of 
+    these events to pre 4.2 instances we need to do some parsing, even in LWF mode.
+  -->
+<module>
+	<pipeline name="stashparsing" type="startup">
+
+		<processor name="readerIn" plugin="queueinputprocessor">
+			   <config>
+		 		<queueName>stashparsing</queueName>
+		 	   </config>
+		</processor>
+
+		<processor name="utf8" plugin="utf8processor">
+			<config></config>
+		</processor>
+
+		<processor name="linebreaker" plugin="linebreakingprocessor">
+			<config></config>
+		</processor>
+
+		<processor name="header" plugin="headerprocessor">
+			<config></config>
+		</processor>
+          
+                <!-- stash_new doesn't need aggregation, but aggregatorprocessor does timestamping 
+                     so we need to aggregate before changing the sourcetype -->
+                <processor name="aggregator" plugin="aggregatorprocessor">
+                        <config> </config>
+                </processor>
+ 
+                <!-- we need this here to rename the sourcetype to stash -->
+                <processor name="regexreplacement" plugin="regexextractionprocessor">
+                        <config></config>
+                </processor>
+
+
+		<processor name="sendOut" plugin="queueoutputprocessor">
+			<config>
+				<queueName>indexQueue</queueName>
+			</config>
+		</processor>
+
+	</pipeline>
+</module>

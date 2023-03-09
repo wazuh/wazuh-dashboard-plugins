@@ -1,0 +1,25 @@
+{
+  "__class__": "rapid_diag.task.Task",
+  "collectors": [
+    {
+      "__class__": "rapid_diag.collector.netstat.NetStat"
+    },
+    {
+      "__class__": "rapid_diag.collector.network_packet.NetworkPacket", 
+      "collection_time": 600,
+      "ip_address": null,
+      "port": null,
+      "action_needed": "Please set ip_address and port as appropriate when only interested in a specific IP and/or port"
+    },
+    {
+      "__class__": "rapid_diag.collector.diag.Diag"
+    }
+  ],
+  "name": "Search head connectivity",
+  "collector_tool_names": "netstat, splunkdiag, tcpdump",
+  "description": "For investigating search head network connectivity issues. The collector monitors and logs the current network connections on the host it is running on. Network traffic is also collected. Run the template on all search head cluster members experiencing network connectivity issues.",
+  "host": "",
+  "task_id": "search-head-connectivity",
+  "features" : [ "searchheadconnectivity" ],
+  "symptoms" : [ "networking", "cluster-issues" ]
+}

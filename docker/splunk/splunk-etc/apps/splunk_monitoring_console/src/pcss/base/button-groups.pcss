@@ -1,0 +1,349 @@
+/*===============================================================================================*/
+/*  SPLUNK: BUTTON GROUPS                                                                        */
+/*  BTN-GROUP handles rounding & spacing on btns & btn-combo.                                    */
+/*  BTN-COMBO handles rounding on dropdowns & splits only, behaves like group but without        */
+/*      grouping or spacing.                                                                     */
+/*===============================================================================================*/
+/* button combos, grouping and toolbar
+    <div class="btn-toolbar">
+        <div class="btn-group">
+            <button class="btn">1</button> <button class="btn">2</button> <button class="btn">3</button>
+            <div class="btn-combo">
+                <button class="btn">Action</button>
+                <button class="btn dropdown-toggle" data-toggle="dropdown">
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a href="#">item 1</a>
+                    </li>
+                    <li>
+                        <a href="#">item 2</a>
+                    </li>
+                    <li>
+                        <a href="#">item 3</a>
+                    </li>
+                </ul>
+            </div><!-- /.btn-combo -->
+        </div><!-- /.btn-group -->
+    </div><!-- /.btn-toolbar -->
+*/
+
+/*  Make the div behave like a button */
+.btn-group,
+.btn-combo {
+    position: relative;
+    display: inline-block;
+    font-size: 0; /*  remove as part 1 of font-size inline-block hack */
+    white-space: nowrap; /*  prevent buttons from wrapping when in tight spaces (e.g., the table on the tests page) */
+    vertical-align: middle; /*  match .btn alignment given font-size hack above */
+}
+
+/*  Space out series of button groups */
+.btn-group + .btn-group,
+.btn-combo + .btn-combo  {
+    margin-left: $spacingHalf;
+}
+
+.btn-group {
+    /*  Float them, remove border radius, then re-add to first and last elements */
+    > .btn,
+    > .btn-combo > .btn {
+        position: relative;
+        border-radius: 0;
+    }
+
+    /*  reset margin when in a group */
+    > .btn + .btn,
+    > .btn + .btn-combo,
+    > .btn-combo + .btn-combo,
+    > .btn-combo + .btn {
+        margin-left: -1px;
+    }
+
+    /*  Redeclare as part 2 of font-size inline-block hack */
+    > .btn,
+    > .btn-large,
+    > .btn-small,
+    > .dropdown-menu,
+    > .popover,
+    .btn-pill,
+    .popdown-dialog,
+    .dropdown-toggle,
+    ul {
+        font-size: $fontSize;
+    }
+    > .btn-mini {
+        font-size: $fontSizeSmall; /*  Reset font for mini size */
+    }
+
+    /*  Set corners individual because sometimes a single button can be in a .btn-group and we need :first-child and :last-child to both match */
+    > .btn:first-child,
+    > .btn-combo:first-child > .btn:first-child ,
+    > .btn-combo:first-child > .drodown-toggle ,
+    > .btn-combo:first-child > .btn:first-child {
+        margin-left: 0;
+        border-top-left-radius: $interactiveBorderRadius;
+        border-bottom-left-radius: $interactiveBorderRadius;
+    }
+
+    /*  Need .dropdown-toggle since :last-child doesn't apply given a .dropdown-menu immediately after it */
+    > .btn:last-child,
+    > .dropdown-toggle,
+    > .btn-combo:last-child > .btn:last-child,
+    > .btn-combo:last-child > .dropdown-toggle {
+        border-top-right-radius: $interactiveBorderRadius;
+        border-bottom-right-radius: $interactiveBorderRadius;
+    }
+
+    /*  Reset corners for large buttons */
+    > .btn.large:first-child,
+    > .btn-combo:first-child > .btn.large:first-child {
+        margin-left: 0;
+        border-top-left-radius: $borderRadiusLarge;
+        border-bottom-left-radius: $borderRadiusLarge;
+    }
+    > .btn.large:last-child,
+    > .large.dropdown-toggle,
+    > .btn-combo:last-child > .btn.large:last-child,
+    > .btn-combo:last-child > .large.dropdown-toggle {
+        border-top-right-radius: $borderRadiusLarge;
+        border-bottom-right-radius: $borderRadiusLarge;
+    }
+
+    /*  On hover/active, bring the proper btn to front */
+    > .btn:hover,
+    > .btn:active,
+    > .btn.active,
+    > .btn-combo > .btn:hover,
+    > .btn-combo > .btn:active,
+    > .btn-combo > .btn.active {
+        z-index: 2;
+    }
+
+    /*  On focus, bring the btn to front */
+    > .btn:focus,
+    > .btn-combo > .btn:focus {
+        z-index: $zindexFocus;
+    }
+
+    /*  On active and open, don't show outline */
+    .dropdown-toggle:active,
+    &.open .dropdown-toggle {
+        outline: 0;
+    }
+}
+
+
+/*************************************************************************************************/
+/*  BUTTON COMBO                                                                                 */
+/*************************************************************************************************/
+.btn-combo {
+    /*  special case for btn-combo */
+    > .btn:first-child {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+    > .btn:last-child,
+    > .dropdown-toggle {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+    }
+
+    /*  reset margin when in a group */
+    > .btn + .btn {
+        margin-left: -1px;
+    }
+
+    /*  Redeclare as part 2 of font-size inline-block hack */
+    > .btn,
+    > .btn-large,
+    > .btn-small,
+    > .dropdown-menu,
+    .btn-pill,
+    .popdown-dialog,
+    .dropdown-toggle,
+    ul {
+        font-size: $fontSize;
+    }
+    > .btn-mini {
+        font-size: $fontSizeSmall; /*  Reset font for mini size */
+    }
+
+    /*  Set corners individual because sometimes a single button can be in a .btn-group and we need :first-child and :last-child to both match */
+    &:first-child > .btn:first-child {
+        margin-left: 0;
+        border-top-left-radius: $interactiveBorderRadius;
+        border-bottom-left-radius: $interactiveBorderRadius;
+    }
+
+    /*  Need .dropdown-toggle since :last-child doesn't apply given a .dropdown-menu immediately after it */
+    > .dropdown-toggle {
+        border-top-right-radius: $interactiveBorderRadius;
+        border-bottom-right-radius: $interactiveBorderRadius;
+    }
+}
+
+
+/*************************************************************************************************/
+/*  BUTTON TOOLBAR                                                                               */
+/*  Optional: Group multiple button groups together for a toolbar.                               */
+/*************************************************************************************************/
+.btn-toolbar {
+    font-size: 0; /*  Hack to remove whitespace that results from using inline-block */
+    margin-top: calc($lineHeight / 2);
+    margin-bottom: calc($lineHeight / 2);
+
+    .btn-combo {
+        display: inline-block; /*  display inline for toolbar */
+    }
+    > .btn + .btn,
+    > .btn-group + .btn,
+    > .btn + .btn-group,
+    > .btn-combo + .btn,
+    > .btn + .btn-combo {
+        margin-left: $spacingQuarter;
+    }
+}
+
+
+/*************************************************************************************************/
+/*  SPLIT BUTTON DROPDOWNS                                                                       */
+/*************************************************************************************************/
+/*  Give the line between buttons some depth */
+.btn-group > .btn-combo > .btn + .dropdown-toggle,
+.btn-combo > .btn + .dropdown-toggle {
+    padding-left: 8px;
+    padding-right: 8px;
+    box-shadow: inset 1px 0 0 rgba(255,255,255,.125), inset 0 1px 0 rgba(255,255,255,.2), 0 1px 2px rgba(0,0,0,.05);
+}
+.btn-group {
+    > .btn-mini + .dropdown-toggle,
+    > .btn-combo > .btn-mini + .dropdown-toggle  {
+        padding-left: $spacingQuarter;
+        padding-right: $spacingQuarter;
+    }
+    > .btn-large + .dropdown-toggle,
+    > .btn-combo > .btn-large + .dropdown-toggle {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+    &.open {
+        /*  The clickable button for toggling the menu */
+        /*  Remove the gradient and set the same inset shadow as the :active state */
+        .dropdown-toggle {
+            background-image: none;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,.15), 0 1px 2px rgba(0,0,0,.05);
+        }
+
+        /*  Keep the hover's background when dropdown is open */
+        .btn.dropdown-toggle {
+            background-color: $interactiveBackgroundColorHover;
+        }
+        .btn-primary.dropdown-toggle {
+            background-color: $primaryBackgroundColorHover;
+        }
+        .btn-danger.dropdown-toggle {
+            background-color: $interactiveErrorBackgroundColorHover;
+        }
+        .btn-success.dropdown-toggle {
+            background-color: $primaryBackgroundColorHover;
+        }
+    }
+
+    /* Prevent Tooltip from spacing two buttons */
+    > .btn + div.tooltip + .btn {
+        margin-left: -1px;
+    }
+}
+
+
+/*************************************************************************************************/
+/*  VERTICAL BUTTON GROUPS                                                                       */
+/*************************************************************************************************/
+.btn-group-vertical {
+    display: inline-block; /*  makes buttons only take up the width they need */
+
+    > .btn {
+        display: block;
+        float: none;
+        max-width: 100%;
+        border-radius: 0;
+
+        + .btn {
+            margin-left: 0;
+            margin-top: -1px;
+        }
+    }
+    &:first-child {
+        border-radius: $borderRadius $borderRadius 0 0;
+    }
+    &:last-child {
+        border-radius: 0 0 $borderRadius $borderRadius;
+    }
+    > .btn-large:first-child {
+        border-radius: $borderRadiusLarge $borderRadiusLarge 0 0;
+    }
+    > .btn-large:last-child {
+        border-radius: 0 0 $borderRadiusLarge $borderRadiusLarge;
+    }
+}
+
+/*************************************************************************************************/
+/*  RADIO BUTTON GROUP                                                                           */
+/*************************************************************************************************/
+.btn-group-radio {
+    > .btn {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        border-color: $borderColor;
+        &:hover {
+            background-color: $interactiveBackgroundColorHover;
+            box-shadow: $interactiveBoxShadowHover;
+        }
+        &.active {
+            cursor: default;
+            background-color: $interactiveBackgroundColorActive;
+            box-shadow: $interactiveBoxShadowActive;
+            border-color: $buttonBorderColorActive;
+        }
+        &.active:focus {
+            cursor: default;
+            @mixin focus-element;
+        }
+        &.active[disabled] {
+            cursor: not-allowed;
+            background-color: $interactiveBackgroundColorActive;
+            box-shadow: $interactiveBoxShadowActive;
+            border-color: $buttonBorderColorActiveDisabled;
+        }
+        &:disabled {
+            box-shadow: none;
+            border-color: $buttonBorderColorDisabled;
+            background-color: $interactiveBackgroundColorDisabled;
+        }
+    }
+}
+
+/*  For synthetic radio with the "locale-responsive-layout" class, align the items vertically to accommodate long words (SPL-83062). */
+$(wideTextLocaleSelector) {
+    .btn-group-radio.locale-responsive-layout {
+        display: block;
+
+        .btn {
+            border-radius: 0;
+            display: block;
+            width: 100%;
+            margin-left: 0;
+            border-bottom-width: 0;
+
+            &:first-child {
+                border-radius: $interactiveBorderRadius $interactiveBorderRadius 0 0;
+            }
+            &:last-child {
+                border-radius: 0 0 $interactiveBorderRadius $interactiveBorderRadius;
+                border-bottom-width: 1px;
+            }
+        }
+    }
+}

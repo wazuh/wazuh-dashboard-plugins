@@ -1,0 +1,8 @@
+<div class="results-reason">
+	<% if(isDone) { %>
+		<span class="status-icon <%= iconClassName %> health-tooltip-link" rel="tooltip" data-title="<%= tooltip %>" style="display: inline;"></span>
+		<div class="reason-text"><%- messageText %></div>
+	<% } else { %>
+		<span class="status-icon pull-right <%= iconClassName %>" style="display: inline;"></span>
+	<% } %>
+</div>

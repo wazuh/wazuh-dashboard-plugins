@@ -1,0 +1,40 @@
+<endpoint name="data/props/sourcetype-rename" showAppContext="1">
+  <header>Sourcetype renaming</header>
+  <breadcrumb>
+    <parent hidecurrent="False">fields</parent>
+    <name>Sourcetype renaming</name>
+  </breadcrumb>
+  <elements>
+
+    <element name="__ns" type="select" label="Destination app">
+      <view name="create"/>
+      <key name="dynamicOptions" type="dict">
+        <key name="keyName">title</key>
+        <key name="keyValue">title</key>
+        <key name="splunkSource">/apps/local</key>
+        <key name="splunkSourceParams" type="dict">
+          <key name="search">'disabled=false'</key>
+          <key name="count">-1</key>
+        </key>
+      </key>
+    </element>
+
+    <element name="name" label="Original sourcetype name">
+      <view name="create"/>
+      <view name="list"/>
+    </element>
+    <element name="value" label="New sourcetype name">
+      <view name="create"/>
+      <view name="edit"/>
+      <view name="list"/>
+    </element>
+    <element name="eai:acl.owner" label="Owner">
+      <view name="list"/>
+      <key name="processValueList">entity['eai:acl']['owner'] == 'nobody' and _('No owner') or entity['eai:acl']['owner']</key>
+    </element>
+    <element name="eai:acl.app" label="App">
+      <view name="list"/>
+      <key name="processValueList">entity['eai:acl']['app'] or ""</key>
+    </element>
+  </elements>
+</endpoint>

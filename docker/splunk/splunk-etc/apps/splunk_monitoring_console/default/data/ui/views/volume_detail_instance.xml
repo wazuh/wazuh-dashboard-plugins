@@ -1,0 +1,355 @@
+<form version="1.1" hideEdit="True" script="cell_fill_gauge.js, common_control.js" stylesheet="index_type.css">
+  <label>Volume Detail: Instance</label>
+  <search id="volume_base_search">
+    <query>
+      | rest splunk_server=$splunk_server$ /services/data/index-volumes
+      | fields title, total_size, max_size, volume_path
+      | `dmc_exclude_volumes`
+    </query>
+  </search>
+  <search id="index_base_search">
+    <query>
+      | rest splunk_server=$splunk_server$ /services/data/indexes-extended $datatype$
+      | join type=outer title [
+        | rest splunk_server=$splunk_server$ /services/data/indexes $datatype$]
+      | `dmc_exclude_indexes`
+      | rex field=homePath "volume:(?&lt;home_vol_name&gt;[^/\\\]*)(?:/|\\\)"
+      | rex field=coldPath "volume:(?&lt;cold_vol_name&gt;[^/\\\]*)(?:/|\\\)"
+    </query>
+  </search>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="radio" searchWhenChanged="true" token="datatype">
+      <label>Index Type</label>
+      <choice value="">Event Indexes Only</choice>
+      <choice value="datatype=all">All Index Types *</choice>
+      <default></default>
+    </input>
+    <input type="dropdown" searchWhenChanged="true" token="dmc_group">
+      <label>Group</label>
+      <showClearButton>false</showClearButton>
+      <search>
+        <query>
+          | `dmc_get_groups_containing_role(dmc_group_indexer)`
+          | search search_group!="dmc_group_*"
+        </query>
+      </search>
+      <fieldForLabel>label</fieldForLabel>
+      <fieldForValue>search_group</fieldForValue>
+      <choice value="dmc_group_indexer">All Indexers</choice>
+      <default>dmc_group_indexer</default>
+    </input>
+    <input type="dropdown" searchWhenChanged="true" token="splunk_server">
+      <label>Instance</label>
+      <showClearButton>false</showClearButton>
+      <populatingSearch fieldForLabel="serverName" fieldForValue="serverName">
+        | `dmc_get_instance_info($dmc_group$)`
+        | where search_group="dmc_group_indexer"
+      </populatingSearch>
+      <selectFirstChoice>true</selectFirstChoice>
+      <change>
+        <condition value="*">
+          <set token="host">$row.host$</set>
+        </condition>
+      </change>
+    </input>
+    <input type="dropdown" searchWhenChanged="true" token="volume_name">
+      <label>Volume</label>
+      <showClearButton>false</showClearButton>
+      <selectFirstChoice>true</selectFirstChoice>
+      <fieldForValue>title</fieldForValue>
+      <fieldForLabel>title</fieldForLabel>
+      <search base="volume_base_search">
+        <query>stats count by title</query>
+      </search>
+    </input>
+    <html id="index_type_disclaimer">
+      <p>The "All Index Types" option is not compatible with indexers running Splunk Enterprise 6.6 or earlier, where only event indexes exist.</p>
+    </html>
+  </fieldset>
+  <row>
+    <panel>
+      <html>
+        <h2>
+          <span>Select views: </span>
+          <span id="link-switcher-view">
+            <a href="#" class="btn-pill active" data-item="all">All</a>
+            <a href="#" class="btn-pill" data-item="snapshot">Snapshot</a>
+            <a href="#" class="btn-pill" data-item="historical">Historical</a>
+          </span>
+        </h2>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Snapshots</title>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Overview</title>
+      <single>
+        <option name="height">80px</option>
+        <search base="index_base_search">
+          <query>
+            fields title, home_vol_name, cold_vol_name
+            | where home_vol_name == "$volume_name$" OR cold_vol_name == "$volume_name$"
+            | stats dc(title) as count
+          </query>
+        </search>
+        <option name="underLabel">Indexes using Volume "$volume_name$"</option>
+      </single>
+      <single>
+        <option name="height">80px</option>
+        <search base="index_base_search">
+          <query>
+            fields title, bucket_dirs.home.hot_bucket_count, bucket_dirs.home.warm_bucket_count, bucket_dirs.cold.bucket_count, home_vol_name, cold_vol_name
+            | where home_vol_name == "$volume_name$" OR cold_vol_name == "$volume_name$"
+            | eval bucket_dirs.home.hot_bucket_count = if(isnotnull('bucket_dirs.home.hot_bucket_count'), 'bucket_dirs.home.hot_bucket_count', 0)
+            | eval bucket_dirs.home.warm_bucket_count = if(isnotnull('bucket_dirs.home.warm_bucket_count'), 'bucket_dirs.home.warm_bucket_count', 0)
+            | eval bucket_dirs.cold.bucket_count = if(isnotnull('bucket_dirs.cold.bucket_count'), 'bucket_dirs.cold.bucket_count', 0)
+            | eval bucket_count = case(
+                home_vol_name == cold_vol_name, 'bucket_dirs.home.hot_bucket_count' + 'bucket_dirs.home.warm_bucket_count' + 'bucket_dirs.cold.bucket_count',
+                home_vol_name == "$volume_name$", 'bucket_dirs.home.hot_bucket_count' + 'bucket_dirs.home.warm_bucket_count',
+                cold_vol_name == "$volume_name$", 'bucket_dirs.cold.bucket_count')
+            | stats sum(bucket_count) as bucket_count
+            | eval bucket_count = toString(bucket_count, "commas")
+          </query>
+        </search>
+        <option name="underLabel">Buckets</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Events</title>
+      <single>
+        <option name="height">80px</option>
+        <search base="index_base_search">
+          <query>
+            fields title, bucket_dirs.home.event_count, bucket_dirs.cold.event_count, home_vol_name, cold_vol_name
+            | where home_vol_name == "$volume_name$" OR cold_vol_name == "$volume_name$"
+            | eval bucket_dirs.home.event_count = if(isnotnull('bucket_dirs.home.event_count'), 'bucket_dirs.home.event_count', 0)
+            | eval bucket_dirs.cold.event_count = if(isnotnull('bucket_dirs.cold.event_count'), 'bucket_dirs.cold.event_count', 0)
+            | eval event_count = case(
+            home_vol_name == cold_vol_name, 'bucket_dirs.home.event_count' + 'bucket_dirs.cold.event_count',
+            home_vol_name == "$volume_name$", 'bucket_dirs.home.event_count',
+            cold_vol_name == "$volume_name$", 'bucket_dirs.cold.event_count')
+            | stats sum(event_count) as count
+            | eval count = toString(count, "commas")
+          </query>
+        </search>
+        <option name="underLabel">Event Count</option>
+      </single>
+      <single>
+        <option name="height">80px</option>
+        <search base="index_base_search">
+          <query>
+            fields title, bucket_dirs.home.event_min_time, bucket_dirs.cold.event_min_time, home_vol_name, cold_vol_name
+            | where home_vol_name == "$volume_name$" OR cold_vol_name == "$volume_name$"
+            | eval min_time = case(
+            home_vol_name == cold_vol_name, min('bucket_dirs.home.event_min_time', 'bucket_dirs.cold.event_min_time'),
+            home_vol_name == "$volume_name$", 'bucket_dirs.home.event_min_time',
+            cold_vol_name == "$volume_name$", 'bucket_dirs.cold.event_min_time')
+            | stats min(min_time) as min_time
+            | `dmc_time_format(min_time)`
+          </query>
+        </search>
+        <option name="underLabel">Earliest Event</option>
+      </single>
+      <single>
+        <option name="height">80px</option>
+        <search base="index_base_search">
+          <query>
+            fields title, bucket_dirs.home.event_max_time, bucket_dirs.cold.event_max_time, home_vol_name, cold_vol_name
+            | where home_vol_name == "$volume_name$" OR cold_vol_name == "$volume_name$"
+            | eval max_time = case(
+            home_vol_name == cold_vol_name, max('bucket_dirs.home.event_max_time', 'bucket_dirs.cold.event_max_time'),
+            home_vol_name == "$volume_name$", 'bucket_dirs.home.event_max_time',
+            cold_vol_name == "$volume_name$", 'bucket_dirs.cold.event_max_time')
+            | stats max(max_time) as max_time
+            | `dmc_time_format(max_time)`
+          </query>
+        </search>
+        <option name="underLabel">Latest Event</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Volume Usage</title>
+      <table id="table1">
+        <search base="volume_base_search">
+          <query>
+            where title == "$volume_name$"
+            | eval total_size_gb = if(isnull(total_size), "-", round(total_size / 1024, 2))
+            | eval max_size_gb = if(isnull(max_size) OR max_size = "infinite", "unlimited", round(max_size / 1024, 2))
+            | eval disk_usage_gb = total_size_gb." / ".max_size_gb
+            | fields title, disk_usage_gb, max_size_gb, volume_path
+            | rename title as Volume, disk_usage_gb as "Volume Usage (GB)", max_size_gb as "Volume Capacity (GB)", volume_path as "Volume Path"
+          </query>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+      <html>
+        <p><b>Volume Usage:</b> The first value is the current size of the volume. The second value is the volume capacity, as specified by the maxVolumeDataSizeMB attribute in <a href="/help?location=learnmore.index.settings" class="external" target="_blank">indexes.conf</a>.</p>
+        <p><b>Note: </b>if the volume is "unlimited", it is not possible to determine the disk usage for the volume. </p>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Index Directories Using This Volume</title>
+      <table id="configured_indexes_list">
+        <search base="index_base_search">
+          <query>
+            eval cold_bucket_size = if(isnotnull('bucket_dirs.cold.bucket_size'), 'bucket_dirs.cold.bucket_size', 'bucket_dirs.cold.size')
+            | fields title, bucket_dirs.home.event_min_time, bucket_dirs.cold.event_min_time, cold_bucket_size, total_size, home_vol_name, cold_vol_name
+            | rename cold_bucket_size AS cold_size
+            | eval cold_size = if(isnull(cold_size), 0, cold_size)
+            | eval home_size = total_size - cold_size
+            | eval cold_size = round(cold_size / 1024, 2)
+            | eval home_size = round(home_size / 1024, 2)
+            | eval dir = "home,cold"
+            | makemv dir delim=","
+            | mvexpand dir
+            | eval dir_size = case(dir == "home", home_size, dir == "cold", cold_size)
+            | eval vol_name = case(dir == "home", home_vol_name, dir == "cold", cold_vol_name)
+            | eval data_age_home_day = if(dir == "home", round((now() - 'bucket_dirs.home.event_min_time') / 86400, 0), NULL)
+            | eval data_age_cold_day = if(dir == "cold", round((now() - 'bucket_dirs.cold.event_min_time') / 86400, 0), NULL)
+            | eval data_age_day = case(dir == "home", data_age_home_day, dir == "cold", data_age_cold_day)
+            | eval data_age_day = if(isnull(data_age_day), "n/a", data_age_day)
+            | where vol_name == "$volume_name$"
+            | fields title dir dir_size data_age_day vol_name
+            | where isnotnull(vol_name)
+            | eval index_dir_name = title.":".dir
+            | fields index_dir_name dir_size data_age_day
+            | sort - dir_size
+            | rename index_dir_name as "Index:Directory" dir_size AS "Disk Usage (GB)" data_age_day as "Data Age (Days)"
+          </query>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+    <panel rejects="$historical$">
+      <title>Volume Usage By Index Directory</title>
+      <chart>
+        <search base="index_base_search">
+          <query>
+            eval cold_bucket_size = if(isnotnull('bucket_dirs.cold.bucket_size'), 'bucket_dirs.cold.bucket_size', 'bucket_dirs.cold.size')
+            | fields title, cold_bucket_size, total_size, home_vol_name, cold_vol_name
+            | rename cold_bucket_size AS cold_size
+            | eval cold_size = if(isnull(cold_size), 0, cold_size)
+            | eval home_size = total_size - cold_size
+            | eval cold_size = round(cold_size / 1024, 2)
+            | eval home_size = round(home_size / 1024, 2)
+            | eval dir = "home,cold"
+            | makemv dir delim=","
+            | mvexpand dir
+            | eval dir_size = case(dir == "home", home_size, dir == "cold", cold_size)
+            | eval vol_name = case(dir == "home", home_vol_name, dir == "cold", cold_vol_name)
+            | where vol_name == "$volume_name$"
+            | fields title dir dir_size vol_name
+            | where isnotnull(vol_name) AND isnotnull(dir_size) AND dir_size > 0
+            | eval index_dir_name = title.":".dir
+            | where vol_name == "$volume_name$"
+            | stats sum(dir_size) AS dir_size by index_dir_name
+          </query>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.axisTitleY.text">Volume Usage (GB)</option>
+      </chart>
+      <html>
+        <p><center>Volume Usage (GB)</center></p>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Data Age By Index Directory</title>
+      <chart>
+        <search base="index_base_search">
+          <query>
+            fields title, bucket_dirs.home.event_min_time, bucket_dirs.cold.event_min_time, home_vol_name, cold_vol_name, datatype
+            | eval dir = "home,cold"
+            | makemv dir delim=","
+            | mvexpand dir
+            | eval indexwithtype=title.":".datatype, title = case(dir == "home", title.":home", dir == "cold", title.":cold")
+            | eval data_age_home_day = if(dir == "home", round((now() - 'bucket_dirs.home.event_min_time') / 86400, 0), NULL)
+            | eval data_age_cold_day = if(dir == "cold", round((now() - 'bucket_dirs.cold.event_min_time') / 86400, 0), NULL)
+            | eval data_age_day = case(dir == "home", data_age_home_day, dir == "cold", data_age_cold_day)
+            | eval vol_name = case(dir == "home", home_vol_name, dir == "cold", cold_vol_name)
+            | where vol_name == "$volume_name$"
+            | sort - data_age_day
+            | fields title, data_age_home_day, data_age_cold_day, indexwithtype
+            | where NOT (isnull(data_age_home_day) AND isnull(data_age_cold_day))
+            | rename title as Index, data_age_home_day as "home data age (days)", data_age_cold_day as "cold data age (days)"
+          </query>
+        </search>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.axisTitleX.text">Index Directories</option>
+        <option name="charting.axisTitleY.text">Data Age (days)</option>
+        <option name="charting.legend.placement">none</option>
+        <drilldown>
+          <link target="_blank">index_detail_instance?form.datatype=$datatype$&amp;form.splunk_server=$splunk_server$&amp;form.single_index_name=$row.indexwithtype$</link>
+        </drilldown>
+      </chart>
+      <html>
+        <p>Tip: you can adjust the height of the bar chart when there are many bars.</p>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Historical Charts</title>
+      <input type="time" searchWhenChanged="true" token="time">
+        <label>Time Range:</label>
+        <default>
+          <earliestTime>-15d@d</earliestTime>
+          <latestTime>now</latestTime>
+        </default>
+      </input>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Volume Size Over Time</title>
+      <input type="dropdown" searchWhenChanged="true" token="funcVolume">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <default>latest</default>
+        <choice value="latest">Latest</choice>
+        <choice value="avg">Average</choice>
+        <choice value="min">Minimum</choice>
+        <choice value="max">Maximum</choice>
+      </input>
+      <input type="radio" searchWhenChanged="true" token="capacityOverlay">
+        <label>Volume Capacity Overlay</label>
+        <choice value="volume_capacity">show</choice>
+        <choice value=" ">hide</choice>
+        <default>volume_capacity</default>
+      </input>
+      <chart>
+        <search>
+          <query>
+            index=_introspection host=$host$ sourcetype=splunk_disk_objects component=Volumes data.name="$volume_name$"
+            | eval data.total_size = round('data.total_size' / 1024, 2)
+            | eval data.total_capacity = round('data.max_size' / 1024, 2)                    
+            | `dmc_timechart_for_disk_usage` partial=false $funcVolume$(data.total_size) as volume_usage, latest(data.total_capacity) as volume_capacity
+            | fields _time, volume_usage $capacityOverlay$
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">area</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Volume Size (GB)</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.chart.overlayFields">volume_capacity</option>
+      </chart>
+    </panel>
+  </row>
+</form>

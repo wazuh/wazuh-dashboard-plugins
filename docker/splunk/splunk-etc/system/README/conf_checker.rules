@@ -1,0 +1,182 @@
+Conf checker syntax rules for spec files
+
+Warning: This may go out of date.  Crossing fingers.
+
+-------------
+Intro:
+
+The syntax checker as it exists now just verifies that setting names
+in a conf file seem to be documented in the matching spec file.  It
+does not validate the values for settings.
+
+For example, for 
+
+    [mystanza]
+    frobnicate = true
+
+We check that frobnicate is mentioned in the documentation for
+mystanza, but we do not check that true is an accepted value.
+
+-------------
+
+Stanza Definitions in spec files:
+
+- Must be in
+[brackets]  
+
+- Must be against the left edge
+
+USED:
+[my_stanza]
+
+IGNORED: 
+     [my_stanza]
+
+Indenting stanzas is useful when referencing stanzas for another file,
+or example purposes.
+
+-------------
+
+Settings:
+
+Must contain an equals sign, eg
+x = y
+
+Indented lines with equals signs are currently used.
+
+-------------
+
+Setting Matching:
+
+Settings are validated two ways.  
+
+1 - Exact matching
+2 - Prefix matching
+
+
+Exact matching:
+
+If the spec file has, for example
+    setting_x = <integer>
+
+then a conf file line that has
+    setting_x = something
+
+will be accepted as valid.
+
+Prefix matching:
+
+For settings which are written in spec files with the character '<' or
+'-', we will do matching of the text prior to these characters
+
+If the spec file has:
+    FOO-class = <foo_stanza>
+
+Then settings beginning with "FOO" will be seen as valid.
+
+ACCEPTED in conf:
+    FOO = true
+    FOOS = true
+    FOO-something = true
+    FOODEATINGMONSTER = true
+
+NOT ACCEPTED in conf:
+    foo = true
+
+
+Settings with arbitrary names:
+    <name> = enabled|disabled
+
+ACCEPTED in conf:
+     any setting names are accepted here
+
+
+-------------
+Stanza matching:
+
+Which spec settings are allowed for which stanzas?
+
+Any settings declared in a spec file without any declared stanza, or
+after a declared [default] stanza are considered valid for all stanzas
+in a conf file.
+
+So for a spec file:
+   foo = bar
+   [default]
+   foo2 = bar2
+
+ACCEPTED in conf:
+   foo = yes
+   foo2 = no
+   [whatever]
+   foo = ...
+   foo2 = ...
+
+Settings following an explicit string stanza will only be accepted for
+that stanza:
+
+For a spec file containing:
+   [access_allowed]
+   admin = true|false
+
+ACCEPTED in conf:
+   [access_allowed]
+   admin = yes
+
+NOT ACCEPTED in conf:
+   admin = false
+
+   [default]
+   admin = true
+
+   [something_else]
+   admin = true
+
+Some stanzas are matched with prefix-matching similar to settings.
+Spec stanzas containing <, :, or . are considered to match conf
+stanzas if they match for the text to the left of any of the above
+characters.  
+
+This can be used to show that stanzas of a particular prefix can have
+settings, or that there are settings which belong to stanzas that can
+be named arbitrarily.
+
+For a spec file containing
+   [category:name]
+   access = true|false
+
+ACCEPTED in conf:
+   [category:fruit]
+   access = true
+
+   [category]
+   access = true
+
+   [categorywhatever]
+   access = true
+
+   [category::::::anything..<><>goes!]
+   access = true
+
+For a spec file containing:
+   blacklist.n = <regular expression>
+
+ACCEPTED in conf:
+   blacklist = hi
+   blacklist.5 = whats up?
+   blacklist.pie_bob = apples!
+
+For  a spec file containing:
+   [<stanza_name>]
+   owner = <user>
+
+ACCEPTED in conf:
+   [anything]
+   owner = jrodman
+
+   [really?:::_anything]
+   owner = ewoo
+
+   [Yep]
+   owner = splunk
+

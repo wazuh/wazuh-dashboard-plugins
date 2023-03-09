@@ -1,0 +1,48 @@
+h3.headerText {
+	color: #73A550;
+}
+
+.SimpleResultsTable .simpleResultsTableWrapper{
+	overflow-x: hidden;
+}
+
+.SingleValueHolder {
+    background: none;
+    text-align: left;
+    font-weight: normal;
+    width: auto;
+    padding-top: 0;
+    padding-left: 0;
+    font-size: 11px;
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    float:left;
+    margin-right: 20px;
+    
+}
+.singleLabelBefore {
+    display: block;
+    margin-bottom: 2px;
+    color: #333;
+}
+.singleResult {
+    font-size: 14px;
+}
+.HiddenPostProcess {
+    display:none;
+}
+
+.SearchLinkLister {
+    margin-right: 10px !important;
+}
+.SearchLinkLister ul {
+    margin-left: 10px;
+}
+.SearchLinkLister li {
+    margin-left: 5px;
+}
+
+/*SPL-50564*/
+.SingleValue .singleResult { margin: 0px; font-size: 18px; }
+

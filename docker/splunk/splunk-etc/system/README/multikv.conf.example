@@ -1,0 +1,72 @@
+#   Version 9.0.3
+#
+# This file contains example multi key/value extraction configurations.
+#
+# To use one or more of these configurations, copy the configuration block into
+# multikv.conf in $SPLUNK_HOME/etc/system/local/. You must restart Splunk to
+# enable configurations.
+#
+# To learn more about configuration files (including precedence) please see the
+# documentation located at
+# http://docs.splunk.com/Documentation/Splunk/latest/Admin/Aboutconfigurationfiles
+
+
+# This example breaks up the output from top:
+
+# Sample output:
+
+# Processes: 56 total, 2 running, 54 sleeping... 221 threads 10:14:07
+#.....
+#
+#   PID COMMAND  %CPU TIME     #TH #PRTS #MREGS RPRVT RSHRD RSIZE  VSIZE
+# 29960 mdimport 0.0%  0:00.29  3    60    50  1.10M  2.55M 3.54M  38.7M
+# 29905 pickup   0.0%  0:00.01  1    16    17   164K   832K  764K  26.7M
+#....
+
+[top_mkv]
+# pre table starts at "Process..." and ends at line containing "PID"
+pre.start = "Process"
+pre.end = "PID"
+pre.ignore = _all_
+
+# specify table header location and processing
+header.start = "PID"
+header.linecount = 1
+header.replace = "%" = "_", "#" = "_"
+header.tokens = _tokenize_, -1," "
+
+# table body ends at the next "Process" line (ie start of another top) tokenize
+# and inherit the number of tokens from previous section (header)
+body.end = "Process"
+body.tokens  = _tokenize_,  0, " "
+
+
+
+## This example handles the output of 'ls -lah' command:
+#
+# total 2150528
+# drwxr-xr-x 88 john john 2K   Jan 30 07:56 .
+# drwxr-xr-x 15 john john 510B Jan 30 07:49 ..
+# -rw------- 1  john john 2K   Jan 28 11:25 .hiden_file
+# drwxr-xr-x 20 john john 680B Jan 30 07:49 my_dir
+# -r--r--r-- 1  john john 3K   Jan 11 09:00 my_file.txt
+
+
+[ls-lah-cpp]
+pre.start     = "total"
+pre.linecount = 1
+
+# the header is missing, so list the column names
+header.tokens = _token_list_, mode, links, user, group, size, date, name
+
+# The ends when we have a line starting with a space
+body.end     = "^\s*$"
+# This filters so that only lines that contain with .cpp are used
+body.member  = "\.cpp"
+# concatenates the date into a single unbreakable item
+body.replace = "(\w{3})\s+(\d{1,2})\s+(\d{2}:\d{2})" ="\1_\2_\3"
+
+# ignore dirs
+body.ignore = _regex_ "^drwx.*",
+body.tokens  = _tokenize_, 0, " "
+

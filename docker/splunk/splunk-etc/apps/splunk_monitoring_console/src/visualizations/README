@@ -1,0 +1,7 @@
+Currently there are two splunk_monitoring_console specific visualizations.
+They are KpiTrafficLight and heatmap.
+
+KpiTrafficLight has no processing or transpiling, it is just copied directly to appserver/static/visualizations.
+
+heatmap is processed to turn src/heatmap/src/heatmap.js into appserver/static/visualizations/heatmap/visualization.js.
+Additionally the other files in src/heatmap are copied directly to appserver/static/visualizations/heatmap

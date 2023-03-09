@@ -1,0 +1,56 @@
+/*===============================================================================================*/
+/*  SPLUNK:  CODE (INLINE AND BLOCK)                                                             */
+/*===============================================================================================*/
+
+/*  Inline and block code styles */
+code,
+pre {
+    font-family: $monoFontFamily;
+    border-radius: $borderRadius;
+}
+
+/*  Inline code */
+code {
+    padding: 2px 4px;
+    color: #D14;
+    background-color: #F7F7F9;
+    border: 1px solid #E1E1E8;
+    white-space: nowrap;
+    font-size: calc($fontSize - 2px);
+}
+
+/*  Blocks of code */
+pre {
+    display: block;
+    padding: calc(($lineHeight - 1px) / 2);
+    margin: 0 0 calc($lineHeight / 2);
+    font-size: calc($fontSize - 1px); /*  14px to 13px */
+    color: $gray30;
+    line-height: $lineHeight;
+    word-break: break-all;
+    word-wrap: break-word;
+    white-space: pre;
+    white-space: pre-wrap;
+    background-color: #F5F5F5;
+    border: 1px solid rgba(0, 0, 0, .15);
+
+    /*  Make prettyprint styles more spaced out for readability */
+    &.prettyprint {
+        margin-bottom: $lineHeight;
+    }
+    /*  Account for some code outputs that place code tags in pre tags */
+    code {
+        padding: 0;
+        color: inherit;
+        white-space: pre;
+        white-space: pre-wrap;
+        background-color: transparent;
+        border: 0;
+    }
+}
+
+/*  Enable scrollable blocks of code */
+.pre-scrollable {
+    max-height: 340px;
+    overflow-y: scroll;
+}

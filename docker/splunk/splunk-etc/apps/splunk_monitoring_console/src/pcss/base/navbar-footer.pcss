@@ -1,0 +1,119 @@
+/*===============================================================================================*/
+/*  SPLUNK: FOOTER                                                                               */
+/*===============================================================================================*/
+/* footer style
+    <footer>
+        <ul class="nav nav-footer">
+            <li><a href="#">about</a></li>
+            <li><a href="#">...</a></li>
+        </ul>
+        <p class="copyright">&copy;2012 splunk</p>
+    </footer>
+*/
+.shared-footer {
+    clear: both;
+    color: $textGrayDark;
+    border-top: $borderDefault;
+    padding: $spacing;
+    font-size: $fontSizeSmall;
+    margin-bottom: $spacing;
+
+    .nav-footer {
+        float: left;
+    }
+    .copyright {
+        float: right;
+    }
+}
+.shared-footer-aboutdialog {
+    font-size: 13px;
+}
+.nav-footer > li {
+    float: left;
+
+    & > a {
+        display: inline;
+        color: $textColor;
+        margin-right: $spacing;
+
+        &:hover {
+            color: $linkColorHover;
+            background: transparent;
+            text-decoration: underline;
+        }
+        &:focus {
+            @mixin focus-link;
+        }
+    }
+}
+.shared-aboutdialog {
+    &.modal {
+        @mixin modal-width 500px;
+    }
+    .modal-header {
+        padding-left: $spacing;
+
+        .modal-title {
+            font-size: $fontSizeXXLarge;
+        }
+    }
+    .modal-body {
+        color: $textGrayDark;
+        font-size: $fontSizeSmall;
+        line-height: $lineHeight;
+
+        h2, h3 {
+            color: $textColor;
+            margin-top: 0;
+            margin-bottom: $spacingQuarter;
+        }
+        .about-section {
+            margin-bottom: $spacing;
+        }
+        .divider {
+            @mixin nav-divider;
+            margin: $spacing 0;
+        }
+        .app-section-header {
+            margin-top: $spacingHalf;
+            font-weight: bold;
+        }
+        .attribution-link {
+            margin-bottom: $spacingHalf;
+            display: block;
+        }
+        .list-dotted {
+            &:empty {
+                display: none;
+            }
+        }
+        .modal-btn-cancel {
+            float: right;
+        }
+    }
+    .about-product-logo, h3.modal-title:not(.about-dialog-title) {
+        font-family: "Splunk Icons";
+        font-weight: normal;
+        color: $black;
+        text-shadow: none;
+        text-decoration: none;
+        font-size: $fontSizeXLarge;
+        cursor: default;
+        margin-top: -$spacingQuarter;
+
+        .prompt {
+            color: $brandColor;
+            font-weight: normal;
+        }
+    }
+}
+
+
+/*************************************************************************************************/
+/*  PRINT                                                                                        */
+/*************************************************************************************************/
+@media print {
+    .shared-footer {
+        @mixin print-hide;
+    }
+}

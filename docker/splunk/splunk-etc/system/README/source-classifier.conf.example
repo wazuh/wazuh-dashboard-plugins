@@ -1,0 +1,20 @@
+#   Version 9.0.3
+#
+# This file contains an example source-classifier.conf.  Use this file to
+# configure classification
+# of sources into sourcetypes.
+#
+# To use one or more of these configurations, copy the configuration block
+# into source-classifier.conf in $SPLUNK_HOME/etc/system/local/. You must
+# restart Splunk to enable configurations.
+#
+# To learn more about configuration files (including precedence) please see
+# the documentation located at
+# http://docs.splunk.com/Documentation/Splunk/latest/Admin/Aboutconfigurationfiles
+
+# terms to ignore when generating sourcetype model to prevent model from
+# containing servernames
+ignored_model_keywords = sun mon tue tues wed thurs fri sat sunday monday tuesday wednesday thursday friday saturday jan feb mar apr may jun jul aug sep oct nov dec january february march april may june july august september october november december 2003 2004 2005 2006 2007 2008 2009 am pm ut utc gmt cet cest cetdst met mest metdst mez mesz eet eest eetdst wet west wetdst msk msd ist jst kst hkt ast adt est edt cst cdt mst mdt pst pdt cast cadt east eadt wast wadt
+
+# terms to ignore when comparing a sourcename against a known sourcename
+ignored_filename_keywords = log logs com common event events little main message messages queue server splunk

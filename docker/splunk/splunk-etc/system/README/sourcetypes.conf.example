@@ -1,0 +1,29 @@
+#   Version 9.0.3
+#
+# This file contains an example sourcetypes.conf.  Use this file to configure
+# sourcetype models.
+#
+# NOTE: sourcetypes.conf is a machine-generated file that stores the document
+# models used by the file classifier for creating source types.
+#
+# Generally, you should not edit sourcetypes.conf, as most attributes are
+# machine generated.  However, there are two attributes which you can change.
+#
+# To use one or more of these configurations, copy the configuration block into
+# sourcetypes.conf in $SPLUNK_HOME/etc/system/local/. You must restart Splunk
+# to enable configurations.
+#
+# To learn more about configuration files (including precedence) please see the
+# documentation located at
+# http://docs.splunk.com/Documentation/Splunk/latest/Admin/Aboutconfigurationfiles
+
+#
+# This is an example of a machine-generated sourcetype models for a fictitious
+# sourcetype cadcamlog.
+#
+
+[/Users/bob/logs/bnf.x5_Thu_Dec_13_15:59:06_2007_171714722]
+_source = /Users/bob/logs/bnf.x5
+_sourcetype = cadcamlog
+L----------- = 0.096899
+L-t<_EQ> = 0.016473

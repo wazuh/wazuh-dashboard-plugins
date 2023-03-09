@@ -1,0 +1,535 @@
+/*===============================================================================================*/
+/*  SPLUNK: VARIABLES                                                                            */
+/*  Variables to customize the look and feel of Bootstrap (splunk version).                      */
+/*  See /en-US/static/docs/style/style-guide.html for style guide                                */
+/*===============================================================================================*/
+/*===============================================================================================*/
+/*  WARNING                                                                                      */
+/*  This file has an implicit dependency on the brand variables injected by the                  */
+/*  'splunk-postcss-theme-import' postcss plugin.                                                */
+/*===============================================================================================*/
+@import "color-palette.pcss";
+
+/*************************************************************************************************/
+/*  STATIC PATHS                                                                                 */
+/*************************************************************************************************/
+$staticPath:                                /static;
+$staticImagePath:                           $staticPath/img;
+$staticFontPath:                            $staticPath/fonts;
+
+
+/*************************************************************************************************/
+/*  TYPOGRAPHY                                                                                   */
+/*************************************************************************************************/
+$fontSizeXXLarge:                               24px;
+$fontSizeXLarge:                                18px;
+$fontSizeLarge:                                 16px;
+$fontSize:                                      14px;
+$fontSizeSmall:                                 12px;
+$fontSizeXSmall:                                11px;
+
+$lineHeightLarge:                               24px;
+$lineHeight:                                    20px;
+$iconsLineHeight:                               inherit;
+
+$modalHeadingFontSize:                          20px;
+
+$serifFontFamily:                           Georgia, "Times New Roman", Times, serif;
+$sansFontFamily:                            "Splunk Platform Sans", "Proxima Nova", Roboto, Droid, "Helvetica Neue", Helvetica, Arial, sans-serif;
+$monoFontFamily:                            "Splunk Platform Mono", Inconsolata, Consolas, "Droid Sans Mono", Monaco, "Courier New", Courier, monospace;
+$fontFamily:                                $sansFontFamily;
+
+$fontWeight:                                400;
+$fontWeightSemiBold:                        500;
+
+$textColor:                                 $gray30;
+$textGrayDark:                              $gray45;
+$textGray:                                  #6b7785;
+$textDisabledColor:                         $gray80;
+$placeholderText:                           $textGray;
+
+$textTileColor:                             $gray92; /*  Lite listing pages */
+
+$headingsFontFamily:                        inherit; /*  empty to use BS default, $fontFamily */
+$headingsFontWeight:                        $fontWeightSemiBold;    /*  instead of browser default, bold */
+$headingsColor:                             inherit;
+$headingsLineHeight:                        $lineHeight;
+$headingsFontColor:                         $gray30;
+$headingsFontColorLight:                    $gray45;
+
+$linkColor:                                 $accentColorD10;
+$linkColorHover:                            $accentColorD10;
+
+
+/*************************************************************************************************/
+/*  SCAFFOLDING                                                                                  */
+/*************************************************************************************************/
+$bodyBackgroundColor:                       $gray96;
+$containerBackgroundColor:                  $white;
+$bodyMinWidth:                              960px;
+$sideNavWidth:                              300px;
+$navTabHeight:                              38px;
+
+/* Border Colors */
+$borderDarkColor:                           $gray80;
+$borderColor:                               $gray80;
+$borderLightColor:                          $gray92; /*  aliases: $tableBorderColor $tableBorderColorVertical */
+                                                     /*  also see: $interactiveBorderColor */
+
+/* Borders */
+$border:                                    1px solid;
+$borderDefault:                             $border $borderColor;
+$borderLight:                               $border $borderLightColor;
+$borderWhite:                               $border $white;
+
+/* Border Radius */
+$borderRadius:                              3px;
+$borderRadiusLarge:                         $borderRadius;
+$borderRadiusSmall:                         2px;
+$containerBorderRadius:                     $borderRadiusSmall; /* For containers without a wrapper */
+$containerOuterBorderRadius:                $borderRadiusSmall; /* For for containers with a wrapper, like popdown */
+$containerInnerBorderRadius:                1px;
+
+/* Padding & Margin */
+$spacing:                                   20px;
+$spacingDouble:                             calc($spacing * 2);     /* 200% - 40px */
+$spacingOneAndAHalf:                        calc($spacing * 1.5);   /* 150% - 30px */
+$spacingThreeQuarters:                      calc($spacing * 0.75);  /* 75% - 15px */
+$spacingHalf:                               calc($spacing / 2);     /* 50% - 10px */
+$spacingQuarter:                            calc($spacing / 4);     /* 25% - 5px */
+$linkPadding:                               2px;
+
+/* Popdown Arrows */
+$popdownArrowSize:                          8px;
+$popdownArrow:                              $popdownArrowSize solid;
+$popdownArrowBorder:                        $popdownArrow $borderColor;
+$popdownArrowWhite:                         $popdownArrow white;
+$popdownArrowClear:                         $popdownArrow transparent;
+
+/* Large Icons */
+$largeIconLinkColor:                        $gray30;
+$largeIconBackgroundOpacityHover:           0.1;
+$largeIconBackgroundMaskColorHover:         $gray80;
+$largeIconBackgroundColorHover:             rgba(195, 203, 212, 0.1);
+
+
+/*************************************************************************************************/
+/*  TRANSITIONS                                                                                  */
+/*************************************************************************************************/
+$transitionTime:                            0.2s;
+$transitionTimeFast:                        0.125s;
+$transitionTimeFaster:                      0.05s;
+
+$transitionBackground:                      background $transitionTime;
+$transitionBackgroundFast:                  background $transitionTimeFaster;
+$transitionBackgroundColor:                 background-color $transitionTime;
+$transitionBorder:                          border $transitionTime;
+$transitionBoxShadow:                       box-shadow $transitionTime;
+$transitionHeight:                          height $transitionTime;
+$transitionMargin:                          margin $transitionTime;
+$transitionOpacityFast:                     opacity $transitionTimeFast;
+$transitionTextColor:                       color $transitionTime;
+$transitionTopFast:                         top $transitionTimeFast;
+
+$transitionInteractive:                     $transitionBackground, $transitionBorder, $transitionBoxShadow, text-decoration $transitionTime;
+$transitionLargeIcon:                       $transitionOpacityFast, $transitionBackgroundFast;
+
+/*************************************************************************************************/
+/*  HORIZONTAL FORMS & LISTS                                                                     */
+/*************************************************************************************************/
+$horizontalComponentOffset:                 180px;
+
+
+/*************************************************************************************************/
+/*  Z-INDEX                                                                                      */
+/*************************************************************************************************/
+/*  If a variable does not suit your purpose, set a value relatively such as, $zindexModal +1 */
+$zindexFocus:                               3;
+$zindexHeaderTable:                         405;
+$zindexDropdown:                            1000;
+$zindexPopover:                             1010;
+$zindexTooltip:                             1020;
+$zindexFixedNavbar:                         1030;
+$zindexSideNavBackdrop:                     1032; /*  Splunk Lite */
+$zindexSideNav:                             1034; /*  Splunk Lite */
+$zindexSideBarBackdrop:                     1036; /*  Sidebar Component */
+$zindexSideBar:                             1038; /*  Sidebar Component */
+$zindexModalBackdrop:                       1040;
+$zindexModal:                               1050;
+$zindexPopdown:                             1059; /*  timerange popdown needs to be above modal + backdrop */
+$zindexTooltip:                             1070; /*  top interactive element */
+$zindexDatePicker:                          1070; /*  top interactive element */
+$zindexModalNoConnection:                   1080; /*  top uninteractive */
+$zindexModalDisconnect:                     1090; /*  top uninteractive */
+
+
+/*************************************************************************************************/
+/*  TABLES                                                                                       */
+/*************************************************************************************************/
+$tableBackground:                           transparent; /*  overall background-color */
+$tableBackgroundFocus:                      $accentColorL40;
+
+$tableHeaderBackground:                     $gray92;
+$tableHeaderSortTextColor:                  $gray60;
+$tableHeaderSortTextColorActive:            $linkColor;
+$tableRowColor:                             $white;
+$tableRowAccentColor:                       $gray96;
+$tableRowHoverColor:                        $accentColorL50;
+$tableRowHoverTextColor:                    $black;
+
+$tableCellPaddingDefault:                   6px;
+$tableCellPadding:                          $tableCellPaddingDefault calc($tableCellPaddingDefault * 2);
+
+$tableBorderColor:                          $borderLightColor;
+$tableBorderVerticalColor:                  $white;
+$tableBorderHorizontalColor:                $borderLightColor;
+$tableBorder:                               $border $tableBorderColor;
+$tableBorderVertical:                       $border $tableBorderVerticalColor;
+$tableBorderHorizontal:                     $border $tableBorderHorizontalColor;
+
+$tableFormatterColor:                       $textGray;
+$tableFormatterColorHover:                  $textColor;
+$tableEditingColumnBackgroundColor:         $gray80;
+
+$tableSummaryRowBackgroundColor:            #EBEBEB;
+$tableSummaryBorderColor:                   #CCCCCC;
+$tableSummaryLastRowBorderBottom:           none;
+
+$tableOverlayHeatmapFromColor:              $white;
+$tableOverlayHeatmapToColor:                #D6563C;
+$tableOverlayHighLowMaxColor:               #D6563C;
+$tableOverlayHighLowMinColor:               #1E93C6;
+
+$tableLineNum:                              $gray20;
+
+/*************************************************************************************************/
+/*  FORMS                                                                                       */
+/*************************************************************************************************/
+$inputHeight:                               32px; /*  base input height + 10px vertical padding + 2px top/bottom border */
+$inputHeightSmall:                          26px;
+$inputPadding:                              5px 8px;
+$inputTextColor:                            $textGrayDark;
+$inputBackground:                           $white;
+$inputBorderColor:                          $borderColor;
+$inputBorder:                               $border $borderColor;
+$inputBorderRadius:                         $borderRadius; /*  This is generally overridden. */
+$inputBorderRadiusLeft:                     $inputBorderRadius 0 0 $inputBorderRadius;
+$inputBorderRadiusRight:                    0 $inputBorderRadius $inputBorderRadius 0;
+$inputDisabledBackground:                   $gray98;
+$inputLabelSpacing:                         8px;
+
+$inputDisabledTextColor:                    $textDisabledColor;
+$inputDisabledBorderColor:                  $gray92;
+
+$checkboxColor:                             $inputTextColor;
+$checkboxDisabledColor:                     $textDisabledColor;
+
+$formActionsBackground:                     $gray98;
+$listItemBackgroundColorHover:              $gray98;
+
+$warningText:                               $warningColor;
+$warningBackground:                         $warningColorL40;
+$warningBorder:                             $warningColor;
+
+$errorText:                                 $errorColor;
+$errorBackground:                           $errorColorL40;
+$errorBorder:                               $errorColor;
+
+$successText:                               $successColor;
+$successBackground:                         $successColorL40;
+$successBorder:                             $successColor;
+
+$infoText:                                  $infoColor;
+$infoBackground:                            $infoColorL40;
+$infoBorder:                                $infoColor;
+
+
+/*************************************************************************************************/
+/*  MODAL                                                                                        */
+/*************************************************************************************************/
+$modalAboutSectionColor:                    $textGrayDark;
+$modalIconColor:                            $black;
+$modalTextColor:                            $black;
+$modalTitleColor:                           $gray30;
+
+/*************************************************************************************************/
+/*  POPUP                                                                                        */
+/*************************************************************************************************/
+$popupBackgroundColor:                      $white;
+$popupFooterBackgroundColor:                $white;
+$popupHeaderBackgroundColor:                $white;
+$popupDividerColor:                         $borderLightColor;
+$popupDivider:                              $border $popupDividerColor;
+$popupBorderColor:                          $borderColor;
+$popupBorder:                               $border $popupBorderColor;
+$popupBackdropColor:                        $gray30;
+$popupCloseColor:                           $gray45;
+$popupCloseColorHover:                      $linkColorHover;
+
+/*************************************************************************************************/
+/*  TABS                                                                                        */
+/*************************************************************************************************/
+$tabHeaderColor:                            $white;
+$tabHeaderColorHover:                       $gray96;
+$tabHeaderActiveColor:                      $gray92;
+$tabHeaderBorder:                           $border $gray92;
+$tabContentColor:                           $popupBackgroundColor;
+
+/*************************************************************************************************/
+/*  MENU                                                                                         */
+/*************************************************************************************************/
+$menuItemTextColor:                         $gray45;
+$menuItemTextColorHover:                    $linkColorHover;
+$menuItemBackgroundColor:                   $white;
+$menuItemBackgroundColorHover:              $gray96;
+$menuItemBackgroundColorActive:             $gray96;
+
+/*************************************************************************************************/
+/*  BASE INTERACTIVE                                                                             */
+/*************************************************************************************************/
+$focusColor:                                $accentColorL10;
+
+/*  text */
+$interactiveTextColor:                      $textGrayDark;
+$interactiveTextColorHover:                 $textGrayDark;
+$interactiveTextColorDisabled:              $textGray;
+
+/*  background */
+$interactiveBackgroundColor:                $gray98;
+$interactiveBackgroundColorHover:           rgba(235, 238, 239, 1);
+$interactiveBackgroundColorActive:          $gray92;
+$interactiveBackgroundColorFocus:           $gray98;
+$interactiveBackgroundColorDisabled:        $gray98;
+$interactiveGroupBackgroundColorHover:      $interactiveBackgroundColor;
+
+/*  borders */
+$interactiveBorderRadius:                   $borderRadius;
+
+$interactiveBorderColor:                    $borderColor;
+$interactiveBorderColorDisabled:            $borderLightColor;
+$interactiveBorder:                         $border $interactiveBorderColor;
+$interactiveBorderColorHover:               $interactiveBorderColor;
+
+/*  shadow */
+$interactiveBoxShadow:                      inset 0px -1px 0 rgba(0,0,0, 0.1);
+$interactiveBoxShadowDisabled:              inset 0px -1px 0 $interactiveBorderColorDisabled;
+$interactiveBoxShadowFocus:                 0 0 1px 3px $accentColorD10;
+$interactiveBoxShadowActive:                inset 0 2px 0 #D8DFE6;
+$interactiveBoxShadowHover:                 inset 0 2px 0 #D8DFE6;
+
+/*************************************************************************************************/
+/*  BASE INTERACTIVE ERROR                                                                       */
+/*************************************************************************************************/
+/*  text */
+$interactiveErrorTextColor:                 $errorText;
+$interactiveErrorBorderColor:               $errorText;
+
+/*  background */
+$interactiveErrorBackgroundColor:           $errorColorL30;
+$interactiveErrorBackgroundColorHover:      $errorColorL20;
+
+
+/*************************************************************************************************/
+/*  BUTTONS                                                                                      */
+/*************************************************************************************************/
+$buttonPaddingSides:                        $fontSize; /* 1 rem */
+$buttonPaddingVertical:                     5px;
+$buttonPaddingVerticalLarge:                8px;
+$buttonPaddingVerticalSmall:                3px;
+$buttonPaddingVerticalMini:                 0px;
+$buttonPadding:                             $buttonPaddingVertical $buttonPaddingSides;
+$buttonSquareSize:                          32px;
+$buttonMinWidth:                            80px;
+$buttonBorderColorActive:                   $gray80;
+$buttonBorderColorDisabled:                 $gray92;
+$buttonBorderColorActiveDisabled:           $gray92;
+
+
+/*************************************************************************************************/
+/*  PRIMARY BUTTONS                                                                              */
+/*************************************************************************************************/
+/*  text */
+$primaryTextColor:                          $white;
+$primaryTextDisabledColor:                  $brandColorL30;
+
+/*  background */
+$primaryBackgroundColor:                    $primaryWcagColor;
+$primaryBackgroundColorHover:               $brandColorD50;
+$primaryBackgroundColorActive:              $brandColorD30;
+$primaryBackgroundColorDisabled:            $brandColorL10;
+
+/*  borders */
+$primaryBorderColor:                        $brandColorD50;
+
+/*  shadow */
+$primaryBoxShadow:                          inset 0px -2px 0 rgba(0,0,0, 0.1);
+
+
+/*************************************************************************************************/
+/*  PILL BUTTONS                                                                                 */
+/*************************************************************************************************/
+/*  text */
+$pillTextColor:                             $textGrayDark;
+$pillTextColorHover:                        $linkColor;
+
+/*  background */
+$pillBackgroundColorHover:                  $gray98;
+$pillBackgroundColorFocus:                  transparent;
+
+
+/*************************************************************************************************/
+/*  COMPONENT VARIABLES                                                                          */
+/*************************************************************************************************/
+$overlayShadow:                             1px 2px 5px;
+$overlayBoxShadow:                          1px 2px 5px rgba(0,0,0, 0.2);
+$affixTopBoxShadow:                         0 2px 4px $gray80;
+$cardBoxBackgroundColor:                    $white;
+$cardBoxShadow:                             0 1px 1px $gray92;
+
+
+/*************************************************************************************************/
+/*  NAVBAR                                                                                       */
+/*************************************************************************************************/
+$navbarHeight:                              34px;
+$litebarHeight:                             40px;
+
+$navbarBackgroundHighlight:                 $white;
+$navbarBackground:                          $gray20;
+
+$navbarTextColor:                           $gray80;
+$navbarLinkColor:                           $gray80;
+$navbarLinkColorHover:                      $gray30;
+$navbarLinkColorActive:                     $gray45;
+$navbarLinkBackgroundHover:                 transparent;
+$navbarLinkBackgroundActive:                rgba(23,29,33,1);
+
+$navbarBackgroundHover:                     transparent;
+$navbarBackgroundActive:                    $navbarBackgroundHover;
+$navbarBackgroundFocus:                     $navbarBackgroundHover;
+
+$navBarCaretColor:                          $textGray;
+$navBarSettingSVGFillColor:                 $gray60;
+
+$navBarSearchInputBackgroundColor:          rgba(255,255,255, 0.0);
+$navBarSearchInputBorder:                   $border $gray45;
+$navBarSearchInputHoverColor:               $white;
+$navBarSearchInputHoverBorderColor:         $white;
+
+$navBarSettingBackgroundColor:              $white;
+$navBarSettingSidebarColor:                 $gray96;
+$navBarSettingSidebarColorHover:            $gray92;
+
+$navBarHealthMonitorItemTextColor:          $textColor;
+$navBarHealthMonitorItemTextColorHover:     $accentColorL40;
+
+/*************************************************************************************************/
+/*  APP BAR                                                                                      */
+/*************************************************************************************************/
+$appBarHeight:                              44px;
+$appBarBackground:                          $gray30;
+$appBarUnderlineWidth:                      3px;
+
+/*************************************************************************************************/
+/*  ACCORDION                                                                                    */
+/*************************************************************************************************/
+$accordionBackgroundColor:                  $white;
+$accordionToggleBackgroundColor:            $gray96;
+$accordionToggleBackgroundColorHover:       $gray92;
+$accordionToggleBackgroundColorSelected:    $white;
+$accordionBodyBackgroundColor:              $white;
+
+/*************************************************************************************************/
+/*  CONCERTINA                                                                                   */
+/*  Concertina has the same color as Accordion, maybe we should just reuse them?                 */
+/*************************************************************************************************/
+$concertinaBackgroundColor:                  $white;
+$concertinaToggleBackgroundColor:            $gray96;
+$concertinaToggleBackgroundColorHover:       $gray92;
+$concertinaToggleBackgroundColorSelected:    $white;
+$concertinaBodyBackgroundColor:              $white;
+
+/*************************************************************************************************/
+/*  TOOLTIPS & POPOVERS                                                                          */
+/*************************************************************************************************/
+$tooltipColor:                              $white;
+$tooltipBackground:                         $black;
+$tooltipArrowWidth:                         5px;
+$tooltipArrowColor:                         $tooltipBackground;
+
+/*************************************************************************************************/
+/*  SELECTORS FOR CUSTOMIZING SPECIFIC LOCALES                                                   */
+/*************************************************************************************************/
+$wideTextLocaleSelector: body.locale-de;
+
+
+/*************************************************************************************************/
+/*  DASHBOARDS                                                                                   */
+/*************************************************************************************************/
+$dashboardPanelBackgroundColor:             $white;
+$dashboardFooterBorder:                     $border $borderColor;
+$dashboardToolbarBackgroundColor:           $white;
+$dashboardPanelDeleteColor:                 $textGray;
+$dashboardPanelDeleteColorHover:            $linkColorHover;
+$dragPlaceHolderBorderColor:                $borderColor;
+$inputDragBackgroundColor:                  $white;
+$xmlEditorBackgroundColor:                  $white;
+$xmlEditorWarningBackgroundColor:           $warningBackground;
+
+/*************************************************************************************************/
+/*  VIZ & VIZ PICKERS                                                                            */
+/*************************************************************************************************/
+$vizPickerFooterColor:                      $gray98;
+$vizPickerHeadingTextColor:                 $textGray;
+$vizPickerSearchExampleTextColor:           $textGrayDark;
+$vizPickerItemBorder:                       1px solid $borderLightColor;
+$vizPickerItemBorderColorHover:             $borderDarkColor;
+$trellisActionBarBackground:                $dashboardPanelBackgroundColor;
+
+/*************************************************************************************************/
+/*  MAPS                                                                                         */
+/*************************************************************************************************/
+$mapTooltipColor:                           $tooltipColor;
+$mapTooltipFont:                            $fontFamily;
+$mapTooltipBackground:                      $tooltipBackground;
+$mapTooltipPadding:                         $tableCellPadding;
+$mapTooltipMargin:                          0;
+$mapTooltipBorderRadius:                    3px;
+$mapTooltipBoxShadow:                       0 3px 10px #888; /* leaflet popup defaults */
+
+/*************************************************************************************************/
+/*  Search IDE                                                                                   */
+/*************************************************************************************************/
+$searchIdeTooltipBackgroundColor:           $gray98;
+$searchIdeTooltipTextColor:                 $textColor;
+
+/*************************************************************************************************/
+/*  Date Picker                                                                                  */
+/*************************************************************************************************/
+$dayOfWeekColor:                            $textGray;
+$dateBackgroundColor:                       $popupBackgroundColor;
+$dateBackgroundColorHover:                  $gray98;
+$dateBackgroundColorSelected:               $gray98;
+$dateBorderColor:                           $gray80;
+
+/*************************************************************************************************/
+/*  Time Range Picker                                                                            */
+/*************************************************************************************************/
+$timeRangePresetCategoryNameColor:          $textGray;
+$timeRangeTimestampPreviewBackgroundColor:  $gray96;
+
+/*************************************************************************************************/
+/*  Events Viewer                                                                                */
+/*************************************************************************************************/
+$eventFieldBorderColor:                     $borderColor;
+$fieldHighlightBackgroundColor:             $warningColorL40;
+$fieldHighlightTextColor:                   $textColor;
+
+/*************************************************************************************************/
+/*  Misc                                                                                         */
+/*************************************************************************************************/
+$uiResizeHandleColor:                       $gray92;
+
+/*************************************************************************************************/
+/*  Side Bar                                                                                         */
+/*************************************************************************************************/
+$sidebarBackgroundColor:                    $white

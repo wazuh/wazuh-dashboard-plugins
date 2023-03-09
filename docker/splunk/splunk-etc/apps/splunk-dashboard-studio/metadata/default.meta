@@ -1,0 +1,27 @@
+# Application-level permissions
+[]
+access = read : [ * ], write : [ admin, power ]
+export = none
+
+
+
+### VIEWS
+
+[views/dashboard]
+export = system
+
+### LOOKUPS
+
+[lookups]
+export = system
+access = read : [ * ], write : [ admin ]
+
+### COLLECTIONS
+
+[collections/splunk-dashboard-icons]
+access = read : [ * ], write : [ admin, power, sc_admin ]
+export = none
+
+[collections/splunk-dashboard-images]
+access = read : [ * ], write : [ admin, power, sc_admin ]
+export = none

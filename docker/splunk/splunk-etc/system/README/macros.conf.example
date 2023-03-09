@@ -1,0 +1,52 @@
+#   Version 9.0.3
+#
+# Example macros.conf
+#
+
+# macro foobar that takes no arguments can be invoked via `foobar`
+[foobar]
+# the defintion of a macro can invoke another macro.  nesting can be indefinite
+# and cycles will be detected and result in an error
+definition = `foobar(foo=defaultfoo)`
+
+
+# macro foobar that takes one argument, invoked via `foobar(someval)`
+[foobar(1)]
+args = foo
+# note this is definition will include the leading and trailing quotes, i.e.
+# something `foobar(someval)`
+# would expand to
+# something "foo = someval"
+definition = "foo = $foo$"
+
+# macro that takes two arguments
+# note that macro arguments can be named so this particular macro could be
+# invoked equivalently as `foobar(1,2)` `foobar(foo=1,bar=2)` or
+# `foobar(bar=2,foo=1)`
+[foobar(2)]
+args = foo, bar
+definition = "foo = $foo$, bar = $bar$"
+
+# macro that takes one argument that does validation
+[foovalid(1)]
+args = foo
+definition = "foovalid = $foo$"
+# the validation eval function takes any even number of arguments (>=2) where
+# the first argument is a boolean expression, the 2nd a string, the third
+# boolean, 4th a string, etc etc etc
+validation = validate(foo>15,"foo must be greater than 15",foo<=100,"foo must be <= 100")
+
+# macro showing simple boolean validation, where if foo > bar is not true,
+# errormsg is displayed
+[foovalid(2)]
+args = foo, bar
+definition = "foo = $foo$ and bar = $bar$"
+validation = foo > bar
+errormsg = foo must be greater than bar
+
+# example of an eval-based definition.  For example in this case
+# `fooeval(10,20)` would get replaced by 10 + 20
+[fooeval(2)]
+args = foo, bar
+definition = if (bar > 0, "$foo$ + $bar$", "$foo$ - $bar$")
+iseval = true

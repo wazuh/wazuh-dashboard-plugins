@@ -1,0 +1,9 @@
+futures_then-0.1.1.dist-info/INSTALLER,sha256=zuuue4knoyJ-UwPPXg8fezS7VCrXJQrAP7zeNuwvFQg,4
+futures_then-0.1.1.dist-info/METADATA,sha256=XkeDuY4qkCzYSQsG4M3Q7qJtA0rTEj6DkvMfooAkaK4,847
+futures_then-0.1.1.dist-info/RECORD,,
+futures_then-0.1.1.dist-info/WHEEL,sha256=wYBY2EO50FhAcckpWmO3c3Zwk2MALACx6lPAl6gVKnE,93
+futures_then-0.1.1.dist-info/top_level.txt,sha256=yW2vP6x_8iuKaylvYVdKxJSSXu-DYkTaFsnZ2WibxRM,13
+futures_then/__init__.py,sha256=GewUDLjXNikWvPnfd1KvZ4jzphLwN2ZLK05v5OaNpgw,72
+futures_then/__pycache__/__init__.cpython-37.pyc,,
+futures_then/__pycache__/futures_then.cpython-37.pyc,,
+futures_then/futures_then.py,sha256=WmL1BQFaVqD2dmLAas34a1suM3XZzlQ8bbEwVMRtAw0,7115

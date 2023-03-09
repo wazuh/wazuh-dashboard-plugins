@@ -1,0 +1,414 @@
+{
+    "links": {
+        "create": "/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/_new",
+        "_reload": "/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/_reload",
+        "_acl": "/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/_acl"
+    },
+    "origin": "https://localhost:8000/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets",
+    "updated": "2020-01-30T02:22:31+00:00",
+    "generator": {
+        "build": "1357bef0a7f6",
+        "version": "8.0.0"
+    },
+    "entry": [
+        {
+            "name": "metric:avg_cpu_usage_all_indexers",
+            "id": "https://localhost:8000/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/metric%3Aavg_cpu_usage_all_indexers",
+            "updated": "2020-01-01T00:00:00+00:00",
+            "links": {
+                "alternate": "/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/metric%3Aavg_cpu_usage_all_indexers",
+                "list": "/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/metric%3Aavg_cpu_usage_all_indexers",
+                "_reload": "/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/metric%3Aavg_cpu_usage_all_indexers/_reload",
+                "edit": "/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/metric%3Aavg_cpu_usage_all_indexers",
+                "enable": "/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/metric%3Aavg_cpu_usage_all_indexers/enable"
+            },
+            "author": "nobody",
+            "acl": {
+                "app": "splunk_monitoring_console",
+                "can_change_perms": true,
+                "can_list": true,
+                "can_share_app": true,
+                "can_share_global": true,
+                "can_share_user": false,
+                "can_write": true,
+                "modifiable": true,
+                "owner": "nobody",
+                "perms": {
+                    "read": [
+                        "admin"
+                    ],
+                    "write": [
+                        "admin"
+                    ]
+                },
+                "removable": false,
+                "sharing": "app"
+            },
+            "content": {
+                "description": "Average CPU usage on indexers.",
+                "disabled": true,
+                "display_name": "Avg. CPU Usage: All Indexers",
+                "eai:acl": null,
+                "eai:appName": "splunk_monitoring_console",
+                "eai:userName": "nobody",
+                "recommended": "0",
+                "search": "| tstats avg(data.cpu_idle_pct) as cpu_idle WHERE index=_introspection component=Hostwide [ \n    | inputlookup dmc_assets \n    | where match(search_group, \"dmc_group_indexer\") \n    | fields host] \n| eval cpu_usage = 100 - cpu_idle \n| stats avg(cpu_usage) as avg_cpu_usage \n| eval value = round(avg_cpu_usage, 2).\"%\" \n| fields value"
+            }
+        },
+        {
+            "name": "metric:avg_cpu_usage_all_sh",
+            "id": "https://localhost:8000/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/metric%3Aavg_cpu_usage_all_sh",
+            "updated": "2020-01-01T00:00:00+00:00",
+            "links": {
+                "alternate": "/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/metric%3Aavg_cpu_usage_all_sh",
+                "list": "/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/metric%3Aavg_cpu_usage_all_sh",
+                "_reload": "/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/metric%3Aavg_cpu_usage_all_sh/_reload",
+                "edit": "/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/metric%3Aavg_cpu_usage_all_sh",
+                "enable": "/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/metric%3Aavg_cpu_usage_all_sh/enable"
+            },
+            "author": "nobody",
+            "acl": {
+                "app": "splunk_monitoring_console",
+                "can_change_perms": true,
+                "can_list": true,
+                "can_share_app": true,
+                "can_share_global": true,
+                "can_share_user": false,
+                "can_write": true,
+                "modifiable": true,
+                "owner": "nobody",
+                "perms": {
+                    "read": [
+                        "admin"
+                    ],
+                    "write": [
+                        "admin"
+                    ]
+                },
+                "removable": false,
+                "sharing": "app"
+            },
+            "content": {
+                "description": "Average CPU usage on search heads.",
+                "disabled": true,
+                "display_name": "Avg. CPU Usage: All Search Heads",
+                "eai:acl": null,
+                "eai:appName": "splunk_monitoring_console",
+                "eai:userName": "nobody",
+                "recommended": "0",
+                "search": "| tstats avg(data.cpu_idle_pct) as cpu_idle WHERE index=_introspection component=Hostwide [ \n    | inputlookup dmc_assets \n    | where match(search_group, \"dmc_group_search_head\") \n    | fields host] \n| eval cpu_usage = 100 - cpu_idle \n| stats avg(cpu_usage) as avg_cpu_usage \n| eval value = round(avg_cpu_usage, 2).\"%\" \n| fields value"
+            }
+        },
+        {
+            "name": "metric:avg_indexing_rate",
+            "id": "https://localhost:8000/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/metric%3Aavg_indexing_rate_all_indexers",
+            "updated": "2020-01-01T00:00:00+00:00",
+            "links": {
+                "alternate": "/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/metric%3Aavg_indexing_rate_all_indexers",
+                "list": "/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/metric%3Aavg_indexing_rate_all_indexers",
+                "_reload": "/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/metric%3Aavg_indexing_rate_all_indexers/_reload",
+                "edit": "/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/metric%3Aavg_indexing_rate_all_indexers",
+                "disable": "/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/metric%3Aavg_indexing_rate_all_indexers/disable"
+            },
+            "author": "nobody",
+            "acl": {
+                "app": "splunk_monitoring_console",
+                "can_change_perms": true,
+                "can_list": true,
+                "can_share_app": true,
+                "can_share_global": true,
+                "can_share_user": false,
+                "can_write": true,
+                "modifiable": true,
+                "owner": "nobody",
+                "perms": {
+                    "read": [
+                        "admin"
+                    ],
+                    "write": [
+                        "admin"
+                    ]
+                },
+                "removable": false,
+                "sharing": "app"
+            },
+            "content": {
+                "description": "Average indexing rate on indexers.",
+                "disabled": false,
+                "display_name": "Avg. Indexing Rate: All Indexers",
+                "eai:acl": null,
+                "eai:appName": "splunk_monitoring_console",
+                "eai:userName": "nobody",
+                "recommended": "1",
+                "search": "| rest splunk_server_group=dmc_group_indexer /services/server/introspection/indexer \n| stats sum(average_KBps) as indexing_rate \n| eval value = round(indexing_rate, 2).\" KB/sec\" \n| fields value"
+            }
+        },
+        {
+            "name": "metric:avg_mem_usage_all_indexers",
+            "id": "https://localhost:8000/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/metric%3Aavg_mem_usage_all_indexers",
+            "updated": "2020-01-01T00:00:00+00:00",
+            "links": {
+                "alternate": "/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/metric%3Aavg_mem_usage_all_indexers",
+                "list": "/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/metric%3Aavg_mem_usage_all_indexers",
+                "_reload": "/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/metric%3Aavg_mem_usage_all_indexers/_reload",
+                "edit": "/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/metric%3Aavg_mem_usage_all_indexers",
+                "enable": "/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/metric%3Aavg_mem_usage_all_indexers/enable"
+            },
+            "author": "nobody",
+            "acl": {
+                "app": "splunk_monitoring_console",
+                "can_change_perms": true,
+                "can_list": true,
+                "can_share_app": true,
+                "can_share_global": true,
+                "can_share_user": false,
+                "can_write": true,
+                "modifiable": true,
+                "owner": "nobody",
+                "perms": {
+                    "read": [
+                        "admin"
+                    ],
+                    "write": [
+                        "admin"
+                    ]
+                },
+                "removable": false,
+                "sharing": "app"
+            },
+            "content": {
+                "description": "Average physical memory usage on indexers.",
+                "disabled": true,
+                "display_name": "Avg. Mem Usage: All Indexers",
+                "eai:acl": null,
+                "eai:appName": "splunk_monitoring_console",
+                "eai:userName": "nobody",
+                "recommended": "0",
+                "search": "| tstats avg(data.mem_used) AS avg_mem_usage avg(data.mem) AS avg_mem WHERE index=_introspection component=Hostwide [ \n    | inputlookup dmc_assets \n    | where match(search_group, \"dmc_group_indexer\") \n    | fields host] \n| eval value = round(100*avg_mem_usage/avg_mem, 0).\"%\" \n| fields value"
+            }
+        },
+        {
+            "name": "metric:avg_mem_usage_all_sh",
+            "id": "https://localhost:8000/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/metric%3Aavg_mem_usage_all_sh",
+            "updated": "2020-01-01T00:00:00+00:00",
+            "links": {
+                "alternate": "/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/metric%3Aavg_mem_usage_all_sh",
+                "list": "/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/metric%3Aavg_mem_usage_all_sh",
+                "_reload": "/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/metric%3Aavg_mem_usage_all_sh/_reload",
+                "edit": "/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/metric%3Aavg_mem_usage_all_sh",
+                "enable": "/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/metric%3Aavg_mem_usage_all_sh/enable"
+            },
+            "author": "nobody",
+            "acl": {
+                "app": "splunk_monitoring_console",
+                "can_change_perms": true,
+                "can_list": true,
+                "can_share_app": true,
+                "can_share_global": true,
+                "can_share_user": false,
+                "can_write": true,
+                "modifiable": true,
+                "owner": "nobody",
+                "perms": {
+                    "read": [
+                        "admin"
+                    ],
+                    "write": [
+                        "admin"
+                    ]
+                },
+                "removable": false,
+                "sharing": "app"
+            },
+            "content": {
+                "description": "Average physical memory usage on search heads.",
+                "disabled": true,
+                "display_name": "Avg. Mem Usage: All Search Heads",
+                "eai:acl": null,
+                "eai:appName": "splunk_monitoring_console",
+                "eai:userName": "nobody",
+                "recommended": "0",
+                "search": "| tstats avg(data.mem_used) AS avg_mem_usage avg(data.mem) AS avg_mem WHERE index=_introspection component=Hostwide [ \n    | inputlookup dmc_assets \n    | where match(search_group, \"dmc_group_search_head\") \n    | fields host] \n| eval value = round(100*avg_mem_usage/avg_mem, 0).\"%\" \n| fields value"
+            }
+        },
+        {
+            "name": "metric:avg_search_latency",
+            "id": "https://localhost:8000/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/metric%3Aavg_search_latency",
+            "updated": "2020-01-01T00:00:00+00:00",
+            "links": {
+                "alternate": "/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/metric%3Aavg_search_latency",
+                "list": "/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/metric%3Aavg_search_latency",
+                "_reload": "/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/metric%3Aavg_search_latency/_reload",
+                "edit": "/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/metric%3Aavg_search_latency",
+                "disable": "/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/metric%3Aavg_search_latency/disable"
+            },
+            "author": "nobody",
+            "acl": {
+                "app": "splunk_monitoring_console",
+                "can_change_perms": true,
+                "can_list": true,
+                "can_share_app": true,
+                "can_share_global": true,
+                "can_share_user": false,
+                "can_write": true,
+                "modifiable": true,
+                "owner": "nobody",
+                "perms": {
+                    "read": [
+                        "admin"
+                    ],
+                    "write": [
+                        "admin"
+                    ]
+                },
+                "removable": false,
+                "sharing": "app"
+            },
+            "content": {
+                "description": "Average Search Latency is a comparison of the execution time of scheduled searches.",
+                "disabled": false,
+                "display_name": "Avg. Search Latency",
+                "eai:acl": null,
+                "eai:appName": "splunk_monitoring_console",
+                "eai:userName": "nobody",
+                "recommended": "1",
+                "search": "index=_internal search_group=dmc_group_search_head sourcetype=scheduler status=\"completed\" search_type=\"scheduled\" \n| eval window_time = if(isnotnull(window_time), window_time, 0) \n| eval execution_latency = max(dispatch_time - (scheduled_time + window_time), 0) \n| stats avg(execution_latency) as avg_exec_latency \n| eval value = round(avg_exec_latency,2).\" sec\" \n| fields value"
+            }
+        },
+        {
+            "name": "metric:avg_skipped_searches",
+            "id": "https://localhost:8000/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/metric%3Aavg_skipped_searches",
+            "updated": "2020-01-01T00:00:00+00:00",
+            "links": {
+                "alternate": "/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/metric%3Aavg_skipped_searches",
+                "list": "/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/metric%3Aavg_skipped_searches",
+                "_reload": "/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/metric%3Aavg_skipped_searches/_reload",
+                "edit": "/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/metric%3Aavg_skipped_searches",
+                "disable": "/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/metric%3Aavg_skipped_searches/disable"
+            },
+            "author": "nobody",
+            "acl": {
+                "app": "splunk_monitoring_console",
+                "can_change_perms": true,
+                "can_list": true,
+                "can_share_app": true,
+                "can_share_global": true,
+                "can_share_user": false,
+                "can_write": true,
+                "modifiable": true,
+                "owner": "nobody",
+                "perms": {
+                    "read": [
+                        "admin"
+                    ],
+                    "write": [
+                        "admin"
+                    ]
+                },
+                "removable": false,
+                "sharing": "app"
+            },
+            "content": {
+                "description": "Average Skipped Searches is a comparison of scheduled searches skipped by default.",
+                "disabled": false,
+                "display_name": "Avg. Skipped Searches",
+                "eai:acl": null,
+                "eai:appName": "splunk_monitoring_console",
+                "eai:userName": "nobody",
+                "recommended": "1",
+                "search": "index=_internal search_group=dmc_group_search_head sourcetype=scheduler (status=\"completed\" OR status=\"skipped\" OR status=\"deferred\") \n| stats count(eval(status==\"completed\" OR status==\"skipped\")) AS total_exec, count(eval(status==\"skipped\")) AS skipped_exec by _time, savedsearch_id \n| eval avg_skip_ratio = skipped_exec / total_exec * 100 \n| stats avg(avg_skip_ratio) as value \n| eval value = round(value, 2).\"%\""
+            }
+        },
+        {
+            "name": "metric:total_hot_buckets",
+            "id": "https://localhost:8000/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/metric%3Atotal_hot_buckets_all_indexers",
+            "updated": "2020-01-01T00:00:00+00:00",
+            "links": {
+                "alternate": "/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/metric%3Atotal_hot_buckets_all_indexers",
+                "list": "/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/metric%3Atotal_hot_buckets_all_indexers",
+                "_reload": "/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/metric%3Atotal_hot_buckets_all_indexers/_reload",
+                "edit": "/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/metric%3Atotal_hot_buckets_all_indexers",
+                "enable": "/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/metric%3Atotal_hot_buckets_all_indexers/enable"
+            },
+            "author": "nobody",
+            "acl": {
+                "app": "splunk_monitoring_console",
+                "can_change_perms": true,
+                "can_list": true,
+                "can_share_app": true,
+                "can_share_global": true,
+                "can_share_user": false,
+                "can_write": true,
+                "modifiable": true,
+                "owner": "nobody",
+                "perms": {
+                    "read": [
+                        "admin"
+                    ],
+                    "write": [
+                        "admin"
+                    ]
+                },
+                "removable": false,
+                "sharing": "app"
+            },
+            "content": {
+                "description": "Total number of hot buckets across system.",
+                "disabled": true,
+                "display_name": "Total Hot Bucket Count: All Indexers",
+                "eai:acl": null,
+                "eai:appName": "splunk_monitoring_console",
+                "eai:userName": "nobody",
+                "recommended": "0",
+                "search": "| rest datatype=all splunk_server_group=dmc_group_indexer /services/data/indexes-extended \n| stats sum(bucket_dirs.home.hot_bucket_count) as value"
+            }
+        },
+        {
+            "name": "settings",
+            "id": "https://localhost:8000/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/settings",
+            "updated": "2020-01-01T00:00:00+00:00",
+            "links": {
+                "alternate": "/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/settings",
+                "list": "/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/settings",
+                "_reload": "/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/settings/_reload",
+                "edit": "/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/settings",
+                "disable": "/servicesNS/nobody/splunk_monitoring_console/configs/conf-splunk_monitoring_console_assets/settings/disable"
+            },
+            "author": "nobody",
+            "acl": {
+                "app": "splunk_monitoring_console",
+                "can_change_perms": true,
+                "can_list": true,
+                "can_share_app": true,
+                "can_share_global": true,
+                "can_share_user": false,
+                "can_write": true,
+                "modifiable": true,
+                "owner": "nobody",
+                "perms": {
+                    "read": [
+                        "admin"
+                    ],
+                    "write": [
+                        "admin"
+                    ]
+                },
+                "removable": false,
+                "sharing": "app"
+            },
+            "content": {
+                "configuredPeers": "",
+                "disabled": false,
+                "eai:acl": null,
+                "eai:appName": "splunk_monitoring_console",
+                "eai:userName": "nobody"
+            }
+        }
+    ],
+    "paging": {
+        "total": 9,
+        "perPage": 30,
+        "offset": 0
+    },
+    "messages": []
+}

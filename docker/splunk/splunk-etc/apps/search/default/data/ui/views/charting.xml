@@ -1,0 +1,3 @@
+<view template="builder.html" onunloadCancelJobs="False" type="redirect" target="search" isVisible="False" isDashboard="False">
+  <label>Advanced Charting</label>
+</view>

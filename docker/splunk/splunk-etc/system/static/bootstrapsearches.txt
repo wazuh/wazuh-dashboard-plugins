@@ -1,0 +1,505 @@
+search ipfw | fields + SourceAddress DestinationAddress DestinationPort
+search eventtypetag=CM starthoursago=1 | timechart count(action) by action
+search eventtypetag=CM starthoursago=1 | timechart count(action) by host
+search eventtypetag=resource eventtypetag=file eventtypetag=create starthoursago=1 | timechart count(action)
+search eventtypetag=resource eventtypetag=file eventtypetag=create starthoursago=1 | timechart count(action) by host
+search eventtypetag=resource eventtypetag=file eventtypetag=delete starthoursago=1 | timechart count(action)
+search eventtypetag=resource eventtypetag=file eventtypetag=delete starthoursago=1 | timechart count(action) by host
+search eventtypetag=resource eventtypetag=file eventtypetag=modify starthoursago=1 | timechart count(action)
+search eventtypetag=resource eventtypetag=file eventtypetag=modify starthoursago=1 | timechart count(action) by host
+search eventtypetag=resource eventtypetag=file eventtypetag=modify starthoursago=1 | timechart count(action) by path
+search eventtypetag=CM host=$Host: $ starthoursago=24
+search eventtypetag=config_file source=$File path: $ host=$Host: $ starthoursago=24 | diff
+search sourcetype=fs_notification starthoursago=24 | dedup path | fields + host, path, modtime, src_user | sort host
+search eventtypetag=resource eventtypetag=file (tag=create OR tag=delete OR tag=modify) host=$Host: $ starthoursago=24 | dedup path | fields + path
+search tag=ticket starthoursago=1
+search eventtypetag=config_file source=/etc/passwd starthoursago=1 | diff
+search eventtypetag=network_config starthoursago=1
+search eventtypetag=network (tag=modify OR tag=create OR tag=delete) starthoursago=1
+search eventtypetag=network_config starttime="04/18/2008:09:15:00" endtime="04/18/2008:09:20:00" | diff
+search eventtypetag=user eventtypetag=authentication eventtypetag=create starthoursago=1
+search source=/etc/passwd starthoursago=1 | diff
+search eventtypetag=resource eventtypetag=file starthoursago=24 | stats dc(host) as hosts first(host) count by path | search hosts < 2
+search eventtypetag=resource eventtypetag=file starthoursago=24 | stats dc(host) count by path
+search eventtypetag=resource eventtypetag=file starthoursago=24 | top 0 host, path showperc=f | sort path
+search eventtypetag=file eventtypetag=resource (tag=modify OR tag=delete OR tag=create) [search tag=ticket | dedup key | rename file as path | rename host_accepted as host | convert timeformat="%Y/%m/%d %T" mktime(created) as _time | search path=* | fields + host, path, date_mday, date_year, date_month | format] starthoursago=24
+search tag=ticket | dedup key | rename file as path | rename host_accepted as host | convert timeformat="%Y/%m/%d %T" mktime(created) as _time
+search eventtypetag=file eventtypetag=resource tag=create starthoursago=24 | dedup path, host  | fields + path, action, uid, _time
+search tag=modify eventtypetag=resource eventtypetag=file | dedup path, host  | fields + path, action, uid, _time
+search tag=delete eventtypetag=resource eventtypetag=file | dedup path, host | dedup path, host  | fields + path, action, uid, _time
+search tag=modify OR tag=delete OR tag=create NOT ([search tag=ticket | dedup key | rename file as path | rename host_accepted as host | convert timeformat="%Y/%m/%d %T" mktime(created) as _time | search path=* | fields + host, path, date_mday, date_year, date_month | format]) starthoursago=24
+search tag=modify OR tag=delete OR tag=create tag=sev1 NOT ([search tag=ticket | dedup key | rename file as path | rename host_accepted as host | convert timeformat="%Y/%m/%d %T" mktime(created) as _time | search path=* | fields + host, path, date_mday, date_year, date_month | format]) starthoursago=24
+search tag=create eventtypetag=file eventtypetag=resource tag=sev1 starthoursago=24 | dedup path, host  | fields + path, action, uid, _time
+search eventtypetag=file eventtypetag=modify eventtypetag=resource tag=sev1 starthoursago=24 | dedup path, host  | fields + path, action, uid, _time
+search eventtypetag=file eventtypetag=delete eventtypetag=resource tag=sev1 starthoursago=24 | dedup path, host  | fields + path, action, uid, _time
+search host=$Host: $ tag=create OR tag=modify OR tag=delete startdaysago=7 | fields + path, action, uid, _time
+search host=$Host: $ tag=create OR tag=modify OR tag=delete startdaysago=7 | timechart span=24h count(_raw) by action usenull=f
+search tag=ticket  | dedup key | rename file as path | rename host_accepted as host | convert timeformat="%Y/%m/%d %T" mktime(created) as _time | timechart count(_raw) by priority
+search tag=ticket  | dedup key | rename file as path | rename host_accepted as host | chart count(_raw) by "tag::host" | regex "tag::host"="sev"
+search tag=modify OR tag=delete OR tag=create starthoursago=24 | rename host as host_changed | chart count(_raw) by host_changed, action useother=f usenull=f
+search tag=modify OR tag=delete OR tag=create starthoursago=24 | stats count(_raw) by host | rename host as host_changed
+search tag=modify OR tag=delete OR tag=create starthoursago=24 | timechart count(_raw) by action usenull=f
+search tag=sev1 OR tag=sev2 OR tag=sev3 tag=create OR tag=delete OR tag=modify starthoursago=24 | chart count(_raw) by "tag::host", action useother=f usenull=f | search "tag::host"=sev1 OR "tag::host"=sev2 OR "tag::host"=sev3
+search tag=sev1 OR tag=sev2 OR tag=sev3  tag=create OR tag=delete OR tag=modify starthoursago=24 | chart count(_raw) by "tag::host" useother=f usenull=f | search "tag::host"=sev1 OR "tag::host"=sev2 OR "tag::host"=sev3
+search tag=modify OR tag=delete OR tag=create starthoursago=24 | chart count(_raw) by action
+search tag=modify OR tag=delete OR tag=create startdaysago=7 | rex   field=action "(?<change>add|delete|update)" | timechart count(_raw) by change usenull=f | outlier
+search tag=modify OR tag=delete OR tag=create starthoursago=24 | dedup host, action | stats count by action, host | rex   field=action "(?<change>add|delete|update)" | replace add with changed in status | replace delete with changed in status | replace update with changed in status | eval hosttype=change | stats dc(host) as hostcount by change
+search tag=modify OR tag=delete OR tag=create startdaysago=7 | rex   field=action "(?<change>add|delete|update)" | timechart span=1h dc(host) by change usenull=f
+search tag=modify OR tag=delete OR tag=create starthoursago=24 | dedup host, action | stats count by action, host | rex   field=action "(?<change>add|delete|update)" | replace add with changed in status | replace delete with changed in status | replace update with changed in status | eval hosttype=change | stats dc(host) as hostcount by change
+search index=_internal savedsplunker source=*splunkd.log CM-policymonitor action NOT action="'no action'" starthoursago=24 | chart count(_raw) by saved_search
+search index=_internal savedsplunker source=*splunkd.log CM-policymonitor action NOT action="'no action'" starthoursago=24 | chart count(_raw) by saved_search
+search tag=modify OR tag=delete OR tag=create NOT ([search tag=ticket | dedup key | rename file as path | rename host_accepted as host | convert timeformat="%Y/%m/%d %T" mktime(created) as _time | search path=* | fields + host, path, date_mday date_year, date_month | format]) starthoursago=24 | timechart span=1h count(_raw)
+search tag=modify OR tag=delete OR tag=create NOT ([search tag=ticket | dedup key | rename file as path | rename host_accepted as host | convert timeformat="%Y/%m/%d %T" mktime(created) as _time | search path=* | fields + host, path, date_mday date_year, date_month | format]) starthoursago=24 | chart count(_raw) by action
+search tag=modify OR tag=delete OR tag=create startdaysago=7 | rex   field=action "(?<change>add|delete|update)" | timechart span=1h count(_raw) by change usenull=f | outlier
+search tag=modify OR tag=delete OR tag=create startdaysago=7 startdaysago=7 | rex   field=action "(?<change>add|delete|update)" | timechart span=1h dc(host) by change usenull=f
+search index=_internal savedsplunker source=*splunkd.log CM-policymonitor action NOT action="'no action'" startdaysago=7 | timechart count(_raw) by saved_search useother=f usenull=f
+search tag=create eventtypetag=file eventtypetag=resource startdaysago=7  | timechart span=1h count(_raw) by path usenull=f useother=f | outlier
+search tag=delete eventtypetag=file eventtypetag=resource startdaysago=7  | timechart count(_raw) by path useother=f usenull=f
+search tag=modify eventtypetag=file eventtypetag=resource | timechart span=1h count(_raw) by host useother=f usenull=f
+search tag=modify eventtypetag=file eventtypetag=resource startdaysago=7 | timechart span=1h count(_raw) by path usenull=f useother=f | outlier
+search source="/etc/aliases" | regex _raw= "#.*mailer"
+search source="/etc/httpd/conf/httpd.conf" | regex _raw="(?m)^Listen 80"
+search source="/etc/ldap.conf" startdaysago=7 | regex _raw!="(base dc=example,dc=com)"
+search source="/etc/nsswitch.conf" startdaysago=7 | regex _raw="(?m)^hosts:\s*files dns"
+search source="/etc/hosts" | regex _raw!="(?m)(127\.0\.0\.1\s+localhost\.localdomain\s+localhost)" | dedup host
+search eventtypetag=authentication eventtypetag=verify eventtypetag=failure startminutesago=60
+search eventtypetag=authentication eventtypetag=verify eventtypetag=failure startminutesago=60 | chart dc(_raw) by user
+search eventtypetag=authentication eventtypetag=verify startminutesago=60 | top user
+search eventtypetag=authentication eventtypetag=modify eventtypetag=failure startminutesago=60
+search eventtypetag=user eventtypetag=authentication eventtypetag=add eventtypetag=success startminutesago=60
+search eventtypetag=authentication eventtypetag=add eventtypetag=success startminutesago=60 | chart count by host
+search eventtypetag=authentication eventtypetag=modify eventtypetag=success startminutesago=60 | chart count by host
+search eventtypetag=authentication eventtypetag=modify eventtypetag=success startminutesago=60
+search eventtypetag=authentication eventtypetag=delete eventtypetag=success startminutesago=60
+search authentication eventtypetag=delete eventtypetag=success startminutesago=60 | chart count by host
+search tag=authentication eventtypetag=verify tag=failure startminutesago=60 | transaction maxspan=1h maxpause=30m fields=src_ip | search count>3 | top user
+search eventtypetag=authorization eventtypetag=modify eventtype=group startminutesago=60
+search eventtypetag=authentication eventtypetag=verify eventtypetag=success startminutesago=60
+search eventtypetag=authentication eventtypetag=verify eventtypetag=success host=* user=* startminutesago=60 | fields + host, user | dedup host,user
+search eventtypetag=authorization eventtypetag=modify eventtype=user startminutesago=60
+search eventtypetag=authentication eventtypetag=verify eventtypetag=success host=* user=* startminutesago=60 | fields + _time, host, user
+search eventtypetag=authentication eventtypetag=verify eventtypetag=success dest_ip=$Machine: $ startminutesago=60
+search (eventtypetag=authorization OR eventtypetag=authentication) eventtypetag=modify eventtype=user user=$User: $ startminutesago=60
+search user=* startminutesago=60 | top user
+search eventtypetag=firewall eventtypetag=communicate signature=$Rule number: $ startminutesago=15 | top dest_port
+search eventtypetag=firewall eventtypetag=communicate eventtypetag=success dest_port=$Port (Service): $ startminutesago=60
+search eventtypetag=fireall eventtypetag=communicate eventtypetag=success host=$Firewall address: $ startminutesago=60 | fields + host, dest_port | sort host, dest_port | dedup host, dest_port
+search eventtypetag=firewall eventtypetag=communicate TCP starthoursago=24 | timechart count(_raw) by dest_port
+search eventtypetag=firewall eventtypetag=communicate UDP starthoursago=24 | timechart count(_raw) by dest_port
+search eventtypetag=firewall eventtypetag=communicate [search eventtypetag=firewall eventtypetag=communicate eventtypetag=success [search eventtypetag=firewall eventtypetag=communicate eventtypetag=failure | stats dc(DPT) as count by src_ip | search count>5| fields + src_ip] | fields + src_ip] startminutesago=60 | stats count by src_ip, DPT, action | sort src_ip, action, DPT
+search eventtypetag=firewall eventtypetag=communicate eventtypetag=success startminutesago=60 | fields + host, dest_port | sort host, dest_port | dedup host, dest_port
+search eventtypetag=firewall eventtypetag=communicate dest_ip=$Destination address: $ startminutesago=60
+search eventtypetag=firewall eventtypetag=communicate dest_port=$Service (port): $ startminutesago=60
+search eventtypetag=firewall eventtypetag=communicate src_ip=$Source address: $ startminutesago=60
+search index=summary type="firewall top service" startdaysago=7 | chart sum(count) as count by dest_port | sort - count
+search index=summary type="firewall top blocked destination" startdaysago=7 | chart sum(count) as count by dest_ip | sort - count
+search index=summary type="firewall top blocked service" startdaysago=7 | chart sum(count) as count by dest_port | sort - count
+search index=summary type="firewall top blocked source" startdaysago=7 | chart sum(count) as count by src_ip | sort - count
+search index=summary type="firewall top destination" startdaysago=7 | chart sum(count) as count by dest_ip | sort - count
+search index=summary type="firewall block statistics"  | timechart count
+search eventtypetag=firewall eventtypetag=communicate starthoursago=24 | top signature
+search index=summary type="firewall top source" startdaysago=7 | chart sum(count) as count by src_ip | sort - count
+search eventtypetag=firewall eventtypetag=communicate startminutesago=60 | timechart count(_raw) by dest_ip
+search eventtypetag=firewall eventtypetag=communicate startminutesago=60 | timechart count(bytes_in) by proto
+search eventtypetag=firewall eventtypetag=communicate startminutesago=60 | timechart count(bytes_in) by dest_port
+search eventtypetag=firewall eventtypetag=communicate starthoursago=24 | timechart count(bytes_in) by action
+search eventtypetag=firewall eventtypetag=communicate startminutesago=60 | timechart count(_raw) by dst_port
+search eventtypetag=firewall eventtypetag=communicate startminutesago=60 | stats count by src_ip,dest_ip,dest_port | search count!=1 | collect index=summary marker="type=\"firewall statistics\"" addtime=T
+search eventtypetag=firewall eventtypetag=communicate eventtypetag=failure startminutesago=65 endminutesago=5 | stats count by src_ip,dest_ip,dest_port | search count!=1 | collect index=summary marker="type=\"firewall block statistics\""  addtime=T
+search index=summary type="firewall statistics" startminutesago=95 endminutesago=35 | stats sum(count) as count by src_ip | sort - count | head 100 | collect index=summary marker="type=\"firewall top source\"" addtime=T
+search index=summary type="firewall block statistics" startminutesago=80 endminutesago=20 | stats sum(count) as count by src_ip | sort - count | head 100 | collect index=summary marker="type=\"firewall top blocked source\"" addtime=T
+search index=summary type="firewall statistics" startminutesago=85 endminutesago=25 | stats sum(count) as count by dest_ip | sort - count | head 100 | collect index=summary marker="type=\"firewall top destination\"" addtime=T
+search index=summary type="firewall block statistics" startminutesago=70 endminutesago=10 | stats sum(count) as count by dest_ip | sort - count | head 100 | collect index=summary marker="type=\"firewall top blocked destination\"" addtime=T
+search index=summary type="firewall statistics" startminutesago=90 endminutesago=30 | stats sum(count) as count by dest_port | sort - count | head 100 | collect index=summary marker="type=\"firewall top service\"" addtime=T
+search index=summary type="firewall block statistics" startminutesago=75 endminutesago=15 | stats sum(count) as count by dest_port | sort - count | head 100 | collect index=summary marker="type=\"firewall top blocked service\"" addtime=T
+search tag=ids starthoursago=1 | stats count by src_ip,dest_ip,severity,signature,name | collect index=summary marker="type=\"ids statistics\"" addtime=T
+search tag=ids starthoursago=1 | makemv tag::eventtype | stats count by src_ip,dest_ip,signature,name,tag::eventtype | search count!=1 (tag::eventtype=suspicious OR tag::eventtype=infoleak OR tag::eventtype=attack OR tag::eventtype=malware OR tag::eventtype=recon) | collect index=summary marker="type=\"ids eventtype statistics\"" addtime=T
+search index=summary type="ids statistics" signature=* startdaysago=7 | timechart count(_raw) by dest_ip
+search index=summary type="ids statistics" signature=* startdaysago=7 | timechart count(_raw) by severity
+search index=summary type="ids statistics" name=* startdaysago=7 | timechart count(_raw) by name
+search index=summary type="ids statistics" signature=* startdaysago=7 | timechart count(_raw) by src_ip
+search index=summary type="ids eventtype statistics" tag::eventtype=attack startdaysago=7 | top src_ip
+search index=summary type="ids eventtype statistics" tag::eventtype=attack startdaysago=7 | top dest_ip
+search index=summary type="ids eventtype statistics" tag::eventtype=malware startdaysago=7 | top src_ip
+search index=summary type="ids eventtype statistics" tag::eventtype=malware startdaysago=7 | top dest_ip
+search index=summary type="ids eventtype statistics" tag::eventtype=recon startdaysago=7 | top src_ip
+search index=summary type="ids eventtype statistics" tag::eventtype=recon startdaysago=7 | top dest_ip
+search index=summary type="ids statistics" name=* startdaysago=7 | top name
+search eventtypetag=host eventtypetag=communicate eventtypetag=attack starthoursago=24
+search eventtypetag=host eventtypetag=execute eventtypetag=stop eventtypetag=success starthoursago=24
+search eventtypetag=application eventtypetag=execute eventtypetag=stop eventtypetag=success eventtypetag=suspicious starthoursago=24
+search eventtype=Bogon-address
+search eventtypetag=trojan starthoursago=24 | top eventtype | where eventtype like "%Trojan"
+search eventtypetag=trojan starthoursago=24 | top dest_port
+search eventtypetag=insecure starthoursago=24 | top dest_port
+search dhcpack | stats distinct_count(mac_address) as unique_hosts by client_hostname | search unique_hosts>2
+search user=$User: $ startminutesago=60
+search index=pci  | chart count(req) by req useother=f usenull=f | sort req
+search index=pci req=1  | chart sum(count) by name useother=f usenull=f
+search index=pci req=2  | chart sum(count) by name useother=f usenull=f
+search index=pci req=3  | chart sum(count) by name useother=f usenull=f
+search index=pci req=4  | chart sum(count) by name useother=f usenull=f
+search index=pci req=5  | chart sum(count) by name useother=f usenull=f
+search index=pci req=6  | chart sum(count) by name useother=f usenull=f
+search index=pci req=7  | chart sum(count) by name useother=f usenull=f
+search index=pci req=8  | chart sum(count) by name useother=f usenull=f
+search index=pci req=9  | chart sum(count) by name useother=f usenull=f
+search index=pci req=10  | chart sum(count) by name useother=f usenull=f
+search index=pci req=11  | chart sum(count) by name useother=f usenull=f
+search index=pci req=12  | chart sum(count) by name useother=f usenull=f
+search *  | top limit=100 sourcetype
+search tag=pci eventtypetag=insecure
+search eventtypetag=communicate eventtypetag=host eventtypetag=firewall tag=pci | top limit=500 dest_port, host
+search eventtypetag=communicate eventtypetag=host tag=cardholder-dest | top limit=1000 dest_port
+search eventtypetag=communicate tag=cardholder-dest
+search tag=pci eventtypetag=network eventtypetag=modify eventtypetag=configuration eventtypetag=success
+search tag=wireless-src tag=cardholder-dest eventtypetag=communicate
+search eventtypetag=authentication eventtypetag=success tag=pci host=$host$
+search eventtypetag=authentication tag=pci host=$host$
+search eventtypetag=communicate tag=dmz-src tag=internal-dest
+search eventtypetag=communicate tag=dmz-src tag=internal-dest | chart count by dest_port
+search eventtypetag=communicate eventtypetag=firewall eventtypetag=failure eventtypetag=host tag=external-src tag=cardholder-dest tag=pci
+search tag=pci eventtypetag=communicate eventtypetag=firewall eventtypetag=success eventtypetag=host tag=external-src tag=cardholder-dest
+search eventtypetag=host eventtypetag=communicate eventtypetag=failure eventtypetag=firewall tag=pci | top limit=100 src_ip, dest_ip
+search eventtypetag=host eventtypetag=communicate eventtypetag=firewall tag=pci | top limit=100 action, src_port, dest_port
+search tag="wireless-src" tag=cardholder-dest eventtypetag=communicate eventtypetag=failure eventtypetag=firewall
+search tag=wireless-src tag=cardholder-dest eventtypetag=communicate eventtypetag=firewall eventtypetag=success
+search tag=wireless-src tag=cardholder-dest eventtypetag=communicate
+search eventtypetag=authentication eventtypetag=success tag=pci host=$host$ | fields + user
+search tag=pci | regex _raw=\D+\d{4}\W\d{4}\W\d{4}\W\d{4}\D+
+search tag=pci | regex _raw=\D+\d{4}\W\d{4}\W\d{4}\W\d{4}\D+ | timechart count by host
+search tag=cardholder-dest eventtypetag=communicate eventtypetag=success eventtypetag=insecure
+search tag=cardholder-dest eventtypetag=communicate eventtypetag=success eventtypetag=insecure source_ip=$src_ip$
+search eventtypetag=communicate eventtypetag=success tag=cardholder-dest
+search eventtypetag=communicate eventtypetag=success tag=cardholder-dest  | chart count by src_ip
+search eventtypetag=authentication eventtypetag=success tag=cardholder  | fields + user, src_ip, host | sort +host
+search eventtypetag=authentication eventtypetag=success tag=cardholder
+search eventtypetag=authentication eventtypetag=success tag=cardholder | stats count by user
+search eventtypetag=authentication eventtypetag=success tag=cardholder | top limit=1000 process
+search eventtypetag=authentication eventtypetag=modify eventtypetag=success tag=pci
+search eventtypetag=authentication eventtypetag=modify eventtypetag=success tag=pci host=$host$
+search eventtypetag=user eventtypetag=authentication eventtypetag=add eventtypetag=success tag=pci
+search eventtypetag=user eventtypetag=authentication eventtypetag=add eventtypetag=success tag=pci host=$host$
+search eventtypetag=authentication eventtypetag=success tag=cardholder | top limit=1000 process user
+search eventtypetag=authentication eventtypetag=add eventtypetag=success tag=pci | chart count by host
+search eventtypetag=authentication eventtypetag=modify eventtypetag=success tag=pci | chart count by host
+search eventtypetag=authentication eventtypetag=delete eventtypetag=success tag=pci
+search eventtypetag=authentication eventtypetag=delete eventtypetag=success tag=pci host=$host$
+search eventtypetag=authentication eventtypetag=delete eventtypetag=success tag=pci | chart count by host
+search eventtypetag=malware tag=pci eventtypetag=alert
+search eventtypetag=malware tag=pci eventtypetag=alert host=$host$
+search tag=pci eventtypetag=malware eventtypetag=alert | top sourcetype limit=5 by virus_type
+search eventtypetag=malware tag=pci eventtypetag=alert | chart count by host
+search eventtypetag=malware tag=pci eventtypetag=check eventtypetag=attempt
+search tag=pci eventtypetag=malware eventtypetag=check  | timechart span=1d count by host | sort -_time
+search tag=pci eventtypetag=malware  host=$host$  | fields + version
+search eventtypetag=os eventtypetag=service eventtypetag=create eventtypetag=success tag=pci
+search tag=pci eventtypetag=os eventtypetag=service eventtypetag=create eventtypetag=success host=$host$
+search eventtypetag=os eventtypetag=service eventtypetag=create eventtypetag=success tag=pci | timechart count(host) by host
+search eventtypetag=os eventtypetag=service eventtypetag=create eventtypetag=success tag=pci
+search tag=pci tag=dns_server (dest_port!=22 AND dest_port!=53 AND dest_port!=953)
+search tag=pci tag=mail_server (dest_port!=22 AND dest_port!=25 AND dest_port!=110 AND dest_port!=143 AND dest_port!=993 AND dest_port!=953)
+search tag=pci tag=web_server (dest_port!=22 AND dest_port!=80 AND dest_port!=8080 AND dest_port!=8081 AND dest_port!=443)
+search eventtypetag=user eventtypetag=authentication eventtypetag=add eventtypetag=success tag=cardholder
+search tag=pci eventtypetag=user eventtypetag=authentication eventtypetag=add eventtypetag=success tag=domain-controller
+search tag=pci eventtypetag=user eventtypetag=authentication eventtypetag=add eventtypetag=success tag=domain-controller | timechart count
+search eventtypetag=user eventtypetag=authentication eventtypetag=add eventtypetag=success NOT tag=domain-controller tag=pci
+search eventtypetag=user eventtypetag=authentication eventtypetag=add eventtypetag=success NOT tag=domain-controller tag=pci | timechart count
+search eventtypetag=user eventtypetag=authentication eventtypetag=add eventtypetag=success tag=cardholder | timechart count
+search tag=pci eventtypetag=user eventtypetag=delete eventtypetag=success tag=domain-controller
+search tag=pci eventtypetag=user eventtypetag=delete eventtypetag=success tag=domain-controller | timechart count
+search eventtypetag=user eventtypetag=authentication eventtypetag=delete eventtypetag=success NOT tag=domain-controller tag=pci
+search eventtypetag=user eventtypetag=authentication eventtypetag=delete eventtypetag=success NOT tag=domain-controller tag=pci | timechart count
+search eventtypetag=user eventtypetag=authentication eventtypetag=delete eventtypetag=success tag=cardholder
+search eventtypetag=user eventtypetag=authentication eventtypetag=delete eventtypetag=success tag=cardholder | timechart count
+search tag=pci event_id=632 user_group="domain admins"
+search tag=pci eventtypetag=group eventtypetag=modify eventtypetag=content eventtypetag=create eventtypetag=success
+search tag=pci eventtypetag=group eventtypetag=modify eventtypetag=content eventtypetag=create eventtypetag=success | timechart count
+search tag=pci event_id=636 user_group=administrators
+search tag=pci event_id=633 user_group="domain admins"
+search tag=pci eventtypetag=group eventtypetag=modify eventtypetag=content eventtypetag=delete eventtypetag=success
+search tag=pci eventtypetag=group eventtypetag=modify eventtypetag=content eventtypetag=delete eventtypetag=success | timechart count
+search tag=pci event_id=637 user_group=administrators
+search tag=pci event_id=632 user_group="enterprise admins"
+search tag=pci event_id=633 user_group="enterprise admins"
+search tag=pci eventtypetag=authentication eventtypetag=modify eventtypetag=success eventtypetag=lock
+search eventtypetag=authentication eventtypetag=failure tag=pci
+search eventtypetag=authentication eventtypetag=failure tag=pci | timechart count(user)
+search eventtypetag=authentication eventtypetag=success eventtypetag=SAP tag=pci
+search tag=pci eventtypetag=authentication eventtypetag=success eventtypetag=sap | chart count by host
+search tag=pci eventtypetag=authentication eventtypetag=success eventtypetag=siebel
+search tag=pci eventtypetag=authentication eventtypetag=success eventtypetag=siebel | chart count by host
+search tag=pci eventtypetag=authentication eventtypetag=modify eventtypetag=success eventtypetag=lock eventtypetag=sap OR eventtypetag=siebel
+search tag=pci eventtypetag=authentication eventtypetag=failure (eventtypetag=sap OR eventtypetag=siebel)  | chart count by user
+search eventtypetag=authentication eventtypetag=modify eventtypetag=success eventtypetag=lock tag=cardholder
+search eventtypetag=authentication eventtypetag=modify eventtypetag=success eventtypetag=lock tag=cardholder | chart count by user
+search eventtypetag=authentication eventtypetag=failure tag=cardholder | fields + src_ip, user
+search tag=pci eventtypetag=default-username eventtypetag=authentication eventtypetag=success
+search tag=pci eventtypetag=authentication eventtypetag=default-username
+search tag=pci eventtypetag=authentication eventtypetag=default-username
+search tag=pci eventtypetag=authentication eventtypetag=default-username | timechart count(host) by host usenull=f
+search eventtypetag=authentication eventtypetag=success tag=cardholder tag=external-src
+search eventtypetag=authentication eventtypetag=success tag="external-src" tag=cardholder
+search eventtypetag=authentication eventtypetag=success tag="external-src" tag=cardholder | fields +src_ip, src_port, dest_port, user
+search eventtypetag=authentication eventtypetag=failure tag=cardholder
+search tag=pci eventtypetag=authentication eventtypetag=failure eventtypetag=sap
+search tag=pci eventtypetag=authentication eventtypetag=failure eventtypetag=sap | chart count by host
+search tag=pci eventtypetag=authentication eventtypetag=failure eventtypetag=siebel
+search tag=pci eventtypetag=authentication eventtypetag=failure eventtypetag=siebel | chart count by host
+search tag=pci eventtypetag=authentication eventtypetag=modify eventtypetag=success eventtypetag=lock tag=internal
+search tag=pci eventtypetag=authentication eventtypetag=modify eventtypetag=success eventtypetag=lock tag=internal | chart count by user
+search eventtypetag=authentication eventtypetag=success tag=cardholder NOT tag=src-whitelist
+search eventtypetag=authentication eventtypetag=success tag=cardholder NOT tag=src-whitelist | fields + src_ip, src_port, dest_port, user
+search eventtypetag=authentication eventtypetag=failure tag=cardholder-dest [search eventtypetag=authentication eventtypetag=failure tag=cardholder-dest | fields + src_ip, dest_ip, user | top src_ip, dest_ip, user | search count>5 | fields + src_ip, dest_ip, user ]  | fields + _time, host, src_ip, dest_ip, user, eventtype
+search eventtypetag=authentication tag=cardholder-dest src_ip="$Source IP$" OR user="$User$" | rex field=tag::eventtype "(?<status>(success|failure))" | strcat src_ip " / " user su | chart count by su status
+search eventtypetag=authentication eventtypetag=modify eventtypetag=success eventtypetag=lock tag=server tag=pci
+search eventtypetag=authentication eventtypetag=modify eventtypetag=success eventtypetag=lock tag=server tag=pci | chart count by user
+search tag=pci eventtypetag=service_account eventtypetag=authentication eventtypetag=success
+search tag=pci eventtypetag=terminated eventtypetag=authentication eventtypetag=success
+search tag=pci eventtypetag=terminated eventtypetag=authentication eventtypetag=success user=$user$
+search tag=pci eventtypetag=attack eventtypetag=host eventtypetag=failure
+search tag=pci eventtypetag=attack eventtypetag=host eventtypetag=attempt | top limit=100 signature
+search tag=pci eventtypetag=host eventtypetag=attack eventtypetag=attempt | top limit=100 signature
+search tag=pci eventtypetag=host eventtypetag=attack eventtypetag=attempt
+search tag=pci eventtypetag=attack eventtypetag=host eventtypetag=alert
+search tag=pci eventtypetag=attack eventtypetag=host eventtypetag=alert | top limit=100 signature
+search tag=pci eventtypetag=attack eventtypetag=host eventtypetag=alert | top limit=100 src_ip
+search tag=pci eventtypetag=attack eventtypetag=host eventtypetag=alert | top limit=100 dest_ip
+search tag=pci eventtypetag=attack eventtypetag=host eventtypetag=check
+search tag=pci eventtypetag=attack eventtypetag=host eventtypetag=check | stats count by host
+search eventtypetag=application eventtypetag=modify eventtypetag=configuration eventtypetag=success tag=pci
+search eventtypetag=application eventtypetag=modify eventtypetag=configuration eventtypetag=success tag=pci product=$application$
+search eventtypetag=application eventtypetag=modify eventtypetag=configuration eventtypetag=success tag=pci | chart count by host
+search eventtypetag=os eventtypetag=modify eventtypetag=configuration eventtypetag=success tag=pci
+search eventtypetag=os eventtypetag=modify eventtypetag=configuration eventtypetag=success tag=pci host=$host$
+search eventtypetag=os eventtypetag=modify eventtypetag=configuration eventtypetag=success tag=pci | stats count by host
+search tag=pci eventtypetag=os eventtypetag=modify eventtypetag=content eventtypetag=success
+search eventtypetag=os eventtypetag=modify eventtypetag=configuration eventtypetag=success tag=pci host=$host$
+search tag=pci eventtypetag=application eventtypetag=execute eventtypetag=stop eventtypetag=success (eventtypetag=malware OR eventtypetag=attack)
+search tag=pci eventtypetag=application eventtypetag=execute eventtypetag=stop eventtypetag=success (eventtypetag=malware OR eventtypetag=attack) host=$host$
+search eventtypetag=os eventtypetag=check eventtypetag=status eventtypetag=success tag=pci
+search eventtypetag=os eventtypetag=check eventtypetag=status eventtypetag=success tag=pci host=$host$
+search eventtypetag=os eventtypetag=execute eventtypetag=restart eventtypetag=success tag=pci
+search eventtypetag=os eventtypetag=execute eventtypetag=restart eventtypetag=success critical tag=pci
+search eventtypetag=os eventtypetag=check eventtypetag=status eventtypetag=success tag=pci NOT product_version=$new_patch_version$ product=$os_type$  | fields + product_version, host
+search tag=pci eventtypetag=attack eventtypetag=check  | timechart span=1d count by host | sort -_time
+search source=fschangemonitor action=update
+search source=fschangemonitor | timechart count(action) by host
+search NOT eventtypetag=not_ok NOT eventtypetag=ok tag=pci startdaysago=1
+search eventtypetag=not_ok startdaysago=1
+search index=_audit action=search pci  | rex field=_raw "search.*?\[(?<search>.*)\]  \| " | fields + _time,host,user,search
+search eventtypetag=firewall eventtypetag=host eventtypetag=communicate eventtypetag=failure tag=pci tag=external-src tag=cardholder-dest daysago::1 | stats count | search count>0 | collect index=pci marker="req=1 name=\"Firewall deny\"" addTime=T
+search eventtypetag=authentication eventtypetag=failure tag=cardholder daysago::1 | stats count  | search count>0 | collect index=pci marker="req=7 name=\"Failed cardholder system access\"" addTime=T
+search eventtypetag=user eventtypetag=authentication eventtypetag=add eventtypetag=success tag=pci daysago::1 | collect index=pci marker="req=7 name=\"New user\"" addTime=T
+search eventtypetag=authentication eventtypetag=delete eventtypetag=success tag=pci daysago::1 | stats count  | search count>0 | collect index=pci marker="req=7 name=\"Removed user\"" addTime=T
+search eventtypetag=user eventtypetag=authentication eventtypetag=add eventtypetag=success tag=cardholder daysago::1 | stats count | search count>0 | collect index=pci marker="req=2 name=\"New cardholder user\"" addTime=T
+search eventtypetag=user eventtypetag=authentication eventtypetag=add eventtypetag=success NOT tag=domain-controller tag=pci daysago::1 | stats count  | search count>0 | collect index=pci marker="req=2 name=\"New local user\"" addTime=T
+search eventtypetag=user eventtypetag=authentication eventtypetag=delete eventtypetag=success NOT tag=domain-controller tag=pci daysago::1 | stats count  | search count>0 | collect index=pci marker="req=2 name=\"Removed local user\"" addTime=T
+search eventtypetag=user eventtypetag=authentication eventtypetag=delete eventtypetag=success tag=cardholder daysago::1 | stats count  | search count>0 | collect index=pci marker="req=2 name=\"Removed cardholder user\"" addTime=T
+search eventtypetag=authentication eventtypetag=failure tag=pci daysago::1 | stats count  | search count>0 | collect index=pci marker="req=10 name=\"Failed logins\"" addTime=T
+search eventtypetag=authentication eventtypetag=failure tag=cardholder-dest [search eventtypetag=authentication eventtypetag=failure tag=cardholder-dest | fields + src_ip, dest_ip, user | top src_ip, dest_ip, user | search count>5 | fields + src_ip, dest_ip, user ] daysago::1 | stats count  | search count>0 | collect index=pci marker="req=10 name=\"Multiple failed logins to cardholder systems\"" addTime=T
+search eventtypetag=application eventtypetag=modify eventtypetag=configuration eventtypetag=success tag=pci daysago::1 | stats count  | search count>0 | collect index=pci marker="req=6 name=\"Application configuration change\"" addTime=T
+search eventtypetag=os eventtypetag=modify eventtypetag=configuration eventtypetag=success tag=pci daysago::1 | stats count | search count>0 | collect index=pci marker="req=6 name=\"OS configuration change\"" addTime=T
+search source=fschangemonitor action=update daysago::1 | stats count  | search count>0 | collect index=pci marker="req=11 name=\"Critical file modified\"" addTime=T
+search eventtypetag=not_ok daysago::1 | stats count | search count>0 | collect index=pci marker="req=10 name=\"Daily log review - Not OK events\"" addTime=T
+search src_anonymized=true startminutesago=60 startminutesago=60
+search tag=http tag=communicate tag=transaction startminutesago=60 startminutesago=60 | regex url="\.\.\/\.\."
+search tag=http tag=communicate tag=transaction startminutesago=60 startminutesago=60 | regex dest_ip=\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}
+search src_anonymized=true  | top url
+search tag=http tag=communicate tag=transaction startminutesago=60 startminutesago=60 session_index=1 | top src_country
+search tag=http tag=communicate tag=transaction startminutesago=60 session_index=1 | top session_index
+search src_anonymized=true  | top user
+search tag=http tag=communicate tag=transaction startminutesago=60 startminutesago=60 | chart count by date_hour, date_wday
+search tag=http tag=communicate tag=transaction startminutesago=60 startminutesago=60
+search tag=http tag=communicate tag=transaction startminutesago=60 startminutesago=60 session_index=1 | rare limit=100 dest_host
+search tag=http tag=communicate tag=transaction startminutesago=60 | top src_country
+search tag=http tag=communicate tag=transaction startminutesago=60 | top session_index
+search tag=http tag=communicate tag=transaction startminutesago=60 startminutesago=60 session_index=1 | top http_content_type
+search tag=http tag=communicate tag=transaction  session_index=1 | chart count by src_ip
+search tag=http tag=communicate tag=transaction startminutesago=60 startminutesago=60 session_index=1 | top http_response
+search tag=http tag=communicate tag=transaction session_index=1 | top session_duration
+search tag=http tag=communicate tag=transaction startminutesago=60 startminutesago=60 dest_host=Virtual
+search index::_internal (saved_search AND trigger) OR (saved_search AND triggering)
+search source=ps starthoursago=3 | multikv | timechart avg(MEM) by COMMAND
+search source=top startminutesago=15 | multikv | timechart avg(CPU) by COMMAND
+search source=iostat startminutesago=60 | multikv | timechart avg(Blk_read_s) avg(Blk_wrtn_s)
+search source=iostat startminutesago=60 | multikv | timechart avg(Blk_wrtn_s) by host
+search source=lsof startminutesago=60 | multikv | timechart count(USER) by USER
+search source=netstat startminutesago=60 | multikv | timechart count(Proto) by Proto
+search source=netstat startminutesago=60 | multikv | timechart count(Type) by Type
+search source=ps startminutesago=60 | multikv | timechart avg(CPU) by COMMAND
+search source=ps startminutesago=60 | multikv | chart avg(RSS) by USER
+search source=ps startminutesago=60 | multikv | timechart avg(RSS) by COMMAND
+search source=ps startminutesago=60 | multikv | chart avg(RSS) by COMMAND
+search source=top startminutesago=15 | multikv | timechart avg(CPU) by host
+search source=top startminutesago=15 | multikv | timechart avg(RES) by COMMAND
+search source=vmstat startminutesago=15 | multikv noheader=t | timechart avg(free_memory) by host
+search source=vmstat starthoursago=3 | multikv noheader=t | timechart avg(total_memory) by host
+search sourcetype="vmware_api" MetricType guestheartbeat GuestHeartbeat="red" startminutesago=5
+search sourcetype="vmware_api" MetricType FreeSpace<2 startminutesago=5
+search (sourcetype=ps OR sourcetype=processmon) [search sourcetype="vmware_api" GuestDNSName | stats values(VMName) as VMName values(GuestDNSName) as GuestDNSName by ESXHost | search VMName="$guest$*" | top 0 GuestDNSName | rex field=GuestDNSName "(?<host>[^\.]*)\.[a-zA-Z]" | fields + host] | sort -sourcetype | multikv | strcat COMMAND Name as process | strcat CPU PercentProcessorTime as CPUTime | fields + CPUTime, host, process | chart avg(CPUTime) by host, process
+search VMName GuestDNSName="$GuestName$*" | dedup GuestDNSName | fields + ESXHost
+search sourcetype="vmware_api" VMName VMName="'$VMName$'" startminutesago=60 | dedup VMName | fields + Host
+search sourcetype="vmware_api" GuestDNSName [search sourcetype="vmware_api" GuestDNSName VMName="$guest$*" | dedup GuestDNSName | top ESXHost | fields + ESXHost]  | dedup GuestDNSName | fields + GuestDNSName | rex field=GuestDNSName "(?<host>[^\.]*)\.[a-zA-Z]" | fields + host
+search sourcetype="vmware_api" GuestDNSName [search sourcetype="vmware_api" GuestDNSName VMName="$GuestName$*" | dedup GuestDNSName | top ESXHost | fields + ESXHost] | dedup GuestDNSName | fields + GuestDNSName
+search (sourcetype=ps OR sourcetype=processmon) [search sourcetype="vmware_api" GuestDNSName [search sourcetype="vmware_api" GuestDNSName VMName="$guest$*" | dedup GuestDNSName | top ESXHost | fields + ESXHost] | dedup GuestDNSName | fields + GuestDNSName | rex field=GuestDNSName "(?<host>[^\.]*)\.[a-zA-Z]" | fields + host] startminutesago=15
+search sourcetype=ps OR sourcetype=processmon [search sourcetype="vmware_api" GuestDNSName [search sourcetype="vmware_api" GuestDNSName VMName="$guest$*" | dedup GuestDNSName | top ESXHost | fields + ESXHost] | dedup GuestDNSName | fields + GuestDNSName | rex field=GuestDNSName "(?<host>[^\.]*)\.[a-zA-Z]" | fields + host] | sort -sourcetype | multikv | strcat COMMAND Name as process | strcat CPU PercentProcessorTime as CPUTime | dedup host process | fields + host, process, CPUTime
+search sourcetype="vmware_api" MetricType cpuusage startminutesago=60 | timechart avg(CPUUsage) by GuestDNSName useother=f usenull=f
+search sourcetype="vmware_api"  MetricType cpu_usage startminutesago=60 | timechart avg(CPU_Usage) by VMName useother=f
+search sourcetype="vmware_api" MetricType HostMemoryUsage startminutesago=15 | timechart avg(HostMemoryUsage) by ESXHost useother=f
+search sourcetype="vmware_api" MetricType HostMemoryUsage startminutesago=60 | timechart avg(HostMemoryUsage) by ESXHost useother=f
+search sourcetype="vmware_api" MetricType GuestMemoryUsage startminutesago=60 startminutesago=60 | timechart avg(GuestMemoryUsage) by GuestDNSName useother=f usenull=f
+search sourcetype="vmware_api" MetricType GuestMemoryUsage startminutesago=60 | timechart avg(GuestMemoryUsage) by VMName useother=f
+search sourcetype="vmware_api" MetricType Capacity startminutesago=60 | chart min(FreeSpace) as FreeSpaceGB by DatastoreName
+search sourcetype="vmware_api" MetricType Information poweredOn startminutesago=60 | dedup VMName | top 100 VMName, ESXHost, GuestOSName, GuestIPAddress, GuestDNSName | fields + VMName, ESXHost, GuestOSName, GuestIPAddress, GuestDNSName | sort by ESXHost, GuestOSName
+search sourcetype="vmware_api" MetricType Information poweredOn startminutesago=60 | dedup VMName | fields + VMName, ESXHost, GuestOSName, GuestIPAddress, GuestDNSName | sort by ESXHost, GuestOSName
+search sourcetype="vmware_api" MetricType guestheartbeat GuestHeartbeat="red" startminutesago=5
+search sourcetype="vmware_api" MetricType FreeSpace<2 startminutesago=5
+search sourcetype="vmware_api" MetricType guestheartbeat GuestHeartbeat="red" startminutesago=5
+search sourcetype="vmware_api" MetricType FreeSpace<2 startminutesago=5
+search (sourcetype=vmware_logs OR sourcetype=vmware_api) AND (VMName="$guest$" OR GuestDNSName="$guest$*") starthoursago=24 starthoursago=24
+search sourcetype="vmware_logs" ethernet0.generatedAddress
+search sourcetype="vmware_logs" TOOLS soft reset detected starthoursago=24
+search sourcetype="vmware_logs" synctime  | search 0
+search source= *$guest$* sourcetype="vmware_logs" Using swap file
+search source=*$guest$* sourcetype="vmware_logs" ethernet0.generatedAddress
+search sourcetype="xen" task startminutesago=360 | timechart count(_raw) by name_label
+search sourcetype=xen "Config Baseline" Running name_label=$VMname$ startminutesago=60
+search sourcetype=xen "Config Baseline" Running startminutesago=60
+search sourcetype=xen "Config Baseline" Running startminutesago=60 | dedup name_label | search NOT name_label=Citrix NOT name_label=Control | stats first(VCPUs_at_startup), first(metrics) by name_label
+search guest metrics memory starthoursago=1 | rex field=_raw "'total':\s+'(?<totalmem>.*)',\s+'free':\s+'(?<freemem>[^']*)'" | timechart avg(freemem) by vmname useother=f
+search sourcetype=xen guest metrics memory NOT "residenton=none" starthoursago=1 | rex field=_raw "'total':\s+'(?<totalmem>.*)',\s+'free':\s+'(?<freemem>[^']*)'" | timechart avg(freemem) by ResidentOn useother=f usenull=f
+search sourcetype=xen metrics PIF startminutesago=60 | timechart avg(io_read_kbs) avg(io_write_kbs)
+search sourcetype=xen guest metrics NOT "Control domain" startminutesago=60 | strcat ResidentOn "/" vmname vm | search vm!="/" | chart count(vm) by ResidentOn useother=f usenull=f
+search sourcetype=xen metrics PIF starthoursago=3 | timechart avg(io_read_kbs) avg(io_write_kbs)
+search sourcetype=xen guest metrics NOT "Control domain" startminutesago=60 | strcat ResidentOn "/" vmname vm | search vm!="/" | timechart count(vm) by vm usenull=f
+search sourcetype=xen "Config Baseline" Running NOT name_label=Control NOT name_label=Citrix startminutesago=60 | top limit=100 name_label
+search sourcetype=xen guest metrics NOT "Control domain" startminutesago=15 | contingency vmname ResidentOn
+search sourcetype=xen guest metrics NOT "Control domain" startminutesago=15 | bucket span=1m _time | stats mode(ResidentOn) by _time, vmname | xyseries _time, vmname mode(ResidentOn)
+search source=xenapi vif metrics startminutesago=60 | timechart avg(io_write_kbs) by vmname
+search source=xenapi vm guest metrics NOT Control startminutesago=60 | dedup vmname | fields + vmname + networks
+search sourcetype=ps [search config baseline running NOT name_label=Control [search config baseline running name_label=$guest$ | stats first(resident_on) as resident_on] |  fields + name_label | rename name_label as host | dedup host]
+search sourcetype=ps [search config baseline running NOT name_label=Control [search config baseline running name_label=$guest$ | stats first(resident_on) as resident_on] |  fields + name_label | rename name_label as host | dedup host] | multikv | strcat host ":" COMMAND host_command | chart avg(CPU) by host, COMMAND useother=f usenull=f
+search sourcetype=$sourcetype$ [search config baseline running NOT name_label=Control [search config baseline running name_label=$guest$ | stats first(resident_on) as resident_on] |  fields + name_label | rename name_label as host | dedup host]
+search config baseline running NOT name_label=Control [search config baseline running name_label=$guest$ | stats first(resident_on) as resident_on]  | fields + name_label | rename name_label as host | dedup host
+search source=xenapi VBD metrics startminutesago=60 | timechart avg(io_read_kbs) by vmname
+search source=xenapi VBD metrics startminutesago=60 | timechart avg(io_write_kbs) by vmname
+search source=xenapi vif metrics startminutesago=60 | timechart avg(io_read_kbs) by vmname
+dispatch [search sourcetype=netstat startminutesago=60 | multikv passthru=f | search LISTEN tcp | rex field=Local ".*:(?<port>.*)" | dedup port,_time,host | stats count by host, port | eventstats mode(count) as expected | where count!=expected | sort host]
+dbinspect index=_internal span=1d
+dbinspect index=main timeformat=%s.%Q
+file /var/log/messages.1
+gentimes start=-30 end=-27
+gentimes start=10/1/07 end=10/5/07
+gentimes start=10/1/07 end=10/5/07 increment=1h
+gentimes start=10/25/07
+inputcsv foo.csv
+inputcsv start=100 max=500 bar
+savedsearch all
+search * [search daysago=2 | fields + source, sourcetype, host | format]
+search * | addinfo
+search * | anomalies
+search * | anomalies blacklist=boringevents | sort -unexpectedness
+search * | anomalousvalue
+search * | associate
+search * | autoregress count p=2-5
+search * | autoregress foo AS oldfoo p=3
+search * | bucket size bins=10
+search * | bucket size bins=10 | stats count(_raw) by size
+search * | chart avg(kbps) by interface
+search * | chart max(size) by host
+search * | chart mean(size) by host interface
+search * | contingency datafield1 datafield2 maxrows=5 maxcols=5 usetotal=F
+search * | contingency host sourcetype
+search * | convert auto(*)
+search * | convert dur2sec(xdelay) dur2sec(delay)
+search * | correlate
+search * | dedup 3 source
+search * | dedup group sortby -_size
+search * | dedup host
+search * | dedup source sortby +_time
+search * | delta count AS countdiff
+search * | delta count p=3
+search * | diff position1=9 position2=10
+search * | eventstats avg(duration) as avgdur
+search * | extract access-extractions
+search * | fields source, sourcetype, host, error*
+search * | head 20
+search * | kmeans
+search * | makemv delim=":" allowempty=t foo
+search * | multikv fields pid command
+search * | mvcombine delim=":" foo
+search * | mvexpand foo
+search * | outlier
+search * | rare host
+search * | rare user by host
+search * | regex _raw = "complicated|regex(?=expression)"
+search * | regex _raw="(?=!\d)10.\d{1,3}\.\d{1,3}\.\d{1,3}(?!\d)"
+search * | rename count as "Count of Events"
+search * | rename foo* as bar*
+search * | replace "* localhost" with "localhost *" in host
+search * | replace *localhost with localhost in host
+search * | replace 0 with Critical, 1 with Error in msg_level
+search * | replace 127.0.0.1 with localhost
+search * | replace 127.0.0.1 with localhost in host
+search * | replace aug with August in start_month end_month
+search * | reverse
+search * | rex mode=sed "s/(\\d{4}-){3}/XXXX-XXXX-XXXX-/g"
+search * | script python myscript myarg1 myarg2 | sendemail to=david@splunk.com
+search * | scrub
+search * | selfjoin id
+search * | sort +ip, -url
+search * | sort 100 -size, +source
+search * | sort _time, -host
+search * | tail 20
+search * | top limit=10 url, ip
+search * | top url
+search * | top user by host
+search * | transaction host cookie maxspan=30s maxpause=5s
+search * | transam maxpause=2s | anomalies | fields + _raw | outputraw
+search * | xmlkv maxinputs=10000
+search * | xyseries delay host_type host
+search 404 host="monkeyBox"
+search 404 host="webserver" | timechart avg(cpu_seconds) by host | outlier action=TF
+search bar | join id [search foo]
+search changes | abstract maxlines=5
+search changes | addtotals
+search changes | addtotals col=t labelfield=change_name label=ALL
+search changes | addtotals fieldname=sum foobar* *baz*
+search disk error | relevancy | sort -relevancy
+search error | localize | map mytimebased_savedsearch
+search error | localize | map search="search starttimeu::$starttime$ endtimeu::$endtime$ |transaction maxspan=1h fields=uid,qid"
+search error | sendemail to="elvis@splunk.com"
+search error | sendemail to="elvis@splunk.com,john@splunk.com" format=html subject=myresults server=mail.splunk.com
+search error | typelearner
+search eventstats avg(duration) as avgdur by date_hour
+search eventtype="sendmail" | makemv delim="," senders | top senders
+search eventtype="sendmail" | nomv senders | top senders
+search eventtypetag="download" | collect index=downloadcount
+search foo | chart count by bar | append [search fubar | chart count by baz]
+search host="CheckPoint" | where (src LIKE "10.9.165.%") OR (dst LIKE "10.9.165.%")
+search host="mailserver" | strcat sourceIP "/" destIP comboIP | chart count by comboIP
+search host="reports" | anomalousvalue action=filter pthresh=0.02
+search host="reports" | associate supcnt=50 supfreq=0.2 improv=0.5
+search index=audit | audit
+search index=summary | overlap
+search maxresults::2 | fields + source, sourcetype, host | format | outputraw
+search source="xml_escaped" | xmlunescape maxinputs=100
+search sourcetype="web" | timechart count by host | fillnull value=NULL
+search sourcetype=access* | setfields ip="10.10.10.10", foo="foo bar"
+search sourcetype=access* | stats avg(kbps) by host
+search sourcetype=access* | strcat host "::" port address
+search sourcetype=access* | timechart avg(delay) by host
+search sourcetype=access* | timechart span=5m avg(delay) by host
+search sourcetype=access* | top limit=100 referer_domain | stats sum(count)
+search sourcetype=access_combined | timechart span=1m count(_raw) by product_id usenull=f
+search sourcetype=myform | kvform field=eventtype
+search sourcetype=physics | eval velocity = distance/time
+search sourcetype=syslog | cluster
+search sourcetype=webserver | highlight login,logout
+search | fillnull
+search | fillnull value=NULL
+search | fillnull value=NULL foo bar
+set diff [search 404 | fields url] [search 303 | fields url]
+set intersect [search 404 | fields url] [search 303 | fields url]
+typeahead prefix=source count=10 index=_internal

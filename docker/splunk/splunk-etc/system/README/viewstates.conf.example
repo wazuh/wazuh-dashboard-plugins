@@ -1,0 +1,33 @@
+#   Version 9.0.3
+#
+# This is an example viewstates.conf.
+#
+# To learn more about configuration files (including precedence) please see
+# the documentation located at
+# http://docs.splunk.com/Documentation/Splunk/latest/Admin/Aboutconfigurationfiles
+
+[charting:g3b5fa7l]
+ChartTypeFormatter_0_7_0.default = area
+Count_0_6_0.count = 10
+LegendFormatter_0_13_0.default = right
+LineMarkerFormatter_0_10_0.default = false
+NullValueFormatter_0_12_0.default = gaps
+
+[*:g3jck9ey]
+Count_0_7_1.count = 20
+DataOverlay_0_12_0.dataOverlayMode = none
+DataOverlay_1_13_0.dataOverlayMode = none
+FieldPicker_0_6_1.fields = host sourcetype source date_hour date_mday date_minute date_month
+FieldPicker_0_6_1.sidebarDisplay = True
+FlashTimeline_0_5_0.annotationSearch = search index=twink
+FlashTimeline_0_5_0.enableAnnotations = true
+FlashTimeline_0_5_0.minimized = false
+MaxLines_0_13_0.maxLines = 10
+RowNumbers_0_12_0.displayRowNumbers = true
+RowNumbers_1_11_0.displayRowNumbers = true
+RowNumbers_2_12_0.displayRowNumbers = true
+Segmentation_0_14_0.segmentation = full
+SoftWrap_0_11_0.enable = true
+
+[dashboard:_current]
+TimeRangePicker_0_1_0.selected = All time

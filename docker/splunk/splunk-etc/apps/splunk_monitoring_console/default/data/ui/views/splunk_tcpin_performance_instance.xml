@@ -1,0 +1,218 @@
+<form version="1.1" hideEdit="True" script="common_control.js, drilldown_action_extension.js, splunk_tcpin_performance_instance_extension.js" stylesheet="splunk_tcpin_performance_extension.css">
+  <label>Splunk TCP Input Performance: Instance</label>
+  <search id="queue_fill_ratio_base">
+    <query>
+      <![CDATA[
+            | rest splunk_server=$splunk_server$ services/server/introspection/queues
+            | search title="tcpin_queue*"
+            | rex field=title "tcpin_queue\.(?<pipeline_number>\d+)"
+            | join splunk_server
+            [ | rest splunk_server=$splunk_server$ /services/properties/inputs
+              | where match(title, "splunktcp(-ssl)?:")
+              `dmc_get_port_from_splunktcp_stanza(title)`
+              | stats delim=", " values(port) as ports by splunk_server
+              | mvcombine ports
+              | fields splunk_server, ports]
+            | join splunk_server [|rest splunk_server_group=dmc_group_indexer services/data/inputs/tcp/ssl]
+            | eval val_last_1min=if(isnotnull(value_cntr1_size_bytes_lookback), round(value_cntr1_size_bytes_lookback, 2), "N/A")
+            | eval val_last_10min=if(isnotnull(value_cntr2_size_bytes_lookback), round(value_cntr2_size_bytes_lookback, 2), "N/A")
+            | eval queue_fill_last_1min = if(isnotnull(pipeline_number), "pset".pipeline_number.": ".val_last_1min, val_last_1min)
+            | eval queue_fill_last_10min = if(isnotnull(pipeline_number), "pset".pipeline_number.": ".val_last_10min, val_last_10min)
+            ]]>
+    </query>
+  </search>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="dropdown" searchWhenChanged="true" token="splunk_server">
+      <label>Instance:</label>
+      <showClearButton>false</showClearButton>
+      <populatingSearch fieldForLabel="splunk_server" fieldForValue="splunk_server">
+        | rest splunk_server_group=dmc_group_indexer services/server/introspection/queues
+        | search title="tcpin_queue*"
+        | fields splunk_server
+        | dedup splunk_server
+        | join type=left splunk_server
+        [|`dmc_get_instance_info(*)` | rename serverName as splunk_server]
+      </populatingSearch>
+      <selectFirstChoice>true</selectFirstChoice>
+      <change>
+        <condition value="*">
+          <set token="host">$row.host$</set>
+        </condition>
+      </change>
+    </input>
+  </fieldset>
+  <row>
+    <panel rejects="$historical$">
+      <title>Health Check</title>
+      <viz type="splunk_monitoring_console.KpiTrafficLight">
+        <search base="queue_fill_ratio_base">
+          <query>
+            <![CDATA[
+              rex field=queue_fill_last_10min "pset\d+:\s(?<queue_fill_last_10min>\d+\.\d+)"
+              | stats max(queue_fill_last_10min) as queue_fill_last_10min
+              | where queue_fill_last_10min > 60
+              | stats count as degraded_instance_count_queue_fill_ratio
+            ]]>
+          </query>
+          <preview>
+            <set token="degraded_instance_count_queue_fill_ratio">$result.degraded_instance_count_queue_fill_ratio$</set>
+          </preview>
+        </search>
+        <option name="height">45</option>
+        <option name="splunk_monitoring_console.KpiTrafficLight.field">degraded_instance_count_queue_fill_ratio</option>
+        <option name="splunk_monitoring_console.KpiTrafficLight.detail">splunk_server</option>
+        <option name="splunk_monitoring_console.KpiTrafficLight.rangeValues">[0]</option>
+        <option name="splunk_monitoring_console.KpiTrafficLight.rangeIcons">["success", "error"]</option>
+        <option name="splunk_monitoring_console.KpiTrafficLight.rangeLabels">["Queue fill ratio within the last 10 minutes is healthy for this instance.", "Queue fill ratio within the last 10 minutes is degraded for this instance."]</option>
+        <!-- <option name="splunk_monitoring_console.KpiTrafficLight.description">KPI Description</option> -->
+      </viz>
+
+      <viz type="splunk_monitoring_console.KpiTrafficLight">
+        <search>
+          <query>
+            `dmc_set_index_internal` splunk_server=$splunk_server$ sourcetype=splunkd source=*splunkd.log "WARN" TcpInputConfig "reverse dns lookups appear to be excessively slow, this may impact receiving from network inputs."
+            | stats count as dns_lookup_warning_count
+          </query>
+          <earliest>-60m@m</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="height">45</option>
+        <option name="splunk_monitoring_console.KpiTrafficLight.field">dns_lookup_warning_count</option>
+        <option name="splunk_monitoring_console.KpiTrafficLight.rangeValues">[0]</option>
+        <option name="splunk_monitoring_console.KpiTrafficLight.rangeIcons">["success", "error"]</option>
+        <option name="splunk_monitoring_console.KpiTrafficLight.rangeLabels">["There were no reverse DNS lookup warnings within the last hour for this instance.", "There was at least one reverse DNS lookup warning within the last hour for this instance."]</option>
+        <!-- <option name="splunk_monitoring_console.KpiTrafficLight.description">KPI Description</option> -->      </viz>
+
+      <viz type="splunk_monitoring_console.KpiTrafficLight">
+        <search>
+          <query>
+            `dmc_set_index_internal` splunk_server=$splunk_server$ sourcetype=splunkd source=*splunkd.log log_level="WARN" component=TcpInputProc "Stopping all listening ports."
+            | stats count as port_closure_count
+          </query>
+          <earliest>-60m@m</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="height">45</option>
+        <option name="splunk_monitoring_console.KpiTrafficLight.field">port_closure_count</option>
+        <option name="splunk_monitoring_console.KpiTrafficLight.rangeValues">[0]</option>
+        <option name="splunk_monitoring_console.KpiTrafficLight.rangeIcons">["success", "error"]</option>
+        <option name="splunk_monitoring_console.KpiTrafficLight.rangeLabels">["There were no Splunk TCP port closures due to queue blockages within the last hour for this instance.", "There were Splunk TCP port closures due to queue blockages within the last hour for this instance."]</option>
+        <!-- <option name="splunk_monitoring_console.KpiTrafficLight.description">KPI Description</option> -->      </viz>
+
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+        <h2>
+          <span>Select views: </span>
+          <span id="link-switcher-view">
+            <a href="#" class="btn-pill active" data-item="all">All</a>
+            <a href="#" class="btn-pill" data-item="snapshot">Snapshot</a>
+            <a href="#" class="btn-pill" data-item="historical">Historical</a>
+          </span>
+        </h2>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Snapshots</title>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Current Splunk TCP Input Queue Fill Ratio</title>
+      <table id="snapshotTcpInFillRatioTable">
+        <search base="queue_fill_ratio_base">
+          <query>
+            stats count as pset_count, values(ports), as ports values(queue_fill_last_1min) as queue_fill_last_1min, values(queue_fill_last_10min) as queue_fill_last_10min by splunk_server
+            | fields splunk_server, pset_count, ports, queue_fill_last_1min, queue_fill_last_10min
+            | rename splunk_server as "Instance", pset_count as "Pipeline Set Count", ports as "Ports", queue_fill_last_1min as "Queue Fill Ratio (Last 1 Minute)", queue_fill_last_10min as "Queue Fill Ratio (Last 10 Minutes)"
+          </query>
+        </search>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Historical Charts</title>
+      <input type="time" searchWhenChanged="true" token="time">
+        <label>Time Range:</label>
+        <default>
+          <earliestTime>-4h@m</earliestTime>
+          <latestTime>now</latestTime>
+        </default>
+      </input>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Average Splunk TCP Incoming Throughput and Forwarder Count</title>
+      <chart>
+        <search>
+          <query>
+            `dmc_get_forwarder_tcpin` host=$host$
+            | `dmc_timechart_for_metrics_log` dc(guid) as forwarder_count, avg(tcp_KBps) as avg_tcp_KBps
+            | rename forwarder_count as "Forwarder Count", avg_tcp_KBps as "Throughput (KB/s)"
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.axisY2.enabled">true</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.chart.overlayFields">"Throughput (KB/s)"</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.axisLabelsY2.majorUnit">1</option>
+        <option name="charting.axisTitleY.text">Count</option>
+        <option name="charting.axisTitleY2.text">Average KB/s</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <drilldown>
+          <condition match="isnotnull('row._span')">
+            <set token="drilldown_forwarder">true</set>
+            <set token="drilldown_forwarder">$row._span$</set>
+            <set token="drilldown_forwarder_earliest">$earliest$</set>
+            <eval token="drilldown_forwarder_earliest_label">strftime(earliest, "%m/%d/%Y %H:%M:%S")</eval>
+            <set token="drilldown_forwarder_latest">$latest$</set>
+            <eval token="drilldown_forwarder_latest_label">strftime(latest, "%m/%d/%Y %H:%M:%S")</eval>
+            <set token="drilldown_forwarder_count">$click.value2$</set>
+          </condition>
+        </drilldown>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel depends="$drilldown_forwarder$" id="drilldown_forwarder" rejects="$snapshot$">
+      <table>
+        <title>$drilldown_forwarder_count$ forwarders connected to selected indexer group between $drilldown_forwarder_earliest_label$ ~ $drilldown_forwarder_latest_label$</title>
+        <search>
+          <query>
+            `dmc_get_forwarder_tcpin` host=$host$
+            | stats dc(host) as connection_count by guid
+            | join type=outer guid [| inputlookup dmc_forwarder_assets]
+            | `dmc_rename_forwarder_type(forwarder_type)`
+            | makemv delim=" " avg_tcp_kbps_sparkline 
+            | eval sum_kb = if (status == "missing", "N/A", sum_kb) 
+            | eval avg_tcp_kbps_sparkline = if (status == "missing", "N/A", avg_tcp_kbps_sparkline) 
+            | eval avg_tcp_kbps = if (status == "missing", "N/A", avg_tcp_kbps) 
+            | eval avg_tcp_eps = if (status == "missing", "N/A", avg_tcp_eps) 
+            | `dmc_rename_forwarder_type(fwdType)` 
+            | `dmc_time_format(last_connected)` 
+            | fields hostname, forwarder_type, version, os, arch, status, last_connected, sum_kb, avg_tcp_kbps_sparkline, avg_tcp_kbps, avg_tcp_eps, connection_count 
+            | search hostname="***" 
+            | search status="*" 
+            | rename hostname as Instance, forwarder_type as Type, version as Version, os as OS, arch as Architecture, status as Status, last_connected as "Last Connected to Indexers", sum_kb as "Total KB", avg_tcp_kbps_sparkline as "Average KB/s Over Time", avg_tcp_kbps as "Average KB/s", avg_tcp_eps as "Average Events/s", connection_count as "Number of Connections"
+          </query>
+          <earliest>$drilldown_forwarder_earliest$</earliest>
+          <latest>$drilldown_forwarder_latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+      <html depends="$drilldown_forwarder$">
+        <a data-unset-token="drilldown_forwarder">Close this drilldown table</a>
+      </html>
+    </panel>
+  </row>
+</form>

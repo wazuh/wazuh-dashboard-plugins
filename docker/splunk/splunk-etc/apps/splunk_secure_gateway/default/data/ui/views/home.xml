@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<view template="splunk_secure_gateway:/templates/home.html" type="html">
+    <label>Home</label>
+</view>

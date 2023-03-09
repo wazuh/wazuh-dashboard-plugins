@@ -1,0 +1,5 @@
+This disabled-apps directories holds those apps that are not loaded at runtime by Splunk. The ideal way to disable apps is via the CLI:
+
+splunk disable app <bundle name>
+
+If you intend to enable/disable apps, this directory must exist.

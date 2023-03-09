@@ -1,0 +1,30 @@
+<td class="cell-name">
+    <% if(canEdit) { %>
+        <a href="#" class="model-title alert-edit-link"><%- model.entry.get('name') %></a>
+    <% } else { %>
+        <span class="model-title"><%- model.entry.get('name') %></span>
+    <% } %>
+    <div class="model-description"><%- description %></div>
+
+</td>
+<td class="cell-actions">
+    <% if(canEdit) { %>
+        <a href="#" class="alert-action edit-action"><%= _("Edit").t() %></a>
+    <% } else { %>
+        <span class="alert-action disabled-action"><%= _("Edit").t() %></span>
+    <% } %>
+	<a href="<%- advancedEditUrl %>" target=_blank class="alert-action advance-edit-action"><%= _("Advanced Edit").t() %></a>
+	<% if(model.entry.content.get('disabled')) { %>
+	   <a href="#" class="alert-action enable-action"><%= _("Enable").t() %></a>
+	<% } else {%>
+	   <a href="#" class="alert-action disable-action"><%= _("Disable").t() %></a>
+    <% } %>
+</td>
+
+<td class="cell-status">
+    <% if (!model.entry.content.get('disabled')) { %>
+        <i class="icon-check enable-icon"></i> <span class="status-text"><%= _("Enabled").t() %></span>
+    <% } else { %>
+        <i class="icon-lock disable-icon"></i> <span class="status-text"><%= _("Disabled").t() %></span>
+    <% } %>
+</td>

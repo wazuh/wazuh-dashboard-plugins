@@ -1,0 +1,330 @@
+<form version="1.1" hideEdit="True" script="common_control.js">
+  <label>Scheduler Activity: Deployment</label>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="dropdown" searchWhenChanged="true" token="group">
+      <label>Group</label>
+      <showClearButton>false</showClearButton>
+      <search>
+        <query>
+          | `dmc_get_groups_containing_role(dmc_group_search_head)`
+          | search search_group="dmc_customgroup_*" OR search_group="dmc_indexerclustergroup_*" OR search_group="dmc_searchheadclustergroup_*"
+        </query>
+      </search>
+      <fieldForLabel>label</fieldForLabel>
+      <fieldForValue>search_group</fieldForValue>
+      <choice value="*">All Search Heads</choice>
+      <default>*</default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <html>
+        <h2>
+          <span>Select views: </span>
+          <span id="link-switcher-view">
+            <a href="#" class="btn-pill active" data-item="all">All</a>
+            <a href="#" class="btn-pill" data-item="snapshot">Snapshot</a>
+            <a href="#" class="btn-pill" data-item="historical">Historical</a>
+          </span>
+        </h2>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Snapshots</title>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Scheduler Status by Instance ($total_instance_count$)</title>
+      <table>
+        <search id="scheduler_status_base">
+          <query>
+            | rest splunk_server_group=dmc_group_search_head splunk_server_group="$group$" /servicesNS/-/-/saved/searches preserve_args_case=t noProxy=t search="is_scheduled=1" search="disabled=0"
+            | stats count by splunk_server
+            | join splunk_server type=outer [
+              | rest splunk_server_group=dmc_group_search_head splunk_server_group="$group$" /services/server/status/limits/search-concurrency
+              | fields splunk_server max_hist_scheduled_searches, max_rt_scheduled_searches]
+            | join splunk_server type=outer [
+              | rest splunk_server_group=dmc_group_search_head splunk_server_group="$group$" /services/server/status/resource-usage/splunk-processes
+              | search search_props.role="head" `dmc_match_all_scheduled_search_types`
+              | dedup search_props.sid
+              | stats count(eval('search_props.mode'=="historical batch" OR 'search_props.mode'=="historical")) as count_hist_search, count(eval('search_props.mode'=="RT" OR 'search_props.mode'=="RT indexed")) as count_rt_search by splunk_server ]
+            | join splunk_server type=outer [
+              | rest splunk_server_group=dmc_group_search_head splunk_server_group="$group$" /services/server/info
+              | fields splunk_server, numberOfCores, numberOfVirtualCores]
+            | eval count_hist_search = if(isnull(count_hist_search), 0, count_hist_search)
+            | eval count_rt_search = if(isnull(count_rt_search), 0, count_rt_search)
+            | eval hist_concur_vs_limit = count_hist_search." / ".max_hist_scheduled_searches
+            | eval rt_concur_vs_limit = count_rt_search." / ".max_rt_scheduled_searches
+            | `dmc_get_core_info`
+            | fields splunk_server, core_info, hist_concur_vs_limit, rt_concur_vs_limit, count
+            | rename splunk_server as Instance, core_info AS "CPU Cores (Physical / Virtual)", hist_concur_vs_limit as "Concurrency of Historical Scheduled Report (Running/Limit)", rt_concur_vs_limit as "Concurrency of Real-time Scheduled Report (Running/Limit)", count as "Unique Scheduled Reports"
+          </query>
+          <done>
+            <set token="total_instance_count">$job.resultCount$</set>
+          </done>
+        </search>
+        <option name="drilldown">row</option>
+        <drilldown>
+          <link target="_blank">scheduler_activity_instance?form.splunk_server=$row.Instance$</link>
+        </drilldown>
+      </table>
+      <html>
+        <p>If your concurrency limits are being reached, you can configure the priority of scheduled reports. <a href="/help?location=learnmore.dmc.sched_act_depl.scheduler_status" class="external" target="_blank">Learn More.</a></p>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Historical Charts</title>
+      <input type="time" searchWhenChanged="true" token="time">
+        <label>Time Range:</label>
+        <default>
+          <earliestTime>-4h@m</earliestTime>
+          <latestTime>now</latestTime>
+        </default>
+      </input>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Scheduler Execution Count by $scheduler_execution_split_by_label$</title>
+      <input type="dropdown" searchWhenChanged="true" token="scheduler_execution_split_by">
+        <label>Group by</label>
+        <showClearButton>false</showClearButton>
+        <choice value="host">Instance</choice>
+        <choice value="status">Status</choice>
+        <choice value="user">User</choice>
+        <choice value="app">App</choice>
+        <default>host</default>
+        <change>
+          <set token="scheduler_execution_split_by_label">$label$</set>
+        </change>
+      </input>
+      <chart>
+        <search>
+          <query>
+            `dmc_set_index_internal` search_group=dmc_group_search_head search_group="$group$" sourcetype=scheduler (status="completed" OR status="skipped" OR status="deferred")
+            | timechart partial=f limit=20 count by $scheduler_execution_split_by$
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">zero</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Count</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.fieldColors">{"completed": 0xa2cc3e, "deferred": 0xf2b827, "skipped":0xd6563c}</option>
+      </chart>
+    </panel>
+    <panel rejects="$snapshot$">
+      <title>Scheduler Execution Count Across All Instances</title>
+      <input type="dropdown" searchWhenChanged="true" token="scheduler_execution_metric">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <choice value="sum(count) as total">Total</choice>
+        <choice value="min(count), as min_count, avg(count) as avg_count, median(count) as median_count, max(count) as max_count">Min, Average, Median, Max</choice>
+        <default>sum(count) as total</default>
+      </input>
+      <chart>
+        <search>
+          <query>
+            `dmc_set_index_internal` search_group=dmc_group_search_head search_group="$group$" sourcetype=scheduler (status="completed" OR status="skipped" OR status="deferred")
+            | bin _time minspan=1min
+            | stats count by host, _time
+            | timechart partial=f $scheduler_execution_metric$
+            | rename total as Total, min_count as Minimum, avg_count as Average, median_count as Median, max_count as Maximum
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">zero</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Count</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.legend.placement">bottom</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Concurrency of Scheduled Reports by Instance</title>
+      <input type="dropdown" searchWhenChanged="true" token="agg_report_concurrency_by_instance">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <choice value="Avg">Average</choice>
+        <choice value="Median">Median</choice>
+        <choice value="Min">Minimum</choice>
+        <choice value="Max">Maximum</choice>
+        <choice value="Perc90">90th Percentile</choice>
+        <choice value="First">Sampled</choice>
+        <default>Median</default>
+      </input>
+      <chart>
+        <search>
+          <query>
+            `dmc_set_index_introspection` search_group=dmc_group_search_head search_group="$group$" sourcetype=splunk_resource_usage component=PerProcess data.search_props.role="head" data.search_props.sid::* `dmc_match_all_scheduled_search_types`
+            | `dmc_set_bin`
+            | `dmc_rename_introspection_fields`
+            | stats dc(sid) AS distinct_search_count by _time, host
+            | `dmc_timechart` partial=f limit=20 $agg_report_concurrency_by_instance$(distinct_search_count) AS agg_distinct_search_count by host
+            | eval agg_distinct_search_count = round(agg_distinct_search_count, 0)
+            | rename agg_distinct_search_count as "Concurrent Report Count"
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">zero</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Count</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.legend.placement">bottom</option>
+      </chart>
+    </panel>
+    <panel rejects="$snapshot$">
+      <title>Concurrency of Scheduled Reports Across All Instances</title>
+      <input type="dropdown" searchWhenChanged="true" token="agg_report_concurrency_all_instance">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <!--<choice value="sum(count) as total">Total</choice> // this is incorrect, because a search could be long running so it is counted multiple times-->
+        <choice value="min(count), as min_count, avg(count) as avg_count, median(count) as median_count, max(count) as max_count">Min, Average, Median, Max</choice>
+        <default>min(count), as min_count, avg(count) as avg_count, median(count) as median_count, max(count) as max_count</default>
+      </input>
+      <chart>
+        <search>
+          <query>
+            `dmc_set_index_introspection` search_group=dmc_group_search_head search_group="$group$" sourcetype=splunk_resource_usage component=PerProcess data.search_props.role="head" data.search_props.sid::* `dmc_match_all_scheduled_search_types`
+            | `dmc_set_bin`
+            | `dmc_rename_introspection_fields`
+            | stats dc(sid) AS distinct_search_count by _time, host
+            | stats sum(distinct_search_count) as count by _time
+            | `dmc_timechart` partial=f $agg_report_concurrency_all_instance$
+            | rename min_count as Minimum, avg_count as Average, median_count as Median, max_count as Maximum
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">zero</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Count</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.legend.placement">bottom</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Skip Ratio by Instance</title>
+      <chart>
+        <search>
+          <query>
+            `dmc_set_index_internal` search_group=dmc_group_search_head search_group="$group$" sourcetype=scheduler (status="completed" OR status="skipped" OR status="deferred")
+            | stats count(eval(status=="completed" OR status=="skipped")) AS total_exec, count(eval(status=="skipped")) AS skipped_exec by _time, host, app, savedsearch_name, user, savedsearch_id
+            | `dmc_timechart` partial=f limit=20 eval(round(sum(skipped_exec) / sum(total_exec) * 100, 2)) as skip_ratio by host
+            | rename skip_ratio as "Skip Ratio"
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">zero</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Skip Ratio (%)</option>
+        <option name="charting.legend.placement">bottom</option>
+      </chart>
+    </panel>
+    <panel rejects="$snapshot$">
+      <title>Skip Ratio Across All Instances</title>
+      <chart>
+        <search>
+          <query>
+            `dmc_set_index_internal` search_group=dmc_group_search_head search_group="$group$" sourcetype=scheduler (status="completed" OR status="skipped" OR status="deferred")
+            | stats count(eval(status=="completed" OR status=="skipped")) AS total_exec, count(eval(status=="skipped")) AS skipped_exec by _time, savedsearch_id
+            | `dmc_timechart` partial=f eval(round(sum(skipped_exec) / sum(total_exec) * 100, 2)) as skip_ratio
+            | rename skip_ratio as "Skip Ratio"
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">area</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Skip Ratio (%)</option>
+        <option name="charting.legend.placement">bottom</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Average Execution Latency by $exec_lat_split_by_label$</title>
+      <input type="dropdown" searchWhenChanged="true" token="exec_lat_split_by">
+        <label>Group by</label>
+        <showClearButton>false</showClearButton>
+        <choice value="host">Instance</choice>
+        <choice value="user">User</choice>
+        <choice value="app">App</choice>
+        <default>host</default>
+        <change>
+          <set token="exec_lat_split_by_label">$label$</set>
+        </change>
+      </input>
+      <chart>
+        <search>
+          <query>
+            `dmc_set_index_internal` search_group=dmc_group_search_head search_group="$group$" sourcetype=scheduler status="completed"
+            | eval window_time = if(isnotnull(window_time), window_time, 0)
+            | eval execution_latency = max(dispatch_time - (scheduled_time + window_time), 0)
+            | timechart partial=f limit=20 eval(round(avg(execution_latency), 0)) as latency by $exec_lat_split_by$
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">zero</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Latency (seconds)</option>
+        <option name="charting.legend.placement">bottom</option>
+      </chart>
+    </panel>
+    <panel rejects="$snapshot$">
+      <title>Execution Latency Across All Instances</title>
+      <input type="dropdown" searchWhenChanged="true" token="exec_lat_agg">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <choice value="sum(execution_latency) as total_execution_latency">Total</choice>
+        <choice value="min(execution_latency), as min_execution_latency, avg(execution_latency) as avg_execution_latency, median(execution_latency) as median_execution_latency, max(execution_latency) as max_execution_latency">Min, Average, Median, Max</choice>
+        <default>sum(execution_latency) as total_execution_latency</default>
+      </input>
+      <chart>
+        <search>
+          <query>
+            `dmc_set_index_internal` search_group=dmc_group_search_head search_group="$group$" sourcetype=scheduler status="completed"
+            | eval window_time = if(isnotnull(window_time), window_time, 0)
+            | eval execution_latency = max(dispatch_time - (scheduled_time + window_time), 0)
+            | timechart partial=f $exec_lat_agg$
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">zero</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Latency (seconds)</option>
+        <option name="charting.legend.placement">bottom</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+        <p>Statistics include only instances on which one or more searches are running at any given time.</p>
+      </html>
+    </panel>
+  </row>
+</form>

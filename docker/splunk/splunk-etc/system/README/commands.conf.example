@@ -1,0 +1,60 @@
+#   Version 9.0.3
+#
+# This is an example commands.conf.  Use this file to configure settings
+# for external search commands.
+#
+# To use one or more of these configurations, copy the configuration block
+# into commands.conf in $SPLUNK_HOME/etc/system/local/. You must restart
+# Splunk to enable configurations.
+#
+# To learn more about configuration files (including precedence) 
+# see the documentation located at
+# http://docs.splunk.com/Documentation/Splunk/latest/Admin/Aboutconfigurationfiles
+
+# Note: These are examples.  Replace the values with your own
+# customizations.
+
+
+##############
+# defaults for all external commands, exceptions are below in 
+# individual stanzas
+
+# type of script: 'python', 'perl'
+TYPE = python
+# default “filename” would be <stanza-name>.py for python, 
+# <stanza-name>.pl for perl, and 
+# <stanza-name> otherwise
+
+# is command streamable?
+streaming = false
+
+# maximum data that can be passed to command (0 = no limit)
+maxinputs = 50000
+
+# end defaults
+#####################
+
+[createrss]
+filename = createrss.py
+
+[diff]
+filename = diff.py
+
+[runshellscript]
+filename = runshellscript.py
+
+[sendemail]
+filename = sendemail.py
+
+[uniq]
+filename = uniq.py
+
+[windbag]
+filename = windbag.py
+supports_multivalues = true
+
+[xmlkv]
+filename = xmlkv.py
+
+[xmlunescape]
+filename = xmlunescape.py

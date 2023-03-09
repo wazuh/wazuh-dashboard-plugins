@@ -1,0 +1,174 @@
+<form version="1.1" hideEdit="True" script="forwarder_overview_extension.js">
+  
+  <search id="loadForwarderAssetsSearch">
+    <query>
+| inputlookup dmc_forwarder_assets
+| makemv delim=" " avg_tcp_kbps_sparkline
+| eval sum_kb = if (status == "missing", "N/A", sum_kb)
+| eval avg_tcp_kbps_sparkline = if (status == "missing", "N/A", avg_tcp_kbps_sparkline)
+| eval avg_tcp_kbps = if (status == "missing", "N/A", avg_tcp_kbps)
+| eval avg_tcp_eps = if (status == "missing", "N/A", avg_tcp_kbps)
+| `dmc_rename_forwarder_type(forwarder_type)`
+    </query>
+  </search>
+
+  <label>Forwarder Monitoring</label>
+  <row>
+      <panel>
+          <input type="dropdown" searchWhenChanged="true" token="time">
+              <label>Time Range:</label>
+              <showClearButton>false</showClearButton>
+              <choice value="-60m@m">Last 60 minutes</choice>
+              <choice value="-4h@h">Last 4 hours</choice>
+              <choice value="-12h@h">Last 12 hours</choice>
+              <choice value="-24h@h">Last 24 hours</choice>
+              <choice value="-7d@d">Last 7 days</choice>
+              <choice value="-30d@d">Last 30 days</choice>
+              <choice value="@y">Year to date</choice>
+              <choice value="">All time</choice>
+              <default>-60m@m</default>
+          </input>
+          <html>
+            <p><b>Note:</b> A forwarder is "missing" if it does not connect to indexers for 15 minutes. Forwarder status takes 30 minutes minimum to reflect a monitoring data collection interval of 15 minutes, and higher intervals can take longer.</p>
+          </html>
+      </panel>
+  </row>
+
+<row>
+  <panel>
+    <title>Total Count of Forwarders</title>
+    <search id="forwarderReceiverCountBaseSearch">
+      <query>
+| inputlookup dmc_forwarder_assets
+| stats count as count_forwarder
+      </query>
+      <earliest>$time$</earliest>
+      <latest>now</latest>
+    </search>
+    <single>
+      <option name="height">80px</option>
+      <search base="forwarderReceiverCountBaseSearch">
+        <query>fields count_forwarder</query>
+      </search>
+    </single>
+  </panel>
+
+  <panel>
+  <title>Count of Missing Forwarders</title>
+  <search id="forwarderMissingCountBaseSearch">
+    <query>
+| inputlookup dmc_forwarder_assets
+| search status = "missing" | stats count as count_forwarder
+    </query>
+    <earliest>$time$</earliest>
+    <latest>now</latest>
+  </search>
+  <single>
+    <option name="height">80px</option>
+    <search base="forwarderMissingCountBaseSearch">
+      <query>fields count_forwarder</query>
+    </search>
+  </single>
+  </panel>
+</row>
+
+  <row>
+    <panel>
+      <title>Outgoing Data Rate - All Forwarders</title>
+      <chart>
+        <search>
+          <query>
+`dmc_get_forwarder_tcpin` | `dmc_timechart_for_metrics_log` avg(eval(tcp_KBps)) as "KB/s", avg(tcp_eps) as "Events/s"
+          </query>
+          <earliest>$time$</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisY2.enabled">true</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.chart.showLabels">auto</option>
+        <option name="charting.chart.overlayFields">Events/s</option>
+        <option name="charting.axisTitleY.text">KB/s</option>
+        <option name="charting.axisTitleY2.text">Events/s</option>
+        <option name="charting.axisTitleX.text">Time</option>
+      </chart>
+    </panel>
+</row>
+
+  <row>
+    <panel>
+      <title>Forwarder Status</title>
+      <input type="dropdown" searchWhenChanged="true" token="forwarderStatusFilter">
+        <label>Status</label>
+        <default>*</default>
+        <showClearButton>false</showClearButton>
+        <choice value="*">All</choice>
+        <choice value="active">active</choice>
+        <choice value="missing">missing</choice>
+        <prefix>search status="</prefix>
+        <suffix>"</suffix>
+      </input>
+
+      <input type="text" searchWhenChanged="true" token="forwarderNameFilter">
+        <label>Instance</label>
+        <default>*</default>
+        <prefix>search hostname="*</prefix>
+        <suffix>*"</suffix>
+      </input>
+
+      <table>
+        <search base="loadForwarderAssetsSearch">
+          <query>
+`dmc_time_format(last_connected)`
+| fields hostname, guid, version, os, arch, status, last_connected, avg_tcp_kbps
+| $forwarderStatusFilter$
+| $forwarderNameFilter$
+| rename hostname as "Instance Name", guid as "GUID", version as "Version", os as "OS", arch as "CPU Architecture", status as "Status", last_connected as "Last Connected", avg_tcp_kbps as "Average KB/s"
+          </query>
+        </search>
+        <option name="drilldown">row</option>
+        <drilldown>
+         <set token="hostname">$row.Instance Name$</set>
+         <set token="show_instance_data_rate">true</set>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+
+
+  <row>
+    <panel depends="$show_instance_data_rate$">
+      <title>Outgoing Data Rate - $hostname$</title>
+      <chart>
+        <search id="confRepPerfSearch">
+          <query>
+`dmc_get_forwarder_tcpin` hostname=$hostname$
+| `dmc_timechart_for_metrics_log` avg(eval(tcp_KBps)) as "KB/s", avg(tcp_eps) as "Events/s"
+          </query>
+          <earliest>$time$</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsY2.majorUnit">auto</option>
+        <option name="charting.axisY2.enabled">true</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.overlayFields">Events/s</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.chart.showLabels">auto</option>
+        <option name="charting.axisTitleY2.text">Events/s</option>
+        <option name="charting.axisLabelsY.majorUnit">auto</option>
+        <option name="charting.axisTitleY.text">KB/s</option>
+        <option name="charting.axisTitleX.text">Time</option>
+      </chart>
+    </panel>
+  </row>
+</form>

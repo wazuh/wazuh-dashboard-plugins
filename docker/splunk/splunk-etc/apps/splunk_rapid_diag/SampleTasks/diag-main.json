@@ -1,0 +1,13 @@
+{
+  "__class__": "rapid_diag.task.Task",
+  "collectors": [
+        {
+            "__class__": "rapid_diag.collector.diag.Diag"
+        }
+    ],
+  "name": "Diag Collection",
+  "collector_tool_names": "splunkdiag",
+  "description": "Used to generate a diag file on the specified host.",
+  "host": "",
+  "task_id": "diag-main"
+}

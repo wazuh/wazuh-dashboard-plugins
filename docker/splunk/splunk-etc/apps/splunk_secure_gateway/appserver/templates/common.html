@@ -1,0 +1,37 @@
+<!-- (C) 2019 Splunk Inc. All rights reserved. -->
+<%!
+app_name = cherrypy.request.path_info.split('/')[3]
+
+%>\
+<!doctype html>
+<html class="no-js" lang="">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>
+        Splunk Secure Gateway
+    </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+</head>
+
+<body>
+    <script>
+        config_endpoint = "${make_url('/config')}";
+        (function(x){x.open('GET',config_endpoint,false);x.send();window.$C=JSON.parse(x.responseText)})(new XMLHttpRequest());
+    </script>
+    <script src="${make_url('/static/js/i18n.js')}"></script>
+    <script src="${make_url('/i18ncatalog?autoload=1')}"></script>
+    <script>
+        __splunkd_partials__ = ${json_decode(splunkd)};
+    </script>
+
+    <%
+    page_path = "/static/app/" + app_name + "/pages/" + page + ".3.0.14.js"
+    %>
+
+    <script src="${make_url(page_path)}"></script>
+</body>
+
+</html>

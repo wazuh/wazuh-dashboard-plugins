@@ -1,0 +1,230 @@
+<endpoint name="authentication/providers/LDAP">
+  <header>LDAP strategies</header>
+  <breadcrumb>
+      <parent hidecurrent="False">authoverview</parent>
+  </breadcrumb>
+  <elements>
+    <element name="name" label="LDAP strategy name" type="textfield">
+      <view name="create"/>
+      <view name="list"/>
+      <key name="exampleText">Enter a unique name for this strategy.</key>
+      <key name="submitValueAdd">value.strip()</key>
+      <key name="submitValueEdit">value.strip()</key>
+    </element>
+
+    <element name="connectionFieldset" type="fieldset">
+      <key name="legend">LDAP connection settings</key>
+      <view name="edit"/>
+      <view name="create"/>
+      <view name="list"/>
+      <elements>
+	<element name="host" label="Host" type="textfield">
+	  <view name="edit"/>
+	  <view name="create"/>
+	  <view name="list"/>
+	  <key name="exampleText">Your Splunk server must be able to resolve this host.</key>
+          <key name="submitValueAdd">value.strip()</key>
+          <key name="submitValueEdit">value.strip()</key>
+	</element>
+	<element name="port" label="Port" type="textfield">
+	  <view name="edit"/>
+	  <view name="create"/>
+	  <view name="list"/>
+	  <key name="exampleText">The LDAP server port defaults to 389 if you are not using SSL, or 636 if SSL is enabled.</key>
+          <key name="submitValueAdd">value.strip()</key>
+          <key name="submitValueEdit">value.strip()</key>
+	</element>
+	<element name="SSLEnabled" label="SSL enabled" type="checkbox">
+	  <view name="edit"/>
+	  <view name="create"/>
+	  <key name="exampleText">You must also have SSL enabled on your LDAP server.</key>
+	</element>
+	<element name="order" label="Connection order" type="textfield">
+	  <key name="disableIfNotInEAIAttributes"/>
+	  <view name="edit"/>
+	  <view name="list"/>
+	  <key name="exampleText">The order in which Splunk will query this LDAP server (among enabled servers).</key>
+          <key name="submitValueAdd">value.strip()</key>
+          <key name="submitValueEdit">value.strip()</key>
+	</element>
+	<element name="bindDN" label="Bind DN" type="textfield">
+	  <view name="edit"/>
+	  <view name="create"/>
+	  <key name="exampleText">This is the distinguished name used to bind to the LDAP server. This is typically the DN of an administrator with access to all LDAP users you wish to add to Splunk. However, you can leave this blank if anonymous bind is sufficient.</key>
+          <key name="submitValueAdd">value.strip()</key>
+          <key name="submitValueEdit">value.strip()</key>
+	</element>
+	<element name="bindDNpassword" label="Bind DN Password" type="password">
+	  <view name="edit"/>
+          <view name="create"/>
+          <key name="processValueEdit">'' if entity_name == en.NEW_EAI_ENTITY_NAME else value</key>
+	  <key name="exampleText">Enter the password for your Bind DN user.</key>
+	</element>
+      </elements>
+    </element>
+
+    <element name="userFieldset" type="fieldset">
+      <key name="legend">User settings</key>
+      <view name="edit"/>
+      <view name="create"/>
+      <elements>
+	<element name="userBaseDN" label="User base DN" type="textfield">
+	  <view name="edit"/>
+	  <view name="create"/>
+	  <key name="exampleText">The location of your LDAP users, specified by the DN of your user subtree. If necessary, you can specify several DNs separated by semicolons.</key>
+          <key name="submitValueAdd">value.strip()</key>
+          <key name="submitValueEdit">value.strip()</key>
+	</element>
+	<element name="userBaseFilter" label="User base filter" type="textfield">
+	  <view name="edit"/>
+	  <view name="create"/>
+	  <key name="exampleText">The LDAP search filter used to filter users. Highly recommended if you have a large amount of user entries under your user base DN. For example, '(department=IT)'</key>
+          <key name="submitValueAdd">value.strip()</key>
+          <key name="submitValueEdit">value.strip()</key>
+	</element>
+	<element name="userNameAttribute" label="User name attribute" type="textfield">
+	  <view name="edit"/>
+	  <view name="create"/>
+	  <key name="exampleText">The user attribute that contains the username. Note that this attribute's value should be case insensitive. &lt;br /&gt; Set to 'uid' for most configurations. In Active Directory (AD), this should be set to 'sAMAccountName'.</key>
+          <key name="submitValueAdd">value.strip()</key>
+          <key name="submitValueEdit">value.strip()</key>
+	</element>
+	<element name="realNameAttribute" label="Real name attribute" type="textfield">
+	  <view name="edit"/>
+	  <view name="create"/>
+	  <key name="exampleText">The user attribute that contains a human readable name. This is typically 'cn' (common name) or 'displayName'.</key>
+          <key name="submitValueAdd">value.strip()</key>
+          <key name="submitValueEdit">value.strip()</key>
+	</element>
+	<element name="emailAttribute" label="Email attribute" type="textfield">
+	  <view name="edit"/>
+	  <view name="create"/>
+	  <key name="exampleText">The user attribute that contains the user's email address. This is typically 'mail'.</key>
+          <key name="submitValueAdd">value.strip()</key>
+          <key name="submitValueEdit">value.strip()</key>
+	</element>
+        <element name="groupMappingAttribute" label="Group mapping attribute" type="textfield">
+	  <view name="edit"/>
+	  <view name="create"/>
+	  <key name="exampleText">The user attribute that group entries use to define their members. If your LDAP groups use distinguished names for membership you can leave this field blank.</key> 
+          <key name="submitValueAdd">value.strip()</key>
+          <key name="submitValueEdit">value.strip()</key>
+	</element>
+      </elements>
+    </element>
+
+    <element name="groupFieldset" type="fieldset">
+      <key name="legend">Group settings</key>
+      <view name="edit"/>
+      <view name="create"/>
+      <elements>
+	<element name="groupBaseDN" label="Group base DN" type="textfield">
+	  <view name="edit"/>
+	  <view name="create"/>
+          <key name="exampleText">The location of your LDAP groups, specified by the DN of your group subtree. If necessary, you can specify several DNs separated by semicolons.</key>
+          <key name="submitValueAdd">value.strip()</key>
+          <key name="submitValueEdit">value.strip()</key>
+	</element>
+	<element name="groupBaseFilter" label="Static group search filter" type="textfield">
+	  <view name="edit"/>
+	  <view name="create"/>
+	  <key name="exampleText">The LDAP search filter used to retrieve static groups. Highly recommended if you have a large amount of group entries under your group base DN. For example, '(department=IT)'</key>
+          <key name="submitValueAdd">value.strip()</key>
+          <key name="submitValueEdit">value.strip()</key>
+	</element>
+	<element name="groupNameAttribute" label="Group name attribute" type="textfield">
+	  <view name="edit"/>
+	  <view name="create"/>
+	  <key name="exampleText">The group attribute that contains the group name. A typical value for this is 'cn'.</key>
+          <key name="submitValueAdd">value.strip()</key>
+          <key name="submitValueEdit">value.strip()</key>
+	</element>
+	<element name="groupMemberAttribute" label="Static member attribute" type="textfield">
+	  <view name="edit"/>
+	  <view name="create"/>
+	  <key name="exampleText">The group attribute whose values are the group's members. Typical values are 'member' or 'memberUid'. Groups list user members with values of groupMappingAttribute, as specified above.</key>
+          <key name="submitValueAdd">value.strip()</key>
+          <key name="submitValueEdit">value.strip()</key>
+	</element>
+        <element name="nestedGroups" label="Nested groups" type="checkbox">
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="exampleText">Controls whether Splunk will expand nested groups using the 'memberof' extension. Only check this if you have nested groups and the 'memberof' extension on your LDAP server.</key>
+        </element>
+      </elements>
+    </element>
+
+    <element name="dynamicGroupFieldset" type="fieldset">
+      <key name="legend">Dynamic group settings</key>
+      <view name="edit"/>
+      <view name="create"/>
+      <elements>
+	<element name="dynamicMemberAttribute" label="Dynamic member attribute" type="textfield">
+	  <view name="edit"/>
+	  <view name="create"/>
+	  <key name="exampleText">The dynamic group attribute that contains the LDAP URL used to find members. This setting is required to configure dynamic groups. A typical value is 'memberURL'.</key>
+          <key name="submitValueAdd">value.strip()</key>
+          <key name="submitValueEdit">value.strip()</key>
+	</element>
+	<element name="dynamicGroupFilter" label="Dynamic group search filter" type="textfield">
+	  <view name="edit"/>
+	  <view name="create"/>
+	  <key name="exampleText">The LDAP search filter used to retrieve dynamic groups (optional). For example, '(objectclass=groupOfURLs)'</key>
+          <key name="submitValueAdd">value.strip()</key>
+          <key name="submitValueEdit">value.strip()</key>
+	</element>
+      </elements>
+    </element>
+
+    <element name="spl-ctrl_EnableAdvanced" type="checkbox" label="Advanced settings" class="spl-mgr-advanced-switch">
+        <view name="edit"/>
+        <view name="create"/>
+          <onChange>
+              <key name="_action">showonly</key>
+              <key name="0">NONE</key>
+              <key name="1">ALL</key>
+              <group_set>
+                <group name="advanced"/>
+              </group_set>
+          </onChange>
+          <key name="processValueEdit">1</key>
+    </element>
+
+    <element name="advanced" type="fieldset" class="spl-mgr-advanced-options">
+      <view name="edit"/>
+      <view name="create"/>
+      <elements>
+        <element name="anonymous_referrals" label="Enable referrals with anonymous bind only" type="checkbox">
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="exampleText">Splunk can chase referrals with anonymous bind only. You must also have anonymous search enabled on your LDAP server. Turn this off if you have no need for referrals.</key>
+          <key name="processValueAdd">1</key>
+        </element>
+        <element name="sizelimit" label="Search request size limit" type="textfield">
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="exampleText">Sets the maximum number of entries requested by LDAP searches. The number actually returned is subject to the limit imposed by the LDAP server.</key>
+          <key name="processValueAdd">'1000'</key>
+          <key name="submitValueAdd">value.strip()</key>
+          <key name="submitValueEdit">value.strip()</key>
+        </element>
+        <element name="timelimit" label="Search request time limit" type="textfield">
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="exampleText">The maximum time limit in seconds to wait for LDAP searches to complete. This should be less than the UI timeout of 30s.</key>
+          <key name="processValueAdd">'15'</key>
+          <key name="submitValueAdd">value.strip()</key>
+          <key name="submitValueEdit">value.strip()</key>
+        </element>
+        <element name="network_timeout" label="Network socket timeout" type="textfield">
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="exampleText">The maximum amount of seconds to wait on a connection to the LDAP server without activity. As a connection could be a search, this must be greater than the search time limit. Enter -1 for an infinite timeout. This should be less than the UI timeout of 30s.</key>
+          <key name="processValueAdd">'20'</key>
+          <key name="submitValueAdd">value.strip()</key>
+          <key name="submitValueEdit">value.strip()</key>
+        </element>
+      </elements>
+    </element>
+  </elements>
+</endpoint>

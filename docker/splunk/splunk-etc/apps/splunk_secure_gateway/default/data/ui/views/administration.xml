@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<view template="splunk_secure_gateway:/templates/administration.html" type="html">
+    <label>Administration</label>
+</view>

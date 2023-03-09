@@ -1,0 +1,6 @@
+<endpoint name="apps/uploaded_apps" showAppContext="1" template="pages/system.html">
+  <header>Uploaded Apps</header>
+  <capabilities>
+    <read>edit_local_apps</read>
+  </capabilities>
+</endpoint>

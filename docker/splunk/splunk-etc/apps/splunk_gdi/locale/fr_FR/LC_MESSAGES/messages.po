@@ -1,0 +1,268 @@
+# Translations template for PROJECT.
+# Copyright (C) 2018 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2018.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2018-08-28 14:28-0700\n"
+"PO-Revision-Date: 2018-08-31 09:11+0100\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.4\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: fr_FR\n"
+"X-Generator: Poedit 2.1.1\n"
+
+#: splunk_gdi/appserver/static/js/components/AsyncImage.jsx:59
+msgid "Loading Now..."
+msgstr "Chargement en cours..."
+
+#: splunk_gdi/appserver/static/js/components/Dots.jsx:7
+msgid "Loading"
+msgstr "Chargement"
+
+#: splunk_gdi/appserver/static/js/pages/home.enterprise.jsx:10 splunk_gdi/appserver/static/js/pages/home.lite.jsx:10
+#: splunk_gdi/appserver/static/js/views/Search/Master.lite.jsx:34
+msgid "Add Data"
+msgstr "Ajouter des données"
+
+#: splunk_gdi/appserver/static/js/utils/messages.js:5
+msgid "No valid data source is found."
+msgstr "Aucune source de données valide n'a été trouvée."
+
+#: splunk_gdi/appserver/static/js/utils/messages.js:6
+msgid "The id of this collection method is invalid."
+msgstr "L’ID de cette méthode de collecte n’est pas valide."
+
+#: splunk_gdi/appserver/static/js/utils/messages.js:7
+msgid "Mandatory fields are missing in the conf file."
+msgstr "Des champs obligatoires manquent dans le fichier de configuration."
+
+#: splunk_gdi/appserver/static/js/utils/messages.js:8
+msgid "The definition of resource server is missing in the response from the web service."
+msgstr "La définition du serveur de ressources manque dans la réponse du service web."
+
+#: splunk_gdi/appserver/static/js/utils/messages.js:9
+msgid "Splunk data onboarding guides are not accessible. Please ensure an internet connection is available to access these guides."
+msgstr ""
+"Les guides d’importation des données Splunk ne sont pas accessibles. Vérifiez qu’une connexion Internet est disponible pour accéder à ces guides."
+
+#: splunk_gdi/appserver/static/js/views/Search/DataSourceCard.jsx:13
+#, python-format
+msgid "images for %s"
+msgstr "images pour %s"
+
+#: splunk_gdi/appserver/static/js/views/Search/DataSourceCard.jsx:42
+msgid "Configure now"
+msgstr "Configurer maintenant"
+
+#: splunk_gdi/appserver/static/js/views/Search/DataSourceCard.jsx:45
+#, python-format
+msgid "%d data source"
+msgstr "%d source de données"
+
+#: splunk_gdi/appserver/static/js/views/Search/DataSourceCard.jsx:48
+#, python-format
+msgid "%d data sources"
+msgstr "%d sources de données"
+
+#: splunk_gdi/appserver/static/js/views/Search/DataSourceContainer.jsx:60
+#, python-format
+msgid "%d data sources in total"
+msgstr "%d sources de données au total"
+
+#: splunk_gdi/appserver/static/js/views/Search/DataSourceContainer.jsx:61
+#, python-format
+msgid "%d data source in total"
+msgstr "%d source de données au total"
+
+#: splunk_gdi/appserver/static/js/views/Search/Master.Header.jsx:5
+msgid "What data do you want to send to the Splunk platform?"
+msgstr "Quelles données voulez-vous envoyer à la plateforme Splunk ?"
+
+#: splunk_gdi/appserver/static/js/views/Search/Master.lite.jsx:35
+msgid "How do you want to add data?"
+msgstr "Comment souhaitez-vous ajouter les données ?"
+
+#: splunk_gdi/appserver/static/js/views/Search/Master.resolved.jsx:11
+msgid "Or get data in with the following methods"
+msgstr "Ou importez des données à l’aide des méthodes suivantes"
+
+#: splunk_gdi/appserver/static/js/views/Search/DataSourceModal/Master.jsx:90
+#: splunk_gdi/appserver/static/js/views/Search/SearchBarAndResult/SearchResult.jsx:72
+msgid "No guides matching your search were found. We are continuously adding new guides."
+msgstr "Aucun guide ne correspond à votre recherche. Nous ajoutons continuellement de nouveaux guides."
+
+#: splunk_gdi/appserver/static/js/views/Search/LegacyInputMethod/InputMethodsContainer.jsx:33
+msgid "Upload"
+msgstr "Envoyer"
+
+#: splunk_gdi/appserver/static/js/views/Search/LegacyInputMethod/InputMethodsContainer.jsx:34
+msgid "files from my computer"
+msgstr "des fichiers depuis mon ordinateur"
+
+#: splunk_gdi/appserver/static/js/views/Search/LegacyInputMethod/InputMethodsContainer.jsx:35
+msgid "Local log files"
+msgstr "Fichiers de logs locaux"
+
+#: splunk_gdi/appserver/static/js/views/Search/LegacyInputMethod/InputMethodsContainer.jsx:35
+msgid "Local structured files (e.g. CSV)"
+msgstr "Fichiers structurés locaux (par ex : CSV)"
+
+#: splunk_gdi/appserver/static/js/views/Search/LegacyInputMethod/InputMethodsContainer.jsx:36
+msgid "Tutorial for adding data"
+msgstr "Didacticiel pour ajouter des données"
+
+#: splunk_gdi/appserver/static/js/views/Search/LegacyInputMethod/InputMethodsContainer.jsx:44
+msgid "Monitor"
+msgstr "Surveiller"
+
+#: splunk_gdi/appserver/static/js/views/Search/LegacyInputMethod/InputMethodsContainer.jsx:45
+msgid "files and ports on this Splunk platform instance"
+msgstr "des fichiers et des ports sur cette instance de la plateforme Splunk"
+
+#: splunk_gdi/appserver/static/js/views/Search/LegacyInputMethod/InputMethodsContainer.jsx:47
+msgid "Files - HTTP - WMI - TCP/UDP - Scripts"
+msgstr "Fichiers - HTTP - WMI - TCP/UDP - Scripts"
+
+#: splunk_gdi/appserver/static/js/views/Search/LegacyInputMethod/InputMethodsContainer.jsx:48
+msgid "Modular inputs for external data sources"
+msgstr "Entrées modulaires pour des sources de données externes"
+
+#: splunk_gdi/appserver/static/js/views/Search/LegacyInputMethod/InputMethodsContainer.jsx:57
+msgid "Forward"
+msgstr "Transmettre"
+
+#: splunk_gdi/appserver/static/js/views/Search/LegacyInputMethod/InputMethodsContainer.jsx:58
+msgid "data from a Splunk forwarder"
+msgstr "des données à partir d’un forwardeur Splunk"
+
+#: splunk_gdi/appserver/static/js/views/Search/LegacyInputMethod/InputMethodsContainer.jsx:59
+msgid "Files - TCP/UDP - Scripts"
+msgstr "Fichiers - TCP/UDP - Scripts"
+
+#: splunk_gdi/appserver/static/js/views/Search/SearchBarAndResult/Master.jsx:13
+msgid "Follow guides for onboarding popular data sources"
+msgstr "Suivez les guides pour importer des sources de données courantes"
+
+#: splunk_gdi/appserver/static/js/views/Search/SearchBarAndResult/SearchBar.jsx:57
+msgid "Search bar"
+msgstr "Barre de recherche"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepControl.jsx:26
+msgid "Exit"
+msgstr "Quitter"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepControl.jsx:27
+msgid "Back"
+msgstr "Retour"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepControl.jsx:28
+msgid "Finish"
+msgstr "Terminer"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepControl.jsx:29
+msgid "Next"
+msgstr "Suiv."
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepControl.jsx:30
+msgid "No"
+msgstr "Non"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepControl.jsx:31
+msgid "Yes"
+msgstr "Oui"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepControl.jsx:32
+msgid "Confirm"
+msgstr "Confirmer"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepControl.jsx:33
+msgid "Exit guide?"
+msgstr "Quitter le guide ?"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepHeader.jsx:11
+msgid "Collection Method"
+msgstr "Méthode de collecte"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepHeader.jsx:12
+msgid "Configurations"
+msgstr "Configurations"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepHeader.jsx:13
+msgid "Validation"
+msgstr "Validation"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepCollectionMethod/CollectionMethodCard.jsx:28
+msgid "Best Practice"
+msgstr "Bonne pratique"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepCollectionMethod/Master.jsx:43
+msgid "Choose collection method"
+msgstr "Choisissez la méthode de collecte"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepTopology/BlankDeployment.jsx:8
+msgid "Please select deployment"
+msgstr "Veuillez sélectionner un déploiement"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepTopology/ConfigurationContainer.jsx:12
+msgid "High level steps"
+msgstr "Étapes de haut niveau"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepTopology/ConfigurationContainer.jsx:13
+msgid "Full Configuration Documentation"
+msgstr "Documentation complète de configuration"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepTopology/Master.jsx:28
+msgid "Choose your deployment environment"
+msgstr "Choisissez votre environnement de déploiement"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepTopology/Master.jsx:29
+msgid "Overview of required configuration for your environment"
+msgstr "Vue d’ensemble de la configuration requise pour votre environnement"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepTopology/Master.jsx:30
+msgid "Deployment Diagram"
+msgstr "Schéma de déploiement"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepTopology/Master.jsx:31
+msgid "Select options on the left describing your distributed deployment configuration"
+msgstr "Sélectionnez sur la gauche les options décrivant votre configuration de déploiement distribué"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepTopology/Master.jsx:32
+msgid "Select the option above that describes your Splunk deployment"
+msgstr "Sélectionnez ci-dessus l’option qui décrit votre déploiement Splunk"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepTopology/Master.jsx:33
+msgid "An overview of the configuration required for your deployment will be shown here"
+msgstr "Une vue d’ensemble de la configuration requise pour votre déploiement s'affichera ici"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepValidation/Master.jsx:58
+#, python-format
+msgid "From the %s, enter the query below."
+msgstr "Dans %s, saisissez la requête ci-dessous."
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepValidation/Master.jsx:59
+msgid "Verify your data is being ingested"
+msgstr "Vérifiez que vos données sont importées"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepValidation/Master.jsx:60
+msgid "Use the following SPL query to verify that your data is indexed and searchable"
+msgstr "Utilisez la requête SPL suivante pour vérifier que vos données sont indexées et que vous pouvez les utiliser pour effectuer des recherches"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepValidation/Master.jsx:61
+msgid "Search & Reporting app"
+msgstr "Application Search & Reporting"
+
+#: splunk_gdi/appserver/templates/home_template.html:21
+msgid "Loading..."
+msgstr "Chargement en cours..."
+
+#: splunk_gdi/default/app.conf:12 splunk_gdi/default/app.conf:17
+msgid "Splunk Get Data In"
+msgstr "Splunk Importer les données"

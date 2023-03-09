@@ -1,0 +1,5 @@
+<endpoint name="auth/view_capabilities" showAppContext="1" template="pages/system.html">
+    <capabilities>
+        <read>edit_user OR edit_roles OR edit_roles_grantable</read>
+    </capabilities>
+</endpoint>

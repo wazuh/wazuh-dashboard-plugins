@@ -1,0 +1,246 @@
+<form version="1.1" hideEdit="True" script="common_control.js, search_usage_statistics_extension.js">
+  <label>Search Usage Statistics: Deployment</label>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="dropdown" searchWhenChanged="true" token="group">
+      <label>Group</label>
+      <showClearButton>false</showClearButton>
+      <search>
+        <query>
+          | `dmc_get_groups_containing_role(dmc_group_search_head)`
+          | search search_group="dmc_customgroup_*" OR search_group="dmc_indexerclustergroup_*" OR search_group="dmc_searchheadclustergroup_*"
+        </query>
+      </search>
+      <fieldForLabel>label</fieldForLabel>
+      <fieldForValue>search_group</fieldForValue>
+      <choice value="*">All Search Heads</choice>
+      <default>*</default>
+    </input>
+    <input type="time" searchWhenChanged="true" token="time">
+      <label>Time Range:</label>
+      <default>Last 4 hours</default>
+    </input>
+    <input type="radio" searchWhenChanged="true" token="filter_out_non_adhoc">
+      <label>Only Ad Hoc Searches</label>
+      <default>search_type=&quot;ad hoc&quot;</default>
+      <choice value="search_type=&quot;ad hoc&quot;">Yes</choice>
+      <choice value="true()">No</choice>
+      <prefix>AND </prefix>
+    </input>
+  </fieldset>
+  <search id="get_audit_base">
+    <query>
+      `dmc_audit_get_searches_for_groups("$group$")`
+      | stats min(_time) as _time, values(user) as user, max(total_run_time) as total_run_time, first(search) as search, first(search_type) as search_type, first(apiStartTime) as apiStartTime, first(apiEndTime) as apiEndTime by search_id, host
+      | where isnotnull(search) $filter_out_non_adhoc$
+    </query>
+    <earliest>$time.earliest$</earliest>
+    <latest>$time.latest$</latest>
+  </search>
+  <search base="get_audit_base">
+    <query>stats dc(user) as user_count</query>
+    <preview>
+      <set token="user_count">$result.user_count$</set>
+    </preview>
+    <finalized>
+      <set token="user_count">$result.user_count$</set>
+    </finalized>
+  </search>
+  <search base="get_audit_base">
+    <query>stats dc(host) as search_head_count</query>
+    <preview>
+      <set token="search_head_count">$result.search_head_count$</set>
+    </preview>
+    <finalized>
+      <set token="search_head_count">$result.search_head_count$</set>
+    </finalized>
+  </search>
+  <row>
+    <panel>
+      <title>Search Activity by User ($user_count$)</title>
+      <table>
+        <search base="get_audit_base">
+          <query>
+            stats dc(host) as count_host, median(total_run_time) as median_runtime, sum(total_run_time) as cum_runtime, count(search) as count, max(_time) as last_use by user
+            | eval median_runtime = if(isnotnull(median_runtime), median_runtime, "-")
+            | eval cum_runtime = if(isnotnull(cum_runtime), cum_runtime, "-")
+            | `dmc_time_format(last_use)`
+            | fields user, count, count_host, median_runtime, cum_runtime, last_use
+            | sort - count
+            | rename user as User, count_host as "Search Head Count", count as "Search Count", median_runtime as "Median Runtime", cum_runtime as "Cumulative Runtime", last_use as "Last Search"
+            | fieldformat "Median Runtime" = `dmc_convert_runtime('Median Runtime')`
+            | fieldformat "Cumulative Runtime" = `dmc_convert_runtime('Cumulative Runtime')`
+          </query>
+        </search>
+        <option name="drilldown">row</option>
+        <drilldown>
+          <set token="user_drilldown_hosts">$row.User$</set>
+          <set token="user_drilldown_searches">$row.User$</set>
+        </drilldown>
+      </table>
+      <html>
+        <p>Click to see a list of search head names and a list of search strings.</p>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel depends="$user_drilldown_hosts$">
+      <title>Search Heads Used by $user_drilldown_hosts$</title>
+      <table>
+        <search base="get_audit_base">
+          <query>
+            search user=$user_drilldown_hosts$
+            | stats count(search) as count by host
+            | sort - count
+            | fields host, count
+            | rename host as "Search Head", count as "Search Count"
+          </query>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+      <html>
+        <a data-unset-token="user_drilldown_hosts">Close this panel</a>
+      </html>
+    </panel>
+    <panel depends="$user_drilldown_searches$">
+      <title>Searches by $user_drilldown_searches$</title>
+      <table>
+        <search base="get_audit_base">
+          <query>
+            search user=$user_drilldown_searches$
+            | stats count by search
+            | sort - count
+            | fields count, search
+            | rename search as "Report Name/Search String", count as "Count"
+          </query>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+      <html>
+        <a data-unset-token="user_drilldown_searches">Close this panel</a>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Search Activity by Search Head ($search_head_count$)</title>
+      <table>
+        <search base="get_audit_base">
+          <query>
+            stats median(total_run_time) as median_runtime sum(total_run_time) as cum_runtime count(search) as count_search max(_time) as last_use dc(user) as count_user by host
+            | eval median_runtime = if(isnotnull(median_runtime), median_runtime, "-")
+            | eval cum_runtime = if(isnotnull(cum_runtime), cum_runtime, "-")
+            | `dmc_time_format(last_use)`
+            | fields host, count_search, count_user, median_runtime, cum_runtime, last_use
+            | sort - count_search
+            | rename host as "Search Head", count_search as "Search Count", count_user as "User Count", median_runtime as "Median Runtime", cum_runtime as "Cumulative Runtime", last_use as "Last Search"
+            | fieldformat "Median Runtime" = `dmc_convert_runtime('Median Runtime')`
+            | fieldformat "Cumulative Runtime" = `dmc_convert_runtime('Cumulative Runtime')`
+          </query>
+        </search>
+        <option name="drilldown">row</option>
+        <drilldown>
+          <set token="host_drilldown_users">$row.Search Head$</set>
+          <set token="host_drilldown_searches">$row.Search Head$</set>
+        </drilldown>
+      </table>
+      <html>
+        <p>Click to see a list of users and a list of search strings.</p>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel depends="$host_drilldown_users$">
+      <title>Users on $host_drilldown_users$</title>
+      <table>
+        <search base="get_audit_base">
+          <query>
+            search host=$host_drilldown_users|s$
+            | stats count(search) as count by user
+            | sort - count
+            | fields user, count
+            | rename user as "User", count as "Count"
+          </query>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+      <html>
+        <a data-unset-token="host_drilldown_users">Close this panel</a>
+      </html>
+    </panel>
+    <panel depends="$host_drilldown_searches$">
+      <title>Searches on $host_drilldown_searches$</title>
+      <table>
+        <search base="get_audit_base">
+          <query>
+            search host=$host_drilldown_searches|s$
+            | stats count by search
+            | sort - count        
+            | fields count, search
+            | rename search as "Report Name/Search String", count as "Count"
+          </query>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+      <html>
+        <a data-unset-token="host_drilldown_searches">Close this panel</a>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Frequently Run Searches</title>
+      <table id="frequently_run_searches">
+        <search base="get_audit_base">
+          <query>
+            search user="*"
+            | stats count(search) as count, median(total_run_time) as median_runtime, max(total_run_time) as max_runtime, values(user) as user, values(host) as host, values(search_type) as search_type by search
+            | eval median_runtime = if(isnotnull(median_runtime), median_runtime, "-")
+            | eval max_runtime = if(isnotnull(max_runtime), max_runtime, "-")
+            | sort - count
+            | rename search as "Report Name/Search String", count as "Count", median_runtime as "Median Runtime", max_runtime as "Max Runtime", user as Users, host as Hosts, search_type as Type
+            | fieldformat "Median Runtime" = `dmc_convert_runtime('Median Runtime')`
+            | fieldformat "Max Runtime" = `dmc_convert_runtime('Max Runtime')`
+          </query>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Long-running Searches</title>
+      <table id="long_running_searches">
+        <search base="get_audit_base">
+          <query>
+            search user="*" search="*"
+            | eval earliest = case(like(apiStartTime, "%ZERO_TIME%") AND like(apiEndTime, "%ZERO_TIME%"), "all time", like(apiStartTime, "%ZERO_TIME%"), "-", 1 == 1, apiStartTime )
+            | eval latest = case(like(apiStartTime, "%ZERO_TIME%") AND like(apiEndTime, "%ZERO_TIME%"), "all time", like(apiEndTime, "%ZERO_TIME%"), "-", 1 == 1, apiEndTime ) 
+            | `dmc_time_format(_time)`
+            | stats max(total_run_time) as total_run_time by search, _time, earliest, latest, search_type, user, host, search_id
+            | sort - total_run_time 
+            | eval total_run_time = if(isnotnull(total_run_time), total_run_time, "-")
+            | fields search, total_run_time, _time, earliest, latest, search_type, user, host, search_id
+            | rename search as "Report Name/Search String", total_run_time as "Search Runtime", _time as "Search Start", earliest as "Earliest Time", latest as "Latest Time", search_type as Type, user as "User", host as "Host", search_id as SID
+            | fieldformat "Search Runtime" = `dmc_convert_runtime('Search Runtime')`
+          </query>
+        </search>
+        <option name="drilldown">row</option>
+        <drilldown>
+          <set token="long_running_sid">$row.SID$</set>
+        </drilldown>
+      </table>
+      <html>
+        <p>Click to see detail</p>
+      </html>
+      <event depends="$long_running_sid$">
+        <title>Detail of SID: $long_running_sid$</title>
+        <search base="get_audit_base">
+          <query>where search_id=$long_running_sid|s$</query>
+        </search>
+      </event>
+      <html depends="$long_running_sid$">
+        <a data-unset-token="long_running_sid">Close event view</a>
+      </html>
+    </panel>
+  </row>
+</form>

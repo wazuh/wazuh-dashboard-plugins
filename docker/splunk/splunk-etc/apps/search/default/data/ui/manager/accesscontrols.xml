@@ -1,0 +1,9 @@
+<!-- Disabling this page since all the links have been moved directly
+    under "User and Authentication" settings.
+-->
+<endpoint name="unused" showOnSearchHeadCluster="1" isDashboard="False" isVisible="False">
+  <capabilities>
+    <read>edit_roles OR edit_roles_grantable OR edit_user OR change_authentication</read>
+  </capabilities>
+  <header></header>
+</endpoint>

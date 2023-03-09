@@ -1,0 +1,6 @@
+<endpoint name="clustering_push" template="pages/system.html">
+  <capabilities>
+    <read>edit_indexer_cluster</read>
+  </capabilities>
+  <header></header>
+</endpoint>

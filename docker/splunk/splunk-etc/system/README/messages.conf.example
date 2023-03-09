@@ -1,0 +1,60 @@
+#   Version 9.0.3
+#
+# This file contains an example messages.conf of attribute/value pairs for 
+# configuring externalized strings.
+#
+# There is a messages.conf in $SPLUNK_HOME/etc/system/default/.  To set custom
+# configurations, place a messages.conf in $SPLUNK_HOME/etc/system/local/. You
+# must restart the instance to enable configurations.
+#
+# To learn more about configuration files (including precedence) please see the
+# documentation located at
+# http://docs.splunk.com/Documentation/Splunk/latest/Admin/Aboutconfigurationfiles
+#
+# For the full list of all literals that can be overridden, check out
+# $SPLUNK_HOME/etc/system/default/messages.conf
+
+
+[DISK_MON]
+name = Disk Monitor
+
+[DISK_MON:INSUFFICIENT_DISK_SPACE_ERROR__S_S_LLU]
+message      = Cannot write data to index path '%s' because you are low on disk space on partition '%s'. Indexing has been paused.
+action       = Free disk space above %lluMB to resume indexing.
+severity     = warn
+capabilities = indexes_edit
+help         = learnmore.indexer.setlimits
+
+
+[LM_LICENSE]
+name = License Manager
+
+[LM_LICENSE:EXPIRED_STATUS__LD]
+message      = Your license has expired as of $t%ld.
+action       = $CONTACT_SPLUNK_SALES_TEXT$
+capabilities = license_edit
+
+[LM_LICENSE:EXPIRING_STATUS__LD]
+message      = Your license will soon expire on $t%ld.
+action       = $CONTACT_SPLUNK_SALES_TEXT$
+capabilities = license_edit
+
+[LM_LICENSE:INDEXING_LIMIT_EXCEEDED]
+message      = Daily indexing volume limit exceeded today.
+action       = See [[/manager/search/licenseusage|License Manager]] for details.
+severity     = warn
+capabilities = license_view_warnings
+help         = learnmore.license.features
+
+[LM_LICENSE:MASTER_CONNECTION_ERROR__S_LD_LD]
+message      = Failed to contact license master: reason='%s', first failure time=%ld ($t%ld).
+severity     = warn
+capabilities = license_edit
+help         = learnmore.license.features
+
+[LM_LICENSE:SLAVE_WARNING__LD_S]
+message      = License warning issued within past 24 hours: $t%ld.
+action       = Please refer to the License Usage Report view on license master '%s' to find out more.
+severity     = warn
+capabilities = license_edit
+help         = learnmore.license.features

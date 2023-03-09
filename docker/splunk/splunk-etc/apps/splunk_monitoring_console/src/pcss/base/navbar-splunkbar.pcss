@@ -1,0 +1,316 @@
+/*===============================================================================================*/
+/*  SPLUNK: SPLUNK BAR                                                                           */
+/*===============================================================================================*/
+
+/*  Main Container */
+.navbar-splunkbar {
+    min-width: 750px;
+    height: $navbarHeight;
+    min-height: $navbarHeight;
+    color: $navbarTextColor;
+    position: relative;
+    margin-bottom: 0;
+    background: $navbarBackground;
+
+    /*  Nav */
+    .nav {
+        float: left;
+        margin-bottom: 0;
+
+        &.pull-right {
+            float: right;
+        }
+        > li {
+            position: relative;
+            float: left;
+
+            > a {
+                padding: 0 15px; /*  can't use vertical padding since badges/labels push this out */
+                color: $navbarLinkColor;
+                line-height: $navbarHeight;
+                height: $navbarHeight;
+                white-space: nowrap;
+
+                &:hover {
+                    color: $white;
+                    background: $navbarBackgroundHover;
+                    outline: none;
+                }
+                &:focus {
+                    color: $white;
+                    @mixin focus-element-inset $navbarBackground;
+                    background-color: transparent;
+                }
+                &.active {
+                    color: $white;
+                    background: $navbarBackgroundActive;
+                    &:focus {
+                        box-shadow: none;
+                    }
+                }
+                > .caret {
+                    color: $navBarCaretColor;
+                }
+            }
+        }
+        .realname,
+        .appname {
+            display: inline-block;
+            vertical-align: middle;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        &:not(.cloud) {
+            .realname,
+            .appname {
+                max-width: calc((100vw - 800px) / 2);
+            }
+        }
+        &.cloud {
+            .realname,
+            .appname {
+                max-width: 100px;
+            }
+            .product-menu-label,
+            .help-menu-label {
+                display: none;
+            }
+        }
+        @media only screen and (min-width: 1100px) {
+            &.cloud {
+                .realname, .appname {
+                    max-width: 150px;
+                }
+            }
+        }
+        @media only screen and (min-width: 1300px) {
+            &.cloud {
+                .product-menu-label, .help-menu-label {
+                    display: inline;
+                }
+            }
+        }
+        @media only screen and (min-width: 1500px) {
+            &.cloud {
+                .realname, .appname {
+                    max-width: 250px;
+                }
+            }
+        }
+        @media only screen and (min-width: 1700px) {
+            &.cloud {
+                .realname, .appname {
+                    max-width: 350px;
+                }
+            }
+        }
+    }
+
+    /*  Nav Logo */
+    .brand {
+        font-family: "Splunk Icons";
+        color: $white;
+        padding: 0 $spacingHalf 0 $spacing;
+        font-size: 16px;
+        line-height: $navbarHeight;
+        float: left;
+        text-decoration: none;
+        letter-spacing: 0.5px;
+
+        strong {
+            color: $brandColor;
+            font-weight: normal;
+            /* reg symbol */
+            &:after {
+                content: '\00AE';
+                color: $brandColor;
+                font-weight: normal;
+            }
+        }
+        .nav-product-logo {
+            color: $brandColor;
+        }
+        &:focus {
+            @mixin focus-element-inset $navbarBackground;
+        }
+        &.active {
+            background: none;
+            &:focus {
+                box-shadow: none;
+            }
+        }
+    }
+    .label {
+        padding: 1px 8px;
+        border-radius: 30px;
+    }
+    .form-search {
+        padding: $spacingQuarter;
+        margin: 0;
+        border-top: $borderDefault;
+
+        .search-query {
+            width: 100%;
+            height: $inputHeight;
+            padding: 0 $spacingHalf;
+            box-sizing: border-box;
+        }
+    }
+    /*  adjust label color in nav */
+    .label-warning {
+        background: $accentColor;
+        border: none;
+        color: $white;
+    }
+    .icon {
+        margin-right: 6px;
+        vertical-align: middle;
+        font-size: 1.4em;
+    }
+}
+
+/*************************************************************************************************/
+/*  APPS MENU                                                                                    */
+/*************************************************************************************************/
+.menu-apps {
+    .menu-icon {
+        height: 18px;
+        position: absolute;
+        right: $spacingHalf;
+        top: 4px;
+    }
+    .menu-label {
+        padding-right: 28px;
+        display: block;
+    }
+}
+
+
+/*************************************************************************************************/
+/*  ACTIVITY MENU                                                                                */
+/*************************************************************************************************/
+#global-activity-menu > ul > li {
+    > a.secondary-link {
+        font-size: 13px;
+    }
+}
+
+
+/*************************************************************************************************/
+/*  FIND                                                                                         */
+/*************************************************************************************************/
+.shared-splunkbar-find {
+    height: $navbarHeight;
+    padding-left: $spacingHalf;
+    padding-right: $spacing;
+
+    .search-query {
+        height: 15px;
+        line-height: 15px;
+        margin-top: 3px;
+        padding-left: 8px;
+        width: 150px;
+        border: $border $gray60;
+        border-radius: $borderRadius;
+        transition: $transitionBackgroundColor;
+        background-color: transparent;
+        color: $textGray;
+        font-size: inherit !important; /* fix for splunk components */
+
+        &::placeholder {
+           color: $navbarTextColor;
+           transition: color 0.3s linear;
+        }
+        &:placeholder-shown {
+            background-position: 5px 2px;
+            background-size: 20px;
+        }
+    }
+    &:hover .search-query, .search-query:focus {
+        background-color: $white;
+        color: $textColor;
+
+        &::placeholder {
+           color: $placeholderText;
+        }
+    }
+    .search-query-clear {
+        right: 7px;
+        top: 7px;
+
+        &:focus, &:hover {
+            color: $linkColorHover !important;
+            background: transparent !important;
+        }
+    }
+    .dropdown-menu {
+        width: 360px;
+        .shared-tablecaption-input {
+            border-top: none;
+            .search-query {
+                width: 350px;
+            }
+        }
+        .search-query-clear {
+            right: 7px;
+            top: 7px;
+
+            &:focus, &:hover {
+                color: $linkColorHover !important;
+                background: transparent !important;
+            }
+        }
+    }
+}
+
+
+/*************************************************************************************************/
+/*  FIND RESULTS                                                                                 */
+/*************************************************************************************************/
+.shared-splunkbar-find-results {
+    background-color: $white;
+    width: 360px;
+
+    .findbar-results-header {
+        padding: $spacingQuarter $spacingHalf;
+        color: $textGray;
+    }
+    li {
+        > a {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+
+            .findbar-results-icon {
+                font-size: 16px;
+            }
+        }
+    }
+    .search-link {
+        border-top: 0;
+    }
+    .shared-splunkbar-find-results-reportresults,
+    .shared-splunkbar-find-results-dashboardresults,
+    .shared-splunkbar-find-results-alertresults,
+    .shared-splunkbar-find-results-datamodelresults {
+        border-bottom: $interactiveBorder;
+    }
+    .no-results {
+        text-align: center;
+        padding-top: $spacingHalf;
+        padding-bottom: $spacingHalf;
+        color: $textGray;
+    }
+}
+
+.shared-splunkbar-find-findprogress {
+    background-color: $white;
+    width: 360px;
+
+    .findbar-results-spinner {
+        position: relative;
+        padding-top: $spacingQuarter;
+        padding-bottom: $spacingQuarter;
+        padding-left: 175px;
+    }
+}

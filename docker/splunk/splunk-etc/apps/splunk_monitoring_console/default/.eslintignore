@@ -1,0 +1,2 @@
+#for IDEs running eslint directly
+**/*.js

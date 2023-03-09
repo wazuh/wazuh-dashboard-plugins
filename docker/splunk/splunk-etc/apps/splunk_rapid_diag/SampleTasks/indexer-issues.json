@@ -1,0 +1,78 @@
+{
+  "__class__": "rapid_diag.task.Task",
+  "collectors": [
+    {
+      "__class__": "rapid_diag.collector.trigger.periodic.Periodic",
+      "collectors": [
+        {
+          "__class__": "rapid_diag.collector.stack_trace.StackTrace",
+          "process": {
+            "__class__": "rapid_diag.process_abstraction.Process",
+            "pid": 0,
+            "name": "splunkd",
+            "args": "splunkd",
+            "process_type": "splunkd server",
+            "ppid": 0,
+            "default_value_description": "By default, the main splunkd process is selected."
+          }
+        }
+      ],
+      "sampleCount": 1000,
+      "interval": 0.5
+    },
+    {
+      "__class__": "rapid_diag.collector.trigger.periodic.Periodic",
+      "collectors": [
+        {
+          "__class__": "rapid_diag.collector.netstat.NetStat"
+        }
+      ],
+      "sampleCount": 600,
+      "interval": 1.0
+    },
+    {
+       "__class__": "rapid_diag.collector.lsof.LSOF",
+       "process": {
+          "name": "splunkd",
+     	  "pid": 0,
+          "ppid": 0,
+          "__class__": "rapid_diag.process_abstraction.Process",
+          "process_type": "splunkd server",
+          "args": "splunkd"
+          }
+    },
+    {
+      "collection_time": 600,
+      "__class__": "rapid_diag.collector.iops.IOPS"
+    },
+    {
+      "collection_time": 600,
+      "__class__": "rapid_diag.collector.system_call_trace.SystemCallTrace",
+      "process": {
+        "__class__": "rapid_diag.process_abstraction.Process",
+        "ppid": 0,
+        "args": "splunkd",
+        "pid": 0,
+        "process_type": "splunkd server",
+        "name": "splunkd"
+      }
+    },
+    {
+      "collection_time": 10,
+      "__class__": "rapid_diag.collector.network_packet.NetworkPacket",
+      "ip_address": "127.0.0.1",
+      "port": 8089,
+      "action_needed": "Replace <ip_address> and <port> with the IP and Port that needs tcp data collected"
+    },
+    {
+      "__class__": "rapid_diag.collector.diag.Diag"
+    }
+  ],
+  "name": "Indexer health",
+  "collector_tool_names": "iops, lsof, netstat, pstack, splunkdiag, strace, tcpdump",
+  "description": "For investigating issues related to indexers. This template should be run on indexers where issues are present.",
+  "host": "",
+  "task_id": "indexer-issues",
+  "features" : [ "indexers", "indexing_ready" ],
+  "symptoms" : [ "cluster-issues" ]
+}

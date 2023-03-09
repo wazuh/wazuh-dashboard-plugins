@@ -1,0 +1,24 @@
+<div class="smc-alerts-panel smc-distributed-mode-row smc-distributed-mode-alerts-panel">
+    <div class="smc-alerts-title-section">
+        <div class="row-fluid">
+            <div class="span9">
+                <div class="smc-panel-title">
+                    <span id="smc-alerts-count">0</span>
+                    <span id="smc-alerts-title"><%= _("Alerts").t()%></span>
+                </div>
+                <div class="control-options">
+                    <a href="<%= alerts_setup_link %>" class="btn-pill"><%= serverInfo.isLite() ? _("Platform Alerts Setup").t() : _('Enable or Disable').t()%></a>
+                    <a class="btn-pill" id="triggered-alerts-link" target="_blank"><%=_('Manage triggered alerts').t()%></a>
+                </div>
+            </div>
+            <% if (!serverInfo.isLite()) { %>
+                <div class="dmc-svg-icons">
+                    <%= AlertIcon %>
+                </div>
+            <% } %>
+        </div>
+    </div>
+    <div class="panel-element-row details-row">
+        <div class="dashboard-element html" id="alerts-fired-table-view"></div>
+    </div>
+</div>

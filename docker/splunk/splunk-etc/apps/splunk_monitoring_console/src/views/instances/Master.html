@@ -1,0 +1,23 @@
+<div class="dmc-instances section-padded section-header">
+  <h2 class="section-title">
+    <%= _("Instances").t() %>
+  </h2>
+  <p class="section-description">
+    <%= _("Splunk Instances are listed here.").t() %>
+    <a href="<%- learnMoreLink %>" class="external" target="_blank"><%= _('Learn More').t() %></a>
+  </p>
+</div>
+<div class="fieldset section-padded">
+  <label><%- _('Group').t() %></label>
+  <div class="input input-dropdown" id="dmc-instances-group-dropdown"></div>
+</div>
+<div class="dmc-instances-description" style="display: none;"></div>
+<div class="dmc-instances-control-section">
+  <div class="dmc-instances-total-count"></div>
+  <div class="dmc-instances-count-per-page"></div>
+</div>
+<div class="search-results-wrapper" id="dmc-instances-listing">
+  <!-- <table class="table table-chrome table-striped table-instances">
+    <tbody></tbody>
+  </table> -->
+</div>

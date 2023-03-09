@@ -1,0 +1,12 @@
+<endpoint name="splunk_rapid_diag/task_template_wizard" template="pages/system.html" showOnSearchHeadCluster="1">
+    <capabilities>
+        <read>get_diag</read>
+    </capabilities>
+    <menu name="system_configurations">
+        <label>RapidDiag</label>
+        <url>/app/splunk_rapid_diag/task_template_wizard</url>
+        <description>Gather data for incident/performance analysis.</description>
+        <order>20</order>
+        <id>rapid-diag</id>
+    </menu>
+</endpoint>

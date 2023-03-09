@@ -1,0 +1,12 @@
+<endpoint name="federated_search" template="pages/system.html" showOnSearchHeadCluster="1">
+  <header>Federated search</header>
+  <capabilities>
+      <read>indexes_edit</read>
+  </capabilities>
+  <menu name="deployment_configurations">
+    <label>Federated search</label>
+    <url>/manager/%(namespace)s/federated_search</url>
+    <order>76</order>
+    <id>federated_search</id>
+  </menu>
+</endpoint>

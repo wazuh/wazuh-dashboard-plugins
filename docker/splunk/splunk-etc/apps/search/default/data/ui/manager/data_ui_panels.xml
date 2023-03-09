@@ -1,0 +1,3 @@
+<endpoint name="data/ui/panels" showAppContext="1" template="pages/system.html">
+  <header>Prebuilt panels</header>
+</endpoint>

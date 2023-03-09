@@ -1,0 +1,115 @@
+<endpoint name="server/settings" showOnSearchHeadCluster="0">
+  <capabilities>
+    <read>edit_server</read>
+  </capabilities>
+  <header>General settings</header>
+  <breadcrumb>
+    <noentity>True</noentity>
+    <parent hidecurrent="False">systemsettings</parent>
+    <name>General settings</name>
+  </breadcrumb>
+  <!-- not putting this on the homepage menu for now
+  <menu name="system_configurations">
+    <label>System settings</label>
+    <url>/manager/%(namespace)s/server/settings/settings/?action=edit</url>
+    <description>Manage general settings for this Splunk instance, including Splunk Web port, host name and index path.</description>
+    <order>10</order>
+  </menu>
+  -->
+  <elements>
+    <element name="spl-ctrl_redirectionPath" type="hidden">
+      <view name="edit"/>
+      <key name="processValueEdit">'systemsettings'</key>
+    </element>
+    <element name="name" type="textfield" label="Server settings">
+      <view name="list"/>
+    </element>
+    <element name="basicSettingFieldset" type="fieldset">
+      <view name="edit"/>
+      <elements>
+        <element name="serverName" type="textfield" label="Splunk server name">
+          <view name="edit"/>
+          <key name="requiredIfVisible" />
+        </element>
+        <element name="SPLUNK_HOME" type="textfield" label="Installation path">
+          <view name="edit"/>
+          <key name="disabled">1</key>
+        </element>
+        <element name="mgmtHostPort" type="textfield" label="Management port">
+          <view name="edit"/>
+          <key name="exampleText">Port that Splunk Web uses to communicate with the splunkd process. This port is also used for distributed search.</key>
+          <key name="requiredIfVisible" />
+        </element>
+
+        <element name="trustedIP" label="SSO Trusted IP">
+          <view name="edit"/>
+          <key name="exampleText">The IP address to accept trusted logins from. Only set this if you are using single sign-on (SSO) with a proxy server for authentication.</key>
+        </element>
+
+      </elements>
+    </element>
+    <element name="splunkWebFieldset" type="fieldset">
+      <view name="edit"/>
+      <elements>
+        <element name="startwebserver" type="radio" label="Run Splunk Web">
+          <options>
+            <opt value="1" label="Yes"/>
+            <opt value="0" label="No"/>
+          </options>
+          <view name="edit"/>
+        </element>
+        <element name="enableSplunkWebSSL" type="radio" label="Enable SSL (HTTPS) in Splunk Web?">
+          <options>
+            <opt value="1" label="Yes"/>
+            <opt value="0" label="No"/>
+          </options>
+          <view name="edit"/>
+        </element>
+        <element name="httpport" type="textfield" label="Web port">
+          <view name="edit"/>
+          <key name="requiredIfVisible" />
+        </element>
+        <element name="appServerPorts" type="textfield" label="App server ports">
+          <view name="edit"/>
+          <key name="exampleText">Port number(s) for the python-based application server to listen on.  Use comma-separated list to specify more than one port number.</key>
+          <key name="processValueEdit">', '.join(value) if isinstance(value, list) else value</key>
+        </element>
+        <element name="sessionTimeout" label="Session timeout">
+          <view name="edit"/>
+          <key name="requiredIfVisible" />
+          <key name="exampleText">Set the Splunk Web session timeout.  Use the same notation as relative time modifiers, for example 3h, 100s, 6d.</key>
+        </element>
+      </elements>
+      <key name="legend">Splunk Web</key>
+    </element>
+    <element name="datastoreFieldset" type="fieldset">
+      <view name="edit"/>
+      <elements>
+        <element name="host" type="textfield" label="Default host name">
+          <view name="edit"/>
+          <key name="exampleText">Sets the host field value for all events coming from this server.</key>
+        </element>
+        <element name="SPLUNK_DB" type="textfield" label="Path to indexes">
+          <view name="edit"/>
+          <key name="disabled">1</key>
+        </element>
+        <element name="minFreeSpace" type="textfield" label="Pause indexing if free disk space (in MB) falls below">
+          <view name="edit"/>
+          <key name="requiredIfVisible" />
+        </element>
+      </elements>
+      <key name="legend">Index settings</key>
+    </element>
+    <element name="kvStoreFieldset" type="fieldset">
+      <view name="edit"/>
+      <elements>
+        <element name="kvStorePort" type="textfield" label="Port">
+          <view name="edit"/>
+          <key name="exampleText">Port that splunkd uses to connect to the KV Store server.</key>
+          <key name="requiredIfVisible" />
+        </element>
+      </elements>
+      <key name="legend">KV Store</key>
+    </element>
+  </elements>
+</endpoint>

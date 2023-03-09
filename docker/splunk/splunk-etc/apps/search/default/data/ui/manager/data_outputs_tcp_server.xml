@@ -1,0 +1,33 @@
+<endpoint name="data/outputs/tcp/server" showAppContext="1" hidePermissionsColumn="1" showOnSearchHeadCluster="0">
+  <capabilities>
+    <read>list_forwarders AND edit_forwarders</read>
+  </capabilities>
+  <header>Forward data</header>
+  <breadcrumb>
+      <parent hidecurrent="False">forwardreceive</parent>
+  </breadcrumb>
+  <elements>
+    <element name="forwarderFields" type="fieldset">
+      <view name="list"/>
+      <view name="create"/>
+      <elements>
+        <element name="outputhelp" type="helpstring">
+            <key name="helpText">Enter host:port to forward data to. Data will be auto load balanced to each host:port.</key>
+            <view name="create"/>
+        </element>
+        <element name="name" type="textfield" label="Host">
+          <view name="list"/>
+          <view name="create"/>
+          <key name="exampleText">Set as host:port or IP:port. &lt;br /&gt; You must also enable receiving on this host.</key>
+        </element>
+       <element name="method" type="hidden" label="Automatic Load Balancing">
+          <view name="list"/>
+          <view name="create"/>
+          <key name="processValueList">'Enabled' if value=='autobalance' else 'Disabled'</key>
+          <key name="submitValueAdd">'autobalance'</key>
+        </element>
+      <key name="legend">Outputs</key>
+      </elements>
+    </element>
+  </elements>
+</endpoint>

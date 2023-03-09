@@ -1,0 +1,1 @@
+"$SPLUNK_HOME/bin/splunkd" instrument-resource-usage

@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<view template="splunk_rapid_diag:/templates/task_template_wizard.html" type="html">
+	<label>Task Templates</label>
+</view>

@@ -1,0 +1,67 @@
+$sectionVerticalMargin: 40px;
+
+.overall-section {
+    flex: 1;
+    display: flex;
+    min-height: calc(100vh - 78px);
+}
+
+.navigation-section {
+    flex: 0 0 173px;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    background: rgba(61, 68, 76, 0.9);
+    padding: 20px 0px 20px 0px;
+}
+
+.bookmarks {
+    text-align: center;
+    flex: 1;
+    color: white;
+}
+
+.content-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    padding: 20px;
+}
+
+.heading {
+    margin-top: 0px;
+}
+
+.heading-description {
+    width: 75%;
+}
+
+.anomalies-section {
+    margin-top: $sectionVerticalMargin;
+}
+
+.deployment-section {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: space-between;
+    margin-top: $sectionVerticalMargin;
+}
+
+.deployment-sub-section-left {
+    flex: 1;
+    margin-right: 10px;
+}
+
+.deployment-sub-section-center {
+    flex: 1;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.deployment-sub-section-right {
+    flex: 1;
+    margin-left: 10px;
+}

@@ -1,0 +1,729 @@
+<form version="1.1" hideEdit="True" script="common_control.js, kv_store_instance_extension.js">
+  <label>KV Store: Instance</label>
+  <description/>
+    <row id="kv_store_instance_extension">
+      <html>
+      </html>
+    </row>
+    <fieldset autoRun="true" submitButton="false">
+      <input type="dropdown" searchWhenChanged="true" token="dmc_group">
+        <label>Group</label>
+        <showClearButton>false</showClearButton>
+        <search>
+          <query>
+            | `dmc_get_groups_containing_role(dmc_group_kv_store)`
+            | search search_group!="dmc_group_*"
+          </query>
+        </search>
+        <fieldForLabel>label</fieldForLabel>
+        <fieldForValue>search_group</fieldForValue>
+        <choice value="dmc_group_kv_store">All KV Stores</choice>
+        <default>dmc_group_kv_store</default>
+      </input>
+      <input type="dropdown" searchWhenChanged="true" token="splunk_server">
+        <label>Instance</label>
+        <showClearButton>false</showClearButton>
+        <populatingSearch fieldForLabel="serverName" fieldForValue="serverName">
+          | `dmc_get_instance_info($dmc_group$)`
+          | where search_group="dmc_group_kv_store"
+        </populatingSearch>
+        <selectFirstChoice>true</selectFirstChoice>
+        <change>
+          <condition value="*">
+            <set token="host">$row.host$</set>
+          </condition>
+        </change>
+      </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Collection Metrics</title>
+      <table>
+        <searchString>
+| rest splunk_server=$splunk_server$ /services/server/introspection/kvstore/collectionstats
+| mvexpand data
+| spath input=data
+| rex field=ns "(?&lt;App&gt;.*)\.(?&lt;Collection&gt;.*)"
+| eval dbsize=round(size/1024/1024, 2)
+| eval indexsize=round(totalIndexSize/1024/1024, 2)
+| stats first(count) AS "Number of Objects" first(nindexes) AS Accelerations first(indexsize) AS "Acceleration Size (MB)" first(dbsize) AS "Collection Size (MB)" by App, Collection
+        </searchString>
+        <earliestTime>-60m</earliestTime>
+        <latestTime>now</latestTime>
+        <option name="refresh.auto.interval">60</option>
+        <option name="refresh.time.visible">false</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+        <h2>
+          <span>Select views: </span>
+          <span id="link-switcher-view">
+            <a href="#" class="btn-pill active" data-item="all">All</a>
+            <a href="#" class="btn-pill" data-item="snapshot">Snapshot</a>
+            <a href="#" class="btn-pill" data-item="historical">Historical</a>
+          </span>
+        </h2>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Snapshots</title>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Memory Usage</title>
+      <chart>
+        <searchString>
+| rest splunk_server=$splunk_server$ /services/server/introspection/kvstore/serverstatus
+| spath input=data
+| stats max(mem.virtual) AS Virtual max(mem.mappedWithJournal) AS Mapped max(mem.resident) AS Resident by host
+        </searchString>
+        <earliestTime>$time.earliest$</earliestTime>
+        <latestTime>$time.latest$</latestTime>
+        <option name="refresh.auto.interval">60</option>
+        <option name="refresh.time.visible">false</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.text">Memory Usage (MB)</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="refresh.auto.interval">60</option>
+        <option name="refresh.time.visible">false</option>
+      </chart>
+    </panel>
+    <panel rejects="$historical$">
+      <title>Network Traffic</title>
+      <chart>
+        <searchString>
+| rest splunk_server=$splunk_server$ /services/server/introspection/kvstore/serverstatus
+| spath input=data
+| eval mbin='network.bytesIn'/1024/1024
+| eval mbout='network.bytesOut'/1024/1024
+| rename mbin AS "MB In", mbout AS "MB Out"
+| table  host "MB In" "MB Out"
+        </searchString>
+        <earliestTime>$time.earliest$</earliestTime>
+        <latestTime>$time.latest$</latestTime>
+        <option name="refresh.auto.interval">60</option>
+        <option name="refresh.time.visible">false</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.text">MB</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">1</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="refresh.auto.interval">60</option>
+        <option name="refresh.time.visible">false</option>
+      </chart>
+      <html>
+        <p>Network traffic since restart.</p>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Flush Time</title>
+      <!--<single>-->
+        <!--<searchString>-->
+<!--| rest splunk_server=$splunk_server$ /services/server/introspection/kvstore/serverstatus-->
+<!--| spath input=data-->
+<!--| eval average=round('backgroundFlushing.average_ms'/1000, 3)-->
+<!--| fields average-->
+        <!--</searchString>-->
+        <!--<option name="underLabel">Average</option>-->
+        <!--<option name="refresh.auto.interval">60</option>-->
+        <!--<option name="refresh.time.visible">false</option>-->
+        <!--<option name="height">80px</option>-->
+      <!--</single>-->
+      <chart>
+        <searchString>
+| rest splunk_server=$splunk_server$ /services/server/introspection/kvstore/serverstatus
+| spath input=data
+| eval average=round('backgroundFlushing.average_ms'/1000, 3)
+| eval last=round('backgroundFlushing.last_ms'/1000, 3)
+| stats first(average) as average first(last) as last by splunk_server
+        </searchString>
+        <earliestTime>$time.earliest$</earliestTime>
+        <latestTime>$time.latest$</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.visibility">collapsed</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.text">Seconds</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="refresh.auto.interval">60</option>
+        <option name="refresh.time.visible">false</option>
+      </chart>
+    </panel>
+    <panel rejects="$historical$">
+      <title>Page Fault per Operation</title>
+      <chart>
+        <searchString>
+| rest splunk_server=$splunk_server$ /services/server/introspection/kvstore/serverstatus
+| spath input=data
+| rename opcounters.command as c, opcounters.update as u, opcounters.query as q, opcounters.delete as d, opcounters.getmore as g, opcounters.insert as i
+| eval totalops=if(isNotNull('c'), 'c',0)+if(isNotNull('u'), 'u', 0)+if(isNotNull('q'), 'q', 0)+if(isNotNull('d'), 'd', 0)+if(isNotNull('g'), 'g', 0)+if(isNotNull('i'), 'i', 0)
+| rename extra_info.page_faults as pf
+| eval percent=round(pf/totalops, 2)
+| stats first(percent)
+        </searchString>
+        <earliestTime>$time.earliest$</earliestTime>
+        <latestTime>$time.latest$</latestTime>
+        <option name="refresh.auto.interval">60</option>
+        <option name="refresh.time.visible">false</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.text">Percentage of Total Operations</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.maximumNumber">100</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">radialGauge</option>
+        <option name="charting.gaugeColors">[0x9AC23C,0xFAC51C,0xF7902B]</option>
+        <option name="charting.chart.rangeValues">["0","0.7","1.3","2"]</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked100</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="refresh.auto.interval">60</option>
+        <option name="refresh.time.visible">false</option>
+      </chart>
+    </panel>
+    <panel rejects="$historical$">
+      <title>Operations</title>
+      <chart>
+        <searchString>
+| rest splunk_server=$splunk_server$ /services/server/introspection/kvstore/serverstatus
+| spath input=data
+| rename opcounters.command as command, opcounters.update as update, opcounters.query as query, opcounters.delete as delete, opcounters.getmore as getmore, opcounters.insert as insert
+| table host command update query delete getmore insert
+        </searchString>
+        <earliestTime>$time.earliest$</earliestTime>
+        <latestTime>$time.latest$</latestTime>
+        <option name="refresh.auto.interval">60</option>
+        <option name="refresh.time.visible">false</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.text">Count</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">1</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="refresh.auto.interval">60</option>
+        <option name="refresh.time.visible">false</option>
+      </chart>
+      <html>
+        <p>KV store operations since last restart.</p>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>KV Store Status</title>
+      <single>
+        <title></title>
+        <searchString>
+| rest splunk_server=$splunk_server$ /services/server/introspection/kvstore/serverstatus
+| spath input=data
+| stats values(connections.current)
+        </searchString>
+        <earliestTime/>
+        <latestTime/>
+        <option name="underLabel">Active connections</option>
+        <option name="refresh.auto.interval">60</option>
+        <option name="refresh.time.visible">false</option>
+        <option name="height">80px</option>
+      </single>
+      <single>
+        <title></title>
+        <searchString>
+| rest splunk_server=$splunk_server$ /services/server/introspection/kvstore/serverstatus
+| spath input=data
+| stats values(globalLock.currentQueue.total)
+        </searchString>
+        <earliestTime/>
+        <latestTime/>
+        <option name="refresh.auto.interval">60</option>
+        <option name="refresh.time.visible">false</option>
+        <option name="underLabel">Total Queues</option>
+        <option name="height">80px</option>
+      </single>
+      <single>
+        <title></title>
+        <searchString>
+| rest splunk_server=$splunk_server$ /services/server/introspection/kvstore/serverstatus
+| spath input=data
+| eval asserts='asserts.msg' +'asserts.regular' +'asserts.rollovers' +'asserts.user' +'asserts.warning'
+| stats first(asserts)
+        </searchString>
+        <earliestTime/>
+        <latestTime/>
+        <option name="refresh.auto.interval">60</option>
+        <option name="refresh.time.visible">false</option>
+        <option name="underLabel">Total Asserts</option>
+        <option name="height">80px</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Historical Charts</title>
+      <input type="time" searchWhenChanged="true" token="time">
+        <label>Time Range:</label>
+        <default>
+          <earliestTime>-4h@m</earliestTime>
+          <latestTime>now</latestTime>
+        </default>
+      </input>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Memory Usage</title>
+      <chart>
+        <searchString>
+`dmc_set_index_introspection` host=$host$ component=kvstoreserverstats
+| timechart minspan=30s avg(data.mem.virtual) AS Virtual avg(data.mem.mappedWithJournal) AS Mapped avg(data.mem.resident) AS Resident
+        </searchString>
+        <earliestTime>$time.earliest$</earliestTime>
+        <latestTime>$time.latest$</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.text">Memory Usage (MB)</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Operations per Minute</title>
+      <input type="dropdown" token="operationToChart" searchWhenChanged="true">
+        <label>Operations</label>
+        <showClearButton>false</showClearButton>
+        <default>All</default>
+        <choice value="command update query delete getmore insert">All</choice>
+        <choice value="command">command</choice>
+        <choice value="update">update</choice>
+        <choice value="query">query</choice>
+        <choice value="delete">delete</choice>
+        <choice value="getmore">getmore</choice>
+        <choice value="insert">insert</choice>
+      </input>
+      <chart>
+        <searchString>
+          `dmc_set_index_introspection` host=$host$ component=kvstoreserverstats
+          | bin _time minspan=30s
+          | stats first(data.opcounters.command) AS command first(data.opcounters.update) as update first(data.opcounters.query) as query first(data.opcounters.delete) as delete first(data.opcounters.getmore) as getmore first(data.opcounters.insert) as insert by _time
+          | streamstats window=2 range(*) as r_*
+          | timechart minspan=30s per_minute(r_*) AS original_*
+          | rename original_* as *
+          | fields _time $operationToChart$
+        </searchString>
+        <earliestTime>$time.earliest$</earliestTime>
+        <latestTime>$time.latest$</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.text">Count</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+    <panel rejects="$snapshot$">
+      <title>Asserts</title>
+      <input type="dropdown" token="assertType" searchWhenChanged="true">
+        <label>Assert Type</label>
+        <showClearButton>false</showClearButton>
+        <default>All</default>
+        <choice value="msg regular rollovers user warning">All</choice>
+        <choice value="msg">msg</choice>
+        <choice value="regular">regular</choice>
+        <choice value="rollovers">rollovers</choice>
+        <choice value="user">user</choice>
+        <choice value="warning">warning</choice>
+      </input>
+      <chart>
+        <searchString>
+          `dmc_set_index_introspection` host=$host$ component=kvstoreserverstats
+          | bin _time minspan=30s
+          | stats first(data.asserts.msg) AS msg first(data.asserts.regular) as regular first(data.asserts.rollovers) as rollovers first(data.asserts.user) as user first(data.asserts.warning) as warning by _time
+          | streamstats window=2 range(*) as r_*
+          | timechart minspan=30s per_minute(r_*) AS original_*
+          | rename original_* as *
+          | fields _time $assertType$
+        </searchString>
+        <earliestTime>$time.earliest$</earliestTime>
+        <latestTime>$time.latest$</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.text">Count</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Page Faults per Operation</title>
+      <chart>
+        <searchString>
+`dmc_set_index_introspection` host=$host$ component=kvstoreserverstats
+| rename data.opcounters.command as c, data.opcounters.update as u, data.opcounters.queries as q, data.opcountes.deletes as d, data.opcounters.getmore as g, data.opcounters.inserts as i
+| eval totalops=if(isNotNull('c'), 'c',0)+if(isNotNull('u'), 'u', 0)+if(isNotNull('q'), 'q', 0)+if(isNotNull('d'), 'd', 0)+if(isNotNull('g'), 'g', 0)+if(isNotNull('i'), 'i', 0)
+| bin minspan=30s _time
+| stats first(totalops) as total first(data.extra_info.page_faults) as faults by _time
+| eval percent=round(faults/total, 2)
+| timechart minspan=30s avg(percent) AS "Page Faults per Operation"
+        </searchString>
+        <earliestTime>$time.earliest$</earliestTime>
+        <latestTime>$time.latest$</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.text">Ratio</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked100</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+    <panel rejects="$snapshot$">
+      <title>Network Traffic</title>
+      <chart>
+        <searchString>
+`dmc_set_index_introspection` host=$host$ component=kvstoreserverstats
+| bin minspan=30s _time
+| stats first(data.network.bytesIn) as bytesIn first(data.network.bytesOut) as bytesOut by _time
+| streamstats window=2 range(*) as *
+| eval in=abs(bytesIn/1024/1024)
+| eval out=abs(bytesOut/1024/1024)
+| timechart minspan=30s per_minute(in) AS "MB/min In" per_minute(out) AS "MB/min Out"
+        </searchString>
+        <earliestTime>$time.earliest$</earliestTime>
+        <latestTime>$time.latest$</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.text">MB</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked100</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Size of Queues</title>
+      <chart>
+        <searchString>
+`dmc_set_index_introspection` host=$host$ component=kvstoreserverstats
+| bin _time minspan=30s
+| timechart median(data.globalLock.currentQueue.total) AS Total median(data.globalLock.currentQueue.readers) AS Readers median(data.globalLock.currentQueue.writers) AS Writers
+        </searchString>
+        <earliestTime>$time.earliest$</earliestTime>
+        <latestTime>$time.latest$</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.text">Count</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked100</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+    <panel rejects="$snapshot$">
+      <title>Connections over Time</title>
+      <chart>
+        <searchString>
+`dmc_set_index_introspection` host=$host$ component=kvstoreserverstats
+| bin _time minspan=30s
+| timechart median(data.connections.current) as Connections
+        </searchString>
+        <earliestTime>$time.earliest$</earliestTime>
+        <latestTime>$time.latest$</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.text">Count</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked100</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">none</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+     <panel rejects="$snapshot$">
+      <title>Percent of Each Minute Spent Flushing to Disk</title>
+      <chart>
+        <searchString>
+`dmc_set_index_introspection` host=$host$ component=kvstoreserverstats
+| bin minspan=30s _time
+| stats first(data.backgroundFlushing.total_ms) as flush by _time
+| streamstats window=2 range(flush) as flush
+| eval seconds=flush/1000
+| timechart minspan=30s per_minute(seconds) AS percent
+| eval Percent = round(percent / 60 * 100, 2)
+| fields - percent
+        </searchString>
+        <earliestTime>$time.earliest$</earliestTime>
+        <latestTime>$time.latest$</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.text">Percent</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked100</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">none</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Slowest Operations</title>
+      <table>
+        <searchString>
+          <![CDATA[
+`dmc_set_index_internal` host=$host$ sourcetype="mongod" "[conn*"
+| rex field=_raw "\[conn\d+\]\s+(?<Operation_type>\w+)\s+(?<Operation>.*)\s+(?<duration>\d+)ms$"
+| where isnotnull(Operation) AND (duration > 0)
+| sort 100 - duration
+| rename duration AS "Duration (ms)"
+| table _time Operation "Duration (ms)"
+          ]]>
+        </searchString>
+        <earliestTime>$time.earliest$</earliestTime>
+        <latestTime>$time.latest$</latestTime>
+      </table>
+    </panel>
+  </row>
+</form>

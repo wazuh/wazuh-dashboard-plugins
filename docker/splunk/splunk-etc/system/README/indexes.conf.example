@@ -1,0 +1,278 @@
+#   Version 9.0.3
+#
+# This file contains an example indexes.conf.  Use this file to configure
+# indexing properties.
+#
+# To use one or more of these configurations, copy the configuration block
+# into indexes.conf in $SPLUNK_HOME/etc/system/local/. You must restart
+# Splunk to enable configurations.
+#
+# To learn more about configuration files (including precedence) please see
+# the documentation located at
+# http://docs.splunk.com/Documentation/Splunk/latest/Admin/Aboutconfigurationfiles
+#
+
+# The following example defines a new high-volume index, called "hatch", and
+# sets this to be the default index for both incoming data and search.
+#
+# Note that you may want to adjust the indexes that your roles have access
+# to when creating indexes (in authorize.conf)
+
+defaultDatabase = hatch
+
+[hatch]
+
+homePath   = $SPLUNK_DB/hatchdb/db
+coldPath   = $SPLUNK_DB/hatchdb/colddb
+thawedPath = $SPLUNK_DB/hatchdb/thaweddb
+maxDataSize = 10000
+maxHotBuckets = 10
+
+
+
+# The following example changes the default amount of space used on a
+# per-index basis.
+
+[default]
+maxTotalDataSizeMB = 650000
+maxGlobalRawDataSizeMB = 0
+maxGlobalDataSizeMB = 0
+
+
+# The following example changes the time data is kept around by default.
+# It also sets an export script.  NOTE: You must edit this script to set
+# export location before running it.
+
+[default]
+maxWarmDBCount = 200
+frozenTimePeriodInSecs = 432000
+rotatePeriodInSecs = 30
+coldToFrozenScript = "$SPLUNK_HOME/bin/python" "$SPLUNK_HOME/bin/myColdToFrozenScript.py"
+
+# This example freezes buckets on the same schedule, but lets Splunk do the
+# freezing process as opposed to a script
+[default]
+maxWarmDBCount = 200
+frozenTimePeriodInSecs = 432000
+rotatePeriodInSecs = 30
+coldToFrozenDir = "$SPLUNK_HOME/myfrozenarchive"
+
+### This example demonstrates the use of volumes ###
+
+# volume definitions; prefixed with "volume:"
+
+[volume:hot1]
+path = /mnt/fast_disk
+maxVolumeDataSizeMB = 100000
+
+[volume:cold1]
+path = /mnt/big_disk
+# maxVolumeDataSizeMB not specified: no data size limitation on top of the
+# existing ones
+
+[volume:cold2]
+path = /mnt/big_disk2
+maxVolumeDataSizeMB = 1000000
+
+# index definitions
+
+[idx1]
+homePath = volume:hot1/idx1
+coldPath = volume:cold1/idx1
+
+# thawedPath must be specified, and cannot use volume: syntax
+# choose a location convenient for reconstitition from archive goals
+# For many sites, this may never be used.
+thawedPath = $SPLUNK_DB/idx1/thaweddb
+
+[idx2]
+# note that the specific indexes must take care to avoid collisions
+homePath = volume:hot1/idx2
+coldPath = volume:cold2/idx2
+thawedPath = $SPLUNK_DB/idx2/thaweddb
+
+[idx3]
+homePath = volume:hot1/idx3
+coldPath = volume:cold2/idx3
+thawedPath = $SPLUNK_DB/idx3/thaweddb
+
+[idx4]
+datatype = metric
+homePath = volume:hot1/idx4
+coldPath = volume:cold2/idx4
+thawedPath = $SPLUNK_DB/idx4/thaweddb
+metric.maxHotBuckets = 6
+metric.splitByIndexKeys = metric_name
+
+### Indexes may be allocated space in effective groups by sharing volumes  ###
+
+# perhaps we only want to keep 100GB of summary data and other
+# low-volume information
+[volume:small_indexes]
+path = /mnt/splunk_indexes
+maxVolumeDataSizeMB = 100000
+
+# and this is our main event series, allowing 50 terabytes
+[volume:large_indexes]
+path = /mnt/splunk_indexes
+maxVolumeDataSizeMB = 50000000
+
+# summary and rare_data together will be limited to 100GB
+[summary]
+homePath=volume:small_indexes/summary/db
+coldPath=volume:small_indexes/summary/colddb
+thawedPath=$SPLUNK_DB/summary/thaweddb
+# low-volume indexes probably don't want a lot of hot buckets
+maxHotBuckets = 2
+# if the volume is quite low, and you have data sunset goals you may
+# want to have smaller buckets
+maxDataSize = 500
+
+
+[rare_data]
+homePath=volume:small_indexes/rare_data/db
+coldPath=volume:small_indexes/rare_data/colddb
+thawedPath=$SPLUNK_DB/rare_data/thaweddb
+maxHotBuckets = 2
+
+# main, and any other large volume indexes you add sharing large_indexes
+# will be together be constrained to 50TB, separately from the 100GB of
+# the small_indexes
+[main]
+homePath=volume:large_indexes/main/db
+coldPath=volume:large_indexes/main/colddb
+thawedPath=$SPLUNK_DB/main/thaweddb
+# large buckets and more hot buckets are desirable for higher volume
+# indexes, and ones where the variations in the timestream of events is
+# hard to predict.
+maxDataSize = auto_high_volume
+maxHotBuckets = 10
+# Allow the main index up to 8TB of the 50TB volume limit.
+homePath.maxDataSizeMB = 8000000
+
+
+[idx1_large_vol]
+homePath=volume:large_indexes/idx1_large_vol/db
+coldPath=volume:large_indexes/idx1_large_vol/colddb
+thawedPath=$SPLUNK_DB/idx1_large/thaweddb
+# this index will exceed the default of .5TB requiring a change to maxTotalDataSizeMB
+maxTotalDataSizeMB = 750000
+maxDataSize = auto_high_volume
+maxHotBuckets = 10
+# but the data will only be retained for about 30 days
+frozenTimePeriodInSecs = 2592000
+
+### This example demonstrates database size constraining ###
+
+# In this example per-database constraint is combined with volumes.  While a
+# central volume setting makes it easy to manage data size across multiple
+# indexes, there is a concern that bursts of data in one index may
+# significantly displace data from others.  The homePath.maxDataSizeMB setting
+# can be used to assure that no index will ever take more than certain size,
+# therefore alleviating the concern.
+
+# global settings
+
+# will be inherited by all indexes: no database will exceed 1TB
+homePath.maxDataSizeMB = 1000000
+
+# volumes
+
+[volume:caliente]
+path = /mnt/fast_disk
+maxVolumeDataSizeMB = 100000
+
+[volume:frio]
+path = /mnt/big_disk
+maxVolumeDataSizeMB = 1000000
+
+# and this is our main event series, allowing about 50 terabytes
+[volume:large_indexes]
+path = /mnt/splunk_indexes
+maxVolumeDataSizeMB = 50000000
+
+# indexes
+
+[i1]
+homePath = volume:caliente/i1
+# homePath.maxDataSizeMB is inherited
+coldPath = volume:frio/i1
+# coldPath.maxDataSizeMB not specified: no limit - old-style behavior
+
+thawedPath = $SPLUNK_DB/i1/thaweddb
+
+[i2]
+homePath = volume:caliente/i2
+# overrides the default maxDataSize
+homePath.maxDataSizeMB = 1000
+coldPath = volume:frio/i2
+# limits the cold DB's
+coldPath.maxDataSizeMB = 10000
+thawedPath = $SPLUNK_DB/i2/thaweddb
+
+[i3]
+homePath = /old/style/path
+homePath.maxDataSizeMB = 1000
+coldPath = volume:frio/i3
+coldPath.maxDataSizeMB = 10000
+thawedPath = $SPLUNK_DB/i3/thaweddb
+
+# main, and any other large volume indexes you add sharing large_indexes
+# will together be constrained to 50TB, separately from the rest of
+# the indexes
+[main]
+homePath=volume:large_indexes/main/db
+coldPath=volume:large_indexes/main/colddb
+thawedPath=$SPLUNK_DB/main/thaweddb
+# large buckets and more hot buckets are desirable for higher volume indexes
+maxDataSize = auto_high_volume
+maxHotBuckets = 10
+# Allow main index to override global and use 8TB of the 50TB volume limit.
+homePath.maxDataSizeMB = 8000000
+
+
+### This example demonstrates how to configure a volume that points to
+### S3-based remote storage and indexes that use this volume.  The setting
+### "storageType=remote" indicates that this is a remote-storage volume.
+### The "remotePath" parameter associates the index with that volume
+### and configures a top-level location for uploading buckets.
+
+[volume:s3]
+storageType = remote
+path = s3://remote_volume
+remote.s3.bucket_name = example-s3-bucket
+remote.s3.access_key = S3_ACCESS_KEY
+remote.s3.secret_key = S3_SECRET_KEY
+
+[default]
+remotePath = volume:s3/$_index_name
+
+[i4]
+coldPath = $SPLUNK_DB/$_index_name/colddb
+homePath = $SPLUNK_DB/$_index_name/db
+thawedPath = $SPLUNK_DB/$_index_name/thaweddb
+
+[i5]
+coldPath = $SPLUNK_DB/$_index_name/colddb
+homePath = $SPLUNK_DB/$_index_name/db
+thawedPath = $SPLUNK_DB/$_index_name/thaweddb
+
+### This example demonstrates how to configure a volume that points to
+### GCS-based remote storage.
+### "storageType=remote" indicates that this is a remote-storage volume.
+### The "remotePath" parameter associates the index with that volume
+### and configures a top-level location for uploading buckets.
+
+[volume:gs]
+storageType = remote
+path = gs://test-bucket/some/path
+remote.gs.credential_file = credentials.json
+
+[default]
+remotePath = volume:gs/$_index_name
+
+[i6]
+coldPath = $SPLUNK_DB/$_index_name/colddb
+homePath = $SPLUNK_DB/$_index_name/db
+thawedPath = $SPLUNK_DB/$_index_name/thaweddb
+

@@ -1,0 +1,13 @@
+<endpoint name="clustering" template="pages/system.html" showOnSearchHeadCluster="0">
+  <header>unused</header>
+  <capabilities>
+    <read>edit_indexer_cluster OR list_indexer_cluster</read>
+  </capabilities>
+  <menu name="deployment_configurations">
+    <label>Indexer clustering</label>
+    <url>/manager/system/clustering</url>
+    <description>Configure cluster components, including master node, peer nodes, and search heads, and view their status.</description>
+    <order>6</order>
+    <id>clustering</id>
+  </menu>
+</endpoint>

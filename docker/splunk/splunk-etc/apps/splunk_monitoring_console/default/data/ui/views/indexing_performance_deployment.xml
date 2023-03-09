@@ -1,0 +1,513 @@
+<form version="1.1" hideEdit="True" script="common_control.js, drilldown_action_extension.js, indexing_performance_deployment_extension.js">
+  <label>Indexing Performance: Deployment</label>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="dropdown" searchWhenChanged="true" token="group">
+      <label>Group</label>
+      <showClearButton>false</showClearButton>
+      <search>
+        <query>
+          | `dmc_get_groups_containing_role(dmc_group_indexer)`
+          | where search_group!="dmc_group_indexer"
+        </query>
+      </search>
+      <fieldForLabel>label</fieldForLabel>
+      <fieldForValue>search_group</fieldForValue>
+      <choice value="*">All Indexers</choice>
+      <default>*</default>
+    </input>
+  </fieldset>
+  <search id="parallel_pipe_api_base">
+    <query>
+      <![CDATA[
+        | rest splunk_server_group=dmc_group_indexer splunk_server_group="$group$" /services/server/introspection/queues
+        | search title=parsingQueue* OR title=aggQueue* OR title=typingQueue* OR title=indexQueue*
+        | eval fill_perc=round(current_size_bytes / max_size_bytes * 100,2)
+        | fields splunk_server, title, fill_perc
+        | rex field=title "(?<queue_name>^\w+)(?:\.(?<pipeline_number>\d+))?"
+        | eval fill_perc = if(isnotnull(pipeline_number), "pset".pipeline_number.": ".fill_perc, fill_perc)
+        | chart values(fill_perc) over splunk_server by queue_name
+        | eval pset_count = mvcount(parsingQueue)
+        | join type=outer splunk_server [
+          | rest splunk_server_group=dmc_group_indexer splunk_server_group="$group$" /services/server/introspection/indexer
+          | eval average_KBps = round(average_KBps, 0)
+          | eval status = if((reason == ".") OR (reason == "") OR isnull(reason), status, status.": ".reason)
+          | fields splunk_server, average_KBps, status]
+        | fields splunk_server pset_count average_KBps status parsingQueue aggQueue typingQueue indexQueue
+        | sort -average_KBps
+      ]]>
+    </query>
+  </search>
+  <row>
+    <panel>
+      <html>
+        <h2>
+          <span>Select views: </span>
+          <span id="link-switcher-view">
+            <a href="#" class="btn-pill active" data-item="all">All</a>
+            <a href="#" class="btn-pill" data-item="snapshot">Snapshot</a>
+            <a href="#" class="btn-pill" data-item="historical">Historical</a>
+          </span>
+        </h2>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Snapshots</title>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <!-- this panel is only about indexer count and indexing rate, which is not affected by parallel pipeline, so no need to handle that -->
+      <title>Overview of Indexing Performance</title>
+      <single>
+        <search base="parallel_pipe_api_base">
+          <query>stats count</query>
+        </search>
+        <option name="underLabel">Indexers</option>
+        <option name="height">80px</option>
+      </single>
+      <single>
+        <search base="parallel_pipe_api_base">
+          <query>stats sum(average_KBps)</query>
+        </search>
+        <option name="underLabel">Total Indexing Rate</option>
+        <option name="afterLabel">KB/s</option>
+        <option name="height">80px</option>
+      </single>
+      <single>
+        <search base="parallel_pipe_api_base">
+          <query>
+stats avg(average_KBps) as avg_indexing_rate
+| eval avg_indexing_rate = round(avg_indexing_rate, 0)
+          </query>
+        </search>
+        <option name="underLabel">Average Indexing Rate</option>
+        <option name="afterLabel">KB/s</option>
+        <option name="height">80px</option>
+      </single>
+      <single>
+        <search base="parallel_pipe_api_base">
+          <query>stats median(average_KBps)</query>
+        </search>
+        <option name="underLabel">Median Indexing Rate</option>
+        <option name="afterLabel">KB/s</option>
+        <option name="height">80px</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Indexing Performance by Instance</title>
+      <table>
+        <title>$totalCountOfInstances$ instances</title>
+        <search base="parallel_pipe_api_base">
+          <query>
+            rename splunk_server as Instance, pset_count as "Pipeline Set Count", average_KBps as "Indexing Rate (KB/s)", status as "Status", parsingQueue as "Parsing Queue Fill Ratio (%)", aggQueue as "Aggregation Queue Fill Ratio (%)", "typingQueue" as "Typing Queue Fill Ratio (%)", indexQueue as "Indexing Queue Fill Ratio (%)"
+          </query>
+          <done>
+            <set token="totalCountOfInstances">$job.resultCount$</set>
+          </done>
+        </search>
+        <option name="drilldown">row</option>
+        <drilldown>
+          <link target="_blank">
+            <![CDATA[indexing_performance_instance?form.splunk_server=$row.Instance$]]>
+          </link>
+        </drilldown>
+      </table>
+      <html>
+        <p>Click instance name for more details. </p>
+        <p>Indexing rate measured over 30 seconds every 30 seconds (available with Splunk Enterprise 6.2 or later indexers).</p>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Historical Charts</title>
+      <input type="time" searchWhenChanged="true" token="time">
+        <label>Time Range:</label>
+        <default>
+          <earliestTime>-4h@m</earliestTime>
+          <latestTime>now</latestTime>
+        </default>
+      </input>
+    <input type="checkbox" searchWhenChanged="true" token="split_by_host">
+      <label></label>
+      <choice>Split by host</choice>
+    </input>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$, $split_by_host$" id="instances_by_indexing_rate">
+      <title>Instances By Indexing Rate</title>
+        <html>
+            <div class="heatmap_toggle"></div>
+        </html>
+        <viz type="splunk_monitoring_console.heatmap">
+            <search id="instances_by_estimated_indexing_rate">
+                <query>
+                    `dmc_set_index_internal` source=*metrics.log* sourcetype=splunkd search_group=dmc_group_indexer search_group="$group$" group=thruput name=index_thruput
+                    | `dmc_timechart_for_metrics_log` partial=f limit=0 per_second(kb) AS kbps by host
+                    | untable _time host kbps
+                    | eval kbps = round(kbps,0)
+                    | `dmc_indexing_rate_rangemap_and_timechart`
+                </query>
+                <earliest>$time.earliest$</earliest>
+                <latest>$time.latest$</latest>
+            </search>
+            <option name="height">300</option>
+            <drilldown>
+                <condition match="isnotnull('row._span')">
+                    <set token="drilldown_indexing_rate">true</set>
+                    <set token="drilldown_indexing_rate_span">$row._span$</set>
+                    <set token="drilldown_indexing_rate_earliest">$row.earliest$</set>
+                    <set token="drilldown_indexing_rate_earliest_label">$row.earliest_label$</set>
+                    <set token="drilldown_indexing_rate_latest">$row.latest$</set>
+                    <set token="drilldown_indexing_rate_latest_label">$row.latest_label$</set>
+                    <set token="drilldown_indexing_rate_metric">$row.drilldown_indexing_rate_metric$</set>
+                    <set token="drilldown_indexing_rate_count">$row.numInstances$</set>
+                </condition>
+                <condition />
+            </drilldown>
+        </viz>
+      <chart>
+        <search>
+          <query>
+`dmc_set_index_internal` source=*metrics.log* sourcetype=splunkd search_group=dmc_group_indexer search_group="$group$" group=thruput name=index_thruput
+| `dmc_timechart_for_metrics_log` partial=f limit=0 per_second(kb) AS kbps by host
+| untable _time host kbps
+| eval kbps = round(kbps,0)
+| `dmc_indexing_rate_rangemap_and_timechart`
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Instance count</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.fieldColors">
+          {"0-50 KB/s": 0xe6ecf3,
+           "50-100 KB/s": 0xcdd8e7,
+           "100-500 KB/s": 0xb4c5db,
+           "500 KB/s - 1 MB/s": 0x9cb1d0,
+           "1-2.5 MB/s": 0x839ec4,
+           "2.5-5 MB/s": 0x6a8ab8,
+           "5-10 MB/s": 0x5177ac,
+           "10+ MB/s": 0x3863a0
+          }
+        </option>
+        <drilldown>
+          <condition match="isnotnull('row._span')">
+            <set token="drilldown_indexing_rate">true</set>
+            <set token="drilldown_indexing_rate_span">$row._span$</set>
+            <set token="drilldown_indexing_rate_earliest">$earliest$</set>
+            <eval token="drilldown_indexing_rate_earliest_label">strftime(earliest, "%m/%d/%Y %H:%M:%S")</eval>
+            <set token="drilldown_indexing_rate_latest">$latest$</set>
+            <eval token="drilldown_indexing_rate_latest_label">strftime(latest, "%m/%d/%Y %H:%M:%S")</eval>
+            <set token="drilldown_indexing_rate_metric">$click.name2$</set>
+            <set token="drilldown_indexing_rate_count">$click.value2$</set>
+          </condition>
+          <condition />
+        </drilldown>
+      </chart>
+      <table depends="$drilldown_indexing_rate$" id="drilldown_indexing_rate">
+        <title>Time range: $drilldown_indexing_rate_earliest_label$ ~ $drilldown_indexing_rate_latest_label$. Metric: indexing rate range: $drilldown_indexing_rate_metric$. ($drilldown_indexing_rate_count$ instances)</title>
+        <search>
+          <query>`dmc_drilldown_indexing_performance_deployment_indexing_rate("$group$", $drilldown_indexing_rate_metric$)`</query>
+          <earliest>$drilldown_indexing_rate_earliest$</earliest>
+          <latest>$drilldown_indexing_rate_latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+      <html depends="$drilldown_indexing_rate$">
+        <a data-unset-token="drilldown_indexing_rate">Close this drilldown table</a>
+      </html>
+    </panel>
+    </row>
+    <row>
+    <panel rejects="$snapshot$" depends="$split_by_host$">
+      <title>Indexing Rate By Instance</title>
+      <chart>
+        <search>
+          <query>
+`dmc_set_index_internal` source=*metrics.log* sourcetype=splunkd search_group=dmc_group_indexer search_group="$group$" group=thruput name=index_thruput
+| `dmc_timechart_for_metrics_log` partial=f per_second(kb) AS kbps by host
+| eval kbps = round(kbps, 0)
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">KB/s</option>
+      </chart>
+    </panel>
+    <panel rejects="$snapshot$">
+      <title>Deployment-Wide $aggrIdxRateLabel$ Indexing Rate</title>
+      <input type="dropdown" token="aggrIdxRateDivider" searchWhenChanged="true">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <default>1</default>
+        <choice value="1">Total</choice>
+        <choice value="num_hosts">Average Per Instance</choice>
+        <change>
+          <set token="aggrIdxRateLabel">$label$</set>
+        </change>
+      </input>
+     <chart>
+        <search>
+          <query>
+`dmc_set_index_internal` source=*metrics.log* sourcetype=splunkd search_group=dmc_group_indexer search_group="$group$" group=thruput name=index_thruput 
+| `dmc_timechart_for_metrics_log` partial=f per_second(kb) AS kbps dc(host) AS num_hosts 
+| eval kbps = kbps / $aggrIdxRateDivider$ 
+| eval kbps = round(kbps, 0)
+| rename kbps as "KB/s"
+| fields - num_hosts
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">area</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">KB/s</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html rejects="$split_by_host$">
+        <p>Count of instances grouped by indexing rate over time.</p>
+      </html>
+      <html depends="$split_by_host$">
+        <p>Indexing rate over time by instance.</p>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$, $split_by_host$" id="instances_by_queue_fill_ratio">
+      <title>Instances By $instanceWideFillRatioAggrLabel$ Queue Fill Ratio</title>
+      <input type="dropdown" token="instanceWideFillRatioQueueType" searchWhenChanged="true">
+        <label>Queue</label>
+        <choice value="splunktcpin">Splunk Tcpin Queue</choice>
+        <choice value="parsingqueue">Parsing Queue</choice>
+        <choice value="aggqueue">Aggregation Queue</choice>
+        <choice value="typingqueue">Typing Queue</choice>
+        <choice value="indexqueue">Indexing Queue</choice>
+        <choice value="tcpout* | eval name=if(like(name,&quot;tcpout_%&quot;),&quot;tcpout&quot;,name)">Tcpout Queue(s) - Consolidated</choice>
+        <default>indexqueue</default>
+        <showClearButton>false</showClearButton>
+      </input>
+      <input type="dropdown" token="instanceWideFillRatioAggrFunc" searchWhenChanged="true">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <choice value="Avg">Average</choice>
+        <choice value="Median">Median</choice>
+        <choice value="Min">Minimum</choice>
+        <choice value="Max">Maximum</choice>
+        <choice value="Perc90">90th Percentile</choice>
+        <choice value="First">Sampled</choice>
+        <default>Median</default>
+        <change>
+          <set token="instanceWideFillRatioAggrLabel">$label$</set>
+        </change>
+      </input>
+        <html>
+            <div class="heatmap_toggle"></div>
+        </html>
+        <viz type="splunk_monitoring_console.heatmap">
+            <search>
+                <query>
+                    `dmc_set_index_internal` sourcetype=splunkd source=*metrics.log search_group=dmc_group_indexer search_group="$group$" group=queue name=$instanceWideFillRatioQueueType$
+                    | eval max=if(isnotnull(max_size_kb),max_size_kb,max_size)
+                    | eval curr=if(isnotnull(current_size_kb),current_size_kb,current_size)
+                    | eval fill_perc=round((curr/max)*100,2)
+                    | bin _time minspan=30s
+                    | stats $instanceWideFillRatioAggrFunc$(fill_perc) AS "fill_percentage" by host, _time
+                    | `dmc_queue_fill_ratio_rangemap_and_timechart`
+                </query>
+                <earliest>$time.earliest$</earliest>
+                <latest>$time.latest$</latest>
+            </search>
+            <drilldown>
+                <condition match="isnotnull('row._span')">
+                    <set token="drilldown_queue_fill_ratio">true</set>
+                    <set token="drilldown_queue_fill_ratio_span">$row._span$</set>
+                    <set token="drilldown_queue_fill_ratio_earliest">$row.earliest$</set>
+                    <eval token="drilldown_queue_fill_ratio_earliest_label">$row.earliest_label$</eval>
+                    <set token="drilldown_queue_fill_ratio_latest">$row.latest$</set>
+                    <eval token="drilldown_queue_fill_ratio_latest_label">$row.latest_label$</eval>
+                    <set token="drilldown_queue_fill_ratio_metric">$row.drilldown_indexing_rate_metric$</set>
+                    <set token="drilldown_queue_fill_ratio_count">$row.numInstances$</set>
+                </condition>
+                <condition/>
+            </drilldown>
+        </viz>
+      <chart>
+        <search>
+          <query>
+`dmc_set_index_internal` sourcetype=splunkd source=*metrics.log search_group=dmc_group_indexer search_group="$group$" group=queue name=$instanceWideFillRatioQueueType$
+| eval max=if(isnotnull(max_size_kb),max_size_kb,max_size)
+| eval curr=if(isnotnull(current_size_kb),current_size_kb,current_size)
+| eval fill_perc=round((curr/max)*100,2)
+| bin _time minspan=30s
+| stats $instanceWideFillRatioAggrFunc$(fill_perc) AS "fill_percentage" by host, _time
+| `dmc_queue_fill_ratio_rangemap_and_timechart`
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Instance count</option>
+        <option name="charting.fieldColors">{"80-100%": 0xD85D3C, "60-80%": 0xF7902B, "0-60%":0x9AC23C, "abnormal":0xC4C4C0}</option>
+        <drilldown>
+          <condition match="isnotnull('row._span')">
+            <set token="drilldown_queue_fill_ratio">true</set>
+            <set token="drilldown_queue_fill_ratio_span">$row._span$</set>
+            <set token="drilldown_queue_fill_ratio_earliest">$earliest$</set>
+            <eval token="drilldown_queue_fill_ratio_earliest_label">strftime(earliest, "%m/%d/%Y %H:%M:%S")</eval>
+            <set token="drilldown_queue_fill_ratio_latest">$latest$</set>
+            <eval token="drilldown_queue_fill_ratio_latest_label">strftime(latest, "%m/%d/%Y %H:%M:%S")</eval>
+            <set token="drilldown_queue_fill_ratio_metric">$click.name2$</set>
+            <set token="drilldown_queue_fill_ratio_count">$click.value2$</set>
+          </condition>
+          <condition/>
+        </drilldown>
+      </chart>
+      <table depends="$drilldown_queue_fill_ratio$" id="drilldown_queue_fill_ratio">
+        <title>Time range: $drilldown_queue_fill_ratio_earliest_label$ ~ $drilldown_queue_fill_ratio_latest_label$. Metric: $instanceWideFillRatioAggrFunc$ $instanceWideFillRatioQueueType$ fill ratio range: $drilldown_queue_fill_ratio_metric$. ($drilldown_queue_fill_ratio_count$ instances)</title>
+        <search>
+          <query>`dmc_drilldown_indexing_performance_deployment_queue_fill_ratio("$group$", $instanceWideFillRatioQueueType$, $instanceWideFillRatioAggrFunc$, $drilldown_queue_fill_ratio_metric$)`</query>
+          <earliest>$drilldown_queue_fill_ratio_earliest$</earliest>
+          <latest>$drilldown_queue_fill_ratio_latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+      <html depends="$drilldown_queue_fill_ratio$">
+        <a data-unset-token="drilldown_queue_fill_ratio">Close this drilldown table</a>
+      </html>
+    </panel>
+    <panel rejects="$snapshot$" depends="$split_by_host$">
+      <title>$instanceWideFillRatioAggrLabel$ Queue Fill Ratio By Instance</title>
+      <input type="dropdown" token="instanceWideFillRatioQueueType" searchWhenChanged="true">
+        <label>Queue</label>
+        <choice value="splunktcpin">Splunk Tcpin Queue</choice>
+        <choice value="parsingqueue">Parsing Queue</choice>
+        <choice value="aggqueue">Aggregation Queue</choice>
+        <choice value="typingqueue">Typing Queue</choice>
+        <choice value="indexqueue">Indexing Queue</choice>
+        <choice value="tcpout* | eval name=if(like(name,&quot;tcpout_%&quot;),&quot;tcpout&quot;,name)">Tcpout Queue(s) - Consolidated</choice>
+        <default>indexqueue</default>
+        <showClearButton>false</showClearButton>
+      </input>
+      <input type="dropdown" token="instanceWideFillRatioAggrFunc" searchWhenChanged="true">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <choice value="Avg">Average</choice>
+        <choice value="Median">Median</choice>
+        <choice value="Min">Minimum</choice>
+        <choice value="Max">Maximum</choice>
+        <choice value="Perc90">90th Percentile</choice>
+        <choice value="First">Sampled</choice>
+        <default>Median</default>
+        <change>
+          <set token="instanceWideAggrLabel">$label$</set>
+        </change>
+      </input>
+      <chart>
+        <search>
+          <query>
+`dmc_set_index_internal` sourcetype=splunkd source=*metrics.log search_group=dmc_group_indexer search_group="$group$" group=queue name=$instanceWideFillRatioQueueType$
+| eval max=if(isnotnull(max_size_kb),max_size_kb,max_size)
+| eval curr=if(isnotnull(current_size_kb),current_size_kb,current_size)
+| eval fill_perc=round((curr/max)*100,2)
+| `dmc_timechart_for_metrics_log` partial=f limit=25 $instanceWideFillRatioAggrFunc$(fill_perc) AS fill_percentage by host
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Queue % filled</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+        <option name="charting.axisY.maximumNumber">100</option>
+      </chart>
+    </panel>
+    </row>
+    <row>
+    <panel rejects="$snapshot$">
+      <title>Deployment-Wide $deploymentWideFillRatioAggrLabel$ Queue Fill Ratio</title>
+      <input type="dropdown" token="deploymentWideFillRatioQueueType" searchWhenChanged="true">
+        <label>Queue</label>
+        <choice value="splunktcpin">Splunk Tcpin Queue</choice>
+        <choice value="parsingqueue">Parsing Queue</choice>
+        <choice value="aggqueue">Aggregation Queue</choice>
+        <choice value="typingqueue">Typing Queue</choice>
+        <choice value="indexqueue">Indexing Queue</choice>
+        <choice value="tcpout* | eval name=if(like(name,&quot;tcpout_%&quot;),&quot;tcpout&quot;,name)">Tcpout Queue(s) - Consolidated</choice>
+        <default>indexqueue</default>
+        <showClearButton>false</showClearButton>
+      </input>
+      <input type="dropdown" token="deploymentWideFillRatioAggrFunc" searchWhenChanged="true">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <choice value="Avg">Average</choice>
+        <choice value="Median">Median</choice>
+        <choice value="Min">Minimum</choice>
+        <choice value="Max">Maximum</choice>
+        <choice value="Perc90">90th Percentile</choice>
+        <choice value="First">Sampled</choice>
+        <default>Median</default>
+        <change>
+          <set token="deploymentWideFillRatioAggrLabel">$label$</set>
+        </change>
+      </input>
+      <chart>
+        <search>
+          <query>
+`dmc_set_index_internal` sourcetype=splunkd source=*metrics.log search_group=dmc_group_indexer search_group="$group$" group=queue name=$deploymentWideFillRatioQueueType$
+| eval max=if(isnotnull(max_size_kb),max_size_kb,max_size)
+| eval curr=if(isnotnull(current_size_kb),current_size_kb,current_size)
+| eval fill_perc=round((curr/max)*100,2)
+| `dmc_timechart_for_metrics_log` partial=f $deploymentWideFillRatioAggrFunc$(fill_perc) AS fill_percentage
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">area</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Queue % filled</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+        <option name="charting.axisY.maximumNumber">100</option>
+      </chart>
+     </panel>
+  </row>
+  <row>
+    <panel>
+      <html rejects="$split_by_host$">
+        <p>Count of instances grouped by $instanceWideFillRatioAggrLabel$ fill ratio of the selected queue over time.</p>
+        <p>If parallel pipeline sets are defined, queue fill ratios are aggregated across all pipeline sets.</p>
+      </html>
+      <html depends="$split_by_host$">
+        <p>$instanceWideFillRatioAggrLabel$ fill ratio of the selected queue over time by instance.</p>
+        <p>If parallel pipeline sets are defined, queue fill ratios are aggregated across all pipeline sets.</p>
+      </html>
+    </panel>
+  </row>
+</form>

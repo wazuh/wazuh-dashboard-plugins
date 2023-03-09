@@ -1,0 +1,43 @@
+<endpoint name="admin/LDAP-groups" hideEnabledColumn="1" hideActionsColumn="1">
+  <header>LDAP Groups</header>
+  <breadcrumb>
+      <parent hidecurrent="False">authentication/providers/LDAP</parent>
+  </breadcrumb>
+  <elements>
+    <element name="indexPage" type="fieldset">
+      <view name="list"/>
+      <view name="edit"/>
+      <elements>
+        <element name="name" type="textfield" label="LDAP Group Name">
+          <view name="list"/>
+        </element>
+        <element name="strategy" type="textfield" label="LDAP Strategy">
+          <view name="list"/>
+        </element>
+        <element name="type" type="textfield" label="Group type">
+          <view name="list"/>
+        </element>
+        <element name="roles" type="accumulator" label="Roles">
+          <view name="list"/>
+          <view name="edit"/>
+          <key name="processValueList">', '.join(value) if isinstance(value, list) else value</key>
+          <key name="dynamicOptions" type="dict">
+            <key name="keyName">title</key>
+            <key name="keyValue">title</key>
+            <key name="splunkSource">/authorization/roles</key>
+	    <key name="splunkSourceParams" type="dict">
+              <key name="count">-1</key>
+            </key>
+          </key>
+        </element>
+        <element name="users" type="textarea" label="LDAP Users">
+          <key name="processValueEdit">'\n'.join(value) if isinstance(value, list) else value</key>
+          <key name="class">huge</key>
+          <key name="disabled">1</key>
+	  <key name="submitValueEdit">None</key>
+          <view name="edit"/>
+        </element>
+      </elements>
+    </element>
+  </elements>
+</endpoint>

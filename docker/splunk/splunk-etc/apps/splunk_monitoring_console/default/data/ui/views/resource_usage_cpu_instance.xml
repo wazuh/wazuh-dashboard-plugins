@@ -1,0 +1,446 @@
+<form version="1.1" hideEdit="True" script="common_control.js">
+  <label>CPU Usage: Instance</label>
+  <description>
+    This dashboard consolidates panels from other Monitoring Console dashboards to help you assess the CPU usage of a Splunk instance.
+  </description>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="dropdown" searchWhenChanged="true" token="role">
+      <label>Role</label>
+      <populatingSearch fieldForLabel="label" fieldForValue="search_group">
+        | `dmc_get_groups`
+        | search search_group="dmc_group_*"
+      </populatingSearch>
+      <choice value="*">All</choice>
+      <selectFirstChoice>true</selectFirstChoice>
+      <showClearButton>false</showClearButton>
+    </input>
+    <input type="dropdown" searchWhenChanged="true" token="group">
+      <label>Group</label>
+      <showClearButton>false</showClearButton>
+      <search fieldForValue="search_group">
+        <query>
+          | `dmc_get_groups_containing_role($role$)`
+          | search search_group!="dmc_group_*"
+        </query>
+      </search>
+      <fieldForLabel>label</fieldForLabel>
+      <fieldForValue>search_group</fieldForValue>
+      <choice value="*">All</choice>
+      <selectFirstChoice>true</selectFirstChoice>
+    </input>
+    <input type="dropdown" searchWhenChanged="true" token="splunk_server">
+      <label>Instance</label>
+      <showClearButton>false</showClearButton>
+      <populatingSearch fieldForLabel="serverName" fieldForValue="serverName">
+        | `dmc_get_instance_info("$group$")`
+        | search search_group="$role$"
+      </populatingSearch>
+      <selectFirstChoice>true</selectFirstChoice>
+      <change>
+        <condition value="*">
+          <set token="host">$row.host$</set>
+        </condition>
+      </change>
+    </input>
+  </fieldset>
+  <search id="instance_cpu_usage">
+    <query>
+      | rest splunk_server=$splunk_server$ /services/server/status/resource-usage/hostwide
+      | join type=outer splunk_server [
+          | `dmc_get_instance_roles` 
+          | fields role serverName
+          | rename serverName as splunk_server]
+      | eventstats min(eval(if(isnull(normalized_load_avg_1min), "0", "1"))) as _load_avg_full_availability
+      | eval normalized_load_avg_1min = if(isnull(normalized_load_avg_1min), "N/A", normalized_load_avg_1min)
+      | eval core_info = if(isnull(cpu_count), "N/A", cpu_count)." / ".if(isnull(virtual_cpu_count), "N/A", virtual_cpu_count)
+      | eval cpu_usage = 'cpu_system_pct' + 'cpu_user_pct'
+      | fields splunk_server, role, normalized_load_avg_1min, core_info, cpu_usage, cpu_count, virtual_cpu_count, cpu_system_pct, cpu_user_pct
+      | eval role = replace(role, " $", "")
+      | eval role = split(role, " ")
+    </query>
+    <earliest>$time.earliest$</earliest>
+    <latest>$time.latest$</latest>
+  </search>
+  <search id="system_cpu_usage">
+    <query>
+      <![CDATA[
+      | rest splunk_server=$splunk_server$ /services/server/status/resource-usage/splunk-processes
+      | fields normalized_pct_cpu pct_cpu process process_type search_props.mode search_props.type search_props.provenance splunk_server
+      | fillnull normalized_pct_cpu pct_cpu
+      | eval process_type_l2 = if(match(process_type, "^search$"), 'process_type'.":".'search_props.type', 'process_type')
+      | stats sum(normalized_pct_cpu) AS normalized_pct_cpu by process_type_l2, splunk_server
+      | chart avg(normalized_pct_cpu) AS normalized_pct_cpu over splunk_server by process_type_l2
+      | foreach * [eval <<FIELD>> = if(isnum('<<FIELD>>'), round('<<FIELD>>', 2), '<<FIELD>>')]
+      ]]>
+    </query>
+  </search>
+  <search id="cpu_by_process_class">
+    <query>
+      `dmc_set_index_introspection` host=$host$ sourcetype=splunk_resource_usage component=PerProcess
+      | `dmc_rename_introspection_fields`
+      | `dmc_classify_processes`
+      | `dmc_resource_usage_by_processes_timechart(normalized_pct_cpu, $funcPerpCPU$)`
+    </query>
+    <earliest>$time.earliest$</earliest>
+    <latest>$time.latest$</latest>
+  </search>
+  <row>
+    <panel>
+      <html>
+        <h2>
+          <span>Select views: </span>
+          <span id="link-switcher-view">
+            <a href="#" class="btn-pill active" data-item="all">All</a>
+            <a href="#" class="btn-pill" data-item="snapshot">Snapshot</a>
+            <a href="#" class="btn-pill" data-item="historical">Historical</a>
+          </span>
+        </h2>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Snapshots</title>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>CPU Usage</title>
+      <table>
+        <search base="instance_cpu_usage">
+          <query>
+            | fields splunk_server, role, core_info, cpu_usage, normalized_load_avg_1min
+            | `dmc_pretty_print_role(role)`
+            | sort - cpu_usage
+            | rename splunk_server AS Instance, role as Role, normalized_load_avg_1min AS "Load Average", core_info AS "CPU Cores (Physical / Virtual)", cpu_usage AS "CPU Usage (%)"
+          </query>
+        </search>
+        <format type="color" field="CPU Usage (%)">
+          <colorPalette type="minMidMax" maxColor="#D85D3C" midColor="#F7902B" minColor="#9AC23C"></colorPalette>
+          <scale type="minMidMax" midType="number" midValue="70"></scale>
+        </format>
+        <format type="color" field="Load Average">
+          <colorPalette type="minMidMax" maxColor="#D85D3C" midColor="#F7902B" minColor="#9AC23C"></colorPalette>
+          <scale type="minMidMax" midType="number" midValue="1.5"></scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>CPU Usage over Splunk Process Type</title>
+      <input type="checkbox" searchWhenChanged="true" token="x_axis_100">
+        <label></label>
+        <choice>Scale x-axis view to actual size</choice>
+      </input>
+      <chart depends="$x_axis_100$">
+        <search base="system_cpu_usage"></search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.axisTitleY.text">CPU Usage (%)</option>
+        <option name="charting.axisLabelsX.majorLabelVisibility">show</option>
+        <option name="charting.axisLabelsX2.axisVisibility">show</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+        <option name="refresh.auto.interval">60</option>
+        <option name="refresh.time.visible">false</option>
+        <drilldown target="_blank">
+          <condition series="*">
+          <link target="_blank"><![CDATA[search?q=`dmc_resource_usage_instance_drilldown($host$)`&earliest=$earliest$&latest=$latest$]]></link>
+          </condition>
+        </drilldown>
+      </chart>
+      <chart rejects="$x_axis_100$">
+        <search base="system_cpu_usage"></search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.axisTitleY.text">CPU Usage (%)</option>
+        <option name="charting.axisLabelsX.majorLabelVisibility">show</option>
+        <option name="charting.axisLabelsX2.axisVisibility">show</option>
+        <option name="charting.axisY.maximumNumber">100</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+        <option name="refresh.auto.interval">60</option>
+        <option name="refresh.time.visible">false</option>
+        <drilldown target="_blank">
+          <condition series="*">
+          <link target="_blank"><![CDATA[search?q=`dmc_resource_usage_instance_drilldown($host$)`&earliest=$earliest$&latest=$latest$]]></link>
+          </condition>
+        </drilldown>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Historical Charts</title>
+      <input type="time" searchWhenChanged="true" token="time">
+        <label>Time Range:</label>
+        <default>
+          <earliestTime>-4h@m</earliestTime>
+          <latestTime>now</latestTime>
+        </default>
+      </input>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>$funcPerpCPULabel$ CPU Usage by Process Class</title>
+      <input type="dropdown" token="funcPerpCPU" searchWhenChanged="true">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <choice value="Avg">Average</choice>
+        <choice value="Median">Median</choice>
+        <choice value="Min">Minimum</choice>
+        <choice value="Max">Maximum</choice>
+        <choice value="Perc90">90th Percentile</choice>
+        <choice value="First">Sampled</choice>
+        <default>Median</default>
+        <change>
+          <set token="funcPerpCPULabel">$label$</set>
+        </change>
+      </input>
+      <input type="checkbox" searchWhenChanged="true" token="stacked_bar">
+        <label></label>
+        <choice>Show as bar chart</choice>
+      </input>
+      <chart rejects="$stacked_bar$">
+        <search base="cpu_by_process_class"></search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">area</option>
+        <option name="charting.chart.nullValueMode">zero</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">CPU Usage (%)</option>
+      </chart>
+      <chart depends="$stacked_bar$">
+        <search base="cpu_by_process_class"></search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">zero</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">CPU Usage (%)</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>$resourceFuncLabel$ CPU Usage of Searches</title>
+      <input type="dropdown" token="resourceFunction" searchWhenChanged="true">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <default>Median</default>
+        <choice value="Avg">Average</choice>
+        <choice value="Median">Median</choice>
+        <choice value="Min">Minimum</choice>
+        <choice value="Max">Maximum</choice>
+        <choice value="Perc90">90th Percentile</choice>
+        <choice value="First">Sampled</choice>
+        <change>
+          <set token="resourceFuncLabel">$label$</set>
+        </change>
+      </input>
+      <input type="dropdown" token="resourceSplitBy" searchWhenChanged="true">
+        <label>Split by</label>
+        <showClearButton>false</showClearButton>
+        <default>type</default>
+        <choice value="app">App</choice>
+        <choice value="user">User</choice>
+        <choice value="mode">Mode</choice>
+        <choice value="type">Type</choice>
+        <choice value="role">Role</choice>
+        <choice value="search_head">Dispatching Search Head</choice>
+        <choice value="label">Search Name</choice>
+        <choice value="provenance">Provenance</choice>
+        <choice value="workload_pool">Workload Pool</choice>
+        <change>
+          <condition value="mode">
+            <set token="resourceModeDoc">true</set>
+          </condition>
+          <condition value="*">
+            <unset token="resourceModeDoc"></unset>
+          </condition>
+        </change>
+      </input>
+      <chart>
+        <searchString>
+        `dmc_set_index_introspection` host=$host$ sourcetype=splunk_resource_usage component=PerProcess data.search_props.sid::*
+        | `dmc_rename_introspection_fields`
+        | `dmc_set_bin`
+        | stats latest(normalized_pct_cpu) AS resource_usage_dedup by _time, $resourceSplitBy$, sid, pid
+        | stats sum(resource_usage_dedup) AS sum_resource_usage by _time,  $resourceSplitBy$
+        | eval sum_resource_usage = round(sum_resource_usage / 100.0, 2)
+        | `dmc_timechart` $resourceFunction$(sum_resource_usage) AS "$resourceFunction$ of resource usage" by $resourceSplitBy$
+        </searchString>
+        <earliestTime>$time.earliest$</earliestTime>
+        <latestTime>$time.latest$</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="list.drilldown">full</option>
+        <option name="list.wrap">1</option>
+        <option name="maxLines">5</option>
+        <option name="raw.drilldown">full</option>
+        <option name="rowNumbers">false</option>
+        <option name="table.drilldown">all</option>
+        <option name="table.wrap">1</option>
+        <option name="type">list</option>
+        <option name="wrap">true</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="charting.axisTitleY.text">CPU Usage (# cores)</option>
+        <drilldown target="_blank">
+          <condition series="*">
+              <link target="_blank"><![CDATA[search?q=`dmc_search_activity_instance_drilldown($host$, $resourceSplitBy$, $click.name2$)`&earliest=$earliest$&latest=$latest$]]></link>
+          </condition>
+        </drilldown>
+      </chart>
+      <html depends="$resourceModeDoc$">
+        <p>Mode can be historical, historical batch, RT, or RT indexed.</p>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>$histFuncLabel$ Historical CPU Usage</title>
+      <input type="dropdown" token="histFunc" searchWhenChanged="true">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <choice value="Avg">Average</choice>
+        <choice value="Median">Median</choice>
+        <choice value="Min">Minimum</choice>
+        <choice value="Max">Maximum</choice>
+        <choice value="Perc90">90th Percentile</choice>
+        <choice value="First">Sampled</choice>
+        <default>Median</default>
+        <change>
+          <set token="histFuncLabel">$label$</set>
+        </change>
+      </input>
+      <input type="time" searchWhenChanged="true" token="hist_time">
+        <label>Time Range:</label>
+        <default>
+          <earliestTime>-30d@d</earliestTime>
+          <latestTime>now</latestTime>
+        </default>
+      </input>
+      <chart>
+        <searchString>
+          | mstats $histFunc$("spl.intr.resource_usage.Hostwide.data.cpu_system_pct_mrollup_avg_86400s")  $histFunc$("spl.intr.resource_usage.Hostwide.data.cpu_user_pct_mrollup_avg_86400s") prestats=true WHERE "index"="_metrics_rollup" by extracted_host span=1h
+          | rename extracted_host as host
+          | where host="$host$"
+          | timechart eval($histFunc$('spl.intr.resource_usage.Hostwide.data.cpu_user_pct_mrollup_avg_86400s') + $histFunc$('spl.intr.resource_usage.Hostwide.data.cpu_system_pct_mrollup_avg_86400s')) by host
+          | fields - _span
+        </searchString>
+        <earliestTime>$hist_time.earliest$</earliestTime>
+        <latestTime>$hist_time.latest$</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="list.drilldown">full</option>
+        <option name="list.wrap">1</option>
+        <option name="maxLines">5</option>
+        <option name="raw.drilldown">full</option>
+        <option name="rowNumbers">false</option>
+        <option name="table.drilldown">none</option>
+        <option name="table.wrap">1</option>
+        <option name="type">list</option>
+        <option name="wrap">true</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="charting.axisTitleY.text">CPU Usage %</option>
+      </chart>
+      <html>
+        <p>To view data in this panel you must enable the metric rollup policy specified in the [index:_metrics] stanza in metric_rollups.conf. <a href="/help?location=learnmore.metrics_rollup_policy" target="_blank" class="external">Learn More</a></p>
+      </html>
+    </panel>
+  </row>
+</form>

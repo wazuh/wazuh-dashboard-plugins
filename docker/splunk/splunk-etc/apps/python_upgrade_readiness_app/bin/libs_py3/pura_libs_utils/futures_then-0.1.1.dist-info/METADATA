@@ -1,0 +1,24 @@
+Metadata-Version: 2.1
+Name: futures-then
+Version: 0.1.1
+Summary: Python Futures made then-able
+Home-page: https://github.com/dvdotsenko/python-future-then
+Author: Daniel Dotsenko
+Author-email: dotsa@hotmail.com
+License: MIT
+Download-URL: https://github.com/dvdotsenko/python-future-then/tarball/master
+Keywords: Promise,Future,Promises,Futures,thenable,chain
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 2.6
+Classifier: Programming Language :: Python :: 2.7
+
+
+Extending Python's Future (Promise) object with missing chaining API like `.then()` and others.
+
+Adapting the most useful chaining mechanisms from JavaScript Promises.
+
+

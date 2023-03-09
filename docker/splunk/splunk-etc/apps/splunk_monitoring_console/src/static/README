@@ -1,0 +1,4 @@
+These are static files that are copied directly to appserver/static.
+There is no processing, transpilation or otherwise, that happens when they are moved.
+
+If files are later added that need PCSS then extensions.config.js will need to be updated to handle that.

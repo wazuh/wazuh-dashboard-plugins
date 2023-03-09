@@ -1,0 +1,32 @@
+#   Version 9.0.3
+#
+# Here are some examples of stanzas in federated.conf
+#
+#
+[provider://provider_1]
+hostPort = remote_searchhead1:8090
+password = secret1
+serviceAccount = user1
+type = splunk
+appContext = search
+useFSHKnowledgeObjects = 0
+mode = standard
+
+[provider://provider_2]
+hostPort = remote_searchhead2:8090
+password = secret2
+serviceAccount = user2
+type = splunk
+appContext = search
+useFSHKnowledgeObjects = 1
+mode = transparent
+
+[provider://provider_3]
+type = aws_s3
+aws_account_id = 12345678901
+aws_region = us-west-1
+database = database1
+data_catalog = glue:arn:aws:glue:us-west-1:12345678901:catalog
+aws_glue_tables_allowlist = table1,table2,table3,table4,table5
+aws_s3_paths_allowlist = s3://bucket1/*,s3://bucket1/path1,s3://bucket2/path1/*,s3://bucket2/path1/a
+

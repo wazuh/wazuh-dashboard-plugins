@@ -1,0 +1,86 @@
+<dashboard hideEdit="True" version="1.1">
+
+  <label>Dashboard Studio Improvements</label>
+  
+  <row>
+
+    <panel>
+
+      <html>
+
+        <p><strong>Description</strong></p>
+        <p> Scope: Splunk Enterprise and Splunk Cloud</p>
+
+        <p><strong>1. Interactivity Capabilities</strong></p>
+        <p>1a. Use the updated splunk.* visualization charts to set tokens that enhance your experience when clicking on a visualization. Tokens allow you to pass dynamic values to searches, options, or visualizations. To set up a token, first configure a drilldown on the visualization of interest. </p>
+         <ul>
+                  <div style="margin-left:10px">
+                   <img src="/static/app/splunk_essentials_9_0/images/dash_studio_1.png" style="margin: 10px 0" width="700px"/>
+                  </div>
+
+                 </ul>
+        <ul>
+                  <div style="margin-left:10px">
+                   <img src="/static/app/splunk_essentials_9_0/images/dash_studio_2.png" style="margin: 10px 0" width="700px"/>
+                  </div>
+
+                 </ul>
+        <p>1b. Next, specify your token’s name and value. The token name is the string you will use in searches. For example, use "$sourcetype$"" as the token name for a query count. The token value can be either the name, value, or "row.&lt;fieldname&gt;.value".</p>
+         <ul>
+                  <div style="margin-left:10px">
+                   <img src="/static/app/splunk_essentials_9_0/images/dash_studio_3.png" style="margin: 10px 0" width="700px"/>
+                  </div>
+
+                 </ul>
+        <p>1c. Finally, when a user clicks on the visualization associated with these token links, tokens will resolve to the values dynamically.</p>
+         <ul>
+                  <div style="margin-left:10px">
+                   <img src="/static/app/splunk_essentials_9_0/images/dash_studio_4.png" style="margin: 10px 0" width="700px"/>
+                  </div>
+
+                 </ul>
+
+        <p>1d. In addition to extracting more data from an individual visualization, tokens can also connect different visualizations together dynamically, as <a href="https://docs.splunk.com/Documentation/SplunkCloud/latest/DashStudio/tokens#Example_of_setting_a_token" target="_blank">shown here</a>.</p>
+        
+        <p><strong>2. Updated Visualizations (splunk.type)</strong></p>
+        
+        <p>2a. The new splunk.type visualizations include area, bar, column, ellipse, image, line, markdown, pie, rectangle, filler gauge, marker gauge and scatter. They are more flexible than the older set of viz.type visualizations and users can easily migrate their visualizations with one click in the configuration panel shown below.</p>
+        <ul>
+                  <div style="margin-left:10px">
+                   <img src="/static/app/splunk_essentials_9_0/images/dash_studio_5.png" style="margin: 10px 0" width="700px"/>
+                  </div>
+
+                 </ul>
+        <p>2b. While the primary benefit of these visualizations is the token setting capability described above, for non-chart visualizations like rectangle and ellipse, the new splunk.* versions also come with an improved editing UI for dynamic coloring.</p>
+        <ul>
+                  <div style="margin-left:10px">
+                   <img src="/static/app/splunk_essentials_9_0/images/dash_studio_6.png" style="margin: 10px 0" width="700px"/>
+                  </div>
+
+                 </ul>
+        <p><strong>3. View mode options</strong></p>
+        <p>3a. Dashboard Studio now provides a more curated dashboard viewing experience to differentiate from the separate use case of editing dashboards. We've added three new options to Dashboard Studio: (1) hide the <strong>Open in Search</strong> button, (2) hide the <strong>Edit</strong> button, and (3) hide the <strong>Export</strong> options.</p>
+        <ul>
+                  <div style="margin-left:10px">
+                   <img src="/static/app/splunk_essentials_9_0/images/dash_studio_7.png" style="margin: 10px 0" width="700px"/>
+                  </div>
+
+                 </ul>
+        <ul>
+                  <div style="margin-left:10px">
+                   <img src="/static/app/splunk_essentials_9_0/images/dash_studio_8.png" style="margin: 10px 0" width="700px"/>
+                  </div>
+
+                 </ul>
+        <ul>
+                  <div style="margin-left:10px">
+                   <img src="/static/app/splunk_essentials_9_0/images/dash_studio_9.png" style="margin: 10px 0" width="700px"/>
+                  </div>
+                  
+                 </ul>
+        <p> There are also several usability improvements that we’ve made since the last release. Learn more about them <a href="https://www.splunk.com/en_us/blog/platform/dashboard-studio-new-features-highlighted-conf21.html" target="_blank">here</a>!</p>
+
+        </html>
+    </panel>
+  </row>
+</dashboard>

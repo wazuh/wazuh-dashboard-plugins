@@ -1,0 +1,9 @@
+#   Version 9.0.3
+#
+# This file contains an example SPLUNK_HOME/etc/instance.cfg file; the
+# instance.cfg file is not to be modified or removed by user.  LEAVE THE
+# instance.cfg FILE ALONE.
+#
+
+[general]
+guid = B58A86D9-DF3D-4BF8-A426-DB85C231B699

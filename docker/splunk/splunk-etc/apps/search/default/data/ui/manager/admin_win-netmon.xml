@@ -1,0 +1,228 @@
+<endpoint name="data/inputs/WinNetMon">
+  <capabilities>
+    <read>edit_modinput_winnetmon</read>
+  </capabilities>
+  <header>Splunk network monitoring</header>
+  <breadcrumb>
+      <parent hidecurrent="False">datainputstats</parent>
+      <name i18ntag="">Splunk network monitoring</name>
+  </breadcrumb>  
+
+  <elements>
+    <!-- MONITOR NAME -->
+    <element name="name" type="textfield" label="Network monitor name">
+      <view name="list"/>
+      <view name="create"/>
+    </element>
+    
+    <!-- Address Family -->
+    <element name="addressFamily" type="hidden" label="Address Family">
+      <view name="list"/>
+      <view name="edit"/>
+      <view name="create"/>
+      <key name="processValueList">', '.join(sorted(value, key=str.lower)) if isinstance(value, list) and len(value)>0 else 'None'</key>
+      <key name="submitValueAdd">';'.join([key[12:] for key, value in form_data.items() if key.startswith('spl-ctrl_af_') and value == '1'])</key>
+      <key name="submitValueEdit">';'.join([key[12:] for key, value in form_data.items() if key.startswith('spl-ctrl_af_') and value == '1'])</key>
+    </element>
+    
+    <element name="addressFamily_types" type="fieldset">
+        <view name="edit"/>
+        <view name="create"/>
+        <view name="list"/>
+        <key name="legend">Address Family</key>
+        <elements>
+            <element name="spl-ctrl_af_ipv4" type="checkbox" label="ipv4">
+                <view name="edit"/>
+                <view name="create"/>
+                <key name="class">inline</key>
+                <key name="processValueAdd">1</key>
+                <key name="processValueEdit">1 if 'ipv4' in form_defaults['addressFamily'] else 0</key>
+            </element>
+            
+            <element name="spl-ctrl_af_ipv6" type="checkbox" label="ipv6">
+                <view name="edit"/>
+                <view name="create"/>
+                <key name="class">inline</key>
+                <key name="processValueAdd">1</key>
+                <key name="processValueEdit">1 if 'ipv6' in form_defaults['addressFamily'] else 0</key>
+            </element>            
+                        
+        </elements>
+    </element>
+    
+
+    <!-- Packet Type -->
+    <element name="packetType" type="hidden" label="Packet Type">
+      <view name="list"/>
+      <view name="edit"/>
+      <view name="create"/>
+      <key name="processValueList">', '.join(sorted(value, key=str.lower)) if isinstance(value, list) and len(value)>0 else 'None'</key>
+      <key name="submitValueAdd">';'.join([key[12:] for key, value in form_data.items() if key.startswith('spl-ctrl_pt_') and value == '1'])</key>
+      <key name="submitValueEdit">';'.join([key[12:] for key, value in form_data.items() if key.startswith('spl-ctrl_pt_') and value == '1'])</key>
+    </element>
+    
+    <element name="packetTypes" type="fieldset">
+        <view name="edit"/>
+        <view name="create"/>
+        <view name="list"/>
+        <key name="legend">Packet Type</key>
+        <elements>
+            <element name="spl-ctrl_pt_connect" type="checkbox" label="connect">
+                <view name="edit"/>
+                <view name="create"/>
+                <key name="class">inline</key>
+                <key name="processValueAdd">1</key>
+                <key name="processValueEdit">1 if 'connect' in form_defaults['packetType'] else 0</key>
+            </element>
+            
+            <element name="spl-ctrl_pt_accept" type="checkbox" label="accept">
+                <view name="edit"/>
+                <view name="create"/>
+                <key name="class">inline</key>
+                <key name="processValueAdd">1</key>
+                <key name="processValueEdit">1 if 'accept' in form_defaults['packetType'] else 0</key>
+            </element> 
+           
+            <element name="spl-ctrl_pt_transport" type="checkbox" label="transport">
+                <view name="edit"/>
+                <view name="create"/>
+                <key name="class">inline</key>
+                <key name="processValueAdd">0</key>
+                <key name="processValueEdit">1 if 'transport' in form_defaults['packetType'] else 0</key>
+            </element> 
+                        
+        </elements>
+    </element>
+
+    <!-- Direction -->
+    <element name="direction" type="hidden" label="Direction">
+      <view name="list"/>
+      <view name="edit"/>
+      <view name="create"/>
+      <key name="processValueList">', '.join(sorted(value, key=str.lower)) if isinstance(value, list) and len(value)>0 else 'None'</key>
+      <key name="submitValueAdd">';'.join([key[12:] for key, value in form_data.items() if key.startswith('spl-ctrl_dr_') and value == '1'])</key>
+      <key name="submitValueEdit">';'.join([key[12:] for key, value in form_data.items() if key.startswith('spl-ctrl_dr_') and value == '1'])</key>
+    </element>
+    
+    <element name="direction_types" type="fieldset">
+        <view name="edit"/>
+        <view name="create"/>
+        <view name="list"/>
+        <key name="legend">Direction</key>
+        <elements>
+            <element name="spl-ctrl_dr_inbound" type="checkbox" label="inbound">
+                <view name="edit"/>
+                <view name="create"/>
+                <key name="class">inline</key>
+                <key name="processValueAdd">1</key>
+                <key name="processValueEdit">1 if 'inbound' in form_defaults['direction'] else 0</key>
+            </element>
+            
+            <element name="spl-ctrl_dr_outbound" type="checkbox" label="outbound">
+                <view name="edit"/>
+                <view name="create"/>
+                <key name="class">inline</key>
+                <key name="processValueAdd">1</key>
+                <key name="processValueEdit">1 if 'outbound' in form_defaults['direction'] else 0</key>
+            </element>            
+                        
+        </elements>
+    </element>
+
+    <!-- Protocol -->
+    <element name="protocol" type="hidden" label="Protocol">
+      <view name="list"/>
+      <view name="edit"/>
+      <view name="create"/>
+      <key name="processValueList">', '.join(sorted(value, key=str.lower)) if isinstance(value, list) and len(value)>0 else 'None'</key>
+      <key name="submitValueAdd">';'.join([key[12:] for key, value in form_data.items() if key.startswith('spl-ctrl_pr_') and value == '1'])</key>
+      <key name="submitValueEdit">';'.join([key[12:] for key, value in form_data.items() if key.startswith('spl-ctrl_pr_') and value == '1'])</key>
+    </element>
+    
+    <element name="protocol_types" type="fieldset">
+        <view name="edit"/>
+        <view name="create"/>
+        <view name="list"/>
+        <key name="legend">Protocol</key>
+        <elements>
+            <element name="spl-ctrl_pr_tcp" type="checkbox" label="tcp">
+                <view name="edit"/>
+                <view name="create"/>
+                <key name="class">inline</key>
+                <key name="processValueAdd">1</key>
+                <key name="processValueEdit">1 if 'tcp' in form_defaults['protocol'] else 0</key>
+            </element>
+            
+            <element name="spl-ctrl_pr_udp" type="checkbox" label="udp">
+                <view name="edit"/>
+                <view name="create"/>
+                <key name="class">inline</key>
+                <key name="processValueAdd">1</key>
+                <key name="processValueEdit">1 if 'udp' in form_defaults['protocol'] else 0</key>
+            </element>            
+                        
+        </elements>
+    </element>
+
+    <!-- Remote Address -->
+    <element name="remoteAddress" type="textfield" label="Remote Address">
+      <view name="list"/>
+      <view name="edit"/>
+      <view name="create"/>
+      <key name="exampleText">Specifies remote address to monitor. Can be a regular expression.</key>
+      <key name="processValueList">'Automatic' if value is None else value</key>
+    </element>
+
+    <!-- Process -->
+    <element name="process" type="textfield" label="Process">
+      <view name="list"/>
+      <view name="edit"/>
+      <view name="create"/>
+      <key name="exampleText">Specifies process/application name to monitor. Can be a regular expression.</key>
+      <key name="processValueList">'Automatic' if value is None else value</key>
+    </element>
+
+    <!-- User -->
+    <element name="user" type="textfield" label="User">
+      <view name="list"/>
+      <view name="edit"/>
+      <view name="create"/>
+      <key name="exampleText">Specifies user name to monitor. Can be a regular expression.</key>
+      <key name="processValueList">'Automatic' if value is None else value</key>
+    </element>
+
+    <!-- INDEX -->
+      <element name="indexField" type="fieldset">
+          <view name="list"/>
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="legend">Index</key>
+          <key name="helpText">Set the destination index for this source.</key>
+          <elements>
+              <element name="index" type="select" label="Index">
+                  <view name="list"/>
+                  <view name="edit"/>
+                  <view name="create"/>
+                  <key name="dynamicOptions" type="dict">
+                      <key name="keyName">title</key>
+                      <key name="keyValue">title</key>
+                      <key name="splunkSource">/data/indexes</key>
+                      <key name="splunkSourceParams" type="dict">
+                          <key name="count">"-1"</key>
+                          <key name="datatype">"all"</key>
+                          <key name="search">"isInternal=0 disabled=0 isVirtual=0"</key>
+                      </key>
+                      <key name="prefixOptions" type="list">
+                          <item type="list">
+                              <item>default</item> <!--value-->
+                              <item>default</item> <!--label-->
+                          </item>
+                      </key>
+                  </key>
+                  <key name="processValueList">'default' if value is None else value</key>
+              </element>
+          </elements>
+      </element>
+
+  </elements>
+</endpoint>

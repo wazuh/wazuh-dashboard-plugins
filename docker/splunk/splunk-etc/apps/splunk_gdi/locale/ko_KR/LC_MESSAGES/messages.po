@@ -1,0 +1,286 @@
+# Translations template for PROJECT.
+# Copyright (C) 2018 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2018.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2018-08-28 14:28-0700\n"
+"PO-Revision-Date: 2018-08-31 09:12+0100\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.4\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ko_KR\n"
+"X-Generator: Poedit 2.1.1\n"
+
+#: splunk_gdi/appserver/static/js/components/AsyncImage.jsx:59
+msgid "Loading Now..."
+msgstr "지금 로드하는 중..."
+
+#: splunk_gdi/appserver/static/js/components/Dots.jsx:7
+msgid "Loading"
+msgstr "로드 중"
+
+#: splunk_gdi/appserver/static/js/pages/home.enterprise.jsx:10
+#: splunk_gdi/appserver/static/js/pages/home.lite.jsx:10
+#: splunk_gdi/appserver/static/js/views/Search/Master.lite.jsx:34
+msgid "Add Data"
+msgstr "데이터 추가"
+
+#: splunk_gdi/appserver/static/js/utils/messages.js:5
+msgid "No valid data source is found."
+msgstr "유효한 데이터 원본을 찾을 수 없습니다."
+
+#: splunk_gdi/appserver/static/js/utils/messages.js:6
+msgid "The id of this collection method is invalid."
+msgstr "이 수집 방법의 ID가 잘못되었습니다."
+
+#: splunk_gdi/appserver/static/js/utils/messages.js:7
+msgid "Mandatory fields are missing in the conf file."
+msgstr "conf 파일에 필수 필드가 없습니다."
+
+#: splunk_gdi/appserver/static/js/utils/messages.js:8
+msgid ""
+"The definition of resource server is missing in the response from the "
+"web service."
+msgstr "웹 서비스의 답변에 리소스 서버 정의가 없습니다."
+
+#: splunk_gdi/appserver/static/js/utils/messages.js:9
+msgid ""
+"Splunk data onboarding guides are not accessible. Please ensure an "
+"internet connection is available to access these guides."
+msgstr ""
+"Splunk 데이터 온보딩 가이드에 접근할 수 없습니다. 가이드에 액세스하려면 "
+"인터넷 연결을 사용할 수 있는지 확인하십시오."
+
+#: splunk_gdi/appserver/static/js/views/Search/DataSourceCard.jsx:13
+#, python-format
+msgid "images for %s"
+msgstr "%s에 대한 이미지"
+
+#: splunk_gdi/appserver/static/js/views/Search/DataSourceCard.jsx:42
+msgid "Configure now"
+msgstr "지금 설정"
+
+#: splunk_gdi/appserver/static/js/views/Search/DataSourceCard.jsx:45
+#, python-format
+msgid "%d data source"
+msgstr "%d개의 데이터 원본"
+
+#: splunk_gdi/appserver/static/js/views/Search/DataSourceCard.jsx:48
+#, python-format
+msgid "%d data sources"
+msgstr "%d개의 데이터 원본"
+
+#: splunk_gdi/appserver/static/js/views/Search/DataSourceContainer.jsx:60
+#, python-format
+msgid "%d data sources in total"
+msgstr "총 %d개의 데이터 원본"
+
+#: splunk_gdi/appserver/static/js/views/Search/DataSourceContainer.jsx:61
+#, python-format
+msgid "%d data source in total"
+msgstr "총 %d개의 데이터 원본"
+
+#: splunk_gdi/appserver/static/js/views/Search/Master.Header.jsx:5
+msgid "What data do you want to send to the Splunk platform?"
+msgstr "어떤 데이터를 Splunk 플랫폼으로 보내시겠습니까?"
+
+#: splunk_gdi/appserver/static/js/views/Search/Master.lite.jsx:35
+msgid "How do you want to add data?"
+msgstr "어떤 방법으로 데이터를 추가하시겠습니까?"
+
+#: splunk_gdi/appserver/static/js/views/Search/Master.resolved.jsx:11
+msgid "Or get data in with the following methods"
+msgstr "또는 다음 방법으로 데이터를 가져오십시오."
+
+#: splunk_gdi/appserver/static/js/views/Search/DataSourceModal/Master.jsx:90
+#: splunk_gdi/appserver/static/js/views/Search/SearchBarAndResult/SearchResult.jsx:72
+msgid ""
+"No guides matching your search were found. We are continuously adding "
+"new guides."
+msgstr ""
+"검색과 일치하는 가이드를 찾을 수 없습니다. Splunk는 새 가이드를 계속 추가"
+"합니다."
+
+#: splunk_gdi/appserver/static/js/views/Search/LegacyInputMethod/InputMethodsContainer.jsx:33
+msgid "Upload"
+msgstr "업로드"
+
+#: splunk_gdi/appserver/static/js/views/Search/LegacyInputMethod/InputMethodsContainer.jsx:34
+msgid "files from my computer"
+msgstr "내 컴퓨터의 파일"
+
+#: splunk_gdi/appserver/static/js/views/Search/LegacyInputMethod/InputMethodsContainer.jsx:35
+msgid "Local log files"
+msgstr "로컬 로그 파일"
+
+#: splunk_gdi/appserver/static/js/views/Search/LegacyInputMethod/InputMethodsContainer.jsx:35
+msgid "Local structured files (e.g. CSV)"
+msgstr "로컬에 있는 정형 파일(예: CSV)"
+
+#: splunk_gdi/appserver/static/js/views/Search/LegacyInputMethod/InputMethodsContainer.jsx:36
+msgid "Tutorial for adding data"
+msgstr "데이터 추가에 관한 튜토리얼"
+
+#: splunk_gdi/appserver/static/js/views/Search/LegacyInputMethod/InputMethodsContainer.jsx:44
+msgid "Monitor"
+msgstr "모니터"
+
+#: splunk_gdi/appserver/static/js/views/Search/LegacyInputMethod/InputMethodsContainer.jsx:45
+msgid "files and ports on this Splunk platform instance"
+msgstr "이 Splunk 플랫폼 인스턴스의 파일 및 포트"
+
+#: splunk_gdi/appserver/static/js/views/Search/LegacyInputMethod/InputMethodsContainer.jsx:47
+msgid "Files - HTTP - WMI - TCP/UDP - Scripts"
+msgstr "파일 - HTTP - WMI - TCP/UDP - 스크립트"
+
+#: splunk_gdi/appserver/static/js/views/Search/LegacyInputMethod/InputMethodsContainer.jsx:48
+msgid "Modular inputs for external data sources"
+msgstr "외부 데이터 원본에 대한 모듈식 입력"
+
+#: splunk_gdi/appserver/static/js/views/Search/LegacyInputMethod/InputMethodsContainer.jsx:57
+msgid "Forward"
+msgstr "전달"
+
+#: splunk_gdi/appserver/static/js/views/Search/LegacyInputMethod/InputMethodsContainer.jsx:58
+msgid "data from a Splunk forwarder"
+msgstr "Splunk 포워더의 데이터"
+
+#: splunk_gdi/appserver/static/js/views/Search/LegacyInputMethod/InputMethodsContainer.jsx:59
+msgid "Files - TCP/UDP - Scripts"
+msgstr "파일 - TCP/UDP - 스크립트"
+
+#: splunk_gdi/appserver/static/js/views/Search/SearchBarAndResult/Master.jsx:13
+msgid "Follow guides for onboarding popular data sources"
+msgstr "인기 데이터 원본 온보딩 가이드 준수"
+
+#: splunk_gdi/appserver/static/js/views/Search/SearchBarAndResult/SearchBar.jsx:57
+msgid "Search bar"
+msgstr "검색란"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepControl.jsx:26
+msgid "Exit"
+msgstr "종료"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepControl.jsx:27
+msgid "Back"
+msgstr "뒤로"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepControl.jsx:28
+msgid "Finish"
+msgstr "마침"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepControl.jsx:29
+msgid "Next"
+msgstr "다음"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepControl.jsx:30
+msgid "No"
+msgstr "아니요"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepControl.jsx:31
+msgid "Yes"
+msgstr "예"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepControl.jsx:32
+msgid "Confirm"
+msgstr "확인"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepControl.jsx:33
+msgid "Exit guide?"
+msgstr "가이드를 종료할까요?"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepHeader.jsx:11
+msgid "Collection Method"
+msgstr "수집 방법"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepHeader.jsx:12
+msgid "Configurations"
+msgstr "설정"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepHeader.jsx:13
+msgid "Validation"
+msgstr "유효성 검사"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepCollectionMethod/CollectionMethodCard.jsx:28
+msgid "Best Practice"
+msgstr "베스트 프랙티스"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepCollectionMethod/Master.jsx:43
+msgid "Choose collection method"
+msgstr "수집 방법 선택"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepTopology/BlankDeployment.jsx:8
+msgid "Please select deployment"
+msgstr "배포를 선택하십시오."
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepTopology/ConfigurationContainer.jsx:12
+msgid "High level steps"
+msgstr "고급 단계"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepTopology/ConfigurationContainer.jsx:13
+msgid "Full Configuration Documentation"
+msgstr "전체 설정 매뉴얼"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepTopology/Master.jsx:28
+msgid "Choose your deployment environment"
+msgstr "배포 환경을 선택하십시오."
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepTopology/Master.jsx:29
+msgid "Overview of required configuration for your environment"
+msgstr "환경에 대한 필수 설정의 개요"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepTopology/Master.jsx:30
+msgid "Deployment Diagram"
+msgstr "배포 다이어그램"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepTopology/Master.jsx:31
+msgid ""
+"Select options on the left describing your distributed deployment "
+"configuration"
+msgstr "왼쪽에서 분산 배포 설정을 설명하는 옵션을 선택하십시오."
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepTopology/Master.jsx:32
+msgid "Select the option above that describes your Splunk deployment"
+msgstr "위에서 귀하의 Splunk 배포를 설명하는 옵션을 선택하십시오."
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepTopology/Master.jsx:33
+msgid ""
+"An overview of the configuration required for your deployment will be "
+"shown here"
+msgstr "배포에 필요한 설정의 개요가 여기에 표시됩니다."
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepValidation/Master.jsx:58
+#, python-format
+msgid "From the %s, enter the query below."
+msgstr "%s에서 아래 쿼리를 입력하십시오."
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepValidation/Master.jsx:59
+msgid "Verify your data is being ingested"
+msgstr "데이터가 수집되고 있는지 확인하십시오."
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepValidation/Master.jsx:60
+msgid ""
+"Use the following SPL query to verify that your data is indexed and "
+"searchable"
+msgstr ""
+"데이터가 인덱싱되고 검색 가능한지 확인하려면 다음 SPL 쿼리를 사용하십시"
+"오."
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepValidation/Master.jsx:61
+msgid "Search & Reporting app"
+msgstr "Search & Reporting 앱"
+
+#: splunk_gdi/appserver/templates/home_template.html:21
+msgid "Loading..."
+msgstr "로드 중..."
+
+#: splunk_gdi/default/app.conf:12 splunk_gdi/default/app.conf:17
+msgid "Splunk Get Data In"
+msgstr "Splunk 데이터 가져오기"

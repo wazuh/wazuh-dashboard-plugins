@@ -1,0 +1,822 @@
+    <form version="1.1" hideEdit="True" onUnloadCancelJobs="true" script="common_control.js">
+  <label>Search Activity: Instance</label>
+  <description/>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="radio" searchWhenChanged="true" token="role">
+      <label>Role</label>
+      <choice value="dmc_group_search_head">Search Heads</choice>
+      <choice value="dmc_group_indexer">Indexers</choice>
+      <default>dmc_group_search_head</default>
+    </input>
+    <input type="dropdown" searchWhenChanged="true" token="dmc_group">
+      <label>Group</label>
+      <showClearButton>false</showClearButton>
+      <search>
+        <query>
+          | `dmc_get_groups_containing_role($role$)`
+          | search search_group!="dmc_group_*"
+        </query>
+      </search>
+      <fieldForLabel>label</fieldForLabel>
+      <fieldForValue>search_group</fieldForValue>
+      <choice value="*">All</choice>
+      <selectFirstChoice>true</selectFirstChoice>
+    </input>
+    <input type="dropdown" searchWhenChanged="true" token="splunk_server">
+      <label>Instance</label>
+      <showClearButton>false</showClearButton>
+      <populatingSearch fieldForLabel="serverName" fieldForValue="serverName">
+        | `dmc_get_instance_info($dmc_group$)`
+        | where search_group="$role$"
+      </populatingSearch>
+      <selectFirstChoice>true</selectFirstChoice>
+      <change>
+        <condition value="*">
+          <set token="host">$row.host$</set>
+        </condition>
+      </change>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <html>
+        <h2>
+          <span>Select views: </span>
+          <span id="link-switcher-view">
+            <a href="#" class="btn-pill active" data-item="all">All</a>
+            <a href="#" class="btn-pill" data-item="snapshot">Snapshot</a>
+            <a href="#" class="btn-pill" data-item="historical">Historical</a>
+          </span>
+        </h2>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Snapshots</title>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Search Concurrency (Running/Limit)</title>
+      <search id="snapshot_search_concurrency_base">
+        <query>
+          | rest splunk_server=$splunk_server$ /services/server/status/resource-usage/splunk-processes
+          | where process_type = "search"
+        </query>
+      </search>
+      <search base="snapshot_search_concurrency_base">
+        <query>
+          | stats count(eval(('search_props.type'=="scheduled" OR 'search_props.type'=="summary indexing" OR 'search_props.type'=="report acceleration" OR 'search_props.type'=="datamodel acceleration" OR 'search_props.type'=="ad-hoc") AND ('search_props.mode'=="historical" OR 'search_props.mode'=="historical batch"))) as count_total_hist,
+          count(eval(('search_props.type'=="scheduled" OR 'search_props.type'=="summary indexing" OR 'search_props.type'=="report acceleration" OR 'search_props.type'=="datamodel acceleration" OR 'search_props.type'=="ad-hoc") AND ('search_props.mode'=="RT" OR 'search_props.mode'=="RT indexed"))) as count_total_rt,
+          count(eval(('search_props.type'=="scheduled" OR 'search_props.type'=="summary indexing" OR 'search_props.type'=="report acceleration" OR 'search_props.type'=="datamodel acceleration") AND ('search_props.mode'=="historical" OR 'search_props.mode'=="historical batch"))) as count_hist_scheduled_search,
+          count(eval(('search_props.type'=="scheduled" OR 'search_props.type'=="summary indexing" OR 'search_props.type'=="report acceleration" OR 'search_props.type'=="datamodel acceleration") AND ('search_props.mode'=="RT" OR 'search_props.mode'=="RT indexed"))) as count_rt_scheduled_search,
+          count(eval(('search_props.type'=="report acceleration" OR 'search_props.type'=="datamodel acceleration"))) as count_auto_summary_search by splunk_server,      
+          | eval count_total_hist = if(isnull(count_total_hist) OR count_total_hist=="", 0, count_total_hist)
+          | eval count_total_rt = if(isnull(count_total_rt) OR count_total_rt=="", 0, count_total_rt)
+          | eval count_hist_scheduled_search = if(isnull(count_hist_scheduled_search) OR count_hist_scheduled_search=="", 0, count_hist_scheduled_search)
+          | eval count_rt_scheduled_search = if(isnull(count_rt_scheduled_search) OR count_rt_scheduled_search=="", 0, count_rt_scheduled_search)
+          | eval count_auto_summary_search = if(isnull(count_auto_summary_search) OR count_auto_summary_search=="", 0, count_auto_summary_search)
+          | eval count_total_adhoc_scheduled_search = count_total_hist + count_total_rt
+          | eval count_total_scheduled_search = count_hist_scheduled_search + count_rt_scheduled_search
+        </query>
+        <finalized>
+          <eval token="count_total_hist">if(isnotnull('result.count_total_hist'), 'result.count_total_hist', 0)</eval>
+          <eval token="count_total_rt">if(isnotnull('result.count_total_rt'), 'result.count_total_rt', 0)</eval>
+          <eval token="count_total_adhoc_scheduled_search">if(isnotnull('result.count_total_adhoc_scheduled_search'), 'result.count_total_adhoc_scheduled_search', 0)</eval>
+          <eval token="count_hist_scheduled_search">if(isnotnull('result.count_hist_scheduled_search'), 'result.count_hist_scheduled_search', 0)</eval>
+          <eval token="count_rt_scheduled_search">if(isnotnull('result.count_rt_scheduled_search'), 'result.count_rt_scheduled_search', 0)</eval>
+          <eval token="count_auto_summary_search">if(isnotnull('result.count_auto_summary_search'), 'result.count_auto_summary_search', 0)</eval>
+          <eval token="count_total_scheduled_search">if(isnotnull('result.count_total_scheduled_search'), 'result.count_total_scheduled_search', 0)</eval>
+        </finalized>
+        <progress>
+          <eval token="count_total_hist">if(isnotnull('result.count_total_hist'), 'result.count_total_hist', 0)</eval>
+          <eval token="count_total_rt">if(isnotnull('result.count_total_rt'), 'result.count_total_rt', 0)</eval>
+          <eval token="count_total_adhoc_scheduled_search">if(isnotnull('result.count_total_adhoc_scheduled_search'), 'result.count_total_adhoc_scheduled_search', 0)</eval>
+          <eval token="count_hist_scheduled_search">if(isnotnull('result.count_hist_scheduled_search'), 'result.count_hist_scheduled_search', 0)</eval>
+          <eval token="count_rt_scheduled_search">if(isnotnull('result.count_rt_scheduled_search'), 'result.count_rt_scheduled_search', 0)</eval>
+          <eval token="count_auto_summary_search">if(isnotnull('result.count_auto_summary_search'), 'result.count_auto_summary_search', 0)</eval>
+          <eval token="count_total_scheduled_search">if(isnotnull('result.count_total_scheduled_search'), 'result.count_total_scheduled_search', 0)</eval>
+        </progress>
+      </search>
+      <search id="search_concurrency_limits_base">
+        <query>
+          | rest splunk_server=$splunk_server$ /services/server/status/limits/search-concurrency
+        </query>
+      </search>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Ad hoc + Scheduled Searches ($count_total_adhoc_scheduled_search$ Running)</title>
+      <single>
+        <search base="search_concurrency_limits_base">
+          <query>
+            eval total_historical_vs_limit = "$count_total_hist$"."/".max_hist_searches
+            | fields total_historical_vs_limit
+          </query>
+        </search>
+        <option name="underLabel">Historical</option>
+        <option name="height">80px</option>
+        <option name="drilldown">all</option>
+        <drilldown>
+          <set token="show_total_hist_search_details">true</set>
+          <unset token="show_total_rt_search_details"></unset>
+          <unset token="show_hist_search_details"></unset>
+          <unset token="show_rt_search_details"></unset>
+          <unset token="show_summarization_search_details"></unset>
+        </drilldown>
+      </single>
+      <single>
+        <search base="search_concurrency_limits_base">
+          <query>
+            eval total_rt_vs_limit = "$count_total_rt$"."/".max_rt_searches
+            | fields total_rt_vs_limit
+          </query>
+        </search>
+        <option name="underLabel">Real-time</option>
+        <option name="height">80px</option>
+        <option name="drilldown">all</option>
+        <drilldown>
+          <unset token="show_total_hist_search_details"></unset>
+          <set token="show_total_rt_search_details">true</set>
+          <unset token="show_hist_search_details"></unset>
+          <unset token="show_rt_search_details"></unset>
+          <unset token="show_summarization_search_details"></unset>
+        </drilldown>
+      </single>
+    </panel>
+    <panel rejects="$historical$">
+      <title>Scheduled Searches ($count_total_scheduled_search$ Running)</title>
+      <single>
+        <search base="search_concurrency_limits_base">
+          <query>
+            eval scheduled_vs_total_hist_scheduled_search_limit = "$count_hist_scheduled_search$"."/".max_hist_scheduled_searches
+            | fields scheduled_vs_total_hist_scheduled_search_limit
+          </query>
+        </search>
+        <option name="underLabel">Historical</option>
+        <option name="height">80px</option>
+        <option name="drilldown">all</option>
+        <drilldown>
+          <unset token="show_total_hist_search_details"></unset>
+          <unset token="show_total_rt_search_details"></unset>
+          <set token="show_hist_search_details">true</set>
+          <unset token="show_rt_search_details"></unset>
+          <unset token="show_summarization_search_details"></unset>
+        </drilldown>
+      </single>
+      <single>
+        <search base="search_concurrency_limits_base">
+          <query>
+            eval scheduled_vs_total_rt_scheduled_search_limit = "$count_rt_scheduled_search$"."/".max_rt_scheduled_searches
+            | fields scheduled_vs_total_rt_scheduled_search_limit
+          </query>
+        </search>
+        <option name="underLabel">Real-time</option>
+        <option name="height">80px</option>
+        <option name="drilldown">all</option>
+        <drilldown>
+          <unset token="show_total_hist_search_details"></unset>
+          <unset token="show_total_rt_search_details"></unset>
+          <unset token="show_hist_search_details"></unset>
+          <set token="show_rt_search_details">true</set>
+          <unset token="show_summarization_search_details"></unset>
+        </drilldown>
+      </single>
+      <single>
+        <search base="search_concurrency_limits_base">
+          <query>
+            eval scheduled_vs_total_auto_summary_search_limit = "$count_auto_summary_search$"."/".max_auto_summary_searches
+            | fields scheduled_vs_total_auto_summary_search_limit
+          </query>
+        </search>
+        <option name="underLabel">Summarization</option>
+        <option name="height">80px</option>
+        <option name="drilldown">all</option>
+        <drilldown>
+          <unset token="show_total_hist_search_details"></unset>
+          <unset token="show_total_rt_search_details"></unset>
+          <unset token="show_hist_search_details"></unset>
+          <unset token="show_rt_search_details"></unset>
+          <set token="show_summarization_search_details">true</set>
+        </drilldown>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <html>
+        <p>
+          Click to see more details.
+        </p>
+        <p>
+        Search concurrency limits can be set in limits.conf. <a href="/help?location=learnmore.admin.limitsconf" target="_blank" class="external">Learn More</a>
+        </p>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel depends="$show_total_hist_search_details$" rejects="$historical$">
+      <title>Ad hoc + Scheduled Historical Search Concurrency Details</title>
+      <table>
+        <search base="snapshot_search_concurrency_base">
+          <query>
+            where ('search_props.type'=="scheduled" OR 'search_props.type'=="summary indexing" OR 'search_props.type'=="report acceleration" OR 'search_props.type'=="datamodel acceleration" OR 'search_props.type'=="ad-hoc") AND ('search_props.mode'=="historical" OR 'search_props.mode'=="historical batch")
+            | eval mem_used = round(mem_used, 0)
+            | eval count_cpu = round(pct_cpu / 100.0, 2)
+            | eval elapsed = round(elapsed, 0)
+            | fields search_props.sid, search_props.label, search_props.app, search_props.user, search_props.type, search_props.mode, search_props.role, mem_used, count_cpu, elapsed
+            | rename search_props.sid as SID, search_props.label as "Search Name", search_props.app as App, search_props.user as User, search_props.type as Type, search_props.mode as Mode, search_props.role as Role, mem_used as "Memory Used (MB)", count_cpu as "CPU Usage (# cores)", elapsed as "Time Elapsed (sec)"
+          </query>
+        </search>
+        <drilldown target="_blank">
+          <link target="_blank"><![CDATA[
+            search?q=`dmc_get_last_hour_resource_usage_from_sid($host$, $click.value$)`&display.page.search.mode=verbose&latest=&display.page.search.tab=visualizations&display.general.type=visualizations]]>
+          </link>
+        </drilldown>
+      </table>
+      <html>
+        <a data-unset-token="show_total_hist_search_details">Close this panel</a>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel depends="$show_total_rt_search_details$" rejects="$historical$">
+      <title>Ad hoc + Scheduled Real-time Search Concurrency Details</title>
+      <table>
+        <search base="snapshot_search_concurrency_base">
+          <query>
+            where ('search_props.type'=="scheduled" OR 'search_props.type'=="summary indexing" OR 'search_props.type'=="report acceleration" OR 'search_props.type'=="datamodel acceleration" OR 'search_props.type'=="ad-hoc") AND ('search_props.mode'=="RT" OR 'search_props.mode'=="RT indexed")
+            | eval mem_used = round(mem_used, 0)
+            | eval count_cpu = round(pct_cpu / 100.0, 2)
+            | eval elapsed = round(elapsed, 0)
+            | fields search_props.sid, search_props.label, search_props.app, search_props.user, search_props.type, search_props.mode, search_props.role, mem_used, count_cpu, elapsed
+            | rename search_props.sid as SID, search_props.label as "Search Name", search_props.app as App, search_props.user as User, search_props.type as Type, search_props.mode as Mode, search_props.role as Role, mem_used as "Memory Used (MB)", count_cpu as "CPU Usage (# cores)", elapsed as "Time Elapsed (sec)"
+          </query>
+        </search>
+        <drilldown target="_blank">
+          <link target="_blank"><![CDATA[
+            search?q=`dmc_get_last_hour_resource_usage_from_sid($host$, $click.value$)`&display.page.search.mode=verbose&latest=&display.page.search.tab=visualizations&display.general.type=visualizations]]>
+          </link>
+        </drilldown>
+      </table>
+      <html>
+        <a data-unset-token="show_total_rt_search_details">Close this panel</a>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel depends="$show_hist_search_details$" rejects="$historical$">
+      <title>Scheduled Historical Search Concurrency Details</title>
+      <table>
+        <search base="snapshot_search_concurrency_base">
+          <query>
+            where ('search_props.type'=="scheduled" OR 'search_props.type'=="summary indexing" OR 'search_props.type'=="report acceleration" OR 'search_props.type'=="datamodel acceleration") AND ('search_props.mode'=="historical" OR 'search_props.mode'=="historical batch")
+            | eval mem_used = round(mem_used, 0)
+            | eval count_cpu = round(pct_cpu / 100.0, 2)
+            | eval elapsed = round(elapsed, 0)
+            | fields search_props.sid, search_props.label, search_props.app, search_props.user, search_props.type, search_props.mode, search_props.role, mem_used, count_cpu, elapsed
+            | rename search_props.sid as SID, search_props.label as "Search Name", search_props.app as App, search_props.user as User, search_props.type as Type, search_props.mode as Mode, search_props.role as Role, mem_used as "Memory Used (MB)", count_cpu as "CPU Usage (# cores)", elapsed as "Time Elapsed (sec)"
+          </query>
+        </search>
+        <drilldown target="_blank">
+          <link target="_blank"><![CDATA[
+            search?q=`dmc_get_last_hour_resource_usage_from_sid($host$, $click.value$)`&display.page.search.mode=verbose&latest=&display.page.search.tab=visualizations&display.general.type=visualizations]]>
+          </link>
+        </drilldown>
+      </table>
+      <html>
+        <a data-unset-token="show_hist_search_details">Close this panel</a>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel depends="$show_rt_search_details$" rejects="$historical$">
+      <title>Scheduled Real-time Concurrency Search Details</title>
+      <table>
+        <search base="snapshot_search_concurrency_base">
+          <query>
+            where ('search_props.type'=="scheduled" OR 'search_props.type'=="summary indexing" OR 'search_props.type'=="report acceleration" OR 'search_props.type'=="datamodel acceleration") AND ('search_props.mode'=="RT" OR 'search_props.mode'=="RT indexed")
+            | eval mem_used = round(mem_used, 0)
+            | eval count_cpu = round(pct_cpu / 100.0, 2)
+            | eval elapsed = round(elapsed, 0)
+            | fields search_props.sid, search_props.label, search_props.app, search_props.user, search_props.type, search_props.mode, search_props.role, mem_used, count_cpu, elapsed
+            | rename search_props.sid as SID, search_props.label as "Search Name", search_props.app as App, search_props.user as User, search_props.type as Type, search_props.mode as Mode, search_props.role as Role, mem_used as "Memory Used (MB)", count_cpu as "CPU Usage (# cores)", elapsed as "Time Elapsed (sec)"
+          </query>
+        </search>
+        <drilldown target="_blank">
+          <link target="_blank"><![CDATA[
+            search?q=`dmc_get_last_hour_resource_usage_from_sid($host$, $click.value$)`&display.page.search.mode=verbose&latest=&display.page.search.tab=visualizations&display.general.type=visualizations]]>
+          </link>
+        </drilldown>
+      </table>
+      <html>
+        <a data-unset-token="show_rt_search_details">Close this panel</a>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel depends="$show_summarization_search_details$" rejects="$historical$">
+      <title>Summarization Search Details</title>
+      <table>
+        <search base="snapshot_search_concurrency_base">
+          <query>
+            where ('search_props.type'=="report acceleration" OR 'search_props.type'=="datamodel acceleration")
+            | eval mem_used = round(mem_used, 0)
+            | eval count_cpu = round(pct_cpu / 100.0, 2)
+            | eval elapsed = round(elapsed, 0)
+            | fields search_props.sid, search_props.label, search_props.app, search_props.user, search_props.type, search_props.mode, search_props.role, mem_used, count_cpu, elapsed
+            | rename search_props.sid as SID, search_props.label as "Search Name", search_props.app as App, search_props.user as User, search_props.type as Type, search_props.mode as Mode, search_props.role as Role, mem_used as "Memory Used (MB)", count_cpu as "CPU Usage (# cores)", elapsed as "Time Elapsed (sec)"
+          </query>
+        </search>
+        <drilldown target="_blank">
+          <link target="_blank"><![CDATA[
+            search?q=`dmc_get_last_hour_resource_usage_from_sid($host$, $click.value$)`&display.page.search.mode=verbose&latest=&display.page.search.tab=visualizations&display.general.type=visualizations]]>
+          </link>
+        </drilldown>
+      </table>
+      <html>
+        <a data-unset-token="show_summarization_search_details">Close this panel</a>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Search Activity</title>
+      <input type="dropdown" token="resourceSnapshotSplitBy" searchWhenChanged="true">
+        <label>Split by</label>
+        <showClearButton>false</showClearButton>
+        <default>type</default>
+        <choice value="app">App</choice>
+        <choice value="user">User</choice>
+        <choice value="mode">Mode</choice>
+        <choice value="type">Type</choice>
+        <choice value="role">Role</choice>
+        <choice value="search_head">Dispatching Search Head</choice>
+        <choice value="label">Search Name</choice>
+        <choice value="provenance">Provenance</choice>
+        <choice value="workload_pool">Workload Pool</choice>
+        <change>
+          <condition value="mode">
+            <set token="resourceSnapshotModeDoc">true</set>
+            <set token="resourceSnapshotSplitByLabel">$label$</set>
+          </condition>
+          <condition value="*">
+            <unset token="resourceSnapshotModeDoc"></unset>
+            <set token="resourceSnapshotSplitByLabel">$label$</set>
+          </condition>
+        </change>
+      </input>
+      <table>
+        <searchString>
+| rest splunk_server=$splunk_server$ /services/server/status/resource-usage/splunk-processes
+| eval search_props.provenance = if(isnull('search_props.provenance') AND isnotnull('search_props.sid'), "unknown", 'search_props.provenance')
+| eval search_props.label = if(isnull('search_props.label') AND isnotnull('search_props.sid'), "N/A", 'search_props.label')
+| search search_props.sid=* AND pct_cpu=* AND mem_used=*
+| stats dc(search_props.sid) AS Count sum(pct_cpu) as sum_pct_cpu sum(mem_used) as mem_used by search_props.$resourceSnapshotSplitBy$
+| sort -Count -sum_pct_cpu -mem_used
+| eval count_cpu = round(sum_pct_cpu / 100.0, 2)
+| rename app AS App user AS User mode AS Mode type AS Type role AS Role Count as "Count of Searches", count_cpu as "CPU Usage (# cores)", mem_used as "Physical Memory Usage (MB)", search_props.$resourceSnapshotSplitBy$ as "$resourceSnapshotSplitByLabel$"
+        </searchString>
+        <earliestTime>$time.earliest$</earliestTime>
+        <latestTime>$time.latest$</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">table</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.axisTitleX.text">Count</option>
+        <option name="charting.axisTitleY.text">Count</option>
+        <option name="refresh.auto.interval">60</option>
+        <option name="refresh.time.visible">false</option>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <drilldown>
+          <condition field="*"></condition>
+        </drilldown>
+      </table>
+      <html depends="$resourceSnapshotModeDoc$">
+        <p>Mode can be historical, historical batch, RT, or RT indexed.</p>
+        <p>CPU usage is expressed in total number of CPU cores cumulatively used by search processes.</p>
+      </html>
+      <html rejects="$resourceSnapshotModeDoc$">
+        <p>CPU usage is expressed in total number of CPU cores cumulatively used by search processes.</p>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Historical Charts</title>
+      <input type="time" searchWhenChanged="true" token="time">
+        <label>Time Range:</label>
+        <default>
+          <earliestTime>-4h@m</earliestTime>
+          <latestTime>now</latestTime>
+        </default>
+      </input>
+    </panel>
+  </row>
+
+  <row>
+    <panel rejects="$snapshot$">
+      <title>$concurrencyFuncLabel$ Search Concurrency</title>
+      <input type="dropdown" token="concurrencyFunction" searchWhenChanged="true">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <default>Median</default>
+        <choice value="Avg">Average</choice>
+        <choice value="Median">Median</choice>
+        <choice value="Min">Minimum</choice>
+        <choice value="Max">Maximum</choice>
+        <choice value="Perc90">90th Percentile</choice>
+        <choice value="First">Sampled</choice>
+        <change>
+          <set token="concurrencyFuncLabel">$label$</set>
+        </change>
+      </input>
+      <input type="dropdown" token="concurrencySplitBy" searchWhenChanged="true">
+        <label>Split by</label>
+        <showClearButton>false</showClearButton>
+        <default>type</default>
+        <choice value="app">App</choice>
+        <choice value="user">User</choice>
+        <choice value="mode">Mode</choice>
+        <choice value="type">Type</choice>
+        <choice value="role">Role</choice>
+        <choice value="search_head">Dispatching Search Head</choice>
+        <choice value="label">Search Name</choice>
+        <choice value="provenance">Provenance</choice>
+        <choice value="workload_pool">Workload Pool</choice>
+        <change>
+          <condition value="mode">
+            <set token="concurrencyModeDoc">true</set>
+          </condition>
+          <condition value="*">
+            <unset token="concurrencyModeDoc"></unset>
+          </condition>
+        </change>
+      </input>
+      <chart>
+        <searchString>
+        `dmc_set_index_introspection` host=$host$ sourcetype=splunk_resource_usage component=PerProcess data.search_props.sid::*
+        | `dmc_rename_introspection_fields`
+        | `dmc_set_bin`
+        | stats dc(sid) AS distinct_search_count by _time, $concurrencySplitBy$
+        | `dmc_timechart` $concurrencyFunction$(distinct_search_count) AS "$concurrencyFunction$ of search concurrency" by $concurrencySplitBy$
+        </searchString>
+        <earliestTime>$time.earliest$</earliestTime>
+        <latestTime>$time.latest$</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Count</option>
+        <!-- <option name="refresh.auto.interval">300</option> -->
+        <drilldown target="_blank">
+            <condition series="*">
+                <link target="_blank"><![CDATA[search?q=`dmc_search_activity_instance_drilldown($host$, $concurrencySplitBy$, $click.name2$)`&earliest=$earliest$&latest=$latest$]]></link>
+            </condition>
+        </drilldown>
+      </chart>
+      <html depends="$concurrencyModeDoc$">
+        <p>Mode can be historical, historical batch, RT, or RT indexed.</p>
+      </html>
+    </panel>
+  </row>
+
+  <row>
+    <panel rejects="$snapshot$">
+      <title>$resourceFuncLabel$ Resource Usage of Searches</title>
+      <input type="dropdown" token="resourceType" searchWhenChanged="true">
+        <label>Resource Type</label>
+        <showClearButton>false</showClearButton>
+        <choice value="pct_cpu">CPU</choice>
+        <choice value="mem_used">Memory</choice>
+        <default>pct_cpu</default>
+        <change>
+          <condition value="pct_cpu">
+            <set token="usageYAxis">CPU Usage (# cores)</set>
+            <set token="cpuDisplayMsg">CPU usage is expressed in total number of CPU cores cumulatively used by search processes.</set>
+          </condition>
+          <condition value="mem_used">
+            <set token="usageYAxis">Memory Usage (MB)</set>
+            <set token="cpuDisplayMsg"> </set>
+          </condition>
+        </change>
+      </input>
+      <input type="dropdown" token="resourceFunction" searchWhenChanged="true">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <default>Median</default>
+        <choice value="Avg">Average</choice>
+        <choice value="Median">Median</choice>
+        <choice value="Min">Minimum</choice>
+        <choice value="Max">Maximum</choice>
+        <choice value="Perc90">90th Percentile</choice>
+        <choice value="First">Sampled</choice>
+        <change>
+          <set token="resourceFuncLabel">$label$</set>
+        </change>
+      </input>
+      <input type="dropdown" token="resourceSplitBy" searchWhenChanged="true">
+        <label>Split by</label>
+        <showClearButton>false</showClearButton>
+        <default>type</default>
+        <choice value="app">App</choice>
+        <choice value="user">User</choice>
+        <choice value="mode">Mode</choice>
+        <choice value="type">Type</choice>
+        <choice value="role">Role</choice>
+        <choice value="search_head">Dispatching Search Head</choice>
+        <choice value="label">Search Name</choice>
+        <choice value="provenance">Provenance</choice>
+        <choice value="workload_pool">Workload Pool</choice>
+        <change>
+          <condition value="mode">
+            <set token="resourceModeDoc">true</set>
+          </condition>
+          <condition value="*">
+            <unset token="resourceModeDoc"></unset>
+          </condition>
+        </change>
+      </input>
+      <chart>
+        <searchString>
+        `dmc_set_index_introspection` host=$host$ sourcetype=splunk_resource_usage component=PerProcess data.search_props.sid::*
+        | `dmc_rename_introspection_fields`
+        | `dmc_set_bin`
+        | stats latest($resourceType$) AS resource_usage_dedup by _time, $resourceSplitBy$, sid, pid
+        | stats sum(resource_usage_dedup) AS sum_resource_usage by _time,  $resourceSplitBy$
+        | eval sum_resource_usage = if("$resourceType$" == "pct_cpu", round(sum_resource_usage / 100.0, 2), sum_resource_usage)
+        | `dmc_timechart` $resourceFunction$(sum_resource_usage) AS "$resourceFunction$ of resource usage" by $resourceSplitBy$
+        </searchString>
+        <earliestTime>$time.earliest$</earliestTime>
+        <latestTime>$time.latest$</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="list.drilldown">full</option>
+        <option name="list.wrap">1</option>
+        <option name="maxLines">5</option>
+        <option name="raw.drilldown">full</option>
+        <option name="rowNumbers">false</option>
+        <option name="table.drilldown">all</option>
+        <option name="table.wrap">1</option>
+        <option name="type">list</option>
+        <option name="wrap">true</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="charting.axisTitleY.text">$usageYAxis$</option>
+        <!-- <option name="refresh.auto.interval">300</option> -->
+        <drilldown target="_blank">
+          <condition series="*">
+              <link target="_blank"><![CDATA[search?q=`dmc_search_activity_instance_drilldown($host$, $resourceSplitBy$, $click.name2$)`&earliest=$earliest$&latest=$latest$]]></link>
+          </condition>
+        </drilldown>
+      </chart>
+      <html depends="$resourceModeDoc$">
+        <p>Mode can be historical, historical batch, RT, or RT indexed.</p>
+        <p>$cpuDisplayMsg$</p>
+      </html>
+      <html rejects="$resourceModeDoc$">
+        <p>$cpuDisplayMsg$</p>
+      </html>
+    </panel>
+  </row>
+
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Top 20 Memory-Consuming Searches</title>
+      <table>
+        <searchString>
+        `dmc_set_index_introspection` host=$host$ sourcetype=splunk_resource_usage data.search_props.sid::* data.search_props.mode!=RT
+        | `dmc_rename_introspection_fields`
+        | stats max(elapsed) as runtime max(mem_used) as mem_used earliest(_time) as _time by sid, label, provenance, type, mode, app, role, search_head, user
+        | eval mem_used = round(mem_used, 2)
+        | sort 20 - mem_used
+        | fields - day, hour, minute, second
+        | eval _time = strftime(_time,"%+")
+        | rename sid as SID, label as "Search Name", provenance AS Provenance, type as Type, mode as Mode, app as App, role as Role, search_head as "Search Head", user as User, mem_used as "Memory Usage (MB)", _time as Started, runtime as Runtime
+        | fieldformat Runtime = `dmc_convert_runtime(Runtime)`
+        </searchString>
+        <earliestTime>$time.earliest$</earliestTime>
+        <latestTime>$time.latest$</latestTime>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">true</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+        <drilldown>
+          <condition field="SID">
+            <set token="top10_drilldown_sid">$click.value2$</set>
+            <set token="top10_drilldown_earliest">$earliest$</set>
+            <set token="top10_drilldown_latest">$latest$</set>
+            <set token="top10drilldown">$click.name2$</set>
+          </condition>
+          <condition field="*"></condition>
+        </drilldown>
+      </table>
+      <html>
+        <p>Click on a SID to see more details</p>
+      </html>
+    </panel>
+    <panel depends="$top10drilldown$">
+      <title>Details of SID: $top10_drilldown_sid$</title>
+      <table>
+        <searchString>
+`dmc_set_index_audit` action=search sourcetype=audittrail
+ [ localop | stats count
+   | eval search_id = replace("$top10_drilldown_sid$", "^remote_[^_]*_", "")
+   | table search_id ]
+ [ localop | stats count
+   | eval earliest = $top10_drilldown_earliest$ - 86400
+   | table earliest ]
+ [ localop | stats count
+   | eval host = if(like("$top10_drilldown_sid$", "remote_%"), "*", "$host$")
+   | table host ]
+ latest="$top10_drilldown_latest$"
+| stats values(savedsearch_name) AS search_name values(result_count) AS result_count values(event_count) AS event_count values(scan_count) AS scan_count values(total_run_time) AS search_run_time values(host) as host values(search) AS search_string by search_id
+| transpose
+| rename column as Property, "row 1" as Value
+        </searchString>
+        <option name="drilldown">off</option>
+        <option name="wrap">true</option>
+      </table>
+      <html>
+        <p>Please try to choose a larger time range if this panel produces no result.</p>
+        <div> </div>
+        <a data-unset-token="top10drilldown">Close this panel</a>
+      </html>
+    </panel>
+  </row>
+
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Searches Started Per Minute by Dispatcher</title>
+      <input type="dropdown" token="dispatcher" searchWhenChanged="true">
+        <label>Dispatcher</label>
+        <showClearButton>false</showClearButton>
+        <default>(`dmc_event_local_search_dispatch`) OR (`dmc_event_remote_search_dispatch`)</default>
+        <choice value="(`dmc_event_local_search_dispatch`) OR (`dmc_event_remote_search_dispatch`)">Local and Remote Instance(s)</choice>
+        <choice value="`dmc_event_local_search_dispatch`">Local Instance</choice>
+        <choice value="`dmc_event_remote_search_dispatch`">Remote Instance(s)</choice>
+      </input>
+      <chart>
+        <searchString>
+$dispatcher$ host=$host$
+| eval dispatcher = case(isnotnull(server) AND sourcetype=="splunkd_remote_searches", server, isnull(server) AND sourcetype=="splunkd_remote_searches", "unknown", sourcetype=="audittrail", "local instance")
+| bin _time
+| stats count by _time, dispatcher
+| timechart limit=50 per_minute(count) AS "New searches per minute" by dispatcher
+        </searchString>
+        <earliestTime>$time.earliest$</earliestTime>
+        <latestTime>$time.latest$</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.axisTitleY.text">New searches/minute</option>
+        <option name="charting.axisTitleX.text">Time</option>
+      </chart>
+      <html>
+        <p>This graph shows the number of searches newly dispatched every minute, grouped by instance that originally dispatched the search. The value "local instance" means that the search originated locally, as opposed to being dispatched by a remote search-head.</p>
+      </html>
+    </panel>
+  </row>
+
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Aggregate Search Runtime</title>
+      <input type="dropdown" token="runtimeSplitBy" searchWhenChanged="true">
+        <label>Split by</label>
+        <showClearButton>false</showClearButton>
+        <default>type</default>
+        <choice value="app">App</choice>
+        <choice value="user">User</choice>
+        <choice value="mode">Mode</choice>
+        <choice value="type">Type</choice>
+        <choice value="role">Role</choice>
+        <choice value="search_head">Dispatching Search Head</choice>
+        <choice value="label">Search Name</choice>
+        <choice value="provenance">Provenance</choice>
+        <choice value="workload_pool">Workload Pool</choice>
+        <change>
+          <condition value="mode">
+            <set token="runtimeModeDoc">true</set>
+          </condition>
+          <condition value="*">
+            <unset token="runtimeModeDoc"></unset>
+          </condition>
+        </change>
+      </input>
+      <chart>
+        <searchString>
+        `dmc_set_index_introspection` host=$host$ sourcetype=splunk_resource_usage component=PerProcess data.search_props.sid::*
+        | `dmc_rename_introspection_fields`
+        | `dmc_set_bin`
+        | stats max(elapsed) as ELAPSED by sid $runtimeSplitBy$ _time
+        | streamstats current=t global=f window=2 earliest(ELAPSED) as prev_ELAPSED latest(ELAPSED) as curr_ELAPSED by sid $runtimeSplitBy$
+        | eval `dmc_collection_interval`
+        | eval delta_ELAPSED = curr_ELAPSED - prev_ELAPSED
+        | eval runtime = if(delta_ELAPSED = 0, min(curr_ELAPSED, collection_interval), delta_ELAPSED)
+        | `dmc_timechart` sum(runtime) by $runtimeSplitBy$
+        </searchString>
+        <earliestTime>$time.earliest$</earliestTime>
+        <latestTime>$time.latest$</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.axisTitleY.text">Runtime (seconds)</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <drilldown target="_blank">
+          <condition series="*">
+              <link target="_blank"><![CDATA[search?q=`dmc_search_activity_instance_drilldown($host$, $concurrencySplitBy$, $click.name2$)`&earliest=$earliest$&latest=$latest$]]></link>
+          </condition>
+        </drilldown>
+      </chart>
+      <html depends="$runtimeModeDoc$">
+        <p>Mode can be historical, historical batch, RT, or RT indexed.</p>
+      </html>
+    </panel>
+  </row>
+
+</form>

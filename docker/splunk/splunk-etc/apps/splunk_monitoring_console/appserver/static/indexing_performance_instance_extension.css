@@ -1,0 +1,38 @@
+.pipeline-queues {
+    margin-left: auto;
+    margin-right: auto;
+    min-height: 350px;
+    background: transparent 50% 50% no-repeat url('splunk_data_pipeline.png');
+}
+
+.pipeline-queue-value {
+    font-size: 32px;
+    font-weight: bold;
+    text-align: center;
+    line-height: 32px;
+    height: 32px;
+}
+
+.pipeline-queue-value:nth-child(1) {
+    -ms-transform: translate(-365px, 176px);
+    -webkit-transform: translate(-365px, 176px);
+    transform: translate(-380px, 179px);
+}
+
+.pipeline-queue-value:nth-child(2) {
+    -ms-transform: translate(-167px, 144px);
+    -webkit-transform: translate(-167px, 144px);
+    transform: translate(-181px, 147px);
+}
+
+.pipeline-queue-value:nth-child(3) {
+    -ms-transform: translate(33px, 112px);
+    -webkit-transform: translate(33px, 112px);
+    transform: translate(19px, 115px);
+}
+
+.pipeline-queue-value:nth-child(4) {
+    -ms-transform: translate(238px, 80px);
+    -webkit-transform: translate(238px, 80px);
+    transform: translate(229px, 83px);
+}

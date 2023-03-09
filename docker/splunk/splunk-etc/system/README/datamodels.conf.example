@@ -1,0 +1,15 @@
+#   Version 9.0.3
+#
+# Configuration for example datamodels
+#
+
+# An example of accelerating data for the 'mymodel' datamodel for the
+# past five days, generating and checking the column stores every 10 minutes
+[mymodel]
+acceleration = true
+acceleration.earliest_time = -5d
+acceleration.poll_buckets_until_maxtime = true
+acceleration.cron_schedule = */10 * * * *
+acceleration.hunk.compression_codec = snappy
+acceleration.hunk.dfs_block_size = 134217728
+acceleration.hunk.file_format = orc

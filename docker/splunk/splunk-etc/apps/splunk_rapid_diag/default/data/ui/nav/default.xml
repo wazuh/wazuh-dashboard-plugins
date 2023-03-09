@@ -1,0 +1,6 @@
+<nav>
+    <view name="task_template_wizard" default="true"/>
+    <view name="data_collection"/>
+    <view name="task_manager"/>
+    <view name="reference_guide"/>
+</nav>

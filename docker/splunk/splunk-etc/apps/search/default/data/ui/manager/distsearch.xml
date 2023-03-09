@@ -1,0 +1,13 @@
+<endpoint name="distsearch" showOnSearchHeadCluster="0">
+  <header></header>
+  <capabilities>
+    <read>edit_dist_peer AND edit_search_server AND indexes_edit</read>
+  </capabilities>
+  <menu name="deployment_configurations">
+    <label>Distributed search</label>
+    <url>/manager/%(namespace)s/distsearch</url>
+    <description>Set up distributed search across multiple Splunk instances.</description>
+    <order>90</order>
+    <id>dist-search</id>
+  </menu>
+</endpoint>

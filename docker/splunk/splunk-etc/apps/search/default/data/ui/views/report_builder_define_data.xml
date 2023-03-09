@@ -1,0 +1,3 @@
+<view isVisible="false" template="builder.html" displayView="report_builder_display" decomposeIntentions="true" isDashboard="False" type="redirect" target="search"> 
+  <label>Report Builder</label>
+</view>

@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<view template="splunk_rapid_diag:/templates/reference_guide.html" type="html">
+	<label>Reference Guide</label>
+</view>

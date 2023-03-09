@@ -1,0 +1,931 @@
+# Translations template for PROJECT.
+# Copyright (C) 2022 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2022-03-31 17:30-0700\n"
+"PO-Revision-Date: 2022-04-07 13:49+0100\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ko\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.6.0\n"
+"X-Generator: Poedit 3.0.1\n"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/SetSchedule/SetScheduleModal.jsx:134
+msgid " at "
+msgstr " 시간 "
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/LogsReportView.jsx:461
+msgid " next to \"Usage Data\""
+msgstr "\"사용량 데이터\" 옆"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/SetSchedule/SetScheduleModal.jsx:112
+msgid " on "
+msgstr " 켜기 "
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:255
+msgid "\"Full\" includes bucket manifests and metadata files, if the index_files component is selected."
+msgstr "\"Full\"에는 index_files 구성 요소가 선택된 경우 버킷 매니페스트 및 메타 데이터 파일이 포함됩니다."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:279
+msgid "\"Light\" lists only hot buckets, if the index_listing component is selected."
+msgstr "\"Light\"는 index_listing 구성 요소가 선택된 경우 핫 버킷만 나열합니다."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInStatus.jsx:97
+#, python-format
+msgid "%s"
+msgstr "%s"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/LogsReportView.jsx:406
+#, python-format
+msgid "%s Data"
+msgstr "%s 데이터"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/SettingsPage/LicenseDataOptOutModal.jsx:52
+#, python-format
+msgid "%s Usage Data"
+msgstr "%s 사용량 데이터"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInDropdown.jsx:422
+msgid ". For  examples, see our "
+msgstr "예시는 다음을 참조하십시오."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:355
+msgid "1 GB"
+msgstr "1GB"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:369 ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:317
+msgid "1 MB"
+msgstr "1MB"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:373 ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:318
+msgid "10 MB"
+msgstr "10MB"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:351 ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:377
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:319
+msgid "100 MB"
+msgstr "100MB"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:359
+msgid "5 GB"
+msgstr "5GB"
+
+#: ../../apps/splunk_instrumentation/default/data/ui/alerts/outputtelemetry.html
+msgid ""
+"<form class=\"form-horizontal form-complex\">\n"
+"    <div class=\"control-group\">\n"
+"        <label class=\"control-label\" for=\"outputtelemetry_component\">Name</label>\n"
+"\n"
+"        <div class=\"controls\">\n"
+"            <input type=\"text\" class=\"input-xlarge\" name=\"action.outputtelemetry.param.component\" id=\"outputtelemetry_component\" placeholder=\"component.name\"/"
+">\n"
+"        </div>\n"
+"    </div>\n"
+"    <div class=\"control-group\">\n"
+"        <label class=\"control-label\" for=\"outputtelemetry_input\">Input field</label>\n"
+"\n"
+"        <div class=\"controls\">\n"
+"            <input type=\"text\" class=\"input-xlarge\" name=\"action.outputtelemetry.param.input\" id=\"outputtelemetry_component\" placeholder=\"field name\"/>\n"
+"        </div>\n"
+"    </div>\n"
+"    <div class=\"control-group\">\n"
+"        <label class=\"control-label\" for=\"outputtelemetry_type\">Data type</label>\n"
+"\n"
+"        <div class=\"controls\">\n"
+"            <label class=\"radio\" for=\"outputtelemetry_type_event\">\n"
+"                <input id=\"outputtelemetry_type_event\" type=\"radio\" name=\"action.outputtelemetry.param.type\" value=\"event\"/>\n"
+"                Event\n"
+"            </label>\n"
+"            <label class=\"radio\" for=\"outputtelemetry_type_aggregate\">\n"
+"                <input id=\"outputtelemetry_type_aggregate\" type=\"radio\" name=\"action.outputtelemetry.param.type\" value=\"aggregate\"/>\n"
+"                Aggregate\n"
+"            </label>\n"
+"        </div>\n"
+"    </div>\n"
+"    <div class=\"control-group\">\n"
+"        <label class=\"control-label\">Categories (at least 1):</label>\n"
+"        <div class=\"controls\">\n"
+"            <label class=\"checkbox\" for=\"outputtelemetry_anonymous\">\n"
+"                <input type=\"checkbox\" name=\"action.outputtelemetry.param.anonymous\" id=\"outputtelemetry_anonymous\" value=\"1\"/>\n"
+"                Anonymized usage data\n"
+"            </label>\n"
+"        </div>\n"
+"        <div class=\"controls\">\n"
+"            <label class=\"checkbox\" for=\"outputtelemetry_support\">\n"
+"                <input type=\"checkbox\" name=\"action.outputtelemetry.param.support\" id=\"outputtelemetry_support\" value=\"1\"/>\n"
+"                Support usage data\n"
+"            </label>\n"
+"        </div>\n"
+"        <div class=\"controls\">\n"
+"            <label class=\"checkbox\" for=\"outputtelemetry_license\">\n"
+"                <input type=\"checkbox\" name=\"action.outputtelemetry.param.license\" id=\"outputtelemetry_license\" value=\"1\"/>\n"
+"                License usage data\n"
+"            </label>\n"
+"        </div>\n"
+"    </div>\n"
+"    <div class=\"control-group\">\n"
+"        <label class=\"control-label\" for=\"outputtelemetry_optinrequired\">Required opt-in</label>\n"
+"\n"
+"        <div class=\"controls\">\n"
+"            <select id=\"outputtelemetry_optinrequired\" name=\"action.outputtelemetry.param.optinrequired\">\n"
+"                <option value=\"1\">1 - Splunk 6.5</option>\n"
+"                <option value=\"2\">2 - Splunk 6.6</option>\n"
+"                <option value=\"3\">3 - Splunk 7.0</option>\n"
+"            </select>\n"
+"        </div>\n"
+"    </div>\n"
+"</form>\n"
+msgstr ""
+"<form class=\"form-horizontal form-complex\">\n"
+"    <div class=\"control-group\">\n"
+"        <label class=\"control-label\" for=\"outputtelemetry_component\">이름</label>\n"
+"\n"
+"        <div class=\"controls\">\n"
+"            <input type=\"text\" class=\"input-xlarge\" name=\"action.outputtelemetry.param.component\" id=\"outputtelemetry_component\" placeholder=\"component.name\"/"
+">\n"
+"        </div>\n"
+"    </div>\n"
+"    <div class=\"control-group\">\n"
+"        <label class=\"control-label\" for=\"outputtelemetry_input\">입력 필드</label>\n"
+"\n"
+"        <div class=\"controls\">\n"
+"            <input type=\"text\" class=\"input-xlarge\" name=\"action.outputtelemetry.param.input\" id=\"outputtelemetry_component\" placeholder=\"field name\"/>\n"
+"        </div>\n"
+"    </div>\n"
+"    <div class=\"control-group\">\n"
+"        <label class=\"control-label\" for=\"outputtelemetry_type\">데이터 유형</label>\n"
+"\n"
+"        <div class=\"controls\">\n"
+"            <label class=\"radio\" for=\"outputtelemetry_type_event\">\n"
+"                <input id=\"outputtelemetry_type_event\" type=\"radio\" name=\"action.outputtelemetry.param.type\" value=\"event\"/>\n"
+"                이벤트\n"
+"            </label>\n"
+"            <label class=\"radio\" for=\"outputtelemetry_type_aggregate\">\n"
+"                <input id=\"outputtelemetry_type_aggregate\" type=\"radio\" name=\"action.outputtelemetry.param.type\" value=\"aggregate\"/>\n"
+"                집계\n"
+"            </label>\n"
+"        </div>\n"
+"    </div>\n"
+"    <div class=\"control-group\">\n"
+"        <label class=\"control-label\">범주(최소 1개):</label>\n"
+"        <div class=\"controls\">\n"
+"            <label class=\"checkbox\" for=\"outputtelemetry_anonymous\">\n"
+"                <input type=\"checkbox\" name=\"action.outputtelemetry.param.anonymous\" id=\"outputtelemetry_anonymous\" value=\"1\"/>\n"
+"                익명 처리된 사용량 데이터\n"
+"            </label>\n"
+"        </div>\n"
+"        <div class=\"controls\">\n"
+"            <label class=\"checkbox\" for=\"outputtelemetry_support\">\n"
+"                <input type=\"checkbox\" name=\"action.outputtelemetry.param.support\" id=\"outputtelemetry_support\" value=\"1\"/>\n"
+"                서포트 사용량 데이터\n"
+"            </label>\n"
+"        </div>\n"
+"        <div class=\"controls\">\n"
+"            <label class=\"checkbox\" for=\"outputtelemetry_license\">\n"
+"                <input type=\"checkbox\" name=\"action.outputtelemetry.param.license\" id=\"outputtelemetry_license\" value=\"1\"/>\n"
+"                라이선스 사용량 데이터\n"
+"            </label>\n"
+"        </div>\n"
+"    </div>\n"
+"    <div class=\"control-group\">\n"
+"        <label class=\"control-label\" for=\"outputtelemetry_optinrequired\">필수 옵트인</label>\n"
+"\n"
+"        <div class=\"controls\">\n"
+"            <select id=\"outputtelemetry_optinrequired\" name=\"action.outputtelemetry.param.optinrequired\">\n"
+"                <option value=\"1\">1 - Splunk 6.5</option>\n"
+"                <option value=\"2\">2 - Splunk 6.6</option>\n"
+"                <option value=\"3\">3 - Splunk 7.0</option>\n"
+"            </select>\n"
+"        </div>\n"
+"    </div>\n"
+"</form>\n"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:418
+msgid "Actions"
+msgstr "작업"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagNodeListPanel.jsx:238
+msgid "All Roles"
+msgstr "모든 역할"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:195
+msgid "All files matching the given patterns will be excluded. To exclude multiple files, use wildcards, or provide a comma-separated list of files or patterns."
+msgstr "주어진 패턴과 일치하는 모든 파일이 제외됩니다. 여러 파일을 제외하려면 와일드카드를 사용하거나 쉼표로 구분된 파일 또는 패턴 리스트를 제공하십시오."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/SettingsPage/LicenseDataOptOutModal.jsx:62
+#, python-format
+msgid "Are you sure you want to disable %s usage data sharing?"
+msgstr "%s 사용량 데이터 공유를 비활성화하시겠습니까?"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:401
+msgid "Attempt to redact search terms from logs that may be private or personally identifying."
+msgstr "비공개 또는 개인적으로 식별할 수 있는 로그에서 검색어 수정을 시도합니다."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInStatus.jsx:119
+msgid "Automatically enabled"
+msgstr "자동으로 활성화됨"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagModalView.jsx:171
+msgid "Back"
+msgstr "뒤로"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:177
+msgid "Business week to date"
+msgstr "영업일 기준 주간 누계"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagModalView.jsx:233
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/SetSchedule/SetScheduleModal.jsx:165
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/common/ExampleHeaderTableUseView.jsx:92
+msgid "Cancel"
+msgstr "취소"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/services/DiagService.es:37
+#, python-format
+msgid "Cannot delete diag with status: %s"
+msgstr "다음 상태인 진단을 삭제할 수 없음: %s"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/services/DiagService.es:59
+#, python-format
+msgid "Cannot download diag with status: %s"
+msgstr "다음 상태인 진단을 다운로드할 수 없음: %s"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/LogsReportView.jsx:459
+msgid "Change your settings by clicking the "
+msgstr "클릭하여 설정 변경"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/ExportSendModalView.jsx:155
+msgid "Close"
+msgstr "닫기"
+
+#: ../../apps/splunk_instrumentation/default/searchbnf.conf:20
+msgid "Combines specified fields into a stringified JSON"
+msgstr "지정된 필드를 문자열로 처리된 JSON으로 결합"
+
+#: ../../apps/splunk_instrumentation/default/searchbnf.conf:22
+msgid ""
+"Combines the specified set of field names, or field name patterns, \\\n"
+"and creates an field with the output name."
+msgstr "지정된 필드 이름 집합 또는 필드 이름 패턴을 결합하고"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/BaseLayout.jsx:19
+msgid "Configure automated reporting settings, view collected data, export data to file, work with diagnostic files, and send data to Splunk. "
+msgstr "자동 보고 설정을 설정하고, 수집된 데이터를 보고, 데이터를 파일로 내보내고, 진단 파일로 작업하고, 데이터를 Splunk로 보냅니다."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInDropdown.jsx:357
+msgid "Configure automated reporting settings."
+msgstr "자동화된 보고 설정을 구성합니다."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:450
+msgid "Configure bundle settings to be applied to all instances. "
+msgstr "모든 인스턴스에 적용되도록 번들 설정을 구성합니다."
+
+#. description
+#: ../../apps/splunk_instrumentation/default/data/ui/manager/instrumentation_index.xml:8
+msgid "Configure instrumentation."
+msgstr "계측을 설정합니다."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagModalView.jsx:186
+msgid "Create"
+msgstr "만들기"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/common/ExampleHeaderTableUseView.jsx:50
+msgid "Create New"
+msgstr "새로 만들기"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagReportView.jsx:594
+msgid "Create New Diags using the button above"
+msgstr "위의 버튼을 사용하여 새 진단을 만듭니다."
+
+#: ../../apps/splunk_instrumentation/default/searchbnf.conf:24
+msgid "Create a stringified JSON: { \"name\": \"<value of name>\", \"data\": { \"count\": <value of data.count>, \"metrics\": [values of data.metrics] }}"
+msgstr "문자열로 처리된 JSON 만들기: { \"name\": \"<value of name>\", \"data\": { \"count\": <value of data.count>, \"metrics\": [values of data.metrics] }}"
+
+#: ../../apps/splunk_instrumentation/default/alert_actions.conf:4
+msgid "Custom action to output results to telemetry endpoint"
+msgstr "결과를 원격 분석 엔드 포인트에 출력하는 사용자 지정 작업"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:421
+msgid "Data"
+msgstr "데이터"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInDropdown.jsx:432
+msgid "Data Transmission Schedule"
+msgstr "데이터 전송 일정"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/ExportSendModalView.jsx:135
+msgid "Data Type"
+msgstr "데이터 유형"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:417
+msgid "Date Range"
+msgstr "날짜 범위"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/ExportSendModalView.jsx:128
+msgid "Date range"
+msgstr "날짜 범위"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:148
+msgid "Date ranges more than 1 year are truncated to a year from latest"
+msgstr "1년 이상의 날짜 범위는 최근에서 1년까지로 잘립니다."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:144
+msgid "Date ranges must be less than 1 year"
+msgstr "날짜 범위는 1년 미만이어야 합니다."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:439
+msgid "Delete"
+msgstr "삭제"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:260
+msgid "Deleted"
+msgstr "삭제됨"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagReportView.jsx:563
+msgid "Diagnostic Log"
+msgstr "진단 로그"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagReportView.jsx:564
+msgid "Diagnostic files contain information about your Splunk deployment, such as configuration files and logs, to help Splunk Support diagnose and resolve problems. "
+msgstr "진단 파일에는 Splunk 서포트에서 문제를 진단하고 해결하는 데 도움이 되는 설정 파일 및 로그와 같은 Splunk 배포에 대한 정보가 포함되어 있습니다."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/common/ExampleHeaderTableUseView.jsx:47
+msgid "Diagnostics Log"
+msgstr "진단 로그"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/common/ExampleHeaderTableUseView.jsx:48
+msgid "Diagnostics contain configuration files and logs that help Splunk support help diagnose and resolve your deployment issues."
+msgstr "진단에는 Splunk 서포트에서 배포 문제를 진단하고 해결하는 데 도움이 되는 설정 파일과 로그가 포함되어 있습니다."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:363 ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:381
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:320
+msgid "Disable limit"
+msgstr "제한 비활성화"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInStatus.jsx:86
+msgid "Disabled"
+msgstr "사용 불가능"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInDropdown.jsx:101
+msgid "Disabling this may hinder troubleshooting and support for your implementation. "
+msgstr "이를 비활성화할 경우 구현에 대한 문제 해결 및 지원에 방해가 될 수 있습니다."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInDropdown.jsx:87
+msgid "Disabling this will exclude your usage data from the data Splunk considers when making improvements to our products and services. "
+msgstr "이 기능을 비활성화하면 Splunk가 제품 및 서비스를 개선할 때 고려하는 데이터에서 사용 데이터가 제외됩니다."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInDropdown.jsx:424
+msgid "Documentation."
+msgstr "매뉴얼."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:261
+msgid "Does not exist"
+msgstr "없음"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:438
+msgid "Download"
+msgstr "다운로드"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:178
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:227
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInDropdown.jsx:439
+msgid "Edit"
+msgstr "편집"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/SetSchedule/SetScheduleModal.jsx:92
+msgid "Edit Data Transmission Schedule"
+msgstr "데이터 전송 일정 편집"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInStatus.jsx:86
+msgid "Enabled"
+msgstr "사용 가능"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:80
+msgid "Error communicating with Splunk. Please check your network connection and try again."
+msgstr "Splunk와 통신하는 동안 오류가 발생했습니다. 네트워크 연결을 확인하고 다시 시도하십시오."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagReportView.jsx:69
+msgid "Error fetching list of servers"
+msgstr "서버 리스트를 가져오는 중에 오류가 발생했습니다."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagReportView.jsx:421 ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagReportView.jsx:437
+#, python-format
+msgid "Error: %s"
+msgstr "오류: %s"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInDropdown.jsx:435
+#, python-format
+msgid "Every %s at %s"
+msgstr "매일(%s, %s)"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:306
+msgid "Exclude etc files larger than"
+msgstr "다음보다 큰 기타 파일 제외"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:357
+msgid "Exclude log files larger than"
+msgstr "다음보다 큰 로그 파일 제외"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:380
+msgid "Exclude log files older than"
+msgstr "다음보다 오래된 로그 파일 제외"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:202
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:221
+msgid "Exclude patterns"
+msgstr "패턴 제외"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:302
+msgid "Excludes large files in the Splunk etc directory."
+msgstr "Splunk 외 디렉터리에서 큰 파일을 제외합니다."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:351
+msgid "Excludes large files in the Splunk var/log directory, if the log component is selected."
+msgstr "로그 구성 요소를 선택한 경우 Splunk var/log 디렉터리에서 큰 파일을 제외합니다."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:375
+msgid "Excludes log files beyond an age given in days. 0 disables this filter."
+msgstr "지정된 기간(일)을 초과하는 로그 파일을 제외합니다. 0은 이 필터를 비활성화합니다."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/ExportSendModalView.jsx:161
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/LogsReportView.jsx:478
+msgid "Export"
+msgstr "내보내기"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/ExportSendModalView.jsx:125
+msgid "Export/Send Usage Data"
+msgstr "사용량 데이터 내보내기/전송"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/ExportSendModalView.jsx:96
+msgid "Exporting instrumentation data"
+msgstr "계측 데이터 내보내기"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:259
+msgid "Failed"
+msgstr "실패"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagNodeListPanel.jsx:248
+msgid "Filter"
+msgstr "필터"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:406
+msgid "Filter search terms"
+msgstr "검색어 필터링"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInDropdown.jsx:416
+msgid "For more information about these data types, including what information might be collected and how it might be used, see our "
+msgstr "데이터 유형, 수집될 수 있는 정보, 해당 정보의 사용 방식에 대한 자세한 내용은 다음을 참조하십시오."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:48 ../../apps/splunk_instrumentation/src/Instrumentation/views/SetSchedule/SetScheduleModal.jsx:128
+msgid "Friday"
+msgstr "금요일"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:335 ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:345
+msgid "Full"
+msgstr "전체"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:333
+msgid "Get every crash .dmp file"
+msgstr "모든 충돌 .dmp 파일 가져오기"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:327
+msgid "If \"No\", gathers at most three Windows .dmp files, if the log component is selected."
+msgstr "\"아니요\"인 경우 로그 구성 요소를 선택할 때 최대 세 개의 Windows .dmp 파일을 수집합니다."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:262
+msgid "In progress"
+msgstr "진행 중"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:153
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:174
+msgid "Include components"
+msgstr "구성 요소 포함"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:424
+msgid "Include lookup files in the etc & pool components."
+msgstr "기타 및 풀 구성 요소의 룩업 파일을 포함합니다."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:428
+msgid "Include lookups"
+msgstr "룩업 포함"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:285
+msgid "Index directory listing level"
+msgstr "인덱스 디렉터리 리스팅 레벨"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:261
+msgid "Index files"
+msgstr "인덱스 파일"
+
+#. label
+#: ../../apps/splunk_instrumentation/default/app.conf:11 ../../apps/splunk_instrumentation/default/data/ui/manager/instrumentation_index.xml:6
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/BaseLayout.jsx:18 ../../apps/splunk_instrumentation/src/Instrumentation/views/ErrorPage.jsx:12
+msgid "Instrumentation"
+msgstr "계측"
+
+#: ../../apps/splunk_instrumentation/appserver/templates/splunk_instrumentation.html:16
+msgid "Instrumentation | Splunk"
+msgstr "계측 | Splunk"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:217
+msgid "Last 24 hours"
+msgstr "최근 24시간"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:227
+msgid "Last 30 days"
+msgstr "최근 30일"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:222
+msgid "Last 7 days"
+msgstr "최근 7일"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/BaseLayout.jsx:45
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/SettingsPage/LicenseDataOptOutModal.jsx:60
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/common/CommonHeaderView.jsx:65
+msgid "Learn More"
+msgstr "자세히 알아보기"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:451
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInStatus.jsx:129
+msgid "Learn more"
+msgstr "자세히 알아보기"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:341
+msgid "Light"
+msgstr "라이트"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:331
+msgid "Manifests"
+msgstr "매니패스트"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/common/ExampleHeaderTableUseView.jsx:87
+msgid "Modal Header"
+msgstr "양식 헤더"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:44 ../../apps/splunk_instrumentation/src/Instrumentation/views/SetSchedule/SetScheduleModal.jsx:124
+msgid "Monday"
+msgstr "월요일"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:182
+msgid "Month to date"
+msgstr "월간 누계"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagNodeListPanel.jsx:281
+msgid "Name"
+msgstr "이름"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagReportView.jsx:606
+msgid "New Diag"
+msgstr "새 진단"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagModalView.jsx:161
+msgid "Next"
+msgstr "다음"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:325 ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:418
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:440
+msgid "No"
+msgstr "아니요"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagReportView.jsx:590
+msgid "No Diags found"
+msgstr "진단을 찾을 수 없음"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:140
+msgid "No data available for selected time range"
+msgstr "선택한 시간 범위에 사용 가능한 데이터 없음"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/LogsReportView.jsx:455
+msgid "No data sent in the last 30 days"
+msgstr "지난 30일간 전송된 데이터 없음"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/common/CommonTableView.jsx:44
+msgid "No results found."
+msgstr "결과를 찾을 수 없습니다."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:422
+msgid "Nodes"
+msgstr "노드"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/common/ExampleHeaderTableUseView.jsx:93
+msgid "OK"
+msgstr "확인"
+
+#: ../../apps/splunk_instrumentation/default/alert_actions.conf:3
+msgid "Output results to telemetry endpoint"
+msgstr "결과를 원격 분석 엔드 포인트에 출력"
+
+#: ../../apps/splunk_instrumentation/default/searchbnf.conf:13
+msgid ""
+"Output search results to the telemetry endpoint, using the field named \"data.\"\" Each will be \\\n"
+"named \"my.telemetry\" and is described as a singular \"event\" type. The telemetry event will only be \\\n"
+"sent if the deployment has been opted in to share Anonymized usage data, with opt-in version of 2."
+msgstr "\"data\"라는 필드를 사용하여 원격 분석 엔드 포인트에 검색 결과를 출력합니다. 각 항목은 \\"
+
+#: ../../apps/splunk_instrumentation/default/searchbnf.conf:3
+msgid "Outputs search results to telemetry endpoint."
+msgstr "검색 결과를 원격 분석 엔드 포인트에 출력"
+
+#: ../../apps/splunk_instrumentation/default/searchbnf.conf:9
+msgid ""
+"Outputs search results to telemetry endpoint. \\\n"
+"Required field “input” will have the endpoint payload. \\\n"
+"The other fields “component”, “type”, “optinrequired” \\\n"
+"are optional fields but the endpoint expects them to be supplied either with the search command \\\n"
+"or to be found in the event data.\\\n"
+"Visibility fields \"anonymous\", \"license\" and \"support\" are optional."
+msgstr "원격 분석 엔드 포인트에 검색 결과를 출력합니다. \\"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:202
+msgid "Previous business week"
+msgstr "이전 영업 주"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:207
+msgid "Previous month"
+msgstr "이전 월"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:197
+msgid "Previous week"
+msgstr "이전 주"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:212
+msgid "Previous year"
+msgstr "이전 연도"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInDropdown.jsx:420
+msgid "Privacy Policy"
+msgstr "개인정보 보호 정책"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:263
+msgid "Queued"
+msgstr "대기열에 있음"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:437
+msgid "Recreate"
+msgstr "다시 만들기"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagModalView.jsx:228
+msgid "Revert to default"
+msgstr "기본값으로 되돌리기"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagNodeListPanel.jsx:282
+msgid "Roles"
+msgstr "역할"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:49 ../../apps/splunk_instrumentation/src/Instrumentation/views/SetSchedule/SetScheduleModal.jsx:129
+msgid "Saturday"
+msgstr "토요일"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/SetSchedule/SetScheduleModal.jsx:171
+msgid "Save"
+msgstr "저장"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/SetSchedule/SetScheduleModal.jsx:97
+msgid "Scheduled "
+msgstr "예약됨 "
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/TimeRangeModal.jsx:76
+msgid "Select Time Range"
+msgstr "시간 범위 선택"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagNodeListPanel.jsx:230
+msgid "Select instance you want to collect data from."
+msgstr "데이터를 수집할 인스턴스를 선택합니다."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/ExportSendModalView.jsx:168
+msgid "Send"
+msgstr "전송"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/ExportSendModalView.jsx:98
+msgid "Sending instrumentation data"
+msgstr "계측 데이터 전송"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInDropdown.jsx:413
+msgid ""
+"Sharing your software usage data helps Splunk Inc. optimize your deployment, prioritize our features, improve your experience, notify you of patches, and develop high "
+"quality product functionality. "
+msgstr ""
+"소프트웨어 사용량 데이터를 공유할 경우 Splunk Inc.가 사용자의 배포를 최적화하고, 기능의 우선 순위를 정하고, 사용자 경험을 개선하고, 패치에 대해 알리고, 고품질 제품 기능"
+"을 개발하는 데 사용할 수 있습니다."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:423
+msgid "Size"
+msgstr "크기"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:420
+msgid "Status"
+msgstr "상태"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:258 ../../apps/splunk_instrumentation/src/Instrumentation/views/common/CommonTableView.jsx:120
+msgid "Success"
+msgstr "성공"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:50 ../../apps/splunk_instrumentation/src/Instrumentation/views/SetSchedule/SetScheduleModal.jsx:130
+msgid "Sunday"
+msgstr "일요일"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:425
+msgid "TestHeader1"
+msgstr "TestHeader1"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:426
+msgid "TestHeader2"
+msgstr "TestHeader2"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:427
+msgid "TestHeader3"
+msgstr "TestHeader3"
+
+#: ../../apps/splunk_instrumentation/default/app.conf:16
+msgid "This application connects the hosting Splunk instance to Splunk's usage data collection services."
+msgstr "이 애플리케이션은 호스팅 Splunk 인스턴스를 Splunk의 사용량 데이터 수집 서비스에 연결합니다."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagNodeListPanel.jsx:223
+msgid ""
+"This list shows the instances connected to this search head. If you have configured Monitoring Console in distributed mode, use that instance to collect data from any "
+"instances not listed here."
+msgstr ""
+"이 리스트는 이 검색 헤드에 연결된 인스턴스를 보여줍니다. 분산 모드에서 모니터링 콘솔을 설정한 경우 해당 인스턴스를 사용하여 여기에 나열되지 않은 인스턴스에서 데이터를 수"
+"집합니다."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:47 ../../apps/splunk_instrumentation/src/Instrumentation/views/SetSchedule/SetScheduleModal.jsx:127
+msgid "Thursday"
+msgstr "목요일"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:424
+msgid "Time Created"
+msgstr "생성한 시간"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:419
+msgid "Time Sent"
+msgstr "전송한 시간"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInDropdown.jsx:108
+msgid "To ensure compliance with your purchased offering, we collect data about your license consumption. This data is linked to your account using your license GUID. "
+msgstr "구매한 제품을 준수하기 위해 Splunk는 사용자의 라이선스 사용량에 대한 데이터를 수집합니다. 이 데이터는 라이선스 GUID를 사용하여 계정에 연결됩니다."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInDropdown.jsx:83
+msgid ""
+"To improve our products and offerings, we collect information about your operating environment and configuration, user and product interactions, and sessions. This "
+"information might include feature usage, performance, deployment topology, and infrastructure. We do not associate this data with your account. "
+msgstr ""
+"Splunk는 제품 및 서비스 개선을 위해 사용자의 운영 환경 및 설정, 사용자 및 제품 상호 작용, 세션에 대한 정보를 수집합니다. 해당 정보에는 기능 사용량, 성능, 배포 토폴로지, "
+"인프라가 포함될 수 있습니다. Splunk는 해당 데이터를 사용자의 계정과 연결하지 않습니다."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInDropdown.jsx:96
+msgid ""
+"To provide enhanced support and help you troubleshoot and improve your implementation and configurations, we collect Usage Data, including information on feature usage, "
+"performance, topology, infrastructure, and operating environment for this deployment. We link this data to your account using your license's globally unique identifier "
+"(GUID). "
+msgstr ""
+"Splunk는 향상된 지원을 제공하고 구현 및 설정 문제를 해결하고 개선하는 데 도움을 주기 위해, 이 배포의 기능 사용량, 성능, 토폴로지, 인프라 및 운영 환경 관련 정보와 같은 사"
+"용량 데이터를 수집합니다. 이 데이터는 라이선스 전역 고유 식별자(GUID)를 사용하여 계정에 연결됩니다."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/OptIn/OptInDropdown.jsx:116
+msgid "To understand the number of customers using older versions of Splunk software, we collect aggregated software version data. "
+msgstr "이전 버전의 Splunk 소프트웨어를 사용하는 고객의 수를 파악하기 위해, 집계된 소프트웨어 버전 데이터를 수집합니다."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:167
+msgid "Today"
+msgstr "오늘"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:45 ../../apps/splunk_instrumentation/src/Instrumentation/views/SetSchedule/SetScheduleModal.jsx:125
+msgid "Tuesday"
+msgstr "화요일"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/LogsReportView.jsx:390
+msgid "Usage Data"
+msgstr "사용량 데이터"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/LogsReportView.jsx:398
+msgid "View in Search: "
+msgstr "검색에서 보기"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/LogsReportView.jsx:466
+msgid "View license usage, anonymized usage, and support usage data that has been collected (does not include browser session data). "
+msgstr "라이선스 사용량, 익명 처리된 사용량을 보고 수집된 사용량 데이터를 지원합니다(브라우저 세션 데이터는 포함되지 않음)."
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:46 ../../apps/splunk_instrumentation/src/Instrumentation/views/SetSchedule/SetScheduleModal.jsx:126
+msgid "Wednesday"
+msgstr "수요일"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:172
+msgid "Week to date"
+msgstr "주간 누계"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:187
+msgid "Year to date"
+msgstr "연간 누계"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:321 ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:417
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:439
+msgid "Yes"
+msgstr "예"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:192
+msgid "Yesterday"
+msgstr "어제"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/SetSchedule/SetScheduleModal.jsx:157
+msgid "am"
+msgstr "am"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:288
+msgid "conf_replication_summary"
+msgstr "conf_replication_summary"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:287
+msgid "consensus"
+msgstr "consensus"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:43
+msgid "day"
+msgstr "day"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:282
+msgid "dispatch"
+msgstr "dispatch"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagConfigPanel.jsx:209
+msgid "e.g. *.csv to exclude all csv files"
+msgstr "예: csv 파일을 모두 제외하는 *.csv"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:283
+msgid "etc"
+msgstr "etc"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/SetSchedule/SetScheduleModal.jsx:107
+msgid "every day"
+msgstr "every day"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/SetSchedule/SetScheduleModal.jsx:108
+msgid "every week"
+msgstr "every week"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:291
+msgid "file_validate"
+msgstr "file_validate"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:280
+msgid "index_files"
+msgstr "index_files"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:281
+msgid "index_listing"
+msgstr "index_listing"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagNodeListPanel.jsx:222
+msgid "instance"
+msgstr "instance"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagNodeListPanel.jsx:222
+msgid "instances"
+msgstr "instances"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:289
+msgid "kvstore"
+msgstr "kvstore"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:284
+msgid "log"
+msgstr "log"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/SetSchedule/SetScheduleModal.jsx:158
+msgid "pm"
+msgstr "pm"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:285
+msgid "pool"
+msgstr "pool"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:290
+msgid "rest"
+msgstr "rest"
+
+#: ../../apps/splunk_instrumentation/default/searchbnf.conf:27
+msgid "results::filter"
+msgstr "results::filter"
+
+#: ../../apps/splunk_instrumentation/default/searchbnf.conf:16
+msgid "results::write"
+msgstr "results::write"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:286
+msgid "searchpeers"
+msgstr "searchpeers"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagNodeListPanel.jsx:120
+#: ../../apps/splunk_instrumentation/src/Instrumentation/views/DiagModal/DiagSelectedNodeListView.jsx:55
+msgid "selected"
+msgstr "selected"
+
+#: ../../apps/splunk_instrumentation/src/Instrumentation/constants.es:153
+msgid "unknown error"
+msgstr "unknown error"

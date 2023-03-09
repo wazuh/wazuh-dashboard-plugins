@@ -1,0 +1,6 @@
+{
+  "name": "splunk-postcss-theme-import",
+  "version": "0.1.0",
+  "description": "A postcss plugin to inject mixin and variable imports for themes.",
+  "main": "index.js"
+}

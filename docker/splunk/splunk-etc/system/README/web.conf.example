@@ -1,0 +1,41 @@
+#   Version 9.0.3
+#
+# This is an example web.conf.  Use this file to configure data web
+# settings.
+#
+# To use one or more of these configurations, copy the configuration block
+# into web.conf in $SPLUNK_HOME/etc/system/local/. You must restart Splunk
+# to enable configurations.
+#
+# To learn more about configuration files (including precedence) please see
+# the documentation located at
+# http://docs.splunk.com/Documentation/Splunk/latest/Admin/Aboutconfigurationfiles
+
+# This stanza heading must precede any changes.
+[settings]
+
+# Change the default port number:
+httpport = 12800
+# Also run the python application server on a non-default port:
+appServerPorts = 12801
+
+# Turn on SSL:
+enableSplunkWebSSL = true
+# absolute paths may be used here.
+privKeyPath = /home/user/certs/myprivatekey.pem
+serverCert = /home/user/certs/mycacert.pem
+# NOTE: non-absolute paths are relative to $SPLUNK_HOME
+
+# First party apps:
+splunk_dashboard_app_name = splunk-dashboard-app
+
+# Allowing embedabble content in dashboards
+# Embed tags will appear as is in the dashboard source
+dashboard_html_allow_embeddable_content = true
+dashboard_html_wrap_embed = false
+
+# Allowing remote images from trusted hosts in simple XML dashboards
+pdfgen_trusted_hosts = *.splunk.com, 192.0.2.0/24
+
+# Allowing images to load from trusted domains in Dashboard Studio 
+dashboards_csp_allowed_domains = *.splunk.com, *

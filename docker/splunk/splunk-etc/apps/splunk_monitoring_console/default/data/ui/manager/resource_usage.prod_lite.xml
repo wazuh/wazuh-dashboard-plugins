@@ -1,0 +1,9 @@
+<endpoint name="unused">
+    <menu name="system_configurations">
+        <label>Resource usage</label>
+        <url>/app/splunk_monitoring_console/monitoringconsole_overview</url>
+        <description>Overview of Resource Usage in Splunk</description>
+        <order>31</order>
+        <id>resource_usage</id>
+    </menu>
+</endpoint>

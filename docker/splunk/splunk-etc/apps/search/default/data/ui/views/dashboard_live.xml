@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<view template="dashboard.html" stylesheet="dashboard2.css" isDashboard="False" type="redirect" target="search">
+  <label>Summary</label>
+</view>

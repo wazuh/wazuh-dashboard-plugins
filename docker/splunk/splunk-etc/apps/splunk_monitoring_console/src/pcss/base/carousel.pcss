@@ -1,0 +1,153 @@
+/*===============================================================================================*/
+/*  SPLUNK: CAROUSEL                                                                             */
+/*===============================================================================================*/
+
+.carousel {
+    position: relative;
+    margin-bottom: $lineHeight;
+    line-height: 1;
+}
+
+.carousel-inner {
+    overflow: hidden;
+    width: 100%;
+    position: relative;
+
+    > .item {
+        display: none;
+        position: relative;
+        transition: .6s ease-in-out left;
+
+        /*  Account for jankitude on images */
+        > img,
+        > a > img {
+            display: block;
+            line-height: 1;
+        }
+    }
+    > .active,
+    > .next,
+    > .prev {
+        display: block;
+    }
+    > .next,
+    > .prev {
+        position: absolute;
+        top: 0;
+        width: 100%;
+    }
+    > .next {
+        left: 100%;
+    }
+    > .prev {
+        left: -100%;
+    }
+    > .next.left,
+    > .prev.right {
+        left: 0;
+    }
+    > .active {
+        left: 0;
+
+        &.left,
+        &.right {
+            left: 100%;
+        }
+    }
+}
+
+
+/*************************************************************************************************/
+/*  LEFT/RIGHT CONTROLS FOR NAV                                                                  */
+/*************************************************************************************************/
+.carousel-control {
+    position: absolute;
+    top: 40%;
+    left: 15px;
+    width: 40px;
+    height: 40px;
+    margin-top: -20px;
+    font-size: 60px;
+    font-weight: 100;
+    line-height: 30px;
+    color: $white;
+    text-align: center;
+    background: $gray20;
+    border: 3px solid $white;
+    border-radius: 23px;
+    opacity: 0.50;
+
+    /*  we can't have this transition here */
+    /*  because webkit cancels the carousel */
+    /*  animation if you trip this while */
+    /*  in the middle of another animation */
+    /*  ;_; */
+    /*  transition: opacity .2s linear; */
+
+    /*  Reposition the right one */
+    &.right {
+        left: auto;
+        right: 15px;
+    }
+
+    /*  Hover/focus state */
+    &:hover,
+    &:focus {
+        color: $white;
+        text-decoration: none;
+        opacity: 0.90;
+    }
+}
+
+
+/*************************************************************************************************/
+/*  CAROUSEL INDICATOR PIPS                                                                      */
+/*************************************************************************************************/
+.carousel-indicators {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    z-index: 5;
+    margin: 0;
+    list-style: none;
+
+    li {
+        display: block;
+        float: left;
+        width: 10px;
+        height: 10px;
+        margin-left: 5px;
+        text-indent: -999px;
+        background-color: $gray80;
+        background-color: rgba(255, 255, 255, .25);
+        border-radius: 5px;
+    }
+    .active {
+        background-color: #FFF;
+    }
+}
+
+
+/*************************************************************************************************/
+/*  CAPTION FOR TEXT BELOW IMAGES                                                                */
+/*************************************************************************************************/
+.carousel-caption {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 15px;
+    background: $gray30;
+    background: rgba(0, 0, 0, .75);
+
+    h4, p {
+        color: $white;
+        line-height: $lineHeight;
+    }
+    h4 {
+        margin: 0 0 5px;
+    }
+    p {
+        margin-bottom: 0;
+    }
+}

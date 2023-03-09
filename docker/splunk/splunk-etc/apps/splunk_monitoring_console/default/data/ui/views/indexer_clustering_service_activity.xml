@@ -1,0 +1,423 @@
+<form version="1.1" hideEdit="True" script="common_control.js" stylesheet="shared.css">
+  <label>Indexer Clustering: Service Activity</label>
+    <fieldset autoRun="true" submitButton="false">
+      <input type="dropdown" searchWhenChanged="true" token="group">
+        <label>Indexer Cluster</label>
+        <showClearButton>false</showClearButton>
+        <search>
+          <query>| `dmc_get_indexer_cluster_groups`</query>
+        </search>
+        <fieldForLabel>label</fieldForLabel>
+        <fieldForValue>search_group</fieldForValue>
+        <selectFirstChoice>true</selectFirstChoice>
+      </input>
+    </fieldset>
+  <row>
+    <panel>
+      <title>Warning and Error Patterns</title>
+      <input type="time" searchWhenChanged="true" token="warningErrorTime">
+        <label>Time Range:</label>
+        <default>
+          <earliestTime>-24h</earliestTime>
+          <latestTime>now</latestTime>
+        </default>
+      </input>
+      <table>
+        <search>
+          <query>
+`dmc_get_warnings_and_errors(dmc_group_indexer, Cluster*)` search_group="$group$"
+| cluster showcount=t
+| table cluster_count, _time, log_level, component, event_message, punct
+| sort - cluster_count
+| `dmc_time_format(_time)`
+| rename cluster_count AS Count, _time AS "Latest Time", log_level as "Log Level", component as Component, event_message as "Latest Message"
+          </query>
+          <earliest>$warningErrorTime.earliest$</earliest>
+          <latest>$warningErrorTime.latest$</latest>
+        </search>
+        <fields>Count, "Latest Time", "Log Level", Component, "Latest Message"</fields>
+        <option name="drilldown">row</option>
+        <drilldown>
+          <set token="warningErrorPunct">$row.punct$</set>
+        </drilldown>
+      </table>
+      <html>
+        <p>Click on a row to see event details.</p>
+      </html>
+    </panel>
+    <panel depends="$warningErrorPunct$">
+      <title>Event Details</title>
+      <event>
+        <search>
+          <query>
+`dmc_get_warnings_and_errors(dmc_group_indexer, Cluster*)` punct="$warningErrorPunct$" search_group="$group$"
+          </query>
+          <earliest>$warningErrorTime.earliest$</earliest>
+          <latest>$warningErrorTime.latest$</latest>
+        </search>
+        <option name="rowNumbers">true</option>
+      </event>
+      <html>
+        <a data-unset-token="warningErrorPunct">Close this panel</a>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+        <h2>
+          <span>Select views: </span>
+          <span id="link-switcher-view">
+            <a href="#" class="btn-pill active" data-item="all">All</a>
+            <a href="#" class="btn-pill" data-item="snapshot">Snapshot</a>
+            <a href="#" class="btn-pill" data-item="historical">Historical</a>
+          </span>
+        </h2>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Snapshots</title>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Fixup Tasks - In Progress ($taskInProgressCount$)</title>
+      <search id="fixupInProgressBaseSearch">
+        <query>
+          | rest splunk_server_group=dmc_group_cluster_master splunk_server_group="$group$" "/services/cluster/master/buckets?filter=search_state=PendingSearchable"
+          | fields title, index, peers*server_name
+          | eval peers = ""
+          | foreach peers.*.server_name [eval peers = mvappend(peers, "", '&lt;&lt;FIELD&gt;&gt;')]
+          | fields title, index, peers
+        </query>
+        <done>
+          <set token="taskInProgressCount">$job.resultCount$</set>
+        </done>
+      </search>
+      <input type="dropdown" searchWhenChanged="true" token="fixupProgressIndexFilter">
+        <label>Index</label>
+        <showClearButton>false</showClearButton>
+        <choice value="*">All</choice>
+        <selectFirstChoice>true</selectFirstChoice>
+        <fieldForLabel>index</fieldForLabel>
+        <fieldForValue>index</fieldForValue>
+        <search base="fixupInProgressBaseSearch">
+          <query>stats count by index</query>
+        </search>
+        <prefix>search index="</prefix>
+        <suffix>"</suffix>
+      </input>
+      <table>
+        <search base="fixupInProgressBaseSearch">
+          <query>
+            $fixupProgressIndexFilter$
+            | rename title as Bucket, index as Index, peers as Peers
+          </query>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Fixup Tasks - Pending</title>
+      <input type="dropdown" searchWhenChanged="true" token="fixupPendingIndexFilter">
+        <label>Index</label>
+        <showClearButton>false</showClearButton>
+        <choice value="*">All</choice>
+        <fieldForLabel>index</fieldForLabel>
+        <fieldForValue>index</fieldForValue>
+        <search>
+          <query>
+            | rest splunk_server_group=dmc_group_cluster_master splunk_server_group="$group$" /services/cluster/master/indexes
+            | fields title
+            | rename title as index
+          </query>
+        </search>
+        <prefix>search index="</prefix>
+        <suffix>"</suffix>
+      </input>
+      <html>
+        <span><i class="icon-alert icon-large"></i>In a large deployment (with millions of buckets) the following searches might cause out-of-memory issues. Exercise caution running them.</span>
+      </html>
+      <table>
+        <title>Tasks to Meet Search Factor ($taskSFCount$)</title>
+        <search>
+          <query>
+            | rest splunk_server_group=dmc_group_cluster_master splunk_server_group="$group$" "/services/cluster/master/fixup?level=search_factor"
+            | fields title, index, initial.reason, initial.timestamp, latest.reason
+            | $fixupPendingIndexFilter$
+            | `dmc_time_format(initial.timestamp)`
+            | rename title as Bucket, index as Index, initial.reason as "Trigger Condition", initial.timestamp as "Trigger Time", latest.reason as "Current State"
+          </query>
+          <done>
+            <set token="taskSFCount">$job.resultCount$</set>
+          </done>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+      <table>
+        <title>Tasks to Meet Replication Factor ($taskRFCount$)</title>
+        <search>
+          <query>
+            | rest splunk_server_group=dmc_group_cluster_master splunk_server_group="$group$" "/services/cluster/master/fixup?level=replication_factor"
+            | fields title, index, initial.reason, initial.timestamp, latest.reason
+            | $fixupPendingIndexFilter$
+            | `dmc_time_format(initial.timestamp)`
+            | rename title as Bucket, index as Index, initial.reason as "Trigger Condition", initial.timestamp as "Trigger Time", latest.reason as "Current State"
+          </query>
+          <done>
+            <set token="taskRFCount">$job.resultCount$</set>
+          </done>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+      <table>
+        <title>Tasks to Meet Generation ($taskGenerationCount$)</title>
+        <search>
+          <query>
+            | rest splunk_server_group=dmc_group_cluster_master splunk_server_group="$group$" "/services/cluster/master/fixup?level=generation"
+            | fields title, index, initial.reason, initial.timestamp, latest.reason
+            | $fixupPendingIndexFilter$
+            | `dmc_time_format(initial.timestamp)`
+            | rename title as Bucket, index as Index, initial.reason as "Trigger Condition", initial.timestamp as "Trigger Time", latest.reason as "Current State"
+          </query>
+          <done>
+            <set token="taskGenerationCount">$job.resultCount$</set>
+          </done>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Indexes With Excess Buckets ($indexWithExcessBucketsCount$)</title>
+      <table>
+        <search>
+          <query>
+            | rest splunk_server_group=dmc_group_cluster_master splunk_server_group="$group$" /services/cluster/master/indexes
+            | fields title, buckets_with_excess_copies, buckets_with_excess_searchable_copies, total_excess_bucket_copies, total_excess_searchable_copies
+            | search (buckets_with_excess_copies > 0) OR (buckets_with_excess_searchable_copies > 0) OR (total_excess_bucket_copies > 0) OR (total_excess_searchable_copies > 0)
+            | rename title as Index, buckets_with_excess_copies as "Buckets with Excess Copies", buckets_with_excess_searchable_copies as "Buckets with Excess Searchable Copies", total_excess_bucket_copies as "Total Excess Copies", total_excess_searchable_copies as "Total Excess Searchable Copies"
+          </query>
+          <done>
+            <set token="indexWithExcessBucketsCount">$job.resultCount$</set>
+          </done>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Historical Charts</title>
+      <input type="time" searchWhenChanged="true" token="time">
+        <label>Time Range:</label>
+        <default>
+          <earliestTime>-4h@m</earliestTime>
+          <latestTime>now</latestTime>
+        </default>
+      </input>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Bucket Fixup Tasks</title>
+      <chart>
+        <search>
+          <query>
+`dmc_set_index_internal` sourcetype=splunkd group=subtask_counts name=cmmaster_service search_group=dmc_group_cluster_master search_group="$group$"
+| fields - to_fix_total to_fix_added to_fix_removed
+| `dmc_timechart_for_metrics_log` median(to_fix_*) as to_fix_*
+| rename to_fix_sync AS Sync to_fix_data_safety AS "Data safety" to_fix_gen AS Generation to_fix_rep_factor AS "Replication factor" to_fix_search_factor AS "Search factor" to_fix_streaming AS Streaming
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.chart.showLabels">auto</option>
+        <option name="charting.axisTitleY.text">Task Count</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Service Jobs</title>
+      <chart>
+        <title>Service Job Activity</title>
+        <search>
+          <query>
+`dmc_set_index_internal` sourcetype=splunkd group=executor name=cmmaster_executor search_group=dmc_group_cluster_master search_group="$group$"
+| eval backlog_change = jobs_added - jobs_finished
+| `dmc_timechart_for_metrics_log` sum(jobs_added) AS "Jobs added" sum(jobs_finished) AS "Jobs finished" sum(backlog_change) AS "Backlog change"
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.chart.showLabels">auto</option>
+        <option name="charting.axisTitleY.text">Job Count</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+      </chart>
+      <chart>
+        <title>Service Jobs Executed</title>
+        <search>
+          <query>
+`dmc_set_index_internal` sourcetype=splunkd group=jobs name=cmmaster search_group=dmc_group_cluster_master search_group="$group$"
+| `dmc_timechart_for_metrics_log` sum(CMRepJob) AS "Bucket replication" sum(CMChangeBucketJob_build) AS "Make bucket searchable" sum(CMChangeBucketJob_makePrimary) AS "Make bucket primary" sum(CMChangeBucketJob_removePrimary) AS "Removing primary bucket site" sum(CMTruncJob) AS "Truncating size of bucket" sum(CMSyncM2PJob) AS "Syncing buckets for peers and master" sum(CMSyncP2PJob) AS "Syncing bucket between peers" sum(CMBucketFrozenJob) AS "Notifying peer that bucket is frozen"
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.chart.showLabels">auto</option>
+        <option name="charting.axisTitleY.text">Job Count</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>REST Endpoint Activity</title>
+      <chart>
+        <title>Time Spent on Hitting REST Endpoints</title>
+        <search>
+          <query>
+`dmc_set_index_internal` sourcetype=splunkd group=subtask_seconds name=cmmaster_endpoints search_group=dmc_group_cluster_master search_group="$group$"
+| `dmc_timechart_for_metrics_log` sum(cluster*) as cluster*
+| rename clustermaster*_* AS "/services/cluster/master/*:*" clusterconfig_* AS "/services/cluster/config:*"
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.chart.showLabels">auto</option>
+        <option name="charting.axisTitleY.text">Time Spent (seconds)</option>
+        <option name="charting.axisTitleX.text">Time</option>
+      </chart>
+      <chart>
+        <title>Count of Hits on REST Endpoints</title>
+        <search>
+          <query>
+`dmc_set_index_internal` sourcetype=splunkd group=subtask_counts name=cmmaster_endpoints search_group=dmc_group_cluster_master search_group="$group$"
+| `dmc_timechart_for_metrics_log` sum(clustermaster*) as clustermaster*
+| rename clustermaster*_* AS "/services/cluster/master/*:*" clusterconfig_* AS "/services/cluster/config:*"
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.chart.showLabels">auto</option>
+        <option name="charting.axisTitleY.text">Count</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+      </chart>
+    </panel>
+  </row>
+</form>

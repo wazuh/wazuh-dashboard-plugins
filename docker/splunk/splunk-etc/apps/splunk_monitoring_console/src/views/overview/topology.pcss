@@ -1,0 +1,278 @@
+.dmc-topology {
+  min-width: 1170px;
+}
+
+ul.dmc-status-filters {
+  margin: 0 auto;
+  width: 160px;
+  display: inline-block;
+  position: relative;
+}
+
+ul.dmc-status-filters li {
+  display: inline-block;
+  float: left;
+  width: 22px;
+  height: 22px;
+  padding: 5px 5px 0px 3px;
+  border: 2px solid transparent;
+  text-align: center;
+  border-radius: 1px;
+  cursor: pointer;
+  margin: 3px;
+  background-color: $gray60;
+  position:relative;
+
+  &.dmc-active::after {
+    content: '';
+    position: absolute;
+    top: -3px;
+    right: -3px;
+    left: -3px;
+    bottom: -3px;
+    border: 1px solid $gray30;
+  }
+
+  &.dmc-status-zero {
+    background-color: transparent;
+    border-color: $gray60;
+    cursor: default;
+
+    > a {
+      color: $gray60;
+      cursor: inherit;
+    }
+  }
+  > a {
+    color: $white;
+    text-decoration: none;
+  }
+}
+
+.dmc-topology-panel {
+  background-color: $white;
+  margin: 0 20px 20px 20px;
+  padding-top: 20px;
+  display: inline-block;
+  float: left;
+
+  &.dmc-topology-bgt {
+    width: 770px;
+    min-height: 650px;
+    background-color: $white;
+  }
+  &.dmc-topology-auxiliaries {
+    width: 300px;
+    min-height: 490px;
+    overflow: hidden;
+    padding: 20px;
+    background-color: $gray92;
+    margin: 0 5px 20px 0;
+
+    .dmc-topology-auxiliaries-type-filter {
+      padding-bottom: 10px;
+    }
+  }
+}
+
+.dmc-topology .dmc-topology-bgt section {
+  display: inline-block;
+  float: left;
+  width: 300px;
+  margin-left: 20px;
+
+  &.dmc-topology-search-heads-section {
+      margin-left: 130px;
+  }
+}
+
+.dmc-topology-indexers-filter, .dmc-topology-search-heads-filter {
+    margin-bottom: 10px;
+
+    input {
+        margin-bottom: 0;
+    }
+}
+
+.dmc-topology-filter-select {
+    width: 100%;
+
+    .dropdown-toggle {
+        width: 100%;
+    }
+}
+
+.dmc-topology ul.dmc-status-filters {
+  top: 6px;
+}
+
+
+
+.dmc-topology-svg, .dmc-topology-auxiliaries-svg {
+  clear: both;
+
+  .hr {
+    stroke-width: 1;
+    stroke: $borderColor;
+  }
+  text {
+      font-size: $fontSize;
+      fill: $textColor;
+  }
+
+  .link {
+      cursor: pointer;
+      fill: $linkColor;
+
+      &:hover {
+          fill: $linkColorHover;
+          text-decoration: underline;
+      }
+  }
+  .per-page, .page {
+       text-anchor: end;
+   }
+
+  .icon {
+      font-family: "Splunk Icons";
+
+      text-decoration: none !important;
+  }
+
+
+  .link-icon {
+      cursor: pointer;
+      fill: $linkColor;
+  }
+
+  .instance-group {
+      fill: $gray60;
+
+
+      &:hover, &.active {
+          cursor: pointer;
+
+          .instance-background {
+              fill: inherit;
+          }
+
+          .instance-label {
+              fill: $white;
+          }
+      }
+
+      &.instance-color-red {
+          fill: $errorColor;
+      }
+
+      &.instance-color-green {
+          fill: $successColor;
+      }
+
+      &.instance-color-yellow {
+          fill: $warningColor;
+      }
+
+      &.instance-color-bluedark {
+          fill: $infoColorD40;
+      }
+
+      &.instance-color-blue {
+          fill: $infoColorL10;
+      }
+
+      &.instance-color-bluelight {
+          fill: $infoColorL30;
+      }
+
+      &.instance-color-bluelighter {
+          fill: $infoColorL40;
+      }
+
+      &.instance-color-orange {
+          fill: $alertColor;
+      }
+
+      &.instance-color-yellow {
+          fill: $warningColor;
+      }
+
+      .instance-background {
+          fill: $gray80;
+      }
+
+      .instance-status-background {
+          fill: inherit;
+      }
+
+      .instance-label {
+          fill: $textColor;
+      }
+
+      .instance-status {
+          fill: $white;
+          font-size: 15px;
+          text-anchor: middle;
+
+          &.instance-status-icon {
+            font-weight: bold;
+            font-family: "Splunk Icons";
+
+             &.dmc-question-mark {
+              font-weight: normal;
+        	  font-family: $sansFontFamily;
+            }
+          }
+      }
+    }
+}
+
+form.dmc-hide-unconnected {
+  padding: 10px;
+  border-top: 1px solid $borderColor;
+  border-bottom: 1px solid $borderColor;
+  font-weight: 100;
+
+  input {
+    margin-top: 0;
+  }
+}
+
+.dmc-dropdown-menu {
+    background-color: $white;
+
+  > h3, > p, > dl {
+    padding-left: 10px;
+  }
+}
+
+.dmc-natural-select {
+  .control-label {
+    width: 100px;
+  }
+  select {
+    margin-left: 20px;
+  }
+}
+
+.dmc-topology .dmc-topology-svg {
+  clear: both;
+}
+
+.dmc-distributed-mode-view .section-header.form-horizontal {
+  .control-label {
+    width: 100px
+  }
+  .controls {
+    margin-left: 120px;
+  }
+}
+
+.splunkmonitoringconsole-views-overview-distributedmode-topology-controls-instancemenu {
+  min-width: 400px;
+  dl.dl-horizontal {
+    dd {
+      margin-left: auto;
+    }
+  }
+}

@@ -1,0 +1,42 @@
+<%!
+    theme = ''
+    import splunk
+    from splunk.appserver.mrsparkle.lib import util
+    faviconFile = util.getFaviconFileName()
+%>\
+<!doctype html>
+<!--[if lt IE 7]> <html lang="${i18n.current_lang()[0]|h}" class="no-js ie  lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>    <html lang="${i18n.current_lang()[0]|h}" class="no-js ie7 lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>    <html lang="${i18n.current_lang()[0]|h}" class="no-js ie8 lt-ie9"> <![endif]-->
+<!--[if IE 9]>    <html lang="${i18n.current_lang()[0]|h}" class="no-js ie9"> <![endif]-->
+<!--[if gt IE 9]><!--> <html lang="${i18n.current_lang()[0]|h}" class="no-js"> <!--<![endif]-->
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>${_('Instrumentation | Splunk')}</title>
+    <meta name="description" content="listen to your data" />
+    <meta name="author" content="Splunk Inc." />
+    <meta name="viewport" content="width=1160, initial-scale=1.0" />
+    <link rel="shortcut icon" href="${make_url('/static/img/' + faviconFile)}" />
+    <link rel="apple-touch-icon-precomposed" sizes="57x57" href="${make_url('/static/img/bookmark/apple-icon-57x57-precomposed.png')}" />
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="${make_url('/static/img/bookmark/apple-icon-72x72-precomposed.png')}" />
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="${make_url('/static/img/bookmark/apple-icon-114x114-precomposed.png')}" />
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="${make_url('/static/img/bookmark/apple-icon-144x144-precomposed.png')}" />
+    <meta name="msapplication-TileColor" content="#65A637">
+    <meta name="msapplication-TileImage" content="${make_url('/static/img/bookmark/ms-tileicon-144x144.png')}">
+    <link rel="stylesheet" type="text/css" href="${make_url('/static/build/css/bootstrap-enterprise.css', _qs=css_less_qs)}" />
+</head>
+<body class="locale-${i18n.current_lang()[0]|h}">
+
+    <script>
+        document.body.append = document.body.append || document.body.appendChild;
+    </script>
+    <script src="${make_url('/config?autoload=1')}" crossorigin="use-credentials"></script>
+    <script src="${make_url('/static/js/i18n.js')}"></script>
+    <script src="${make_url('/i18ncatalog?autoload=1')}"></script>
+    <script>
+    __splunkd_partials__ = ${json_decode(splunkd)};
+    </script>
+    <script src="${make_url('/static/app/splunk_instrumentation/build/pages/inst.js')}"></script>
+</body>
+</html>

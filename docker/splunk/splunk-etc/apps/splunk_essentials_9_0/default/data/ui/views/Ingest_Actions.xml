@@ -1,0 +1,87 @@
+<dashboard hideEdit="True" version="1.1">
+
+  <label>Ingest Actions</label>
+
+  <row>
+    <panel>
+      <html>
+
+        <p><strong>Description</strong></p>
+        <p> Scope: Splunk Enterprise and Splunk Cloud </p>
+        <p> Ingest Actions is a data transformation feature for routing, filtering, and masking the data being streamed into your indexers. Each type of data transformation is expressed as a rule. You can apply multiple rules to a data stream, and save the combined rules as a ruleset. Use the Ingest Actions page to dynamically preview and build rules using indexed data. When you're ready to apply the ruleset to your data, you can deploy the configuration from the indexer cluster manager. </p>
+        <p> Use the Ingest Actions page to create a ruleset:</p>
+        <ol> 
+        	<li>Log in to the Indexer Cluster Manager.</li>
+        	<li>Click on Settings > Data > Ingest Actions.</li>
+        	<ul>
+                  <div style="margin-left:10px">
+                   <img src="/static/app/splunk_essentials_9_0/images/ingest_actions_1.png" style="margin: 10px 0" width="700px"/>
+                  </div>
+                  
+                 </ul>
+            <ul>
+                  <div style="margin-left:10px">
+                   <img src="/static/app/splunk_essentials_9_0/images/ingest_actions_2.png" style="margin: 10px 0" width="700px"/>
+                  </div>
+                  
+                 </ul>
+        </ol>
+        <p> A data preview is available when you're building a ruleset using the Ingest Actions page. The data preview uses indexed data to help you define rules. It also estimates the changes a rule will have on the data source. The data preview is only a preview of the rule changes, and does not modify any indexed data.</p>
+        <p>See three example use cases with screenshots below.</p>
+        <p><strong>1. Easily filter out logs that you don’t want to index:</strong></p>
+        <ul>
+                  <div style="margin-left:10px">
+                   <img src="/static/app/splunk_essentials_9_0/images/ingest_actions_3.png" style="margin: 10px 0" width="700px"/>
+                  </div>
+                  
+                 </ul>
+        <ul>
+                  <div style="margin-left:10px">
+                   <img src="/static/app/splunk_essentials_9_0/images/ingest_actions_4.png" style="margin: 10px 0" width="700px"/>
+                  </div>
+                  
+                 </ul>
+        <ul>
+                  <div style="margin-left:10px">
+                   <img src="/static/app/splunk_essentials_9_0/images/ingest_actions_5.png" style="margin: 10px 0" width="700px"/>
+                  </div>
+                  
+                 </ul>
+        <ul>
+                  <div style="margin-left:10px">
+                   <img src="/static/app/splunk_essentials_9_0/images/ingest_actions_6.png" style="margin: 10px 0" width="700px"/>
+                  </div>
+                  
+                 </ul>
+        <ul>
+                  <div style="margin-left:10px">
+                   <img src="/static/app/splunk_essentials_9_0/images/ingest_actions_7.png" style="margin: 10px 0" width="700px"/>
+                  </div>
+                  
+                 </ul>
+        <p><strong>2. Seamlessly mask data within logs with other regular expressions:</strong></p>
+        <ul>
+                  <div style="margin-left:10px">
+                   <img src="/static/app/splunk_essentials_9_0/images/ingest_actions_8.png" style="margin: 10px 0" width="700px"/>
+                  </div>
+                  
+                 </ul>
+        <ul>
+                  <div style="margin-left:10px">
+                   <img src="/static/app/splunk_essentials_9_0/images/ingest_actions_9.png" style="margin: 10px 0" width="700px"/>
+                  </div>
+                  
+                 </ul>
+        <p><strong>3. Effortlessly route data to different destinations, including to AWS S3 or S3-compliant endpoints:</strong></p>
+        <ul>
+                  <div style="margin-left:10px">
+                   <img src="/static/app/splunk_essentials_9_0/images/ingest_actions_10.png" style="margin: 10px 0" width="700px"/>
+                  </div>
+                  
+                 </ul>  
+        <p> Ingest Actions are supported on indexers and heavy weight forwarders. For the latter specifically, once an ingest action has been configured to a deployment server it will automatically deploy to all deployment clients (e.g. HWFs).</p>
+        <p> Click <a href="https://docs.splunk.com/Documentation/Splunk/9.0.0/Data/DataIngest#Use_the_Ingest_Actions_page" target="_blank">here</a> for more information about this feature.</p> 
+        </html>
+    </panel>
+  </row>
+</dashboard>

@@ -1,0 +1,54 @@
+{
+    "schemaVersion": "2.0.0",
+    "info": {
+        "title": "Splunk Dashboard Studio",
+        "id": {
+            "group": null,
+            "name": "splunk-dashboard-studio",
+            "version": "1.7.3"
+        },
+        "author": [
+            {
+                "name": "Splunk",
+                "email": null,
+                "company": null
+            }
+        ],
+        "releaseDate": null,
+        "description": "Splunk dashboard studio",
+        "classification": {
+            "intendedAudience": null,
+            "categories": [],
+            "developmentStatus": null
+        },
+        "commonInformationModels": null,
+        "license": {
+            "name": null,
+            "text": null,
+            "uri": null
+        },
+        "privacyPolicy": {
+            "name": null,
+            "text": null,
+            "uri": null
+        },
+        "releaseNotes": {
+            "name": null,
+            "text": null,
+            "uri": null
+        }
+    },
+    "dependencies": null,
+    "tasks": [
+        "script://$SPLUNK_HOME/etc/apps/splunk-dashboard-studio/bin/save_image_and_icon_on_install.py"
+    ],
+    "inputGroups": null,
+    "incompatibleApps": null,
+    "platformRequirements": null,
+    "supportedDeployments": [
+        "_standalone",
+        "_distributed",
+        "_search_head_clustering"
+    ],
+    "targetWorkloads": ["_search_heads"]
+}

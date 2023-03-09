@@ -1,0 +1,543 @@
+<form version="1.1" hideEdit="True" script="common_control.js" stylesheet="shared.css, health-check.css">
+  <label>Distributed Search: Deployment</label>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="radio" searchWhenChanged="true" token="role">
+      <label>Role</label>
+      <choice value="dmc_group_search_head">Search Heads</choice>
+      <choice value="dmc_group_indexer">Indexers (Search Peers)</choice>
+      <default>dmc_group_search_head</default>
+      <change>
+        <condition value="dmc_group_search_head">
+          <set token="instances_snapshot_title">Search Heads</set>
+          <set token="show_peer_heartbeat_log">true</set>
+          <set token="show_peer_status_health_kpi">true</set>
+          <set token="bundles_group">bundles_uploads</set>
+          <set token="bundles_group_label">Upload</set>
+          <set token="instance_fields_filter">fields splunk_server, peer_count, bundle_file_count, avg_baseline_mb, avg_sec, "Dispatch_Directory_Reaper_Average_Time(ms)", "Dispatch_Directory_Reaper_Max_Time(ms)"</set>
+          <unset token="show_bundle_reaper"></unset>
+        </condition>
+        <condition value="dmc_group_indexer">
+          <set token="instances_snapshot_title">Search Peers</set>
+          <unset token="show_peer_heartbeat_log"></unset>
+          <unset token="show_peer_status_health_kpi"></unset>
+          <set token="bundles_group">bundles_downloads</set>
+          <set token="bundles_group_label">Download</set>
+          <set token="instance_fields_filter">fields splunk_server, bundle_file_count, avg_sec, "Bundle_Directory_Reaper_Average_Time(ms)", "Bundle_Directory_Reaper_Max_Time(ms)", "Dispatch_Directory_Reaper_Average_Time(ms)", "Dispatch_Directory_Reaper_Max_Time(ms)"</set>
+          <set token="show_bundle_reaper">true</set>
+        </condition>
+      </change>
+    </input>
+    <input type="dropdown" searchWhenChanged="true" token="group">
+      <label>Group</label>
+      <showClearButton>false</showClearButton>
+      <search fieldForValue="search_group">
+        <query>| `dmc_get_groups_containing_role($role | h$)` | search search_group!="dmc_group_*"</query>
+      </search>
+      <fieldForLabel>label</fieldForLabel>
+      <fieldForValue>search_group</fieldForValue>
+      <choice value="*">All</choice>
+      <selectFirstChoice>true</selectFirstChoice>
+    </input>
+  </fieldset>
+  <row>
+    <panel rejects="$historical$" depends="$show_peer_status_health_kpi$">
+      <title>Health Check</title>
+      <search id="peer_status_health_api_base">
+        <query>
+          | rest splunk_server_group=$role | h$ splunk_server_group="$group$" /services/search/distributed/peers
+          | join type=outer title, splunk_server [
+          | rest splunk_server_group=$role | h$ splunk_server_group="$group$" /services/server/introspection/search/distributed
+          | where title != "per_searchhead_metrics" AND title != "window_metrics"
+          ]
+          | fields status, health_status, splunk_server, peerName
+        </query>
+      </search>
+      <viz type="splunk_monitoring_console.KpiTrafficLight">
+        <search base="peer_status_health_api_base">
+          <query>
+            where status!="Up"
+            | stats dc(splunk_server) as down_count, values(splunk_server) as splunk_server
+          </query>
+          <preview>
+            <set token="down_count">$result.down_count$</set>
+          </preview>
+        </search>
+        <option name="height">45</option>
+        <option name="splunk_monitoring_console.KpiTrafficLight.field">down_count</option>
+        <option name="splunk_monitoring_console.KpiTrafficLight.detail">splunk_server</option>
+        <option name="splunk_monitoring_console.KpiTrafficLight.rangeValues">[0]</option>
+        <option name="splunk_monitoring_console.KpiTrafficLight.rangeIcons">["success", "error"]</option>
+        <option name="splunk_monitoring_console.KpiTrafficLight.rangeLabels">["All search heads' peers are up.", "$down_count$ search heads have peers that are not up."]</option>
+        <!--<option name="splunk_monitoring_console.KpiTrafficLight.description">Please check your network connectivity and make sure all search heads' peers are running.</option>-->
+      </viz>
+      <viz type="splunk_monitoring_console.KpiTrafficLight">
+        <search base="peer_status_health_api_base">
+          <!-- can use this search string to test tooltip: -->
+          <!-- eval health_status = if(random() % 2 == 1, "Healthy", "Unhealthy") -->
+          <query>
+            where health_status!="Healthy"
+            | stats dc(splunk_server) as unhealthy_count, values(splunk_server) as splunk_server
+          </query>
+          <preview>
+            <set token="unhealthy_count">$result.unhealthy_count$</set>
+          </preview>
+        </search>
+        <option name="height">50</option>
+        <option name="splunk_monitoring_console.KpiTrafficLight.field">unhealthy_count</option>
+        <option name="splunk_monitoring_console.KpiTrafficLight.detail">splunk_server</option>
+        <option name="splunk_monitoring_console.KpiTrafficLight.rangeValues">[0]</option>
+        <option name="splunk_monitoring_console.KpiTrafficLight.rangeIcons">["success", "error"]</option>
+        <option name="splunk_monitoring_console.KpiTrafficLight.rangeLabels">["All search heads' peers are healthy.", "$unhealthy_count$ search heads have peers that are unhealthy."]</option>
+        <!--<option name="splunk_monitoring_console.KpiTrafficLight.description">Please check the "Distributed Search: Instance" dashboard to see the details of unhealthy peers.</option>-->
+      </viz>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+        <h2>
+          <span>Select views: </span>
+          <span id="link-switcher-view">
+            <a href="#" class="btn-pill active" data-item="all">All</a>
+            <a href="#" class="btn-pill" data-item="snapshot">Snapshot</a>
+            <a href="#" class="btn-pill" data-item="historical">Historical</a>
+          </span>
+        </h2>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Snapshots</title>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>$instances_snapshot_title$ ($instance_count$)</title>
+      <table>
+        <search>
+          <query>
+            | rest splunk_server_group=$role | h$ splunk_server_group="$group$" /services/server/introspection/search/distributed/window_metrics
+            | eval avg_baseline_mb = if(isNotNull(average_baseline_file_size), round(average_baseline_file_size /1024 / 1024, 2), "Unknown")
+            | eval avg_sec = round(average_msecs / 1000, 2)
+            | eval bundle_file_count = if(isNotNull(bundle_file_count), bundle_file_count, count)
+            | fields splunk_server, bundle_file_count, avg_baseline_mb, avg_sec
+            | join type=outer splunk_server [
+              | rest splunk_server_group=$role | h$ splunk_server_group="$group$" /services/search/distributed/peers
+              | stats count as peer_count by splunk_server
+            ]
+            | join type=outer splunk_server [
+              | rest splunk_server_group=$role | h$ splunk_server_group="$group$" /services/server/introspection/search/dispatch/Bundle_Directory_Reaper
+              | eval Bundle_Directory_Reaper_Average_Time(ms) = round('Bundle_Directory_Reaper_Average_Time(ms)')
+              | eval Bundle_Directory_Reaper_Max_Time(ms) = round('Bundle_Directory_Reaper_Max_Time(ms)')
+              | fields splunk_server, "Bundle_Directory_Reaper_Average_Time(ms)", "Bundle_Directory_Reaper_Max_Time(ms)"
+            ]
+            | join type=outer splunk_server [
+              | rest splunk_server_group=$role | h$ splunk_server_group="$group$" /services/server/introspection/search/dispatch/Dispatch_Directory_Reaper
+              | eval Dispatch_Directory_Reaper_Average_Time(ms) = round('Dispatch_Directory_Reaper_Average_Time(ms)')
+              | eval Dispatch_Directory_Reaper_Max_Time(ms) = round('Dispatch_Directory_Reaper_Max_Time(ms)')
+              | fields splunk_server, "Dispatch_Directory_Reaper_Average_Time(ms)", "Dispatch_Directory_Reaper_Max_Time(ms)"
+            ]
+            | $instance_fields_filter$
+            | rename splunk_server as Instance, peer_count as "Peer Count", bundle_file_count as "Knowledge Bundle Replication Count", avg_baseline_mb as "Average Size of Baseline Knowledge Bundle (MB)", avg_sec as "Average Time Spent on Knowledge Bundle Replication (sec)", "Bundle_Directory_Reaper_Average_Time(ms)" as "Average Time to Reap Knowledge Bundle Directory (ms)", "Bundle_Directory_Reaper_Max_Time(ms)" as "Max Time to Reap Knowledge Bundle Directory (ms)", "Dispatch_Directory_Reaper_Average_Time(ms)" as "Average Time to Reap Dispatch Directory (ms)", "Dispatch_Directory_Reaper_Max_Time(ms)" as "Max Time to Reap Dispatch Directory (ms)"
+          </query>
+          <preview>
+            <set token="instance_count">$job.resultCount$</set>
+          </preview>
+          <finalized>
+            <set token="instance_count">$job.resultCount$</set>
+          </finalized>
+        </search>
+        <option name="drilldown">row</option>
+        <drilldown>
+          <link target="_blank">
+            <![CDATA[
+              distributed_search_instance?form.splunk_server=$row.Instance$&form.role=$role | h$
+            ]]>
+          </link>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Historical Charts</title>
+      <input type="time" searchWhenChanged="true" token="time">
+        <label>Time Range:</label>
+        <default>
+          <earliestTime>-4h@m</earliestTime>
+          <latestTime>now</latestTime>
+        </default>
+      </input>
+      <input type="checkbox" searchWhenChanged="true" token="split_by_host">
+        <label></label>
+        <choice>Split by host</choice>
+      </input>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$, $split_by_host$" depends="$show_peer_heartbeat_log$">
+      <title>Peer Heartbeat</title>
+      <input type="dropdown" searchWhenChanged="true" token="peer_heartbeat_no_split_agg">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <choice value="mean">Average</choice>
+        <choice value="max">Maximum</choice>
+        <default>max</default>
+      </input>
+      <chart>
+        <title>Time to Get Authentication, Bundle List, and Peer Info</title>
+        <search>
+          <query>
+            `dmc_set_index_internal` sourcetype=splunkd group=search_health_metrics name=distributed_peer_heartbeat search_group=$role | h$ search_group="$group$"
+            | `dmc_timechart_for_metrics_reaper_and_heartbeat`
+              avg(get_auth_$peer_heartbeat_no_split_agg$_ms) as get_auth_$peer_heartbeat_no_split_agg$_ms
+              avg(get_bundleList_$peer_heartbeat_no_split_agg$_ms) as get_bundleList_$peer_heartbeat_no_split_agg$_ms
+              avg(get_serverInfo_$peer_heartbeat_no_split_agg$_ms) as get_serverInfo_$peer_heartbeat_no_split_agg$_ms
+            | eval get_auth_$peer_heartbeat_no_split_agg$_ms = round(get_auth_$peer_heartbeat_no_split_agg$_ms)
+            | eval get_bundleList_$peer_heartbeat_no_split_agg$_ms = round(get_bundleList_$peer_heartbeat_no_split_agg$_ms)
+            | eval get_serverInfo_$peer_heartbeat_no_split_agg$_ms = round(get_serverInfo_$peer_heartbeat_no_split_agg$_ms)
+            | rename get_auth_$peer_heartbeat_no_split_agg$_ms as "Get Authentication",
+                get_bundleList_$peer_heartbeat_no_split_agg$_ms as "Get Bundle List",
+                get_serverInfo_$peer_heartbeat_no_split_agg$_ms as "Get Peer Info"
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Time Spent (ms)</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+      </chart>
+      <html>
+        <p><b>Authentication:</b> the search head requests an authentication token from the peer's /services/admin/auth-tokens endpoint. </p>
+        <p><b>Get Bundle List:</b> the search head requests a list of available knowledge bundles from the peer's /services/admin/bundles endpoint. </p>
+        <p><b>Get Peer Info:</b> the search head requests instance information from the peer's /services/server/info endpoint. </p>
+      </html>
+    </panel>
+    <!-- <panel rejects="$snapshot$" depends="$split_by_host$, $show_peer_heartbeat_log$">
+      <title>Peer Count</title>
+      <input type="dropdown" searchWhenChanged="true" token="peer_count_agg">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <choice value="avg">Average</choice>
+        <choice value="min">Minimum</choice>
+        <choice value="max">Maximum</choice>
+        <default>min</default>
+      </input>
+      <input type="text" searchWhenChanged="true" token="peer_count_filter">
+        <label>Count > </label>
+        <default>0</default>
+      </input>
+      <chart>
+        <search>
+          <query>
+            `dmc_set_index_internal` sourcetype=splunkd group=search_health_metrics name=distributed_peer_heartbeat search_group=$role | h$ search_group="$group$"
+            | where Peer_Count > $peer_count_filter$
+            | `dmc_timechart_for_metrics_reaper_and_heartbeat` $peer_count_agg$(Peer_Count) as peer_count by host
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Count</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+      </chart>
+    </panel> -->
+    <panel rejects="$snapshot$" depends="$split_by_host$, $show_peer_heartbeat_log$">
+      <title>Peer Heartbeat: Time to Get $peer_heartbeat_metric_label$</title>
+      <input type="dropdown" searchWhenChanged="true" token="peer_heartbeat_metric">
+        <label>Metric</label>
+        <showClearButton>false</showClearButton>
+        <choice value="auth">Authentication</choice>
+        <choice value="bundleList">Bundle List</choice>
+        <choice value="serverInfo">Peer Info</choice>
+        <default>serverInfo</default>
+        <change>
+          <set token="peer_heartbeat_metric_label">$label$</set>
+        </change>
+      </input>
+      <input type="dropdown" searchWhenChanged="true" token="peer_heartbeat_split_agg">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <choice value="mean">Average</choice>
+        <choice value="max">Maximum</choice>
+        <default>max</default>
+      </input>
+      <input type="text" searchWhenChanged="true" token="peer_heartbeat_metric_filter">
+        <label>Time to Get $peer_heartbeat_metric_label$ > </label>
+        <default>0</default>
+      </input>
+      <chart>
+        <search>
+          <query>
+            `dmc_set_index_internal` sourcetype=splunkd group=search_health_metrics name=distributed_peer_heartbeat search_group=$role | h$ search_group="$group$"
+            | where get_$peer_heartbeat_metric$_$peer_heartbeat_split_agg$_ms > $peer_heartbeat_metric_filter$
+            | `dmc_timechart_for_metrics_reaper_and_heartbeat` $peer_heartbeat_split_agg$(get_$peer_heartbeat_metric$_$peer_heartbeat_split_agg$_ms) as metric by host
+            | eval metric = round(metric)
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Time Spent (ms)</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+      </chart>
+      <html>
+        <p><b>Authentication:</b> the search head requests an authentication token from the peer's /services/admin/auth-tokens endpoint. </p>
+        <p><b>Get Bundle List:</b> the search head requests a list of available knowledge bundles from the peer's /services/admin/bundles endpoint. </p>
+        <p><b>Get Peer Info:</b> the search head requests instance information from the peer's /services/server/info endpoint. </p>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$, $split_by_host$">
+      <title>Knowledge Bundle $bundles_group_label$ Activity</title>
+      <search id="bundle_rep_log_base">
+        <query>
+          `dmc_set_index_internal` sourcetype=splunkd group=$bundles_group$ search_group=$role | h$ search_group="$group$"
+          | `dmc_timechart_for_metrics_log` sum(total_count) as total_count,
+            sum(success_count) as success_count, sum(failure_count) as failure_count,
+            sum(baseline_count) as baseline_count, sum(delta_count) as delta_count,
+            sum(already_present_count) as already_present_count, sum(unattempted_count) as unattempted_count,
+            sum(total_msec_spent), as total_msec_spent,
+            sum(baseline_msec_spent) as baseline_msec_spent, sum(delta_msec_spent) as delta_msec_spent,
+            sum(total_bytes) as total_bytes,
+            sum(baseline_bytes) as baseline_bytes, sum(delta_bytes) as delta_bytes
+        </query>
+        <earliest>$time.earliest$</earliest>
+        <latest>$time.latest$</latest>
+      </search>
+      <chart>
+        <title>Total $bundles_group_label$ Count</title>
+        <search base="bundle_rep_log_base">
+          <query>
+            fields _time, baseline_count, delta_count
+          </query>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Count</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+      </chart>
+      <chart>
+        <title>Total $bundles_group_label$ Size</title>
+        <search base="bundle_rep_log_base">
+          <query>
+            eval baseline_size_mb = round(baseline_bytes / 1024 / 1024, 2)
+            | eval delta_size_mb = round(delta_bytes / 1024 / 1024, 2)
+            | fields _time, baseline_size_mb, delta_size_mb
+          </query>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Size (MB)</option>
+      </chart>
+      <chart>
+        <title>Total $bundles_group_label$ Time</title>
+        <search base="bundle_rep_log_base">
+          <query>
+            eval baseline_sec_spent = round(baseline_msec_spent / 1000, 2)
+            | eval delta_sec_spent = round(delta_msec_spent / 1000, 2)
+            | fields _time, baseline_sec_spent, delta_sec_spent
+          </query>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Time Spent (sec)</option>
+      </chart>
+    </panel>
+    <panel rejects="$snapshot$" depends="$split_by_host$">
+      <title>Bundle $bundles_group_label$ Activity</title>
+      <input type="dropdown" searchWhenChanged="true" token="bundle_rep_mode">
+        <label>Mode</label>
+        <showClearButton>false</showClearButton>
+        <choice value="baseline">Baseline</choice>
+        <choice value="delta">Delta</choice>
+        <choice value="total">Baseline + Delta</choice>
+        <default>total</default>
+        <change>
+          <set token="bundle_rep_mode_label">$label$</set>
+        </change>
+      </input>
+      <chart>
+        <title>$bundle_rep_mode_label$ $bundles_group_label$ Count</title>
+        <search>
+          <query>
+            `dmc_set_index_internal` sourcetype=splunkd group=$bundles_group$ search_group=$role | h$ search_group="$group$"
+            | `dmc_timechart_for_metrics_log` sum($bundle_rep_mode$_count) as count by host
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Count</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+      </chart>
+      <chart>
+        <title>$bundle_rep_mode_label$ $bundles_group_label$ Size</title>
+        <search>
+          <query>
+            `dmc_set_index_internal` sourcetype=splunkd group=$bundles_group$ search_group=$role | h$ search_group="$group$"
+            | eval $bundle_rep_mode$_mb = round($bundle_rep_mode$_bytes / 1024 / 1024, 2)
+            | `dmc_timechart_for_metrics_log` sum($bundle_rep_mode$_mb) as size by host
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Size (MB)</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+      </chart>
+      <chart>
+        <title>$bundle_rep_mode_label$ $bundles_group_label$ Time</title>
+        <search>
+          <query>
+            `dmc_set_index_internal` sourcetype=splunkd group=$bundles_group$ search_group=$role | h$ search_group="$group$"
+            | eval $bundle_rep_mode$_sec_spent = round($bundle_rep_mode$_msec_spent / 1000, 2)
+            | `dmc_timechart_for_metrics_log` sum($bundle_rep_mode$_sec_spent) as msec_spent by host
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Time Spent (sec)</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <html>
+        <p>Total $bundles_group_label$ size is the sum of all bundles sent by all search heads to all search peers.</p>
+        <p>Total $bundles_group_label$ time is the sum of all time taken by all search heads to push bundles to all search peers.</p>
+        <p>Time spent is related to bundle size, larger bundles take more time to be replicated.</p>
+        <p>These panels account for the replication of both baseline (full bundle) and delta (incremental changes only) bundles.</p>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$, $split_by_host$">
+      <title>Time to Reap</title>
+      <chart>
+        <title>Dispatch Directory</title>
+        <search>
+          <query>
+            `dmc_set_index_internal` sourcetype=splunkd group=search_health_metrics name=dispatch_directory_reaper search_group=$role | h$ search_group="$group$"
+            | `dmc_timechart_for_metrics_reaper_and_heartbeat` avg(dispatch_dir_reaper_mean_ms) as dispatch_dir_reaper_mean_ms, max(dispatch_dir_reaper_max_ms) as dispatch_dir_reaper_max_ms
+            | eval dispatch_dir_reaper_mean_ms = round(dispatch_dir_reaper_mean_ms)
+            | eval dispatch_dir_reaper_max_ms = round(dispatch_dir_reaper_max_ms)
+            | rename dispatch_dir_reaper_mean_ms as Average, dispatch_dir_reaper_max_ms as Max
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Time Spent (ms)</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+      </chart>
+      <chart depends="$show_bundle_reaper$">
+        <title>Bundle Directory</title>
+        <search>
+          <query>
+            `dmc_set_index_internal` sourcetype=splunkd group=search_health_metrics name=bundle_directory_reaper search_group=$role | h$ search_group="$group$"
+            | `dmc_timechart_for_metrics_reaper_and_heartbeat` avg(bundle_dir_reaper_mean_ms) as bundle_dir_reaper_mean_ms, max(bundle_dir_reaper_max_ms) as bundle_dir_reaper_max_ms
+            | eval bundle_dir_reaper_mean_ms = round(bundle_dir_reaper_mean_ms)
+            | eval bundle_dir_reaper_max_ms = round(bundle_dir_reaper_max_ms)
+            | rename bundle_dir_reaper_mean_ms as Average, bundle_dir_reaper_max_ms as Max
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Time Spent (ms)</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+      </chart>
+    </panel>
+    <panel rejects="$snapshot$" depends="$split_by_host$">
+      <title>Time to Reap Directories</title>
+      <input type="dropdown" searchWhenChanged="true" token="reaper_agg">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <choice value="mean">Average</choice>
+        <choice value="max">Maximum</choice>
+        <default>max</default>
+      </input>
+      <input type="text" searchWhenChanged="true" token="dispatch_dir_filter">
+        <label>Time to Reap Dispatch Directory > </label>
+        <default>0</default>
+      </input>
+      <input type="text" searchWhenChanged="true" depends="$show_bundle_reaper$" token="bundle_dir_filter">
+        <label>Time to Reap Bundle Directory</label>
+        <default>0</default>
+      </input>
+      <chart>
+        <title>Dispatch Directory Reaper</title>
+        <search>
+          <query>
+            `dmc_set_index_internal` sourcetype=splunkd group=search_health_metrics name=dispatch_directory_reaper search_group=$role | h$ search_group="$group$"
+            | where dispatch_dir_reaper_$reaper_agg$_ms > $dispatch_dir_filter$
+            | eval dispatch_dir_reaper_$reaper_agg$_ms = round(dispatch_dir_reaper_$reaper_agg$_ms)
+            | `dmc_timechart_for_metrics_reaper_and_heartbeat` $reaper_agg$(dispatch_dir_reaper_$reaper_agg$_ms) as dispatch_dir_reaper_ms by host
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Time Spent (ms)</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+      </chart>
+      <html>
+        <p>The dispatch reaper clears expired search artifacts from the dispatch directory. <a href="/help?location=learnmore.dmc.distsearch.dispatch" target="_blank" title="Splunk help">Learn More</a></p>
+        <p>Long reap times can indicate storage performance issues or an <a href="/help?location=learnmore.dmc.distsearch.searchartifacts" target="_blank" title="Splunk help">excessive number of artifacts</a>.</p>
+        <p>The Average reap time is averaged across all instances in scope.</p>
+        <p>The Maximum reap time is the highest reap time across all instances in scope.</p>
+      </html>
+      <chart depends="$show_bundle_reaper$">
+        <title>Bundle Directory Reaper</title>
+        <search>
+          <query>
+            `dmc_set_index_internal` sourcetype=splunkd group=search_health_metrics name=bundle_directory_reaper search_group=$role | h$ search_group="$group$"
+            | where bundle_dir_reaper_$reaper_agg$_ms > $bundle_dir_filter$
+            | `dmc_timechart_for_metrics_reaper_and_heartbeat` $reaper_agg$(bundle_dir_reaper_$reaper_agg$_ms) as bundle_dir_reaper_$reaper_agg$_ms by host
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Time Spent (ms)</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+      </chart>
+      <html depends="$show_bundle_reaper$">
+        <p>The knowledge bundle reaper clears expired knowledge bundles from a search peer's $SPLUNK_HOME/var/run/searchpeers directory.</p>
+        <p>Long reap times can indicate storage performance issues or an excessive number of bundles.</p>
+        <p>The Average reap time is averaged across all instances in scope.</p>
+        <p>The Maximum reap time is the highest reap time across all instances in scope.</p>
+      </html>
+    </panel>
+  </row>
+</form>

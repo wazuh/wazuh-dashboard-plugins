@@ -1,0 +1,281 @@
+/*===============================================================================================*/
+/*  SPLUNK: JQUERY UI THEME                                                                      */
+/*===============================================================================================*/
+
+/*  generic widgets */
+/*  --------------- */
+
+$jquerySquareButtonSize: 32px;
+
+.ui-widget {
+    font-family: inherit;
+}
+.ui-widget-header {
+    font-weight: normal;
+    background: transparent;
+     border: 0;
+    color: $textColor;
+    a {
+        color: $black;
+    }
+}
+.ui-corner-all {
+	border-radius: $containerBorderRadius;
+}
+.ui-icon {
+	font-family: "Splunk Icons";
+	width: $lineHeight;
+	height: $lineHeight;
+}
+
+
+/*  Tabs */
+/*  ----------- */
+
+.ui-tabs {
+	/*jq-ui adds background to tabs which is shared by other components*/
+	.ui-widget-header {
+		background: none;
+		border-bottom:1px solid $borderColor;
+		border-radius: 0;
+	}
+	/*  override default tabs borders */
+	.ui-tabs-nav li {
+		border-bottom: 1px solid $borderColor !important; /*need important to override jq-ui bs*/
+		margin-bottom:-1px;
+		/*  selected state */
+		&.ui-tabs-selected {
+			border-bottom:1px solid $borderColor !important; /*need important to override the other important*/
+		}
+	}
+}
+
+
+/*  Accordiion */
+/*  ------------ */
+
+.ui-accordion {
+	.ui-accordion-header {
+		.ui-icon {
+			left: 0.5em;
+			margin-top: -8px;
+			position: absolute;
+			top: 50%;
+		}
+	}
+}
+
+.ui-accordion-icons {
+	.ui-accordion-header a {
+		padding-left: 2.2em;
+	}
+}
+
+
+/*  Datepicker */
+/*  ------------- */
+
+#ui-datepicker-div {
+	display:none; /*  jquery ui adds this id by default ;_; */
+	z-index: $zindexDatePicker !important; /*  need to override jquery inline z-index nonsense ;_; */
+}
+
+.ui-datepicker {
+
+	@mixin popdown-dialog;
+    background-color: $popupBackgroundColor;
+	width: 17em;
+	height: auto;
+	position: relative;
+	padding: 5px;
+    margin: 0;
+
+
+	.ui-datepicker-header {
+		position: relative;
+		padding: 0.2em 0;
+		background: transparent;
+	}/* header */
+
+	.ui-datepicker-title {
+		margin: 0 2.3em;
+		line-height: $jquerySquareButtonSize;
+		text-align: center;
+	}
+
+	.ui-datepicker-prev, .ui-datepicker-next {
+		position: absolute;
+		text-decoration: none;
+
+		.ui-icon{
+			@mixin hide-text;
+			left: 0;
+			/*  override hide-text for ie-7 */
+		}
+		.ui-icon:after {
+			display: block;
+			position: absolute;
+            top: 0;
+            left: 0;
+            text-align: center;
+            width: $jquerySquareButtonSize;
+            line-height: $jquerySquareButtonSize;
+            color: $pillTextColor;
+
+			text-indent: 0;
+			font-size: $fontSizeSmall;
+			font-family: "Splunk Icons";
+		}
+	}/* prev-next */
+
+	.ui-datepicker-prev .ui-icon:after {
+			content: "\25C0";
+	}
+	.ui-datepicker-next {
+		top: 0;
+		right: 0;
+
+		.ui-icon:after {
+			content: "\25B6";
+		}
+	}
+
+	table {
+		margin-bottom: 0;
+		width: 100%;
+		border-collapse: collapse;
+		margin: 0 0 0.4em;
+	}
+
+	.ui-datepicker-calendar {/*  table */
+		margin: 0;
+		th {
+			line-height: 10px;
+			padding: 0.7em 0.3em;
+			padding-top: 20px;
+			color: $dayOfWeekColor;
+			text-align: center;
+			border: 0;
+			font-weight: normal;
+		}
+		td {
+			padding: 1px;
+			a {
+				display: block;
+				padding: 0.2em;
+				text-align: right;
+                color: $pillTextColor;
+			}
+		}
+		a {
+			border: 1px solid $borderColor;
+		}
+
+		a:hover {text-decoration: none;}
+
+		.ui-state-default {
+			background: $dateBackgroundColor;
+			border:1px solid $dateBorderColor;
+			color: $pillTextColor;
+		}
+		.ui-state-active {
+			background-color: $dateBackgroundColorSelected;
+			border-color: $accentColor;
+			color: $linkColorHover;
+		}
+		.ui-state-hover {
+			border-color: $accentColorL10;
+			background: $dateBackgroundColorHover;
+			color: $linkColorHover;
+		}
+	} /*  calendar */
+
+	a.ui-corner-all {
+
+        display: inline-block;
+        @mixin button-padding; /*  note the vertical padding will be funky unless it's block, inline-block, or floated */
+        border-radius: $interactiveBorderRadius;
+
+        @mixin interactive none, transparent, none, $pillTextColor;
+        @mixin button-states link-style $linkColor, link-style, link-style $textDisabledColor, link-style-underline $linkColor;
+
+        width: $jquerySquareButtonSize;
+        height: $jquerySquareButtonSize;
+        text-align: center;
+        padding:0;
+
+	}
+
+	a.ui-corner-all:hover {
+		cursor: pointer; /*  ensure pointer if missing href */
+		color: $linkColorHover;
+		background: $gray98;
+		font-weight: normal;
+
+		.ui-icon:after {
+    		color: $linkColorHover;
+        }
+	}
+
+}/* .ui-datepicker */
+
+
+/*
+ * jQuery UI Resizable $VERSION
+ *
+ * Copyright 2011, AUTHORS.txt (http://jqueryui.com/about)
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ * http://jquery.org/license
+ *
+ * http://docs.jquery.com/UI/Resizable#theming
+ */
+.ui-resizable { position: relative;}
+.ui-resizable-handle { position: absolute;font-size: 0.1px;z-index: 99999; display: block; }
+.ui-resizable-disabled .ui-resizable-handle, .ui-resizable-autohide .ui-resizable-handle { display: none; }
+.ui-resizable-n { cursor: n-resize; height: 7px; width: 100%; top: -5px; left: 0; }
+.ui-resizable-s { cursor: s-resize; height: 7px; width: 100%; bottom: -5px; left: 0; }
+.ui-resizable-e { cursor: e-resize; width: 7px; right: -5px; top: 0; height: 100%; }
+.ui-resizable-w { cursor: w-resize; width: 7px; left: -5px; top: 0; height: 100%; }
+.ui-resizable-se { cursor: se-resize; width: 12px; height: 12px; right: 1px; bottom: 1px; }
+.ui-resizable-sw { cursor: sw-resize; width: 9px; height: 9px; left: -5px; bottom: -5px; }
+.ui-resizable-nw { cursor: nw-resize; width: 9px; height: 9px; left: -5px; top: -5px; }
+.ui-resizable-ne { cursor: ne-resize; width: 9px; height: 9px; right: -5px; top: -5px;}
+
+
+.ui-resizable-handle {
+    width: 100%;
+    height: 9px;
+    background-color: transparent;
+    z-index: 1000;
+	cursor: ns-resize;
+    cursor: row-resize;
+    bottom: 0;
+
+    &:before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        margin-top:-1px;
+        display: block;
+        border-radius: 3px;
+        border: none;
+        height: 6px;
+        width: 6px;
+        background-color: rgba(0,0,0,0.25);
+    }
+
+    &:hover {
+      /*   .gradient-vertical($interactiveGradientStartColorHover, $interactiveGradientEndColorHover); */
+    }
+
+    .ui-draggable-dragging {
+        position: relative;
+    }
+}
+
+
+.ui-resizable:hover .ui-resizable-handle {
+  visibility: visible;
+}

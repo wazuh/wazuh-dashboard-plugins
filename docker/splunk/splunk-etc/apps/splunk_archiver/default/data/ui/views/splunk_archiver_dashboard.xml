@@ -1,0 +1,389 @@
+<form version="1.1" isDashboard="False">
+  <label>Splunk Archiver</label>
+  <description>Splunk archiver overview</description>
+  <row>
+    <panel>
+      <table>
+        <title>Archive Summary By Index</title>
+        <search>
+          <query>index=_internal source=*splunk_archiver.log* finished | eval last_bucket_time=strftime(latest_bucket_time_secs, "%F %T %z")| eval transfered_mb=remote_bucket_bytes/1000000 | rename splunk_index AS "Splunk Index", virtual_index AS "Archive Index" | stats max(last_bucket_time) as "Latest Archive Bucket Time" sum(transfered_mb) as "Total Transfered MB" sum(buckets_copied) as "Total Buckets Copied" by "Splunk Index", "Archive Index"</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <event>
+        <title>Archiving Errors in the Last Day</title>
+        <search>
+          <query>index=_internal source=*splunk_archiver.log* earliest=-1d | rex max_match=1000 "\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d+ -\d{4} (?&lt;severity&gt;\w+) " | where severity="ERROR"</query>
+        </search>
+        <option name="count">5</option>
+        <option name="list.drilldown">full</option>
+        <option name="list.wrap">1</option>
+        <option name="maxLines">5</option>
+        <option name="raw.drilldown">full</option>
+        <option name="rowNumbers">0</option>
+        <option name="table.drilldown">all</option>
+        <option name="table.wrap">1</option>
+        <option name="type">list</option>
+        <fields>[]</fields>
+      </event>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <input type="time" token="field1" searchWhenChanged="true">
+        <label>Select a time range:</label>
+        <default>
+          <earliest>-7d@h</earliest>
+          <latest>now</latest>
+        </default>
+      </input>
+      <input type="dropdown" token="splunk_idx1" searchWhenChanged="true">
+        <label>Select a splunk index:</label>
+        <prefix>splunk_index="</prefix>
+        <suffix>"</suffix>
+        <default>*</default>
+        <choice value="*">ALL</choice>
+        <search>
+          <query>index=_internal source=*splunk_archiver.log* committed | stats count by splunk_index</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <fieldForLabel>splunk_index</fieldForLabel>
+        <fieldForValue>splunk_index</fieldForValue>
+      </input>
+      <chart>
+        <title>Buckets Copied</title>
+        <search>
+          <query>index=_internal source=*splunk_archiver.log* committed $splunk_idx1$ | timechart count by splunk_index</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="list.drilldown">full</option>
+        <option name="list.wrap">1</option>
+        <option name="maxLines">5</option>
+        <option name="raw.drilldown">full</option>
+        <option name="rowNumbers">0</option>
+        <option name="table.drilldown">all</option>
+        <option name="table.wrap">1</option>
+        <option name="type">list</option>
+        <fields>["host","source","sourcetype"]</fields>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <input type="time" token="field2" searchWhenChanged="true">
+        <label>Select a time range:</label>
+        <default>
+          <earliest>-7d@h</earliest>
+          <latest>now</latest>
+        </default>
+      </input>
+      <input type="dropdown" token="splunk_idx2" searchWhenChanged="true">
+        <label>Select a splunk index:</label>
+        <prefix>splunk_index="</prefix>
+        <suffix>"</suffix>
+        <default>*</default>
+        <choice value="*">ALL</choice>
+        <search>
+          <query>index=_internal source=*splunk_archiver.log* committed | stats count by splunk_index</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <fieldForLabel>splunk_index</fieldForLabel>
+        <fieldForValue>splunk_index</fieldForValue>
+      </input>
+      <chart>
+        <title>Total MB Transferred</title>
+        <search>
+          <query>index=_internal source=*splunk_archiver.log* committed "$splunk_idx2$" |  eval mb = remote_bucket_bytes/1000000 | timechart sum(mb) by splunk_index</query>
+          <earliest>$field2.earliest$</earliest>
+          <latest>$field2.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">log</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">zero</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <input type="time" token="field4">
+        <label>Select a time range:</label>
+        <default>
+          <earliest>-7d@h</earliest>
+          <latest>now</latest>
+        </default>
+      </input>
+      <table>
+        <title>Buckets Update</title>
+        <search>
+          <query>index=_internal source=*splunk_archiver.log* committed | rename bucket_name AS "Archived Bucket", splunk_index AS "Splunk Index" | eval mb=round(remote_bucket_bytes/1000000,2) | stats sum(mb) as "Archived Bucket MB" by "Splunk Index", "Archived Bucket"</query>
+          <earliest>$field4.earliest$</earliest>
+          <latest>$field4.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <input type="time" token="field3">
+        <label>Select a time range:</label>
+        <default>
+          <earliest>-7d@h</earliest>
+          <latest>now</latest>
+        </default>
+      </input>
+      <chart>
+        <title>Errors</title>
+        <search>
+          <query>index=_internal source=*splunk_archiver.log* | rex max_match=1000 "\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d+ -\d{4} (?&lt;severity&gt;\w+) " | where severity="ERROR" | timechart count AS errors</query>
+          <earliest>$field3.earliest$</earliest>
+          <latest>$field3.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Archiving via coldToFrozen</title>
+      <input type="time" token="field3" searchWhenChanged="true">
+        <label>Select a time range:</label>
+        <default>
+          <earliest>-7d@h</earliest>
+          <latest>now</latest>
+        </default>
+      </input>
+      <input type="dropdown" token="splunk_idx3" searchWhenChanged="true">
+        <label>Select a splunk index:</label>
+        <prefix>splunk_index="</prefix>
+        <suffix>"</suffix>
+        <default>*</default>
+        <choice value="*">ALL</choice>
+        <search>
+          <query>index=_internal source=*splunk_archiver.log* report: buckets_to_freeze_remaining_count buckets_to_freeze_deleted | stats count by splunk_index</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <fieldForLabel>splunk_index</fieldForLabel>
+        <fieldForValue>splunk_index</fieldForValue>
+      </input>
+      <chart>
+        <title>Archives via coldToFrozen by index</title>
+        <search>
+          <query>index=_internal source=*splunk_archiver.log* buckets_to_freeze_remaining_count buckets_to_freeze_deleted report: $splunk_idx3$ | timechart sum(buckets_to_freeze_remaining_count) as "Buckets to freeze", sum(buckets_to_freeze_deleted) as "Buckets frozen" by splunk_index</query>
+          <earliest>$field3.earliest$</earliest>
+          <latest>$field3.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">log</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">zero</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+      </chart>
+      <chart>
+        <title>MB transfered via coldToFrozen by index</title>
+        <search>
+          <query>index=_internal source=*splunk_archiver.log* buckets_to_freeze_size_bytes buckets_to_freeze_deleted_size_bytes report: $splunk_idx3$ | timechart sum(buckets_to_freeze_size_bytes) as "to_freeze", sum(buckets_to_freeze_deleted_size_bytes) as "frozen", by splunk_index | eval "to_freeze_mb"=to_freeze/1000000 | eval frozen_mb=frozen/1000000 | rename to_freeze_mb AS "Remaning diskspace to free (MB)", frozen_mb AS "Frozen transfered (MB)", splunk_index AS "Splunk index" | fields -  to_freeze, frozen</query>
+          <earliest>$field3.earliest$</earliest>
+          <latest>$field3.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">log</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">zero</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Archiving by host</title>
+      <input type="time" token="time_field5">
+        <label>Select a time range:</label>
+        <default>
+          <earliest>-7d@h</earliest>
+          <latest>now</latest>
+        </default>
+      </input>
+      <chart>
+        <title>Time spent by host</title>
+        <search>
+          <query>index=_internal source=*splunk_archiver.log* Report: | eval secs = total_elapsed_ms/1000 | timechart sum(secs) as "Seconds spent archiving" by host</query>
+          <earliest>$time_field5.earliest$</earliest>
+          <latest>$time_field5.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">zero</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.axisTitleY.text">Seconds</option>
+      </chart>
+      <chart>
+        <title>Data transferred by host</title>
+        <search>
+          <query>index=_internal source=*splunk_archiver.log* Report: | eval mb = remote_bucket_bytes/1000000 | timechart sum(mb) as "Data transferred" by host</query>
+          <earliest>$time_field5.earliest$</earliest>
+          <latest>$time_field5.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">zero</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.axisTitleY.text">MB</option>
+      </chart>
+    </panel>
+  </row>
+</form>

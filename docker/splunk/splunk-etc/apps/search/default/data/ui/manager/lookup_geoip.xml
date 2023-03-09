@@ -1,0 +1,7 @@
+<endpoint name="lookup_geoip" template="pages/system.html" showOnSearchHeadCluster="1">
+    <header>Lookup GeoIP</header>
+    <capabilities>
+        <read>upload_mmdb_files</read>
+    </capabilities>
+</endpoint>
+

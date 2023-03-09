@@ -1,0 +1,28 @@
+.appLogo {
+    height: 43px; 
+    width: 155px;
+    padding-right: 5px;
+    float: left;
+    background: url(appLogo.png) no-repeat 0 0;
+    _background: url(appLogo.gif) no-repeat 0 0;
+}
+
+.appHeaderWrapper h1 {
+    display: none;
+} 
+
+.appHeaderWrapper .accountBarItems li {
+    text-shadow: -1px -1px 1px #111;   
+}
+
+# classes used by eventtype renderer
+.splEvent-et_blue    .t { color:#00F; }
+.splEvent-et_green   .t { color:#0C0; }
+.splEvent-et_magenta .t { color:#F09; }
+.splEvent-et_orange  .t { color:#F30; }
+.splEvent-et_purple  .t { color:#90C; }
+.splEvent-et_red     .t { color:#F00; }
+.splEvent-et_sky     .t { color:#09F; }
+.splEvent-et_teal    .t { color:#099; }
+.splEvent-et_yellow  .t { color:#990; }
+

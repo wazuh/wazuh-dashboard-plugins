@@ -1,0 +1,10 @@
+**/*.jsx
+**/*.es
+
+**/*.pcss.js
+**/*.pcssm.js
+**/*.jsx.js
+**/*.es.js
+**/*.min.js
+
+src/visualizations/heatmap/node_modules

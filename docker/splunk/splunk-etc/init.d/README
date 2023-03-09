@@ -1,0 +1,28 @@
+
+WHERE ARE THE INIT SCRIPTS?
+-----------------------------
+
+The init scripts that used to reside in this directory are deprecated.  Splunk
+now includes the ability to update the system boot configuration on its own.
+
+For more info, see "splunk help boot-start".
+
+
+QUICKSTART
+------------
+
+As root, you'll want to run "splunk enable boot-start".  This will create an
+init script (or other configuration change) appropriate for your operating
+system.
+
+If you don't start Splunk as root, you can pass in the -user parameter to
+specify which user to start Splunk as.  For example, if Splunk runs as the user
+bob, then as root you would run "splunk enable boot-start -user bob".
+
+
+PROBLEMS?
+-----------
+
+As usual, contact http://www.splunk.com/page/submit_issue if you have any issues.
+Or come visit us on EFnet #splunk :)
+

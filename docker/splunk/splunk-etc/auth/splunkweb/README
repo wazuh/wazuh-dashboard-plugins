@@ -1,0 +1,5 @@
+This directory is intended to contain SSL certificates for use with 
+SplunkWeb -- the program which provides the browser-based interface to Splunk.
+
+These certs are typically created on first-run of the product, or during the
+install process on Windows.

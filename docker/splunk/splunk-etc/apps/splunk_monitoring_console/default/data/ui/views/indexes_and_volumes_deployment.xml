@@ -1,0 +1,224 @@
+<form version="1.1" hideEdit="True" script="cell_fill_gauge.js, common_control.js" stylesheet="index_type.css">
+    <fieldset autoRun="true" submitButton="false">
+        <input type="radio" searchWhenChanged="true" token="datatype">
+              <label>Index Type</label>
+              <choice value="">Event Indexes Only</choice>
+              <choice value="datatype=all">All Index Types *</choice>
+              <default></default>
+        </input>
+        <input type="dropdown" searchWhenChanged="true" token="group">
+            <label>Group</label>
+            <showClearButton>false</showClearButton>
+            <search>
+                <query>
+                    | `dmc_get_groups_containing_role(dmc_group_indexer)`
+                    | where search_group!="dmc_group_indexer"
+                </query>
+            </search>
+            <fieldForLabel>label</fieldForLabel>
+            <fieldForValue>search_group</fieldForValue>
+            <choice value="*">All Indexers</choice>
+            <default>*</default>
+        </input>
+        <html id="index_type_disclaimer">
+            <p>The "All Index Types" option is not compatible with indexers running Splunk Enterprise 6.6 or earlier, where only event indexes exist.</p>
+        </html>
+    </fieldset>
+    <label>Indexes and Volumes: Deployment</label>
+    <search id="indexes_base_search">
+        <query>
+            | rest splunk_server_group=dmc_group_indexer splunk_server_group="$group$" /services/data/indexes $datatype$
+            | join title splunk_server type=outer [rest splunk_server_group=dmc_group_indexer splunk_server_group="$group$" /services/data/indexes-extended $datatype$]
+            | `dmc_exclude_indexes`
+            | eval elapsedTime = now() - strptime(minTime,"%Y-%m-%dT%H:%M:%S%z")
+            | eval dataAge = ceiling(elapsedTime / 86400)
+            | eval indexSizeGB = if(currentDBSizeMB >= 1 AND totalEventCount >=1, currentDBSizeMB/1024, null())
+            | eval maxSizeGB = maxTotalDataSizeMB / 1024
+            | eval sizeUsagePerc = indexSizeGB / maxSizeGB * 100
+        </query>
+    </search>
+    <row>
+        <panel>
+            <title>Overview</title>
+            <single>
+                <option name="underLabel">Total Indexes</option>
+                <option name="height">80px</option>
+                <search base="indexes_base_search">
+                    <query>
+                        stats dc(title) as numIndexes
+                    </query>
+                </search>
+            </single>
+            <single>
+                <option name="underLabel">Non-Empty Indexes</option>
+                <option name="height">80px</option>
+                <search base="indexes_base_search">
+                    <query>
+                        stats dc(eval(if(isnotnull(indexSizeGB), title, null()))) as nonEmptyIndexes
+                    </query>
+                </search>
+            </single>
+            <single>
+                <option name="underLabel">Instances</option>
+                <option name="height">80px</option>
+                <search base="indexes_base_search">
+                    <query>
+                        stats dc(splunk_server) AS instances
+                    </query>
+                </search>
+            </single>
+        </panel>
+    </row>
+    <row>
+        <panel>
+            <title>Index Size</title>
+            <single>
+                <option name="underLabel">Total Across Deployment</option>
+                <option name="height">80px</option>
+                <search base="indexes_base_search">
+                    <query>
+                        stats sum(indexSizeGB) as totalSize
+                        | eval totalSize = if(isNum(totalSize), round(totalSize, 2)." GB", "N/A")
+                    </query>
+                </search>
+            </single>
+            <single>
+                <option name="underLabel">Averaged Across All Indexers</option>
+                <option name="height">80px</option>
+                <search base="indexes_base_search">
+                    <query>
+                        stats sum(indexSizeGB) as totalSize
+                        dc(splunk_server) as instances
+                        | eval averageAggregateIndexesSizePerInstance = round(totalSize / instances, 2)." GB"
+                        | fields averageAggregateIndexesSizePerInstance
+                    </query>
+                </search>
+            </single>
+        </panel>
+        <panel>
+            <title>Data Age</title>
+            <single>
+                <option name="underLabel">Median</option>
+                <option name="height">80px</option>                
+                <search base="indexes_base_search">
+                    <query>
+                        stats median(dataAge) AS medianDataAge
+                        | eval medianDataAge = if(isNum(medianDataAge), medianDataAge." days", "N/A")
+                    </query>
+                </search>
+            </single>
+            <single>
+                <option name="underLabel">Oldest</option>
+                <option name="height">80px</option>                
+                <search base="indexes_base_search">
+                    <query>
+                        stats max(dataAge) AS oldestDataAge
+                        | eval oldestDataAge = if(isNum(oldestDataAge), oldestDataAge." days", "N/A")
+                    </query>
+                </search>
+            </single>
+        </panel>
+    </row>
+    <row>
+        <panel>
+            <title>Indexes ($indexCount$)</title>
+            <search base="indexes_base_search">
+                <query>stats dc(title) as count</query>
+                <finalized>
+                    <set token="indexCount">$result.count$</set>
+                </finalized>
+            </search>
+            <table>
+                <search base="indexes_base_search">
+                    <query>
+                        stats dc(splunk_server) AS Instances
+                        count(indexSizeGB) as "Non-Empty Instances"
+                        sum(indexSizeGB) AS totalSize
+                        avg(indexSizeGB) as averageSize
+                        avg(sizeUsagePerc) as averageSizePerc
+                        perc90(sizeUsagePerc) as ninetyPercentileSizePerc
+                        count(eval(sizeUsagePerc > 95)) as instancesFreezingDueToSize
+                        median(dataAge) as medianDataAge
+                        max(dataAge) as oldestDataAge
+                        count(eval(elapsedTime > frozenTimePeriodInSecs)) as instancesFreezingDueToAge
+                        sum(frozenTimePeriodInSecs) as infiniteFreezingFlag
+                        by title, datatype
+                        | eval totalSize = if(isnotnull(totalSize), round(totalSize, 2), 0)
+                        | eval averageSize = if(isnotnull(averageSize), round(averageSize, 2), 0)
+                        | eval averageSizePerc = if(isnotnull(averageSizePerc), round(averageSizePerc, 2)."%", "N/A")
+                        | eval ninetyPercentileSizePerc = if(isnotnull(ninetyPercentileSizePerc), round(ninetyPercentileSizePerc, 2)."%", "N/A")
+                        | eval instancesFreezingDueToSize = if(averageSizePerc != "N/A", instancesFreezingDueToSize, "N/A")
+                        | eval medianDataAge = if(isNum(medianDataAge), medianDataAge, "N/A")
+                        | eval oldestDataAge = if(isNum(oldestDataAge), oldestDataAge, "N/A")
+                        | eval instancesFreezingDueToAge = if(infiniteFreezingFlag > 0, instancesFreezingDueToAge, "N/A")
+                        | rename title as "Index"
+                        datatype as "Data Type"
+                        totalSize as "Total Size (GB)"
+                        averageSize as "Average Size (GB)"
+                        averageSizePerc as "Average Usage (%)"
+                        ninetyPercentileSizePerc as "90th Percentile Usage (%)"
+                        instancesFreezingDueToSize as "Instances Freezing Due To Size*"
+                        medianDataAge as "Median Data Age (days)"
+                        oldestDataAge as "Oldest Data Age (days)"
+                        instancesFreezingDueToAge as "Instances Freezing Due to Age"
+                        | fields - infiniteFreezingFlag
+                    </query>
+                </search>
+                <drilldown target="_blank">
+                    <link>
+                        /app/splunk_monitoring_console/index_detail_deployment?form.datatype=$datatype$&amp;form.group=$group$&amp;form.index=$row.Index$
+                    </link>
+                </drilldown>
+            </table>
+            <html>
+                <p>Click on instance name for more details.</p>
+                <p>*Number of instances freezing or about to freeze data at 95% or more of configured disk usage capacity.</p>
+            </html>
+        </panel>
+    </row>
+    <row>
+        <panel>
+            <title>Volumes ($volumeCount$)</title>
+            <table>
+                <search>
+                    <query>
+                        | rest splunk_server_group=dmc_group_indexer splunk_server_group="$group$" services/data/index-volumes
+                        | `dmc_exclude_volumes`
+                        | eval volumeSizeGB = if(total_size > 1, round(total_size / 1024, 2), null())
+                        | eval sizeUsagePerc = total_size / max_size * 100
+                        | stats dc(splunk_server) as Instances
+                        count(eval(total_size > 1)) as "Non-Empty Instances"
+                        sum(volumeSizeGB) as totalSize
+                        avg(volumeSizeGB) as avgSize
+                        avg(sizeUsagePerc) as avgSizePerc
+                        perc90(sizeUsagePerc) as ninetyPercentileSizePerc
+                        count(eval(total_size > max_size)) as volumesFreezingDueToSize
+                        by title
+                        | eval totalSize = if(isnotnull(totalSize), totalSize, 0)
+                        | eval avgSize = if(isnotnull(avgSize), round(avgSize, 2), 0)
+                        | eval avgSizePerc = if(isnotnull(avgSizePerc), round(avgSizePerc, 2)."%", "N/A")
+                        | eval ninetyPercentileSizePerc = if(isnotnull(ninetyPercentileSizePerc), round(ninetyPercentileSizePerc, 2)."%", "N/A")
+                        | eval volumesFreezingDueToSize = if(avgSizePerc != "N/A", volumesFreezingDueToSize, "N/A")
+                        | rename title as "Volume"
+                        totalSize as "Total Size (GB)"
+                        avgSize as "Average Size (GB)"
+                        avgSizePerc as "Average Usage (%)"
+                        ninetyPercentileSizePerc as "90th Percentile Usage (%)"
+                        volumesFreezingDueToSize as "Volumes Freezing Due To Size"
+                    </query>
+                    <done>
+                        <set token="volumeCount">$job.resultCount$</set>
+                    </done>
+                </search>
+                <drilldown target="_blank">
+                    <link>
+                        /app/splunk_monitoring_console/volume_detail_deployment?form.datatype=$datatype$&amp;form.group=$group$&amp;form.volume=$row.Volume$
+                    </link>
+                </drilldown>
+            </table>
+            <html>
+                <p>Click on volume name for more details.</p>
+            </html>
+        </panel>
+    </row>
+</form>

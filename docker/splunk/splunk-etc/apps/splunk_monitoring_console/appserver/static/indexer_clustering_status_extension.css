@@ -1,0 +1,60 @@
+.indexer-cluster-summary {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    line-height: 26px;
+    padding-top: 30px;
+    padding-bottom: 50px;
+}
+
+.indexer-cluster-summary-single-value {
+    display: inline-block;
+    width: 24%;
+}
+
+.indexer-cluster-count {
+    text-align: center;
+}
+
+.indexer-cluster-count-value {
+    float: left;
+    width: 50%;
+    line-height: 26px;
+}
+
+.indexer-cluster-count-value-searchable-peer {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.indexer-cluster-count-value-searchable-index {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.indexer-cluster-count-value-not-searchable-peer {
+    font-size: 24px;
+    font-weight: bold;
+    padding-left: 2em;
+}
+
+.indexer-cluster-count-value-not-searchable-index {
+    font-size: 24px;
+    font-weight: bold;
+    padding-left: 2em;
+}
+
+.index-cluster-count-under-label {
+    text-align: center;
+    padding-bottom: 30px;
+}
+
+.index-cluster-count-under-label-value-peer {
+    float: left;
+    width: 50%;
+}
+
+.index-cluster-count-under-label-value-index {
+    float: left;
+    width: 50%;
+}

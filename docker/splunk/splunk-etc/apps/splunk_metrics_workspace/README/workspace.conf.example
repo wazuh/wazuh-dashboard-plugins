@@ -1,0 +1,71 @@
+# The following are example workspace.conf configurations. Each block represents
+# a potential workspace.conf. Configure properties for your data.
+#
+# To use one or more of these configurations, copy the configuration block into
+# workspace.conf in $SPLUNK_HOME/etc/system/local/. You must restart Splunk to
+# enable configurations.
+#
+# To learn more about configuration files (including precedence) please see the
+# documentation located at
+# http://docs.splunk.com/Documentation/Splunk/latest/Admin/Aboutconfigurationfiles 
+
+
+# The following example sets the earliest look back time to 24 hours ago.
+[metadata]
+earliest = -1d
+
+# Load all the available metrics
+[metadata]
+max_metrics = -1
+
+# Limit to 5000 dimensions
+[metadata]
+max_dimensions = 5000
+
+# The following example disables alerts data type.
+[features]
+data-alerts = 0
+
+# The following example disables the scheduled alert sub-type.
+[features]
+data-alerts-scheduled = 0
+
+# The following example disables the streaming alert sub-type.
+[features]
+data-alerts-streaming = 1
+
+# The following example disable the global-save-all-to-dashboard
+[features]
+global-save-all-to-dashboard = 0
+
+# The following example disable the analysis-related-events
+[features]
+analysis-related-events = 0
+
+# The following example disables the "Open in search" functionality.
+[features]
+analysis-open-in-search = 0
+
+# The following example disables the "Save to dashboard" functionality.
+[features]
+analysis-save-to-dashboard = 0
+
+# The following example disables the "Save to report" functionality.
+[features]
+analysis-save-to-report = 0
+
+# The following example disables alert creation.
+[features]
+analysis-create-alert = 0
+
+# The following example disables state restore
+[features]
+state-restore = 0
+
+# The following example disables the datasets data type.
+[features]
+data-panel = 0
+
+# The following example disable the data-metrics
+[features]
+data-metrics = 0

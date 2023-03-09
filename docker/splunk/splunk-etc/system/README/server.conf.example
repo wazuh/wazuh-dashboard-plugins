@@ -1,0 +1,125 @@
+#   Version 9.0.3
+#
+# This file contains an example server.conf.  Use this file to configure SSL
+# and HTTP server options.
+#
+# To use one or more of these configurations, copy the configuration block
+# into server.conf in $SPLUNK_HOME/etc/system/local/. You must restart
+# Splunk to enable configurations.
+#
+# To learn more about configuration files (including precedence) please see
+# the documentation located at
+# http://docs.splunk.com/Documentation/Splunk/latest/Admin/Aboutconfigurationfiles
+
+# Allow users 8 hours before they time out
+[general]
+sessionTimeout=8h
+pass4SymmKey = changeme
+
+# Listen on IPv6 in addition to IPv4...
+listenOnIPv6 = yes
+# ...but make all outgoing TCP connections on IPv4 exclusively
+connectUsingIpVersion = 4-only
+
+# Turn on SSL:
+
+[sslConfig]
+enableSplunkdSSL = true
+useClientSSLCompression = true
+serverCert = $SPLUNK_HOME/etc/auth/server.pem
+sslPassword = password
+sslRootCAPath = $SPLUNK_HOME/etc/auth/cacert.pem
+certCreateScript = genMyServerCert.sh
+
+[proxyConfig]
+http_proxy = http://proxy:80
+https_proxy = http://proxy:80
+proxy_rules = *
+no_proxy = localhost, 127.0.0.1, ::1
+
+######## SSO Example ########
+# This example trusts all logins from the splunk web server and localhost
+# Note that a proxy to the splunk web server should exist to enforce
+# authentication
+[general]
+trustedIP = 127.0.0.1
+
+####### Cascading Replication Example ######
+[cascading_replication]
+pass4SymmKey = someSecret
+max_replication_threads = auto
+max_replication_jobs = 5
+cascade_replication_plan_reap_interval = 1h
+cascade_replication_plan_age = 8h
+cascade_replication_plan_fanout = auto
+cascade_replication_plan_topology = size_balanced
+cascade_replication_plan_select_policy = random
+
+
+############################################################################
+# Set this node to be a cluster manager.
+############################################################################
+
+
+[clustering]
+mode = manager
+replication_factor = 3
+pass4SymmKey = someSecret
+search_factor = 2
+
+
+############################################################################
+# Set this node to be a peer to cluster manager "SplunkManager01" on port
+# 8089.
+############################################################################
+
+[clustering]
+mode = peer 
+manager_uri = https://SplunkManager01.example.com:8089
+pass4SymmKey = someSecret
+
+############################################################################
+# Set this node to be a searchhead to cluster manager "SplunkManager01" on
+# port 8089.
+############################################################################
+[clustering]
+mode = searchhead
+manager_uri = https://SplunkManager01.example.com:8089
+pass4SymmKey = someSecret
+
+############################################################################
+# Set this node to be a searchhead to multiple cluster managers -
+# "SplunkManager01" with pass4SymmKey set to 'someSecret and "SplunkManager02"
+# with no pass4SymmKey set here.
+############################################################################
+[clustering]
+mode = searchhead
+manager_uri = clustermanager:east, clustermanager:west
+
+[clustermanager:east]
+manager_uri = https://SplunkManager01.example.com:8089
+pass4SymmKey=someSecret
+
+[clustermanager:west]
+manager_uri = https://SplunkManager02.example.com:8089
+
+############################################################################
+#     Configuration file change tracker
+#  To enable the feature, set 'disabled=false'.
+#  Set 'mode=auto' to include all available features.
+###############################################################################
+[config_change_tracker]
+disabled = false
+mode = auto
+denylist=peer-apps|savedsearches\.conf$
+exclude_fields = server.conf:general:pass4SymmKey, authentication.conf:authentication:*
+ 
+############################################################################
+# Open an additional non-SSL HTTP REST port, bound to the localhost
+# interface (and therefore not accessible from outside the machine)  Local
+# REST clients like the CLI can use this to avoid SSL overhead when not
+# sending data across the network.
+############################################################################
+[httpServerListener:127.0.0.1:8090]
+ssl = false
+

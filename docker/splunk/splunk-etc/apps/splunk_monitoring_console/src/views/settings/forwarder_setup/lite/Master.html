@@ -1,0 +1,20 @@
+<% if (!isModal) { %>
+	<div class="section-header section-padded page-heading">
+		<h2 class="section-title">
+			<%= _("Forwarder Monitoring").t() %>
+		</h2>
+	</div>
+<% } %>
+
+<div class="section-padded">
+	<div class="section-description">
+		<p><%= _('If you enable forwarder monitoring, a scheduled search named ').t() %>"DMC Forwarder - Build Asset Table"<%= _(' will be enabled. This may affect the search workload.').t() %></p>
+	</div>
+
+	<div class="form form-horizontal forwarder-monitoring-settings"></div>
+		<% if (!isModal) { %>
+			<div class="dmc-forwarder-setup-button-section">
+				<a class="btn btn-primary btn-start-forwarder-monitoring disabled"><%= _('Start Monitoring').t() %></a>
+			</div>
+		<% } %>
+</div>

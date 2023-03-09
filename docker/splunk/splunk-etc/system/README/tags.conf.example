@@ -1,0 +1,36 @@
+#   Version 9.0.3
+#
+# This is an example tags.conf.  Use this file to define tags for fields.
+#
+# To use one or more of these configurations, copy the configuration block into
+# tags.conf in $SPLUNK_HOME/etc/system/local/. You must restart Splunk to
+# enable configurations.
+#
+# To learn more about configuration files (including precedence) please see the
+# documentation located at
+# http://docs.splunk.com/Documentation/Splunk/latest/Admin/Aboutconfigurationfiles
+#
+# This first example presents a situation where the field is "host" and the
+# three hostnames for which tags are being defined are "hostswitch,"
+# "emailbox," and "devmachine." Each hostname has two tags applied to it, one
+# per line. Note also that the "building1" tag has been applied to two hostname
+# values (emailbox and devmachine).
+
+[host=hostswitch]
+pci = enabled
+cardholder-dest = enabled
+
+[host=emailbox]
+email = enabled
+building1 = enabled
+
+[host=devmachine]
+development = enabled
+building1 = enabled
+
+[src_ip=192.168.1.1]
+firewall = enabled
+
+[seekPtr=1cb58000]
+EOF = enabled
+NOT_EOF = disabled

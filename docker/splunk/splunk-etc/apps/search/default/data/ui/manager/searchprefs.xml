@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<endpoint name="searchprefs" template="pages/system.html" showOnSearchHeadCluster="0">
+    <capabilities>
+        <read>admin_all_objects</read>
+    </capabilities>
+</endpoint>

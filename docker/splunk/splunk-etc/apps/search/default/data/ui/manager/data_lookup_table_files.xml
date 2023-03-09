@@ -1,0 +1,46 @@
+<endpoint name="data/lookup-table-files" showAppContext="1">
+  <header>Lookup table files</header>
+  <breadcrumb>
+    <parent hidecurrent="False">lookups</parent>
+    <name>Lookup table files</name>
+  </breadcrumb>
+  <elements>
+
+    <element name="__ns" type="select" label="Destination app">
+      <view name="create"/>
+      <key name="dynamicOptions" type="dict">
+        <key name="keyName">title</key>
+        <key name="keyValue">title</key>
+        <key name="splunkSource">/apps/local</key>
+        <key name="splunkSourceParams" type="dict">
+          <key name="search">'disabled=false'</key>
+          <key name="count">-1</key>
+        </key>
+      </key>
+    </element>
+
+    <element name="spl-ctrl_lookupfile" type="fileupload" label="Upload a lookup file">
+      <view name="create"/>
+      <key name="requiredIfVisible" />
+      <key name="exampleText">Select either a plaintext CSV file, a gzipped CSV file, or a KMZ/KML file. &lt;br/&gt;The maximum file size that can be uploaded through the browser is 500MB.</key>
+    </element>
+    <element name="name" label="Destination filename">
+      <view name="create"/>
+      <key name="exampleText">
+          Enter the name this lookup table file will have on the Splunk server. If you are uploading a gzipped CSV file, enter a filename ending in ".gz". If you are uploading a plaintext CSV file, we recommend a filename ending in ".csv".
+          For a KMZ/KML file, we recommend a filename ending in ".kmz"/".kml".
+      </key>
+    </element>
+    <element name="eai:data" label="Path">
+      <view name="list"/>
+    </element>
+    <element name="eai:acl.owner" label="Owner">
+      <view name="list"/>
+      <key name="processValueList">entity['eai:acl']['owner'] == 'nobody' and _('No owner') or entity['eai:acl']['owner']</key>
+    </element>
+    <element name="eai:acl.app" label="App">
+      <view name="list"/>
+      <key name="processValueList">entity['eai:acl']['app'] or ""</key>
+    </element>
+  </elements>
+</endpoint>

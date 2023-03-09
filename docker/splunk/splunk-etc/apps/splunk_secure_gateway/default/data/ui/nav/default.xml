@@ -1,0 +1,15 @@
+<nav>
+    <view name="home" default="true"/>
+    <view name="administration" />
+    <collection label="Dashboards">
+        <view name="secure_gateway_status_dashboard" />
+        <view name="recent_ssg_dashboard_activity"/>
+        <collection label="Troubleshooting Dashboards">
+            <view name="request_tracing_dashboard"/>
+            <view name="subscription_tracing_dashboard"/>
+            <view name="test_dashboard_single_value"/>
+            <view name="ssg_e2e_wss_test"/>
+            <view name="kvstore_dashboard_client"/>
+        </collection>
+    </collection>
+</nav>

@@ -1,0 +1,11 @@
+<endpoint name="authentication/providers/Splunk">
+  <header>Configure Splunk authentication</header>
+  <breadcrumb>
+      <parent hidecurrent="True">authoverview</parent>
+  </breadcrumb>
+  <elements>
+    <element name="authType" type="hidden" label="Auth Type">
+      <view name="list"/>
+    </element>
+  </elements>
+</endpoint>

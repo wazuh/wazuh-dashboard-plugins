@@ -1,0 +1,49 @@
+<dashboard hideEdit="True" version="1.1">
+
+  <label>Federated Search Enhancements</label>
+
+  <row>
+
+    <panel>
+
+      <html>
+
+        <p><strong>Description</strong></p>
+        <p>Scope: Splunk Enterprise and Splunk Cloud, <em>with the exception of Windows Support which is Splunk Enterprise only </em> </p>
+        <p><strong>1. Transparent Mode</strong></p>
+
+        <p> Unlike Standard Mode, Transparent Mode allows users to use SPL without the special search syntax of the “federated:” keyword. Additionally, it eliminates the need to modify existing search queries leveraged for Hybrid Search scenarios. Lastly, transparent mode enables users not to worry about federated index definitions for each dataset on the federated provider that you want to search. See below for 4 simple steps to start using transparent mode.</p>
+        <p>1a. Create a service account on a remote Splunk deployment.</p>
+        <p>1b. Establish a connection to the remote splunk deployment by creating a federated Splunk provider.</p>
+        <ul>
+                  <div style="margin-left:10px">
+                   <img src="/static/app/splunk_essentials_9_0/images/fed_search_1.png" style="margin: 10px 0" width="700px"/>
+                  </div>
+                  <br/>
+                 </ul>
+        <p>1c. Create a federated index (only in Standard mode).</p>
+        <ul>
+                  <div style="margin-left:10px">
+                   <img src="/static/app/splunk_essentials_9_0/images/fed_search_2.png" style="margin: 10px 0" width="700px"/>
+                  </div>
+                  <br/>
+                 </ul>
+        <p>1d. Run the federated search:</p>
+        <p> - In Standard mode: Search a remote index mapped to a local federated index (in 1c.)
+<code>search index = federated:audit | stats count</code>.</p>
+        <p> - In Transparent Mode: Search <code>index=audit | stats count</code>.</p>
+        <br/>
+          <p><strong>2.Query for saved searches and data models on remote deployments</strong></p>
+        <p> Saved Search Support: After creating a service account on a remote search head and establishing a connection to Splunk Remote Deployment by following the steps <a href="https://www.splunk.com/en_us/blog/platform/introducing-splunk-federated-search.html" target="_blank">here</a>, you can now create a federated index that maps to a saved search.</p>
+        <p> Data Models Support: Ability to query and search for Data models and DMAs.</p>
+        <ul>
+                  <div style="margin-left:10px">
+                   <img src="/static/app/splunk_essentials_9_0/images/fed_search_3.png" style="margin: 10px 0" width="700px"/>
+                  </div>
+                  <br/>
+                 </ul>
+
+        </html>
+    </panel>
+  </row>
+</dashboard>

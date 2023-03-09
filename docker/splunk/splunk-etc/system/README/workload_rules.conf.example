@@ -1,0 +1,47 @@
+[workload_rules_order]
+rules = my_analyst_rule,my_app_rule,my_user_rule,my_index_rule
+
+[workload_rule:my_app_rule]
+predicate = app=search
+workload_pool = my_app_pool
+
+[workload_rule:my_analyst_rule]
+predicate = role=analyst
+workload_pool = my_analyst_pool
+schedule = always_on
+
+[workload_rule:my_user_rule]
+predicate = user=admin
+workload_pool = my_user_pool
+schedule = always_on
+
+[workload_rule:my_index_rule]
+predicate = index=_internal
+workload_pool = my_index_pool
+schedule = time_range
+start_time = 2019-01-01T04:00:00-08:00
+end_time = 2019-01-05T04:00:00-08:00
+
+[workload_rule:my_search_type_rule]
+predicate = search_type=adhoc
+workload_pool = my_adhoc_pool
+schedule = every_day
+start_time = 10
+end_time = 15
+
+[workload_rule:my_logical_rule_1]
+predicate = app=search AND (NOT index=_internal)
+workload_pool = my_logical_pool_1
+schedule = every_week
+start_time = 10
+end_time = 23
+every_week_days = [0,4,6]
+
+[workload_rule:my_logical_rule_2]
+predicate = NOT role=power OR user=admin
+workload_pool = my_logical_pool_2
+schedule = every_month
+start_time = 1
+end_time = 2
+every_month_days = [1,5,16,31]
+

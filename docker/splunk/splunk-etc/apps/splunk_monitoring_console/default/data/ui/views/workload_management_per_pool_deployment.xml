@@ -1,0 +1,440 @@
+<form version="1.1" hideEdit="True" script="cell_fill_gauge.js, common_control.js">
+  <label>Workload Management Activity: Deployment</label>
+
+  <fieldset autoRun="true" submitButton="false">
+    <input type="radio" searchWhenChanged="true" token="role">
+      <label>Role</label>
+      <choice value="dmc_group_search_head">Search Heads</choice>
+      <choice value="dmc_group_indexer">Indexers</choice>
+      <default>dmc_group_search_head</default>
+    </input>
+    <input type="dropdown" searchWhenChanged="true" token="dmc_group">
+      <label>Group</label>
+      <showClearButton>false</showClearButton>
+      <search>
+        <query>
+          | `dmc_get_groups_containing_role($role$)`
+          | search search_group!="dmc_group_*"
+        </query>
+      </search>
+      <fieldForLabel>label</fieldForLabel>
+      <fieldForValue>search_group</fieldForValue>
+      <choice value="*">All</choice>
+      <selectFirstChoice>true</selectFirstChoice>
+    </input>
+  </fieldset>
+
+<row>
+    <panel>
+      <html>
+        <h2>
+          <span>Select views: </span>
+          <span id="link-switcher-view">
+            <a href="#" class="btn-pill active" data-item="all">All</a>
+            <a href="#" class="btn-pill" data-item="snapshot">Snapshot</a>
+            <a href="#" class="btn-pill" data-item="historical">Historical</a>
+          </span>
+        </h2>
+      </html>
+    </panel>
+  </row>
+
+<row>
+    <panel rejects="$historical$">
+      <title>Snapshots</title>
+    </panel>
+  </row>
+
+  <row>
+    <panel rejects="$historical$">
+      <title>Workload Management Pool Limits</title>
+      <table>
+        <searchString>
+          | rest splunk_server_group=$role$ splunk_server_group="$dmc_group$" /services/workloads/pools
+          | rename category as pool_type
+          | eval pool_and_type = title." (".pool_type.")"
+          | eventstats dc(splunk_server) as total_instance_count 
+          | stats avg(mem_limit) as mem_limit dc(splunk_server) as instance_count max(total_instance_count) as total_instance_count values(ingest_pool) as ingest_pool values(pool_and_type) as pool_and_type by title, pool_type
+          | eval instance_count=instance_count."/".total_instance_count
+          | eval mem_limit=round(mem_limit/1024/1024, 0)
+          | rename title as workload_pool
+          | join workload_pool type=outer
+              [rest splunk_server_group=$role$ splunk_server_group="$dmc_group$" /services/server/status/resource-usage/splunk-processes
+                | stats sum(mem_used) as mem_used sum(pct_cpu) as pct_cpu by splunk_server, workload_pool
+                | stats avg(mem_used) as avg_mem_used avg(pct_cpu) as avg_pct_cpu by workload_pool
+              ]
+          | eval avg_mem_used=if(isNULL('avg_mem_used'), 0, round(avg_mem_used, 2))
+          | eval avg_num_cores = if(isNull('avg_pct_cpu'), 0, round(avg_pct_cpu/100.0, 2))
+          | fields workload_pool, pool_type, instance_count, mem_limit, avg_mem_used, avg_num_cores
+          | rename workload_pool as "Workload Pool" pool_type as "Pool Type" instance_count as "Instance Count" mem_limit as "Memory Limit (MB)" avg_mem_used as "Avg Memory Used Per Instance (MB)" avg_num_cores as "Avg CPU Used Per Instance (# of Cores)"
+        </searchString>
+      </table>
+    </panel>
+  </row>
+
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Historical Charts</title>
+      <input type="time" searchWhenChanged="true" token="time">
+        <label>Time Range:</label>
+        <default>
+          <earliestTime>-4h@m</earliestTime>
+          <latestTime>now</latestTime>
+        </default>
+      </input>
+
+      <input type="dropdown" searchWhenChanged="true" token="workload_pool">
+        <label>Workload Pool</label>
+        <search>
+          <query>
+            | rest /services/workloads/pools splunk_server_group=* splunk_server_group=*
+            | rename title AS pool_name category AS pool_type
+            | eval pool_and_type = pool_name." (".pool_type.")"
+            | stats values(splunk_server)  values(pool_type) as pool_type values(pool_name) as pool_name by pool_and_type
+            | fields pool_and_type pool_type pool_name
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <fieldForLabel>pool_and_type</fieldForLabel>
+        <fieldForValue>pool_and_type</fieldForValue>
+        <selectFirstChoice>true</selectFirstChoice>
+        <showClearButton>false</showClearButton>
+        <change>
+          <condition match="like($value$,&quot;%ingest%&quot;)">
+            <set token="wlm_pool">$row.pool_name$</set>
+            <set token="wlm_pool_type">$row.pool_type$</set>
+            <set token="isIngest">true</set>
+            <unset token="isSearch"></unset>
+          </condition>
+          <condition match="like($value$,&quot;%search%&quot;)">
+            <set token="wlm_pool">$row.pool_name$</set>
+            <set token="wlm_pool_type">$row.pool_type$</set>
+            <set token="isSearch">true</set>
+            <unset token="isIngest"></unset>
+          </condition>
+        </change>
+      </input>
+    </panel>
+  </row>
+
+  <row depends="$isSearch$">
+    <panel rejects="$snapshot$">
+      <title>$resourceFuncLabel$ Memory Usage</title>
+      <input type="dropdown" token="resourceFunction" searchWhenChanged="true">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <default>Median</default>
+        <choice value="Avg">Average</choice>
+        <choice value="Median">Median</choice>
+        <choice value="Min">Minimum</choice>
+        <choice value="Max">Maximum</choice>
+        <choice value="Perc90">90th Percentile</choice>
+        <choice value="First">Sampled</choice>
+        <change>
+          <set token="resourceFuncLabel">$label$</set>
+        </change>
+      </input>
+      <input type="dropdown" token="resourceSplitBySearch" searchWhenChanged="true">
+        <label>Split by</label>
+        <showClearButton>false</showClearButton>
+        <default>type</default>
+        <choice value="app">App</choice>
+        <choice value="user">User</choice>
+        <choice value="mode">Mode</choice>
+        <choice value="type">Type</choice>
+        <choice value="role">Role</choice>
+        <choice value="search_head">Dispatching Search Head</choice>
+        <choice value="label">Search Name</choice>
+        <choice value="provenance">Provenance</choice>
+      </input>
+      <chart>
+        <searchString>
+        `dmc_set_index_introspection` search_group=$role$ search_group="$dmc_group$" data.workload_pool=$wlm_pool$ data.workload_pool_type=$wlm_pool_type$ sourcetype=splunk_resource_usage component=PerProcess
+        | `dmc_rename_introspection_fields`
+        | `dmc_set_bin`
+        | eval process=process." ".args
+        | stats latest(mem_used) AS mem_used_dedup by _time, $resourceSplitBySearch$, pid, host
+        | stats sum(mem_used_dedup) AS sum_mem_used by _time, $resourceSplitBySearch$, host
+        | `dmc_timechart` $resourceFunction$(sum_mem_used) AS "$resourceFunction$ of resource usage" by $resourceSplitBySearch$
+        </searchString>
+        <earliestTime>$time.earliest$</earliestTime>
+        <latestTime>$time.latest$</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.overlayFields">Memory Limit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="list.drilldown">full</option>
+        <option name="list.wrap">1</option>
+        <option name="maxLines">5</option>
+        <option name="raw.drilldown">full</option>
+        <option name="rowNumbers">false</option>
+        <option name="table.drilldown">all</option>
+        <option name="table.wrap">1</option>
+        <option name="type">list</option>
+        <option name="wrap">true</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="charting.axisTitleY.text">MB</option>
+        <!-- <option name="refresh.auto.interval">300</option> -->
+        <drilldown target="_blank">
+          <condition series="*">
+              <link target="_blank"><![CDATA[search?q=`dmc_search_activity_instance_drilldown($host$, $resourceSplitBySearch$, $click.name2$)`&earliest=$earliest$&latest=$latest$]]></link>
+          </condition>
+        </drilldown>
+      </chart>
+    </panel>
+  </row>
+
+  <row depends="$isIngest$">
+    <panel rejects="$snapshot$">
+      <title>$resourceFuncLabel$ Memory Usage</title>
+      <input type="dropdown" token="resourceFunction" searchWhenChanged="true">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <default>Median</default>
+        <choice value="Avg">Average</choice>
+        <choice value="Median">Median</choice>
+        <choice value="Min">Minimum</choice>
+        <choice value="Max">Maximum</choice>
+        <choice value="Perc90">90th Percentile</choice>
+        <choice value="First">Sampled</choice>
+        <change>
+          <set token="resourceFuncLabel">$label$</set>
+        </change>
+      </input>
+      <input type="dropdown" token="resourceSplitByIngest" searchWhenChanged="true">
+        <label>Split by</label>
+        <showClearButton>false</showClearButton>
+        <default>data.process_type</default>
+        <choice value="data.process_type">Process Type</choice>
+        <choice value="process">Process</choice>
+      </input>
+      <chart>
+        <searchString>
+        `dmc_set_index_introspection` search_group=$role$ search_group="$dmc_group$" data.workload_pool=$wlm_pool$ data.workload_pool_type=$wlm_pool_type$ sourcetype=splunk_resource_usage component=PerProcess
+        | `dmc_rename_introspection_fields`
+        | `dmc_set_bin`
+        | eval process=process." ".args
+        | stats latest(mem_used) AS mem_used_dedup by _time, $resourceSplitByIngest$, pid, host
+        | stats sum(mem_used_dedup) AS sum_mem_used by _time, $resourceSplitByIngest$, host
+        | `dmc_timechart` $resourceFunction$(sum_mem_used) AS "$resourceFunction$ of resource usage" by $resourceSplitByIngest$
+        </searchString>
+        <earliestTime>$time.earliest$</earliestTime>
+        <latestTime>$time.latest$</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.overlayFields">Memory Limit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="list.drilldown">full</option>
+        <option name="list.wrap">1</option>
+        <option name="maxLines">5</option>
+        <option name="raw.drilldown">full</option>
+        <option name="rowNumbers">false</option>
+        <option name="table.drilldown">all</option>
+        <option name="table.wrap">1</option>
+        <option name="type">list</option>
+        <option name="wrap">true</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="charting.axisTitleY.text">MB</option>
+        <!-- <option name="refresh.auto.interval">300</option> -->
+        <drilldown target="_blank">
+          <condition series="*">
+              <link target="_blank"><![CDATA[search?q=`dmc_search_activity_instance_drilldown($host$, $resourceSplitByIngest$, $click.name2$)`&earliest=$earliest$&latest=$latest$]]></link>
+          </condition>
+        </drilldown>
+      </chart>
+    </panel>
+  </row>
+
+  <row depends="$isSearch$">
+    <panel rejects="$snapshot$">
+      <title>$resourceFuncLabel$ CPU Usage</title>
+      <input type="dropdown" token="resourceFunction" searchWhenChanged="true">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <default>Median</default>
+        <choice value="Avg">Average</choice>
+        <choice value="Median">Median</choice>
+        <choice value="Min">Minimum</choice>
+        <choice value="Max">Maximum</choice>
+        <choice value="Perc90">90th Percentile</choice>
+        <choice value="First">Sampled</choice>
+        <change>
+          <set token="resourceFuncLabel">$label$</set>
+        </change>
+      </input>
+      <input type="dropdown" token="resourceSplitBySearch" searchWhenChanged="true">
+        <label>Split by</label>
+        <showClearButton>false</showClearButton>
+        <default>type</default>
+        <choice value="app">App</choice>
+        <choice value="user">User</choice>
+        <choice value="mode">Mode</choice>
+        <choice value="type">Type</choice>
+        <choice value="role">Role</choice>
+        <choice value="search_head">Dispatching Search Head</choice>
+        <choice value="label">Search Name</choice>
+        <choice value="provenance">Provenance</choice>
+      </input>
+      <chart>
+        <searchString>
+        `dmc_set_index_introspection` search_group=$role$ search_group="$dmc_group$" data.workload_pool=$wlm_pool$ data.workload_pool_type=$wlm_pool_type$ sourcetype=splunk_resource_usage component=PerProcess
+        | `dmc_rename_introspection_fields`
+        | `dmc_set_bin`
+        | eval process=process." ".args
+        | stats latest(pct_cpu) AS pct_cpu_dedup by _time, $resourceSplitBySearch$, pid, host
+        | stats sum(pct_cpu_dedup) AS sum_pct_cpu by _time, $resourceSplitBySearch$, host
+        | eval sum_pct_cpu = round(sum_pct_cpu/ 100.0, 2)
+        | `dmc_timechart` $resourceFunction$(sum_pct_cpu) AS "$resourceFunction$ of resource usage" by $resourceSplitBySearch$
+        </searchString>
+        <earliestTime>$time.earliest$</earliestTime>
+        <latestTime>$time.latest$</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="list.drilldown">full</option>
+        <option name="list.wrap">1</option>
+        <option name="maxLines">5</option>
+        <option name="raw.drilldown">full</option>
+        <option name="rowNumbers">false</option>
+        <option name="table.drilldown">all</option>
+        <option name="table.wrap">1</option>
+        <option name="type">list</option>
+        <option name="wrap">true</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="charting.axisTitleY.text"># Of Cores</option>
+        <!-- <option name="refresh.auto.interval">300</option> -->
+        <drilldown target="_blank">
+          <condition series="*">
+              <link target="_blank"><![CDATA[search?q=`dmc_search_activity_instance_drilldown($host$, $resourceSplitBySearch$, $click.name2$)`&earliest=$earliest$&latest=$latest$]]></link>
+          </condition>
+        </drilldown>
+      </chart>
+    </panel>
+  </row>
+
+  <row depends="$isIngest$">
+    <panel rejects="$snapshot$">
+      <title>$resourceFuncLabel$ CPU Usage</title>
+      <input type="dropdown" token="resourceFunction" searchWhenChanged="true">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <default>Median</default>
+        <choice value="Avg">Average</choice>
+        <choice value="Median">Median</choice>
+        <choice value="Min">Minimum</choice>
+        <choice value="Max">Maximum</choice>
+        <choice value="Perc90">90th Percentile</choice>
+        <choice value="First">Sampled</choice>
+        <change>
+          <set token="resourceFuncLabel">$label$</set>
+        </change>
+      </input>
+      <input type="dropdown" token="resourceSplitByIngest" searchWhenChanged="true">
+        <label>Split by</label>
+        <showClearButton>false</showClearButton>
+        <default>data.process_type</default>
+        <choice value="data.process_type">Process Type</choice>
+        <choice value="process">Process</choice>
+      </input>
+      <chart>
+        <searchString>
+        `dmc_set_index_introspection` search_group=$role$ search_group="$dmc_group$" data.workload_pool=$wlm_pool$ data.workload_pool_type=$wlm_pool_type$ sourcetype=splunk_resource_usage component=PerProcess
+        | `dmc_rename_introspection_fields`
+        | `dmc_set_bin`
+        | eval process=process." ".args
+        | stats latest(pct_cpu) AS pct_cpu_dedup by _time, $resourceSplitByIngest$, pid, host
+        | stats sum(pct_cpu_dedup) AS sum_pct_cpu by _time, $resourceSplitByIngest$, host
+        | eval sum_pct_cpu = round(sum_pct_cpu/ 100.0, 2)
+        | `dmc_timechart` $resourceFunction$(sum_pct_cpu) AS "$resourceFunction$ of resource usage" by $resourceSplitByIngest$
+        </searchString>
+        <earliestTime>$time.earliest$</earliestTime>
+        <latestTime>$time.latest$</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="list.drilldown">full</option>
+        <option name="list.wrap">1</option>
+        <option name="maxLines">5</option>
+        <option name="raw.drilldown">full</option>
+        <option name="rowNumbers">false</option>
+        <option name="table.drilldown">all</option>
+        <option name="table.wrap">1</option>
+        <option name="type">list</option>
+        <option name="wrap">true</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="charting.axisTitleY.text"># Of Cores</option>
+        <!-- <option name="refresh.auto.interval">300</option> -->
+        <drilldown target="_blank">
+          <condition series="*">
+              <link target="_blank"><![CDATA[search?q=`dmc_search_activity_instance_drilldown($host$, $resourceSplitByIngest$, $click.name2$)`&earliest=$earliest$&latest=$latest$]]></link>
+          </condition>
+        </drilldown>
+      </chart>
+    </panel>
+  </row>
+</form>

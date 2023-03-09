@@ -1,0 +1,7 @@
+<nav>
+    <view name="setting_scan"/>
+    <view name="splunk9x_scan" default="true"/>
+    <view name="setting" />
+    <view name="jquery_scan"/>
+    <view name="python_scan"/>
+</nav>

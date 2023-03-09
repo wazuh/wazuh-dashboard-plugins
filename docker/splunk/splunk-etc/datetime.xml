@@ -1,0 +1,225 @@
+<!--   Version 5.0 -->
+
+<!-- datetime.xml -->
+<!-- This file contains the general formulas for parsing date/time formats. -->
+
+<datetime>
+
+<define name="_year" extract="year">
+	<text><![CDATA[(20\d\d|19\d\d|[9012]\d(?!\d))]]></text>
+</define>
+
+<define name="_month" extract="month">
+	<text><![CDATA[(0?[1-9]|1[012])(?!:)]]></text>
+</define>
+
+<define name="_litmonth"  extract="litmonth">
+	 <text><![CDATA[(?<![\d\w])(jan|\x{3127}\x{6708}|feb|\x{4E8C}\x{6708}|mar|\x{4E09}\x{6708}|apr|\x{56DB}\x{6708}|may|\x{4E94}\x{6708}|jun|\x{516D}\x{6708}|jul|\x{4E03}\x{6708}|aug|\x{516B}\x{6708}|sep|\x{4E5D}\x{6708}|oct|\x{5341}\x{6708}|nov|\x{5341}\x{3127}\x{6708}|dec|\x{5341}\x{4E8C}\x{6708})[a-z,\.;]*]]></text>
+</define>
+
+<define name="_allmonth" extract="litmonth, month">
+	<text><![CDATA[(?:]]></text>
+        <use name="_litmonth"/>
+	<text><![CDATA[|]]></text>
+        <use name="_month"/>
+	<text><![CDATA[)]]></text>
+</define>
+
+<define name="_day"  extract="day">
+	<text><![CDATA[(0?[1-9]|[12]\d|3[01])]]></text> 
+</define>
+
+<define name="_usday" extract="day">
+	<use name="_day"/>
+	<text><![CDATA[(?:st|nd|rd|th|[,\.;])?]]></text>
+</define>
+
+<define name="_hour" extract="hour">
+	<text><![CDATA[([01]?[0-9]|[012][0-3])(?!\d)]]></text>
+</define>
+
+<define name="_minute" extract="minute">
+	<text><![CDATA[([0-6]\d)(?!\d)]]></text>
+</define>
+
+<define name="_second" extract="second">
+	<text><![CDATA[([0-6]\d)(?!\d)]]></text>
+</define>
+
+<define name="_zone" extract="zone">
+	 <text><![CDATA[((?:(?:UT|UTC|GMT(?![+-])|CET|CEST|CETDST|MET|MEST|METDST|MEZ|MESZ|EET|EEST|EETDST|WET|WEST|WETDST|MSK|MSD|IST|JST|KST|HKT|AST|ADT|EST|EDT|CST|CDT|MST|MDT|PST|PDT|CAST|CADT|EAST|EADT|WAST|WADT|Z)|(?:GMT)?[+-]\d\d?:?(?:\d\d)?)(?!\w))?]]></text>
+</define>
+
+<define name="_ampm" extract="ampm">
+	<text><![CDATA[([ap]m(?:[^A-Za-z0-9]|$)|[\x{4E0A}\x{4E0B}]\x{5348})?]]></text>
+</define>
+
+<define name="_time" extract="hour, minute, second, subsecond, ampm, zone">
+	<text><![CDATA[(?<!\d)]]></text>
+        <use name="_hour"/>
+	<text><![CDATA[:]]></text>
+        <use name="_minute"/>
+	<text><![CDATA[:]]></text>
+        <use name="_second"/> 
+	<text><![CDATA[(?:(?: \d{4})?[:,\.](\d+))? {0,2}]]></text>
+        <use name="_ampm"/>
+	<text><![CDATA[ {0,2}]]></text>
+        <use name="_zone"/>
+	<text><![CDATA[(?!:\d)]]></text>
+</define>
+
+<define name="_hmtime" extract="hour, minute, ampm">
+	<text><![CDATA[(?<!\d)]]></text>
+        <use name="_hour"/>
+	<text><![CDATA[:]]></text>
+        <use name="_minute"/>
+	<text><![CDATA[(?: ([ap]m(?:[^A-Za-z0-9]|$)|[\x{4E0A}\x{4E0B}]\x{5348}))?(?!:[:\d])]]></text>
+</define>
+
+
+<define name="_dottime" extract="hour, minute, second, subsecond, zone">
+	<text><![CDATA[(?<![\d\.])([01]\d|2[0-3])\.]]></text>
+        <use name="_minute"/>
+	<text><![CDATA[(?:\.?]]></text>
+        <use name="_second"/>
+	<text><![CDATA[(?:[:,]\d+)?(?:\.(\d\d\d\d+))?) {0,2}]]></text>
+        <use name="_zone"/>
+	<text><![CDATA[(?![0-9\.])]]></text>
+</define>
+
+<define name="_combdatetime" extract="year, month, day, hour, minute, second, subsecond">
+        <!-- ... 20060502-000002 GMT ... -->
+	<text><![CDATA[(?<![\d\.])(20\d\d)(0\d|1[012])([012]\d|3[01])[.-]?([01]\d|2[0123])([0-6]\d)([0-6]\d)(?:\.?(\d+))?]]>\s*</text>
+        <use name="_zone"/> 
+</define>
+
+<define name="_combdatetime2" extract="year, ignored_sep, month, day, hour, minute, second, zone">
+        <!-- ... 2007-3-22 0:0:2 GMT ...' -->
+        <!-- ... 2007/3/22 0:0:2 GMT ...' -->
+        <text><![CDATA[(?<![\d\.])(20\d\d)([-/])([01]?\d)\2([012]?\d|3[01])\s+([012]?\d):([0-6]?\d):([0-6]?\d)]]>\s*</text>
+        <use name="_zone"/> 
+</define>
+
+
+
+<define name="_usdate" extract="litmonth, month, ignored_sep, day, zone, ignored_sep2, year">
+	 <text><![CDATA[(?<!\w|\d[:\.\-])]]></text>
+	 <use name="_allmonth"/> 
+         <text><![CDATA[([/\- ]) {0,2}]]></text>
+         <use name="_day"/>
+         <text><![CDATA[(?!:) {0,2}(?:\d\d:\d\d:\d\d(?:[\.\,]\d+)? {0,2}]]></text>
+	 <use name="_zone"/>
+         <text><![CDATA[)?((?:\3|,) {0,2}]]></text>
+         <use name="_year"/> 
+         <text><![CDATA[)?(?!/|\w|\.\d)]]></text>
+</define>
+
+<!-- Jan 21, 09.  allows spaces with litmonth only -->
+<define name="_usdate1" extract="litmonth, ignored_sep, day, zone, ignored_sep2, year">
+	 <text><![CDATA[(?<!\w|\d[:\.\-])]]></text>
+	 <use name="_litmonth"/> 
+         <text><![CDATA[([/\- ]) {0,2}]]></text>
+         <use name="_day"/>
+         <text><![CDATA[(?!:) {0,2}(?:\d\d:\d\d:\d\d(?:[\.\,]\d+)? {0,2}]]></text>
+	 <use name="_zone"/>
+         <text><![CDATA[)?((?:\2|,) {0,2}]]></text>
+         <use name="_year"/> 
+         <text><![CDATA[)?(?!/|\w|\.\d)]]></text>
+</define>
+
+<!-- 10/21/09. doesn't allow spaces (e.g. 10 21 09) with numeric month -->
+<define name="_usdate2" extract="month, ignored_sep, day, zone, ignored_sep2, year">
+	 <text><![CDATA[(?<!\w|\d[:\.\-])]]></text>
+	 <use name="_month"/> 
+         <text><![CDATA[([/\-])]]></text>
+         <use name="_day"/>
+         <text><![CDATA[(?!:)(?:\d\d:\d\d:\d\d(?:[\.\,]\d+)? {0,2}]]></text>
+	 <use name="_zone"/>
+         <text><![CDATA[)?((?:\2)]]></text>
+         <use name="_year"/> 
+         <text><![CDATA[)?(?!/|\w|\.\d)]]></text>
+</define>
+
+
+<define name="_isodate" extract="year, ignored_sep, litmonth, month, day">
+        <text><![CDATA[(?<![\w\d])]]></text>
+        <use name="_year"/>
+	<text><![CDATA[([\./\- ])]]></text>
+        <use name="_allmonth"/>
+	<text><![CDATA[(?!\d)(?:[\./\- ] {0,2})?]]></text>
+        <use name="_day"/>
+        <text><![CDATA[(?!/)(?:(?=T)|(?!\w)(?!\.\d))]]></text>
+</define>
+
+<!-- eurodate format.  period/dot delim separated out to eurodate2 -->
+<define name="_eurodate1" extract="day, ignored_sep, litmonth, month, year">
+        <text><![CDATA[(?<![\w\.])]]></text>
+        <use name="_usday"/> 
+	<text><![CDATA[([\- /]) {0,2}]]></text>
+        <use name="_allmonth"/>
+        <text><![CDATA[\2 {0,2}]]></text>
+        <use name="_year"/>
+        <text><![CDATA[(?![\w\.])]]></text>
+</define>
+
+<!-- just period/dot delimiter.  do not allow any spaces after dots (e.g. "version 5.4. 10" -->
+<define name="_eurodate2" extract="day, litmonth, month, year">
+        <text><![CDATA[(?<![\w\.])]]></text>
+        <use name="_usday"/> 
+	<text><![CDATA[\.]]></text>
+        <use name="_allmonth"/>
+        <text><![CDATA[\.]]></text>
+        <use name="_year"/>
+        <text><![CDATA[(?![\w\.])]]></text>
+</define>
+
+
+<define name="_bareurlitdate" extract="day, litmonth, year">
+	<text><![CDATA[(\d\d?)\|\|(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\|\|(20\d\d)]]></text>
+</define>
+
+<define name="_orddate" extract="year, ord">
+	<text><![CDATA[\s([01]\d)([0123]\d\d)\s]]></text>
+</define>
+
+<!-- due to high number of false positive matches, this format is
+     limited to special cases.  either at the start of a line or in
+     filename matches only, by prefixing with a "source::" -->
+
+<!-- don't allow multiple spaces after mashed date.  indicates number in column -->
+<define name="_masheddate" extract="year, month, day">
+	<text><![CDATA[(?:^|source::).*?(?<!\d|\d\.|-)(?:20)?([9012]\d)(0\d|1[012])([012]\d|3[01])(?!\d|-| {2,})]]></text>
+</define>
+<define name="_masheddate2" extract="month, day, year">
+	<text><![CDATA[(?:^|source::).*?(?<!\d|\d\.)(0\d|1[012])([012]\d|3[01])(?:20)?([9012]\d)(?!\d| {2,})]]></text>
+</define>
+
+<define name="_utcepoch" extract="utcepoch, subsecond">
+        <!-- update regex before '2030' -->
+	<text><![CDATA[((?<=^|[\s#,"=\(\[\|\{])(?:1[012345678])\d{8}|^@[\da-fA-F]{16,24})(?:\.?(\d{1,6}))?(?![\d\(])]]></text>
+</define>
+
+<timePatterns>
+      <use name="_time"/>
+      <use name="_hmtime"/>
+      <use name="_hmtime"/>
+      <use name="_dottime"/>
+      <use name="_combdatetime"/>
+      <use name="_utcepoch"/>
+      <use name="_combdatetime2"/>
+</timePatterns>
+<datePatterns>
+      <use name="_usdate1"/> 
+      <use name="_usdate2"/> 
+      <use name="_isodate"/>
+      <use name="_eurodate1"/> 
+      <use name="_eurodate2"/> 
+      <use name="_bareurlitdate"/> 
+      <use name="_orddate"/>
+      <use name="_combdatetime"/>
+      <use name="_masheddate"/>
+      <use name="_masheddate2"/>
+      <use name="_combdatetime2"/>
+</datePatterns>
+
+</datetime>

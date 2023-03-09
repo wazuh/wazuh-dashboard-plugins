@@ -1,0 +1,33 @@
+{
+  "__class__": "rapid_diag.task.Task",
+    "collectors": [
+        {
+            "__class__": "rapid_diag.collector.trigger.periodic.Periodic", 
+            "collectors": [
+                {
+                    "__class__": "rapid_diag.collector.stack_trace.StackTrace", 
+                    "process": {
+                        "__class__": "rapid_diag.process_abstraction.Process", 
+                        "pid": 0, 
+                        "name": "splunkd", 
+                        "args": "splunkd", 
+                        "process_type": "splunkd server", 
+                        "ppid": 0,
+                        "default_value_description": "By default, the main splunkd process is selected."
+                    }
+                }
+            ], 
+            "sampleCount": 1000, 
+            "interval": 0.5
+        },
+        {
+            "__class__": "rapid_diag.collector.diag.Diag"
+        }
+    ],
+  "name": "Performance",
+  "collector_tool_names": "pstack, splunkdiag",
+  "description": "For investigating issues related to excessive time or CPU load used by a process. The collector monitors a process and generates a series of process stacks on the host it is running on. By default, the main splunkd process is selected.",
+  "host": "",
+  "task_id": "pstacks-main",
+  "symptoms" : [ "slow-search", "high-cpu", "stuck-process", "scheduler-issues", "blocked-queues" ]
+}

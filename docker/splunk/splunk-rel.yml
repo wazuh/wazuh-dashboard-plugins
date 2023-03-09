@@ -1,0 +1,17 @@
+version: '3.7'
+services:
+  splunk:
+    image: splunk/splunk:latest
+    ports:
+      - "8000:8000"
+      - "8088:8088" #izquierda local, derecha servidor
+    volumes:
+      - splunk-data:/opt/splunk/var
+      - splunk-etc:/opt/splunk/etc
+    environment:
+      SPLUNK_START_ARGS: --accept-license
+      SPLUNK_PASSWORD: password
+
+volumes:
+  splunk-data:
+  splunk-etc:

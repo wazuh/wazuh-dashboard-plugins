@@ -1,0 +1,37 @@
+#   Version 9.0.3
+#
+# The following are examples of segmentation configurations.
+#
+# To use one or more of these configurations, copy the configuration block into
+# segmenters.conf in $SPLUNK_HOME/etc/system/local/. You must restart Splunk to
+# enable configurations.
+#
+# To learn more about configuration files (including precedence) please see the
+# documentation located at
+# http://docs.splunk.com/Documentation/Splunk/latest/Admin/Aboutconfigurationfiles
+
+
+# Example of a segmenter that doesn't index the date as segments in syslog
+# data:
+
+[syslog]
+FILTER = ^.*?\d\d:\d\d:\d\d\s+\S+\s+(.*)$
+
+
+# Example of a segmenter that only indexes the first 256b of events:
+
+[limited-reach]
+LOOKAHEAD = 256
+
+
+# Example of a segmenter that only indexes the first line of an event:
+
+[first-line]
+FILTER = ^(.*?)(\n|$)
+
+
+# Turn segmentation off completely:
+
+[no-segmentation]
+LOOKAHEAD = 0
+

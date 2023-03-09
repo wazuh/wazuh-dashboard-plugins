@@ -1,0 +1,76 @@
+Following patch was added for security vulnerability remediation
+for Arbitrary Code Execution (CVE-2021-23358) tracked by SPL-205745.
+Source: https://github.com/jashkenas/underscore/commit/4c73526d43838ad6ab43a6134728776632adeb66
+--- patches/underscore.js.org	2021-07-09 10:37:06.000000000 -0700
++++ underscore.js	2021-07-09 10:34:45.000000000 -0700
+@@ -1216,6 +1216,13 @@
+ 
+   var escaper = /\\|'|\r|\n|\t|\u2028|\u2029/g;
+ 
++  // In order to prevent third-party code injection through
++  // `_.templateSettings.variable`, we test it against the following regular
++  // expression. It is intentionally a bit more liberal than just matching valid
++  // identifiers, but still prevents possible loopholes through defaults or
++  // destructuring assignment.
++  var bareIdentifier = /^\s*(\w|\$)+\s*$/;
++
+   // JavaScript micro-templating, similar to John Resig's implementation.
+   // Underscore templating handles arbitrary delimiters, preserves whitespace,
+   // and correctly escapes quotes within interpolated code.
+@@ -1251,15 +1258,24 @@
+     });
+     source += "';\n";
+ 
+-    // If a variable is not specified, place data values in local scope.
+-    if (!settings.variable) source = 'with(obj||{}){\n' + source + '}\n';
++    var argument = settings.variable;
++    if (argument) {
++      // Insure against third-party code injection.
++      if (!bareIdentifier.test(argument)) throw new Error(
++        'variable is not a bare identifier: ' + argument
++      );
++    } else {
++      // If a variable is not specified, place data values in local scope.
++      source = 'with(obj||{}){\n' + source + '}\n';
++      argument = 'obj';
++    }
+ 
+     source = "var __t,__p='',__j=Array.prototype.join," +
+       "print=function(){__p+=__j.call(arguments,'');};\n" +
+       source + "return __p;\n";
+ 
+     try {
+-      render = new Function(settings.variable || 'obj', '_', source);
++      render = new Function(argument, '_', source);
+     } catch (e) {
+       e.source = source;
+       throw e;
+@@ -1271,7 +1287,7 @@
+     };
+ 
+     // Provide the compiled function source as a convenience for precompilation.
+-    template.source = 'function(' + (settings.variable || 'obj') + '){\n' + source + '}';
++    template.source = 'function(' + argument + '){\n' + source + '}';
+ 
+     return template;
+   };
+@@ -1329,15 +1345,11 @@
+ 
+   });
+ 
+-  // AMD registration happens at the end for compatibility with AMD loaders
+-  // that may not enforce next-turn semantics on modules. Even though general
+-  // practice for AMD registration is to be anonymous, underscore registers
+-  // as a named module because, like jQuery, it is a base library that is
+-  // popular enough to be bundled in a third party lib, but not be part of
+-  // an AMD load request. Those cases could generate an error when an
+-  // anonymous define() is called outside of a loader request.
++  // NOTE: this file has been patched so that Underscore defines itself as an
++  // anonymous AMD module.  This allows us to create a wrapper module called "underscore"
++  // that adds mixin functionality and enforces no-conflict mode.
+   if (typeof define === 'function' && define.amd) {
+-    define('underscore', [], function() {
++    define([], function() {
+       return _;
+     });
+   }

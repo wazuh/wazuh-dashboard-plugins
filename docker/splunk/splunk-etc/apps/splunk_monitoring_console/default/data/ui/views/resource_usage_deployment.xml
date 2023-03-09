@@ -1,0 +1,1042 @@
+<form version="1.1" hideEdit="True" script="common_control.js, drilldown_action_extension.js, resource_usage_deployment_extension.js">
+  <label>Resource Usage: Deployment</label>
+  <description/>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="dropdown" searchWhenChanged="true" token="role">
+      <label>Role</label>
+      <populatingSearch fieldForLabel="label" fieldForValue="search_group">
+        | `dmc_get_groups`
+        | search search_group="dmc_group_*"
+      </populatingSearch>
+      <choice value="*">All</choice>
+      <selectFirstChoice>true</selectFirstChoice>
+      <showClearButton>false</showClearButton>
+    </input>
+    <input type="dropdown" searchWhenChanged="true" token="group">
+      <label>Group</label>
+      <showClearButton>false</showClearButton>
+      <search fieldForValue="search_group">
+        <query>| `dmc_get_groups_containing_role($role$)` | search search_group!="dmc_group_*"</query>
+      </search>
+      <fieldForLabel>label</fieldForLabel>
+      <fieldForValue>search_group</fieldForValue>
+      <choice value="*">All</choice>
+      <selectFirstChoice>true</selectFirstChoice>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <html>
+        <h2>
+          <span>Select views: </span>
+          <span id="link-switcher-view">
+            <a href="#" class="btn-pill active" data-item="all">All</a>
+            <a href="#" class="btn-pill" data-item="snapshot">Snapshot</a>
+            <a href="#" class="btn-pill" data-item="historical">Historical</a>
+          </span>
+        </h2>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Snapshots</title>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Resource Usage by Instance</title>
+      <table>
+        <title>$countInstance$ instance(s)</title>
+        <search>
+          <query>
+| rest splunk_server_group=$role$ splunk_server_group="$group$" /services/server/status/resource-usage/hostwide
+| join type=outer splunk_server [
+  | rest splunk_server_group=$role$ splunk_server_group="$group$" /services/server/status/resource-usage/iostats
+  | eval iops = round(reads_ps + writes_ps)
+  | eval iops_mountpoint = iops." (".mount_point.")"
+  | eval cpupct_mountpoint = cpu_pct."% (".mount_point.")"
+  | stats values(iops_mountpoint) as iops_mountpoint, values(cpupct_mountpoint) as cpupct_mountpoint by splunk_server]
+| eventstats min(eval(if(isnull(normalized_load_avg_1min), "0", "1"))) as _load_avg_full_availability
+| eval normalized_load_avg_1min = if(isnull(normalized_load_avg_1min), "N/A", normalized_load_avg_1min)
+| eval core_info = if(isnull(cpu_count), "N/A", cpu_count)." / ".if(isnull(virtual_cpu_count), "N/A", virtual_cpu_count)
+| eval cpu_usage = cpu_system_pct + cpu_user_pct
+| eval mem_used_pct = round(mem_used / mem * 100 , 2)
+| eval mem_used = round(mem_used, 0)
+| eval mem = round(mem, 0)
+| fields splunk_server, normalized_load_avg_1min, core_info, cpu_usage, mem, mem_used, mem_used_pct, iops_mountpoint, cpupct_mountpoint
+| sort - cpu_usage, -mem_used
+| rename splunk_server AS Instance, normalized_load_avg_1min AS "Load Average", core_info AS "CPU Cores (Physical / Virtual)", cpu_usage AS "CPU Usage (%)", mem AS "Physical Memory Capacity (MB)", mem_used AS "Physical Memory Usage (MB)", mem_used_pct AS "Physical Memory Usage (%)", iops_mountpoint as "I/O Operations per second (Mount Point)", cpupct_mountpoint as "Storage I/O Saturation (Mount Point)"
+          </query>
+          <finalized>
+            <condition match='$result._load_avg_full_availability$ == "1"'>
+              <set token="load_avg_available">true</set>
+            </condition>
+            <condition match='$result._load_avg_full_availability$ == "0"'>
+              <set token="load_avg_unavailable">true</set>
+            </condition>
+          </finalized>
+          <done>
+            <set token="countInstance">$job.resultCount$</set>
+          </done>
+        </search>
+        <option name="refresh.time.visible">false</option>
+        <drilldown>
+          <condition field="Instance">
+            <link target="_blank">
+              <![CDATA[resource_usage_instance?form.splunk_server=$click.value2$]]>
+            </link>
+          </condition>
+          <condition field="*"></condition>
+        </drilldown>
+      </table>
+      <html>
+        <p>Click on instance name for more details.</p>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Historical Charts</title>
+      <input type="time" searchWhenChanged="true" token="time">
+        <label>Time Range:</label>
+        <default>
+          <earliestTime>-4h@m</earliestTime>
+          <latestTime>now</latestTime>
+        </default>
+      </input>
+      <input type="checkbox" searchWhenChanged="true" token="split_by_host">
+        <label></label>
+        <choice>Split by host</choice>
+      </input>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$, $split_by_host$" id="load_average">
+      <title>$countLoadAvgFuncLabel$ Load Average</title>
+      <input type="dropdown" token="countLoadAvgFunc" searchWhenChanged="true">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <default>Median</default>
+        <choice value="Avg">Average</choice>
+        <choice value="Median">Median</choice>
+        <choice value="Max">Maximum</choice>
+        <choice value="Min">Minimum</choice>
+        <choice value="Perc90">90th Percentile</choice>
+        <choice value="First">Sampled</choice>
+        <change>
+          <condition value="Avg">
+            <set token="countLoadAvgFuncLabel">Averaged System</set>
+          </condition>
+          <condition value="*">
+            <set token="countLoadAvgFuncLabel">$label$</set>
+          </condition>
+        </change>
+      </input>
+        <html>
+            <div class="heatmap_toggle"></div>
+        </html>
+        <viz type="splunk_monitoring_console.heatmap">
+            <search>
+                <query>
+                    `dmc_set_index_introspection` search_group=$role$ search_group="$group$" sourcetype=splunk_resource_usage component=Hostwide
+                    | eval server = host
+                    | `dmc_set_bin_for_timechart`
+                    | stats $countLoadAvgFunc$(data.normalized_load_avg_1min) as load_average by server _time
+                    | `dmc_load_average_rangemap_and_timechart`
+                </query>
+                <earliest>$time.earliest$</earliest>
+                <latest>$time.latest$</latest>
+            </search>
+            <drilldown>
+                <condition match="isnotnull('row._span')">
+                    <set token="drilldown_load_average">true</set>
+                    <set token="drilldown_load_average_earliest">$row.earliest$</set>
+                    <eval token="drilldown_load_average_earliest_label">$row.earliest_label$</eval>
+                    <set token="drilldown_load_average_latest">$row.latest$</set>
+                    <eval token="drilldown_load_average_latest_label">$row.latest_label$</eval>
+                    <set token="drilldown_load_average_metric">$row.drilldown_indexing_rate_metric$</set>
+                    <set token="drilldown_load_average_count">$row.numInstances$</set>
+                </condition>
+                <condition/>
+            </drilldown>
+        </viz>
+      <chart rejects="$split_by_host$">
+        <search>
+          <query>
+`dmc_set_index_introspection` search_group=$role$ search_group="$group$" sourcetype=splunk_resource_usage component=Hostwide
+| eval server = host 
+| `dmc_set_bin_for_timechart`
+| stats $countLoadAvgFunc$(data.normalized_load_avg_1min) as load_average by server _time
+| `dmc_load_average_rangemap_and_timechart`
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Instance count</option>
+        <option name="charting.fieldColors">{"1.5+": 0xD85D3C, "0.75-1.5": 0xF7902B, "0-0.75":0x9AC23C, "abnormal":0xC4C4C0}</option>
+        <drilldown>
+          <condition match="isnotnull('row._span')">
+            <set token="drilldown_load_average">true</set>
+            <set token="drilldown_load_average_earliest">$earliest$</set>
+            <eval token="drilldown_load_average_earliest_label">strftime(earliest, "%m/%d/%Y %H:%M:%S")</eval>
+            <set token="drilldown_load_average_latest">$latest$</set>
+            <eval token="drilldown_load_average_latest_label">strftime(latest, "%m/%d/%Y %H:%M:%S")</eval>
+            <set token="drilldown_load_average_metric">$click.name2$</set>
+            <set token="drilldown_load_average_count">$click.value2$</set>
+          </condition>
+          <condition />
+        </drilldown>
+      </chart>
+      <table depends="$drilldown_load_average$" rejects="$split_by_host$" id="drilldown_load_average">
+        <title>Time range: $drilldown_load_average_earliest_label$ ~ $drilldown_load_average_latest_label$. Metric: $countLoadAvgFunc$ Load average range: $drilldown_load_average_metric$. ($drilldown_load_average_count$ instances)</title>
+        <search>
+          <query>`dmc_drilldown_resource_usage_deployment_load_average("$role$", "$group$", $countLoadAvgFunc$, $drilldown_load_average_metric$)`</query>
+          <earliest>$drilldown_load_average_earliest$</earliest>
+          <latest>$drilldown_load_average_latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+      <html depends="$drilldown_load_average$" rejects="$split_by_host$">
+        <a data-unset-token="drilldown_load_average">Close this drilldown table</a>
+      </html>
+      <html rejects="$split_by_host$" depends="$load_avg_available$">
+        <p>Count of instances grouped by $countLoadAvgFuncLabel$ machine-wide load average over time.</p>
+      </html>
+      <html depends="$split_by_host$, $load_avg_available$">
+        <p>$loadAvgFuncLabel$ machine-wide load average over time by instance.</p>
+      </html>
+      <html depends="$load_avg_unavailable$">
+        <div class="alert alert-inline alert-info">
+          <i class="icon-alert"></i>
+          $countLoadAvgFuncLabel$ load average metric is not supported on Windows and will not be shown for instances running on that operating system.
+        </div>
+      </html>
+     </panel>
+  </row>
+  <row>
+     <panel depends="$split_by_host$">
+      <title>$countLoadAvgFuncLabel$ Load Average</title>
+         <input type="dropdown" token="countLoadAvgFunc" searchWhenChanged="true">
+             <label>Aggregation</label>
+             <showClearButton>false</showClearButton>
+             <default>Median</default>
+             <choice value="Avg">Average</choice>
+             <choice value="Median">Median</choice>
+             <choice value="Max">Maximum</choice>
+             <choice value="Min">Minimum</choice>
+             <choice value="Perc90">90th Percentile</choice>
+             <choice value="First">Sampled</choice>
+             <change>
+                 <condition value="Avg">
+                     <set token="countLoadAvgFuncLabel">Averaged System</set>
+                 </condition>
+                 <condition value="*">
+                     <set token="countLoadAvgFuncLabel">$label$</set>
+                 </condition>
+             </change>
+         </input>
+      <chart>
+        <search>
+          <query>
+`dmc_set_index_introspection` search_group=$role$ search_group="$group$" sourcetype=splunk_resource_usage component=Hostwide
+|`dmc_timechart` partial=f limit=25 $countLoadAvgFunc$(data.normalized_load_avg_1min) AS load_average by host
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Load Average</option>
+      </chart>
+      <html rejects="$split_by_host$" depends="$load_avg_available$">
+        <p>Count of instances grouped by $countLoadAvgFuncLabel$ machine-wide load average over time.</p>
+      </html>
+      <html depends="$split_by_host$, $load_avg_available$">
+        <p>$loadAvgFuncLabel$ machine-wide load average over time by instance.</p>
+      </html>
+       <html depends="$load_avg_unavailable$">
+         <div class="alert alert-inline alert-info">
+           <i class="icon-alert"></i>
+           $countLoadAvgFuncLabel$ load average metric is not supported on Windows and will not be shown for instances running on that operating system.
+         </div>
+       </html>
+    </panel>
+    <panel rejects="$snapshot$">
+      <title>Deployment-Wide $loadAvgFuncLabel$ Load Average</title>
+      <input type="dropdown" token="loadAvgFunc" searchWhenChanged="true">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <default>Median</default>
+        <choice value="Avg">Average</choice>
+        <choice value="Median">Median</choice>
+        <choice value="Max">Maximum</choice>
+        <choice value="Min">Minimum</choice>
+        <choice value="Perc90">90th Percentile</choice>
+        <choice value="First">Sampled</choice>
+        <change>
+          <condition value="Avg">
+            <set token="loadAvgFuncLabel">Averaged System</set>
+          </condition>
+          <condition value="*">
+            <set token="loadAvgFuncLabel">$label$</set>
+          </condition>
+        </change>
+      </input>
+      <chart>
+        <search>
+          <query>
+`dmc_set_index_introspection` search_group=$role$ search_group="$group$" sourcetype=splunk_resource_usage component=Hostwide
+| eval server = host
+| `dmc_set_bin`
+| stats latest(data.normalized_load_avg_1min) as dedup_load_average by server _time
+| `dmc_timechart` $loadAvgFunc$(dedup_load_average) as load_average
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">area</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Load Average</option>
+      </chart>
+      <html depends="$load_avg_unavailable$">
+        <div class="alert alert-inline alert-info">
+          <i class="icon-alert"></i>
+          Deployment-Wide $loadAvgFuncLabel$ Load Average is not supported on Windows and will not be shown for instances running on that operating system.
+        </div>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$, $split_by_host$" id="cpu_usage">
+      <title>$countCPUFuncLabel$ CPU Usage</title>
+      <input type="dropdown" token="countCPUFunc" searchWhenChanged="true">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <default>Median</default>
+        <choice value="Avg">Average</choice>
+        <choice value="Median">Median</choice>
+        <choice value="Min">Minimum</choice>
+        <choice value="Max">Maximum</choice>
+        <choice value="Perc90">90th Percentile</choice>
+        <choice value="First">Sampled</choice>
+        <change>
+          <set token="countCPUFuncLabel">$label$</set>
+        </change>
+      </input>
+        <html>
+            <div class="heatmap_toggle"></div>
+        </html>
+        <viz type="splunk_monitoring_console.heatmap">
+            <search>
+                <query>
+                    `dmc_set_index_introspection` search_group=$role$ search_group="$group$" sourcetype=splunk_resource_usage component=Hostwide
+                    | eval total_cpu_usage = 'data.cpu_system_pct' + 'data.cpu_user_pct'
+                    | eval server = host
+                    | `dmc_set_bin_for_timechart`
+                    | stats $countCPUFunc$(total_cpu_usage) as cpu_usage by server _time
+                    | `dmc_cpu_usage_rangemap_and_timechart`
+                </query>
+                <earliest>$time.earliest$</earliest>
+                <latest>$time.latest$</latest>
+            </search>
+            <drilldown>
+                <condition match="isnotnull('row._span')">
+                    <set token="drilldown_cpu_usage">true</set>
+                    <set token="drilldown_cpu_usage_earliest">$row.earliest$</set>
+                    <eval token="drilldown_cpu_usage_earliest_label">$row.earliest_label$</eval>
+                    <set token="drilldown_cpu_usage_latest">$row.latest$</set>
+                    <eval token="drilldown_cpu_usage_latest_label">$row.latest_label$</eval>
+                    <set token="drilldown_cpu_usage_metric">$row.drilldown_indexing_rate_metric$</set>
+                    <set token="drilldown_cpu_usage_count">$row.numInstances$</set>
+                </condition>
+                <condition/>
+            </drilldown>
+        </viz>
+      <chart rejects="$split_by_host$">
+        <search>
+          <query>
+`dmc_set_index_introspection` search_group=$role$ search_group="$group$" sourcetype=splunk_resource_usage component=Hostwide
+| eval total_cpu_usage = 'data.cpu_system_pct' + 'data.cpu_user_pct' 
+| eval server = host 
+| `dmc_set_bin_for_timechart`
+| stats $countCPUFunc$(total_cpu_usage) as cpu_usage by server _time
+| `dmc_cpu_usage_rangemap_and_timechart`
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Instance count</option>
+        <option name="charting.fieldColors">{"80-100%": 0xD85D3C, "60-80%": 0xF7902B, "0-60%":0x9AC23C, "100%+": 0x956D95, "abnormal":0xC4C4C0}</option>
+        <drilldown>
+          <condition match="isnotnull('row._span')">
+            <set token="drilldown_cpu_usage">true</set>
+            <set token="drilldown_cpu_usage_earliest">$earliest$</set>
+            <eval token="drilldown_cpu_usage_earliest_label">strftime(earliest, "%m/%d/%Y %H:%M:%S")</eval>
+            <set token="drilldown_cpu_usage_latest">$latest$</set>
+            <eval token="drilldown_cpu_usage_latest_label">strftime(latest, "%m/%d/%Y %H:%M:%S")</eval>
+            <set token="drilldown_cpu_usage_metric">$click.name2$</set>
+            <set token="drilldown_cpu_usage_count">$click.value2$</set>
+          </condition>
+          <condition />
+        </drilldown>
+      </chart>
+      <table depends="$drilldown_cpu_usage$" rejects="$split_by_host$" id="drilldown_cpu_usage">
+        <title>Time range: $drilldown_cpu_usage_earliest_label$ ~ $drilldown_cpu_usage_latest_label$. Metric: $countCPUFunc$ CPU usage range: $drilldown_cpu_usage_metric$. ($drilldown_cpu_usage_count$ instances)</title>
+        <search>
+          <query>`dmc_drilldown_resource_usage_deployment_cpu_usage("$role$", "$group$", $countCPUFunc$, $drilldown_cpu_usage_metric$)`</query>
+          <earliest>$drilldown_cpu_usage_earliest$</earliest>
+          <latest>$drilldown_cpu_usage_latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+      <html depends="$drilldown_cpu_usage$" rejects="$split_by_host$">
+        <a data-unset-token="drilldown_cpu_usage">Close this drilldown table</a>
+      </html>
+     </panel>
+    </row>
+    <row>
+     <panel depends="$split_by_host$">
+          <title>$countCPUFuncLabel$ CPU Usage</title>
+          <input type="dropdown" token="countCPUFunc" searchWhenChanged="true">
+              <label>Aggregation</label>
+              <showClearButton>false</showClearButton>
+              <default>Median</default>
+              <choice value="Avg">Average</choice>
+              <choice value="Median">Median</choice>
+              <choice value="Min">Minimum</choice>
+              <choice value="Max">Maximum</choice>
+              <choice value="Perc90">90th Percentile</choice>
+              <choice value="First">Sampled</choice>
+              <change>
+                  <set token="countCPUFuncLabel">$label$</set>
+              </change>
+          </input>
+        <chart>
+        <search>
+          <query>
+`dmc_set_index_introspection` search_group=$role$ search_group="$group$" sourcetype=splunk_resource_usage component=Hostwide
+| eval total_cpu_usage = 'data.cpu_system_pct' + 'data.cpu_user_pct'
+|`dmc_timechart` partial=f limit=25 $countCPUFunc$(total_cpu_usage) AS cpu_usage by host
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">CPU Usage (%)</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+        <option name="charting.axisY.maximumNumber">100</option>
+        <option name="charting.fieldColors">{"80-100%": 0xD85D3C, "60-80%": 0xF7902B, "0-60%":0x9AC23C, "100%+": 0x956D95, "abnormal":0xC4C4C0}</option>
+      </chart>
+      <html rejects="$split_by_host$">
+        <p>Count of instances grouped by $countCPUFuncLabel$ machine-wide CPU usage over time.</p>
+      </html>
+      <html depends="$split_by_host$">
+        <p>$countCPUFuncLabel$ machine-wide CPU usage over time by instance.</p>
+      </html>
+    </panel>
+    <panel rejects="$snapshot$">
+      <title>Deployment-Wide $avgCPUFuncLabel$ CPU Usage</title>
+      <input type="dropdown" token="avgCPUFunc" searchWhenChanged="true">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <default>Median</default>
+        <choice value="Avg">Average</choice>
+        <choice value="Median">Median</choice>
+        <choice value="Min">Minimum</choice>
+        <choice value="Max">Maximum</choice>
+        <choice value="Perc90">90th Percentile</choice>
+        <choice value="First">Sampled</choice>
+        <change>
+          <set token="avgCPUFuncLabel">$label$</set>
+        </change>
+      </input>
+      <chart>
+        <search>
+          <query>
+`dmc_set_index_introspection` search_group=$role$ search_group="$group$" sourcetype=splunk_resource_usage component=Hostwide
+| eval total_cpu_usage = ('data.cpu_system_pct' + 'data.cpu_user_pct')
+| eval server = host
+| `dmc_set_bin`
+| stats latest(total_cpu_usage) as dedup_total_cpu_usage by server _time
+| `dmc_timechart` $avgCPUFunc$(dedup_total_cpu_usage) as cpu_usage
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">area</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">CPU Usage (%)</option>
+        <option name="charting.axisY.majorUnit">20</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+        <option name="charting.axisY.maximumNumber">100</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$, $split_by_host$" id="physical_memory_usage">
+      <title>$countMemFuncLabel$ Physical Memory Usage</title>
+      <input type="dropdown" token="countMemFunc" searchWhenChanged="true">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <default>Median</default>
+        <choice value="Avg">Average</choice>
+        <choice value="Median">Median</choice>
+        <choice value="Min">Minimum</choice>
+        <choice value="Max">Maximum</choice>
+        <choice value="Perc90">90th Percentile</choice>
+        <choice value="First">Sampled</choice>
+        <change>
+          <set token="countMemFuncLabel">$label$</set>
+        </change>
+      </input>
+        <html>
+            <div class="heatmap_toggle"></div>
+        </html>
+        <viz type="splunk_monitoring_console.heatmap">
+            <search>
+                <query>
+                    `dmc_set_index_introspection` search_group=$role$ search_group="$group$" sourcetype=splunk_resource_usage component=Hostwide
+                    | eval pct_mem_used = 'data.mem_used' / 'data.mem'
+                    | eval server = host
+                    | `dmc_set_bin_for_timechart`
+                    | stats $countMemFunc$(pct_mem_used) as pct_mem_used by server _time
+                    | `dmc_memory_usage_rangemap_and_timechart`
+                </query>
+                <earliest>$time.earliest$</earliest>
+                <latest>$time.latest$</latest>
+            </search>
+            <drilldown>
+                <condition match="isnotnull('row._span')">
+                    <set token="drilldown_memory_usage">true</set>
+                    <set token="drilldown_memory_usage_earliest">$row.earliest$</set>
+                    <eval token="drilldown_memory_usage_earliest_label">$row.earliest_label$</eval>
+                    <set token="drilldown_memory_usage_latest">$row.latest$</set>
+                    <eval token="drilldown_memory_usage_latest_label">$row.latest_label$</eval>
+                    <set token="drilldown_memory_usage_metric">$row.drilldown_indexing_rate_metric$</set>
+                    <set token="drilldown_memory_usage_count">$row.numInstances$</set>
+                </condition>
+                <condition />
+            </drilldown>
+        </viz>
+      <chart rejects="$split_by_host$">
+        <search>
+          <query>
+`dmc_set_index_introspection` search_group=$role$ search_group="$group$" sourcetype=splunk_resource_usage component=Hostwide
+| eval pct_mem_used = 'data.mem_used' / 'data.mem' 
+| eval server = host 
+| `dmc_set_bin_for_timechart`
+| stats $countMemFunc$(pct_mem_used) as pct_mem_used by server _time
+| `dmc_memory_usage_rangemap_and_timechart`
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Instance count</option>
+        <option name="charting.fieldColors">{"80-100%": 0xD85D3C, "60-80%": 0xF7902B, "0-60%":0x9AC23C, "abnormal":0xC4C4C0}</option>
+        <drilldown>
+          <condition match="isnotnull('row._span')">
+            <set token="drilldown_memory_usage">true</set>
+            <set token="drilldown_memory_usage_earliest">$earliest$</set>
+            <eval token="drilldown_memory_usage_earliest_label">strftime(earliest, "%m/%d/%Y %H:%M:%S")</eval>
+            <set token="drilldown_memory_usage_latest">$latest$</set>
+            <eval token="drilldown_memory_usage_latest_label">strftime(latest, "%m/%d/%Y %H:%M:%S")</eval>
+            <set token="drilldown_memory_usage_metric">$click.name2$</set>
+            <set token="drilldown_memory_usage_count">$click.value2$</set>
+          </condition>
+          <condition />
+        </drilldown>
+      </chart>
+      <table depends="$drilldown_memory_usage$" rejects="$split_by_host$" id="drilldown_memory_usage">
+        <title>Time range: $drilldown_memory_usage_earliest_label$ ~ $drilldown_memory_usage_latest_label$. Metric: $countMemFunc$ memory usage range: $drilldown_memory_usage_metric$. ($drilldown_memory_usage_count$ instances)</title>
+        <search>
+          <query>`dmc_drilldown_resource_usage_deployment_memory_usage("$role$", "$group$", $countMemFunc$, $drilldown_memory_usage_metric$)`</query>
+          <earliest>$drilldown_memory_usage_earliest$</earliest>
+          <latest>$drilldown_memory_usage_latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+      <html depends="$drilldown_memory_usage$" rejects="$split_by_host$">
+        <a data-unset-token="drilldown_memory_usage">Close this drilldown table</a>
+      </html>
+      </panel>
+    </row>
+    <row>
+      <panel depends="$split_by_host$">
+          <title>$countMemFuncLabel$ Physical Memory Usage</title>
+          <input type="dropdown" token="avgMemFunc" searchWhenChanged="true">
+              <label>Aggregation</label>
+              <showClearButton>false</showClearButton>
+              <default>Median</default>
+              <choice value="Avg">Average</choice>
+              <choice value="Median">Median</choice>
+              <choice value="Min">Minimum</choice>
+              <choice value="Max">Maximum</choice>
+              <choice value="Perc90">90th Percentile</choice>
+              <choice value="First">Sampled</choice>
+              <change>
+                  <set token="avgMemFuncLabel">$label$</set>
+              </change>
+          </input>
+      <chart>
+        <search>
+          <query>
+`dmc_set_index_introspection` search_group=$role$ search_group="$group$" sourcetype=splunk_resource_usage component=Hostwide
+| eval pct_mem_used = 'data.mem_used' / 'data.mem' * 100
+| eval server = host
+| `dmc_set_bin_for_timechart`
+| `dmc_timechart` partial=f limit=25 $countMemFunc$(pct_mem_used) AS pct_mem_used by server
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Memory Usage (%)</option>
+        <option name="charting.axisLabelsY.majorUnit">20</option>
+        <option name="charting.axisY.maximumNumber">100</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+        <option name="charting.fieldColors">{"80-100%": 0xD85D3C, "60-80%": 0xF7902B, "0-60%":0x9AC23C, "abnormal":0xC4C4C0}</option>
+      </chart>
+      <html rejects="$split_by_host$">
+        <p>Count of instances grouped by $countMemFuncLabel$ machine-wide physical memory usage over time.</p>
+      </html>
+      <html depends="$split_by_host$">
+        <p>$countMemFuncLabel$ machine-wide physical memory usage over time by instance.</p>
+      </html>
+    </panel>
+    <panel rejects="$snapshot$">
+      <title>Deployment-Wide $avgMemFuncLabel$ Physical Memory Usage</title>
+      <input type="dropdown" token="avgMemFunc" searchWhenChanged="true">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <default>Median</default>
+        <choice value="Avg">Average</choice>
+        <choice value="Median">Median</choice>
+        <choice value="Min">Minimum</choice>
+        <choice value="Max">Maximum</choice>
+        <choice value="Perc90">90th Percentile</choice>
+        <choice value="First">Sampled</choice>
+        <change>
+          <set token="avgMemFuncLabel">$label$</set>
+        </change>
+      </input>
+      <chart>
+        <search>
+          <query>
+`dmc_set_index_introspection` search_group=$role$ search_group="$group$" sourcetype=splunk_resource_usage component=Hostwide
+| eval pct_mem_usage = 'data.mem_used' / 'data.mem' * 100 
+| eval server = host 
+| `dmc_set_bin`
+| stats latest(pct_mem_usage) as dedup_pct_mem_usage by server _time 
+| `dmc_timechart` $avgMemFunc$(dedup_pct_mem_usage) as pct_mem_usage
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">area</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Memory Usage (%)</option>
+        <option name="charting.axisLabelsY.majorUnit">20</option>
+        <option name="charting.axisY.maximumNumber">100</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+      </chart>
+    </panel>
+  </row>
+  <search id="iostats_log_base">
+    <query>
+      `dmc_set_index_introspection` search_group=$role$ search_group="$group$" sourcetype=splunk_resource_usage component=IOStats
+      | eval mount_point = 'data.mount_point'
+      | eval cpu_pct = 'data.cpu_pct'
+      | eval host_mountpoint = host.":".mount_point
+      | `dmc_set_bin_for_iostats`
+    </query>
+    <earliest>$time.earliest$</earliest>
+    <latest>$time.latest$</latest>
+  </search>
+  <row>
+    <panel rejects="$snapshot$, $split_by_host$" id="io_bandwidth_utilization">
+      <title>$countIOstatsFuncLabel$ Storage I/O Saturation</title>
+      <input type="dropdown" token="countIOstatsFunc" searchWhenChanged="true">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <default>Median</default>
+        <choice value="Avg">Average</choice>
+        <choice value="Median">Median</choice>
+        <choice value="Min">Minimum</choice>
+        <choice value="Max">Maximum</choice>
+        <choice value="Perc90">90th Percentile</choice>
+        <choice value="First">Sampled</choice>
+        <change>
+          <set token="countIOstatsFuncLabel">$label$</set>
+        </change>
+      </input>
+        <html>
+            <div class="heatmap_toggle"></div>
+        </html>
+        <viz type="splunk_monitoring_console.heatmap">
+            <search base="iostats_log_base">
+                <query>
+                    stats $countIOstatsFunc$(cpu_pct) as cpu_pct by host_mountpoint, _time
+                    | `dmc_iostats_rangemap(cpu_pct)`
+                    | `dmc_timechart_for_iostats` dc(host_mountpoint) as count by range
+                    | fields _time, "80-100%", "60-80%", "0-60%", "abnormal"
+                </query>
+                <earliest>$time.earliest$</earliest>
+                <latest>$time.latest$</latest>
+            </search>
+            <drilldown>
+                <condition match="isnotnull('row._span')">
+                    <set token="drilldown_iostats">true</set>
+                    <set token="drilldown_iostats_earliest">$row.earliest$</set>
+                    <eval token="drilldown_iostats_earliest_label">$row.earliest_label$</eval>
+                    <set token="drilldown_iostats_latest">$row.latest$</set>
+                    <eval token="drilldown_iostats_latest_label">$row.latest_label$</eval>
+                    <set token="drilldown_iostats_metric">$row.drilldown_indexing_rate_metric$</set>
+                    <set token="drilldown_iostats_count">$row.numInstances$</set>
+                </condition>
+                <condition />
+            </drilldown>
+        </viz>
+      <chart rejects="$split_by_host$">
+        <search base="iostats_log_base">
+          <query>
+            stats $countIOstatsFunc$(cpu_pct) as cpu_pct by host_mountpoint, _time
+            | `dmc_iostats_rangemap(cpu_pct)`
+            | `dmc_timechart_for_iostats` dc(host_mountpoint) as count by range
+            | fields _time, "80-100%", "60-80%", "0-60%", "abnormal"
+          </query>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.fieldColors">{"80-100%": 0xD85D3C, "60-80%": 0xF7902B, "0-60%":0x9AC23C, "abnormal":0xC4C4C0}</option>
+        <option name="charting.axisTitleY.text">Mount Point Count</option>
+        <drilldown>
+          <condition match="isnotnull('row._span')">
+            <set token="drilldown_iostats">true</set>
+            <set token="drilldown_iostats_earliest">$earliest$</set>
+            <eval token="drilldown_iostats_earliest_label">strftime(earliest, "%m/%d/%Y %H:%M:%S")</eval>
+            <set token="drilldown_iostats_latest">$latest$</set>
+            <eval token="drilldown_iostats_latest_label">strftime(latest, "%m/%d/%Y %H:%M:%S")</eval>
+            <set token="drilldown_iostats_metric">$click.name2$</set>
+            <set token="drilldown_iostats_count">$click.value2$</set>
+          </condition>
+          <condition />
+        </drilldown>
+      </chart>
+      <!-- need table id to add custom cell render of the action menu -->
+      <table depends="$drilldown_iostats$" rejects="$split_by_host$" id="drilldown_iostats">
+        <title>Time range: $drilldown_iostats_earliest_label$ ~ $drilldown_iostats_latest_label$. Metric: $countIOstatsFunc$ I/O bandwidth utilization range: $drilldown_iostats_metric$. ($drilldown_iostats_count$ instances)</title>
+        <search base="iostats_log_base">
+          <query>
+            stats $countIOstatsFunc$(cpu_pct) as cpu_pct by host_mountpoint
+            | `dmc_iostats_rangemap(cpu_pct)`
+            | where range==$drilldown_iostats_metric|s$
+            | eval host = replace(host_mountpoint, ":.*", "")
+            | eval mount_point = replace(host_mountpoint, ".*:", "")
+            | `dmc_drilldown_join_peers_by_peerURI`
+            | eval Action = Action." $role$"
+            | fields serverName, machine, mount_point, cpu_pct, range, numberOfCores, ram, version, Action
+            | rename serverName as Instance, machine as Machine, mount_point as "Mount Point", cpu_pct as "I/O Bandwidth Utilizatio (%)", range as "Storage I/O Saturation Range", version as Version, numberOfCores as Cores, ram as RAM
+          </query>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+      <html depends="$drilldown_iostats$" rejects="$split_by_host$">
+        <a data-unset-token="drilldown_iostats">Close this drilldown table</a>
+      </html>
+      </panel>
+    </row>
+    <row>
+      <panel depends="$split_by_host$">
+          <title>$countIOstatsFuncLabel$ Storage I/O Saturation</title>
+          <input type="dropdown" token="aggIOstatsFunc" searchWhenChanged="true">
+              <label>Aggregation</label>
+              <showClearButton>false</showClearButton>
+              <default>Median</default>
+              <choice value="Avg">Average</choice>
+              <choice value="Median">Median</choice>
+              <choice value="Min">Minimum</choice>
+              <choice value="Max">Maximum</choice>
+              <choice value="Perc90">90th Percentile</choice>
+              <choice value="First">Sampled</choice>
+              <change>
+                  <set token="aggIOstatsFuncLabel">$label$</set>
+              </change>
+          </input>
+      <chart>
+        <search base="iostats_log_base">
+          <query>
+            `dmc_timechart_for_iostats` limit=25 $countIOstatsFunc$(cpu_pct) by host_mountpoint
+          </query>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Storage I/O Saturation (%)</option>
+        <option name="charting.axisY.maximumNumber">100</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+      </chart>
+      <html>
+        <p>This panel shows data for instances running Splunk Enterprise 6.4+.</p>
+        <p><b>Storage I/O Saturation: </b>Percentage of time the CPU was servicing requests. Disk saturation occurs when this value is close to 100%. </p>
+        <p><a href="/help?location=learnmore.dmc.ru_machine.iostats" target="_blank">Learn more</a> about the source of this data. </p>
+      </html>
+    </panel>
+    <panel rejects="$snapshot$">
+      <title>Deployment-wide $aggIOstatsFuncLabel$ Storage I/O Saturation</title>
+      <input type="dropdown" token="aggIOstatsFunc" searchWhenChanged="true">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <default>Median</default>
+        <choice value="Avg">Average</choice>
+        <choice value="Median">Median</choice>
+        <choice value="Min">Minimum</choice>
+        <choice value="Max">Maximum</choice>
+        <choice value="Perc90">90th Percentile</choice>
+        <choice value="First">Sampled</choice>
+        <change>
+          <set token="aggIOstatsFuncLabel">$label$</set>
+        </change>
+      </input>
+      <chart>
+        <search base="iostats_log_base">
+          <query>
+            `dmc_timechart_for_iostats` $aggIOstatsFunc$(cpu_pct) as cpu_pct
+          </query>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="charting.chart">area</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Storage I/O Saturation (%)</option>
+        <option name="charting.axisY.maximumNumber">100</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+      </chart>
+      <html>
+        <p>This panel shows data for instances running Splunk Enterprise 6.4+.</p>
+        <p><b>Storage I/O Saturation: </b>Percentage of time the CPU was servicing requests. Disk saturation occurs when this value is close to 100%. </p>
+        <p><a href="/help?location=learnmore.dmc.ru_machine.iostats" target="_blank">Learn more</a> about the source of this data. </p>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$, $split_by_host$" id="disk_usage">
+      <title>$countDiskFuncLabel$ Disk Usage</title>
+      <input type="dropdown" token="countDiskFunc" searchWhenChanged="true">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <default>Median</default>
+        <choice value="Avg">Average</choice>
+        <choice value="Median">Median</choice>
+        <choice value="Min">Minimum</choice>
+        <choice value="Max">Maximum</choice>
+        <choice value="Perc90">90th Percentile</choice>
+        <choice value="First">Sampled</choice>
+        <change>
+          <set token="countDiskFuncLabel">$label$</set>
+        </change>
+      </input>
+        <html>
+            <div class="heatmap_toggle"></div>
+        </html>
+        <viz type="splunk_monitoring_console.heatmap">
+            <search>
+                <query>
+                    `dmc_set_index_introspection` search_group=$role$ search_group="$group$" sourcetype=splunk_disk_objects component=Partitions
+                    | eval mount_point = 'data.mount_point'
+                    | eval free = if(isnotnull('data.available'), 'data.available', 'data.free')
+                    | eval pct_disk_usage = 1 - free / 'data.capacity'
+                    | `dmc_set_bin_for_timechart_for_disk_usage`
+                    | eval server_mount_point = host.":".mount_point
+                    | stats $countDiskFunc$(pct_disk_usage) as pct_disk_usage by server_mount_point _time
+                    | `dmc_disk_usage_rangemap_and_timechart`
+                </query>
+                <earliest>$time.earliest$</earliest>
+                <latest>$time.latest$</latest>
+            </search>
+            <drilldown>
+                <condition match="isnotnull('row._span')">
+                    <set token="drilldown_disk_usage">true</set>
+                    <set token="drilldown_disk_usage_span">$row._span$</set>
+                    <set token="drilldown_disk_usage_earliest">$row.earliest$</set>
+                    <eval token="drilldown_disk_usage_earliest_label">$row.earliest_label$</eval>
+                    <set token="drilldown_disk_usage_latest">$row.latest$</set>
+                    <eval token="drilldown_disk_usage_latest_label">$row.latest_label$</eval>
+                    <set token="drilldown_disk_usage_metric">$row.drilldown_indexing_rate_metric$</set>
+                    <set token="drilldown_disk_usage_count">$row.numInstances$</set>
+                </condition>
+                <condition />
+            </drilldown>
+        </viz>
+      <chart rejects="$split_by_host$">
+        <search>
+          <query>
+            `dmc_set_index_introspection` search_group=$role$ search_group="$group$" sourcetype=splunk_disk_objects component=Partitions
+            | eval mount_point = 'data.mount_point'
+            | eval free = if(isnotnull('data.available'), 'data.available', 'data.free')
+            | eval pct_disk_usage = 1 - free / 'data.capacity'
+            | `dmc_set_bin_for_timechart_for_disk_usage`
+            | eval server_mount_point = host.":".mount_point
+            | stats $countDiskFunc$(pct_disk_usage) as pct_disk_usage by server_mount_point _time
+            | `dmc_disk_usage_rangemap_and_timechart`
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.fieldColors">{"80-100%": 0xD85D3C, "60-80%": 0xF7902B, "0-60%":0x9AC23C, "abnormal":0xC4C4C0}</option>
+        <option name="charting.axisTitleY.text">Mount point count</option>
+        <drilldown>
+          <condition match="isnotnull('row._span')">
+            <set token="drilldown_disk_usage">true</set>
+            <set token="drilldown_disk_usage_span">$row._span$</set>
+            <set token="drilldown_disk_usage_earliest">$earliest$</set>
+            <eval token="drilldown_disk_usage_earliest_label">strftime(earliest, "%m/%d/%Y %H:%M:%S")</eval>
+            <set token="drilldown_disk_usage_latest">$latest$</set>
+            <eval token="drilldown_disk_usage_latest_label">strftime(latest, "%m/%d/%Y %H:%M:%S")</eval>
+            <set token="drilldown_disk_usage_metric">$click.name2$</set>
+            <set token="drilldown_disk_usage_count">$click.value2$</set>
+          </condition>
+          <condition />
+        </drilldown>
+      </chart>
+      <table depends="$drilldown_disk_usage$" rejects="$split_by_host$" id="drilldown_disk_usage">
+        <title>Time range: $drilldown_disk_usage_earliest_label$ ~ $drilldown_disk_usage_latest_label$. Metric: $countDiskFunc$ disk usage range: $drilldown_disk_usage_metric$. ($drilldown_disk_usage_count$ instances)</title>
+        <search>
+          <query>`dmc_drilldown_resource_usage_deployment_disk_usage("$role$", "$group$", $countDiskFunc$, $drilldown_disk_usage_metric$)`</query>
+          <earliest>$drilldown_disk_usage_earliest$</earliest>
+          <latest>$drilldown_disk_usage_latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+      <html depends="$drilldown_disk_usage$" rejects="$split_by_host$">
+        <a data-unset-token="drilldown_disk_usage">Close this drilldown table</a>
+      </html>
+      </panel>
+    </row>
+    <row>
+      <panel depends="$split_by_host$">
+          <title>$countDiskFuncLabel$ Disk Usage</title>
+          <input type="dropdown" token="avgDiskFunc" searchWhenChanged="true">
+              <label>Aggregation</label>
+              <showClearButton>false</showClearButton>
+              <default>Median</default>
+              <choice value="Avg">Average</choice>
+              <choice value="Median">Median</choice>
+              <choice value="Min">Minimum</choice>
+              <choice value="Max">Maximum</choice>
+              <choice value="Perc90">90th Percentile</choice>
+              <choice value="First">Sampled</choice>
+              <change>
+                  <set token="avgDiskFuncLabel">$label$</set>
+              </change>
+          </input>
+      <chart>
+        <search>
+          <query>
+            `dmc_set_index_introspection` search_group=$role$ search_group="$group$" sourcetype=splunk_disk_objects component=Partitions
+            | eval mount_point = 'data.mount_point'
+            | eval free = if(isnotnull('data.available'), 'data.available', 'data.free')
+            | eval pct_disk_usage = (1 - free / 'data.capacity') * 100
+            | `dmc_set_bin_for_timechart_for_disk_usage`
+            | eval server_mount_point = host.":".mount_point
+            | `dmc_timechart` partial=f limit=25 $countDiskFunc$(pct_disk_usage) AS pct_disk_usage by server_mount_point
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.fieldColors">{"80-100%": 0xD85D3C, "60-80%": 0xF7902B, "0-60%":0x9AC23C, "abnormal":0xC4C4C0}</option>
+        <option name="charting.axisTitleY.text">Disk Usage (%)</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+        <option name="charting.axisY.maximumNumber">100</option>
+      </chart>
+      <html rejects="$split_by_host$">
+        <p>Count of instances grouped by $countDiskFuncLabel$ disk usage over time. This metric takes into account all partitions in use by each instance.</p>
+      </html>
+      <html depends="$split_by_host$">
+        <p>$countDiskFuncLabel$ disk usage over time by instance. This metric takes into account all partitions in use by each instance.</p>
+      </html>
+    </panel>
+    <panel rejects="$snapshot$">
+      <title>Deployment-Wide $avgDiskFuncLabel$ Disk Usage</title>
+      <input type="dropdown" token="avgDiskFunc" searchWhenChanged="true">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <default>Median</default>
+        <choice value="Avg">Average</choice>
+        <choice value="Median">Median</choice>
+        <choice value="Min">Minimum</choice>
+        <choice value="Max">Maximum</choice>
+        <choice value="Perc90">90th Percentile</choice>
+        <choice value="First">Sampled</choice>
+        <change>
+          <set token="avgDiskFuncLabel">$label$</set>
+        </change>
+      </input>
+      <chart>
+        <search>
+          <query>
+            `dmc_set_index_introspection` search_group=$role$ search_group="$group$" sourcetype=splunk_disk_objects component=Partitions
+            | eval server = host
+            | eval mount_point = 'data.mount_point'
+            | eval free = if(isnotnull('data.available'), 'data.available', 'data.free')
+            | eval pct_disk_usage = (1 - free / 'data.capacity') * 100
+            | `dmc_set_bin_for_disk_usage`
+            | stats latest(pct_disk_usage) as dedup_pct_disk_usage by server mount_point _time
+            | `dmc_timechart_for_disk_usage` $avgDiskFunc$(dedup_pct_disk_usage) as pct_disk_usage
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">area</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Disk Usage (%)</option>
+        <option name="charting.axisLabelsY.majorUnit">20</option>
+        <option name="charting.axisY.maximumNumber">100</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+      </chart>
+      <html>
+        <p>This metric takes into account all partitions in use by each Splunk Enterprise instance.</p>
+      </html>
+    </panel>
+  </row>
+</form>

@@ -1,0 +1,128 @@
+<form version="1.1" hideEdit="True" script="common_control.js, forwarder_monitoring_extension.js">
+  <label>Forwarders: Instance</label>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="dropdown" searchWhenChanged="true" token="hostname">
+      <label>Instance:</label>
+      <showClearButton>false</showClearButton>
+      <populatingSearch fieldForLabel="hostname" fieldForValue="hostname">
+        | `dmc_get_forwarder_info`
+        | stats count by hostname
+      </populatingSearch>
+      <selectFirstChoice>true</selectFirstChoice>
+    </input>
+    <input type="time" searchWhenChanged="true" token="time">
+      <label>Time Range:</label>
+      <default>
+        <earliestTime>-4h@m</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+  </fieldset>
+  <row id="forwarder_monitoring_extension">
+    <panel>
+      <html>
+        <h3>Forwarder Monitoring is <b>disabled</b>. Please go to the <a href="monitoringconsole_forwarder_setup" target="_blank">setup<span class="icon-external"></span></a> page to enable it.</h3>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Status and Configuration</title>
+      <table>
+        <search>
+          <query>
+`dmc_get_forwarder_tcpin` hostname=$hostname$
+| eval source_uri = hostname.":".sourcePort
+| eval dest_uri = host.":".destPort
+| eval connection = source_uri."->".dest_uri
+| stats values(fwdType) as fwdType, values(sourceIp) as sourceIp, latest(version) as version,  values(os) as os, values(arch) as arch, dc(dest_uri) as dest_count, dc(connection) as connection_count, avg(tcp_KBps) as avg_tcp_kbps, avg(tcp_eps) as avg_tcp_eps by hostname, guid
+| eval avg_tcp_kbps = round(avg_tcp_kbps, 2)
+| eval avg_tcp_eps = round(avg_tcp_eps, 2)
+| `dmc_rename_forwarder_type(fwdType)`
+| rename hostname as Instance, fwdType as "Forwarder Type", sourceIp as IP, version as "Splunk Version", os as OS, arch as Architecture, guid as GUID, dest_count as "Receiver Count", connection_count as "Connection Count", avg_tcp_kbps as "Average KB/s", avg_tcp_eps as "Average Events/s"
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="drilldown">row</option>
+        <drilldown>
+          <set token="forwarderStatusDrilldown">$row.Instance$</set>
+        </drilldown>
+      </table>
+      <html>
+        <p>Click on a forwarder to see a list of connected receivers.</p>
+        <p><b>Note: </b>Multiple forwarders installed on one host appear with identical host names, but different GUIDs.</p>
+      </html>
+    </panel>
+    <panel depends="$forwarderStatusDrilldown$">
+      <title>List of Instances $forwarderStatusDrilldown$ Connects to</title>
+      <table>
+        <search>
+          <query>
+`dmc_get_forwarder_tcpin` hostname=$hostname$
+| eval dest_uri = host.": ".destPort
+| stats count by dest_uri
+| fields dest_uri
+| rename dest_uri as "Receivers"
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+      <html>
+        <a data-unset-token="forwarderStatusDrilldown">Close this panel</a>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Outgoing Data Rate</title>
+      <input type="dropdown" searchWhenChanged="true" token="funcVolume">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <default>avg</default>
+        <choice value="avg">Average</choice>
+        <choice value="max">Maximum</choice>
+      </input>
+      <chart>
+        <search id="confRepPerfSearch">
+          <query>
+`dmc_get_forwarder_tcpin` hostname=$hostname$
+| `dmc_timechart_for_metrics_log` $funcVolume$(eval(tcp_KBps)) as "KB/s", $funcVolume$(tcp_eps) as "Events/s"
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisLabelsY2.majorUnit">auto</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">true</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.overlayFields">Events/s</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.chart.showLabels">auto</option>
+        <option name="charting.axisTitleY2.text">Events/s</option>
+        <option name="charting.axisLabelsY.majorUnit">auto</option>
+        <option name="charting.axisTitleY.text">KB/s</option>
+        <option name="charting.axisTitleX.text">Time</option>
+      </chart>
+    </panel>
+  </row>
+</form>

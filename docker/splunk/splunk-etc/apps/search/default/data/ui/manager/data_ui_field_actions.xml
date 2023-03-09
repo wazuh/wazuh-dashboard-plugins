@@ -1,0 +1,229 @@
+<endpoint name="data/ui/workflow-actions" showAppContext="1">
+  <header>Workflow actions</header>
+  <breadcrumb>
+    <parent hidecurrent="False">fields</parent>
+    <name>Workflow actions</name>
+  </breadcrumb>
+  <elements>
+
+    <element name="__ns" type="select" label="Destination app">
+      <view name="create"/>
+      <key name="dynamicOptions" type="dict">
+        <key name="keyName">title</key>
+        <key name="keyValue">title</key>
+        <key name="splunkSource">/apps/local</key>
+        <key name="splunkSourceParams" type="dict">
+          <key name="search">'disabled=false'</key>
+          <key name="count">-1</key>
+        </key>
+      </key>
+    </element>
+
+    <element name="name" label="Name">
+      <view name="create"/>
+      <view name="list"/>
+      <key name="exampleText">Enter a unique name without spaces or special characters. This is used for identifying your workflow action later on within Splunk Settings.</key>
+    </element>
+    <element name="label" type="textfield" label="Label">
+      <view name="create"/>
+      <view name="edit"/>
+      <key name="exampleText">Enter the label that appears for this action. Optionally, incorporate a field's value by enclosing the field name in dollar signs, e.g. 'Search for ticket number : $ticketnum$'.</key>
+    </element>
+
+    <element name="fields" type="textfield" label="Apply only to the following fields">
+      <view name="create"/>
+      <view name="edit"/>
+      <key name="exampleText">Specify a comma-separated list of fields that must be present in an event for the workflow action to apply to it. When fields are specified, the workflow action only appears in the field menus for those fields; otherwise it appears in all field menus.</key>
+    </element>
+
+    <element name="eventtypes" type="textfield" label="Apply only to the following event types">
+      <view name="create"/>
+      <view name="edit"/>
+      <key name="exampleText">Specify a comma-separated list of event types that an event must be associated with for the workflow action to apply to it.</key>
+    </element>
+
+    <element name="display_location" type="select" label="Show action in">
+      <view name="create"/>
+      <view name="edit"/>
+      <options>
+        <opt value="event_menu" label="Event menu"/>
+        <opt value="field_menu" label="Fields menus"/>
+        <opt value="both" label="Both"/>
+      </options>
+    </element>
+
+    <element name="type" type="select" label="Action type">
+      <view name="create"/>
+      <view name="edit"/>
+      <options>
+        <opt value="link" label="link"/>
+        <opt value="search" label="search"/>
+      </options>
+      <onChange>
+        <key name="link">link_group</key>
+        <key name="search">search_group</key>
+        <key name="_action">showonly</key>
+        <group_set>
+          <group name="link_group"/>
+          <group name="search_group"/>
+        </group_set>
+      </onChange>
+    </element>
+
+    <element name="link_group" type="fieldset">
+      <view name="create"/>
+      <view name="edit"/>
+      <key name="legend">Link configuration</key>
+      <elements>
+
+        <element name="link.uri" type="textfield" label="URI">
+          <view name="create"/>
+          <view name="edit"/>
+          <key name="requiredIfVisible" />
+          <key name="submitValueEdit">value if form_data.get('type')=='link' else None</key>
+          <key name="submitValueAdd">value if form_data.get('type')=='link' else None</key>
+          <key name="exampleText">Enter the location to link to. Optionally, specify fields by enclosing the field name in dollar signs, e.g. http://www.google.com/search?q=$host$.</key>
+        </element>
+        <element name="link.target" type="select" label="Open link in">
+          <view name="create"/>
+          <view name="edit"/>
+          <key name="submitValueEdit">value if form_data.get('type')=='link' else None</key>
+          <key name="submitValueAdd">value if form_data.get('type')=='link' else None</key>
+          <options>
+            <opt value="blank" label="New window"/>
+            <opt value="self" label="Current window"/>
+          </options>
+        </element>
+
+        <element name="link.method" type="select" label="Link method">
+          <view name="create"/>
+          <view name="edit"/>
+          <key name="submitValueEdit">value if form_data.get('type')=='link' else None</key>
+          <key name="submitValueAdd">value if form_data.get('type')=='link' else None</key>
+          <options>
+            <opt value="get" label="get"/>
+            <opt value="post" label="post"/>
+          </options>
+          <onChange>
+            <key name="get">link_get_group</key>
+            <key name="post">link_postargs</key>
+            <key name="_action">showonly</key>
+            <group_set>
+              <group name="link_get_group"/>
+              <group name="link_postargs"/>
+            </group_set>
+          </onChange>
+        </element>
+        <element name="link_postargs" type="repeatable" label="Post arguments">
+          <view name="create"/>
+          <view name="edit"/>
+          <key name="deleteable">True</key> <!-- user can remove items -->
+          <key name="expandable">True</key> <!-- user can add more items -->
+          <key name="fieldprefixregex">link\.postargs\.[0-9]*\.</key>
+          <key name="fieldprefix">link.postargs.</key>
+          <element name="template" type="fieldmapping">
+            <key name="hideLabel">True</key>
+            <!-- XXX: I want this to prevent link.postargs.* from being submitted if link.method = get or if type = search -->
+            <key name="submitValueEdit">value if ((form_data.get('link.method')=='post') and (form_data.get('type')=='link')) else None</key>
+            <key name="submitValueAdd">value if ((form_data.get('link.method')=='post') and (form_data.get('type')=='link')) else None</key>
+          </element>
+        </element>
+        <element name="link_get_group">
+        </element>
+
+      </elements>
+    </element>
+
+    <element name="search_group" type="fieldset">
+      <view name="create"/>
+      <view name="edit"/>
+      <key name="legend">Search configuration</key>
+      <elements>
+        <element name="search.search_string" type="textfield" label="Search string">
+          <view name="create"/>
+          <view name="edit"/>
+          <key name="requiredIfVisible" />
+          <key name="submitValueEdit">value if form_data.get('type')=='search' else None</key>
+          <key name="submitValueAdd">value if form_data.get('type')=='search' else None</key>
+          <key name="exampleText">Enter the search for this action. Optionally, specify fields as $fieldname$, e.g. sourcetype=rails controller=$controller$ error=*.</key>
+        </element>
+        <element name="search.app" type="select" label="Run in app">
+          <view name="create"/>
+          <view name="edit"/>
+          <extraOptions>
+            <opt value="" label=""/>
+          </extraOptions>
+          <key name="dynamicOptions" type="dict">
+            <key name="keyName">title</key>
+            <key name="keyValue">title</key>
+            <key name="splunkSource">/apps/local</key>
+            <key name="splunkSourceParams" type="dict">
+              <key name="search">'disabled=false'</key>
+              <key name="count">-1</key>
+            </key>
+          </key>
+          <key name="submitValueEdit">value if form_data.get('type')=='search' else None</key>
+          <key name="submitValueAdd">value if form_data.get('type')=='search' else None</key>
+          <key name="exampleText">Choose an app for the search to run in. Defaults to the current app.</key>
+        </element>
+        <element name="search.view" type="textfield" label="Open in view">
+          <view name="create"/>
+          <view name="edit"/>
+          <key name="submitValueEdit">value if form_data.get('type')=='search' else None</key>
+          <key name="submitValueAdd">value if form_data.get('type')=='search' else None</key>
+          <key name="exampleText">Enter the name of a view for the search to open in. Defaults to the current view.</key>
+        </element>
+        <element name="search.target" type="select" label="Run search in">
+          <view name="create"/>
+          <view name="edit"/>
+          <key name="submitValueEdit">value if form_data.get('type')=='search' else None</key>
+          <key name="submitValueAdd">value if form_data.get('type')=='search' else None</key>
+          <options>
+            <opt value="blank" label="New window"/>
+            <opt value="self" label="Current window"/>
+          </options>
+        </element>
+
+        <element name="time_range_group" type="fieldset">
+          <view name="create"/>
+          <view name="edit"/>
+          <key name="legend">Time range</key>
+          <key name="multiColumn">True</key>
+          <elements>
+            <element name="search.earliest" type="textfield" label="Earliest time">
+              <view name="create"/>
+              <view name="edit"/>
+              <key name="class">short</key>
+              <key name="submitValueEdit">(value.strip() if value else value) if form_data.get('type')=='search' else None</key>
+              <key name="submitValueAdd">(value.strip() if value else value) if form_data.get('type')=='search' else None</key>
+            </element>
+            <element name="search.latest" type="textfield" label="Latest time">
+              <view name="create"/>
+              <view name="edit"/>
+              <key name="class">short</key>
+              <key name="submitValueEdit">(value.strip() if value else value) if form_data.get('type')=='search' else None</key>
+              <key name="submitValueAdd">(value.strip() if value else value) if form_data.get('type')=='search' else None</key>
+            </element>
+          </elements>
+        </element>
+        <element name="search.preserve_timerange" type="checkbox" label="Use the same time range as the search that created the field listing">
+          <view name="create"/>
+          <view name="edit"/>
+          <key name="submitValueEdit">value if form_data.get('type')=='search' else None</key>
+          <key name="submitValueAdd">value if form_data.get('type')=='search' else None</key>
+        </element>
+
+      </elements>
+    </element>
+
+    <element name="eai:acl.owner" label="Owner">
+      <view name="list"/>
+      <key name="processValueList">entity['eai:acl']['owner'] == 'nobody' and _('No owner') or entity['eai:acl']['owner']</key>
+    </element>
+    <element name="eai:acl.app" label="App">
+      <view name="list"/>
+      <key name="processValueList">entity['eai:acl']['app'] or ""</key>
+    </element>
+
+  </elements>
+</endpoint>

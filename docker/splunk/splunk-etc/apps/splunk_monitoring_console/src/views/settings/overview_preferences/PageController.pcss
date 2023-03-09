@@ -1,0 +1,132 @@
+.status-cube {
+	width: 45px;
+	height: 45px;
+	color: $white;
+	display: inline-block;
+	float: left;
+	margin: 2px;
+	vertical-align: middle;
+    text-align: center;
+    font-size: $fontSizeSmall;
+    padding: 5px;
+}
+
+.color-control-full-col {
+	float: left;
+	width: 160px;
+	.control-label.input-label {
+	  width: 35px;
+	}
+	.input-value {
+	  width: 40px;
+	}
+}
+
+.color-range-control-container {
+    display: flex;
+
+    .btn {
+        flex: 1 0 0px;
+
+        &:not(:last-child) {
+            margin-right: $spacingHalf;
+        }
+    }
+}
+
+.gradient-range-control-container {
+    .row-container {
+        padding: 5px 0px 5px 0px
+    }
+
+    div.row-title {
+        display: inline-block;
+        width: 60px;
+        text-align: right;
+        padding: 0px 5px 0px 5px;
+    }
+
+    .color-square {
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    .color-square.preview {
+        border: none !important;
+    }
+}
+
+ .subheader {
+ 	padding-left: 10px;
+ 	padding-top: 10px;
+ 	margin-bottom: 0;
+ }
+
+ /*  --- start of copy from less/sourcetypes/sourcetypes.pcss --- */
+.main-section {
+    background: $bodyBackgroundColor;
+
+    .table-toolbar {
+        padding-top: $spacingHalf;
+
+        > * {
+            min-height: 28px;
+            padding: 0 0 4px;
+
+            > * {
+                display: inline-block;
+            }
+        }
+        .filter-container {
+            border-top: 1px solid $gray80;
+            padding-top: 10px;
+
+            .collection-count {
+                margin-left: 13px;
+                margin-right: 13px;
+            }
+
+            .select-page-count {
+              float: right;
+            }
+        }
+
+        .paginator-container {
+          min-height: initial;
+        }
+    }
+    .threshold-configs-grid {
+        clear: both;
+
+        .col-actions {
+            white-space: nowrap;
+            width: 120px;
+        }
+        tr.list-item {
+            td {
+                transition: background, 0.2s;
+            }
+            &:hover td {
+                background-color: $tableRowHoverColor;
+                transition: background, 0.02s;
+            }
+            .cell-name {
+                word-break: break-all;
+            }
+        }
+        .message-single {
+            margin-left: 10px;
+        }
+        .model-description {
+            color: $textGray;
+            font-size: .85em;
+        }
+    }
+}
+
+
+/*  Shift error box */
+.shared-flashmessages {
+  padding-left: 15px;
+}
+/*  --- end copy --- */

@@ -1,0 +1,125 @@
+
+.alert-edit {
+    .modal-body-scrolling {
+        padding-bottom: 0px; /*  workaround for SPL-110625 */
+    }
+
+    .trigger-actions {
+        padding-bottom: 20px; /*  workaround for SPL-110625 */
+
+        .add-action-btn {
+            margin-bottom: 10px;
+        }
+        .table-row-expanding > tbody > tr > td.expands a {
+            padding: 4px 4px 4px 16px;
+        }
+        .table-row-expanding td.expands {
+            width: 35px;
+            &.disabled {
+                &:hover {
+                    border-right-color: transparent !important;
+                }
+                a {
+                    opacity: 0.1;
+                    cursor: default;
+                }
+            }
+            &:focus {
+                background: $tableBackgroundFocus;
+            }
+        }
+        .table-row-expanding .expandable td.action-title {
+            cursor: pointer;
+        }
+        .alert-actions-control-group {
+            width: inherit;
+
+            table > tbody > tr > td {
+                border-left: none;
+                border-right: none;
+                background: none;
+            }
+            .active-action td {
+              line-height: 24px;
+              img {
+                  width: 24px;
+                  height: 24px;
+                  padding: 0 5px 0 0;
+              }
+            }
+
+            .more-info {
+                .control-group {
+                    width: 330px;
+                    clear: both;
+                }
+                .control-label {
+                    width: 50px;
+                }
+                .controls {
+                    margin-left: 70px;
+                }
+                .help-block {
+                    width: 170px;
+                }
+            }
+        }
+    }
+
+    .add-alert-action-dropdown {
+        li {
+            > a.unselected-action {
+                padding-left: 34px;
+                min-height: 25px;
+                > img {
+                    position: absolute;
+                    top: 5px;
+                    left: 5px;
+                    width: 24px;
+                    height: 24px;
+                }
+            }
+        }
+    }
+
+    .alert-success-content-container {
+        margin-bottom: 20px;
+    }
+
+}
+
+.email-include > .shared-controls-syntheticcheckboxcontrol {
+    display: inline-block;
+    width: 130px;
+    vertical-align: top;
+    word-break: break-word;
+}
+.email-include > .shared-controls-syntheticcheckboxcontrol.include-inline {
+    width: inherit;
+    padding: 0 5px 0 0;
+    max-width: 62px;
+}
+.email-include > .shared-controls-syntheticselectcontrol.include-inline-format {
+    margin-top: 6px;
+    max-width: 62px;
+    word-break: break-word;
+    vertical-align: top;
+    white-space: normal;
+}
+.email-include > .shared-controls-syntheticselectcontrol.include-inline-format > a.dropdown-toggle{
+    display: inline-block;
+}
+.email-include > .shared-controls-syntheticcheckboxcontrol > label{
+    /* needed for editing a alert on dashboard */
+    overflow: visible;
+}
+.modal-wide  textarea.messagearea {
+    resize: both;
+    max-width: 575px;
+    min-width: 100%;
+    height: 100px;
+}
+
+.custom_time .time-advanced > .control-label {
+    max-width: none;
+}

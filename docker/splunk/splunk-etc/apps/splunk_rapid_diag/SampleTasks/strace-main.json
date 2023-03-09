@@ -1,0 +1,26 @@
+{
+  "__class__": "rapid_diag.task.Task",
+  "collectors": [
+        {
+            "collection_time": 600, 
+            "__class__": "rapid_diag.collector.system_call_trace.SystemCallTrace", 
+            "process": {
+                "__class__": "rapid_diag.process_abstraction.Process", 
+                "ppid": 0, 
+                "args": "splunkd",
+                "pid": 0, 
+                "process_type": "splunkd server", 
+                "name": "splunkd"
+            }
+        }, 
+        {
+            "__class__": "rapid_diag.collector.diag.Diag"
+        }
+  ],
+  "name": "System call activity",
+  "collector_tool_names": "splunkdiag, strace",
+  "description": "For investigating unexpected interactions or performance issues between a process and the operating system. The collector monitors a process and logs the system call activity on the host it is running on. By default, the main splunkd process is selected.",
+  "host": "",
+  "task_id": "strace-main",
+  "symptoms" : [ "storage-issues" ]
+}

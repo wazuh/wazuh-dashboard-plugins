@@ -1,0 +1,104 @@
+/*===============================================================================================*/
+/*  SPLUNK: APP BAR                                                                              */
+/*  Note, the menus that open from the app bar are in a separate file navs-app.                  */
+/*===============================================================================================*/
+
+.app-bar {
+    color: $white;
+    background-color: rgba(155,167,179,1);
+
+    min-height: $appBarHeight;
+    position:relative;
+    clear:both;
+    @mixin clearfix;
+
+    .nav {
+        margin-bottom: 0;
+    }
+    .app-name {
+        margin: 0;
+        line-height: $appBarHeight;
+        font-weight: 200;
+        font-size: 18px;
+        height: $appBarHeight;
+        font-weight: 200;
+        overflow: hidden;
+    }
+
+    .app-name a {
+        color: $white;
+        display: block;
+        padding: 0 $spacing;
+        position: relative;
+
+        &:hover {
+            text-decoration: none;
+            background-color: transparent; /*  fallback */
+            background: rgba(255,255,255,0.07);
+        }
+
+        &:focus {
+            box-shadow: inset 0 0 8px 0 rgba(255,255,255,0.07);
+            background: rgba(255,255,255,0.11);
+            text-decoration: none;
+        }
+
+    }
+
+    .app-link
+    .app-logo img {
+        max-height: $appBarHeight;
+    }
+
+    /*  override normal pills style for header */
+    .nav-pills {
+        font-size:$fontSize;
+        margin: 0;
+        padding-left: 0;
+        /*  default state */
+        > li > a {
+            color: $white;
+            border:1px solid transparent;
+            padding:0 15px;
+            line-height: $appBarHeight;
+            position: relative;
+            border-radius: 0;
+            border: none;
+            margin: 0;
+            white-space: nowrap;
+            /*  hover / focus state */
+            &:hover {
+                background: rgba(255,255,255,0.07);
+            }
+
+
+            &:focus {
+                box-shadow: inset 0 0 8px 0 rgba(255,255,255,0.07);
+                background: rgba(255,255,255,0.11);
+                text-decoration: none;
+            }
+
+        }
+        > li:first-child > a {
+            padding-left: $spacing;
+        }
+
+        /*  selected */
+        .active > a {
+            background-image: linear-gradient(to bottom, rgba(0,0,0,0.08), rgba(0,0,0,0.07));
+            background-color: transparent; /*  need to override background fallback */
+        }
+        /*  open */
+        .open > a {
+            background: rgba(255,255,255,0.07);
+        }
+    }
+
+    .shared-appbar-navitem > .dropdown-menu {
+        width: 300px;
+    }
+
+    ul.slidenavList li > a {
+        border-top: none;
+    }
+}

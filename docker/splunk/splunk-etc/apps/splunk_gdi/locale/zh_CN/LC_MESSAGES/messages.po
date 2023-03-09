@@ -1,0 +1,281 @@
+# Translations template for PROJECT.
+# Copyright (C) 2018 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2018.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2018-08-28 14:28-0700\n"
+"PO-Revision-Date: 2018-08-31 09:12+0100\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.4\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: zh_CN\n"
+"X-Generator: Poedit 2.1.1\n"
+
+#: splunk_gdi/appserver/static/js/components/AsyncImage.jsx:59
+msgid "Loading Now..."
+msgstr "当前正在加载..."
+
+#: splunk_gdi/appserver/static/js/components/Dots.jsx:7
+msgid "Loading"
+msgstr "正在加载"
+
+#: splunk_gdi/appserver/static/js/pages/home.enterprise.jsx:10
+#: splunk_gdi/appserver/static/js/pages/home.lite.jsx:10
+#: splunk_gdi/appserver/static/js/views/Search/Master.lite.jsx:34
+msgid "Add Data"
+msgstr "添加数据"
+
+#: splunk_gdi/appserver/static/js/utils/messages.js:5
+msgid "No valid data source is found."
+msgstr "未发现有效数据来源。"
+
+#: splunk_gdi/appserver/static/js/utils/messages.js:6
+msgid "The id of this collection method is invalid."
+msgstr "此集合方法的 ID 无效。"
+
+#: splunk_gdi/appserver/static/js/utils/messages.js:7
+msgid "Mandatory fields are missing in the conf file."
+msgstr "配置文件中的强制性字段缺失。"
+
+#: splunk_gdi/appserver/static/js/utils/messages.js:8
+msgid ""
+"The definition of resource server is missing in the response from the "
+"web service."
+msgstr "Web 服务的响应中资源服务器的定义缺失。"
+
+#: splunk_gdi/appserver/static/js/utils/messages.js:9
+msgid ""
+"Splunk data onboarding guides are not accessible. Please ensure an "
+"internet connection is available to access these guides."
+msgstr ""
+"Splunk 数据入门指南无法访问。请确保可以通过互联网连接访问这些指南。"
+
+#: splunk_gdi/appserver/static/js/views/Search/DataSourceCard.jsx:13
+#, python-format
+msgid "images for %s"
+msgstr "%s 的图片"
+
+#: splunk_gdi/appserver/static/js/views/Search/DataSourceCard.jsx:42
+msgid "Configure now"
+msgstr "现在配置"
+
+#: splunk_gdi/appserver/static/js/views/Search/DataSourceCard.jsx:45
+#, python-format
+msgid "%d data source"
+msgstr "%d 数据源"
+
+#: splunk_gdi/appserver/static/js/views/Search/DataSourceCard.jsx:48
+#, python-format
+msgid "%d data sources"
+msgstr "%d 数据源"
+
+#: splunk_gdi/appserver/static/js/views/Search/DataSourceContainer.jsx:60
+#, python-format
+msgid "%d data sources in total"
+msgstr "%d 数据源总计"
+
+#: splunk_gdi/appserver/static/js/views/Search/DataSourceContainer.jsx:61
+#, python-format
+msgid "%d data source in total"
+msgstr "%d 数据源总计"
+
+#: splunk_gdi/appserver/static/js/views/Search/Master.Header.jsx:5
+msgid "What data do you want to send to the Splunk platform?"
+msgstr "您想将哪些数据发送到 Splunk 平台？"
+
+#: splunk_gdi/appserver/static/js/views/Search/Master.lite.jsx:35
+msgid "How do you want to add data?"
+msgstr "您要如何添加数据？"
+
+#: splunk_gdi/appserver/static/js/views/Search/Master.resolved.jsx:11
+msgid "Or get data in with the following methods"
+msgstr "或用以下方法导入数据"
+
+#: splunk_gdi/appserver/static/js/views/Search/DataSourceModal/Master.jsx:90
+#: splunk_gdi/appserver/static/js/views/Search/SearchBarAndResult/SearchResult.jsx:72
+msgid ""
+"No guides matching your search were found. We are continuously adding "
+"new guides."
+msgstr "未发现和搜索匹配的指南。我们正在继续添加新指南。"
+
+#: splunk_gdi/appserver/static/js/views/Search/LegacyInputMethod/InputMethodsContainer.jsx:33
+msgid "Upload"
+msgstr "上载"
+
+#: splunk_gdi/appserver/static/js/views/Search/LegacyInputMethod/InputMethodsContainer.jsx:34
+msgid "files from my computer"
+msgstr "来自我的计算机的文件"
+
+#: splunk_gdi/appserver/static/js/views/Search/LegacyInputMethod/InputMethodsContainer.jsx:35
+msgid "Local log files"
+msgstr "本地日志文件"
+
+#: splunk_gdi/appserver/static/js/views/Search/LegacyInputMethod/InputMethodsContainer.jsx:35
+msgid "Local structured files (e.g. CSV)"
+msgstr "本地结构化文件（例如 CSV）"
+
+#: splunk_gdi/appserver/static/js/views/Search/LegacyInputMethod/InputMethodsContainer.jsx:36
+msgid "Tutorial for adding data"
+msgstr "添加数据教程"
+
+#: splunk_gdi/appserver/static/js/views/Search/LegacyInputMethod/InputMethodsContainer.jsx:44
+msgid "Monitor"
+msgstr "监视"
+
+#: splunk_gdi/appserver/static/js/views/Search/LegacyInputMethod/InputMethodsContainer.jsx:45
+msgid "files and ports on this Splunk platform instance"
+msgstr "此 Splunk 平台实例上的文件和端口"
+
+#: splunk_gdi/appserver/static/js/views/Search/LegacyInputMethod/InputMethodsContainer.jsx:47
+msgid "Files - HTTP - WMI - TCP/UDP - Scripts"
+msgstr "文件 - HTTP - WMI - TCP/UDP - 脚本"
+
+#: splunk_gdi/appserver/static/js/views/Search/LegacyInputMethod/InputMethodsContainer.jsx:48
+msgid "Modular inputs for external data sources"
+msgstr "外部数据来源的模块化输入"
+
+#: splunk_gdi/appserver/static/js/views/Search/LegacyInputMethod/InputMethodsContainer.jsx:57
+msgid "Forward"
+msgstr "转发"
+
+#: splunk_gdi/appserver/static/js/views/Search/LegacyInputMethod/InputMethodsContainer.jsx:58
+msgid "data from a Splunk forwarder"
+msgstr "来自 Splunk 转发器的数据"
+
+#: splunk_gdi/appserver/static/js/views/Search/LegacyInputMethod/InputMethodsContainer.jsx:59
+msgid "Files - TCP/UDP - Scripts"
+msgstr "文件 - TCP/UDP - 脚本"
+
+#: splunk_gdi/appserver/static/js/views/Search/SearchBarAndResult/Master.jsx:13
+msgid "Follow guides for onboarding popular data sources"
+msgstr "遵循热门数据源入门指南"
+
+#: splunk_gdi/appserver/static/js/views/Search/SearchBarAndResult/SearchBar.jsx:57
+msgid "Search bar"
+msgstr "搜索栏"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepControl.jsx:26
+msgid "Exit"
+msgstr "退出"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepControl.jsx:27
+msgid "Back"
+msgstr "上一步"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepControl.jsx:28
+msgid "Finish"
+msgstr "完成"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepControl.jsx:29
+msgid "Next"
+msgstr "下一步"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepControl.jsx:30
+msgid "No"
+msgstr "否"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepControl.jsx:31
+msgid "Yes"
+msgstr "是"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepControl.jsx:32
+msgid "Confirm"
+msgstr "确认"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepControl.jsx:33
+msgid "Exit guide?"
+msgstr "退出指南？"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepHeader.jsx:11
+msgid "Collection Method"
+msgstr "集合方法"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepHeader.jsx:12
+msgid "Configurations"
+msgstr "配置"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepHeader.jsx:13
+msgid "Validation"
+msgstr "验证"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepCollectionMethod/CollectionMethodCard.jsx:28
+msgid "Best Practice"
+msgstr "最佳实践"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepCollectionMethod/Master.jsx:43
+msgid "Choose collection method"
+msgstr "选择集合方法"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepTopology/BlankDeployment.jsx:8
+msgid "Please select deployment"
+msgstr "请选择部署"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepTopology/ConfigurationContainer.jsx:12
+msgid "High level steps"
+msgstr "高级步骤"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepTopology/ConfigurationContainer.jsx:13
+msgid "Full Configuration Documentation"
+msgstr "完整的配置文档"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepTopology/Master.jsx:28
+msgid "Choose your deployment environment"
+msgstr "选择部署环境"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepTopology/Master.jsx:29
+msgid "Overview of required configuration for your environment"
+msgstr "环境要求的配置概览"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepTopology/Master.jsx:30
+msgid "Deployment Diagram"
+msgstr "部署图"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepTopology/Master.jsx:31
+msgid ""
+"Select options on the left describing your distributed deployment "
+"configuration"
+msgstr "在左侧选择描述分布式部署配置的选项"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepTopology/Master.jsx:32
+msgid "Select the option above that describes your Splunk deployment"
+msgstr "选择以上描述 Splunk 部署的选项"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepTopology/Master.jsx:33
+msgid ""
+"An overview of the configuration required for your deployment will be "
+"shown here"
+msgstr "此处显示部署需要的配置概览"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepValidation/Master.jsx:58
+#, python-format
+msgid "From the %s, enter the query below."
+msgstr "从 %s 中，输入以下查询。"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepValidation/Master.jsx:59
+msgid "Verify your data is being ingested"
+msgstr "验证是否正在插入数据"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepValidation/Master.jsx:60
+msgid ""
+"Use the following SPL query to verify that your data is indexed and "
+"searchable"
+msgstr "使用下列 SPL 查询验证已为数据建立索引，数据可供搜索"
+
+#: splunk_gdi/appserver/static/js/views/Wizard/StepWizard/StepValidation/Master.jsx:61
+msgid "Search & Reporting app"
+msgstr "搜索和报告应用"
+
+#: splunk_gdi/appserver/templates/home_template.html:21
+msgid "Loading..."
+msgstr "正在加载..."
+
+#: splunk_gdi/default/app.conf:12 splunk_gdi/default/app.conf:17
+msgid "Splunk Get Data In"
+msgstr "Splunk 数据导入"

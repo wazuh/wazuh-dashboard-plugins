@@ -1,0 +1,28 @@
+.dashboard-body {
+	font-size: 14px;
+	line-height: 150%;
+}
+
+.dashboard-header .description {
+	margin-top: 10px !important;
+	margin-bottom: 10px !important;
+	font-weight: 400;
+	font-size: 14px;
+}
+
+.dashboard-header h2 {
+	font-weight: 400;
+}
+
+.dashboard-cell h2 {
+	font-weight: 600;
+	font-size: 16px;
+}
+
+.dashboard-cell ol {
+	margin-top: 10px !important;
+}
+
+.dashboard-cell li {
+	line-height: 150%;
+}

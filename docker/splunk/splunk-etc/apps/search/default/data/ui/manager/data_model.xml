@@ -1,0 +1,10 @@
+<endpoint name="data_model_manager" template="pages/system.html">
+  <header>unused</header>
+  <menu name="knowledge_configurations">
+    <label>Data models</label>
+    <url>/manager/%(namespace)s/data_model_manager</url>
+    <description>Create, view, and edit data models. Set permissions. Accelerate shared data models.</description>
+    <order>30</order>
+    <id>data_model</id>
+  </menu>
+</endpoint>

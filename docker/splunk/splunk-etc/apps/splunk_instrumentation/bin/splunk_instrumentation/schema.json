@@ -1,0 +1,787 @@
+{
+  "delivery": {
+    "checksum": "true",
+    "compress": "true",
+    "encoding": "UTF-8",
+    "format": "JSON",
+    "frequency": "daily",
+    "version": "4"
+  },
+  "classes": [
+    {
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.performance.indexing",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 2,
+      "interval": "nightly",
+      "roles": [ "lead_node" ],
+      "component": "performance.indexing",
+      "priority": "high",
+      "visibility": "anonymous,support",
+      "hash_key": ["host"]
+    },
+    {
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.performance.search",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 2,
+      "interval": "nightly",
+      "roles": [ "lead_node" ],
+      "component": "performance.search",
+      "priority": "high",
+      "visibility": "anonymous,support"
+    },
+    {
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.usage.search.concurrent",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 2,
+      "interval": "nightly",
+      "roles": [ "lead_node" ],
+      "component": "usage.search.concurrent",
+      "priority": "high",
+      "visibility": "anonymous,support",
+      "hash_key": ["host"]
+    },
+    {
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.usage.users.active",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 2,
+      "interval": "nightly",
+      "roles": [ "lead_node" ],
+      "component": "usage.users.active",
+      "priority": "high",
+      "visibility": "anonymous,support"
+    },
+    {
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.deployment.node",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 2,
+      "interval": "nightly",
+      "roles": [ "lead_node" ],
+      "component": "deployment.node",
+      "priority": "high",
+      "visibility": "anonymous,support,license",
+      "hash_key": ["host"]
+    },
+    {
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.deployment.index",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 2,
+      "interval": "nightly",
+      "roles": [ "lead_node" ],
+      "component": "deployment.index",
+      "priority": "high",
+      "visibility": "anonymous,support",
+      "hash_key": ["host"]
+    },
+    {
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.deployment.app",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 1,
+      "interval": "nightly",
+      "roles": [ "shc_captain" ],
+      "component": "deployment.app",
+      "priority": "high",
+      "visibility": "anonymous,support",
+      "hash_key": ["host"]
+    },
+    {
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.deployment.app",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 1,
+      "interval": "nightly",
+      "roles": [ "!cluster_master", "search_head", "!search_peer", "!in_cluster", "!cluster_slave", "!shc_member"],
+      "component": "deployment.app",
+      "priority": "high",
+      "visibility": "anonymous,support",
+      "hash_key": ["host"]
+    },
+    {
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.deployment.app",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 1,
+      "interval": "nightly",
+      "roles":  ["indexer", "!search_peer", "!cluster_slave", "!shc_member"],
+      "component": "deployment.app",
+      "priority": "high",
+      "visibility": "anonymous,support",
+      "hash_key": ["host"]
+    },
+    {
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.usage.search.type",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 2,
+      "interval": "nightly",
+      "roles": [ "lead_node" ],
+      "component": "usage.search.type",
+      "priority": "high",
+      "visibility": "anonymous,support"
+    },
+    {
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.licensing.stack",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 2,
+      "interval": "nightly",
+      "roles": [ "lead_node" ],
+      "component": "licensing.stack",
+      "priority": "high",
+      "visibility": "anonymous,support,license",
+      "hash_key": ["host"]
+    },
+    {
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.deployment.forwarders",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 2,
+      "interval": "nightly",
+      "roles": [ "lead_node" ],
+      "component": "deployment.forwarders",
+      "priority": "high",
+      "visibility": "anonymous,support"
+    },
+    {
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.usage.indexing.sourcetype",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 2,
+      "interval": "nightly",
+      "roles": [ "lead_node" ],
+      "component": "usage.indexing.sourcetype",
+      "priority": "high",
+      "visibility": "anonymous,support"
+    },
+    {
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.deployment.clustering.indexer",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 2,
+      "interval": "nightly",
+      "roles": [ "lead_node" ],
+      "component": "deployment.clustering.indexer",
+      "priority": "high",
+      "visibility": "anonymous,support",
+      "hash_key": ["host"]
+    },
+    {
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.usage.app.page",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 2,
+      "interval": "nightly",
+      "roles": [ "lead_node" ],
+      "component": "usage.app.page",
+      "priority": "high",
+      "visibility": "anonymous,support"
+    },
+    {
+      "dataPoints": [
+        {
+          "type": "ReportDataPoint",
+          "mapping" : [
+            {
+              "path" : "queries",
+              "report_path": "components"
+            },
+            {
+              "path" : "roles",
+              "report_path": "profile.roles"
+            },
+             {
+              "path" : "instance_type",
+              "report_path": "instance.type"
+            },
+            {
+              "path" : "timezone",
+              "date_value": "%z"
+            }
+          ]
+
+        }
+      ],
+      "phase": 2,
+      "interval": "nightly",
+      "roles": [ "lead_node" ],
+      "component": "instrumentation.performance",
+      "priority": "high",
+      "visibility": "anonymous,support"
+    },
+    {
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.topology.deployment.clustering.member",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 1,
+      "interval": "nightly",
+      "roles": [ "cluster_master" ],
+      "component": "deployment.clustering.member",
+      "priority": "high",
+      "visibility": "anonymous,support",
+      "hash_key": ["host", "master"]
+    },
+    {
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.topology.deployment.clustering.searchhead",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 1,
+      "interval": "nightly",
+      "roles": [ "cluster_master" ],
+      "component": "deployment.clustering.searchhead",
+      "priority": "high",
+      "visibility": "anonymous,support",
+      "hash_key": ["host", "master"]
+    },
+    {
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.topology.deployment.shclustering.member",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 1,
+      "interval": "nightly",
+      "roles": [ "shc_captain" ],
+      "component": "deployment.shclustering.member",
+      "priority": "high",
+      "visibility": "anonymous,support",
+      "hash_key": ["host", "captain"]
+    },
+    {
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.topology.deployment.distsearch.peer",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 1,
+      "interval": "nightly",
+      "roles": [ "shc_captain" ],
+      "component": "deployment.distsearch.peer",
+      "priority": "high",
+      "visibility": "anonymous,support",
+      "hash_key": ["host"]
+    },
+    {
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.topology.deployment.distsearch.peer",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 1,
+      "interval": "nightly",
+      "roles": [ "search_head", "!shc_member"],
+      "component": "deployment.distsearch.peer",
+      "priority": "high",
+      "visibility": "anonymous,support",
+      "hash_key": ["host"]
+    },
+    {
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.topology.deployment.licensing.slave",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 1,
+      "interval": "nightly",
+      "roles": [ "license_master" ],
+      "component": "deployment.licensing.slave",
+      "priority": "high",
+      "visibility": "anonymous,support",
+      "hash_key": ["host", "master"]
+    },
+    {
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.usage.search.report_acceleration",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 1,
+      "interval": "nightly",
+      "roles": [ "shc_captain" ],
+      "component": "usage.search.report_acceleration",
+      "priority": "high",
+      "visibility": "anonymous,support"
+    },
+    {
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.usage.search.report_acceleration",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 1,
+      "interval": "nightly",
+      "roles": [ "indexer", "!search_peer", "!cluster_slave", "!shc_member", "!cluster_master", "!shc_captain", "!cluster_search_head" ],
+      "component": "usage.search.report_acceleration",
+      "priority": "high",
+      "visibility": "anonymous,support"
+    },
+	{
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.usage.search.report_acceleration",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 1,
+      "interval": "nightly",
+      "roles": [ "search_head", "!shc_member", "!shc_captain", "!search_peer" ],
+      "component": "usage.search.report_acceleration",
+      "priority": "high",
+      "visibility": "anonymous,support"
+    },
+    {
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.usage.search.searchTelemetry",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 1,
+      "interval": "nightly",
+      "roles": [ "lead_node" ],
+      "component": "usage.search.searchTelemetry",
+      "priority": "high",
+      "visibility": "anonymous,support"
+    },
+    {
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.usage.search.searchtelemetry.sourcetypeUsage",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 1,
+      "interval": "nightly",
+      "roles": [ "lead_node" ],
+      "component": "usage.search.searchtelemetry.sourcetypeUsage",
+      "priority": "high",
+      "visibility": "anonymous,support"
+    },
+    {
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.usage.lookups.lookupDefinitions",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 1,
+      "interval": "nightly",
+      "roles": [ "lead_node" ],
+      "component": "usage.lookups.lookupDefinitions",
+      "priority": "high",
+      "visibility": "anonymous,support"
+    },
+    {
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.performance.bundleReplication",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 1,
+      "interval": "nightly",
+      "roles": [ "lead_node" ],
+      "component": "performance.bundleReplication",
+      "priority": "high",
+      "visibility": "anonymous,support"
+    },
+    {
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.performance.bundleReplicationCycle",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 1,
+      "interval": "nightly",
+      "roles": [ "lead_node" ],
+      "component": "performance.bundleReplicationCycle",
+      "priority": "high",
+      "visibility": "anonymous,support"
+    },
+    {
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.usage.metrics",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 1,
+      "interval": "nightly",
+      "roles": [ "lead_node" ],
+      "component": "usage.metrics",
+      "priority": "high",
+      "visibility": "anonymous,support"
+    },
+    {
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.usage.rollup",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 1,
+      "interval": "nightly",
+      "roles": [ "indexer", "!search_peer", "!cluster_slave", "!shc_member", "!cluster_master", "!shc_captain", "!cluster_search_head" ],
+      "component": "usage.rollup",
+      "priority": "high",
+      "visibility": "anonymous,support"
+    },
+    {
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.usage.rollup",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 1,
+      "interval": "nightly",
+      "roles": [ "shc_captain" ],
+      "component": "usage.rollup",
+      "priority": "high",
+      "visibility": "anonymous,support"
+    },
+    {
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.usage.rollup",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 1,
+      "interval": "nightly",
+      "roles": [ "!cluster_master", "search_head", "!search_peer", "!in_cluster", "!cluster_slave", "!shc_member" ],
+      "component": "usage.rollup",
+      "priority": "high",
+      "visibility": "anonymous,support"
+    },
+    {
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.usage.kvstore",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 1,
+      "interval": "nightly",
+      "roles": [ "lead_node" ],
+      "component": "usage.kvstore",
+      "priority": "high",
+      "visibility": "anonymous,support"
+    },
+    {
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.usage.kvstorebackuprestore",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 1,
+      "interval": "nightly",
+      "roles": [ "lead_node" ],
+      "component": "usage.kvstorebackuprestore",
+      "priority": "high",
+      "visibility": "anonymous,support"
+    },
+    {
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.usage.healthMonitor.currentState",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 1,
+      "interval": "nightly",
+      "roles": [ "lead_node" ],
+      "component": "usage.healthMonitor.currentState",
+      "priority": "high",
+      "visibility": "anonymous,support"
+    },
+    {
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.deployment.featureFlags",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 1,
+      "interval": "nightly",
+      "roles": [ "indexer", "search_head", "cluster_master", "license_master"],
+      "component": "deployment.featureFlags",
+      "priority": "high",
+      "visibility": "anonymous,support"
+    },
+    {
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.usage.savedSearches.alerts",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 1,
+      "interval": "nightly",
+      "roles": [ "lead_node" ],
+      "component": "usage.savedSearches.alerts",
+      "priority": "high",
+      "visibility": "anonymous,support"
+    },
+    {
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.usage.streamingMetricAlerts",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 1,
+      "interval": "nightly",
+      "roles": [ "lead_node" ],
+      "component": "usage.streamingMetricAlerts",
+      "priority": "high",
+      "visibility": "anonymous,support"
+    },
+    {
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.usage.durableSearch",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 1,
+      "interval": "nightly",
+      "roles": [ "lead_node" ],
+      "component": "usage.durableSearch",
+      "priority": "high",
+      "visibility": "anonymous,support"
+    },
+    {
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.usage.rest",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 1,
+      "interval": "nightly",
+      "roles": [ "lead_node"],
+      "component": "usage.rest",
+      "priority": "high",
+      "visibility": "anonymous,support"
+    },
+    {
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.authentication.jwt",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 2,
+      "interval": "nightly",
+      "roles": [ "lead_node"],
+      "component": "authentication.jwt",
+      "priority": "high",
+      "visibility": "anonymous,support"
+    },
+    {
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.usage.bucketmerge.standalone",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 1,
+      "interval": "nightly",
+      "roles": [ "indexer", "!search_peer", "!cluster_slave", "!shc_member", "!cluster_master", "!shc_captain", "!cluster_search_head" ],
+      "component": "usage.bucketmerge.standalone",
+      "priority": "high",
+      "visibility": "anonymous,support"
+    },
+    {
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.usage.bucketmerge.clustered",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 1,
+      "interval": "nightly",
+      "roles": [ "cluster_master" ],
+      "component": "usage.bucketmerge.clustered",
+      "priority": "high",
+      "visibility": "anonymous,support"
+    },
+    {
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.usage.configtracker.info",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 1,
+      "interval": "nightly",
+      "roles": [ "lead_node" ],
+      "component": "usage.configtracker.info",
+      "priority": "high",
+      "visibility": "anonymous,support"
+    },
+    {
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.usage.configtracker.introspection",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 1,
+      "interval": "nightly",
+      "roles": [ "lead_node" ],
+      "component": "usage.configtracker.introspection",
+      "priority": "high",
+      "visibility": "anonymous,support"
+    },
+    {
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.usage.configtracker.searches",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 1,
+      "interval": "nightly",
+      "roles": [ "lead_node" ],
+      "component": "usage.configtracker.searches",
+      "priority": "high",
+      "visibility": "anonymous,support"
+    },
+    {
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.usage.cmredundancy",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 1,
+      "interval": "nightly",
+      "roles": [ "cluster_master" ],
+      "component": "usage.cmredundancy",
+      "priority": "high",
+      "visibility": "anonymous,support"
+    },
+    {
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.usage.s3tsidxcompression",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 1,
+      "interval": "nightly",
+      "roles": [ "lead_node" ],
+      "component": "usage.s3tsidxcompression",
+      "priority": "high",
+      "visibility": "anonymous,support"
+    },
+    {
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.upgrade.kvstore.standalone",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 1,
+      "interval": "nightly",
+      "roles": [ "!shc_captain", "!shc_member" ],
+      "component": "upgrade.kvstore.standalone",
+      "priority": "high",
+      "visibility": "anonymous,support"
+    },
+    {
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.upgrade.kvstore.shc",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 1,
+      "interval": "nightly",
+      "roles": [ "lead_node" ],
+      "component": "upgrade.kvstore.shc",
+      "priority": "high",
+      "visibility": "anonymous,support"
+    },
+       {
+      "dataPoints": [
+        {
+          "saved_search": "instrumentation.usage.tlsBestPractices",
+          "type": "SPLDataPoint"
+        }
+      ],
+      "phase": 1,
+      "interval": "nightly",
+      "roles": [ "lead_node" ],
+      "component": "usage.tlsBestPractices",
+      "priority": "high",
+      "visibility": "anonymous,support"
+    }    
+  ]
+}

@@ -1,0 +1,6 @@
+<endpoint name="splunkbase">
+  <header>Browse more apps</header>
+  <breadcrumb>
+    <parent>apps/local</parent>
+  </breadcrumb>
+</endpoint>

@@ -1,0 +1,716 @@
+/*===============================================================================================*/
+/*  SPLUNK: TABLES                                                                               */
+/*  Tables for, you guessed it, tabular data.                                                    */
+/*===============================================================================================*/
+
+/*************************************************************************************************/
+/*  BASE TABLES                                                                                  */
+/*************************************************************************************************/
+table {
+    max-width: 100%;
+    background-color: $tableBackground;
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+/*************************************************************************************************/
+/*  BASELINE STYLES                                                                              */
+/*************************************************************************************************/
+.table {
+    width: auto;
+    min-width: 100%;
+    max-width: none;
+    margin-bottom: $lineHeight;
+
+    /*  Cells */
+    th, td {
+        text-align: left;
+        vertical-align: top;
+        padding: $tableCellPadding;
+        line-height: $lineHeight;
+        border-bottom: $tableBorder;
+
+        td:focus {
+            @mixin focus-element-inset;
+        }
+
+        .tooltip-link {
+            top:-.5em;
+            position:relative;
+            font-size:75%;
+            line-height:0;
+            vertical-align:baseline;
+            cursor:default;
+            font-weight:400;
+        }
+    }
+
+    th {
+	div {
+            padding: $tableCellPadding;
+        }
+    }
+
+    thead th {
+        vertical-align: bottom;
+    }
+
+    /*  Remove top border from thead by default */
+    caption + thead tr:first-child th,
+    caption + thead tr:first-child td,
+    colgroup + thead tr:first-child th,
+    colgroup + thead tr:first-child td,
+    thead:first-child tr:first-child th,
+    thead:first-child tr:first-child td {
+        border-top: 0;
+    }
+    /*  Account for multiple tbody instances */
+    tbody + tbody {
+        border-top: 2px solid $tableBorderColor;
+    }
+
+    /* sorts */
+    .sorts {
+        white-space: nowrap;
+        cursor: pointer;
+        a {
+            color: inherit;
+            &:hover {
+                text-decoration: none;
+            }
+        }
+        &:hover {
+            color: $linkColor;
+        }
+        .icon-sorts {
+            &:before {
+                font-family: "Splunk Icons";
+                content: "\2195";
+                padding-left: 5px;
+                color: $tableHeaderSortTextColor;
+            }
+        }
+        &.active {
+            .icon-sorts {
+                &:before {
+                    color: $tableHeaderSortTextColorActive;
+                }
+            }
+        }
+        .asc:before,
+        .Asc:before {
+            content: "\21A5";
+            color: inherit;
+        }
+        .desc:before,
+        .Desc:before {
+            content: "\21A7";
+            color: inherit;
+        }
+        &[tabindex]:focus {
+            outline: 0;
+            @mixin focus-element-inset $tableHeaderBackground;
+        }
+    }
+
+    /*  Nesting */
+    .table {
+        background-color: $tableBackground;
+    }
+}
+
+/*************************************************************************************************/
+/*  CONDENSED TABLE W/ HALF PADDING                                                              */
+/*************************************************************************************************/
+.table-condensed {
+    th,
+    td {
+        padding: 3px 6px;
+    }
+}
+
+/*************************************************************************************************/
+/*  BORDERED TABLE                                                                              */
+/*************************************************************************************************/
+.table-bordered {
+    border: $tableBorder;
+    border-collapse: separate; /*  Done so we can round those corners! */
+    border-left: 0;
+    th,
+    td {
+        border-left: $tableBorder;
+    }
+}
+
+/*************************************************************************************************/
+/*  BORDERED LITE TABLE                                                                          */
+/*  A stripped-down version of bootstrap's table-bordered                                        */
+/*************************************************************************************************/
+.table-bordered-lite {
+    th, td {
+        border-left: $tableBorder;
+
+        &:first-child {
+            border-left: none;
+        }
+    }
+}
+
+/*************************************************************************************************/
+/*  BORDERED DOTTED TABLE                                                                        */
+/*************************************************************************************************/
+.table-dotted {
+    td, th {
+        border-top: 1px dashed $borderColor;
+    }
+}
+
+/*************************************************************************************************/
+/*  STRIPED TABLE                                                                                */
+/*************************************************************************************************/
+.table-striped {
+    > thead > tr > th {
+        background-color: $tableRowColor;
+        border-top: $tableBorder;
+    }
+    > tbody {
+        > tr {
+            &:nth-child(odd) > td,
+            &:nth-child(odd) > th {
+                background-color: $tableRowAccentColor;
+            }
+            &:nth-child(even) > td {
+                background-color: $tableRowColor;
+            }
+            &.odd > td,
+            &.odd > th {
+                background-color: $tableRowAccentColor;
+            }
+            &.even > td,
+            &.even > th {
+                background-color: $tableRowColor;
+            }
+            > td {
+                border: none;
+            }
+        }
+    }
+    &.table-chrome > tbody {
+        > tr {
+            &:nth-child(even) > td,
+            &:nth-child(odd).even > td,
+            &.even > td {
+                background-color: $tableRowAccentColor;
+            }
+            &:nth-child(odd) > td,
+            &:nth-child(even).odd > td,
+            &.odd > td {
+                background-color: $tableRowColor;
+            }
+        }
+    }
+}
+/*************************************************************************************************/
+/*  CHROME TABLE                                                                                 */
+/*  Table with dark header background color.                                                     */
+/*************************************************************************************************/
+.table-chrome {
+    &, &.table-row-expanding {
+        border: none;
+    }
+    > thead > tr > th {
+        font-weight: normal;
+        background-color: $tableHeaderBackground;
+        border-right: $tableBorderVertical;
+        border-bottom: none;
+        box-shadow: none;
+        &:last-child {
+            border-right: none;
+        }
+    }
+
+    /*  sorting */
+    .sorts {
+        border-bottom: none;
+    }
+}
+/* saf3+, chrome1+ */
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+    /*  fix table headers */
+    .table-chrome > thead > tr > th  { position: relative;  }
+}
+
+/*************************************************************************************************/
+/*  HOVER EFFECT                                                                                 */
+/*************************************************************************************************/
+.table-hover {
+    > tbody {
+        > tr {
+            > td, > th {
+                transition: $transitionBackgroundFast;
+            }
+            &:hover > td,
+            &:hover > th {
+                background-color: $tableRowHoverColor !important;
+            }
+        }
+    }
+}
+
+/*************************************************************************************************/
+/*  TABLE CELL SIZING                                                                            */
+/*************************************************************************************************/
+/*  Reset default grid behavior */
+table td[class*="span"],
+table th[class*="span"],
+.row-fluid table td[class*="span"],
+.row-fluid table th[class*="span"] {
+    display: table-cell;
+    float: none; /*  undo default grid column styles */
+    margin-left: 0; /*  undo default grid column styles */
+}
+
+/*  Change the column widths to account for td/th padding */
+.table td,
+.table th {
+  &.span1     { @mixin tableColumns 1; }
+  &.span2     { @mixin tableColumns 2; }
+  &.span3     { @mixin tableColumns 3; }
+  &.span4     { @mixin tableColumns 4; }
+  &.span5     { @mixin tableColumns 5; }
+  &.span6     { @mixin tableColumns 6; }
+  &.span7     { @mixin tableColumns 7; }
+  &.span8     { @mixin tableColumns 8; }
+  &.span9     { @mixin tableColumns 9; }
+  &.span10    { @mixin tableColumns 10; }
+  &.span11    { @mixin tableColumns 11; }
+  &.span12    { @mixin tableColumns 12; }
+}
+
+/*************************************************************************************************/
+/*  FOCUS EFFECT                                                                                 */
+/*  Add focus back in, needs to come last                                                        */
+/*************************************************************************************************/
+.table > tbody > tr {
+    &.even,
+    &.odd {
+        > td:focus {
+            @mixin focus-element-inset $tableRowColor
+        }
+    }
+    &:focus,
+    &.even:focus,
+    &.odd:focus {
+        outline: none;
+        > td {
+            @mixin focus-element-inset $tableRowColor
+        }
+    }
+}
+
+
+/*************************************************************************************************/
+/*  TABLE BACKGROUNDS                                                                            */
+/*  Exact selectors below required to override .table-striped                                    */
+/*************************************************************************************************/
+.table tbody tr {
+    &.success > td {
+        background-color: $successBackground;
+    }
+    &.error > td {
+        background-color: $errorBackground;
+    }
+    &.warning > td {
+        background-color: $warningBackground;
+    }
+    &.info > td {
+        background-color: $infoBackground;
+    }
+}
+
+/*  Hover states for .table-hover */
+.table-hover tbody tr {
+    &.success:hover > td {
+        background-color: rgba(234,249,234,1);
+    }
+    &.error:hover > td {
+        background-color: rgba(255,233,230,1);
+    }
+    &.warning:hover > td {
+        background-color: rgba(255,255,228,1);
+    }
+    &.info:hover > td {
+        background-color: rgba(204,226,235,1);
+    }
+}
+
+/*  EMBEDDED TABLES */
+/*  -------------------- */
+/*  tables that appear within other tables. */
+
+.table-embed {
+    width: 100%;
+    border: 0;
+    td {
+        border-bottom: 1px dashed $borderColor;
+        border-left: 0;
+        padding: 0;
+        background-color: transparent !important;
+    }
+    td:first-child {
+        padding-right: 10px;
+    }
+}
+
+/*************************************************************************************************/
+/*  ROW EXPANDING                                                                                */
+/*************************************************************************************************/
+.table-row-expanding {
+    width: 100%;
+    table-layout: fixed;
+    margin-bottom: -1px;
+    border-bottom: $borderDefault;
+
+    & > tbody > tr {
+        > td {
+            &.expands {
+                cursor: pointer;
+                border-right: $tableBorderVertical;
+                padding: 0;
+
+                &.disabled {
+                    color: $textDisabledColor;
+                    cursor: default;
+                    > span, a {
+                        color: inherit;
+                        cursor: inherit;
+                    }
+                }
+
+                > span, a, > i {
+                    color: $textColor;
+                    display: block;
+                    padding: 6px 10px;
+                    width: 15px;
+                    height: 100%;
+                    text-decoration: none;
+                    text-align: center;
+                }
+                a:focus {
+                    @mixin focus-element-inset;
+                }
+            }
+            > .btn-combo {
+                margin: -4px 5px -6px 20px;
+                &:first-child {
+                    margin-left: 0;
+                }
+            }
+            &.title {
+                > a, > span {
+                    margin: -6px -12px;
+                    padding: $tableCellPadding;
+                    display: block;
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
+                    overflow: hidden;
+                    font-size: 14px;
+                    line-height: $lineHeight;
+
+                    &:focus {
+                        @mixin focus-element-inset;
+                    }
+                }
+                > .disabled {
+                    color: $textDisabledColor;
+                }
+            }
+            &:focus {
+                @mixin focus-element-inset;
+            }
+        }
+        /*  style for an extra row inserted in the expanded state */
+        /*  TODO unify these class names */
+        &.more-info, &.info-row  > td {
+            border-top: none;
+            background-color: $tableRowHoverColor;
+        }
+
+        &.expanded > td {
+            background-color: $tableRowHoverColor;
+
+            &.title > a {
+                white-space: normal;
+            }
+        }
+    }
+
+    th.col-info {
+        width: 15px;
+        padding-left: $spacingHalf;
+        padding-right: $spacingHalf;
+        text-align: center;
+        vertical-align: top;
+        font-size: 100%;
+        border-right: $tableBorderVertical;
+
+        a {
+            text-decoration: none;
+            color: $black;
+            box-shadow: none;
+        }
+
+        .icon-info {
+            width: 15px;
+            display: block;
+        }
+    }
+    td.expands,
+    td.col-info {
+        &:hover:not(.disabled) {
+            border-right: $tableBorderVertical !important;
+            a > i {
+                color: $linkColor;
+            }
+        }
+        &.disabled:hover {
+            background-color: inherit !important;
+        }
+    }
+
+
+    td.expands .icon-triangle-right-small:before {
+        content: "\203A";
+    }
+    td.expands .icon-triangle-down-small:before {
+        content: "\02C5";
+    }
+}
+
+/*  remove sorting icons for info column */
+.table-chrome {
+    .sorts th.col-info:after {
+        content: "";
+    }
+
+}
+
+.table-padded {
+    padding: 0 $spacing;
+}
+
+
+/*************************************************************************************************/
+/*  SPECIAL COLUMNS AND CELLS                                                                    */
+/*  Custom styles for row numbers                                                                */
+/*************************************************************************************************/
+td.row-number,
+th.row-number {
+    width: 1px;
+}
+
+td.row-number, td.line-num {
+    text-align: right;
+    color: $tableLineNum;
+}
+
+/*  custom styles for numeric value cells */
+th.numeric, td.numeric {
+    text-align: right
+}
+
+td.end-group {
+    border-right: $tableBorderVertical;
+}
+
+
+/*************************************************************************************************/
+/*  DOCKING AND STATIC TABLE HEADERS                                                             */
+/*  Class for docking table header and scroll bar                                                */
+/*************************************************************************************************/
+.header-table-docked {
+    position: fixed;
+    top: 0;
+    z-index: $zindexHeaderTable;
+    overflow: hidden;
+    box-shadow: $affixTopBoxShadow;
+    background: $white;
+
+    > .disable {
+        display: block;
+        position: absolute;
+        top: 0px;
+        right: 0px;
+        bottom: 0px;
+        left: 0px;
+        background-color: $gray45;
+        opacity: 0.30;
+    }
+    > table {
+        table-layout: fixed;
+        margin-bottom: 0;
+        /*  SPL-71945, this prevents the last header cell from appearing un-styled in Firefox and IE */
+        max-width: inherit;
+    }
+    .main-section > &, .table-padded > & {
+        width: calc(100% - $spacingDouble);
+        margin-left: $spacing !important;
+    }
+}
+.table-scroll-bar-docked {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    overflow-x: auto;
+}
+
+/*  class for static table header and scroll bar */
+.header-table-static {
+    height: 0;
+    position: relative;
+    z-index: $zindexHeaderTable;
+
+    > table {
+        margin-bottom: 0;
+    }
+}
+
+.header-table-wrapper {
+    overflow: hidden;
+    border-bottom: $tableBorder;
+    .table {
+        margin-bottom: 0;
+    }
+}
+
+/*  need to clean up these two classes to make sense */
+.scroll-table-wrapper { /*  used on dashboards and embedded tables, the wrapper scrolls horz and vert */
+    height: 380px; /* override */
+    width: 100%;
+    overflow: auto;
+}
+
+.scrolling-table-wrapper { /* tables that will scroll horizontally */
+    width: 100%;
+    overflow-x: auto;
+    position: relative;
+}
+
+/*  tables that will scroll vertically, up to consumer to set height or max-height */
+.vertical-scrolling-table-wrapper {
+    width: 100%;
+    overflow-y: auto;
+}
+
+
+/*************************************************************************************************/
+/*  MODALIZING ROWS                                                                              */
+/*************************************************************************************************/
+.modalize-table-top, .modalize-table-bottom, .modalize-table-overlay {
+    position: absolute;
+    left: 0;
+    background-color: $gray45;
+    opacity: 0.30;
+}
+
+.modalize-table-top {
+    top: 0;
+}
+
+.modalize-table-bottom {
+    bottom: 0;
+}
+
+.modalize-table-overlay {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    right: 0;
+}
+
+
+/*************************************************************************************************/
+/*  DRILLDOWN                                                                                    */
+/*************************************************************************************************/
+.table-drilldown > tbody > tr > td {
+    color: $linkColor;
+    &:hover {
+        color: $linkColorHover;
+    }
+    /*  reset for row # */
+    &.row-number {
+        color: $textGray;
+    }
+}
+
+.table-drilldown-row > tbody > tr:hover > td {
+    color: $linkColorHover;
+    /*  reset for row # */
+    &.row-number {
+        color: $textGray;
+    }
+}
+
+.table-drilldown-cell > tbody > tr > td:hover {
+    .multivalue-subcell {
+        color: $linkColor;
+        &:hover {
+            color: $linkColorHover;
+        }
+    }
+}
+
+
+/*************************************************************************************************/
+/*  MISC                                                                                         */
+/*************************************************************************************************/
+/*  misc hacks that should probably never been added */
+.ui-grid-head-table,
+.ui-grid-body-table {
+    margin-bottom: 0;
+}
+
+/*  table-scroll? */
+.table-scroll {
+    tbody {
+        max-height: 200px;
+        overflow-y: scroll;
+    }
+}
+
+/*  just the row borders */
+.table-border-row {
+    border-top: $tableBorder;
+    th, td {
+        border-top: $tableBorder;
+    }
+}
+
+/*  fixed width tables */
+.table-fixed {
+    table-layout: fixed;
+    tr > td:first-child {
+        max-width: 300px;
+        word-break: break-all;
+    }
+}
+
+/*  remove the sorting icons for the row number column */
+.table-chrome {
+    .sorts th.row-number:after {
+        content: "";
+    }
+}
+
+
+/*  Print */
+/*  -------------------------------------------------- */
+@media print {
+    body {
+        @mixin print-table;
+    }
+}
+body.print {
+    @mixin print-table;
+}

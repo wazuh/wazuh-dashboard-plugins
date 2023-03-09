@@ -1,0 +1,378 @@
+<endpoint name="data/transforms/lookups" showAppContext="1">
+  <header>Lookup definitions</header>
+  <breadcrumb>
+    <parent hidecurrent="False">lookups</parent>
+    <name>Lookup definitions</name>
+  </breadcrumb>
+  <elements>
+
+    <element name="__ns" type="select" label="Destination app">
+      <view name="create"/>
+      <key name="dynamicOptions" type="dict">
+        <key name="keyName">title</key>
+        <key name="keyValue">title</key>
+        <key name="splunkSource">/apps/local</key>
+        <key name="splunkSourceParams" type="dict">
+          <key name="search">'disabled=false'</key>
+          <key name="count">-1</key>
+        </key>
+      </key>
+    </element>
+
+    <element name="name" label="Name">
+      <view name="create"/>
+      <view name="list"/>
+    </element>
+
+    <element name="type" type="select" label="Type">
+      <view name="create"/>
+      <view name="edit"/>
+      <view name="list"/>
+      <key name="processValueList">entity['type']</key>
+      <key name="processValueEdit">entity['type']</key>
+      <options>
+        <opt value="file" label="File-based"/>
+        <opt value="external" label="External"/>
+        <opt value="kvstore" label="KV Store"/>
+        <opt value="geo" label="Geospatial"/>
+      </options>
+      <onChange>
+        <key name="file">file_group</key>
+        <key name="external">external_group</key>
+        <key name="kvstore">kvstore_group</key>
+        <key name="geo">geo_group</key>
+        <key name="_action">showonly</key>
+        <group_set>
+          <group name="file_group"/>
+          <group name="external_group"/>
+          <group name="kvstore_group"/>
+          <group name="geo_group"/>
+        </group_set>
+      </onChange>
+      <onChange>
+        <key name="file">ALL</key>
+        <key name="external">ALL</key>
+        <key name="kvstore">ALL</key>
+        <key name="geo">NONE</key>
+        <key name="_action">showonly</key>
+        <group_set>
+          <group name="spl-ctrl_show_time_options"/>
+          <group name="spl-ctrl_show_advanced_options"/>
+        </group_set>
+      </onChange>
+      <onChange>
+        <key name="file">case_sensitive_match batch_index_query</key>
+        <key name="external">case_sensitive_match allow_caching</key>
+        <key name="kvstore">max_ext_batch</key>
+        <key name="geo">case_sensitive_match filter</key>
+        <key name="_action">showonly</key>
+        <group_set>
+          <group name="batch_index_query"/>
+          <group name="max_ext_batch"/>
+          <group name="case_sensitive_match"/>
+          <group name="allow_caching"/>
+        </group_set>
+      </onChange>
+    </element>
+
+    <element name="file_group" type="fieldset">
+      <view name="create"/>
+      <view name="edit"/>
+      <!-- <key name="legend">File-based lookup options</key> -->
+      <elements>
+        <element name="spl-ctrl_file_filename" type="select" label="Lookup file">
+          <view name="create"/>
+          <view name="edit"/>
+          <view name="list"/>
+          <key name="exampleText">Create and manage &lt;a href="../../lookup-table-files"&gt;lookup table files&lt;/a&gt;.</key>
+          <key name="requiredIfVisible" />
+          <key name="submitValueEdit">value if form_data.get('type')=='file' else None</key>
+          <key name="submitValueAdd">value if form_data.get('type')=='file' else None</key>
+          <key name="processValueEdit">form_defaults.get('filename')</key>
+          <key name="dynamicOptions" type="dict">
+            <key name="keyName">title</key>
+            <key name="keyValue">title</key>
+            <key name="splunkSource">/data/lookup-table-files</key>
+            <key name="splunkSourceParams" type="dict">
+              <key name="count">-1</key>
+            </key>
+          </key>
+        </element>
+      </elements>
+    </element>
+
+    <element name="external_group" type="fieldset">
+      <view name="create"/>
+      <view name="edit"/>
+      <!-- <key name="legend">External lookup options</key> -->
+      <elements>
+        <element name="external_cmd" type="textfield" label="Command">
+          <view name="create"/>
+          <view name="edit"/>
+          <view name="list"/>
+          <key name="requiredIfVisible" />
+          <key name="submitValueEdit">value if form_data.get('type')=='external' else None</key>
+          <key name="submitValueAdd">value if form_data.get('type')=='external' else None</key>
+          <key name="exampleText">Specify the command and arguments to invoke to perform lookups. The command must be a Python script located in $SPLUNK_HOME/etc/apps/app_name/bin.</key>
+        </element>
+        <element name="spl-ctrl_ex_cmd_fields_list" type="textfield" label="Supported fields">
+          <view name="create"/>
+          <view name="edit"/>
+          <view name="list"/>
+          <key name="requiredIfVisible" />
+          <key name="processValueEdit">form_defaults.get('fields_list')</key>
+          <key name="exampleText">A comma-delimited list of the fields supported by the external command.</key>
+        </element>
+      </elements>
+    </element>
+
+    <element name="kvstore_group" type="fieldset">
+      <view name="create"/>
+      <view name="edit"/>
+      <!-- <key name="legend">KV Store lookup options</key> -->
+      <elements>
+        <element name="collection" type="textfield" label="Collection Name">
+          <view name="create"/>
+          <view name="edit"/>
+          <view name="list"/>
+          <key name="submitValueEdit">value if form_data.get('type')=='kvstore' else None</key>
+          <key name="submitValueAdd">value if form_data.get('type')=='kvstore' else None</key>
+          <key name="exampleText">Specify the collection name to use (as defined in collections.conf) for this lookup. Defaults to the lookup name.</key>
+        </element>
+        <element name="spl-ctrl_kvstore_fields_list" type="textfield" label="Supported fields">
+          <view name="create"/>
+          <view name="edit"/>
+          <view name="list"/>
+          <key name="requiredIfVisible" />
+          <key name="processValueEdit">form_defaults.get('fields_list')</key>
+          <key name="exampleText">A comma-delimited list of the fields supported by the collection.</key>
+        </element>
+      </elements>
+    </element>
+
+    <element name="geo_group" type="fieldset">
+      <view name="create"/>
+      <view name="edit"/>
+      <!-- <key name="legend">Geospatial lookup options</key> -->
+      <elements>
+        <element name="spl-ctrl_geo_filename" type="select" label="Lookup file">
+          <view name="create"/>
+          <view name="edit"/>
+          <view name="list"/>
+          <key name="exampleText">Create and manage &lt;a href="../../lookup-table-files"&gt;lookup table files&lt;/a&gt;.</key>
+          <key name="requiredIfVisible" />
+          <key name="submitValueEdit">value if form_data.get('type')=='geo' else None</key>
+          <key name="submitValueAdd">value if form_data.get('type')=='geo' else None</key>
+          <key name="processValueEdit">form_defaults.get('filename')</key>
+          <key name="dynamicOptions" type="dict">
+            <key name="keyName">title</key>
+            <key name="keyValue">title</key>
+            <key name="splunkSource">/data/lookup-table-files</key>
+            <key name="splunkSourceParams" type="dict">
+              <key name="count">-1</key>
+            </key>
+          </key>
+        </element>
+        <element name="spl-ctrl_show_advanced_geo_options" type="checkbox" label="Advanced options">
+          <view name="create"/>
+          <view name="edit"/>
+          <key name="processValueEdit">1 if entity.get('feature_id_element') else 0</key>
+          <onChange>
+            <key name="0">NONE</key>
+            <key name="1">ALL</key>
+            <key name="_action">showonly</key>
+            <group_set>
+              <group name="advanced_geo_options"/>
+            </group_set>
+          </onChange>
+        </element>
+        <element name="advanced_geo_options" type="fieldset">
+          <view name="create"/>
+          <view name="edit"/>
+          <elements>
+            <element name="feature_id_element" type="textfield" label="Feature Id Element">
+              <view name="create"/>
+              <view name="edit"/>
+              <key name="submitValueEdit">value if form_data.get('spl-ctrl_show_advanced_geo_options')=='1' else None</key>
+              <key name="submitValueAdd">value if form_data.get('spl-ctrl_show_advanced_geo_options')=='1' else None</key>
+              <key name="exampleText">
+                  If the features in your KMZ aren't named, you can define a custom expression to determine where to look for names in the XML structure of the contents of your KMZ.
+                  The default location in the XML is &lt;b&gt;/Placemark/name&lt;/b&gt;
+              </key>
+            </element>
+            
+          </elements>
+        </element>
+      </elements>
+    </element>
+
+    <element name="fields_list" type="hidden" label="Supported fields">
+      <view name="create"/>
+      <view name="edit"/>
+      <view name="list"/>
+      <key name="submitValueEdit">form_data.get('spl-ctrl_ex_cmd_fields_list') if form_data.get('type')=='external' else (form_data.get('spl-ctrl_kvstore_fields_list') if form_data.get('type')=='kvstore' else None)</key>
+      <key name="submitValueAdd">form_data.get('spl-ctrl_ex_cmd_fields_list') if form_data.get('type')=='external' else (form_data.get('spl-ctrl_kvstore_fields_list') if form_data.get('type')=='kvstore' else None)</key>
+    </element>
+
+    <element name="filename" type="hidden" label="Lookup file">
+      <view name="create"/>
+      <view name="edit"/>
+      <view name="list"/>
+      <key name="submitValueEdit">form_data.get('spl-ctrl_file_filename') if form_data.get('type')=='file' else (form_data.get('spl-ctrl_geo_filename') if form_data.get('type')=='geo' else None)</key>
+      <key name="submitValueAdd">form_data.get('spl-ctrl_file_filename') if form_data.get('type')=='file' else (form_data.get('spl-ctrl_geo_filename') if form_data.get('type')=='geo' else None)</key>
+    </element>
+
+    <element name="external_type" type="hidden" label="External Type">
+      <view name="create"/>
+      <view name="edit"/>
+      <key name="submitValueEdit">"geo" if form_data.get('type')=='geo' else ("kvstore" if form_data.get('type')=='kvstore' else None)</key>
+      <key name="submitValueAdd">"geo" if form_data.get('type')=='geo' else ("kvstore" if form_data.get('type')=='kvstore' else None)</key>
+    </element>
+
+    <element name="spl-ctrl_show_time_options" type="checkbox" label="Configure time-based lookup">
+      <view name="create"/>
+      <view name="edit"/>
+      <key name="processValueEdit">1 if (entity.get('time_field') or entity.get('time_format') or entity.get('min_offset_secs') or entity.get('max_offset_secs')) else 0</key>
+      <onChange>
+        <key name="0">NONE</key>
+        <key name="1">ALL</key>
+        <key name="_action">showonly</key>
+        <group_set>
+          <group name="time_options"/>
+        </group_set>
+      </onChange>
+    </element>
+
+    <element name="time_options" type="fieldset">
+      <view name="create"/>
+      <view name="edit"/>
+      <!-- <key name="legend">Time-based lookup options</key> -->
+      <elements>
+        <element name="time_field" type="textfield" label="Name of time field">
+          <view name="create"/>
+          <view name="edit"/>
+          <key name="submitValueEdit">value if form_data.get('spl-ctrl_show_time_options')=='1' else None</key>
+          <key name="submitValueAdd">value if form_data.get('spl-ctrl_show_time_options')=='1' else None</key>
+          <key name="requiredIfVisible"/>
+          <key name="exampleText">For time-based lookups, specify the name of the field in the lookup table that represents the timestamp.</key>
+        </element>
+        <element name="time_format" type="textfield" label="Time format">
+          <view name="create"/>
+          <view name="edit"/>
+          <key name="submitValueEdit">value if form_data.get('spl-ctrl_show_time_options')=='1' else None</key>
+          <key name="submitValueAdd">value if form_data.get('spl-ctrl_show_time_options')=='1' else None</key>
+          <key name="exampleText">Specify the strptime format of the timestamp field. Default format is UTC time.</key>
+        </element>
+        <element name="min_offset_secs" type="textfield" label="Minimum offset">
+          <view name="create"/>
+          <view name="edit"/>
+          <key name="submitValueEdit">value if form_data.get('spl-ctrl_show_time_options')=='1' else None</key>
+          <key name="submitValueAdd">value if form_data.get('spl-ctrl_show_time_options')=='1' else None</key>
+          <key name="exampleText">The minimum time in seconds that the event time may be ahead of lookup entry time for a match to occur. Default is 0.</key>
+        </element>
+        <element name="max_offset_secs" type="textfield" label="Maximum offset">
+          <view name="create"/>
+          <view name="edit"/>
+          <key name="submitValueEdit">value if form_data.get('spl-ctrl_show_time_options')=='1' else None</key>
+          <key name="submitValueAdd">value if form_data.get('spl-ctrl_show_time_options')=='1' else None</key>
+          <key name="exampleText">The maximum time in seconds that the event time may be ahead of lookup entry time for a match to occur. Default is 2000000000.</key>
+        </element>
+      </elements>
+    </element>
+
+    <element name="spl-ctrl_show_advanced_options" type="checkbox" label="Advanced options">
+      <view name="create"/>
+      <view name="edit"/>
+      <key name="processValueEdit">1 if (entity.get('min_matches') or entity.get('max_matches') or entity.get('default_match')) else 0</key>
+      <onChange>
+        <key name="0">NONE</key>
+        <key name="1">ALL</key>
+        <key name="_action">showonly</key>
+        <group_set>
+          <group name="advanced_options"/>
+        </group_set>
+      </onChange>
+    </element>
+
+    <element name="advanced_options" type="fieldset">
+      <view name="create"/>
+      <view name="edit"/>
+      <!-- <key name="legend">Advanced options</key> -->
+      <elements>
+        <element name="min_matches" type="textfield" label="Minimum matches">
+          <view name="create"/>
+          <view name="edit"/>
+          <key name="submitValueEdit">value if form_data.get('spl-ctrl_show_advanced_options')=='1' else None</key>
+          <key name="submitValueAdd">value if form_data.get('spl-ctrl_show_advanced_options')=='1' else None</key>
+          <key name="exampleText">The minimum number of matches for each input lookup value. Default is 0.</key>
+        </element>
+        <element name="max_matches" type="textfield" label="Maximum matches">
+          <view name="create"/>
+          <view name="edit"/>
+          <key name="submitValueEdit">value if form_data.get('spl-ctrl_show_advanced_options')=='1' else None</key>
+          <key name="submitValueAdd">value if form_data.get('spl-ctrl_show_advanced_options')=='1' else None</key>
+          <key name="exampleText">Enter a number from 1-1000 to specify the maximum number of matches for each lookup value. If time-based, default is 1; otherwise, default is 100.</key>
+        </element>
+        <element name="default_match" type="textfield" label="Default matches">
+          <view name="create"/>
+          <view name="edit"/>
+          <key name="submitValueEdit">value if form_data.get('spl-ctrl_show_advanced_options')=='1' else None</key>
+          <key name="submitValueAdd">value if form_data.get('spl-ctrl_show_advanced_options')=='1' else None</key>
+          <key name="exampleText">When fewer than the minimum number of matches are present for any given input, the Splunk software provides this value one or more times until the minimum is reached.</key>
+        </element>
+
+        <element name="case_sensitive_match" type="checkbox" label="Case sensitive match">
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="processValueAdd">1</key>
+          <key name="processValueEdit">form_defaults.get('case_sensitive_match', 1)</key>
+          <key name="submitValueEdit">value if form_data.get('type')!='kvstore' else None</key>
+          <key name="submitValueAdd">value if form_data.get('type')!='kvstore' else None</key>
+          <key name="exampleText">Perform case sensitive matching for all lookup table fields.</key>
+        </element>
+        <element name="batch_index_query" type="checkbox" label="Batch index query">
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="submitValueEdit">value if form_data.get('type')=='file' else None</key>
+          <key name="submitValueAdd">value if form_data.get('type')=='file' else None</key>
+          <key name="exampleText">If you are working with a large lookup file, select this to improve search performance by grouping index queries.</key>
+        </element>
+        <element name="allow_caching" type="checkbox" label="Allow caching">
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="processValueAdd">1</key>
+          <key name="submitValueEdit">value if form_data.get('type')=='external' else None</key>
+          <key name="submitValueAdd">value if form_data.get('type')=='external' else None</key>
+          <key name="exampleText">Allow output from lookup scripts to be cached.</key>
+        </element>
+        <element name="max_ext_batch" type="textfield" label="Maximum external batch">
+          <view name="create"/>
+          <view name="edit"/>
+          <key name="submitValueEdit">value if form_data.get('type')=='kvstore' else None</key>
+          <key name="submitValueAdd">value if form_data.get('type')=='kvstore' else None</key>
+          <key name="exampleText">The maximum size of external batch (range 1 - 1000).</key>
+        </element>
+        <element name="match_type" type="textfield" label="Match type">
+          <view name="create"/>
+          <view name="edit"/>
+          <key name="exampleText"><![CDATA[Optionally set up non-exact matching of a comma-and-space-delimited field list. Format is &lt;match_type>(&lt;field_name>). Available values for match_type are WILDCARD and CIDR.]]></key>
+        </element>
+        <element name="filter" type="textfield" label="Filter lookup">
+          <view name="create"/>
+          <view name="edit"/>
+          <key name="exampleText">Filter results from the lookup table before returning data. Create this filter like you would a typical search query using Boolean expressions and/or comparison operators.</key>
+        </element>
+      </elements>
+    </element>
+
+    <element name="eai:acl.owner" label="Owner">
+      <view name="list"/>
+      <key name="processValueList">entity['eai:acl']['owner'] == 'nobody' and _('No owner') or entity['eai:acl']['owner']</key>
+    </element>
+    <element name="eai:acl.app" label="App">
+      <view name="list"/>
+      <key name="processValueList">entity['eai:acl']['app'] or ""</key>
+    </element>
+
+  </elements>
+</endpoint>

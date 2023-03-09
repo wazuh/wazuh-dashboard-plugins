@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<view template="splunk_rapid_diag:/templates/data_collection.html" type="html">
+	<label>Data Collection</label>
+</view>

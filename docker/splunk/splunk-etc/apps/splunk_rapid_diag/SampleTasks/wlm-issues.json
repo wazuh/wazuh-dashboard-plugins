@@ -1,0 +1,25 @@
+{
+  "__class__": "rapid_diag.task.Task",
+  "collectors": [
+    {
+      "__class__": "rapid_diag.collector.trigger.periodic.Periodic", 
+      "collectors": [
+        {
+          "__class__": "rapid_diag.collector.ps.PS"
+        }
+      ],
+      "sampleCount": 60, 
+      "interval": 1.0
+    },
+    {
+      "__class__": "rapid_diag.collector.diag.Diag"
+    }
+  ],
+  "name": "Workload management issues",
+  "collector_tool_names": "ps, splunkdiag",
+  "description": "For investigating issues with workload management.",
+  "host": "",
+  "task_id": "wlm-issues",
+  "features" : [ "wlm_system_check", "wlm_configuration_check" ],
+  "symptoms" : [ "search-queued", "search-terminated" ]
+}

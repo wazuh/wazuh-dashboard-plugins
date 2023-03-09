@@ -1,0 +1,6 @@
+<endpoint name="data/ui/panels" template="pages/system.html">
+    <capabilities>
+        <read>admin_all_objects</read>
+    </capabilities>
+    <header>Prebuilt panels</header>
+</endpoint>

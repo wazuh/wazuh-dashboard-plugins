@@ -1,0 +1,13 @@
+<endpoint name="forwardreceive" showOnSearchHeadCluster="0">
+  <capabilities>
+    <read>(list_forwarders AND edit_forwarders) OR (list_inputs AND edit_splunktcp)</read>
+  </capabilities>
+  <header></header>
+  <menu name="data_configurations">
+    <label>Forwarding and receiving</label>
+    <url>/manager/%(namespace)s/forwardreceive</url>
+    <description>Configure this host to send and receive data.</description>
+    <order>60</order>
+    <id>forwarding</id>
+  </menu>
+</endpoint>

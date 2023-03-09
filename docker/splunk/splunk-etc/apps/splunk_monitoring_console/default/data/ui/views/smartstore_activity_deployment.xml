@@ -1,0 +1,168 @@
+<form version="1.1" hideEdit="True" script="cell_fill_gauge.js, common_control.js" stylesheet="index_type.css">
+  <label>SmartStore Activity: Deployment</label>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="dropdown" searchWhenChanged="true" token="search_group">
+      <label>Group</label>
+      <showClearButton>false</showClearButton>
+      <search>
+        <query>
+          | `dmc_get_groups_containing_role(dmc_group_indexer)`
+          | where search_group!="dmc_group_indexer"
+        </query>
+      </search>
+      <fieldForLabel>label</fieldForLabel>
+      <fieldForValue>search_group</fieldForValue>
+      <choice value="*">All Indexers</choice>
+      <default>*</default>
+    </input>
+    <input type="time" token="range">
+      <label>Time Range</label>
+      <default>
+        <earliest>-4h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="checkbox" token="migration" searchWhenChanged="true">
+      <label>Show Migration Progress</label>
+      <choice value="Enable"></choice>
+    </input>
+    <input type="checkbox" token="bootstrap" searchWhenChanged="true">
+      <label>Show Bootstrap Progress</label>
+      <choice value="Enable"></choice>
+    </input>
+  </fieldset>
+   <row>
+    <panel>
+      <single>
+        <title>Remote Storage Connectivity</title>
+        <search>
+          <query>`dmc_set_index_internal` search_group=$search_group$ source=*splunkd.log CacheManager action=* earliest=-1h 
+                | stats count(eval(status="failed")) as txn_failed, count(eval(status="succeeded")) as txn_succeeded 
+                | eval available=case(txn_failed=0 AND txn_succeeded=0, "IDLE", txn_succeeded>0, "ONLINE", true(), "OFFLINE") 
+                | fields - txn_failed - txn_succeeded</query>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </single>
+      <html>
+        <p>IDLE means no remote activity has happened in the last hour.</p>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel depends="$migration$">
+      <single>
+        <title>Migration Progress</title>
+        <search>
+          <query>
+            | rest splunk_server_group=$search_group$ /services/admin/cacheman
+            | eval stable_size = if('cm:bucket.stable'=1, 'cm:bucket.estimated_size', 0)
+            | stats sum(stable_size) as stable_bytes, sum(cm:bucket.estimated_size) as all_bytes
+            | eval migration_progress=round((stable_bytes / all_bytes) * 100)
+            | fields - stable_bytes - all_bytes
+          </query>
+          <!-- check with igor s about how this works with cluster -->
+        </search>
+        <option name="drilldown">none</option>
+      </single>
+      <html>This tracks progress when migrating data from non-SmartStore to SmartStore. Otherwise ignore this.</html>
+    </panel>
+    <panel depends="$bootstrap$">
+      <single>
+        <title>Bootstrapping progress</title>
+        <search>
+          <query>
+            `dmc_set_index_internal` search_group=$search_group$ group=cmmaster source=*metrics.log subgroup=buckets_re_creation
+            | stats sum(success_count) as successes, sum(in_progress_count) as in_progress
+            | eval total = successes + in_progress
+            | eval percent = if(total=0, 100, (1 - ((in_progress - successes) / total)) * 100)
+            | fields percent
+          </query>
+          <earliest>$range.earliest$</earliest>
+          <latest>$range.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0.00</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="unit">%</option>
+      </single>
+      <html>This tracks progress when bootstrapping data from remote storage onto indexers. Otherwise, ignore this.</html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Bucket Activity</title>
+      <input type="dropdown" searchWhenChanged="true" token="funcAggregate">
+        <label>Metric</label>
+        <showClearButton>false</showClearButton>
+        <choice value="count">Buckets</choice>
+        <choice value="sum">Volume (MB)</choice>
+        <choice value="per_second">Throughput (MB/s)</choice>
+        <default>count</default>
+        <change>
+          <condition value="count">
+            <set token="y_label">Buckets</set>
+          </condition>
+          <condition value="sum">
+            <set token="y_label">MB</set>
+          </condition>
+          <condition value="per_second">
+            <set token="y_label">MB/s</set>
+          </condition>
+        </change>
+      </input>
+      <chart>
+        <search>
+          <query>
+            `dmc_set_index_internal` search_group=$search_group$ source=*splunkd.log ((action=download AND download_set=*journal*) OR action=upload) status=succeeded component=CacheManager
+            | eval mb = kb / 1024
+            | timechart $funcAggregate$(mb) by action
+          </query>
+          <earliest>$range.earliest$</earliest>
+          <latest>$range.latest$</latest>
+        </search>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">$y_label$</option>
+      </chart>
+      <html>
+        <p>Each new warm bucket gets uploaded to remote storage. Buckets are only downloaded if they're required for a search and are not already in the local cache. High download rates are a negative indicator of cache health</p>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+        <title>Bucket Upload/Download Failure Count</title>
+      <input type="dropdown" searchWhenChanged="true" token="aggregation">
+        <label>Group by</label>
+        <showClearButton>false</showClearButton>
+        <choice value="action">Upload/Download</choice>
+        <choice value="reason_str">HTTP Status Code</choice>
+        <default>action</default>
+      </input>
+      <chart>
+        <search>
+          <query>
+            <![CDATA[
+              `dmc_set_index_internal` search_group=$search_group$ source=*splunkd.log (action=download OR action=upload) status=failed component=CacheManager
+              | rex field=reason "HTTP Error (?<statuscode>\d*): (?<description>.*)"
+              | eval reason_str = statuscode.": ".description
+              | fillnull reason_str value="Non-HTTP"
+              | timechart count by $aggregation$
+            ]]>
+          </query>
+          <earliest>$range.earliest$</earliest>
+          <latest>$range.latest$</latest>
+      </search>
+        <option name="charting.axisTitleY.text">Count</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.drilldown">none</option>
+        <option name="height">323</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+      <html>
+        Check the logs for details on non-http errors.
+      </html>
+    </panel>
+  </row>
+</form>

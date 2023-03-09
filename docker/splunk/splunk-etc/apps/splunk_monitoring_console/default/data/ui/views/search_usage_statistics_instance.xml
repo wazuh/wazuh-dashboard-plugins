@@ -1,0 +1,220 @@
+<form version="1.1" hideEdit="True" script="common_control.js">
+  <label>Search Usage Statistics: Instance</label>
+  <description/>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="dropdown" searchWhenChanged="true" token="dmc_group">
+      <label>Group</label>
+      <showClearButton>false</showClearButton>
+      <search>
+        <query>
+          | `dmc_get_groups_containing_role(dmc_group_search_head)`
+          | search search_group!="dmc_group_*"
+        </query>
+      </search>
+      <fieldForLabel>label</fieldForLabel>
+      <fieldForValue>search_group</fieldForValue>
+      <choice value="dmc_group_search_head">All Search Heads</choice>
+      <default>dmc_group_search_head</default>
+    </input>
+    <input type="dropdown" searchWhenChanged="true" token="splunk_server">
+      <label>Instance</label>
+      <showClearButton>false</showClearButton>
+      <populatingSearch fieldForLabel="serverName" fieldForValue="serverName">
+        | `dmc_get_instance_info($dmc_group$)`
+        | where search_group="dmc_group_search_head"
+      </populatingSearch>
+      <selectFirstChoice>true</selectFirstChoice>
+      <change>
+        <condition value="*">
+          <set token="host">$row.host$</set>
+        </condition>
+      </change>
+    </input>
+    <input type="time" searchWhenChanged="true" token="time">
+      <label>Time Range:</label>
+      <default>Last 4 hours</default>
+    </input>
+    <input type="radio" searchWhenChanged="true" token="filter_out_non_adhoc">
+      <label>Only Ad Hoc Searches</label>
+      <default>search_type=&quot;ad hoc&quot;</default>
+      <choice value="search_type=&quot;ad hoc&quot;">Yes</choice>
+      <choice value="true()">No</choice>
+      <prefix>AND </prefix>
+    </input>
+  </fieldset>
+  <search id="get_audit_base">
+    <query>
+      `dmc_audit_get_searches($host$)`
+      | stats min(_time) as _time, values(user) as user, max(total_run_time) as total_run_time, first(search) as search, first(search_type) as search_type, first(apiStartTime) as apiStartTime, first(apiEndTime) as apiEndTime by search_id
+      | where isnotnull(search) $filter_out_non_adhoc$
+    </query>
+    <earliest>$time.earliest$</earliest>
+    <latest>$time.latest$</latest>
+  </search>
+  <search base="get_audit_base">
+    <query>stats dc(user) as user_count</query>
+    <preview>
+      <set token="user_count">$result.user_count$</set>
+    </preview>
+    <finalized>
+      <set token="user_count">$result.user_count$</set>
+    </finalized>
+  </search>
+  <row>
+    <panel>
+      <title>Search Activity by User ($user_count$)</title>
+      <table>
+        <search base="get_audit_base">
+          <query>
+            | stats median(total_run_time) as median_runtime Perc90(total_run_time) as Perc90_runtime sum(total_run_time) as cum_runtime count(search) as count max(_time) as last_use by user
+            | eval last_use = strftime(last_use, "%F %T")
+            | fields user, count, median_runtime, Perc90_runtime, cum_runtime, last_use
+            | rename user as User, count as "Search Count", median_runtime as "Median Runtime", Perc90_runtime as "90th Percentile Runtime", cum_runtime as "Cumulative Runtime", last_use as "Last Search"
+            | fieldformat "Median Runtime" = `dmc_convert_runtime('Median Runtime')`
+            | fieldformat "90th Percentile Runtime" = `dmc_convert_runtime('90th Percentile Runtime')`
+            | fieldformat "Cumulative Runtime" = `dmc_convert_runtime('Cumulative Runtime')`
+          </query>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">true</option>
+        <option name="drilldown">none</option>
+        <option name="count">10</option>
+        <drilldown>
+          <condition field="*"></condition>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Frequently Run Searches</title>
+      <input type="dropdown" searchWhenChanged="true" token="common_search_user_filter">
+        <label>User</label>
+        <choice value="*">All</choice>
+        <search>
+          <query>
+            `dmc_audit_get_searches($host$)`
+            | stats count by user
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <fieldForLabel>user</fieldForLabel>
+        <fieldForValue>user</fieldForValue>
+        <default>*</default>
+        <prefix>search user="</prefix>
+        <suffix>"</suffix>
+        <showClearButton>false</showClearButton>
+      </input>
+      <table>
+        <search base="get_audit_base">
+          <query>
+            $common_search_user_filter$
+            | stats count median(total_run_time) as median_runtime max(total_run_time) as max_runtime values(user) as user by search
+            | eval median_runtime=if(isnotnull(median_runtime), median_runtime, "-")
+            | eval max_runtime=if(isnotnull(max_runtime), max_runtime, "-")
+            | sort - count
+            | rename search as "Search", count as "Count", median_runtime as "Median Runtime", max_runtime as "Max Runtime", user as User
+            | fieldformat "Median Runtime" = `dmc_convert_runtime('Median Runtime')`
+            | fieldformat "Max Runtime" = `dmc_convert_runtime('Max Runtime')`
+          </query>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">true</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="count">10</option>
+        <drilldown>
+          <condition field="*"></condition>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Long-running Searches</title>
+      <input type="dropdown" searchWhenChanged="true" token="long_running_search_user_filter">
+        <label>User</label>
+        <choice value="*">All</choice>
+        <search>
+          <query>
+            `dmc_audit_get_searches($host$)`
+            | stats count by user
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <fieldForLabel>user</fieldForLabel>
+        <fieldForValue>user</fieldForValue>
+        <default>*</default>
+        <prefix>search user="</prefix>
+        <suffix>"</suffix>
+        <showClearButton>false</showClearButton>
+      </input>
+      <table>
+        <search base="get_audit_base">
+          <query>
+$long_running_search_user_filter$
+| fields search, total_run_time, _time, apiStartTime, apiEndTime, search_type, user
+| eval earliest = case(
+    like(apiStartTime, "%ZERO_TIME%") AND like(apiEndTime, "%ZERO_TIME%"), "all time",
+    like(apiStartTime, "%ZERO_TIME%"), "-",
+    1 == 1, apiStartTime
+)
+| eval latest = case(
+    like(apiStartTime, "%ZERO_TIME%") AND like(apiEndTime, "%ZERO_TIME%"), "all time",
+    like(apiEndTime, "%ZERO_TIME%"), "-",
+    1 == 1, apiEndTime
+)
+| eval search = if(isnotnull(search), search, "N/A")
+| `dmc_time_format(_time)`
+| sort - total_run_time
+| fields search, total_run_time, _time, earliest, latest, search_type, user
+| rename search as Search, total_run_time as "Search Runtime", _time as "Search Start", earliest as "Earliest Time", latest as "Latest Time", search_type as Type, user as "User"
+| fieldformat "Search Runtime" = `dmc_convert_runtime('Search Runtime')`
+          </query>
+        </search>
+        <earliestTime>$time.earliest$</earliestTime>
+        <latestTime>$time.latest$</latestTime>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">true</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="count">10</option>
+        <drilldown>
+          <condition field="*"></condition>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Common Search Commands</title>
+      <table>
+        <search base="get_audit_base">
+          <query>
+eval commands = commands(search)
+| streamstats window=1 values(commands) as commands
+| stats count avg(total_run_time) as avg_runtime max(total_run_time) as max_runtime by commands
+| eval avg_runtime = round(avg_runtime, 2)
+| eval max_runtime = round(max_runtime, 2)
+| sort - count, - max_runtime, - avg_runtime
+| rename commands as Command, avg_runtime as "Average Runtime", max_runtime as "Max Runtime", count as "Count"
+| eval "Average Runtime" = `dmc_convert_runtime('Average Runtime')`
+| eval "Max Runtime" = `dmc_convert_runtime('Max Runtime')`
+          </query>
+        </search>
+        <earliestTime>$time.earliest$</earliestTime>
+        <latestTime>$time.latest$</latestTime>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">true</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="count">20</option>
+        <drilldown>
+          <condition field="*"></condition>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+</form>

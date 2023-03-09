@@ -1,0 +1,44 @@
+<endpoint name="saved/ntags" showAppContext="1">
+  <header>List by tag name</header>
+  <breadcrumb>
+    <parent hidecurrent="False">tags</parent>
+    <name>List by tag name</name>
+  </breadcrumb>
+  <elements>
+    <!-- Name = tag name -->
+    <element name="name" type="textfield" label="Tag name">
+      <view name="list"/>
+      <view name="create"/>
+    </element>
+    <!-- Field values corresponding to given tag -->
+    <element name="fieldset-tagged" type="fieldset">
+      <view name="list"/>
+      <view name="edit"/>
+      <view name="create"/>
+      <elements>
+        <element name="tagged" type="repeatable" label="Field value pair">
+          <view name="list"/>
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="exampleText">'example: host=splunk.com</key>
+          <!-- For listing, display field values in a single comma-delimited list -->
+          <key name="processValueList">', '.join(value) if isinstance(value, list) else value</key>
+          <key name="deleteable">True</key> <!-- user can remove items -->
+          <key name="expandable">True</key> <!-- user can add more items -->
+          <key name="fieldprefix">tagged.</key>
+          <element name="template" type="textfield">
+            <key name="hideLabel">True</key>
+          </element>
+        </element>
+      </elements>
+    </element>
+    <element name="eai:acl.owner" label="Owner">
+       <view name="list"/>
+       <key name="processValueList">entity['eai:acl']['owner'] or ""</key>
+    </element>
+    <element name="eai:acl.app" label="App">
+       <view name="list"/>
+       <key name="processValueList">entity['eai:acl']['app'] or ""</key>
+    </element>    
+  </elements>
+</endpoint>

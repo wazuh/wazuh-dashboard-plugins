@@ -1,0 +1,47 @@
+$sidebarColor: $gray30;
+$sidebarTextColor: $gray80;
+$titleHeight: 50px;
+$appIconSize: 36px;
+
+@define-mixin sidebarLink {
+    text-align: center;
+    display: block;
+    color: $sidebarTextColor;
+    transition: background-color 0.15s linear, color 0.15s linear;
+    background-color: $sidebarColor;
+
+    &:hover {
+        background-color: $gray45;
+        color: $white;
+        text-decoration: none;
+    }
+
+    &:focus {
+        @mixin focus-element-inset $sidebarColor;
+    }
+}
+
+.bookmarks ul {
+    padding: 0;
+}
+
+.bookmarks ul li {
+    list-style: none;
+    width: 200px;
+    height: 60px;
+}
+
+.bookmarks ul li a,
+.bookmarks ul li a:hover {
+    @mixin sidebarLink;
+    display: inline-block;
+    text-decoration: none;
+    width: 200px;
+    height: 60px;
+    background-color: #3C444D;
+    border-bottom: 1px solid #171D21;
+    color: #C3CBD4;
+    padding: 20px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

@@ -1,0 +1,151 @@
+<endpoint name="data/inputs/WinHostMon">
+  <capabilities>
+    <read>edit_modinput_winhostmon</read>
+  </capabilities>
+  <header>Local host monitoring</header>
+  <breadcrumb>
+      <parent hidecurrent="False">datainputstats</parent>
+      <name>Windows host monitor</name>
+  </breadcrumb>  
+
+  <elements>
+
+    <!-- COLLECTION NAME -->
+    <element name="name" type="textfield" label="Collection name">
+      <view name="list"/>
+      <view name="create"/>
+    </element> 
+
+    <!-- TYPE -->
+    <element name="type" type="hidden" label="Input types">
+      <view name="list"/>
+      <view name="edit"/>
+      <view name="create"/>
+      <key name="processValueList">', '.join(value) if isinstance(value, list) and len(value)>0 else 'None'</key>
+      <key name="submitValueAdd">';'.join([key[14:] for key, value in form_data.items() if key.startswith('spl-ctrl_type_') and value == '1'])</key>
+      <key name="submitValueEdit">';'.join([key[14:] for key, value in form_data.items() if key.startswith('spl-ctrl_type_') and value == '1'])</key>
+    </element>
+    
+    <element name="evt_types" type="fieldset">
+        <view name="edit"/>
+        <view name="create"/>
+        <view name="list"/>
+        <key name="legend">Types</key>
+        <elements>
+            <element name="spl-ctrl_type_Computer" type="checkbox" label="Computer">
+                <view name="edit"/>
+                <view name="create"/>
+                <key name="class">inline</key>
+                <key name="processValueAdd">1</key>
+                <key name="processValueEdit">1 if 'Computer' in form_defaults['type'] else 0</key>
+            </element>
+
+            <element name="spl-ctrl_type_OperatingSystem" type="checkbox" label="Operating System">
+                <view name="edit"/>
+                <view name="create"/>
+                <key name="class">inline</key>
+                <key name="processValueAdd">1</key>
+                <key name="processValueEdit">1 if 'OperatingSystem' in form_defaults['type'] else 0</key>
+            </element>
+            
+            <element name="spl-ctrl_type_Processor" type="checkbox" label="Processor">
+                <view name="edit"/>
+                <view name="create"/>
+                <key name="class">inline</key>
+                <key name="processValueAdd">1</key>
+                <key name="processValueEdit">1 if 'Processor' in form_defaults['type'] else 0</key>
+            </element>
+            
+            <element name="spl-ctrl_type_Disk" type="checkbox" label="Disk">
+                <view name="edit"/>
+                <view name="create"/>
+                <key name="class">inline</key>
+                <key name="processValueAdd">0</key>
+                <key name="processValueEdit">1 if 'Disk' in form_defaults['type'] else 0</key>
+            </element>
+
+            <element name="spl-ctrl_type_NetworkAdapter" type="checkbox" label="Network Adapter">
+                <view name="edit"/>
+                <view name="create"/>
+                <key name="class">inline</key>
+                <key name="processValueAdd">0</key>
+                <key name="processValueEdit">1 if 'NetworkAdapter' in form_defaults['type'] else 0</key>
+            </element>
+            
+            <element name="spl-ctrl_type_Service" type="checkbox" label="Service">
+                <view name="edit"/>
+                <view name="create"/>
+                <key name="class">inline</key>
+                <key name="processValueAdd">0</key>
+                <key name="processValueEdit">1 if 'Service' in form_defaults['type'] else 0</key>
+            </element>                         
+
+            <element name="spl-ctrl_type_Process" type="checkbox" label="Process">
+                <view name="edit"/>
+                <view name="create"/>
+                <key name="class">inline</key>
+                <key name="processValueAdd">0</key>
+                <key name="processValueEdit">1 if 'Process' in form_defaults['type'] else 0</key>
+            </element>                         
+
+            <element name="spl-ctrl_type_Driver" type="checkbox" label="Driver">
+                <view name="edit"/>
+                <view name="create"/>
+                <key name="class">inline</key>
+                <key name="processValueAdd">0</key>
+                <key name="processValueEdit">1 if 'Driver' in form_defaults['type'] else 0</key>
+            </element>                           
+
+            <element name="spl-ctrl_type_Roles" type="checkbox" label="Roles">
+                <view name="edit"/>
+                <view name="create"/>
+                <key name="class">inline</key>
+                <key name="processValueAdd">0</key>
+                <key name="processValueEdit">1 if 'Roles' in form_defaults['type'] else 0</key>
+            </element>                           
+
+        </elements>
+    </element>
+    
+    <!-- interval -->
+    <element name="interval" type="textfield" label="Interval (in seconds)">
+      <view name="list"/>
+      <view name="edit"/>
+      <view name="create"/>
+    </element> 
+
+    <!-- INDEX -->
+      <element name="indexField" type="fieldset">
+          <view name="list"/>
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="legend">Index</key>
+          <key name="helpText">Set the destination index for this source.</key>
+          <elements>
+              <element name="index" type="select" label="Index">
+                  <view name="list"/>
+                  <view name="edit"/>
+                  <view name="create"/>
+                  <key name="dynamicOptions" type="dict">
+                      <key name="keyName">title</key>
+                      <key name="keyValue">title</key>
+                      <key name="splunkSource">/data/indexes</key>
+                      <key name="splunkSourceParams" type="dict">
+                          <key name="count">"-1"</key>
+                          <key name="datatype">"all"</key>
+                          <key name="search">"isInternal=0 disabled=0 isVirtual=0"</key>
+                      </key>
+                      <key name="prefixOptions" type="list">
+                          <item type="list">
+                              <item>default</item> <!--value-->
+                              <item>default</item> <!--label-->
+                          </item>
+                      </key>
+                  </key>
+                  <key name="processValueList">'default' if value is None else value</key>
+              </element>
+          </elements>
+      </element>
+        
+  </elements>
+</endpoint>

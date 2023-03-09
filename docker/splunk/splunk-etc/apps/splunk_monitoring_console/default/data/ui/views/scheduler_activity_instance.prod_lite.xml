@@ -1,0 +1,184 @@
+<form version="1.1" hideEdit="True" isVisible="true" onUnloadCancelJobs="true" script="common_control_lite.js">
+  <label>System activity</label>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="dropdown" searchWhenChanged="true" token="time">
+        <label></label>
+        <showClearButton>false</showClearButton>
+        <choice value="-60m@m">Last 60 minutes</choice>
+        <choice value="-4h@h">Last 4 hours</choice>
+        <choice value="-12h@h">Last 12 hours</choice>
+        <choice value="-24h@h">Last 24 hours</choice>
+        <choice value="-7d@d">Last 7 days</choice>
+        <choice value="-30d@d">Last 30 days</choice>
+        <choice value="@y">Year to date</choice>
+        <choice value="">All time</choice>
+        <default>-24h@h</default>
+    </input>
+  </fieldset>
+
+  <row>
+    <panel>
+      <title>Search Activity</title>
+    </panel>
+  </row>
+
+  <row>
+    <panel>
+      <input type="dropdown" searchWhenChanged="true" token="bypropertysearchcount">
+        <label>Search count</label>
+        <showClearButton>false</showClearButton>
+        <choice value="by user">By user</choice>
+        <choice value="by search_type">By type</choice>
+        <default>by user</default>
+      </input>
+      <chart>
+        <searchString>`dmc_audit_get_searches("*")` | search search_id != "rt_*" | search user != null() | timechart count $bypropertysearchcount$</searchString>
+        <earliestTime>$time$</earliestTime>
+        <latestTime>now</latestTime>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.axisTitleX.text"></option>
+      </chart>
+    </panel>
+    <panel>
+      <input type="dropdown" searchWhenChanged="true" token="bypropertyruntime">
+        <label>Run time</label>
+        <showClearButton>false</showClearButton>
+        <choice value="by user">By user</choice>
+        <choice value="by search_type">By type</choice>
+        <default>by user</default>
+      <change>
+        <condition value="by user">
+          <set token="grouping">search_id</set>
+        </condition>
+        <condition value="by search_type">
+          <set token="grouping">search_type</set>
+        </condition>
+      </change>
+      </input>
+      <chart>
+        <searchString>
+`dmc_audit_get_searches("*")` | search search_id != "rt_*" | search user != null() | stats min(_time) as _time first(user) as user max(total_run_time) as total_run_time by $grouping$ | timechart sum(total_run_time) $bypropertyruntime$ | sort - sum(total_run_time) | head 5
+        </searchString> 
+        <earliestTime>$time$</earliestTime>
+        <latestTime>now</latestTime>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.axisTitleX.text"></option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Scheduler Activity</title>
+    </panel>
+  </row>
+
+  <row>
+    <panel rejects="$hide_performance$">
+      <title>Scheduled Reports</title>
+      <table id="runtime_statistics">
+        <search>
+          <query>
+`dmc_set_index_internal` host=* sourcetype=scheduler (status="completed" OR status="skipped" OR status="deferred")
+| eval window_time = if(isnotnull(window_time), window_time, 0)
+| eval execution_latency = max(dispatch_time - (scheduled_time + window_time), 0)
+| stats avg(run_time) as runtime, avg(execution_latency) AS avg_exec_latency, count(eval(status=="completed" OR status=="skipped")) AS total_exec, count(eval(status=="skipped")) AS skipped_exec count(eval(status=="deferred")) AS deferred_exec by app, savedsearch_name, user, savedsearch_id
+| join savedsearch_id type=outer [
+| rest splunk_server=local "/servicesNS/-/-/saved/searches/" earliest_time=`time_modifier(-0s@s)` latest_time=`time_modifier(+8d@d)` search="is_scheduled=1" search="disabled=0"
+| search NOT (dispatch.earliest_time=rt* OR dispatch.latest_time=rt*)
+| stats dc(scheduled_times) as count max(scheduled_times) as max_t min(scheduled_times) as min_t by title, eai:acl.app, eai:acl.owner cron_schedule
+| eval schedule_interval=round((max_t-min_t)/(count-1), 0)
+| eval savedsearch_id = 'eai:acl.owner'.";".'eai:acl.app'.";".title
+| fields savedsearch_id, cron_schedule, schedule_interval ]
+| eval runtime = round(runtime, 0)
+| eval avg_exec_latency = round(avg_exec_latency, 0)
+| eval search_workload = round(runtime / schedule_interval * 100, 2)." %"
+| eval skip_ratio = round(skipped_exec / total_exec * 100, 2)." %"
+| fields savedsearch_name, user, cron_schedule, schedule_interval, runtime, search_workload, total_exec, skipped_exec, skip_ratio, deferred_exec, avg_exec_latency
+| sort - search_workload
+| rename savedsearch_name as "Report Name", app as App, user as User, cron_schedule as "Cron Schedule", runtime as "Average Runtime (sec)", total_exec as "Total Executions", skip_ratio as "Skip Ratio", skipped_exec as "Skipped Executions", deferred_exec AS "Deferred Executions", schedule_interval as "Schedule Interval (sec)", search_workload as "Interval Load Factor", avg_exec_latency AS "Average Execution Latency (sec)"
+          </query>
+          <earliest>$time$</earliest>
+          <latest>now</latest>
+        </search>
+      </table>
+      <html>
+        <p><b>Interval Load Factor</b> = Average Runtime / Schedule Interval * 100</p>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$hide_activity$">
+      <title>Count of Scheduler Executions Over Time</title>
+      <input type="dropdown" searchWhenChanged="true" token="scheduler_execution_timechart_split_by">
+        <label>Group by</label>
+        <showClearButton>false</showClearButton>
+        <choice value="status">Status</choice>
+        <choice value="app">App</choice>
+        <choice value="user">User</choice>
+        <choice value="savedsearch_name">Report Name</choice>
+        <choice value="alert_actions">Alert Actions</choice>
+        <default>status</default>
+      </input>
+      <chart>
+        <search>
+          <query>
+`dmc_set_index_internal` host=* sourcetype=scheduler (status="completed" OR status="skipped" OR
+status="deferred")
+| eval alert_actions = if(isnull(alert_actions) OR alert_actions == "", "none", alert_actions)
+| timechart partial=f count by $scheduler_execution_timechart_split_by$
+          </query>
+          <earliest>$time$</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Count</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.fieldColors">{"success": 0xa2cc3e, "deferred": 0xf2b827, "skipped":0xd6563c}</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Count of Skipped Reports by Name and Reason</title>
+      <search id="count_skipped_search_base">
+        <query>
+`dmc_set_index_internal` host=* sourcetype=scheduler status="skipped"
+| eval alert_actions = if(isnull(alert_actions) OR alert_actions == "", "none", alert_actions)
+| eval reason = if(isnull(reason) OR reason == "", "none", reason)
+| stats count by reason
+        </query>
+        <earliest>$time$</earliest>
+        <latest>now</latest>
+      </search>
+      <search base="count_skipped_search_base">
+        <query>stats sum(count) as total</query>
+        <preview>
+          <eval token="total_skipped_searches">if(isnotnull('result.total'), 'result.total', 0)</eval>
+        </preview>
+        <finalized>
+          <eval token="total_skipped_searches">if(isnotnull('result.total'), 'result.total', 0)</eval>
+        </finalized>
+      </search> 
+      <table>
+        <title>Total: $total_skipped_searches$</title>
+        <search>
+          <query>
+`dmc_set_index_internal` host=* sourcetype=scheduler status="skipped"
+| eval alert_actions = if(isnull(alert_actions) OR alert_actions == "", "none", alert_actions)
+| eval reason = if(isnull(reason) OR reason == "", "none", reason)
+| stats count AS count values(alert_actions) AS alert_actions by savedsearch_name, reason
+| eval reason_and_count = reason." (".count.")"
+| stats values(reason_and_count) AS reasons first(alert_actions) AS alert_actions by savedsearch_name
+| rename reasons AS "Skip Reason (Skip Count)" alert_actions AS "Alert Actions" savedsearch_name AS "Report
+Name"
+          </query>
+          <earliest>$time$</earliest>
+          <latest>now</latest>
+        </search>
+      </table>
+    </panel>
+  </row>
+</form>

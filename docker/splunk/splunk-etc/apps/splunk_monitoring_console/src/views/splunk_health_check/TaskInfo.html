@@ -1,0 +1,26 @@
+<% if (description) { %>
+	<div class="task-info-section task-info-desc">
+		<div class="task-info-heading"><%= _("Description").t() %></div>
+		<p><%= _.escape(_(description).t()).replace(/[\r\n]/g, "<br />") %></p>
+	</div>
+<% } %>
+<% if (message) { %>
+	<div class="task-info-section task-info-message">
+		<div class="task-info-heading"><%= _("Message").t() %></div>
+		<p><%= _.escape(_(message).t()).replace(/[\r\n]/g, "<br />") %></p>
+	</div>
+<% } %>
+<% if (suggestedAction) { %>
+	<div class="task-info-section task-info-sugg-action">
+		<div class="task-info-heading"><%= _("Suggested Action").t() %></div>
+		<p><%= _.escape(_(suggestedAction).t()).replace(/[\r\n]/g, "<br />") %></p>
+	</div>
+<% } %>
+<% if (docLinks.length) { %>
+	<div class="task-info-section task-info-links">
+		<div class="task-info-heading"><%= _("Links").t() %></div>
+		<% for (var i = 0; i < docLinks.length && i < docTitles.length; i++) { %>
+			<p><a class="results-doc-link-<%= i %>" href="<%= docLinks[i] %>" target="_blank"><%= docTitles[i] %> <i class="icon-external"></i></a></p>
+		<% } %>
+	</div>
+<% } %>

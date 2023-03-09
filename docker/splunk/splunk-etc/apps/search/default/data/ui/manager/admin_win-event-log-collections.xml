@@ -1,0 +1,139 @@
+<endpoint name="data/inputs/win-event-log-collections">
+  <header>Event log collections</header>
+  <capabilities>
+    <read>edit_win_eventlogs</read>
+  </capabilities>
+  <introText>If you want to change which Event Logs are collected from this local host, edit the existing 'localhost' collection. To add a new WMI remote collection, click 'New'.</introText>
+  <breadcrumb>
+      <parent hidecurrent="False">datainputstats</parent>
+      <name i18ntag="">Event log collections</name>
+  </breadcrumb>  
+  
+  <elements>
+    <element name="basicgroup" type="fieldset">
+      <view name="list"/>
+      <view name="edit"/>
+      <view name="create"/>
+      <elements>
+        <!-- COLLECTION NAME -->
+        <element name="name" type="textfield" label="Event Log collection name">
+          <view name="list"/>
+          <view name="create"/>
+          <key name="exampleText">Assign a unique name to this collection</key>
+        </element>
+        
+        <element name="spl-ctrl_thecloak" type="hidden">
+          <onChange>
+            <key name="invisible">NONE</key>
+            <key name="visible">ALL</key>
+            <key name="_action">showonly</key>
+            <key name="_triggerOnLoad" type="bool">1</key>
+            <group_set>
+              <group name="lookup_host"/>
+              <group name="hosts"/>
+            </group_set>
+          </onChange>
+          <view name="edit"/>
+          <key name="processValueEdit">'invisible' if form_defaults['name'] == 'localhost' else 'visible'</key>
+        </element>
+      </elements>
+    </element>
+    
+    <element name="selectGroup" type="fieldset">
+      <view name="list"/>
+      <view name="edit"/>
+      <view name="create"/>
+      <elements>
+        <!-- LOOKUP HOST -->
+        <element name="lookup_host" type="textfield" label="Choose logs from this host">
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="displayButton">True</key>
+          <key name="buttonLabel">Find logs...</key>
+          <key name="exampleText">Enter IP address or host name, for example 10.1.1.39 or foo.ad.yourdomain.com. &lt;br /&gt; To collect logs from your local machine, edit the existing entry called 'localhost'.</key>
+          <onChange>
+            <key name="_action">triggerElementRefresh</key>
+            <key name="_triggerOnLoad" type="bool">0</key>
+            <key name="target">logs</key>
+            <key name="makeVisible" type="bool">1</key>
+          </onChange>
+        </element>
+
+        <!-- LOGS -->
+        <element name="logs" type="accumulator" label="log(s)">
+          <view name="list"/>
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="labelList">Log(s)</key>
+          <key name="nullUnlessFieldSet">lookup_host</key>
+          <key name="processValueList">', '.join(value) if isinstance(value, list) else value</key>
+          <key name="sortType">none</key>          
+          <key name="caseSensitiveMatch">true</key>  
+          <key name="dynamicOptions" type="dict">
+            <key name="entityField">'logs'</key>
+            <key name="splunkSource">'/admin/win-wmi-enum-eventlogs' if not entity_name == 'localhost' or entity_name is None else '/admin/win-alleventlogs'</key>
+            <key name="splunkSourceParams" type="dict">
+              <key name="sort_key">'importance' if entity_name == 'localhost' else ''</key>
+              <key name="sort_dir">'asc' if entity_name == 'localhost' else ''</key>
+              <key name="sort_mode">'num' if entity_name == 'localhost' else ''</key>
+              <key name="server">form_defaults['lookup_host'] if not entity_name == 'localhost' or entity_name is None else ''</key>
+            </key>
+            <key name="splunkSourceEntity">form_defaults['lookup_host'] if not entity_name == 'localhost' or entity_name is None else None</key>
+          </key>
+          <key name="exampleText">Select the Windows Event Logs you want to index from the list.</key>
+        </element>
+      </elements>
+    </element>
+    
+    <element name="hostGroup" type="fieldset">
+      <view name="list"/>
+      <view name="edit"/>
+      <view name="create"/>
+      <elements>
+        <!-- HOSTS -->
+        <element name="hosts" type="textfield" label="Collect the same set of logs from additional hosts">
+          <view name="list"/>
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="labelList">Host(s)</key>
+          <key name="processValueList">', '.join(value) if isinstance(value, list) else value</key>
+          <key name="exampleText">Enter a comma-separated list of host names or IP addresses.</key>
+        </element>
+        
+        <!-- INDEX -->
+        <element name="indexField" type="fieldset">
+          <view name="list"/>
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="legend">Index</key>
+          <key name="helpText">Set the destination index for this source.</key>
+          <elements>
+            <element name="index" type="select" label="Index">
+              <view name="list"/>
+              <view name="edit"/>
+              <view name="create"/>
+              <key name="dynamicOptions" type="dict">
+                <key name="keyName">title</key>
+                <key name="keyValue">title</key>
+                <key name="splunkSource">/data/indexes</key>
+                <key name="splunkSourceParams" type="dict">
+                  <key name="count">"-1"</key>
+                  <key name="datatype">"all"</key>
+                  <key name="search">"isInternal=0 disabled=0 isVirtual=0"</key>
+                </key>
+                <key name="prefixOptions" type="list">
+                  <item type="list">
+                    <item>default</item> <!--value-->
+                    <item>default</item> <!--label-->
+                  </item>
+                </key>
+              </key>
+              <key name="processValueList">'default' if value is None else value</key>
+            </element>
+          </elements>
+        </element>
+
+      </elements>
+    </element>
+  </elements>
+</endpoint>

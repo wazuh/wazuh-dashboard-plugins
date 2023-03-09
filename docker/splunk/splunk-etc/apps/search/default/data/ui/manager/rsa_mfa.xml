@@ -1,0 +1,81 @@
+<endpoint name="admin/Rsa-MFA" hidePermissionsColumn="True">
+  <breadcrumb>
+    <parent hidecurrent="True">authoverview</parent>
+    <name>Multifactor Authentication - RSA Security</name>
+  </breadcrumb>
+  <elements>
+    <element name="outputhelp" type="helpstring">
+        <key name="helpText"> </key>
+      <view name="edit"/>
+    </element>
+    <element name="name" type="hidden" label="Name">
+      <view name="list"/>
+      <view name="create"/>
+      <key name="processValueAdd">'rsa-mfa'</key>
+    </element>
+    <element name="authManagerUrl" type="textfield" label="RSA Auth Manager REST service URL">
+      <view name="edit"/>
+      <view name="create"/>
+    </element>
+    <element name="accessKey" type="simplepassword" label="Access Key">
+      <view name="edit"/>
+      <view name="create"/>
+    </element>
+    <element name="sslRootCAPath" type="textfield" label="SSL Certificate Path">
+      <view name="edit"/>
+    </element>
+    <element name="caCertBundlePayload" type="textarea" label="SSL Certificate Chain">
+      <view name="edit"/>
+      <view name="create"/>
+      <key name="exampleText">Paste root, intermediate(s) and leaf certificates</key>
+      <key name="submitValueEdit">value if form_data.get('caCertBundlePayload')!='' else None</key>
+    </element>
+    <!--element name="replicateCertificates" type="checkbox" label="Replicate Certificates">
+      <view name="edit"/>
+      <view name="create"/>
+      <key name="processValueAdd">1</key>
+      <key name="processValueEdit">1 if 'replicateCertificates' in form_defaults else 0</key>
+    </element-->
+    <element name="clientId" type="textfield" label="Client ID">
+      <view name="edit"/>
+      <view name="create"/>
+      <key name="exampleText">Client id is agent name created on RSA Manager</key>
+    </element>
+    <element name="failOpen" type="radio" label="Authentication behavior when RSA Security is unavailable">
+      <view name="edit"/>
+      <view name="create"/>
+      <options>
+        <opt value="1" label="Let users login"/>
+        <opt value="0" label="Do not let users login"/>
+      </options>
+      <key name="format">list</key>
+      <key name="processValueAdd">0</key>
+    </element>
+    <element name="enableMfaAuthRest" type="checkbox" label="Enable MFA for REST endpoints">
+      <view name="edit"/>
+      <view name="create"/>
+      <key name="processValueAdd">0</key>
+      <key name="submitValueEdit">value</key>
+      <key name="submitValueAdd">value</key>
+    </element>
+    <element name="messageOnError" type="textfield" label="Message/diagnostic page URL on error">
+      <view name="edit"/>
+      <view name="create"/>
+    </element>
+    <element name="timeout" type="textfield" label="Connection Timeout">
+      <view name="edit"/>
+      <view name="create"/>
+      <key name="exampleText">Positive integer in seconds.</key>
+      <key name="processValueAdd">15 if not form_defaults['timeout'] else form_defaults['timeout']</key>
+      <key name="processValueEdit">15 if not form_defaults['timeout'] else form_defaults['timeout']</key>
+      <key name="submitValueAdd">15 if not value.strip() else value.strip()</key>
+      <key name="submitValueEdit">15 if not value.strip() else value.strip()</key>
+    </element>
+    <element name="spl-ctrl_redirectionPath" type="hidden">
+      <view name="edit"/>
+      <view name="create"/>
+      <key name="processValueAdd">'authoverview'</key>
+      <key name="processValueEdit">'authoverview'</key>
+    </element>
+  </elements>
+</endpoint>

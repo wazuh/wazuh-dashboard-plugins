@@ -1,0 +1,51 @@
+{
+	"schemaVersion": "2.0.0",
+	"info": {
+		"id": {
+			"group": null,
+			"name": "splunk_assist",
+			"version": "1.0.3"
+		},
+		"title": "Splunk Assist",
+		"author": [{
+			"name": "Splunk Inc.",
+			"email": null,
+			"company": null
+		}],
+		"releaseDate": null,
+		"description": "Splunk Assist",
+		"classification": null,
+		"commonInformationModels": null,
+		"license": {
+			"name": null,
+			"text": "LICENSE.TXT",
+			"uri": null
+		},
+		"privacyPolicy": {
+			"name": null,
+			"text": null,
+			"uri": null
+		},
+		"releaseNotes": {
+			"name": null,
+			"text": null,
+			"uri": null
+		}
+	},
+	"tasks": [
+		"supervisor_modular_input",
+		"supervisor_modular_input://default",
+		"instance_id_modular_input",
+		"instance_id_modular_input://default"
+		"selfupdate_modular_input",
+		"selfupdate_modular_input://default",
+		"uiassets_modular_input",
+		"uiassets_modular_input://default"
+	],
+	"dependencies": null,
+	"inputGroups": null,
+	"incompatibleApps": null,
+	"platformRequirements": null,
+	"supportedDeployments": ["*"],
+	"targetWorkloads": ["_search_heads"]
+}

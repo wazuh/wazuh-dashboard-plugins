@@ -1,0 +1,41 @@
+/* Change the app logo here.  set the height/width for your image, as well as the path to the image */
+.appLogo {
+    height: 43px; 
+    width: 80px;
+    background: url(/static/img/skins/default/splunk_logo_black.png) no-repeat 0 0;
+    _background: url(/static/img/skins/default/splunk_logo_black.gif) no-repeat 0 0;
+}
+
+/* Turn on the default positioning of the "Splunk Powered" logo here.  */
+.splunkPoweredLogo {
+    /**
+      * Uncomment the following lines (with 'display' properties) to show the logo  */
+    /* display: -moz-inline-stack;
+    display: inline-block; */
+
+    /**
+      * Logo with white text
+      *  - uncomment these two 'background' properties if you'd like a Splunk Powered logo with white text */
+    /* background:url("/static/img/skins/default/splunk_powered_logo_white.png") no-repeat scroll 0 0 transparent;
+    _background:url("/static/img/skins/default/splunk_powered_logo_white.gif") no-repeat scroll 0 0 transparent; */ /* for IE6 transparency */    
+    
+    /**
+      * Logo with black text
+      * - uncomment these two 'background' properties if you'd like a Splunk Powered logo with white text  */
+    /* background:url("/static/img/skins/default/splunk_powered_logo_black.png") no-repeat scroll 0 0 transparent;
+    _background:url("/static/img/skins/default/splunk_powered_logo_black.gif") no-repeat scroll 0 0 transparent; */ /* for IE6 transparency */    
+    
+    height:23px;
+    margin-top:13px;
+    width:65px;
+}
+
+/* 
+use this to display the name of the app. 
+use line-height to adjust alignment with logo. if
+if the name of the app is in the logo,  set this to display: none;  
+*/
+.appHeaderWrapper h1 {
+    color:#73a550;
+    line-height: 43px;
+}

@@ -1,0 +1,583 @@
+<form version="1.1" hideEdit="True" script="cell_fill_gauge.js, common_control.js">
+  <label>Resource Usage: Machine</label>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="dropdown" searchWhenChanged="true" token="machine">
+      <label>Machine:</label>
+      <populatingSearch fieldForLabel="machine" fieldForValue="machine">
+        | `dmc_get_machine_info`
+      </populatingSearch> 
+      <selectFirstChoice>true</selectFirstChoice>
+      <showClearButton>false</showClearButton>
+      <change>
+        <condition value="*">
+          <set token="host">$row.host$</set>
+          <set token="splunk_server">$row.serverName$</set>
+          <unset token="form.hostDiskUsageHistorical" />
+          <unset token="form.instanceDiskUsageSnapshot" />
+        </condition>
+      </change>
+    </input>
+  </fieldset>
+  <searchTemplate>
+| rest splunk_server=$splunk_server$ /services/server/info 
+| fields numberOfCores, numberOfVirtualCores, physicalMemoryMB
+| eval capacity=[rest splunk_server=$splunk_server$ /services/server/status/partitions-space | return $capacity]
+  </searchTemplate>
+  <row>
+    <panel>
+      <table>
+        <title>Machine Information</title>
+        <searchString>
+| inputlookup dmc_assets
+| search serverName = $splunk_server$
+| stats first(serverName) as serverName, first(host) as host, first(machine) as machine
+| join type=outer serverName [
+  | rest splunk_server=$splunk_server$ /services/server/info
+  | fields serverName, numberOfCores, numberOfVirtualCores, physicalMemoryMB, os_name, cpu_arch
+]
+| `dmc_get_core_info`
+| fields machine core_info physicalMemoryMB os_name cpu_arch
+| rename machine as Machine, core_info AS "CPU Cores (Physical / Virtual)", physicalMemoryMB AS "Physical Memory Capacity (MB)", cpu_arch AS "CPU Architecture", os_name AS "Operating System"
+        </searchString>
+        <earliestTime>$time.earliest$</earliestTime>
+        <latestTime>$time.latest$</latestTime>
+        <option name="refresh.time.visible">false</option>
+        <option name="drilldown">none</option>
+      </table>
+      <table>
+        <title>$countInstance$ Splunk Enterprise Instance(s) on this Machine</title>
+        <search>
+          <query>
+| inputlookup dmc_assets
+| search machine=$machine$
+| mvcombine search_group
+| join type=outer peerURI
+  [| rest splunk_server=local /services/search/distributed/peers
+   | rename title as peerURI]
+| join type=outer peerURI [|rest splunk_server=local /services/server/info
+  | eval peerURI = "localhost"
+  | eval status = "Up"
+  | fields peerURI, status, version]
+| join type=outer peerURI [|rest splunk_server=local /services/server/settings
+  | eval peerURI = "localhost"
+  | fields peerURI, mgmtHostPort]
+| join peerURI
+  [| `dmc_get_instance_roles` ]
+| eval status = if(status == "Up", status, "Unreachable")
+| makemv role
+| fields serverName, peerURI, role, version, status, mgmtHostPort
+| eval peerURI = if(peerURI == "localhost", "localhost:".mgmtHostPort, peerURI)
+| fields - mgmtHostPort
+| rename serverName as Instance, peerURI as URI, status as "Status", role as Role, version as "Version"
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+          <done>
+            <set token="countInstance">$job.resultCount$</set>
+          </done>
+        </search>
+        <option name="refresh.time.visible">false</option>
+        <option name="drilldown">row</option>
+        <drilldown>
+          <link target="_blank">
+            <![CDATA[resource_usage_instance?form.splunk_server=$row.Instance$]]>
+          </link>
+        </drilldown>
+      </table>
+      <html>
+        <p>Click on instance name for more details.</p>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+        <h2>
+          <span>Select views: </span>
+          <span id="link-switcher-view">
+            <a href="#" class="btn-pill active" data-item="all">All</a>
+            <a href="#" class="btn-pill" data-item="snapshot">Snapshot</a>
+            <a href="#" class="btn-pill" data-item="historical">Historical</a>
+          </span>
+        </h2>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Snapshots</title>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Load Average</title>
+      <search id="hostwide_metrics_api_base">
+        <query>
+| rest splunk_server=$splunk_server$ /services/server/status/resource-usage/hostwide 
+| stats first(normalized_load_avg_1min) as load_average first(cpu_system_pct) as system, first(cpu_user_pct) as user first(mem) AS mem first(mem_used) AS mem_used by splunk_server
+        </query>
+      </search>
+      <single>
+        <search base="hostwide_metrics_api_base">
+          <query>fields load_average</query>
+        </search>
+        <option name="height">80px</option>
+        <option name="useColors">true</option>
+        <option name="numberPrecision">0.00</option>
+        <option name="rangeValues">[20, 50]</option>
+        <option name="rangeColors">["0x5cc05c", "0xed8440", "0xd6563c"]</option>
+      </single>
+    </panel>
+    <panel rejects="$historical$">
+      <title>CPU Usage</title>
+      <chart>
+        <search base="hostwide_metrics_api_base">
+          <query>fields splunk_server system user</query>
+        </search>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.axisTitleY.text">CPU Usage (%)</option>
+        <option name="charting.axisY.maximumNumber">100</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+        <option name="charting.axisLabelsX.majorLabelVisibility">hide</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+    <panel rejects="$historical$">
+      <title>Physical Memory Usage (MB)</title>
+      <chart>
+        <search base="hostwide_metrics_api_base">
+          <query>
+fields mem mem_used
+| eval perc_80=mem*0.8 
+| eval perc_90=mem*0.9 
+| eval mem_used=round(mem_used, 0) 
+| gauge mem_used 0 perc_80 perc_90, mem
+          </query>
+        </search>
+        <option name="charting.chart">fillerGauge</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.axisTitleY.text">Memory (MB)</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Disk Usage</title>
+      <input type="dropdown" token="instanceDiskUsageSnapshot" searchWhenChanged="true">
+        <showClearButton>false</showClearButton>
+        <label>Instance</label>
+        <populatingSearch fieldForLabel="serverName" fieldForValue="serverName">
+          | `dmc_get_instances_on_a_machine($machine$)`
+        </populatingSearch>
+        <selectFirstChoice>true</selectFirstChoice>
+      </input>
+      <table id="table1">
+        <search>
+          <query>
+| rest splunk_server=$instanceDiskUsageSnapshot$ /services/server/status/partitions-space
+| join type=outer splunk_server, mount_point [
+  | rest splunk_server=$instanceDiskUsageSnapshot$ /services/server/status/resource-usage/iostats
+  | eval iops = round(reads_ps + writes_ps)
+  | fields splunk_server, mount_point, iops, cpu_pct]
+| eval free = if(isnotnull(available), available, free)
+| eval usage = round((capacity - free) / 1024, 2)
+| eval capacity = round(capacity / 1024, 2)
+| eval compare_usage = usage." / ".capacity
+| eval pct_usage = round(usage / capacity * 100, 2) 
+| stats first(fs_type) as fs_type first(compare_usage) as compare_usage first(pct_usage) as pct_usage, first(iops) as iops, first(cpu_pct) as cpu_pct by mount_point
+| rename mount_point as "Mount Point", fs_type as "File System Type", compare_usage as "Disk Usage (GB)", capacity as "Capacity (GB)", pct_usage as "Disk Usage (%)", iops as "I/O operations per second", cpu_pct as "Storage I/O Saturation(%)"
+          </query>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Historical Charts</title>
+      <input type="time" searchWhenChanged="true" token="time">
+        <label>Time Range:</label>
+        <default>
+          <earliestTime>-4h@m</earliestTime>
+          <latestTime>now</latestTime>
+        </default>
+      </input>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>$funcLoadAvgLabel$ Load Average</title>
+      <input type="dropdown" token="funcLoadAvg" searchWhenChanged="true">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <choice value="Avg">Average</choice>
+        <choice value="Median">Median</choice>
+        <choice value="Max">Maximum</choice>
+        <choice value="Min">Minimum</choice>
+        <choice value="Perc90">90th Percentile</choice>
+        <choice value="First">Sampled</choice>
+        <default>Median</default>
+        <change>
+          <set token="funcLoadAvgLabel">$label$</set>
+        </change>
+      </input>
+      <chart>
+        <searchString>
+`dmc_set_index_introspection` host=$host$ sourcetype=splunk_resource_usage component=Hostwide
+| `dmc_timechart` $funcLoadAvg$(data.normalized_load_avg_1min) AS "load average"
+        </searchString>
+        <earliestTime>$time.earliest$</earliestTime>
+        <latestTime>$time.latest$</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.axisTitleY.text">Load Average</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.axisTitleX.text">Time</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>$funcCPULabel$ CPU Usage</title>
+      <input type="dropdown" token="funcCPU" searchWhenChanged="true">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <choice value="Avg">Average</choice>
+        <choice value="Median">Median</choice>
+        <choice value="Min">Minimum</choice>
+        <choice value="Max">Maximum</choice>
+        <choice value="Perc90">90th Percentile</choice>
+        <choice value="First">Sampled</choice>
+        <default>Median</default>
+        <change>
+          <set token="funcCPULabel">$label$</set>
+        </change>
+      </input>
+      <chart>
+        <searchString>
+`dmc_set_index_introspection` host=$host$ sourcetype=splunk_resource_usage component=Hostwide
+| `dmc_timechart` $funcCPU$(data.cpu_system_pct) AS "system" $funcCPU$(data.cpu_user_pct) AS "user"
+        </searchString>
+        <earliestTime>$time.earliest$</earliestTime>
+        <latestTime>$time.latest$</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.axisTitleY.text">CPU Usage (%)</option>
+        <option name="charting.axisY.maximumNumber">100</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.axisTitleX.text">Time</option>
+      </chart>
+    </panel>
+    <panel rejects="$snapshot$">
+      <title>$funcMemLabel$ Physical Memory Usage</title>
+      <input type="dropdown" token="funcMem" searchWhenChanged="true">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <choice value="Avg">Average</choice>
+        <choice value="Median">Median</choice>
+        <choice value="Min">Minimum</choice>
+        <choice value="Max">Maximum</choice>
+        <choice value="Perc90">90th Percentile</choice>
+        <choice value="First">Sampled</choice>
+        <default>Median</default>
+        <change>
+          <set token="funcMemLabel">$label$</set>
+        </change>
+      </input>
+      <chart>
+        <searchString>
+`dmc_set_index_introspection` host=$host$ sourcetype=splunk_resource_usage component=Hostwide
+| `dmc_timechart` latest(data.mem) AS "capacity" $funcMem$(data.mem_used) AS "usage"
+        </searchString>
+        <earliestTime>$time.earliest$</earliestTime>
+        <latestTime>$time.latest$</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">area</option>
+        <option name="charting.lineDashStyle">shortDash</option>
+        <option name="charting.chart.overlayFields">capacity</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.axisTitleY.text">Memory Usage (MB)</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>$funcDiskLabel$ Disk Space</title>
+      <input type="dropdown" token="hostDiskUsageHistorical" searchWhenChanged="true">
+        <label>Instance</label>
+        <showClearButton>false</showClearButton>
+        <populatingSearch fieldForLabel="serverName" fieldForValue="host">
+          | `dmc_get_instances_on_a_machine($machine$)`
+        </populatingSearch>
+        <selectFirstChoice>true</selectFirstChoice>
+        <change>
+          <condition value="*">
+            <set token="splunkServerDiskUsageHistorical">$row.serverName$</set>
+          </condition>
+        </change>
+      </input>
+      <input type="dropdown" token="mount_point" searchWhenChanged="true">
+        <label>Mount Point</label>
+        <showClearButton>false</showClearButton>
+        <selectFirstChoice>true</selectFirstChoice>
+        <populatingSearch earliest="0" latest="" fieldForLabel="mount_point" fieldForValue="mount_point">
+          | rest splunk_server=$splunkServerDiskUsageHistorical$ /services/server/status/partitions-space
+          | stats count by mount_point
+        </populatingSearch>
+      </input>
+      <input type="dropdown" token="funcDisk" searchWhenChanged="true">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <choice value="Avg">Average</choice>
+        <choice value="Median">Median</choice>
+        <choice value="Min">Minimum</choice>
+        <choice value="Max">Maximum</choice>
+        <choice value="Perc90">90th Percentile</choice>
+        <choice value="First">Sampled</choice>
+        <default>Median</default>
+        <change>
+          <set token="funcDiskLabel">$label$</set>
+        </change>
+      </input>
+      <chart>
+        <searchString>
+`dmc_set_index_introspection` host=$hostDiskUsageHistorical$ sourcetype=splunk_disk_objects component=Partitions data.mount_point=$mount_point|s$
+| eval free = if(isnotnull('data.available'), 'data.available', 'data.free')
+| eval usage = round(('data.capacity' - free) / 1024, 2)
+| eval capacity = round('data.capacity' / 1024, 2)
+| `dmc_timechart_for_disk_usage` latest(capacity) as capacity $funcDisk$(usage) as usage
+        </searchString>
+        <earliestTime>$time.earliest$</earliestTime>
+        <latestTime>$time.latest$</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">area</option>
+        <option name="charting.lineDashStyle">shortDash</option>
+        <option name="charting.chart.overlayFields">capacity</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">GB</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <search id="io_log_base_search">
+        <query>
+          `dmc_set_index_introspection` sourcetype=splunk_resource_usage component=IOStats host=$host$
+          | eval mount_point = 'data.mount_point'
+          | eval reads_ps = 'data.reads_ps'
+          | eval writes_ps = 'data.writes_ps'
+          | eval interval = 'data.interval'
+          | eval op_count = (reads_ps + writes_ps) * interval
+          | eval avg_service_ms = 'data.avg_service_ms'
+          | eval avg_wait_ms = 'data.avg_total_ms'
+          | eval cpu_pct = 'data.cpu_pct'
+          | eval network_pct = 'data.network_pct'
+        </query>
+        <earliest>$time.earliest$</earliest>
+        <latest>$time.latest$</latest>
+      </search>
+      <title>Average I/O Usage and Performance</title>
+      <input type="dropdown" searchWhenChanged="true" token="io_mount_point">
+        <label>Mount Point</label>
+        <showClearButton>false</showClearButton>
+        <search base="io_log_base_search">
+          <query>
+            | stats count by mount_point
+          </query>
+        </search>
+        <fieldForLabel>mount_point</fieldForLabel>
+        <fieldForValue>mount_point</fieldForValue>
+        <selectFirstChoice>true</selectFirstChoice>
+      </input>
+      <input type="dropdown" searchWhenChanged="true" token="io_overlay">
+        <label>Overlay</label>
+        <showClearButton>false</showClearButton>
+        <choice value="avg_service_ms">Service Time</choice>
+        <choice value="avg_wait_ms">Wait Time</choice>
+        <choice value="avg_cpu_pct">Storage I/O Saturation</choice>
+        <choice value="avg_network_pct">Storage I/O Saturation (NFS)</choice>
+        <default>avg_wait_ms</default>
+        <change>
+          <condition value="avg_cpu_pct">
+            <set token="io_overlay_axis_label">%</set>
+            <set token="io_overlay_label">$label$</set>
+          </condition>
+          <condition value="avg_network_pct">
+            <set token="io_overlay_axis_label">%</set>
+            <set token="io_overlay_label">$label$</set>
+          </condition>
+          <condition value="*">
+            <set token="io_overlay_axis_label">Time (ms)</set>
+            <set token="io_overlay_label">$label$</set>
+          </condition>
+        </change>
+      </input>
+      <chart>
+        <search base="io_log_base_search">
+          <query>
+            | search data.mount_point=$io_mount_point|s$
+            | `dmc_timechart_for_iostats` per_second(op_count) as iops, avg(data.cpu_pct) as avg_cpu_pct, avg(data.avg_service_ms) as avg_service_ms, avg(data.avg_total_ms) as avg_wait_ms, avg(data.network_pct) as avg_network_pct
+            | eval iops = round(iops)
+            | eval avg_cpu_pct = round(avg_cpu_pct)
+            | eval avg_service_ms = round(avg_service_ms)
+            | eval avg_wait_ms = round(avg_wait_ms)
+            | eval avg_network_pct = round(avg_network_pct)
+            | fields _time, iops $io_overlay$
+            | rename $io_overlay$ as $io_overlay_label|s$
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.chart.overlayFields">$io_overlay_label|s$</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Count</option>
+        <option name="charting.axisTitleY2.text">$io_overlay_axis_label$</option>
+        <option name="charting.axisY2.enabled">true</option>
+        <option name="charting.legend.placement">bottom</option>
+      </chart>
+      <html>
+        <p>This panel shows data for instances running Splunk Enterprise 6.4+.</p>
+        <p><b>Service Time: </b>The time for the device to execute the requests.</p>
+        <p><b>Wait Time: </b>I/O queue + execution time for requests to complete. This reflects the end-to-end time spent on the requests.</p>
+        <p><b>Storage I/O Saturation: </b>Percentage of time the CPU was servicing requests. Disk saturation occurs when this value is close to 100%. </p>
+        <p><b>Storage I/O Saturation (NFS): </b>Percentage of time network resources were used to serve requests. Only applies to NFS disks. </p>
+        <p><a href="/help?location=learnmore.dmc.ru_machine.iostats" target="_blank">Learn more</a> about the source of this data. </p>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Average I/O Usage by Mount Point</title>
+      <chart>
+        <search base="io_log_base_search">
+          <query>
+            `dmc_timechart_for_iostats` per_second(op_count) as op_count by mount_point
+          </query>
+        </search>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Count</option>
+        <option name="charting.legend.placement">bottom</option>
+      </chart>
+      <html>
+        <p>This panel shows data for instances running Splunk Enterprise 6.4+.</p>
+      </html>
+    </panel>
+    <panel>
+      <title>Average I/O Performance by Mount Point</title>
+      <input type="dropdown" searchWhenChanged="true" token="io_perf_metric">
+        <label>Metric</label>
+        <showClearButton>false</showClearButton>
+        <choice value="avg_service_ms">Service Time</choice>
+        <choice value="avg_wait_ms">Wait Time</choice>
+        <choice value="cpu_pct">Storage I/O Saturation</choice>
+        <choice value="network_pct">Storage I/O Saturation (NFS)</choice>
+        <default>avg_wait_ms</default>
+        <change>
+          <condition value="cpu_pct">
+            <set token="io_perf_metric_label">%</set>
+          </condition>
+          <condition value="network_pct">
+            <set token="io_perf_metric_label">%</set>
+          </condition>
+          <condition value="*">
+            <set token="io_perf_metric_label">Time (ms)</set>
+          </condition>
+        </change>
+      </input>
+      <chart>
+        <search base="io_log_base_search">
+          <query>
+            `dmc_timechart_for_iostats` avg($io_perf_metric$) by mount_point
+          </query>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">$io_perf_metric_label$</option>
+        <option name="charting.legend.placement">bottom</option>
+      </chart>
+      <html>
+        <p>This panel shows data for instances running Splunk Enterprise 6.4+.</p>
+      </html>
+    </panel>
+  </row>
+</form>

@@ -1,0 +1,819 @@
+/*===============================================================================================*/
+/*  SPLUNK: MIXINS                                                                               */
+/*  Snippets of reusable CSS to develop faster and keep code readable                            */
+/*===============================================================================================*/
+
+
+/*  Reset */
+/*  ------------------ */
+@define-mixin reset $display: inline {
+    all: initial;
+    font-family: $fontFamily;
+    font-size: $fontSize;
+    line-height: $lineHeight;
+    color: $textColor;
+    box-sizing: border-box;
+    display: $display;
+    border-width: 1px;
+    visibility: inherit;
+    /* postcss-initial does not correctly reset this for all browsers */
+    outline: medium none $focusColor;
+    outline: medium none invert;
+}
+
+
+/*  Link */
+/*  ------------------ */
+@define-mixin link {
+    color: $linkColor;
+    text-decoration: none;
+    cursor: pointer;
+
+    &:hover {
+        color: $linkColorHover;
+        text-decoration: underline;
+    }
+    &:focus {
+        @mixin focus-link;
+    }
+    &:active {
+        box-shadow: none;
+    }
+    &.disabled {
+        color: $interactiveTextColorDisabled;
+    }
+}
+
+/*************************************************************************************************/
+/*  FOCUS STATES                                                                                 */
+/*************************************************************************************************/
+@define-mixin focus-element
+    $boxShadow: $interactiveBoxShadowFocus {
+        box-shadow: $boxShadow;
+        border-collapse: separate; /* Fix IE9 Issue with box-shadow */
+        outline: 0;
+        text-decoration: none;
+        &:active:not([disabled]) {
+            box-shadow: none;
+        }
+    }
+
+/* Use when are outer focus glow will be block (i.e Menu Items). Provide background color.*/
+@define-mixin focus-element-inset
+    $backgroundColor: $white {
+    @mixin focus-element none;
+    box-shadow: inset 0 0 2px 1px $backgroundColor, inset 0 0 0 2px $focusColor;
+}
+
+/*  Block elements change the background color */
+@define-mixin focus-background {
+    background-color: rgba(rgba(0,164,253,0.1));
+    box-shadow: none;
+    outline: none;
+}
+
+/*  Block elements change the background color and spread via box-shadow */
+@define-mixin focus-link {
+    @mixin focus-element;
+    text-decoration: none;
+}
+
+@define-mixin input-selected {
+    box-shadow: inset 0 2px 0 #D8DFE6;
+}
+
+
+/*************************************************************************************************/
+/*  INTERACTIVE                                                                                  */
+/*  These are by any element that can be clicked, such as buttons, menus and table headings.     */
+/*************************************************************************************************/
+/*----------------------------------------------*/
+/*  Interactive style:                          */
+/*  @params:                                    */
+/*      Background Color                        */
+/*      Border Color                            */
+/*      Box Shadow                              */
+/*      Text Color                              */
+/*      Transition                              */
+/*----------------------------------------------*/
+@define-mixin interactive
+    $backgroundColor: $interactiveBackgroundColor,
+    $borderColor: $interactiveBorderColor,
+    $boxShadow: $interactiveBoxShadow,
+    $textColor: $interactiveTextColor,
+    $transition: $transitionInteractive {
+        background-color: $backgroundColor;
+        border-color: $borderColor;
+        color: $textColor;
+        box-shadow: $boxShadow;
+        text-decoration: none;
+        text-shadow: none;
+        transition: $transition;
+        filter: none;
+    }
+@define-mixin interactive-hover $borderColor: $interactiveBorderColor, $boxShadow: $interactiveBoxShadow {
+    @mixin interactive $interactiveBackgroundColorHover, $borderColor, $boxShadow;
+}
+@define-mixin interactive-active $borderColor: $interactiveBorderColor {
+    @mixin interactive $interactiveBackgroundColorActive, $borderColor, none, $textColor, none;
+}
+@define-mixin interactive-disabled $borderColor: $interactiveBorderColorDisabled {
+    @mixin interactive $interactiveBackgroundColorDisabled, $borderColor, $interactiveBoxShadowDisabled, $interactiveTextColorDisabled;
+}
+
+/*----------------------------------------------*/
+/*  Primary interactive style:                  */
+/*  @params:                                    */
+/*      Background Color                        */
+/*      Box Shadow                              */
+/*      Text Color                              */
+/*      Transition                              */
+/*----------------------------------------------*/
+@define-mixin interactive-primary
+    $backgroundColor: $primaryBackgroundColor,
+    $boxShadow: $primaryBoxShadow,
+    $textColor: $primaryTextColor,
+    $transition: $transitionInteractive {
+        @mixin interactive $backgroundColor, transparent, $boxShadow, $textColor, $transitionInteractive;
+    }
+@define-mixin interactive-primary-hover $backgroundColor: $primaryBackgroundColorHover {
+    @mixin interactive-primary $backgroundColor;
+}
+@define-mixin interactive-primary-active $backgroundColor: $primaryBackgroundColorActive {
+    @mixin interactive-primary $backgroundColor, none;
+}
+@define-mixin interactive-primary-disabled $backgroundColor: $primaryBackgroundColorDisabled, $textColor: $primaryTextDisabledColor {
+    @mixin interactive-primary $backgroundColor, $primaryBoxShadow, $textColor;
+}
+
+
+/*************************************************************************************************/
+/*  INTERACTIVE ERROR                                                                            */
+/*  These are by any interactive element that is is in an error state.                           */
+/*************************************************************************************************/
+@define-mixin interactive-error {
+    @mixin interactive $interactiveErrorBackgroundColor, $interactiveErrorBorderColor, $interactiveBoxShadow, $interactiveErrorTextColor;
+}
+
+@define-mixin interactive-error-hover {
+    @mixin interactive $interactiveErrorBackgroundColorHover, $interactiveErrorBorderColor, $interactiveBoxShadow,  $interactiveErrorTextColor;
+}
+
+
+/*************************************************************************************************/
+/*  BUTTONS                                                                                      */
+/*************************************************************************************************/
+/*----------------------------------------------*/
+/*  Pills, Links                                */
+/*----------------------------------------------*/
+@define-mixin link-style
+    $textColor: $linkColor,
+    $textDecoration: none {
+        color: $textColor;
+        text-decoration: $textDecoration;
+    }
+@define-mixin link-style-underline
+    $textColor: $linkColor {
+        @mixin link-style $textColor, underline;
+    }
+
+@define-mixin pill-style
+    $textColor: $interactiveTextColor,
+    $background: none,
+    $borderColor: transparent,
+    $textDecoration: none {
+        color: $textColor;
+        background: $background;
+        border-color: $borderColor;
+        text-decoration: $textDecoration;
+    }
+@define-mixin pill-hover {
+    @mixin pill-style $pillTextColorHover, $interactiveBackgroundColorHover, $borderColor;
+}
+@define-mixin pill-active {
+    @mixin pill-style $interactiveTextColor, $interactiveBackgroundColorActive;
+}
+@define-mixin pill-disabled {
+    @mixin pill-style $textDisabledColor;
+    box-shadow: none;
+}
+
+/*----------------------------------------------*/
+/*  Define states of buttons:                   */
+/*  :hover, :active, disabled and :focus        */
+/*  @params:                                    */
+/*      Hover Mixin                             */
+/*      Active Mixin                            */
+/*      Disabled Mixin                          */
+/*      Focus Mixin                             */
+/*----------------------------------------------*/
+@define-mixin button-states
+    $interactiveHoverMixin: interactive-hover,
+    $interactiveActiveMixin: interactive-active,
+    $interactiveDisabledMixin: interactive-disabled,
+    $interactiveFocusMixin: interactive $interactiveBackgroundColorFocus,
+    $focusGlow: focus-element {
+        &:hover {
+            @mixin $interactiveHoverMixin;
+        }
+        &:focus {
+            @mixin $interactiveFocusMixin;
+            @mixin $focusGlow;
+        }
+        &:active, &.active {
+            @mixin $interactiveActiveMixin;
+        }
+        &.disabled,
+        &[disabled],
+        &.disabled:hover,
+        &[disabled]:hover,
+        &.disabled:focus,
+        &[disabled]:focus,
+        &.disabled:active,
+        &[disabled]:active {
+            @mixin $interactiveDisabledMixin;
+            cursor: not-allowed;
+        }
+    }
+
+/*----------------------------------------------*/
+/*  Button Padding:                             */
+/*  @params:                                    */
+/*      Vertical Padding                        */
+/*      Horizontal Padding                      */
+/*----------------------------------------------*/
+@define-mixin button-padding
+    $paddingVertical: $buttonPaddingVertical,
+    $paddingSides: $buttonPaddingSides {
+        padding: $paddingVertical $paddingSides;
+    }
+
+/*----------------------------------------------*/
+/*  Primary Button Padding:                     */
+/*  @params:                                    */
+/*      Vertical Padding                        */
+/*      Horizontal Padding                      */
+/*----------------------------------------------*/
+@define-mixin button-padding-primary
+    $paddingVertical: $buttonPaddingVertical,
+    $paddingSides: $buttonPaddingSides {
+        @mixin button-padding calc($paddingVertical + 1px), calc($paddingSides + 1px);
+    }
+
+/*----------------------------------------------*/
+/*  Button Padding For Other Button Sizes:      */
+/*  @params:                                    */
+/*      Vertical Padding                        */
+/*      Horizontal Padding                      */
+/*      Button Icon Margin Top                  */
+/*----------------------------------------------*/
+@define-mixin button-size
+    $paddingVertical: $buttonPaddingVertical,
+    $paddingSides: $buttonPaddingSides,
+    $iconMarginTop: 0px {
+        @mixin button-padding $paddingVertical, $paddingSides;
+        [class^="icon-"],
+        [class*=" icon-"] {
+            margin-top: $iconMarginTop;
+        }
+        &.btn-primary {
+            @mixin button-padding-primary $paddingVertical, $paddingSides;
+        }
+    }
+
+/*  Draggable Handle */
+@define-mixin draggable-handle-background $color: 818D99 {
+    background: url(data:image/svg+xml,%3Csvg%20version%3D%221.1%22%20id%3D%22Layer_1%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20xmlns%3Axlink%3D%22http%3A//www.w3.org/1999/xlink%22%20x%3D%220px%22%20y%3D%220px%22%0A%09%20width%3D%224px%22%20height%3D%224px%22%20viewBox%3D%220%200%204%204%22%20xml%3Aspace%3D%22preserve%22%3E%0A%3Crect%20fill%3D%22%23$(color)%22%20width%3D%222%22%20height%3D%222%22/%3E%0A%3C/svg%3E);
+    cursor: move;
+}
+
+
+/*************************************************************************************************/
+/*  FONTS                                                                                        */
+/*************************************************************************************************/
+
+/*----------------------------------------------*/
+/*  Define Font Family:                         */
+/*  @params:                                    */
+/*      Font Name                               */
+/*      Name of Font File                       */
+/*      Font Format                             */
+/*      Font Weight                             */
+/*      Font Style                              */
+/*----------------------------------------------*/
+@define-mixin define-font $fontName, $file, $format: woff, $fontWeight: normal, $fontStyle: normal {
+    @font-face {
+        font-family: $fontName;
+        src: url('$staticFontPath/$file') format('$format');
+        font-weight: $fontWeight;
+        font-style: $fontStyle;
+    }
+}
+
+/*----------------------------------------------*/
+/*  Create a heading                            */
+/*  @params:                                    */
+/*      Font Size                               */
+/*      Margin                                  */
+/*      Font Color                              */
+/*      Text Transform                          */
+/*----------------------------------------------*/
+@define-mixin create-heading $fontSize: $fontSizeXLarge, $margin: calc($lineHeight / 2) 0, $fontColor: $headingsFontColor, $textTransform: none {
+    margin: $margin;
+    font-size: $fontSize;
+    font-family: $headingsFontFamily;
+    font-weight: $headingsFontWeight;
+    line-height: $headingsLineHeight;
+    text-transform: $textTransform;
+    color: $fontColor;
+    text-rendering: optimizelegibility; /*  Fix the character spacing for headings */
+}
+@define-mixin create-heading-extra-large $margin: calc($lineHeight / 2) 0 {
+    @mixin create-heading $fontSizeXXLarge, $margin;
+}
+@define-mixin create-heading-large $margin: calc($lineHeight / 2) 0 {
+    @mixin create-heading $fontSizeXLarge, $margin;
+}
+@define-mixin create-heading-medium $margin: calc($lineHeight / 2) 0 {
+    @mixin create-heading $fontSizeLarge, $margin;
+}
+@define-mixin create-heading-small $margin: calc($lineHeight / 2) 0 {
+    @mixin create-heading $fontSize, $margin;
+}
+@define-mixin create-section-heading $fontSize: $fontSize {
+    @mixin create-heading $fontSize, calc($lineHeight / 4) 0, $headingsFontColorLight, uppercase;
+}
+@define-mixin create-section-heading-small {
+    @mixin create-section-heading $fontSizeSmall;
+}
+
+
+/*************************************************************************************************/
+/*  UTILITY MIXINS                                                                               */
+/*************************************************************************************************/
+
+/*----------------------------------------------*/
+/*  Clearfix:                                   */
+/*  For clearing floats like a boss h5bp.com/q  */
+/*----------------------------------------------*/
+@define-mixin clearfix {
+    &:before,
+    &:after {
+        display: table;
+        content: "";
+        line-height: 0;
+    }
+    &:after {
+        clear: both;
+    }
+}
+
+/*  Placeholder text */
+@define-mixin placeholder $color: $placeholderText {
+    &::placeholder {
+        color: $color;
+        opacity: 1;
+    }
+}
+
+/* Basic input styles */
+@define-mixin base-input $padding: $inputPadding, $height: $inputHeight, $lineHeight: $lineHeight, $fontSize: $fontSize {
+    display: inline-block;
+    padding: $padding;
+    height: $height;
+    line-height: $lineHeight;
+    font-size: $fontSize;
+    box-sizing: border-box;
+}
+
+/* Sets Modal width and margin */
+@define-mixin modal-width $width: 550px {
+    width: $width;
+    margin-left: calc($width / 2 * -1);
+    .form-horizontal {
+        width: $width;
+        box-sizing: border-box;
+    }
+}
+
+@define-mixin display-flex $direction: row {
+    display: flex;
+    flex-direction: $direction;
+}
+
+@define-mixin flex-fit-or-fill {
+    /* IE10, IE11 */
+    -ms-flex-positive: 0; /*Not sure why IE10 requires the broken out values.*/
+    -ms-flex-negative: 1;
+    -ms-flex-preferred-size: auto;
+    -ms-flex: 0 1 auto; /* Shrink if you are too big. */
+
+    /* Firefox, maybe MS Edge */
+    flex: 1 0 0px; /* Just fill the space. *
+
+    /* Chrome and Safari */
+    -webkit-flex: 0 1 auto; /* Shrink if you are too big. */
+
+    /* Temp Chrome bug. This can be removed when fixed in Chrome 48.
+    /* https://code.google.com/p/chromium/issues/detail?id=546034#c6 */
+    min-height: 0;
+    min-width: 0;
+}
+
+/* Define card style. Add white background and shadow. */
+@define-mixin create-card {
+    background-color: $cardBoxBackgroundColor;
+    box-shadow: $cardBoxShadow;
+}
+
+/* Workaround for table shadows in IE. Don't use this mixin, use create-card-table */
+@define-mixin ie-table-box-shadow-fix {
+    position: relative;
+    &:before {
+        content: '';
+        display: inline-block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100%;
+        pointer-events: none;
+        background: transparent;
+        box-shadow: $cardBoxShadow;
+    }
+}
+
+/* Define card style on tables. Adds workaround for IE */
+@define-mixin create-card-table {
+    @mixin create-card;
+
+    /* Edge */
+    @supports (-ms-ime-align:auto) {
+        @mixin ie-table-box-shadow-fix;
+    }
+    /* IE 11 */
+    @media screen and (-ms-high-contrast: active), screen and (-ms-high-contrast: none) {
+        @mixin ie-table-box-shadow-fix;
+    }
+}
+
+/* Cover browser specific radio button with styled radio button. */
+/* Can only be used if label comes immediately after input[type=radio] */
+@define-mixin radio-button-overlay {
+    margin: 4px;
+    font-size: 16px;
+    height: 12px;
+    opacity: 0.01;
+
+    + label, + .radio-label {
+        position: relative;
+
+        &:before, &:after {
+            content: '';
+            display: inline-block;
+            position: absolute;
+            border-radius: 100%;
+        }
+        &:before {
+            top: -2px;
+            left: -24px;
+            height: 16px;
+            width: 16px;
+            border: $border;
+            vertical-align: bottom;
+            @mixin interactive;
+        }
+        &:after {
+            top: 3px;
+            left: -19px;
+            height: 8px;
+            width: 8px;
+            background: transparent;
+            vertical-align: bottom;
+        }
+        &:hover:before {
+            @mixin interactive-hover;
+        }
+        &:active:before {
+            @mixin interactive-active;
+        }
+        + input[type=radio] {
+            margin-left: $spacing;
+        }
+    }
+    &:checked {
+        + label:after, + .radio-label:after {
+            background: $textColor;
+        }
+    }
+    &:focus, &:focus:hover {
+        box-shadow: none;
+
+        + label:before, + label:hover:before,
+        + .radio-label:before, + .radio-label:hover:before {
+            @mixin focus-element;
+        }
+    }
+    &[disabled] + label:before,
+    &[disabled] + .radio-label:before {
+        @mixin interactive-disabled;
+        cursor: not-allowed;
+    }
+    &[disabled] + label:after,
+    &[disabled] + .radio-label:after {
+        cursor: not-allowed;
+    }
+}
+
+/* Use to cover button in .radio class */
+@define-mixin radio-class-button-overlay {
+    padding-left: 0;
+    > input[type=radio] {
+        @mixin radio-button-overlay;
+        margin-right: 6px;
+    }
+}
+
+
+/*-------------------------------------------------------------------------*/
+/*  CSS image replacement                                                  */
+/*  For clearing floats like a boss h5bp.com/q                             */
+/*  Source: https://github.com/h5bp/html5-boilerplate/commit/aa0396eae757  */
+/*-------------------------------------------------------------------------*/
+@define-mixin hide-text {
+    font: 0/0 a;
+    color: transparent;
+    text-shadow: none;
+    background-color: transparent;
+    border: 0;
+    position: absolute;
+    width: 0;
+}
+
+/*************************************************************************************************/
+/*  ICONS                                                                                        */
+/*************************************************************************************************/
+@define-mixin search-icon-background {
+    background-image: url(data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJMYXllcl8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4PSIwcHgiIHk9IjBweCIgd2lkdGg9IjI0cHgiIGhlaWdodD0iMjRweCIgdmlld0JveD0iMCAwIDI0IDI0IiBlbmFibGUtYmFja2dyb3VuZD0ibmV3IDAgMCAyNCAyNCIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+PHBhdGggZmlsbD0iI0IyQjlCRiIgZD0iTTIwLDE4LjU4NmwtNC4yNTgtNC4yNThDMTYuNTI5LDEzLjI1MiwxNywxMS45MzIsMTcsMTAuNUMxNyw2LjkxNiwxNC4wODQsNCwxMC41LDRTNCw2LjkxNiw0LDEwLjVTNi45MTYsMTcsMTAuNSwxN2MxLjQzMiwwLDIuNzUyLTAuNDcxLDMuODI4LTEuMjU4TDE4LjU4NiwyMEwyMCwxOC41ODZ6IE02LDEwLjVDNiw4LjAxOSw4LjAxOSw2LDEwLjUsNlMxNSw4LjAxOSwxNSwxMC41UzEyLjk4MSwxNSwxMC41LDE1UzYsMTIuOTgxLDYsMTAuNXoiLz48L3N2Zz4=);
+    background-repeat: no-repeat;
+}
+
+
+/*************************************************************************************************/
+/*  FORMS                                                                                        */
+/*************************************************************************************************/
+/*  Block level inputs  */
+@define-mixin input-block-level {
+    display: block;
+    width: 100%;
+    min-height: $inputHeight; /*  Make inputs at least the height of their button counterpart (base line-height + padding + border) */
+    box-sizing: border-box; /*  Makes inputs behave like true block-level elements */
+}
+
+/*************************************************************************************************/
+/*  COMPONENT MIXINS                                                                             */
+/*************************************************************************************************/
+
+/*----------------------------------------------*/
+/*  Horizontal Dividers:                        */
+/*  Dividers (basically an hr) within dropdowns */
+/*  and nav lists.                              */
+/*  @params:                                    */
+/*      Border Color                            */
+/*----------------------------------------------*/
+@define-mixin nav-divider $color: $borderColor {
+    height: 1px;
+    margin: calc(($lineHeight / 2) - 1px) 1px; /*  8px 1px */
+    overflow: hidden;
+    background-color: $color;
+}
+
+/*----------------------------------------------*/
+/*  Navbar Vertical Align:                      */
+/*  Vertically center elements in the navbar.   */
+/*  Example: an element has a height of 30px,   */
+/*  so write out `.navbarVerticalAlign(30px);`  */
+/*  to calculate the appropriate top margin.    */
+/*  @params:                                    */
+/*      Element Height                          */
+/*----------------------------------------------*/
+@define-mixin navbarVerticalAlign $elementHeight {
+    margin-top: calc(($navbarHeight - $elementHeight) / 2);
+}
+
+
+/*************************************************************************************************/
+/*  PRINTING                                                                                     */
+/*************************************************************************************************/
+@define-mixin print-width-100-percent {
+    max-width: 100% !important;
+    width: 100% !important;
+    overflow: hidden !important;
+}
+
+@define-mixin print-hide {
+    display: none !important;
+}
+
+@define-mixin print-no-background {
+    background: none !important;
+}
+
+@define-mixin print-wrap-all {
+    word-break: break-all !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    white-space: normal !important;
+}
+
+@define-mixin print-table {
+    table {
+        @mixin print-width-100-percent;
+        table-layout: auto !important;
+    }
+    .scrolling-table-wrapper, .results-wrapper, .results-table, .events-viewer-wrapper {
+        @mixin print-width-100-percent;
+    }
+    td,
+    th {
+        @mixin print-no-background;
+        @mixin print-wrap-all;
+        width: auto !important;
+        page-break-inside:auto;
+    }
+    .table-chrome .sorts:after {
+        content: '';
+    }
+    .header-table-docked,
+    .table-scroll-bar-docked {
+        @mixin print-hide;
+    }
+}
+
+
+/*************************************************************************************************/
+/*  POPDOWN                                                                                      */
+/*************************************************************************************************/
+@define-mixin arrow-down $color: $white {
+    border-bottom: 0;
+    border-top-color: $color;
+}
+@define-mixin arrow-up $color: $white {
+    border-top: 0;
+    border-bottom-color: $color;
+}
+@define-mixin arrow-left $color: $white {
+    border-left: 0;
+    border-right-color: $color;
+}
+@define-mixin arrow-right $color: $white {
+    border-right: 0;
+    border-left-color: $color;
+}
+
+/*----------------------------------------------*/
+/*  Arrow:                                      */
+/*  Create an arrow.                            */
+/*  @params:                                    */
+/*      Arrow Direction (up, down, left, right) */
+/*      Arrow Color                             */
+/*      Arrow Size                              */
+/*----------------------------------------------*/
+@define-mixin arrow $direction: up, $color: $white, $size: $popdownArrowSize {
+    position: absolute;
+    height: 0;
+    width: 0;
+    border: $size solid transparent;
+    content: "";
+    display: block;
+    @mixin arrow-$direction $color;
+}
+
+@define-mixin popdown-dialog {
+    background-color: $popupBackgroundColor;
+    border: $popupBorder;
+    box-shadow: $overlayBoxShadow;
+    border-radius: $containerOuterBorderRadius;
+    top: 100%;
+    left: 50%;
+    margin: $popdownArrowSize 0 0 -103px;
+    display: none;
+    position: absolute;
+    z-index: $zindexPopdown;
+    white-space: normal; /* prevent inheriting nowrap from btn-group */
+
+    /*  placement of arrow */
+    .arrow {
+        @mixin arrow up, $popupBorderColor;
+        top: -$popdownArrowSize;
+        left: 50%;
+        margin-left: -4px;
+
+        /*  generated arrow */
+        &:before {
+            @mixin arrow up, $popupBackgroundColor;
+            top: 1px;
+            left: -$popdownArrowSize;
+        }
+    }
+    &.up {
+        margin-top: 0;
+
+        /*  placement of arrow */
+        > .arrow {
+            @mixin arrow down, $popupBorderColor;
+            top: auto;
+            bottom: -$popdownArrowSize;
+
+            &:before {
+                @mixin arrow down, $popupBackgroundColor;
+                top: auto;
+                bottom: 1px;
+            }
+        }
+    }
+    &.right { /* point left */
+        margin-left: 5px;
+        margin-top: 0;
+
+        /*  placement of arrow */
+        .arrow {
+            @mixin arrow left, $popupBorderColor;
+            top: 50%;
+            left: -$popdownArrowSize;
+            margin: -$popdownArrowSize 0 0 0;
+
+            &:before {
+                @mixin arrow left, $popupBackgroundColor;
+                top: 50%;
+                left: 1px;
+                margin: -$popdownArrowSize 0 0 0;
+            }
+        }
+    }
+    /*  position of arrow when floated right */
+    &.pull-right .arrow {
+        left: auto;
+        right: $popdownArrowSize;
+    }
+    /*  open state */
+    &.open {
+        display: block;
+    }
+}
+
+/*  popdown body */
+@define-mixin popdown-dialog-body {
+    margin: 0;
+    border-radius: $containerInnerBorderRadius;
+    background-color: $popupBackgroundColor;
+    @mixin clearfix;
+}
+
+
+/*************************************************************************************************/
+/*  FULL PAGE LAYOUT                                                                             */
+/*************************************************************************************************/
+@define-mixin application-layout $leftColWidth: 400px {
+    html,
+    body,
+    .shared-page {
+        height: 100% !important;
+    }
+
+    .scroll-x {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .scroll-y {
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .layoutBodyColumns {
+        background-color: $white;
+        overflow: auto;
+    }
+
+    .layoutColLeft {
+        width: $leftColWidth;
+    }
+
+    .layoutColRight {
+        flex: 1;
+        min-width: 0; /* Fixes issue with ever exanding col in FF */
+    }
+
+    .shared-page,
+    .main-section-body,
+    .layoutBodyColumns {
+      @mixin display-flex column;
+      flex-grow: 1;
+    }
+
+    .flexRow {
+      @mixin display-flex;
+      flex-grow: 1;
+    }
+}

@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<view template="pages/app.html" type="html" isVisible="False" isDashboard="False">
+    <label>Alert</label>
+</view>

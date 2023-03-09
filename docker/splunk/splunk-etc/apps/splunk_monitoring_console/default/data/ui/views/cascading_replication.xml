@@ -1,0 +1,344 @@
+<form version="1.1" hideEdit="True" isVisible="true" script="common_control.js" >
+  <label>Cascading Replication</label>
+
+  <fieldset autoRun="true" submitButton="false">
+    <input type="radio" searchWhenChanged="true" token="role">
+      <label>Role</label>
+      <choice value="dmc_group_search_head">Search Heads</choice>
+      <choice value="dmc_group_indexer">Indexers (Search Peers)</choice>
+      <default>dmc_group_search_head</default>
+    </input>
+    <input type="dropdown" searchWhenChanged="true" token="dmc_group">
+      <label>Group</label>
+      <showClearButton>false</showClearButton>
+      <search>
+        <query>
+          | `dmc_get_groups_containing_role($role$)`
+          | search search_group!="dmc_group_*"
+        </query>
+      </search>
+      <fieldForLabel>label</fieldForLabel>
+      <fieldForValue>search_group</fieldForValue>
+      <choice value="*">All</choice>
+      <default>*</default>
+    </input>
+    <input type="dropdown" searchWhenChanged="true" token="splunk_server">
+      <label>Instance</label>
+      <showClearButton>false</showClearButton>
+      <search>
+        <query>
+          | `dmc_get_instance_info($dmc_group$)`
+          | where search_group="$role$"
+        </query>
+      </search>
+      <fieldForLabel>serverName</fieldForLabel>
+      <fieldForValue>serverName</fieldForValue>
+      <selectFirstChoice>true</selectFirstChoice>
+      <change>
+        <condition value="*">
+          <set token="host">$row.host$</set>
+        </condition>
+      </change>
+    </input>
+  </fieldset>
+  
+  <row depends="$show_cascade$">
+    <panel>
+        <search id="replication_config_api_base">
+          <query>
+            | rest splunk_server=$splunk_server$ /services/search/distributed/bundle/replication/config
+          </query>
+        </search>
+        <single>
+          <search base="replication_config_api_base">
+            <query>
+              | fields replicationPolicy
+              | eval replicationPolicy = upper(substr(replicationPolicy,1,1)).substr(replicationPolicy,2)
+            </query>
+            <done>
+              <condition match="'result.replicationPolicy'=&quot;Cascading&quot;">
+                 <set token="show_cascade">true</set>
+              </condition>
+              <condition>
+                 <set token="show_msg">true</set>
+              </condition>
+            </done>
+          </search>
+          <option name="underLabel">Replication Policy</option>
+          <option name="height">80px</option>
+        </single>
+        <single>
+          <search base="replication_config_api_base">
+            <query>
+              | fields replicationThreads
+            </query>
+          </search>
+          <option name="underLabel">Replication Threads</option>
+          <option name="height">80px</option>
+        </single>
+    </panel>
+  </row>
+ 
+  <row depends="$show_msg$">
+    <panel>
+      <html>
+        <h3>Cascading Replication is disabled. Set replicationPolicy = cascading under the [replicationSettings] stanza in distsearch.conf to enable.</h3>
+      </html>
+    </panel>
+  </row>
+
+  <row depends="$show_cascade$">
+    <panel rejects="$snapshot$">
+        <title>Historical Charts</title>
+        <input type="time" searchWhenChanged="true" token="time">
+            <label>Time Range:</label>
+            <default>
+              <earliestTime>-4h@m</earliestTime>
+              <latestTime>now</latestTime>
+            </default>
+          </input>
+    </panel>
+  </row>
+
+  <row depends="$show_cascade$">
+    <html>
+        <p>In cascading replication, the search head first creates a <b>plan</b> that specifies the 
+        replication relationships between peers; in other words, which peers send the payload to which 
+        other peers. The search head distributes this plan to all search peers. There can be multiple plans
+        associated with a knowledge bundle replication cycle.</p>
+        <p>Each sender node, including the search head and any sender search peers, then sends the payload
+        to its own set of receiver search peers. A <b>payload</b> is any packet of information exchanged
+        by nodes during the cascading replication process. Payloads can include, but are not limited to,
+        full or delta knowledge bundles.</p>
+    </html>
+  </row>
+  
+  <!-- Plan Metadata -->
+  <row depends="$show_cascade$">
+    <panel rejects="$snapshot$">
+        <title>Plan Count by Number of Levels</title>
+        <chart>
+          <search>
+            <query>
+              `dmc_set_index_internal` host=$host$ source=*/metrics.log* group=cascading name=plan_metadata
+               | dedup planid
+               | stats count by num_levels
+            </query>
+            <earliest>$time.earliest$</earliest>
+            <latest>$time.latest$</latest>
+          </search>
+          <option name="charting.chart">pie</option>
+          <option name="charting.legend.placement">none</option>
+        </chart>
+        <html>
+          <p>The search head is one level. Cascading replication occurs when there are at least 
+             three levels: The search head sends the payload to a subset of search peers, which in turn 
+             distribute the payload to their own set of search peers, and so on.</p>
+        </html>
+    </panel>
+    <panel rejects="$snapshot$">
+        <title>Plan Count by Number of Peers</title>
+        <chart>
+          <search>
+            <query>
+              `dmc_set_index_internal` host=$host$ source=*/metrics.log* group=cascading name=plan_metadata
+               | dedup planid
+               | stats count by num_peers
+            </query>
+            <earliest>$time.earliest$</earliest>
+            <latest>$time.latest$</latest>
+          </search>
+          <option name="charting.chart">pie</option>
+          <option name="charting.legend.placement">none</option>
+        </chart>
+        <html>
+            <p>Count of plans by number of peers involved.</p>
+        </html>
+    </panel>
+    <panel rejects="$snapshot$">
+        <title>Plan Count by Replication Type</title>
+        <chart>
+          <search>
+            <query>
+              `dmc_set_index_internal` host=$host$ source=*/metrics.log* group=cascading name=plan_metadata
+               | dedup planid
+               | stats count by endpoint
+            </query>
+            <earliest>$time.earliest$</earliest>
+            <latest>$time.latest$</latest>
+          </search>
+          <option name="charting.chart">pie</option>
+          <option name="charting.legend.placement">none</option>
+        </chart>
+        <html>
+            <p>Count of plans by replication type.</p>
+        </html>
+    </panel>
+  </row>
+
+  <row depends="$show_cascade$">
+    <panel rejects="$snapshot$">
+      <title>Plan Count by Number of Receivers</title>
+        <chart>
+          <search>
+            <query>
+               `dmc_set_index_internal` host=$host$ source=*/metrics.log* group=cascading name=plan_replication
+               | dedup planid
+               | stats count by num_receivers
+            </query>
+            <earliest>$time.earliest$</earliest>
+            <latest>$time.latest$</latest>
+          </search>
+          <option name="charting.chart">pie</option>
+          <option name="charting.legend.placement">none</option>
+        </chart>
+        <html>
+            <p>Count of plans by number of intended receivers.</p>
+        </html>
+    </panel>
+    <panel rejects="$snapshot$">
+      <title>Payload Count by Number of Receivers</title>
+        <chart>
+          <search>
+            <query>
+               `dmc_set_index_internal` host=$host$ source=*/metrics.log* group=cascading name=payload_replication
+               | dedup planid
+               | stats count by num_receivers
+            </query>
+            <earliest>$time.earliest$</earliest>
+            <latest>$time.latest$</latest>
+          </search>
+          <option name="charting.chart">pie</option>
+          <option name="charting.legend.placement">none</option>
+        </chart>
+        <html>
+            <p>Count of payloads by number of intended receivers.</p>
+        </html>
+    </panel>
+    <panel rejects="$snapshot$">
+      <title>Plan and Payload Replication Status</title>
+        <chart>
+          <search>
+            <query>
+               | multisearch
+                 [search `dmc_set_index_internal` source=*metrics.log group=cascading name=plan_replication]
+                 [search `dmc_set_index_internal` source=*metrics.log group=cascading name=payload_replication]
+               | chart count over name by status
+               | replace payload_replication WITH payload
+               | replace plan_replication WITH plan
+               | rename name as "Replication Type" 
+               | sort -"Replication Type"
+            </query>
+            <earliest>$time.earliest$</earliest>
+            <latest>$time.latest$</latest>
+          </search>
+          <option name="charting.chart">column</option>
+          <option name="charting.chart.stackMode">stacked</option>
+          <option name="charting.legend.placement">none</option>
+          <option name="charting.axisTitleX.text">Replication Type</option>
+          <option name="charting.axisTitleY.text">Status Count</option>
+          <option name="charting.fieldColors">{"success": 0x4FA484, "failure": 0xAF575A}</option>
+        </chart>
+        <html>
+            <p>Count of plans and payloads by status; success indicates successful replication to <i>all</i> intended peers.</p>
+        </html>
+    </panel>
+  </row>
+
+  <row depends="$show_cascade$">
+    <panel rejects="$snapshot$">
+        <title>Plan Replication Performance</title>
+        <chart>
+          <search>
+            <query>
+              `dmc_set_index_internal` host=$host$ source=*/metrics.log* group=cascading name=plan_replication
+               | dedup planid
+               | `dmc_timechart_for_metrics_log` avg(dispatch_time_ms) AS avg_plan_msec
+            </query>
+            <earliest>$time.earliest$</earliest>
+            <latest>$time.latest$</latest>
+          </search>
+          <option name="charting.chart">line</option>
+          <option name="charting.legend.placement">none</option>
+          <option name="charting.axisTitleX.text">Time</option>
+          <option name="charting.axisTitleY.text">Time Spent (msec)</option>
+        </chart>
+        <html>
+          <p>"Time spent" is the average msec for the search head to send a plan to all search peers.</p>
+        </html>
+    </panel>
+  </row>
+
+  <row depends="$show_cascade$">
+    <panel rejects="$snapshot$">
+        <title rejects="$split_by_peer$">Payload Replication Performance</title>
+        <input type="checkbox" searchWhenChanged="true" token="split_by_peer">
+          <label></label>
+          <choice>Split by peer</choice>
+        </input>
+        <chart rejects="$split_by_peer$">
+          <search>
+            <query>
+              `dmc_set_index_internal` search_group=dmc_group_indexer source=*/metrics.log* group=cascading name=payload_replication
+               | dedup planid
+               | eval dispatch_time_sec=dispatch_time_ms/1000
+               | `dmc_timechart_for_metrics_log` avg(dispatch_time_sec) AS avg_payload_sec
+            </query>
+            <earliest>$time.earliest$</earliest>
+            <latest>$time.latest$</latest>
+          </search>
+          <option name="charting.chart">line</option>
+          <option name="charting.legend.placement">none</option>
+          <option name="charting.axisTitleX.text">Time</option>
+          <option name="charting.axisTitleY.text">Time Spent (sec)</option>
+        </chart>
+        <html rejects="$split_by_peer$">
+          <p>"Time spent" is the average sec for a sender peer (the search head or any other sender peer)
+            to send a payload to all of its receivers.</p>
+        </html>
+        <title depends="$split_by_peer$">Payload Replication Performance (Per-Peer)</title>
+        <chart depends="$split_by_peer$">
+          <search>
+            <query>
+              `dmc_set_index_internal` search_group=dmc_group_indexer source=*/metrics.log* group=cascading name=payload_replication
+               | dedup planid
+               | eval dispatch_time_sec=dispatch_time_ms/1000
+               | `dmc_timechart_for_metrics_log` avg(dispatch_time_sec) by peer_guid
+            </query>
+            <earliest>$time.earliest$</earliest>
+            <latest>$time.latest$</latest>
+          </search>
+          <option name="charting.chart">line</option>
+          <option name="charting.axisTitleX.text">Time</option>
+          <option name="charting.axisTitleY.text">Time Spent (sec)</option>
+        </chart>
+        <html depends="$split_by_peer$">
+          <p> Time spent is the average sec for the given peer (which may be the search head, or any other sender peer)
+            to send a payload to all of its receivers.</p>
+        </html>
+    </panel>
+  </row>
+
+  <row depends="$show_cascade$">
+    <panel rejects="$snapshot$">
+        <title>Average Peer Time to Receive Payload</title>
+        <table>
+            <searchString>
+              `dmc_set_index_internal` host=$host$ source=*/metrics.log* group=cascading name=per_peer_replication
+               | dedup planid
+               | stats avg(repl_time_ms) AS avg_time by peer_uri
+               | eval avg_time=round(avg_time, 2)
+               | rename avg_time AS "Time To Receive (msec)"
+               | rename peer_uri AS "Peer URI"
+               | sort 0 - "Time to Receive (msec)"
+            <earliest>$time.earliest$</earliest>
+            <latest>$time.latest$</latest>
+          </searchString>
+         </table>
+        <html>
+            <p>"Time to receive" is the average time for a peer to receive a payload from its sender.</p>
+        </html>
+    </panel>
+  </row>
+
+</form>

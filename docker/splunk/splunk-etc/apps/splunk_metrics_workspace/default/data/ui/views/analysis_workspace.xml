@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<view isDashboard="false" type="redirect" target="analytics_workspace">
+	<label>Analytics</label>
+</view>

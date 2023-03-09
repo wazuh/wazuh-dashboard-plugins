@@ -1,0 +1,252 @@
+/*===============================================================================================*/
+/*  SPLUNK: MODALS                                                                               */
+/*===============================================================================================*/
+
+/*  TODO: the close button seems to have issues on placement */
+
+/* modal windows
+    <body class="body-modal-open">
+    <div class="modal fade">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h3>Modal header</h3>
+        </div>
+        <div class="modal-body">
+            <p>One fine body…</p>
+        </div>
+        <div class="modal-footer">
+            <a href="#" class="btn">Close</a>
+            <a href="#" class="btn btn-primary">Save changes</a>
+        </div>
+    </div>
+
+    <!-- static example -->
+    <div style="position: relative; top: auto; left: auto; margin: 0 auto 20px; z-index: 1; max-width: 100%;" class="modal">
+        <div class="modal-header">
+            <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
+            <h3>Modal header</h3>
+         </div>
+        <div class="modal-body">
+            <p>One fine body…</p>
+         </div>
+        <div class="modal-footer">
+            <a class="btn" href="#">Close</a>
+            <a class="btn btn-primary" href="#">Save changes</a>
+        </div>
+    </div>
+    </body>
+*/
+
+/* body while modal is open */
+.body-modal-open {
+    overflow: hidden;
+}
+
+/*  Background */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: $zindexModalBackdrop;
+    background-color: $popupBackdropColor;
+    /*  Fade for backdrop */
+    &.fade { opacity: 0; }
+}
+
+.modal-backdrop,
+.modal-backdrop.fade.in {
+    opacity: 0.80;
+}
+
+ /*  modal container */
+.modal {
+    position: fixed;
+    top: $spacingDouble;
+    left: 50%;
+    @mixin modal-width;
+    z-index: $zindexModal;
+    background-color: $popupBackgroundColor;
+    border: none;
+    box-shadow: 0 3px 7px rgba(0,0,0,0.3);
+    background-clip: border-box;
+    /*  Remove focus outline from opened modal */
+    outline: none;
+
+    &.fade {
+        transition: $transitionOpacityFast, $transitionTopFast ease;
+        top: 0;
+    }
+    &.fade.in { top: $spacingDouble }
+}/*  modal */
+
+/*  SPL-68751 - IE10 box shadow animation artifacts fix */
+.modal:after {
+    content: "";
+    font-size: 0;
+    display: inline;
+    overflow: hidden;
+}
+
+
+/*************************************************************************************************/
+/*  MODAL HEADER                                                                                 */
+/*************************************************************************************************/
+.modal-header {
+    border: none;
+    position: relative;
+    background: $popupHeaderBackgroundColor;
+    padding: $spacing;
+
+    /*  heading */
+    h3, h1, .modal-title {
+        font-size: $modalHeadingFontSize;
+        font-weight: $fontWeightSemiBold;
+        line-height: 22px;
+        margin: 0;
+        overflow-wrap: break-word;
+        padding-right: $spacingDouble;
+    }
+    /*  close button */
+    .close {
+        border: $border;
+        top: $spacing;
+        right: $spacing;
+        margin-top: -2px;
+        position: absolute;
+        @mixin interactive none, transparent, none, $pillTextColor;
+        @mixin button-states pill-hover, pill-active, pill-disabled, pill-style $linkColor;
+    }
+}
+
+
+/*************************************************************************************************/
+/*  MODAL BODY                                                                                   */
+/*************************************************************************************************/
+.modal-body {
+    position: relative;
+    padding: 0 $spacing;
+    overflow: visible;
+    max-height: calc(100vh - 246px);
+    &:last-child {
+        max-height: calc(100vh - 259px); /* if no footer, can be somewhat taller */
+    }
+}
+
+/*  Remove bottom margin if need be */
+.modal-form {
+    margin-bottom: 0;
+}
+
+.modal-body-scrolling {
+    overflow-y: auto;
+    padding: $spacing;
+    position: relative;
+    border-top: $popupDivider;
+    border-bottom: $popupDivider;
+}
+
+
+/*************************************************************************************************/
+/*  MODAL FOOTER                                                                                 */
+/*************************************************************************************************/
+.modal-footer {
+    padding: $spacing;
+    margin-bottom: 0;
+    text-align: right; /*  right align buttons */
+    background: $popupFooterBackgroundColor;
+    @mixin clearfix; /*  clear it in case folks use .pull-* classes on buttons */
+
+    > .btn {
+        min-width: $buttonMinWidth;
+
+        + .btn:not(.pull-left) {
+            /*  Properly space out buttons */
+            margin-left: $spacingHalf;
+            margin-bottom: 0; /*  account for input[type="submit"] which gets the bottom margin like all other inputs */
+        }
+    }
+    /*  but override that for button groups */
+    > .btn-group .btn + .btn {
+        margin-left: -1px;
+    }
+    /*  and override it for block buttons as well */
+    > .btn-block + .btn-block {
+        margin-left: 0;
+    }
+
+    &:empty {
+        padding: 0;
+    }
+}
+
+/*************************************************************************************************/
+/*  MODAL VARIATIONS                                                                             */
+/*************************************************************************************************/
+/*  extends modal; sets width & offset */
+.modal-wide {
+    @mixin modal-width 800px;
+}
+
+/*  Disconnect needs to be above other modals */
+.modal.disconnection-warning-modal {
+    z-index: $zindexModalDisconnect;
+}
+
+.shared-splunkbar-messages-noconnectionoverlay .modal-backdrop {
+    z-index: $zindexModalNoConnection;
+}
+
+/*  loading ... */
+.modal-loading {
+    text-align: center;
+    color: $placeholderText;
+}
+
+
+
+/*************************************************************************************************/
+/*  WHATS NEW DIALOG                                                                             */
+/*************************************************************************************************/
+.shared-whatsnewdialog {
+    &.modal {
+        width: 900px;
+        margin-left: -450px;
+
+        .modal-body {
+            padding-right: 0;
+        }
+    }
+    h2 {
+         font-weight: 200;
+         font-size: 24px;
+         margin: 0 0 $spacing -$spacing;
+         padding-left: $spacing;
+     }
+    .feature {
+        display:inline-block;
+        width: 260px;
+        margin: 0 $spacing $spacing 0;
+        position: relative;
+        vertical-align: top;
+
+        > h3 {
+            margin: 0 0 $spacingQuarter 0;
+        }
+        > img {
+            display: block;
+            width: 100%;
+            height: 170px;
+            border: $borderDefault;
+            margin-bottom: $spacingHalf;
+        }
+        > p {
+            margin: 0;
+        }
+        + h2 {
+            padding-top: $spacing;
+            border-top: 1px dotted $borderColor;
+        }
+    }
+}

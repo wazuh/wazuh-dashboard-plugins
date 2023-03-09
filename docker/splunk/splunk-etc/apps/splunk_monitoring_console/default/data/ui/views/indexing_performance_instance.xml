@@ -1,0 +1,271 @@
+<form version="1.1" hideEdit="True" isVisible="true" onUnloadCancelJobs="true" stylesheet="indexing_performance_instance_extension.css" script="common_control.js">
+  <label>Indexing Performance: Instance</label>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="dropdown" searchWhenChanged="true" token="dmc_group">
+      <label>Group</label>
+      <showClearButton>false</showClearButton>
+      <search>
+        <query>
+          | `dmc_get_groups_containing_role(dmc_group_indexer)`
+          | search search_group!="dmc_group_*"
+        </query>
+      </search>
+      <fieldForLabel>label</fieldForLabel>
+      <fieldForValue>search_group</fieldForValue>
+      <choice value="dmc_group_indexer">All Indexers</choice>
+      <default>dmc_group_indexer</default>
+    </input>
+    <input type="dropdown" searchWhenChanged="true" token="splunk_server">
+      <label>Instance</label>
+      <showClearButton>false</showClearButton>
+      <populatingSearch fieldForLabel="serverName" fieldForValue="serverName">
+        | `dmc_get_instance_info($dmc_group$)`
+        | where search_group="dmc_group_indexer"
+      </populatingSearch>
+      <selectFirstChoice>true</selectFirstChoice>
+      <change>
+        <condition value="*">
+          <set token="host">$row.host$</set>
+        </condition>
+      </change>
+    </input>
+  </fieldset>
+  <search>
+    <query>
+      | rest splunk_server=$splunk_server$ /services/properties/server/general/parallelIngestionPipelines
+    </query>
+    <finalized>
+      <condition match="'result.value'>1">
+        <set token="parallel_pipeline_enabled">$result.value$</set>
+      </condition>
+      <condition>
+        <unset token="parallel_pipeline_enabled" />
+      </condition>
+    </finalized>
+  </search>
+  <search id="pipeline_queue_api_base">
+    <query>
+      | rest splunk_server=$splunk_server$ /services/server/introspection/queues
+      | eval current_fill_perc = round(current_size_bytes / max_size_bytes * 100, 0)
+      | fields title, current_fill_perc
+    </query>
+  </search>
+  <search base="pipeline_queue_api_base">
+    <!-- NOTE: need to filter the result before | chart command, otherwise chart could potentially put some result into "OTHER" field. -->
+    <query>
+      eval a = "to transpose table"
+      | where title=="parsingQueue" OR title=="aggQueue" OR title=="typingQueue" OR title=="indexQueue"
+      | chart values(current_fill_perc) over a by title
+      | fields parsingQueue, aggQueue, typingQueue, indexQueue
+      | eval parsingQueue = if(isnotnull(parsingQueue), parsingQueue, "N/A")
+      | eval aggQueue = if(isnotnull(aggQueue), aggQueue, "N/A")
+      | eval typingQueue = if(isnotnull(typingQueue), typingQueue, "N/A")
+      | eval indexQueue = if(isnotnull(indexQueue), indexQueue, "N/A")
+    </query>
+    <!-- Need to keep eval in the above search as its not certain that a result with null values is not returned -->
+    <done>
+      <!-- Search does not return any result when a server is down. Hence setting N/A if there is no result -->
+      <condition match="$job.resultCount$ = 0">
+        <set token="parsing_queue_value">N/A</set>
+        <set token="agg_queue_value">N/A</set>
+        <set token="typing_queue_value">N/A</set>
+        <set token="index_queue_value">N/A</set>
+      </condition>
+      <!-- Search does return result when a server is up. Hence setting field values as token -->
+      <condition match="$job.resultCount$ > 0">
+        <set token="parsing_queue_value">$result.parsingQueue$</set>
+        <set token="agg_queue_value">$result.aggQueue$</set>
+        <set token="typing_queue_value">$result.typingQueue$</set>
+        <set token="index_queue_value">$result.indexQueue$</set>
+      </condition>
+    </done>
+  </search>
+  <row>
+    <panel>
+      <html>
+        <h2>
+          <span>Select views: </span>
+          <span id="link-switcher-view">
+            <a href="#" class="btn-pill active" data-item="all">All</a>
+            <a href="#" class="btn-pill" data-item="snapshot">Snapshot</a>
+            <a href="#" class="btn-pill" data-item="historical">Historical</a>
+          </span>
+        </h2>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Snapshots</title>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Indexing Overview</title>
+      <table>
+        <search>
+          <query>
+            | rest splunk_server=$splunk_server$ /services/server/introspection/indexer
+            | eval status = if((reason == ".") OR (reason == "") OR isnull(reason), status, status.": ".reason)
+            | fields splunk_server, average_KBps, status
+            | eval average_KBps = round(average_KBps, 0)
+            | join type=outer [
+              | rest splunk_server=$splunk_server$ /services/properties/server/general/pipelineSetSelectionPolicy
+              | fields value
+              | rename value as pipeline_set_selection_policy]
+            | join type=outer [
+              | rest splunk_server=$splunk_server$ /services/properties/server/general/parallelIngestionPipelines]
+            | fields splunk_server, value, pipeline_set_selection_policy, average_KBps, status
+            | rename splunk_server as Instance, value as "Pipeline Set Count", pipeline_set_selection_policy as "Pipeline Set Selection Policy", average_KBps as "Indexing Rate (KB/s)", status as Status, reason as Reason
+          </query>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+      <html>
+        <p>Indexing rate measured over 30 seconds every 30 seconds (available with Splunk Enterprise 6.2 or later indexers).</p>
+        <p>The Pipeline Set selection policies can be set in server.conf. <a href="/help?location=learnmore.dmc.pipelinesets" target="_blank" class="external">Learn more</a></p>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$, $parallel_pipeline_enabled$">
+      <title>Splunk Enterprise Data Pipeline</title>
+      <html depends="$parsing_queue_value$">
+        <div class="pipeline-queues">
+          <div class="pipeline-queue-value">$parsing_queue_value$</div>
+          <div class="pipeline-queue-value">$agg_queue_value$</div>
+          <div class="pipeline-queue-value">$typing_queue_value$</div>
+          <div class="pipeline-queue-value">$index_queue_value$</div>
+        </div>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$" depends="$parallel_pipeline_enabled$">
+      <title>Splunk Enterprise Parallel Data Pipelines</title>
+      <table>
+        <search base="pipeline_queue_api_base">
+          <query>
+            <![CDATA[
+            search title="parsingQueue.*" OR title="aggQueue.*" OR title="typingQueue.*" OR title="indexQueue.*"
+            | rex field=title "(?<queue_name>^\w+)\.(?<pipeline_number>\d+)"
+            | chart values(current_fill_perc) over pipeline_number by queue_name
+            | fields pipeline_number, parsingQueue, aggQueue, typingQueue, indexQueue
+            | rename pipeline_number as "Pipeline Number", parsingQueue as "Parsing Queue Fill Ratio (%)", aggQueue as "Aggregator Queue Fill Ratio (%)", typingQueue as "Typing Queue Fill Ratio (%)", indexQueue as "Index Queue Fill Ratio (%)"
+            ]]>
+          </query>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Historical Charts</title>
+      <input type="time" searchWhenChanged="true" token="time">
+        <label>Time Range:</label>
+        <default>
+          <earliestTime>-4h@m</earliestTime>
+          <latestTime>now</latestTime>
+        </default>
+      </input>
+      <input depends="$parallel_pipeline_enabled$" type="dropdown" searchWhenChanged="true" token="log_pipe_scope">
+        <label>Pipeline Set</label>
+        <showClearButton>false</showClearButton>
+        <default>*</default>
+        <search>
+          <query>
+            `dmc_set_index_internal` host=$host$ source="*metrics.log" sourcetype=splunkd group=pipeline
+            | stats count by ingest_pipe
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <fieldForLabel>ingest_pipe</fieldForLabel>
+        <fieldForValue>ingest_pipe</fieldForValue>
+        <choice value="*">All</choice>
+      </input>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Estimated Indexing Rate Per $groupTypeIdxPerfLabel$</title>
+      <input type="dropdown" searchWhenChanged="true" token="groupTypeIdxPerf">
+        <label>Split by</label>
+        <showClearButton>false</showClearButton>
+        <default>Sourcetype</default>
+        <choice value="Sourcetype">Sourcetype</choice>
+        <choice value="Index">Index</choice>
+        <choice value="Host">Host</choice>
+        <choice value="Source">Source</choice>
+        <change>
+          <set token="groupTypeIdxPerfLabel">$label$</set>
+        </change>
+      </input>
+      <chart>
+        <search>
+          <query>
+            `dmc_set_index_internal` host=$host$ source="*metrics.log" sourcetype=splunkd group=per_$groupTypeIdxPerf$_thruput
+            | eval ingest_pipe = if(isnotnull(ingest_pipe), ingest_pipe, "none")
+            | search ingest_pipe=$log_pipe_scope$
+            | `dmc_timechart_for_metrics_log` per_second(kb) by series useother=false limit=15
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Indexing Rate (KB/s)</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>$funcQueueLabel$ Fill Ratio of Data Processing Queues</title>
+      <input type="dropdown" searchWhenChanged="true" token="queues">
+        <label>Queues to Measure:</label>
+        <showClearButton>false</showClearButton>
+        <default>(name=parsingqueue OR name=aggqueue OR name=typingqueue OR name=indexqueue OR name=splunktcpin) | eval name=case(name=="splunktcpin","5 - Splunktcpin Queue",name=="aggqueue","2 - Aggregation Queue",name=="indexqueue","4 - Indexing Queue",name=="parsingqueue","1 - Parsing Queue",name=="typingqueue","3 - Typing Queue")</default>
+        <choice value="(name=parsingqueue OR name=aggqueue OR name=typingqueue OR name=indexqueue OR name=splunktcpin) | eval name=case(name==&quot;splunktcpin&quot;,&quot;5 - Splunktcpin Queue&quot;,name==&quot;aggqueue&quot;,&quot;2 - Aggregation Queue&quot;,name==&quot;indexqueue&quot;,&quot;4 - Indexing Queue&quot;,name==&quot;parsingqueue&quot;,&quot;1 - Parsing Queue&quot;,name==&quot;typingqueue&quot;,&quot;3 - Typing Queue&quot;)">Event-Processing Queues</choice>
+        <choice value="name=*">All Queues</choice>
+      </input>
+      <input type="dropdown" searchWhenChanged="true" token="functionQueue">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <default>Median</default>
+        <choice value="Avg">Average</choice>
+        <choice value="Median">Median</choice>
+        <choice value="Min">Minimum</choice>
+        <choice value="Max">Maximum</choice>
+        <choice value="Perc90">90th Percentile</choice>
+        <choice value="First">Sampled</choice>
+        <change>
+          <set token="funcQueueLabel">$label$</set>
+        </change>
+      </input>
+      <chart>
+        <search>
+          <query>
+`dmc_set_index_internal` host=$host$ source=*metrics.log sourcetype=splunkd group=queue $queues$
+| eval ingest_pipe = if(isnotnull(ingest_pipe), ingest_pipe, "none")
+| search ingest_pipe=$log_pipe_scope$
+| eval max=if(isnotnull(max_size_kb),max_size_kb,max_size)
+| eval curr=if(isnotnull(current_size_kb),current_size_kb,current_size)
+| eval fill_perc=round((curr/max)*100,2)
+| `dmc_timechart_for_metrics_log` $functionQueue$(fill_perc) by name useother=false limit=15
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">area</option>
+        <option name="height">500px</option>
+        <option name="charting.layout.splitSeries">1</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Fill Ratio (%)</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+        <option name="charting.axisY.maximumNumber">100</option>
+      </chart>
+    </panel>
+  </row>
+</form>

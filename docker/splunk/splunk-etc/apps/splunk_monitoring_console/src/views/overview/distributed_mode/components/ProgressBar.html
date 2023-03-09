@@ -1,0 +1,8 @@
+<div class="dmc-progress-bar-before-label"><%= BEFORE_LABEL %></div>
+<div class="dmc-progress-bar-container">
+  <div class="dmc-progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: <% print(result[searchResultFieldName[0]]) %>%;"></div>
+</div>
+<div class="dmc-progress-bar-after-label">
+  <%  // note this is a hack. for some reason we need to manually append '%' sign if this value is a number, otherwise just use it.
+    print(Number(result[searchResultFieldName[1]]) ? result[searchResultFieldName[1]] + ' %' : (_.isUndefined(result[searchResultFieldName[1]]) || _.isNull(result[searchResultFieldName[1]]) ? 'N/A' : result[searchResultFieldName[1]] )) %>
+</div>

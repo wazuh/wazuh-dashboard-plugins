@@ -1,0 +1,669 @@
+<form version="1.1" hideEdit="True" script="common_control.js, drilldown_action_extension.js, splunk_tcpin_performance_extension.js, splunk_tcpin_performance_deployment_extension.js" stylesheet="splunk_tcpin_performance_extension.css">
+  <label>Splunk TCP Input Performance: Deployment</label>
+  <search id="tcp_queue_fill_ratio_snapshot">
+    <query>
+      <![CDATA[
+        | rest splunk_server_group=dmc_group_indexer splunk_server_group="$group$" services/server/introspection/queues
+        | search title="tcpin_queue*"
+        | rex field=title "tcpin_queue\.(?<pipeline_number>\d+)"
+        | join splunk_server
+        [ | rest splunk_server_group=dmc_group_indexer splunk_server_group="$group$" /services/properties/inputs
+        | where match(title, "splunktcp(-ssl)?:")
+        `dmc_get_port_from_splunktcp_stanza(title)`
+        | stats delim=", " values(port) as ports by splunk_server
+        | mvcombine ports
+        | fields splunk_server, ports]
+        | join splunk_server [|rest splunk_server_group=dmc_group_indexer services/data/inputs/tcp/ssl]
+        | eval val_last_1min=if(isnotnull(value_cntr1_size_bytes_lookback), round(value_cntr1_size_bytes_lookback, 2), "N/A")
+        | eval val_last_10min=if(isnotnull(value_cntr2_size_bytes_lookback), round(value_cntr2_size_bytes_lookback, 2), "N/A")
+        | eval queue_fill_last_1min = if(isnotnull(pipeline_number), "pset".pipeline_number.": ".val_last_1min, val_last_1min)
+        | eval queue_fill_last_10min = if(isnotnull(pipeline_number), "pset".pipeline_number.": ".val_last_10min, val_last_10min)
+      ]]>
+    </query>
+  </search>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="dropdown" searchWhenChanged="true" token="group">
+      <label>Group</label>
+      <showClearButton>false</showClearButton>
+      <search>
+        <query>
+          | `dmc_get_groups_containing_role(dmc_group_indexer)`| search search_group!="dmc_group_*"
+        </query>
+      </search>
+      <fieldForLabel>label</fieldForLabel>
+      <fieldForValue>search_group</fieldForValue>
+      <choice value="*">All</choice>
+      <selectFirstChoice>true</selectFirstChoice>
+    </input>
+  </fieldset>
+  <row>
+    <panel rejects="$historical$">
+      <title>Health Check</title>
+      <viz type="splunk_monitoring_console.KpiTrafficLight">
+        <search base="tcp_queue_fill_ratio_snapshot">
+          <query>
+            <![CDATA[
+              rex field=queue_fill_last_10min "pset\d+:\s(?<queue_fill_last_10min>\d+\.\d+)"
+              | stats max(queue_fill_last_10min) as queue_fill_last_10min by splunk_server
+              | where queue_fill_last_10min > 60
+              | stats count as degraded_instance_count_queue_fill_ratio
+            ]]>
+          </query>
+          <preview>
+            <set token="degraded_instance_count_queue_fill_ratio">$result.degraded_instance_count_queue_fill_ratio$</set>
+          </preview>
+        </search>
+        <option name="height">45</option>
+        <option name="splunk_monitoring_console.KpiTrafficLight.field">degraded_instance_count_queue_fill_ratio</option>
+        <option name="splunk_monitoring_console.KpiTrafficLight.detail">splunk_server</option>
+        <option name="splunk_monitoring_console.KpiTrafficLight.rangeValues">[0]</option>
+        <option name="splunk_monitoring_console.KpiTrafficLight.rangeIcons">["success", "error"]</option>
+        <option name="splunk_monitoring_console.KpiTrafficLight.rangeLabels">["Queue fill ratio within the last 10 minutes is healthy for all instances.", "Queue fill ratio within the last 10 minutes is degraded on $degraded_instance_count_queue_fill_ratio$ instance(s)."]</option>
+        <!-- <option name="splunk_monitoring_console.KpiTrafficLight.description">KPI Description</option> -->
+      </viz>
+      <viz type="splunk_monitoring_console.KpiTrafficLight">
+        <search>
+          <query>
+            `dmc_set_index_internal` search_group=dmc_group_indexer search_group="$group$" sourcetype=splunkd source=*splunkd.log "WARN" TcpInputConfig "reverse dns lookups appear to be excessively slow, this may impact receiving from network inputs."
+            | stats count as degraded_instance_count_dnc_lookup, values(host) as hosts
+          </query>
+          <preview>
+            <set token="degraded_instance_count_dnc_lookup">$result.degraded_instance_count_dnc_lookup$</set>
+          </preview>
+          <earliest>-60m@m</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="height">45</option>
+        <option name="splunk_monitoring_console.KpiTrafficLight.field">degraded_instance_count_dnc_lookup</option>
+        <option name="splunk_monitoring_console.KpiTrafficLight.detail">hosts</option>
+        <option name="splunk_monitoring_console.KpiTrafficLight.rangeValues">[0]</option>
+        <option name="splunk_monitoring_console.KpiTrafficLight.rangeIcons">["success", "error"]</option>
+        <option name="splunk_monitoring_console.KpiTrafficLight.rangeLabels">["There were no reverse DNS lookup warnings within the last hour.", "There were $degraded_instance_count_dnc_lookup$ reverse DNS lookup warning(s) within the last hour."]</option>
+        <!-- <option name="splunk_monitoring_console.KpiTrafficLight.description">KPI Description</option> -->      </viz>
+
+      <viz type="splunk_monitoring_console.KpiTrafficLight">
+        <search>
+          <query>
+            `dmc_set_index_internal` search_group=dmc_group_indexer search_group="$group$" sourcetype=splunkd source=*splunkd.log log_level="WARN" component=TcpInputProc "Stopping all listening ports."
+            | stats count as degraded_instance_count_port_closure, values(host) as hosts
+          </query>
+          <preview>
+            <set token="degraded_instance_count_port_closure">$result.degraded_instance_count_port_closure$</set>
+          </preview>
+          <earliest>-60m@m</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="height">45</option>
+        <option name="splunk_monitoring_console.KpiTrafficLight.field">degraded_instance_count_port_closure</option>
+        <option name="splunk_monitoring_console.KpiTrafficLight.detail">hosts</option>
+        <option name="splunk_monitoring_console.KpiTrafficLight.rangeValues">[0]</option>
+        <option name="splunk_monitoring_console.KpiTrafficLight.rangeIcons">["success", "error"]</option>
+        <option name="splunk_monitoring_console.KpiTrafficLight.rangeLabels">["There were no Splunk TCP port closures due to queue blockages within the last hour.", "There were $degraded_instance_count_port_closure$ Splunk TCP port closure(s) due to queue blockages within the last hour."]</option>
+        <!-- <option name="splunk_monitoring_console.KpiTrafficLight.description">KPI Description</option> -->      </viz>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+        <h2>
+          <span>Select views: </span>
+          <span id="link-switcher-view">
+            <a href="#" class="btn-pill active" data-item="all">All</a>
+            <a href="#" class="btn-pill" data-item="snapshot">Snapshot</a>
+            <a href="#" class="btn-pill" data-item="historical">Historical</a>
+          </span>
+        </h2>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Snapshots</title>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$historical$">
+      <title>Current Splunk TCP Input Queue Fill Ratio</title>
+      <table id="snapshotTcpInFillRatioTable">
+        <search base="tcp_queue_fill_ratio_snapshot">
+          <query>
+            stats count as pset_count, values(ports), as ports values(queue_fill_last_1min) as queue_fill_last_1min, values(queue_fill_last_10min) as queue_fill_last_10min by splunk_server
+            | fields splunk_server, pset_count, ports, queue_fill_last_1min, queue_fill_last_10min
+            | rename splunk_server as "Instance", pset_count as "Pipeline Set Count", ports as "Ports", queue_fill_last_1min as "Queue Fill Ratio (Last 1 Minute)", queue_fill_last_10min as "Queue Fill Ratio (Last 10 Minutes)"
+          </query>
+        </search>
+        <option name="drilldown">row</option>
+        <drilldown>
+          <link target="_blank">splunk_tcpin_performance_instance?form.splunk_server=$row.Instance$</link>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Historical Charts</title>
+      <input type="time" searchWhenChanged="true" token="time">
+        <label>Time Range:</label>
+        <default>
+          <earliestTime>-4h@m</earliestTime>
+          <latestTime>now</latestTime>
+        </default>
+      </input>
+      <input type="dropdown" searchWhenChanged="true" token="split_by">
+        <label>Split by Options</label>
+        <showClearButton>false</showClearButton>
+
+        <!-- default -->
+        <selectFirstChoice>True</selectFirstChoice>
+
+        <choice value="total">Total</choice>
+        <choice value="indexer">Split by Indexer</choice>
+        <choice value="forwarder">Split by Forwarder Type</choice>
+        <choice value="port">Split by Port</choice>
+        <change>
+          <condition value="total">
+            <set token="total">true</set>
+            <unset token="split_by_indexer" />
+            <unset token="split_by_forwarder_type" />
+            <unset token="split_by_port" />
+          </condition>
+          <condition value="indexer">
+            <set token="split_by_indexer">true</set>
+            <unset token="total" />
+            <unset token="split_by_forwarder_type" />
+            <unset token="split_by_port" />
+          </condition>
+          <condition value="forwarder">
+            <set token="split_by_forwarder_type">true</set>
+            <unset token="total" />
+            <unset token="split_by_indexer" />
+            <unset token="split_by_port" />
+          </condition>
+          <condition value="port">
+            <set token="split_by_port">true</set>
+            <unset token="total" />
+            <unset token="split_by_indexer" />
+            <unset token="split_by_forwarder_type" />
+          </condition>
+        </change>
+      </input>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$ $total$ $split_by_forwarder_type$ $split_by_port$" depends="$split_by_indexer$">
+      <title>Average Splunk TCP Incoming Throughput by Indexer</title>
+      <chart>
+        <search>
+          <query>
+            `dmc_tcp_throughput_split_by(host, "$group$")`
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Average KB/s</option>
+        <option name="charting.axisLabelsX.axisVisibility">hide</option>
+      </chart>
+    </panel>
+    <panel rejects="$snapshot$ $total$ $split_by_indexer$ $split_by_port$" depends="$split_by_forwarder_type$">
+      <title>Average Splunk TCP Incoming Throughput by Forwarder Type</title>
+      <chart>
+        <search>
+          <query>
+            `dmc_get_forwarder_tcpin` search_group=dmc_group_indexer search_group="$group$"
+            | `dmc_rename_forwarder_type(fwdType)`
+            | `dmc_timechart_for_metrics_log` per_second(kb) as avg_tcp_KBps by fwdType
+            | rename avg_tcp_KBps as "KB/s"
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Average KB/s</option>
+        <option name="charting.axisLabelsX.axisVisibility">hide</option>
+      </chart>
+    </panel>
+    <panel rejects="$snapshot$ $total$ $split_by_indexer$ $split_by_forwarder_type$" depends="$split_by_port$">
+      <title>Average Splunk TCP Incoming Throughput by Port</title>
+      <chart>
+        <search>
+          <query>
+            `dmc_tcp_throughput_split_by(destPort, "$group$")`
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Average KB/s</option>
+        <option name="charting.axisLabelsX.axisVisibility">hide</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$ $split_by_indexer$ $split_by_forwarder_type$ $split_by_port$">
+      <title>Total Average Splunk TCP Incoming Throughput and Forwarder Count</title>
+      <chart>
+        <search>
+          <query>
+            `dmc_get_forwarder_tcpin` search_group=dmc_group_indexer search_group="$group$"
+            | `dmc_timechart_for_metrics_log` dc(guid) as forwarder_count, per_second(kb) as tcp_KBps
+            | rename forwarder_count as "Forwarder Count", tcp_KBps as "Throughput (KB/s)"
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.axisY2.enabled">true</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.chart.overlayFields">"Throughput (KB/s)"</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.axisLabelsY2.majorUnit">1</option>
+        <option name="charting.axisTitleY.text">Count</option>
+        <option name="charting.axisTitleY2.text">Average KB/s</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <drilldown>
+          <condition match="isnotnull('row._span')">
+            <set token="drilldown_global_forwarder">true</set>
+            <set token="drilldown_global_forwarder">$row._span$</set>
+            <set token="drilldown_global_forwarder_earliest">$earliest$</set>
+            <eval token="drilldown_global_forwarder_earliest_label">strftime(earliest, "%m/%d/%Y %H:%M:%S")</eval>
+            <set token="drilldown_global_forwarder_latest">$latest$</set>
+            <eval token="drilldown_global_forwarder_latest_label">strftime(latest, "%m/%d/%Y %H:%M:%S")</eval>
+            <set token="drilldown_global_forwarder_count">$click.value2$</set>
+          </condition>
+        </drilldown>
+      </chart>
+    </panel>
+    <panel rejects="$snapshot$ $total$ $split_by_forwarder_type$ $split_by_port$" depends="$split_by_indexer$">
+      <title>Connection Count by Indexer</title>
+      <chart>
+        <search>
+          <query>
+            `dmc_tcp_forwarder_count_split_by(host, "$group$")`
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.axisY2.enabled">true</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.axisLabelsY2.majorUnit">1</option>
+        <option name="charting.axisTitleY.text">Count</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <drilldown>
+          <condition match="isnotnull('row._span')">
+            <set token="drilldown_indexer_forwarder">true</set>
+            <set token="drilldown_indexer_forwarder">$row._span$</set>
+            <set token="drilldown_indexer_forwarder_earliest">$earliest$</set>
+            <eval token="drilldown_indexer_forwarder_earliest_label">strftime(earliest, "%m/%d/%Y %H:%M:%S")</eval>
+            <set token="drilldown_indexer_forwarder_latest">$latest$</set>
+            <eval token="drilldown_indexer_forwarder_latest_label">strftime(latest, "%m/%d/%Y %H:%M:%S")</eval>
+            <set token="drilldown_indexer_name">$click.name2$</set>
+            <set token="drilldown_indexer_forwarder_count">$click.value2$</set>
+          </condition>
+        </drilldown>
+      </chart>
+    </panel>
+    <panel rejects="$snapshot$ $total$ $split_by_indexer$ $split_by_port$" depends="$split_by_forwarder_type$">
+      <title>Forwarder Count by Forwarder Type</title>
+      <chart>
+        <search>
+          <query>
+            `dmc_get_forwarder_tcpin` search_group=dmc_group_indexer search_group="$group$"
+            | `dmc_rename_forwarder_type(fwdType)`
+            | `dmc_timechart_for_metrics_log` dc(guid) as forwarder_count by fwdType
+            | rename forwarder_count as "Forwarder Count"
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.axisY2.enabled">true</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.axisLabelsY2.majorUnit">1</option>
+        <option name="charting.axisTitleY.text">Count</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <drilldown>
+          <condition match="isnotnull('row._span')">
+            <set token="drilldown_type_forwarder">true</set>
+            <set token="drilldown_type_forwarder">$row._span$</set>
+            <set token="drilldown_type_forwarder_earliest">$earliest$</set>
+            <eval token="drilldown_type_forwarder_earliest_label">strftime(earliest, "%m/%d/%Y %H:%M:%S")</eval>
+            <set token="drilldown_type_forwarder_latest">$latest$</set>
+            <eval token="drilldown_type_forwarder_latest_label">strftime(latest, "%m/%d/%Y %H:%M:%S")</eval>
+            <set token="drilldown_type_forwarder_type">$click.name2$</set>
+            <set token="drilldown_type_forwarder_count">$click.value2$</set>
+          </condition>
+        </drilldown>
+      </chart>
+    </panel>
+    <panel rejects="$snapshot$ $total$ $split_by_indexer$ $split_by_forwarder_type$" depends="$split_by_port$">
+      <title>Forwarder Count by Port</title>
+      <chart>
+        <search>
+          <query>
+            `dmc_tcp_forwarder_count_split_by(destPort, "$group$")`
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.axisY2.enabled">true</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.axisLabelsY2.majorUnit">1</option>
+        <option name="charting.axisTitleY.text">Count</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <drilldown>
+          <condition match="isnotnull('row._span')">
+            <set token="drilldown_port_forwarder">true</set>
+            <set token="drilldown_port_forwarder">$row._span$</set>
+            <set token="drilldown_port_forwarder_earliest">$earliest$</set>
+            <eval token="drilldown_port_forwarder_earliest_label">strftime(earliest, "%m/%d/%Y %H:%M:%S")</eval>
+            <set token="drilldown_port_forwarder_latest">$latest$</set>
+            <eval token="drilldown_port_forwarder_latest_label">strftime(latest, "%m/%d/%Y %H:%M:%S")</eval>
+            <set token="drilldown_port_forwarder_port">$click.name2$</set>
+            <set token="drilldown_port_forwarder_count">$click.value2$</set>
+          </condition>
+        </drilldown>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel depends="$drilldown_global_forwarder$" rejects="$snapshot$" id="drilldown_global_forwarder">
+      <table>
+        <title>$drilldown_global_forwarder_count$ forwarders connected to selected indexer group between $drilldown_global_forwarder_earliest_label$ ~ $drilldown_global_forwarder_latest_label$</title>
+        <search>
+          <query>
+            `dmc_get_forwarder_tcpin` search_group=dmc_group_indexer search_group="$group$"
+            | stats dc(host) as connection_count by guid
+            | join type=outer guid [| inputlookup dmc_forwarder_assets]
+            | `dmc_rename_forwarder_type(forwarder_type)`
+            | makemv delim=" " avg_tcp_kbps_sparkline
+            | eval sum_kb = if (status == "missing", "N/A", sum_kb)
+            | eval avg_tcp_kbps_sparkline = if (status == "missing", "N/A", avg_tcp_kbps_sparkline)
+            | eval avg_tcp_kbps = if (status == "missing", "N/A", avg_tcp_kbps)
+            | eval avg_tcp_eps = if (status == "missing", "N/A", avg_tcp_eps)
+            | `dmc_rename_forwarder_type(fwdType)`
+            | `dmc_time_format(last_connected)`
+            | fields hostname, forwarder_type, version, os, arch, status, last_connected, sum_kb, avg_tcp_kbps_sparkline, avg_tcp_kbps, avg_tcp_eps, connection_count
+            | search hostname="***"
+            | search status="*"
+            | rename hostname as Instance, forwarder_type as Type, version as Version, os as OS, arch as Architecture, status as Status, last_connected as "Last Connected to Indexers", sum_kb as "Total KB", avg_tcp_kbps_sparkline as "Average KB/s Over Time", avg_tcp_kbps as "Average KB/s", avg_tcp_eps as "Average Events/s", connection_count as "Number of Connections"
+          </query>
+          <earliest>$drilldown_global_forwarder_earliest$</earliest>
+          <latest>$drilldown_global_forwarder_latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+      <html depends="$drilldown_global_forwarder$">
+        <a data-unset-token="drilldown_global_forwarder">Close this drilldown table</a>
+      </html>
+    </panel>
+    <panel depends="$drilldown_indexer_forwarder$" rejects="$snapshot$" id="drilldown_indexer_forwarder">
+      <table>
+        <title>$drilldown_indexer_forwarder_count$ forwarders connected to $drilldown_indexer_name$ between $drilldown_indexer_forwarder_earliest_label$ ~ $drilldown_indexer_forwarder_latest_label$</title>
+        <search>
+          <query>
+            `dmc_get_forwarder_tcpin` search_group=dmc_group_indexer search_group="$group$"
+            | where host="$drilldown_indexer_name$"
+            | stats dc(host) as connection_count by guid
+            | join type=outer guid [| inputlookup dmc_forwarder_assets]
+            | `dmc_rename_forwarder_type(forwarder_type)`
+            | makemv delim=" " avg_tcp_kbps_sparkline
+            | eval sum_kb = if (status == "missing", "N/A", sum_kb)
+            | eval avg_tcp_kbps_sparkline = if (status == "missing", "N/A", avg_tcp_kbps_sparkline)
+            | eval avg_tcp_kbps = if (status == "missing", "N/A", avg_tcp_kbps) | eval avg_tcp_eps = if (status == "missing", "N/A", avg_tcp_eps)
+            | `dmc_rename_forwarder_type(fwdType)`
+            | `dmc_time_format(last_connected)`
+            | fields hostname, forwarder_type, version, os, arch, status, last_connected, sum_kb, avg_tcp_kbps_sparkline, avg_tcp_kbps, avg_tcp_eps
+            | search hostname="***"
+            | search status="*"
+            | rename hostname as Instance, forwarder_type as Type, version as Version, os as OS, arch as Architecture, status as Status, last_connected as "Last Connected to Indexers", sum_kb as "Total KB", avg_tcp_kbps_sparkline as "Average KB/s Over Time", avg_tcp_kbps as "Average KB/s", avg_tcp_eps as "Average Events/s"
+          </query>
+          <earliest>$drilldown_indexer_forwarder_earliest$</earliest>
+          <latest>$drilldown_indexer_forwarder_latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+      <html depends="$drilldown_indexer_forwarder$">
+        <a data-unset-token="drilldown_indexer_forwarder">Close this drilldown table</a>
+      </html>
+    </panel>
+    <panel depends="$drilldown_type_forwarder$" rejects="$snapshot$" id="drilldown_type_forwarder">
+      <table>
+        <title>$drilldown_type_forwarder_count$ $drilldown_type_forwarder_type$ forwarders connected to selected indexer group between $drilldown_type_forwarder_earliest_label$ ~ $drilldown_type_forwarder_latest_label$ </title>
+        <search>
+          <query>
+            `dmc_get_forwarder_tcpin` search_group=dmc_group_indexer search_group="$group$"
+            | `dmc_rename_forwarder_type(fwdType)`
+            | where fwdType="$drilldown_type_forwarder_type$"
+            | stats dc(host) as connection_count by guid
+            | join type=outer guid [| inputlookup dmc_forwarder_assets]
+            | `dmc_rename_forwarder_type(forwarder_type)`
+            | makemv delim=" " avg_tcp_kbps_sparkline
+            | eval sum_kb = if (status == "missing", "N/A", sum_kb)
+            | eval avg_tcp_kbps_sparkline = if (status == "missing", "N/A", avg_tcp_kbps_sparkline)
+            | eval avg_tcp_kbps = if (status == "missing", "N/A", avg_tcp_kbps)
+            | eval avg_tcp_eps = if (status == "missing", "N/A", avg_tcp_eps)
+            | `dmc_time_format(last_connected)`
+            | fields hostname, forwarder_type, version, os, arch, status, last_connected, sum_kb, avg_tcp_kbps_sparkline, avg_tcp_kbps, avg_tcp_eps, connection_count
+            | search hostname="***"
+            | search status="*"
+            | rename hostname as Instance, forwarder_type as Type, version as Version, os as OS, arch as Architecture, status as Status, last_connected as "Last Connected to Indexers", sum_kb as "Total KB", avg_tcp_kbps_sparkline as "Average KB/s Over Time", avg_tcp_kbps as "Average KB/s", avg_tcp_eps as "Average Events/s", connection_count as "Number of Connections"
+          </query>
+          <earliest>$drilldown_type_forwarder_earliest$</earliest>
+          <latest>$drilldown_type_forwarder_latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+      <html depends="$drilldown_type_forwarder$">
+        <a data-unset-token="drilldown_type_forwarder">Close this drilldown table</a>
+      </html>
+    </panel>
+    <panel depends="$drilldown_port_forwarder$" rejects="$snapshot$" id="drilldown_port_forwarder">
+      <table>
+        <title>$drilldown_port_forwarder_count$ forwarders on port $drilldown_port_forwarder_port$ connected to selected indexer group between $drilldown_port_forwarder_earliest_label$ ~ $drilldown_port_forwarder_latest_label$ </title>
+        <search>
+          <query>
+            `dmc_get_forwarder_tcpin` search_group=dmc_group_indexer search_group="$group$"
+            | where destPort="$drilldown_port_forwarder_port$"
+            | stats dc(host) as connection_count by guid
+            | join type=outer guid [| inputlookup dmc_forwarder_assets]
+            | `dmc_rename_forwarder_type(forwarder_type)`
+            | makemv delim=" " avg_tcp_kbps_sparkline
+            | eval sum_kb = if (status == "missing", "N/A", sum_kb)
+            | eval avg_tcp_kbps_sparkline = if (status == "missing", "N/A", avg_tcp_kbps_sparkline)
+            | eval avg_tcp_kbps = if (status == "missing", "N/A", avg_tcp_kbps) | eval avg_tcp_eps = if (status == "missing", "N/A", avg_tcp_eps)
+            | `dmc_rename_forwarder_type(fwdType)`
+            | `dmc_time_format(last_connected)`
+            | fields hostname, forwarder_type, version, os, arch, status, last_connected, sum_kb, avg_tcp_kbps_sparkline, avg_tcp_kbps, avg_tcp_eps, connection_count
+            | search hostname="***"
+            | search status="*"
+            | rename hostname as Instance, forwarder_type as Type, version as Version, os as OS, arch as Architecture, status as Status, last_connected as "Last Connected to Indexers", sum_kb as "Total KB", avg_tcp_kbps_sparkline as "Average KB/s Over Time", avg_tcp_kbps as "Average KB/s", avg_tcp_eps as "Average Events/s", connection_count as "Number of Connections"
+          </query>
+          <earliest>$drilldown_port_forwarder_earliest$</earliest>
+          <latest>$drilldown_port_forwarder_latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+      <html depends="$drilldown_port_forwarder$">
+        <a data-unset-token="drilldown_port_forwarder">Close this drilldown table</a>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <input type="dropdown" token="fillRatioAggrFunc" searchWhenChanged="true">
+        <label>Aggregation</label>
+        <showClearButton>false</showClearButton>
+        <choice value="Avg">Average</choice>
+        <choice value="Median">Median</choice>
+        <choice value="Max">Maximum</choice>
+        <choice value="Min">Minimum</choice>
+        <choice value="Perc90">90th Percentile</choice>
+        <choice value="First">Sampled</choice>
+        <default>Median</default>
+        <change>
+          <set token="fillRatioAggrLabel">$label$</set>
+        </change>
+      </input>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$ $split_by_indexer$" id="indexer_count_by_tcp_input_queue_fill_ratio">
+      <title>Indexer Count by $fillRatioAggrLabel$ Splunk TCP Input Queue Fill Ratio</title>
+      <html>
+        <div class="heatmap_toggle"></div>
+      </html>
+      <viz type="splunk_monitoring_console.heatmap">
+        <search>
+          <query>
+            `dmc_set_index_internal` sourcetype=splunkd source=*metrics.log search_group=dmc_group_indexer search_group="$group$" group=queue name=splunktcpin
+            | eval max=if(isnotnull(max_size_kb),max_size_kb,max_size)
+            | eval curr=if(isnotnull(current_size_kb),current_size_kb,current_size)
+            | eval fill_perc=round((curr/max)*100,2)
+            | bin _time minspan=30s
+            | stats $fillRatioAggrFunc$(fill_perc) AS "fill_percentage" by host, _time
+            | `dmc_queue_fill_ratio_rangemap_and_timechart`
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <drilldown>
+          <condition match="isnotnull('row._span')">
+            <set token="drilldown_queue_fill_ratio">true</set>
+            <set token="drilldown_queue_fill_ratio_span">$row._span$</set>
+            <set token="drilldown_queue_fill_ratio_earliest">$row.earliest$</set>
+            <eval token="drilldown_queue_fill_ratio_earliest_label">$row.earliest_label$</eval>
+            <set token="drilldown_queue_fill_ratio_latest">$row.latest$</set>
+            <eval token="drilldown_queue_fill_ratio_latest_label">$row.latest_label$</eval>
+            <set token="drilldown_queue_fill_ratio_metric">$row.drilldown_indexing_rate_metric$</set>
+            <set token="drilldown_queue_fill_ratio_count">$row.numInstances$</set>
+          </condition>
+          <condition/>
+        </drilldown>
+      </viz>
+      <chart>
+        <search>
+          <query>
+            `dmc_set_index_internal` sourcetype=splunkd source=*metrics.log search_group=dmc_group_indexer search_group="$group$" group=queue name=splunktcpin
+            | eval max=if(isnotnull(max_size_kb),max_size_kb,max_size)
+            | eval curr=if(isnotnull(current_size_kb),current_size_kb,current_size)
+            | eval fill_perc=round((curr/max)*100,2)
+            | bin _time minspan=30s
+            | stats $fillRatioAggrFunc$(fill_perc) AS "fill_percentage" by host, _time
+            | `dmc_queue_fill_ratio_rangemap_and_timechart`
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Instance count</option>
+        <option name="charting.fieldColors">{"80-100%": 0xD85D3C, "60-80%": 0xF7902B, "0-60%":0x9AC23C, "abnormal":0xC4C4C0}</option>
+        <drilldown>
+          <condition match="isnotnull('row._span')">
+            <set token="drilldown_queue_fill_ratio">true</set>
+            <set token="drilldown_queue_fill_ratio_span">$row._span$</set>
+            <set token="drilldown_queue_fill_ratio_earliest">$earliest$</set>
+            <eval token="drilldown_queue_fill_ratio_earliest_label">strftime(earliest, "%m/%d/%Y %H:%M:%S")</eval>
+            <set token="drilldown_queue_fill_ratio_latest">$latest$</set>
+            <eval token="drilldown_queue_fill_ratio_latest_label">strftime(latest, "%m/%d/%Y %H:%M:%S")</eval>
+            <set token="drilldown_queue_fill_ratio_metric">$click.name2$</set>
+            <set token="drilldown_queue_fill_ratio_count">$click.value2$</set>
+          </condition>
+          <condition/>
+        </drilldown>
+      </chart>
+      <table depends="$drilldown_queue_fill_ratio$" id="drilldown_queue_fill_ratio">
+        <title>$drilldown_queue_fill_ratio_count$ indexers in the $drilldown_queue_fill_ratio_metric$ fill ratio range between $drilldown_queue_fill_ratio_earliest_label$ ~ $drilldown_queue_fill_ratio_latest_label$</title>
+        <search>
+          <query>`dmc_drilldown_indexing_performance_deployment_queue_fill_ratio("*", splunktcpin, $fillRatioAggrFunc$, $drilldown_queue_fill_ratio_metric$)`</query>
+          <earliest>$drilldown_queue_fill_ratio_earliest$</earliest>
+          <latest>$drilldown_queue_fill_ratio_latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+      <html depends="$drilldown_queue_fill_ratio$">
+        <a data-unset-token="drilldown_queue_fill_ratio">Close this drilldown table</a>
+      </html>
+    </panel>
+    <panel rejects="$snapshot$" depends="$split_by_indexer$">
+      <title>Splunk $fillRatioAggrLabel$ TCP Input Queue Fill Ratio By Instance</title>
+      <chart>
+        <search>
+          <query>
+            `dmc_set_index_internal` sourcetype=splunkd source=*metrics.log search_group=dmc_group_indexer search_group="$group$" group=queue name=splunktcpin
+            | eval max=if(isnotnull(max_size_kb),max_size_kb,max_size)
+            | eval curr=if(isnotnull(current_size_kb),current_size_kb,current_size)
+            | eval fill_perc=round((curr/max)*100,2)
+            | `dmc_timechart_for_metrics_log` partial=f limit=25 $fillRatioAggrFunc$(fill_perc) AS fill_percentage by host
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.axisY.maximumNumber">100</option>
+        <option name="charting.axisLabelsY.majorUnit">25</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Queue % filled</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <title>Deployment-Wide $fillRatioAggrLabel$ Splunk TCP Input Queue Fill Ratio</title>
+      <chart>
+        <search>
+          <query>
+            `dmc_set_index_internal` sourcetype=splunkd source=*metrics.log search_group=dmc_group_indexer search_group="$group$" group=queue name=splunktcpin
+            | eval max=if(isnotnull(max_size_kb),max_size_kb,max_size)
+            | eval curr=if(isnotnull(current_size_kb),current_size_kb,current_size)
+            | eval fill_perc=round((curr/max)*100,2)
+            | `dmc_timechart_for_metrics_log` partial=f $fillRatioAggrFunc$(fill_perc) AS fill_percentage
+          </query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.axisY.maximumNumber">100</option>
+        <option name="charting.axisLabelsY.majorUnit">25</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Queue % filled</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel rejects="$snapshot$">
+      <html rejects="$split_by_indexer$">
+        <p>Count of instances grouped by the $fillRatioAggrLabel$ fill ratio of the Splunk TCP queue over time.</p>
+      </html>
+      <html depends="$split_by_indexer$">
+        <p>$fillRatioAggrLabel$ fill ratio of the Splunk TCP queue over time by instance.</p>
+      </html>
+    </panel>
+  </row>
+</form>

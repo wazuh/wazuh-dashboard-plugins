@@ -1,0 +1,77 @@
+#   Version 9.0.3
+#
+# Example 1
+# Deployment client receives apps and places them into the same
+# repositoryLocation (locally, relative to $SPLUNK_HOME) as it picked them
+# up from. This is typically $SPLUNK_HOME/etc/apps.  There
+# is nothing in [deployment-client] because the deployment client is not
+# overriding the value set on the deployment server side.
+
+[deployment-client]
+
+[target-broker:deploymentServer]
+targetUri= https://deploymentserver.splunk.mycompany.com:8089
+
+
+# Example 2
+# Deployment server keeps apps to be deployed in a non-standard location on
+# the server side (perhaps for organization purposes).
+# Deployment client receives apps and places them in the standard location.
+# Note: Apps deployed to any location other than
+# $SPLUNK_HOME/etc/apps on the deployment client side will
+# not be recognized and run.
+# This configuration rejects any location specified by the deployment server
+# and replaces it with the standard client-side location.
+
+[deployment-client]
+serverRepositoryLocationPolicy = rejectAlways
+repositoryLocation = $SPLUNK_HOME/etc/apps
+
+[target-broker:deploymentServer]
+targetUri= https://deploymentserver.splunk.mycompany.com:8089
+
+
+# Example 3
+# Deployment client should get apps from an HTTP server that is different
+# from the one specified by the deployment server.
+
+[deployment-client]
+serverEndpointPolicy = rejectAlways
+endpoint = http://apache.mycompany.server:8080/$serverClassName$/$appName$.tar
+
+[target-broker:deploymentServer]
+targetUri= https://deploymentserver.splunk.mycompany.com:8089
+
+
+# Example 4
+# Deployment client should get apps from a location on the file system and
+# not from a location specified by the deployment server
+
+[deployment-client]
+serverEndpointPolicy = rejectAlways
+endpoint = file:/<some_mount_point>/$serverClassName$/$appName$.tar
+handshakeRetryIntervalInSecs=20
+
+[target-broker:deploymentServer]
+targetUri= https://deploymentserver.splunk.mycompany.com:8089
+
+# Example 5
+# Deployment client should phonehome server for app updates quicker
+# Deployment client should only send back appEvents once a day
+
+[deployment-client]
+phoneHomeIntervalInSecs=30
+appEventsResyncIntervalInSecs=86400
+
+[target-broker:deploymentServer]
+targetUri= https://deploymentserver.splunk.mycompany.com:8089
+
+
+# Example 6
+# Sets the deployment client connection/transaction timeouts to 1 minute.
+# Deployment clients terminate connections if deployment server does not reply.
+
+[deployment-client]
+connect_timeout=60 
+send_timeout=60
+recv_timeout=60

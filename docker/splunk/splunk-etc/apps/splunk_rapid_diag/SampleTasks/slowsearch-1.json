@@ -1,0 +1,68 @@
+{
+  "__class__": "rapid_diag.task.Task",
+    "collectors": [
+        {
+            "__class__": "rapid_diag.collector.trigger.search_debug.SearchDebug",
+            "collectors": [
+                {
+                    "__class__": "rapid_diag.collector.trigger.periodic.Periodic",
+                    "collectors": [
+                        {
+                            "__class__": "rapid_diag.collector.stack_trace.StackTrace",
+                            "process": {
+                                "__class__": "rapid_diag.process_abstraction.SearchProcess",
+                                "default_value_description": "By default, the search process is selected.",
+                                "owning_app": null,
+                                "owning_user": null,
+                                "process": {
+                                    "__class__": "rapid_diag.process_abstraction.Process",
+                                    "args": "this is just a dummy process, will get replaced once user starts the search",
+                                    "name": "dummy",
+                                    "pid": 0,
+                                    "ppid": 0,
+                                    "process_type": "splunk search"
+                                },
+                                "root_sid": "",
+                                "running_app": "dummy",
+                                "running_user": "dummy",
+                                "savedsearch_name": "",
+                                "search": "search string"
+                            }
+                        },
+                        {
+                            "__class__": "rapid_diag.collector.netstat.NetStat"
+                        },
+                        {
+                          "__class__": "rapid_diag.collector.stack_trace.StackTrace",
+                          "process": {
+                            "name": "splunkd",
+                            "process_type": "splunkd server",
+                            "ppid": 0,
+                            "__class__": "rapid_diag.process_abstraction.Process",
+                            "pid": 0,
+                            "args": "splunkd",
+                            "default_value_description": "By default, the main splunkd process is selected."
+                            }
+                        }
+                    ],
+                    "interval": 0.5,
+                    "sampleCount": 1000
+                },
+                {
+                    "__class__": "rapid_diag.collector.iops.IOPS",
+                    "collection_time": 600
+                }
+            ],
+            "search_regex": "Rapid",
+            "action_needed": "Please specify a regular expression that matches the search to investigate"
+        },
+        {
+            "__class__": "rapid_diag.collector.diag.Diag"
+        }
+    ],
+  "name": "Slow search performance",
+  "collector_tool_names": "iops, netstat, pstack, splunkdiag",
+  "description": "For investigating slow performing searches. The collector monitors a specific search and logs network connections, process stacks, and I/O statistics on the host it is running on. Run the template on a search head. The template requires a regex match to a portion of the monitored search command. ",
+  "host": "",
+  "task_id": "SlowSearch-1"
+}

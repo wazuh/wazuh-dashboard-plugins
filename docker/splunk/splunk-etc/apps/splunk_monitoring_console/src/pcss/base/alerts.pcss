@@ -1,0 +1,77 @@
+/*===============================================================================================*/
+/*  SPLUNK: ALERTS                                                                               */
+/*===============================================================================================*/
+
+/*************************************************************************************************/
+/*  ALERTS CONTAINER                                                                             */
+/*************************************************************************************************/
+.alerts:not(.alerts-view) {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+/*************************************************************************************************/
+/*  BASE STYLES                                                                                  */
+/*************************************************************************************************/
+.alert {
+    margin-bottom: $lineHeight;
+    border-radius: $borderRadius;
+    position: relative;
+    padding: 8px 35px 8px 27px;
+    word-wrap: break-word;
+    color: $textColor;
+
+    .icon-alert {
+        font-size: 200%;
+        position: absolute;
+        left: 0px;
+        top: 8px;
+    }
+
+    h4 {
+        color: inherit;
+        margin: 0;
+    }
+    .close {
+      position: relative;
+      top: -2px;
+      right: -21px;
+      line-height: $lineHeight;
+    }
+}
+
+.alert-inline {
+    display: inline-block;
+    border: 0;
+    margin-bottom: 0;
+}
+
+
+/*************************************************************************************************/
+/*  ALERTS LEVELS                                                                                */
+/*************************************************************************************************/
+.alert-warning  .icon-alert {
+    color: $warningColor;
+}
+
+.alert-info .icon-alert {
+    color: $infoColor;
+    &:before {
+        content: 'I';
+    }
+}
+
+.alert-success .icon-alert {
+    color: $successColor;
+    &:before {
+        content: 'I';
+    }
+}
+
+.alert-404,
+.alert-error .icon-alert {
+    color: $errorColor;
+    &:before {
+        content: '\ECE2';
+    }
+}
