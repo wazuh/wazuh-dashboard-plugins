@@ -52,7 +52,7 @@
     "json2csv": "^4.1.2",
     "jwt-decode": "^3.1.2",
     "loglevel": "^1.7.1",
-    "markdown-it-link-attributes": "^3.0.0",
+    "markdown-it-link-attributes": "^4.0.1",
     "md5": "^2.3.0",
     "needle": "^2.0.1",
     "node-cron": "^1.1.2",
