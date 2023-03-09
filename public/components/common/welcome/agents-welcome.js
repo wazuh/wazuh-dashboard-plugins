@@ -531,7 +531,11 @@ class AgentsWelcome extends Component {
               <p>
                 The agent has been registered but has not yet connected to the manager.
             </p>
-              <a href={webDocumentationLink('user-manual/agents/agent-connection.html')} target="_blank">
+              <a
+                href={webDocumentationLink('user-manual/agents/agent-connection.html')}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 Checking connection with the Wazuh server
               </a>
             </Fragment>
