@@ -281,9 +281,6 @@ export const AgentsTable = withErrorBoundary(
     }
 
     formatAgent(agent) {
-      const checkField = (field) => {
-        return field !== undefined ? field : '-';
-      };
       const agentVersion = agent.version !== undefined ? agent.version.split(' ')[1] : '-';
       const node_name = agent.node_name && agent.node_name !== 'unknown' ? agent.node_name : '-';
       return {
@@ -292,7 +289,7 @@ export const AgentsTable = withErrorBoundary(
         ip: compressIPv6(agent.ip),
         status: agent.status,
         group_config_status: agent.group_config_status,
-        group: checkField(agent.group),
+        group: agent?.group || '-',
         os_name: agent,
         version: agentVersion,
         node_name: node_name,
@@ -336,11 +333,8 @@ export const AgentsTable = withErrorBoundary(
     }
 
     addIconPlatformRender(agent) {
-      let icon = false;
-      const checkField = (field) => {
-        return field !== undefined ? field : '-';
-      };
-      const os = (agent || {}).os;
+      let icon = '';
+      const os = agent?.os || {};
 
       if ((os?.uname || '').includes('Linux')) {
         icon = 'linux';
@@ -349,10 +343,7 @@ export const AgentsTable = withErrorBoundary(
       } else if (os?.platform === 'darwin') {
         icon = 'apple';
       }
-      const os_name =
-        checkField(agent?.os?.name) +
-        ' ' +
-        checkField(agent?.os?.version);
+      const os_name = `${agent?.os?.name || ''} ${agent?.os?.version || ''}`;
 
       return (
         <EuiFlexGroup gutterSize="xs">
@@ -360,7 +351,7 @@ export const AgentsTable = withErrorBoundary(
             className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`}
             aria-hidden="true"
           ></i></EuiFlexItem>{' '}
-          <EuiFlexItem>{os_name === '- -' ? '-' : os_name}</EuiFlexItem>
+          <EuiFlexItem>{os_name.trim() || '-'}</EuiFlexItem>
         </EuiFlexGroup>
       );
     }
