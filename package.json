@@ -5,7 +5,7 @@
   "stage": "pre-alpha",
   "commit": "19e41c3bf",
   "pluginPlatform": {
-    "version": "2.4.1"
+    "version": "2.6.0"
   },
   "description": "Wazuh dashboard",
   "keywords": [
