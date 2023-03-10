@@ -137,29 +137,4 @@ export const checkApiService =
       checkLogger.info('Removed [navigate] cookie');
       throw error;
     }
-<<<<<<< HEAD
   };
-=======
-    //update cluster info
-    const cluster_info = (((data || {}).data || {}).data || {}).cluster_info;
-    if (cluster_info) {
-      AppState.setClusterInfo(cluster_info);
-      checkLogger.info(`Set cluster info in cookie`);
-    }
-    if (data === 3099) {
-      checkLogger.error('Wazuh not ready yet');
-    } else if (data.data.error || data.data.data.apiIsDown) {
-      const errorMessage = data.data.data.apiIsDown
-        ? 'Wazuh API is down'
-        : `Error connecting to the API: ${
-            data.data.error && data.data.error.message ? ` ${data.data.error.message}` : ''
-          }`;
-      checkLogger.error(errorMessage);
-    }
-  } catch (error) {
-    AppState.removeNavigation();
-    checkLogger.info('Removed [navigate] cookie');
-    throw error;
-  }
-};
->>>>>>> f0c94d20f (Fixed catch error throw string instead error)
