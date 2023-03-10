@@ -1,30 +1,22 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 /**
 
-Runs Jest tests using into a Docker container.
+Runs Jest tests using a Docker container.
 
-Uses development images.
+Uses development images. Must be executed from the root folder of the project.
 
-# Parameters
+# Usage:
 # -------------
-#   - APP: osd (OpenSearch Dashboards) or kbn (Kibana)
-#   - VERSION: OpenSearch Dashboards / Kibana version
-#   - REPO: Path to the Wazuh app repository
-# Example
-# -------------
-# APP="osd" VERSION="2.6.0" REPO=$(WZ_HOME) docker-compose up
-# APP="kbn" VERSION="7.10.2" REPO=$(WZ_HOME) docker-compose up
+#   - node scripts/jest-runner [<jest_cli_options>]
+#   - yarn test:jest:runner [<jest_cli_options>]
 
 */
 const childProcess = require('child_process');
 const fs = require('fs');
 
-const projectDirectory = process.cwd();
-console.log(projectDirectory);
-
 /**
  * Reads the package.json file.
- * @returns {Object} Package.json file
+ * @returns {Object} JSON object.
  */
 function loadPackageJson() {
   const packageJson = fs.readFileSync('./package.json');
@@ -32,8 +24,19 @@ function loadPackageJson() {
 }
 
 /**
+ * Transforms the Jest CLI options from process.argv back to a string.
+ * If no options are provided, default ones are generated.
+ * @returns {String} Space separated string with all Jest CLI options provided.
+ */
+function buildJestArgs() {
+  return (
+    process.argv.filter(arg => arg.startsWith('--')) || ['--runInBand'])
+    .join(' ');
+};
+
+/**
  * Generates the execution parameters if they are not set.
- * @returns {Object} Default environment variables
+ * @returns {Object} Default environment variables.
  */
 const defaultEnvVars = () => {
   const manifest = loadPackageJson();
@@ -41,7 +44,8 @@ const defaultEnvVars = () => {
   return {
     APP: manifest['keywords'].includes('opensearch_dashboards') ? 'osd' : 'kbn',
     VERSION: manifest['pluginPlatform']['version'],
-    REPO: './',
+    REPO: process.cwd(),
+    JEST_ARGS: buildJestArgs(),
   };
 };
 
