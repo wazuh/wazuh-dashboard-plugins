@@ -158,7 +158,7 @@ export class AgentInfo extends Component {
       arrayStats = [
         { title: agent.id, description: 'ID', style: { minWidth: 30 } },
         { title: agent.status, description: 'Status', style: { minWidth: 130 } },
-        { title: compressIPv6(agent.ip), description: 'IP', style: {} },
+        { title: compressIPv6(agent.ip), description: 'IP address', style: { minWidth: 80 } },
         { title: agent.version, description: 'Version', style: { minWidth: 100 } },
         { title: agent.group, description: 'Groups', style: { minWidth: 150 } },
         { title: agent.name, description: 'Operating system', style: { minWidth: 150 } },
@@ -169,8 +169,6 @@ export class AgentInfo extends Component {
     }
 
     const stats = this.buildStats(arrayStats);
-
-    // window.innerWidth < 1500 ? console.log("<1500") : console.log("max")
 
     return (
       <Fragment>

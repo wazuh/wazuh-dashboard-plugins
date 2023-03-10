@@ -417,212 +417,213 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
             (agent || {}).status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED &&
             !this.state.policies.length &&
             !this.state.loading && (
-              <EuiCallOut title='No scans available' iconType='iInCircle'>
-                <EuiButton color='primary' onClick={() => this.initialize()}>
+            <EuiCallOut title='No scans available' iconType='iInCircle'>
+              <EuiButton color='primary' onClick={() => this.initialize()}>
                   Refresh
-                </EuiButton>
-              </EuiCallOut>
-            )}
+              </EuiButton>
+            </EuiCallOut>
+          )}
 
           {agent &&
             (agent || {}).status === API_NAME_AGENT_STATUS.NEVER_CONNECTED &&
             !this.state.loading && (
-              <EuiCallOut
-                title='Agent has never connected'
-                style={{ width: '100%' }}
-                iconType='iInCircle'
-              >
-                <EuiButton color='primary' onClick={() => this.initialize()}>
+            <EuiCallOut
+              title='Agent has never connected'
+              style={{ width: '100%' }}
+              iconType='iInCircle'
+            >
+              <EuiButton color='primary' onClick={() => this.initialize()}>
                   Refresh
-                </EuiButton>
-              </EuiCallOut>
-            )}
+              </EuiButton>
+            </EuiCallOut>
+          )}
           {agent &&
             (agent || {}).os &&
             !this.state.lookingPolicy &&
             this.state.policies.length > 0 &&
             !this.state.loading &&
             !this.state.checksIsLoading && (
-              <div>
-                {this.state.policies.length && (
-                  <EuiFlexGroup style={{ marginTop: 0 }}>
-                    {this.state.policies.map((policy: any, idx) => (
-                      <EuiFlexItem key={idx} grow={false}>
-                        <EuiCard
-                          title
-                          description
-                          betaBadgeLabel={policy.name}
-                          style={{ paddingBottom: 0 }}
-                        >
-                          <VisualizationBasic
-                            type='donut'
-                            size={{ width: '100%', height: '150px' }}
-                            data={[
-                              {
-                                label: MODULE_SCA_CHECK_RESULT_LABEL.passed,
-                                value: policy.pass,
-                                color: '#00a69b',
-                              },
-                              {
-                                label: MODULE_SCA_CHECK_RESULT_LABEL.failed,
-                                value: policy.fail,
-                                color: '#ff645c',
-                              },
-                              {
-                                label: MODULE_SCA_CHECK_RESULT_LABEL['not applicable'],
-                                value: policy.invalid,
-                                color: '#5c6773',
-                              },
-                            ]}
-                            showLegend
-                            noDataTitle='No results'
-                            noDataMessage='No results were found.'
-                          />
-                          <EuiSpacer size='m' />
-                        </EuiCard>
-                      </EuiFlexItem>
-                    ))}
-                  </EuiFlexGroup>
-                )}
-                <EuiSpacer size='m' />
-                <EuiFlexGroup>
-                  <EuiFlexItem>
-                    <EuiPanel>
-                      <SCAPoliciesTable
-                        agent={this.props.agent}
-                        columns={this.columnsPolicies}
-                        rowProps={handlePoliciesTableClickRow}
-                      />
-                    </EuiPanel>
-                  </EuiFlexItem>
+            <div>
+              {this.state.policies.length && (
+                <EuiFlexGroup style={{ marginTop: 0 }}>
+                  {this.state.policies.map((policy: any, idx) => (
+                    <EuiFlexItem key={idx} grow={false}>
+                      <EuiCard
+                        title
+                        description
+                        betaBadgeLabel={policy.name}
+                        style={{ paddingBottom: 0 }}
+                      >
+                        <VisualizationBasic
+                          type='donut'
+                          size={{ width: '100%', height: '150px' }}
+                          data={[
+                            {
+                              label: MODULE_SCA_CHECK_RESULT_LABEL.passed,
+                              value: policy.pass,
+                              color: '#00a69b',
+                            },
+                            {
+                              label: MODULE_SCA_CHECK_RESULT_LABEL.failed,
+                              value: policy.fail,
+                              color: '#ff645c',
+                            },
+                            {
+                              label: MODULE_SCA_CHECK_RESULT_LABEL['not applicable'],
+                              value: policy.invalid,
+                              color: '#5c6773',
+                            },
+                          ]}
+                          showLegend
+                          noDataTitle='No results'
+                          noDataMessage='No results were found.'
+                        />
+                        <EuiSpacer size='m' />
+                      </EuiCard>
+                    </EuiFlexItem>
+                  ))}
                 </EuiFlexGroup>
-              </div>
-            )}
+              )}
+              <EuiSpacer size='m' />
+              <EuiFlexGroup>
+                <EuiFlexItem>
+                  <EuiPanel>
+                    <SCAPoliciesTable
+                      agent={this.props.agent}
+                      columns={this.columnsPolicies}
+                      rowProps={handlePoliciesTableClickRow}
+                    />
+                  </EuiPanel>
+                </EuiFlexItem>
+              </EuiFlexGroup>
+            </div>
+          )}
           {agent &&
             (agent || {}).os &&
             this.state.lookingPolicy &&
             (!this.state.loading || !this.state.checksIsLoading) && (
-              <div>
-                <EuiPanel paddingSize='l'>
-                  <EuiFlexGroup>
-                    <EuiFlexItem grow={false}>
-                      <EuiButtonIcon
-                        color='primary'
-                        style={{ padding: '6px 0px' }}
-                        onClick={
-                          this.state.secondTableBack
-                            ? ev => this.handleBack(ev)
-                            : () => this.loadScaPolicy(false)
-                        }
-                        iconType='arrowLeft'
-                        aria-label='Back to policies'
-                        {...{ iconSize: 'l' }}
-                      />
-                    </EuiFlexItem>
-                    <EuiFlexItem>
-                      <EuiTitle size='s'>
-                        <h2>
-                          {this.state.lookingPolicy.name}&nbsp;
-                          <EuiToolTip
-                            position='right'
-                            content='Show policy checksum'
+            <div>
+              <EuiPanel paddingSize='l'>
+                <EuiFlexGroup>
+                  <EuiFlexItem grow={false}>
+                    <EuiButtonIcon
+                      color='primary'
+                      style={{ padding: '6px 0px' }}
+                      onClick={
+                        this.state.secondTableBack
+                          ? ev => this.handleBack(ev)
+                          : () => this.loadScaPolicy(false)
+                      }
+                      iconType='arrowLeft'
+                      aria-label='Back to policies'
+                      {...{ iconSize: 'l' }}
+                    />
+                  </EuiFlexItem>
+                  <EuiFlexItem>
+                    <EuiTitle size='s'>
+                      <h2>
+                        {this.state.lookingPolicy.name}&nbsp;
+                        <EuiToolTip
+                          position='right'
+                          content='Show policy checksum'
+                        >
+                          <EuiPopover
+                            button={buttonPopover}
+                            isOpen={this.state.showMoreInfo}
+                            closePopover={() =>
+                              this.setState({ showMoreInfo: false })
+                            }
                           >
-                            <EuiPopover
-                              button={buttonPopover}
-                              isOpen={this.state.showMoreInfo}
-                              closePopover={() =>
-                                this.setState({ showMoreInfo: false })
-                              }
-                            >
-                              <EuiFlexItem style={{ width: 700 }}>
-                                <EuiSpacer size='s' />
-                                <EuiText>
-                                  <b>Policy description:</b>{' '}
-                                  {this.state.lookingPolicy.description}
-                                  <br></br>
-                                  <b>Policy checksum:</b>{' '}
-                                  {this.state.lookingPolicy.hash_file}
-                                </EuiText>
-                              </EuiFlexItem>
-                            </EuiPopover>
-                          </EuiToolTip>
-                        </h2>
-                      </EuiTitle>
-                    </EuiFlexItem>
-                  </EuiFlexGroup>
-                  <EuiSpacer size='m' />
-                  <EuiFlexGroup>
-                    <EuiFlexItem>
-                      <EuiStat
-                        title={this.buttonStat(
-                          this.state.lookingPolicy.pass,
-                          'result',
-                          'passed',
-                        )}
-                        description={MODULE_SCA_CHECK_RESULT_LABEL.passed}
-                        titleColor='secondary'
-                        titleSize='m'
-                        textAlign='center'
-                      />
-                    </EuiFlexItem>
-                    <EuiFlexItem>
-                      <EuiStat
-                        title={this.buttonStat(
-                          this.state.lookingPolicy.fail,
-                          'result',
-                          'failed',
-                        )}
-                        description={MODULE_SCA_CHECK_RESULT_LABEL.failed}
-                        titleColor='danger'
-                        titleSize='m'
-                        textAlign='center'
-                      />
-                    </EuiFlexItem>
-                    <EuiFlexItem>
-                      <EuiStat
-                        title={this.buttonStat(
-                          this.state.lookingPolicy.invalid,
-                          'result',
-                          'not applicable',
-                        )}
-                        description={MODULE_SCA_CHECK_RESULT_LABEL['not applicable']}
-                        titleColor='subdued'
-                        titleSize='m'
-                        textAlign='center'
-                      />
-                    </EuiFlexItem>
-                    <EuiFlexItem>
-                      <EuiStat
-                        title={`${this.state.lookingPolicy.score}%`}
-                        description='Score'
-                        titleColor='accent'
-                        titleSize='m'
-                        textAlign='center'
-                      />
-                    </EuiFlexItem>
-                    <EuiFlexItem>
-                      <EuiStat
-                        title={formatUIDate(this.state.lookingPolicy.end_scan)}
-                        description='End scan'
-                        titleColor='primary'
-                        titleSize='s'
-                        textAlign='center'
-                        style={{ padding: 5 }}
-                      />
-                    </EuiFlexItem>
-                  </EuiFlexGroup>
-                  <EuiSpacer size='m' />
-                  <EuiFlexGroup>
-                    <EuiFlexItem>
-                      <InventoryPolicyChecksTable
-                        agent={this.props.agent}
-                        lookingPolicy={this.state.lookingPolicy}
-                      />
-                    </EuiFlexItem>
-                  </EuiFlexGroup>
-                </EuiPanel>
-              </div>
-            )}
+                            <EuiFlexItem style={{ width: 700 }}>
+                              <EuiSpacer size='s' />
+                              <EuiText>
+                                <b>Policy description:</b>{' '}
+                                {this.state.lookingPolicy.description}
+                                <br></br>
+                                <b>Policy checksum:</b>{' '}
+                                {this.state.lookingPolicy.hash_file}
+                              </EuiText>
+                            </EuiFlexItem>
+                          </EuiPopover>
+                        </EuiToolTip>
+                      </h2>
+                    </EuiTitle>
+                  </EuiFlexItem>
+                </EuiFlexGroup>
+                <EuiSpacer size='m' />
+                <EuiFlexGroup>
+                  <EuiFlexItem>
+                    <EuiStat
+                      title={this.buttonStat(
+                        this.state.lookingPolicy.pass,
+                        'result',
+                        'passed',
+                      )}
+                      description={MODULE_SCA_CHECK_RESULT_LABEL.passed}
+                      titleColor='secondary'
+                      titleSize='m'
+                      textAlign='center'
+                    />
+                  </EuiFlexItem>
+                  <EuiFlexItem>
+                    <EuiStat
+                      title={this.buttonStat(
+                        this.state.lookingPolicy.fail,
+                        'result',
+                        'failed',
+                      )}
+                      description={MODULE_SCA_CHECK_RESULT_LABEL.failed}
+                      titleColor='danger'
+                      titleSize='m'
+                      textAlign='center'
+                    />
+                  </EuiFlexItem>
+                  <EuiFlexItem>
+                    <EuiStat
+                      title={this.buttonStat(
+                        this.state.lookingPolicy.invalid,
+                        'result',
+                        'not applicable',
+                      )}
+                      description={MODULE_SCA_CHECK_RESULT_LABEL['not applicable']}
+                      titleColor='subdued'
+                      titleSize='m'
+                      textAlign='center'
+                    />
+                  </EuiFlexItem>
+                  <EuiFlexItem>
+                    <EuiStat
+                      title={`${this.state.lookingPolicy.score}%`}
+                      description='Score'
+                      titleColor='accent'
+                      titleSize='m'
+                      textAlign='center'
+                    />
+                  </EuiFlexItem>
+                  <EuiFlexItem>
+                    <EuiStat
+                      title={formatUIDate(this.state.lookingPolicy.end_scan)}
+                      description='End scan'
+                      titleColor='primary'
+                      titleSize='s'
+                      textAlign='center'
+                      style={{ padding: 5 }}
+                    />
+                  </EuiFlexItem>
+                </EuiFlexGroup>
+                <EuiSpacer size='m' />
+                <EuiFlexGroup>
+                  <EuiFlexItem>
+                    <InventoryPolicyChecksTable
+                      agent={this.props.agent}
+                      filters={this.state.filters}
+                      lookingPolicy={this.state.lookingPolicy}
+                    />
+                  </EuiFlexItem>
+                </EuiFlexGroup>
+              </EuiPanel>
+            </div>
+          )}
         </EuiPage>
       </Fragment>
     );
