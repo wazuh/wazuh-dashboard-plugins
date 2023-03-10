@@ -32,7 +32,15 @@ export class WzBlankScreen extends Component {
               <a href={PLUGIN_PLATFORM_URL_GUIDE}>{PLUGIN_PLATFORM_URL_GUIDE_TITLE}</a>
               <br />
               <br />
-              <a href={webDocumentationLink(PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_TROUBLESHOOTING)}>Wazuh installation guide</a>
+              <a
+                href={webDocumentationLink(
+                  PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_TROUBLESHOOTING,
+                )}
+                target='_blank'
+                rel='noopener noreferrer'
+              >
+                Wazuh installation guide
+              </a>
             </p>
             <EuiSpacer />
 

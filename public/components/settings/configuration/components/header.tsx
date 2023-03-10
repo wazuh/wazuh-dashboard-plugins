@@ -59,6 +59,7 @@ const Title = () => {
               iconSize="l"
               aria-label="Help"
               target="_blank"
+              rel="noopener noreferrer"
               href={webDocumentationLink(PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_APP_CONFIGURATION)}
             ></EuiButtonIcon>
           </EuiToolTip>
@@ -80,7 +81,7 @@ const SubTitle = () => {
 
 const SearchBar = ({query, setQuery, searchBarFilters}) => {
   const [error, setError] = useState();
-  
+
   useEffect(() => {
     getDefaultCategory(setQuery)
   }, []);
@@ -93,7 +94,7 @@ const SearchBar = ({query, setQuery, searchBarFilters}) => {
       setQuery(args);
     }
   };
-  
+
   return (
     <>
       <EuiSearchBar
