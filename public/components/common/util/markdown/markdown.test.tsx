@@ -1,4 +1,4 @@
-  
+
 /*
  * Wazuh app - Markdown Component - Test
  *
@@ -25,6 +25,12 @@ describe('Markdown container', () => {
 
   test('should render a link', () => {
     const component = shallow(<Markdown markdown={`[label](https://example.com)`}/>);
-    expect(component.html().includes('<a href="https://example.com" target="_blank">label</a>')).toBe(true);
+    expect(
+      component
+        .html()
+        .includes(
+          '<a href="https://example.com" target="_blank" rel="noopener noreferrer">label</a>',
+        ),
+    ).toBe(true);
   });
 });

@@ -209,16 +209,16 @@ function HealthCheckComponent() {
       if (word.includes('http://') || word.includes('https://')) {
         if (words[index - 1] === 'guide:') {
           if (word.endsWith('.') || word.endsWith(',')) {
-            words[index - 2] = `<a href="${word.slice(0, -1)}" target="_blank">${words[index - 2]} ${words[index - 1].slice(0, -1)}</a>${word.slice(-1)}`;
+            words[index - 2] = `<a href="${word.slice(0, -1)}" rel="noopener noreferrer" target="_blank">${words[index - 2]} ${words[index - 1].slice(0, -1)}</a>${word.slice(-1)}`;
           } else {
-            words[index - 2] = `<a href="${word}" target="_blank">${words[index - 2]} ${words[index - 1].slice(0, -1)}</a> `;
+            words[index - 2] = `<a href="${word}" rel="noopener noreferrer" target="_blank">${words[index - 2]} ${words[index - 1].slice(0, -1)}</a> `;
           }
           words.splice(index - 1, 2);
         } else{
           if (word.endsWith('.') || word.endsWith(',')) {
-            words[index] = `<a href="${word.slice(0, -1)}" target="_blank">${word.slice(0, -1)}</a>${word.slice(-1)}`;
+            words[index] = `<a href="${word.slice(0, -1)}" rel="noopener noreferrer" target="_blank">${word.slice(0, -1)}</a>${word.slice(-1)}`;
           } else {
-            words[index] = `<a href="${word}" target="_blank">${word}</a>`;
+            words[index] = `<a href="${word}" rel="noopener noreferrer" target="_blank">${word}</a>`;
           }
         }
       }
