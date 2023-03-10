@@ -26,7 +26,11 @@ export const ClusterDisabled = withErrorBoundary (class ClusterDisabled extends 
             {!this.props.enabled && (
               <p>
                 Visit the documentation on{' '}
-                <a href={webDocumentationLink('user-manual/configuring-cluster/index.html')}>
+                <a
+                  href={webDocumentationLink('user-manual/configuring-cluster/index.html')}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                >
                   this link
                 </a>{' '}
                 to learn about how to enable it.
