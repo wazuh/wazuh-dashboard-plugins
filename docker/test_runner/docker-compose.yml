@@ -1,0 +1,24 @@
+version: "3"
+
+# Parameters
+# -------------
+#   - APP: osd (OpenSearch Dashboards) or kbn (Kibana)
+#   - VERSION: OpenSearch Dashboards / Kibana version
+#   - REPO: Path to the Wazuh app repository
+# Example
+# -------------
+# APP="osd" VERSION="2.6.0" REPO=$(WZ_HOME) docker-compose up
+
+# yarn config set registry https://registry.yarnpkg.com;
+services:
+  test_runner:
+    container_name: jest
+    image:  quay.io/wazuh/$APP-dev:$VERSION
+    working_dir: /home/node/kbn/plugins/wazuh
+    volumes:
+      - $REPO:/home/node/kbn/plugins/wazuh
+    command: /bin/bash -c '
+        pwd;
+        yarn;
+        yarn test:jest --runInBand
+      '

@@ -40,6 +40,7 @@
     "test:server": "plugin-helpers test:server",
     "test:browser": "plugin-helpers test:browser",
     "test:jest": "node scripts/jest",
+    "test:jest:runner": "node scripts/jest-runner",
     "generate:api-4.0-info": "cd scripts/generate-api-4.0-info;./generate-api-4.0-info.sh;cd ../..",
     "prebuild": "node scripts/generate-build-version"
   },
