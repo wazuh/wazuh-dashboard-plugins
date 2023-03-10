@@ -1,3 +1,4 @@
+/* eslint-disable array-element-newline */
 /* eslint-disable @typescript-eslint/no-var-requires */
 /**
 
@@ -29,8 +30,9 @@ function loadPackageJson() {
  * @returns {String} Space separated string with all Jest CLI options provided.
  */
 function buildJestArgs() {
-  return (
-    process.argv.filter(arg => arg.startsWith('--')) || ['--runInBand'])
+  // Remove duplicates using set
+  return Array.from(new Set([ ...process.argv, '--runInBand' ]))
+    .filter(opt => opt.startsWith('--'))
     .join(' ');
 };
 
@@ -50,7 +52,6 @@ const defaultEnvVars = () => {
 };
 
 // Check the required environment variables are set
-// eslint-disable-next-line array-element-newline
 for (const [ key, value ] of Object.entries(defaultEnvVars())) {
   if (!process.argv.includes(key)) {
     process.env[key] = value;
@@ -74,8 +75,4 @@ runner.stdout.on('data', data => {
 
 runner.stderr.on('data', data => {
   console.error(`${data}`);
-});
-
-runner.on('close', code => {
-  console.log(`child process exited with code ${code}`);
 });
