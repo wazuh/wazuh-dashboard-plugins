@@ -86,6 +86,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed the module information button in Office365 and Github Panel tab to open the nav drawer. [#5167](https://github.com/wazuh/wazuh-kibana-app/pull/5167)
 - Fixed a UI crash due to `external_references` field could be missing in some vulnerability data [#5200](https://github.com/wazuh/wazuh-kibana-app/pull/5200)
 - Fixed Wazuh main menu not displayed when navigation menu is locked [#5273](https://github.com/wazuh/wazuh-kibana-app/pull/5273)
+- Fixed events view when search bar language is `lucene` [#5286](https://github.com/wazuh/wazuh-kibana-app/pull/5286)
 
 ### Removed
 
