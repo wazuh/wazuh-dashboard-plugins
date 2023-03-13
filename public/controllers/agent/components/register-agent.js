@@ -204,9 +204,9 @@ export const RegisterAgent = withErrorBoundary(
       if (remoteConfig) {
         this.setState({
           haveUdpProtocol: remoteConfig.isUdp,
-          haveConnectionSecure: remoteConfig.isSecure,
+          haveConnectionSecure: remoteConfig.haveSecureConnection,
           udpProtocol: remoteConfig.isUdp,
-          connectionSecure: remoteConfig.isSecure,
+          connectionSecure: remoteConfig.haveSecureConnection,
         })
       }
     }
