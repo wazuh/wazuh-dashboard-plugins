@@ -1162,6 +1162,7 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
                       <span>
                         Might require some extra installation{' '}
                         <EuiLink
+                          rel='noopener noreferrer'
                           target='_blank'
                           href={webDocumentationLink(
                             'installation-guide/wazuh-agent/wazuh-agent-package-solaris.html',
@@ -1201,6 +1202,7 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
                       <span>
                         Might require some extra installation{' '}
                         <EuiLink
+                          rel='noopener noreferrer'
                           target='_blank'
                           href={webDocumentationLink(
                             'installation-guide/wazuh-agent/wazuh-agent-package-aix.html',
@@ -1225,6 +1227,7 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
                       <span>
                         Might require some extra installation{' '}
                         <EuiLink
+                          rel='noopener noreferrer'
                           target='_blank'
                           href={webDocumentationLink(
                             'installation-guide/wazuh-agent/wazuh-agent-package-hpux.html',
@@ -1264,6 +1267,7 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
                       <span>
                         Might require some extra installation{' '}
                         <EuiLink
+                          rel='noopener noreferrer'
                           target='_blank'
                           href={webDocumentationLink(
                             'installation-guide/wazuh-agent/wazuh-agent-package-linux.html',
@@ -1306,6 +1310,7 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
                       <span>
                         Might require some extra installation{' '}
                         <EuiLink
+                          rel='noopener noreferrer'
                           target='_blank'
                           href={webDocumentationLink(
                             'installation-guide/wazuh-agent/wazuh-agent-package-linux.html',
@@ -1353,6 +1358,7 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
                   <>
                     Warning: there's no{' '}
                     <EuiLink
+                      rel='noopener noreferrer'
                       target='_blank'
                       href={webDocumentationLink(
                         'user-manual/deployment-variables/deployment-variables.html',
