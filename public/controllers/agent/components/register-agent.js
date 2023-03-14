@@ -1138,8 +1138,7 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
               <EuiSpacer />
               {windowsAdvice}
               {['windowsxp', 'windowsserver2008'].includes(
-                this.state.selectedVersion,
-              ) === 'windowsxp' && (
+                this.state.selectedVersion) && (
                 <>
                   <EuiCallOut
                     color='warning'
