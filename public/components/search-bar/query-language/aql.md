@@ -170,12 +170,12 @@ implicitQuery: 'id!=000;'
 
 ```mermaid
 graph TD;
-    user_input[User input]-->tokenizerAPI;
-    subgraph tokenizerAPI
+    user_input[User input]-->tokenizer;
+    subgraph tokenizer
         tokenize_regex[Wazuh API `q` regular expression]
     end
 
-    tokenizerAPI-->tokens;
+    tokenizer-->tokens;
     
     tokens-->searchBarProps;
     subgraph searchBarProps;

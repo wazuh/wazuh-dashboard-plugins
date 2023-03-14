@@ -643,8 +643,7 @@ export const AgentsTable = withErrorBoundary(
                         { label: 'os.platform', description: 'Operating system platform' },
                         { label: 'status', description: 'Status' },
                         { label: 'version', description: 'Version' },
-                      ]
-                      .map(field => ({ type: 'field', ...field }));
+                      ];
                     },
                     value: async (currentValue, { previousField }) => {
                       switch (previousField) {
@@ -686,7 +685,6 @@ export const AgentsTable = withErrorBoundary(
                         case 'group_config_status':
                           return [AGENT_SYNCED_STATUS.SYNCED, AGENT_SYNCED_STATUS.NOT_SYNCED].map(
                             (status) => ({
-                              type: 'value',
                               label: status,
                             }),
                           );
@@ -736,7 +734,6 @@ export const AgentsTable = withErrorBoundary(
                         case 'status':
                           return UI_ORDER_AGENT_STATUS.map(
                             (status) => ({
-                              type: 'value',
                               label: status,
                             }),
                           );
@@ -817,7 +814,6 @@ export const AgentsTable = withErrorBoundary(
                         case 'group_config_status':
                           return [AGENT_SYNCED_STATUS.SYNCED, AGENT_SYNCED_STATUS.NOT_SYNCED].map(
                             (status) => ({
-                              type: 'value',
                               label: status,
                             }),
                           );
@@ -867,7 +863,6 @@ export const AgentsTable = withErrorBoundary(
                         case 'status':
                           return UI_ORDER_AGENT_STATUS.map(
                             (status) => ({
-                              type: 'value',
                               label: status,
                             }),
                           );

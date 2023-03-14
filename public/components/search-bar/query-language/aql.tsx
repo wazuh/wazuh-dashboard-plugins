@@ -70,7 +70,7 @@ const suggestionMappingLanguageTokenType = {
 };
 
 /**
- * Creator of intermediate interfacte of EuiSuggestItem
+ * Creator of intermediate interface of EuiSuggestItem
  * @param type 
  * @returns 
  */
@@ -92,7 +92,7 @@ const mapSuggestionCreatorValue = mapSuggestionCreator('value');
  * @param input
  * @returns
  */
-export function tokenizerAPI(input: string): ITokens{
+export function tokenizer(input: string): ITokens{
   // API regular expression
   // https://github.com/wazuh/wazuh/blob/v4.4.0-rc1/framework/wazuh/core/utils.py#L1242-L1257
   //   self.query_regex = re.compile(
@@ -145,18 +145,31 @@ export function tokenizerAPI(input: string): ITokens{
       ).flat();
 };
 
-type OptionSuggestionHandler = (
+type QLOptionSuggestionEntityItem = {
+  description?: string
+  label: string
+};
+
+type QLOptionSuggestionEntityItemTyped =
+  QLOptionSuggestionEntityItem
+  & { type: 'operator_group'|'field'|'operator_compare'|'value'|'conjunction' };
+
+type SuggestItem = QLOptionSuggestionEntityItem & {
+  type: { iconType: string, color: string }
+};
+
+type QLOptionSuggestionHandler = (
   currentValue: string | undefined,
   {
     previousField,
     previousOperatorCompare,
   }: { previousField: string; previousOperatorCompare: string },
-) => Promise<{ description?: string; label: string }[]>;
+) => Promise<QLOptionSuggestionEntityItem[]>;
 
 type optionsQL = {
   suggestions: {
-    field: OptionSuggestionHandler;
-    value: OptionSuggestionHandler;
+    field: QLOptionSuggestionHandler;
+    value: QLOptionSuggestionHandler;
   };
 };
 
@@ -205,7 +218,7 @@ function getLastTokenWithValueByType(
  * @param options
  * @returns
  */
-export async function getSuggestionsAPI(tokens: ITokens, options: optionsQL) {
+export async function getSuggestions(tokens: ITokens, options: optionsQL): Promise<QLOptionSuggestionEntityItemTyped[]> {
   if (!tokens.length) {
     return [];
   }
@@ -368,19 +381,27 @@ export async function getSuggestionsAPI(tokens: ITokens, options: optionsQL) {
 
 /**
  * Transform the suggestion object to the expected object by EuiSuggestItem
+ * @param param0 
+ * @returns 
+ */
+export function transformSuggestionToEuiSuggestItem(suggestion: QLOptionSuggestionEntityItemTyped): SuggestItem{
+  const { type, ...rest} = suggestion;
+  return {
+    type: { ...suggestionMappingLanguageTokenType[type] },
+    ...rest
+  };
+};
+
+/**
+ * Transform the suggestion object to the expected object by EuiSuggestItem
  * @param suggestions
- * @param options
  * @returns
  */
-function transformSuggestionsToUI(
-  suggestions: { type: string; label: string; description?: string }[],
-  mapSuggestionByLanguageToken: any,
-) {
-  return suggestions.map(({ type, ...rest }) => ({
-    type: { ...mapSuggestionByLanguageToken[type] },
-    ...rest,
-  }));
-}
+function transformSuggestionsToEuiSuggestItem(
+  suggestions: QLOptionSuggestionEntityItemTyped[]
+): SuggestItem[] {
+  return suggestions.map(transformSuggestionToEuiSuggestItem);
+};
 
 /**
  * Get the output from the input
@@ -408,15 +429,14 @@ export const AQL = {
   },
   async run(input, params) {
     // Get the tokens from the input
-    const tokens: ITokens = tokenizerAPI(input);
+    const tokens: ITokens = tokenizer(input);
 
     return {
       searchBarProps: {
         // Props that will be used by the EuiSuggest component
         // Suggestions
-        suggestions: transformSuggestionsToUI(
-          await getSuggestionsAPI(tokens, params.queryLanguage.parameters),
-          suggestionMappingLanguageTokenType,
+        suggestions: transformSuggestionsToEuiSuggestItem(
+          await getSuggestions(tokens, params.queryLanguage.parameters)
         ),
         // Handler to manage when clicking in a suggestion item
         onItemClick: item => {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { EuiButtonEmpty, EuiPopover, EuiText, EuiCode } from '@elastic/eui';
-import { tokenizerAPI as tokenizerUQL } from './aql';
+import { tokenizer as tokenizerUQL } from './aql';
 import { pluginPlatform } from '../../../../package.json';
 
 /* UI Query language
@@ -38,9 +38,6 @@ Implemented schema:
 const language = {
   // Tokens
   tokens: {
-    field: {
-      regex: /[\w.]/,
-    },
     // eslint-disable-next-line camelcase
     operator_compare: {
       literal: {
@@ -80,6 +77,48 @@ const suggestionMappingLanguageTokenType = {
   function_search: { iconType: 'search', color: 'tint5' },
 };
 
+/**
+ * Creator of intermediate interface of EuiSuggestItem
+ * @param type 
+ * @returns 
+ */
+function mapSuggestionCreator(type: ITokenType ){
+  return function({...params}){
+    return {
+      type,
+      ...params
+    };
+  };
+};
+
+const mapSuggestionCreatorField = mapSuggestionCreator('field');
+const mapSuggestionCreatorValue = mapSuggestionCreator('value');
+
+/**
+ * Transform the conjunction to the query language syntax
+ * @param conjunction 
+ * @returns 
+ */
+function transformQLConjunction(conjunction: string): string{
+  // If the value has a whitespace or comma, then
+  return conjunction === ';'
+    ? ' and '
+    : ' or ';
+};
+
+/**
+ * Transform the value to the query language syntax
+ * @param value 
+ * @returns 
+ */
+function transformQLValue(value: string): string{
+  // If the value has a whitespace or comma, then
+  return /[\s|"]/.test(value)
+    // Escape the commas (") => (\") and wraps the string with commas ("<string>")
+    ? `"${value.replace(/"/, '\\"')}"`
+    // Raw value
+    : value;
+};
 
 /**
  * Tokenize the input string. Returns an array with the tokens.
@@ -135,18 +174,31 @@ export function tokenizer(input: string): ITokens{
       ).flat();
 };
 
-type OptionSuggestionHandler = (
+type QLOptionSuggestionEntityItem = {
+  description?: string
+  label: string
+};
+
+type QLOptionSuggestionEntityItemTyped =
+  QLOptionSuggestionEntityItem
+  & { type: 'operator_group'|'field'|'operator_compare'|'value'|'conjunction' };
+
+type SuggestItem = QLOptionSuggestionEntityItem & {
+  type: { iconType: string, color: string }
+};
+
+type QLOptionSuggestionHandler = (
   currentValue: string | undefined,
   {
     previousField,
     previousOperatorCompare,
   }: { previousField: string; previousOperatorCompare: string },
-) => Promise<{ description?: string; label: string; type: string }[]>;
+) => Promise<QLOptionSuggestionEntityItem[]>;
 
 type optionsQL = {
   suggestions: {
-    field: OptionSuggestionHandler;
-    value: OptionSuggestionHandler;
+    field: QLOptionSuggestionHandler;
+    value: QLOptionSuggestionHandler;
   };
 };
 
@@ -195,7 +247,7 @@ function getLastTokenWithValueByType(
  * @param options
  * @returns
  */
-export async function getSuggestions(tokens: ITokens, options: optionsQL) {
+export async function getSuggestions(tokens: ITokens, options: optionsQL): Promise<QLOptionSuggestionEntityItemTyped[]> {
   if (!tokens.length) {
     return [];
   }
@@ -207,7 +259,7 @@ export async function getSuggestions(tokens: ITokens, options: optionsQL) {
   if(!lastToken?.type){
     return  [
       // fields
-      ...(await options.suggestions.field()),
+      ...(await options.suggestions.field()).map(mapSuggestionCreatorField),
       {
         type: 'operator_group',
         label: '(',
@@ -223,7 +275,7 @@ export async function getSuggestions(tokens: ITokens, options: optionsQL) {
         ...(await options.suggestions.field()).filter(
           ({ label }) =>
             label.startsWith(lastToken.value) && label !== lastToken.value,
-        ),
+        ).map(mapSuggestionCreatorField),
         // operators if the input field is exact
         ...((await options.suggestions.field()).some(
           ({ label }) => label === lastToken.value,
@@ -241,7 +293,19 @@ export async function getSuggestions(tokens: ITokens, options: optionsQL) {
           : []),
       ];
       break;
-    case 'operator_compare':
+    case 'operator_compare':{
+      const previousField = getLastTokenWithValueByType(tokens, 'field')?.value;
+      const previousOperatorCompare = getLastTokenWithValueByType(
+        tokens,
+        'operator_compare',
+      )?.value;
+
+      // If there is no a previous field, then no return suggestions because it would be an syntax
+      // error
+      if(!previousField){
+        return [];
+      };
+
       return [
         ...Object.keys(language.tokens.operator_compare.literal)
           .filter(
@@ -259,17 +323,27 @@ export async function getSuggestions(tokens: ITokens, options: optionsQL) {
         )
           ? [
             ...(await options.suggestions.value(undefined, {
-              previousField: getLastTokenWithValueByType(tokens, 'field')!.value,
-              previousOperatorCompare: getLastTokenWithValueByType(
-                tokens,
-                'operator_compare',
-              )!.value,
-            })),
+              previousField,
+              previousOperatorCompare,
+            })).map(mapSuggestionCreatorValue),
           ]
           : []),
       ];
       break;
-    case 'value':
+    }
+    case 'value':{
+      const previousField = getLastTokenWithValueByType(tokens, 'field')?.value;
+      const previousOperatorCompare = getLastTokenWithValueByType(
+        tokens,
+        'operator_compare',
+      )?.value;
+
+      // If there is no a previous field or operator_compar, then no return suggestions because
+      //it would be an syntax error
+      if(!previousField || !previousOperatorCompare){
+        return [];
+      };
+
       return [
         ...(lastToken.value
           ? [
@@ -281,12 +355,9 @@ export async function getSuggestions(tokens: ITokens, options: optionsQL) {
           ]
           : []),
         ...(await options.suggestions.value(lastToken.value, {
-          previousField: getLastTokenWithValueByType(tokens, 'field')!.value,
-          previousOperatorCompare: getLastTokenWithValueByType(
-            tokens,
-            'operator_compare',
-          )!.value,
-        })),
+          previousField,
+          previousOperatorCompare,
+        })).map(mapSuggestionCreatorValue),
         ...Object.entries(language.tokens.conjunction.literal).map(
           ([ conjunction, description]) => ({
             type: 'conjunction',
@@ -301,6 +372,7 @@ export async function getSuggestions(tokens: ITokens, options: optionsQL) {
         },
       ];
       break;
+    }
     case 'conjunction':
       return [
         ...Object.keys(language.tokens.conjunction.literal)
@@ -319,13 +391,7 @@ export async function getSuggestions(tokens: ITokens, options: optionsQL) {
           conjunction => conjunction === lastToken.value,
         )
           ? [
-            ...(await options.suggestions.field()).map(
-              ({ label, description }) => ({
-                type: 'field',
-                label,
-                description,
-              }),
-            ),
+            ...(await options.suggestions.field()).map(mapSuggestionCreatorField),
           ]
           : []),
         {
@@ -339,9 +405,7 @@ export async function getSuggestions(tokens: ITokens, options: optionsQL) {
       if (lastToken.value === '(') {
         return [
           // fields
-          ...(await options.suggestions.field()).map(
-            ({ label, description }) => ({ type: 'field', label, description }),
-          ),
+          ...(await options.suggestions.field()).map(mapSuggestionCreatorField),
         ];
       } else if (lastToken.value === ')') {
         return [
@@ -366,18 +430,26 @@ export async function getSuggestions(tokens: ITokens, options: optionsQL) {
 
 /**
  * Transform the suggestion object to the expected object by EuiSuggestItem
+ * @param param0 
+ * @returns 
+ */
+export function transformSuggestionToEuiSuggestItem(suggestion: QLOptionSuggestionEntityItemTyped): SuggestItem{
+  const { type, ...rest} = suggestion;
+  return {
+    type: { ...suggestionMappingLanguageTokenType[type] },
+    ...rest
+  };
+};
+
+/**
+ * Transform the suggestion object to the expected object by EuiSuggestItem
  * @param suggestions
- * @param options
  * @returns
  */
-function transformSuggestionsToUI(
-  suggestions: { type: string; label: string; description?: string }[],
-  mapSuggestionByLanguageToken: any,
-) {
-  return suggestions.map(({ type, ...rest }) => ({
-    type: { ...mapSuggestionByLanguageToken[type] },
-    ...rest,
-  }));
+function transformSuggestionsToEuiSuggestItem(
+  suggestions: QLOptionSuggestionEntityItemTyped[]
+): SuggestItem[] {
+  return suggestions.map(transformSuggestionToEuiSuggestItem);
 };
 
 /**
@@ -389,11 +461,19 @@ export function transformUnifiedQueryToSpecificQueryLanguage(input: string){
   const tokens = tokenizerUQL(input);
   return tokens
     .filter(({value}) => value)
-    .map(({type, value}) => type === 'conjunction'
-      ? value === ';'
-        ? ' and '
-        : ' or '
-      : value
+    .map(({type, value}) => {
+      switch (type) {
+        case 'conjunction':
+          return transformQLConjunction(value);
+          break;
+        case 'value':
+          return transformQLValue(value);
+          break;
+        default:
+          return value;
+          break;
+      }
+    }
     ).join('');
 };
 
@@ -466,9 +546,8 @@ export const HAQL = {
       searchBarProps: {
         // Props that will be used by the EuiSuggest component
         // Suggestions
-        suggestions: transformSuggestionsToUI(
-          await getSuggestions(tokens, params.queryLanguage.parameters),
-          suggestionMappingLanguageTokenType,
+        suggestions: transformSuggestionsToEuiSuggestItem(
+          await getSuggestions(tokens, params.queryLanguage.parameters)
         ),
         // Handler to manage when clicking in a suggestion item
         onItemClick: item => {
@@ -487,9 +566,8 @@ export const HAQL = {
               // replace the value of last token
               lastToken.value = item.label;
             } else {
-              // add a whitespace for conjunction <whitespace><conjunction><whitespace>
-              input.length
-              && !(/\s$/.test(input))
+              // add a whitespace for conjunction <whitespace><conjunction>
+              !(/\s$/.test(input))
               && item.type.iconType === suggestionMappingLanguageTokenType.conjunction.iconType
               && tokens.push({
                 type: 'whitespace',
@@ -502,12 +580,11 @@ export const HAQL = {
                   ([, { iconType }]) => iconType === item.type.iconType,
                 )[0],
                 value: item.type.iconType === suggestionMappingLanguageTokenType.value.iconType
-                  && /\s/.test(item.label)
-                  ? `"${item.label}"`
+                  ? transformQLValue(item.label)
                   : item.label,
               });
 
-              // add a whitespace for conjunction <whitespace><conjunction><whitespace>
+              // add a whitespace for conjunction <conjunction><whitespace>
               item.type.iconType === suggestionMappingLanguageTokenType.conjunction.iconType
               && tokens.push({
                 type: 'whitespace',

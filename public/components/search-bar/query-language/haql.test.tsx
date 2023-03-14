@@ -1,5 +1,48 @@
-import { getSuggestions, tokenizer, transformSpecificQLToUnifiedQL } from './haql';
+import { getSuggestions, tokenizer, transformSpecificQLToUnifiedQL, HAQL } from './haql';
+import React from 'react';
+import { render, waitFor } from '@testing-library/react';
+import { SearchBar } from '../index';
 
+describe('SearchBar component', () => {
+  const componentProps = {
+    defaultMode: HAQL.id,
+    input: '',
+    modes: [
+      {
+        id: HAQL.id,
+        implicitQuery: 'id!=000;',
+        suggestions: {
+          field(currentValue) {
+            return [];
+          },
+          value(currentValue, { previousField }){
+            return [];
+          },
+        },
+      }
+    ],
+    /* eslint-disable @typescript-eslint/no-empty-function */
+    onChange: () => {},
+    onSearch: () => {}
+    /* eslint-enable @typescript-eslint/no-empty-function */
+  };
+
+  it('Renders correctly to match the snapshot of query language', async () => {
+    const wrapper = render(
+      <SearchBar
+        {...componentProps}
+      />
+    );
+
+    await waitFor(() => {
+      const elementImplicitQuery = wrapper.container.querySelector('.euiCodeBlock__code');
+      expect(elementImplicitQuery?.innerHTML).toEqual('id!=000 and ');
+      expect(wrapper.container).toMatchSnapshot();
+    });
+  });
+});
+
+/* eslint-disable max-len */
 describe('Query language - HAQL', () => {
   // Tokenize the input
   function tokenCreator({type, value}){
@@ -108,6 +151,7 @@ describe('Query language - HAQL', () => {
     ).toEqual(suggestions);
   });
 
+  // Transform specific query language to UQL (Unified Query Language)
   it.each`
   HAQL                                                    | UQL
   ${'field'}                                              | ${'field'}
@@ -135,5 +179,84 @@ describe('Query language - HAQL', () => {
   ${'( field = value ) and field2 > "custom value" '}     | ${'(field=value);field2>custom value'}
   `('transformSpecificQLToUnifiedQL - HAQL $HAQL', ({HAQL, UQL}) => {
     expect(transformSpecificQLToUnifiedQL(HAQL)).toEqual(UQL);
-  })
+  });
+
+  // When a suggestion is clicked, change the input text
+  it.each`
+  HAQL                              | clikedSuggestion                                                            | changedInput
+  ${''}                             | ${{type: { iconType: 'kqlField', color: 'tint4' }, label: 'field'}}         | ${'field'}
+  ${'field'}                        | ${{type: { iconType: 'kqlField', color: 'tint4' }, label: 'field2'}}        | ${'field2'}
+  ${'field'}                        | ${{type: { iconType: 'kqlOperand', color: 'tint1' }, label: '='}}           | ${'field='}
+  ${'field='}                       | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'value'}}         | ${'field=value'}
+  ${'field='}                       | ${{type: { iconType: 'kqlOperand', color: 'tint1' }, label: '!='}}          | ${'field!='}
+  ${'field=value'}                  | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'value2'}}        | ${'field=value2'}
+  ${'field=value'}                  | ${{type: { iconType: 'kqlSelector', color: 'tint3' }, label: 'and'}}        | ${'field=value and '}
+  ${'field=value and '}             | ${{type: { iconType: 'kqlField', color: 'tint4' }, label: 'field2'}}        | ${'field=value and field2'}
+  ${'field=value and field2'}       | ${{type: { iconType: 'kqlOperand', color: 'tint1' }, label: '>'}}           | ${'field=value and field2>'}
+  ${'field='}                       | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'with spaces'}}   | ${'field="with spaces"'}
+  ${'field='}                       | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'with "spaces'}}  | ${'field="with \\"spaces"'}
+  ${'field='}                       | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: '"value'}}        | ${'field="\\"value"'}
+  ${''}                             | ${{type: { iconType: 'tokenDenseVector', color: 'tint3' }, label: '('}}     | ${'('}
+  ${'('}                            | ${{type: { iconType: 'kqlField', color: 'tint4' }, label: 'field'}}         | ${'(field'}
+  ${'(field'}                       | ${{type: { iconType: 'kqlField', color: 'tint4' }, label: 'field2'}}        | ${'(field2'}
+  ${'(field'}                       | ${{type: { iconType: 'kqlOperand', color: 'tint1' }, label: '='}}           | ${'(field='}
+  ${'(field='}                      | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'value'}}         | ${'(field=value'}
+  ${'(field=value'}                 | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'value2'}}        | ${'(field=value2'}
+  ${'(field=value'}                 | ${{type: { iconType: 'kqlSelector', color: 'tint3' }, label: 'or'}}         | ${'(field=value or '}
+  ${'(field=value or '}             | ${{type: { iconType: 'kqlField', color: 'tint4' }, label: 'field2'}}        | ${'(field=value or field2'}
+  ${'(field=value or field2'}       | ${{type: { iconType: 'kqlOperand', color: 'tint1' }, label: '>'}}           | ${'(field=value or field2>'}
+  ${'(field=value or field2>'}      | ${{type: { iconType: 'kqlOperand', color: 'tint1' }, label: '>'}}           | ${'(field=value or field2>'}
+  ${'(field=value or field2>'}      | ${{type: { iconType: 'kqlOperand', color: 'tint1' }, label: '~'}}           | ${'(field=value or field2~'}
+  ${'(field=value or field2>'}      | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'value2'}}        | ${'(field=value or field2>value2'}
+  ${'(field=value or field2>value2'}| ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'value3'}}        | ${'(field=value or field2>value3'}
+  ${'(field=value or field2>value2'}| ${{type: { iconType: 'tokenDenseVector', color: 'tint3' }, label: ')'}}     | ${'(field=value or field2>value2)'}
+  `('click suggestion - HAQL $HAQL => $changedInput', async ({HAQL: currentInput, clikedSuggestion, changedInput}) => {
+    // Mock input
+    let input = currentInput;
+
+    const qlOutput = await HAQL.run(input, {
+      setInput: (value: string): void => { input = value; },
+      queryLanguage: {
+        parameters: {
+          implicitQuery: '',
+          suggestions: {
+            field: () => ([]),
+            value: () => ([])
+          }
+        }
+      }
+    });
+    qlOutput.searchBarProps.onItemClick(clikedSuggestion);
+    expect(input).toEqual(changedInput);
+  });
+
+  // Transform the external input in UQL (Unified Query Language) to QL
+  it.each`
+  UQL                                 | HAQL
+  ${''}                               | ${''}
+  ${'field'}                          | ${'field'}
+  ${'field='}                         | ${'field='}
+  ${'field!='}                        | ${'field!='}
+  ${'field>'}                         | ${'field>'}
+  ${'field<'}                         | ${'field<'}
+  ${'field~'}                         | ${'field~'}
+  ${'field=value'}                    | ${'field=value'}
+  ${'field=value;'}                   | ${'field=value and '}
+  ${'field=value;field2'}             | ${'field=value and field2'}
+  ${'field="'}                        | ${'field="\\""'}
+  ${'field=with spaces'}              | ${'field="with spaces"'}
+  ${'field=with "spaces'}             | ${'field="with \\"spaces"'}
+  ${'('}                              | ${'('}
+  ${'(field'}                         | ${'(field'}
+  ${'(field='}                        | ${'(field='}
+  ${'(field=value'}                   | ${'(field=value'}
+  ${'(field=value,'}                  | ${'(field=value or '}
+  ${'(field=value,field2'}            | ${'(field=value or field2'}
+  ${'(field=value,field2>'}           | ${'(field=value or field2>'}
+  ${'(field=value,field2>value2'}     | ${'(field=value or field2>value2'}
+  ${'(field=value,field2>value2)'}     | ${'(field=value or field2>value2)'}
+  `('Transform the external input UQL to QL - UQL $UQL => $HAQL', async ({UQL, HAQL: changedInput}) => {
+    expect(HAQL.transformUnifiedQuery(UQL)).toEqual(changedInput);
+  });
+
 });

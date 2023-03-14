@@ -128,8 +128,7 @@ implicitQuery: 'id!=000;'
       { label: 'os.platform', description: 'Operating system platform' },
       { label: 'status', description: 'Status' },
       { label: 'version', description: 'Version' },
-    ]
-    .map(field => ({ type: 'field', ...field }));
+    ];
   }
   ```
 

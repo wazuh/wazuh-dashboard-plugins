@@ -1,4 +1,46 @@
-import { getSuggestionsAPI, tokenizerAPI, validate } from './aql';
+import { AQL, getSuggestions, tokenizer } from './aql';
+import React from 'react';
+import { render, waitFor } from '@testing-library/react';
+import { SearchBar } from '../index';
+
+describe('SearchBar component', () => {
+  const componentProps = {
+    defaultMode: AQL.id,
+    input: '',
+    modes: [
+      {
+        id: AQL.id,
+        implicitQuery: 'id!=000;',
+        suggestions: {
+          field(currentValue) {
+            return [];
+          },
+          value(currentValue, { previousField }){
+            return [];
+          },
+        },
+      }
+    ],
+    /* eslint-disable @typescript-eslint/no-empty-function */
+    onChange: () => {},
+    onSearch: () => {}
+    /* eslint-enable @typescript-eslint/no-empty-function */
+  };
+
+  it('Renders correctly to match the snapshot of query language', async () => {
+    const wrapper = render(
+      <SearchBar
+        {...componentProps}
+      />
+    );
+
+    await waitFor(() => {
+      const elementImplicitQuery = wrapper.container.querySelector('.euiCodeBlock__code');
+      expect(elementImplicitQuery?.innerHTML).toEqual('id!=000;');
+      expect(wrapper.container).toMatchSnapshot();
+    });
+  });
+});
 
 describe('Query language - AQL', () => {
   // Tokenize the input
@@ -29,7 +71,7 @@ describe('Query language - AQL', () => {
   ${'(field>2;field2=value2)'}                       | ${[{ type: 'operator_group', value: '(' }, { type: 'field', value: 'field' }, { type: 'operator_compare', value: '>' }, { type: 'value', value: '2' }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: ';' }, { type: 'operator_group', value: undefined }, { type: 'field', value: 'field2' }, { type: 'operator_compare', value: '=' }, { type: 'value', value: 'value2' }, { type: 'operator_group', value: ')' }, { type: 'conjunction', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }]}
   ${'(field>2;field2=custom value())'}                       | ${[{ type: 'operator_group', value: '(' }, { type: 'field', value: 'field' }, { type: 'operator_compare', value: '>' }, { type: 'value', value: '2' }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: ';' }, { type: 'operator_group', value: undefined }, { type: 'field', value: 'field2' }, { type: 'operator_compare', value: '=' }, { type: 'value', value: 'custom value()' }, { type: 'operator_group', value: ')' }, { type: 'conjunction', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }]}
   `(`Tokenizer API input $input`, ({input, tokens}) => {
-    expect(tokenizerAPI(input)).toEqual(tokens);
+    expect(tokenizer(input)).toEqual(tokens);
   });
 
   // Get suggestions
@@ -48,7 +90,7 @@ describe('Query language - AQL', () => {
     ${'field=value;field2=127'} | ${[{ description: 'Run the search query', label: 'Search', type: 'function_search' }, { label: '127.0.0.1', type: 'value' }, { label: '127.0.0.2', type: 'value' }, { description: 'and', label: ';', type: 'conjunction' }, { description: 'or', label: ',', type: 'conjunction' }, { description: 'close group', label: ')', type: 'operator_group' }]}
   `('Get suggestion from the input: $input', async ({ input, suggestions }) => {
     expect(
-      await getSuggestionsAPI(tokenizerAPI(input), {
+      await getSuggestions(tokenizer(input), {
         id: 'aql',
         suggestions: {
           field(currentValue) {
@@ -81,5 +123,83 @@ describe('Query language - AQL', () => {
         },
       }),
     ).toEqual(suggestions);
+  });
+
+  // When a suggestion is clicked, change the input text
+  it.each`
+  AQL                              | clikedSuggestion                                                            | changedInput
+  ${''}                             | ${{type: { iconType: 'kqlField', color: 'tint4' }, label: 'field'}}        | ${'field'}
+  ${'field'}                        | ${{type: { iconType: 'kqlField', color: 'tint4' }, label: 'field2'}}       | ${'field2'}
+  ${'field'}                        | ${{type: { iconType: 'kqlOperand', color: 'tint1' }, label: '='}}          | ${'field='}
+  ${'field='}                       | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'value'}}        | ${'field=value'}
+  ${'field='}                       | ${{type: { iconType: 'kqlOperand', color: 'tint1' }, label: '!='}}         | ${'field!='}
+  ${'field=value'}                  | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'value2'}}       | ${'field=value2'}
+  ${'field=value'}                  | ${{type: { iconType: 'kqlSelector', color: 'tint3' }, label: ';'}}         | ${'field=value;'}
+  ${'field=value;'}                 | ${{type: { iconType: 'kqlField', color: 'tint4' }, label: 'field2'}}       | ${'field=value;field2'}
+  ${'field=value;field2'}           | ${{type: { iconType: 'kqlOperand', color: 'tint1' }, label: '>'}}          | ${'field=value;field2>'}
+  ${'field='}                       | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'with spaces'}}  | ${'field=with spaces'}
+  ${'field='}                       | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'with "spaces'}} | ${'field=with "spaces'}
+  ${'field='}                       | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: '"value'}}       | ${'field="value'}
+  ${''}                             | ${{type: { iconType: 'tokenDenseVector', color: 'tint3' }, label: '('}}    | ${'('}
+  ${'('}                            | ${{type: { iconType: 'kqlField', color: 'tint4' }, label: 'field'}}        | ${'(field'}
+  ${'(field'}                       | ${{type: { iconType: 'kqlField', color: 'tint4' }, label: 'field2'}}       | ${'(field2'}
+  ${'(field'}                       | ${{type: { iconType: 'kqlOperand', color: 'tint1' }, label: '='}}          | ${'(field='}
+  ${'(field='}                      | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'value'}}        | ${'(field=value'}
+  ${'(field=value'}                 | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'value2'}}       | ${'(field=value2'}
+  ${'(field=value'}                 | ${{type: { iconType: 'kqlSelector', color: 'tint3' }, label: ','}}         | ${'(field=value,'}
+  ${'(field=value,'}                | ${{type: { iconType: 'kqlField', color: 'tint4' }, label: 'field2'}}       | ${'(field=value,field2'}
+  ${'(field=value,field2'}          | ${{type: { iconType: 'kqlOperand', color: 'tint1' }, label: '>'}}          | ${'(field=value,field2>'}
+  ${'(field=value,field2>'}         | ${{type: { iconType: 'kqlOperand', color: 'tint1' }, label: '>'}}          | ${'(field=value,field2>'}
+  ${'(field=value,field2>'}         | ${{type: { iconType: 'kqlOperand', color: 'tint1' }, label: '~'}}          | ${'(field=value,field2~'}
+  ${'(field=value,field2>'}         | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'value2'}}       | ${'(field=value,field2>value2'}
+  ${'(field=value,field2>value2'}   | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'value3'}}       | ${'(field=value,field2>value3'}
+  ${'(field=value,field2>value2'}   | ${{type: { iconType: 'tokenDenseVector', color: 'tint3' }, label: ')'}}    | ${'(field=value,field2>value2)'}
+  `('click suggestion - AQL $AQL => $changedInput', async ({AQL: currentInput, clikedSuggestion, changedInput}) => {
+    // Mock input
+    let input = currentInput;
+
+    const qlOutput = await AQL.run(input, {
+      setInput: (value: string): void => { input = value; },
+      queryLanguage: {
+        parameters: {
+          implicitQuery: '',
+          suggestions: {
+            field: () => ([]),
+            value: () => ([])
+          }
+        }
+      }
+    });
+    qlOutput.searchBarProps.onItemClick(clikedSuggestion);
+    expect(input).toEqual(changedInput);
+  });
+
+  // Transform the external input in UQL (Unified Query Language) to QL
+  it.each`
+  UQL                                 | AQL
+  ${''}                               | ${''}
+  ${'field'}                          | ${'field'}
+  ${'field='}                         | ${'field='}
+  ${'field!='}                        | ${'field!='}
+  ${'field>'}                         | ${'field>'}
+  ${'field<'}                         | ${'field<'}
+  ${'field~'}                         | ${'field~'}
+  ${'field=value'}                    | ${'field=value'}
+  ${'field=value;'}                   | ${'field=value;'}
+  ${'field=value;field2'}             | ${'field=value;field2'}
+  ${'field="'}                        | ${'field="'}
+  ${'field=with spaces'}              | ${'field=with spaces'}
+  ${'field=with "spaces'}             | ${'field=with "spaces'}
+  ${'('}                              | ${'('}
+  ${'(field'}                         | ${'(field'}
+  ${'(field='}                        | ${'(field='}
+  ${'(field=value'}                   | ${'(field=value'}
+  ${'(field=value,'}                  | ${'(field=value,'}
+  ${'(field=value,field2'}            | ${'(field=value,field2'}
+  ${'(field=value,field2>'}           | ${'(field=value,field2>'}
+  ${'(field=value,field2>value2'}     | ${'(field=value,field2>value2'}
+  ${'(field=value,field2>value2)'}    | ${'(field=value,field2>value2)'}
+  `('Transform the external input UQL to QL - UQL $UQL => $AQL', async ({UQL, AQL: changedInput}) => {
+    expect(AQL.transformUnifiedQuery(UQL)).toEqual(changedInput);
   });
 });

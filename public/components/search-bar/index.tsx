@@ -119,7 +119,11 @@ export const SearchBar = ({
       value={input}
       onChange={onChangeInput}
       onKeyPress={onKeyPressHandler}
-      onInputChange={() => {}}
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      onInputChange={() => {}} /* This method is run by EuiSuggest when there is a change in
+                                a div wrapper of the input and should be defined. Defining this
+                                property prevents an error. */
+      suggestions={[]}
       isPopoverOpen={
         queryLanguageOutputRun.searchBarProps.suggestions.length > 0 &&
         isOpenSuggestionPopover
