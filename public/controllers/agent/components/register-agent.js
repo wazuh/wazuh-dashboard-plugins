@@ -1022,13 +1022,13 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
       const textAndLinkToCheckConnectionDocumentation = (
         <p>
           To verify the connection with the Wazuh server, please follow this{' '}
-          <a
+          <EuiLink
             href={urlCheckConnectionDocumentation}
             target='_blank'
             rel="noopener noreferrer"
           >
             document.
-          </a>
+          </EuiLink>
         </p>
       );
 
@@ -1036,7 +1036,7 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
         <>
           <p>
             Please
-            <a href={urlWindowsPackage}> download </a>
+            <EuiLink href={urlWindowsPackage} target='_blank'> download </EuiLink>
             the package from our repository and copy it to the Windows system
             where you are going to install it. Then run the following command to
             perform the installation:

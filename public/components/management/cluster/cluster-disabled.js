@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react';
-import { EuiPage, EuiPageContent, EuiEmptyPrompt } from '@elastic/eui';
-import { withErrorBoundary } from '../../common/hocs'
+import { EuiLink, EuiEmptyPrompt } from '@elastic/eui';
+import { withErrorBoundary } from '../../common/hocs';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
 export const ClusterDisabled = withErrorBoundary (class ClusterDisabled extends Component {
   constructor(props) {
@@ -26,13 +26,13 @@ export const ClusterDisabled = withErrorBoundary (class ClusterDisabled extends 
             {!this.props.enabled && (
               <p>
                 Visit the documentation on{' '}
-                <a
+                <EuiLink
                   href={webDocumentationLink('user-manual/configuring-cluster/index.html')}
                   target='_blank'
                   rel='noopener noreferrer'
                 >
                   this link
-                </a>{' '}
+                </EuiLink>{' '}
                 to learn about how to enable it.
               </p>
             )}
