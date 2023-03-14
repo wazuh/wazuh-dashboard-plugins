@@ -77,6 +77,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed Wazuh main menu not displayed when navigation menu is locked [#5273](https://github.com/wazuh/wazuh-kibana-app/pull/5273)
 - Fixed Deploy Agent wrong use of connection secure property [#5285](https://github.com/wazuh/wazuh-kibana-app/pull/5285)
 - Fixed events view when search bar language is `lucene` [#5286](https://github.com/wazuh/wazuh-kibana-app/pull/5286)
+- Fixed head rendering in agent view [#5291](https://github.com/wazuh/wazuh-kibana-app/pull/5291)
 
 ### Removed
 
