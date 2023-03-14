@@ -1199,8 +1199,8 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
                         After installing the agent, you need to enroll it in the
                         Wazuh server. Check the Wazuh agent enrollment{' '}
                         <EuiLink target='_blank' href={urlWazuhAgentEnrollment}>
-                          Wazuh agent enrollment{' '}
-                        </EuiLink>
+                          Wazuh agent enrollment
+                        </EuiLink>{' '}
                         section to learn more.
                       </span>
                     }
