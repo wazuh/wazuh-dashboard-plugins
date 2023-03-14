@@ -40,47 +40,52 @@ export const clusterStatusResponse = async (): Promise<boolean> => {
 async function getRemoteConfiguration(nodeName: string): Promise<RemoteConfig> {
   let config: RemoteConfig = {
     name: nodeName,
-    isUdp: null,
-    haveSecureConnection: null,
+    isUdp: false,
+    haveSecureConnection: false,
   };
-  const clusterStatus = await clusterStatusResponse();
-  let result;
-  if (clusterStatus) {
-    result = await WzRequest.apiReq(
-      'GET',
-      `/cluster/${nodeName}/configuration/request/remote`,
-      {},
-    );
-  } else {
-    result = await WzRequest.apiReq(
-      'GET',
-      '/manager/configuration/request/remote',
-      {},
-    );
-  }
-  const items = ((result.data || {}).data || {}).affected_items || [];
-  const remote = items[0]?.remote;
-  if (remote) {
-    const remoteFiltered = remote.filter((item: RemoteItem) => {
-      return item.connection === 'secure';
-    });
-
-    remoteFiltered.length > 0
-      ? (config.haveSecureConnection = true)
-      : (config.haveSecureConnection = false);
-
-    let protocolsAvailable: Protocol[] = [];
-    remote.forEach((item: RemoteItem) => {
-      // get all protocols available
-      item.protocol.forEach(protocol => {
-        protocolsAvailable = protocolsAvailable.concat(protocol);
+  
+  try {
+    const clusterStatus = await clusterStatusResponse();
+    let result;
+    if (clusterStatus) {
+      result = await WzRequest.apiReq(
+        'GET',
+        `/cluster/${nodeName}/configuration/request/remote`,
+        {},
+      );
+    } else {
+      result = await WzRequest.apiReq(
+        'GET',
+        '/manager/configuration/request/remote',
+        {},
+      );
+    }
+    const items = ((result.data || {}).data || {}).affected_items || [];
+    const remote = items[0]?.remote;
+    if (remote) {
+      const remoteFiltered = remote.filter((item: RemoteItem) => {
+        return item.connection === 'secure';
       });
-    });
-
-    config.isUdp =
-      getRemoteProtocol(protocolsAvailable) === 'UDP' ? true : false;
+  
+      remoteFiltered.length > 0
+        ? (config.haveSecureConnection = true)
+        : (config.haveSecureConnection = false);
+  
+      let protocolsAvailable: Protocol[] = [];
+      remote.forEach((item: RemoteItem) => {
+        // get all protocols available
+        item.protocol.forEach(protocol => {
+          protocolsAvailable = protocolsAvailable.concat(protocol);
+        });
+      });
+  
+      config.isUdp =
+        getRemoteProtocol(protocolsAvailable) === 'UDP' ? true : false;
+    }
+    return config;
+  }catch(error){
+    return config;
   }
-  return config;
 }
 
 /**
