@@ -91,6 +91,24 @@ describe('Query language - WQL', () => {
   ${'field'}                       | ${[tu.opGroup, tu.whitespace, t.field('field'), tu.whitespace, tu.opCompare, tu.whitespace, tu.value, tu.whitespace, tu.opGroup, tu.whitespace, tu.conjunction, tu.whitespace, ...tuBlankSerie]}
   ${'field='}                       | ${[tu.opGroup, tu.whitespace, t.field('field'), tu.whitespace, t.opCompare('='), tu.whitespace, tu.value, tu.whitespace, tu.opGroup, tu.whitespace, tu.conjunction, tu.whitespace, ...tuBlankSerie]}
   ${'field=value'}                       | ${[tu.opGroup, tu.whitespace, t.field('field'), tu.whitespace, t.opCompare('='), tu.whitespace, t.value('value'), tu.whitespace, tu.opGroup, tu.whitespace, tu.conjunction, tu.whitespace, ...tuBlankSerie]}
+  ${'field=and'}                       | ${[tu.opGroup, tu.whitespace, t.field('field'), tu.whitespace, t.opCompare('='), tu.whitespace, t.value('and'), tu.whitespace, tu.opGroup, tu.whitespace, tu.conjunction, tu.whitespace, ...tuBlankSerie]}
+  ${'field=or'}                       | ${[tu.opGroup, tu.whitespace, t.field('field'), tu.whitespace, t.opCompare('='), tu.whitespace, t.value('or'), tu.whitespace, tu.opGroup, tu.whitespace, tu.conjunction, tu.whitespace, ...tuBlankSerie]}
+  ${'field=valueand'}                       | ${[tu.opGroup, tu.whitespace, t.field('field'), tu.whitespace, t.opCompare('='), tu.whitespace, t.value('valueand'), tu.whitespace, tu.opGroup, tu.whitespace, tu.conjunction, tu.whitespace, ...tuBlankSerie]}
+  ${'field=valueor'}                       | ${[tu.opGroup, tu.whitespace, t.field('field'), tu.whitespace, t.opCompare('='), tu.whitespace, t.value('valueor'), tu.whitespace, tu.opGroup, tu.whitespace, tu.conjunction, tu.whitespace, ...tuBlankSerie]}
+  ${'field=value='}                       | ${[tu.opGroup, tu.whitespace, t.field('field'), tu.whitespace, t.opCompare('='), tu.whitespace, t.value('value='), tu.whitespace, tu.opGroup, tu.whitespace, tu.conjunction, tu.whitespace, ...tuBlankSerie]}
+  ${'field=value!='}                       | ${[tu.opGroup, tu.whitespace, t.field('field'), tu.whitespace, t.opCompare('='), tu.whitespace, t.value('value!='), tu.whitespace, tu.opGroup, tu.whitespace, tu.conjunction, tu.whitespace, ...tuBlankSerie]}
+  ${'field=value>'}                       | ${[tu.opGroup, tu.whitespace, t.field('field'), tu.whitespace, t.opCompare('='), tu.whitespace, t.value('value>'), tu.whitespace, tu.opGroup, tu.whitespace, tu.conjunction, tu.whitespace, ...tuBlankSerie]}
+  ${'field=value<'}                       | ${[tu.opGroup, tu.whitespace, t.field('field'), tu.whitespace, t.opCompare('='), tu.whitespace, t.value('value<'), tu.whitespace, tu.opGroup, tu.whitespace, tu.conjunction, tu.whitespace, ...tuBlankSerie]}
+  ${'field=value~'}                       | ${[tu.opGroup, tu.whitespace, t.field('field'), tu.whitespace, t.opCompare('='), tu.whitespace, t.value('value~'), tu.whitespace, tu.opGroup, tu.whitespace, tu.conjunction, tu.whitespace, ...tuBlankSerie] /** ~ character is not supported as value in the q query parameter */}
+  ${'field="'}                       | ${[tu.opGroup, tu.whitespace, t.field('field'), tu.whitespace, t.opCompare('='), tu.whitespace, t.value('"'), tu.whitespace, tu.opGroup, tu.whitespace, tu.conjunction, tu.whitespace, ...tuBlankSerie]}
+  ${'field="value and'}                       | ${[tu.opGroup, tu.whitespace, t.field('field'), tu.whitespace, t.opCompare('='), tu.whitespace, t.value('"value and'), tu.whitespace, tu.opGroup, tu.whitespace, tu.conjunction, tu.whitespace, ...tuBlankSerie]}
+  ${'field="value and value2"'}                       | ${[tu.opGroup, tu.whitespace, t.field('field'), tu.whitespace, t.opCompare('='), tu.whitespace, t.value('"value and value2"'), tu.whitespace, tu.opGroup, tu.whitespace, tu.conjunction, tu.whitespace, ...tuBlankSerie]}
+  ${'field="value or value2"'}                       | ${[tu.opGroup, tu.whitespace, t.field('field'), tu.whitespace, t.opCompare('='), tu.whitespace, t.value('"value or value2"'), tu.whitespace, tu.opGroup, tu.whitespace, tu.conjunction, tu.whitespace, ...tuBlankSerie]}
+  ${'field="value = value2"'}                       | ${[tu.opGroup, tu.whitespace, t.field('field'), tu.whitespace, t.opCompare('='), tu.whitespace, t.value('"value = value2"'), tu.whitespace, tu.opGroup, tu.whitespace, tu.conjunction, tu.whitespace, ...tuBlankSerie]}
+  ${'field="value != value2"'}                       | ${[tu.opGroup, tu.whitespace, t.field('field'), tu.whitespace, t.opCompare('='), tu.whitespace, t.value('"value != value2"'), tu.whitespace, tu.opGroup, tu.whitespace, tu.conjunction, tu.whitespace, ...tuBlankSerie]}
+  ${'field="value > value2"'}                       | ${[tu.opGroup, tu.whitespace, t.field('field'), tu.whitespace, t.opCompare('='), tu.whitespace, t.value('"value > value2"'), tu.whitespace, tu.opGroup, tu.whitespace, tu.conjunction, tu.whitespace, ...tuBlankSerie]}
+  ${'field="value < value2"'}                       | ${[tu.opGroup, tu.whitespace, t.field('field'), tu.whitespace, t.opCompare('='), tu.whitespace, t.value('"value < value2"'), tu.whitespace, tu.opGroup, tu.whitespace, tu.conjunction, tu.whitespace, ...tuBlankSerie]}
+  ${'field="value ~ value2"'}                       | ${[tu.opGroup, tu.whitespace, t.field('field'), tu.whitespace, t.opCompare('='), tu.whitespace, t.value('"value ~ value2"'), tu.whitespace, tu.opGroup, tu.whitespace, tu.conjunction, tu.whitespace, ...tuBlankSerie] /** ~ character is not supported as value in the q query parameter */}
   ${'field=value and'}                       | ${[tu.opGroup, tu.whitespace, t.field('field'), tu.whitespace, t.opCompare('='), tu.whitespace, t.value('value'), t.whitespace(' '), tu.opGroup, tu.whitespace, t.conjunction('and'), tu.whitespace, ...tuBlankSerie]}
   ${'field=value and '}                       | ${[tu.opGroup, tu.whitespace, t.field('field'), tu.whitespace, t.opCompare('='), tu.whitespace, t.value('value'), t.whitespace(' '), tu.opGroup, tu.whitespace, t.conjunction('and'), t.whitespace(' '), ...tuBlankSerie]}
   ${'field=value and field2'}                       | ${[tu.opGroup, tu.whitespace, t.field('field'), tu.whitespace, t.opCompare('='), tu.whitespace, t.value('value'), t.whitespace(' '), tu.opGroup, tu.whitespace, t.conjunction('and'), t.whitespace(' '), tu.opGroup, tu.whitespace, t.field('field2'), tu.whitespace, tu.opCompare, tu.whitespace, tu.value, tu.whitespace, tu.opGroup, tu.whitespace, tu.conjunction, tu.whitespace, ...tuBlankSerie]}
@@ -153,12 +171,27 @@ describe('Query language - WQL', () => {
 
   // Transform specific query language to UQL (Unified Query Language)
   it.each`
-  WQL                                                    | UQL
+  WQL                                                     | UQL
   ${'field'}                                              | ${'field'}
   ${'field='}                                             | ${'field='}
   ${'field=value'}                                        | ${'field=value'}
   ${'field=value()'}                                      | ${'field=value()'}
+  ${'field=valueand'}                                     | ${'field=valueand'}
+  ${'field=valueor'}                                      | ${'field=valueor'}
+  ${'field=value='}                                       | ${'field=value='}
+  ${'field=value!='}                                      | ${'field=value!='}
+  ${'field=value>'}                                       | ${'field=value>'}
+  ${'field=value<'}                                       | ${'field=value<'}
+  ${'field=value~'}                                       | ${'field=value~' /** ~ character is not supported as value in the q query parameter */}
   ${'field="custom value"'}                               | ${'field=custom value'}
+  ${'field="custom value()"'}                             | ${'field=custom value()'}
+  ${'field="value and value2"'}                           | ${'field=value and value2'}
+  ${'field="value or value2"'}                            | ${'field=value or value2'}
+  ${'field="value = value2"'}                             | ${'field=value = value2'}
+  ${'field="value != value2"'}                            | ${'field=value != value2'}
+  ${'field="value > value2"'}                             | ${'field=value > value2'}
+  ${'field="value < value2"'}                             | ${'field=value < value2'}
+  ${'field="value ~ value2"'}                             | ${'field=value ~ value2'  /** ~ character is not supported as value in the q query parameter */}
   ${'field="custom \\"value"'}                            | ${'field=custom "value'}
   ${'field="custom \\"value\\""'}                         | ${'field=custom "value"'}
   ${'field=value and'}                                    | ${'field=value;'}
@@ -172,22 +205,47 @@ describe('Query language - WQL', () => {
   ${'(field=value) and field2>"value with spaces"'}       | ${'(field=value);field2>value with spaces'}
   ${'field ='}                                            | ${'field='}
   ${'field = value'}                                      | ${'field=value'}
+  ${'field = value()'}                                    | ${'field=value()'}
+  ${'field = valueand'}                                   | ${'field=valueand'}
+  ${'field = valueor'}                                    | ${'field=valueor'}
+  ${'field = value='}                                     | ${'field=value='}
+  ${'field = value!='}                                    | ${'field=value!='}
+  ${'field = value>'}                                     | ${'field=value>'}
+  ${'field = value<'}                                     | ${'field=value<'}
+  ${'field = value~'}                                     | ${'field=value~' /** ~ character is not supported as value in the q query parameter */}
+  ${'field = "custom value"'}                             | ${'field=custom value'}
+  ${'field = "custom value()"'}                           | ${'field=custom value()'}
+  ${'field = "value and value2"'}                         | ${'field=value and value2'}
+  ${'field = "value or value2"'}                          | ${'field=value or value2'}
+  ${'field = "value = value2"'}                           | ${'field=value = value2'}
+  ${'field = "value != value2"'}                          | ${'field=value != value2'}
+  ${'field = "value > value2"'}                           | ${'field=value > value2'}
+  ${'field = "value < value2"'}                           | ${'field=value < value2'}
+  ${'field = "value ~ value2"'}                           | ${'field=value ~ value2'  /** ~ character is not supported as value in the q query parameter */}
   ${'field = value or'}                                   | ${'field=value,'}
   ${'field = value or field2'}                            | ${'field=value,field2'}
   ${'field = value or field2 <'}                          | ${'field=value,field2<'}
   ${'field = value or field2 < value2'}                   | ${'field=value,field2<value2'}
   ${'( field = value ) and field2 > "custom value" '}     | ${'(field=value);field2>custom value'}
-  `('transformSpecificQLToUnifiedQL - WQL $WQL', ({WQL, UQL}) => {
+  `('transformSpecificQLToUnifiedQL - WQL $WQL TO UQL $UQL', ({WQL, UQL}) => {
     expect(transformSpecificQLToUnifiedQL(WQL)).toEqual(UQL);
   });
 
   // When a suggestion is clicked, change the input text
   it.each`
-  WQL                              | clikedSuggestion                                                            | changedInput
+  WQL                               | clikedSuggestion                                                            | changedInput
   ${''}                             | ${{type: { iconType: 'kqlField', color: 'tint4' }, label: 'field'}}         | ${'field'}
   ${'field'}                        | ${{type: { iconType: 'kqlField', color: 'tint4' }, label: 'field2'}}        | ${'field2'}
   ${'field'}                        | ${{type: { iconType: 'kqlOperand', color: 'tint1' }, label: '='}}           | ${'field='}
   ${'field='}                       | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'value'}}         | ${'field=value'}
+  ${'field='}                       | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'value()'}}       | ${'field=value()'}
+  ${'field='}                       | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'valueand'}}      | ${'field=valueand'}
+  ${'field='}                       | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'valueor'}}       | ${'field=valueor'}
+  ${'field='}                       | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'value='}}        | ${'field=value='}
+  ${'field='}                       | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'value!='}}       | ${'field=value!='}
+  ${'field='}                       | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'value>'}}        | ${'field=value>'}
+  ${'field='}                       | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'value<'}}        | ${'field=value<'}
+  ${'field='}                       | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'value~'}}        | ${'field=value~'   /** ~ character is not supported as value in the q query parameter */}
   ${'field='}                       | ${{type: { iconType: 'kqlOperand', color: 'tint1' }, label: '!='}}          | ${'field!='}
   ${'field=value'}                  | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'value2'}}        | ${'field=value2'}
   ${'field=value'}                  | ${{type: { iconType: 'kqlSelector', color: 'tint3' }, label: 'and'}}        | ${'field=value and '}
@@ -195,6 +253,14 @@ describe('Query language - WQL', () => {
   ${'field=value and field2'}       | ${{type: { iconType: 'kqlOperand', color: 'tint1' }, label: '>'}}           | ${'field=value and field2>'}
   ${'field='}                       | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'with spaces'}}   | ${'field="with spaces"'}
   ${'field='}                       | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'with "spaces'}}  | ${'field="with \\"spaces"'}
+  ${'field='}                       | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'with value()'}}  | ${'field="with value()"'}
+  ${'field='}                       | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'with and value'}}| ${'field="with and value"'}
+  ${'field='}                       | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'with or value'}} | ${'field="with or value"'}
+  ${'field='}                       | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'with = value'}}  | ${'field="with = value"'}
+  ${'field='}                       | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'with != value'}} | ${'field="with != value"'}
+  ${'field='}                       | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'with > value'}}  | ${'field="with > value"'}
+  ${'field='}                       | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'with < value'}}  | ${'field="with < value"'}
+  ${'field='}                       | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'with ~ value'}}  | ${'field="with ~ value"'   /** ~ character is not supported as value in the q query parameter */}
   ${'field='}                       | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: '"value'}}        | ${'field="\\"value"'}
   ${''}                             | ${{type: { iconType: 'tokenDenseVector', color: 'tint3' }, label: '('}}     | ${'('}
   ${'('}                            | ${{type: { iconType: 'kqlField', color: 'tint4' }, label: 'field'}}         | ${'(field'}
@@ -236,6 +302,14 @@ describe('Query language - WQL', () => {
   ${''}                               | ${''}
   ${'field'}                          | ${'field'}
   ${'field='}                         | ${'field='}
+  ${'field=()'}                       | ${'field=()'}
+  ${'field=valueand'}                 | ${'field=valueand'}
+  ${'field=valueor'}                  | ${'field=valueor'}
+  ${'field=value='}                   | ${'field=value='}
+  ${'field=value!='}                  | ${'field=value!='}
+  ${'field=value>'}                   | ${'field=value>'}
+  ${'field=value<'}                   | ${'field=value<'}
+  ${'field=value~'}                   | ${'field=value~'}
   ${'field!='}                        | ${'field!='}
   ${'field>'}                         | ${'field>'}
   ${'field<'}                         | ${'field<'}
@@ -246,6 +320,12 @@ describe('Query language - WQL', () => {
   ${'field="'}                        | ${'field="\\""'}
   ${'field=with spaces'}              | ${'field="with spaces"'}
   ${'field=with "spaces'}             | ${'field="with \\"spaces"'}
+  ${'field=value ()'}                 | ${'field="value ()"'}
+  ${'field=with and value'}           | ${'field="with and value"'}
+  ${'field=with or value'}            | ${'field="with or value"'}
+  ${'field=with = value'}             | ${'field="with = value"'}
+  ${'field=with > value'}             | ${'field="with > value"'}
+  ${'field=with < value'}             | ${'field="with < value"'}
   ${'('}                              | ${'('}
   ${'(field'}                         | ${'(field'}
   ${'(field='}                        | ${'(field='}
@@ -259,4 +339,11 @@ describe('Query language - WQL', () => {
     expect(WQL.transformUnifiedQuery(UQL)).toEqual(changedInput);
   });
 
+  /* The ! and ~ characters can't be part of a value that contains examples. The tests doesn't
+  include these cases.
+  
+  Value examples:
+  - with != value
+  - with ~ value
+  */
 });

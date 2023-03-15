@@ -62,6 +62,14 @@ const language = {
       },
     },
   },
+  equivalencesToUQL:{
+    conjunction:{
+      literal:{
+        'and': ';',
+        'or': ',',
+      }
+    }
+  }
 };
 
 // Suggestion mapper by language token type
@@ -101,9 +109,9 @@ const mapSuggestionCreatorValue = mapSuggestionCreator('value');
  */
 function transformQLConjunction(conjunction: string): string{
   // If the value has a whitespace or comma, then
-  return conjunction === ';'
-    ? ' and '
-    : ' or ';
+  return conjunction === language.equivalencesToUQL.conjunction.literal['and']
+    ? ` ${language.tokens.conjunction.literal['and']} `
+    : ` ${language.tokens.conjunction.literal['or']} `;
 };
 
 /**
@@ -491,15 +499,16 @@ export function transformSpecificQLToUnifiedQL(input: string){
         case 'value':{
           // Value is wrapped with "
           let [ _, extractedValue ] = value.match(/^"(.+)"$/) || [ null, null ];
-          // Replace the escape commas (\") by comma (")
+          // Replace the escaped comma (\") by comma (")
+          // WARN: This could cause a problem with value that contains this sequence \"
           extractedValue && (extractedValue = extractedValue.replace(/\\"/g, '"'));
           return extractedValue || value;
           break;
         }
         case 'conjunction':
           return value === 'and'
-            ? ';'
-            : ',';
+            ? language.equivalencesToUQL.conjunction.literal['and']
+            : language.equivalencesToUQL.conjunction.literal['or'];
           break;
         default:
           return value;
