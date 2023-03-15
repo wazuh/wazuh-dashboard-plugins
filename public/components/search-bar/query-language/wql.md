@@ -12,15 +12,15 @@ The implementation is adapted to work with the search bar component defined
 - Suggestions for `fields` (configurable), `operators` and `values` (configurable)
 - Support implicit query
 
-## Language syntax
+# Language syntax
 
-### Schema
+## Schema
 
 ```
 <operator_group>?<whitespace>?<field>?<whitespace>?<operator_compare>?<whitespace>?<value>?<whitespace>?<operator_conjunction>?<whitespace>?<operator_group>?<whitespace>?
 ```
 
-### Fields
+## Fields
 
 Regular expression: /[\\w.]+/
 
@@ -31,9 +31,9 @@ field
 field.custom
 ```
 
-### Operators
+## Operators
 
-#### Compare
+### Compare
 
 - `=` equal to
 - `!=` not equal to
@@ -41,15 +41,15 @@ field.custom
 - `<` smaller
 - `~` like
 
-#### Group
+### Group
 
 - `(` open
 - `)` close
 
-#### Logical
+### Conjunction (logical)
 
-- `and`
-- `or`
+- `and` intersection
+- `or` union
 
 ### Values
 
@@ -92,6 +92,8 @@ status != never_connected and ip ~ 240 or os.platform ~ linux
 (status!=never_connected and ip~240) or id=001
 ( status != never_connected and ip ~ 240 ) or id = 001
 ```
+
+## Developer notes
 
 ## Options
 
@@ -276,3 +278,11 @@ graph TD;
 
     output-->output_search_bar[Output]
 ```
+
+## Notes
+
+- The value that contains the following characters: `!`, `~` are not supported by the AQL and this
+could cause problems when do the request to the API.
+- The value with spaces are wrapped with `"`. If the value contains the `\"` sequence this is
+replaced by `"`. This could cause a problem with values that are intended to have the mentioned
+sequence.

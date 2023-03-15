@@ -12,9 +12,11 @@ The implementation is adapted to work with the search bar component defined
 - Suggestions for `fields` (configurable), `operators` and `values` (configurable)
 - Support implicit query
 
-## Language syntax
+# Language syntax
 
 Documentation: https://wazuh.com/<major_version>.<minor_version>/user-manual/api/queries.html
+
+# Developer notes
 
 ## Options
 
