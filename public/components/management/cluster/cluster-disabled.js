@@ -28,6 +28,7 @@ export const ClusterDisabled = withErrorBoundary (class ClusterDisabled extends 
                 Visit the documentation on{' '}
                 <EuiLink
                   href={webDocumentationLink('user-manual/configuring-cluster/index.html')}
+                  external
                   target='_blank'
                   rel='noopener noreferrer'
                 >

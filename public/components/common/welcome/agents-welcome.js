@@ -534,6 +534,7 @@ class AgentsWelcome extends Component {
             </p>
               <EuiLink
                 href={webDocumentationLink('user-manual/agents/agent-connection.html')}
+                external
                 target="_blank"
                 rel="noopener noreferrer"
               >

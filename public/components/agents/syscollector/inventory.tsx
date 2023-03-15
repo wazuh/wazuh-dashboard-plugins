@@ -44,6 +44,7 @@ export function SyscollectorInventory({ agent }) {
               )}
               target='_blank'
               rel='noopener noreferrer'
+              external
             >
               Checking connection with the Wazuh server
             </EuiLink>

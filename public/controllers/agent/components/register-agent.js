@@ -1026,6 +1026,7 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
             href={urlCheckConnectionDocumentation}
             target='_blank'
             rel="noopener noreferrer"
+            external
           >
             document.
           </EuiLink>

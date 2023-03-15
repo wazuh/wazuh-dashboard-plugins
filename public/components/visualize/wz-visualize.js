@@ -14,14 +14,13 @@ import { visualizations } from './visualizations';
 import { agentVisualizations } from './agent-visualizations';
 import KibanaVis from '../../kibana-integrations/kibana-vis';
 import {
-  EuiPage,
   EuiFlexGroup,
   EuiPanel,
   EuiFlexItem,
   EuiButton,
   EuiButtonIcon,
-  EuiDescriptionList,
   EuiCallOut,
+  EuiLink,
 } from '@elastic/eui';
 import WzReduxProvider from '../../redux/wz-redux-provider';
 import { WazuhConfig } from '../../react-services/wazuh-config';
@@ -77,18 +76,18 @@ export const WzVisualize = compose(
 
     /**
      * Reset the visualizations when the type of Dashboard is changed.
-     * 
+     *
      * There are 2 kinds of Dashboards:
      *   - General or overview   --> When to agent is pinned.
      *   - Specific or per agent --> When there is an agent pinned.
-     * 
-     * The visualizations are reset only when the type of Dashboard changes 
+     *
+     * The visualizations are reset only when the type of Dashboard changes
      * from a type to another, but aren't when the pinned agent changes.
-     * 
+     *
      * More info:
      * https://github.com/wazuh/wazuh-kibana-app/issues/4230#issuecomment-1152161434
-     * 
-     * @param {Object} prevProps 
+     *
+     * @param {Object} prevProps
      */
     async componentDidUpdate(prevProps) {
       if (
@@ -155,13 +154,14 @@ export const WzVisualize = compose(
           <EuiFlexItem grow={false}>
             There were some unknown fields for the current index pattern.
             You need to refresh the page to apply the changes.
-            <a
+            <EuiLink
               title="More information in Wazuh documentation"
               href={urlTroubleShootingDocs}
-              target="documentation"
+              target="_blank"
+              external
             >
               Troubleshooting
-            </a>
+            </EuiLink>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
             <EuiButton onClick={() => window.location.reload()} size="s">Reload page</EuiButton>
@@ -195,7 +195,7 @@ export const WzVisualize = compose(
                     aria-label="Expand"
                   />
                 </EuiFlexGroup>
-                <div style={{ height: '100%' }}>   
+                <div style={{ height: '100%' }}>
                   <WzReduxProvider>
                     <KibanaVis
                       refreshKnownFields={this.refreshKnownFields}
