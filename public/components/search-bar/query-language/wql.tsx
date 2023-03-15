@@ -524,7 +524,7 @@ export function transformSpecificQLToUnifiedQL(input: string){
  * @returns
  */
 function getOutput(input: string, options: {implicitQuery?: string} = {}) {
-  const query = `${transformUnifiedQueryToSpecificQueryLanguage(options?.implicitQuery ?? '')}${input}`;
+  const query = `${transformUnifiedQueryToSpecificQueryLanguage(options?.implicitQuery ?? '')}${options?.implicitQuery ? `(${input})` : input}`;
   return {
     language: WQL.id,
     unifiedQuery: transformSpecificQLToUnifiedQL(query),

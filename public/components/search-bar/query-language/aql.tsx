@@ -409,7 +409,7 @@ function transformSuggestionsToEuiSuggestItem(
  * @returns
  */
 function getOutput(input: string, options: {implicitQuery?: string} = {}) {
-  const unifiedQuery = `${options?.implicitQuery ?? ''}${input}`;
+  const unifiedQuery = `${options?.implicitQuery ?? ''}${options?.implicitQuery ? `(${input})` : input}`;
   return {
     language: AQL.id,
     query: unifiedQuery,
