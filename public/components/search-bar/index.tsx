@@ -4,6 +4,7 @@ import {
   EuiFormRow,
   EuiLink,
   EuiPopover,
+  EuiPopoverTitle,
   EuiSpacer,
   EuiSelect,
   EuiText,
@@ -141,6 +142,7 @@ export const SearchBar = ({
           isOpen={isOpenPopoverQueryLanguage}
           closePopover={onQueryLanguagePopoverSwitch}
         >
+          <EuiPopoverTitle>SYNTAX OPTIONS</EuiPopoverTitle>
           <EuiText>
             {searchBarQueryLanguages[queryLanguage.id].description}
           </EuiText>
