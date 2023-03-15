@@ -1,5 +1,5 @@
 import { AQL } from './aql';
-import { HAQL } from './haql';
+import { WQL } from './wql';
 
 type SearchBarQueryLanguage = {
   description: string;
@@ -21,7 +21,7 @@ type SearchBarQueryLanguage = {
 // Register the query languages
 export const searchBarQueryLanguages: {
   [key: string]: SearchBarQueryLanguage;
-} = [AQL, HAQL].reduce((accum, item) => {
+} = [AQL, WQL].reduce((accum, item) => {
   if (accum[item.id]) {
     throw new Error(`Query language with id: ${item.id} already registered.`);
   }

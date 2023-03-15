@@ -1,15 +1,15 @@
-import { getSuggestions, tokenizer, transformSpecificQLToUnifiedQL, HAQL } from './haql';
+import { getSuggestions, tokenizer, transformSpecificQLToUnifiedQL, WQL } from './wql';
 import React from 'react';
 import { render, waitFor } from '@testing-library/react';
 import { SearchBar } from '../index';
 
 describe('SearchBar component', () => {
   const componentProps = {
-    defaultMode: HAQL.id,
+    defaultMode: WQL.id,
     input: '',
     modes: [
       {
-        id: HAQL.id,
+        id: WQL.id,
         implicitQuery: 'id!=000;',
         suggestions: {
           field(currentValue) {
@@ -43,7 +43,7 @@ describe('SearchBar component', () => {
 });
 
 /* eslint-disable max-len */
-describe('Query language - HAQL', () => {
+describe('Query language - WQL', () => {
   // Tokenize the input
   function tokenCreator({type, value}){
     return {type, value};
@@ -153,7 +153,7 @@ describe('Query language - HAQL', () => {
 
   // Transform specific query language to UQL (Unified Query Language)
   it.each`
-  HAQL                                                    | UQL
+  WQL                                                    | UQL
   ${'field'}                                              | ${'field'}
   ${'field='}                                             | ${'field='}
   ${'field=value'}                                        | ${'field=value'}
@@ -177,13 +177,13 @@ describe('Query language - HAQL', () => {
   ${'field = value or field2 <'}                          | ${'field=value,field2<'}
   ${'field = value or field2 < value2'}                   | ${'field=value,field2<value2'}
   ${'( field = value ) and field2 > "custom value" '}     | ${'(field=value);field2>custom value'}
-  `('transformSpecificQLToUnifiedQL - HAQL $HAQL', ({HAQL, UQL}) => {
-    expect(transformSpecificQLToUnifiedQL(HAQL)).toEqual(UQL);
+  `('transformSpecificQLToUnifiedQL - WQL $WQL', ({WQL, UQL}) => {
+    expect(transformSpecificQLToUnifiedQL(WQL)).toEqual(UQL);
   });
 
   // When a suggestion is clicked, change the input text
   it.each`
-  HAQL                              | clikedSuggestion                                                            | changedInput
+  WQL                              | clikedSuggestion                                                            | changedInput
   ${''}                             | ${{type: { iconType: 'kqlField', color: 'tint4' }, label: 'field'}}         | ${'field'}
   ${'field'}                        | ${{type: { iconType: 'kqlField', color: 'tint4' }, label: 'field2'}}        | ${'field2'}
   ${'field'}                        | ${{type: { iconType: 'kqlOperand', color: 'tint1' }, label: '='}}           | ${'field='}
@@ -210,11 +210,11 @@ describe('Query language - HAQL', () => {
   ${'(field=value or field2>'}      | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'value2'}}        | ${'(field=value or field2>value2'}
   ${'(field=value or field2>value2'}| ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'value3'}}        | ${'(field=value or field2>value3'}
   ${'(field=value or field2>value2'}| ${{type: { iconType: 'tokenDenseVector', color: 'tint3' }, label: ')'}}     | ${'(field=value or field2>value2)'}
-  `('click suggestion - HAQL $HAQL => $changedInput', async ({HAQL: currentInput, clikedSuggestion, changedInput}) => {
+  `('click suggestion - WQL $WQL => $changedInput', async ({WQL: currentInput, clikedSuggestion, changedInput}) => {
     // Mock input
     let input = currentInput;
 
-    const qlOutput = await HAQL.run(input, {
+    const qlOutput = await WQL.run(input, {
       setInput: (value: string): void => { input = value; },
       queryLanguage: {
         parameters: {
@@ -232,7 +232,7 @@ describe('Query language - HAQL', () => {
 
   // Transform the external input in UQL (Unified Query Language) to QL
   it.each`
-  UQL                                 | HAQL
+  UQL                                 | WQL
   ${''}                               | ${''}
   ${'field'}                          | ${'field'}
   ${'field='}                         | ${'field='}
@@ -255,8 +255,8 @@ describe('Query language - HAQL', () => {
   ${'(field=value,field2>'}           | ${'(field=value or field2>'}
   ${'(field=value,field2>value2'}     | ${'(field=value or field2>value2'}
   ${'(field=value,field2>value2)'}     | ${'(field=value or field2>value2)'}
-  `('Transform the external input UQL to QL - UQL $UQL => $HAQL', async ({UQL, HAQL: changedInput}) => {
-    expect(HAQL.transformUnifiedQuery(UQL)).toEqual(changedInput);
+  `('Transform the external input UQL to QL - UQL $UQL => $WQL', async ({UQL, WQL: changedInput}) => {
+    expect(WQL.transformUnifiedQuery(UQL)).toEqual(changedInput);
   });
 
 });

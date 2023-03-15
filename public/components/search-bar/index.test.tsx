@@ -4,7 +4,7 @@ import { SearchBar } from './index';
 
 describe('SearchBar component', () => {
   const componentProps = {
-    defaultMode: 'haql',
+    defaultMode: 'wql',
     input: '',
     modes: [
       {
@@ -20,7 +20,7 @@ describe('SearchBar component', () => {
         },
       },
       {
-        id: 'haql',
+        id: 'wql',
         implicitQuery: 'id!=000;',
         suggestions: {
           field(currentValue) {
@@ -42,7 +42,7 @@ describe('SearchBar component', () => {
     const wrapper = render(
       <SearchBar
         {...componentProps}
-        defaultMode='haql'
+        defaultMode='wql'
       />
     );
 

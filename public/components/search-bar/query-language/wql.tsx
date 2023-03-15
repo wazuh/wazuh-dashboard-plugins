@@ -517,17 +517,17 @@ export function transformSpecificQLToUnifiedQL(input: string){
 function getOutput(input: string, options: {implicitQuery?: string} = {}) {
   const query = `${transformUnifiedQueryToSpecificQueryLanguage(options?.implicitQuery ?? '')}${input}`;
   return {
-    language: HAQL.id,
+    language: WQL.id,
     unifiedQuery: transformSpecificQLToUnifiedQL(query),
     query
   };
 };
 
-export const HAQL = {
-  id: 'haql',
-  label: 'HAQL',
-  description: 'HAQL allows to do queries.',
-  documentationLink: `https://github.com/wazuh/wazuh-kibana-app/blob/v${pluginPlatform.version.split('.').splice(0,2).join('.')}/public/components/search-bar/query-language/haql.md`,
+export const WQL = {
+  id: 'wql',
+  label: 'WQL',
+  description: 'WQL (Wazuh Query language) allows to do queries.',
+  documentationLink: `https://github.com/wazuh/wazuh-kibana-app/blob/v${pluginPlatform.version.split('.').splice(0,2).join('.')}/public/components/search-bar/query-language/wql.md`,
   getConfiguration() {
     return {
       isOpenPopoverImplicitFilter: false,

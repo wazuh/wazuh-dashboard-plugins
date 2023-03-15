@@ -43,7 +43,7 @@ exports[`SearchBar component Renders correctly the initial render 1`] = `
                       <span
                         class="euiButtonEmpty__text"
                       >
-                        HAQL
+                        WQL
                       </span>
                     </span>
                   </button>

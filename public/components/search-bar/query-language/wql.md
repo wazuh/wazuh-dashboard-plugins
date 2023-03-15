@@ -1,6 +1,6 @@
-# Query Language - HAQL
+# Query Language - WQL
 
-HAQL (Human API Query Language) is a query language based in the `q` query parameters of the Wazuh API
+WQL (Wazuh Query Language) is a query language based in the `q` query parameters of the Wazuh API
 endpoints.
 
 Documentation: https://wazuh.com/<major_version>.<minor_version>/user-manual/api/queries.html
