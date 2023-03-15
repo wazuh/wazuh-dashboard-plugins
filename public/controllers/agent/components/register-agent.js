@@ -1036,8 +1036,15 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
       const warningCommand = (
         <>
           <p>
-            Please
-            <EuiLink href={urlWindowsPackage} target='_blank'> download </EuiLink>
+            Please{' '}
+            <EuiLink
+              href={urlWindowsPackage}
+              target='_blank'
+              rel='noopener noreferrer'
+              external
+            >
+              download
+            </EuiLink>{' '}
             the package from our repository and copy it to the Windows system
             where you are going to install it. Then run the following command to
             perform the installation:
@@ -1167,10 +1174,10 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
                             'installation-guide/wazuh-agent/wazuh-agent-package-solaris.html',
                             appVersionMajorDotMinor,
                           )}
+                          external
                         >
-                          steps
+                          steps.
                         </EuiLink>
-                        .
                       </span>
                     }
                   ></EuiCallOut>
@@ -1183,9 +1190,14 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
                       <span>
                         After installing the agent, you need to enroll it in the
                         Wazuh server. Check the Wazuh agent enrollment{' '}
-                        <EuiLink target='_blank' href={urlWazuhAgentEnrollment}>
-                          Wazuh agent enrollment{' '}
-                        </EuiLink>
+                        <EuiLink
+                          target='_blank'
+                          href={urlWazuhAgentEnrollment}
+                          external
+                          rel='noopener noreferrer'
+                        >
+                          Wazuh agent enrollment
+                        </EuiLink>{' '}
                         section to learn more.
                       </span>
                     }
@@ -1207,10 +1219,10 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
                             'installation-guide/wazuh-agent/wazuh-agent-package-aix.html',
                             appVersionMajorDotMinor,
                           )}
+                          external
                         >
-                          steps
+                          steps.
                         </EuiLink>
-                        .
                       </span>
                     }
                   ></EuiCallOut>
@@ -1232,10 +1244,10 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
                             'installation-guide/wazuh-agent/wazuh-agent-package-hpux.html',
                             appVersionMajorDotMinor,
                           )}
+                          external
                         >
-                          steps
+                          steps.
                         </EuiLink>
-                        .
                       </span>
                     }
                   ></EuiCallOut>
@@ -1248,9 +1260,14 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
                       <span>
                         After installing the agent, you need to enroll it in the
                         Wazuh server. Check the Wazuh agent enrollment{' '}
-                        <EuiLink target='_blank' href={urlWazuhAgentEnrollment}>
-                          Wazuh agent enrollment{' '}
-                        </EuiLink>
+                        <EuiLink
+                          target='_blank'
+                          href={urlWazuhAgentEnrollment}
+                          external
+                          rel='noopener noreferrer'
+                        >
+                          Wazuh agent enrollment
+                        </EuiLink>{' '}
                         section to learn more.
                       </span>
                     }
@@ -1272,10 +1289,10 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
                             'installation-guide/wazuh-agent/wazuh-agent-package-linux.html',
                             appVersionMajorDotMinor,
                           )}
+                          external
                         >
-                          steps
+                          steps.
                         </EuiLink>
-                        .
                       </span>
                     }
                   ></EuiCallOut>
@@ -1288,9 +1305,14 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
                       <span>
                         After installing the agent, you need to enroll it in the
                         Wazuh server. Check the Wazuh agent enrollment{' '}
-                        <EuiLink target='_blank' href={urlWazuhAgentEnrollment}>
-                          Wazuh agent enrollment{' '}
-                        </EuiLink>
+                        <EuiLink
+                          target='_blank'
+                          href={urlWazuhAgentEnrollment}
+                          external
+                          rel='noopener noreferrer'
+                        >
+                          Wazuh agent enrollment
+                        </EuiLink>{' '}
                         section to learn more.
                       </span>
                     }
@@ -1315,10 +1337,10 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
                             'installation-guide/wazuh-agent/wazuh-agent-package-linux.html',
                             appVersionMajorDotMinor,
                           )}
+                          external
                         >
-                          steps
+                          steps.
                         </EuiLink>
-                        .
                       </span>
                     }
                   ></EuiCallOut>
@@ -1363,6 +1385,7 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
                         'user-manual/deployment-variables/deployment-variables.html',
                         appVersionMajorDotMinor,
                       )}
+                      external
                     >
                       secure protocol configured
                     </EuiLink>{' '}
