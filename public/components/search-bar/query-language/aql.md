@@ -1,3 +1,5 @@
+**WARNING: The search bar was changed and this language needs some adaptations to work.**
+
 # Query Language - AQL
 
 AQL (API Query Language) is a query language based in the `q` query parameters of the Wazuh API

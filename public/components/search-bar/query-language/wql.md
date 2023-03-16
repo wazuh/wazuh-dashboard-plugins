@@ -8,19 +8,24 @@ Documentation: https://wazuh.com/<major_version>.<minor_version>/user-manual/api
 The implementation is adapted to work with the search bar component defined 
 `public/components/search-bar/index.tsx`.
 
-## Features
-- Suggestions for `fields` (configurable), `operators` and `values` (configurable)
-- Support implicit query
-
 # Language syntax
 
-## Schema
+It supports 2 modes:
+
+- `explicit`: define the field, operator and value
+- `implicit`: use a term to search in the available fields
+
+Theses modes can not be combined.
+
+## Mode: explicit
+
+### Schema
 
 ```
 <operator_group>?<whitespace>?<field>?<whitespace>?<operator_compare>?<whitespace>?<value>?<whitespace>?<operator_conjunction>?<whitespace>?<operator_group>?<whitespace>?
 ```
 
-## Fields
+### Fields
 
 Regular expression: /[\\w.]+/
 
@@ -31,9 +36,9 @@ field
 field.custom
 ```
 
-## Operators
+### Operators
 
-### Compare
+#### Compare
 
 - `=` equal to
 - `!=` not equal to
@@ -41,17 +46,17 @@ field.custom
 - `<` smaller
 - `~` like
 
-### Group
+#### Group
 
 - `(` open
 - `)` close
 
-### Conjunction (logical)
+#### Conjunction (logical)
 
 - `and` intersection
 - `or` union
 
-### Values
+#### Values
 
 - Value without spaces can be literal
 - Value with spaces should be wrapped by `"`. The `"` can be escaped using `\"`.
@@ -93,19 +98,73 @@ status != never_connected and ip ~ 240 or os.platform ~ linux
 ( status != never_connected and ip ~ 240 ) or id = 001
 ```
 
+## Mode: implicit
+
+Search the term in the available fields.
+
+This mode is used when there is no a `field` and `operator` attending to the regular expression
+of the **explicit** mode.
+
+### Examples:
+
+```
+linux
+```
+
+If the available fields are `id` and `ip`, then the input will be translated under the hood to the
+following UQL syntax:
+
+```
+id~linux,ip~linux
+```
+
 ## Developer notes
+
+## Features
+- Support suggestions for each token entity. `fields` and `values` are customizable.
+- Support implicit query.
+- Support for search term mode. It enables to search a term in multiple fields.
+  The query is built under the hoods. This mode requires there are `field` and `operator_compare`.
+
+### Implicit query
+
+This a query that can't be added, edited or removed by the user. It is added to the user input.
+
+### Search term mode
+
+This mode enables to search in multiple fields. The fields to use must be defined.
+
+Use an union expression of each field with the like as operation `~`.
+
+The user input is transformed to something as:
+```
+field1~user_input,field2~user_input,field3~user_input
+```
 
 ## Options
 
 - `implicitQuery`: add an implicit query that is added to the user input. Optional.
+  This can't be changed by the user. If this is defined, will be displayed as a prepend of the search bar.
+  - `query`: query string in UQL (Unified Query Language)
 Use UQL (Unified Query Language).
-This can't be changed by the user. If this is defined, will be displayed as a prepend of the search bar. 
+  - `conjunction`: query string of the conjunction in UQL (Unified Query Language)
+ 
 
 ```ts
 // language options
 // ID is not equal to 000 and <user input>. This is defined in UQL that is transformed internally to
 // the specific query language.
-implicitQuery: 'id!=000;'
+implicitQuery: {
+  query: 'id!=000',
+  conjunction: ';'
+}
+```
+
+- `searchTermFields`: define the fields used to build the query for the search term mode
+
+```ts
+// language options
+searchTermFields: ['id', 'ip']
 ```
 
 - `suggestions`: define the suggestion handlers. This is required.

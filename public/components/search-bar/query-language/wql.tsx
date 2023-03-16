@@ -203,7 +203,13 @@ type QLOptionSuggestionHandler = (
   }: { previousField: string; previousOperatorCompare: string },
 ) => Promise<QLOptionSuggestionEntityItem[]>;
 
-type optionsQL = {
+type OptionsQLImplicitQuery = {
+  query: string
+  conjunction: string
+}
+type OptionsQL = {
+  implicitQuery?: OptionsQLImplicitQuery
+  searchTermFields?: string[]
   suggestions: {
     field: QLOptionSuggestionHandler;
     value: QLOptionSuggestionHandler;
@@ -216,7 +222,7 @@ type optionsQL = {
  * @param tokenType token type to search
  * @returns
  */
-function getLastTokenWithValue(
+function getLastTokenDefined(
   tokens: ITokens
 ): IToken | undefined {
   // Reverse the tokens array and use the Array.protorype.find method
@@ -234,7 +240,7 @@ function getLastTokenWithValue(
  * @param tokenType token type to search
  * @returns
  */
-function getLastTokenWithValueByType(
+function getLastTokenDefinedByType(
   tokens: ITokens,
   tokenType: ITokenType,
 ): IToken | undefined {
@@ -255,13 +261,13 @@ function getLastTokenWithValueByType(
  * @param options
  * @returns
  */
-export async function getSuggestions(tokens: ITokens, options: optionsQL): Promise<QLOptionSuggestionEntityItemTyped[]> {
+export async function getSuggestions(tokens: ITokens, options: OptionsQL): Promise<QLOptionSuggestionEntityItemTyped[]> {
   if (!tokens.length) {
     return [];
   }
 
   // Get last token
-  const lastToken = getLastTokenWithValue(tokens);
+  const lastToken = getLastTokenDefined(tokens);
 
   // If it can't get a token with value, then returns fields and open operator group
   if(!lastToken?.type){
@@ -302,8 +308,8 @@ export async function getSuggestions(tokens: ITokens, options: optionsQL): Promi
       ];
       break;
     case 'operator_compare':{
-      const previousField = getLastTokenWithValueByType(tokens, 'field')?.value;
-      const previousOperatorCompare = getLastTokenWithValueByType(
+      const previousField = getLastTokenDefinedByType(tokens, 'field')?.value;
+      const previousOperatorCompare = getLastTokenDefinedByType(
         tokens,
         'operator_compare',
       )?.value;
@@ -340,14 +346,14 @@ export async function getSuggestions(tokens: ITokens, options: optionsQL): Promi
       break;
     }
     case 'value':{
-      const previousField = getLastTokenWithValueByType(tokens, 'field')?.value;
-      const previousOperatorCompare = getLastTokenWithValueByType(
+      const previousField = getLastTokenDefinedByType(tokens, 'field')?.value;
+      const previousOperatorCompare = getLastTokenDefinedByType(
         tokens,
         'operator_compare',
       )?.value;
 
-      // If there is no a previous field or operator_compar, then no return suggestions because
-      //it would be an syntax error
+      /* If there is no a previous field or operator_compare, then no return suggestions because
+        it would be an syntax error */
       if(!previousField || !previousOperatorCompare){
         return [];
       };
@@ -461,11 +467,11 @@ function transformSuggestionsToEuiSuggestItem(
 };
 
 /**
- * Transform the UQL (Unified Query Language) to SpecificQueryLanguage
+ * Transform the UQL (Unified Query Language) to QL
  * @param input 
  * @returns 
  */
-export function transformUnifiedQueryToSpecificQueryLanguage(input: string){
+export function transformUQLToQL(input: string){
   const tokens = tokenizerUQL(input);
   return tokens
     .filter(({value}) => value)
@@ -485,13 +491,29 @@ export function transformUnifiedQueryToSpecificQueryLanguage(input: string){
     ).join('');
 };
 
+export function shouldUseSearchTerm(tokens: ITokens): boolean{
+  return !(
+    tokens.some(({type, value}) => type === 'operator_compare' && value )
+    && tokens.some(({type, value}) => type === 'field' && value )
+  );
+};
+
+export function transformToSearchTerm(searchTermFields: string[], input: string): string{
+  return searchTermFields.map(searchTermField => `${searchTermField}~${input}`).join(',');
+};
+
 /**
- * Transform the input in SpecificQueryLanguage to UQL (Unified Query Language)
+ * Transform the input in QL to UQL (Unified Query Language)
  * @param input 
  * @returns 
  */
-export function transformSpecificQLToUnifiedQL(input: string){
+export function transformSpecificQLToUnifiedQL(input: string, searchTermFields: string[]){
   const tokens = tokenizer(input);
+
+  if(input && searchTermFields && shouldUseSearchTerm(tokens)){
+    return transformToSearchTerm(searchTermFields, input);
+  };
+
   return tokens
     .filter(({type, value}) => type !== 'whitespace' && value)
     .map(({type, value}) => {
@@ -523,19 +545,45 @@ export function transformSpecificQLToUnifiedQL(input: string){
  * @param input
  * @returns
  */
-function getOutput(input: string, options: {implicitQuery?: string} = {}) {
-  const query = `${transformUnifiedQueryToSpecificQueryLanguage(options?.implicitQuery ?? '')}${options?.implicitQuery ? `(${input})` : input}`;
+function getOutput(input: string, options: OptionsQL) {
+  // Implicit query
+  const implicitQueryAsUQL = options?.implicitQuery?.query ?? '';
+  const implicitQueryAsQL = transformUQLToQL(
+    implicitQueryAsUQL
+  );
+
+  // Implicit query conjunction
+  const implicitQueryConjunctionAsUQL = options?.implicitQuery?.conjunction ?? '';
+  const implicitQueryConjunctionAsQL = transformUQLToQL(
+    implicitQueryConjunctionAsUQL
+  );
+
+  // User input query
+  const inputQueryAsQL = input;
+  const inputQueryAsUQL = transformSpecificQLToUnifiedQL(
+    inputQueryAsQL,
+    options?.searchTermFields ?? []
+  );
+
   return {
     language: WQL.id,
-    unifiedQuery: transformSpecificQLToUnifiedQL(query),
-    query
+    unifiedQuery: [
+      implicitQueryAsUQL,
+      implicitQueryAsUQL && inputQueryAsUQL ? implicitQueryConjunctionAsUQL : '',
+      implicitQueryAsUQL && inputQueryAsUQL ? `(${inputQueryAsUQL})`: inputQueryAsUQL
+    ].join(''),
+    query: [
+      implicitQueryAsQL,
+      implicitQueryAsQL && inputQueryAsQL ? implicitQueryConjunctionAsQL : '',
+      implicitQueryAsQL && inputQueryAsQL ? `(${inputQueryAsQL})`: inputQueryAsQL
+    ].join('')
   };
 };
 
 export const WQL = {
   id: 'wql',
   label: 'WQL',
-  description: 'WQL (Wazuh Query language) allows to do queries.',
+  description: 'WQL (Wazuh Query Language) allows to do queries.',
   documentationLink: `https://github.com/wazuh/wazuh-kibana-app/blob/v${pluginPlatform.version.split('.').splice(0,2).join('.')}/public/components/search-bar/query-language/wql.md`,
   getConfiguration() {
     return {
@@ -546,10 +594,16 @@ export const WQL = {
     // Get the tokens from the input
     const tokens: ITokens = tokenizer(input);
 
-    //
-    const implicitQueryAsSpecificQueryLanguage = params.queryLanguage.parameters.implicitQuery
-      ? transformUnifiedQueryToSpecificQueryLanguage(params.queryLanguage.parameters.implicitQuery)
+    // Get the implicit query as query language syntax
+    const implicitQueryAsQL = params.queryLanguage.parameters.implicitQuery
+      ? transformUQLToQL(
+        params.queryLanguage.parameters.implicitQuery.query
+        + params.queryLanguage.parameters.implicitQuery.conjunction
+      )
       : '';
+
+    // Get the output of query language
+    const output = getOutput(input, params.queryLanguage.parameters);
 
     return {
       searchBarProps: {
@@ -563,10 +617,10 @@ export const WQL = {
           // When the clicked item has the `search` iconType, run the `onSearch` function
           if (item.type.iconType === 'search') {
             // Execute the search action
-            params.onSearch(getOutput(input, params.queryLanguage.parameters));
+            params.onSearch(output);
           } else {
             // When the clicked item has another iconType
-            const lastToken: IToken | undefined = getLastTokenWithValue(tokens);
+            const lastToken: IToken | undefined = getLastTokenDefined(tokens);
             // if the clicked suggestion is of same type of last token
             if (
               lastToken && suggestionMappingLanguageTokenType[lastToken.type].iconType ===
@@ -577,7 +631,10 @@ export const WQL = {
             } else {
               // add a whitespace for conjunction <whitespace><conjunction>
               !(/\s$/.test(input))
-              && item.type.iconType === suggestionMappingLanguageTokenType.conjunction.iconType
+              && (
+                item.type.iconType === suggestionMappingLanguageTokenType.conjunction.iconType
+                || lastToken?.type === 'conjunction'
+              )
               && tokens.push({
                 type: 'whitespace',
                 value: ' '
@@ -610,7 +667,7 @@ export const WQL = {
               .join(''));
           }
         },
-        prepend: implicitQueryAsSpecificQueryLanguage ? (
+        prepend: implicitQueryAsQL ? (
           <EuiPopover
             button={
               <EuiButtonEmpty
@@ -624,7 +681,7 @@ export const WQL = {
                 iconType='filter'
               >
                 <EuiCode>
-                  {implicitQueryAsSpecificQueryLanguage}
+                  {implicitQueryAsQL}
                 </EuiCode>
               </EuiButtonEmpty>
             }
@@ -640,7 +697,7 @@ export const WQL = {
           >
             <EuiText>
               Implicit query:{' '}
-              <EuiCode>{implicitQueryAsSpecificQueryLanguage}</EuiCode>
+              <EuiCode>{implicitQueryAsQL}</EuiCode>
             </EuiText>
             <EuiText color='subdued'>This query is added to the input.</EuiText>
           </EuiPopover>
@@ -651,8 +708,8 @@ export const WQL = {
         // use case.
         disableFocusTrap: true
       },
-      output: getOutput(input, params.queryLanguage.parameters),
+      output,
     };
   },
-  transformUnifiedQuery: transformUnifiedQueryToSpecificQueryLanguage,
+  transformUQLToQL: transformUQLToQL,
 };

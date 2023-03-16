@@ -21,7 +21,10 @@ describe('SearchBar component', () => {
       },
       {
         id: 'wql',
-        implicitQuery: 'id!=000;',
+        implicitQuery: {
+          query: 'id!=000',
+          conjunction: ';'
+        },
         suggestions: {
           field(currentValue) {
             return [];

@@ -200,6 +200,6 @@ describe('Query language - AQL', () => {
   ${'(field=value,field2>value2'}     | ${'(field=value,field2>value2'}
   ${'(field=value,field2>value2)'}    | ${'(field=value,field2>value2)'}
   `('Transform the external input UQL to QL - UQL $UQL => $AQL', async ({UQL, AQL: changedInput}) => {
-    expect(AQL.transformUnifiedQuery(UQL)).toEqual(changedInput);
+    expect(AQL.transformUQLToQL(UQL)).toEqual(changedInput);
   });
 });

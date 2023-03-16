@@ -625,7 +625,25 @@ export const AgentsTable = withErrorBoundary(
               modes={[
                 {
                   id: 'wql',
-                  implicitQuery: 'id!=000;',
+                  implicitQuery: {
+                    query: 'id!=000',
+                    conjunction: ';'
+                  },
+                  searchTermFields: [
+                    'configSum',
+                    'dateAdd',
+                    'id',
+                    'group',
+                    'group_config_status',
+                    'lastKeepAline',
+                    'manager',
+                    'mergedSum',
+                    'name',
+                    'node_name',
+                    'os.platform',
+                    'status',
+                    'version'
+                  ],
                   suggestions: {
                     field(currentValue) {
                       return [

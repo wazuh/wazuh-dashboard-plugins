@@ -12,7 +12,7 @@ import {
 import { EuiSuggest } from '../eui-suggest';
 import { searchBarQueryLanguages } from './query-language';
 
-type Props = {
+type SearchBarProps = {
   defaultMode?: string;
   modes: { id: string; [key: string]: any }[];
   onChange?: (params: any) => void;
@@ -26,7 +26,7 @@ export const SearchBar = ({
   onChange,
   onSearch,
   ...rest
-}: Props) => {
+}: SearchBarProps) => {
   // Query language ID and configuration
   const [queryLanguage, setQueryLanguage] = useState<{
     id: string;
@@ -73,10 +73,10 @@ export const SearchBar = ({
   };
 
   useEffect(() => {
-    // React to external changes and set the internal input text. Use the `transformUnifiedQuery` of
+    // React to external changes and set the internal input text. Use the `transformUQLToQL` of
     // the query language in use
     rest.input && setInput(
-      searchBarQueryLanguages[queryLanguage.id]?.transformUnifiedQuery?.(
+      searchBarQueryLanguages[queryLanguage.id]?.transformUQLToQL?.(
         rest.input,
       ),
     );

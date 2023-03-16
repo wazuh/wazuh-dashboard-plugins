@@ -26,13 +26,15 @@ Basic usage:
   // The ID of them should be registered previously. See How to add a new query language documentation.
   modes={[
     {
-      id: 'aql',
+      id: 'wql',
       // specific query language parameters
       // implicit query. Optional
       // Set a implicit query that can't be changed by the user.
       // Use the UQL (Unified Query Language) syntax.
-      // Each query language implementation must interpret
-      implicitQuery: 'id!=000;',
+      implicitQuery: {
+        query: 'id!=000',
+        conjunction: ';'
+      },
       suggestions: {
         field(currentValue) {
           return [
@@ -202,7 +204,7 @@ type SearchBarQueryLanguage = {
       query: string
     }
   }>;
-  transformUnifiedQuery: (unifiedQuery: string) => string;
+  transformUQLToQL: (unifiedQuery: string) => string;
 };
 ```
 
@@ -221,7 +223,7 @@ where:
     - `language`: query language ID
     - `unifiedQuery`: query in unified query syntax
     - `query`: current query in the specified language
-- `transformUnifiedQuery`: method that transform the Unified Query Language to the specific query
+- `transformUQLToQL`: method that transforms the UQL (Unified Query Language) to the specific query
   language. This is used when receives a external input in the Unified Query Language, the returned
   value is converted to the specific query language to set the new input text of the search bar
   component.

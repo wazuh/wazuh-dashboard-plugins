@@ -10,7 +10,10 @@ describe('SearchBar component', () => {
     modes: [
       {
         id: WQL.id,
-        implicitQuery: 'id!=000;',
+        implicitQuery: {
+          query: 'id!=000',
+          conjunction: ';'
+        },
         suggestions: {
           field(currentValue) {
             return [];
@@ -249,6 +252,9 @@ describe('Query language - WQL', () => {
   ${'field='}                       | ${{type: { iconType: 'kqlOperand', color: 'tint1' }, label: '!='}}          | ${'field!='}
   ${'field=value'}                  | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'value2'}}        | ${'field=value2'}
   ${'field=value'}                  | ${{type: { iconType: 'kqlSelector', color: 'tint3' }, label: 'and'}}        | ${'field=value and '}
+  ${'field=value and'}              | ${{type: { iconType: 'kqlSelector', color: 'tint3' }, label: 'or'}}         | ${'field=value or'}
+  ${'field=value and'}              | ${{type: { iconType: 'kqlField', color: 'tint4' }, label: 'field2'}}        | ${'field=value and field2'}
+  ${'field=value and '}             | ${{type: { iconType: 'kqlSelector', color: 'tint3' }, label: 'or'}}         | ${'field=value or '}
   ${'field=value and '}             | ${{type: { iconType: 'kqlField', color: 'tint4' }, label: 'field2'}}        | ${'field=value and field2'}
   ${'field=value and field2'}       | ${{type: { iconType: 'kqlOperand', color: 'tint1' }, label: '>'}}           | ${'field=value and field2>'}
   ${'field='}                       | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'with spaces'}}   | ${'field="with spaces"'}
@@ -269,6 +275,9 @@ describe('Query language - WQL', () => {
   ${'(field='}                      | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'value'}}         | ${'(field=value'}
   ${'(field=value'}                 | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'value2'}}        | ${'(field=value2'}
   ${'(field=value'}                 | ${{type: { iconType: 'kqlSelector', color: 'tint3' }, label: 'or'}}         | ${'(field=value or '}
+  ${'(field=value or'}              | ${{type: { iconType: 'kqlSelector', color: 'tint3' }, label: 'and'}}        | ${'(field=value and'}
+  ${'(field=value or'}              | ${{type: { iconType: 'kqlField', color: 'tint4' }, label: 'field2'}}        | ${'(field=value or field2'}
+  ${'(field=value or '}             | ${{type: { iconType: 'kqlSelector', color: 'tint3' }, label: 'and'}}        | ${'(field=value and '}
   ${'(field=value or '}             | ${{type: { iconType: 'kqlField', color: 'tint4' }, label: 'field2'}}        | ${'(field=value or field2'}
   ${'(field=value or field2'}       | ${{type: { iconType: 'kqlOperand', color: 'tint1' }, label: '>'}}           | ${'(field=value or field2>'}
   ${'(field=value or field2>'}      | ${{type: { iconType: 'kqlOperand', color: 'tint1' }, label: '>'}}           | ${'(field=value or field2>'}
@@ -336,7 +345,7 @@ describe('Query language - WQL', () => {
   ${'(field=value,field2>value2'}     | ${'(field=value or field2>value2'}
   ${'(field=value,field2>value2)'}     | ${'(field=value or field2>value2)'}
   `('Transform the external input UQL to QL - UQL $UQL => $WQL', async ({UQL, WQL: changedInput}) => {
-    expect(WQL.transformUnifiedQuery(UQL)).toEqual(changedInput);
+    expect(WQL.transformUQLToQL(UQL)).toEqual(changedInput);
   });
 
   /* The ! and ~ characters can't be part of a value that contains examples. The tests doesn't

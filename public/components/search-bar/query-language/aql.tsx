@@ -517,7 +517,7 @@ export const AQL = {
       output: getOutput(input, params.queryLanguage.parameters),
     };
   },
-  transformUnifiedQuery(unifiedQuery: string): string {
+  transformUQLToQL(unifiedQuery: string): string {
     return unifiedQuery;
   },
 };
