@@ -157,7 +157,7 @@ export class DiscoverNoResults extends Component {
             <p>
               <FormattedMessage
                 id="discover.noResults.searchExamples.howTosearchForWebServerLogsDescription"
-                defaultMessage="The search bar at the top uses Elasticsearch&rsquo;s support for Lucene {queryStringSyntaxLink}.
+                defaultMessage="The search bar at the top uses OpenSearch&rsquo;s support for Lucene {queryStringSyntaxLink}.
                 Here are some examples of how you can search for web server logs that have been parsed into a few fields."
                 values={{
                   queryStringSyntaxLink: (
@@ -165,7 +165,7 @@ export class DiscoverNoResults extends Component {
                       rel="noopener noreferrer"
                       external
                       target="_blank"
-                      href={getServices().docLinks.links.query.luceneQuerySyntax}
+                      href={getServices().docLinks.links.opensearch.queryDSL.base}
                     >
                       <FormattedMessage
                         id="discover.noResults.searchExamples.queryStringSyntaxLinkText"

@@ -204,9 +204,9 @@ export const RegisterAgent = withErrorBoundary(
       if (remoteConfig) {
         this.setState({
           haveUdpProtocol: remoteConfig.isUdp,
-          haveConnectionSecure: remoteConfig.isSecure,
+          haveConnectionSecure: remoteConfig.haveSecureConnection,
           udpProtocol: remoteConfig.isUdp,
-          connectionSecure: remoteConfig.isSecure,
+          connectionSecure: remoteConfig.haveSecureConnection,
         })
       }
     }
@@ -1097,9 +1097,7 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
               title='This section could not be displayed because you do not have permission to get access to the registration service.'
               iconType='iInCircle'
             />
-          ) : this.state.selectedOS &&
-            this.state.connectionSecure === true &&
-            this.state.udpProtocol === false ? (
+          ) : this.state.selectedOS && (
             <EuiText>
               {this.state.agentName.length > 0 ? (
                 <p>
@@ -1117,19 +1115,39 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
                 title={warningUpgrade}
                 iconType='iInCircle'
               />
-              <EuiSpacer />
-              {windowsAdvice}
-              {this.state.selectedVersion === 'windowsxp' && (
+
+              {!this.state.connectionSecure && (
                 <>
+                  <EuiSpacer />
+                  {/** Warning connection NO SECURE */}
                   <EuiCallOut
-                    color='warning'
-                    title={warningCommand}
+                    color='danger'
+                    title={
+                      <>
+                        Warning: there's no{' '}
+                        <EuiLink
+                          rel='noopener noreferrer'
+                          target='_blank'
+                          href={webDocumentationLink(
+                            'user-manual/deployment-variables/deployment-variables.html',
+                            appVersionMajorDotMinor,
+                          )}
+                          external
+                        >
+                          secure protocol configured
+                        </EuiLink>{' '}
+                        and agents will not be able to communicate with the manager.
+                      </>
+                    }
                     iconType='iInCircle'
                   />
-                  <EuiSpacer />
+                  {/** END Warning connection NO SECURE */}
                 </>
               )}
-              {this.state.selectedVersion === 'windowsserver2008' && (
+              <EuiSpacer />
+              {windowsAdvice}
+              {['windowsxp', 'windowsserver2008'].includes(
+                this.state.selectedVersion) && (
                 <>
                   <EuiCallOut
                     color='warning'
@@ -1147,7 +1165,7 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
                     ? this.obfuscatePassword(text)
                     : text}
                 </EuiCodeBlock>
-                <EuiCopy textToCopy={text}>
+                <EuiCopy textToCopy={text || ''}>
                   {copy => (
                     <div className='copy-overlay' onClick={copy}>
                       <p>
@@ -1361,150 +1379,6 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
               )}
               <EuiSpacer />
             </EuiText>
-          ) : this.state.selectedOS && this.state.connectionSecure === false ? (
-            <EuiText>
-              <p>
-                You can use this command to install and enroll the Wazuh agent
-                in one or more hosts.
-              </p>
-              <EuiCallOut
-                color='warning'
-                title={warningUpgrade}
-                iconType='iInCircle'
-              />
-              <EuiSpacer />
-              <EuiCallOut
-                color='danger'
-                title={
-                  <>
-                    Warning: there's no{' '}
-                    <EuiLink
-                      rel='noopener noreferrer'
-                      target='_blank'
-                      href={webDocumentationLink(
-                        'user-manual/deployment-variables/deployment-variables.html',
-                        appVersionMajorDotMinor,
-                      )}
-                      external
-                    >
-                      secure protocol configured
-                    </EuiLink>{' '}
-                    and agents will not be able to communicate with the manager.
-                  </>
-                }
-                iconType='iInCircle'
-              />
-              <EuiSpacer />
-              {windowsAdvice}
-              {this.state.selectedVersion === 'windowsxp' && (
-                <>
-                  <EuiCallOut
-                    color='warning'
-                    title={warningCommand}
-                    iconType='iInCircle'
-                  />
-                  <EuiSpacer />
-                </>
-              )}
-              {this.state.selectedVersion === 'windowsserver2008' && (
-                <>
-                  <EuiCallOut
-                    color='warning'
-                    title={warningCommand}
-                    iconType='iInCircle'
-                  />
-                  <EuiSpacer />
-                </>
-              )}
-              <div className='copy-codeblock-wrapper'>
-                <EuiCodeBlock style={codeBlock} language={language}>
-                  {this.state.wazuhPassword &&
-                  !this.state.showPassword &&
-                  !['sol', 'hp', 'alpine'].includes(this.state.selectedOS)
-                    ? this.obfuscatePassword(text)
-                    : text}
-                </EuiCodeBlock>
-                <EuiCopy textToCopy={text || ''}>
-                  {copy => (
-                    <div className='copy-overlay' onClick={copy}>
-                      <p>
-                        <EuiIcon type='copy' /> Copy command
-                      </p>
-                    </div>
-                  )}
-                </EuiCopy>
-              </div>
-              {this.state.needsPassword && (
-                <EuiSwitch
-                  label='Show password'
-                  checked={this.state.showPassword}
-                  onChange={active => this.setShowPassword(active)}
-                />
-              )}
-              <EuiSpacer />
-            </EuiText>
-          ) : (
-            this.state.selectedOS && (
-              <EuiText>
-                <p>
-                  You can use this command to install and enroll the Wazuh agent
-                  in one or more hosts.
-                </p>
-                <EuiCallOut
-                  color='warning'
-                  title={warningUpgrade}
-                  iconType='iInCircle'
-                />
-                <EuiSpacer />
-                {windowsAdvice}
-                {this.state.selectedVersion === 'windowsxp' && (
-                  <>
-                    <EuiCallOut
-                      color='warning'
-                      title={warningCommand}
-                      iconType='iInCircle'
-                    />
-                    <EuiSpacer />
-                  </>
-                )}
-                {this.state.selectedVersion === 'windowsserver2008' && (
-                  <>
-                    <EuiCallOut
-                      color='warning'
-                      title={warningCommand}
-                      iconType='iInCircle'
-                    />
-                    <EuiSpacer />
-                  </>
-                )}
-                <div className='copy-codeblock-wrapper'>
-                  <EuiCodeBlock style={codeBlock} language={language}>
-                    {this.state.wazuhPassword &&
-                    !this.state.showPassword &&
-                    !['sol', 'hp', 'alpine'].includes(this.state.selectedOS)
-                      ? this.obfuscatePassword(text)
-                      : text}
-                  </EuiCodeBlock>
-                  <EuiCopy textToCopy={text || ''}>
-                    {copy => (
-                      <div className='copy-overlay' onClick={copy}>
-                        <p>
-                          <EuiIcon type='copy' /> Copy command
-                        </p>
-                      </div>
-                    )}
-                  </EuiCopy>
-                </div>
-                {this.state.needsPassword && (
-                  <EuiSwitch
-                    label='Show password'
-                    checked={this.state.showPassword}
-                    onChange={active => this.setShowPassword(active)}
-                  />
-                )}
-                <EuiSpacer />
-              </EuiText>
-            )
           )}
         </div>
       );
