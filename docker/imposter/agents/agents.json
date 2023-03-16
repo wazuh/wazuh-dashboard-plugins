@@ -84,6 +84,15 @@
         "lastKeepAlive": "9999-12-31T23:59:59Z",
         "version": "Wazuh v4.5.0",
         "group_config_status": "not synced"
+      },
+      {
+        "status": "never_connected",
+        "name": "NewAgent",
+        "dateAdd": "2023-03-14T09:44:11Z",
+        "node_name": "unknown",
+        "registerIP": "any",
+        "id": "004",
+        "ip": "any"
       }
     ],
     "total_affected_items": 4,
