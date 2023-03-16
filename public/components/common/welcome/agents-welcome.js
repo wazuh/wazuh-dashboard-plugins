@@ -316,9 +316,7 @@ class AgentsWelcome extends Component {
                 </EuiPopover>
               </EuiFlexItem>
               }
-              <div className="wz-agent-empty-item">
-              <EuiFlexItem></EuiFlexItem>
-              </div>
+              <EuiFlexItem className="wz-agent-empty-item"></EuiFlexItem>
               <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
                 <EuiButtonEmpty
                   iconType="inspect"
