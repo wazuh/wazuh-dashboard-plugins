@@ -245,6 +245,15 @@ export class InventoryTable extends Component {
         endpoint={`/vulnerability/${this.props.agent.id}?${selectFields}`}
         isExpandable={true}
         rowProps={getRowProps}
+        mapResponseItem={(item) => ({
+          ...item,
+          // Some vulnerability data could not contain the external_references field.
+          // This causes the rendering of them can crash when opening the flyout with the details.
+          // So, we ensure the fields are defined with the expected data structure.
+          external_references: Array.isArray(item?.external_references) 
+            ? item?.external_references
+            : []
+        })}
         error={error}
         downloadCsv={true}
         filters={filters}

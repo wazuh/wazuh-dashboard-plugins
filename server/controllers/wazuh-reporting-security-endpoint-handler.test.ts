@@ -6,6 +6,11 @@ jest.mock('../lib/logger', () => ({
   log: jest.fn()
 }));
 
+jest.mock('../lib/reporting/extended-information', () => ({
+  extendedInformation: () => {},
+  buildAgentsTable: () => {}
+}));
+
 jest.mock('../lib/reporting/printer', () => {
   class ReportPrinterMock {
     constructor() { }
@@ -143,16 +148,15 @@ describe('[security] POST /reports', () => {
 
   it.each`
 		titleTest               | username         | moduleID          | valid
-		${'Get report'}         | ${'admin'}       | ${'general'}      | ${true}
+		${'Create report'}         | ${'admin'}       | ${'general'}      | ${true}
 		${'Endpoint protected'} | ${'admin'}       | ${'../general'}   | ${false}
-		${'Get report'}         | ${'../../etc'}   | ${'general'}      | ${true}
+		${'Create report'}         | ${'../../etc'}   | ${'general'}      | ${true}
 		${'Endpoint protected'} | ${'../../etc'}   | ${'../general'}   | ${false}
 	`(`$titleTest: POST /reports/modules/$moduleID
 	username: $username
 	valid: $valid`, async ({ username, moduleID, valid }) => {
     jest.spyOn(endpointController, 'renderHeader').mockImplementation(() => true);
     jest.spyOn(endpointController, 'sanitizeKibanaFilters').mockImplementation(() => [false, false]);
-    jest.spyOn(endpointController, 'extendedInformation').mockImplementation(() => true);
 
     const mockRequest = {
       body: {

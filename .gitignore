@@ -68,9 +68,17 @@ typings/
 # dotenv environment variables file
 .env
 
-package-lock.json
 
 target/
 build/
 
 yarn.lock
+
+cypress/node_modules/
+cypress/.idea/
+cypress/cypress.env.json
+cypress/report/
+cypress/cookies.json
+
+# Customization plugin assets
+public/assets/custom/*

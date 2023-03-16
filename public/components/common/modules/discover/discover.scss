@@ -37,3 +37,18 @@ div.euiPanel.euiComboBoxOptionsList.euiComboBoxOptionsList {
 .hover-row{
     background-color: #fbfcfd;
 }
+
+.module-discover-table .module-discover-table-details {
+    td {
+        vertical-align: text-bottom;
+
+        .wzDocViewer__value {
+            display: inline-block;
+            word-break: break-all;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            vertical-align: top;
+            padding-top: 2px;
+        }
+    }
+}

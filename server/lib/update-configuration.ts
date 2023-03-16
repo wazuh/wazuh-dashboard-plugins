@@ -12,7 +12,8 @@
 import fs from 'fs';
 import { log } from './logger';
 import { getConfiguration } from './get-configuration';
-import { WAZUH_DATA_CONFIG_APP_PATH, WAZUH_CONFIGURATION_SETTINGS_NEED_RESTART, WAZUH_CONFIGURATION_SETTINGS_NEED_RELOAD, WAZUH_CONFIGURATION_SETTINGS_NEED_HEALTH_CHECK } from '../../common/constants';
+import { WAZUH_DATA_CONFIG_APP_PATH } from '../../common/constants';
+import { formatSettingValueToFile } from '../../common/services/settings';
 
 export class UpdateConfigurationFile {
   constructor() {
@@ -30,7 +31,7 @@ export class UpdateConfigurationFile {
     try {
       const data = fs.readFileSync(this.file, { encoding: 'utf-8' });
       const re = new RegExp(`^${key}\\s{0,}:\\s{1,}.*`, 'gm');
-      const formatedValue = this.formatValue(value);
+      const formatedValue = formatSettingValueToFile(value);
       const result = exists
         ? data.replace(re, `${key}: ${formatedValue}`)
         : `${data}\n${key}: ${formatedValue}`;
@@ -43,33 +44,26 @@ export class UpdateConfigurationFile {
     }
   }
 
-  formatValue = (value) => typeof value === 'string'
-    ? isNaN(Number(value)) ? `'${value}'` : value
-    : typeof value === 'object'
-      ? JSON.stringify(value)
-      : value
-
-  formatValueCachedConfiguration = (value) => typeof value === 'string'
-    ? isNaN(Number(value)) ? value : Number(value)
-    : value;
   /**
    * Updates wazuh.yml file. If it fails, it throws the error to the next function.
-   * @param {Object} input
+   * @param {Object} updatedConfiguration
    */
-  updateConfiguration(input) {
+  updateConfiguration(updatedConfiguration) {
     try {
       if (this.busy) {
         throw new Error('Another process is updating the configuration file');
       }
       this.busy = true;
 
-      const configuration = getConfiguration(true) || {};
+      const pluginConfiguration = getConfiguration({force: true}) || {};
 
-      const { key, value } = (input || {}).body || {};
-      this.updateLine(key, value, typeof configuration[key] !== 'undefined');
-
-      // Update the app configuration server-cached setting in memory with the new value
-      configuration[key] = this.formatValueCachedConfiguration(value);
+      for(const pluginSettingKey in updatedConfiguration){
+        // Store the configuration in the configuration file.
+        const value = updatedConfiguration[pluginSettingKey];
+        this.updateLine(pluginSettingKey, value, typeof pluginConfiguration[pluginSettingKey] !== 'undefined');
+        // Update the app configuration server-cached setting in memory with the new value.
+        pluginConfiguration[pluginSettingKey] = value;
+      };
 
       this.busy = false;
       log(
@@ -77,11 +71,6 @@ export class UpdateConfigurationFile {
         'Updating configuration',
         'debug'
       );
-      return {
-        needRestart: WAZUH_CONFIGURATION_SETTINGS_NEED_RESTART.includes(key),
-        needReload: WAZUH_CONFIGURATION_SETTINGS_NEED_RELOAD.includes(key),
-        needHealtCheck: WAZUH_CONFIGURATION_SETTINGS_NEED_HEALTH_CHECK.includes(key)
-      };
     } catch (error) {
       log('update-configuration:updateConfiguration', error.message || error);
       this.busy = false;

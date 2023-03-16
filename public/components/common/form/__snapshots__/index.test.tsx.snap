@@ -1,0 +1,452 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`[component] InputForm Renders correctly to match the snapshot with validation errors. Input: number 1`] = `
+<div>
+  <div
+    class="euiFormRow euiFormRow--fullWidth"
+    id="test-id-row"
+  >
+    <div
+      class="euiFormRow__labelWrapper"
+    >
+      <label
+        aria-invalid="false"
+        class="euiFormLabel euiFormRow__label"
+        for="test-id"
+      >
+        Test
+      </label>
+    </div>
+    <div
+      class="euiFormRow__fieldWrapper"
+    >
+      <div
+        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow"
+      >
+        <div
+          class="euiFlexItem"
+        >
+          <div
+            class="euiFormControlLayout euiFormControlLayout--fullWidth"
+          >
+            <div
+              class="euiFormControlLayout__childrenWrapper"
+            >
+              <input
+                class="euiFieldNumber euiFieldNumber--fullWidth"
+                min="5"
+                type="number"
+                value="4"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`[component] InputForm Renders correctly to match the snapshot with validation errors. Input: text 1`] = `
+<div>
+  <div
+    class="euiFormRow euiFormRow--fullWidth"
+    id="test-id-row"
+  >
+    <div
+      class="euiFormRow__labelWrapper"
+    >
+      <label
+        aria-invalid="true"
+        class="euiFormLabel euiFormRow__label euiFormLabel-isInvalid"
+        for="test-id"
+      >
+        Test
+      </label>
+    </div>
+    <div
+      class="euiFormRow__fieldWrapper"
+    >
+      <div
+        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow"
+      >
+        <div
+          class="euiFlexItem"
+        >
+          <div
+            class="euiFormControlLayout euiFormControlLayout--fullWidth"
+          >
+            <div
+              class="euiFormControlLayout__childrenWrapper"
+            >
+              <input
+                class="euiFieldText euiFieldText--fullWidth"
+                type="text"
+                value=""
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        aria-live="polite"
+        class="euiFormErrorText euiFormRow__text"
+        id="test-id-error-0"
+      >
+        Validation error: string can not be empty
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`[component] InputForm Renders correctly to match the snapshot with validation errors. Input: text 2`] = `
+<div>
+  <div
+    class="euiFormRow euiFormRow--fullWidth"
+    id="test-id-row"
+  >
+    <div
+      class="euiFormRow__labelWrapper"
+    >
+      <label
+        aria-invalid="false"
+        class="euiFormLabel euiFormRow__label"
+        for="test-id"
+      >
+        Test
+      </label>
+    </div>
+    <div
+      class="euiFormRow__fieldWrapper"
+    >
+      <div
+        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow"
+      >
+        <div
+          class="euiFlexItem"
+        >
+          <div
+            class="euiFormControlLayout euiFormControlLayout--fullWidth"
+          >
+            <div
+              class="euiFormControlLayout__childrenWrapper"
+            >
+              <input
+                class="euiFieldText euiFieldText--fullWidth"
+                type="text"
+                value="test spaces"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`[component] InputForm Renders correctly to match the snapshot: Input: editor 1`] = `
+<div>
+  <div
+    class="euiCodeEditorWrapper"
+    data-test-subj="codeEditorContainer"
+    style="width: 100%; height: 50px;"
+  >
+    <div
+      class="euiCodeEditorKeyboardHint"
+      data-test-subj="codeEditorHint"
+      id="test-id"
+      role="button"
+      tabindex="0"
+    >
+      <p
+        class="euiText"
+      >
+        Press Enter to start editing.
+      </p>
+      <p
+        class="euiText"
+      >
+        When you're done, press Escape to stop editing.
+      </p>
+    </div>
+    <div
+      class=" ace_editor ace-tm"
+      id="test-id"
+      style="width: 100%; height: 50px;"
+    >
+      <textarea
+        autocapitalize="off"
+        autocorrect="off"
+        class="ace_text-input"
+        spellcheck="false"
+        style="opacity: 0;"
+        tabindex="-1"
+        wrap="off"
+      />
+      <div
+        aria-hidden="true"
+        class="ace_gutter"
+      >
+        <div
+          class="ace_layer ace_gutter-layer ace_folding-enabled"
+        />
+        <div
+          class="ace_gutter-active-line"
+        />
+      </div>
+      <div
+        class="ace_scroller"
+      >
+        <div
+          class="ace_content"
+        >
+          <div
+            class="ace_layer ace_print-margin-layer"
+          >
+            <div
+              class="ace_print-margin"
+              style="left: 4px; visibility: visible;"
+            />
+          </div>
+          <div
+            class="ace_layer ace_marker-layer"
+          />
+          <div
+            class="ace_layer ace_text-layer"
+            style="padding: 0px 4px;"
+          />
+          <div
+            class="ace_layer ace_marker-layer"
+          />
+          <div
+            class="ace_layer ace_cursor-layer ace_hidden-cursors"
+          >
+            <div
+              class="ace_cursor"
+            />
+          </div>
+        </div>
+      </div>
+      <div
+        class="ace_scrollbar ace_scrollbar-v"
+        style="display: none; width: 20px;"
+      >
+        <div
+          class="ace_scrollbar-inner"
+          style="width: 20px;"
+        />
+      </div>
+      <div
+        class="ace_scrollbar ace_scrollbar-h"
+        style="display: none; height: 20px;"
+      >
+        <div
+          class="ace_scrollbar-inner"
+          style="height: 20px;"
+        />
+      </div>
+      <div
+        style="height: auto; width: auto; top: 0px; left: 0px; visibility: hidden; position: absolute; white-space: pre; overflow: hidden;"
+      >
+        <div
+          style="height: auto; width: auto; top: 0px; left: 0px; visibility: hidden; position: absolute; white-space: pre; overflow: visible;"
+        />
+        <div
+          style="height: auto; width: auto; top: 0px; left: 0px; visibility: hidden; position: absolute; white-space: pre; overflow: visible;"
+        >
+          XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`[component] InputForm Renders correctly to match the snapshot: Input: filepicker 1`] = `
+<div>
+  <div
+    class="euiFilePicker euiFilePicker--fullWidth"
+  >
+    <div
+      class="euiFilePicker__wrap"
+    >
+      <input
+        accept=".jpeg,.jpg,.png,.svg"
+        aria-describedby="test-id"
+        aria-label="Upload a file"
+        class="euiFilePicker__input"
+        type="file"
+      />
+      <div
+        class="euiFilePicker__prompt"
+        id="test-id"
+      >
+        <svg
+          aria-hidden="true"
+          class="euiIcon euiIcon--medium euiIcon-isLoading euiFilePicker__icon"
+          focusable="false"
+          height="16"
+          role="img"
+          viewBox="0 0 16 16"
+          width="16"
+          xmlns="http://www.w3.org/2000/svg"
+        />
+        <div
+          class="euiFilePicker__promptText"
+        >
+          Select or drag the file
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`[component] InputForm Renders correctly to match the snapshot: Input: number 1`] = `
+<div>
+  <div
+    class="euiFormControlLayout euiFormControlLayout--fullWidth"
+  >
+    <div
+      class="euiFormControlLayout__childrenWrapper"
+    >
+      <input
+        class="euiFieldNumber euiFieldNumber--fullWidth"
+        type="number"
+        value="4"
+      />
+    </div>
+  </div>
+</div>
+`;
+
+exports[`[component] InputForm Renders correctly to match the snapshot: Input: select 1`] = `
+<div>
+  <div
+    class="euiFormControlLayout"
+  >
+    <div
+      class="euiFormControlLayout__childrenWrapper"
+    >
+      <select
+        class="euiSelect"
+      >
+        <option
+          value="value1"
+        >
+          Label1
+        </option>
+        <option
+          value="value2"
+        >
+          Label2
+        </option>
+      </select>
+      <div
+        class="euiFormControlLayoutIcons euiFormControlLayoutIcons--right"
+      >
+        <span
+          class="euiFormControlLayoutCustomIcon"
+        >
+          <svg
+            aria-hidden="true"
+            class="euiIcon euiIcon--medium euiIcon-isLoading euiFormControlLayoutCustomIcon__icon"
+            focusable="false"
+            height="16"
+            role="img"
+            viewBox="0 0 16 16"
+            width="16"
+            xmlns="http://www.w3.org/2000/svg"
+          />
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`[component] InputForm Renders correctly to match the snapshot: Input: switch 1`] = `
+<div>
+  <div
+    class="euiSwitch"
+  >
+    <button
+      aria-checked="true"
+      aria-labelledby="test-id"
+      class="euiSwitch__button"
+      id="test-id"
+      role="switch"
+      type="button"
+    >
+      <span
+        class="euiSwitch__body"
+      >
+        <span
+          class="euiSwitch__thumb"
+        />
+        <span
+          class="euiSwitch__track"
+        >
+          <svg
+            aria-hidden="true"
+            class="euiIcon euiIcon--medium euiIcon-isLoading euiSwitch__icon"
+            focusable="false"
+            height="16"
+            role="img"
+            viewBox="0 0 16 16"
+            width="16"
+            xmlns="http://www.w3.org/2000/svg"
+          />
+          <svg
+            aria-hidden="true"
+            class="euiIcon euiIcon--medium euiIcon-isLoading euiSwitch__icon euiSwitch__icon--checked"
+            focusable="false"
+            height="16"
+            role="img"
+            viewBox="0 0 16 16"
+            width="16"
+            xmlns="http://www.w3.org/2000/svg"
+          />
+        </span>
+      </span>
+    </button>
+    <span
+      class="euiSwitch__label"
+      id="test-id"
+    >
+      Enabled
+    </span>
+  </div>
+</div>
+`;
+
+exports[`[component] InputForm Renders correctly to match the snapshot: Input: text 1`] = `
+<div>
+  <div
+    class="euiFormControlLayout euiFormControlLayout--fullWidth"
+  >
+    <div
+      class="euiFormControlLayout__childrenWrapper"
+    >
+      <input
+        class="euiFieldText euiFieldText--fullWidth"
+        type="text"
+        value="test"
+      />
+    </div>
+  </div>
+</div>
+`;
+
+exports[`[component] InputForm Renders correctly to match the snapshot: Input: textarea 1`] = `
+<div>
+  <textarea
+    class="euiTextArea euiTextArea--resizeVertical euiTextArea--fullWidth"
+    rows="6"
+  >
+    test
+  </textarea>
+</div>
+`;

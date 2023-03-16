@@ -13,17 +13,13 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 
-import {
-  EuiFieldText,
-  EuiSpacer,
-  EuiTextAlign
-} from '@elastic/eui';
+import { EuiFieldText, EuiSpacer, EuiTextAlign } from '@elastic/eui';
 
 class WzConfigurationSetting extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isMobile: false
+      isMobile: false,
     };
     this.limitResize = 760;
     this.resize = this.resize.bind(this);
@@ -41,13 +37,13 @@ class WzConfigurationSetting extends Component {
   render() {
     const { isMobile } = this.state;
     const { keyItem, label, value } = this.props;
-    return (value || typeof value === 'number' || typeof value === 'boolean')  ? (
+    return value || typeof value === 'number' || typeof value === 'boolean' ? (
       <Fragment>
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
-            flexDirection: isMobile ? 'column' : 'row'
+            flexDirection: isMobile ? 'column' : 'row',
           }}
         >
           <div
@@ -57,9 +53,7 @@ class WzConfigurationSetting extends Component {
                 : { justifySelf: 'flex-end', margin: '1em', width: '35%' }
             }
           >
-            <EuiTextAlign textAlign={isMobile ? 'left' : 'right'}>
-              {label}
-            </EuiTextAlign>
+            <EuiTextAlign textAlign={isMobile ? 'left' : 'right'}>{label}</EuiTextAlign>
           </div>
           <div style={isMobile ? { width: '100%' } : { width: '65%' }}>
             {Array.isArray(value) ? (
@@ -71,7 +65,11 @@ class WzConfigurationSetting extends Component {
                 ))}
               </ul>
             ) : (
-              <EuiFieldText value={String(value)} readOnly />
+              <EuiFieldText
+                data-testid={`${String(label).toLowerCase().replace(/\s/g, '-')}`}
+                value={String(value)}
+                readOnly
+              />
             )}
           </div>
         </div>
@@ -83,8 +81,7 @@ class WzConfigurationSetting extends Component {
 
 WzConfigurationSetting.propTypes = {
   keyItem: PropTypes.string.isRequired,
-  label: PropTypes.string.isRequired
-  // value: PropTypes.string
+  label: PropTypes.string.isRequired,
 };
 
 export default WzConfigurationSetting;
