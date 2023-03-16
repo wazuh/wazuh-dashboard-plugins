@@ -3,7 +3,7 @@
     "affected_items": [
       {
         "status": "never_connected",
-        "name": "NewAgent",
+        "name": "never_connected_agent",
         "dateAdd": "2023-03-14T09:44:11Z",
         "node_name": "unknown",
         "registerIP": "any",

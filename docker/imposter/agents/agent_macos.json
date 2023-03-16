@@ -15,7 +15,7 @@
         "group": ["default"],
         "registerIP": "127.0.0.1",
         "dateAdd": "2022-08-25T16:17:46Z",
-        "name": "wazuh-manager-master-0",
+        "name": "macOS High Sierra agent",
         "status": "disconnected",
         "manager": "wazuh-manager-master-0",
         "node_name": "master",

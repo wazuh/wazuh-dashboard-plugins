@@ -18,7 +18,7 @@
         "registerIP": "any",
         "dateAdd": "2022-08-25T16:25:53Z",
         "disconnection_time": "2022-08-25T16:36:35Z",
-        "name": "Debian",
+        "name": "Debian agent",
         "status": "active",
         "manager": "wazuh-manager-master-0",
         "node_name": "master",
