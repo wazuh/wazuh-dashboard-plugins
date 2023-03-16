@@ -97,7 +97,9 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed Inventory module for solaris agents [#5144](https://github.com/wazuh/wazuh-kibana-app/pull/5144)
 - Fixed Statistic cronjob bulk document insert [#5150](https://github.com/wazuh/wazuh-kibana-app/pull/5150)
 - Fixed the style of the buttons showing more event information in the event view table. [#5137](https://github.com/wazuh/wazuh-kibana-app/pull/5137)
-
+- Fixed a UI crash due to `external_references` field could be missing in some vulnerability data [#5200](https://github.com/wazuh/wazuh-kibana-app/pull/5200)
+- Fixed Deploy Agent wrong use of connection secure property [#5285](https://github.com/wazuh/wazuh-kibana-app/pull/5285) [#5295](https://github.com/wazuh/wazuh-kibana-app/pull/5295)
+- Fixed head rendering in agent view [#5291](https://github.com/wazuh/wazuh-kibana-app/pull/5291)
 ### Removed
 
 - Removed the `angular-chart.js` dependency [#4985](https://github.com/wazuh/wazuh-kibana-app/pull/4985)

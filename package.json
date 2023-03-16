@@ -5,7 +5,7 @@
   "stage": "pre-alpha",
   "commit": "150d5b56d",
   "pluginPlatform": {
-    "version": "7.16.0"
+    "version": "7.17.8"
   },
   "description": "Wazuh app",
   "keywords": [
