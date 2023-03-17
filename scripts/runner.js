@@ -22,8 +22,7 @@ const { loadPackageJson } = require('./manifest');
 
 const COMPOSE_DIR = './docker/runner';
 
-
-function getProjectInfo () {
+function getProjectInfo() {
   const manifest = loadPackageJson();
 
   return {
@@ -33,7 +32,7 @@ function getProjectInfo () {
   };
 }
 
-function getBuildArgs({app, version}) {
+function getBuildArgs({ app, version }) {
   return app === 'osd'
     ? `--opensearch-dashboards-version=${version}`
     : `--kibana-version=${version}`;
@@ -46,22 +45,22 @@ function getBuildArgs({app, version}) {
  */
 function getJestArgs() {
   // Remove duplicates using set
-  return Array.from(new Set([ ...process.argv, '--runInBand' ]))
+  return Array.from(new Set([...process.argv, '--runInBand']))
     .filter(opt => opt.startsWith('--'))
     .join(' ');
-};
+}
 
 /**
  * Generates the execution parameters if they are not set.
  * @returns {Object} Default environment variables.
  */
-const buildEnvVars = ({app, version, repo, cmd, args}) => {
+const buildEnvVars = ({ app, version, repo, cmd, args }) => {
   return {
     APP: app,
     VERSION: version,
     REPO: repo,
     CMD: cmd,
-    ARGS: args
+    ARGS: args,
   };
 };
 
@@ -70,14 +69,11 @@ const buildEnvVars = ({app, version, repo, cmd, args}) => {
  */
 function setupAbortController() {
   process.on('SIGINT', () => {
-    childProcess.spawnSync(
-      'docker-compose',
-      [
-        '--project-directory',
-        COMPOSE_DIR,
-        'stop'
-      ]
-    );
+    childProcess.spawnSync('docker-compose', [
+      '--project-directory',
+      COMPOSE_DIR,
+      'stop',
+    ]);
     process.exit();
   });
 }
@@ -86,14 +82,11 @@ function setupAbortController() {
  * Start the container.
  */
 function startRunner() {
-  const runner = childProcess.spawn(
-    'docker-compose',
-    [
-      '--project-directory',
-      COMPOSE_DIR,
-      'up'
-    ]
-  );
+  const runner = childProcess.spawn('docker-compose', [
+    '--project-directory',
+    COMPOSE_DIR,
+    'up',
+  ]);
 
   runner.stdout.on('data', data => {
     console.log(`${data}`);
@@ -108,7 +101,6 @@ function startRunner() {
  * Main function
  */
 function main() {
-
   if (process.argv.length < 2) {
     process.stderr.write('Required parameters not provided');
     process.exit(-1);
@@ -122,7 +114,7 @@ function main() {
       envVars = buildEnvVars({
         ...projectInfo,
         cmd: 'plugin-helpers build',
-        args: getBuildArgs({...projectInfo})
+        args: getBuildArgs({ ...projectInfo }),
       });
       break;
 
@@ -130,7 +122,7 @@ function main() {
       envVars = buildEnvVars({
         ...projectInfo,
         cmd: 'test:jest',
-        args: getJestArgs()
+        args: getJestArgs(),
       });
       break;
 
@@ -141,8 +133,8 @@ function main() {
   }
 
   // Check the required environment variables are set
-  for (const [ key, value ] of Object.entries(envVars)) {
-    if (!process.argv.includes(key)) {
+  for (const [key, value] of Object.entries(envVars)) {
+    if (!process.env[key]) {
       process.env[key] = value;
     }
     console.log(`${key}: ${process.env[key]}`);
@@ -150,8 +142,6 @@ function main() {
 
   setupAbortController();
   startRunner();
-};
-
-
+}
 
 main();
