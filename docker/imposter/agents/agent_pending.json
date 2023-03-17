@@ -1,0 +1,36 @@
+{
+  "data": {
+    "affected_items": [
+      {
+        "os": {
+          "arch": "x86_64",
+          "codename": "Bionic Beaver",
+          "major": "18",
+          "minor": "04",
+          "name": "Ubuntu",
+          "platform": "ubuntu",
+          "uname": "Linux |980c7c96eae2 |5.19.0-35-generic |#36~22.04.1-Ubuntu SMP PREEMPT_DYNAMIC Fri Feb 17 15:17:25 UTC 2 |x86_64",
+          "version": "18.04.6 LTS"
+        },
+        "registerIP": "any",
+        "ip": "172.19.0.32",
+        "name": "Pending agent",
+        "group": ["default"],
+        "version": "Wazuh v4.4.0",
+        "lastKeepAlive": "2023-03-16T15:15:07+00:00",
+        "id": "006",
+        "dateAdd": "2023-03-16T15:14:49+00:00",
+        "group_config_status": "not synced",
+        "status": "pending",
+        "mergedSum": "x",
+        "node_name": "master-node",
+        "manager": "wazuh_manager_filebeat_sources_cmake-v4.4.0-rc1-7.10.2"
+      }
+    ],
+    "total_affected_items": 1,
+    "total_failed_items": 0,
+    "failed_items": []
+  },
+  "message": "All selected agents information was returned",
+  "error": 0
+}
