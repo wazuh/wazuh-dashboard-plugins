@@ -8,6 +8,8 @@ Intended to test and build locally.
 
 Uses development images. Must be executed from the root folder of the project.
 
+See /docker/runner/docker-compose.yml for available environment variables.
+
 # Usage:
 # -------------
 #   - node scripts/runner <command> [<command_args>]
