@@ -312,6 +312,7 @@ export class Inventory extends Component {
             target="_blank"
             external
             style={{ textAlign: "center" }}
+            rel="noopener noreferrer"
           >
             How to configure the module
           </EuiLink>
