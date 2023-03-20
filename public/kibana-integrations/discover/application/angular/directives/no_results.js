@@ -163,6 +163,7 @@ export class DiscoverNoResults extends Component {
                   queryStringSyntaxLink: (
                     <EuiLink
                       rel="noopener noreferrer"
+                      external
                       target="_blank"
                       href={getServices().docLinks.links.query.luceneQuerySyntax}
                     >

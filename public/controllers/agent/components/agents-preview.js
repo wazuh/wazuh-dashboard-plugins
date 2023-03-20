@@ -23,6 +23,7 @@ import {
   EuiSpacer,
   EuiToolTip,
   EuiCard,
+  EuiLink,
 } from '@elastic/eui';
 import { AgentsTable } from './agents-table';
 import { WzRequest } from '../../../react-services/wz-request';
@@ -235,9 +236,9 @@ export const AgentsPreview = compose(
                               isLoading={this.state.loadingAgents}
                               title={
                                 <EuiToolTip position="top" content="View agent details">
-                                  <a onClick={() => this.showAgent(this.state.lastRegisteredAgent)}>
+                                  <EuiLink onClick={() => this.showAgent(this.state.lastRegisteredAgent)}>
                                     {this.state.lastRegisteredAgent?.name || '-'}
-                                  </a>
+                                  </EuiLink>
                                 </EuiToolTip>
                               }
                               titleSize="s"
@@ -252,9 +253,9 @@ export const AgentsPreview = compose(
                               isLoading={this.state.loadingAgents}
                               title={
                                 <EuiToolTip position="top" content="View agent details">
-                                  <a onClick={() => this.showAgent(this.state.agentMostActive)}>
+                                  <EuiLink onClick={() => this.showEuiLinkgent(this.state.agentMostActive)}>
                                     {this.state.agentMostActive?.name || '-'}
-                                  </a>
+                                  </EuiLink>
                                 </EuiToolTip>
                               }
                               titleSize="s"

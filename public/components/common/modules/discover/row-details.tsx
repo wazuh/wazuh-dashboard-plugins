@@ -461,13 +461,13 @@ export class RowDetails extends Component {
           name = item.name;
         }
         if (item.type === 'link') {
-          link = <a
+          link = <EuiLink
             href={item.name}
             target="_blank"
             rel="noopener noreferrer"
           >
             {item.name}
-          </a>;
+          </EuiLink>;
         }
       });
       return <span>{name}: {link}</span>;
@@ -553,14 +553,14 @@ export class RowDetails extends Component {
                 </EuiTitle>
               }
               extraAction={
-                <a
+                <EuiLink
                   href={`#/manager/rules?tab=rules&redirectRule=${id}`}
                   target="_blank" style={{ paddingTop: 5 }}
                   rel="noopener noreferrer"
                 >
                   <EuiIcon type="popout" color='primary' />&nbsp;
                   View in Rules
-                </a>
+                </EuiLink>
               }
               paddingSize="none"
               initialIsOpen={true}>
