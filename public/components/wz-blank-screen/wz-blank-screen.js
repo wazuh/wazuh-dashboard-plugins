@@ -50,9 +50,6 @@ export class WzBlankScreen extends Component {
               >
                 Wazuh installation guide
               </EuiLink>
-              >
-                Wazuh installation guide
-              </a>
             </p>
             <EuiSpacer />
 
