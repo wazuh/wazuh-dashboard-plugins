@@ -23,9 +23,15 @@ In the .env file it is possible to configure the desired version of the Wazuh st
 
 After that, running `docker compose up -d` will start all the containers. Once the start process finishes, it is possible to configure the desired integrations. To stop the environment and cleare it, use `docker compose down`.
 
-The Splunk Indexer instance is accessible from https://localhost:8000, credentials admin:password
-The Wazuh Dashboard instance is accessible from https://localhost:5601 credentials admin:SecretPassword
-The Kibana instance is accessible from http://localhost:5602 credentials elastic:changeme
+The Splunk Indexer instance is accessible from https://localhost:8000, credentials `admin:password`
+
+The Wazuh Dashboard instance is accessible from https://localhost:5601 credentials `admin:SecretPassword`
+
+The Kibana instance is accessible from http://localhost:5602 credentials `elastic:changeme`
+
+
+The Opensearch dashboards instance is accessible from http://localhost:5603 credentials `admin:admin`
+
 
 ## Configuring integrations
 The complete guide for integrations can be found [here](https://docs.google.com/document/d/1QotuX58m9f_GFJbLK-aZ74PDsf-SzmM8VoEhvrlkza0/edit)
@@ -161,7 +167,7 @@ To integrate Elastic from the manager, we are going to use Logstash, that it is 
 
 The first step is storing the credentials in the logstash keystore . The LOGSTASH_KEYSTORE_PASS variable is predefined in the container. After the last two commands, it will ask for each value. `ES_USER`:elastic `ES_PWD`:changeme 
 
-These command should be executed from the `/opt/logstash` folder:
+These command should be executed from the `/opt/logstash-8.6.2` folder:
 
 ```
 bin/logstash-keystore create
