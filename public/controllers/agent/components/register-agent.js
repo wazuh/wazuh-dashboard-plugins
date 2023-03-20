@@ -71,9 +71,7 @@ import {
   architectureButtonsWithPPC64LEAlpine,
 } from '../wazuh-config';
 import WzManagerAddressInput from '../register-agent/steps/wz-manager-address';
-import {
-  getMasterRemoteConfiguration
-} from './register-agent-service';
+import { getMasterRemoteConfiguration } from './register-agent-service';
 import { PrincipalButtonGroup } from './wz-accordion';
 import RegisterAgentButtonGroup from '../register-agent/register-agent-button-group';
 import '../../../styles/common.scss';
@@ -119,7 +117,6 @@ export const RegisterAgent = withErrorBoundary(
         win: this.systemSelectorNet(),
       };
     }
-
 
     async componentDidMount() {
       try {
@@ -206,10 +203,9 @@ export const RegisterAgent = withErrorBoundary(
           haveConnectionSecure: remoteConfig.isSecure,
           udpProtocol: remoteConfig.isUdp,
           connectionSecure: remoteConfig.isSecure,
-        })
+        });
       }
-    }
-
+    };
 
     async getAuthInfo() {
       try {
@@ -1025,7 +1021,7 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
           <EuiLink
             href={urlCheckConnectionDocumentation}
             target='_blank'
-            rel="noopener noreferrer"
+            rel='noopener noreferrer'
             external
           >
             document.
@@ -1117,35 +1113,6 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
                 title={warningUpgrade}
                 iconType='iInCircle'
               />
-
-              {!this.state.connectionSecure && (
-                <>
-                  <EuiSpacer />
-                  {/** Warning connection NO SECURE */}
-                  <EuiCallOut
-                    color='danger'
-                    title={
-                      <>
-                        Warning: there's no{' '}
-                        <EuiLink
-                          rel='noopener noreferrer'
-                          target='_blank'
-                          href={webDocumentationLink(
-                            'user-manual/deployment-variables/deployment-variables.html',
-                            appVersionMajorDotMinor,
-                          )}
-                          external
-                        >
-                          secure protocol configured
-                        </EuiLink>{' '}
-                        and agents will not be able to communicate with the manager.
-                      </>
-                    }
-                    iconType='iInCircle'
-                  />
-                  {/** END Warning connection NO SECURE */}
-                </>
-              )}
               <EuiSpacer />
               {windowsAdvice}
               {this.state.selectedVersion === 'windowsxp' && (
@@ -1712,11 +1679,11 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
       ];
 
       const onChangeServerAddress = async nodeSelected => {
-          this.setState({
-            serverAddress: nodeSelected,
-            udpProtocol: this.state.haveUdpProtocol,
-            connectionSecure: this.state.haveConnectionSecure
-          });
+        this.setState({
+          serverAddress: nodeSelected,
+          udpProtocol: this.state.haveUdpProtocol,
+          connectionSecure: this.state.haveConnectionSecure,
+        });
       };
 
       const steps = [
