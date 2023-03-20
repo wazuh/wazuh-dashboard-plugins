@@ -310,6 +310,7 @@ export class Inventory extends Component {
           <EuiLink
             href={webDocumentationLink('user-manual/capabilities/file-integrity/index.html')}
             target="_blank"
+            external
             style={{ textAlign: "center" }}
             rel="noopener noreferrer"
           >
