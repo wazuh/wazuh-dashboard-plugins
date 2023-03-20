@@ -6,7 +6,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Added
 
-- Added rel="noopener noreferrer" in documentation links. [#5197](https://github.com/wazuh/wazuh-kibana-app/pull/5197)
+- Added rel="noopener noreferrer" in documentation links. [#5197](https://github.com/wazuh/wazuh-kibana-app/pull/5197) [#5274](https://github.com/wazuh/wazuh-kibana-app/pull/5274) [#5298](https://github.com/wazuh/wazuh-kibana-app/pull/5298)
 - Added `ignore` and `restrict` options to Syslog configuration. [#5203](https://github.com/wazuh/wazuh-kibana-app/pull/5203)
 
 ### Changed
@@ -21,6 +21,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed the display of more than one protocol in the Global configuration section [#4917](https://github.com/wazuh/wazuh-kibana-app/pull/4917)
 - Handling endpoint response was done when there is no data to show [#4918](https://github.com/wazuh/wazuh-kibana-app/pull/4918)
 - Fixed references to Elasticsearch in Wazuh-stack plugin [4894](https://github.com/wazuh/wazuh-kibana-app/pull/4894)
+- Fixed the 2 errors that appeared in console in Settings>Configuration section. [#5135](https://github.com/wazuh/wazuh-kibana-app/pull/5135)
 
 ## Wazuh v4.4.0 - OpenSearch Dashboards 2.3.0 - Revision 4400
 
@@ -104,7 +105,11 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed the style of the buttons showing more event information in the event view table. [#5137](https://github.com/wazuh/wazuh-kibana-app/pull/5137)
 - Fixed Inventory module for solaris agents [#5144](https://github.com/wazuh/wazuh-kibana-app/pull/5144)
 - Fixed the module information button in Office365 and Github Panel tab to open the nav drawer. [#5167](https://github.com/wazuh/wazuh-kibana-app/pull/5167)
-
+- Fixed a UI crash due to `external_references` field could be missing in some vulnerability data [#5200](https://github.com/wazuh/wazuh-kibana-app/pull/5200)
+- Fixed Wazuh main menu not displayed when navigation menu is locked [#5273](https://github.com/wazuh/wazuh-kibana-app/pull/5273)
+- Fixed Deploy Agent wrong use of connection secure property [#5285](https://github.com/wazuh/wazuh-kibana-app/pull/5285) [#5295](https://github.com/wazuh/wazuh-kibana-app/pull/5295)
+- Fixed events view when search bar language is `lucene` [#5286](https://github.com/wazuh/wazuh-kibana-app/pull/5286)
+- Fixed head rendering in agent view [#5291](https://github.com/wazuh/wazuh-kibana-app/pull/5291)
 ### Removed
 
 - Removed custom styles from kibana 7.9.0 [#4491](https://github.com/wazuh/wazuh-kibana-app/pull/4491)
