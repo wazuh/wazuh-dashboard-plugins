@@ -12,7 +12,7 @@
 
 import React, { Component, Fragment } from 'react';
 
-import { EuiBasicTable, EuiIcon, EuiLink } from '@elastic/eui';
+import { EuiBasicTable } from '@elastic/eui';
 
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';

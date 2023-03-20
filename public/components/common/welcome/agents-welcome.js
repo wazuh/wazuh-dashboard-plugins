@@ -30,7 +30,8 @@ import {
   EuiToolTip,
   EuiButtonIcon,
   EuiEmptyPrompt,
-  EuiPageBody
+  EuiPageBody,
+  EuiLink
 } from '@elastic/eui';
 import { FimEventsTable, ScaScan, MitreTopTactics, RequirementVis } from './components';
 import { AgentInfo } from './agents-info';
@@ -529,13 +530,14 @@ class AgentsWelcome extends Component {
               <p>
                 The agent has been registered but has not yet connected to the manager.
             </p>
-              <a
+              <EuiLink
                 href={webDocumentationLink('user-manual/agents/agent-connection.html')}
+                external
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 Checking connection with the Wazuh server
-              </a>
+              </EuiLink>
             </Fragment>
           }
           actions={

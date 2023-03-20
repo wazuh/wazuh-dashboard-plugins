@@ -71,9 +71,7 @@ import {
   architectureButtonsWithPPC64LEAlpine,
 } from '../wazuh-config';
 import WzManagerAddressInput from '../register-agent/steps/wz-manager-address';
-import {
-  getMasterRemoteConfiguration
-} from './register-agent-service';
+import { getMasterRemoteConfiguration } from './register-agent-service';
 import { PrincipalButtonGroup } from './wz-accordion';
 import RegisterAgentButtonGroup from '../register-agent/register-agent-button-group';
 import '../../../styles/common.scss';
@@ -119,7 +117,6 @@ export const RegisterAgent = withErrorBoundary(
         win: this.systemSelectorNet(),
       };
     }
-
 
     async componentDidMount() {
       try {
@@ -208,8 +205,7 @@ export const RegisterAgent = withErrorBoundary(
           connectionSecure: remoteConfig.haveSecureConnection,
         })
       }
-    }
-
+    };
 
     async getAuthInfo() {
       try {
@@ -1022,21 +1018,29 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
       const textAndLinkToCheckConnectionDocumentation = (
         <p>
           To verify the connection with the Wazuh server, please follow this{' '}
-          <a
+          <EuiLink
             href={urlCheckConnectionDocumentation}
             target='_blank'
-            rel="noopener noreferrer"
+            rel='noopener noreferrer'
+            external
           >
             document.
-          </a>
+          </EuiLink>
         </p>
       );
 
       const warningCommand = (
         <>
           <p>
-            Please
-            <a href={urlWindowsPackage}> download </a>
+            Please{' '}
+            <EuiLink
+              href={urlWindowsPackage}
+              target='_blank'
+              rel='noopener noreferrer'
+              external
+            >
+              download
+            </EuiLink>{' '}
             the package from our repository and copy it to the Windows system
             where you are going to install it. Then run the following command to
             perform the installation:
@@ -1183,10 +1187,10 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
                             'installation-guide/wazuh-agent/wazuh-agent-package-solaris.html',
                             appVersionMajorDotMinor,
                           )}
+                          external
                         >
-                          steps
+                          steps.
                         </EuiLink>
-                        .
                       </span>
                     }
                   ></EuiCallOut>
@@ -1199,7 +1203,12 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
                       <span>
                         After installing the agent, you need to enroll it in the
                         Wazuh server. Check the Wazuh agent enrollment{' '}
-                        <EuiLink target='_blank' href={urlWazuhAgentEnrollment}>
+                        <EuiLink
+                          target='_blank'
+                          href={urlWazuhAgentEnrollment}
+                          external
+                          rel='noopener noreferrer'
+                        >
                           Wazuh agent enrollment
                         </EuiLink>{' '}
                         section to learn more.
@@ -1223,10 +1232,10 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
                             'installation-guide/wazuh-agent/wazuh-agent-package-aix.html',
                             appVersionMajorDotMinor,
                           )}
+                          external
                         >
-                          steps
+                          steps.
                         </EuiLink>
-                        .
                       </span>
                     }
                   ></EuiCallOut>
@@ -1248,10 +1257,10 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
                             'installation-guide/wazuh-agent/wazuh-agent-package-hpux.html',
                             appVersionMajorDotMinor,
                           )}
+                          external
                         >
-                          steps
+                          steps.
                         </EuiLink>
-                        .
                       </span>
                     }
                   ></EuiCallOut>
@@ -1264,9 +1273,14 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
                       <span>
                         After installing the agent, you need to enroll it in the
                         Wazuh server. Check the Wazuh agent enrollment{' '}
-                        <EuiLink target='_blank' href={urlWazuhAgentEnrollment}>
-                          Wazuh agent enrollment{' '}
-                        </EuiLink>
+                        <EuiLink
+                          target='_blank'
+                          href={urlWazuhAgentEnrollment}
+                          external
+                          rel='noopener noreferrer'
+                        >
+                          Wazuh agent enrollment
+                        </EuiLink>{' '}
                         section to learn more.
                       </span>
                     }
@@ -1288,10 +1302,10 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
                             'installation-guide/wazuh-agent/wazuh-agent-package-linux.html',
                             appVersionMajorDotMinor,
                           )}
+                          external
                         >
-                          steps
+                          steps.
                         </EuiLink>
-                        .
                       </span>
                     }
                   ></EuiCallOut>
@@ -1304,9 +1318,14 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
                       <span>
                         After installing the agent, you need to enroll it in the
                         Wazuh server. Check the Wazuh agent enrollment{' '}
-                        <EuiLink target='_blank' href={urlWazuhAgentEnrollment}>
-                          Wazuh agent enrollment{' '}
-                        </EuiLink>
+                        <EuiLink
+                          target='_blank'
+                          href={urlWazuhAgentEnrollment}
+                          external
+                          rel='noopener noreferrer'
+                        >
+                          Wazuh agent enrollment
+                        </EuiLink>{' '}
                         section to learn more.
                       </span>
                     }
@@ -1331,10 +1350,10 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
                             'installation-guide/wazuh-agent/wazuh-agent-package-linux.html',
                             appVersionMajorDotMinor,
                           )}
+                          external
                         >
-                          steps
+                          steps.
                         </EuiLink>
-                        .
                       </span>
                     }
                   ></EuiCallOut>
@@ -1540,11 +1559,11 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
       ];
 
       const onChangeServerAddress = async nodeSelected => {
-          this.setState({
-            serverAddress: nodeSelected,
-            udpProtocol: this.state.haveUdpProtocol,
-            connectionSecure: this.state.haveConnectionSecure
-          });
+        this.setState({
+          serverAddress: nodeSelected,
+          udpProtocol: this.state.haveUdpProtocol,
+          connectionSecure: this.state.haveConnectionSecure,
+        });
       };
 
       const steps = [
