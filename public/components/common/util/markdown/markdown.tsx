@@ -21,7 +21,8 @@ const md = new MarkdownIt({
   typographer: true
 }).use(MarkdownItLinkAttributes, {
   attrs: {
-    target: '_blank'
+    target: '_blank',
+    rel: 'noopener noreferrer'
   }
 });
 
@@ -35,7 +36,7 @@ export const Markdown = ({markdown, className = ''}: MarkdownProps) => (
     className={classnames('wz-markdown-margin', 'wz-markdown-wrapper', className)}
     /*
      * Justification for dangerouslySetInnerHTML:
-     * Render HTML elements from a markdown text using a function to transform the 
+     * Render HTML elements from a markdown text using a function to transform the
      * Markdown into HTML elements
      */
     dangerouslySetInnerHTML={{__html: md.render(markdown)}}>

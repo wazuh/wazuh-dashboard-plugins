@@ -39,6 +39,7 @@ export class WzBlankScreen extends Component {
               </EuiLink>
               <br />
               <br />
+
               <EuiLink
                 href={webDocumentationLink(
                   PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_TROUBLESHOOTING,
@@ -49,6 +50,9 @@ export class WzBlankScreen extends Component {
               >
                 Wazuh installation guide
               </EuiLink>
+              >
+                Wazuh installation guide
+              </a>
             </p>
             <EuiSpacer />
 

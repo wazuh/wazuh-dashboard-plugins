@@ -47,7 +47,7 @@ class WzHelpButtonPopover extends Component {
           </EuiText>
           {links.map(link => (
             <div key={`show-help-${link.text}`}>
-              <EuiButtonEmpty target="_blank" href={link.href}>
+              <EuiButtonEmpty rel="noopener noreferrer" target="_blank" href={link.href}>
                 {link.text}
               </EuiButtonEmpty>
             </div>
