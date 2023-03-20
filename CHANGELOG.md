@@ -6,8 +6,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Added
 
-- Added rel="noopener noreferrer" in documentation links. [#5197](https://github.com/wazuh/wazuh-kibana-app/pull/5197)
-- 2 fields (ignore and restrict) are added in the `Management/Configuration/Log collection`. [#5203](https://github.com/wazuh/wazuh-kibana-app/pull/5203)
+- Added rel="noopener noreferrer" in documentation links. [#5197](https://github.com/wazuh/wazuh-kibana-app/pull/5197) [#5274](https://github.com/wazuh/wazuh-kibana-app/pull/5274) [#5298](https://github.com/wazuh/wazuh-kibana-app/pull/5298)
+- Added `ignore` and `restrict` options to Syslog configuration. [#5203](https://github.com/wazuh/wazuh-kibana-app/pull/5203)
 
 ### Changed
 
