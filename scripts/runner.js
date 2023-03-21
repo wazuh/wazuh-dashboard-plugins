@@ -44,9 +44,11 @@ function getBuildArgs({ app, version }) {
  * @returns {String} Space separated string with all Jest CLI options provided.
  */
 function getJestArgs() {
+  // Take args only after `test` word
+  const index = process.argv.indexOf('test');
+  const args = process.argv.slice(index + 1);
   // Remove duplicates using set
-  return Array.from(new Set([ ...process.argv, '--runInBand' ]))
-    .filter(opt => opt.startsWith('--'))
+  return Array.from(new Set([ ...args, '--runInBand' ]))
     .join(' ');
 }
 
