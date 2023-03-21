@@ -37,7 +37,10 @@ The Opensearch dashboards instance is accessible from http://localhost:5603 cred
 The complete guide for integrations can be found [here](https://docs.google.com/document/d/1QotuX58m9f_GFJbLK-aZ74PDsf-SzmM8VoEhvrlkza0/edit)
 
 ### Splunk from manager
-To integrate Splunk from the manager, the first step is to configure the required indices. To do that, attach a terminal to the Splunk instance and create a file `/opt/splunk/etc/system/local/indexes.conf`, with the following content:
+To integrate Splunk from the manager, it is possible to do it via Splunk Forwarder or via Logstash.
+
+#### Via Splunk Forwarder
+The first step is to configure the required indices. To do that, attach a terminal to the Splunk instance and create a file `/opt/splunk/etc/system/local/indexes.conf`, with the following content:
 
 ```
 [wazuh-alerts]
@@ -95,15 +98,60 @@ server = indexer:9997
 
 After that, the integration is completed. It should be possible to see the logs from the Splunk interface, in `Search & reporting` running the `index='wazuh-alerts'`query.
 
+#### Via Logstash
+We are going to use Logstash, that it is already in the manager container, inside the `/opt` folder.
+
+The first step is to [generate a http event collector token](https://docs.splunk.com/Documentation/Splunk/8.0.5/Data/UsetheHTTPEventCollector) in the Splunk interface, selecting the `wazuh-alerts` index. To create that index, refer to the previous instructions (Splunk from manager)
+
+Then, we will use the Logstash Keystore to store the token. The LOGSTASH_KEYSTORE_PASS variable is predefined in the container. After the last command, it will ask for a value. `SP_AUTH`: Splunk <the previously generated token>.
+
+```
+bin/logstash-keystore create
+bin/logstash-keystore add SP_AUTH
+```
+
+After that, we will create a `pipeline.conf` file. The certificates are already loaded in the container. In this example we will use the `sample_alerts.json` file. To configure it in a production environment, just change it to `alerts.json`. The content is the following:
+
+```
+input {
+  file {
+    id => "wazuh_alerts"
+    codec => "json"
+    start_position => "beginning"
+    stat_interval => "1 second"
+    path => "/var/ossec/logs/alerts/sample_alerts.json"
+    mode => "tail"
+    ecs_compatibility => "disabled"
+  }
+}
+
+
+output {
+    http {
+    	format => "json" # format of forwarded logs
+    	http_method => "post" # HTTP method used to forward logs
+    	url => "https://splunk:8088/services/collector/raw" # endpoint to forward logs to
+    	headers => ["Authorization", "${SP_AUTH}"]
+        cacert => "/etc/ssl/root-ca.pem"
+	}
+	stdout{}
+}
+```
+
+The `stdout` will show the logs in the console as they are being read. It is useful in case of errors to verify if it is an error reading the logs or writing them.
+Then, we have to run logstash with the recently created pipeline:
+
+```
+bin/logstash -f pipeline.conf --log.level info
+```
+
+It is possible to change the log level for troubleshooting in case that it fails.
+
+After this configuration, the integration is completed. To verify that it's working, enter Kibana from http://localhost:5602, and navigate to `Discover`. If no log is shown, it is possible that a new data view is needed. To configure it, click on the button on the top-left margin, under the navigation bar, click on `Create a data view`, write `wazuh-alerts-4.x` as name, and in the `Index pattern` field write `wazuh-alerts-4.x*`. Select `timestamp` as the Timestamp field. It is important to select `timestamp` and not `@timestamp`. Then click on `Save data view to Kibana`
+
 ### Splunk from indexer
 To integrate Splunk from the Wazuh Indexer, we will use Logstash, that is in the `/opt` folder of the Wazuh Manager container. 
 The first step is to [generate a http event collector token](https://docs.splunk.com/Documentation/Splunk/8.0.5/Data/UsetheHTTPEventCollector) in the Splunk interface, selecting the `wazuh-alerts` index. To create that index, refer to the previous instructions (Splunk from manager)
-
-Next, we need to install the [logstash-input-opensearch plugin](https://github.com/opensearch-project/logstash-input-opensearch), running from the `/opt/logstash` folder:
-
-```
-bin/logstash-plugin install logstash-input-opensearch
-```
 
 Then, we will use the Logstash Keystore to store the credentials. The LOGSTASH_KEYSTORE_PASS variable is predefined in the container. After the last three commands, it will ask for each value. `IN_USER`:admin `IN_PWD`:SecretPassword `SP_AUTH`: Splunk <the previously generated token>.
 
@@ -175,6 +223,19 @@ bin/logstash-keystore add ES_USER
 bin/logstash-keystore add ES_PWD
 ```
 
+Then, we need to create a file called `es_template.json`, with the following:
+
+```
+{
+  "index_patterns" : "wazuh-*",
+  "template" : {
+	"settings" : {
+  	"index.mapping.total_fields.limit": 2000
+	}
+  }
+}
+```
+
 After that, we will create a `pipeline.conf` file. The certificates are already loaded in the container. In this example we will use the `sample_alerts.json` file. To configure it in a production environment, just change it to `alerts.json`. The content is the following:
 
 ```
@@ -199,6 +260,9 @@ output {
         password => "${ES_PWD}"
         ssl => true
         cacert => '/etc/certs/elastic/ca/ca.crt'
+		    template => '/opt/logstash-8.6.2/es_template.json'
+        template_name => 'wazuh'
+        template_overwrite => true
     }
 	stdout{}
 }
@@ -214,7 +278,7 @@ bin/logstash -f pipeline.conf --log.level info
 It is possible to change the log level for troubleshooting in case that it fails.
 
 After this configuration, the integration is completed. To verify that it's working, enter Kibana from http://localhost:5602, and navigate to `Discover`. If no log is shown, it is possible that a new data view is needed. To configure it, click on the button on the top-left margin, under the navigation bar, click on `Create a data view`, write `wazuh-alerts-4.x` as name, and in the `Index pattern` field write `wazuh-alerts-4.x*`. Select `timestamp` as the Timestamp field. It is important to select `timestamp` and not `@timestamp`. Then click on `Save data view to Kibana`.
-
+If it is not already created, the data view will be automatically generated after importing a dashboard.
 
 ### Elastic from indexer
 To integrate Elastic from the Wazuh Indexer, we will also use logstash. 
@@ -233,6 +297,19 @@ bin/logstash-keystore add ES_USER
 bin/logstash-keystore add ES_PWD
 bin/logstash-keystore add IN_USER
 bin/logstash-keystore add IN_PWD
+```
+
+Then, we need to create a file called `es_template.json`, with the following:
+
+```
+{
+  "index_patterns" : "wazuh-*",
+  "template" : {
+	"settings" : {
+  	"index.mapping.total_fields.limit": 2000
+	}
+  }
+}
 ```
 
 After that, we will create a `pipeline.conf` file. The certificates are already loaded in the container. The content is the following:
@@ -267,6 +344,9 @@ output {
         password => "${ES_PWD}"
         ssl => true
         cacert => '/etc/certs/elastic/ca/ca.crt'
+		    template => '/opt/logstash-8.6.2/es_template.json'
+        template_name => 'wazuh'
+        template_overwrite => true
     }
 	stdout{}
 }
@@ -283,7 +363,7 @@ bin/logstash -f pipeline.conf --log.level info
 It is possible to change the log level for troubleshooting in case that it fails.
 
 After this configuration, the integration is completed. To verify that it's working, enter Kibana from http://localhost:5602, and navigate to `Discover`. If no log is shown, it is possible that a new data view is needed. To configure it, click on the button on the top-left margin, under the navigation bar, click on `Create a data view`, write `wazuh-alerts-4.x` as name, and in the `Index pattern` field write `wazuh-alerts-4.x*`. Select `timestamp` as the Timestamp field. It is important to select `timestamp` and not `@timestamp`. Then click on `Save data view to Kibana`.
-
+If it is not already created, the data view will be automatically generated after importing a dashboard.
 
 ### Opensearch from manager
 To integrate Opensearch from the manager, we are going to use Logstash, that it is already in the manager container, inside the `/opt` folder.
@@ -302,6 +382,25 @@ These command should be executed from the `/opt/logstash` folder:
 bin/logstash-keystore create
 bin/logstash-keystore add OS_USER
 bin/logstash-keystore add OS_PWD
+```
+
+Then, we need to create a file called `os_template.json`, with the following:
+
+```
+{
+  "index_patterns": [
+    "wazuh-*"
+  ],
+  "settings": {
+    "index": {
+      "mapping": {
+        "total_fields": {
+          "limit": 2000
+        }
+      }
+    }
+  }
+}
 ```
 
 After that, we will create a `pipeline.conf` file. The certificates are already loaded in the container. In this example we will use the `sample_alerts.json` file. To configure it in a production environment, just change it to `alerts.json`. The content is the following:
@@ -331,6 +430,9 @@ output {
     	index  => "wazuh-alerts-4.x-%{+YYYY.MM.dd}"
     	ssl => true
     	cacert => "/etc/ssl/root-ca.pem"
+		  template => '/opt/logstash-8.6.2/os_template.json'
+      template_name => 'wazuh'
+      template_overwrite => true
 	}
 	stdout{}
 }
@@ -347,7 +449,7 @@ bin/logstash -f pipeline.conf --log.level info
 It is possible to change the log level for troubleshooting in case that it fails.
 
 After this configuration, the integration is completed. To verify that it's working, enter Opensearch Dashboards from http://localhost:5603, and navigate to `Discover`. If no log is shown, it is possible that a new index pattern is needed. To create it, open the left bar, go to `Stack Management`, click on `Create index pattern`, write `wazuh-alerts-4.x*` as name, click on `Next step`, select `timestamp` as Time field. It is important to select `timestamp` and not `@timestamp`. Then click on `Create index pattern`
-
+If it is not already created, the index patter will be automatically generated after importing a dashboard.
 
 ### Opensearch from indexer
 To integrate Elastic from the Wazuh Indexer, we will also use logstash. 
@@ -366,6 +468,25 @@ bin/logstash-keystore add OS_USER
 bin/logstash-keystore add OS_PWD
 bin/logstash-keystore add IN_USER
 bin/logstash-keystore add IN_PWD
+```
+
+Then, we need to create a file called `os_template.json`, with the following:
+
+```
+{
+  "index_patterns": [
+    "wazuh-*"
+  ],
+  "settings": {
+    "index": {
+      "mapping": {
+        "total_fields": {
+          "limit": 2000
+        }
+      }
+    }
+  }
+}
 ```
 
 After that, we will create a `pipeline.conf` file. The certificates are already loaded in the container. The content is the following:
@@ -403,6 +524,9 @@ output {
     	index  => "wazuh-alerts-4.x-%{+YYYY.MM.dd}"
     	ssl => true
     	cacert => "/etc/ssl/root-ca.pem"
+		  template => '/opt/logstash-8.6.2/os_template.json'
+      template_name => 'wazuh'
+      template_overwrite => true
 	}
 	stdout{}
 }
@@ -418,7 +542,8 @@ bin/logstash -f pipeline.conf --log.level info
 
 It is possible to change the log level for troubleshooting in case that it fails.
 
-After this configuration, the integration is completed. To verify that it's working, enter Opensearch Dashboards from http://localhost:5603, and navigate to `Discover`. If no log is shown, it is possible that a new index pattern is needed. To create it, open the left bar, go to `Stack Management`, click on `Create index pattern`, write `wazuh-alerts-4.x*` as name, click on `Next step`, select `timestamp` as Time field. It is important to select `timestamp` and not `@timestamp`. Then click on `Create index pattern`
+After this configuration, the integration is completed. To verify that it's working, enter Opensearch Dashboards from http://localhost:5603, and navigate to `Discover`. If no log is shown, it is possible that a new index pattern is needed. To create it, open the left bar, go to `Stack Management`, click on `Create index pattern`, write `wazuh-alerts-4.x*` as name, click on `Next step`, select `timestamp` as Time field. It is important to select `timestamp` and not `@timestamp`. Then click on `Create index pattern`. 
+If it is not already created, the index patter will be automatically generated after importing a dashboard.
 
 
 
