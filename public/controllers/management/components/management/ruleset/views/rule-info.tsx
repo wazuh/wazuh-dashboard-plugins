@@ -353,13 +353,14 @@ export default class WzRuleInfo extends Component {
         }
         if (item.type === 'link'){
           link = (
-            <a
+            <EuiLink
               href={item.name}
               target="_blank"
               rel="noopener noreferrer"
+              external
             >
               {item.name}
-            </a>
+            </EuiLink>
           );
         }
       });
