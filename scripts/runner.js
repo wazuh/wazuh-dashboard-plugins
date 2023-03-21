@@ -45,7 +45,7 @@ function getBuildArgs({ app, version }) {
  */
 function getJestArgs() {
   // Remove duplicates using set
-  return Array.from(new Set([...process.argv, '--runInBand']))
+  return Array.from(new Set([ ...process.argv, '--runInBand' ]))
     .filter(opt => opt.startsWith('--'))
     .join(' ');
 }
@@ -69,7 +69,8 @@ const buildEnvVars = ({ app, version, repo, cmd, args }) => {
  */
 function setupAbortController() {
   process.on('SIGINT', () => {
-    childProcess.spawnSync('docker-compose', [
+    childProcess.spawnSync('docker', [
+      'compose',
       '--project-directory',
       COMPOSE_DIR,
       'stop',
@@ -82,7 +83,8 @@ function setupAbortController() {
  * Start the container.
  */
 function startRunner() {
-  const runner = childProcess.spawn('docker-compose', [
+  const runner = childProcess.spawn('docker', [
+    'compose',
     '--project-directory',
     COMPOSE_DIR,
     'up',
@@ -133,7 +135,7 @@ function main() {
   }
 
   // Check the required environment variables are set
-  for (const [key, value] of Object.entries(envVars)) {
+  for (const [ key, value ] of Object.entries(envVars)) {
     if (!process.env[key]) {
       process.env[key] = value;
     }
