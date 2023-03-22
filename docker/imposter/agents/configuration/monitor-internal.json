@@ -1,0 +1,16 @@
+{
+  "data": {
+    "monitord": {
+      "day_wait": 10,
+      "compress": 1,
+      "sign": 1,
+      "monitor_agents": 1,
+      "keep_log_days": 31,
+      "rotate_log": 1,
+      "size_rotate": 536870912,
+      "daily_rotations": 12,
+      "delete_old_agents": 0
+    }
+  },
+  "error": 0
+}

@@ -1,0 +1,22 @@
+{
+  "data": {
+    "internal": {
+      "analysisd": {
+        "debug": 0,
+        "default_timeframe": 360,
+        "stats_maxdiff": 999000,
+        "stats_mindiff": 1250,
+        "stats_percent_diff": 150,
+        "fts_list_size": 32,
+        "fts_min_size_for_str": 14,
+        "log_fw": 1,
+        "decoder_order_size": 256,
+        "label_cache_maxage": 10,
+        "show_hidden_labels": 0,
+        "rlimit_nofile": 458752,
+        "min_rotate_interval": 600
+      }
+    }
+  },
+  "error": 0
+}

@@ -1,0 +1,11 @@
+{
+  "data": {
+    "global": {
+      "remoted": {
+        "agents_disconnection_alert_time": 0,
+        "agents_disconnection_time": 600
+      }
+    }
+  },
+  "error": 0
+}

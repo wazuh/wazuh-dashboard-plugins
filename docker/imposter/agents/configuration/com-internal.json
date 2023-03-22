@@ -1,0 +1,11 @@
+{
+  "data": {
+    "internal": {
+      "execd": {
+        "request_timeout": 0,
+        "max_restart_lock": 0
+      }
+    }
+  },
+  "error": 0
+}

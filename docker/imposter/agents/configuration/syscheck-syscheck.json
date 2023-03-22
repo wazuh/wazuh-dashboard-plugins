@@ -1,0 +1,842 @@
+{
+  "data": {
+    "syscheck": {
+      "disabled": "no",
+      "frequency": 43200,
+      "skip_nfs": "yes",
+      "skip_dev": "yes",
+      "skip_sys": "yes",
+      "skip_proc": "yes",
+      "scan_on_start": "yes",
+      "max_files_per_second": 0,
+      "file_limit": {
+        "enabled": "yes",
+        "entries": 100000
+      },
+      "diff": {
+        "disk_quota": {
+          "enabled": "yes",
+          "limit": 1048576
+        },
+        "file_size": {
+          "enabled": "yes",
+          "limit": 51200
+        }
+      },
+      "directories": [
+        {
+          "opts": [
+            "check_md5sum",
+            "check_sha1sum",
+            "check_perm",
+            "check_size",
+            "check_owner",
+            "check_group",
+            "check_mtime",
+            "check_inode",
+            "realtime",
+            "check_sha256sum",
+            "check_attrs"
+          ],
+          "dir": "c:\\programdata\\microsoft\\windows\\start menu\\programs\\startup",
+          "recursion_level": 256,
+          "diff_size_limit": 51200
+        },
+        {
+          "opts": [
+            "check_md5sum",
+            "check_sha1sum",
+            "check_perm",
+            "check_size",
+            "check_owner",
+            "check_group",
+            "check_mtime",
+            "check_inode",
+            "check_sha256sum",
+            "check_attrs"
+          ],
+          "dir": "c:\\windows",
+          "recursion_level": 0,
+          "restrict": "regedit.exe$|system.ini$|win.ini$",
+          "diff_size_limit": 51200
+        },
+        {
+          "opts": [
+            "check_md5sum",
+            "check_sha1sum",
+            "check_perm",
+            "check_size",
+            "check_owner",
+            "check_group",
+            "check_mtime",
+            "check_inode",
+            "check_sha256sum",
+            "check_attrs"
+          ],
+          "dir": "c:\\windows\\sysnative",
+          "recursion_level": 0,
+          "restrict": "winrm.vbs$",
+          "diff_size_limit": 51200
+        },
+        {
+          "opts": [
+            "check_md5sum",
+            "check_sha1sum",
+            "check_perm",
+            "check_size",
+            "check_owner",
+            "check_group",
+            "check_mtime",
+            "check_inode",
+            "check_sha256sum",
+            "check_attrs"
+          ],
+          "dir": "c:\\windows\\sysnative\\drivers\\etc",
+          "recursion_level": 0,
+          "diff_size_limit": 51200
+        },
+        {
+          "opts": [
+            "check_md5sum",
+            "check_sha1sum",
+            "check_perm",
+            "check_size",
+            "check_owner",
+            "check_group",
+            "check_mtime",
+            "check_inode",
+            "check_sha256sum",
+            "check_attrs"
+          ],
+          "dir": "c:\\windows\\sysnative\\wbem",
+          "recursion_level": 0,
+          "restrict": "wmic.exe$",
+          "diff_size_limit": 51200
+        },
+        {
+          "opts": [
+            "check_md5sum",
+            "check_sha1sum",
+            "check_perm",
+            "check_size",
+            "check_owner",
+            "check_group",
+            "check_mtime",
+            "check_inode",
+            "check_sha256sum",
+            "check_attrs"
+          ],
+          "dir": "c:\\windows\\sysnative\\windowspowershell\\v1.0",
+          "recursion_level": 0,
+          "restrict": "powershell.exe$",
+          "diff_size_limit": 51200
+        },
+        {
+          "opts": [
+            "check_md5sum",
+            "check_sha1sum",
+            "check_perm",
+            "check_size",
+            "check_owner",
+            "check_group",
+            "check_mtime",
+            "check_inode",
+            "check_sha256sum",
+            "check_attrs"
+          ],
+          "dir": "c:\\windows\\system32",
+          "recursion_level": 0,
+          "restrict": "winrm.vbs$",
+          "diff_size_limit": 51200
+        },
+        {
+          "opts": [
+            "check_md5sum",
+            "check_sha1sum",
+            "check_perm",
+            "check_size",
+            "check_owner",
+            "check_group",
+            "check_mtime",
+            "check_inode",
+            "check_sha256sum",
+            "check_attrs"
+          ],
+          "dir": "c:\\windows\\system32\\drivers\\etc",
+          "recursion_level": 0,
+          "diff_size_limit": 51200
+        },
+        {
+          "opts": [
+            "check_md5sum",
+            "check_sha1sum",
+            "check_perm",
+            "check_size",
+            "check_owner",
+            "check_group",
+            "check_mtime",
+            "check_inode",
+            "check_sha256sum",
+            "check_attrs"
+          ],
+          "dir": "c:\\windows\\system32\\wbem",
+          "recursion_level": 0,
+          "restrict": "wmic.exe$",
+          "diff_size_limit": 51200
+        },
+        {
+          "opts": [
+            "check_md5sum",
+            "check_sha1sum",
+            "check_perm",
+            "check_size",
+            "check_owner",
+            "check_group",
+            "check_mtime",
+            "check_inode",
+            "check_sha256sum",
+            "check_attrs"
+          ],
+          "dir": "c:\\windows\\system32\\windowspowershell\\v1.0",
+          "recursion_level": 0,
+          "restrict": "powershell.exe$",
+          "diff_size_limit": 51200
+        }
+      ],
+      "ignore": [
+        "c:\\programdata\\microsoft\\windows\\start menu\\programs\\startup\\desktop.ini"
+      ],
+      "ignore_sregex": [".log$|.htm$|.jpg$|.png$|.chm$|.pnf$|.evtx$"],
+      "windows_audit_interval": 60,
+      "registry": [
+        {
+          "opts": [
+            "check_md5sum",
+            "check_sha1sum",
+            "check_sha256sum",
+            "check_size",
+            "check_owner",
+            "check_group",
+            "check_perm",
+            "check_mtime",
+            "check_type"
+          ],
+          "entry": "HKEY_LOCAL_MACHINE\\Software\\Classes\\batfile",
+          "arch": "32bit",
+          "diff_size_limit": 51200,
+          "recursion_level": 512
+        },
+        {
+          "opts": [
+            "check_md5sum",
+            "check_sha1sum",
+            "check_sha256sum",
+            "check_size",
+            "check_owner",
+            "check_group",
+            "check_perm",
+            "check_mtime",
+            "check_type"
+          ],
+          "entry": "HKEY_LOCAL_MACHINE\\Software\\Classes\\cmdfile",
+          "arch": "32bit",
+          "diff_size_limit": 51200,
+          "recursion_level": 512
+        },
+        {
+          "opts": [
+            "check_md5sum",
+            "check_sha1sum",
+            "check_sha256sum",
+            "check_size",
+            "check_owner",
+            "check_group",
+            "check_perm",
+            "check_mtime",
+            "check_type"
+          ],
+          "entry": "HKEY_LOCAL_MACHINE\\Software\\Classes\\comfile",
+          "arch": "32bit",
+          "diff_size_limit": 51200,
+          "recursion_level": 512
+        },
+        {
+          "opts": [
+            "check_md5sum",
+            "check_sha1sum",
+            "check_sha256sum",
+            "check_size",
+            "check_owner",
+            "check_group",
+            "check_perm",
+            "check_mtime",
+            "check_type"
+          ],
+          "entry": "HKEY_LOCAL_MACHINE\\Software\\Classes\\exefile",
+          "arch": "32bit",
+          "diff_size_limit": 51200,
+          "recursion_level": 512
+        },
+        {
+          "opts": [
+            "check_md5sum",
+            "check_sha1sum",
+            "check_sha256sum",
+            "check_size",
+            "check_owner",
+            "check_group",
+            "check_perm",
+            "check_mtime",
+            "check_type"
+          ],
+          "entry": "HKEY_LOCAL_MACHINE\\Software\\Classes\\piffile",
+          "arch": "32bit",
+          "diff_size_limit": 51200,
+          "recursion_level": 512
+        },
+        {
+          "opts": [
+            "check_md5sum",
+            "check_sha1sum",
+            "check_sha256sum",
+            "check_size",
+            "check_owner",
+            "check_group",
+            "check_perm",
+            "check_mtime",
+            "check_type"
+          ],
+          "entry": "HKEY_LOCAL_MACHINE\\Software\\Classes\\AllFilesystemObjects",
+          "arch": "32bit",
+          "diff_size_limit": 51200,
+          "recursion_level": 512
+        },
+        {
+          "opts": [
+            "check_md5sum",
+            "check_sha1sum",
+            "check_sha256sum",
+            "check_size",
+            "check_owner",
+            "check_group",
+            "check_perm",
+            "check_mtime",
+            "check_type"
+          ],
+          "entry": "HKEY_LOCAL_MACHINE\\Software\\Classes\\Directory",
+          "arch": "32bit",
+          "diff_size_limit": 51200,
+          "recursion_level": 512
+        },
+        {
+          "opts": [
+            "check_md5sum",
+            "check_sha1sum",
+            "check_sha256sum",
+            "check_size",
+            "check_owner",
+            "check_group",
+            "check_perm",
+            "check_mtime",
+            "check_type"
+          ],
+          "entry": "HKEY_LOCAL_MACHINE\\Software\\Classes\\Folder",
+          "arch": "32bit",
+          "diff_size_limit": 51200,
+          "recursion_level": 512
+        },
+        {
+          "opts": [
+            "check_md5sum",
+            "check_sha1sum",
+            "check_sha256sum",
+            "check_size",
+            "check_owner",
+            "check_group",
+            "check_perm",
+            "check_mtime",
+            "check_type"
+          ],
+          "entry": "HKEY_LOCAL_MACHINE\\Software\\Classes\\Protocols",
+          "arch": "64bit",
+          "diff_size_limit": 51200,
+          "recursion_level": 512
+        },
+        {
+          "opts": [
+            "check_md5sum",
+            "check_sha1sum",
+            "check_sha256sum",
+            "check_size",
+            "check_owner",
+            "check_group",
+            "check_perm",
+            "check_mtime",
+            "check_type"
+          ],
+          "entry": "HKEY_LOCAL_MACHINE\\Software\\Classes\\Protocols",
+          "arch": "32bit",
+          "diff_size_limit": 51200,
+          "recursion_level": 512
+        },
+        {
+          "opts": [
+            "check_md5sum",
+            "check_sha1sum",
+            "check_sha256sum",
+            "check_size",
+            "check_owner",
+            "check_group",
+            "check_perm",
+            "check_mtime",
+            "check_type"
+          ],
+          "entry": "HKEY_LOCAL_MACHINE\\Software\\Policies",
+          "arch": "64bit",
+          "diff_size_limit": 51200,
+          "recursion_level": 512
+        },
+        {
+          "opts": [
+            "check_md5sum",
+            "check_sha1sum",
+            "check_sha256sum",
+            "check_size",
+            "check_owner",
+            "check_group",
+            "check_perm",
+            "check_mtime",
+            "check_type"
+          ],
+          "entry": "HKEY_LOCAL_MACHINE\\Software\\Policies",
+          "arch": "32bit",
+          "diff_size_limit": 51200,
+          "recursion_level": 512
+        },
+        {
+          "opts": [
+            "check_md5sum",
+            "check_sha1sum",
+            "check_sha256sum",
+            "check_size",
+            "check_owner",
+            "check_group",
+            "check_perm",
+            "check_mtime",
+            "check_type"
+          ],
+          "entry": "HKEY_LOCAL_MACHINE\\Security",
+          "arch": "32bit",
+          "diff_size_limit": 51200,
+          "recursion_level": 512
+        },
+        {
+          "opts": [
+            "check_md5sum",
+            "check_sha1sum",
+            "check_sha256sum",
+            "check_size",
+            "check_owner",
+            "check_group",
+            "check_perm",
+            "check_mtime",
+            "check_type"
+          ],
+          "entry": "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Internet Explorer",
+          "arch": "64bit",
+          "diff_size_limit": 51200,
+          "recursion_level": 512
+        },
+        {
+          "opts": [
+            "check_md5sum",
+            "check_sha1sum",
+            "check_sha256sum",
+            "check_size",
+            "check_owner",
+            "check_group",
+            "check_perm",
+            "check_mtime",
+            "check_type"
+          ],
+          "entry": "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Internet Explorer",
+          "arch": "32bit",
+          "diff_size_limit": 51200,
+          "recursion_level": 512
+        },
+        {
+          "opts": [
+            "check_md5sum",
+            "check_sha1sum",
+            "check_sha256sum",
+            "check_size",
+            "check_owner",
+            "check_group",
+            "check_perm",
+            "check_mtime",
+            "check_type"
+          ],
+          "entry": "HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Services",
+          "arch": "32bit",
+          "diff_size_limit": 51200,
+          "recursion_level": 512
+        },
+        {
+          "opts": [
+            "check_md5sum",
+            "check_sha1sum",
+            "check_sha256sum",
+            "check_size",
+            "check_owner",
+            "check_group",
+            "check_perm",
+            "check_mtime",
+            "check_type"
+          ],
+          "entry": "HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Control\\Session Manager\\KnownDLLs",
+          "arch": "32bit",
+          "diff_size_limit": 51200,
+          "recursion_level": 512
+        },
+        {
+          "opts": [
+            "check_md5sum",
+            "check_sha1sum",
+            "check_sha256sum",
+            "check_size",
+            "check_owner",
+            "check_group",
+            "check_perm",
+            "check_mtime",
+            "check_type"
+          ],
+          "entry": "HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Control\\SecurePipeServers\\winreg",
+          "arch": "32bit",
+          "diff_size_limit": 51200,
+          "recursion_level": 512
+        },
+        {
+          "opts": [
+            "check_md5sum",
+            "check_sha1sum",
+            "check_sha256sum",
+            "check_size",
+            "check_owner",
+            "check_group",
+            "check_perm",
+            "check_mtime",
+            "check_type"
+          ],
+          "entry": "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+          "arch": "64bit",
+          "diff_size_limit": 51200,
+          "recursion_level": 512
+        },
+        {
+          "opts": [
+            "check_md5sum",
+            "check_sha1sum",
+            "check_sha256sum",
+            "check_size",
+            "check_owner",
+            "check_group",
+            "check_perm",
+            "check_mtime",
+            "check_type"
+          ],
+          "entry": "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+          "arch": "32bit",
+          "diff_size_limit": 51200,
+          "recursion_level": 512
+        },
+        {
+          "opts": [
+            "check_md5sum",
+            "check_sha1sum",
+            "check_sha256sum",
+            "check_size",
+            "check_owner",
+            "check_group",
+            "check_perm",
+            "check_mtime",
+            "check_type"
+          ],
+          "entry": "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce",
+          "arch": "64bit",
+          "diff_size_limit": 51200,
+          "recursion_level": 512
+        },
+        {
+          "opts": [
+            "check_md5sum",
+            "check_sha1sum",
+            "check_sha256sum",
+            "check_size",
+            "check_owner",
+            "check_group",
+            "check_perm",
+            "check_mtime",
+            "check_type"
+          ],
+          "entry": "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce",
+          "arch": "32bit",
+          "diff_size_limit": 51200,
+          "recursion_level": 512
+        },
+        {
+          "opts": [
+            "check_md5sum",
+            "check_sha1sum",
+            "check_sha256sum",
+            "check_size",
+            "check_owner",
+            "check_group",
+            "check_perm",
+            "check_mtime",
+            "check_type"
+          ],
+          "entry": "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnceEx",
+          "arch": "32bit",
+          "diff_size_limit": 51200,
+          "recursion_level": 512
+        },
+        {
+          "opts": [
+            "check_md5sum",
+            "check_sha1sum",
+            "check_sha256sum",
+            "check_size",
+            "check_owner",
+            "check_group",
+            "check_perm",
+            "check_mtime",
+            "check_type"
+          ],
+          "entry": "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\URL",
+          "arch": "64bit",
+          "diff_size_limit": 51200,
+          "recursion_level": 512
+        },
+        {
+          "opts": [
+            "check_md5sum",
+            "check_sha1sum",
+            "check_sha256sum",
+            "check_size",
+            "check_owner",
+            "check_group",
+            "check_perm",
+            "check_mtime",
+            "check_type"
+          ],
+          "entry": "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\URL",
+          "arch": "32bit",
+          "diff_size_limit": 51200,
+          "recursion_level": 512
+        },
+        {
+          "opts": [
+            "check_md5sum",
+            "check_sha1sum",
+            "check_sha256sum",
+            "check_size",
+            "check_owner",
+            "check_group",
+            "check_perm",
+            "check_mtime",
+            "check_type"
+          ],
+          "entry": "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies",
+          "arch": "64bit",
+          "diff_size_limit": 51200,
+          "recursion_level": 512
+        },
+        {
+          "opts": [
+            "check_md5sum",
+            "check_sha1sum",
+            "check_sha256sum",
+            "check_size",
+            "check_owner",
+            "check_group",
+            "check_perm",
+            "check_mtime",
+            "check_type"
+          ],
+          "entry": "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies",
+          "arch": "32bit",
+          "diff_size_limit": 51200,
+          "recursion_level": 512
+        },
+        {
+          "opts": [
+            "check_md5sum",
+            "check_sha1sum",
+            "check_sha256sum",
+            "check_size",
+            "check_owner",
+            "check_group",
+            "check_perm",
+            "check_mtime",
+            "check_type"
+          ],
+          "entry": "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows",
+          "arch": "64bit",
+          "diff_size_limit": 51200,
+          "recursion_level": 512
+        },
+        {
+          "opts": [
+            "check_md5sum",
+            "check_sha1sum",
+            "check_sha256sum",
+            "check_size",
+            "check_owner",
+            "check_group",
+            "check_perm",
+            "check_mtime",
+            "check_type"
+          ],
+          "entry": "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows",
+          "arch": "32bit",
+          "diff_size_limit": 51200,
+          "recursion_level": 512
+        },
+        {
+          "opts": [
+            "check_md5sum",
+            "check_sha1sum",
+            "check_sha256sum",
+            "check_size",
+            "check_owner",
+            "check_group",
+            "check_perm",
+            "check_mtime",
+            "check_type"
+          ],
+          "entry": "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon",
+          "arch": "64bit",
+          "diff_size_limit": 51200,
+          "recursion_level": 512
+        },
+        {
+          "opts": [
+            "check_md5sum",
+            "check_sha1sum",
+            "check_sha256sum",
+            "check_size",
+            "check_owner",
+            "check_group",
+            "check_perm",
+            "check_mtime",
+            "check_type"
+          ],
+          "entry": "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon",
+          "arch": "32bit",
+          "diff_size_limit": 51200,
+          "recursion_level": 512
+        },
+        {
+          "opts": [
+            "check_md5sum",
+            "check_sha1sum",
+            "check_sha256sum",
+            "check_size",
+            "check_owner",
+            "check_group",
+            "check_perm",
+            "check_mtime",
+            "check_type"
+          ],
+          "entry": "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Active Setup\\Installed Components",
+          "arch": "64bit",
+          "diff_size_limit": 51200,
+          "recursion_level": 512
+        },
+        {
+          "opts": [
+            "check_md5sum",
+            "check_sha1sum",
+            "check_sha256sum",
+            "check_size",
+            "check_owner",
+            "check_group",
+            "check_perm",
+            "check_mtime",
+            "check_type"
+          ],
+          "entry": "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Active Setup\\Installed Components",
+          "arch": "32bit",
+          "diff_size_limit": 51200,
+          "recursion_level": 512
+        }
+      ],
+      "key_ignore": [
+        {
+          "entry": "HKEY_LOCAL_MACHINE\\Security\\Policy\\Secrets",
+          "arch": "32bit"
+        },
+        {
+          "entry": "HKEY_LOCAL_MACHINE\\Security\\SAM\\Domains\\Account\\Users",
+          "arch": "32bit"
+        },
+        {
+          "entry": "HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Services\\MpsSvc\\Parameters\\AppCs",
+          "arch": "32bit"
+        },
+        {
+          "entry": "HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Services\\MpsSvc\\Parameters\\PortKeywords\\DHCP",
+          "arch": "32bit"
+        },
+        {
+          "entry": "HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Services\\MpsSvc\\Parameters\\PortKeywords\\IPTLSIn",
+          "arch": "32bit"
+        },
+        {
+          "entry": "HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Services\\MpsSvc\\Parameters\\PortKeywords\\IPTLSOut",
+          "arch": "32bit"
+        },
+        {
+          "entry": "HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Services\\MpsSvc\\Parameters\\PortKeywords\\RPC-EPMap",
+          "arch": "32bit"
+        },
+        {
+          "entry": "HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Services\\MpsSvc\\Parameters\\PortKeywords\\Teredo",
+          "arch": "32bit"
+        },
+        {
+          "entry": "HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Services\\PolicyAgent\\Parameters\\Cache",
+          "arch": "32bit"
+        },
+        {
+          "entry": "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnceEx",
+          "arch": "32bit"
+        },
+        {
+          "entry": "HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Services\\ADOVMPPackage\\Final",
+          "arch": "32bit"
+        }
+      ],
+      "key_ignore_sregex": [
+        {
+          "entry": "\\Enum$",
+          "arch": "32bit"
+        }
+      ],
+      "allow_remote_prefilter_cmd": "no",
+      "synchronization": {
+        "enabled": "yes",
+        "registry_enabled": "yes",
+        "max_interval": 3600,
+        "interval": 300,
+        "response_timeout": 30,
+        "queue_size": 16384,
+        "max_eps": 10
+      },
+      "max_eps": 100,
+      "process_priority": 10,
+      "database": "disk"
+    }
+  },
+  "error": 0
+}

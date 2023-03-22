@@ -1,0 +1,9 @@
+{
+  "data": {
+    "monitord": {
+      "agents_disconnection_time": 600,
+      "agents_disconnection_alert_time": 0
+    }
+  },
+  "error": 0
+}

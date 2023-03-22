@@ -1,0 +1,9 @@
+{
+  "data": {
+    "logging": {
+      "plain": "yes",
+      "json": "no"
+    }
+  },
+  "error": 0
+}
