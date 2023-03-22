@@ -34,7 +34,7 @@ The Opensearch dashboards instance is accessible from http://localhost:5603 cred
 
 
 ## Configuring integrations
-The complete guide for integrations can be found [here](https://docs.google.com/document/d/1QotuX58m9f_GFJbLK-aZ74PDsf-SzmM8VoEhvrlkza0/edit)
+
 
 ### Splunk from manager
 To integrate Splunk from the manager, it is possible to do it via Splunk Forwarder or via Logstash.
