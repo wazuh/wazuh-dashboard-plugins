@@ -1,9 +1,0 @@
-{
-  "data": {
-    "alerts": {
-      "email_alert_level": 12,
-      "log_alert_level": 3
-    }
-  },
-  "error": 0
-}
