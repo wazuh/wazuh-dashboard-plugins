@@ -364,7 +364,7 @@ export async function getSuggestions(tokens: ITokens, options: OptionsQL): Promi
             {
               type: 'function_search',
               label: 'Search',
-              description: 'Run the search query',
+              description: 'run the search query',
             },
           ]
           : []),
@@ -583,7 +583,7 @@ function getOutput(input: string, options: OptionsQL) {
 export const WQL = {
   id: 'wql',
   label: 'WQL',
-  description: 'WQL (Wazuh Query Language) allows to do queries.',
+  description: 'WQL (Wazuh Query Language) offers a human query syntax based on the Wazuh API query language.',
   documentationLink: `https://github.com/wazuh/wazuh-kibana-app/blob/v${pluginPlatform.version.split('.').splice(0,2).join('.')}/public/components/search-bar/query-language/wql.md`,
   getConfiguration() {
     return {

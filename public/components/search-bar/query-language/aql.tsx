@@ -299,7 +299,7 @@ export async function getSuggestions(tokens: ITokens, options: optionsQL): Promi
             {
               type: 'function_search',
               label: 'Search',
-              description: 'Run the search query',
+              description: 'run the search query',
             },
           ]
           : []),
