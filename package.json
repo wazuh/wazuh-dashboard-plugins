@@ -35,11 +35,13 @@
     "es": "node ../../scripts/es",
     "start": "plugin-helpers start",
     "build": "yarn plugin-helpers build --kibana-version=$KIBANA_VERSION",
+    "build:runner": "node scripts/runner build",
     "plugin-helpers": "node ../../scripts/plugin_helpers",
     "test:ui:runner": "node ../../scripts/functional_test_runner.js",
     "test:server": "plugin-helpers test:server",
     "test:browser": "plugin-helpers test:browser",
     "test:jest": "node scripts/jest",
+    "test:jest:runner": "node scripts/runner test",
     "generate:api-4.0-info": "cd scripts/generate-api-4.0-info;./generate-api-4.0-info.sh;cd ../..",
     "prebuild": "node scripts/generate-build-version"
   },
