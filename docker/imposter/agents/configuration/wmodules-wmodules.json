@@ -15,7 +15,7 @@
       },
       {
         "cis-cat": {
-          "disabled": "yes",
+          "disabled": "no",
           "scan-on-start": "yes",
           "interval": 86400,
           "java_path": "wodles/java",
@@ -24,8 +24,17 @@
         }
       },
       {
+        "disabled": "no",
+        "scan-on-start": "yes",
+        "interval": 86400,
+        "content": {
+          "type": "xccdf",
+          "path": "wodles/oscap/content/ssg-ubuntu2004-ds.xml"
+        }
+      },
+      {
         "osquery": {
-          "disabled": "yes",
+          "disabled": "no",
           "run_daemon": "yes",
           "add_labels": "yes",
           "log_path": "/var/log/osquery/osqueryd.results.log",

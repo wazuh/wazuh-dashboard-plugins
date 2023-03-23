@@ -1,4 +1,26 @@
 {
-  "data": {},
+  "data": {
+    "affected_items": [
+      {
+        "target": [
+          {
+            "name": "custom_socket",
+            "location": "/var/run/custom.sock",
+            "mode": "tcp",
+            "prefix": "custom_syslog: "
+          },
+          {
+            "name": "test_socket",
+            "location": "/var/run/test.sock",
+            "mode": "udp"
+          }
+        ]
+      }
+    ],
+    "total_affected_items": 1,
+    "total_failed_items": 0,
+    "failed_items": []
+  },
+  "message": "Active configuration was successfully read",
   "error": 0
 }
