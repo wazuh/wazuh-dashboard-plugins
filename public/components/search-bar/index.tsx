@@ -143,52 +143,54 @@ export const SearchBar = ({
           closePopover={onQueryLanguagePopoverSwitch}
         >
           <EuiPopoverTitle>SYNTAX OPTIONS</EuiPopoverTitle>
-          <EuiText>
-            {searchBarQueryLanguages[queryLanguage.id].description}
-          </EuiText>
-          {searchBarQueryLanguages[queryLanguage.id].documentationLink && (
-            <>
-              <EuiSpacer />
-              <div>
-                <EuiLink
-                  href={
-                    searchBarQueryLanguages[queryLanguage.id].documentationLink
-                  }
-                  target='__blank'
-                  rel='noopener noreferrer'
-                >
-                  Documentation
-                </EuiLink>
-              </div>
-            </>
-          )}
-          {modes?.length > 1 && (
-            <>
-              <EuiSpacer />
-              <EuiFormRow label='Select a query language' fullWidth>
-                <EuiSelect
-                  id='query-language-selector'
-                  options={modes.map(({ id }) => ({
-                    value: id,
-                    text: searchBarQueryLanguages[id].label,
-                  }))}
-                  value={queryLanguage.id}
-                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                    const queryLanguageID: string = event.target.value;
-                    setQueryLanguage({
-                      id: queryLanguageID,
-                      configuration:
-                        searchBarQueryLanguages[
-                          queryLanguageID
-                        ]?.getConfiguration?.() || {},
-                    });
-                    setInput('');
-                  }}
-                  aria-label='query-language-selector'
-                />
-              </EuiFormRow>
-            </>
-          )}
+          <div style={{width: '350px'}}>
+            <EuiText>
+              {searchBarQueryLanguages[queryLanguage.id].description}
+            </EuiText>
+            {searchBarQueryLanguages[queryLanguage.id].documentationLink && (
+              <>
+                <EuiSpacer />
+                <div>
+                  <EuiLink
+                    href={
+                      searchBarQueryLanguages[queryLanguage.id].documentationLink
+                    }
+                    target='__blank'
+                    rel='noopener noreferrer'
+                  >
+                    Documentation
+                  </EuiLink>
+                </div>
+              </>
+            )}
+            {modes?.length > 1 && (
+              <>
+                <EuiSpacer />
+                <EuiFormRow label='Select a query language' fullWidth>
+                  <EuiSelect
+                    id='query-language-selector'
+                    options={modes.map(({ id }) => ({
+                      value: id,
+                      text: searchBarQueryLanguages[id].label,
+                    }))}
+                    value={queryLanguage.id}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                      const queryLanguageID: string = event.target.value;
+                      setQueryLanguage({
+                        id: queryLanguageID,
+                        configuration:
+                          searchBarQueryLanguages[
+                            queryLanguageID
+                          ]?.getConfiguration?.() || {},
+                      });
+                      setInput('');
+                    }}
+                    aria-label='query-language-selector'
+                  />
+                </EuiFormRow>
+              </>
+            )}
+          </div>
         </EuiPopover>
       }
       {...queryLanguageOutputRun.searchBarProps}
