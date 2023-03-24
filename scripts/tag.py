@@ -16,7 +16,7 @@ version = '4.4.0'
 # App's revision number (previous rev + 1)
 revision = '04'
 # One of 'pre-alpha', 'alpha', 'beta', 'release-candidate', 'stable'
-stage = 'rc2'
+stage = 'release-candidate'
 
 # Global variable. Will be set later
 branch = None
