@@ -835,7 +835,12 @@
       },
       "max_eps": 100,
       "process_priority": 10,
-      "database": "disk"
+      "database": "disk",
+      "whodata": {
+        "restart_audit": "yes",
+        "startup_healthcheck": "yes"
+      },
+      "nodiff": ["/etc/ssl/private.key"]
     }
   },
   "error": 0
