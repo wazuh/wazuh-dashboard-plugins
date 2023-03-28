@@ -47,6 +47,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Updated the `mocha` dependency to `10.1.0` [#5062](https://github.com/wazuh/wazuh-kibana-app/pull/5062)
 - Updated the `pdfmake` dependency to `0.2.7` [#5062](https://github.com/wazuh/wazuh-kibana-app/pull/5062)
 - The button to export the app logs is now disabled when there are no results, instead of showing an error toast [#4992](https://github.com/wazuh/wazuh-kibana-app/pull/4992)
+- Independently load each dashboard from the `Agents Overview` page [#4363](https://github.com/wazuh/wazuh-kibana-app/pull/4363)
 
 ### Fixed
 
