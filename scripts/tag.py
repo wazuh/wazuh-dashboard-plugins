@@ -25,7 +25,7 @@ minor = ".".join(version.split('.')[:2])
 # Supported versions of Kibana
 kbn_versions = [
     [f'7.16.{x}' for x in range(0, 4)],
-    [f'7.17.{x}' for x in range(0, 9)]
+    [f'7.17.{x}' for x in range(0, 10)]
 ]
 
 # Platforms versions
@@ -82,7 +82,7 @@ def setup():
 
 def main(platform: str, versions: list):
     for v in versions:
-        if stage is 'stable':
+        if stage == 'stable':
             tag = f'v{version}-{v}'
         else:
             tag = f'v{version}-{v}-{stage}'
