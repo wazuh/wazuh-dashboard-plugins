@@ -1,11 +1,11 @@
 {
   "name": "wazuh",
   "version": "4.4.0",
-  "revision": "05",
-  "stage": "rc3",
-  "commit": "d9deded0a",
+  "revision": "06",
+  "stage": "stable",
+  "commit": "88572dfca",
   "pluginPlatform": {
-    "version": "7.17.9"
+    "version": "7.17.4"
   },
   "description": "Wazuh app",
   "keywords": [
