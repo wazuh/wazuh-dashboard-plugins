@@ -1,0 +1,32 @@
+{
+  "data": {
+    "labels": [
+      {
+        "value": "i-052a1838c",
+        "key": "aws.instance-id",
+        "hidden": "no"
+      },
+      {
+        "value": "sg-1103",
+        "key": "aws.sec-group",
+        "hidden": "no"
+      },
+      {
+        "value": "172.17.0.0",
+        "key": "network.ip",
+        "hidden": "no"
+      },
+      {
+        "value": "02:42:ac:11:00:02",
+        "key": "network.mac",
+        "hidden": "no"
+      },
+      {
+        "value": "January 1st, 2017",
+        "key": "installation",
+        "hidden": "yes"
+      }
+    ]
+  },
+  "error": 0
+}

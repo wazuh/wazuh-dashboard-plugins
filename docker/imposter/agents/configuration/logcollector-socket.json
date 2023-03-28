@@ -1,0 +1,18 @@
+{
+  "data": {
+    "target": [
+      {
+        "name": "custom_socket",
+        "location": "/var/run/custom.sock",
+        "mode": "tcp",
+        "prefix": "custom_syslog: "
+      },
+      {
+        "name": "test_socket",
+        "location": "/var/run/test.sock",
+        "mode": "udp"
+      }
+    ]
+  },
+  "error": 0
+}
