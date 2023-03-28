@@ -14,9 +14,9 @@ import subprocess
 # Wazuh version: major.minor.patch
 version = '4.4.0'
 # App's revision number (previous rev + 1)
-revision = '05'
+revision = '06'
 # One of 'pre-alpha', 'alpha', 'beta', 'release-candidate', 'stable'
-stage = 'rc3'
+stage = 'stable'
 
 # Global variable. Will be set later
 branch = None
