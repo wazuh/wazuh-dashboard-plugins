@@ -70,7 +70,11 @@ const checkClientAppVersion = (appInfo: TAppInfo) => {
         <p>If the error persists, restart {PLUGIN_PLATFORM_NAME} as well.</p>
         <p>
           For more information check our troubleshooting section{' '}
-          <a href={troubleshootingUrl} target="_blank">
+          <a
+            href={troubleshootingUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             here.
           </a>
         </p>

@@ -17,6 +17,7 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiCallOut,
+  EuiLink
 } from '@elastic/eui';
 import { InventoryMetrics } from './components/syscollector-metrics';
 import { SyscollectorTable } from './components/syscollector-table';
@@ -37,14 +38,16 @@ export function SyscollectorInventory({ agent }) {
               The agent has been registered but has not yet connected to the
               manager.
             </p>
-            <a
+            <EuiLink
               href={webDocumentationLink(
                 'user-manual/agents/agent-connection.html',
               )}
               target='_blank'
+              rel='noopener noreferrer'
+              external
             >
               Checking connection with the Wazuh server
-            </a>
+            </EuiLink>
           </Fragment>
         }
         actions={

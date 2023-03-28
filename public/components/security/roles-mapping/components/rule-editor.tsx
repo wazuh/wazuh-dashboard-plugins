@@ -97,7 +97,7 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
     setIsLogicalPopoverOpen(isLogicalPopoverOpen => !isLogicalPopoverOpen);
   const closeLogicalPopover = () => setIsLogicalPopoverOpen(false);
 
-  const selectOperator = op => {  
+  const selectOperator = op => {
     setLogicalOperator(op);
     closeLogicalPopover();
   };
@@ -125,7 +125,7 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
     rulesTmp.splice(id, 1);
     setRules(rulesTmp);
   };
-  
+
   const getRulesFromJson = (jsonRule) => {
     if (jsonRule !== '{}' && jsonRule !== '') {
       // empty json is valid
@@ -217,9 +217,9 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
     setRules(rulesTmp);
   };
 
-  const openJsonEditor = () => {  
+  const openJsonEditor = () => {
     const ruleObject = getJsonFromRule(internalUserRules, rules, logicalOperator);
-    
+
     setRuleJson(JSON.stringify(ruleObject, undefined, 2));
     setIsJsonEditor(true);
   };
@@ -258,7 +258,7 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
   const saveRule = () => {
     if (isJsonEditor) {
       // if json editor is empty
-      if (ruleJson === '') {       
+      if (ruleJson === '') {
         setRuleJson('{}');
       }
       save(JSON.parse(ruleJson));
@@ -302,6 +302,7 @@ export const RuleEditor = ({ save, initialRule, isLoading, isReserved, internalU
                 href={webDocumentationLink('user-manual/api/rbac/auth-context.html')}
                 external
                 target="_blank"
+                rel="noopener noreferrer"
               >
                 Learn more
               </EuiLink>
