@@ -82,7 +82,10 @@ def setup():
 
 def main(platform: str, versions: list):
     for v in versions:
-        tag = f'v{version}-{v}-{stage}'
+        if stage is 'stable':
+            tag = f'v{version}-{v}'
+        else:
+            tag = f'v{version}-{v}-{stage}'
         logging.info(f'Generating tag "{tag}"')
         update_package_json(v)
         os.system(f'git commit -am "Bump {tag}"')
