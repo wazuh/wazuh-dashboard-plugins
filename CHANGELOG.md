@@ -2,6 +2,12 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.4.1 - OpenSearch Dashboards 2.6.0 - Revision 00
+
+### Changed
+
+- Changed the anomaly and malware detection link to the malware detection link. [#5329](https://github.com/wazuh/wazuh-kibana-app/pull/5329)
+
 ## Wazuh v4.4.0 - OpenSearch Dashboards 2.4.0 - Revision 06
 
 ### Added
