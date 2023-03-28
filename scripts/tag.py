@@ -14,9 +14,9 @@ import subprocess
 # Wazuh version: major.minor.patch
 version = '4.4.0'
 # App's revision number (previous rev + 1)
-revision = '04'
+revision = '06'
 # One of 'pre-alpha', 'alpha', 'beta', 'release-candidate', 'stable'
-stage = 'rc2'
+stage = 'stable'
 
 # Global variable. Will be set later
 branch = None
@@ -25,7 +25,7 @@ minor = ".".join(version.split('.')[:2])
 # Supported versions of Kibana
 kbn_versions = [
     [f'7.16.{x}' for x in range(0, 4)],
-    [f'7.17.{x}' for x in range(0, 9)]
+    [f'7.17.{x}' for x in range(0, 10)]
 ]
 
 # Platforms versions
@@ -82,7 +82,10 @@ def setup():
 
 def main(platform: str, versions: list):
     for v in versions:
-        tag = f'v{version}-{v}-{stage}'
+        if stage == 'stable':
+            tag = f'v{version}-{v}'
+        else:
+            tag = f'v{version}-{v}-{stage}'
         logging.info(f'Generating tag "{tag}"')
         update_package_json(v)
         os.system(f'git commit -am "Bump {tag}"')
