@@ -111,11 +111,11 @@ export function SyscollectorTable({ tableParams }) {
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiFieldSearch
-              placeholder={`Search`}
+              placeholder='Search'
               value={searchBarValue}
               fullWidth={true}
               onChange={onChange}
-              aria-label={`Search`}
+              aria-label='Search'
             />
           </EuiFlexItem>
         </EuiFlexGroup>
