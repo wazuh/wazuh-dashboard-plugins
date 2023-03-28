@@ -50,6 +50,9 @@ resources:
   # Get active configuration
   - method: GET
     path: /agents/{agent_id}/config/{component}/{configuration}
+    response:
+      statusCode: 200
+      scriptFile: agents/agents-configuration.js
 
   # Remove agent from groups
   - method: DELETE
