@@ -2,6 +2,12 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.4.1 - OpenSearch Dashboards 2.4.0 - Revision 07
+
+### Fixed
+
+- Fixed a visual error in the 'About' section. [#5337](https://github.com/wazuh/wazuh-kibana-app/pull/5337)
+
 ## Wazuh v4.4.0 - OpenSearch Dashboards 2.4.0 - Revision 06
 
 ### Added
