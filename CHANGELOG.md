@@ -2,6 +2,12 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.4.1 - OpenSearch Dashboards 2.6.0 - Revision 00
+
+### Fixed
+
+- Fixed `Top 5 users` table overflow in `FIM::Dashboard` [#5334](https://github.com/wazuh/wazuh-kibana-app/pull/5334)
+
 ## Wazuh v4.4.0 - OpenSearch Dashboards 2.4.0 - Revision 06
 
 ### Added
