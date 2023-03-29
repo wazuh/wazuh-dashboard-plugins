@@ -27,6 +27,7 @@ import WzConfigurationIntegrityMonitoringNoDiff from './integrity-monitoring-no-
 import WzConfigurationIntegrityMonitoringWhoData from './integrity-monitoring-who-data';
 import WzConfigurationIntegrityMonitoringSynchronization from './integrity-monitoring-synchronization';
 import WzConfigurationIntegrityMonitoringFileLimit from './integrity-monitoring-file-limit';
+import WzConfigurationIntegrityMonitoringRegistryLimit from './integrity-monitoring-registry-limit';
 
 class WzConfigurationIntegrityMonitoring extends Component {
   constructor(props) {
@@ -87,8 +88,11 @@ class WzConfigurationIntegrityMonitoring extends Component {
                   {...this.props}
                 />
               </WzTabSelectorTab>
-              <WzTabSelectorTab label="Entries limit">
+              <WzTabSelectorTab label="Files limit">
                 <WzConfigurationIntegrityMonitoringFileLimit {...this.props} />
+              </WzTabSelectorTab>
+              <WzTabSelectorTab label="Registries limit">
+                <WzConfigurationIntegrityMonitoringRegistryLimit {...this.props} />
               </WzTabSelectorTab>
             </WzTabSelector>
           )}

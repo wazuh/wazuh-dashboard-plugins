@@ -22,21 +22,18 @@ import { renderValueYesThenEnabled } from '../utils/utils';
 const mainSettings = [
   {
     field: 'enabled',
-    label: 'Synchronization status',
+    label: 'File limit status',
     render: renderValueYesThenEnabled
   },
   {
-    field: 'max_interval',
-    label: 'Maximum interval (in seconds) between every sync'
-  },
-  { field: 'interval', label: 'Interval (in seconds) between every sync' },
-  { field: 'response_timeout', label: 'Response timeout (in seconds)' },
-  { field: 'queue_size', label: 'Queue size of the manager responses' },
-  { field: 'max_eps', label: 'Maximum message throughput' },
-  { field: 'thread_pool', label: 'Number of threads' },
+    field: 'registries',
+    label: 'Maximum number of registries values to monitor'
+  }
 ];
 
-class WzConfigurationIntegrityMonitoringSynchronization extends Component {
+const FILE_LIMIT_PROP = 'registry_limit'
+
+class WzConfigurationIntegrityMonitoringFileLimit extends Component {
   constructor(props) {
     super(props);
   }
@@ -47,17 +44,17 @@ class WzConfigurationIntegrityMonitoringSynchronization extends Component {
         {currentConfig &&
         currentConfig['syscheck-syscheck'] &&
         currentConfig['syscheck-syscheck'].syscheck &&
-        currentConfig['syscheck-syscheck'].syscheck.synchronization ? (
+        currentConfig['syscheck-syscheck'].syscheck[FILE_LIMIT_PROP] ? (
           <WzConfigurationSettingsTabSelector
-            title="Syncronization"
-            description="Database synchronization settings"
+            title="Entries limit"
+            description="Limit the maximum entries in the FIM database"
             currentConfig={currentConfig['syscheck-syscheck']}
             minusHeight={this.props.agent.id === '000' ? 320 : 415}
             helpLinks={helpLinks}
           >
             <WzConfigurationSettingsGroup
               config={
-                currentConfig['syscheck-syscheck'].syscheck.synchronization
+                currentConfig['syscheck-syscheck'].syscheck[FILE_LIMIT_PROP]
               }
               items={mainSettings}
             />
@@ -70,8 +67,8 @@ class WzConfigurationIntegrityMonitoringSynchronization extends Component {
   }
 }
 
-WzConfigurationIntegrityMonitoringSynchronization.proptTypes = {
+WzConfigurationIntegrityMonitoringFileLimit.proptTypes = {
   // currentConfig: PropTypes.object.isRequired
 };
 
-export default WzConfigurationIntegrityMonitoringSynchronization;
+export default WzConfigurationIntegrityMonitoringFileLimit;
