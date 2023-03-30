@@ -2,6 +2,12 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.4.1 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 00
+
+### Fixed
+
+- Fixed the `Anomaly and malware detection` link. [#5329](https://github.com/wazuh/wazuh-kibana-app/pull/5329)
+
 ## Wazuh v4.4.0 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 06
 
 ### Added
