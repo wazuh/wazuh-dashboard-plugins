@@ -2,11 +2,13 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Unreleased
+## Wazuh v4.4.1 - OpenSearch Dashboards 2.6.0 - Revision 00
 
 ### Fixed
 
 - Fixed the search in the agent inventory data tables [#5196](https://github.com/wazuh/wazuh-kibana-app/pull/5196)
+- Fixed a visual error in the 'About' section. [#5337](https://github.com/wazuh/wazuh-kibana-app/pull/5337)
+- Fixed the `Anomaly and malware detection` link. [#5329](https://github.com/wazuh/wazuh-kibana-app/pull/5329)
 
 ## Wazuh v4.4.0 - OpenSearch Dashboards 2.4.0 - Revision 06
 
