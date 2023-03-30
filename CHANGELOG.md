@@ -7,6 +7,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Fixed
 
 - Fixed the `Anomaly and malware detection` link. [#5329](https://github.com/wazuh/wazuh-kibana-app/pull/5329)
+- Fixed the problem that did not allow closing the time picker when the button was clicked again. [#5341](https://github.com/wazuh/wazuh-kibana-app/pull/5341)
 
 ## Wazuh v4.4.0 - OpenSearch Dashboards 2.4.0 - Revision 06
 
