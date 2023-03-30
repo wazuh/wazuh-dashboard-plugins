@@ -48,8 +48,8 @@ export function CondensedPicker({ ranges, onTimeChange }) {
     return result;
   }
 
-  const button = (<EuiButtonEmpty 
-    onClick={() => setIsOpen(true)}
+  const button = (<EuiButtonEmpty
+    onClick={() => setIsOpen(!isOpen)}
     iconType="arrowDown"
     iconSide="right">
     {!!customRange
