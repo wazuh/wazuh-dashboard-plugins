@@ -23,6 +23,12 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed references to Elasticsearch in Wazuh-stack plugin [4894](https://github.com/wazuh/wazuh-kibana-app/pull/4894)
 - Fixed the 2 errors that appeared in console in Settings>Configuration section. [#5135](https://github.com/wazuh/wazuh-kibana-app/pull/5135)
 
+## Wazuh v4.4.1 - OpenSearch Dashboards 2.6.0 - Revision 00
+
+### Fixed
+- Fixed a visual error in the 'About' section. [#5337](https://github.com/wazuh/wazuh-kibana-app/pull/5337)
+- Fixed the `Anomaly and malware detection` link. [#5329](https://github.com/wazuh/wazuh-kibana-app/pull/5329)
+
 ## Wazuh v4.4.0 - OpenSearch Dashboards 2.4.0 - Revision 06
 
 ### Added
