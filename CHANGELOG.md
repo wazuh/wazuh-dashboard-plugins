@@ -2,11 +2,11 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v4.4.1 - OpenSearch Dashboards 2.6.0 - Revision 07
+## Unreleased
 
-### Change
+### Fixed
 
-- Change the search method in the agents inventory tables [#5196](https://github.com/wazuh/wazuh-kibana-app/pull/5196)
+- Fixed the search in the agent inventory data tables [#5196](https://github.com/wazuh/wazuh-kibana-app/pull/5196)
 
 ## Wazuh v4.4.0 - OpenSearch Dashboards 2.4.0 - Revision 06
 
