@@ -45,6 +45,7 @@ class WzConfigurationIntegrityMonitoring extends Component {
       this.props.currentConfig['syscheck-syscheck'].syscheck.disabled === 'no'
     );
   }
+
   render() {
     const { currentConfig, agent } = this.props;
     const agentPlatform = ((agent || {}).os || {}).platform;
@@ -91,9 +92,12 @@ class WzConfigurationIntegrityMonitoring extends Component {
               <WzTabSelectorTab label="Files limit">
                 <WzConfigurationIntegrityMonitoringFileLimit {...this.props} />
               </WzTabSelectorTab>
-              <WzTabSelectorTab label="Registries limit">
-                <WzConfigurationIntegrityMonitoringRegistryLimit {...this.props} />
-              </WzTabSelectorTab>
+              { agentPlatform === 'windows' && (
+                <WzTabSelectorTab label="Registries limit">
+                  <WzConfigurationIntegrityMonitoringRegistryLimit {...this.props} />
+                </WzTabSelectorTab>
+              )}
+              
             </WzTabSelector>
           )}
       </Fragment>
