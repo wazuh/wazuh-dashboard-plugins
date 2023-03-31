@@ -21,8 +21,6 @@ revision = '00'
 stage = 'alpha'
 # RC number(optional, set to 0 or None to disable)
 stage_cycle = 1
-# Debug mode
-dry_run = False
 
 # ================================================ #
 # Constants and global variables                   #
