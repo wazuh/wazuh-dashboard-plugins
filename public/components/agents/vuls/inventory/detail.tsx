@@ -309,8 +309,8 @@ export class Details extends Component {
     );
   }
 
-  renderExternalReferences(references) {
-    return (
+  renderExternalReferences(references: string[]) {
+    return references.length ? (
       <EuiAccordion
         id="modules_vulnerabilities_inventory_flyout_details_references"
         paddingSize="none"
@@ -332,7 +332,7 @@ export class Details extends Component {
           }
         />
       </EuiAccordion>
-    );
+    ) : "-";
   }
 
   updateTotalHits = (total) => {
