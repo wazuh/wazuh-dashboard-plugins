@@ -5,7 +5,7 @@ import subprocess
 
 # ==================== CONFIGURATION ==================== #
 # Fill the variables below with the desired values
-# 
+#
 # Values to modify:
 #  - version        - sent to the package.json
 #  - revision       - sent to the package.json
@@ -122,9 +122,9 @@ def main(platform: str, versions: list):
         os.system(f'git push origin {tag}')
         # Undo latest commit
         os.system(f'git reset --hard origin/{branch}')
-    
+
     # Save created tags to file
-    os.system(f'git tag | grep -P -i "^v{version}-.*-{stage}" > {TAGS_FILE}')
+    os.system(f'git tag | grep -P -i "^v{version}-.*-{tag_suffix}" > {TAGS_FILE}')
 
 # ================================================ #
 # Main program                                     #
