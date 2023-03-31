@@ -6,7 +6,11 @@ import { AppState } from '../../../../react-services/app-state';
 
 
 export function SyscollectorTable({ tableParams }) {
-  const [params, setParams] = useState({ limit: 10, offset: 0, });
+  const [params, setParams] = useState<{ limit: number, offset: number, select:string, q?: string}>({
+    limit: 10,
+    offset: 0,
+    select: tableParams.columns.map(({id}) => id).join(",")
+  });
   const [pageIndex, setPageIndex] = useState(0);
   const [searchBarValue, setSearchBarValue] = useState("");
   const [pageSize, setPageSize] = useState(10);
@@ -67,7 +71,13 @@ export function SyscollectorTable({ tableParams }) {
     setSearchBarValue(value);
     timerDelaySearch && clearTimeout(timerDelaySearch);
     const timeoutId = setTimeout(() => {
-      const newParams = { ...params, search: value };
+      const { q, ...rest} = params;
+      const newParams = {
+        ...rest,
+        ...(value ? {
+          q: tableParams.columns.map(({id}) => `${id}~${value}`).join(",")
+        }: {})
+       };
       setParams(newParams);
       setPageIndex(0);
     }, 400)
@@ -85,7 +95,7 @@ export function SyscollectorTable({ tableParams }) {
     await AppState.downloadCsv(
       tableParams.path,
       tableParams.exportFormatted,
-      !!params.search ? [{ name: 'search', value: params.search }] : []
+      !!params.q ? [{ name: 'q', value: params.q }] : []
     )
   }
 
@@ -101,11 +111,11 @@ export function SyscollectorTable({ tableParams }) {
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiFieldSearch
-              placeholder={`Filter ${tableParams.title.toLowerCase()}...`}
+              placeholder='Search'
               value={searchBarValue}
               fullWidth={true}
               onChange={onChange}
-              aria-label={`Filter ${tableParams.title.toLowerCase()}...`}
+              aria-label='Search'
             />
           </EuiFlexItem>
         </EuiFlexGroup>
