@@ -7,9 +7,10 @@ import subprocess
 # Fill the variables below with the desired values
 # 
 # Values to modify:
-#  - version
-#  - revision
-#  - stage
+#  - version        - sent to the package.json
+#  - revision       - sent to the package.json
+#  - stage          - sent to the package.json
+#  - tag_suffix     - used by the tag generation
 #  - supported_versions & kbn_versions ONLY IF NEEDED (e.g. new Kibana version)
 # ======================================================= #
 
@@ -18,9 +19,9 @@ version = '4.4.1'
 # App's revision number (previous rev + 1)
 revision = '00'
 # One of 'pre-alpha', 'alpha', 'beta', 'release-candidate', 'stable'
-stage = 'alpha'
-# RC number(optional, set to 0 or None to disable)
-stage_cycle = 1
+stage = 'release-candidate'
+# Tag suffix. Usually set to stage + stage iteration.
+tag_suffix = 'rc1'
 
 # ================================================ #
 # Constants and global variables                   #
@@ -111,7 +112,7 @@ def main(platform: str, versions: list):
         if stage == 'stable':
             tag = f'v{version}-{v}'
         else:
-            tag = f'v{version}-{v}-{stage}-{stage_cycle}'
+            tag = f'v{version}-{v}-{tag_suffix}'
         logging.info(f'Generating tag "{tag}"')
         update_package_json(v)
         os.system(f'git commit -am "Bump {tag}"')
