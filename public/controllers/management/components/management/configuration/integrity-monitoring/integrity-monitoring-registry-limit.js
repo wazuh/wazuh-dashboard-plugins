@@ -11,7 +11,6 @@
  */
 
 import React, { Component, Fragment } from 'react';
-import PropTypes from 'prop-types';
 
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
@@ -26,7 +25,7 @@ const mainSettings = [
     render: renderValueYesThenEnabled
   },
   {
-    field: 'registries',
+    field: 'entries',
     label: 'Maximum number of registries values to monitor'
   }
 ];
