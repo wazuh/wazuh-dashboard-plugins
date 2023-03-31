@@ -109,30 +109,23 @@ def setup():
 
 def main(platform: str, versions: list):
     """Main function."""
-    with open(TAGS_FILE, 'w') as f:
-        for v in versions:
-            if stage == 'stable':
-                tag = f'v{version}-{v}'
-            else:
-                tag = f'v{version}-{v}-{stage}-{stage_cycle}'
-            
-            logging.info(f'Generating tag "{tag}"')
-            update_package_json(v)
-            os.system(f'git commit -am "Bump {tag}"')
-            os.system(
-                f'git tag -a {tag} -m "Wazuh {version} for {platform} {v}"')
-            if not dry_run:
-                logging.info(f'Pushing tag "{tag}" to remote.')
-                os.system(f'git push origin {tag}')
-                
-            # Undo latest commit
-            os.system(f'git reset --hard origin/{branch}')
-
-            # Write tag to file (used later by the CI)
-            f.write(f'{tag}\n')
+    for v in versions:
+        if stage == 'stable':
+            tag = f'v{version}-{v}'
+        else:
+            tag = f'v{version}-{v}-{stage}-{stage_cycle}'
+        logging.info(f'Generating tag "{tag}"')
+        update_package_json(v)
+        os.system(f'git commit -am "Bump {tag}"')
+        os.system(
+            f'git tag -a {tag} -m "Wazuh {version} for {platform} {v}"')
+        logging.info(f'Pushing tag "{tag}" to remote.')
+        os.system(f'git push origin {tag}')
+        # Undo latest commit
+        os.system(f'git reset --hard origin/{branch}')
     
     # Save created tags to file
-    os.system(f'git tag | grep -P -i "^v{version}-.*-{stage}" > tags.txt')
+    os.system(f'git tag | grep -P -i "^v{version}-.*-{stage}" > {TAGS_FILE}')
 
 # ================================================ #
 # Main program                                     #
