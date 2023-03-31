@@ -4,6 +4,8 @@ import os
 import subprocess
 
 # ==================== CONFIGURATION ==================== #
+# Fill the variables below with the desired values
+# 
 # Values to modify:
 #  - version
 #  - revision
@@ -12,12 +14,21 @@ import subprocess
 # ======================================================= #
 
 # Wazuh version: major.minor.patch
-version = '4.4.0'
+version = '4.4.1'
 # App's revision number (previous rev + 1)
-revision = '06'
+revision = '00'
 # One of 'pre-alpha', 'alpha', 'beta', 'release-candidate', 'stable'
-stage = 'stable'
+stage = 'alpha'
+# RC number(optional, set to 0 or None to disable)
+stage_cycle = 1
+# Debug mode
+dry_run = False
 
+# ================================================ #
+# Constants and global variables                   #
+# ================================================ #
+LOG_FILE = 'output.log'
+TAGS_FILE = 'tags.log'
 # Global variable. Will be set later
 branch = None
 minor = ".".join(version.split('.')[:2])
@@ -41,9 +52,23 @@ supported_versions = {
     },
     'Wazuh Dashboard': {
         'branch': f'{minor}-2.4-wzd',
-        'versions': ['2.4.1']
+        'versions': ['2.6.0']
     }
 }
+
+# ================================================ #
+# Functions                                        #
+# ================================================ #
+
+def require_confirmation():
+    """Ask for confirmation before running the script."""
+    print('WARNING! This script will commit and push the tags to the remote '
+        + 'repository, deleting any unpushed changes.')
+    confirmation = input('Do you want to continue? [y/N] ')
+
+    if confirmation.lower() != 'y':
+        logging.info('Aborting...')
+        exit(0)
 
 
 def get_git_revision_short_hash() -> str:
@@ -51,6 +76,7 @@ def get_git_revision_short_hash() -> str:
 
 
 def update_package_json(v: str) -> tuple:
+    """Update package.json with the new version and revision."""
     logging.info(f'Updating package.json')
     data, success = {}, True
 
@@ -74,6 +100,7 @@ def update_package_json(v: str) -> tuple:
 
 
 def setup():
+    """Sync the repo."""
     logging.info(
         f'Switching to branch "{branch}" and removing outdated tags...')
     os.system(f'git checkout {branch}')
@@ -81,34 +108,51 @@ def setup():
 
 
 def main(platform: str, versions: list):
-    for v in versions:
-        if stage == 'stable':
-            tag = f'v{version}-{v}'
-        else:
-            tag = f'v{version}-{v}-{stage}'
-        logging.info(f'Generating tag "{tag}"')
-        update_package_json(v)
-        os.system(f'git commit -am "Bump {tag}"')
-        os.system(
-            f'git tag -a {tag} -m "Wazuh {version} for {platform} {v}"')
-        logging.info(f'Pushing tag "{tag}" to remote.')
-        os.system(f'git push origin {tag}')
-        # Undo latest commit
-        os.system(f'git reset --hard origin/{branch}')
+    """Main function."""
+    with open(TAGS_FILE, 'w') as f:
+        for v in versions:
+            if stage == 'stable':
+                tag = f'v{version}-{v}'
+            else:
+                tag = f'v{version}-{v}-{stage}-{stage_cycle}'
+            
+            logging.info(f'Generating tag "{tag}"')
+            update_package_json(v)
+            os.system(f'git commit -am "Bump {tag}"')
+            os.system(
+                f'git tag -a {tag} -m "Wazuh {version} for {platform} {v}"')
+            if not dry_run:
+                logging.info(f'Pushing tag "{tag}" to remote.')
+                os.system(f'git push origin {tag}')
+                
+            # Undo latest commit
+            os.system(f'git reset --hard origin/{branch}')
+
+            # Write tag to file (used later by the CI)
+            f.write(f'{tag}\n')
+    
     # Save created tags to file
     os.system(f'git tag | grep -P -i "^v{version}-.*-{stage}" > tags.txt')
 
+# ================================================ #
+# Main program                                     #
+# ================================================ #
 
 if __name__ == '__main__':
     logging.basicConfig(
-        filename='output.log',
+        filename=LOG_FILE,
         level=logging.INFO,
         format='%(asctime)s %(message)s'
     )
     logging.info(
         f'Wazuh version is "{version}". App revision is "{revision}". Stage is "{stage}"')
+    require_confirmation()
 
     for platform_name, platform_data in supported_versions.items():
         branch, versions = platform_data['branch'], platform_data['versions']
         setup()
         main(platform_name, versions)
+
+
+    print(f'\nCOMPLETED. \nCheck {LOG_FILE} for more details.')
+    print(f'Tags are stored in {TAGS_FILE}')
