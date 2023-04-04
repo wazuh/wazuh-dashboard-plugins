@@ -1,0 +1,14 @@
+{
+  "data": {
+    "remote": [
+      {
+        "connection": "secure",
+        "ipv6": "no",
+        "protocol": ["TCP"],
+        "port": "1514",
+        "queue_size": "131072"
+      }
+    ]
+  },
+  "error": 0
+}

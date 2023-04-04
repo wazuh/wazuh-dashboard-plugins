@@ -1,0 +1,87 @@
+{
+  "data": {
+    "localfile": [
+      {
+        "logformat": "command",
+        "command": "df -P",
+        "alias": "df -P",
+        "ignore_binaries": "no",
+        "target": ["agent"],
+        "frequency": 360
+      },
+      {
+        "logformat": "full_command",
+        "command": "netstat -tulpn | sed 's/\\([[:alnum:]]\\+\\)\\ \\+[[:digit:]]\\+\\ \\+[[:digit:]]\\+\\ \\+\\(.*\\):\\([[:digit:]]*\\)\\ \\+\\([0-9\\.\\:\\*]\\+\\).\\+\\ \\([[:digit:]]*\\/[[:alnum:]\\-]*\\).*/\\1 \\2 == \\3 == \\4 \\5/' | sort -k 4 -g | sed 's/ == \\(.*\\) ==/:\\1/' | sed 1,2d",
+        "alias": "netstat listening ports",
+        "ignore_binaries": "no",
+        "target": ["agent"],
+        "frequency": 360
+      },
+      {
+        "logformat": "full_command",
+        "command": "last -n 20",
+        "alias": "last -n 20",
+        "ignore_binaries": "no",
+        "target": ["agent"],
+        "frequency": 360
+      },
+      {
+        "file": "/var/log/test.log",
+        "logformat": "syslog",
+        "ignore_binaries": "no",
+        "only-future-events": "yes",
+        "target": ["agent"]
+      },
+      {
+        "file": "/var/log/nginx/access.log",
+        "logformat": "apache",
+        "ignore_binaries": "no",
+        "only-future-events": "yes",
+        "target": ["agent"]
+      },
+      {
+        "file": "/var/log/nginx/error.log",
+        "logformat": "apache",
+        "ignore_binaries": "no",
+        "only-future-events": "yes",
+        "target": ["agent"]
+      },
+      {
+        "file": "/var/ossec/logs/active-responses.log",
+        "logformat": "syslog",
+        "ignore_binaries": "no",
+        "only-future-events": "yes",
+        "target": ["agent"]
+      },
+      {
+        "file": "/var/log/auth.log",
+        "logformat": "syslog",
+        "ignore_binaries": "no",
+        "only-future-events": "yes",
+        "target": ["agent"]
+      },
+      {
+        "file": "/var/log/syslog",
+        "logformat": "syslog",
+        "ignore_binaries": "no",
+        "only-future-events": "yes",
+        "target": ["agent"]
+      },
+      {
+        "file": "/var/log/dpkg.log",
+        "logformat": "syslog",
+        "ignore_binaries": "no",
+        "only-future-events": "yes",
+        "target": ["agent"]
+      },
+      {
+        "file": "/var/log/kern.log",
+        "logformat": "syslog",
+        "ignore_binaries": "no",
+        "only-future-events": "yes",
+        "target": ["agent"]
+      }
+    ]
+  },
+  "error": 0
+}
