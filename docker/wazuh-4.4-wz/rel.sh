@@ -33,11 +33,13 @@ export COMPOSE_PROJECT_NAME=wz-rel-${WAZUH_STACK//./}
 
 profile="standard"
 export WAZUH_DASHBOARD_CONF=./config/wazuh_dashboard/wazuh_dashboard.yml
+export SEC_CONFIG_FILE=./config/wazuh_indexer/config.yml
 
 if [[ "$3" =~ "saml" ]]
 then
 	profile="saml"
 	export WAZUH_DASHBOARD_CONF=./config/wazuh_dashboard/wazuh_dashboard_saml.yml
+	export SEC_CONFIG_FILE=./config/wazuh_indexer/config-saml.yml
 fi
 
 case "$2" in
