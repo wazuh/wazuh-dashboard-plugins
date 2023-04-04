@@ -45,10 +45,6 @@ fi
 case "$2" in
 	up)
 		docker compose --profile $profile -f rel.yml -p ${COMPOSE_PROJECT_NAME} up -Vd
-		if [[ "${profile}" =~ "saml" ]]
-		then
-			./enable_saml.sh ${COMPOSE_PROJECT_NAME}
-		fi
     echo
     echo "1. (Optional) Enroll an agent (Ubuntu 20.04):"
     echo "docker run --name ${COMPOSE_PROJECT_NAME}-agent --network ${COMPOSE_PROJECT_NAME} --label com.docker.compose.project=${COMPOSE_PROJECT_NAME} -d ubuntu:20.04 bash -c '"
