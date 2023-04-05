@@ -159,9 +159,12 @@ services:
         hard: 65536
     volumes:
       - wazuh-indexer-data:/var/lib/wazuh-indexer
-      - wi_certs:/usr/share/wazuh-indexer/config/certs/
-      - ./config/wazuh_indexer/wazuh.indexer.yml:/usr/share/wazuh-indexer/config/opensearch.yml
-      - ./config/wazuh_indexer/internal_users.yml:/usr/share/wazuh-indexer/plugins/opensearch-security/securityconfig/internal_users.yml
+      - wi_certs:/usr/share/wazuh-indexer/certs/
+      - ./config/wazuh_indexer/wazuh.indexer.yml:/usr/share/wazuh-indexer/opensearch.yml
+      - ./config/wazuh_indexer/internal_users.yml:/usr/share/wazuh-indexer/opensearch-security/internal_users.yml
+      - ./config/wazuh_indexer/config.yml:/usr/share/wazuh-indexer/opensearch-security/config.yml
+      - ./config/wazuh_indexer/roles.yml:/usr/share/wazuh-indexer/opensearch-security/roles.yml
+      - ./config/wazuh_indexer/roles_mapping.yml:/usr/share/wazuh-indexer/opensearch-security/roles_mapping.yml
     healthcheck:
       test:
         [
