@@ -1,0 +1,14 @@
+{
+  "index_patterns": [
+    "wazuh-*"
+  ],
+  "settings": {
+    "index": {
+      "mapping": {
+        "total_fields": {
+          "limit": 2000
+        }
+      }
+    }
+  }
+}

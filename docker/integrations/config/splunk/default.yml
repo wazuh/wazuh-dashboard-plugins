@@ -17,3 +17,9 @@ splunk:
             pass4SymmKey: dadqaBZA2fzxHOvfdlSQpKjIooupehTnmjysUx7j+bP1/NucBL+rch/Kw==
           sslConfig:
             serverCert: /opt/splunk/etc/auth/custom/splunkhec.pem
+  hec:
+    enable: True
+    ssl: True
+    port: 8088
+    # hec.token is used only for ingestion (receiving Splunk events)
+    token: a51ddfbd-3a69-468f-a235-e63f5d9704cc

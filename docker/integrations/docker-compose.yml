@@ -1,12 +1,13 @@
 version: '3.7'
 
 services:
-  
+
   splunk:
     image: splunk/splunk:9.0.4
     volumes:
       - sp_certs:/opt/splunk/etc/auth/custom
       - ./config/splunk/default.yml:/tmp/defaults/default.yml
+      - ./config/splunk/indexes.conf:/opt/splunk/etc/system/local/indexes.conf
     depends_on:
       generator:
         condition: service_healthy
@@ -19,14 +20,14 @@ services:
       SPLUNK_PASSWORD: password
       SPLUNK_HOSTNAME: splunk
       SPLUNK_STANDALONE_URL: https://splunk:8080
-      
+
 
  ## WAZUH STACK
 
   wazuh.manager:
     image: wazuh/wazuh-manager:${WAZUH_VERSION}
     depends_on:
-      generator:
+      es01:
         condition: service_healthy
     hostname: wazuh.manager
     ports:
@@ -46,6 +47,9 @@ services:
       - API_PASSWORD=MyS3cr37P450r.*-
       - LOGSTASH_KEYSTORE_PASS=mypassword
     volumes:
+      - ./config/logstash/logstash-manager.conf:/etc/logstash/conf.d/logstash.conf
+      - ./config/logstash/es_template.json:/etc/logstash/es_template.json
+      - ./config/logstash/os_template.json:/etc/logstash/os_template.json
       - wm_certs:/etc/ssl
       - wd_certs:/etc/certs/wazuh-dashboard
       - es_certs:/etc/certs/elastic
@@ -54,6 +58,10 @@ services:
       - ./extra/sample_alerts/changeDate.py:/tmp/changeDate.py
       - ./extra/sample_alerts/sample.json:/tmp/sample.json
       - ./extra/dashboards:/tmp/dashboards
+      - ./config/splunkforwarder/inputs.conf:/opt/splunkforwarder/etc/system/local/inputs.conf
+      - ./config/splunkforwarder/outputs.conf:/opt/splunkforwarder/etc/system/local/outputs.conf
+      - ./config/splunkforwarder/props.conf:/opt/splunkforwarder/etc/system/local/props.conf
+      - ./config/splunkforwarder/user-seed.conf:/opt/splunkforwarder/etc/system/local/user-seed.conf
     command: bash -c "cd tmp
              && cp /tmp/packages/* /opt/
              && tar -xzf /opt/logstash.tar.gz -C /opt
@@ -61,11 +69,12 @@ services:
              && dpkg -i /opt/splunkforwarder.deb
              && rm /opt/splunkforwarder.deb
              && python3 changeDate.py
-             && rm /etc/apt/sources.list.d/*
-             && apt update 
-             && apt -y install vim
-             && touch /etc/apt/sources.list.d/wazuh.list
-             && tail -F /var/ossec/logs/ossec.log"
+             && cat /var/ossec/logs/alerts/sample_alerts.json >> /var/ossec/logs/alerts/alerts.json
+             && cd /opt/logstash-${STACK_VERSION}
+             && bin/logstash-plugin install logstash-output-opensearch
+             && echo COSO
+             && bin/logstash -f /etc/logstash/conf.d/logstash.conf"
+             && tail -F /var/ossec/logs/ossec.log
 
   wazuh.indexer:
     image: wazuh/wazuh-indexer:${WAZUH_VERSION}
@@ -89,7 +98,7 @@ services:
       - ./config/wazuh_indexer/wazuh.indexer.yml:/usr/share/wazuh-indexer/config/opensearch.yml
       - ./config/wazuh_indexer/internal_users.yml:/usr/share/wazuh-indexer/plugins/opensearch-security/securityconfig/internal_users.yml
 
-  
+
   wazuh.dashboard:
     image: wazuh/wazuh-dashboard:${WAZUH_VERSION}
     hostname: wazuh.dashboard
@@ -113,7 +122,7 @@ services:
       - wazuh.indexer:wazuh.indexer
       - wazuh.manager:wazuh.manager
 
- 
+
 
  ##ELASTIC STACK
 
@@ -281,6 +290,26 @@ services:
     volumes:
       - os_certs:/usr/share/opensearch-dashboards/config/certs/
       - ./config/opensearch_dashboards/opensearch_dashboards.yml:/usr/share/opensearch-dashboards/config/opensearch_dashboards.yml
+
+
+### Logstash
+  logstash:
+    depends_on:
+      generator:
+        condition: service_healthy
+    image: docker.elastic.co/logstash/logstash:8.6.2
+    command: bash -c "bin/logstash-plugin install logstash-input-opensearch logstash-output-opensearch
+             && logstash -f /etc/logstash/conf.d/logstash.conf"
+    volumes:
+      - wm_certs:/etc/ssl
+      - ./config/logstash/logstash-indexer.conf:/etc/logstash/conf.d/logstash.conf
+      - ./config/logstash/es_template.json:/etc/logstash/es_template.json
+      - ./config/logstash/os_template.json:/etc/logstash/os_template.json
+      - wd_certs:/etc/certs/wazuh-dashboard
+      - es_certs:/etc/certs/elastic
+    environment:
+      LS_JAVA_OPTS: "-Xmx1024m -Xms1024m"
+
 ### Certificates generation
 
   generator:
@@ -300,7 +329,7 @@ services:
           echo Validating packages
           [ ! -f "/packages/logstash.tar.gz" ] && echo Downloading Logstash && wget -q -O logstash.tar.gz ${LOGSTASH_URL} && cp logstash.tar.gz /packages/logstash.tar.gz && echo Download complete
           [ ! -f "/packages/splunkforwarder.deb" ] && echo Downloading Splunk forwarder && wget -q -O splunkforwarder.deb ${SPLUNK_FORWARDER_URL} && cp splunkforwarder.deb /packages/splunkforwarder.deb && echo Download complete
-          
+
           export certs=/tmp/certs
           mkdir $$certs
         	cd $$certs
@@ -345,7 +374,7 @@ services:
             mv /certs/wi/admin.key /certs/wi/admin-key.pem
             cp $$certs/ca.pem /certs/wi/root-ca.pem
             cp $$certs/ca-key.pem /certs/wi/root-ca-key.pem
-            
+
             mv $$certs/wazuh-dashboard* /certs/wd
             cp $$certs/ca.pem /certs/wd/root-ca.pem
             cp $$certs/ca-key.pem /certs/wd/root-ca-key.pem

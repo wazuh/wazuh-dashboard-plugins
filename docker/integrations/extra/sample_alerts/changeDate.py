@@ -11,7 +11,7 @@ destination='/var/ossec/logs/alerts/sample_alerts.json'
 with open(file,'r') as f:
     newlines = []
     for line in f.readlines():
-        result = str(random_date(seven_days_before,current_time,random.random()).strftime('%Y-%m-%dT%H:%M:%S.%f+0000'))
+        result = str(random_date(seven_days_before,current_time,random.random()).strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3])+'+0000'
         newlines.append(line.replace('dateToChange',result))
 with open(destination,'w') as f:
     for line in newlines:
