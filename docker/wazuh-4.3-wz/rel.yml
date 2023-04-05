@@ -161,6 +161,8 @@ services:
     depends_on:
       generator:
         condition: service_healthy
+      idpsetup:
+        condition: service_completed_successfully
     image: wazuh/wazuh-indexer:${WAZUH_STACK}
     profiles:
       - "saml"
@@ -186,7 +188,9 @@ services:
       - idp_certs:/usr/share/wazuh-indexer/config/idp/
       - ./config/wazuh_indexer/wazuh.indexer.yml:/usr/share/wazuh-indexer/config/opensearch.yml
       - ./config/wazuh_indexer/internal_users.yml:/usr/share/wazuh-indexer/plugins/opensearch-security/securityconfig/internal_users.yml
-      - ./config/wazuh_indexer/config.yml:/usr/share/wazuh-indexer/plugins/opensearch-security/securityconfig/config.yml
+      - ./config/wazuh_indexer/roles.yml:/usr/share/wazuh-indexer/plugins/opensearch-security/securityconfig/roles.yml
+      - ./config/wazuh_indexer/roles_mapping.yml:/usr/share/wazuh-indexer/plugins/opensearch-security/securityconfig/roles_mapping.yml
+      - ${SEC_CONFIG_FILE}:/usr/share/wazuh-indexer/plugins/opensearch-security/securityconfig/config.yml
     healthcheck:
       test:
         [
@@ -262,10 +266,33 @@ services:
       - idp_certs:/certs
     command: start-dev
     healthcheck:
-      test: curl -f http://idp:8080/auth/realms/master || exit 1
+      test: curl -f http://idp:8080/realms/master || exit 1
       interval: 10s
       timeout: 5s
       retries: 6
+
+  idpsetup:
+    image: badouralix/curl-jq
+    depends_on:
+      idp:
+        condition: service_healthy
+    profiles:
+      - 'saml'
+    hostname: idpsetup
+    <<: *logging
+    networks:
+      - wz-rel
+      - mon
+    volumes:
+      - wi_certs:/certs/wi
+      - ./enable_saml.sh:/enable_saml.sh
+    entrypoint: /bin/sh
+    command: >
+      -c '
+       apk add bash
+       bash /enable_saml.sh
+       exit 0
+      '
 
 networks:
   wz-rel:
