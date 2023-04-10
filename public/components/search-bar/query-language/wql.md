@@ -187,7 +187,7 @@ searchTermFields: ['id', 'ip']
   - `value`: method that returns the suggestion for the values
   ```ts
   // language options
-  value: async (currentValue, { previousField }) => {
+  value: async (currentValue, { field }) => {
     // static or async fetching is allowed
     // async fetching data
     // const response = await fetchData();

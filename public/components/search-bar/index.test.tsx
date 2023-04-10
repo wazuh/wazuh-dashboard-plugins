@@ -14,7 +14,7 @@ describe('SearchBar component', () => {
           field(currentValue) {
             return [];
           },
-          value(currentValue, { previousField }){
+          value(currentValue, { field }){
             return [];
           },
         },
@@ -29,7 +29,7 @@ describe('SearchBar component', () => {
           field(currentValue) {
             return [];
           },
-          value(currentValue, { previousField }){
+          value(currentValue, { field }){
             return [];
           },
         },

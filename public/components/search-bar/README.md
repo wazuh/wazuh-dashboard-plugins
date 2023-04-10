@@ -54,106 +54,25 @@ Basic usage:
             { label: 'version', description: 'Version' },
           ];
         },
-        value: async (currentValue, { previousField }) => {
-          switch (previousField) {
+        value: async (currentValue, { field }) => {
+          switch (field) {
             case 'configSum':
-              return await getAgentFilterValuesMapToSearchBarSuggestion(
-                previousField,
-                currentValue,
-                {q: 'id!=000'}
-              );
+              return [
+                { label: 'configSum1' },
+                { label: 'configSum2' },
+              ];
               break;
             case 'dateAdd':
-              return await getAgentFilterValuesMapToSearchBarSuggestion(
-                previousField,
-                currentValue,
-                {q: 'id!=000'}
-              );
-              break;
-            case 'id':
-              return await getAgentFilterValuesMapToSearchBarSuggestion(
-                previousField,
-                currentValue,
-                {q: 'id!=000'}
-              );
-              break;
-            case 'ip':
-              return await getAgentFilterValuesMapToSearchBarSuggestion(
-                previousField,
-                currentValue,
-                {q: 'id!=000'}
-              );
-              break;
-            case 'group':
-              return await getAgentFilterValuesMapToSearchBarSuggestion(
-                previousField,
-                currentValue,
-                {q: 'id!=000'}
-              );
-              break;
-            case 'group_config_status':
-              return [AGENT_SYNCED_STATUS.SYNCED, AGENT_SYNCED_STATUS.NOT_SYNCED].map(
-                (status) => ({
-                  type: 'value',
-                  label: status,
-                }),
-              );
-              break;
-            case 'lastKeepAline':
-              return await getAgentFilterValuesMapToSearchBarSuggestion(
-                previousField,
-                currentValue,
-                {q: 'id!=000'}
-              );
-              break;
-            case 'manager':
-              return await getAgentFilterValuesMapToSearchBarSuggestion(
-                previousField,
-                currentValue,
-                {q: 'id!=000'}
-              );
-              break;
-            case 'mergedSum':
-              return await getAgentFilterValuesMapToSearchBarSuggestion(
-                previousField,
-                currentValue,
-                {q: 'id!=000'}
-              );
-              break;
-            case 'name':
-              return await getAgentFilterValuesMapToSearchBarSuggestion(
-                previousField,
-                currentValue,
-                {q: 'id!=000'}
-              );
-              break;
-            case 'node_name':
-              return await getAgentFilterValuesMapToSearchBarSuggestion(
-                previousField,
-                currentValue,
-                {q: 'id!=000'}
-              );
-              break;
-            case 'os.platform':
-              return await getAgentFilterValuesMapToSearchBarSuggestion(
-                previousField,
-                currentValue,
-                {q: 'id!=000'}
-              );
+              return [
+                { label: 'dateAdd1' },
+                { label: 'dateAdd2' },
+              ];
               break;
             case 'status':
               return UI_ORDER_AGENT_STATUS.map(
                 (status) => ({
-                  type: 'value',
                   label: status,
                 }),
-              );
-              break;
-            case 'version':
-              return await getAgentFilterValuesMapToSearchBarSuggestion(
-                previousField,
-                currentValue,
-                {q: 'id!=000'}
               );
               break;
             default:

@@ -199,9 +199,9 @@ type SuggestItem = QLOptionSuggestionEntityItem & {
 type QLOptionSuggestionHandler = (
   currentValue: string | undefined,
   {
-    previousField,
-    previousOperatorCompare,
-  }: { previousField: string; previousOperatorCompare: string },
+    field,
+    operatorCompare,
+  }: { field: string; operatorCompare: string },
 ) => Promise<QLOptionSuggestionEntityItem[]>;
 
 type OptionsQLImplicitQuery = {
@@ -334,15 +334,15 @@ export async function getSuggestions(tokens: ITokens, options: OptionsQL): Promi
       ];
       break;
     case 'operator_compare':{
-      const previousField = getLastTokenDefinedByType(tokens, 'field')?.value;
-      const previousOperatorCompare = getLastTokenDefinedByType(
+      const field = getLastTokenDefinedByType(tokens, 'field')?.value;
+      const operatorCompare = getLastTokenDefinedByType(
         tokens,
         'operator_compare',
       )?.value;
 
       // If there is no a previous field, then no return suggestions because it would be an syntax
       // error
-      if(!previousField){
+      if(!field){
         return [];
       };
 
@@ -363,8 +363,8 @@ export async function getSuggestions(tokens: ITokens, options: OptionsQL): Promi
         )
           ? [
             ...(await options.suggestions.value(undefined, {
-              previousField,
-              previousOperatorCompare,
+              field,
+              operatorCompare,
             })).map(mapSuggestionCreatorValue),
           ]
           : []),
@@ -372,15 +372,15 @@ export async function getSuggestions(tokens: ITokens, options: OptionsQL): Promi
       break;
     }
     case 'value':{
-      const previousField = getLastTokenDefinedByType(tokens, 'field')?.value;
-      const previousOperatorCompare = getLastTokenDefinedByType(
+      const field = getLastTokenDefinedByType(tokens, 'field')?.value;
+      const operatorCompare = getLastTokenDefinedByType(
         tokens,
         'operator_compare',
       )?.value;
 
       /* If there is no a previous field or operator_compare, then no return suggestions because
         it would be an syntax error */
-      if(!previousField || !previousOperatorCompare){
+      if(!field || !operatorCompare){
         return [];
       };
 
@@ -395,8 +395,8 @@ export async function getSuggestions(tokens: ITokens, options: OptionsQL): Promi
           ]
           : []),
         ...(await options.suggestions.value(lastToken.value, {
-          previousField,
-          previousOperatorCompare,
+          field,
+          operatorCompare,
         })).map(mapSuggestionCreatorValue),
         ...Object.entries(language.tokens.conjunction.literal).map(
           ([ conjunction, description]) => ({

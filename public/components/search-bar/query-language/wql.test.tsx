@@ -18,7 +18,7 @@ describe('SearchBar component', () => {
           field(currentValue) {
             return [];
           },
-          value(currentValue, { previousField }){
+          value(currentValue, { field }){
             return [];
           },
         },
@@ -150,8 +150,8 @@ describe('Query language - WQL', () => {
               description,
             }));
           },
-          value(currentValue = '', { previousField }) {
-            switch (previousField) {
+          value(currentValue = '', { field }) {
+            switch (field) {
               case 'field':
                 return ['value', 'value2', 'value3', 'value4']
                   .filter(value => value.startsWith(currentValue))
@@ -370,10 +370,10 @@ describe('Query language - WQL', () => {
   ${'field2=value'}                 | ${undefined}
   ${'field=value'}                  | ${['"field" is not a valid field.']}
   ${'custom=value'}                 | ${['"custom" is not a valid field.']}
-  ${'field1=value and'}             | ${['There is no sentence after conjunction "and".']}
-  ${'field2=value and'}             | ${['There is no sentence after conjunction "and".']}
-  ${'field=value and'}              | ${['"field" is not a valid field.', 'There is no sentence after conjunction "and".']}
-  ${'custom=value and'}             | ${['"custom" is not a valid field.', 'There is no sentence after conjunction "and".']}
+  ${'field1=value and'}             | ${['There is no whitespace after conjunction "and".', 'There is no sentence after conjunction "and".']}
+  ${'field2=value and'}             | ${['There is no whitespace after conjunction "and".', 'There is no sentence after conjunction "and".']}
+  ${'field=value and'}              | ${['"field" is not a valid field.', 'There is no whitespace after conjunction "and".', 'There is no sentence after conjunction "and".']}
+  ${'custom=value and'}             | ${['"custom" is not a valid field.', 'There is no whitespace after conjunction "and".', 'There is no sentence after conjunction "and".']}
   ${'field1=value and '}            | ${['There is no sentence after conjunction "and".']}
   ${'field2=value and '}            | ${['There is no sentence after conjunction "and".']}
   ${'field=value and '}             | ${['"field" is not a valid field.', 'There is no sentence after conjunction "and".']}
@@ -387,8 +387,8 @@ describe('Query language - WQL', () => {
   ${'(field'}                       | ${undefined}
   ${'(field='}                      | ${['"field" is not a valid field.']}
   ${'(field=value'}                 | ${['"field" is not a valid field.']}
-  ${'(field=value or'}              | ${['"field" is not a valid field.', 'There is no sentence after conjunction or.']}
-  ${'(field=value or '}             | ${['"field" is not a valid field.', 'There is no sentence after conjunction or.']}
+  ${'(field=value or'}              | ${['"field" is not a valid field.', 'There is no whitespace after conjunction "or".', 'There is no sentence after conjunction "or".']}
+  ${'(field=value or '}             | ${['"field" is not a valid field.', 'There is no sentence after conjunction "or".']}
   ${'(field=value or field2'}       | ${['"field" is not a valid field.', 'The operator for field \"field2\" is missing.']}
   ${'(field=value or field2>'}      | ${['"field" is not a valid field.', 'The value for field "field2" is missing.']}
   ${'(field=value or field2>value2'}| ${['"field" is not a valid field.']}

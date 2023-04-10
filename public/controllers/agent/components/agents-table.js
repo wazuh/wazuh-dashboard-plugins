@@ -655,39 +655,39 @@ export const AgentsTable = withErrorBoundary(
                         { label: 'version', description: 'filter by version' },
                       ];
                     },
-                    value: async (currentValue, { previousField }) => {
-                      switch (previousField) {
+                    value: async (currentValue, { field }) => {
+                      switch (field) {
                         case 'configSum':
                           return await getAgentFilterValuesMapToSearchBarSuggestion(
-                            previousField,
+                            field,
                             currentValue,
                             {q: 'id!=000'}
                           );
                           break;
                         case 'dateAdd':
                           return await getAgentFilterValuesMapToSearchBarSuggestion(
-                            previousField,
+                            field,
                             currentValue,
                             {q: 'id!=000'}
                           );
                           break;
                         case 'id':
                           return await getAgentFilterValuesMapToSearchBarSuggestion(
-                            previousField,
+                            field,
                             currentValue,
                             {q: 'id!=000'}
                           );
                           break;
                         case 'ip':
                           return await getAgentFilterValuesMapToSearchBarSuggestion(
-                            previousField,
+                            field,
                             currentValue,
                             {q: 'id!=000'}
                           );
                           break;
                         case 'group':
                           return await getAgentFilterValuesMapToSearchBarSuggestion(
-                            previousField,
+                            field,
                             currentValue,
                             {q: 'id!=000'}
                           );
@@ -701,42 +701,42 @@ export const AgentsTable = withErrorBoundary(
                           break;
                         case 'lastKeepAlive':
                           return await getAgentFilterValuesMapToSearchBarSuggestion(
-                            previousField,
+                            field,
                             currentValue,
                             {q: 'id!=000'}
                           );
                           break;
                         case 'manager':
                           return await getAgentFilterValuesMapToSearchBarSuggestion(
-                            previousField,
+                            field,
                             currentValue,
                             {q: 'id!=000'}
                           );
                           break;
                         case 'mergedSum':
                           return await getAgentFilterValuesMapToSearchBarSuggestion(
-                            previousField,
+                            field,
                             currentValue,
                             {q: 'id!=000'}
                           );
                           break;
                         case 'name':
                           return await getAgentFilterValuesMapToSearchBarSuggestion(
-                            previousField,
+                            field,
                             currentValue,
                             {q: 'id!=000'}
                           );
                           break;
                         case 'node_name':
                           return await getAgentFilterValuesMapToSearchBarSuggestion(
-                            previousField,
+                            field,
                             currentValue,
                             {q: 'id!=000'}
                           );
                           break;
                         case 'os.platform':
                           return await getAgentFilterValuesMapToSearchBarSuggestion(
-                            previousField,
+                            field,
                             currentValue,
                             {q: 'id!=000'}
                           );
@@ -750,7 +750,7 @@ export const AgentsTable = withErrorBoundary(
                           break;
                         case 'version':
                           return await getAgentFilterValuesMapToSearchBarSuggestion(
-                            previousField,
+                            field,
                             currentValue,
                             {q: 'id!=000'}
                           );
