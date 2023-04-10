@@ -97,6 +97,7 @@ export const SearchBar = ({
               configuration:
                 configuration?.(state.configuration) || configuration,
             })),
+          setQueryLanguageOutput: setQueryLanguageOutputRun,
           inputRef,
           queryLanguage: {
             configuration: queryLanguage.configuration,
@@ -126,7 +127,7 @@ export const SearchBar = ({
                                 property prevents an error. */
       suggestions={[]}
       isPopoverOpen={
-        queryLanguageOutputRun.searchBarProps.suggestions.length > 0 &&
+        queryLanguageOutputRun?.searchBarProps?.suggestions?.length > 0 &&
         isOpenSuggestionPopover
       }
       onClosePopover={() => setIsOpenSuggestionPopover(false)}

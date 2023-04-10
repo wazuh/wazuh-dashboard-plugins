@@ -652,8 +652,8 @@ export const AgentsTable = withErrorBoundary(
                         { label: 'dateAdd', description: 'filter by date add' },
                         { label: 'id', description: 'filter by ID' },
                         { label: 'ip', description: 'filter by IP address' },
-                        { label: 'group', description: 'filter by Group' },
-                        { label: 'group_config_status', description: 'filter by Synced configuration status' },
+                        { label: 'group', description: 'filter by group' },
+                        { label: 'group_config_status', description: 'filter by synced configuration status' },
                         { label: 'lastKeepAlive', description: 'filter by date add' },
                         { label: 'manager', description: 'filter by manager' },
                         { label: 'mergedSum', description: 'filter by merged sum' },
@@ -708,7 +708,7 @@ export const AgentsTable = withErrorBoundary(
                             }),
                           );
                           break;
-                        case 'lastKeepAline':
+                        case 'lastKeepAlive':
                           return await getAgentFilterValuesMapToSearchBarSuggestion(
                             previousField,
                             currentValue,
@@ -773,7 +773,10 @@ export const AgentsTable = withErrorBoundary(
                 },
               ]}
               onChange={console.log}
-              onSearch={async ({language, unifiedQuery}) => {
+              onSearch={async ({language, unifiedQuery, error}) => {
+                if(error){
+                  return;
+                }
                 try{
                   this.setState({isLoading: true});
                   const response = await this.props.wzReq('GET', '/agents', { params: { 

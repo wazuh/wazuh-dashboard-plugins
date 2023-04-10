@@ -1,6 +1,6 @@
 # Query Language - WQL
 
-WQL (Wazuh Query Language) is a query language based in the `q` query parameters of the Wazuh API
+WQL (Wazuh Query Language) is a query language based in the `q` query parameter of the Wazuh API
 endpoints.
 
 Documentation: https://wazuh.com/<major_version>.<minor_version>/user-manual/api/queries.html
@@ -13,9 +13,11 @@ The implementation is adapted to work with the search bar component defined
 It supports 2 modes:
 
 - `explicit`: define the field, operator and value
-- `implicit`: use a term to search in the available fields
+- `search term`: use a term to search in the available fields
 
 Theses modes can not be combined.
+
+`explicit` mode is enabled when it finds a field and operator tokens.
 
 ## Mode: explicit
 
@@ -63,14 +65,14 @@ field.custom
 
 Examples:
 ```
-value
-"custom value"
-"custom \" value"
+value_without_whitespace
+"value with whitespaces"
+"value with whitespaces and escaped \"quotes\""
 ```
 
 ### Notes
 
-- The entities can be separated by whitespaces.
+- The tokens can be separated by whitespaces.
 
 ### Examples
 
@@ -81,7 +83,7 @@ id=001
 id = 001
 ```
 
-- Complex query
+- Complex query (logical operator)
 ```
 status=active and os.platform~linux
 status = active and os.platform ~ linux
@@ -92,17 +94,17 @@ status!=never_connected and ip~240 or os.platform~linux
 status != never_connected and ip ~ 240 or os.platform ~ linux
 ```
 
-- Complex query with group operator
+- Complex query (logical operators and group operator)
 ```
 (status!=never_connected and ip~240) or id=001
 ( status != never_connected and ip ~ 240 ) or id = 001
 ```
 
-## Mode: implicit
+## Mode: search term
 
 Search the term in the available fields.
 
-This mode is used when there is no a `field` and `operator` attending to the regular expression
+This mode is used when there is no a `field` and `operator` according to the regular expression
 of the **explicit** mode.
 
 ### Examples:
@@ -132,7 +134,7 @@ This a query that can't be added, edited or removed by the user. It is added to 
 
 ### Search term mode
 
-This mode enables to search in multiple fields. The fields to use must be defined.
+This mode enables to search in multiple fields using a search term. The fields to use must be defined.
 
 Use an union expression of each field with the like as operation `~`.
 
@@ -174,21 +176,10 @@ searchTermFields: ['id', 'ip']
   ```ts
   // language options
   field(currentValue) {
+    // static or async fetching is allowed
     return [
-      { label: 'configSum', description: 'Config sum' },
-      { label: 'dateAdd', description: 'Date add' },
-      { label: 'id', description: 'ID' },
-      { label: 'ip', description: 'IP address' },
-      { label: 'group', description: 'Group' },
-      { label: 'group_config_status', description: 'Synced configuration status' },
-      { label: 'lastKeepAline', description: 'Date add' },
-      { label: 'manager', description: 'Manager' },
-      { label: 'mergedSum', description: 'Merged sum' },
-      { label: 'name', description: 'Agent name' },
-      { label: 'node_name', description: 'Node name' },
-      { label: 'os.platform', description: 'Operating system platform' },
-      { label: 'status', description: 'Status' },
-      { label: 'version', description: 'Version' },
+      { label: 'field1', description: 'Description' },
+      { label: 'field2', description: 'Description' }
     ];
   }
   ```
@@ -197,111 +188,13 @@ searchTermFields: ['id', 'ip']
   ```ts
   // language options
   value: async (currentValue, { previousField }) => {
-    switch (previousField) {
-      case 'configSum':
-        return await getAgentFilterValuesMapToSearchBarSuggestion(
-          previousField,
-          currentValue,
-          {q: 'id!=000'}
-        );
-        break;
-      case 'dateAdd':
-        return await getAgentFilterValuesMapToSearchBarSuggestion(
-          previousField,
-          currentValue,
-          {q: 'id!=000'}
-        );
-        break;
-      case 'id':
-        return await getAgentFilterValuesMapToSearchBarSuggestion(
-          previousField,
-          currentValue,
-          {q: 'id!=000'}
-        );
-        break;
-      case 'ip':
-        return await getAgentFilterValuesMapToSearchBarSuggestion(
-          previousField,
-          currentValue,
-          {q: 'id!=000'}
-        );
-        break;
-      case 'group':
-        return await getAgentFilterValuesMapToSearchBarSuggestion(
-          previousField,
-          currentValue,
-          {q: 'id!=000'}
-        );
-        break;
-      case 'group_config_status':
-        return [AGENT_SYNCED_STATUS.SYNCED, AGENT_SYNCED_STATUS.NOT_SYNCED].map(
-          (status) => ({
-            type: 'value',
-            label: status,
-          }),
-        );
-        break;
-      case 'lastKeepAline':
-        return await getAgentFilterValuesMapToSearchBarSuggestion(
-          previousField,
-          currentValue,
-          {q: 'id!=000'}
-        );
-        break;
-      case 'manager':
-        return await getAgentFilterValuesMapToSearchBarSuggestion(
-          previousField,
-          currentValue,
-          {q: 'id!=000'}
-        );
-        break;
-      case 'mergedSum':
-        return await getAgentFilterValuesMapToSearchBarSuggestion(
-          previousField,
-          currentValue,
-          {q: 'id!=000'}
-        );
-        break;
-      case 'name':
-        return await getAgentFilterValuesMapToSearchBarSuggestion(
-          previousField,
-          currentValue,
-          {q: 'id!=000'}
-        );
-        break;
-      case 'node_name':
-        return await getAgentFilterValuesMapToSearchBarSuggestion(
-          previousField,
-          currentValue,
-          {q: 'id!=000'}
-        );
-        break;
-      case 'os.platform':
-        return await getAgentFilterValuesMapToSearchBarSuggestion(
-          previousField,
-          currentValue,
-          {q: 'id!=000'}
-        );
-        break;
-      case 'status':
-        return UI_ORDER_AGENT_STATUS.map(
-          (status) => ({
-            type: 'value',
-            label: status,
-          }),
-        );
-        break;
-      case 'version':
-        return await getAgentFilterValuesMapToSearchBarSuggestion(
-          previousField,
-          currentValue,
-          {q: 'id!=000'}
-        );
-        break;
-      default:
-        return [];
-        break;
-    }
+    // static or async fetching is allowed
+    // async fetching data
+    // const response = await fetchData();
+    return [
+      { label: 'value1' },
+      { label: 'value2' }
+    ]
   }
   ```
 
@@ -315,19 +208,27 @@ graph TD;
     end
 
     tokenizer-->tokens;
+    tokens-->validate;
     
     tokens-->searchBarProps;
     subgraph searchBarProps;
-        searchBarProps_suggestions-->searchBarProps_suggestions_get_last_token_with_value[Get last token with value]
-        searchBarProps_suggestions_get_last_token_with_value[Get last token with value]-->searchBarProps_suggestions__result[Suggestions]
+        searchBarProps_suggestions[suggestions]-->searchBarProps_suggestions_input_isvalid{Input is valid}
+        searchBarProps_suggestions_input_isvalid{Is input valid?}-->searchBarProps_suggestions_input_isvalid_success[Yes]
+        searchBarProps_suggestions_input_isvalid{Is input valid?}-->searchBarProps_suggestions_input_isvalid_fail[No]
+        searchBarProps_suggestions_input_isvalid_success[Yes]--->searchBarProps_suggestions_get_last_token_with_value[Get last token with value]-->searchBarProps_suggestions__result[Suggestions]
         searchBarProps_suggestions__result[Suggestions]-->EuiSuggestItem
+        searchBarProps_suggestions_input_isvalid_fail[No]-->searchBarProps_suggestions_invalid[Invalid with error message]
+        searchBarProps_suggestions_invalid[Invalid with error message]-->EuiSuggestItem
         searchBarProps_prepend[prepend]-->searchBarProps_prepend_implicitQuery{implicitQuery}
         searchBarProps_prepend_implicitQuery{implicitQuery}-->searchBarProps_prepend_implicitQuery_yes[Yes]-->EuiButton
         searchBarProps_prepend_implicitQuery{implicitQuery}-->searchBarProps_prepend_implicitQuery_no[No]-->null
         searchBarProps_disableFocusTrap:true[disableFocusTrap = true]
-        searchBarProps_onItemClick[onItemClickSuggestion onclick handler]-->searchBarProps_onItemClick_suggestion_search[Search suggestion]
-        searchBarProps_onItemClick[onItemClickSuggestion onclick handler]-->searchBarProps_onItemClick_suggestion_edit_current_token[Edit current token]-->searchBarProps_onItemClick_build_input[Build input]
-        searchBarProps_onItemClick[onItemClickSuggestion onclick handler]-->searchBarProps_onItemClick_suggestion_add_new_token[Add new token]-->searchBarProps_onItemClick_build_input[Build input]
+        searchBarProps_onItemClick[onItemClickSuggestion]-->searchBarProps_onItemClick_suggestion_search[Search suggestion]
+        searchBarProps_onItemClick_suggestion_search[Search suggestion]-->searchBarProps_onItemClick_suggestion_search_run[Run search]
+        searchBarProps_onItemClick[onItemClickSuggestion]-->searchBarProps_onItemClick_suggestion_edit_current_token[Edit current token]-->searchBarProps_onItemClick_build_input[Build input]
+        searchBarProps_onItemClick[onItemClickSuggestion]-->searchBarProps_onItemClick_suggestion_add_new_token[Add new token]-->searchBarProps_onItemClick_build_input[Build input]
+        searchBarProps_onItemClick[onItemClickSuggestion]-->searchBarProps_onItemClick_suggestion_error[Error]
+        searchBarProps_isInvalid[isInvalid]
     end
 
     tokens-->output;

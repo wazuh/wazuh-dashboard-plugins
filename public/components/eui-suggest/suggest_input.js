@@ -53,7 +53,7 @@ export class EuiSuggestInput extends Component {
       onPopoverFocus,
       isPopoverOpen,
       onClosePopover,
-      disableFocusTrap,
+      disableFocusTrap = false,
       ...rest
     } = this.props;
 

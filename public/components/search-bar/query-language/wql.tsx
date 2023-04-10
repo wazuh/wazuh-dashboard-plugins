@@ -83,6 +83,8 @@ const suggestionMappingLanguageTokenType = {
   operator_group: { iconType: 'tokenDenseVector', color: 'tint3' },
   // eslint-disable-next-line camelcase
   function_search: { iconType: 'search', color: 'tint5' },
+  // eslint-disable-next-line camelcase
+  validation_error: { iconType: 'alert', color: 'tint2' }
 };
 
 /**
@@ -153,7 +155,6 @@ export function tokenizer(input: string): ITokens{
     // Simple value
     // Quoted ", "value, "value", "escaped \"quote"
     // Escape quoted string with escaping quotes: https://stackoverflow.com/questions/249791/regex-for-quoted-string-with-escaping-quotes
-    // '(?<value>(?:(?:[^"\\s]+|(?:"(?:[^"\\\\]|\\\\")*"))))?' +
     '(?<value>(?:(?:[^"\\s]+|(?:"(?:[^"\\\\]|\\\\")*")|(?:"(?:[^"\\\\]|\\\\")*)|")))?' +
     // Whitespace
     '(?<whitespace_4>\\s+)?' +
@@ -168,8 +169,8 @@ export function tokenizer(input: string): ITokens{
   );
 
   return [
-    ...input.matchAll(re)]
-      .map(
+    ...input.matchAll(re)
+    ].map(
         ({groups}) => Object.entries(groups)
           .map(([key, value]) => ({
             type: key.startsWith('operator_group') // Transform operator_group group match
@@ -252,7 +253,32 @@ function getLastTokenDefinedByType(
     ({ type, value }) => type === tokenType && value,
   );
   return tokenFound;
-}
+};
+
+/**
+ * Get the token that is near to a token position of the token type.
+ * @param tokens 
+ * @param tokenReferencePosition 
+ * @param tokenType 
+ * @param mode 
+ * @returns 
+ */
+function getTokenNearTo(
+  tokens: ITokens,
+  tokenType: ITokenType,
+  mode : 'previous' | 'next' = 'previous',
+  options : {tokenReferencePosition?: number, tokenFoundShouldHaveValue?: boolean} = {} 
+): IToken | undefined {
+  const shallowCopyTokens = Array.from([...tokens]);
+  const computedShallowCopyTokens = mode === 'previous'
+    ? shallowCopyTokens.slice(0, options?.tokenReferencePosition || tokens.length).reverse()
+    : shallowCopyTokens.slice(options?.tokenReferencePosition || 0);
+  return computedShallowCopyTokens
+    .find(({type, value}) =>
+      type === tokenType
+      && (options?.tokenFoundShouldHaveValue ? value : true)
+    );
+};
 
 /**
  * Get the suggestions from the tokens
@@ -580,6 +606,128 @@ function getOutput(input: string, options: OptionsQL) {
   };
 };
 
+/**
+ * Validate the tokens while the user is building the query
+ * @param tokens 
+ * @param options 
+ * @returns 
+ */
+function validatePartial(tokens: ITokens, options: {field: string[]}): undefined | string{
+  // Ensure is not in search term mode
+  if (!shouldUseSearchTerm(tokens)){
+    return tokens.map((token: IToken, index) => {
+      if(token.value){
+        if(token.type === 'field'){
+          // Ensure there is a operator next to field to check if the fields is valid or not.
+          // This allows the user can type the field token and get the suggestions for the field.
+          const tokenOperatorNearToField = getTokenNearTo(
+            tokens,
+            'operator_compare',
+            'next',
+            { tokenReferencePosition: index, tokenFoundShouldHaveValue: true }
+          );
+          return tokenOperatorNearToField
+            && !options.field.includes(token.value)
+            ? `"${token.value}" is not a valid field.`
+            : undefined;
+        };
+        // Check if the value is allowed
+        if(token.type === 'value'){
+          // Usage of API regular expression
+          const re = new RegExp(
+            // Value: A string.
+            '^(?<value>(?:(?:\\((?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|[\\[\\]\\w _\\-.:?\\/\'"=@%<>{}]*)\\))*' +
+            '(?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|[\\[\\]\\w _\\-.:?\\\\/\'"=@%<>{}]+)' +
+            '(?:\\((?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|[\\[\\]\\w _\\-.:?\\\\/\'"=@%<>{}]*)\\))*)+)$'
+          );
+
+          const match = token.value.match(re);
+          return match?.groups?.value === token.value
+            ? undefined
+            : `"${token.value}" is not a valid value222.`;
+        }
+      };
+    })
+      .filter(t => typeof t !== 'undefined')
+      .join('\n') || undefined;
+  }
+};
+
+/**
+ * Validate the tokens if they are a valid syntax 
+ * @param tokens 
+ * @param options 
+ * @returns 
+ */
+function validate(tokens: ITokens, options: {field: string[]}): undefined | string[]{
+  if (!shouldUseSearchTerm(tokens)){
+    const errors = tokens.map((token: IToken, index) => {
+      const errors = [];
+      if(token.value){
+        if(token.type === 'field'){
+          const tokenOperatorNearToField = getTokenNearTo(
+            tokens,
+            'operator_compare',
+            'next',
+            { tokenReferencePosition: index, tokenFoundShouldHaveValue: true }
+          );
+          const tokenValueNearToField = getTokenNearTo(
+            tokens,
+            'value',
+            'next',
+            { tokenReferencePosition: index, tokenFoundShouldHaveValue: true }
+          );
+          if(!options.field.includes(token.value)){
+            errors.push(`"${token.value}" is not a valid field.`);
+          }else if(!tokenOperatorNearToField){
+            errors.push(`The operator for field "${token.value}" is missing.`);
+          }else if(!tokenValueNearToField){
+            errors.push(`The value for field "${token.value}" is missing.`);
+          }
+        };
+        // Check if the value is allowed
+        if(token.type === 'value'){
+          // Usage of API regular expression
+          const re = new RegExp(
+            // Value: A string.
+            '^(?<value>(?:(?:\\((?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|[\\[\\]\\w _\\-.:?\\/\'"=@%<>{}]*)\\))*' +
+            '(?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|[\\[\\]\\w _\\-.:?\\\\/\'"=@%<>{}]+)' +
+            '(?:\\((?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|[\\[\\]\\w _\\-.:?\\\\/\'"=@%<>{}]*)\\))*)+)$'
+          );
+
+          const match = token.value.match(re);
+          match?.groups?.value !== token.value && errors.push(`"${token.value}" is not a valid value.`);
+        };
+
+        // Check if the value is allowed
+        if(token.type === 'conjunction'){
+          
+          const tokenWhitespaceNearToFieldNext = getTokenNearTo(
+            tokens,
+            'whitespace',
+            'next',
+            { tokenReferencePosition: index }
+          );
+          const tokenFieldNearToFieldNext = getTokenNearTo(
+            tokens,
+            'field',
+            'next',
+            { tokenReferencePosition: index, tokenFoundShouldHaveValue: true }
+          );
+          !tokenWhitespaceNearToFieldNext?.value?.length
+            && errors.push(`There is no whitespace after conjunction "${token.value}".`);
+          !tokenFieldNearToFieldNext?.value?.length
+            && errors.push(`There is no sentence after conjunction "${token.value}".`);
+        };
+      };
+      return errors.length ? errors : undefined;
+    }).filter(errors => errors)
+      .flat()
+    return errors.length ? errors : undefined;
+  };
+  return undefined;
+};
+
 export const WQL = {
   id: 'wql',
   label: 'WQL',
@@ -602,22 +750,59 @@ export const WQL = {
       )
       : '';
 
+    // Validate the user input
+    const fieldsSuggestion: string[] = await params.queryLanguage.parameters.suggestions.field()
+      .map(({label}) => label);
+
+    const validationPartial = validatePartial(tokens, {
+      field: fieldsSuggestion
+    });
+
+    const validationStrict = validate(tokens, {
+      field: fieldsSuggestion
+    });
+
     // Get the output of query language
-    const output = getOutput(input, params.queryLanguage.parameters);
+    const output = {
+      ...getOutput(input, params.queryLanguage.parameters),
+      error: validationStrict
+    };
+
+    const onSearch = () => {
+      if(output?.error){
+        params.setQueryLanguageOutput((state) => ({
+          ...state,
+          searchBarProps: {
+            ...state.searchBarProps,
+            suggestions: transformSuggestionsToEuiSuggestItem(
+              output.error.map(error => ({type: 'validation_error', label: 'Invalid', description: error}))
+            )
+          }
+        }));
+      }else{
+        params.onSearch(output);
+      };
+    };
 
     return {
       searchBarProps: {
         // Props that will be used by the EuiSuggest component
         // Suggestions
         suggestions: transformSuggestionsToEuiSuggestItem(
-          await getSuggestions(tokens, params.queryLanguage.parameters)
+          validationPartial
+            ? [{ type: 'validation_error', label: 'Invalid', description: validationPartial}]
+            : await getSuggestions(tokens, params.queryLanguage.parameters)
         ),
         // Handler to manage when clicking in a suggestion item
         onItemClick: item => {
+          // There is an error, clicking on the item does nothing
+          if (item.type.iconType === 'alert'){
+            return;
+          };
           // When the clicked item has the `search` iconType, run the `onSearch` function
           if (item.type.iconType === 'search') {
             // Execute the search action
-            params.onSearch(output);
+            onSearch();
           } else {
             // When the clicked item has another iconType
             const lastToken: IToken | undefined = getLastTokenDefined(tokens);
@@ -706,9 +891,17 @@ export const WQL = {
         // This causes when using the Search suggestion, the suggestion popover can be closed.
         // If this is disabled, then the suggestion popover is open after a short time for this
         // use case.
-        disableFocusTrap: true
+        disableFocusTrap: true,
+        // Show the input is invalid
+        isInvalid: Boolean(validationStrict),
+        // Define the handler when the a key is pressed while the input is focused
+        onKeyPress: (event) => {
+          if (event.key === 'Enter') {
+            onSearch();
+          };
+        }
       },
-      output,
+      output
     };
   },
   transformUQLToQL: transformUQLToQL,

@@ -355,4 +355,56 @@ describe('Query language - WQL', () => {
   - with != value
   - with ~ value
   */
+ 
+  // Validate the tokens
+  it.only.each`
+  WQL                               | validationError
+  ${''}                             | ${undefined} 
+  ${'field1'}                       | ${undefined} 
+  ${'field2'}                       | ${undefined}
+  ${'field1='}                      | ${['The value for field "field1" is missing.']}
+  ${'field2='}                      | ${['The value for field "field2" is missing.']}
+  ${'field='}                       | ${['"field" is not a valid field.']}
+  ${'custom='}                      | ${['"custom" is not a valid field.']}
+  ${'field1=value'}                 | ${undefined}
+  ${'field2=value'}                 | ${undefined}
+  ${'field=value'}                  | ${['"field" is not a valid field.']}
+  ${'custom=value'}                 | ${['"custom" is not a valid field.']}
+  ${'field1=value and'}             | ${['There is no sentence after conjunction "and".']}
+  ${'field2=value and'}             | ${['There is no sentence after conjunction "and".']}
+  ${'field=value and'}              | ${['"field" is not a valid field.', 'There is no sentence after conjunction "and".']}
+  ${'custom=value and'}             | ${['"custom" is not a valid field.', 'There is no sentence after conjunction "and".']}
+  ${'field1=value and '}            | ${['There is no sentence after conjunction "and".']}
+  ${'field2=value and '}            | ${['There is no sentence after conjunction "and".']}
+  ${'field=value and '}             | ${['"field" is not a valid field.', 'There is no sentence after conjunction "and".']}
+  ${'custom=value and '}            | ${['"custom" is not a valid field.', 'There is no sentence after conjunction "and".']}
+  ${'field1=value and field2'}      | ${['The operator for field \"field2\" is missing.']}
+  ${'field2=value and field1'}      | ${['The operator for field \"field1\" is missing.']}
+  ${'field1=value and field'}       | ${['"field" is not a valid field.']}
+  ${'field2=value and field'}       | ${['"field" is not a valid field.']}
+  ${'field=value and custom'}       | ${['"field" is not a valid field.', '"custom" is not a valid field.']}
+  ${'('}                            | ${undefined}
+  ${'(field'}                       | ${undefined}
+  ${'(field='}                      | ${['"field" is not a valid field.']}
+  ${'(field=value'}                 | ${['"field" is not a valid field.']}
+  ${'(field=value or'}              | ${['"field" is not a valid field.', 'There is no sentence after conjunction or.']}
+  ${'(field=value or '}             | ${['"field" is not a valid field.', 'There is no sentence after conjunction or.']}
+  ${'(field=value or field2'}       | ${['"field" is not a valid field.', 'The operator for field \"field2\" is missing.']}
+  ${'(field=value or field2>'}      | ${['"field" is not a valid field.', 'The value for field "field2" is missing.']}
+  ${'(field=value or field2>value2'}| ${['"field" is not a valid field.']}
+  `('validate the tokens - WQL $WQL => $validationError', async ({WQL: currentInput, validationError}) => {
+
+    const qlOutput = await WQL.run(currentInput, {
+      queryLanguage: {
+        parameters: {
+          implicitQuery: '',
+          suggestions: {
+            field: () => (['field1', 'field2'].map(label => ({label}))),
+            value: () => ([])
+          }
+        }
+      }
+    });
+    expect(qlOutput.output.error).toEqual(validationError);
+  });
 });
