@@ -19,19 +19,6 @@ In general, the environment consist of:
 
 ## Pre-requisites
 
-> **IMPORTANT**: you will need 2 copies of the Wazuh Kibana App repository, one 
-> for the Docker environments, and other one for the plugin source code in the
-> required branch (`4.x-7.16`, `4.x-wzd`, ...). Our recommendation is:
-> 
->  - **wazuh-kibana-docker** : on the master branch.
->  - **wazuh-kibana-app**    : on any development branch. This one will be used 
->                              as source code and mounted as volume in the 
->                              platform's container.
->
-> In future releases, the containers (`4.5`) and higher, we expect that every 
-> development branch will contain this folder and this duplication won't be
-> necessary anymore.
-
  1. Create the `devel` network:
 
     ```bash
@@ -166,9 +153,16 @@ To setup the crendentials (**this only has to be done once**):
 
 To build an image, use the docker build command like:
 
+Use the `--build-arg` flag to specify the version of Node and the version of
+the platform. The version of Node to use is defined in the `.nvmrc` file. Use 
+the Node version defined in that file for the target platform version, as the 
+version of Node might be increased between platfform's versions.
+
+For example, to build the image for OpenSearch Dashboards `2.6.0`:
+
 ```bash
 cd images
-docker build -t quay.io/wazuh/image-name:version -f image-name-version.Dockerfile .
+docker build --build-arg NODE_VERSION=14.20.1 --build-arg OPENSEARCH_VERSION=2.6.0 -t quay.io/wazuh/osd-dev:2.6.0 -f osd-dev.Dockerfile .
 cd ..
 ```
 

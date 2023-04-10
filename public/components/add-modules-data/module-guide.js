@@ -221,7 +221,7 @@ class WzModuleGuide extends Component {
   }
   transformToXML() {
     const json = this.transformStateToJSON();
-    return (this.guide.wodle_name) ? 
+    return (this.guide.wodle_name) ?
     XMLBeautifier(js2xmlparser.parse('configuration', { wodle: {'@': {name: this.guide.wodle_name}, ...json}}, js2xmlOptionsParser).replace("<?xml version=\"1.0\"?>\n", "").replace("<configuration>\n", "").replace("</configuration>","").replace("    <wodle", "<wodle"))
     : XMLBeautifier(js2xmlparser.parse(this.guide.xml_tag || this.guide.id, json, js2xmlOptionsParser).replace("<?xml version=\"1.0\"?>\n", ""));
   }
@@ -235,8 +235,8 @@ class WzModuleGuide extends Component {
       collapsed: (element.attributes || element.options) ? false : undefined,
       elements: !params.ignore_repeatable && element.repeatable ? (element.repeatable_insert_first ? [this.buildConfigurationElement({...element, ...element.repeatable_insert_first_properties }, {ignore_repeatable: true})] : []) : undefined,
       show_options: element.show_options || false,
-      options: element.options && element.options.filter((option) => this.filterElementByAgent(option)).map(option => ({ 
-        ...option, 
+      options: element.options && element.options.filter((option) => this.filterElementByAgent(option)).map(option => ({
+        ...option,
         value: this.buildConfigurationElementValue(option),
         toggleable: this.buildConfigurationElementToggleable(option),
         enabled: this.buildConfigurationElementEnabled(option),
@@ -244,7 +244,7 @@ class WzModuleGuide extends Component {
         attributes: option.attributes && option.attributes.length ? option.attributes.map((optionAtribute) => this.buildConfigurationElement(optionAtribute)) : undefined
       })) || undefined,
       show_attributes: element.show_attributes || false,
-      attributes: element.attributes && element.attributes.filter((attribute) => this.filterElementByAgent(attribute)).map(attribute => ({ 
+      attributes: element.attributes && element.attributes.filter((attribute) => this.filterElementByAgent(attribute)).map(attribute => ({
         ...attribute,
         value: this.buildConfigurationElementValue(attribute),
         toggleable: this.buildConfigurationElementToggleable(attribute),
@@ -707,7 +707,11 @@ class WzModuleGuide extends Component {
                 <EuiSpacer size='m' />
                 <EuiText>
                   {guide.description} {guide.documentation_link && (
-                    <EuiLink href={guide.documentation_link} external target="_blank">
+                    <EuiLink
+                      href={guide.documentation_link}
+                      external target="_blank"
+                      rel='noopener noreferrer'
+                    >
                       Learn more
                     </EuiLink>
                   )}

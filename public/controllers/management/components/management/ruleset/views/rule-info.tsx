@@ -220,7 +220,7 @@ export default class WzRuleInfo extends Component {
     const badgeList = [];
     const fields = ['pci_dss', 'gpg13', 'hipaa', 'gdpr', 'nist_800_53', 'tsc', 'mitre'];
     const buildBadge = (field) => {
-      
+
       return (
         <EuiToolTip content={item[field].join(', ')} key={`${item.id}-${field}`} position="bottom">
           <EuiBadge
@@ -348,13 +348,21 @@ export default class WzRuleInfo extends Component {
       let name = '';
 
       value.forEach((item) => {
-        if (item.type === 'cve') name = item.name;
-        if (item.type === 'link')
+        if (item.type === 'cve'){
+          name = item.name;
+        }
+        if (item.type === 'link'){
           link = (
-            <a href={item.name} target="_blank">
+            <EuiLink
+              href={item.name}
+              target="_blank"
+              rel="noopener noreferrer"
+              external
+            >
               {item.name}
-            </a>
+            </EuiLink>
           );
+        }
       });
       return (
         <span>

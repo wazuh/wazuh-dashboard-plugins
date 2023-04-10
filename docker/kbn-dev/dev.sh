@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 elastic_versions=(
 	'7.10.2'
 	'7.16.0'
@@ -17,12 +16,11 @@ elastic_versions=(
 	'8.2.3'
 	'8.3.0'
 	'8.3.1'
-  '8.3.3'
-  '8.4.2'
-  '8.4.3'
-  '8.5.0'
+	'8.3.3'
+	'8.4.2'
+	'8.4.3'
+	'8.5.0'
 )
-
 
 usage() {
 	echo
@@ -35,19 +33,16 @@ usage() {
 	exit -1
 }
 
-
-if [ $# -ne	3 ]
-  then
-  	echo "Incorrect number of arguments " $# ", got " $@
-  	echo
-    usage
+if [ $# -ne 3 ]; then
+	echo "Incorrect number of arguments " $# ", got " $@
+	echo
+	usage
 fi
 
-if [[ ! " ${elastic_versions[*]} " =~ " ${1} " ]]
- then
- 	echo "Version ${1} not found in ${elastic_versions[*]}"
- 	echo
- 	exit -1
+if [[ ! " ${elastic_versions[*]} " =~ " ${1} " ]]; then
+	echo "Version ${1} not found in ${elastic_versions[*]}"
+	echo
+	exit -1
 fi
 
 if [[ $2 != /* ]]; then
@@ -67,18 +62,18 @@ export SRC=$2
 export COMPOSE_PROJECT_NAME=es-dev-${ES_VERSION//./} # /./ removes dots: 7.10.2 => 7102
 
 case "$3" in
-	up)
-		docker compose -f dev.yml -p ${COMPOSE_PROJECT_NAME} up -Vd
-		;;
-	down)
-		docker compose -f dev.yml -p ${COMPOSE_PROJECT_NAME} down -v --remove-orphans
-		;;
-	stop)
-		docker compose -f dev.yml -p ${COMPOSE_PROJECT_NAME} stop
-		;;
-	*)
-		echo "Action must be up | down | stop: "
-		echo
-		usage
-		;;
+up)
+	docker compose -f dev.yml -p ${COMPOSE_PROJECT_NAME} up -Vd
+	;;
+down)
+	docker compose -f dev.yml -p ${COMPOSE_PROJECT_NAME} down -v --remove-orphans
+	;;
+stop)
+	docker compose -f dev.yml -p ${COMPOSE_PROJECT_NAME} stop
+	;;
+*)
+	echo "Action must be up | down | stop: "
+	echo
+	usage
+	;;
 esac

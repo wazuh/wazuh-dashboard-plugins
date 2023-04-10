@@ -35,7 +35,7 @@
     margin-top: 0px;
 }
 
-.wz-module-header-agent-title{    
+.wz-module-header-agent-title{
     margin: 6px 12px!important;
 }
 
@@ -53,16 +53,16 @@
     color: #006BB4;
 }
 
-.wz-module-header-agent h1{    
+.wz-module-header-agent h1{
     font-weight: 400;
 }
 
-.wz-module-header-agent h1 b{    
+.wz-module-header-agent h1 b{
     font-weight: 500;
 }
 
 .wz-module-header-nav-wrapper{
-    margin-top: 49px;    
+    margin-top: 49px;
 }
 
 .wz-module-header-nav .euiTabs{
@@ -121,7 +121,7 @@ discover-app-w .sidebar-container {
         }
         .wz-module-header-agent{
             height: auto;
-            h1{    
+            h1{
                 white-space: nowrap;
                 text-overflow: ellipsis;
                 overflow: hidden;
@@ -130,27 +130,27 @@ discover-app-w .sidebar-container {
         .wz-module-body {
             margin-top: -160px;
         }
-    
+
         .wz-module-header-agent-wrapper, .wz-module-header-nav-wrapper{
             position: relative;
         }
-    
+
         .wz-module-header-nav-wrapper{
             margin-top: 15px;
         }
-    
+
         .wz-module-header-nav {
             padding-bottom: 16px;
         }
-    
+
         .wz-module-body-agent-info > .euiFlexGroup > .euiFlexItem {
             max-width: unset!important;
         }
 
         .wz-module-header-agent-title .euiFlexItem{
-            align-items: flex-start!important;    
+            align-items: flex-start!important;
         }
-        .wz-agent-empty-item .euiFlexItem{
+        .wz-agent-empty-item.euiFlexItem{
             margin-top: 0px!important;
             margin-bottom:0px!important;
         }

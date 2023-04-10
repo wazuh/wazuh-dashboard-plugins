@@ -32,7 +32,8 @@ const mainSettings = [
   { field: 'interval', label: 'Interval (in seconds) between every sync' },
   { field: 'response_timeout', label: 'Response timeout (in seconds)' },
   { field: 'queue_size', label: 'Queue size of the manager responses' },
-  { field: 'max_eps', label: 'Maximum message throughput' }
+  { field: 'max_eps', label: 'Maximum message throughput' },
+  { field: 'thread_pool', label: 'Number of threads' },
 ];
 
 class WzConfigurationIntegrityMonitoringSynchronization extends Component {
