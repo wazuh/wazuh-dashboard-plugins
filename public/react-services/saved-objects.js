@@ -117,7 +117,9 @@ export class SavedObject {
         };
       }
     } catch (error) {
-      return Promise.reject(error);
+      return ((error || {}).data || {}).message || false
+        ? error.data.message
+        : error.message || error;
     }
   }
 
