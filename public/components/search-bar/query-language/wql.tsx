@@ -1,7 +1,7 @@
 import React from 'react';
 import { EuiButtonEmpty, EuiPopover, EuiText, EuiCode } from '@elastic/eui';
 import { tokenizer as tokenizerUQL } from './aql';
-import { pluginPlatform } from '../../../../package.json';
+import { PLUGIN_VERSION_SHORT } from '../../../../common/constants';
 
 /* UI Query language
 https://documentation.wazuh.com/current/user-manual/api/queries.html
@@ -732,7 +732,7 @@ export const WQL = {
   id: 'wql',
   label: 'WQL',
   description: 'WQL (Wazuh Query Language) offers a human query syntax based on the Wazuh API query language.',
-  documentationLink: `https://github.com/wazuh/wazuh-kibana-app/blob/v${pluginPlatform.version.split('.').splice(0,2).join('.')}/public/components/search-bar/query-language/wql.md`,
+  documentationLink: `https://github.com/wazuh/wazuh-kibana-app/blob/v${PLUGIN_VERSION_SHORT}/public/components/search-bar/query-language/wql.md`,
   getConfiguration() {
     return {
       isOpenPopoverImplicitFilter: false,
