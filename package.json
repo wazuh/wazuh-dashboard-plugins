@@ -1,11 +1,11 @@
 {
   "name": "wazuh",
-  "version": "4.4.0",
-  "revision": "06",
+  "version": "4.4.1",
+  "revision": "01",
   "stage": "stable",
-  "commit": "dba9720e4",
+  "commit": "efb5eee4f",
   "pluginPlatform": {
-    "version": "2.4.1"
+    "version": "2.6.0"
   },
   "description": "Wazuh dashboard",
   "keywords": [
