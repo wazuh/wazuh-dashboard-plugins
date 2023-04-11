@@ -41,7 +41,6 @@ import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { AgentStatus } from '../../../components/agents/agent_status';
 import { AgentSynced } from '../../../components/agents/agent-synced';
-import { SearchBar } from '../../../components/search-bar';
 import { compressIPv6 } from '../../../services/ipv6-services';
 
 export const AgentsTable = withErrorBoundary(
@@ -63,8 +62,7 @@ export const AgentsTable = withErrorBoundary(
         isFilterColumnOpen: false,
         filters: sessionStorage.getItem('agents_preview_selected_options')
           ? JSON.parse(sessionStorage.getItem('agents_preview_selected_options'))
-          : [],
-        query: ''
+          : []
       };
       this.suggestions = [
         {
@@ -212,7 +210,7 @@ export const AgentsTable = withErrorBoundary(
         this.props.filters &&
         this.props.filters.length
       ) {
-        this.setState({ filters: this.props.filters, pageIndex: 0, query: this.props.filters.find(({field}) => field === 'q')?.value || '' });
+        this.setState({ filters: this.props.filters, pageIndex: 0 });
         this.props.removeFilters();
       }
     }
@@ -609,188 +607,6 @@ export const AgentsTable = withErrorBoundary(
               }
               placeholder='Filter or search agent'
             />
-            {/** Example implementation */}
-            <SearchBar
-              defaultMode='wql'
-              input={this.state.query}
-              modes={[
-                {
-                  id: 'wql',
-                  implicitQuery: {
-                    query: 'id!=000',
-                    conjunction: ';'
-                  },
-                  searchTermFields: [
-                    'configSum',
-                    'dateAdd',
-                    'id',
-                    'ip',
-                    'group',
-                    'group_config_status',
-                    'lastKeepAlive',
-                    'manager',
-                    'mergedSum',
-                    'name',
-                    'node_name',
-                    'os.platform',
-                    'status',
-                    'version'
-                  ],
-                  suggestions: {
-                    field(currentValue) {
-                      return [
-                        { label: 'configSum', description: 'filter by config sum' },
-                        { label: 'dateAdd', description: 'filter by date add' },
-                        { label: 'id', description: 'filter by ID' },
-                        { label: 'ip', description: 'filter by IP address' },
-                        { label: 'group', description: 'filter by group' },
-                        { label: 'group_config_status', description: 'filter by synced configuration status' },
-                        { label: 'lastKeepAlive', description: 'filter by date add' },
-                        { label: 'manager', description: 'filter by manager' },
-                        { label: 'mergedSum', description: 'filter by merged sum' },
-                        { label: 'name', description: 'filter by name' },
-                        { label: 'node_name', description: 'filter by manager node name' },
-                        { label: 'os.platform', description: 'filter by operating system platform' },
-                        { label: 'status', description: 'filter by status' },
-                        { label: 'version', description: 'filter by version' },
-                      ];
-                    },
-                    value: async (currentValue, { field }) => {
-                      switch (field) {
-                        case 'configSum':
-                          return await getAgentFilterValuesMapToSearchBarSuggestion(
-                            field,
-                            currentValue,
-                            {q: 'id!=000'}
-                          );
-                          break;
-                        case 'dateAdd':
-                          return await getAgentFilterValuesMapToSearchBarSuggestion(
-                            field,
-                            currentValue,
-                            {q: 'id!=000'}
-                          );
-                          break;
-                        case 'id':
-                          return await getAgentFilterValuesMapToSearchBarSuggestion(
-                            field,
-                            currentValue,
-                            {q: 'id!=000'}
-                          );
-                          break;
-                        case 'ip':
-                          return await getAgentFilterValuesMapToSearchBarSuggestion(
-                            field,
-                            currentValue,
-                            {q: 'id!=000'}
-                          );
-                          break;
-                        case 'group':
-                          return await getAgentFilterValuesMapToSearchBarSuggestion(
-                            field,
-                            currentValue,
-                            {q: 'id!=000'}
-                          );
-                          break;
-                        case 'group_config_status':
-                          return [AGENT_SYNCED_STATUS.SYNCED, AGENT_SYNCED_STATUS.NOT_SYNCED].map(
-                            (status) => ({
-                              label: status,
-                            }),
-                          );
-                          break;
-                        case 'lastKeepAlive':
-                          return await getAgentFilterValuesMapToSearchBarSuggestion(
-                            field,
-                            currentValue,
-                            {q: 'id!=000'}
-                          );
-                          break;
-                        case 'manager':
-                          return await getAgentFilterValuesMapToSearchBarSuggestion(
-                            field,
-                            currentValue,
-                            {q: 'id!=000'}
-                          );
-                          break;
-                        case 'mergedSum':
-                          return await getAgentFilterValuesMapToSearchBarSuggestion(
-                            field,
-                            currentValue,
-                            {q: 'id!=000'}
-                          );
-                          break;
-                        case 'name':
-                          return await getAgentFilterValuesMapToSearchBarSuggestion(
-                            field,
-                            currentValue,
-                            {q: 'id!=000'}
-                          );
-                          break;
-                        case 'node_name':
-                          return await getAgentFilterValuesMapToSearchBarSuggestion(
-                            field,
-                            currentValue,
-                            {q: 'id!=000'}
-                          );
-                          break;
-                        case 'os.platform':
-                          return await getAgentFilterValuesMapToSearchBarSuggestion(
-                            field,
-                            currentValue,
-                            {q: 'id!=000'}
-                          );
-                          break;
-                        case 'status':
-                          return UI_ORDER_AGENT_STATUS.map(
-                            (status) => ({
-                              label: status,
-                            }),
-                          );
-                          break;
-                        case 'version':
-                          return await getAgentFilterValuesMapToSearchBarSuggestion(
-                            field,
-                            currentValue,
-                            {q: 'id!=000'}
-                          );
-                          break;
-                        default:
-                          return [];
-                          break;
-                      }
-                    },
-                  },
-                },
-              ]}
-              onChange={console.log}
-              onSearch={async ({language, unifiedQuery, error}) => {
-                if(error){
-                  return;
-                }
-                try{
-                  this.setState({isLoading: true});
-                  const response = await this.props.wzReq('GET', '/agents', { params: { 
-                    limit: this.state.pageSize,
-                    offset: 0,
-                    q: unifiedQuery,
-                    sort: this.buildSortFilter()
-                  }});
-
-                  const formatedAgents = response?.data?.data?.affected_items?.map(
-                    this.formatAgent.bind(this)
-                  );
-
-                  this._isMount && this.setState({
-                    agents: formatedAgents,
-                    totalItems: response?.data?.data?.total_affected_items,
-                    isLoading: false,
-                  });
-                }catch(error){
-                  this.setState({isLoading: false});
-                };
-              }}
-            />
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
             <EuiButton
@@ -977,11 +793,3 @@ AgentsTable.propTypes = {
   reload: PropTypes.func,
 };
 
-
-const getAgentFilterValuesMapToSearchBarSuggestion = async (key, value, params) => {
-  try{
-    return (await getAgentFilterValues(key, value, params)).map(label => ({label}));
-  }catch(error){
-    return [];
-  };
-};
