@@ -27,12 +27,14 @@ import WzConfigurationIntegrityMonitoringNoDiff from './integrity-monitoring-no-
 import WzConfigurationIntegrityMonitoringWhoData from './integrity-monitoring-who-data';
 import WzConfigurationIntegrityMonitoringSynchronization from './integrity-monitoring-synchronization';
 import WzConfigurationIntegrityMonitoringFileLimit from './integrity-monitoring-file-limit';
+import WzConfigurationIntegrityMonitoringRegistryLimit from './integrity-monitoring-registry-limit';
 
 class WzConfigurationIntegrityMonitoring extends Component {
   constructor(props) {
     super(props);
   }
   componentDidMount() {
+    this.props.currentConfig['syscheck-syscheck'].syscheck.disabled = 'no';
     this.props.updateBadge(this.badgeEnabled());
   }
   badgeEnabled() {
@@ -43,6 +45,7 @@ class WzConfigurationIntegrityMonitoring extends Component {
       this.props.currentConfig['syscheck-syscheck'].syscheck.disabled === 'no'
     );
   }
+
   render() {
     const { currentConfig, agent } = this.props;
     const agentPlatform = ((agent || {}).os || {}).platform;
@@ -86,9 +89,15 @@ class WzConfigurationIntegrityMonitoring extends Component {
                   {...this.props}
                 />
               </WzTabSelectorTab>
-              <WzTabSelectorTab label="File limit">
+              <WzTabSelectorTab label="Files limit">
                 <WzConfigurationIntegrityMonitoringFileLimit {...this.props} />
               </WzTabSelectorTab>
+              { agentPlatform === 'windows' && (
+                <WzTabSelectorTab label="Registries limit">
+                  <WzConfigurationIntegrityMonitoringRegistryLimit {...this.props} />
+                </WzTabSelectorTab>
+              )}
+              
             </WzTabSelector>
           )}
       </Fragment>
