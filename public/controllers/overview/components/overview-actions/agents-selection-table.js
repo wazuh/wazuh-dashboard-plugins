@@ -25,17 +25,20 @@ import { LEFT_ALIGNMENT } from '@elastic/eui/lib/services';
 import { updateCurrentAgentData } from '../../../../redux/actions/appStateActions';
 import store from '../../../../redux/store';
 import { GroupTruncate } from '../../../../components/common/util/agent-group-truncate/';
-import { filtersToObject, WzSearchBar } from '../../../../components/wz-search-bar';
 import { getAgentFilterValues } from '../../../../controllers/management/components/management/groups/get-agents-filters-values';
 import _ from 'lodash';
-import { UI_LOGGER_LEVELS, UI_ORDER_AGENT_STATUS } from '../../../../../common/constants';
+import { AGENT_SYNCED_STATUS, UI_LOGGER_LEVELS, UI_ORDER_AGENT_STATUS } from '../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
 import { AgentStatus } from '../../../../components/agents/agent_status';
+import { SearchBar } from '../../../../components/search-bar';
 
 const checkField = field => {
   return field !== undefined ? field : '-';
 };
+
+const IMPLICIT_QUERY = 'id!=000';
+const IMPLICIT_QUERY_CONJUNCTION = ';';
 
 export class AgentSelectionTable extends Component {
   constructor(props) {
@@ -52,7 +55,8 @@ export class AgentSelectionTable extends Component {
       sortField: 'id',
       agents: [],
       selectedOptions: [],
-      filters: []
+      query: '',
+      input: ''
     };
 
     this.columns = [
@@ -83,6 +87,11 @@ export class AgentSelectionTable extends Component {
           show: false,
         },
         isSortable: true,
+        /* FIX: the ability to add a filter from a hidden group doesn't work.
+        This is happening in previous versions and could be related to the events order
+        and stopping the propagation of events. This is handled by
+        public/components/common/util/agent-group-truncate/group-truncate.tsx file.
+        */
         render: groups => this.renderGroups(groups)
       },
       {
@@ -117,21 +126,14 @@ export class AgentSelectionTable extends Component {
         render: status => <AgentStatus status={status} style={{ whiteSpace: 'no-wrap' }}/>,
       },
     ];
-    this.suggestions = [
-      { type: 'q', label: 'status', description: 'Filter by agent connection status', operators: ['=', '!=',], values: UI_ORDER_AGENT_STATUS },
-      { type: 'q', label: 'os.platform', description: 'Filter by operating system platform', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('os.platform', value, { q: 'id!=000'})},
-      { type: 'q', label: 'ip', description: 'Filter by agent IP address', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('ip', value, { q: 'id!=000'})},
-      { type: 'q', label: 'name', description: 'Filter by agent name', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('name', value, { q: 'id!=000'})},
-      { type: 'q', label: 'id', description: 'Filter by agent id', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('id', value, { q: 'id!=000'})},
-      { type: 'q', label: 'group', description: 'Filter by agent group', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('group', value, { q: 'id!=000'})},
-      { type: 'q', label: 'node_name', description: 'Filter by node name', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('node_name', value, { q: 'id!=000'})},
-      { type: 'q', label: 'manager', description: 'Filter by manager', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('manager', value, { q: 'id!=000'})},
-      { type: 'q', label: 'version', description: 'Filter by agent version', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('version', value, { q: 'id!=000'})},
-      { type: 'q', label: 'configSum', description: 'Filter by agent config sum', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('configSum', value, { q: 'id!=000'})},
-      { type: 'q', label: 'mergedSum', description: 'Filter by agent merged sum', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('mergedSum', value, { q: 'id!=000'})},
-      { type: 'q', label: 'dateAdd', description: 'Filter by add date', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('dateAdd', value, { q: 'id!=000'})},
-      { type: 'q', label: 'lastKeepAlive', description: 'Filter by last keep alive', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('lastKeepAlive', value, { q: 'id!=000'})},
-    ];
+
+    this.selectFields = [
+      ...this.columns.filter(({id}) => id !== 'os').map(({id}) => id),
+      'os.name',
+      'os.uname',
+      'os.platform',
+      'os.version'
+    ].join(',');
   }
 
   onChangeItemsPerPage = async itemsPerPage => {
@@ -157,7 +159,7 @@ export class AgentSelectionTable extends Component {
   }
 
   async componentDidUpdate(prevProps, prevState) {
-    if(!(_.isEqual(prevState.filters,this.state.filters))){
+    if(prevState.query!== this.state.query){
       await this.getItems();
     }
   }
@@ -219,14 +221,14 @@ export class AgentSelectionTable extends Component {
   }
 
   buildFilter() {
-    const { itemsPerPage, pageIndex, filters } = this.state;
+    const { itemsPerPage, pageIndex, query } = this.state;
     const filter = {
-      ...filtersToObject(filters),
+      q: query || IMPLICIT_QUERY,
       offset: (pageIndex * itemsPerPage) || 0,
-      limit: pageIndex * itemsPerPage + itemsPerPage,
+      limit: itemsPerPage,
+      select: this.selectFields,
       ...this.buildSortFilter()
     };
-    filter.q = !filter.q ? `id!=000` : `id!=000;${filter.q}`;
     return filter;
   }
 
@@ -577,19 +579,8 @@ export class AgentSelectionTable extends Component {
   }
 
   filterGroupBadge = (group) => {
-    const { filters } = this.state;
-    let auxFilters = filters.map( filter => filter.value.match(/group=(.*S?)/)[1] );
-    if (filters.length > 0) {
-      !auxFilters.includes(group) ?
-      this.setState({
-        filters: [...filters, {field: "q", value: `group=${group}`}],
-      }) : false;
-    } else {
-      this.setState({
-        filters: [...filters, {field: "q", value: `group=${group}`}],
-      })
-    }
-  }
+    this.setState({ input: `group=${group}` });
+  };
 
   renderGroups(groups){
     return Array.isArray(groups) ? (
@@ -619,11 +610,102 @@ export class AgentSelectionTable extends Component {
       <div>
         <EuiFlexGroup gutterSize="m">
           <EuiFlexItem>
-            <WzSearchBar
-              filters={this.state.filters}
-              suggestions={this.suggestions}
-              onFiltersChange={filters => this.setState({filters, pageIndex: 0})}
-              placeholder="Filter or search agent"
+            <SearchBar
+              defaultMode='wql'
+              input={this.state.input}
+              modes={[
+                {
+                  id: 'wql',
+                  implicitQuery: {
+                    query: IMPLICIT_QUERY,
+                    conjunction: IMPLICIT_QUERY_CONJUNCTION
+                  },
+                  searchTermFields: [
+                    'configSum',
+                    'dateAdd',
+                    'id',
+                    'ip',
+                    'group',
+                    'group_config_status',
+                    'lastKeepAlive',
+                    'manager',
+                    'mergedSum',
+                    'name',
+                    'node_name',
+                    'os.platform',
+                    'status',
+                    'version'
+                  ],
+                  suggestions: {
+                    field(currentValue) {
+                      return [
+                        { label: 'configSum', description: 'filter by config sum' },
+                        { label: 'dateAdd', description: 'filter by date add' },
+                        { label: 'id', description: 'filter by ID' },
+                        { label: 'ip', description: 'filter by IP address' },
+                        { label: 'group', description: 'filter by group' },
+                        { label: 'group_config_status', description: 'filter by synced configuration status' },
+                        { label: 'lastKeepAlive', description: 'filter by date add' },
+                        { label: 'manager', description: 'filter by manager' },
+                        { label: 'mergedSum', description: 'filter by merged sum' },
+                        { label: 'name', description: 'filter by name' },
+                        { label: 'node_name', description: 'filter by manager node name' },
+                        { label: 'os.platform', description: 'filter by operating system platform' },
+                        { label: 'status', description: 'filter by status' },
+                        { label: 'version', description: 'filter by version' },
+                      ];
+                    },
+                    value: async (currentValue, { field }) => {
+                      const distinct = {
+                        group_config_status: () => [
+                          AGENT_SYNCED_STATUS.SYNCED,
+                          AGENT_SYNCED_STATUS.NOT_SYNCED
+                        ].map(
+                          status => ({
+                            label: status,
+                          })),
+                        status: () => UI_ORDER_AGENT_STATUS.map(
+                          status => ({
+                            label: status,
+                          })),
+                      };
+                      if(distinct?.[field]){
+                        return distinct?.[field]?.();
+                      };
+
+                      if([
+                        'configSum',
+                        'dateAdd',
+                        'id',
+                        'ip',
+                        'group',
+                        'lastKeepAlive',
+                        'manager',
+                        'mergedSum',
+                        'name',
+                        'node_name',
+                        'os.platform',
+                        'version'
+                      ].includes(field)){
+                        try{
+                          return (await getAgentFilterValues(
+                            field,
+                            currentValue,
+                            {q: IMPLICIT_QUERY}
+                          )).map(label => ({label}));
+                        }catch(error){
+                          return [];
+                        };
+                      };
+                      return [];
+                    },
+                  },
+                },
+              ]}
+              onSearch={({unifiedQuery}) => {
+                // Set the query and reset the page index
+                this.setState({query: unifiedQuery, pageIndex: 0});
+              }}
             />
           </EuiFlexItem>
         </EuiFlexGroup>
@@ -661,6 +743,7 @@ export class AgentSelectionTable extends Component {
           </EuiFlexGroup>
         </EuiTableHeaderMobile>
 
+        {/* TODO: We should consider to use a reusable component instead of building the table with more atomic components. */}
         <EuiTable>
           <EuiTableHeader>{this.renderHeaderCells()}</EuiTableHeader>
           {(this.state.agents.length && (
