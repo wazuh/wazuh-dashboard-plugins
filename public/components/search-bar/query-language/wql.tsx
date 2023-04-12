@@ -811,8 +811,11 @@ export const WQL = {
               lastToken && suggestionMappingLanguageTokenType[lastToken.type].iconType ===
               item.type.iconType
             ) {
-              // replace the value of last token
-              lastToken.value = item.label;
+              // replace the value of last token with the current one.
+              // if the current token is a value, then transform it
+              lastToken.value = item.type.iconType === suggestionMappingLanguageTokenType.value.iconType
+                ? transformQLValue(item.label)
+                : item.label;
             } else {
               // add a whitespace for conjunction <whitespace><conjunction>
               !(/\s$/.test(input))
