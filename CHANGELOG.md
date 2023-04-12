@@ -22,6 +22,14 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Handling endpoint response was done when there is no data to show [#4918]https://github.com/wazuh/wazuh-kibana-app/pull/4918
 - Fixed the 2 errors that appeared in console in Settings>Configuration section. [#5135](https://github.com/wazuh/wazuh-kibana-app/pull/5135)
 
+## Wazuh v4.4.1 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 01
+
+### Fixed
+
+- Fixed the search in the agent inventory data tables [#5196](https://github.com/wazuh/wazuh-kibana-app/pull/5196)
+- Fixed the `Anomaly and malware detection` link. [#5329](https://github.com/wazuh/wazuh-kibana-app/pull/5329)
+- Fixed the problem that did not allow closing the time picker when the button was clicked again in `Agents` and `Management/Statistics`. [#5341](https://github.com/wazuh/wazuh-kibana-app/pull/5341)
+
 ## Wazuh v4.4.0 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 06
 
 ### Added
