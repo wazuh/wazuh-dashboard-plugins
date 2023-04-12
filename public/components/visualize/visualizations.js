@@ -72,7 +72,7 @@ export const visualizations = {
         ]
       },
       {
-        height: 300,
+        height: 350,
         vis: [
           {
             title: 'Rule distribution',
