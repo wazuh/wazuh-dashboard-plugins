@@ -137,6 +137,9 @@ resources:
   # List agents distinct
   - method: GET
     path: /agents/stats/distinct
+    response:
+      statusCode: 200
+      scriptFile: agents/agent_distinct.js
 
   # Summarize agents OS
   - method: GET
