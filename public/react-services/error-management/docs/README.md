@@ -35,7 +35,7 @@ Exists the following error sources:
 - Etc
 
 
-Our frontend server-side have a intermedial layer between the frontend and the backend APIs like Indexer and wazuh.
+Our frontend server-side have a intermedial layer between the frontend and the backend APIs like Indexer and Wazuh.
 This layer catch the error and categorize them by type and add a custom error code.
 
  ### Error codes: code
