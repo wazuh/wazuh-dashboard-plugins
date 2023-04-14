@@ -534,6 +534,15 @@ export const AgentsTable = withErrorBoundary(
     }
 
     filterBarRender() {
+      // Build the search term fields from the visible columns in the table
+      const searchTermFields = this.columns()
+        .filter(({field}) => field !== 'actions')
+        /* Map the object
+        If the table column field is `os_name` then adds the os.name and os.version
+        */
+        .map(({field}) => field === 'os_name' ? ['os.name', 'os.version'] : [field])
+        .flat()
+        .sort();
       return (
         <EuiFlexGroup>
           <EuiFlexItem style={{ marginRight: 0 }}>
@@ -547,7 +556,7 @@ export const AgentsTable = withErrorBoundary(
                     query: IMPLICIT_QUERY,
                     conjunction: IMPLICIT_QUERY_CONJUNCTION
                   },
-                  searchTermFields: searchBar.wql.searchTermFields,
+                  searchTermFields,
                   suggestions: {
                     field(currentValue) {
                       return searchBar.wql.suggestionsValue;
