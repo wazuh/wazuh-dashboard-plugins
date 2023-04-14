@@ -137,11 +137,11 @@ export class AgentSelectionTable extends Component {
   }
 
   onChangeItemsPerPage = async itemsPerPage => {
-    this._isMounted && this.setState({ itemsPerPage }, async () => await this.getItems());
+    this._isMounted && this.setState({ itemsPerPage });
   };
 
   onChangePage = async pageIndex => {
-    this._isMounted && this.setState({ pageIndex }, async () => await this.getItems());
+    this._isMounted && this.setState({ pageIndex });
   };
 
   async componentDidMount() {
@@ -159,7 +159,12 @@ export class AgentSelectionTable extends Component {
   }
 
   async componentDidUpdate(prevProps, prevState) {
-    if(prevState.query!== this.state.query){
+    if(prevState.query!== this.state.query
+      || prevState.pageIndex !== this.state.pageIndex
+      || prevState.pageSize !== this.state.pageSize
+      || prevState.sortField !== this.state.sortField
+      || prevState.sortDirection !== this.state.sortDirection
+      ){
       await this.getItems();
     }
   }
@@ -227,20 +232,17 @@ export class AgentSelectionTable extends Component {
       offset: (pageIndex * itemsPerPage) || 0,
       limit: itemsPerPage,
       select: this.selectFields,
-      ...this.buildSortFilter()
+      sort: this.buildSortFilter()
     };
     return filter;
   }
 
   buildSortFilter() {
     const { sortDirection, sortField } = this.state;
-    const sortFilter = {};
-    if (sortField) {
-      const direction = sortDirection === 'asc' ? '+' : '-';
-      sortFilter['sort'] = direction + (sortField === 'os'? 'os.name,os.version' : sortField);
-    }
+    const direction = sortDirection === 'asc' ? '+' : '-';
+    const field = sortField === 'os'? 'os.name,os.version' : sortField;
 
-    return sortFilter;
+    return direction + field;
   }
 
   onSort = async prop => {
@@ -252,7 +254,7 @@ export class AgentSelectionTable extends Component {
         ? 'desc'
         : 'asc';
 
-    this._isMounted && this.setState({ sortField, sortDirection }, async () => await this.getItems());
+    this._isMounted && this.setState({ sortField, sortDirection });
   };
 
   toggleItem = itemId => {
@@ -501,13 +503,6 @@ export class AgentSelectionTable extends Component {
     return undefined;
   };
 
-  async onQueryChange(result) {
-    this._isMounted &&
-      this.setState({ isLoading: true, ...result }, async () => {
-        await this.getItems();
-      });
-  }
-
   getSelectedItems(){
     return Object.keys(this.state.itemIdToSelectedMap).filter(x => {
       return (this.state.itemIdToSelectedMap[x] === true)
@@ -578,8 +573,16 @@ export class AgentSelectionTable extends Component {
     );
   }
 
+  buildQueryWithImplicitQuery(query){
+    return [
+      IMPLICIT_QUERY,
+      `(${query})`
+    ].join(IMPLICIT_QUERY_CONJUNCTION);
+  }
+
   filterGroupBadge = (group) => {
-    this.setState({ input: `group=${group}` });
+    const query = `group=${group}`;
+    this.setState({ input: query, query: this.buildQueryWithImplicitQuery(query) });
   };
 
   renderGroups(groups){
@@ -673,31 +676,15 @@ export class AgentSelectionTable extends Component {
                         return distinct?.[field]?.();
                       };
 
-                      if([
-                        'configSum',
-                        'dateAdd',
-                        'id',
-                        'ip',
-                        'group',
-                        'lastKeepAlive',
-                        'manager',
-                        'mergedSum',
-                        'name',
-                        'node_name',
-                        'os.platform',
-                        'version'
-                      ].includes(field)){
-                        try{
-                          return (await getAgentFilterValues(
-                            field,
-                            currentValue,
-                            {q: IMPLICIT_QUERY}
-                          )).map(label => ({label}));
-                        }catch(error){
-                          return [];
-                        };
+                      try{
+                        return (await getAgentFilterValues(
+                          field,
+                          currentValue,
+                          {q: IMPLICIT_QUERY}
+                        )).map(label => ({label}));
+                      }catch(error){
+                        return [];
                       };
-                      return [];
                     },
                   },
                 },
