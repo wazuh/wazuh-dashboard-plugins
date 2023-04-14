@@ -15,7 +15,6 @@ import { WzCurrentOverviewSectionWrapper } from '../../components/common/modules
 import { WzCurrentAgentsSectionWrapper } from '../../components/common/modules/agents-current-section-wrapper';
 import { Mitre } from '../../components/overview'
 import { Stats } from './components/stats';
-import { SelectAgent } from './components/select-agent';
 import { RequirementCard } from './components/requirement-card';
 import { getAngularModule } from '../../kibana-services';
 
@@ -26,7 +25,6 @@ WzCurrentOverviewSectionWrapper.displayName = 'WzCurrentOverviewSectionWrapper';
 WzCurrentAgentsSectionWrapper.displayName = 'WzCurrentAgentsSectionWrapper';
 Stats.displayName = 'StatsOverview';
 Mitre.displayName = 'Mitre';
-SelectAgent.displayName = 'SelectAgent';
 RequirementCard.displayName = 'RequirementCard';
 
 app
@@ -36,5 +34,4 @@ app
   .value('WzCurrentAgentsSectionWrapper', WzCurrentAgentsSectionWrapper)
   .value('StatsOverview', Stats)
   .value('Mitre', Mitre)
-  .value('SelectAgent', SelectAgent)
   .value('RequirementCard', RequirementCard);

@@ -33,11 +33,11 @@ export const Stats = withErrorBoundary (class Stats extends Component {
   goToAgents(status) {
     if(status){
       sessionStorage.setItem(
-        'agents_preview_selected_options',
-        JSON.stringify([{field: 'q', value: `status=${status}`}])
+        'wz_page_agents_search_bar_query',
+        `status=${status}`
       );
-    }else if(sessionStorage.getItem('agents_preview_selected_options')){
-      sessionStorage.removeItem('agents_preview_selected_options');
+    }else if(sessionStorage.getItem('wz_page_agents_search_bar_query')){
+      sessionStorage.removeItem('wz_page_agents_search_bar_query');
     }
     window.location.href = '#/agents-preview';
   }

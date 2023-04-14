@@ -31,7 +31,6 @@ import {
 import { getToasts } from '../../../kibana-services';
 import { AppNavigate } from '../../../react-services/app-navigate';
 import { GroupTruncate } from '../../../components/common/util';
-import { WzSearchBar, filtersToObject } from '../../../components/wz-search-bar';
 import { getAgentFilterValues } from '../../../controllers/management/components/management/groups/get-agents-filters-values';
 import { WzButtonPermissions } from '../../../components/common/permissions/button';
 import { formatUIDate } from '../../../react-services/time-service';
@@ -42,12 +41,56 @@ import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { AgentStatus } from '../../../components/agents/agent_status';
 import { AgentSynced } from '../../../components/agents/agent-synced';
 import { compressIPv6 } from '../../../services/ipv6-services';
+import { SearchBar } from '../../../components/search-bar';
+
+const IMPLICIT_QUERY = 'id!=000';
+const IMPLICIT_QUERY_CONJUNCTION = ';';
+const searchBar = {
+  wql: {
+    suggestionsValue: [
+      { label: 'configSum', description: 'filter by config sum' },
+      { label: 'dateAdd', description: 'filter by date add' },
+      { label: 'id', description: 'filter by ID' },
+      { label: 'ip', description: 'filter by IP address' },
+      { label: 'group', description: 'filter by group' },
+      { label: 'group_config_status', description: 'filter by synced configuration status' },
+      { label: 'lastKeepAlive', description: 'filter by date add' },
+      { label: 'manager', description: 'filter by manager' },
+      { label: 'mergedSum', description: 'filter by merged sum' },
+      { label: 'name', description: 'filter by name' },
+      { label: 'node_name', description: 'filter by manager node name' },
+      { label: 'os.platform', description: 'filter by operating system platform' },
+      { label: 'status', description: 'filter by status' },
+      { label: 'version', description: 'filter by version' },
+    ],
+    searchTermFields: [
+      'configSum',
+      'dateAdd',
+      'id',
+      'ip',
+      'group',
+      'group_config_status',
+      'lastKeepAlive',
+      'manager',
+      'mergedSum',
+      'name',
+      'node_name',
+      'os.name',
+      'os.version',
+      'status',
+      'version'
+    ]
+  }
+};
 
 export const AgentsTable = withErrorBoundary(
   class AgentsTable extends Component {
     _isMount = false;
     constructor(props) {
       super(props);
+      const filterSessionStorage = sessionStorage.getItem('wz_page_agents_search_bar_query')
+        ? sessionStorage.getItem('wz_page_agents_search_bar_query')
+        : '';
       this.state = {
         agents: [],
         isLoading: false,
@@ -60,110 +103,9 @@ export const AgentsTable = withErrorBoundary(
         allSelected: false,
         purgeModal: false,
         isFilterColumnOpen: false,
-        filters: sessionStorage.getItem('agents_preview_selected_options')
-          ? JSON.parse(sessionStorage.getItem('agents_preview_selected_options'))
-          : []
+        input: typeof filterSessionStorage !== 'undefined' ? filterSessionStorage : '',
+        query: typeof filterSessionStorage !== 'undefined' ? filterSessionStorage : ''
       };
-      this.suggestions = [
-        {
-          type: 'q',
-          label: 'status',
-          description: 'Filter by agent connection status',
-          operators: ['=', '!='],
-          values: UI_ORDER_AGENT_STATUS,
-        },
-        {
-          type: 'q',
-          label: 'group_config_status',
-          description: 'Filter by agent synced configuration status',
-          operators: ['=', '!='],
-          values: [AGENT_SYNCED_STATUS.SYNCED, AGENT_SYNCED_STATUS.NOT_SYNCED],
-        },
-        {
-          type: 'q',
-          label: 'os.platform',
-          description: 'Filter by operating system platform',
-          operators: ['=', '!='],
-          values: async (value) => getAgentFilterValues('os.platform', value, { q: 'id!=000' }),
-        },
-        {
-          type: 'q',
-          label: 'ip',
-          description: 'Filter by agent IP address',
-          operators: ['=', '!='],
-          values: async (value) => getAgentFilterValues('ip', value, { q: 'id!=000' }),
-        },
-        {
-          type: 'q',
-          label: 'name',
-          description: 'Filter by agent name',
-          operators: ['=', '!='],
-          values: async (value) => getAgentFilterValues('name', value, { q: 'id!=000' }),
-        },
-        {
-          type: 'q',
-          label: 'id',
-          description: 'Filter by agent id',
-          operators: ['=', '!='],
-          values: async (value) => getAgentFilterValues('id', value, { q: 'id!=000' }),
-        },
-        {
-          type: 'q',
-          label: 'group',
-          description: 'Filter by agent group',
-          operators: ['=', '!='],
-          values: async (value) => getAgentFilterValues('group', value, { q: 'id!=000' }),
-        },
-        {
-          type: 'q',
-          label: 'node_name',
-          description: 'Filter by node name',
-          operators: ['=', '!='],
-          values: async (value) => getAgentFilterValues('node_name', value, { q: 'id!=000' }),
-        },
-        {
-          type: 'q',
-          label: 'manager',
-          description: 'Filter by manager',
-          operators: ['=', '!='],
-          values: async (value) => getAgentFilterValues('manager', value, { q: 'id!=000' }),
-        },
-        {
-          type: 'q',
-          label: 'version',
-          description: 'Filter by agent version',
-          operators: ['=', '!='],
-          values: async (value) => getAgentFilterValues('version', value, { q: 'id!=000' }),
-        },
-        {
-          type: 'q',
-          label: 'configSum',
-          description: 'Filter by agent config sum',
-          operators: ['=', '!='],
-          values: async (value) => getAgentFilterValues('configSum', value, { q: 'id!=000' }),
-        },
-        {
-          type: 'q',
-          label: 'mergedSum',
-          description: 'Filter by agent merged sum',
-          operators: ['=', '!='],
-          values: async (value) => getAgentFilterValues('mergedSum', value, { q: 'id!=000' }),
-        },
-        {
-          type: 'q',
-          label: 'dateAdd',
-          description: 'Filter by add date',
-          operators: ['=', '!='],
-          values: async (value) => getAgentFilterValues('dateAdd', value, { q: 'id!=000' }),
-        },
-        {
-          type: 'q',
-          label: 'lastKeepAlive',
-          description: 'Filter by last keep alive',
-          operators: ['=', '!='],
-          values: async (value) => getAgentFilterValues('lastKeepAlive', value, { q: 'id!=000' }),
-        },
-      ];
       this.downloadCsv.bind(this);
     }
 
@@ -186,8 +128,8 @@ export const AgentsTable = withErrorBoundary(
 
     componentWillUnmount() {
       this._isMount = false;
-      if (sessionStorage.getItem('agents_preview_selected_options')) {
-        sessionStorage.removeItem('agents_preview_selected_options');
+      if (sessionStorage.getItem('wz_page_agents_search_bar_query')) {
+        sessionStorage.removeItem('wz_page_agents_search_bar_query');
       }
     }
 
@@ -198,7 +140,7 @@ export const AgentsTable = withErrorBoundary(
 
     async componentDidUpdate(prevProps, prevState) {
       if (
-        !_.isEqual(prevState.filters, this.state.filters) ||
+        !_.isEqual(prevState.query, this.state.query) ||
         prevState.pageIndex !== this.state.pageIndex ||
         prevState.pageSize !== this.state.pageSize ||
         prevState.sortField !== this.state.sortField ||
@@ -206,12 +148,9 @@ export const AgentsTable = withErrorBoundary(
       ) {
         await this.getItems();
       } else if (
-        !_.isEqual(prevProps.filters, this.props.filters) &&
-        this.props.filters &&
-        this.props.filters.length
+        !_.isEqual(prevProps.filters, this.props.filters)
       ) {
-        this.setState({ filters: this.props.filters, pageIndex: 0 });
-        this.props.removeFilters();
+        this.setState({ input: this.props.filters, query: this.buildQueryWithImplicitQuery(this.props.filters), pageIndex: 0 });
       }
     }
 
@@ -219,9 +158,9 @@ export const AgentsTable = withErrorBoundary(
       try {
         this._isMount && this.setState({ isLoading: true });
         const selectFieldsList = this.defaultColumns
-          .filter(field => field.field != 'actions')
-          .map(field => field.field.replace('os_', 'os.')); // "os_name" subfield should be specified as 'os.name'
-        const selectFields = [...selectFieldsList, 'os.platform', 'os.uname', 'os.version'].join(','); // Add version and uname fields to render the OS icon and version in the table
+          .filter(field => !['os_name', 'actions'].includes(field.field))
+          .map(({field}) => field);
+        const selectFields = [...selectFieldsList, 'os.name', 'os.platform', 'os.uname', 'os.version'].join(','); // Add os.name, os.platform, os.uname and os.version fields to render the OS icon and version in the table
 
         const rawAgents = await this.props.wzReq('GET', '/agents', { params: { ...this.buildFilter(), select: selectFields } });
         const formatedAgents = (((rawAgents || {}).data || {}).data || {}).affected_items.map(
@@ -251,17 +190,22 @@ export const AgentsTable = withErrorBoundary(
       }
     }
 
+    buildQueryWithImplicitQuery(query){
+      return [
+        IMPLICIT_QUERY,
+        `(${query})`
+      ].join(IMPLICIT_QUERY_CONJUNCTION);
+    }
 
     buildFilter() {
-      const { pageIndex, pageSize, filters } = this.state;
+      const { pageIndex, pageSize, query } = this.state;
 
       const filter = {
-        ...filtersToObject(filters),
-        offset: pageIndex * pageSize || 0,
+        q: query || IMPLICIT_QUERY,
+        offset: (pageIndex * pageSize) || 0,
         limit: pageSize,
         sort: this.buildSortFilter(),
       };
-      filter.q = !filter.q ? `id!=000` : `id!=000;${filter.q}`;
 
       return filter;
     }
@@ -269,15 +213,10 @@ export const AgentsTable = withErrorBoundary(
     buildSortFilter() {
       const { sortField, sortDirection } = this.state;
 
-      const field = sortField === 'os_name' ? 'os.name,os.version' : sortField;
       const direction = sortDirection === 'asc' ? '+' : '-';
+      const field = sortField === 'os_name' ? 'os.name,os.version' : sortField;
 
       return direction + field;
-    }
-
-    buildQFilter() {
-      const { q } = this.state;
-      return q === '' ? `id!=000` : `id!=000;${q}`;
     }
 
     formatAgent(agent) {
@@ -598,14 +537,56 @@ export const AgentsTable = withErrorBoundary(
       return (
         <EuiFlexGroup>
           <EuiFlexItem style={{ marginRight: 0 }}>
-            <WzSearchBar
-              noDeleteFiltersOnUpdateSuggests
-              filters={this.state.filters}
-              suggestions={this.suggestions}
-              onFiltersChange={filters =>
-                this.setState({ filters, pageIndex: 0 })
-              }
-              placeholder='Filter or search agent'
+            <SearchBar
+              defaultMode='wql'
+              input={this.state.input}
+              modes={[
+                {
+                  id: 'wql',
+                  implicitQuery: {
+                    query: IMPLICIT_QUERY,
+                    conjunction: IMPLICIT_QUERY_CONJUNCTION
+                  },
+                  searchTermFields: searchBar.wql.searchTermFields,
+                  suggestions: {
+                    field(currentValue) {
+                      return searchBar.wql.suggestionsValue;
+                    },
+                    value: async (currentValue, { field }) => {
+                      const distinct = {
+                        group_config_status: () => [
+                          AGENT_SYNCED_STATUS.SYNCED,
+                          AGENT_SYNCED_STATUS.NOT_SYNCED
+                        ].map(
+                          status => ({
+                            label: status,
+                          })),
+                        status: () => UI_ORDER_AGENT_STATUS.map(
+                          status => ({
+                            label: status,
+                          })),
+                      };
+                      if(distinct?.[field]){
+                        return distinct?.[field]?.();
+                      };
+
+                      try{
+                        return (await getAgentFilterValues(
+                          field,
+                          currentValue,
+                          {q: IMPLICIT_QUERY}
+                        )).map(label => ({label}));
+                      }catch(error){
+                        return [];
+                      };
+                    },
+                  },
+                },
+              ]}
+              onSearch={({unifiedQuery}) => {
+                // Set the query and reset the page index
+                this.setState({query: unifiedQuery, pageIndex: 0});
+              }}
             />
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
@@ -730,19 +711,8 @@ export const AgentsTable = withErrorBoundary(
     }
 
     filterGroupBadge = (group) => {
-      const { filters } = this.state;
-      let auxFilters = filters.map((filter) => filter.value.match(/group=(.*S?)/)[1]);
-      if (filters.length > 0) {
-        !auxFilters.includes(group)
-          ? this.setState({
-            filters: [...filters, { field: 'q', value: `group=${group}` }],
-          })
-          : false;
-      } else {
-        this.setState({
-          filters: [...filters, { field: 'q', value: `group=${group}` }],
-        });
-      }
+      const query = `group=${group}`;
+      this.setState({ input: query, query: this.buildQueryWithImplicitQuery(query) });
     };
 
     renderGroups(groups) {

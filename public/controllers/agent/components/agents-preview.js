@@ -67,7 +67,7 @@ export const AgentsPreview = compose(
         loadingAgents: false,
         loadingSummary: false,
         showAgentsEvolutionVisualization: true,
-        agentTableFilters: [],
+        agentTableFilters: '',
         agentStatusSummary: { active: '-', disconnected: '-', total: '-', pending: '-', never_connected: '-' },
         agentConfiguration: {},
         agentsActiveCoverage: 0,
@@ -156,9 +156,6 @@ export const AgentsPreview = compose(
       }
     }
 
-    removeFilters() {
-      this._isMount && this.setState({ agentTableFilters: [] });
-    }
 
     showAgent(agent) {
       agent && this.props.tableProps.showAgent(agent);
@@ -167,7 +164,7 @@ export const AgentsPreview = compose(
     filterAgentByStatus(status) {
       this._isMount &&
         this.setState({
-          agentTableFilters: [{ field: 'q', value: `status=${status}` }],
+          agentTableFilters: `status=${status}`,
         });
     }
     onRenderComplete(){
@@ -316,7 +313,6 @@ export const AgentsPreview = compose(
             <WzReduxProvider>
               <AgentsTable
                 filters={this.state.agentTableFilters}
-                removeFilters={() => this.removeFilters()}
                 wzReq={this.props.tableProps.wzReq}
                 addingNewAgent={this.props.tableProps.addingNewAgent}
                 downloadCsv={this.props.tableProps.downloadCsv}
