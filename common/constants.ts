@@ -1355,6 +1355,30 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
 			return schema.boolean();
 		},
   },
+  "extensions.github": {
+    title: "GitHub",
+    description: "Enable or disable the GitHub tab on Overview and Agents.",
+    category: SettingCategory.EXTENSIONS,
+    type: EpluginSettingType.switch,
+    defaultValue: false,
+    isConfigurableFromFile: true,
+    isConfigurableFromUI: false,
+    options: {
+      switch: {
+        values: {
+          disabled: { label: 'false', value: false },
+          enabled: { label: 'true', value: true },
+        }
+      }
+    },
+    uiFormTransformChangedInputValue: function (value: boolean | string): boolean {
+      return Boolean(value);
+    },
+    validate: SettingsValidator.isBoolean,
+		validateBackend: function(schema){
+			return schema.boolean();
+		},
+  },
   "extensions.hipaa": {
     title: "Hipaa",
     description: "Enable or disable the HIPAA tab on Overview and Agents.",
@@ -1385,6 +1409,30 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     category: SettingCategory.EXTENSIONS,
     type: EpluginSettingType.switch,
     defaultValue: true,
+    isConfigurableFromFile: true,
+    isConfigurableFromUI: false,
+    options: {
+      switch: {
+        values: {
+          disabled: { label: 'false', value: false },
+          enabled: { label: 'true', value: true },
+        }
+      }
+    },
+    uiFormTransformChangedInputValue: function (value: boolean | string): boolean {
+      return Boolean(value);
+    },
+    validate: SettingsValidator.isBoolean,
+		validateBackend: function(schema){
+			return schema.boolean();
+		},
+  },
+  "extensions.office": {
+    title: "Office 365",
+    description: "Enable or disable the Office 365 tab on Overview and Agents.",
+    category: SettingCategory.EXTENSIONS,
+    type: EpluginSettingType.switch,
+    defaultValue: false,
     isConfigurableFromFile: true,
     isConfigurableFromUI: false,
     options: {
