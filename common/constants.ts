@@ -502,7 +502,7 @@ export const PLUGIN_SETTINGS_CATEGORIES: { [category: number]: TPluginSettingCat
   },
   [SettingCategory.STATISTICS]: {
     title: 'Task:Statistics',
-    description: "Options related to the daemons manager monitoring job and their storage in indexes..",
+    description: "Options related to the daemons manager monitoring job and their storage in indexes.",
     renderOrder: SettingCategory.STATISTICS,
   },
   [SettingCategory.CUSTOMIZATION]: {
@@ -1380,7 +1380,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
 		},
   },
   "extensions.hipaa": {
-    title: "Hipaa",
+    title: "HIPAA",
     description: "Enable or disable the HIPAA tab on Overview and Agents.",
     category: SettingCategory.EXTENSIONS,
     type: EpluginSettingType.switch,
