@@ -9,17 +9,22 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { getToasts }  from '../kibana-services';
+import { getToasts } from '../kibana-services';
 import store from '../redux/store';
 import { updateWazuhNotReadyYet } from '../redux/actions/appStateActions';
 import { WzMisc } from '../factories/misc';
 import { CheckDaemonsStatus } from './check-daemons-status';
 
+interface IHistoryItem {
+  text: string;
+  date: any;
+}
 const wzMisc = new WzMisc();
 let history = [];
 const filterHistoryTimeInMs = 2000;
-const filterRecentHistory = date => history.filter(item => date - item.date <= filterHistoryTimeInMs);
-const isErrorRecentlyShown = text => history.some(item => item.text === text)
+const filterRecentHistory = (date) =>
+  history.filter((item: IHistoryItem) => date - item.date <= filterHistoryTimeInMs);
+const isErrorRecentlyShown = (text) => history.some((item: IHistoryItem) => item.text === text);
 
 export class ErrorHandler {
   /**
@@ -33,43 +38,45 @@ export class ErrorHandler {
         origin.includes('/api/request') ||
         origin.includes('/api/csv') ||
         origin.includes('/api/agents-unique');
-      return isFromAPI
-        ? 'Wazuh API is not reachable. Reason: timeout.'
-        : 'Server did not respond';
-    };
-    if ((((error || {}).data || {}).errorData || {}).message){
+      return isFromAPI ? 'Wazuh API is not reachable. Reason: timeout.' : 'Server did not respond';
+    }
+
+    if ((((error || {}).response || {}).data || {}).message) {
+      return error.response.data.message;
+    }
+    if ((((error || {}).data || {}).errorData || {}).message) {
       return error.data.errorData.message;
-    };
-    if (((error || {}).errorData || {}).message){
+    }
+    if (((error || {}).errorData || {}).message) {
       return error.errorData.message;
-    } ;
-    if (typeof (error || {}).data === 'string'){
+    }
+    if (typeof (error || {}).data === 'string') {
       return error.data;
-    };
-    if (typeof ((error || {}).data || {}).error === 'string'){
+    }
+    if (typeof ((error || {}).data || {}).error === 'string') {
       return error.data.error;
-    };
-    if (typeof ((error || {}).data || {}).message === 'string'){
+    }
+    if (typeof ((error || {}).data || {}).message === 'string') {
       return error.data.message;
-    };
-    if (typeof (((error || {}).data || {}).message || {}).msg === 'string'){
+    }
+    if (typeof (((error || {}).data || {}).message || {}).msg === 'string') {
       return error.data.message.msg;
-    };
-    if (typeof ((error || {}).data || {}).data === 'string'){
+    }
+    if (typeof ((error || {}).data || {}).data === 'string') {
       return error.data.data;
-    };
-    if (typeof error.message === 'string'){
+    }
+    if (typeof error.message === 'string') {
       return error.message;
-    };
-    if (((error || {}).message || {}).msg){
+    }
+    if (((error || {}).message || {}).msg) {
       return error.message.msg;
-    };
-    if (typeof error === 'string'){
-      return error
-    };
-    if (typeof error === 'object' && error !== null){
-      return JSON.stringify(error)
-    };
+    }
+    if (typeof error === 'string') {
+      return error;
+    }
+    if (typeof error === 'object' && error !== null) {
+      return JSON.stringify(error);
+    }
     return error || 'Unexpected error';
   }
 
@@ -129,7 +136,7 @@ export class ErrorHandler {
    * @param {boolean} [params.warning=false] If true, the toast is yellow
    * @param {boolean} [params.silent=false] If true, no message is shown
    */
-  static handle(error, location, params = {warning: false, silent: false}) {
+  static handle(error, location, params = { warning: false, silent: false }) {
     const message = ErrorHandler.extractMessage(error);
     const messageIsString = typeof message === 'string';
     if (messageIsString && message.includes('ERROR3099')) {
@@ -142,17 +149,17 @@ export class ErrorHandler {
     const origin = ((error || {}).config || {}).url || '';
     const originIsString = typeof origin === 'string' && origin.length;
 
-    if (wzMisc.getBlankScr()){
-      params.silent = true
-    };
+    if (wzMisc.getBlankScr()) {
+      params.silent = true;
+    }
 
     const hasOrigin = messageIsString && originIsString;
 
     let text = hasOrigin ? `${message} (${origin})` : message;
 
-    if (error.extraMessage){
-      text = error.extraMessage
-    };
+    if (error.extraMessage) {
+      text = error.extraMessage;
+    }
 
     text = location ? `${location}. ${text}` : text;
 
@@ -172,9 +179,7 @@ export class ErrorHandler {
     if (!params.silent && !recentlyShown) {
       if (
         params.warning ||
-        (text &&
-          typeof text === 'string' &&
-          text.toLowerCase().includes('no results'))
+        (text && typeof text === 'string' && text.toLowerCase().includes('no results'))
       ) {
         getToasts().addWarning(text);
       } else {
@@ -183,4 +188,4 @@ export class ErrorHandler {
     }
     return text;
   }
-};
+}
