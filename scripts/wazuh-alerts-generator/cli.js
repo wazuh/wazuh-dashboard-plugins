@@ -426,7 +426,7 @@ node ${cliFilePath} --module-aws --module-github --size 5000 > output.ndjson
       configuration,
     );
   } catch (error) {
-    console.error(`An inexpected error: ${error}`);
+    console.error(`An unexpected error: ${error}`);
     process.exit(1);
   }
 })();
