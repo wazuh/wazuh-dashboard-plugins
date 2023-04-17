@@ -141,8 +141,8 @@ export class SavedObject {
       if (error && error.response && error.response.status == 404) return false;
       return Promise.reject(
         ((error || {}).data || {}).message || false
-          ? error.data.message
-          : error.message || `Error getting the '${patternID}' index pattern`
+          ? new Error(error.data.message)
+          : new Error(error.message || `Error getting the '${patternID}' index pattern`)
       );
     }
   }
@@ -161,9 +161,7 @@ export class SavedObject {
 
       return result;
     } catch (error) {
-      throw ((error || {}).data || {}).message || false
-        ? error.data.message
-        : error.message || error;
+      throw ((error || {}).data || {}).message || false ? new Error(error.data.message) : error;
     }
   }
 
@@ -183,9 +181,7 @@ export class SavedObject {
         }
       );
     } catch (error) {
-      throw ((error || {}).data || {}).message || false
-        ? error.data.message
-        : error.message || error;
+      throw ((error || {}).data || {}).message || false ? new Error(error.data.message) : error;
     }
   }
 
