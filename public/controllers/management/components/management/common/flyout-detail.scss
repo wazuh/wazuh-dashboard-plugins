@@ -1,0 +1,17 @@
+.wz-decoders-flyout,
+.wz-ruleset-flyout {
+  .flyout-header {
+    padding-right: 42px;
+  }
+
+  .euiAccordion__button {
+    margin-top: 8px;
+  }
+
+  .euiFlyoutBody__overflow {
+    padding-top: 3px;
+  }
+  .euiAccordion__children-isLoading {
+    line-height: inherit;
+  }
+}

@@ -267,9 +267,17 @@ class AgentsWelcome extends Component {
               <span style={{ display: 'inline-flex' }}>
                 <EuiTitle size="s">
                   <h1>
-                    <WzTextWithTooltipIfTruncated position='top' elementStyle={{ maxWidth: "150px" }}>
+                    {this.state.widthWindow >= 768?(
+                      <WzTextWithTooltipIfTruncated position='top' elementStyle={{ maxWidth: "150px" }}>
                       {this.props.agent.name}
-                    </WzTextWithTooltipIfTruncated>
+                      </WzTextWithTooltipIfTruncated>
+                    ):
+                    (
+                      <WzTextWithTooltipIfTruncated position='top'>
+                      {this.props.agent.name}
+                      </WzTextWithTooltipIfTruncated>
+                    )
+                    }
                   </h1>
                 </EuiTitle>
               </span>
@@ -308,7 +316,7 @@ class AgentsWelcome extends Component {
                 </EuiPopover>
               </EuiFlexItem>
               }
-              <EuiFlexItem></EuiFlexItem>
+              <EuiFlexItem className="wz-agent-empty-item"></EuiFlexItem>
               <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
                 <EuiButtonEmpty
                   iconType="inspect"
@@ -483,7 +491,7 @@ class AgentsWelcome extends Component {
             </EuiFlexItem>
           </EuiFlexGroup>
           <EuiSpacer size="s" />
-          <div style={{ height: this.props.resultState !== 'loading' ? '225px' : 0 }}>
+          <div style={{ height: this.props.resultState !== 'loading' ? '350px' : 0 }}>
             <WzReduxProvider>
               <KibanaVis
                 visID={'Wazuh-App-Agents-Welcome-Events-Evolution'}
@@ -536,28 +544,25 @@ class AgentsWelcome extends Component {
 
     return (
       <div className="wz-module wz-module-welcome">
-        <div className='wz-module-header-agent-wrapper'>
-          <div className='wz-module-header-agent wz-module-header-agent-main'>
+        <div className='wz-module-header-agent wz-module-header-agent-wrapper'>
+          <div className='wz-module-header-agent-main'>
             {title}
           </div>
         </div>
-        <div>
-          <div className='wz-module-header-nav-wrapper'>
-            <div className='wz-module-header-nav'>
-              <div style={{ margin: '0 16px' }}>
-                <EuiPanel grow paddingSize='s' className="wz-welcome-page-agent-info">
-                  <AgentInfo agent={this.props.agent} isCondensed={false} hideActions={true} {...this.props}></AgentInfo>
-                </EuiPanel>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className='wz-module-body wz-module-agents-padding-responsive'>
+        <div className='wz-module-agent-body wz-module-agents-padding-responsive'>
           <EuiPage>
             <EuiPageBody component="div">
+
+              <div className='wz-module-header-nav'>
+                <div>
+                  <EuiPanel grow paddingSize='s' className="wz-welcome-page-agent-info">
+                    <AgentInfo agent={this.props.agent} isCondensed={false} hideActions={true} {...this.props}></AgentInfo>
+                  </EuiPanel>
+                </div>
+              </div>
               <EuiFlexGroup>
                 <EuiFlexItem />
-                <EuiFlexItem style={{ alignItems: 'flex-end', marginTop: 6, marginBottom: 10 }}> {/* DatePicker */}
+                <EuiFlexItem style={{ alignItems: 'flex-end', marginTop: 10, marginBottom: 10 }}> {/* DatePicker */}
                   <WzDatePicker condensed={true} onTimeChange={() => { }} />
                 </EuiFlexItem>
               </EuiFlexGroup>

@@ -2,6 +2,96 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.4.1 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 01
+
+### Fixed
+
+- Fixed the search in the agent inventory data tables [#5196](https://github.com/wazuh/wazuh-kibana-app/pull/5196)
+- Fixed the `Anomaly and malware detection` link. [#5329](https://github.com/wazuh/wazuh-kibana-app/pull/5329)
+- Fixed the problem that did not allow closing the time picker when the button was clicked again in `Agents` and `Management/Statistics`. [#5341](https://github.com/wazuh/wazuh-kibana-app/pull/5341)
+
+## Wazuh v4.4.0 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 06
+
+### Added
+
+- Added the option to sort by the agent's count in the group table. [#4323](https://github.com/wazuh/wazuh-kibana-app/pull/4323)
+- Added agent synchronization status in the agent module. [#3874](https://github.com/wazuh/wazuh-kibana-app/pull/3874) [#5143](https://github.com/wazuh/wazuh-kibana-app/pull/5143) [#5177](https://github.com/wazuh/wazuh-kibana-app/pull/5177)
+- Added the ability to set the agent name in the installation command. [#4739](https://github.com/wazuh/wazuh-kibana-app/pull/4739)
+- Added validation to the plugin's settings [#4503](https://github.com/wazuh/wazuh-kibana-app/pull/4503)[#4785](https://github.com/wazuh/wazuh-kibana-app/pull/4785)
+- Added new settings to customize the header and footer on the PDF reports [#4505](https://github.com/wazuh/wazuh-kibana-app/pull/4505)[#4798](https://github.com/wazuh/wazuh-kibana-app/pull/4798)[#4805](https://github.com/wazuh/wazuh-kibana-app/pull/4805)
+- Added a new setting to enable or disable the customization [#4507](https://github.com/wazuh/wazuh-kibana-app/pull/4507)
+- Added the ability to upload an image for the `customization.logo.*` settings in `Settings/Configuration` [#4504](https://github.com/wazuh/wazuh-kibana-app/pull/4504)
+- Added macOS support to the 'Deploy new agent' section [#4867](https://github.com/wazuh/wazuh-kibana-app/pull/4867)
+- Added PowerPC architecture support for redhat7, in the 'Deploy new agent' section. [#4833](https://github.com/wazuh/wazuh-kibana-app/pull/4833)
+- Added a centralized service to handle the requests [#4831](https://github.com/wazuh/wazuh-kibana-app/pull/4831)
+- Added data-test-subj property to the create-policy component [#4873](https://github.com/wazuh/wazuh-kibana-app/pull/4873)
+- Added a link for additional steps to enroll agents on Alpine Linux in the 'Deploy new agent' section. [#4933](https://github.com/wazuh/wazuh-kibana-app/pull/4933)
+- Added extra steps message and new command for Windows XP and Windows Server 2008, added alpine agent with all its steps. [#4933](https://github.com/wazuh/wazuh-kibana-app/pull/4933)
+- Added file saving conditions in File Editor [#4970](https://github.com/wazuh/wazuh-kibana-app/pull/4970)
+- Added character validation to avoid invalid agent names in the 'Deploy new agent' section. [#5021](https://github.com/wazuh/wazuh-kibana-app/pull/5021) [#5028](https://github.com/wazuh/wazuh-kibana-app/pull/5028)
+- Added default selected options in the 'Deploy new agent' section [#5063](https://github.com/wazuh/wazuh-kibana-app/pull/5063)
+- Added suggestions for cluster's node and protocol to use for agent enrollment in the 'Deploy new agent' section. [#4776](https://github.com/wazuh/wazuh-kibana-app/pull/4776) [#4954](https://github.com/wazuh/wazuh-kibana-app/pull/4954) [#5166](https://github.com/wazuh/wazuh-kibana-app/pull/5166)
+- Redesign the SCA table of the agent's dashboard [#4512](https://github.com/wazuh/wazuh-kibana-app/pull/4512)
+
+### Changed
+
+- Changed the HTTP verb from `GET` to `POST` in the requests to log in to the Wazuh API [#4103](https://github.com/wazuh/wazuh-kibana-app/pull/4103)
+- Changed the endpoint that updates the plugin configuration to support updating multiple settings at once. [#4501](https://github.com/wazuh/wazuh-kibana-app/pull/4501)
+- Improved alerts summary performance [#4376](https://github.com/wazuh/wazuh-kibana-app/pull/4376) [#5071](https://github.com/wazuh/wazuh-kibana-app/pull/5071) [#5131](https://github.com/wazuh/wazuh-kibana-app/pull/5131)
+- Improved the setting's description for the plugin displayed in the UI and the configuration file. [#4501](https://github.com/wazuh/wazuh-kibana-app/pull/4501)
+- Improved `Agents Overview` performance [#4363](https://github.com/wazuh/wazuh-kibana-app/pull/4363) [#5076](https://github.com/wazuh/wazuh-kibana-app/pull/5076)
+- Improved the message displayed when there is a versions mismatch between the Wazuh API and the Wazuh app [#4529](https://github.com/wazuh/wazuh-kibana-app/pull/4529) [#4964](https://github.com/wazuh/wazuh-kibana-app/pull/4964)
+- Updated operating systems' information in the 'Deploy new agent' section. [#4851](https://github.com/wazuh/wazuh-kibana-app/pull/4851)
+- Updated and unified the fetching and rendering of the SCA checks results due to changes in the Wazuh API [#5031](https://github.com/wazuh/wazuh-kibana-app/pull/5031)
+- Updated the `Agent details` component to the changes in the Wazuh API response. [#3874](https://github.com/wazuh/wazuh-kibana-app/pull/3874)
+- Updated the `Last vulnerability scan` component to the changes in the Wazuh API response [#4975](https://github.com/wazuh/wazuh-kibana-app/pull/4975)
+- Updated the `winston` dependency to `3.5.1` [#4985](https://github.com/wazuh/wazuh-kibana-app/pull/4985)
+- Updated the `mocha` dependency to `10.1.0` [#5062](https://github.com/wazuh/wazuh-kibana-app/pull/5062)
+- Updated the `pdfmake` dependency to `0.2.7` [#5062](https://github.com/wazuh/wazuh-kibana-app/pull/5062)
+- The button to export the app logs is now disabled when there are no results, instead of showing an error toast [#4992](https://github.com/wazuh/wazuh-kibana-app/pull/4992)
+- Independently load each dashboard from the `Agents Overview` page [#4363](https://github.com/wazuh/wazuh-kibana-app/pull/4363)
+
+### Fixed
+
+- Fixed nested fields filtering in dashboards tables and KPIs [#4425](https://github.com/wazuh/wazuh-kibana-app/pull/4425)
+- Fixed nested field rendering in security alerts table details [#4428](https://github.com/wazuh/wazuh-kibana-app/pull/4428)
+- Fixed a bug where the Wazuh logo was used instead of the custom one [#4539](https://github.com/wazuh/wazuh-kibana-app/pull/4539)
+- Fixed rendering problems of the `Agent Overview` section in low resolutions [#4516](https://github.com/wazuh/wazuh-kibana-app/pull/4516)
+- Fixed issue when logging out from Wazuh when SAML is enabled [#4595](https://github.com/wazuh/wazuh-kibana-app/issues/4595)
+- Fixed server errors with code 500 when the Wazuh API is not reachable / up. [#4710](https://github.com/wazuh/wazuh-kibana-app/pull/4710) [#4728](https://github.com/wazuh/wazuh-kibana-app/pull/4728) [#4971](https://github.com/wazuh/wazuh-kibana-app/pull/4971)
+- Fixed pagination to SCA table [#4653](https://github.com/wazuh/wazuh-kibana-app/issues/4653) [#5010](https://github.com/wazuh/wazuh-kibana-app/pull/5010)
+- Fixed `WAZUH_PROTOCOL` suggestion in the 'Deploy new agent' section. [#4849](https://github.com/wazuh/wazuh-kibana-app/pull/4849)
+- Fixed agent deployment instructions for HP-UX and Solaris. [#4943](https://github.com/wazuh/wazuh-kibana-app/pull/4943)
+- Fixed a bug that caused the flyouts to close when clicking inside them [#4638](https://github.com/wazuh/wazuh-kibana-app/pull/4638) [#5046](https://github.com/wazuh/wazuh-kibana-app/pull/5046)
+- Fixed the manager option in the 'Deploy new agent' section [#4981](https://github.com/wazuh/wazuh-kibana-app/pull/4981)
+- Fixed Inventory checks table filters by stats [#4999](https://github.com/wazuh/wazuh-kibana-app/pull/4999) [#5031](https://github.com/wazuh/wazuh-kibana-app/pull/5031)
+- Fixed commands in the 'Deploy new agent' section (most of the commands are missing '-1') [#4962](https://github.com/wazuh/wazuh-kibana-app/pull/4962)
+- Fixed agent installation command for macOS in the 'Deploy new agent' section. [#4968](https://github.com/wazuh/wazuh-kibana-app/pull/4968)
+- Fixed agent evolution chart [#4942](https://github.com/wazuh/wazuh-kibana-app/pull/4942)
+- Fixed Solaris command [#5035](https://github.com/wazuh/wazuh-kibana-app/pull/5035)
+- Fixed commands: AIX, OpenSUSE, Alpine, Suse11, Fedora, HP, Oracle Linux 5, Amazon Linux 2, CentOS5. Changed the word 'or higher' in buttons to '+'. Fixed validations for HP, Solaris and Alpine. [#5045](https://github.com/wazuh/wazuh-kibana-app/pull/5045)
+- Fixed error in GitHub module PDF report. [#5069](https://github.com/wazuh/wazuh-kibana-app/pull/5069)
+- Fixed password input in 'Deploy new agent' section [#5098](https://github.com/wazuh/wazuh-kibana-app/pull/5098)
+- Fixed error when clicking on the selectors of agents in the group agents management [#5094](https://github.com/wazuh/wazuh-kibana-app/pull/5094)
+- Fixed menu content panel is displayed in the wrong place. [5092](https://github.com/wazuh/wazuh-kibana-app/pull/5092)
+- Fixed greyed and disabled menu section names [#5101](https://github.com/wazuh/wazuh-kibana-app/pull/5101)
+- Fixed misspelling in the NIST module [#5107](https://github.com/wazuh/wazuh-kibana-app/pull/5107)
+- Fixed Statistic cronjob bulk document insert [#5150](https://github.com/wazuh/wazuh-kibana-app/pull/5150)
+- Fixed the style of the buttons showing more event information in the event view table. [#5137](https://github.com/wazuh/wazuh-kibana-app/pull/5137)
+- Fixed Inventory module for Solaris agents [#5144](https://github.com/wazuh/wazuh-kibana-app/pull/5144)
+- Fixed the module information button in Office 365 and GitHub Panel tab to open the nav drawer. [#5167](https://github.com/wazuh/wazuh-kibana-app/pull/5167)
+- Fixed a UI crash due to `external_references` field could be missing in some vulnerability data [#5200](https://github.com/wazuh/wazuh-kibana-app/pull/5200)
+- Fixed Wazuh main menu not displayed when navigation menu is locked [#5273](https://github.com/wazuh/wazuh-kibana-app/pull/5273)
+- Fixed 'Deploy new agent' section which used wrong secure connection property [#5285](https://github.com/wazuh/wazuh-kibana-app/pull/5285) [#5295](https://github.com/wazuh/wazuh-kibana-app/pull/5295)
+- Disabled unmapped fields filter in `Security Events` alerts table [#4929](https://github.com/wazuh/wazuh-kibana-app/pull/4929)
+- Raspbian OS, Ubuntu, Amazon Linux and Amazon Linux 2 commands in the 'Deploy new agent' section now change when a different architecture is selected [#4876](https://github.com/wazuh/wazuh-kibana-app/pull/4876) [#4880](https://github.com/wazuh/wazuh-kibana-app/pull/4880)
+
+### Removed
+
+- Removed unused file related to agent menu [#5102](https://github.com/wazuh/wazuh-kibana-app/pull/5102)
+- Removed the `angular-chart.js` dependency [#4985](https://github.com/wazuh/wazuh-kibana-app/pull/4985)
+- Removed the `pug-loader` dependency [#5062](https://github.com/wazuh/wazuh-kibana-app/pull/5062) [#5089](https://github.com/wazuh/wazuh-kibana-app/pull/5089)
+
 ## Wazuh v4.3.10 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4311
 
 ### Fixed
@@ -24,7 +114,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
-- Wazuh.yml review: fixed link to web documentation, improved in-file documentation and fixed some grammatical errors. [#4378](https://github.com/wazuh/wazuh-kibana-app/pull/4378) [#4399](https://github.com/wazuh/wazuh-kibana-app/pull/4399) 
+- Wazuh.yml review: fixed link to web documentation, improved in-file documentation and fixed some grammatical errors. [#4378](https://github.com/wazuh/wazuh-kibana-app/pull/4378) [#4399](https://github.com/wazuh/wazuh-kibana-app/pull/4399)
 - Fixed an error during the generation of a group's report, if the request to the Wazuh API fails [#4350](https://github.com/wazuh/wazuh-kibana-app/pull/4350)
 - Fixed a problem with the group's report, when the group has no agents [#4350](https://github.com/wazuh/wazuh-kibana-app/pull/4350)
 - Fixed path in logo customization section [#4352](https://github.com/wazuh/wazuh-kibana-app/pull/4352)
@@ -183,6 +273,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Run `template` and `fields` checks in the health check depends on the app configuration [#3783](https://github.com/wazuh/wazuh-kibana-app/pull/3783)
 - Added a toast message when there is an error creating a new group [#3804](https://github.com/wazuh/wazuh-kibana-app/pull/3804)
 - Added a step to start the agent to the deploy new Windowns agent guide [#3846](https://github.com/wazuh/wazuh-kibana-app/pull/3846)
+- Added agents windows events config tab [#3905](https://github.com/wazuh/wazuh-kibana-app/pull/3905)
 - Added 3 new panels to `Vulnerabilities/Inventory` [#3893](https://github.com/wazuh/wazuh-kibana-app/pull/3893)
 - Added new fields of `Vulnerabilities` to the details flyout [#3893](https://github.com/wazuh/wazuh-kibana-app/pull/3893) [#3908](https://github.com/wazuh/wazuh-kibana-app/pull/3908)
 - Added missing fields used in visualizations to the known fiels related to alerts [#3924](https://github.com/wazuh/wazuh-kibana-app/pull/3924)

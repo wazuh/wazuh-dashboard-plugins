@@ -14,8 +14,8 @@ import { webDocumentationLink } from "../../../../../../../common/services/web_d
 
 export default [
   {
-    text: 'Anomaly and malware detection',
-    href: webDocumentationLink('user-manual/capabilities/anomalies-detection/index.html')
+    text: 'Malware detection',
+    href: webDocumentationLink('user-manual/capabilities/malware-detection/index.html')
   },
   {
     text: 'Monitoring security policies',

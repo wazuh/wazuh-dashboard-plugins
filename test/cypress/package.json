@@ -1,0 +1,52 @@
+{
+  "name": "wazuh-kibana-app-automation",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "npx cypress open ",
+    "start:xpack": "npx cypress open --config baseUrl=https://localhost:5601/ --env type=xpack",
+    "start:basic": "npx cypress open --config baseUrl=http://localhost:5601/ --env type=basic",
+    "start:odfe": "npx cypress open --config baseUrl=http://localhost:5601/ --env type=odfe",
+    "start:wzd": "npx cypress open --config baseUrl=https://localhost:5601/ --env type=wzd",
+    "cy:install": "npx cypress install --force",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "cypress:run-headless": "cypress run --headless --browser chrome",
+    "cypress:run-headless:github-actions:xpack": "cypress-tags run -e TAGS=\"@actions\" --headless --browser chrome --config baseUrl=https://kibana:5601/ --env type=xpack -e TAGS=\"@actions\"",
+    "cypress:run-headless:github-actions:basic": "cypress-tags run -e TAGS=\"@actions\" --headless --browser chrome --config baseUrl=http://kibana:5601/ --env type=basic -e TAGS=\"@actions\"",
+    "cypress:run-headless:github-actions:odfe": "cypress-tags run -e TAGS=\"@actions\" --headless --browser chrome --config baseUrl=http://kibana:5601/ --env type=odfe -e TAGS=\"@actions\"",
+    "cypress:run-headless:github-actions:wzd": "cypress-tags run -e TAGS=\"@actions\" --headless --browser chrome --config baseUrl=https://wazuh.dashboard:5601/ --env type=wzd -e TAGS=\"@actions\"",
+    "cypress:run-headless:xpack": "cypress run --headless --browser chrome --config baseUrl=https://localhost:5601/ --env type=xpack",
+    "cypress:run-headless:basic": "cypress run --headless --browser chrome --config baseUrl=http://localhost:5601/ --env type=basic",
+    "cypress:run-headless:odfe": "cypress run --headless --browser chrome --config baseUrl=http://localhost:5601/ --env type=odfe",
+    "cypress:run-headless:wzd": "cypress run --headless --browser chrome --config baseUrl=https://localhost:5601/ --env type=wzd",
+    "cypress:run": "cypress run --headed --browser chrome",
+    "merge": "mochawesome-merge cypress/report/mochawesome-report/*.json > cypress/report/output.json",
+    "generate_mochawesome_report": "marge cypress/report/output.json --reportDir ./cypress/report --inline",
+    "cypress:report": "mochawesome-merge cypress/report/mochawesome-report/*.json > cypress/report/output.json && marge cypress/report/output.json --reportDir ./cypress/report --inline",
+    "delete:reports": "rm -r cypress/report/* || true"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cosmiconfig": "^4.0.0",
+    "mocha": "^10.1.0",
+    "prettier": "^2.3.0"
+  },
+  "devDependencies": {
+    "cypress": "^9.5.2",
+    "cypress-cucumber-preprocessor": "^4.0.3",
+    "cypress-real-events": "^1.7.1",
+    "cypress-xpath": "^1.6.2",
+    "eslint-plugin-cypress": "^2.11.3",
+    "mochawesome": "^7.1.3",
+    "mochawesome-merge": "^4.2.0"
+  },
+  "cypress-cucumber-preprocessor": {
+    "nonGlobalStepDefinitions": false,
+    "step_definitions": "cypress/integration/step-definitions/**/"
+  },
+  "engines": {
+    "node": "17.3.0"
+  }
+}

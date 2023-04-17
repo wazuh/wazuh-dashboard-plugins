@@ -10,14 +10,13 @@
  * Find more information about this on the LICENSE file.
  */
 
-import axios from 'axios';
 import { AppState } from './app-state';
 import { WazuhConfig } from './wazuh-config';
 import { ApiCheck } from './wz-api-check';
 import { WzMisc } from '../factories/misc';
-import { OdfeUtils } from '../utils';
 import { getHttp, getDataPlugin } from '../kibana-services';
 import { PLUGIN_PLATFORM_REQUEST_HEADERS } from '../../common/constants';
+import { request } from '../services/request-handler';
 
 export class GenericRequest {
   static async request(method, path, payload = null, returnError = false) {
@@ -81,7 +80,7 @@ export class GenericRequest {
         };
       }
 
-      Object.assign(data, await axios(options));
+      Object.assign(data, await request(options));
       if (!data) {
         throw new Error(
           `Error doing a request to ${tmpUrl}, method: ${method}.`
@@ -90,7 +89,6 @@ export class GenericRequest {
 
       return data;
     } catch (err) {
-      OdfeUtils.checkOdfeSessionExpired(err);
       //if the requests fails, we need to check if the API is down
       const currentApi = JSON.parse(AppState.getCurrentAPI() || '{}');
       if (currentApi && currentApi.id) {

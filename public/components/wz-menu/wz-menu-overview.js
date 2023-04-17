@@ -331,7 +331,6 @@ class WzMenuOverview extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.rulesetReducers,
     currentAgentData: state.appStateReducers.currentAgentData,
     currentTab: state.appStateReducers.currentTab
   };

@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import { Base } from './base-query';
-import { WAZUH_ALERTS_PATTERN } from '../../../common/constants';
+import { getSettingDefaultValue } from '../../../common/services/settings';
 
   /**
    * Returns top 5 TSC requirements
@@ -25,7 +25,8 @@ export const topTSCRequirements = async (
   gte,
   lte,
   filters,
-  pattern = WAZUH_ALERTS_PATTERN
+  allowedAgentsFilter,
+  pattern = getSettingDefaultValue('pattern')
 ) => {
   if (filters.includes('rule.tsc: exists')) {
     filters = filters.replace('AND rule.tsc: exists', '');
@@ -34,7 +35,7 @@ export const topTSCRequirements = async (
   try {
     const base = {};
 
-    Object.assign(base, Base(pattern, filters, gte, lte));
+    Object.assign(base, Base(pattern, filters, gte, lte, allowedAgentsFilter));
 
     Object.assign(base.aggs, {
       '2': {
@@ -95,8 +96,9 @@ export const getRulesByRequirement = async (
   gte,
   lte,
   filters,
+  allowedAgentsFilter,
   requirement,
-  pattern = WAZUH_ALERTS_PATTERN
+  pattern = getSettingDefaultValue('pattern')
 ) => {
   if (filters.includes('rule.tsc: exists')) {
     filters = filters.replace('AND rule.tsc: exists', '');
@@ -105,7 +107,7 @@ export const getRulesByRequirement = async (
   try {
     const base = {};
 
-    Object.assign(base, Base(pattern, filters, gte, lte));
+    Object.assign(base, Base(pattern, filters, gte, lte, allowedAgentsFilter));
 
     Object.assign(base.aggs, {
       '2': {

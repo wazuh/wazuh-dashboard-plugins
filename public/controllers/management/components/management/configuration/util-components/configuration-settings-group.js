@@ -62,7 +62,11 @@ class WzSettingsGroup extends Component {
                 <WzConfigurationSetting
                   key={keyItem}
                   keyItem={keyItem}
-                  label={item.label}
+                  label={
+                    item.renderLabel
+                    ? item.renderLabel(value, item, config)
+                    : item.label
+                  }
                   value={
                     item.render
                       ? item.render(value)

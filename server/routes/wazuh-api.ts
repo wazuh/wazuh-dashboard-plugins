@@ -153,4 +153,13 @@ export function WazuhApiRoutes(router: IRouter) {
   },
     async (context, request, response) => ctrl.isWazuhDisabled(context, request, response)
   );
+
+  // Return app logos configuration
+  router.get({
+    path: '/api/logos',
+    validate: false,
+    options: { authRequired: false }
+  },
+    async (context, request, response) => ctrl.getAppLogos(context, request, response)
+  );
 }

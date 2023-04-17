@@ -1,4 +1,0 @@
-<div ng-cloak flex="auto" ng-controller="agentsPreviewController as ctrl" layout="column">
-    <div class="md-padding md-padding-top-16" ng-show="ctrl.init || ctrl.loading">
-        <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" ></react-component>
-    </div>

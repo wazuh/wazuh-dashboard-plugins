@@ -45,6 +45,7 @@
   display: flex;
   align-items: baseline;
   margin: 15px 0px;
+  flex-wrap: wrap;
 }
 
 .columnsSelectedCheckboxs div {
@@ -95,5 +96,11 @@
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+  }
+}
+
+.agents-status-pie {
+  .euiListGroupItem__label{
+    white-space: normal;
   }
 }

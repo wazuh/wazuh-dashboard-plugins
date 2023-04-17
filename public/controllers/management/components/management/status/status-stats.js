@@ -44,8 +44,16 @@ export class WzStatusStats extends Component {
     this._isMounted = false;
   }
 
-  render() {
+  getTitle(status) {
     const { stats } = this.props.state;
+    const metric = {
+      [status]: stats?.agentsCount?.[status],
+      coverage: `${stats?.agentsCoverage}%`,
+    };
+    return metric[status];
+  }
+
+  render() {
 
     return (
       <div>
@@ -54,7 +62,7 @@ export class WzStatusStats extends Component {
           {this.agentStatus.map(({color, description, status}) => (
             <EuiFlexItem key={`agent-status-${status}`}>
               <EuiStat
-                title={status === 'coverage' ? `${stats?.agentsCoverage}%` : stats?.agentsCount?.[status]}
+                title={this.getTitle(status)}
                 description={description}
                 titleColor={color}
                 textAlign="center"

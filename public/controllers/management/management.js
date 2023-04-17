@@ -16,9 +16,9 @@ import { WzRequest } from '../../react-services/wz-request';
 import { ErrorHandler } from '../../react-services/error-handler';
 import { ShareAgent } from '../../factories/share-agent';
 import {
-  RulesetHandler,
-  RulesetResources,
-} from './components/management/ruleset/utils/ruleset-handler';
+  ResourcesHandler,
+  ResourcesConstants
+} from './components/management/common/resources-handler';
 
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../common/constants';
@@ -47,7 +47,7 @@ export class ManagementController {
     this.currentGroup = false;
     this.logtestOpened = false;
     this.uploadOpened = false;
-    this.rulesetTab = RulesetResources.RULES;
+    this.rulesetTab = ResourcesConstants.RULES;
 
     this.$scope.$on('setCurrentGroup', (ev, params) => {
       this.currentGroup = (params || {}).currentGroup || false;
@@ -490,12 +490,12 @@ export class ManagementController {
     try {
       this.errors = false;
       this.results = [];
-      const rulesetHandler = new RulesetHandler(resource);
+      const resourcesHandler = new ResourcesHandler(resource);
 
       for (let idx in files) {
         const { file, content } = files[idx];
         try {
-          await rulesetHandler.updateFile(file, content, true); // True does not overwrite the file
+          await resourcesHandler.updateFile(file, content, true); // True does not overwrite the file
           this.results.push({
             index: idx,
             uploaded: true,

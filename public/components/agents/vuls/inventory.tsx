@@ -25,21 +25,36 @@ import {
   euiPaletteColorBlind,
 } from '@elastic/eui';
 import { EuiPalette } from '@elastic/eui/src/services/color/eui_palettes';
-import {
-  InventoryTable,
-} from './inventory/';
-import {
-  getLastScan, getAggregation
-} from './inventory/lib';
+import { InventoryTable } from './inventory/';
+import { getLastScan, getAggregation } from './inventory/lib';
 import { ICustomBadges } from '../../wz-search-bar/components';
-import { formatUIDate } from '../../../react-services';
-import { VisualizationBasicWidgetSelector, VisualizationBasicWidget  } from '../../common/charts/visualizations/basic';
+import {
+  VisualizationBasicWidgetSelector,
+  VisualizationBasicWidget,
+} from '../../common/charts/visualizations/basic';
 import { WzStat } from '../../wz-stat';
+import { beautifyDate } from './inventory/lib';
 
-interface Aggregation { title: number, description: string, titleColor: string }
-interface pieStats { id: string, label: string, value: number }
-interface LastScan { last_full_scan: string, last_partial_scan: string }
-interface TitleColors { Critical: string, High: string, Medium: string, Low: string }
+interface Aggregation {
+  title: number;
+  description: string;
+  titleColor: string;
+}
+interface pieStats {
+  id: string;
+  label: string;
+  value: number;
+}
+interface LastScan {
+  last_full_scan: string;
+  last_partial_scan: string;
+}
+interface TitleColors {
+  Critical: string;
+  High: string;
+  Medium: string;
+  Low: string;
+}
 
 export class Inventory extends Component {
   _isMount = false;
@@ -48,13 +63,18 @@ export class Inventory extends Component {
     isLoading: boolean;
     isLoadingStats: boolean;
     customBadges: ICustomBadges[];
-    stats: Aggregation[],
-    severityPieStats: pieStats[],
-    vulnerabilityLastScan: LastScan,
+    stats: Aggregation[];
+    severityPieStats: pieStats[];
+    vulnerabilityLastScan: LastScan;
   };
   props: any;
   colorsVisualizationVulnerabilitiesSummaryData: EuiPalette;
-  titleColors: TitleColors = { Critical: '#BD271E', High: '#d5a612', Medium: '#006BB4', Low: '#6a717d' };
+  titleColors: TitleColors = {
+    Critical: '#BD271E',
+    High: '#d5a612',
+    Medium: '#006BB4',
+    Low: '#6a717d',
+  };
 
   constructor(props) {
     super(props);
@@ -72,13 +92,18 @@ export class Inventory extends Component {
       severityPieStats: [],
       vulnerabilityLastScan: {
         last_full_scan: '',
-        last_partial_scan: ''
+        last_partial_scan: '',
       },
-    }
-    this.fetchVisualizationVulnerabilitiesSummaryData = this.fetchVisualizationVulnerabilitiesSummaryData.bind(this);
-    this.fetchVisualizationVulnerabilitiesSeverityData = this.fetchVisualizationVulnerabilitiesSeverityData.bind(this);
+    };
+    this.fetchVisualizationVulnerabilitiesSummaryData = this.fetchVisualizationVulnerabilitiesSummaryData.bind(
+      this
+    );
+    this.fetchVisualizationVulnerabilitiesSeverityData = this.fetchVisualizationVulnerabilitiesSeverityData.bind(
+      this
+    );
     this.colorsVisualizationVulnerabilitiesSummaryData = euiPaletteColorBlind();
   }
+
 
   async componentDidMount() {
     this._isMount = true;
@@ -91,15 +116,17 @@ export class Inventory extends Component {
 
   async fetchVisualizationVulnerabilitiesSummaryData(field, agentID) {
     const results = await getAggregation(agentID, field, 4);
-    return Object.entries(results[field]).map(([key, value], index) => ({
-      label: key,
-      value,
-      color: this.colorsVisualizationVulnerabilitiesSummaryData[index],
-      onClick: () => this.onFiltersChange(this.buildFilterQuery(field, key))
-    })).sort((firstElement, secondElement) => secondElement.value - firstElement.value)
+    return Object.entries(results[field])
+      .map(([key, value], index) => ({
+        label: key,
+        value,
+        color: this.colorsVisualizationVulnerabilitiesSummaryData[index],
+        onClick: () => this.onFiltersChange(this.buildFilterQuery(field, key)),
+      }))
+      .sort((firstElement, secondElement) => secondElement.value - firstElement.value);
   }
 
-  async fetchVisualizationVulnerabilitiesSeverityData(){
+  async fetchVisualizationVulnerabilitiesSeverityData() {
     const { id } = this.props.agent;
     const FIELD = 'severity';
     const SEVERITY_KEYS = ['Critical', 'High', 'Medium', 'Low'];
@@ -108,24 +135,26 @@ export class Inventory extends Component {
     const vulnerabilityLastScan = await getLastScan(id);
     const { severity } = await getAggregation(id, FIELD);
 
-    const severityStats = SEVERITY_KEYS.map(key => ({ 
+    const severityStats = SEVERITY_KEYS.map((key) => ({
       titleColor: this.titleColors[key],
       description: key,
-      title: severity[key] ? severity[key] : 0
+      title: severity[key] ? severity[key] : 0,
     }));
 
     this.setState({
       stats: severityStats,
       isLoadingStats: false,
-      vulnerabilityLastScan
+      vulnerabilityLastScan,
     });
-    
-    return Object.keys(severity).length ? SEVERITY_KEYS.map(key => ({
-      label: key,
-      value: severity[key] ? severity[key] : 0,
-      color: this.titleColors[key],
-      onClick: () => this.onFiltersChange(this.buildFilterQuery(FIELD, key))
-    })) : [];
+
+    return Object.keys(severity).length
+      ? SEVERITY_KEYS.map((key) => ({
+          label: key,
+          value: severity[key] ? severity[key] : 0,
+          color: this.titleColors[key],
+          onClick: () => this.onFiltersChange(this.buildFilterQuery(FIELD, key)),
+        }))
+      : [];
   }
 
   buildFilterQuery(field = '', selectedItem = '') {
@@ -134,61 +163,50 @@ export class Inventory extends Component {
         field: 'q',
         value: `${field}=${selectedItem}`,
       },
-    ]
+    ];
   }
 
   async loadAgent() {
     if (this._isMount) {
       this.setState({
-        isLoading: false
+        isLoading: false,
       });
     }
   }
 
   onFiltersChange = (filters) => {
     this.setState({ filters });
-  }
+  };
 
   renderTable() {
     const { filters } = this.state;
     return (
       <div>
-        <InventoryTable
-          {...this.props}
-          filters={filters}
-          onFiltersChange={this.onFiltersChange}
-        />
+        <InventoryTable {...this.props} filters={filters} onFiltersChange={this.onFiltersChange} />
       </div>
-    )
+    );
   }
 
   loadingInventory() {
-    return <EuiPage>
-      <EuiFlexGroup>
-        <EuiFlexItem>
-          <EuiProgress size="xs" color="primary" />
-        </EuiFlexItem>
-      </EuiFlexGroup>
-    </EuiPage>;
-  }
-
-  // This method was created because Wazuh API returns 1970-01-01T00:00:00Z dates or undefined ones
-  // when vulnerability module is not configured
-  // its meant to render nothing when such date is received
-  beautifyDate(date?: string) {
-    return date && !['1970-01-01T00:00:00Z', '-'].includes(date) ? formatUIDate(date) : '-';
+    return (
+      <EuiPage>
+        <EuiFlexGroup>
+          <EuiFlexItem>
+            <EuiProgress size="xs" color="primary" />
+          </EuiFlexItem>
+        </EuiFlexGroup>
+      </EuiPage>
+    );
   }
 
   buildTitleFilter({ description, title, titleColor }) {
     const { isLoadingStats } = this.state;
     return (
-      <EuiFlexItem
-        key={`module_vulnerabilities_inventory_stat_${description}`}
-      >
+      <EuiFlexItem key={`module_vulnerabilities_inventory_stat_${description}`}>
         <EuiStat
-          textAlign='center'
+          textAlign="center"
           isLoading={isLoadingStats}
-          title={(
+          title={
             <EuiToolTip position="top" content={`Filter by Severity`}>
               <span
                 className={'statWithLink wz-user-select-none'}
@@ -198,96 +216,98 @@ export class Inventory extends Component {
                 {title}
               </span>
             </EuiToolTip>
-          )}
+          }
           description={description}
           titleColor={titleColor}
         />
       </EuiFlexItem>
-    )
+    );
   }
 
   render() {
     const { isLoading, stats, vulnerabilityLastScan } = this.state;
     if (isLoading) {
-      return this.loadingInventory()
+      return this.loadingInventory();
     }
-    const last_full_scan = this.beautifyDate(vulnerabilityLastScan.last_full_scan);
-    const last_partial_scan = this.beautifyDate(vulnerabilityLastScan.last_partial_scan);
-    
+    const last_full_scan = beautifyDate(vulnerabilityLastScan.last_full_scan);
+    const last_partial_scan = beautifyDate(vulnerabilityLastScan.last_partial_scan);
+
     const table = this.renderTable();
-    return <EuiPage>
-      <EuiPageBody>
-        <EuiFlexGroup wrap>
-          <EuiFlexItem>
-            <EuiCard title description betaBadgeLabel="Severity" className="wz-euiCard-no-title">
-              <div style={{display: 'flex', alignItems: 'flex-end', height: '100%'}}>
-                <VisualizationBasicWidget
-                  type='donut'
+    return (
+      <EuiPage>
+        <EuiPageBody>
+          <EuiFlexGroup wrap>
+            <EuiFlexItem>
+              <EuiCard title description betaBadgeLabel="Severity" className="wz-euiCard-no-title">
+                <div style={{ display: 'flex', alignItems: 'flex-end', height: '100%' }}>
+                  <VisualizationBasicWidget
+                    type="donut"
+                    size={{ width: '100%', height: '150px' }}
+                    showLegend
+                    onFetch={this.fetchVisualizationVulnerabilitiesSeverityData}
+                    onFetchDependencies={[this.props.agent.id]}
+                    noDataTitle="No results"
+                    noDataMessage="No results were found."
+                  />
+                </div>
+              </EuiCard>
+            </EuiFlexItem>
+            <EuiFlexItem>
+              <EuiCard title description betaBadgeLabel="Details">
+                <EuiFlexGroup alignItems="center" className={'height-full'}>
+                  <EuiFlexItem>
+                    <EuiFlexGroup alignItems="center">
+                      {stats.map((stat) => this.buildTitleFilter(stat))}
+                    </EuiFlexGroup>
+                    <EuiFlexGroup style={{ marginTop: 'auto' }}>
+                      <EuiFlexItem>
+                        <WzStat
+                          title={last_full_scan}
+                          description="Last full scan"
+                          textAlign="center"
+                          titleSize="xs"
+                        />
+                      </EuiFlexItem>
+                      <EuiFlexItem>
+                        <WzStat
+                          title={last_partial_scan}
+                          description="Last partial scan"
+                          textAlign="center"
+                          titleSize="xs"
+                        />
+                      </EuiFlexItem>
+                    </EuiFlexGroup>
+                  </EuiFlexItem>
+                </EuiFlexGroup>
+              </EuiCard>
+            </EuiFlexItem>
+            <EuiFlexItem>
+              <EuiCard title description betaBadgeLabel="Summary" className="wz-euiCard-no-title">
+                <VisualizationBasicWidgetSelector
+                  type="donut"
                   size={{ width: '100%', height: '150px' }}
                   showLegend
-                  onFetch={this.fetchVisualizationVulnerabilitiesSeverityData}
-                  onFetchDependencies={[this.props.agent.id]}
-                  noDataTitle='No results'
-                  noDataMessage='No results were found.'
+                  selectorOptions={[
+                    { value: 'name', text: 'Name' },
+                    { value: 'cve', text: 'CVE' },
+                    { value: 'version', text: 'Version' },
+                    { value: 'cvss2_score', text: 'CVSS2 Score' },
+                    { value: 'cvss3_score', text: 'CVSS3 Score' },
+                  ]}
+                  onFetch={this.fetchVisualizationVulnerabilitiesSummaryData}
+                  onFetchExtraDependencies={[this.props.agent.id]}
+                  noDataTitle="No results"
+                  noDataMessage={(_, optionRequirement) =>
+                    `No ${optionRequirement.text} results were found.`
+                  }
                 />
-              </div>
-            </EuiCard>
-          </EuiFlexItem>
-          <EuiFlexItem>
-            <EuiCard title description betaBadgeLabel="Details">
-              <EuiFlexGroup alignItems="center" className={"height-full"}>
-                <EuiFlexItem>
-                  <EuiFlexGroup alignItems="center">
-                    {stats.map((stat) => this.buildTitleFilter(stat))}
-                  </EuiFlexGroup>
-                  <EuiFlexGroup style={{ marginTop: 'auto' }}>
-                    <EuiFlexItem>
-                      <WzStat
-                        title={last_full_scan}
-                        description="Last full scan"
-                        textAlign='center'
-                        titleSize='xs'
-                      />
-                    </EuiFlexItem>
-                    <EuiFlexItem>
-                      <WzStat
-                        title={last_partial_scan}
-                        description="Last partial scan"
-                        textAlign='center'
-                        titleSize='xs'
-                      />
-                    </EuiFlexItem>
-                  </EuiFlexGroup>
-                </EuiFlexItem>
-              </EuiFlexGroup>
-            </EuiCard>
-          </EuiFlexItem>
-          <EuiFlexItem>
-            <EuiCard title description betaBadgeLabel="Summary" className="wz-euiCard-no-title">
-              <VisualizationBasicWidgetSelector
-                type='donut'
-                size={{ width: '100%', height: '150px' }}
-                showLegend
-                selectorOptions={[
-                  { value: 'name', text: 'Name' },
-                  { value: 'cve', text: 'CVE' },
-                  { value: 'version', text: 'Version' },
-                  { value: 'cvss2_score', text: 'CVSS2 Score' },
-                  { value: 'cvss3_score', text: 'CVSS3 Score' }
-                ]}
-                onFetch={this.fetchVisualizationVulnerabilitiesSummaryData}
-                onFetchExtraDependencies={[this.props.agent.id]}
-                noDataTitle='No results'
-                noDataMessage={(_, optionRequirement) => `No ${optionRequirement.text} results were found.`}
-              />
-            </EuiCard>
-          </EuiFlexItem>
-        </EuiFlexGroup>
-        <EuiSpacer />
-        <EuiPanel>
-          {table}
-        </EuiPanel>
-      </EuiPageBody>
-    </EuiPage>
+              </EuiCard>
+            </EuiFlexItem>
+          </EuiFlexGroup>
+          <EuiSpacer />
+          <EuiPanel>{table}</EuiPanel>
+        </EuiPageBody>
+      </EuiPage>
+    );
   }
 }

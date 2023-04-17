@@ -14,14 +14,14 @@ const suggestions: IWzSuggestItem[] = [
   {
     type: 'q',
     label: 'os.platform',
-    description: 'Filter by OS platform',
+    description: 'Filter by operating system platform',
     operators: ['=', '!='],
     values: async (value) => getSuggestionsFilters('os.platform', value, { q: 'id!=000' }),
   },
   {
     type: 'q',
     label: 'ip',
-    description: 'Filter by agent IP',
+    description: 'Filter by agent IP address',
     operators: ['=', '!='],
     values: async (value) => getSuggestionsFilters('ip', value, { q: 'id!=000' }),
   },
