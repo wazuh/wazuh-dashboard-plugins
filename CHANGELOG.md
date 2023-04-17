@@ -23,7 +23,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Handling endpoint response was done when there is no data to show [#4918](https://github.com/wazuh/wazuh-kibana-app/pull/4918)
 - Fixed references to Elasticsearch in Wazuh-stack plugin [4894](https://github.com/wazuh/wazuh-kibana-app/pull/4894)
 - Fixed the 2 errors that appeared in console in Settings>Configuration section. [#5135](https://github.com/wazuh/wazuh-kibana-app/pull/5135)
-- Fix TypeError in FIM Inventory using new error handler [#5364](https://github.com/wazuh/wazuh-kibana-app/pull/5364)
+- Fixed TypeError in FIM Inventory using new error handler [#5364](https://github.com/wazuh/wazuh-kibana-app/pull/5364)
 
 ## Wazuh v4.4.1 - OpenSearch Dashboards 2.6.0 - Revision 01
 
