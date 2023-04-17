@@ -87,7 +87,6 @@ export function initializeInnerAngularModule(name = 'app/wazuh', navigation: Nav
       'ngRoute',
       'react',
       'ngMaterial',
-      'chart.js',
       'ui.bootstrap',
       'app/discover',
     ])

@@ -17,8 +17,8 @@ import { getHttp } from '../../../kibana-services';
 import { getAssetURL, getThemeAssetURL  } from "../../../utils/assets";
 
 export const withUserLogged = (WrappedComponent) => (props) => {
-    const withUserLogged = useSelector((state)=> state.appStateReducers.withUserLogged);
-    const customAppLogo = useSelector((state)=> state?.appConfig?.data?.['customization.logo.app']);
+    const withUserLogged = useSelector((state) => state.appStateReducers.withUserLogged);
+    const customAppLogo = useSelector((state) => state?.appConfig?.data?.['customization.enabled'] && state?.appConfig?.data?.['customization.logo.app']);
     
     return withUserLogged ? <WrappedComponent {...props}/> : (
       <div className="withUserLogged">

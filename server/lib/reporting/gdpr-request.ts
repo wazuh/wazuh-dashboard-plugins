@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import { Base } from './base-query';
-import { WAZUH_ALERTS_PATTERN } from '../../../common/constants';
+import { getSettingDefaultValue } from '../../../common/services/settings';
 
 /**
  * Returns top 5 GDPR requirements
@@ -21,11 +21,12 @@ import { WAZUH_ALERTS_PATTERN } from '../../../common/constants';
  * @returns {Array<String>}
  */
 export const topGDPRRequirements = async (
-  context, 
-  gte, 
-  lte, 
-  filters, 
-  pattern = WAZUH_ALERTS_PATTERN
+  context,
+  gte,
+  lte,
+  filters,
+  allowedAgentsFilter,
+  pattern = getSettingDefaultValue('pattern')
 ) => {
   if (filters.includes('rule.gdpr: exists')) {
     const [head, tail] = filters.split('AND rule.gdpr: exists');
@@ -35,7 +36,7 @@ export const topGDPRRequirements = async (
   try {
     const base = {};
 
-    Object.assign(base, Base(pattern, filters, gte, lte));
+    Object.assign(base, Base(pattern, filters, gte, lte, allowedAgentsFilter));
 
     Object.assign(base.aggs, {
       '2': {
@@ -81,8 +82,9 @@ export const getRulesByRequirement= async (
   gte,
   lte,
   filters,
+  allowedAgentsFilter,
   requirement,
-  pattern = WAZUH_ALERTS_PATTERN
+  pattern = getSettingDefaultValue('pattern')
 ) => {
   if (filters.includes('rule.gdpr: exists')) {
     const [head, tail] = filters.split('AND rule.gdpr: exists');
@@ -92,7 +94,7 @@ export const getRulesByRequirement= async (
   try {
     const base = {};
 
-    Object.assign(base, Base(pattern, filters, gte, lte));
+    Object.assign(base, Base(pattern, filters, gte, lte, allowedAgentsFilter));
 
     Object.assign(base.aggs, {
       '2': {

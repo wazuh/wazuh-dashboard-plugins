@@ -76,15 +76,11 @@ export class SaveDocument {
   private createDocument(doc, index, mapping: string): BulkIndexDocumentsParams {
     const createDocumentObject: BulkIndexDocumentsParams = {
       index,
-      type: '_doc',
-      body: doc.flatMap(item => [{
-        index: { _index: index }
-      },
-      {
+      body: doc.map(item => `{"index": { "_index": "${index}" }}\n${JSON.stringify({
         ...this.buildData(item, mapping),
         timestamp: new Date(Date.now()).toISOString()
-      }
-      ])
+      })}\n`)
+      .join('')
     };
     log(this.logPath, `Document object: ${JSON.stringify(createDocumentObject)}`, 'debug');
     return createDocumentObject;

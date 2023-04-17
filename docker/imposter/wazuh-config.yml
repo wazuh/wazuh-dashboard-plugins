@@ -8,7 +8,6 @@ system:
       preloadFile: initial_data.json
 
 resources:
-
   # ===================================================== #
   #   API INFO
   # ===================================================== #
@@ -144,7 +143,6 @@ resources:
   - method: GET
     path: /agents/summary/status
 
-
   # ===================================================== #
   #   CISCAT
   # ===================================================== #
@@ -183,6 +181,9 @@ resources:
   # Get cluster status
   - method: GET
     path: /cluster/status
+    response:
+      statusCode: 200
+      staticFile: cluster/cluster_status.json
 
   # Get local node config
   - method: GET
@@ -236,6 +237,9 @@ resources:
   # Get node logs
   - method: GET
     path: /cluster/{node_id}/logs
+    response:
+      statusCode: 200
+      scriptFile: cluster/cluster-logs.js
 
   # Get node logs summary
   - method: GET
@@ -471,6 +475,9 @@ resources:
   # Get logs
   - method: GET
     path: /manager/logs
+    response:
+      statusCode: 200
+      scriptFile: cluster/cluster-logs.js
 
   # Get logs summary
   - method: GET
@@ -603,6 +610,9 @@ resources:
   # Get policy checks
   - method: GET
     path: /sca/{agent_id}/checks/{policy_id}
+    response:
+      statusCode: 200
+      scriptFile: sca/policy-checks.js
 
   # ===================================================== #
   #   SECURITY
@@ -842,6 +852,9 @@ resources:
   # Get last scan datetime
   - method: GET
     path: /vulnerability/{agent_id}/last_scan
+    response:
+      statusCode: 200
+      staticFile: vulnerability/last_scan.json
 
   # Get agent vulnerabilities' field summary
   - method: GET

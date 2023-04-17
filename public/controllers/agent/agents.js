@@ -28,12 +28,13 @@ import { ErrorHandler } from '../../react-services/error-handler';
 import { GroupHandler } from '../../react-services/group-handler';
 import store from '../../redux/store';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
-import { API_NAME_AGENT_STATUS, WAZUH_ALERTS_PATTERN } from '../../../common/constants';
+import { API_NAME_AGENT_STATUS } from '../../../common/constants';
 import { getDataPlugin } from '../../kibana-services';
 import { hasAgentSupportModule } from '../../react-services/wz-agents';
 import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
+import { getSettingDefaultValue } from '../../../common/services/settings';
 
 export class AgentsController {
   /**
@@ -306,8 +307,6 @@ export class AgentsController {
     };
 
     this.$scope.switchConfigurationTab = (configurationTab, navigate) => {
-      // Check if configuration is synced
-      this.checkSync();
       this.$scope.navigate = navigate;
       this.configurationHandler.switchConfigurationTab(configurationTab, this.$scope);
       if (!this.$scope.navigate) {
@@ -510,8 +509,11 @@ export class AgentsController {
           },
         });
         this.$scope.agent.status =
-          (((((agentInfo || {}).data || {}).data || {}).affected_items || [])[0] || {}).status ||
+          agentInfo?.data?.data?.affected_items?.[0]?.status ||
           this.$scope.agent.status;
+        this.$scope.isSynchronized = this.$scope.agent.status?.synced;
+
+    this.$scope.$applyAsync();
       } catch (error) {
         throw new Error(error);
       }
@@ -617,7 +619,7 @@ export class AgentsController {
    */
   addMitrefilter(id) {
     const filter = `{"meta":{"index": ${
-      AppState.getCurrentPattern() || WAZUH_ALERTS_PATTERN
+      AppState.getCurrentPattern() || getSettingDefaultValue('pattern')
     }},"query":{"match":{"rule.mitre.id":{"query":"${id}","type":"phrase"}}}}`;
     this.$rootScope.$emit('addNewKibanaFilter', {
       filter: JSON.parse(filter),
@@ -736,20 +738,6 @@ export class AgentsController {
   validateSysCheck() {
     const result = this.commonData.validateRange(this.$scope.agent.syscheck);
     this.$scope.agent.syscheck = result;
-  }
-
-  /**
-   * Checks if configuration is sync
-   */
-  async checkSync() {
-    const isSync = await WzRequest.apiReq(
-      'GET',
-      `/agents/${this.$scope.agent.id}/group/is_sync`,
-      {}
-    );
-    this.$scope.isSynchronized =
-      (((((isSync || {}).data || {}).data || {}).affected_items || [])[0] || {}).synced || false;
-    this.$scope.$applyAsync();
   }
 
   /**

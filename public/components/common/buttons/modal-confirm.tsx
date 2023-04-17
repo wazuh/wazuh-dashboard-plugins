@@ -35,12 +35,12 @@ interface WzButtonModalConfirmProps{
 };
 
 const renderModal = ({onConfirm, onCancel, modalTitle, modalConfirmText, modalCancelText, modalProps }) => ({close}) => {
-  const onModalConfirm = () => {
-    close();
+  const onModalConfirm = (ev) => {
+    close(ev);
     onConfirm && onConfirm();
   };
-  const onModalCancel = () => {
-    close();
+  const onModalCancel = (ev) => {
+    close(ev);
     onCancel && onCancel();
   };
   return (

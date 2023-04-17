@@ -36,7 +36,7 @@
     layout="column"
     layout-align="start space-around"
   >
-    <div class="registerAgent" ng-show="ctrl.addingNewAgent">
+    <div class="registerAgent" ng-if="ctrl.addingNewAgent">
       <react-component name="RegisterAgent" props="ctrl.registerAgentsProps"></react-component>
     </div>
     <div ng-show="!ctrl.addingNewAgent">

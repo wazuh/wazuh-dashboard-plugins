@@ -11,7 +11,7 @@
  */
 import { Base } from './base-query';
 import AuditMap from './audit-map';
-import { WAZUH_ALERTS_PATTERN } from '../../../common/constants';
+import { getSettingDefaultValue } from '../../../common/services/settings';
 
 /**
    * Returns top 3 agents that execute sudo commands without success
@@ -26,12 +26,13 @@ export const getTop3AgentsSudoNonSuccessful = async (
   gte,
   lte,
   filters,
-  pattern = WAZUH_ALERTS_PATTERN
+  allowedAgentsFilter,
+  pattern = getSettingDefaultValue('pattern')
 ) => {
   try {
     const base = {};
 
-    Object.assign(base, Base(pattern, filters, gte, lte));
+    Object.assign(base, Base(pattern, filters, gte, lte, allowedAgentsFilter));
 
     Object.assign(base.aggs, {
       '3': {
@@ -93,12 +94,13 @@ export const getTop3AgentsFailedSyscalls = async (
   gte,
   lte,
   filters,
-  pattern = WAZUH_ALERTS_PATTERN
+  allowedAgentsFilter,
+  pattern = getSettingDefaultValue('pattern')
 ) => {
   try {
     const base = {};
 
-    Object.assign(base, Base(pattern, filters, gte, lte));
+    Object.assign(base, Base(pattern, filters, gte, lte, allowedAgentsFilter));
 
     Object.assign(base.aggs, {
       '3': {
@@ -138,7 +140,7 @@ export const getTop3AgentsFailedSyscalls = async (
     const { buckets } = response.body.aggregations['3'];
 
     return buckets.map(bucket => {
-      try{
+      try {
         const agent = bucket.key;
         const syscall = {
           id: bucket['4'].buckets[0].key,
@@ -150,7 +152,7 @@ export const getTop3AgentsFailedSyscalls = async (
           agent,
           syscall
         };
-      }catch(error){
+      } catch (error) {
         return undefined;
       }
     }).filter(bucket => bucket);
@@ -172,12 +174,13 @@ export const getTopFailedSyscalls = async (
   gte,
   lte,
   filters,
-  pattern = WAZUH_ALERTS_PATTERN
+  allowedAgentsFilter,
+  pattern = getSettingDefaultValue('pattern')
 ) => {
   try {
     const base = {};
 
-    Object.assign(base, Base(pattern, filters, gte, lte));
+    Object.assign(base, Base(pattern, filters, gte, lte, allowedAgentsFilter));
 
     Object.assign(base.aggs, {
       '2': {

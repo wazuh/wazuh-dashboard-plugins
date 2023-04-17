@@ -17,6 +17,8 @@ import { log } from '../lib/logger';
 import { KeyEquivalence } from '../../common/csv-key-equivalence';
 import { ApiErrorEquivalence } from '../lib/api-errors-equivalence';
 import apiRequestList from '../../common/api-info/endpoints';
+import { HTTP_STATUS_CODES } from '../../common/constants';
+import { getCustomizationSetting } from '../../common/services/settings';
 import { addJobToQueue } from '../start/queue';
 import fs from 'fs';
 import { ManageHosts } from '../lib/manage-hosts';
@@ -85,7 +87,7 @@ export class WazuhApiCtrl {
       return ErrorResponse(
         `Error getting the authorization token: ${errorMessage}`,
         3000,
-        500,
+        error?.response?.status || HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
         response
       );
     }
@@ -123,13 +125,13 @@ export class WazuhApiCtrl {
         return ErrorResponse(
           `ERROR3099 - ${responseManagerInfo.data.detail || 'Wazuh not ready yet'}`,
           3099,
-          500,
+          HTTP_STATUS_CODES.SERVICE_UNAVAILABLE,
           response
         );
       }
 
       // If we have a valid response from the Wazuh API
-      if (responseManagerInfo.status === 200 && responseManagerInfo.data) {
+      if (responseManagerInfo.status === HTTP_STATUS_CODES.OK && responseManagerInfo.data) {
         // Clear and update cluster information before being sent back to frontend
         delete api.cluster_info;
         const responseAgents = await context.wazuh.api.client.asInternalUser.request(
@@ -139,7 +141,7 @@ export class WazuhApiCtrl {
           { apiHostID: id }
         );
 
-        if (responseAgents.status === 200) {
+        if (responseAgents.status === HTTP_STATUS_CODES.OK) {
           const managerName = responseAgents.data.data.affected_items[0].manager;
 
           const responseClusterStatus = await context.wazuh.api.client.asInternalUser.request(
@@ -148,7 +150,7 @@ export class WazuhApiCtrl {
             {},
             { apiHostID: id }
           );
-          if (responseClusterStatus.status === 200) {
+          if (responseClusterStatus.status === HTTP_STATUS_CODES.OK) {
             if (responseClusterStatus.data.data.enabled === 'yes') {
               const responseClusterLocalInfo = await context.wazuh.api.client.asInternalUser.request(
                 'GET',
@@ -156,7 +158,7 @@ export class WazuhApiCtrl {
                 {},
                 { apiHostID: id }
               );
-              if (responseClusterLocalInfo.status === 200) {
+              if (responseClusterLocalInfo.status === HTTP_STATUS_CODES.OK) {
                 const clusterEnabled = responseClusterStatus.data.data.enabled === 'yes';
                 api.cluster_info = {
                   status: clusterEnabled ? 'enabled' : 'disabled',
@@ -195,7 +197,7 @@ export class WazuhApiCtrl {
 
             return response.ok({
               body: {
-                statusCode: 200,
+                statusCode: HTTP_STATUS_CODES.OK,
                 data: copied,
                 idChanged: request.body.idChanged || null,
               }
@@ -210,14 +212,14 @@ export class WazuhApiCtrl {
       if (error.code === 'EPROTO') {
         return response.ok({
           body: {
-            statusCode: 200,
+            statusCode: HTTP_STATUS_CODES.OK,
             data: { apiIsDown: true },
           }
         });
       } else if (error.code === 'ECONNREFUSED') {
         return response.ok({
           body: {
-            statusCode: 200,
+            statusCode: HTTP_STATUS_CODES.OK,
             data: { apiIsDown: true },
           }
         });
@@ -239,11 +241,11 @@ export class WazuhApiCtrl {
                 return ErrorResponse(
                   `ERROR3099 - ${response.data.detail || 'Wazuh not ready yet'}`,
                   3099,
-                  500,
+                  HTTP_STATUS_CODES.SERVICE_UNAVAILABLE,
                   response
                 );
               }
-              if (responseManagerInfo.status === 200) {
+              if (responseManagerInfo.status === HTTP_STATUS_CODES.OK) {
                 request.body.id = id;
                 request.body.idChanged = id;
                 return await this.checkStoredAPI(context, request, response);
@@ -252,10 +254,20 @@ export class WazuhApiCtrl {
           }
         } catch (error) {
           log('wazuh-api:checkStoredAPI', error.message || error);
-          return ErrorResponse(error.message || error, 3020, 500, response);
+          return ErrorResponse(
+            error.message || error,
+            3020,
+            error?.response?.status || HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
+            response
+          );
         }
         log('wazuh-api:checkStoredAPI', error.message || error);
-        return ErrorResponse(error.message || error, 3002, 500, response);
+        return ErrorResponse(
+          error.message || error,
+          3002,
+          error?.response?.status || HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
+          response
+        );
       }
     }
   }
@@ -299,7 +311,7 @@ export class WazuhApiCtrl {
     try {
       let apiAvailable = null;
       // const notValid = this.validateCheckApiParams(request.body);
-      // if (notValid) return ErrorResponse(notValid, 3003, 500, response);
+      // if (notValid) return ErrorResponse(notValid, 3003, HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR, response);
       log('wazuh-api:checkAPI', `${request.body.id} is valid`, 'debug');
       // Check if a Wazuh API id is given (already stored API)
       const data = await this.manageHosts.getHostById(request.body.id);
@@ -307,7 +319,12 @@ export class WazuhApiCtrl {
         apiAvailable = data;
       } else {
         log('wazuh-api:checkAPI', `API ${request.body.id} not found`);
-        return ErrorResponse(`The API ${request.body.id} was not found`, 3029, 500, response);
+        return ErrorResponse(
+          `The API ${request.body.id} was not found`,
+          3029,
+          HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
+          response
+        );
       }
       const options = { apiHostID: request.body.id };
       if (request.body.forceRefresh) {
@@ -325,13 +342,13 @@ export class WazuhApiCtrl {
         return ErrorResponse(
           `ERROR3099 - ${error.response?.data?.detail || 'Wazuh not ready yet'}`,
           3099,
-          500,
+          error?.response?.status || HTTP_STATUS_CODES.SERVICE_UNAVAILABLE,
           response
         );
       }
 
       log('wazuh-api:checkAPI', `${request.body.id} credentials are valid`, 'debug');
-      if (responseManagerInfo.status === 200 && responseManagerInfo.data) {
+      if (responseManagerInfo.status === HTTP_STATUS_CODES.OK && responseManagerInfo.data) {
         let responseAgents = await context.wazuh.api.client.asInternalUser.request(
           'GET',
           `/agents`,
@@ -339,7 +356,7 @@ export class WazuhApiCtrl {
           { apiHostID: request.body.id }
         );
 
-        if (responseAgents.status === 200) {
+        if (responseAgents.status === HTTP_STATUS_CODES.OK) {
           const managerName = responseAgents.data.data.affected_items[0].manager;
 
           let responseCluster = await context.wazuh.api.client.asInternalUser.request(
@@ -357,7 +374,7 @@ export class WazuhApiCtrl {
             {},
             { apiHostID: request.body.id }
           );
-          if (responseApiUserAllowRunAs.status === 200) {
+          if (responseApiUserAllowRunAs.status === HTTP_STATUS_CODES.OK) {
             const allow_run_as = responseApiUserAllowRunAs.data.data.affected_items[0].allow_run_as;
 
             if (allow_run_as && apiAvailable && apiAvailable.run_as) // HOST AND USER ENABLED
@@ -378,7 +395,7 @@ export class WazuhApiCtrl {
             apiUserAllowRunAs
           );
 
-          if (responseCluster.status === 200) {
+          if (responseCluster.status === HTTP_STATUS_CODES.OK) {
             log('wazuh-api:checkStoredAPI', `Wazuh API response is valid`, 'debug');
             if (responseCluster.data.data.enabled === 'yes') {
               // If cluster mode is active
@@ -389,7 +406,7 @@ export class WazuhApiCtrl {
                 { apiHostID: request.body.id }
               );
 
-              if (responseClusterLocal.status === 200) {
+              if (responseClusterLocal.status === HTTP_STATUS_CODES.OK) {
                 return response.ok({
                   body: {
                     manager: managerName,
@@ -417,19 +434,19 @@ export class WazuhApiCtrl {
     } catch (error) {
       log('wazuh-api:checkAPI', error.message || error);
 
-      if (error && error.response && error.response.status === 401) {
+      if (error && error.response && error.response.status === HTTP_STATUS_CODES.UNAUTHORIZED) {
         return ErrorResponse(
           `Unathorized. Please check API credentials. ${error.response.data.message}`,
-          401,
-          401,
+          HTTP_STATUS_CODES.UNAUTHORIZED,
+          HTTP_STATUS_CODES.UNAUTHORIZED,
           response
         );
       }
       if (error && error.response && error.response.data && error.response.data.detail) {
         return ErrorResponse(
           error.response.data.detail,
-          error.response.status || 500,
-          error.response.status || 500,
+          error.response.status || HTTP_STATUS_CODES.SERVICE_UNAVAILABLE,
+          error.response.status || HTTP_STATUS_CODES.SERVICE_UNAVAILABLE,
           response
         );
       }
@@ -437,16 +454,21 @@ export class WazuhApiCtrl {
         return ErrorResponse(
           'Wrong protocol being used to connect to the Wazuh API',
           3005,
-          500,
+          HTTP_STATUS_CODES.BAD_REQUEST,
           response
         );
       }
-      return ErrorResponse(error.message || error, 3005, 500, response);
+      return ErrorResponse(
+        error.message || error,
+        3005,
+        error?.response?.status || HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
+        response
+      );
     }
   }
 
   checkResponseIsDown(response) {
-    if (response.status !== 200) {
+    if (response.status !== HTTP_STATUS_CODES.OK) {
       // Avoid "Error communicating with socket" like errors
       const socketErrorCodes = [1013, 1014, 1017, 1018, 1019];
       const status = (response.data || {}).status || 1
@@ -539,7 +561,7 @@ export class WazuhApiCtrl {
    * @returns {Object} API response or ErrorResponse
    */
   async makeRequest(context, method, path, data, id, response) {
-    
+
     const devTools = !!(data || {}).devTools;
     try {
       const api = await this.manageHosts.getHostById(id);
@@ -550,7 +572,7 @@ export class WazuhApiCtrl {
       if (!Object.keys(api).length) {
         log('wazuh-api:makeRequest', 'Could not get host credentials');
         //Can not get credentials from wazuh-hosts
-        return ErrorResponse('Could not get host credentials', 3011, 404, response);
+        return ErrorResponse('Could not get host credentials', 3011, HTTP_STATUS_CODES.NOT_FOUND, response);
       }
 
       if (!data) {
@@ -608,7 +630,7 @@ export class WazuhApiCtrl {
             return ErrorResponse(
               `ERROR3099 - ${error.message || 'Wazuh not ready yet'}`,
               3099,
-              500,
+              HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
               response
             );
           }
@@ -637,7 +659,7 @@ export class WazuhApiCtrl {
         return ErrorResponse(
           `ERROR3099 - ${response.body.message || 'Wazuh not ready yet'}`,
           3099,
-          500,
+          HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
           response
         );
       }
@@ -649,7 +671,7 @@ export class WazuhApiCtrl {
             : false;
         response.data = responseBody;
       }
-      const responseError = response.status !== 200 ? response.status : false;
+      const responseError = response.status !== HTTP_STATUS_CODES.OK ? response.status : false;
 
       if (!responseError && responseBody) {
         //cleanKeys(response);
@@ -667,11 +689,11 @@ export class WazuhApiCtrl {
         ? { message: responseBody.detail, code: responseError }
         : new Error('Unexpected error fetching data from the Wazuh API');
     } catch (error) {
-      if (error && error.response && error.response.status === 401) {
+      if (error && error.response && error.response.status === HTTP_STATUS_CODES.UNAUTHORIZED) {
         return ErrorResponse(
           error.message || error,
           error.code ? `Wazuh API error: ${error.code}` : 3013,
-          401,
+          HTTP_STATUS_CODES.UNAUTHORIZED,
           response
         );
       }
@@ -688,7 +710,7 @@ export class WazuhApiCtrl {
         return ErrorResponse(
           errorMsg.detail || error,
           error.code ? `Wazuh API error: ${error.code}` : 3013,
-          500,
+          HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
           response
         );
       }
@@ -708,23 +730,23 @@ export class WazuhApiCtrl {
     if (idApi !== request.body.id) { // if the current token belongs to a different API id, we relogin to obtain a new token
       return ErrorResponse(
         'status code 401',
-        401,
-        401,
+        HTTP_STATUS_CODES.UNAUTHORIZED,
+        HTTP_STATUS_CODES.UNAUTHORIZED,
         response
       );
     }
     if (!request.body.method) {
-      return ErrorResponse('Missing param: method', 3015, 400, response);
+      return ErrorResponse('Missing param: method', 3015, HTTP_STATUS_CODES.BAD_REQUEST, response);
     } else if (!request.body.method.match(/^(?:GET|PUT|POST|DELETE)$/)) {
       log('wazuh-api:makeRequest', 'Request method is not valid.');
       //Method is not a valid HTTP request method
-      return ErrorResponse('Request method is not valid.', 3015, 400, response);
+      return ErrorResponse('Request method is not valid.', 3015, HTTP_STATUS_CODES.BAD_REQUEST, response);
     } else if (!request.body.path) {
-      return ErrorResponse('Missing param: path', 3016, 400, response);
+      return ErrorResponse('Missing param: path', 3016, HTTP_STATUS_CODES.BAD_REQUEST, response);
     } else if (!request.body.path.startsWith('/')) {
       log('wazuh-api:makeRequest', 'Request path is not valid.');
       //Path doesn't start with '/'
-      return ErrorResponse('Request path is not valid.', 3015, 400, response);
+      return ErrorResponse('Request path is not valid.', 3015, HTTP_STATUS_CODES.BAD_REQUEST, response);
     } else {
 
       return this.makeRequest(
@@ -873,7 +895,7 @@ export class WazuhApiCtrl {
       }
     } catch (error) {
       log('wazuh-api:csv', error.message || error);
-      return ErrorResponse(error.message || error, 3034, 500, response);
+      return ErrorResponse(error.message || error, 3034, HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR, response);
     }
   }
 
@@ -915,7 +937,7 @@ export class WazuhApiCtrl {
       return ErrorResponse(
         error.message || 'Could not fetch wazuh-version registry',
         4001,
-        500,
+        HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
         response
       );
     }
@@ -935,7 +957,7 @@ export class WazuhApiCtrl {
       await this.updateRegistry.updateAPIExtensions(id, extensions);
       return response.ok({
         body: {
-          statusCode: 200
+          statusCode: HTTP_STATUS_CODES.OK
         }
       });
     } catch (error) {
@@ -943,7 +965,7 @@ export class WazuhApiCtrl {
       return ErrorResponse(
         error.message || 'Could not set extensions',
         4001,
-        500,
+        HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
         response
       );
     }
@@ -971,7 +993,7 @@ export class WazuhApiCtrl {
       return ErrorResponse(
         error.message || 'Could not fetch wazuh-version registry',
         4001,
-        500,
+        HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
         response
       );
     }
@@ -989,7 +1011,7 @@ export class WazuhApiCtrl {
       const source = JSON.parse(fs.readFileSync(this.updateRegistry.file, 'utf8'));
       return response.ok({
         body: {
-          statusCode: 200,
+          statusCode: HTTP_STATUS_CODES.OK,
           data: !Object.values(source).length ? '' : source
         }
       });
@@ -998,7 +1020,7 @@ export class WazuhApiCtrl {
       return ErrorResponse(
         `Could not get data from wazuh-version registry due to ${error.message || error}`,
         4005,
-        500,
+        HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
         response
       );
     }
@@ -1045,19 +1067,19 @@ export class WazuhApiCtrl {
       });
     } catch (error) {
       log('wazuh-api:getSyscollector', error.message || error);
-      return ErrorResponse(error.message || error, 3035, 500, response);
+      return ErrorResponse(error.message || error, 3035, HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR, response);
     }
   }
   /**
    * Check if user assigned roles disable Wazuh Plugin
-   * @param context 
-   * @param request 
-   * @param response 
-   * @returns {object} Returns { isWazuhDisabled: boolean parsed integer } 
+   * @param context
+   * @param request
+   * @param response
+   * @returns {object} Returns { isWazuhDisabled: boolean parsed integer }
    */
   async isWazuhDisabled(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
     try {
-      
+
       const disabledRoles = ( await getConfiguration() )['disabled_roles'] || [];
       const logoSidebar = ( await getConfiguration() )['customization.logo.sidebar'];
       const data = (await context.wazuh.security.getCurrentUser(request, context)).authContext;
@@ -1069,8 +1091,37 @@ export class WazuhApiCtrl {
       });
     } catch (error) {
       log('wazuh-api:isWazuhDisabled', error.message || error);
-      return ErrorResponse(error.message || error, 3035, 500, response);
+      return ErrorResponse(error.message || error, 3035, HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR, response);
     }
-    
+
+  }
+
+  /**
+   * Gets custom logos configuration (path)
+   * @param context
+   * @param request
+   * @param response
+   */
+  async getAppLogos(context: RequestHandlerContext, request: KibanaRequest, response: KibanaResponseFactory) {
+    try {
+      const configuration = getConfiguration();
+      const SIDEBAR_LOGO = 'customization.logo.sidebar';
+      const APP_LOGO = 'customization.logo.app';
+      const HEALTHCHECK_LOGO = 'customization.logo.healthcheck';
+
+      const logos= {
+        [SIDEBAR_LOGO]: getCustomizationSetting(configuration, SIDEBAR_LOGO),
+        [APP_LOGO]: getCustomizationSetting(configuration, APP_LOGO),
+        [HEALTHCHECK_LOGO]: getCustomizationSetting(configuration, HEALTHCHECK_LOGO),
+      }
+
+      return response.ok({
+        body: { logos }
+      });
+    } catch (error) {
+      log('wazuh-api:getAppLogos', error.message || error);
+      return ErrorResponse(error.message || error, 3035, HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR, response);
+    }
+
   }
 }

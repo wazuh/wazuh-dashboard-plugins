@@ -23,19 +23,12 @@ import {
   EuiPanel,
   EuiToolTip,
   EuiTitle,
-  EuiHealth,
   EuiSpacer,
   EuiCallOut,
-  EuiOverlayMask,
-  EuiConfirmModal,
-  EuiLoadingSpinner,
   EuiCheckboxGroup,
   EuiIcon,
 } from '@elastic/eui';
-import { CheckUpgrade } from './checkUpgrade';
 import { getToasts } from '../../../kibana-services';
-import { WzRequest } from '../../../react-services/wz-request';
-import { ActionAgents } from '../../../react-services/action-agents';
 import { AppNavigate } from '../../../react-services/app-navigate';
 import { GroupTruncate } from '../../../components/common/util';
 import { WzSearchBar, filtersToObject } from '../../../components/wz-search-bar';
@@ -43,10 +36,11 @@ import { getAgentFilterValues } from '../../../controllers/management/components
 import { WzButtonPermissions } from '../../../components/common/permissions/button';
 import { formatUIDate } from '../../../react-services/time-service';
 import { withErrorBoundary } from '../../../components/common/hocs';
-import { API_NAME_AGENT_STATUS, UI_LOGGER_LEVELS, UI_ORDER_AGENT_STATUS } from '../../../../common/constants';
+import { API_NAME_AGENT_STATUS, UI_LOGGER_LEVELS, UI_ORDER_AGENT_STATUS, AGENT_SYNCED_STATUS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { AgentStatus } from '../../../components/agents/agent_status';
+import { AgentSynced } from '../../../components/agents/agent-synced';
 
 export const AgentsTable = withErrorBoundary(
   class AgentsTable extends Component {
@@ -79,15 +73,22 @@ export const AgentsTable = withErrorBoundary(
         },
         {
           type: 'q',
+          label: 'group_config_status',
+          description: 'Filter by agent synced configuration status',
+          operators: ['=', '!='],
+          values: [AGENT_SYNCED_STATUS.SYNCED, AGENT_SYNCED_STATUS.NOT_SYNCED],
+        },
+        {
+          type: 'q',
           label: 'os.platform',
-          description: 'Filter by OS platform',
+          description: 'Filter by operating system platform',
           operators: ['=', '!='],
           values: async (value) => getAgentFilterValues('os.platform', value, { q: 'id!=000' }),
         },
         {
           type: 'q',
           label: 'ip',
-          description: 'Filter by agent IP',
+          description: 'Filter by agent IP address',
           operators: ['=', '!='],
           values: async (value) => getAgentFilterValues('ip', value, { q: 'id!=000' }),
         },
@@ -165,19 +166,6 @@ export const AgentsTable = withErrorBoundary(
       this.downloadCsv.bind(this);
     }
 
-    async UNSAFE_componentWillMount() {
-      const managerVersion = await WzRequest.apiReq('GET', '/', {});
-      const totalAgent = await WzRequest.apiReq('GET', '/agents', {});
-      const agentActive = await WzRequest.apiReq('GET', '/agents/summary/status', {});
-
-      
-      this.setState({
-        managerVersion: managerVersion.data.data.api_version,
-        avaibleAgents: totalAgent.data.data.affected_items,
-        agentActive: agentActive.data.data.active + agentActive.data.data.disconnected,
-      });
-    }
-
     onTableChange = ({ page = {}, sort = {} }) => {
       const { index: pageIndex, size: pageSize } = page;
       const { field: sortField, direction: sortDirection } = sort;
@@ -229,8 +217,12 @@ export const AgentsTable = withErrorBoundary(
     async getItems() {
       try {
         this._isMount && this.setState({ isLoading: true });
-        const rawAgents = await this.props.wzReq('GET', '/agents', { params: this.buildFilter() });
+        const selectFieldsList = this.defaultColumns
+          .filter(field => field.field != 'actions')
+          .map(field => field.field.replace('os_', 'os.')); // "os_name" subfield should be specified as 'os.name'
+        const selectFields = [...selectFieldsList, 'os.platform', 'os.uname', 'os.version'].join(','); // Add version and uname fields to render the OS icon and version in the table
 
+        const rawAgents = await this.props.wzReq('GET', '/agents', { params: { ...this.buildFilter(), select: selectFields } });
         const formatedAgents = (((rawAgents || {}).data || {}).data || {}).affected_items.map(
           this.formatAgent.bind(this)
         );
@@ -258,37 +250,6 @@ export const AgentsTable = withErrorBoundary(
       }
     }
 
-    async getAllItems() {
-      const { pageIndex, pageSize } = this.state;
-      const filterTable = {
-        offset: pageIndex * pageSize,
-        limit: pageSize,
-        q: this.buildQFilter(),
-        sort: this.buildSortFilter(),
-      };
-
-      const filterAll = {
-        q: this.buildQFilter(),
-        sort: this.buildSortFilter(),
-      };
-
-      const rawAgents = await this.props.wzReq('GET', '/agents', filterTable);
-
-      const agentsFiltered = await this.props.wzReq('GET', '/agents', filterAll).then(() => {
-        this._isMount && this.setState({ loadingAllItem: false });
-      });
-
-      const formatedAgents = (((rawAgents || {}).data || {}).data || {}).items.map(
-        this.formatAgent.bind(this)
-      );
-      this._isMount &&
-        this.setState({
-          agents: formatedAgents,
-          avaibleAgents: agentsFiltered.data.data.items,
-          totalItems: (((rawAgents || {}).data || {}).data || {}).totalItems,
-          isLoading: false,
-        });
-    }
 
     buildFilter() {
       const { pageIndex, pageSize, filters } = this.state;
@@ -330,6 +291,7 @@ export const AgentsTable = withErrorBoundary(
         name: agent.name,
         ip: agent.ip,
         status: agent.status,
+        group_config_status: agent.group_config_status,
         group: checkField(agent.group),
         os_name: agent,
         version: agentVersion,
@@ -380,26 +342,26 @@ export const AgentsTable = withErrorBoundary(
       };
       const os = (agent || {}).os;
 
-      if (((os || {}).uname || '').includes('Linux')) {
+      if ((os?.uname || '').includes('Linux')) {
         icon = 'linux';
-      } else if ((os || {}).platform === 'windows') {
+      } else if (os?.platform === 'windows') {
         icon = 'windows';
-      } else if ((os || {}).platform === 'darwin') {
+      } else if (os?.platform === 'darwin') {
         icon = 'apple';
       }
       const os_name =
-        checkField(((agent || {}).os || {}).name) +
+        checkField(agent?.os?.name) +
         ' ' +
-        checkField(((agent || {}).os || {}).version);
+        checkField(agent?.os?.version);
 
       return (
-        <span className="euiTableCellContent__text euiTableCellContent--truncateText">
-          <i
+        <EuiFlexGroup gutterSize="xs">
+          <EuiFlexItem grow={false} ><i
             className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`}
             aria-hidden="true"
-          ></i>{' '}
-          {os_name === '- -' ? '-' : os_name}
-        </span>
+          ></i></EuiFlexItem>{' '}
+          <EuiFlexItem>{os_name === '- -' ? '-' : os_name}</EuiFlexItem>
+        </EuiFlexGroup>
       );
     }
 
@@ -410,18 +372,6 @@ export const AgentsTable = withErrorBoundary(
         });
       this.props.reload();
     };
-
-    addUpgradeStatus(version, agent) {
-      const { managerVersion } = this.state;
-      return (
-        <CheckUpgrade
-          {...agent}
-          managerVersion={managerVersion}
-          changeStatusUpdate={this.changeUpgradingState}
-          reloadAgent={this.reloadAgent}
-        />
-      );
-    }
 
     downloadCsv = () => {
       const filters = this.buildFilter();
@@ -464,156 +414,6 @@ export const AgentsTable = withErrorBoundary(
         toastLifeTimeMs: time,
       });
     };
-
-    /* MULTISELECT TABLE */
-    onSelectionChange = (selectedItems) => {
-      const { managerVersion, pageSize } = this.state;
-
-      selectedItems.forEach((item) => {
-        if (managerVersion > item.version && item.version !== '.') {
-          item.outdated = true;
-        }
-      });
-
-      selectedItems.length !== pageSize
-        ? this._isMount && this.setState({ allSelected: false })
-        : false;
-
-      this._isMount && this.setState({ selectedItems });
-    };
-
-    renderUpgradeButton() {
-      const { selectedItems } = this.state;
-
-      if (
-        selectedItems.length === 0 ||
-        (selectedItems.length > 0 && selectedItems.filter((item) => item.outdated).length === 0) ||
-        (selectedItems.length > 0 && selectedItems.filter((item) => item.upgrading).length > 0) ||
-        (selectedItems.length > 0 &&
-          selectedItems.filter((item) => item.status === API_NAME_AGENT_STATUS.ACTIVE).length === 0) ||
-        (selectedItems.length > 0 &&
-          selectedItems.filter((item) => item.status === API_NAME_AGENT_STATUS.ACTIVE).length === 0 &&
-          selectedItems.filter((item) => item.status === API_NAME_AGENT_STATUS.DISCONNECTED).length > 0) ||
-        selectedItems.filter((item) => item.outdated && item.status === API_NAME_AGENT_STATUS.ACTIVE).length === 0
-      ) {
-        return;
-      }
-
-      return (
-        <EuiFlexItem grow={false}>
-          <EuiButton color="secondary" iconType="sortUp" onClick={this.onClickUpgrade}>
-            Upgrade{' '}
-            {selectedItems.filter((item) => item.outdated && item.status === API_NAME_AGENT_STATUS.ACTIVE).length}{' '}
-            agents
-          </EuiButton>
-        </EuiFlexItem>
-      );
-    }
-
-    renderUpgradeButtonAll() {
-      const { selectedItems, avaibleAgents, managerVersion } = this.state;
-
-      if (
-        selectedItems.length > 0 &&
-        avaibleAgents.filter(
-          (agent) => agent.version !== 'Wazuh ' + managerVersion && agent.status === API_NAME_AGENT_STATUS.ACTIVE
-        ).length === 0
-      ) {
-        return;
-      }
-
-      return (
-        <EuiFlexItem grow={false}>
-          <EuiButton color="secondary" iconType="sortUp" onClick={this.onClickUpgradeAll}>
-            Upgrade all agents
-          </EuiButton>
-        </EuiFlexItem>
-      );
-    }
-
-    renderRestartButton() {
-      const { selectedItems } = this.state;
-
-      if (
-        selectedItems.length === 0 ||
-        selectedItems.filter((item) => item.status === API_NAME_AGENT_STATUS.ACTIVE).length === 0
-      ) {
-        return;
-      }
-
-      return (
-        <EuiFlexItem grow={false}>
-          <EuiButton color="primary" iconType="refresh" onClick={this.onClickRestart}>
-            Restart {selectedItems.filter((item) => item.status === API_NAME_AGENT_STATUS.ACTIVE).length} agents
-          </EuiButton>
-        </EuiFlexItem>
-      );
-    }
-
-    renderRestartButtonAll() {
-      const { selectedItems, agentActive, avaibleAgents } = this.state;
-
-      if (
-        (selectedItems.length > 0 &&
-          avaibleAgents.filter((item) => item.status === API_NAME_AGENT_STATUS.ACTIVE).length === 0 &&
-          selectedItems.length === 0) ||
-        agentActive === 0
-      ) {
-        return;
-      }
-
-      return (
-        <EuiFlexItem grow={false}>
-          <EuiButton color="primary" iconType="refresh" onClick={this.onClickRestartAll}>
-            Restart all agents
-          </EuiButton>
-        </EuiFlexItem>
-      );
-    }
-
-    renderPurgeButton() {
-      const { selectedItems } = this.state;
-
-      if (selectedItems.length === 0) {
-        return;
-      }
-
-      return (
-        <EuiFlexItem grow={false}>
-          <EuiButton
-            iconType="trash"
-            color="danger"
-            onClick={() => {
-              this.setState({ purgeModal: true });
-            }}
-          >
-            Delete {selectedItems.length} agents
-          </EuiButton>
-        </EuiFlexItem>
-      );
-    }
-
-    renderPurgeButtonAll() {
-      const { selectedItems, allSelected } = this.state;
-
-      if (selectedItems.length === 0 && !allSelected) {
-        return;
-      }
-
-      return (
-        <EuiFlexItem grow={false}>
-          <EuiButton
-            iconType="trash"
-            color="danger"
-            onClick={() => {
-              this._isMount && this.setState({ purgeModal: true });
-            }}
-          >
-            Delete all agents
-          </EuiButton>
-        </EuiFlexItem>
-      );
-    }
 
     callOutRender() {
       const { selectedItems, pageSize, allSelected, totalItems } = this.state;
@@ -661,218 +461,112 @@ export const AgentsTable = withErrorBoundary(
       window.localStorage.setItem('columnsSelectedTableAgent', JSON.stringify(data));
     }
 
-    setUpgradingState(agentID) {
-      const { agents } = this.state;
-      agents.forEach((element) => {
-        element.id === agentID ? (element.upgrading = true) : false;
-      });
-      this._isMount && this.setState({ agents });
-    }
-
-    changeUpgradingState = (agentID) => {
-      const { agents } = this.state;
-      agents.forEach((element) => {
-        element.id === agentID && element.upgrading === true ? (element.upgrading = false) : false;
-      });
-      this._isMount && this.setState(() => ({ agents }));
-    };
-
-    onClickUpgrade = () => {
-      const { selectedItems } = this.state;
-      ActionAgents.upgradeAgents(selectedItems);
-    };
-
-    onClickUpgradeAll = () => {
-      const { avaibleAgents, managerVersion } = this.state;
-      ActionAgents.upgradeAllAgents(avaibleAgents, managerVersion);
-    };
-
-    onClickRestart = () => {
-      const { selectedItems } = this.state;
-      ActionAgents.restartAgents(selectedItems);
-      this.reloadAgents();
-    };
-
-    onClickRestartAll = () => {
-      const { avaibleAgents } = this.state;
-      ActionAgents.restartAllAgents(avaibleAgents);
-      this.reloadAgents();
-    };
-
-    onClickPurge = async () => {
-      const { selectedItems } = this.state;
-      const auxAgents = selectedItems
-        .map((agent) => {
-          return agent.id !== '000' ? agent.id : null;
-        })
-        .filter((agent) => agent !== null);
-      try {
-        const response = await WzRequest.apiReq('DELETE', `/agents`, {
-          purge: true,
-          ids: auxAgents,
-          older_than: '1s',
-        });
-        response.status === 200
-          ? this.showToast('success', `Selected agents were successfully deleted`, '', 5000)
-          : this.showToast('warning', `Failed to delete selected agents`, '', 5000);
-      } catch (error) {
-        const options = {
-          context: `${AgentsTable.name}.onClickPurge`,
-          level: UI_LOGGER_LEVELS.ERROR,
-          severity: UI_ERROR_SEVERITIES.BUSINESS,
-          store: true,
-          error: {
-            error: error,
-            message: error.message || error,
-            title: `Failed to delete selected agents`,
-          },
-        };
-        getErrorOrchestrator().handleError(options);
-      }
-      this.getAllItems();
-      this.reloadAgents();
-      this._isMount && this.setState({ purgeModal: false });
-    };
-
-    onClickPurgeAll = () => {
-      const { avaibleAgents } = this.state;
-      const auxAgents = avaibleAgents
-        .map((agent) => {
-          return agent.id !== '000' ? agent.id : null;
-        })
-        .filter((agent) => agent !== null);
-      try {
-        const response = WzRequest.apiReq('DELETE', `/agents`, {
-          purge: true,
-          ids: auxAgents,
-          older_than: '1s',
-        });
-        response.status === 200
-          ? this.showToast('success', `All agents have been successfully deleted`, '', 5000)
-          : this.showToast('warning', `Failed to delete all agents`, '', 5000);
-      } catch (error) {
-        const options = {
-          context: `${AgentsTable.name}.onClickPurgeAll`,
-          level: UI_LOGGER_LEVELS.ERROR,
-          severity: UI_ERROR_SEVERITIES.BUSINESS,
-          store: true,
-          error: {
-            error: error,
-            message: error.message || error,
-            title: `Failed to delete all agents`,
-          },
-        };
-        getErrorOrchestrator().handleError(options);
-      }
-      this.getAllItems();
-      this.reloadAgents();
-      this._isMount && this.setState({ purgeModal: false });
-    };
+    // Columns with the property truncateText: true won't wrap the text
+    // This is added to prevent the wrap because of the table-layout: auto
+    defaultColumns = [
+      {
+        field: 'id',
+        name: 'ID',
+        sortable: true,
+        show: true,
+      },
+      {
+        field: 'name',
+        name: 'Name',
+        sortable: true,
+        show: true,
+      },
+      {
+        field: 'ip',
+        name: 'IP address',
+        sortable: true,
+        show: true,
+      },
+      {
+        field: 'group',
+        name: 'Group(s)',
+        sortable: true,
+        show: true,
+        render: (groups) => (groups !== '-' ? this.renderGroups(groups) : '-'),
+      },
+      {
+        field: 'os_name',
+        name: 'Operating system',
+        sortable: true,
+        show: true,
+        render: this.addIconPlatformRender,
+      },
+      {
+        field: 'node_name',
+        name: 'Cluster node',
+        sortable: true,
+        show: true,
+      },
+      {
+        field: 'version',
+        name: 'Version',
+        sortable: true,
+        show: true,
+      },
+      {
+        field: 'dateAdd',
+        name: 'Registration date',
+        sortable: true,
+        show: false,
+      },
+      {
+        field: 'lastKeepAlive',
+        name: 'Last keep alive',
+        sortable: true,
+        show: false,
+      },
+      {
+        field: 'status',
+        name: 'Status',
+        truncateText: true,
+        sortable: true,
+        show: true,
+        render: (status) => <AgentStatus status={status} labelProps={{ className: 'hide-agent-status' }} />,
+      },
+      {
+        field: 'group_config_status',
+        name: 'Synced',
+        sortable: true,
+        show: false,
+        render: (synced) => <AgentSynced synced={synced} />,
+      },
+      {
+        align: 'right',
+        width: '5%',
+        field: 'actions',
+        name: 'Actions',
+        show: true,
+        render: (agent) => this.actionButtonsRender(agent),
+      },
+    ];
 
     columns() {
       const selectedColumns = this.getTableColumnsSelected();
-      const defaultColumns = [
-        {
-          field: 'id',
-          name: 'ID',
-          sortable: true,
-          width: '6%',
-        },
-        {
-          field: 'name',
-          name: 'Name',
-          sortable: true,
-          width: '15%',
-          truncateText: true,
-        },
-        {
-          field: 'ip',
-          name: 'IP',
-          width: '10%',
-          truncateText: true,
-          sortable: true,
-        },
-        {
-          field: 'group',
-          name: 'Group(s)',
-          width: '20%',
-          truncateText: true,
-          sortable: true,
-          render: (groups) => (groups !== '-' ? this.renderGroups(groups) : '-'),
-        },
-        {
-          field: 'os_name',
-          name: 'OS',
-          sortable: true,
-          width: '15%',
-          truncateText: true,
-          render: this.addIconPlatformRender,
-        },
-        {
-          field: 'node_name',
-          name: 'Cluster node',
-          width: '10%',
-          truncateText: true,
-          sortable: true,
-        },
-        {
-          field: 'version',
-          name: 'Version',
-          width: '5%',
-          truncateText: true,
-          sortable: true,
-          /* render: (version, agent) => this.addUpgradeStatus(version, agent), */
-        },
-        {
-          field: 'dateAdd',
-          name: 'Registration date',
-          width: '10%',
-          truncateText: true,
-          sortable: true,
-        },
-        {
-          field: 'lastKeepAlive',
-          name: 'Last keep alive',
-          width: '10%',
-          truncateText: true,
-          sortable: true,
-        },
-        {
-          field: 'status',
-          name: 'Status',
-          truncateText: true,
-          sortable: true,
-          width: '15%',
-          render: (status) => <AgentStatus status={status} labelProps={{className: 'hide-agent-status' }}/>,
-        },
-        {
-          align: 'right',
-          width: '5%',
-          field: 'actions',
-          name: 'Actions',
-          render: (agent) => this.actionButtonsRender(agent),
-        },
-      ];
 
       if (selectedColumns.length != 0) {
         const newSelectedColumns = [];
         selectedColumns.forEach((item) => {
           if (item.show) {
-            const column = defaultColumns.find((column) => column.field === item.field);
+            const column = this.defaultColumns.find((column) => column.field === item.field);
             newSelectedColumns.push(column);
           }
         });
         return newSelectedColumns;
       } else {
-        const fieldColumns = defaultColumns.map((item) => {
+        const fieldColumns = this.defaultColumns.map((item) => {
           return {
             field: item.field,
             name: item.name,
-            show: true,
+            show: item.show,
           };
         });
         this.setTableColumnsSelected(fieldColumns);
-        return defaultColumns;
+        return fieldColumns;
       }
     }
 
@@ -972,7 +666,7 @@ export const AgentsTable = withErrorBoundary(
         return {
           'data-test-subj': `row-${id}`,
           className: 'customRowClass',
-          onClick: () => {},
+          onClick: () => { },
         };
       };
 
@@ -1001,11 +695,11 @@ export const AgentsTable = withErrorBoundary(
       const pagination =
         totalItems > 15
           ? {
-              pageIndex: pageIndex,
-              pageSize: pageSize,
-              totalItemCount: totalItems,
-              pageSizeOptions: [15, 25, 50, 100],
-            }
+            pageIndex: pageIndex,
+            pageSize: pageSize,
+            totalItemCount: totalItems,
+            pageSizeOptions: [15, 25, 50, 100],
+          }
           : false;
       const sorting = {
         sort: {
@@ -1014,15 +708,14 @@ export const AgentsTable = withErrorBoundary(
         },
       };
 
-      const selection = {
-        selectable: (agent) => agent.id,
-        /* onSelectionChange: this.onSelectionChange */
-      };
-
+      // The EuiBasicTable tableLayout is set to "auto" to improve the use of empty space in the component.
+      // Previously the tableLayout is set to "fixed" with percentage width for each column, but the use of space was not optimal.
+      // Important: If all the columns have the truncateText property set to true, the table cannot adjust properly when the viewport size is small.
       return (
-        <EuiFlexGroup>
+        <EuiFlexGroup className="wz-overflow-auto">
           <EuiFlexItem>
             <EuiBasicTable
+              tableLayout="auto"
               items={agents}
               itemId="id"
               columns={columns}
@@ -1031,8 +724,6 @@ export const AgentsTable = withErrorBoundary(
               loading={isLoading}
               rowProps={getRowProps}
               cellProps={getCellProps}
-              /*             isSelectable={false}
-                        selection={selection} */
               noItemsMessage="No agents found"
               {...(pagination && { pagination })}
             />
@@ -1047,8 +738,8 @@ export const AgentsTable = withErrorBoundary(
       if (filters.length > 0) {
         !auxFilters.includes(group)
           ? this.setState({
-              filters: [...filters, { field: 'q', value: `group=${group}` }],
-            })
+            filters: [...filters, { field: 'q', value: `group=${group}` }],
+          })
           : false;
       } else {
         this.setState({
@@ -1071,56 +762,12 @@ export const AgentsTable = withErrorBoundary(
     }
 
     render() {
-      const { allSelected, purgeModal, selectedItems, loadingAllItem } = this.state;
       const title = this.headRender();
       const filter = this.filterBarRender();
       const selectColumnsRender = this.selectColumnsRender();
-      const upgradeButton = this.renderUpgradeButton();
-      const restartButton = this.renderRestartButton();
-      const purgeButton = this.renderPurgeButton();
-      const upgradeButtonAll = this.renderUpgradeButtonAll();
-      const restartButtonAll = this.renderRestartButtonAll();
-      const purgeButtonAll = this.renderPurgeButtonAll();
       const table = this.tableRender();
       const callOut = this.callOutRender();
-      let renderPurgeModal, loadItems, barButtons;
-      if (purgeModal) {
-        renderPurgeModal = (
-          <EuiOverlayMask>
-            <EuiConfirmModal
-              title={allSelected ? 'Delete all agents' : `Delete ${selectedItems.length} agents`}
-              onCancel={() => {
-                this.setState({ purgeModal: false });
-              }}
-              onConfirm={allSelected ? this.onClickPurgeAll : this.onClickPurge}
-              cancelButtonText="No, don't do it"
-              confirmButtonText="Yes, delete agents"
-              defaultFocusedButton="confirm"
-              buttonColor="danger"
-            >
-              <p>Are you sure you want to do this?</p>
-            </EuiConfirmModal>
-          </EuiOverlayMask>
-        );
-      }
-
-      if (loadingAllItem) {
-        barButtons = (
-          <EuiFlexGroup>
-            <EuiFlexItem>
-              <EuiLoadingSpinner size="l" />
-            </EuiFlexItem>
-          </EuiFlexGroup>
-        );
-      } else {
-        barButtons = (
-          <EuiFlexGroup>
-            {allSelected ? upgradeButtonAll : upgradeButton}
-            {allSelected ? restartButtonAll : restartButton}
-            {allSelected ? purgeButtonAll : purgeButton}
-          </EuiFlexGroup>
-        );
-      }
+      let renderPurgeModal, loadItems;
 
       return (
         <div>
@@ -1129,7 +776,6 @@ export const AgentsTable = withErrorBoundary(
           <EuiPanel paddingSize="m">
             {title}
             {loadItems}
-            {selectedItems.length > 0 && barButtons}
             {callOut}
             {selectColumnsRender}
             {table}

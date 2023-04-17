@@ -22,7 +22,7 @@ import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrat
 import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
 
-export function ExportTableCsv({endpoint,totalItems,filters,title}){
+export function ExportTableCsv({ endpoint, totalItems, filters, title }) {
 
   const showToast = (color, title, time) => {
     getToasts().add({
@@ -42,7 +42,7 @@ export function ExportTableCsv({endpoint,totalItems,filters,title}){
         [
           ...formatedFilters
         ],
-        `vuls-${(title).toLowerCase()}`
+        `${(title).toLowerCase()}`
       );
     } catch (error) {
       const options = {
