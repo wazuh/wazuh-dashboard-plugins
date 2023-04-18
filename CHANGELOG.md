@@ -12,6 +12,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Changed
 
 - Changed of regular expression in RBAC. [#5201](https://github.com/wazuh/wazuh-kibana-app/pull/5201)
+- Changed the search bar of agent selector modal and Agents section [#5366](https://github.com/wazuh/wazuh-kibana-app/pull/5366)
 
 ### Fixed
 
