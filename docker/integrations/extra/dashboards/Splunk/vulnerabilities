@@ -34,7 +34,7 @@
       "dataSources": {
         "primary": "ds_TVyYlSRA"
       },
-      "title": "High Severity Alerts",
+      "title": "Hight Severity Alerts",
       "options": {
         "majorColor": "#0258a1"
       }
