@@ -90,33 +90,6 @@ const checks = {
     shouldCheck: true,
     canRetry: true,
   },
-  maxBuckets: {
-    title: `Check ${PLUGIN_PLATFORM_SETTING_NAME_MAX_BUCKETS} setting`,
-    label: `${PLUGIN_PLATFORM_SETTING_NAME_MAX_BUCKETS} setting`,
-    validator: checkPluginPlatformSettings(PLUGIN_PLATFORM_SETTING_NAME_MAX_BUCKETS, WAZUH_PLUGIN_PLATFORM_SETTING_MAX_BUCKETS),
-    awaitFor: [],
-    canRetry: true,
-  },
-  metaFields: {
-    title: `Check ${PLUGIN_PLATFORM_SETTING_NAME_METAFIELDS} setting`,
-    label: `${PLUGIN_PLATFORM_SETTING_NAME_METAFIELDS} setting`,
-    validator: checkPluginPlatformSettings(PLUGIN_PLATFORM_SETTING_NAME_METAFIELDS, WAZUH_PLUGIN_PLATFORM_SETTING_METAFIELDS),
-    awaitFor: [],
-    canRetry: true,
-  },
-  timeFilter: {
-    title: `Check ${PLUGIN_PLATFORM_SETTING_NAME_TIME_FILTER} setting`,
-    label: `${PLUGIN_PLATFORM_SETTING_NAME_TIME_FILTER} setting`,
-    validator: checkPluginPlatformSettings(
-      PLUGIN_PLATFORM_SETTING_NAME_TIME_FILTER,
-      JSON.stringify(WAZUH_PLUGIN_PLATFORM_SETTING_TIME_FILTER),
-      (checkLogger: CheckLogger, options: { defaultAppValue: any }) => {
-        getDataPlugin().query.timefilter.timefilter.setTime(WAZUH_PLUGIN_PLATFORM_SETTING_TIME_FILTER)
-          && checkLogger.action(`Timefilter set to ${JSON.stringify(options.defaultAppValue)}`);
-      }),
-    awaitFor: [],
-    canRetry: true,
-  }
 };
 
 function HealthCheckComponent() {
