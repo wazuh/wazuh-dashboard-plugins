@@ -21,7 +21,7 @@ export const checkPluginPlatformSettings = (
   pluginPlatformSettingName: string,
   defaultAppValue: any,
   callback?: (checkLogger: CheckLogger, options: { defaultAppValue: any }) => void
-) => (appConfig: any) => async (checkLogger: CheckLogger) => {
+) => async (appConfig: any, checkLogger: CheckLogger) => {
   checkLogger.info('Getting settings...');
   const valuePluginPlatformSetting = getUiSettings().get(pluginPlatformSettingName);
   const settingsAreDifferent = !_.isEqual(

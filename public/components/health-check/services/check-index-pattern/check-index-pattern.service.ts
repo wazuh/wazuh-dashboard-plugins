@@ -58,22 +58,22 @@ const checkTemplate = decoratorHealthCheckRunCheckEnabled('template', checkTempl
 const checkFields = decoratorHealthCheckRunCheckEnabled('fields', checkFieldsService);
 
 const checkMaxBuckets = decoratorHealthCheckRunCheckEnabled('maxBuckets',
-  (appConfig, checkLogger) => checkPluginPlatformSettings(
+  checkPluginPlatformSettings(
     PLUGIN_PLATFORM_SETTING_NAME_MAX_BUCKETS,
     WAZUH_PLUGIN_PLATFORM_SETTING_MAX_BUCKETS
-  )(appConfig)(checkLogger));
+  ));
 
 const checkMetaFields = decoratorHealthCheckRunCheckEnabled('metaFields',
-  (appConfig, checkLogger) => checkPluginPlatformSettings(
+  checkPluginPlatformSettings(
     PLUGIN_PLATFORM_SETTING_NAME_METAFIELDS,
     WAZUH_PLUGIN_PLATFORM_SETTING_METAFIELDS
-  )(appConfig)(checkLogger));
+  ));
 
 const checkTimeFilter = decoratorHealthCheckRunCheckEnabled('timeFilter',
-  (appConfig, checkLogger) => checkPluginPlatformSettings(
+  checkPluginPlatformSettings(
     PLUGIN_PLATFORM_SETTING_NAME_TIME_FILTER,
     JSON.stringify(WAZUH_PLUGIN_PLATFORM_SETTING_TIME_FILTER),
     (checkLogger: CheckLogger, options: { defaultAppValue: any }) => {
       getDataPlugin().query.timefilter.timefilter.setTime(WAZUH_PLUGIN_PLATFORM_SETTING_TIME_FILTER)
         && checkLogger.action(`Timefilter set to ${JSON.stringify(options.defaultAppValue)}`);
-    })(appConfig)(checkLogger));
+    }));

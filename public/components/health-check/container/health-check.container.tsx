@@ -27,7 +27,6 @@ import { AppState, ErrorHandler } from '../../../react-services';
 import { useAppConfig, useRootScope } from '../../../components/common/hooks';
 import {
   checkApiService,
-  checkPluginPlatformSettings,
   checkIndexPatternService,
   checkPatternSupportService,
   checkSetupService,
@@ -37,18 +36,10 @@ import { withErrorBoundary, withReduxProvider } from '../../common/hocs';
 import { getHttp } from '../../../kibana-services';
 import {
   HEALTH_CHECK_REDIRECTION_TIME,
-  PLUGIN_PLATFORM_SETTING_NAME_MAX_BUCKETS,
-  PLUGIN_PLATFORM_SETTING_NAME_METAFIELDS,
-  PLUGIN_PLATFORM_SETTING_NAME_TIME_FILTER,
   WAZUH_INDEX_TYPE_MONITORING,
   WAZUH_INDEX_TYPE_STATISTICS,
-  WAZUH_PLUGIN_PLATFORM_SETTING_MAX_BUCKETS,
-  WAZUH_PLUGIN_PLATFORM_SETTING_METAFIELDS,
-  WAZUH_PLUGIN_PLATFORM_SETTING_TIME_FILTER,
 } from '../../../../common/constants';
 
-import { getDataPlugin } from '../../../kibana-services';
-import { CheckLogger } from '../types/check_logger';
 import { compose } from 'redux';
 import { getThemeAssetURL, getAssetURL } from '../../../utils/assets';
 
