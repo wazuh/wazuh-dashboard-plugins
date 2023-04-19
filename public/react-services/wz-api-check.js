@@ -43,7 +43,7 @@ export class ApiCheck {
       const response = await request(options);
 
       if (response.error) {
-        return Promise.reject(response);
+        return Promise.reject(this.returnErrorInstance(response));
       }
 
       return response;
@@ -52,11 +52,11 @@ export class ApiCheck {
         const wzMisc = new WzMisc();
         wzMisc.setApiIsDown(true);
         const response = (err.response.data || {}).message || err.message;
-        return Promise.reject(response);
+        return Promise.reject(this.returnErrorInstance(response));
       } else {
         return (err || {}).message || false
-          ? Promise.reject(err.message)
-          : Promise.reject(err || 'Server did not respond');
+          ? Promise.reject(this.returnErrorInstance(err,err.message))
+          : Promise.reject(this.returnErrorInstance(err,err || 'Server did not respond'));
       }
     }
   }
@@ -82,19 +82,33 @@ export class ApiCheck {
       const response = await request(options);
 
       if (response.error) {
-        return Promise.reject(response);
+        return Promise.reject(this.returnErrorInstance(response));
       }
 
       return response;
     } catch (err) {
       if (err.response) {
         const response = (err.response.data || {}).message || err.message;
-        return Promise.reject(response);
+        return Promise.reject(this.returnErrorInstance(response));
       } else {
         return (err || {}).message || false
-          ? Promise.reject(err.message)
-          : Promise.reject(err || 'Server did not respond');
+          ? Promise.reject(this.returnErrorInstance(err,err.message))
+          : Promise.reject(this.returnErrorInstance(err,err || 'Server did not respond'));
       }
     }
   }
+
+    /**
+   * Customize message and return an error object
+   * @param error 
+   * @param message 
+   * @returns error
+   */
+    static returnErrorInstance(error, message){
+      if(!error || typeof error === 'string'){
+        return new Error(message || error);
+      }
+      error.message = message
+      return error
+    }
 }
