@@ -27,7 +27,6 @@ import { AppState, ErrorHandler } from '../../../react-services';
 import { useAppConfig, useRootScope } from '../../../components/common/hooks';
 import {
   checkApiService,
-  checkPluginPlatformSettings,
   checkIndexPatternService,
   checkPatternSupportService,
   checkSetupService,
@@ -37,18 +36,10 @@ import { withErrorBoundary, withReduxProvider } from '../../common/hocs';
 import { getHttp } from '../../../kibana-services';
 import {
   HEALTH_CHECK_REDIRECTION_TIME,
-  PLUGIN_PLATFORM_SETTING_NAME_MAX_BUCKETS,
-  PLUGIN_PLATFORM_SETTING_NAME_METAFIELDS,
-  PLUGIN_PLATFORM_SETTING_NAME_TIME_FILTER,
   WAZUH_INDEX_TYPE_MONITORING,
   WAZUH_INDEX_TYPE_STATISTICS,
-  WAZUH_PLUGIN_PLATFORM_SETTING_MAX_BUCKETS,
-  WAZUH_PLUGIN_PLATFORM_SETTING_METAFIELDS,
-  WAZUH_PLUGIN_PLATFORM_SETTING_TIME_FILTER,
 } from '../../../../common/constants';
 
-import { getDataPlugin } from '../../../kibana-services';
-import { CheckLogger } from '../types/check_logger';
 import { compose } from 'redux';
 import './health-check.scss';
 import { getThemeAssetURL, getAssetURL } from '../../../utils/assets';
@@ -91,33 +82,6 @@ const checks = {
     shouldCheck: true,
     canRetry: true,
   },
-  maxBuckets: {
-    title: `Check ${PLUGIN_PLATFORM_SETTING_NAME_MAX_BUCKETS} setting`,
-    label: `${PLUGIN_PLATFORM_SETTING_NAME_MAX_BUCKETS} setting`,
-    validator: checkPluginPlatformSettings(PLUGIN_PLATFORM_SETTING_NAME_MAX_BUCKETS, WAZUH_PLUGIN_PLATFORM_SETTING_MAX_BUCKETS),
-    awaitFor: [],
-    canRetry: true,
-  },
-  metaFields: {
-    title: `Check ${PLUGIN_PLATFORM_SETTING_NAME_METAFIELDS} setting`,
-    label: `${PLUGIN_PLATFORM_SETTING_NAME_METAFIELDS} setting`,
-    validator: checkPluginPlatformSettings(PLUGIN_PLATFORM_SETTING_NAME_METAFIELDS, WAZUH_PLUGIN_PLATFORM_SETTING_METAFIELDS),
-    awaitFor: [],
-    canRetry: true,
-  },
-  timeFilter: {
-    title: `Check ${PLUGIN_PLATFORM_SETTING_NAME_TIME_FILTER} setting`,
-    label: `${PLUGIN_PLATFORM_SETTING_NAME_TIME_FILTER} setting`,
-    validator: checkPluginPlatformSettings(
-      PLUGIN_PLATFORM_SETTING_NAME_TIME_FILTER,
-      JSON.stringify(WAZUH_PLUGIN_PLATFORM_SETTING_TIME_FILTER),
-      (checkLogger: CheckLogger, options: { defaultAppValue: any }) => {
-        getDataPlugin().query.timefilter.timefilter.setTime(WAZUH_PLUGIN_PLATFORM_SETTING_TIME_FILTER)
-          && checkLogger.action(`Timefilter set to ${JSON.stringify(options.defaultAppValue)}`);
-      }),
-    awaitFor: [],
-    canRetry: true,
-  }
 };
 
 function HealthCheckComponent() {
