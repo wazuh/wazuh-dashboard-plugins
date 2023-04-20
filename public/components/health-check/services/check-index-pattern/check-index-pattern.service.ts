@@ -16,10 +16,27 @@ import { checkFieldsService } from './check-fields.service';
 import { checkIndexPatternObjectService } from './check-index-pattern-object.service';
 import { checkTemplateService } from './check-template.service';
 
-export const checkIndexPatternService = (appConfig) => async (checkLogger: CheckLogger) =>  await checkPattern(appConfig, checkLogger);
+import { checkPluginPlatformSettings } from '../../services';
+import {
+  PLUGIN_PLATFORM_SETTING_NAME_MAX_BUCKETS,
+  PLUGIN_PLATFORM_SETTING_NAME_METAFIELDS,
+  PLUGIN_PLATFORM_SETTING_NAME_TIME_FILTER,
+  WAZUH_PLUGIN_PLATFORM_SETTING_MAX_BUCKETS,
+  WAZUH_PLUGIN_PLATFORM_SETTING_METAFIELDS,
+  WAZUH_PLUGIN_PLATFORM_SETTING_TIME_FILTER,
+} from '../../../../../common/constants';
 
-const checkPattern = async (appConfig, checkLogger: CheckLogger) =>  {
-  if(!appConfig.data['checks.pattern']){
+import { getDataPlugin } from '../../../../kibana-services';
+
+export const checkIndexPatternService = (appConfig) => async (checkLogger: CheckLogger) => {
+  await checkPattern(appConfig, checkLogger);
+  await checkMaxBuckets(appConfig, checkLogger);
+  await checkMetaFields(appConfig, checkLogger);
+  await checkTimeFilter(appConfig, checkLogger);
+};
+
+const checkPattern = async (appConfig, checkLogger: CheckLogger) => {
+  if (!appConfig.data['checks.pattern']) {
     checkLogger.info('Check [pattern]: disabled. Some minimal tasks will be done.');
   };
   await checkIndexPatternObjectService(appConfig, checkLogger);
@@ -29,9 +46,9 @@ const checkPattern = async (appConfig, checkLogger: CheckLogger) =>  {
 
 const decoratorHealthCheckRunCheckEnabled = (checkKey, fn) => {
   return async (appConfig: any, checkLogger: CheckLogger) => {
-    if(appConfig.data[`checks.${checkKey}`]){
+    if (appConfig.data[`checks.${checkKey}`]) {
       await fn(appConfig, checkLogger);
-    }else{
+    } else {
       checkLogger.info(`Check [${checkKey}]: disabled. Skipped.`);
     };
   }
@@ -39,3 +56,24 @@ const decoratorHealthCheckRunCheckEnabled = (checkKey, fn) => {
 
 const checkTemplate = decoratorHealthCheckRunCheckEnabled('template', checkTemplateService);
 const checkFields = decoratorHealthCheckRunCheckEnabled('fields', checkFieldsService);
+
+const checkMaxBuckets = decoratorHealthCheckRunCheckEnabled('maxBuckets',
+  checkPluginPlatformSettings(
+    PLUGIN_PLATFORM_SETTING_NAME_MAX_BUCKETS,
+    WAZUH_PLUGIN_PLATFORM_SETTING_MAX_BUCKETS
+  ));
+
+const checkMetaFields = decoratorHealthCheckRunCheckEnabled('metaFields',
+  checkPluginPlatformSettings(
+    PLUGIN_PLATFORM_SETTING_NAME_METAFIELDS,
+    WAZUH_PLUGIN_PLATFORM_SETTING_METAFIELDS
+  ));
+
+const checkTimeFilter = decoratorHealthCheckRunCheckEnabled('timeFilter',
+  checkPluginPlatformSettings(
+    PLUGIN_PLATFORM_SETTING_NAME_TIME_FILTER,
+    JSON.stringify(WAZUH_PLUGIN_PLATFORM_SETTING_TIME_FILTER),
+    (checkLogger: CheckLogger, options: { defaultAppValue: any }) => {
+      getDataPlugin().query.timefilter.timefilter.setTime(WAZUH_PLUGIN_PLATFORM_SETTING_TIME_FILTER)
+        && checkLogger.action(`Timefilter set to ${JSON.stringify(options.defaultAppValue)}`);
+    }));

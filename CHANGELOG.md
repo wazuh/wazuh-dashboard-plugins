@@ -2,17 +2,20 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v4.5.0 - OpenSearch Dashboards 2.3.0 - Revision 4500
+## Wazuh v4.5.0 - OpenSearch Dashboards 2.6.0 - Revision 4500
 
 ### Added
 
 - Added rel="noopener noreferrer" in documentation links. [#5197](https://github.com/wazuh/wazuh-kibana-app/pull/5197) [#5274](https://github.com/wazuh/wazuh-kibana-app/pull/5274) [#5298](https://github.com/wazuh/wazuh-kibana-app/pull/5298)
 - Added `ignore` and `restrict` options to Syslog configuration. [#5203](https://github.com/wazuh/wazuh-kibana-app/pull/5203)
+- Added the `extensions.github` and `extensions.office` settings to the default configuration file [#5376](https://github.com/wazuh/wazuh-kibana-app/pull/5376)
+- Added new global error treatment (client-side) [#4163](https://github.com/wazuh/wazuh-kibana-app/pull/4163)
 
 ### Changed
 
 - Changed of regular expression in RBAC. [#5201](https://github.com/wazuh/wazuh-kibana-app/pull/5201)
 - Changed the search bar of agent selector modal and Agents section [#5366](https://github.com/wazuh/wazuh-kibana-app/pull/5366)
+- Migrate the timeFilter, metaFields, maxBuckets health checks inside the pattern check. [#5384](https://github.com/wazuh/wazuh-kibana-app/pull/5384)
 
 ### Fixed
 
@@ -23,6 +26,19 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Handling endpoint response was done when there is no data to show [#4918](https://github.com/wazuh/wazuh-kibana-app/pull/4918)
 - Fixed references to Elasticsearch in Wazuh-stack plugin [4894](https://github.com/wazuh/wazuh-kibana-app/pull/4894)
 - Fixed the 2 errors that appeared in console in Settings>Configuration section. [#5135](https://github.com/wazuh/wazuh-kibana-app/pull/5135)
+- Fixed the GitHub and Office 365 module visibility configuration for each API host was not kept when changing/upgrading the plugin [#5376](https://github.com/wazuh/wazuh-kibana-app/pull/5376)
+- Fixed the GitHub and Office 365 modules appear in the main menu when they were not configured [#5376](https://github.com/wazuh/wazuh-kibana-app/pull/5376)
+- Fixed TypeError in FIM Inventory using new error handler [#5364](https://github.com/wazuh/wazuh-kibana-app/pull/5364)
+
+## Wazuh v4.4.1 - OpenSearch Dashboards 2.6.0 - Revision 01
+
+### Fixed
+
+- Fixed the search in the agent inventory data tables [#5196](https://github.com/wazuh/wazuh-kibana-app/pull/5196)
+- Fixed `Top 5 users` table overflow in `FIM::Dashboard` [#5334](https://github.com/wazuh/wazuh-kibana-app/pull/5334)
+- Fixed a visual error in the 'About' section. [#5337](https://github.com/wazuh/wazuh-kibana-app/pull/5337)
+- Fixed the `Anomaly and malware detection` link. [#5329](https://github.com/wazuh/wazuh-kibana-app/pull/5329)
+- Fixed the problem that did not allow closing the time picker when the button was clicked again in `Agents` and `Management/Statistics`. [#5341](https://github.com/wazuh/wazuh-kibana-app/pull/5341)
 
 ## Wazuh v4.4.0 - OpenSearch Dashboards 2.4.0 - Revision 06
 

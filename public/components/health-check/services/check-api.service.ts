@@ -60,13 +60,13 @@ const trySetDefault = async (checkLogger: CheckLogger) => {
             );
           }
         }
-        return Promise.reject('No API available to connect');
+        return Promise.reject(new Error('No API available to connect'));
       }
     }
-    return Promise.reject('No API configuration found');
+    return Promise.reject(new Error('No API configuration found'));
   } catch (error) {
     checkLogger.error(`Error connecting to API: ${error}`);
-    return Promise.reject(`Error connecting to API: ${error}`);
+    return Promise.reject(new Error(`Error connecting to API: ${error}`));
   }
 };
 
