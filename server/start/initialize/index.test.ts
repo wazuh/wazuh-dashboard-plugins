@@ -338,9 +338,7 @@ describe("[initialize] `wazuh-registry.json` created", () => {
       if ( Object.keys(contentRegistryFile.hosts).length ){
         Object.entries(contentRegistryFile.hosts).forEach(([hostID, hostData]) => {
           if(hostData.extensions){
-            Object.entries(hostData.extensions).forEach(([extensionID, extensionEnabled]) => {
-              expect(extensionEnabled).toBe(contentRegistryExpected.hosts[hostID].extensions[extensionID])
-            });
+            expect(hostData.extensions).toEqual(contentRegistryExpected.hosts[hostID].extensions);
           };
         });
       };

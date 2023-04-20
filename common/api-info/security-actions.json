@@ -111,8 +111,7 @@
       "DELETE /agents/{agent_id}/group/{group_id}",
       "PUT /agents/{agent_id}/group/{group_id}",
       "DELETE /agents/group",
-      "PUT /agents/group",
-      "DELETE /groups"
+      "PUT /agents/group"
     ]
   },
   "group:modify_assignments": {
@@ -134,8 +133,7 @@
       "DELETE /agents/{agent_id}/group/{group_id}",
       "PUT /agents/{agent_id}/group/{group_id}",
       "DELETE /agents/group",
-      "PUT /agents/group",
-      "DELETE /groups"
+      "PUT /agents/group"
     ]
   },
   "agent:restart": {
