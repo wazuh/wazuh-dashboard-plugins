@@ -636,5 +636,5 @@ export class Inventory extends Component<InventoryProps, InventoryState> {
 }
 
 Inventory.defaultProps = {
-  onClickRow: undefined,
-};
+  onClickRow: undefined
+}
