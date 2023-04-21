@@ -1,7 +1,6 @@
 version: '3.7'
 
 services:
-
   splunk:
     image: splunk/splunk:9.0.4
     volumes:
@@ -12,17 +11,16 @@ services:
       generator:
         condition: service_healthy
     ports:
-      - "8000:8000"
-      - "8088:8088"
+      - '8000:8000'
+      - '8088:8088'
     environment:
       SPLUNK_START_ARGS: --accept-license
-      SPLUNK_HTTP_ENABLESSL: "true"
+      SPLUNK_HTTP_ENABLESSL: 'true'
       SPLUNK_PASSWORD: password
       SPLUNK_HOSTNAME: splunk
       SPLUNK_STANDALONE_URL: https://splunk:8080
 
-
- ## WAZUH STACK
+  ## WAZUH STACK
 
   wazuh.manager:
     image: wazuh/wazuh-manager:${WAZUH_VERSION}
@@ -31,10 +29,10 @@ services:
         condition: service_healthy
     hostname: wazuh.manager
     ports:
-      - "1514:1514"
-      - "1515:1515"
-      - "514:514/udp"
-      - "55000:55000"
+      - '1514:1514'
+      - '1515:1515'
+      - '514:514/udp'
+      - '55000:55000'
     environment:
       - INDEXER_URL=https://wazuh.indexer:9200
       - INDEXER_USERNAME=admin
@@ -63,18 +61,18 @@ services:
       - ./config/splunkforwarder/props.conf:/opt/splunkforwarder/etc/system/local/props.conf
       - ./config/splunkforwarder/user-seed.conf:/opt/splunkforwarder/etc/system/local/user-seed.conf
     command: bash -c "cd tmp
-             && cp /tmp/packages/* /opt/
-             && tar -xzf /opt/logstash.tar.gz -C /opt
-             && rm /opt/logstash.tar.gz
-             && dpkg -i /opt/splunkforwarder.deb
-             && rm /opt/splunkforwarder.deb
-             && python3 changeDate.py
-             && cat /var/ossec/logs/alerts/sample_alerts.json >> /var/ossec/logs/alerts/alerts.json
-             && cd /opt/logstash-${STACK_VERSION}
-             && bin/logstash-plugin install logstash-output-opensearch
-             && echo COSO
-             && bin/logstash -f /etc/logstash/conf.d/logstash.conf"
-             && tail -F /var/ossec/logs/ossec.log
+      && cp /tmp/packages/* /opt/
+      && tar -xzf /opt/logstash.tar.gz -C /opt
+      && rm /opt/logstash.tar.gz
+      && dpkg -i /opt/splunkforwarder.deb
+      && rm /opt/splunkforwarder.deb
+      && python3 changeDate.py
+      && cat /var/ossec/logs/alerts/sample_alerts.json >> /var/ossec/logs/alerts/alerts.json
+      && cd /opt/logstash-${STACK_VERSION}
+      && bin/logstash-plugin install logstash-output-opensearch
+      && echo COSO
+      && bin/logstash -f /etc/logstash/conf.d/logstash.conf"
+      && tail -F /var/ossec/logs/ossec.log
 
   wazuh.indexer:
     image: wazuh/wazuh-indexer:${WAZUH_VERSION}
@@ -83,9 +81,9 @@ services:
         condition: service_healthy
     hostname: wazuh.indexer
     ports:
-      - "9200:9200"
+      - '9200:9200'
     environment:
-      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+      - 'OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m'
     ulimits:
       memlock:
         soft: -1
@@ -97,7 +95,6 @@ services:
       - wi_certs:/usr/share/wazuh-indexer/config/certs/
       - ./config/wazuh_indexer/wazuh.indexer.yml:/usr/share/wazuh-indexer/config/opensearch.yml
       - ./config/wazuh_indexer/internal_users.yml:/usr/share/wazuh-indexer/plugins/opensearch-security/securityconfig/internal_users.yml
-
 
   wazuh.dashboard:
     image: wazuh/wazuh-dashboard:${WAZUH_VERSION}
@@ -122,15 +119,13 @@ services:
       - wazuh.indexer:wazuh.indexer
       - wazuh.manager:wazuh.manager
 
-
-
- ##ELASTIC STACK
+  ##ELASTIC STACK
 
   setup:
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
     volumes:
       - es_certs:/usr/share/elasticsearch/config/certs
-    user: "0"
+    user: '0'
     command: >
       bash -c '
         if [ x${ELASTIC_PASSWORD} == x ]; then
@@ -170,7 +165,7 @@ services:
         echo "All done!";
       '
     healthcheck:
-      test: ["CMD-SHELL", "[ -f config/certs/es01/es01.crt ]"]
+      test: ['CMD-SHELL', '[ -f config/certs/es01/es01.crt ]']
       interval: 1s
       timeout: 5s
       retries: 120
@@ -208,7 +203,7 @@ services:
     healthcheck:
       test:
         [
-          "CMD-SHELL",
+          'CMD-SHELL',
           "curl -s --cacert config/certs/ca/ca.crt https://localhost:9200 | grep -q 'missing authentication credentials'",
         ]
       interval: 10s
@@ -233,14 +228,14 @@ services:
     healthcheck:
       test:
         [
-          "CMD-SHELL",
+          'CMD-SHELL',
           "curl -s -I http://localhost:5601 | grep -q 'HTTP/1.1 302 Found'",
         ]
       interval: 10s
       timeout: 10s
       retries: 120
 
-## OPENSEARCH STACK
+  ## OPENSEARCH STACK
   opensearch:
     image: opensearchproject/opensearch:${OS_VERSION}
     depends_on:
@@ -253,7 +248,7 @@ services:
       - discovery.seed_hosts=opensearch
       - cluster.initial_master_nodes=opensearch
       - bootstrap.memory_lock=true # along with the memlock settings below, disables swapping
-      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m" # minimum and maximum Java heap size, recommend setting both to 50% of system RAM
+      - 'OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m' # minimum and maximum Java heap size, recommend setting both to 50% of system RAM
     volumes:
       - os_certs:/usr/share/opensearch/config/certs/
       - ./config/opensearch/opensearch.yml:/usr/share/opensearch/config/opensearch.yml
@@ -270,7 +265,7 @@ services:
     healthcheck:
       test:
         [
-          "CMD-SHELL",
+          'CMD-SHELL',
           "curl -v --cacert /usr/share/opensearch/config/certs/root-ca.pem https://opensearch:9200 2>&1 | grep -q '401 Unauthorized'",
         ]
       interval: 1s
@@ -286,31 +281,32 @@ services:
     ports:
       - 5603:5601
     expose:
-      - "5601"
+      - '5601'
     volumes:
       - os_certs:/usr/share/opensearch-dashboards/config/certs/
       - ./config/opensearch_dashboards/opensearch_dashboards.yml:/usr/share/opensearch-dashboards/config/opensearch_dashboards.yml
 
-
-### Logstash
+  ### Logstash
   logstash:
     depends_on:
       generator:
         condition: service_healthy
     image: docker.elastic.co/logstash/logstash:8.6.2
-    command: bash -c "bin/logstash-plugin install logstash-input-opensearch logstash-output-opensearch
-             && logstash -f /etc/logstash/conf.d/logstash.conf"
+    command:
+      bash -c "bin/logstash-plugin install logstash-input-opensearch logstash-output-opensearch
+      && logstash -f /etc/logstash/conf.d/logstash.conf"
     volumes:
       - wm_certs:/etc/ssl
       - ./config/logstash/logstash-indexer.conf:/etc/logstash/conf.d/logstash.conf
       - ./config/logstash/es_template.json:/etc/logstash/es_template.json
+      - ./config/logstash/os_templatee.json:/etc/logstash/os_templatee.json
       - ./config/logstash/os_template.json:/etc/logstash/os_template.json
       - wd_certs:/etc/certs/wazuh-dashboard
       - es_certs:/etc/certs/elastic
     environment:
-      LS_JAVA_OPTS: "-Xmx1024m -Xms1024m"
+      LS_JAVA_OPTS: '-Xmx1024m -Xms1024m'
 
-### Certificates generation
+  ### Certificates generation
 
   generator:
     image: cfssl/cfssl
@@ -325,82 +321,86 @@ services:
       - ./config/certs:/conf
     entrypoint: /bin/bash
     command: >
-        -c '
-          echo Validating packages
-          [ ! -f "/packages/logstash.tar.gz" ] && echo Downloading Logstash && wget -q -O logstash.tar.gz ${LOGSTASH_URL} && cp logstash.tar.gz /packages/logstash.tar.gz && echo Download complete
-          [ ! -f "/packages/splunkforwarder.deb" ] && echo Downloading Splunk forwarder && wget -q -O splunkforwarder.deb ${SPLUNK_FORWARDER_URL} && cp splunkforwarder.deb /packages/splunkforwarder.deb && echo Download complete
+      -c '
+        echo Validating packages
+        [ ! -f "/packages/logstash.tar.gz" ] && echo Downloading Logstash && wget -q -O logstash.tar.gz ${LOGSTASH_URL} && cp logstash.tar.gz /packages/logstash.tar.gz && echo Download complete
+        [ ! -f "/packages/splunkforwarder.deb" ] && echo Downloading Splunk forwarder && wget -q -O splunkforwarder.deb ${SPLUNK_FORWARDER_URL} && cp splunkforwarder.deb /packages/splunkforwarder.deb && echo Download complete
 
-          export certs=/tmp/certs
-          mkdir $$certs
-        	cd $$certs
+        export certs=/tmp/certs
+        mkdir $$certs
+      	cd $$certs
 
-        	echo "Generating CA"
-        	cfssl gencert -initca /conf/ca.json | cfssljson -bare ca
+      	echo "Generating CA"
+      	cfssl gencert -initca /conf/ca.json | cfssljson -bare ca
 
-        	echo "Generating servers certificates"
-        	for i in wazuh.indexer wazuh-dashboard wazuh.manager splunk opensearch; do
+      	echo "Generating servers certificates"
+      	for i in wazuh.indexer wazuh-dashboard wazuh.manager splunk opensearch; do
+      		echo "Generating cert for $$i"
+      		cat /conf/host.json | \
+      		sed "s/HOST/$$i/g" | \
+      		cfssl gencert \
+      			-ca $$certs/ca.pem \
+      			-ca-key $$certs/ca-key.pem \
+      			-config /conf/cfssl.json \
+      			-profile=server - | \
+      		cfssljson -bare $$i
+      		openssl pkcs8 -topk8 -inform pem -in $$i-key.pem -outform pem -nocrypt -out $$i.key
+      	done
+
+      	echo "Generating clients certificates"
+        	for i in admin filebeat; do
         		echo "Generating cert for $$i"
-        		cat /conf/host.json | \
-        		sed "s/HOST/$$i/g" | \
-        		cfssl gencert \
-        			-ca $$certs/ca.pem \
-        			-ca-key $$certs/ca-key.pem \
-        			-config /conf/cfssl.json \
-        			-profile=server - | \
-        		cfssljson -bare $$i
-        		openssl pkcs8 -topk8 -inform pem -in $$i-key.pem -outform pem -nocrypt -out $$i.key
-        	done
+      		cat /conf/host.json | \
+      		sed "s/HOST/$$i/g" | \
+      		cfssl gencert \
+      			-ca $$certs/ca.pem \
+      			-ca-key $$certs/ca-key.pem \
+      			-config /conf/cfssl.json \
+      			-profile=client - | \
+      		cfssljson -bare $$i
+      		openssl pkcs8 -topk8 -inform pem -in $$i-key.pem -outform pem -nocrypt -out $$i.key
+      	done
 
-        	echo "Generating clients certificates"
-          	for i in admin filebeat; do
-          		echo "Generating cert for $$i"
-        		cat /conf/host.json | \
-        		sed "s/HOST/$$i/g" | \
-        		cfssl gencert \
-        			-ca $$certs/ca.pem \
-        			-ca-key $$certs/ca-key.pem \
-        			-config /conf/cfssl.json \
-        			-profile=client - | \
-        		cfssljson -bare $$i
-        		openssl pkcs8 -topk8 -inform pem -in $$i-key.pem -outform pem -nocrypt -out $$i.key
-        	done
+          echo "Setting up permissions"
 
-            echo "Setting up permissions"
+          rm /certs/wi/* /certs/wd/* /certs/wm/*
 
-            rm /certs/wi/* /certs/wd/* /certs/wm/*
+          mv $$certs/wazuh.indexer* /certs/wi
+          mv $$certs/admin* /certs/wi
+          mv /certs/wi/admin.key /certs/wi/admin-key.pem
+          cp $$certs/ca.pem /certs/wi/root-ca.pem
+          cp $$certs/ca-key.pem /certs/wi/root-ca-key.pem
 
-            mv $$certs/wazuh.indexer* /certs/wi
-            mv $$certs/admin* /certs/wi
-            mv /certs/wi/admin.key /certs/wi/admin-key.pem
-            cp $$certs/ca.pem /certs/wi/root-ca.pem
-            cp $$certs/ca-key.pem /certs/wi/root-ca-key.pem
+          mv $$certs/wazuh-dashboard* /certs/wd
+          cp $$certs/ca.pem /certs/wd/root-ca.pem
+          cp $$certs/ca-key.pem /certs/wd/root-ca-key.pem
 
-            mv $$certs/wazuh-dashboard* /certs/wd
-            cp $$certs/ca.pem /certs/wd/root-ca.pem
-            cp $$certs/ca-key.pem /certs/wd/root-ca-key.pem
+          mv $$certs/splunk* /certs/sp
+          cp $$certs/ca.pem /certs/sp/cacert.pem
+          cp $$certs/ca-key.pem /certs/sp/cacert-key.pem
+          cat /certs/sp/splunk.pem /certs/sp/splunk-key.pem /certs/sp/cacert.pem > /certs/sp/splunkhec.pem
 
-            mv $$certs/splunk* /certs/sp
-            cp $$certs/ca.pem /certs/sp/cacert.pem
-            cp $$certs/ca-key.pem /certs/sp/cacert-key.pem
-            cat /certs/sp/splunk.pem /certs/sp/splunk-key.pem /certs/sp/cacert.pem > /certs/sp/splunkhec.pem
+          mv $$certs/opensearch* /certs/os
+          cp $$certs/ca.pem /certs/os/root-ca.pem
+          cp $$certs/ca-key.pem /certs/os/root-ca-key.pem
 
-            mv $$certs/opensearch* /certs/os
-            cp $$certs/ca.pem /certs/os/root-ca.pem
-            cp $$certs/ca-key.pem /certs/os/root-ca-key.pem
+          mv $$certs/*.* /certs/wm
+          cp /certs/wm/ca.pem /certs/wm/root-ca.pem
+          cp /certs/wm/ca-key.pem /certs/wm/root-ca-key.pem
 
-            mv $$certs/*.* /certs/wm
-            cp /certs/wm/ca.pem /certs/wm/root-ca.pem
-            cp /certs/wm/ca-key.pem /certs/wm/root-ca-key.pem
+          chmod 640 /certs/wi/* /certs/wd/* /certs/wm/*
+          chown -R 1000:1000 /certs/*
+          ls -alR /certs/
 
-            chmod 640 /certs/wi/* /certs/wd/* /certs/wm/*
-            chown -R 1000:1000 /certs/*
-            ls -alR /certs/
+          sleep 300
 
-            sleep 300
-
-        '
+      '
     healthcheck:
-      test: ["CMD-SHELL", "[ -r /certs/wm/wazuh.manager.pem ] && [ -f /packages/splunkforwarder.deb ]"]
+      test:
+        [
+          'CMD-SHELL',
+          '[ -r /certs/wm/wazuh.manager.pem ] && [ -f /packages/splunkforwarder.deb ]',
+        ]
       interval: 2s
       timeout: 5s
       retries: 100
