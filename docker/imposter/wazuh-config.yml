@@ -50,6 +50,9 @@ resources:
   # Get active configuration
   - method: GET
     path: /agents/{agent_id}/config/{component}/{configuration}
+    response:
+      statusCode: 200
+      scriptFile: agents/agents-configuration.js
 
   # Remove agent from groups
   - method: DELETE
@@ -134,6 +137,9 @@ resources:
   # List agents distinct
   - method: GET
     path: /agents/stats/distinct
+    response:
+      statusCode: 200
+      scriptFile: agents/agent_distinct.js
 
   # Summarize agents OS
   - method: GET
