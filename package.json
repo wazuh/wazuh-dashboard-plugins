@@ -1,10 +1,10 @@
 {
   "name": "wazuh",
-  "version": "4.3.10",
-  "revision": "4311",
-  "code": "4311",
+  "version": "4.3.11",
+  "revision": "4312",
+  "code": "4312",
   "pluginPlatform": {
-    "version": "7.16.0"
+    "version": "7.17.5"
   },
   "description": "Wazuh app",
   "keywords": [
@@ -77,5 +77,7 @@
     "eslint-plugin-async-await": "^0.0.0",
     "tslint": "^5.11.0",
     "typescript-eslint-parser": "^18.0.0"
-  }
+  },
+  "commit": "040b80330",
+  "stage": "stable"
 }
