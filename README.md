@@ -105,9 +105,11 @@ chown -R kibana:kibana /usr/share/kibana/data
 
 Install the Wazuh app plugin for Kibana
 
+Replace `{WAZUH_KIBANA_PACKAGE_URI}` with the desired URL of the [compatibility matrix](https://github.com/wazuh/wazuh-kibana-app/wiki/Compatibility#compatibility-matrix)
+
 ```
 cd /usr/share/kibana
-sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.5.0_7.16.0-1.zip
+sudo -u kibana bin/kibana-plugin install {WAZUH_KIBANA_PACKAGE_URI}
 ```
 
 Restart Kibana
@@ -192,9 +194,11 @@ chown -R kibana:kibana /usr/share/kibana/plugins
 
 Install the Wazuh app
 
+Replace `{WAZUH_KIBANA_PACKAGE_URI}` with the desired URL of the [compatibility matrix](https://github.com/wazuh/wazuh-kibana-app/wiki/Compatibility#compatibility-matrix)
+
 ```
 cd /usr/share/kibana/
-sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.5.0_7.16.0-1.zip
+sudo -u kibana bin/kibana-plugin install {WAZUH_KIBANA_PACKAGE_URI}
 ```
 
 Update configuration file permissions.
