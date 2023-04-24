@@ -131,5 +131,5 @@
     ]
   },
   "description": "",
-  "title": "wazuh-docker-listener-v1.0"
+  "title": "wazuh-incident-response-v1.0"
 }
