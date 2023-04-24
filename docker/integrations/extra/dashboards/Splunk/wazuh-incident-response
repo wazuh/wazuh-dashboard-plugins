@@ -1,67 +1,66 @@
 {
   "visualizations": {
-    "viz_lTJLU7ar": {
-      "type": "splunk.area",
-      "options": {
-        "stackMode": "stacked",
-        "xAxisTitleText": "timestamp",
-        "yAxisTitleText": "count",
-        "legendDisplay": "left"
-      },
-      "dataSources": {
-        "primary": "ds_BHh1kZmb"
-      },
-      "title": "Events by source over time"
-    },
-    "viz_l5qazB46": {
+    "viz_bRMOrrNo": {
       "type": "splunk.pie",
       "options": {
         "showDonutHole": true
       },
       "dataSources": {
-        "primary": "ds_Y2J0psR4"
+        "primary": "ds_T5OG9qjO"
       },
-      "title": "Sources"
+      "title": "Alert groups"
     },
-    "viz_1JzeNwnq": {
+    "viz_iOvmhhgU": {
       "type": "splunk.table",
-      "title": "Events",
+      "options": {},
       "dataSources": {
-        "primary": "ds_K2y81pak"
+        "primary": "ds_tnYl87gQ"
       }
+    },
+    "viz_P0bNNVfw": {
+      "type": "splunk.column",
+      "options": {
+        "stackMode": "stacked",
+        "xAxisTitleText": "timestamp",
+        "yAxisTitleText": "count"
+      },
+      "dataSources": {
+        "primary": "ds_GccX6Lrj"
+      },
+      "title": "Events"
     }
   },
   "dataSources": {
-    "ds_BHh1kZmb": {
+    "ds_T5OG9qjO": {
       "type": "ds.search",
       "options": {
+        "query": "index=\"wazuh-alerts\" \"rule.groups{}\"=\"*\" | top limit=5 \"rule.groups{}\" | chart count by \"rule.groups{}\" useother=false usenull=false",
         "queryParameters": {
-          "earliest": "$global_time.earliest$",
-          "latest": "$global_time.latest$"
-        },
-        "query": "index=\"wazuh-alerts\" \"data.aws.source\"=\"*\" | timechart count by \"data.aws.source\""
+          "latest": "$global_time.latest$",
+          "earliest": "$global_time.earliest$"
+        }
       },
       "name": "Search_1"
     },
-    "ds_Y2J0psR4": {
+    "ds_tnYl87gQ": {
       "type": "ds.search",
       "options": {
+        "query": "index=\"wazuh-alerts\" \"agent.name\"=\"*\", \"rule.groups{}\"=\"*\", \"rule.description\"=\"*\", \"rule.level\"=\"*\", \"rule.id\"=\"*\" | table _time, agent.name, rule.groups{}, rule.description, rule.level, rule.id",
         "queryParameters": {
-          "earliest": "$global_time.earliest$",
-          "latest": "$global_time.latest$"
-        },
-        "query": "index=\"wazuh-alerts\" \"data.aws.source\"=\"*\" | chart count by \"data.aws.source\""
+          "latest": "$global_time.latest$",
+          "earliest": "$global_time.earliest$"
+        }
       },
       "name": "Search_2"
     },
-    "ds_K2y81pak": {
+    "ds_GccX6Lrj": {
       "type": "ds.search",
       "options": {
+        "query": "index=\"wazuh-alerts\" \"rule.groups{}\"=\"audit\" | timechart count by \"rule.groups{}\"",
         "queryParameters": {
-          "earliest": "$global_time.earliest$",
-          "latest": "$global_time.latest$"
-        },
-        "query": "index=\"wazuh-alerts\" \"agent.name\"=\"*\", \"data.aws.source\"=\"*\", \"rule.description\"=\"*\", \"rule.level\"=\"*\", \"rule.id\"=\"*\" | table _time, agent.name, data.aws.source, rule.description, rule.level, rule.id"
+          "latest": "$global_time.latest$",
+          "earliest": "$global_time.earliest$"
+        }
       },
       "name": "Search_3"
     }
@@ -97,33 +96,33 @@
     "options": {},
     "structure": [
       {
-        "item": "viz_lTJLU7ar",
+        "item": "viz_bRMOrrNo",
         "type": "block",
         "position": {
           "x": 0,
           "y": 0,
-          "w": 795,
-          "h": 334
+          "w": 388,
+          "h": 292
         }
       },
       {
-        "item": "viz_1JzeNwnq",
+        "item": "viz_iOvmhhgU",
         "type": "block",
         "position": {
           "x": 0,
-          "y": 334,
+          "y": 292,
           "w": 1200,
-          "h": 358
+          "h": 399
         }
       },
       {
-        "item": "viz_l5qazB46",
+        "item": "viz_P0bNNVfw",
         "type": "block",
         "position": {
-          "x": 795,
+          "x": 388,
           "y": 0,
-          "w": 405,
-          "h": 334
+          "w": 812,
+          "h": 292
         }
       }
     ],
@@ -132,5 +131,5 @@
     ]
   },
   "description": "",
-  "title": "Amazon AWS"
+  "title": "wazuh-docker-listener-v1.0"
 }

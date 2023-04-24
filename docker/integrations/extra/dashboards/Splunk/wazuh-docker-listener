@@ -126,5 +126,5 @@
     ]
   },
   "description": "",
-  "title": "Docker Listener"
+  "title": "wazuh-docker-listener-v1.0"
 }

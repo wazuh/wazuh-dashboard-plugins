@@ -1,70 +1,85 @@
 {
   "visualizations": {
-    "viz_XlLyYDmC": {
-      "type": "splunk.area",
-      "dataSources": {
-        "primary": "ds_DljIxEDR"
-      },
+    "viz_oAPKLE0R": {
+      "type": "splunk.column",
       "options": {
-        "stackMode": "stacked",
         "xAxisTitleText": "timestamp",
-        "yAxisTitleText": "count"
+        "yAxisTitleText": "Count",
+        "stackMode": "stacked"
       },
-      "title": "Alert severity"
+      "dataSources": {
+        "primary": "ds_TdanKF0I"
+      },
+      "showProgressBar": false,
+      "showLastUpdated": false,
+      "title": "Alerts evolution - Top 5 agents",
+      "description": ""
     },
-    "viz_qzFw5Wx7": {
+    "viz_Y07WmZ1b": {
       "type": "splunk.table",
-      "options": {},
       "dataSources": {
-        "primary": "ds_Irx4cEkl"
-      }
-    },
-    "viz_3V3AvVY4": {
-      "type": "splunk.singlevalueradial",
-      "dataSources": {
-        "primary": "ds_oyvgAG73"
+        "primary": "ds_ut2DiVW9"
       },
-      "title": "Critical Severity Alerts",
+      "title": "Security alerts",
+      "description": ""
+    },
+    "viz_DI7fpctI": {
+      "type": "splunk.pie",
+      "dataSources": {
+        "primary": "ds_EmDJmxMO"
+      },
+      "showProgressBar": false,
+      "showLastUpdated": false,
+      "title": "Top Mitre ATT&K tactics"
+    },
+    "viz_qYCIuSjF": {
+      "type": "splunk.singlevalueradial",
+      "options": {
+        "majorColor": "#0258a1",
+        "trendColor": "#000000"
+      },
+      "dataSources": {
+        "primary": "ds_d9cN1Qn9"
+      },
+      "title": "Total"
+    },
+    "viz_aTlMnG7A": {
+      "type": "splunk.singlevalueradial",
       "options": {
         "majorColor": "#db566f"
-      }
-    },
-    "viz_cmEIbZ9q": {
-      "type": "splunk.singlevalueradial",
-      "dataSources": {
-        "primary": "ds_TVyYlSRA"
       },
-      "title": "Hight Severity Alerts",
+      "dataSources": {
+        "primary": "ds_ZPT4uVoe"
+      },
+      "title": "Level 12 or above alerts"
+    },
+    "viz_R8LMR6U6": {
+      "type": "splunk.singlevalueradial",
       "options": {
-        "majorColor": "#0258a1"
-      }
-    },
-    "viz_4QSVuglC": {
-      "type": "splunk.singlevalueradial",
-      "dataSources": {
-        "primary": "ds_D0hAYmXA"
+        "backgroundColor": "#ffffff",
+        "majorColor": "#bf0561"
       },
-      "title": "Medium Severity Alerts",
+      "dataSources": {
+        "primary": "ds_d8m0U7Ph"
+      },
+      "title": "Authentication failure"
+    },
+    "viz_nDMI4ZGW": {
+      "type": "splunk.singlevalueradial",
       "options": {
         "majorColor": "#007d73"
-      }
-    },
-    "viz_VI9ZdnSO": {
-      "type": "splunk.singlevalueradial",
-      "dataSources": {
-        "primary": "ds_1KrtDz29"
       },
-      "title": "Low Severity Alerts",
-      "options": {
-        "majorColor": "#232323"
-      }
+      "dataSources": {
+        "primary": "ds_7FDRhb5m"
+      },
+      "title": "Authentication success"
     }
   },
   "dataSources": {
-    "ds_DljIxEDR": {
+    "ds_TdanKF0I": {
       "type": "ds.search",
       "options": {
-        "query": "index=\"wazuh-alerts\" | timechart count by data.vulnerability.severity useother=false usenull=false",
+        "query": "index=\"wazuh-alerts\" | timechart count by agent.name\n\n",
         "queryParameters": {
           "latest": "$global_time.latest$",
           "earliest": "$global_time.earliest$"
@@ -72,10 +87,10 @@
       },
       "name": "Search_1"
     },
-    "ds_31leL1fM": {
+    "ds_ut2DiVW9": {
       "type": "ds.search",
       "options": {
-        "query": "wazuh-alerts-4.x-sample | timechart count by data.vulnerability.severity",
+        "query": "index=\"wazuh-alerts\" \"rule.mitre.id{}\"=\"*\" | table _time, agent.name, rule.mitre.id{}, rule.mitre.tactic{}, rule.description, rule.level, rule.id\n",
         "queryParameters": {
           "latest": "$global_time.latest$",
           "earliest": "$global_time.earliest$"
@@ -83,10 +98,10 @@
       },
       "name": "Search_2"
     },
-    "ds_jymjmvtF": {
+    "ds_EmDJmxMO": {
       "type": "ds.search",
       "options": {
-        "query": "wazuh-alerts-4.x-sample | timechart count by data.vulnerability.severity",
+        "query": "index=\"wazuh-alerts\" | top limit=5 agent.name | chart count by agent.name\n",
         "queryParameters": {
           "latest": "$global_time.latest$",
           "earliest": "$global_time.earliest$"
@@ -94,10 +109,10 @@
       },
       "name": "Search_3"
     },
-    "ds_jEwqnxee": {
+    "ds_5QIbKzqF": {
       "type": "ds.search",
       "options": {
-        "query": "wazuh-alerts-4.x-sample | timechart count by data.vulnerability.severity",
+        "query": "wazuh-alerts-4.x-sample | chart count by rule.groups",
         "queryParameters": {
           "latest": "$global_time.latest$",
           "earliest": "$global_time.earliest$"
@@ -105,21 +120,21 @@
       },
       "name": "Search_4"
     },
-    "ds_Irx4cEkl": {
+    "ds_d9cN1Qn9": {
       "type": "ds.search",
       "options": {
+        "query": "index=\"wazuh-alerts\" | stats count",
         "queryParameters": {
           "latest": "$global_time.latest$",
           "earliest": "$global_time.earliest$"
-        },
-        "query": "index=\"wazuh-alerts\" \"agent.name\"=\"*\", \"data.vulnerability.cve\"=\"*\", \"data.vulnerability.package.name\"=\"*\", \"data.vulnerability.package.version\"=\"*\", \"data.vulnerability.severity\"=\"*\", \"rule.id\"=\"*\" | table _time, agent.name, data.vulnerability.cve, data.vulnerability.package.name, data.vulnerability.package.version, data.vulnerability.severity, rule.id\n\n"
+        }
       },
       "name": "Search_5"
     },
-    "ds_oyvgAG73": {
+    "ds_ZPT4uVoe": {
       "type": "ds.search",
       "options": {
-        "query": "index=\"wazuh-alerts\" \"data.vulnerability.severity\"=\"Critical\" | stats count by \"data.vulnerability.severity\"",
+        "query": "index=\"wazuh-alerts\" rule.level>=12 | stats count",
         "queryParameters": {
           "latest": "$global_time.latest$",
           "earliest": "$global_time.earliest$"
@@ -127,10 +142,10 @@
       },
       "name": "Search_6"
     },
-    "ds_TVyYlSRA": {
+    "ds_d8m0U7Ph": {
       "type": "ds.search",
       "options": {
-        "query": "index=\"wazuh-alerts\" \"data.vulnerability.severity\"=\"High\" | stats count by \"data.vulnerability.severity\"",
+        "query": "index=\"wazuh-alerts\" \"rule.groups{}\"=\"authentication_failed\" OR \"rule.groups{}\"=\"win_authentication_failed\" OR \"rule.groups{}\"=\"authentication_failures\" | stats count",
         "queryParameters": {
           "latest": "$global_time.latest$",
           "earliest": "$global_time.earliest$"
@@ -138,10 +153,10 @@
       },
       "name": "Search_7"
     },
-    "ds_D0hAYmXA": {
+    "ds_7FDRhb5m": {
       "type": "ds.search",
       "options": {
-        "query": "index-\"wazuh-alerts\" \"data.vulnerability.severity\"=\"Medium\" | stats count by \"data.vulnerability.severity\"",
+        "query": "index=\"wazuh-alerts\" \"rule.groups{}\"=authentication_success | stats count",
         "queryParameters": {
           "latest": "$global_time.latest$",
           "earliest": "$global_time.earliest$"
@@ -149,16 +164,27 @@
       },
       "name": "Search_8"
     },
-    "ds_1KrtDz29": {
+    "ds_UIfFJptm": {
       "type": "ds.search",
       "options": {
-        "query": "index=\"wazuh-alerts\" \"data.vulnerability.severity\"=\"Low\" | stats count by \"data.vulnerability.severity\"",
+        "query": "wazuh-alerts-4.x-sample | stats count",
         "queryParameters": {
           "latest": "$global_time.latest$",
           "earliest": "$global_time.earliest$"
         }
       },
       "name": "Search_9"
+    },
+    "ds_z3i8WcOf": {
+      "type": "ds.search",
+      "options": {
+        "queryParameters": {
+          "latest": "$global_time.latest$",
+          "earliest": "$global_time.earliest$"
+        },
+        "query": "wazuh-alerts-4.x-sample rule.groups=\"authentication_failures\" | stats count by rule.groups"
+      },
+      "name": "Search_10"
     }
   },
   "defaults": {
@@ -192,63 +218,73 @@
     "options": {},
     "structure": [
       {
-        "item": "viz_3V3AvVY4",
+        "item": "viz_qYCIuSjF",
         "type": "block",
         "position": {
           "x": 0,
           "y": 0,
-          "w": 279,
-          "h": 131
+          "w": 291,
+          "h": 137
         }
       },
       {
-        "item": "viz_XlLyYDmC",
+        "item": "viz_oAPKLE0R",
         "type": "block",
         "position": {
           "x": 0,
-          "y": 131,
+          "y": 137,
+          "w": 731,
+          "h": 326
+        }
+      },
+      {
+        "item": "viz_Y07WmZ1b",
+        "type": "block",
+        "position": {
+          "x": 0,
+          "y": 463,
           "w": 1200,
-          "h": 284
+          "h": 400
         }
       },
       {
-        "item": "viz_qzFw5Wx7",
+        "item": "viz_aTlMnG7A",
         "type": "block",
         "position": {
-          "x": 0,
-          "y": 415,
-          "w": 1200,
-          "h": 251
-        }
-      },
-      {
-        "item": "viz_cmEIbZ9q",
-        "type": "block",
-        "position": {
-          "x": 279,
+          "x": 291,
           "y": 0,
-          "w": 293,
-          "h": 131
+          "w": 286,
+          "h": 137
         }
       },
       {
-        "item": "viz_4QSVuglC",
+        "item": "viz_R8LMR6U6",
         "type": "block",
         "position": {
-          "x": 572,
+          "x": 577,
           "y": 0,
-          "w": 309,
-          "h": 131
+          "w": 301,
+          "h": 137
         }
       },
       {
-        "item": "viz_VI9ZdnSO",
+        "item": "viz_DI7fpctI",
         "type": "block",
         "position": {
-          "x": 881,
+          "x": 731,
+          "y": 137,
+          "w": 469,
+          "h": 326
+        }
+      },
+      {
+        "item": "viz_nDMI4ZGW",
+        "type": "block",
+        "position": {
+          "x": 878,
           "y": 0,
-          "w": 319,
-          "h": 131
+          "w": 322,
+          "h": 137
         }
       }
     ],
@@ -257,5 +293,5 @@
     ]
   },
   "description": "",
-  "title": "Vulnerabilities"
+  "title": "wazuh-policy-monitoring-v1.0"
 }
