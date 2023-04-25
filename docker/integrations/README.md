@@ -13,7 +13,7 @@ This folder contains a docker environment with all the necessary to test integra
 
 ## Additional content:
 
-- Dashboards for Splunk and Kibana
+- Dashboards for Splunk, Kibana and Opensearch
 - Sample alerts for the last 7 days after starting the environments. Those are inside the wazuh-manager in `/var/ossec/logs/alerts/sample_alerts.json` and also in the `alerts.json` file merged with the non-sample data.
 
 ## Requirement:
@@ -26,7 +26,7 @@ This folder contains a docker environment with all the necessary to test integra
 
 In the .env file it is possible to configure the desired version of the Wazuh stack. It will only work with already released versions.
 
-After that, running `docker compose up -d` will start all the containers. Once the start process finishes, the integrations will be configured. It is necessary to manually start the Splunk integration from manager by running `/opt/splunkforwarder/bin/splunk start --accept-license` in the Wazuh manager container.To stop the environment and cleare it, use `docker compose down`.
+After that, running `docker compose up -d` will start all the containers. Once the start process finishes, the integrations will be configured. It is necessary to manually start the Splunk integration from manager by running `/opt/splunkforwarder/bin/splunk start --accept-license` in the Wazuh manager container.To stop the environment and clear it, use `docker compose down`.
 
 The Splunk Indexer instance is accessible from https://localhost:8000, credentials `admin:password`. In this instance, the logs imported from the Wazuh Indexer are in the `main` index, and the logs imported from the manager are in the `wazuh-alerts` index.
 
