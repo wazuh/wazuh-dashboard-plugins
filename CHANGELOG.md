@@ -122,6 +122,12 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed the `angular-chart.js` dependency [#4985](https://github.com/wazuh/wazuh-kibana-app/pull/4985)
 - Removed the `pug-loader` dependency [#5062](https://github.com/wazuh/wazuh-kibana-app/pull/5062) [#5089](https://github.com/wazuh/wazuh-kibana-app/pull/5089)
 
+## Wazuh v4.3.11 - OpenSearch Dashboards 1.2.0 - Revision 4312
+
+### Added
+
+- Support for Wazuh 4.3.11
+
 ## Wazuh v4.3.10 - OpenSearch Dashboards 1.2.0 - Revision 4311
 
 ### Fixed
