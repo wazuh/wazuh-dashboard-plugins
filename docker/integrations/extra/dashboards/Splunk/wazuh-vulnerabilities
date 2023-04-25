@@ -141,7 +141,7 @@
     "ds_D0hAYmXA": {
       "type": "ds.search",
       "options": {
-        "query": "index-\"wazuh-alerts\" \"data.vulnerability.severity\"=\"Medium\" | stats count by \"data.vulnerability.severity\"",
+        "query": "index=\"wazuh-alerts\" \"data.vulnerability.severity\"=\"Medium\" | stats count by \"data.vulnerability.severity\"",
         "queryParameters": {
           "latest": "$global_time.latest$",
           "earliest": "$global_time.earliest$"
