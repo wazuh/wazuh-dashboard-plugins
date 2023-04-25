@@ -8,4 +8,3 @@ prebuild:
 tags:
 	@echo "- Generating Git tags ..."
 	@python3 scripts/tag.py
-
