@@ -11,6 +11,7 @@ import {
 } from '@elastic/eui';
 import { EuiSuggest } from '../eui-suggest';
 import { searchBarQueryLanguages } from './query-language';
+import _ from 'lodash';
 
 type SearchBarProps = {
   defaultMode?: string;
@@ -48,6 +49,8 @@ export const SearchBar = ({
     searchBarProps: { suggestions: [] },
     output: undefined,
   });
+  // Cache the previous output
+  const queryLanguageOutputRunPreviousOutput = useRef(queryLanguageOutputRun.output);
   // Controls when the suggestion popover is open/close
   const [isOpenSuggestionPopover, setIsOpenSuggestionPopover] =
     useState<boolean>(false);
@@ -85,31 +88,36 @@ export const SearchBar = ({
   useEffect(() => {
     (async () => {
       // Set the query language output
-      setQueryLanguageOutputRun(
-        await searchBarQueryLanguages[queryLanguage.id].run(input, {
-          onSearch: _onSearch,
-          setInput,
-          closeSuggestionPopover: () => setIsOpenSuggestionPopover(false),
-          openSuggestionPopover: () => setIsOpenSuggestionPopover(true),
-          setQueryLanguageConfiguration: (configuration: any) =>
-            setQueryLanguage(state => ({
-              ...state,
-              configuration:
-                configuration?.(state.configuration) || configuration,
-            })),
-          setQueryLanguageOutput: setQueryLanguageOutputRun,
-          inputRef,
-          queryLanguage: {
-            configuration: queryLanguage.configuration,
-            parameters: modes.find(({ id }) => id === queryLanguage.id),
-          },
-        }),
-      );
+      const queryLanguageOutput = await searchBarQueryLanguages[queryLanguage.id].run(input, {
+        onSearch: _onSearch,
+        setInput,
+        closeSuggestionPopover: () => setIsOpenSuggestionPopover(false),
+        openSuggestionPopover: () => setIsOpenSuggestionPopover(true),
+        setQueryLanguageConfiguration: (configuration: any) =>
+          setQueryLanguage(state => ({
+            ...state,
+            configuration:
+              configuration?.(state.configuration) || configuration,
+          })),
+        setQueryLanguageOutput: setQueryLanguageOutputRun,
+        inputRef,
+        queryLanguage: {
+          configuration: queryLanguage.configuration,
+          parameters: modes.find(({ id }) => id === queryLanguage.id),
+        },
+      });
+      queryLanguageOutputRunPreviousOutput.current = {
+        ...queryLanguageOutputRun.output
+      };
+      setQueryLanguageOutputRun(queryLanguageOutput);
     })();
   }, [input, queryLanguage]);
 
   useEffect(() => {
-    onChange && onChange(queryLanguageOutputRun.output);
+    onChange
+    // Ensure the previous output is different to the new one
+    && !_.isEqual(queryLanguageOutputRun.output, queryLanguageOutputRunPreviousOutput.current)
+    && onChange(queryLanguageOutputRun.output);
   }, [queryLanguageOutputRun.output]);
 
   const onQueryLanguagePopoverSwitch = () =>
