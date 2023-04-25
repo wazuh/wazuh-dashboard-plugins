@@ -268,6 +268,8 @@ describe('Query language - WQL', () => {
   ${'field='}                       | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'with < value'}}  | ${'field="with < value"'}
   ${'field='}                       | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'with ~ value'}}  | ${'field="with ~ value"'   /** ~ character is not supported as value in the q query parameter */}
   ${'field='}                       | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: '"value'}}        | ${'field="\\"value"'}
+  ${'field="with spaces"'}          | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'value'}}         | ${'field=value'}
+  ${'field="with spaces"'}          | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'other spaces'}}  | ${'field="other spaces"'}
   ${''}                             | ${{type: { iconType: 'tokenDenseVector', color: 'tint3' }, label: '('}}     | ${'('}
   ${'('}                            | ${{type: { iconType: 'kqlField', color: 'tint4' }, label: 'field'}}         | ${'(field'}
   ${'(field'}                       | ${{type: { iconType: 'kqlField', color: 'tint4' }, label: 'field2'}}        | ${'(field2'}
@@ -357,7 +359,7 @@ describe('Query language - WQL', () => {
   */
  
   // Validate the tokens
-  it.only.each`
+  it.each`
   WQL                               | validationError
   ${''}                             | ${undefined} 
   ${'field1'}                       | ${undefined} 

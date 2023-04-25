@@ -190,7 +190,7 @@ type QLOptionSuggestionEntityItem = {
 
 type QLOptionSuggestionEntityItemTyped =
   QLOptionSuggestionEntityItem
-  & { type: 'operator_group'|'field'|'operator_compare'|'value'|'conjunction' };
+  & { type: 'operator_group'|'field'|'operator_compare'|'value'|'conjunction'|'function_search' };
 
 type SuggestItem = QLOptionSuggestionEntityItem & {
   type: { iconType: string, color: string }
@@ -298,6 +298,12 @@ export async function getSuggestions(tokens: ITokens, options: OptionsQL): Promi
   // If it can't get a token with value, then returns fields and open operator group
   if(!lastToken?.type){
     return  [
+      // Search function
+      {
+        type: 'function_search',
+        label: 'Search',
+        description: 'run the search query',
+      },
       // fields
       ...(await options.suggestions.field()).map(mapSuggestionCreatorField),
       {
@@ -811,8 +817,11 @@ export const WQL = {
               lastToken && suggestionMappingLanguageTokenType[lastToken.type].iconType ===
               item.type.iconType
             ) {
-              // replace the value of last token
-              lastToken.value = item.label;
+              // replace the value of last token with the current one.
+              // if the current token is a value, then transform it
+              lastToken.value = item.type.iconType === suggestionMappingLanguageTokenType.value.iconType
+                ? transformQLValue(item.label)
+                : item.label;
             } else {
               // add a whitespace for conjunction <whitespace><conjunction>
               !(/\s$/.test(input))
