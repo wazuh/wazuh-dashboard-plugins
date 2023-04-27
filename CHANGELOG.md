@@ -8,10 +8,13 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Added rel="noopener noreferrer" in documentation links. [#5197](https://github.com/wazuh/wazuh-kibana-app/pull/5197) [#5274](https://github.com/wazuh/wazuh-kibana-app/pull/5274) [#5298](https://github.com/wazuh/wazuh-kibana-app/pull/5298) [#5409](https://github.com/wazuh/wazuh-kibana-app/pull/5409)
 - Added `ignore` and `restrict` options to Syslog configuration. [#5203](https://github.com/wazuh/wazuh-kibana-app/pull/5203)
+- Added the `extensions.github` and `extensions.office` settings to the default configuration file [#5376](https://github.com/wazuh/wazuh-kibana-app/pull/5376)
+- Added new global error treatment (client-side) [#4163](https://github.com/wazuh/wazuh-kibana-app/pull/4163)
 
 ### Changed
 
 - Changed of regular expression in RBAC. [#5201](https://github.com/wazuh/wazuh-kibana-app/pull/5201)
+- Migrate the timeFilter, metaFields, maxBuckets health checks inside the pattern check. [#5384](https://github.com/wazuh/wazuh-kibana-app/pull/5384)
 
 ### Fixed
 
@@ -22,6 +25,9 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Handling endpoint response was done when there is no data to show [#4918](https://github.com/wazuh/wazuh-kibana-app/pull/4918)
 - Fixed references to Elasticsearch in Wazuh-stack plugin [4894](https://github.com/wazuh/wazuh-kibana-app/pull/4894)
 - Fixed the 2 errors that appeared in console in Settings>Configuration section. [#5135](https://github.com/wazuh/wazuh-kibana-app/pull/5135)
+- Fixed the GitHub and Office 365 module visibility configuration for each API host was not kept when changing/upgrading the plugin [#5376](https://github.com/wazuh/wazuh-kibana-app/pull/5376)
+- Fixed the GitHub and Office 365 modules appear in the main menu when they were not configured [#5376](https://github.com/wazuh/wazuh-kibana-app/pull/5376)
+- Fixed TypeError in FIM Inventory using new error handler [#5364](https://github.com/wazuh/wazuh-kibana-app/pull/5364)
 
 ## Wazuh v4.4.1 - OpenSearch Dashboards 2.6.0 - Revision 01
 
@@ -115,6 +121,12 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed custom styles for Kibana 7.9.0 [#4491](https://github.com/wazuh/wazuh-kibana-app/pull/4491)
 - Removed the `angular-chart.js` dependency [#4985](https://github.com/wazuh/wazuh-kibana-app/pull/4985)
 - Removed the `pug-loader` dependency [#5062](https://github.com/wazuh/wazuh-kibana-app/pull/5062) [#5089](https://github.com/wazuh/wazuh-kibana-app/pull/5089)
+
+## Wazuh v4.3.11 - OpenSearch Dashboards 1.2.0 - Revision 4312
+
+### Added
+
+- Support for Wazuh 4.3.11
 
 ## Wazuh v4.3.10 - OpenSearch Dashboards 1.2.0 - Revision 4311
 

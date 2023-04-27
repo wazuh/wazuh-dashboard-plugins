@@ -17,7 +17,11 @@ import _ from 'lodash';
 import { getUiSettings } from '../../../kibana-services';
 import { PLUGIN_PLATFORM_NAME } from '../../../../common/constants';
 
-export const checkPluginPlatformSettings = (pluginPlatformSettingName: string, defaultAppValue: any, callback?: (checkLogger: CheckLogger, options: {defaultAppValue: any}) => void) => (appConfig: any) => async (checkLogger: CheckLogger) => {
+export const checkPluginPlatformSettings = (
+  pluginPlatformSettingName: string,
+  defaultAppValue: any,
+  callback?: (checkLogger: CheckLogger, options: { defaultAppValue: any }) => void
+) => async (appConfig: any, checkLogger: CheckLogger) => {
   checkLogger.info('Getting settings...');
   const valuePluginPlatformSetting = getUiSettings().get(pluginPlatformSettingName);
   const settingsAreDifferent = !_.isEqual(
@@ -27,11 +31,11 @@ export const checkPluginPlatformSettings = (pluginPlatformSettingName: string, d
   checkLogger.info(`Check ${PLUGIN_PLATFORM_NAME} setting [${pluginPlatformSettingName}]: ${stringifySetting(valuePluginPlatformSetting)}`);
   checkLogger.info(`App setting [${pluginPlatformSettingName}]: ${stringifySetting(defaultAppValue)}`);
   checkLogger.info(`Settings mismatch [${pluginPlatformSettingName}]: ${settingsAreDifferent ? 'yes' : 'no'}`);
-  if ( !valuePluginPlatformSetting || settingsAreDifferent ){
+  if (!valuePluginPlatformSetting || settingsAreDifferent) {
     checkLogger.info(`Updating [${pluginPlatformSettingName}] setting...`);
     await updateSetting(pluginPlatformSettingName, defaultAppValue);
     checkLogger.action(`Updated [${pluginPlatformSettingName}] setting to: ${stringifySetting(defaultAppValue)}`);
-    callback && callback(checkLogger,{ defaultAppValue });
+    callback && callback(checkLogger, { defaultAppValue });
   }
 }
 
@@ -46,10 +50,10 @@ async function updateSetting(pluginPlatformSettingName, defaultAppValue, retries
     });
 }
 
-function stringifySetting(setting: any){
-  try{
+function stringifySetting(setting: any) {
+  try {
     return JSON.stringify(setting);
-  }catch(error){
+  } catch (error) {
     return setting;
   };
 };
