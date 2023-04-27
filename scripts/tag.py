@@ -50,7 +50,7 @@ supported_versions = {
         'versions': [item for sublist in kbn_versions for item in sublist]
     },
     'Wazuh Dashboard': {
-        'branch': f'{minor}-2.4-wzd',
+        'branch': f'{minor}',
         'versions': ['2.6.0']
     }
 }
