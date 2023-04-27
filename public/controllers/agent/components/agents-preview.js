@@ -253,7 +253,7 @@ export const AgentsPreview = compose(
                               isLoading={this.state.loadingAgents}
                               title={
                                 <EuiToolTip position="top" content="View agent details">
-                                  <EuiLink onClick={() => this.showEuiLinkgent(this.state.agentMostActive)}>
+                                  <EuiLink onClick={() => this.showAgent(this.state.agentMostActive)}>
                                     {this.state.agentMostActive?.name || '-'}
                                   </EuiLink>
                                 </EuiToolTip>
