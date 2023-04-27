@@ -10,9 +10,11 @@ describe('SearchBar component', () => {
     modes: [
       {
         id: WQL.id,
-        implicitQuery: {
-          query: 'id!=000',
-          conjunction: ';'
+        options: {
+          implicitQuery: {
+            query: 'id!=000',
+            conjunction: ';'
+          },
         },
         suggestions: {
           field(currentValue) {
@@ -127,7 +129,7 @@ describe('Query language - WQL', () => {
   // Get suggestions
   it.each`
     input                       | suggestions
-    ${''}                       | ${[{ description: 'Field', label: 'field', type: 'field' }, { description: 'Field2', label: 'field2', type: 'field' }, { description: 'open group', label: '(', type: 'operator_group' }]}
+    ${''}                       | ${[{ description: 'run the search query', label: 'Search', type: 'function_search' }, { description: 'Field', label: 'field', type: 'field' }, { description: 'Field2', label: 'field2', type: 'field' }, { description: 'open group', label: '(', type: 'operator_group' }]}
     ${'w'}                      | ${[]}
     ${'f'}                      | ${[{ description: 'Field', label: 'field', type: 'field' }, { description: 'Field2', label: 'field2', type: 'field' }]}
     ${'field'}                  | ${[{ description: 'Field2', label: 'field2', type: 'field' }, { description: 'equality', label: '=', type: 'operator_compare' }, { description: 'not equality', label: '!=', type: 'operator_compare' }, { description: 'bigger', label: '>', type: 'operator_compare' }, { description: 'smaller', label: '<', type: 'operator_compare' }, { description: 'like as', label: '~', type: 'operator_compare' }]}
@@ -295,7 +297,7 @@ describe('Query language - WQL', () => {
       setInput: (value: string): void => { input = value; },
       queryLanguage: {
         parameters: {
-          implicitQuery: '',
+          options: {},
           suggestions: {
             field: () => ([]),
             value: () => ([])
@@ -399,7 +401,7 @@ describe('Query language - WQL', () => {
     const qlOutput = await WQL.run(currentInput, {
       queryLanguage: {
         parameters: {
-          implicitQuery: '',
+          options: {},
           suggestions: {
             field: () => (['field1', 'field2'].map(label => ({label}))),
             value: () => ([])

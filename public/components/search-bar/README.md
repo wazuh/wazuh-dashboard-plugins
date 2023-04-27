@@ -28,12 +28,15 @@ Basic usage:
     {
       id: 'wql',
       // specific query language parameters
-      // implicit query. Optional
-      // Set a implicit query that can't be changed by the user.
-      // Use the UQL (Unified Query Language) syntax.
-      implicitQuery: {
-        query: 'id!=000',
-        conjunction: ';'
+      options: {
+        // implicit query. Optional
+        // Set a implicit query that can't be changed by the user.
+        // Use the UQL (Unified Query Language) syntax.
+        implicitQuery: {
+          query: 'id!=000',
+          conjunction: ';'
+        },
+        searchTermFields: ['id', 'ip']
       },
       suggestions: {
         field(currentValue) {
@@ -90,9 +93,9 @@ Basic usage:
   // Used to define the internal input. Optional.
   // This could be used to change the input text from the external components.
   // Use the UQL (Unified Query Language) syntax.
-  input=""
+  input=''
   // Define the default mode. Optional. If not defined, it will use the first one mode.
-  defaultMode=""
+  defaultMode=''
 ></SearchBar>
 ```
 
@@ -119,7 +122,7 @@ type SearchBarQueryLanguage = {
     searchBarProps: any,
     output: {
       language: string,
-      unifiedQuery: string,
+      apiQuery: string,
       query: string
     }
   }>;
@@ -140,7 +143,7 @@ where:
   customization the properties that will used by the base search bar component and the output used when searching
   - `output`:
     - `language`: query language ID
-    - `unifiedQuery`: query in unified query syntax
+    - `apiQuery`: API query.
     - `query`: current query in the specified language
 - `transformUQLToQL`: method that transforms the UQL (Unified Query Language) to the specific query
   language. This is used when receives a external input in the Unified Query Language, the returned

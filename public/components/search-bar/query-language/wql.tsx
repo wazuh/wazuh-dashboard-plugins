@@ -209,8 +209,10 @@ type OptionsQLImplicitQuery = {
   conjunction: string
 }
 type OptionsQL = {
-  implicitQuery?: OptionsQLImplicitQuery
-  searchTermFields?: string[]
+  options?: {
+    implicitQuery?: OptionsQLImplicitQuery
+    searchTermFields?: string[]
+  }
   suggestions: {
     field: QLOptionSuggestionHandler;
     value: QLOptionSuggestionHandler;
@@ -579,13 +581,13 @@ export function transformSpecificQLToUnifiedQL(input: string, searchTermFields: 
  */
 function getOutput(input: string, options: OptionsQL) {
   // Implicit query
-  const implicitQueryAsUQL = options?.implicitQuery?.query ?? '';
+  const implicitQueryAsUQL = options?.options?.implicitQuery?.query ?? '';
   const implicitQueryAsQL = transformUQLToQL(
     implicitQueryAsUQL
   );
 
   // Implicit query conjunction
-  const implicitQueryConjunctionAsUQL = options?.implicitQuery?.conjunction ?? '';
+  const implicitQueryConjunctionAsUQL = options?.options?.implicitQuery?.conjunction ?? '';
   const implicitQueryConjunctionAsQL = transformUQLToQL(
     implicitQueryConjunctionAsUQL
   );
@@ -594,16 +596,18 @@ function getOutput(input: string, options: OptionsQL) {
   const inputQueryAsQL = input;
   const inputQueryAsUQL = transformSpecificQLToUnifiedQL(
     inputQueryAsQL,
-    options?.searchTermFields ?? []
+    options?.options?.searchTermFields ?? []
   );
 
   return {
     language: WQL.id,
-    unifiedQuery: [
-      implicitQueryAsUQL,
-      implicitQueryAsUQL && inputQueryAsUQL ? implicitQueryConjunctionAsUQL : '',
-      implicitQueryAsUQL && inputQueryAsUQL ? `(${inputQueryAsUQL})`: inputQueryAsUQL
-    ].join(''),
+    apiQuery: {
+      q: [
+        implicitQueryAsUQL,
+        implicitQueryAsUQL && inputQueryAsUQL ? implicitQueryConjunctionAsUQL : '',
+        implicitQueryAsUQL && inputQueryAsUQL ? `(${inputQueryAsUQL})`: inputQueryAsUQL
+      ].join(''),
+    },
     query: [
       implicitQueryAsQL,
       implicitQueryAsQL && inputQueryAsQL ? implicitQueryConjunctionAsQL : '',
@@ -749,17 +753,17 @@ export const WQL = {
     const tokens: ITokens = tokenizer(input);
 
     // Get the implicit query as query language syntax
-    const implicitQueryAsQL = params.queryLanguage.parameters.implicitQuery
+    const implicitQueryAsQL = params.queryLanguage.parameters?.options?.implicitQuery
       ? transformUQLToQL(
-        params.queryLanguage.parameters.implicitQuery.query
-        + params.queryLanguage.parameters.implicitQuery.conjunction
+        params.queryLanguage.parameters.options.implicitQuery.query
+        + params.queryLanguage.parameters.options.implicitQuery.conjunction
       )
       : '';
 
-    // Validate the user input
     const fieldsSuggestion: string[] = await params.queryLanguage.parameters.suggestions.field()
       .map(({label}) => label);
 
+    // Validate the user input
     const validationPartial = validatePartial(tokens, {
       field: fieldsSuggestion
     });

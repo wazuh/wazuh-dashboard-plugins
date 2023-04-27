@@ -145,28 +145,27 @@ field1~user_input,field2~user_input,field3~user_input
 
 ## Options
 
-- `implicitQuery`: add an implicit query that is added to the user input. Optional.
+- `options`: options
+
+  - `implicitQuery`: add an implicit query that is added to the user input. Optional.
   This can't be changed by the user. If this is defined, will be displayed as a prepend of the search bar.
-  - `query`: query string in UQL (Unified Query Language)
+    - `query`: query string in UQL (Unified Query Language)
 Use UQL (Unified Query Language).
-  - `conjunction`: query string of the conjunction in UQL (Unified Query Language)
+    - `conjunction`: query string of the conjunction in UQL (Unified Query Language)
+  - `searchTermFields`: define the fields used to build the query for the search term mode
  
 
 ```ts
 // language options
-// ID is not equal to 000 and <user input>. This is defined in UQL that is transformed internally to
-// the specific query language.
-implicitQuery: {
-  query: 'id!=000',
-  conjunction: ';'
+options: {
+  // ID is not equal to 000 and <user input>. This is defined in UQL that is transformed internally to
+  // the specific query language.
+  implicitQuery: {
+    query: 'id!=000',
+    conjunction: ';'
+  }
+  searchTermFields: ['id', 'ip']
 }
-```
-
-- `searchTermFields`: define the fields used to build the query for the search term mode
-
-```ts
-// language options
-searchTermFields: ['id', 'ip']
 ```
 
 - `suggestions`: define the suggestion handlers. This is required.

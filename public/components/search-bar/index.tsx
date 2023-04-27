@@ -75,6 +75,8 @@ export const SearchBar = ({
     }
   };
 
+  const selectedQueryLanguageParameters = modes.find(({ id }) => id === queryLanguage.id);
+
   useEffect(() => {
     // React to external changes and set the internal input text. Use the `transformUQLToQL` of
     // the query language in use
@@ -103,7 +105,7 @@ export const SearchBar = ({
         inputRef,
         queryLanguage: {
           configuration: queryLanguage.configuration,
-          parameters: modes.find(({ id }) => id === queryLanguage.id),
+          parameters: selectedQueryLanguageParameters,
         },
       });
       queryLanguageOutputRunPreviousOutput.current = {
@@ -111,7 +113,7 @@ export const SearchBar = ({
       };
       setQueryLanguageOutputRun(queryLanguageOutput);
     })();
-  }, [input, queryLanguage]);
+  }, [input, queryLanguage, selectedQueryLanguageParameters?.options]);
 
   useEffect(() => {
     onChange
