@@ -19,7 +19,7 @@ version = '4.4.2'
 # App's revision number (previous rev + 1)
 revision = '00'
 # One of 'pre-alpha', 'alpha', 'beta', 'release-candidate', 'stable'
-stage = 'release-candidate'
+stage = 'stable'
 # Tag suffix. Usually set to stage + stage iteration.
 tag_suffix = 'rc1'
 
