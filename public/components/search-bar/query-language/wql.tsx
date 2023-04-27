@@ -617,6 +617,51 @@ function getOutput(input: string, options: OptionsQL) {
 };
 
 /**
+ * Validate the token value
+ * @param token 
+ * @returns 
+ */
+function validateTokenValue(token: IToken): string | undefined {
+  // Usage of API regular expression
+  const re = new RegExp(
+    // Value: A string.
+    '^(?<value>(?:(?:\\((?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|[\\[\\]\\w _\\-.:?\\/\'"=@%<>{}]*)\\))*' +
+    '(?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|[\\[\\]\\w _\\-.:?\\\\/\'"=@%<>{}]+)' +
+    '(?:\\((?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|[\\[\\]\\w _\\-.:?\\\\/\'"=@%<>{}]*)\\))*)+)$'
+  );
+
+  /* WARN: the validation for the value token is complex, this supports some characters in
+  certain circumstances.
+
+  Ideally a character validation helps to the user to identify the problem in the query, but
+  as the original regular expression is so complex, the logic to get this can be
+  complicated.
+
+  The original regular expression has a common schema of allowed characters, these and other
+  characters of the original regular expression can be used to check each character. This
+  approach can identify some invalid characters despite this is not the ideal way.
+
+  The ideal solution will be check each subset of the complex regex against the allowed
+  characters.
+  */
+
+  const invalidCharacters: string[] = token.value.split('')
+    .filter((character) => !(new RegExp('[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}\\(\\)]').test(character)))
+    .filter((value, index, array) => array.indexOf(value) === index);
+
+  const match = token.value.match(re);
+  return match?.groups?.value === token.value
+    ? undefined
+    : [
+      `"${token.value}" is not a valid value.`,
+      ...(invalidCharacters.length
+        ? [`Invalid characters found: ${invalidCharacters.join(', ')}`]
+        : []
+      )
+    ].join(' ');
+};
+
+/**
  * Validate the tokens while the user is building the query
  * @param tokens 
  * @param options 
@@ -643,18 +688,7 @@ function validatePartial(tokens: ITokens, options: {field: string[]}): undefined
         };
         // Check if the value is allowed
         if(token.type === 'value'){
-          // Usage of API regular expression
-          const re = new RegExp(
-            // Value: A string.
-            '^(?<value>(?:(?:\\((?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|[\\[\\]\\w _\\-.:?\\/\'"=@%<>{}]*)\\))*' +
-            '(?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|[\\[\\]\\w _\\-.:?\\\\/\'"=@%<>{}]+)' +
-            '(?:\\((?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|[\\[\\]\\w _\\-.:?\\\\/\'"=@%<>{}]*)\\))*)+)$'
-          );
-
-          const match = token.value.match(re);
-          return match?.groups?.value === token.value
-            ? undefined
-            : `"${token.value}" is not a valid value222.`;
+          return validateTokenValue(token);
         }
       };
     })
@@ -697,21 +731,14 @@ function validate(tokens: ITokens, options: {field: string[]}): undefined | stri
         };
         // Check if the value is allowed
         if(token.type === 'value'){
-          // Usage of API regular expression
-          const re = new RegExp(
-            // Value: A string.
-            '^(?<value>(?:(?:\\((?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|[\\[\\]\\w _\\-.:?\\/\'"=@%<>{}]*)\\))*' +
-            '(?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|[\\[\\]\\w _\\-.:?\\\\/\'"=@%<>{}]+)' +
-            '(?:\\((?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|[\\[\\]\\w _\\-.:?\\\\/\'"=@%<>{}]*)\\))*)+)$'
-          );
+          const validationError = validateTokenValue(token);
 
-          const match = token.value.match(re);
-          match?.groups?.value !== token.value && errors.push(`"${token.value}" is not a valid value.`);
+          validationError && errors.push(validationError);
         };
 
         // Check if the value is allowed
         if(token.type === 'conjunction'){
-          
+
           const tokenWhitespaceNearToFieldNext = getTokenNearTo(
             tokens,
             'whitespace',
