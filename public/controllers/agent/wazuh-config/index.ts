@@ -122,6 +122,35 @@ const architectureButtonsHpUx = [
   },
 ];
 
+const architectureButtonsFreeBSD = [
+  {
+    id: 'i386',
+    label: 'i386',
+  },
+  {
+    id: 'amd64',
+    label: 'amd64',
+    default: true
+  },
+  {
+    id: 'aarch64',
+    label: 'aarch64',
+  },
+  {
+    id: 'armv6',
+    label: 'armv6',
+  },
+  {
+    id: 'armv7',
+    label: 'armv7',
+  },
+  {
+    id: 'powerpc64',
+    label: 'powerpc64',
+  },
+];
+
+
 const versionButtonAmazonLinux = [
   {
     id: 'amazonlinux1',
@@ -299,6 +328,23 @@ const versionButtonAlpine = [
   },
 ];
 
+const versionButtonsFreeBSD = [
+  {
+    id: 'freebsd12',
+    label: 'FreeBSD 12.x',
+  },
+  {
+    id: 'freebsd13',
+    label: 'FreeBSD 13.x',
+    default: true
+  },
+  {
+    id: 'freebsd14',
+    label: 'FreeBSD 14.x',
+  },
+];
+
+
 /**
  * Order the OS Buttons Alphabetically by label
  * @param a
@@ -368,6 +414,10 @@ const osButtons = [
     label: 'Fedora',
   },
   {
+    id: 'freebsd',
+    label: 'FreeBSD',
+  },
+  {
     id: 'oraclelinux',
     label: 'Oracle Linux',
   },
@@ -408,9 +458,11 @@ export {
   versionButtonsSolaris,
   versionButtonsAix,
   versionButtonsHPUX,
+  versionButtonsFreeBSD,
   architectureButtonsi386,
   architectureButtonsSolaris,
   architectureButtonsAix,
   architectureButtonsHpUx,
+  architectureButtonsFreeBSD,
   architectureButtonsWithPPC64LEAlpine,
 };
