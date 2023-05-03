@@ -56,7 +56,8 @@ export class AgentSelectionTable extends Component {
       agents: [],
       selectedOptions: [],
       query: '',
-      input: ''
+      input: '',
+      refreshTime: Date.now()
     };
 
     this.columns = [
@@ -134,14 +135,30 @@ export class AgentSelectionTable extends Component {
       'os.platform',
       'os.version'
     ].join(',');
+
+    this.searchBarWQLOptions = {
+      implicitQuery: {
+        query: IMPLICIT_QUERY,
+        conjunction: IMPLICIT_QUERY_CONJUNCTION
+      },
+      searchTermFields: [
+        'id',
+        'name',
+        'group',
+        'version',
+        'os.name',
+        'os.version',
+        'status',
+      ]
+    };
   }
 
   onChangeItemsPerPage = async itemsPerPage => {
-    this._isMounted && this.setState({ itemsPerPage });
+    this._isMounted && this.setState({ itemsPerPage, refreshTime: Date.now() });
   };
 
   onChangePage = async pageIndex => {
-    this._isMounted && this.setState({ pageIndex });
+    this._isMounted && this.setState({ pageIndex, refreshTime: Date.now() });
   };
 
   async componentDidMount() {
@@ -159,12 +176,7 @@ export class AgentSelectionTable extends Component {
   }
 
   async componentDidUpdate(prevProps, prevState) {
-    if(prevState.query!== this.state.query
-      || prevState.pageIndex !== this.state.pageIndex
-      || prevState.pageSize !== this.state.pageSize
-      || prevState.sortField !== this.state.sortField
-      || prevState.sortDirection !== this.state.sortDirection
-      ){
+    if(prevState.refreshTime !== this.state.refreshTime){
       await this.getItems();
     }
   }
@@ -254,7 +266,7 @@ export class AgentSelectionTable extends Component {
         ? 'desc'
         : 'asc';
 
-    this._isMounted && this.setState({ sortField, sortDirection });
+    this._isMounted && this.setState({ sortField, sortDirection, refreshTime: Date.now() });
   };
 
   toggleItem = itemId => {
@@ -619,26 +631,7 @@ export class AgentSelectionTable extends Component {
               modes={[
                 {
                   id: 'wql',
-                  implicitQuery: {
-                    query: IMPLICIT_QUERY,
-                    conjunction: IMPLICIT_QUERY_CONJUNCTION
-                  },
-                  searchTermFields: [
-                    'configSum',
-                    'dateAdd',
-                    'id',
-                    'ip',
-                    'group',
-                    'group_config_status',
-                    'lastKeepAlive',
-                    'manager',
-                    'mergedSum',
-                    'name',
-                    'node_name',
-                    'os.platform',
-                    'status',
-                    'version'
-                  ],
+                  options: this.searchBarWQLOptions,
                   suggestions: {
                     field(currentValue) {
                       return [
@@ -689,9 +682,9 @@ export class AgentSelectionTable extends Component {
                   },
                 },
               ]}
-              onSearch={({unifiedQuery}) => {
+              onSearch={({apiQuery}) => {
                 // Set the query and reset the page index
-                this.setState({query: unifiedQuery, pageIndex: 0});
+                this.setState({query: apiQuery.q, pageIndex: 0, refreshTime: Date.now()});
               }}
             />
           </EuiFlexItem>

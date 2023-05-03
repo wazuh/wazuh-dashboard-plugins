@@ -62,26 +62,10 @@ const searchBar = {
       { label: 'os.platform', description: 'filter by operating system platform' },
       { label: 'status', description: 'filter by status' },
       { label: 'version', description: 'filter by version' },
-    ],
-    searchTermFields: [
-      'configSum',
-      'dateAdd',
-      'id',
-      'ip',
-      'group',
-      'group_config_status',
-      'lastKeepAlive',
-      'manager',
-      'mergedSum',
-      'name',
-      'node_name',
-      'os.name',
-      'os.version',
-      'status',
-      'version'
     ]
   }
 };
+const removeColumnsSearchTermFields = ['actions', 'dateAdd', 'lastKeepAlive'];
 
 export const AgentsTable = withErrorBoundary(
   class AgentsTable extends Component {
@@ -89,8 +73,7 @@ export const AgentsTable = withErrorBoundary(
     constructor(props) {
       super(props);
       const filterSessionStorage = sessionStorage.getItem('wz_page_agents_search_bar_query')
-        ? sessionStorage.getItem('wz_page_agents_search_bar_query')
-        : '';
+        ?? undefined;
       this.state = {
         agents: [],
         isLoading: false,
@@ -104,9 +87,32 @@ export const AgentsTable = withErrorBoundary(
         purgeModal: false,
         isFilterColumnOpen: false,
         input: typeof filterSessionStorage !== 'undefined' ? filterSessionStorage : '',
-        query: typeof filterSessionStorage !== 'undefined' ? filterSessionStorage : ''
+        query: typeof filterSessionStorage !== 'undefined' ? filterSessionStorage : IMPLICIT_QUERY,
+        queryChange: typeof filterSessionStorage !== 'undefined' ? filterSessionStorage : IMPLICIT_QUERY,
+        refreshTime: Date.now(),
+        selectedColumns: window.localStorage.getItem('columnsSelectedTableAgent')
+          ? JSON.parse(window.localStorage.getItem('columnsSelectedTableAgent'))
+          : this.defaultColumns.map(item => ({...item})),
+      };
+      this.state.searchBarWQLOptions = {
+        implicitQuery: {
+          query: IMPLICIT_QUERY,
+          conjunction: IMPLICIT_QUERY_CONJUNCTION
+        },
+        searchTermFields: this.getSearchTermFieldsFromAvailableColumns(this.state.selectedColumns),
       };
       this.downloadCsv.bind(this);
+    }
+
+    getSearchTermFieldsFromAvailableColumns(columns){
+      return columns
+        .filter(({field, show}) => !removeColumnsSearchTermFields.includes(field) && show)
+        /* Map the object
+        If the table column field is `os_name` then adds the os.name and os.version
+        */
+        .map(({field}) => field === 'os_name' ? ['os.name', 'os.version'] : [field])
+        .flat()
+        .sort();
     }
 
     onTableChange = ({ page = {}, sort = {} }) => {
@@ -118,6 +124,7 @@ export const AgentsTable = withErrorBoundary(
           pageSize,
           sortField,
           sortDirection,
+          refreshTime: Date.now()
         });
     };
 
@@ -140,17 +147,13 @@ export const AgentsTable = withErrorBoundary(
 
     async componentDidUpdate(prevProps, prevState) {
       if (
-        !_.isEqual(prevState.query, this.state.query) ||
-        prevState.pageIndex !== this.state.pageIndex ||
-        prevState.pageSize !== this.state.pageSize ||
-        prevState.sortField !== this.state.sortField ||
-        prevState.sortDirection !== this.state.sortDirection
+        !_.isEqual(prevState.refreshTime, this.state.refreshTime)
       ) {
         await this.getItems();
       } else if (
         !_.isEqual(prevProps.filters, this.props.filters)
       ) {
-        this.setState({ input: this.props.filters, query: this.buildQueryWithImplicitQuery(this.props.filters), pageIndex: 0 });
+        this.setState({ input: this.props.filters, query: this.buildQueryWithImplicitQuery(this.props.filters), pageIndex: 0, refreshTime: Date.now() });
       }
     }
 
@@ -389,6 +392,16 @@ export const AgentsTable = withErrorBoundary(
 
     setTableColumnsSelected(data) {
       window.localStorage.setItem('columnsSelectedTableAgent', JSON.stringify(data));
+      this.setState({
+        selectedColumns: data,
+        searchBarWQLOptions: {
+          implicitQuery: {
+            query: IMPLICIT_QUERY,
+            conjunction: IMPLICIT_QUERY_CONJUNCTION
+          },
+          searchTermFields: this.getSearchTermFieldsFromAvailableColumns(data),
+        }
+      });
     }
 
     // Columns with the property truncateText: true won't wrap the text
@@ -534,15 +547,6 @@ export const AgentsTable = withErrorBoundary(
     }
 
     filterBarRender() {
-      // Build the search term fields from the visible columns in the table
-      const searchTermFields = this.columns()
-        .filter(({field}) => field !== 'actions')
-        /* Map the object
-        If the table column field is `os_name` then adds the os.name and os.version
-        */
-        .map(({field}) => field === 'os_name' ? ['os.name', 'os.version'] : [field])
-        .flat()
-        .sort();
       return (
         <EuiFlexGroup>
           <EuiFlexItem style={{ marginRight: 0 }}>
@@ -552,11 +556,7 @@ export const AgentsTable = withErrorBoundary(
               modes={[
                 {
                   id: 'wql',
-                  implicitQuery: {
-                    query: IMPLICIT_QUERY,
-                    conjunction: IMPLICIT_QUERY_CONJUNCTION
-                  },
-                  searchTermFields,
+                  options: this.state.searchBarWQLOptions,
                   suggestions: {
                     field(currentValue) {
                       return searchBar.wql.suggestionsValue;
@@ -592,50 +592,63 @@ export const AgentsTable = withErrorBoundary(
                   },
                 },
               ]}
-              onSearch={({unifiedQuery}) => {
+              onChange={({apiQuery}) => {
                 // Set the query and reset the page index
-                this.setState({query: unifiedQuery, pageIndex: 0});
+                this.setState({queryChange: apiQuery.q, pageIndex: 0});
+              }}
+              onSearch={({apiQuery}) => {
+                // Set the query, reset the page index and update the refreshTime
+                this.setState({queryChange: apiQuery.q, query: apiQuery.q, pageIndex: 0, refreshTime: Date.now()});
               }}
             />
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
-            <EuiButton
-              iconType='refresh'
-              fill={true}
-              onClick={() => this.reloadAgents()}
-            >
-              Refresh
-            </EuiButton>
+            {this.state.queryChange === this.state.query ?
+            (
+              <EuiButton
+                iconType='refresh'
+                fill={true}
+                onClick={() => this.reloadAgents()}
+              >
+                Refresh
+              </EuiButton>
+            )
+            : 
+            (
+              <EuiButton
+                iconType='kqlFunction'
+                fill={true}
+                color="success"
+                onClick={() => this.setState({query: this.state.queryChange}, () => this.reloadAgents())}
+              >
+                Update
+              </EuiButton>
+            )
+            }
           </EuiFlexItem>
         </EuiFlexGroup>
       );
     }
 
     selectColumnsRender() {
-      const columnsSelected = this.getTableColumnsSelected();
-
       const onChange = (optionId) => {
-        let item = columnsSelected.find((item) => item.field === optionId);
-        item.show = !item.show;
-        this.setTableColumnsSelected(columnsSelected);
-        this.forceUpdate();
+        const results = this.state.selectedColumns.map(item => item.field === optionId ? {...item, show: !item.show} : item);
+        this.setTableColumnsSelected([...results]);
       };
 
-      const options = () => {
-        return columnsSelected.map((item) => {
-          return {
-            id: item.field,
-            label: item.name,
-            checked: item.show,
-          };
-        });
-      };
+      const options = this.state.selectedColumns.map((item) => {
+        return {
+          id: item.field,
+          label: item.name,
+          checked: item.show,
+        };
+      });
 
       return this.state.isFilterColumnOpen ? (
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiCheckboxGroup
-              options={options()}
+              options={options}
               onChange={onChange}
               className="columnsSelectedCheckboxs"
               idToSelectedMap={{}}
@@ -678,16 +691,14 @@ export const AgentsTable = withErrorBoundary(
         sortDirection,
         isLoading,
       } = this.state;
-      const columns = this.columns();
-      const pagination =
-        totalItems > 15
-          ? {
-            pageIndex: pageIndex,
-            pageSize: pageSize,
-            totalItemCount: totalItems,
-            pageSizeOptions: [15, 25, 50, 100],
-          }
-          : false;
+      const columns = this.state.selectedColumns
+        .filter(({show}) => show).map(({field}) =>  this.defaultColumns.find((column) => column.field === field));
+      const pagination = {
+        pageIndex: pageIndex,
+        pageSize: pageSize,
+        totalItemCount: totalItems,
+        pageSizeOptions: [15, 25, 50, 100],
+      };
       const sorting = {
         sort: {
           field: sortField,
