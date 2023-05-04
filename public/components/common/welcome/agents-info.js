@@ -157,7 +157,7 @@ export class AgentInfo extends Component {
       arrayStats = [
         { title: agent.id, description: 'ID', style: { minWidth: 30 } },
         { title: agent.status, description: 'Status', style: { minWidth: 130 } },
-        { title: agent.ip, description: 'IP address', style: { minWidth: 80 } },
+        { title: agent.ip, description: 'IP address', style: { minWidth: 260 } },
         { title: agent.version, description: 'Version', style: { minWidth: 100 } },
         { title: agent.group, description: 'Groups', style: { minWidth: 150 } },
         { title: agent.name, description: 'Operating system', style: { minWidth: 150 } },
