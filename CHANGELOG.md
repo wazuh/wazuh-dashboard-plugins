@@ -2,8 +2,6 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-- Support for Wazuh 4.4.3
-
 ### Added
 
 - Added a description to step 3 of the deploy a new agent section. [#5416](https://github.com/wazuh/wazuh-kibana-app/pull/5416)
