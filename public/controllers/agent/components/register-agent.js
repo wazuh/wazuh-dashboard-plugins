@@ -904,7 +904,7 @@ export const RegisterAgent = withErrorBoundary(
       const urlWindowsPackage = `https://packages.wazuh.com/4.x/windows/wazuh-agent-${this.state.wazuhVersion}-1.msi`;
       const missingOSSelection = this.checkMissingOSSelection();
       const warningForAgentName =
-        'The agent name must be unique. It can’t be change once the agent has been enrolled.';
+        'The agent name must be unique. It can’t be changed once the agent has been enrolled.';
 
       const agentName = (
         <EuiText>
