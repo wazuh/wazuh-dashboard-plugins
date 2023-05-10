@@ -27,6 +27,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed the GitHub and Office 365 module visibility configuration for each API host was not kept when changing/upgrading the plugin [#5376](https://github.com/wazuh/wazuh-kibana-app/pull/5376)
 - Fixed the GitHub and Office 365 modules appear in the main menu when they were not configured [#5376](https://github.com/wazuh/wazuh-kibana-app/pull/5376)
 - Fixed TypeError in FIM Inventory using new error handler [#5364](https://github.com/wazuh/wazuh-kibana-app/pull/5364)
+- Fixed error when using invalid group configuration [#5423](https://github.com/wazuh/wazuh-kibana-app/pull/5423)
 
 ## Wazuh v4.4.1 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 01
 
@@ -117,6 +118,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed unused file related to agent menu [#5102](https://github.com/wazuh/wazuh-kibana-app/pull/5102)
 - Removed the `angular-chart.js` dependency [#4985](https://github.com/wazuh/wazuh-kibana-app/pull/4985)
 - Removed the `pug-loader` dependency [#5062](https://github.com/wazuh/wazuh-kibana-app/pull/5062) [#5089](https://github.com/wazuh/wazuh-kibana-app/pull/5089)
+
 ## Wazuh v4.3.11 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4312
 
 ### Added
