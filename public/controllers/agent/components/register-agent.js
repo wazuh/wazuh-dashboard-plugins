@@ -902,15 +902,18 @@ export const RegisterAgent = withErrorBoundary(
       );
 
       const urlWindowsPackage = `https://packages.wazuh.com/4.x/windows/wazuh-agent-${this.state.wazuhVersion}-1.msi`;
-
       const missingOSSelection = this.checkMissingOSSelection();
+      const warningForAgentName =
+        'The agent name must be unique. It can’t be change once the agent has been enrolled.';
+
       const agentName = (
         <EuiText>
           <p>
-            The agent name is set as the name of the host where it is deployed.
-            You can set your own name in the field below. Note that the agent
-            name cannot be changed once registered.
+            The deployment sets the endpoint hostname as the agent name by
+            default. Optionally, you can set the agent name below.
           </p>
+          <EuiText color='default'>Assign an agent name</EuiText>
+          <EuiSpacer />
           <EuiForm>
             <EuiFormRow
               isInvalid={this.state.agentNameError}
@@ -927,12 +930,18 @@ export const RegisterAgent = withErrorBoundary(
             >
               <EuiFieldText
                 isInvalid={this.state.agentNameError}
-                placeholder='Name agent'
+                placeholder='Agent name'
                 value={this.state.agentName}
                 onChange={event => this.setAgentName(event)}
               />
             </EuiFormRow>
           </EuiForm>
+          <EuiSpacer size='s' />
+          <EuiCallOut
+            color='warning'
+            title={warningForAgentName}
+            iconType='iInCircle'
+          />
         </EuiText>
       );
       const groupInput = (
@@ -952,7 +961,7 @@ export const RegisterAgent = withErrorBoundary(
 
       const agentGroup = (
         <EuiText style={{ marginTop: '1.5rem' }}>
-          <p>Select one or more existing groups.</p>
+          <p>Select one or more existing groups</p>
           <EuiComboBox
             placeholder={!this.state.groups.length ? 'Default' : 'Select group'}
             options={this.state.groups}
@@ -2039,7 +2048,7 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
         )
           ? [
               {
-                title: 'Optionally, assign a name and a group to the agent',
+                title: 'Optional settings',
                 children: (
                   <Fragment>
                     {agentName}
