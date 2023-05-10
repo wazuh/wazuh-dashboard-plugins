@@ -37,7 +37,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed the `Anomaly and malware detection` link. [#5329](https://github.com/wazuh/wazuh-kibana-app/pull/5329)
 - Fixed the problem that did not allow closing the time picker when the button was clicked again in `Agents` and `Management/Statistics`. [#5341](https://github.com/wazuh/wazuh-kibana-app/pull/5341)
 
-## Wazuh v4.4.0 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 06
+## Wazuh v4.4.1 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 01
 
 ### Added
 
