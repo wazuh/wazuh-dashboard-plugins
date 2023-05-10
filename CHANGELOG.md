@@ -4,11 +4,14 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Added
 
-- Added a description to step 3 of the deploy a new agent section. [#5416](https://github.com/wazuh/wazuh-kibana-app/pull/5416)
+- Added a title to the agent name input of the deploy a new agent section. [#5416](https://github.com/wazuh/wazuh-kibana-app/pull/5416)
+- Added callout below the agent name entry of the deploy a new agent section. [#5416](https://github.com/wazuh/wazuh-kibana-app/pull/5416)
 
 ### Changed
 
-- Changed the title to step 3 of the deploy a new agent section. [#5416](https://github.com/wazuh/wazuh-kibana-app/pull/5416)
+- Changed the title of step 3 of the deploy a new agent section. [#5416](https://github.com/wazuh/wazuh-kibana-app/pull/5416)
+- Changed the description of step 3 of the deploy a new agent section. [#5416](https://github.com/wazuh/wazuh-kibana-app/pull/5416)
+- Change the placeholder of the agent name input of the deploy a new agent section. [#5416](https://github.com/wazuh/wazuh-kibana-app/pull/5416)
 
 ## Wazuh v4.4.2 - OpenSearch Dashboards 2.6.0 - Revision 00
 
