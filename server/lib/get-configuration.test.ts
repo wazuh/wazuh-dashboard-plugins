@@ -13,7 +13,7 @@ beforeAll(() => {
 
 afterAll(() => {
   // Remove <PLUGIN_PLATFORM_PATH>/data/wazuh directory.
-  unlinkSync(WAZUH_DATA_ABSOLUTE_PATH);
+  execSync(`rm -rf ${WAZUH_DATA_ABSOLUTE_PATH}`);
 });
 
 describe('[service] get-configuration', () => {
