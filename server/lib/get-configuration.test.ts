@@ -12,14 +12,14 @@ beforeAll(() => {
 });
 
 afterAll(() => {
-  // Remove <PLUGIN_PLATFORM_PATH>/data/wazuh/config directory.
+  // Remove <PLUGIN_PLATFORM_PATH>/data/wazuh directory.
   unlinkSync(WAZUH_DATA_ABSOLUTE_PATH);
 });
 
 describe('[service] get-configuration', () => {
 
   afterEach(() => {
-    // Remove <PLUGIN_PLATFORM_PATH>/data/wazuh/config/wazuh-registry file.
+    // Remove <PLUGIN_PLATFORM_PATH>/data/wazuh/config/wazuh.yml file.
     execSync(`rm ${WAZUH_DATA_ABSOLUTE_PATH}/config/wazuh.yml || echo ""`);
   });
 
