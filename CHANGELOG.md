@@ -2,11 +2,29 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v4.4.0 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4400
+## Wazuh v4.4.2 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 00
 
 ### Added
 
-- Added the option to sort by the agents count in the group table. [#4323](https://github.com/wazuh/wazuh-kibana-app/pull/4323)
+- Support for Wazuh 4.4.2
+
+### Fixed
+
+- Fixed a problem in the backend service to get the plugin configuration [#5428](https://github.com/wazuh/wazuh-kibana-app/pull/5428)
+
+## Wazuh v4.4.1 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 00
+
+### Fixed
+
+- Fixed the search in the agent inventory data tables [#5196](https://github.com/wazuh/wazuh-kibana-app/pull/5196)
+- Fixed the `Anomaly and malware detection` link. [#5329](https://github.com/wazuh/wazuh-kibana-app/pull/5329)
+- Fixed the problem that did not allow closing the time picker when the button was clicked again in `Agents` and `Management/Statistics`. [#5341](https://github.com/wazuh/wazuh-kibana-app/pull/5341)
+
+## Wazuh v4.4.0 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 06
+
+### Added
+
+- Added the option to sort by the agent's count in the group table. [#4323](https://github.com/wazuh/wazuh-kibana-app/pull/4323)
 - Added agent synchronization status in the agent module. [#3874](https://github.com/wazuh/wazuh-kibana-app/pull/3874) [#5143](https://github.com/wazuh/wazuh-kibana-app/pull/5143) [#5177](https://github.com/wazuh/wazuh-kibana-app/pull/5177)
 - The input name was added and when the user adds a value the variable WAZUH_AGENT_NAME with its value appears in the installation command. [#4739](https://github.com/wazuh/wazuh-kibana-app/pull/4739)
 - Redesign the SCA table from agent's dashboard [#4512](https://github.com/wazuh/wazuh-kibana-app/pull/4512)

@@ -118,6 +118,11 @@ hosts:
     expect(response.body.data).toBeDefined();
     expect(response.body.data.pattern).toBeDefined();
     expect(response.body.data.hosts).toBeDefined();
+    response?.body?.data?.hosts?.map(host => {
+      const hostID = Object.keys(host)[0];
+      expect(Object.keys(host).length).toEqual(1);
+      expect(host[hostID].password).toEqual('*****');
+    });
   });
 });
 
