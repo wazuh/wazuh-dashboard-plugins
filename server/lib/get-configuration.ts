@@ -59,7 +59,7 @@ function obfuscateHostsConfiguration(configuration: any, obfuscateHostConfigurat
   if(configuration.hosts){
     configuration.hosts = configuration.hosts
       .map((host) => {
-        const hostID = Object.keys(host);
+        const hostID = Object.keys(host)[0];
         return {
           [hostID]: {
             ...host[hostID],
