@@ -1,5 +1,5 @@
 import React from 'react';
-import { EuiButtonEmpty, EuiPopover, EuiText, EuiCode } from '@elastic/eui';
+import { EuiButtonEmpty, EuiButtonGroup, EuiPopover, EuiText, EuiCode } from '@elastic/eui';
 import { tokenizer as tokenizerUQL } from './aql';
 import { PLUGIN_VERSION_SHORT } from '../../../../common/constants';
 
@@ -171,15 +171,20 @@ export function tokenizer(input: string): ITokens{
   return [
     ...input.matchAll(re)
     ].map(
-        ({groups}) => Object.entries(groups)
-          .map(([key, value]) => ({
-            type: key.startsWith('operator_group') // Transform operator_group group match
-              ? 'operator_group'
-              : (key.startsWith('whitespace') // Transform whitespace group match
-                ? 'whitespace'
-                : key),
-            value})
+      ({groups}) => Object.entries(groups)
+        .map(([key, value]) => ({
+          type: key.startsWith('operator_group') // Transform operator_group group match
+            ? 'operator_group'
+            : (key.startsWith('whitespace') // Transform whitespace group match
+              ? 'whitespace'
+              : key),
+          value,
+          ...( key === 'value' && value && /^"(.+)"$/.test(value)
+            ? { formattedValue: value.match(/^"(.+)"$/)[1]}
+            : {}
           )
+        })
+        )
       ).flat();
 };
 
@@ -661,13 +666,14 @@ function validateTokenValue(token: IToken): string | undefined {
     ].join(' ');
 };
 
+type ITokenValidator = (tokenValue: IToken, proximityTokens: any) => string | undefined;
 /**
  * Validate the tokens while the user is building the query
  * @param tokens 
- * @param options 
+ * @param validate 
  * @returns 
  */
-function validatePartial(tokens: ITokens, options: {field: string[]}): undefined | string{
+function validatePartial(tokens: ITokens, validate: {field: ITokenValidator, value: ITokenValidator}): undefined | string{
   // Ensure is not in search term mode
   if (!shouldUseSearchTerm(tokens)){
     return tokens.map((token: IToken, index) => {
@@ -682,13 +688,28 @@ function validatePartial(tokens: ITokens, options: {field: string[]}): undefined
             { tokenReferencePosition: index, tokenFoundShouldHaveValue: true }
           );
           return tokenOperatorNearToField
-            && !options.field.includes(token.value)
-            ? `"${token.value}" is not a valid field.`
+            ? validate.field(token)
             : undefined;
         };
         // Check if the value is allowed
         if(token.type === 'value'){
-          return validateTokenValue(token);
+          const tokenFieldNearToValue = getTokenNearTo(
+            tokens,
+            'field',
+            'previous',
+            { tokenReferencePosition: index, tokenFoundShouldHaveValue: true }
+          );
+          const tokenOperatorCompareNearToValue = getTokenNearTo(
+            tokens,
+            'operator_compare',
+            'previous',
+            { tokenReferencePosition: index, tokenFoundShouldHaveValue: true }
+          );
+          return validateTokenValue(token)
+            || (tokenFieldNearToValue && tokenOperatorCompareNearToValue && validate.value ? validate.value(token, {
+              field: tokenFieldNearToValue?.value,
+              operator: tokenOperatorCompareNearToValue?.value
+            }) : undefined);
         }
       };
     })
@@ -700,10 +721,10 @@ function validatePartial(tokens: ITokens, options: {field: string[]}): undefined
 /**
  * Validate the tokens if they are a valid syntax 
  * @param tokens 
- * @param options 
+ * @param validate 
  * @returns 
  */
-function validate(tokens: ITokens, options: {field: string[]}): undefined | string[]{
+function validate(tokens: ITokens, validate: {field: ITokenValidator, value: ITokenValidator}): undefined | string[]{
   if (!shouldUseSearchTerm(tokens)){
     const errors = tokens.map((token: IToken, index) => {
       const errors = [];
@@ -721,7 +742,7 @@ function validate(tokens: ITokens, options: {field: string[]}): undefined | stri
             'next',
             { tokenReferencePosition: index, tokenFoundShouldHaveValue: true }
           );
-          if(!options.field.includes(token.value)){
+          if(validate.field(token)){
             errors.push(`"${token.value}" is not a valid field.`);
           }else if(!tokenOperatorNearToField){
             errors.push(`The operator for field "${token.value}" is missing.`);
@@ -731,7 +752,23 @@ function validate(tokens: ITokens, options: {field: string[]}): undefined | stri
         };
         // Check if the value is allowed
         if(token.type === 'value'){
-          const validationError = validateTokenValue(token);
+          const tokenFieldNearToValue = getTokenNearTo(
+            tokens,
+            'field',
+            'previous',
+            { tokenReferencePosition: index, tokenFoundShouldHaveValue: true }
+          );
+          const tokenOperatorCompareNearToValue = getTokenNearTo(
+            tokens,
+            'operator_compare',
+            'previous',
+            { tokenReferencePosition: index, tokenFoundShouldHaveValue: true }
+          );
+          const validationError = validateTokenValue(token)
+          || (tokenFieldNearToValue && tokenOperatorCompareNearToValue && validate.value ? validate.value(token, {
+            field: tokenFieldNearToValue?.value,
+            operator: tokenOperatorCompareNearToValue?.value
+          }) : undefined);;
 
           validationError && errors.push(validationError);
         };
@@ -768,7 +805,7 @@ function validate(tokens: ITokens, options: {field: string[]}): undefined | stri
 export const WQL = {
   id: 'wql',
   label: 'WQL',
-  description: 'WQL (Wazuh Query Language) offers a human query syntax based on the Wazuh API query language.',
+  description: 'WQL (Wazuh Query Language) provides a human query syntax based on the Wazuh API query language.',
   documentationLink: `https://github.com/wazuh/wazuh-kibana-app/blob/v${PLUGIN_VERSION_SHORT}/public/components/search-bar/query-language/wql.md`,
   getConfiguration() {
     return {
@@ -790,14 +827,17 @@ export const WQL = {
     const fieldsSuggestion: string[] = await params.queryLanguage.parameters.suggestions.field()
       .map(({label}) => label);
 
-    // Validate the user input
-    const validationPartial = validatePartial(tokens, {
-      field: fieldsSuggestion
-    });
+    const validators = {
+      field: ({value}) => fieldsSuggestion.includes(value) ? undefined : `"${value}" is not valid field.`,
+      ...(params.queryLanguage.parameters?.validate?.value ? {
+        value: params.queryLanguage.parameters?.validate?.value
+      } : {})
+    };
 
-    const validationStrict = validate(tokens, {
-      field: fieldsSuggestion
-    });
+    // Validate the user input
+    const validationPartial = validatePartial(tokens, validators);
+
+    const validationStrict = validate(tokens, validators);
 
     // Get the output of query language
     const output = {
@@ -822,6 +862,29 @@ export const WQL = {
     };
 
     return {
+      filterButtons: params.queryLanguage.parameters?.options?.filterButtons
+        ? <EuiButtonGroup
+          legend="Search bar button filters"
+          name="textAlign"
+          buttonSize="m"
+          options={params.queryLanguage.parameters?.options?.filterButtons.map(({id, label}) => (
+            { id, label }
+          ))}
+          idToSelectedMap={{}}
+          type="multi"
+          onChange={(id: string) => {
+            const buttonParams = params.queryLanguage.parameters?.options?.filterButtons.find(({id: buttonID}) => buttonID === id);
+            if(buttonParams){
+              params.setInput(buttonParams.input);
+              const output = {
+                ...getOutput(buttonParams.input, params.queryLanguage.parameters),
+                error: undefined
+              };
+              params.onSearch(output);
+            }
+          }}
+        />
+        : null,
       searchBarProps: {
         // Props that will be used by the EuiSuggest component
         // Suggestions

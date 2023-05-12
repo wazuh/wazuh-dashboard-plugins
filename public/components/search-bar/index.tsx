@@ -8,6 +8,8 @@ import {
   EuiSpacer,
   EuiSelect,
   EuiText,
+  EuiFlexGroup,
+  EuiFlexItem
 } from '@elastic/eui';
 import { EuiSuggest } from '../eui-suggest';
 import { searchBarQueryLanguages } from './query-language';
@@ -43,7 +45,7 @@ export const SearchBar = ({
   const [isOpenPopoverQueryLanguage, setIsOpenPopoverQueryLanguage] =
     useState<boolean>(false);
   // Input field
-  const [input, setInput] = useState<string | undefined>('');
+  const [input, setInput] = useState<string | undefined>(rest.input || '');
   // Query language output of run method
   const [queryLanguageOutputRun, setQueryLanguageOutputRun] = useState<any>({
     searchBarProps: { suggestions: [] },
@@ -80,7 +82,7 @@ export const SearchBar = ({
   useEffect(() => {
     // React to external changes and set the internal input text. Use the `transformUQLToQL` of
     // the query language in use
-    rest.input && setInput(
+    rest.input && searchBarQueryLanguages[queryLanguage.id]?.transformUQLToQL && setInput(
       searchBarQueryLanguages[queryLanguage.id]?.transformUQLToQL?.(
         rest.input,
       ),
@@ -125,86 +127,97 @@ export const SearchBar = ({
   const onQueryLanguagePopoverSwitch = () =>
     setIsOpenPopoverQueryLanguage(state => !state);
 
-  return (
-    <EuiSuggest
-      inputRef={inputRef}
-      value={input}
-      onChange={onChangeInput}
-      onKeyPress={onKeyPressHandler}
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
-      onInputChange={() => {}} /* This method is run by EuiSuggest when there is a change in
-                                a div wrapper of the input and should be defined. Defining this
-                                property prevents an error. */
-      suggestions={[]}
-      isPopoverOpen={
-        queryLanguageOutputRun?.searchBarProps?.suggestions?.length > 0 &&
-        isOpenSuggestionPopover
-      }
-      onClosePopover={() => setIsOpenSuggestionPopover(false)}
-      onPopoverFocus={() => setIsOpenSuggestionPopover(true)}
-      placeholder={'Search'}
-      append={
-        <EuiPopover
-          button={
-            <EuiButtonEmpty onClick={onQueryLanguagePopoverSwitch}>
-              {searchBarQueryLanguages[queryLanguage.id].label}
-            </EuiButtonEmpty>
-          }
-          isOpen={isOpenPopoverQueryLanguage}
-          closePopover={onQueryLanguagePopoverSwitch}
-        >
-          <EuiPopoverTitle>SYNTAX OPTIONS</EuiPopoverTitle>
-          <div style={{width: '350px'}}>
-            <EuiText>
-              {searchBarQueryLanguages[queryLanguage.id].description}
-            </EuiText>
-            {searchBarQueryLanguages[queryLanguage.id].documentationLink && (
-              <>
-                <EuiSpacer />
-                <div>
-                  <EuiLink
-                    href={
-                      searchBarQueryLanguages[queryLanguage.id].documentationLink
-                    }
-                    target='__blank'
-                    rel='noopener noreferrer'
-                  >
-                    Documentation
-                  </EuiLink>
-                </div>
-              </>
-            )}
-            {modes?.length > 1 && (
-              <>
-                <EuiSpacer />
-                <EuiFormRow label='Select a query language' fullWidth>
-                  <EuiSelect
-                    id='query-language-selector'
-                    options={modes.map(({ id }) => ({
-                      value: id,
-                      text: searchBarQueryLanguages[id].label,
-                    }))}
-                    value={queryLanguage.id}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                      const queryLanguageID: string = event.target.value;
-                      setQueryLanguage({
-                        id: queryLanguageID,
-                        configuration:
-                          searchBarQueryLanguages[
-                            queryLanguageID
-                          ]?.getConfiguration?.() || {},
-                      });
-                      setInput('');
-                    }}
-                    aria-label='query-language-selector'
-                  />
-                </EuiFormRow>
-              </>
-            )}
-          </div>
-        </EuiPopover>
-      }
-      {...queryLanguageOutputRun.searchBarProps}
-    />
+  const searchBar = (
+    <>
+      <EuiSuggest
+        inputRef={inputRef}
+        value={input}
+        onChange={onChangeInput}
+        onKeyPress={onKeyPressHandler}
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        onInputChange={() => {}} /* This method is run by EuiSuggest when there is a change in
+                                  a div wrapper of the input and should be defined. Defining this
+                                  property prevents an error. */
+        suggestions={[]}
+        isPopoverOpen={
+          queryLanguageOutputRun?.searchBarProps?.suggestions?.length > 0 &&
+          isOpenSuggestionPopover
+        }
+        onClosePopover={() => setIsOpenSuggestionPopover(false)}
+        onPopoverFocus={() => setIsOpenSuggestionPopover(true)}
+        placeholder={'Search'}
+        append={
+          <EuiPopover
+            button={
+              <EuiButtonEmpty onClick={onQueryLanguagePopoverSwitch}>
+                {searchBarQueryLanguages[queryLanguage.id].label}
+              </EuiButtonEmpty>
+            }
+            isOpen={isOpenPopoverQueryLanguage}
+            closePopover={onQueryLanguagePopoverSwitch}
+          >
+            <EuiPopoverTitle>SYNTAX OPTIONS</EuiPopoverTitle>
+            <div style={{width: '350px'}}>
+              <EuiText>
+                {searchBarQueryLanguages[queryLanguage.id].description}
+              </EuiText>
+              {searchBarQueryLanguages[queryLanguage.id].documentationLink && (
+                <>
+                  <EuiSpacer />
+                  <div>
+                    <EuiLink
+                      href={
+                        searchBarQueryLanguages[queryLanguage.id].documentationLink
+                      }
+                      target='__blank'
+                      rel='noopener noreferrer'
+                    >
+                      Documentation
+                    </EuiLink>
+                  </div>
+                </>
+              )}
+              {modes?.length > 1 && (
+                <>
+                  <EuiSpacer />
+                  <EuiFormRow label='Select a query language' fullWidth>
+                    <EuiSelect
+                      id='query-language-selector'
+                      options={modes.map(({ id }) => ({
+                        value: id,
+                        text: searchBarQueryLanguages[id].label,
+                      }))}
+                      value={queryLanguage.id}
+                      onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        const queryLanguageID: string = event.target.value;
+                        setQueryLanguage({
+                          id: queryLanguageID,
+                          configuration:
+                            searchBarQueryLanguages[
+                              queryLanguageID
+                            ]?.getConfiguration?.() || {},
+                        });
+                        setInput('');
+                      }}
+                      aria-label='query-language-selector'
+                    />
+                  </EuiFormRow>
+                </>
+              )}
+            </div>
+          </EuiPopover>
+        }
+        {...queryLanguageOutputRun.searchBarProps}
+      />
+    </>
   );
+  return rest.buttonsRender || queryLanguageOutputRun.filterButtons
+    ? (
+      <EuiFlexGroup>
+        <EuiFlexItem>{searchBar}</EuiFlexItem>
+        {rest.buttonsRender && <EuiFlexItem grow={false}>{rest.buttonsRender()}</EuiFlexItem>}
+        {queryLanguageOutputRun.filterButtons && <EuiFlexItem grow={false}>{queryLanguageOutputRun.filterButtons}</EuiFlexItem>}
+      </EuiFlexGroup>
+    )
+    : searchBar;
 };

@@ -153,6 +153,7 @@ field1~user_input,field2~user_input,field3~user_input
 Use UQL (Unified Query Language).
     - `conjunction`: query string of the conjunction in UQL (Unified Query Language)
   - `searchTermFields`: define the fields used to build the query for the search term mode
+  - `filterButtons`: define a list of buttons to filter in the search bar
  
 
 ```ts
@@ -165,6 +166,9 @@ options: {
     conjunction: ';'
   }
   searchTermFields: ['id', 'ip']
+  filterButtons: [
+    {id: 'status-active', input: 'status=active', label: 'Active'}
+  ]
 }
 ```
 
@@ -197,45 +201,63 @@ options: {
   }
   ```
 
+- `validate`: define validation methods for the field types. Optional
+  - `value`: method to validate the value token
+
+  ```ts
+  validate: {
+    value: (token, {field, operator_compare}) => {
+      if(field === 'field1'){
+        const value = token.formattedValue || token.value
+        return /\d+/ ? undefined : `Invalid value for field ${field}, only digits are supported: "${value}"`
+      }
+    }
+  }
+  ```
+
 ## Language workflow
 
 ```mermaid
 graph TD;
-    user_input[User input]-->tokenizer;
-    subgraph tokenizer
-        tokenize_regex[Query language regular expression]
-    end
+  user_input[User input]-->ql_run;
+  ql_run-->filterButtons[filterButtons];
+  ql_run-->tokenizer-->tokens;
+  tokens-->searchBarProps;
+  tokens-->output;
 
-    tokenizer-->tokens;
-    tokens-->validate;
-    
-    tokens-->searchBarProps;
-    subgraph searchBarProps;
-        searchBarProps_suggestions[suggestions]-->searchBarProps_suggestions_input_isvalid{Input is valid}
-        searchBarProps_suggestions_input_isvalid{Is input valid?}-->searchBarProps_suggestions_input_isvalid_success[Yes]
-        searchBarProps_suggestions_input_isvalid{Is input valid?}-->searchBarProps_suggestions_input_isvalid_fail[No]
-        searchBarProps_suggestions_input_isvalid_success[Yes]--->searchBarProps_suggestions_get_last_token_with_value[Get last token with value]-->searchBarProps_suggestions__result[Suggestions]
-        searchBarProps_suggestions__result[Suggestions]-->EuiSuggestItem
-        searchBarProps_suggestions_input_isvalid_fail[No]-->searchBarProps_suggestions_invalid[Invalid with error message]
-        searchBarProps_suggestions_invalid[Invalid with error message]-->EuiSuggestItem
-        searchBarProps_prepend[prepend]-->searchBarProps_prepend_implicitQuery{implicitQuery}
-        searchBarProps_prepend_implicitQuery{implicitQuery}-->searchBarProps_prepend_implicitQuery_yes[Yes]-->EuiButton
-        searchBarProps_prepend_implicitQuery{implicitQuery}-->searchBarProps_prepend_implicitQuery_no[No]-->null
-        searchBarProps_disableFocusTrap:true[disableFocusTrap = true]
-        searchBarProps_onItemClick[onItemClickSuggestion]-->searchBarProps_onItemClick_suggestion_search[Search suggestion]
-        searchBarProps_onItemClick_suggestion_search[Search suggestion]-->searchBarProps_onItemClick_suggestion_search_run[Run search]
-        searchBarProps_onItemClick[onItemClickSuggestion]-->searchBarProps_onItemClick_suggestion_edit_current_token[Edit current token]-->searchBarProps_onItemClick_build_input[Build input]
-        searchBarProps_onItemClick[onItemClickSuggestion]-->searchBarProps_onItemClick_suggestion_add_new_token[Add new token]-->searchBarProps_onItemClick_build_input[Build input]
-        searchBarProps_onItemClick[onItemClickSuggestion]-->searchBarProps_onItemClick_suggestion_error[Error]
-        searchBarProps_isInvalid[isInvalid]
-    end
+  subgraph tokenizer
+    tokenize_regex[Query language regular expression: decomposition and extract quoted values]
+  end
 
-    tokens-->output;
-    subgraph output[output];
-        output_result[implicitFilter + user input]
-    end
+  subgraph searchBarProps;
+    searchBarProps_suggestions[suggestions]-->searchBarProps_suggestions_input_isvalid{Input is valid}
+    searchBarProps_suggestions_input_isvalid{Is input valid?}-->searchBarProps_suggestions_input_isvalid_success[Yes]
+    searchBarProps_suggestions_input_isvalid{Is input valid?}-->searchBarProps_suggestions_input_isvalid_fail[No]
+    searchBarProps_suggestions_input_isvalid_success[Yes]--->searchBarProps_suggestions_get_last_token_with_value[Get last token with value]-->searchBarProps_suggestions__result[Suggestions]
+    searchBarProps_suggestions__result[Suggestions]-->EuiSuggestItem
+    searchBarProps_suggestions_input_isvalid_fail[No]-->searchBarProps_suggestions_invalid[Invalid with error message]
+    searchBarProps_suggestions_invalid[Invalid with error message]-->EuiSuggestItem
+    searchBarProps_prepend[prepend]-->searchBarProps_prepend_implicitQuery{options.implicitQuery}
+    searchBarProps_prepend_implicitQuery{options.implicitQuery}-->searchBarProps_prepend_implicitQuery_yes[Yes]-->EuiButton
+    searchBarProps_prepend_implicitQuery{options.implicitQuery}-->searchBarProps_prepend_implicitQuery_no[No]-->null
+    searchBarProps_disableFocusTrap:true[disableFocusTrap = true]
+    searchBarProps_onItemClick[onItemClickSuggestion]-->searchBarProps_onItemClick_suggestion_search[Search suggestion]
+    searchBarProps_onItemClick_suggestion_search[Search suggestion]-->searchBarProps_onItemClick_suggestion_search_run[Run search]
+    searchBarProps_onItemClick[onItemClickSuggestion]-->searchBarProps_onItemClick_suggestion_edit_current_token[Edit current token]-->searchBarProps_onItemClick_build_input[Build input]
+    searchBarProps_onItemClick[onItemClickSuggestion]-->searchBarProps_onItemClick_suggestion_add_new_token[Add new token]-->searchBarProps_onItemClick_build_input[Build input]
+    searchBarProps_onItemClick[onItemClickSuggestion]-->searchBarProps_onItemClick_suggestion_error[Error]
+    searchBarProps_isInvalid[isInvalid]-->searchBarProps_validate_input[validate input]
+  end
+  
+  subgraph output[output];
+    output_input_options_implicitFilter[options.implicitFilter]-->output_input_options_result["{apiQuery: { q }, error, language: 'wql', query}"]
+    output_input_user_input_QL[User input in QL]-->output_input_user_input_UQL[User input in UQL]-->output_input_options_result["{apiQuery: { q }, error, language: 'wql', query}"]
+  end
 
-    output-->output_search_bar[Output]
+  subgraph filterButtons;
+    filterButtons_optional{options.filterButtons}-->filterButtons_optional_yes[Yes]-->filterButtons_optional_yes_component[Render fitter button]
+    filterButtons_optional{options.filterButtons}-->filterButtons_optional_no[No]-->filterButtons_optional_no_null[null]
+  end
 ```
 
 ## Notes
