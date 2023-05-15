@@ -14,35 +14,25 @@ import React, { Component } from 'react';
 import {
   EuiFlexGroup,
   EuiFlexItem,
-  EuiBasicTable,
-  Direction,
-  EuiOverlayMask,
-  EuiOutsideClickDetector,
+  EuiIconTip
 } from '@elastic/eui';
 import { WzRequest } from '../../../../react-services/wz-request';
 import { FlyoutDetail } from './flyout';
-import { filtersToObject, IFilter } from '../../../wz-search-bar';
 import { formatUIDate } from '../../../../react-services/time-service';
-import {
-  UI_ERROR_SEVERITIES,
-  UIErrorLog,
-  UIErrorSeverity,
-  UILogLevel,
-} from '../../../../react-services/error-orchestrator/types';
-import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
-import { getErrorOrchestrator } from '../../../../react-services/common-services';
+import { TableWzAPI } from '../../../common/tables';
+
+const searchBarWQLOptions = {
+  searchTermFields: ['file', 'uname', 'uid', 'gname', 'gid', 'size'],
+  implicitQuery: {
+    query: 'type=file',
+    conjunction: ';'
+  }
+};
 
 export class InventoryTable extends Component {
   state: {
     syscheck: [];
-    error?: string;
-    pageIndex: number;
-    pageSize: number;
-    totalItems: number;
-    sortField: string;
     isFlyoutVisible: Boolean;
-    sortDirection: Direction;
-    isLoading: boolean;
     currentFile: {
       file: string;
     };
@@ -50,7 +40,7 @@ export class InventoryTable extends Component {
   };
 
   props!: {
-    filters: IFilter[];
+    filters: any;
     agent: any;
     items: [];
     totalItems: number;
@@ -62,12 +52,6 @@ export class InventoryTable extends Component {
 
     this.state = {
       syscheck: props.items,
-      pageIndex: 0,
-      pageSize: 15,
-      totalItems: 0,
-      sortField: 'file',
-      sortDirection: 'asc',
-      isLoading: false,
       isFlyoutVisible: false,
       currentFile: {
         file: '',
@@ -79,10 +63,9 @@ export class InventoryTable extends Component {
   async componentDidMount() {
     const regex = new RegExp('file=' + '[^&]*');
     const match = window.location.href.match(regex);
-    this.setState({ totalItems: this.props.totalItems });
     if (match && match[0]) {
       const file = match[0].split('=')[1];
-      this.showFlyout(decodeURIComponent(file), true);
+      this.showFlyout(decodeURIComponent(file), true); // FIX: second parameter is the item. Why is this a boolean?
     }
   }
 
@@ -92,7 +75,7 @@ export class InventoryTable extends Component {
 
   async showFlyout(file, item, redirect = false) {
     window.location.href = window.location.href.replace(new RegExp('&file=' + '[^&]*', 'g'), '');
-    let fileData = false;
+    let fileData = false; // FIX: fileData variable is unused
     if (!redirect) {
       fileData = this.state.syscheck.filter((item) => {
         return item.file === file;
@@ -112,82 +95,12 @@ export class InventoryTable extends Component {
     );
   }
 
-  async componentDidUpdate(prevProps) {
-    const { filters } = this.props;
-    if (JSON.stringify(filters) !== JSON.stringify(prevProps.filters)) {
-      this.setState({ pageIndex: 0, isLoading: true }, this.getSyscheck);
-    }
-  }
-
-  async getSyscheck() {
-    const agentID = this.props.agent.id;
-    try {
-      const syscheck = await WzRequest.apiReq('GET', `/syscheck/${agentID}`, {
-        params: this.buildFilter(),
-      });
-
-      this.props.onTotalItemsChange(
+  // TODO: connect to total items change on parent component 
+  /*
+    tis.props.onTotalItemsChange(
         (((syscheck || {}).data || {}).data || {}).total_affected_items
       );
-
-      this.setState({
-        syscheck: (((syscheck || {}).data || {}).data || {}).affected_items || {},
-        totalItems: (((syscheck || {}).data || {}).data || {}).total_affected_items - 1,
-        isLoading: false,
-        error: undefined,
-      });
-    } catch (error) {
-      this.setState({ error, isLoading: false });
-      const options: UIErrorLog = {
-        context: `${InventoryTable.name}.getSyscheck`,
-        level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
-        severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: error.name,
-        },
-      };
-      getErrorOrchestrator().handleError(options);
-    }
-  }
-
-  buildSortFilter() {
-    const { sortField, sortDirection } = this.state;
-
-    const field = sortField === 'os_name' ? '' : sortField;
-    const direction = sortDirection === 'asc' ? '+' : '-';
-
-    return direction + field;
-  }
-
-  buildFilter() {
-    const { pageIndex, pageSize } = this.state;
-    const filters = filtersToObject(this.props.filters);
-    const filter = {
-      ...filters,
-      offset: pageIndex * pageSize,
-      limit: pageSize,
-      sort: this.buildSortFilter(),
-      type: 'file',
-    };
-    return filter;
-  }
-
-  onTableChange = ({ page = {}, sort = {} }) => {
-    const { index: pageIndex, size: pageSize } = page;
-    const { field: sortField, direction: sortDirection } = sort;
-    this.setState(
-      {
-        pageIndex,
-        pageSize,
-        sortField,
-        sortDirection,
-        isLoading: true,
-      },
-      () => this.getSyscheck()
-    );
-  };
+  */
 
   columns() {
     let width;
@@ -203,7 +116,16 @@ export class InventoryTable extends Component {
       },
       {
         field: 'mtime',
-        name: 'Last Modified',
+        name: (
+          <span>Last Modified{' '}
+            <EuiIconTip
+              content='This is not searchable through a search term.'
+              size='s'
+              color='subdued'
+              type='alert'
+            />
+          </span>
+        ),
         sortable: true,
         width: '100px',
         render: formatUIDate,
@@ -253,45 +175,47 @@ export class InventoryTable extends Component {
         onClick: () => this.showFlyout(file, item),
       };
     };
-
-    const {
-      syscheck,
-      pageIndex,
-      pageSize,
-      totalItems,
-      sortField,
-      sortDirection,
-      isLoading,
-      error,
-    } = this.state;
     const columns = this.columns();
-    const pagination = {
-      pageIndex: pageIndex,
-      pageSize: pageSize,
-      totalItemCount: totalItems,
-      pageSizeOptions: [15, 25, 50, 100],
-    };
-    const sorting = {
-      sort: {
-        field: sortField,
-        direction: sortDirection,
-      },
-    };
 
     return (
       <EuiFlexGroup>
         <EuiFlexItem>
-          <EuiBasicTable
-            items={syscheck}
-            error={error}
-            columns={columns}
-            pagination={pagination}
-            onChange={this.onTableChange}
+          <TableWzAPI
+            title='Files'
+            tableColumns={columns}
+            tableInitialSortingField='file'
+            endpoint={`/syscheck/${this.props.agent.id}`}
+            searchBarProps={{
+              modes: [
+                {
+                  id: 'wql',
+                  options: searchBarWQLOptions,
+                  suggestions: {
+                    field: (currentValue) => [
+                      {label: 'file', description: 'filter by file'},
+                      {label: 'gid', description: 'filter by gid'},
+                      {label: 'gname', description: 'filter by gname'},
+                      {label: 'size', description: 'filter by size'},
+                      {label: 'uname', description: 'filter by uname'},
+                      {label: 'uid', description: 'filter by uid'}
+                    ],
+                    value: async (currentValue, { field }) => {
+                      return [];
+                      try{ // TODO distinct:
+                        return [];
+                      }catch(error){
+                        return [];
+                      };
+                    }
+                  },
+                }
+              ]
+            }}
+            filters={{default: {q: 'type=file'}}}
+            showReload
+            downloadCsv={`fim-files-${this.props.agent.id}`}
+            searchTable={true}
             rowProps={getRowProps}
-            sorting={sorting}
-            itemId="file"
-            isExpandable={true}
-            loading={isLoading}
           />
         </EuiFlexItem>
       </EuiFlexGroup>
