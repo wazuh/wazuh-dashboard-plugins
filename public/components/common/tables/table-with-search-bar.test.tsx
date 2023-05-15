@@ -73,6 +73,24 @@ const tableProps = {
   reload: () => {},
   searchBarSuggestions: [],
   rowProps: () => {},
+  searchBarProps: {
+    modes: [
+      {
+        id: 'wql',
+        options: {
+          searchTermFields: []
+        },
+        suggestions: {
+          field(currentValue) {
+            return [];
+          },
+          value: async (currentValue, { field }) => {
+            return [];
+          },
+        },
+      }
+    ]
+  }
 };
 
 describe('Table With Search Bar component', () => {
