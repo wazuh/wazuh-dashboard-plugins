@@ -1,31 +1,33 @@
+import { KeyEquivalence } from "../../../../../common/csv-key-equivalence";
+
 const windowsColumns = [
-  { id: 'name' },
-  { id: 'architecture', width: '10%' },
-  { id: 'version' },
-  { id: 'vendor', width: '30%' },
-];
+  { field: 'name', sortable: true },
+  { field: 'architecture', sortable: true, width: '10%' },
+  { field: 'version', sortable: true },
+  { field: 'vendor', width: '30%', sortable: true },
+].map(({field, ...rest}) => ({...rest, field, name: rest.name || KeyEquivalence[field] || field}));
 const linuxColumns = [
-  { id: 'name' },
-  { id: 'architecture', width: '10%' },
-  { id: 'version' },
-  { id: 'vendor', width: '30%' },
-  { id: 'description', width: '30%' },
-];
+  { field: 'name', sortable: true },
+  { field: 'architecture', sortable: true, width: '10%' },
+  { field: 'version', sortable: true },
+  { field: 'vendor', sortable: true, width: '30%' },
+  { field: 'description', sortable: true, width: '30%' },
+].map(({field, ...rest}) => ({...rest, field, name: rest.name || KeyEquivalence[field] || field}));
 const MacColumns = [
-  { id: 'name' },
-  { id: 'version' },
-  { id: 'format' },
-  { id: 'location', width: '30%' },
-  { id: 'description', width: '20%' },
-];
+  { field: 'name', sortable: true },
+  { field: 'version', sortable: true },
+  { field: 'format', sortable: true },
+  { field: 'location', sortable: true, width: '30%' },
+  { field: 'description', sortable: true, width: '20%' },
+].map(({field, ...rest}) => ({...rest, field, name: rest.name || KeyEquivalence[field] || field}));
 const FreebsdColumns = [
-  { id: 'name' },
-  { id: 'version' },
-  { id: 'format' },
-  { id: 'architecture', width: '20%' },
-  { id: 'vendor', width: '20%' },
-  { id: 'description', width: '30%' },
-];
+  { field: 'name', sortable: true },
+  { field: 'version', sortable: true },
+  { field: 'format', sortable: true },
+  { field: 'architecture', sortable: true, width: '20%' },
+  { field: 'vendor', sortable: true, width: '20%' },
+  { field: 'description', sortable: true, width: '30%' },
+].map(({field, ...rest}) => ({...rest, field, name: rest.name || KeyEquivalence[field] || field}));
 
 export const packagesColumns = {
   windows: windowsColumns,
