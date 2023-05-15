@@ -41,102 +41,6 @@ class WzGroupAgentsTable extends Component {
   _isMounted = false;
   constructor(props) {
     super(props);
-    this.suggestions = [
-      {
-        type: 'q',
-        label: 'status',
-        description: 'Filter by agent connection status',
-        operators: ['=', '!='],
-        values: UI_ORDER_AGENT_STATUS,
-      },
-      {
-        type: 'q',
-        label: 'os.platform',
-        description: 'Filter by operating system platform',
-        operators: ['=', '!='],
-        values: async (value) =>
-          getAgentFilterValues('os.platform', value, {
-            q: `group=${this.props.state.itemDetail.name}`,
-          }),
-      },
-      {
-        type: 'q',
-        label: 'ip',
-        description: 'Filter by agent IP address',
-        operators: ['=', '!='],
-        values: async (value) =>
-          getAgentFilterValues('ip', value, { q: `group=${this.props.state.itemDetail.name}` }),
-      },
-      {
-        type: 'q',
-        label: 'name',
-        description: 'Filter by agent name',
-        operators: ['=', '!='],
-        values: async (value) =>
-          getAgentFilterValues('name', value, { q: `group=${this.props.state.itemDetail.name}` }),
-      },
-      {
-        type: 'q',
-        label: 'id',
-        description: 'Filter by agent id',
-        operators: ['=', '!='],
-        values: async (value) =>
-          getAgentFilterValues('id', value, { q: `group=${this.props.state.itemDetail.name}` }),
-      },
-      {
-        type: 'q',
-        label: 'node_name',
-        description: 'Filter by node name',
-        operators: ['=', '!='],
-        values: async (value) =>
-          getAgentFilterValues('node_name', value, {
-            q: `group=${this.props.state.itemDetail.name}`,
-          }),
-      },
-      {
-        type: 'q',
-        label: 'manager',
-        description: 'Filter by manager',
-        operators: ['=', '!='],
-        values: async (value) =>
-          getAgentFilterValues('manager', value, {
-            q: `group=${this.props.state.itemDetail.name}`,
-          }),
-      },
-      {
-        type: 'q',
-        label: 'version',
-        description: 'Filter by agent version',
-        operators: ['=', '!='],
-        values: async (value) =>
-          getAgentFilterValues('version', value, {
-            q: `group=${this.props.state.itemDetail.name}`,
-          }),
-      },
-      {
-        type: 'q',
-        label: 'configSum',
-        description: 'Filter by agent config sum',
-        operators: ['=', '!='],
-        values: async (value) =>
-          getAgentFilterValues('configSum', value, {
-            q: `group=${this.props.state.itemDetail.name}`,
-          }),
-      },
-      {
-        type: 'q',
-        label: 'mergedSum',
-        description: 'Filter by agent merged sum',
-        operators: ['=', '!='],
-        values: async (value) =>
-          getAgentFilterValues('mergedSum', value, {
-            q: `group=${this.props.state.itemDetail.name}`,
-          }),
-      },
-      //{ type: 'q', label: 'dateAdd', description: 'Filter by add date', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('dateAdd', value,  {q: `group=${this.props.state.itemDetail.name}`})},
-      //{ type: 'q', label: 'lastKeepAlive', description: 'Filter by last keep alive', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('lastKeepAlive', value,  {q: `group=${this.props.state.itemDetail.name}`})},
-    ];
-    this.groupsHandler = GroupsHandler;
 
     this.columns = [
       {
@@ -237,6 +141,22 @@ class WzGroupAgentsTable extends Component {
         },
       },
     ];
+
+    this.searchBar = {
+      wql: {
+        suggestionFields: [
+          { label: 'id', description: `filter by ID` },
+          { label: 'ip', description: `filter by IP address` },
+          { label: 'name', description: `filter by Name` },
+          { label: 'os.name', description: `filter by Operating system name` },
+          { label: 'os.version', description: `filter by Operating system version` },
+          { label: 'status', description: `filter by Status` },
+          { label: 'version', description: `filter by Version` },
+        ]
+      }
+    };
+
+    this.searchBar.wql.options = this.searchBar.wql.suggestionFields.map(({label}) => label);
   }
 
   componentWillUnmount() {
@@ -245,13 +165,38 @@ class WzGroupAgentsTable extends Component {
 
   render() {
     const { error } = this.props.state;
+    const groupName = this.props.state?.itemDetail?.name;
+    const searchBarSuggestionsFields = this.searchBar.wql.suggestionFields;
     if (!error) {
       return (
         <TableWzAPI
+          title='Agents'
+          description='From here you can list and manage your agents'
           tableColumns={this.columns}
           tableInitialSortingField="id"
-          searchBarSuggestions={this.suggestions}
-          endpoint={`/groups/${this.props.state.itemDetail.name}/agents`}
+          endpoint={`/groups/${groupName}/agents`}
+          searchBarProps={{
+            modes: [
+              {
+                id: 'wql',
+                options: this.searchBar.wql.options,
+                suggestions: {
+                  field: () => searchBarSuggestionsFields,
+                  value: async (currentValue, { field }) => {
+                    try{ // TODO: distinct
+                      return await getAgentFilterValues(field, currentValue, {
+                        q: `group=${groupName}`,
+                      });
+                    }catch(error){
+                      return [];
+                    };
+                  }
+                },
+              }
+            ]
+          }}
+          showReload
+          downloadCsv={`agents-group-${groupName}`}
           reload={this.props.state.reload}
           searchTable={true}
         />
@@ -274,7 +219,7 @@ class WzGroupAgentsTable extends Component {
     const { itemDetail } = this.props.state;
     this.props.updateLoadingStatus(true);
     try {
-      await Promise.all(items.map(item => this.groupsHandler.deleteAgent(item.id, itemDetail.name)));
+      await Promise.all(items.map(item => GroupsHandler.deleteAgent(item.id, itemDetail.name)));
       this.props.updateIsProcessing(true);
       this.props.updateLoadingStatus(false);
       this.props.updateReload();
