@@ -286,7 +286,7 @@ export default class WzRuleInfo extends Component {
           <span>
             <EuiToolTip position="top" content={`Filter by this rule ID: ${id}`}>
               <EuiLink
-                onClick={async () => this.setNewFiltersAndBack([{ field: 'rule_ids', value: id }])}
+                onClick={async () => this.setNewFiltersAndBack({q: `id=${id}`})}
               >
                 {id}
               </EuiLink>
@@ -298,7 +298,7 @@ export default class WzRuleInfo extends Component {
           <span>
             <EuiToolTip position="top" content={`Filter by this level: ${level}`}>
               <EuiLink
-                onClick={async () => this.setNewFiltersAndBack([{ field: 'level', value: level }])}
+                onClick={async () => this.setNewFiltersAndBack({q: `level=${level}`})}
               >
                 {level}
               </EuiLink>
@@ -311,7 +311,7 @@ export default class WzRuleInfo extends Component {
             <EuiToolTip position="top" content={`Filter by this file: ${file}`}>
               <EuiLink
                 onClick={async () =>
-                  this.setNewFiltersAndBack([{ field: 'filename', value: file }])
+                  this.setNewFiltersAndBack({q: `filename=${file}`})
                 }
               >
                 {file}
@@ -325,7 +325,7 @@ export default class WzRuleInfo extends Component {
             <EuiToolTip position="top" content={`Filter by this path: ${path}`}>
               <EuiLink
                 onClick={async () =>
-                  this.setNewFiltersAndBack([{ field: 'relative_dirname', value: path }])
+                  this.setNewFiltersAndBack({q: `relative_dirname=${path}`})
                 }
               >
                 {path}
@@ -422,7 +422,7 @@ export default class WzRuleInfo extends Component {
       listGroups.push(
         <span key={group}>
           <EuiLink
-            onClick={async () => this.setNewFiltersAndBack([{ field: 'group', value: group }])}
+            onClick={async () => this.setNewFiltersAndBack({q: `group=${group}`})}
           >
             <EuiToolTip position="top" content={`Filter by this group: ${group}`}>
               <span>{group}</span>
@@ -527,7 +527,7 @@ export default class WzRuleInfo extends Component {
         return (
           <span key={index}>
             <EuiLink
-              onClick={async () => this.setNewFiltersAndBack([{ field: key, value: element }])}
+              onClick={async () => this.setNewFiltersAndBack({q: `${key}=${element}`})}
             >
               <EuiToolTip position="top" content="Filter by this compliance">
                 <span>{element}</span>
@@ -553,7 +553,7 @@ export default class WzRuleInfo extends Component {
           <span key={index}>
             <EuiLink
               onClick={async () =>
-                this.setNewFiltersAndBack([{ field: 'mitre', value: this.state.mitreIds[index] }])
+                this.setNewFiltersAndBack({q: `mitre=${this.state.mitreIds[index]}`})
               }
             >
               <EuiToolTip position="top" content="Filter by this compliance">

@@ -32,39 +32,49 @@ import {
 
 import apiSuggestsItems from './decoders-suggestions';
 
+const searchBarWQLOptions =  {
+  searchTermFields: [], // TODO: add search term fields
+  filterButtons: [
+    {id: 'relative-dirname', input: 'relative_dirname=etc/decoders', label: 'Custom decoders'}
+  ]
+};
+
 /***************************************
  * Render tables 
  */
 const FilesTable = ({
   actionButtons,
-  buttonOptions,
   columns,
   searchBarSuggestions,
   filters,
-  updateFilters,
   reload
 }) => <TableWzAPI
-    reload={reload}
-    actionButtons={actionButtons}
-    title={'Decoders files'}
-    searchBarProps={{ buttonOptions: buttonOptions }}
-    description={`From here you can manage your decoders files.`}
-    tableColumns={columns}
-    tableInitialSortingField={'filename'}
-    searchTable={true}
-    searchBarSuggestions={searchBarSuggestions}
-    endpoint={'/decoders/files'}
-    isExpandable={true}
-    downloadCsv={true}
-    showReload={true}
-    filters={filters}
-    onFiltersChange={updateFilters}
-    tablePageSizeOptions={[10, 25, 50, 100]}
-  />
+  reload={reload}
+  actionButtons={actionButtons}
+  title='Decoders files'
+  description='From here you can manage your decoders files.'
+  tableColumns={columns}
+  tableInitialSortingField='filename'
+  searchTable={true}
+  searchBarProps={{
+    modes: [
+      {
+        id: 'wql',
+        options: searchBarWQLOptions,
+        suggestions: searchBarSuggestions,
+      }
+    ]
+  }}
+  endpoint='/decoders/files'
+  isExpandable={true}
+  downloadCsv={true}
+  showReload={true}
+  filters={filters}
+  tablePageSizeOptions={[10, 25, 50, 100]}
+/>;
 
 const DecodersFlyoutTable = ({
   actionButtons,
-  buttonOptions,
   columns,
   searchBarSuggestions,
   getRowProps,
@@ -76,37 +86,43 @@ const DecodersFlyoutTable = ({
   cleanFilters,
   ...props
 }) => <>
-    <TableWzAPI
-      actionButtons={actionButtons}
-      title={'Decoders'}
-      searchBarProps={{ buttonOptions: buttonOptions }}
-      description={`From here you can manage your decoders.`}
-      tableColumns={columns}
-      tableInitialSortingField={'filename'}
-      searchTable={true}
-      searchBarSuggestions={searchBarSuggestions}
-      endpoint={'/decoders'}
-      isExpandable={true}
-      rowProps={getRowProps}
-      downloadCsv={true}
-      showReload={true}
+  <TableWzAPI
+    actionButtons={actionButtons}
+    title='Decoders'
+    description='From here you can manage your decoders.'
+    tableColumns={columns}
+    tableInitialSortingField='filename'
+    searchTable={true}
+    searchBarProps={{
+      modes: [
+        {
+          id: 'wql',
+          options: searchBarWQLOptions,
+          suggestions: searchBarSuggestions,
+        }
+      ]
+    }}
+    endpoint='/decoders'
+    isExpandable={true}
+    rowProps={getRowProps}
+    downloadCsv={true}
+    showReload={true}
+    filters={filters}
+    tablePageSizeOptions={[10, 25, 50, 100]}
+  />
+  {isFlyoutVisible && (
+    <FlyoutDetail
+      item={currentItem}
+      closeFlyout={closeFlyout}
+      showViewInEvents={true}
+      outsideClickCloses={true}
       filters={filters}
       onFiltersChange={updateFilters}
-      tablePageSizeOptions={[10, 25, 50, 100]}
+      cleanFilters={cleanFilters}
+      {...props}
     />
-    {isFlyoutVisible && (
-      <FlyoutDetail
-        item={currentItem}
-        closeFlyout={closeFlyout}
-        showViewInEvents={true}
-        outsideClickCloses={true}
-        filters={filters}
-        onFiltersChange={updateFilters}
-        cleanFilters={cleanFilters}
-        {...props}
-      />
-    )}
-  </>
+  )}
+</>;
 
 /***************************************
  * Main component
@@ -120,9 +136,6 @@ export default compose(
   const [tableFootprint, setTableFootprint] = useState(0);
 
   const resourcesHandler = new ResourcesHandler(ResourcesConstants.DECODERS);
-
-  // Table custom filter options
-  const buttonOptions = [{ label: "Custom decoders", field: "relative_dirname", value: "etc/decoders" },];
 
   const updateFilters = (filters) => {
     setFilters(filters);
@@ -251,17 +264,14 @@ export default compose(
       {showingFiles ? (
         <FilesTable
           actionButtons={actionButtons}
-          buttonOptions={buttonOptions}
           columns={columns}
           searchBarSuggestions={apiSuggestsItems.files}
           filters={filters}
-          updateFilters={updateFilters}
           reload={tableFootprint}
         />
       ) : (
           <DecodersFlyoutTable
             actionButtons={actionButtons}
-            buttonOptions={buttonOptions}
             columns={columns}
             searchBarSuggestions={apiSuggestsItems.items}
             filters={filters}

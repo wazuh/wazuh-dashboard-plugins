@@ -13,10 +13,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { EuiBasicTable, EuiSpacer } from '@elastic/eui';
 import _ from 'lodash';
-import { WzSearchBar } from '../../wz-search-bar/';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
+import { SearchBar } from '../../search-bar';
 
 export function TableWithSearchBar({
   onSearch,
@@ -36,20 +36,25 @@ export function TableWithSearchBar({
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState([]);
   const [totalItems, setTotalItems] = useState(0);
-  const [filters, setFilters] = useState(rest.filters || []);
+  const [filters, setFilters] = useState(rest.filters || {});
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: tablePageSizeOptions[0],
   });
-
   const [sorting, setSorting] = useState({
     sort: {
       field: tableInitialSortingField,
       direction: tableInitialSortingDirection,
     },
   });
+  const [refresh, setRefresh] = useState(Date.now());
 
   const isMounted = useRef(false);
+
+  function updateRefresh() {
+    setPagination({ pageIndex: 0, pageSize: pagination.pageSize });
+    setRefresh(Date.now());
+  };
 
   function tableOnChange({ page = {}, sort = {} }) {
     if (isMounted.current) {
@@ -73,9 +78,9 @@ export function TableWithSearchBar({
     // We don't want to set the pagination state because there is another effect that has this dependency
     // and will cause the effect is triggered (redoing the onSearch function).
     if (isMounted.current) {
-      // Reset the page index when the endpoint changes.
+      // Reset the page index when the endpoint or reload changes.
       // This will cause that onSearch function is triggered because to changes in pagination in the another effect.
-      setPagination({ pageIndex: 0, pageSize: pagination.pageSize });
+      updateRefresh();
     }
   }, [endpoint, reload]);
 
@@ -103,14 +108,15 @@ export function TableWithSearchBar({
       }
       setLoading(false);
     })();
-  }, [filters, pagination, sorting]);
+  }, [filters, pagination, sorting, refresh]);
 
   useEffect(() => {
     // This effect is triggered when the component is mounted because of how to the useEffect hook works.
     // We don't want to set the filters state because there is another effect that has this dependency
     // and will cause the effect is triggered (redoing the onSearch function).
     if (isMounted.current && !_.isEqual(rest.filters, filters)) {
-      setFilters(rest.filters || []);
+      setFilters(rest.filters || {});
+      updateRefresh();
     }
   }, [rest.filters]);
 
@@ -128,13 +134,15 @@ export function TableWithSearchBar({
   };
   return (
     <>
-      <WzSearchBar
-        noDeleteFiltersOnUpdateSuggests
-        filters={filters}
-        onFiltersChange={setFilters}
-        suggestions={searchBarSuggestions}
-        placeholder={searchBarPlaceholder}
+      <SearchBar
+        defaultMode='wql'
         {...searchBarProps}
+        input={rest?.filters?.q || ''}
+        onSearch={({apiQuery}) => {
+          // Set the query, reset the page index and update the refresh
+          setFilters(apiQuery);
+          updateRefresh();
+        }}
       />
       <EuiSpacer size="s" />
       <EuiBasicTable

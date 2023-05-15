@@ -11,86 +11,35 @@
  */
 
 import React, { Component } from 'react';
-import { Direction } from '@elastic/eui';
 import { FlyoutDetail } from './flyout';
-import { filtersToObject, IFilter, IWzSuggestItem } from '../../../wz-search-bar';
 import { TableWzAPI } from '../../../../components/common/tables';
 import { getFilterValues } from './lib';
 import { formatUIDate } from '../../../../react-services/time-service';
+import { EuiIconTip } from '@elastic/eui';
+
+const searchBarWQLOptions = {
+  searchTermFields: [
+    'name',
+    'cve',
+    'version',
+    'architecture',
+    'severity',
+    'cvss2_score',
+    'cvss3_score'
+  ]
+};
 
 export class InventoryTable extends Component {
   state: {
     error?: string;
-    pageIndex: number;
-    pageSize: number;
-    sortField: string;
     isFlyoutVisible: Boolean;
-    sortDirection: Direction;
     isLoading: boolean;
     currentItem: {};
   };
 
-  suggestions: IWzSuggestItem[] = [
-    {
-      type: 'q',
-      label: 'name',
-      description: 'Filter by package ID',
-      operators: ['=', '!=', '~'],
-      values: async (value) => getFilterValues('name', value, this.props.agent.id),
-    },
-    {
-      type: 'q',
-      label: 'cve',
-      description: 'Filter by CVE ID',
-      operators: ['=', '!=', '~'],
-      values: async (value) => getFilterValues('cve', value, this.props.agent.id),
-    },
-    {
-      type: 'q',
-      label: 'version',
-      description: 'Filter by CVE version',
-      operators: ['=', '!=', '~'],
-      values: async (value) => getFilterValues('version', value, this.props.agent.id),
-    },
-    {
-      type: 'q',
-      label: 'architecture',
-      description: 'Filter by architecture',
-      operators: ['=', '!=', '~'],
-      values: async (value) => getFilterValues('architecture', value, this.props.agent.id),
-    },
-    {
-      type: 'q',
-      label: 'severity',
-      description: 'Filter by Severity',
-      operators: ['=', '!=', '~'],
-      values: async (value) => getFilterValues('severity', value, this.props.agent.id),
-    },
-    {
-      type: 'q',
-      label: 'cvss2_score',
-      description: 'Filter by CVSS2',
-      operators: ['=', '!=', '~'],
-      values: async (value) => getFilterValues('cvss2_score', value, this.props.agent.id),
-    },
-    {
-      type: 'q',
-      label: 'cvss3_score',
-      description: 'Filter by CVSS3',
-      operators: ['=', '!=', '~'],
-      values: async (value) => getFilterValues('cvss3_score', value, this.props.agent.id),
-    },
-    {
-      type: 'q',
-      label: 'detection_time',
-      description: 'Filter by Detection Time',
-      operators: ['=', '!=', '~'],
-      values: async (value) => getFilterValues('detection_time', value, this.props.agent.id),
-    },
-  ];
 
   props!: {
-    filters: IFilter[];
+    filters: string;
     agent: any;
     items: [];
     onFiltersChange: Function;
@@ -100,13 +49,8 @@ export class InventoryTable extends Component {
     super(props);
 
     this.state = {
-      pageIndex: 0,
-      pageSize: 15,
-      sortField: 'name',
-      sortDirection: 'asc',
-      isLoading: false,
       isFlyoutVisible: false,
-      currentItem: {},
+      currentItem: {}
     };
   }
 
@@ -121,31 +65,6 @@ export class InventoryTable extends Component {
     );
   }
 
-  async componentDidUpdate(prevProps) {
-    const { filters } = this.props;
-    if (JSON.stringify(filters) !== JSON.stringify(prevProps.filters)) {
-      this.setState({ pageIndex: 0, isLoading: true });
-    }
-  }
-
-  buildSortFilter() {
-    const { sortField, sortDirection } = this.state;
-    const direction = sortDirection === 'asc' ? '+' : '-';
-
-    return direction + sortField;
-  }
-
-  buildFilter() {
-    const { pageIndex, pageSize } = this.state;
-    const filters = filtersToObject(this.props.filters);
-    const filter = {
-      ...filters,
-      offset: pageIndex * pageSize,
-      limit: pageSize,
-      sort: this.buildSortFilter(),
-    };
-    return filter;
-  }
 
   columns() {
     let width;
@@ -199,7 +118,16 @@ export class InventoryTable extends Component {
       },
       {
         field: 'detection_time',
-        name: 'Detection Time',
+        name: (
+          <span>Detection Time{' '}
+            <EuiIconTip
+              content='This is not searchable through a search term.'
+              size='s'
+              color='subdued'
+              type='alert'
+            />
+          </span>
+        ),
         sortable: true,
         width: `100px`,
         render: formatUIDate,
@@ -217,7 +145,6 @@ export class InventoryTable extends Component {
     };
 
     const { error } = this.state;
-    const { filters, onFiltersChange } = this.props;
     const columns = this.columns();
     const selectFields = `select=${[
       'cve',
@@ -235,13 +162,13 @@ export class InventoryTable extends Component {
       'external_references'
     ].join(',')}`;
 
+    const agentID = this.props.agent.id;
+
     return (
       <TableWzAPI
         title="Vulnerabilities"
         tableColumns={columns}
         tableInitialSortingField="name"
-        searchTable={true}
-        searchBarSuggestions={this.suggestions}
         endpoint={`/vulnerability/${this.props.agent.id}?${selectFields}`}
         isExpandable={true}
         rowProps={getRowProps}
@@ -251,14 +178,44 @@ export class InventoryTable extends Component {
           // This causes the rendering of them can crash when opening the flyout with the details.
           // So, we ensure the fields are defined with the expected data structure.
           external_references: Array.isArray(item?.external_references) 
-            ? item?.external_references
-            : []
+          ? item?.external_references
+          : []
         })}
         error={error}
-        downloadCsv={true}
-        filters={filters}
-        onFiltersChange={onFiltersChange}
+        searchTable
+        downloadCsv
+        showReload
         tablePageSizeOptions={[10, 25, 50, 100]}
+        filters={this.props.filters}
+        searchBarProps={{
+          modes: [
+            {
+              id: 'wql',
+              options: searchBarWQLOptions,
+              suggestions: {
+                field(currentValue) {
+                  return [
+                    { label: 'architecture', description: 'filter by architecture' },
+                    { label: 'cve', description: 'filter by CVE ID' },
+                    { label: 'cvss2_score', description: 'filter by CVSS2' },
+                    { label: 'cvss3_score', description: 'filter by CVSS3' },
+                    { label: 'detection_time', description: 'filter by detection time' },
+                    { label: 'name', description: 'filter by package name' },
+                    { label: 'severity', description: 'filter by severity' },
+                    { label: 'version', description: 'filter by CVE version' },
+                  ];
+                },
+                value: async (currentValue, { field }) => {
+                  try{
+                    return await getFilterValues(field, currentValue, agentID, {}, label => ({label}));
+                  }catch(error){
+                    return [];
+                  };
+                },
+              },
+            }
+          ]
+        }}
       />
     );
   }

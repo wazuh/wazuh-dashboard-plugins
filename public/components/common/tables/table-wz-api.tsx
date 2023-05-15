@@ -18,8 +18,8 @@ import {
   EuiFlexItem,
   EuiText,
   EuiButtonEmpty,
+  EuiSpacer,
 } from '@elastic/eui';
-import { filtersToObject } from '../../wz-search-bar';
 import { TableWithSearchBar } from './table-with-search-bar';
 import { TableDefault } from './table-default';
 import { WzRequest } from '../../../react-services/wz-request';
@@ -37,6 +37,11 @@ interface CustomFilterButton {
   value: string;
 }
 
+const getFilters = filters => {
+  const { default: defaultFilters, ...restFilters } = filters;
+  return Object.keys(restFilters).length ? restFilters : defaultFilters;
+};
+
 export function TableWzAPI({
   actionButtons,
   ...rest
@@ -44,7 +49,7 @@ export function TableWzAPI({
   actionButtons?: ReactNode | ReactNode[];
   title?: string;
   description?: string;
-  downloadCsv?: boolean;
+  downloadCsv?: boolean | string;
   searchTable?: boolean;
   endpoint: string;
   buttonOptions?: CustomFilterButton[];
@@ -54,7 +59,7 @@ export function TableWzAPI({
   reload?: boolean;
 }) {
   const [totalItems, setTotalItems] = useState(0);
-  const [filters, setFilters] = useState([]);
+  const [filters, setFilters] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const onFiltersChange = (filters) =>
     typeof rest.onFiltersChange === 'function' ? rest.onFiltersChange(filters) : null;
@@ -72,7 +77,7 @@ export function TableWzAPI({
       setFilters(filters);
       onFiltersChange(filters);
       const params = {
-        ...filtersToObject(filters),
+        ...getFilters(filters),
         offset: pageIndex * pageSize,
         limit: pageSize,
         sort: `${direction === 'asc' ? '+' : '-'}${field}`,
@@ -131,7 +136,6 @@ export function TableWzAPI({
   const ReloadButton = (
     <EuiFlexItem grow={false}>
       <EuiButtonEmpty
-        isDisabled={totalItems == 0}
         iconType="refresh"
         onClick={() => triggerReload()}
       >
@@ -164,8 +168,8 @@ export function TableWzAPI({
             <ExportTableCsv
               endpoint={rest.endpoint}
               totalItems={totalItems}
-              filters={filters}
-              title={rest.title}
+              filters={getFilters(filters)}
+              title={typeof rest.downloadCsv === 'string' ? rest.downloadCsv : rest.title}
             />
           )}
         </EuiFlexGroup>
@@ -182,6 +186,7 @@ export function TableWzAPI({
   return (
     <>
       {header}
+      {rest.description && <EuiSpacer />}
       {table}
     </>
   );

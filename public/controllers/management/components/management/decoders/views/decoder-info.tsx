@@ -129,7 +129,7 @@ export default class WzDecoderInfo extends Component {
             <EuiToolTip position="top" content={`Filter by this file: ${file}`}>
               <EuiLink
                 onClick={async () =>
-                  this.setNewFiltersAndBack([{ field: 'filename', value: file }])
+                  this.setNewFiltersAndBack({q: `filename=${file}`})
                 }
               >
                 &nbsp;{file}
@@ -143,7 +143,7 @@ export default class WzDecoderInfo extends Component {
             <EuiToolTip position="top" content={`Filter by this path: ${path}`}>
               <EuiLink
                 onClick={async () =>
-                  this.setNewFiltersAndBack([{ field: 'relative_dirname', value: path }])
+                  this.setNewFiltersAndBack({q: `relative_dirname=${path}`})
                 }
               >
                 &nbsp;{path}

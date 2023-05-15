@@ -59,7 +59,7 @@ interface TitleColors {
 export class Inventory extends Component {
   _isMount = false;
   state: {
-    filters: [];
+    filters: object;
     isLoading: boolean;
     isLoadingStats: boolean;
     customBadges: ICustomBadges[];
@@ -82,7 +82,7 @@ export class Inventory extends Component {
       isLoading: true,
       isLoadingStats: true,
       customBadges: [],
-      filters: [],
+      filters: {},
       stats: [
         {
           title: 0,
@@ -167,12 +167,9 @@ export class Inventory extends Component {
   }
 
   buildFilterQuery(field = '', selectedItem = '') {
-    return [
-      {
-        field: 'q',
-        value: `${field}=${selectedItem}`,
-      },
-    ];
+    return {
+      q: `${field}=${selectedItem}`
+    };
   }
 
   async loadAgent() {

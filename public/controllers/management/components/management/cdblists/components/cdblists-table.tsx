@@ -29,18 +29,21 @@ import {
   AddNewFileButton,
   AddNewCdbListButton,
   UploadFilesButton,
-} from '../../common/actions-buttons'
+} from '../../common/actions-buttons';
+
+const searchBarWQLOptions =  {
+  searchTermFields: ['filename', 'relative_dirname'],
+  filterButtons: [
+    {id: 'relative-dirname', input: 'relative_dirname=etc/lists', label: 'Custom lists'}
+  ]
+};
 
 function CDBListsTable(props) {
-  const [filters, setFilters] = useState([]);
   const [showingFiles, setShowingFiles] = useState(false);
   const [tableFootprint, setTableFootprint] = useState(0);
 
   const resourcesHandler = new ResourcesHandler(ResourcesConstants.LISTS);
 
-  const updateFilters = (filters) => {
-    setFilters(filters);
-  }
 
   const toggleShowFiles = () => {
     setShowingFiles(!showingFiles);
@@ -169,15 +172,35 @@ function CDBListsTable(props) {
         description={`From here you can manage your lists.`}
         tableColumns={columns}
         tableInitialSortingField={'filename'}
-        searchTable={true}
-        searchBarSuggestions={[]}
+        searchTable
+        searchBarProps={{
+          modes: [
+            {
+              id: 'wql',
+              options: searchBarWQLOptions,
+              suggestions: {
+                field(currentValue) {
+                  return [
+                    {label: 'filename', description: 'filter by filename'},
+                    {label: 'relative_dirname', description: 'filter by relative path'},
+                  ];
+                },
+                value: async (currentValue, { field }) => {
+                  try{ // TODO: distinct
+                    return [];
+                  }catch(error){
+                    return [];
+                  };
+                },
+              },
+            }
+          ]
+        }}
         endpoint={'/lists'}
         isExpandable={true}
         rowProps={getRowProps}
-        downloadCsv={true}
-        showReload={true}
-        filters={filters}
-        onFiltersChange={updateFilters}
+        downloadCsv
+        showReload
         tablePageSizeOptions={[10, 25, 50, 100]}
       />
     </div>

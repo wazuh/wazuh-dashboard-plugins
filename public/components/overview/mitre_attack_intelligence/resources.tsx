@@ -22,12 +22,13 @@ import { getErrorOrchestrator } from '../../../react-services/common-services';
 
 const getMitreAttackIntelligenceSuggestions = (endpoint: string, field: string) => async (input: string) => {
   try{
-    const response = await WzRequest.apiReq('GET', endpoint, {});
+    const response = await WzRequest.apiReq('GET', endpoint, {}); // TODO: change to use distinct
     return response?.data?.data.affected_items
       .map(item => item[field])
-      .filter(item => item && item.toLowerCase().includes(input.toLowerCase()))
+      .filter(item => input ? (item && item.toLowerCase().includes(input.toLowerCase())) : true)
       .sort()
-      .slice(0,9)
+      .slice(0, 9)
+      .map(label => ({label}));
   }catch(error){
     const options = {
       context: `${ModuleMitreAttackIntelligenceResource.name}.getMitreItemToRedirect`,
@@ -49,32 +50,34 @@ const getMitreAttackIntelligenceSuggestions = (endpoint: string, field: string) 
 function buildResource(label: string, labelResource: string){
   const id = label.toLowerCase();
   const endpoint: string = `/mitre/${id}`;
+  const fieldsMitreAttactResource = [
+    { field: 'description', name: 'description' },
+    { field: 'external_id', name: 'external ID' },
+    { field: 'name', name: 'name' }
+  ];
   return {
     label: label,
     id,
-    searchBarSuggestions: [
-      {
-        type: 'q',
-        label: 'description',
-        description: `${labelResource} description`,
-        operators: ['~'],
-        values: (input) => input ? [input] : []
-      },
-      {
-        type: 'q',
-        label: 'name',
-        description: `${labelResource} name`,
-        operators: ['=', '!='],
-        values: getMitreAttackIntelligenceSuggestions(endpoint, 'name')
-      },
-      {
-        type: 'q',
-        label: 'external_id',
-        description: `${labelResource} ID`,
-        operators: ['=', '!='],
-        values: getMitreAttackIntelligenceSuggestions(endpoint, 'external_id')
+    searchBar: {
+      wql: {
+        options: {
+          searchTermFields: fieldsMitreAttactResource.map(({field}) => field)
+        },
+        suggestions: {
+          field(currentValue) {
+            return fieldsMitreAttactResource
+              .map(({field, name}) => ({label: field, description: `filter by ${name}`}));
+          },
+          value: async (currentValue, { field }) => {
+            try{ // TODO: distinct
+              return await (getMitreAttackIntelligenceSuggestions(endpoint, field))(currentValue);
+            }catch(error){
+              return [];
+            };
+          },
+        }
       }
-    ],
+    },
     apiEndpoint: endpoint,
     fieldName: 'name',
     initialSortingField: 'name',

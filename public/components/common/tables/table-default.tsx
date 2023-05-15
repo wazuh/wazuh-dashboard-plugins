@@ -111,7 +111,6 @@ export function TableDefault({
     hidePerPageOptions
   };
   return (
-    <>
     <EuiBasicTable
       columns={tableColumns}
       items={items}
@@ -122,6 +121,5 @@ export function TableDefault({
       rowProps={rowProps}
       {...tableProps}
     />
-    </>
   );
 }
