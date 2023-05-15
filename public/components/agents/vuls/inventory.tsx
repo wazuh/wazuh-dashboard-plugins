@@ -217,7 +217,7 @@ export class Inventory extends Component {
           textAlign='center'
           isLoading={isLoadingStats}
           title={
-            <EuiToolTip position='top' content={`Filter by Severity`}>
+            <EuiToolTip position='top' content={`Filter by severity: ${description}`}>
               <span
                 className={'statWithLink wz-user-select-none'}
                 style={{ cursor: 'pointer', fontSize: '2.25rem' }}
