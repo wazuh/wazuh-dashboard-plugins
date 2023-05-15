@@ -33,7 +33,7 @@ import {
   EuiProgress,
   EuiIcon,
   EuiSwitch,
-  EuiLink
+  EuiLink,
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
 import { withErrorBoundary } from '../../../components/common/hocs';
@@ -41,12 +41,40 @@ import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
-import { architectureButtons, architectureButtonsi386, architecturei386Andx86_64, versionButtonsRaspbian, versionButtonsSuse, versionButtonsOracleLinux, versionButtonFedora, architectureButtonsSolaris, architectureButtonsWithPPC64LE, architectureButtonsOpenSuse, architectureButtonsAix, architectureButtonsHpUx, versionButtonAmazonLinux, versionButtonsRedHat, versionButtonsCentos, architectureButtonsMacos, osButtons, versionButtonsDebian, versionButtonsUbuntu, versionButtonsWindows, versionButtonsMacOS, versionButtonsOpenSuse, versionButtonsSolaris, versionButtonsAix, versionButtonsHPUX } from '../wazuh-config'
-import  ServerAddress  from '../register-agent/steps/server-address';
-import { getConnectionConfig, fetchClusterNodesOptions } from './register-agent-service'
+import {
+  architectureButtons,
+  architectureButtonsi386,
+  architecturei386Andx86_64,
+  versionButtonsRaspbian,
+  versionButtonsSuse,
+  versionButtonsOracleLinux,
+  versionButtonFedora,
+  architectureButtonsSolaris,
+  architectureButtonsWithPPC64LE,
+  architectureButtonsOpenSuse,
+  architectureButtonsAix,
+  architectureButtonsHpUx,
+  versionButtonAmazonLinux,
+  versionButtonsRedHat,
+  versionButtonsCentos,
+  architectureButtonsMacos,
+  osButtons,
+  versionButtonsDebian,
+  versionButtonsUbuntu,
+  versionButtonsWindows,
+  versionButtonsMacOS,
+  versionButtonsOpenSuse,
+  versionButtonsSolaris,
+  versionButtonsAix,
+  versionButtonsHPUX,
+} from '../wazuh-config';
+import ServerAddress from '../register-agent/steps/server-address';
+import {
+  getConnectionConfig,
+  fetchClusterNodesOptions,
+} from './register-agent-service';
 
 export const RegisterAgent = withErrorBoundary(
-
   class RegisterAgent extends Component {
     constructor(props) {
       super(props);
@@ -70,7 +98,7 @@ export const RegisterAgent = withErrorBoundary(
         udpProtocol: false,
         showPassword: false,
         showProtocol: true,
-        connectionSecure: true
+        connectionSecure: true,
       };
       this.restartAgentCommand = {
         rpm: this.systemSelector(),
@@ -79,7 +107,7 @@ export const RegisterAgent = withErrorBoundary(
         ubu: this.systemSelector(),
         oraclelinux: this.systemSelector(),
         macos: 'sudo /Library/Ossec/bin/wazuh-control start',
-        win: 'NET START WazuhSvc'
+        win: 'NET START WazuhSvc',
       };
     }
 
@@ -93,7 +121,10 @@ export const RegisterAgent = withErrorBoundary(
         let authInfo = await this.getAuthInfo();
         const needsPassword = (authInfo.auth || {}).use_password === 'yes';
         if (needsPassword) {
-          wazuhPassword = this.configuration['enrollment.password'] || authInfo['authd.pass'] || '';
+          wazuhPassword =
+            this.configuration['enrollment.password'] ||
+            authInfo['authd.pass'] ||
+            '';
           if (wazuhPassword) {
             hidePasswordInput = true;
           }
@@ -154,16 +185,20 @@ export const RegisterAgent = withErrorBoundary(
     getEnrollDNSConfig = () => {
       let serverAddress = this.configuration['enrollment.dns'] || '';
       this.setState({ defaultServerAddress: serverAddress });
-      if(serverAddress){
+      if (serverAddress) {
         this.setState({ udpProtocol: true });
-      }else{
+      } else {
         this.setState({ udpProtocol: false });
       }
-    }
+    };
 
     async getAuthInfo() {
       try {
-        const result = await WzRequest.apiReq('GET', '/agents/000/config/auth/auth', {});
+        const result = await WzRequest.apiReq(
+          'GET',
+          '/agents/000/config/auth/auth',
+          {},
+        );
         return (result.data || {}).data || {};
       } catch (error) {
         this.setState({ gotErrorRegistrationServiceInfo: true });
@@ -181,28 +216,69 @@ export const RegisterAgent = withErrorBoundary(
     }
 
     systemSelector() {
-      if (this.state.selectedVersion === 'redhat7' || this.state.selectedVersion === 'amazonlinux2022' || this.state.selectedVersion === 'centos7' || this.state.selectedVersion === 'suse11' || this.state.selectedVersion === 'suse12' || this.state.selectedVersion === 'oraclelinux5' || this.state.selectedVersion === '22' || this.state.selectedVersion === 'amazonlinux2' || this.state.selectedVersion === 'debian8' || this.state.selectedVersion === 'debian9' || this.state.selectedVersion === 'debian10' || this.state.selectedVersion === 'busterorgreater' || this.state.selectedVersion === 'ubuntu15' || this.state.selectedVersion === 'ubuntu16' || this.state.selectedVersion === 'leap15') {
+      if (
+        this.state.selectedVersion === 'redhat7' ||
+        this.state.selectedVersion === 'amazonlinux2022' ||
+        this.state.selectedVersion === 'centos7' ||
+        this.state.selectedVersion === 'suse11' ||
+        this.state.selectedVersion === 'suse12' ||
+        this.state.selectedVersion === 'oraclelinux5' ||
+        this.state.selectedVersion === '22' ||
+        this.state.selectedVersion === 'amazonlinux2' ||
+        this.state.selectedVersion === 'debian8' ||
+        this.state.selectedVersion === 'debian9' ||
+        this.state.selectedVersion === 'debian10' ||
+        this.state.selectedVersion === 'busterorgreater' ||
+        this.state.selectedVersion === 'ubuntu15' ||
+        this.state.selectedVersion === 'ubuntu16' ||
+        this.state.selectedVersion === 'leap15'
+      ) {
         return 'sudo systemctl daemon-reload\nsudo systemctl enable wazuh-agent\nsudo systemctl start wazuh-agent';
-      } else if (this.state.selectedVersion === 'redhat5' || this.state.selectedVersion === 'redhat6' || this.state.selectedVersion === 'centos5' || this.state.selectedVersion === 'centos6' || this.state.selectedVersion === 'oraclelinux6' || this.state.selectedVersion === 'amazonlinux1' || this.state.selectedVersion === 'debian7' || this.state.selectedVersion === 'ubuntu14') {
-        return ('service wazuh-agent start');
+      } else if (
+        this.state.selectedVersion === 'redhat5' ||
+        this.state.selectedVersion === 'redhat6' ||
+        this.state.selectedVersion === 'centos5' ||
+        this.state.selectedVersion === 'centos6' ||
+        this.state.selectedVersion === 'oraclelinux6' ||
+        this.state.selectedVersion === 'amazonlinux1' ||
+        this.state.selectedVersion === 'debian7' ||
+        this.state.selectedVersion === 'ubuntu14'
+      ) {
+        return 'service wazuh-agent start';
       }
     }
 
     systemSelectorNet() {
-      if (this.state.selectedVersion === 'windowsxp' || this.state.selectedVersion === 'windows8') {
-        return ('update-rc.d wazuh-agent defaults && service wazuh-agent start');
+      if (
+        this.state.selectedVersion === 'windowsxp' ||
+        this.state.selectedVersion === 'windows8'
+      ) {
+        return 'update-rc.d wazuh-agent defaults && service wazuh-agent start';
       }
     }
 
     systemSelectorWazuhControlMacos() {
-      if (this.state.selectedVersion == 'sierra' || this.state.selectedVersion == 'highSierra' || this.state.selectedVersion == 'mojave' || this.state.selectedVersion == 'catalina' || this.state.selectedVersion == 'bigSur' || this.state.selectedVersion == 'monterrey' || this.state.selectedVersion == 'ventura') {
-        return ('/Library/Ossec/bin/wazuh-control start');
+      if (
+        this.state.selectedVersion == 'sierra' ||
+        this.state.selectedVersion == 'highSierra' ||
+        this.state.selectedVersion == 'mojave' ||
+        this.state.selectedVersion == 'catalina' ||
+        this.state.selectedVersion == 'bigSur' ||
+        this.state.selectedVersion == 'monterrey' ||
+        this.state.selectedVersion == 'ventura'
+      ) {
+        return '/Library/Ossec/bin/wazuh-control start';
       }
     }
 
     systemSelectorWazuhControl() {
-      if (this.state.selectedVersion === 'solaris10' || this.state.selectedVersion === 'solaris11' || this.state.selectedVersion === '6.1 TL9' || this.state.selectedVersion === '11.31') {
-        return ('/var/ossec/bin/wazuh-control start');
+      if (
+        this.state.selectedVersion === 'solaris10' ||
+        this.state.selectedVersion === 'solaris11' ||
+        this.state.selectedVersion === '6.1 TL9' ||
+        this.state.selectedVersion === '11.31'
+      ) {
+        return '/var/ossec/bin/wazuh-control start';
       }
     }
 
@@ -257,16 +333,20 @@ export const RegisterAgent = withErrorBoundary(
     async getGroups() {
       try {
         const result = await WzRequest.apiReq('GET', '/groups', {});
-        return result.data.data.affected_items.map((item) => ({ label: item.name, id: item.name }));
+        return result.data.data.affected_items.map(item => ({
+          label: item.name,
+          id: item.name,
+        }));
       } catch (error) {
         throw new Error(error);
       }
     }
 
     optionalDeploymentVariables() {
-
-      let deployment = this.state.serverAddress && `WAZUH_MANAGER='${this.state.serverAddress}' `;
-      const protocol = false
+      let deployment =
+        this.state.serverAddress &&
+        `WAZUH_MANAGER='${this.state.serverAddress}' `;
+      const protocol = false;
       if (this.state.selectedOS == 'win') {
         deployment += `WAZUH_REGISTRATION_SERVER='${this.state.serverAddress}' `;
       }
@@ -281,7 +361,7 @@ export const RegisterAgent = withErrorBoundary(
 
       if (this.state.selectedGroup.length) {
         deployment += `WAZUH_AGENT_GROUP='${this.state.selectedGroup
-          .map((item) => item.label)
+          .map(item => item.label)
           .join(',')}' `;
       }
 
@@ -295,7 +375,7 @@ export const RegisterAgent = withErrorBoundary(
 
     agentNameVariable() {
       let agentName = `WAZUH_AGENT_NAME='${this.state.agentName}' `;
-      if(this.state.selectedArchitecture && this.state.agentName !== '') {
+      if (this.state.selectedArchitecture && this.state.agentName !== '') {
         return agentName;
       } else {
         return '';
@@ -303,7 +383,9 @@ export const RegisterAgent = withErrorBoundary(
     }
 
     resolveRPMPackage() {
-      switch (`${this.state.selectedVersion}-${this.state.selectedArchitecture}`) {
+      switch (
+        `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
+      ) {
         case 'redhat5-i386':
           return `https://packages.wazuh.com/4.x/yum5/i386/wazuh-agent-${this.state.wazuhVersion}-1.el5.i386.rpm`;
         case 'redhat5-x86_64':
@@ -332,7 +414,9 @@ export const RegisterAgent = withErrorBoundary(
     }
 
     resolveORACLELINUXPackage() {
-      switch (`${this.state.selectedVersion}-${this.state.selectedArchitecture}`) {
+      switch (
+        `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
+      ) {
         case 'oraclelinux5-i386':
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.i386.rpm`;
         case 'oraclelinux5-aarch64':
@@ -357,7 +441,9 @@ export const RegisterAgent = withErrorBoundary(
     }
 
     resolveCENTPackage() {
-      switch (`${this.state.selectedVersion}-${this.state.selectedArchitecture}`) {
+      switch (
+        `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
+      ) {
         case 'centos5-i386':
           return `https://packages.wazuh.com/4.x/yum/i386/wazuh-agent-${this.state.wazuhVersion}.el5.i386.rpm`;
         case 'centos5-x86_64':
@@ -386,7 +472,9 @@ export const RegisterAgent = withErrorBoundary(
     }
 
     resolveSUSEPackage() {
-      switch (`${this.state.selectedVersion}-${this.state.selectedArchitecture}`) {
+      switch (
+        `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
+      ) {
         case 'suse11-i386':
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.i386.rpm`;
         case 'suse11-x86_64':
@@ -407,7 +495,9 @@ export const RegisterAgent = withErrorBoundary(
     }
 
     resolveFEDORAPachage() {
-      switch (`${this.state.selectedVersion}-${this.state.selectedArchitecture}`) {
+      switch (
+        `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
+      ) {
         case '22-i386':
           return `https://packages.wazuh.com/4.x/yum/i386/wazuh-agent-${this.state.wazuhVersion}-1.el5.i386.rpm`;
         case '22-aarch64':
@@ -424,7 +514,9 @@ export const RegisterAgent = withErrorBoundary(
     }
 
     resolveAMAZONLPackage() {
-      switch (`${this.state.selectedVersion}-${this.state.selectedArchitecture}`) {
+      switch (
+        `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
+      ) {
         case 'amazonlinux1-i386':
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.i386.rpm`;
         case 'amazonlinux1-aarch64':
@@ -476,7 +568,9 @@ export const RegisterAgent = withErrorBoundary(
     }
 
     resolveRASPBIANPackage() {
-      switch (`${this.state.selectedVersion}-${this.state.selectedArchitecture}`) {
+      switch (
+        `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
+      ) {
         case 'busterorgreater-i386':
           return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_i386.deb`;
         case 'busterorgreater-aarch64':
@@ -493,7 +587,9 @@ export const RegisterAgent = withErrorBoundary(
     }
 
     resolveUBUNTUPackage() {
-      switch (`${this.state.selectedVersion}-${this.state.selectedArchitecture}`) {
+      switch (
+        `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
+      ) {
         case 'ubuntu14-i386':
           return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}_i386.deb`;
         case 'ubuntu14-aarch64':
@@ -524,18 +620,22 @@ export const RegisterAgent = withErrorBoundary(
     }
 
     resolveOPENSUSEPackage() {
-      switch (`${this.state.selectedVersion}-${this.state.selectedArchitecture}`) {
+      switch (
+        `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
+      ) {
         case 'leap15-x86_64':
           return `https://packages.wazuh.com/4.x/yum/i386/wazuh-agent-${this.state.wazuhVersion}.x86_64.rpm`;
         case 'leap15-ARM64':
-          return `https://packages.wazuh.com/4.x/yum/x86_64/wazuh-agent-${this.state.wazuhVersion}.armv7hl.rpm`
+          return `https://packages.wazuh.com/4.x/yum/x86_64/wazuh-agent-${this.state.wazuhVersion}.armv7hl.rpm`;
         default:
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}.x86_64.rpm`;
       }
     }
-    
+
     resolveSOLARISPackage() {
-      switch (`${this.state.selectedVersion}-${this.state.selectedArchitecture}`) {
+      switch (
+        `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
+      ) {
         case 'solaris10-i386':
           return `https://packages.wazuh.com/4.x/solaris/i386/10/wazuh-agent-${this.state.wazuhVersion}-sol10-i386.pkg`;
         case 'solaris10-sparc':
@@ -543,14 +643,16 @@ export const RegisterAgent = withErrorBoundary(
         case 'solaris11-i386':
           return `https://packages.wazuh.com/4.x/solaris/i386/11/wazuh-agent-${this.state.wazuhVersion}-sol11-i386.p5p`;
         case 'solaris11-sparc':
-          return `https://packages.wazuh.com/4.x/solaris/sparc/11/wazuh-agent-${this.state.wazuhVersion}-sol11-sparc.p5p`
+          return `https://packages.wazuh.com/4.x/solaris/sparc/11/wazuh-agent-${this.state.wazuhVersion}-sol11-sparc.p5p`;
         default:
           return `https://packages.wazuh.com/4.x/solaris/sparc/11/wazuh-agent-${this.state.wazuhVersion}-sol11-sparc.p5p`;
       }
     }
 
     resolveAIXPackage() {
-      switch (`${this.state.selectedVersion}-${this.state.selectedArchitecture}`) {
+      switch (
+        `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
+      ) {
         case '6.1 TL9-powerpc':
           return `https://packages.wazuh.com/4.x/yum/i386/wazuh-agent-${this.state.wazuhVersion}.aix.ppc.rpm`;
         default:
@@ -559,7 +661,9 @@ export const RegisterAgent = withErrorBoundary(
     }
 
     resolveHPPackage() {
-      switch (`${this.state.selectedVersion}-${this.state.selectedArchitecture}`) {
+      switch (
+        `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
+      ) {
         case '11.31-itanium2':
           return `https://packages.wazuh.com/4.x/yum/i386/wazuh-agent-${this.state.wazuhVersion}-hpux-11v3-ia64.tar`;
         default:
@@ -723,63 +827,107 @@ export const RegisterAgent = withErrorBoundary(
       }
     }
     render() {
-      const appVersionMajorDotMinor = this.state.wazuhVersion.split('.').slice(0, 2).join('.');
-      const urlCheckConnectionDocumentation = webDocumentationLink('user-manual/agents/agent-connection.html', appVersionMajorDotMinor);
+      const appVersionMajorDotMinor = this.state.wazuhVersion
+        .split('.')
+        .slice(0, 2)
+        .join('.');
+      const urlCheckConnectionDocumentation = webDocumentationLink(
+        'user-manual/agents/agent-connection.html',
+        appVersionMajorDotMinor,
+      );
       const textAndLinkToCheckConnectionDocumentation = (
         <p>
           To verify the connection with the Wazuh server, please follow this{' '}
-          <a href={urlCheckConnectionDocumentation} target="_blank">
+          <a href={urlCheckConnectionDocumentation} target='_blank'>
             document.
           </a>
         </p>
       );
+
+      const urlWazuhAgentEnrollment = webDocumentationLink(
+        'user-manual/agent-enrollment/index.html',
+        appVersionMajorDotMinor,
+      );
+
+      const urlWindowsPackage = `https://packages.wazuh.com/4.x/windows/wazuh-agent-${this.state.wazuhVersion}-1.msi`;
       const missingOSSelection = this.checkMissingOSSelection();
-      
+      const warningForAgentName =
+        'The agent name must be unique. It can’t be changed once the agent has been enrolled.';
 
       const agentName = (
-        <EuiFieldText
-          placeholder="Name agent"
-          value={this.state.agentName}
-          onChange={(event) => this.setAgentName(event)}
-        />
+        <EuiText>
+          <p>
+            The deployment sets the endpoint hostname as the agent name by
+            default. Optionally, you can set the agent name below.
+          </p>
+          <EuiText color='default'>Assign an agent name</EuiText>
+          <EuiSpacer />
+          <EuiForm>
+            <EuiFormRow
+              isInvalid={this.state.agentNameError}
+              error={[
+                this.state.badCharacters.length < 1
+                  ? 'The minimum length is 2 characters.'
+                  : `The character${
+                      this.state.badCharacters.length <= 1 ? '' : 's'
+                    }
+            ${this.state.badCharacters.map(char => ` "${char}"`)}
+            ${this.state.badCharacters.length <= 1 ? 'is' : 'are'}
+            not valid. Allowed characters are A-Z, a-z, ".", "-", "_"`,
+              ]}
+            >
+              <EuiFieldText
+                isInvalid={this.state.agentNameError}
+                placeholder='Agent name'
+                value={this.state.agentName}
+                onChange={event => this.setAgentName(event)}
+              />
+            </EuiFormRow>
+          </EuiForm>
+          <EuiSpacer size='s' />
+          <EuiCallOut
+            color='warning'
+            title={warningForAgentName}
+            iconType='iInCircle'
+          />
+        </EuiText>
       );
       const groupInput = (
         <>
           {!this.state.groups.length && (
             <>
-              <EuiCallOut style={{ marginTop: '1.5rem' }}
-                color="warning"
+              <EuiCallOut
+                style={{ marginTop: '1.5rem' }}
+                color='warning'
                 title='This section could not be configured because you do not have permission to read groups.'
-                iconType="iInCircle"
+                iconType='iInCircle'
               />
             </>
           )}
         </>
       );
-      
-
 
       const agentGroup = (
-        <EuiText style={{marginTop: '1.5rem'}}>
-        <p>Select one or more existing groups</p>
-        <EuiComboBox
-          placeholder={!this.state.groups.length ? "Default" : "Select group"}
-          options={this.state.groups}
-          selectedOptions={this.state.selectedGroup}
-          onChange={(group) => {
-            this.setGroupName(group);
-          }}
-          isDisabled={!this.state.groups.length}
-          isClearable={true}
-          data-test-subj="demoComboBox"
-        />
-      </EuiText>
-      )
+        <EuiText style={{ marginTop: '1.5rem' }}>
+          <p>Select one or more existing groups</p>
+          <EuiComboBox
+            placeholder={!this.state.groups.length ? 'Default' : 'Select group'}
+            options={this.state.groups}
+            selectedOptions={this.state.selectedGroup}
+            onChange={group => {
+              this.setGroupName(group);
+            }}
+            isDisabled={!this.state.groups.length}
+            isClearable={true}
+            data-test-subj='demoComboBox'
+          />
+        </EuiText>
+      );
       const passwordInput = (
         <EuiFieldText
-          placeholder="Wazuh password"
+          placeholder='Wazuh password'
           value={this.state.wazuhPassword}
-          onChange={(event) => this.setWazuhPassword(event)}
+          onChange={event => this.setWazuhPassword(event)}
         />
       );
 
@@ -789,181 +937,235 @@ export const RegisterAgent = withErrorBoundary(
       const customTexts = {
         rpmText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
         centText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
-        debText: `curl -so wazuh-agent-${this.state.wazuhVersion
-          }.deb ${this.optionalPackages()} && sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}dpkg -i ./wazuh-agent-${this.state.wazuhVersion
-          }.deb`,
-        ubuText: `curl -so wazuh-agent-${this.state.wazuhVersion
-          }.deb ${this.optionalPackages()} && sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}dpkg -i ./wazuh-agent-${this.state.wazuhVersion
-          }.deb`,
-        macosText: `curl -so wazuh-agent-${this.state.wazuhVersion
-          }.pkg https://packages.wazuh.com/4.x/macos/wazuh-agent-${this.state.wazuhVersion
-          }-1.pkg && sudo launchctl setenv ${this.optionalDeploymentVariables()}${this.agentNameVariable()}&& sudo installer -pkg ./wazuh-agent-${this.state.wazuhVersion
-          }.pkg -target /`,
-        winText: `Invoke-WebRequest -Uri https://packages.wazuh.com/4.x/windows/wazuh-agent-${this.state.wazuhVersion
-          }-1.msi -OutFile \${env:tmp}\\wazuh-agent-${this.state.wazuhVersion}.msi; msiexec.exe /i \${env:tmp}\\wazuh-agent-${this.state.wazuhVersion
-          }.msi /q ${this.optionalDeploymentVariables()}${this.agentNameVariable()}`,
+        debText: `curl -so wazuh-agent-${
+          this.state.wazuhVersion
+        }.deb ${this.optionalPackages()} && sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}dpkg -i ./wazuh-agent-${
+          this.state.wazuhVersion
+        }.deb`,
+        ubuText: `curl -so wazuh-agent-${
+          this.state.wazuhVersion
+        }.deb ${this.optionalPackages()} && sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}dpkg -i ./wazuh-agent-${
+          this.state.wazuhVersion
+        }.deb`,
+        macosText: `curl -so wazuh-agent-${
+          this.state.wazuhVersion
+        }.pkg https://packages.wazuh.com/4.x/macos/wazuh-agent-${
+          this.state.wazuhVersion
+        }-1.pkg && sudo launchctl setenv ${this.optionalDeploymentVariables()}${this.agentNameVariable()}&& sudo installer -pkg ./wazuh-agent-${
+          this.state.wazuhVersion
+        }.pkg -target /`,
+        winText: `Invoke-WebRequest -Uri https://packages.wazuh.com/4.x/windows/wazuh-agent-${
+          this.state.wazuhVersion
+        }-1.msi -OutFile \${env:tmp}\\wazuh-agent-${
+          this.state.wazuhVersion
+        }.msi; msiexec.exe /i \${env:tmp}\\wazuh-agent-${
+          this.state.wazuhVersion
+        }.msi /q ${this.optionalDeploymentVariables()}${this.agentNameVariable()}`,
         openText: `sudo rpm --import https://packages.wazuh.com/key/GPG-KEY-WAZUH && sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()} zypper install -y ${this.optionalPackages()}`,
-        solText: `sudo curl -so ${this.optionalPackages()} && sudo ${this.agentNameVariable()}&& ${this.state.selectedVersion == 'solaris11' ? 'pkg install -g wazuh-agent.p5p wazuh-agent' : 'pkgadd -d wazuh-agent.pkg'}`,
+        solText: `sudo curl -so ${this.optionalPackages()} && sudo ${this.agentNameVariable()}&& ${
+          this.state.selectedVersion == 'solaris11'
+            ? 'pkg install -g wazuh-agent.p5p wazuh-agent'
+            : 'pkgadd -d wazuh-agent.pkg'
+        }`,
         aixText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}rpm -ivh ${this.optionalPackages()}`,
         hpText: `cd / && sudo curl -so ${this.optionalPackages()} && sudo ${this.agentNameVariable()}groupadd wazuh && sudo useradd -G wazuh wazuh && sudo tar -xvf wazuh-agent.tar`,
         amazonlinuxText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
         fedoraText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
         oraclelinuxText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
         suseText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
-        raspbianText: `curl -so wazuh-agent-${this.state.wazuhVersion
-          }.deb ${this.optionalPackages()} && sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}dpkg -i ./wazuh-agent-${this.state.wazuhVersion
-          }.deb`,
+        raspbianText: `curl -so wazuh-agent-${
+          this.state.wazuhVersion
+        }.deb ${this.optionalPackages()} && sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}dpkg -i ./wazuh-agent-${
+          this.state.wazuhVersion
+        }.deb`,
       };
 
       const field = `${this.state.selectedOS}Text`;
       const text = customTexts[field];
       const language = this.getHighlightCodeLanguage(this.state.selectedOS);
-      const warningUpgrade = 'If the installer finds another Wazuh agent in the system, it will upgrade it preserving the configuration.'
+      const warningUpgrade =
+        'If the installer finds another Wazuh agent in the system, it will upgrade it preserving the configuration.';
       const windowsAdvice = this.state.selectedOS === 'win' && (
         <>
-          <EuiCallOut
-            title="Requirements"
-            iconType="iInCircle"
-          >
-            <ul class="wz-callout-list">
-              <li><span>You will need administrator privileges to perform this installation.</span></li>
-              <li><span>PowerShell 3.0 or greater is required.</span></li>
+          <EuiCallOut title='Requirements' iconType='iInCircle'>
+            <ul class='wz-callout-list'>
+              <li>
+                <span>
+                  You will need administrator privileges to perform this
+                  installation.
+                </span>
+              </li>
+              <li>
+                <span>PowerShell 3.0 or greater is required.</span>
+              </li>
             </ul>
-            <p>Keep in mind you need to run this command in a Windows PowerShell terminal.</p>
+            <p>
+              Keep in mind you need to run this command in a Windows PowerShell
+              terminal.
+            </p>
           </EuiCallOut>
           <EuiSpacer></EuiSpacer>
         </>
       );
-      const restartAgentCommand = this.restartAgentCommand[this.state.selectedOS];
-      const onTabClick = (selectedTab) => {
+      const restartAgentCommand =
+        this.restartAgentCommand[this.state.selectedOS];
+      const onTabClick = selectedTab => {
         this.selectSYS(selectedTab.id);
       };
 
-      const calloutErrorRegistrationServiceInfo = this.state.gotErrorRegistrationServiceInfo ? (
+      const calloutErrorRegistrationServiceInfo = this.state
+        .gotErrorRegistrationServiceInfo ? (
         <EuiCallOut
-          color="danger"
+          color='danger'
           title='This section could not be displayed because you do not have permission to get access to the registration service.'
-          iconType="iInCircle"
+          iconType='iInCircle'
         />
       ) : null;
 
       const guide = (
         <div>
-          {(this.state.gotErrorRegistrationServiceInfo) ? (
+          {this.state.gotErrorRegistrationServiceInfo ? (
             <EuiCallOut
-              color="danger"
+              color='danger'
               title='This section could not be displayed because you do not have permission to get access to the registration service.'
-              iconType="iInCircle"
+              iconType='iInCircle'
             />
-          ) : (this.state.connectionSecure === true && this.state.udpProtocol === false) ? (
+          ) : this.state.connectionSecure === true &&
+            this.state.udpProtocol === false ? (
             <EuiText>
-            <p>
-              You can use this command to install and enroll the Wazuh agent in one or more hosts.
-            </p>
-            <EuiCallOut
-              color="warning"
-              title={warningUpgrade}
-              iconType="iInCircle"
-            />
-            <EuiSpacer />
-            {windowsAdvice}
-            <div className="copy-codeblock-wrapper">
-              <EuiCodeBlock style={codeBlock} language={language}>
-                {this.state.wazuhPassword && !this.state.showPassword ? this.obfuscatePassword(text) : text}
-              </EuiCodeBlock>
-              <EuiCopy textToCopy={text}>
-                {(copy) => (
-                  <div className="copy-overlay"  onClick={copy}>
-                    <p><EuiIcon type="copy"/> Copy command</p>
-                  </div>
-                )}
-              </EuiCopy>
-            </div>
-            {this.state.needsPassword && (
-              <EuiSwitch
-                label="Show password"
-                checked={this.state.showPassword}
-                onChange={(active) => this.setShowPassword(active)}
+              <p>
+                You can use this command to install and enroll the Wazuh agent
+                in one or more hosts.
+              </p>
+              <EuiCallOut
+                color='warning'
+                title={warningUpgrade}
+                iconType='iInCircle'
               />
-            )}
-            <EuiSpacer />
-          </EuiText>) : (this.state.connectionSecure === false) ? 
-          (
-            <EuiText>
-            <p>
-              You can use this command to install and enroll the Wazuh agent in one or more hosts.
-            </p>
-            <EuiCallOut
-              color="warning"
-              title={warningUpgrade}
-              iconType="iInCircle"
-            />
-            <EuiSpacer />
-            <EuiCallOut
-              color="danger"
-              title={
-                <>
-                  Warning: there's no <EuiLink target="_blank" href={webDocumentationLink('user-manual/deployment-variables/deployment-variables.html', appVersionMajorDotMinor)}>secure protocol configured</EuiLink> and agents will not be able to communicate with the manager.
-                </>
-              }
-              iconType="iInCircle"
-            />
-            <EuiSpacer />
-            {windowsAdvice}
-            <div className="copy-codeblock-wrapper">
-              <EuiCodeBlock style={codeBlock} language={language}>
-                {this.state.wazuhPassword && !this.state.showPassword ? this.obfuscatePassword(text) : text}
-              </EuiCodeBlock>
-              <EuiCopy textToCopy={text || ''}>
-                {(copy) => (
-                  <div className="copy-overlay"  onClick={copy}>
-                    <p><EuiIcon type="copy"/> Copy command</p>
-                  </div>
-                )}
-              </EuiCopy>
-            </div>
-            {this.state.needsPassword && (
-              <EuiSwitch
-                label="Show password"
-                checked={this.state.showPassword}
-                onChange={(active) => this.setShowPassword(active)}
-              />
-            )}
-            <EuiSpacer />
-          </EuiText>) : (
-              <EuiText>
-                <p>
-                  You can use this command to install and enroll the Wazuh agent in one or more hosts.
-                </p>
-                <EuiCallOut
-                  color="warning"
-                  title={warningUpgrade}
-                  iconType="iInCircle"
+              <EuiSpacer />
+              {windowsAdvice}
+              <div className='copy-codeblock-wrapper'>
+                <EuiCodeBlock style={codeBlock} language={language}>
+                  {this.state.wazuhPassword && !this.state.showPassword
+                    ? this.obfuscatePassword(text)
+                    : text}
+                </EuiCodeBlock>
+                <EuiCopy textToCopy={text}>
+                  {copy => (
+                    <div className='copy-overlay' onClick={copy}>
+                      <p>
+                        <EuiIcon type='copy' /> Copy command
+                      </p>
+                    </div>
+                  )}
+                </EuiCopy>
+              </div>
+              {this.state.needsPassword && (
+                <EuiSwitch
+                  label='Show password'
+                  checked={this.state.showPassword}
+                  onChange={active => this.setShowPassword(active)}
                 />
-                <EuiSpacer />
-                {windowsAdvice}
-                <div className="copy-codeblock-wrapper">
-                  <EuiCodeBlock style={codeBlock} language={language}>
-                    {this.state.wazuhPassword && !this.state.showPassword ? this.obfuscatePassword(text) : text}
-                  </EuiCodeBlock>
-                  <EuiCopy textToCopy={text || ''}>
-                    {(copy) => (
-                      <div className="copy-overlay" onClick={copy}>
-                        <p><EuiIcon type="copy" /> Copy command</p>
-                      </div>
-                    )}
-                  </EuiCopy>
-                </div>
-                {this.state.needsPassword && (
-                  <EuiSwitch
-                    label="Show password"
-                    checked={this.state.showPassword}
-                    onChange={(active) => this.setShowPassword(active)}
-                  />
-                )}
-                <EuiSpacer />
-              </EuiText>
-            )}
+              )}
+              <EuiSpacer />
+            </EuiText>
+          ) : this.state.connectionSecure === false ? (
+            <EuiText>
+              <p>
+                You can use this command to install and enroll the Wazuh agent
+                in one or more hosts.
+              </p>
+              <EuiCallOut
+                color='warning'
+                title={warningUpgrade}
+                iconType='iInCircle'
+              />
+              <EuiSpacer />
+              <EuiCallOut
+                color='danger'
+                title={
+                  <>
+                    Warning: there's no{' '}
+                    <EuiLink
+                      target='_blank'
+                      href={webDocumentationLink(
+                        'user-manual/deployment-variables/deployment-variables.html',
+                        appVersionMajorDotMinor,
+                      )}
+                    >
+                      secure protocol configured
+                    </EuiLink>{' '}
+                    and agents will not be able to communicate with the manager.
+                  </>
+                }
+                iconType='iInCircle'
+              />
+              <EuiSpacer />
+              {windowsAdvice}
+              <div className='copy-codeblock-wrapper'>
+                <EuiCodeBlock style={codeBlock} language={language}>
+                  {this.state.wazuhPassword && !this.state.showPassword
+                    ? this.obfuscatePassword(text)
+                    : text}
+                </EuiCodeBlock>
+                <EuiCopy textToCopy={text || ''}>
+                  {copy => (
+                    <div className='copy-overlay' onClick={copy}>
+                      <p>
+                        <EuiIcon type='copy' /> Copy command
+                      </p>
+                    </div>
+                  )}
+                </EuiCopy>
+              </div>
+              {this.state.needsPassword && (
+                <EuiSwitch
+                  label='Show password'
+                  checked={this.state.showPassword}
+                  onChange={active => this.setShowPassword(active)}
+                />
+              )}
+              <EuiSpacer />
+            </EuiText>
+          ) : (
+            <EuiText>
+              <p>
+                You can use this command to install and enroll the Wazuh agent
+                in one or more hosts.
+              </p>
+              <EuiCallOut
+                color='warning'
+                title={warningUpgrade}
+                iconType='iInCircle'
+              />
+              <EuiSpacer />
+              {windowsAdvice}
+              <div className='copy-codeblock-wrapper'>
+                <EuiCodeBlock style={codeBlock} language={language}>
+                  {this.state.wazuhPassword && !this.state.showPassword
+                    ? this.obfuscatePassword(text)
+                    : text}
+                </EuiCodeBlock>
+                <EuiCopy textToCopy={text || ''}>
+                  {copy => (
+                    <div className='copy-overlay' onClick={copy}>
+                      <p>
+                        <EuiIcon type='copy' /> Copy command
+                      </p>
+                    </div>
+                  )}
+                </EuiCopy>
+              </div>
+              {this.state.needsPassword && (
+                <EuiSwitch
+                  label='Show password'
+                  checked={this.state.showPassword}
+                  onChange={active => this.setShowPassword(active)}
+                />
+              )}
+              <EuiSpacer />
+            </EuiText>
+          )}
         </div>
       );
 
@@ -975,14 +1177,16 @@ export const RegisterAgent = withErrorBoundary(
             <Fragment>
               <EuiSpacer />
               <EuiText>
-                <div className="copy-codeblock-wrapper">
+                <div className='copy-codeblock-wrapper'>
                   <EuiCodeBlock style={codeBlock} language={language}>
                     {this.systemSelector()}
                   </EuiCodeBlock>
                   <EuiCopy textToCopy={this.systemSelector()}>
-                    {(copy) => (
-                      <div className="copy-overlay" onClick={copy}>
-                        <p><EuiIcon type="copy" /> Copy command</p>
+                    {copy => (
+                      <div className='copy-overlay' onClick={copy}>
+                        <p>
+                          <EuiIcon type='copy' /> Copy command
+                        </p>
                       </div>
                     )}
                   </EuiCopy>
@@ -1003,14 +1207,16 @@ export const RegisterAgent = withErrorBoundary(
             <Fragment>
               <EuiSpacer />
               <EuiText>
-                <div className="copy-codeblock-wrapper">
+                <div className='copy-codeblock-wrapper'>
                   <EuiCodeBlock style={codeBlock} language={language}>
                     {this.systemSelector()}
                   </EuiCodeBlock>
                   <EuiCopy textToCopy={this.systemSelector()}>
-                    {(copy) => (
-                      <div className="copy-overlay" onClick={copy}>
-                        <p><EuiIcon type="copy" /> Copy command</p>
+                    {copy => (
+                      <div className='copy-overlay' onClick={copy}>
+                        <p>
+                          <EuiIcon type='copy' /> Copy command
+                        </p>
                       </div>
                     )}
                   </EuiCopy>
@@ -1031,14 +1237,16 @@ export const RegisterAgent = withErrorBoundary(
             <Fragment>
               <EuiSpacer />
               <EuiText>
-                <div className="copy-codeblock-wrapper">
+                <div className='copy-codeblock-wrapper'>
                   <EuiCodeBlock style={codeBlock} language={language}>
                     {this.systemSelectorNet()}
                   </EuiCodeBlock>
                   <EuiCopy textToCopy={this.systemSelectorNet()}>
-                    {(copy) => (
-                      <div className="copy-overlay" onClick={copy}>
-                        <p><EuiIcon type="copy" /> Copy command</p>
+                    {copy => (
+                      <div className='copy-overlay' onClick={copy}>
+                        <p>
+                          <EuiIcon type='copy' /> Copy command
+                        </p>
                       </div>
                     )}
                   </EuiCopy>
@@ -1059,14 +1267,16 @@ export const RegisterAgent = withErrorBoundary(
             <Fragment>
               <EuiSpacer />
               <EuiText>
-                <div className="copy-codeblock-wrapper">
+                <div className='copy-codeblock-wrapper'>
                   <EuiCodeBlock style={codeBlock} language={language}>
                     {this.systemSelectorWazuhControlMacos()}
                   </EuiCodeBlock>
                   <EuiCopy textToCopy={this.systemSelectorWazuhControlMacos()}>
-                    {(copy) => (
-                      <div className="copy-overlay" onClick={copy}>
-                        <p><EuiIcon type="copy" /> Copy command</p>
+                    {copy => (
+                      <div className='copy-overlay' onClick={copy}>
+                        <p>
+                          <EuiIcon type='copy' /> Copy command
+                        </p>
                       </div>
                     )}
                   </EuiCopy>
@@ -1087,14 +1297,16 @@ export const RegisterAgent = withErrorBoundary(
             <Fragment>
               <EuiSpacer />
               <EuiText>
-                <div className="copy-codeblock-wrapper">
+                <div className='copy-codeblock-wrapper'>
                   <EuiCodeBlock style={codeBlock} language={language}>
                     {this.systemSelectorWazuhControl()}
                   </EuiCodeBlock>
                   <EuiCopy textToCopy={this.systemSelectorWazuhControl()}>
-                    {(copy) => (
-                      <div className="copy-overlay" onClick={copy}>
-                        <p><EuiIcon type="copy" /> Copy command</p>
+                    {copy => (
+                      <div className='copy-overlay' onClick={copy}>
+                        <p>
+                          <EuiIcon type='copy' /> Copy command
+                        </p>
                       </div>
                     )}
                   </EuiCopy>
@@ -1110,80 +1322,157 @@ export const RegisterAgent = withErrorBoundary(
       const buttonGroup = (legend, options, idSelected, onChange) => {
         return (
           <EuiButtonGroup
-            color="primary"
+            color='primary'
             legend={legend}
             options={options}
             idSelected={idSelected}
             onChange={onChange}
-            className={'osButtonsStyle'} />
-        )
-      }
+            className={'osButtonsStyle'}
+          />
+        );
+      };
 
-      const buttonGroupWithMessage = (legend, options, idSelected, onChange) => {
+      const buttonGroupWithMessage = (
+        legend,
+        options,
+        idSelected,
+        onChange,
+      ) => {
         return (
           <>
             <EuiButtonGroup
-              color="primary"
+              color='primary'
               legend={legend}
               options={options}
               idSelected={idSelected}
               onChange={onChange}
               className={'osButtonsStyle'}
             />
-            {this.state.selectedVersion == 'solaris10' || this.state.selectedVersion == 'solaris11' ? <EuiCallOut color="warning" className='message' iconType="iInCircle" title={
-              <span>
-                Might require some extra installation <EuiLink target="_blank" href={webDocumentationLink('installation-guide/wazuh-agent/wazuh-agent-package-solaris.html', appVersionMajorDotMinor)}>steps</EuiLink>.
-              </span>
-            }>
-            </EuiCallOut> : this.state.selectedVersion == '6.1 TL9' ? <EuiCallOut color="warning" className='message' iconType="iInCircle" title={
-              <span>
-                Might require some extra installation <EuiLink target="_blank" href={webDocumentationLink('installation-guide/wazuh-agent/wazuh-agent-package-aix.html', appVersionMajorDotMinor)}>steps</EuiLink>.
-              </span>
-            }>
-            </EuiCallOut> : this.state.selectedVersion == '11.31' ? <EuiCallOut color="warning" className='message' iconType="iInCircle" title={
-              <span>
-                Might require some extra installation <EuiLink target="_blank" href={webDocumentationLink('installation-guide/wazuh-agent/wazuh-agent-package-hpux.html', appVersionMajorDotMinor)}>steps</EuiLink>.
-              </span>
-            }>
-            </EuiCallOut> : this.state.selectedVersion == 'debian7' || this.state.selectedVersion == 'debian8' || this.state.selectedVersion == 'debian9' || this.state.selectedVersion == 'debian10' ? <EuiCallOut color="warning" className='message' iconType="iInCircle" title={
-              <span>
-                Might require some extra installation <EuiLink target="_blank" href={webDocumentationLink('installation-guide/wazuh-agent/wazuh-agent-package-linux.html', appVersionMajorDotMinor)}>steps</EuiLink>.
-              </span>
-            }>
-            </EuiCallOut> : ''}
+            {this.state.selectedVersion == 'solaris10' ||
+            this.state.selectedVersion == 'solaris11' ? (
+              <EuiCallOut
+                color='warning'
+                className='message'
+                iconType='iInCircle'
+                title={
+                  <span>
+                    Might require some extra installation{' '}
+                    <EuiLink
+                      target='_blank'
+                      href={webDocumentationLink(
+                        'installation-guide/wazuh-agent/wazuh-agent-package-solaris.html',
+                        appVersionMajorDotMinor,
+                      )}
+                    >
+                      steps
+                    </EuiLink>
+                    .
+                  </span>
+                }
+              ></EuiCallOut>
+            ) : this.state.selectedVersion == '6.1 TL9' ? (
+              <EuiCallOut
+                color='warning'
+                className='message'
+                iconType='iInCircle'
+                title={
+                  <span>
+                    Might require some extra installation{' '}
+                    <EuiLink
+                      target='_blank'
+                      href={webDocumentationLink(
+                        'installation-guide/wazuh-agent/wazuh-agent-package-aix.html',
+                        appVersionMajorDotMinor,
+                      )}
+                    >
+                      steps
+                    </EuiLink>
+                    .
+                  </span>
+                }
+              ></EuiCallOut>
+            ) : this.state.selectedVersion == '11.31' ? (
+              <EuiCallOut
+                color='warning'
+                className='message'
+                iconType='iInCircle'
+                title={
+                  <span>
+                    Might require some extra installation{' '}
+                    <EuiLink
+                      target='_blank'
+                      href={webDocumentationLink(
+                        'installation-guide/wazuh-agent/wazuh-agent-package-hpux.html',
+                        appVersionMajorDotMinor,
+                      )}
+                    >
+                      steps
+                    </EuiLink>
+                    .
+                  </span>
+                }
+              ></EuiCallOut>
+            ) : this.state.selectedVersion == 'debian7' ||
+              this.state.selectedVersion == 'debian8' ||
+              this.state.selectedVersion == 'debian9' ||
+              this.state.selectedVersion == 'debian10' ? (
+              <EuiCallOut
+                color='warning'
+                className='message'
+                iconType='iInCircle'
+                title={
+                  <span>
+                    Might require some extra installation{' '}
+                    <EuiLink
+                      target='_blank'
+                      href={webDocumentationLink(
+                        'installation-guide/wazuh-agent/wazuh-agent-package-linux.html',
+                        appVersionMajorDotMinor,
+                      )}
+                    >
+                      steps
+                    </EuiLink>
+                    .
+                  </span>
+                }
+              ></EuiCallOut>
+            ) : (
+              ''
+            )}
           </>
-        )
-      }
+        );
+      };
 
       const selectedVersionMac = (legend, options, idSelected, onChange) => {
         return (
           <EuiButtonGroup
-            color="primary"
+            color='primary'
             legend={legend}
             options={options}
             idSelected={idSelected}
             onChange={onChange}
-            className={'osButtonsStyleMac'} />
-        )
-      }
+            className={'osButtonsStyleMac'}
+          />
+        );
+      };
 
-      const onChangeServerAddress = async (selectedNodes) => {
-        if(selectedNodes.length === 0){
+      const onChangeServerAddress = async selectedNodes => {
+        if (selectedNodes.length === 0) {
           this.setState({
             serverAddress: '',
             udpProtocol: false,
-            connectionSecure: null
-          })
-        }else{
+            connectionSecure: null,
+          });
+        } else {
           const nodeSelected = selectedNodes[0];
           try {
             const remoteConfig = await getConnectionConfig(nodeSelected);
             this.setState({
               serverAddress: remoteConfig.serverAddress,
               udpProtocol: remoteConfig.udpProtocol,
-              connectionSecure: remoteConfig.connectionSecure
-            })
-          }catch(error){
+              connectionSecure: remoteConfig.connectionSecure,
+            });
+          } catch (error) {
             const options = {
               context: `${RegisterAgent.name}.onChangeServerAddress`,
               level: UI_LOGGER_LEVELS.ERROR,
@@ -1200,352 +1489,638 @@ export const RegisterAgent = withErrorBoundary(
             this.setState({
               serverAddress: nodeSelected.label,
               udpProtocol: false,
-              connectionSecure: false
-            })
+              connectionSecure: false,
+            });
           }
         }
-          
-      }
-      
+      };
 
       const steps = [
         {
           title: 'Choose the operating system',
-          children: (
-            buttonGroup("Choose the Operating system", osButtons, this.state.selectedOS, (os) => this.selectOS(os))
+          children: buttonGroup(
+            'Choose the Operating system',
+            osButtons,
+            this.state.selectedOS,
+            os => this.selectOS(os),
           ),
         },
         ...(this.state.selectedOS == 'rpm'
           ? [
-            {
-              title: 'Choose the version',
-              children: (
-                this.state.selectedVersion == 'redhat5' || this.state.selectedVersion == 'redhat6' ? buttonGroupWithMessage("Choose the version", versionButtonsRedHat, this.state.selectedVersion, (version) => this.setVersion(version)) : buttonGroup("Choose the version", versionButtonsRedHat, this.state.selectedVersion, (version) => this.setVersion(version))
-              ),
-            },
-          ]
+              {
+                title: 'Choose the version',
+                children:
+                  this.state.selectedVersion == 'redhat5' ||
+                  this.state.selectedVersion == 'redhat6'
+                    ? buttonGroupWithMessage(
+                        'Choose the version',
+                        versionButtonsRedHat,
+                        this.state.selectedVersion,
+                        version => this.setVersion(version),
+                      )
+                    : buttonGroup(
+                        'Choose the version',
+                        versionButtonsRedHat,
+                        this.state.selectedVersion,
+                        version => this.setVersion(version),
+                      ),
+              },
+            ]
           : []),
         ...(this.state.selectedOS == 'oraclelinux'
           ? [
-            {
-              title: 'Choose the version',
-              children: (
-                buttonGroup("Choose the version", versionButtonsOracleLinux, this.state.selectedVersion, (version) => this.setVersion(version))
-              ),
-            },
-          ]
+              {
+                title: 'Choose the version',
+                children: buttonGroup(
+                  'Choose the version',
+                  versionButtonsOracleLinux,
+                  this.state.selectedVersion,
+                  version => this.setVersion(version),
+                ),
+              },
+            ]
           : []),
         ...(this.state.selectedOS == 'raspbian'
           ? [
-            {
-              title: 'Choose the version',
-              children: (
-                buttonGroup("Choose the version", versionButtonsRaspbian, this.state.selectedVersion, (version) => this.setVersion(version))
-              ),
-            },
-          ]
+              {
+                title: 'Choose the version',
+                children: buttonGroup(
+                  'Choose the version',
+                  versionButtonsRaspbian,
+                  this.state.selectedVersion,
+                  version => this.setVersion(version),
+                ),
+              },
+            ]
           : []),
         ...(this.state.selectedOS == 'amazonlinux'
           ? [
-            {
-              title: 'Choose the version',
-              children: (
-                buttonGroup("Choose the version", versionButtonAmazonLinux, this.state.selectedVersion, (version) => this.setVersion(version))
-              ),
-            },
-          ]
+              {
+                title: 'Choose the version',
+                children: buttonGroup(
+                  'Choose the version',
+                  versionButtonAmazonLinux,
+                  this.state.selectedVersion,
+                  version => this.setVersion(version),
+                ),
+              },
+            ]
           : []),
         ...(this.state.selectedOS == 'cent'
           ? [
-            {
-              title: 'Choose the version',
-              children: (
-                this.state.selectedVersion == 'centos5' || this.state.selectedVersion == 'centos6' ? buttonGroupWithMessage("Choose the version", versionButtonsCentos, this.state.selectedVersion, (version) => this.setVersion(version)) : buttonGroup("Choose the version", versionButtonsCentos, this.state.selectedVersion, (version) => this.setVersion(version))
-              ),
-            },
-          ]
+              {
+                title: 'Choose the version',
+                children:
+                  this.state.selectedVersion == 'centos5' ||
+                  this.state.selectedVersion == 'centos6'
+                    ? buttonGroupWithMessage(
+                        'Choose the version',
+                        versionButtonsCentos,
+                        this.state.selectedVersion,
+                        version => this.setVersion(version),
+                      )
+                    : buttonGroup(
+                        'Choose the version',
+                        versionButtonsCentos,
+                        this.state.selectedVersion,
+                        version => this.setVersion(version),
+                      ),
+              },
+            ]
           : []),
         ...(this.state.selectedOS == 'fedora'
           ? [
-            {
-              title: 'Choose the version',
-              children: (
-                buttonGroup("Choose the version", versionButtonFedora, this.state.selectedVersion, (version) => this.setVersion(version))
-              ),
-            },
-          ]
+              {
+                title: 'Choose the version',
+                children: buttonGroup(
+                  'Choose the version',
+                  versionButtonFedora,
+                  this.state.selectedVersion,
+                  version => this.setVersion(version),
+                ),
+              },
+            ]
           : []),
         ...(this.state.selectedOS == 'deb'
           ? [
-            {
-              title: 'Choose the version',
-              children: (
-                this.state.selectedVersion == 'debian7' || this.state.selectedVersion == 'debian8' || this.state.selectedVersion == 'debian9' || this.state.selectedVersion == 'debian10' ? buttonGroupWithMessage("Choose the version", versionButtonsDebian, this.state.selectedVersion, (version) => this.setVersion(version)) : buttonGroup("Choose the version", versionButtonsDebian, this.state.selectedVersion, (version) => this.setVersion(version))
-              ),
-            },
-          ]
+              {
+                title: 'Choose the version',
+                children:
+                  this.state.selectedVersion == 'debian7' ||
+                  this.state.selectedVersion == 'debian8' ||
+                  this.state.selectedVersion == 'debian9' ||
+                  this.state.selectedVersion == 'debian10'
+                    ? buttonGroupWithMessage(
+                        'Choose the version',
+                        versionButtonsDebian,
+                        this.state.selectedVersion,
+                        version => this.setVersion(version),
+                      )
+                    : buttonGroup(
+                        'Choose the version',
+                        versionButtonsDebian,
+                        this.state.selectedVersion,
+                        version => this.setVersion(version),
+                      ),
+              },
+            ]
           : []),
         ...(this.state.selectedOS == 'ubu'
           ? [
-            {
-              title: 'Choose the version',
-              children: (
-                this.state.selectedVersion == 'ubuntu14' ? buttonGroupWithMessage("Choose the version", versionButtonsUbuntu, this.state.selectedVersion, (version) => this.setVersion(version)) : buttonGroup("Choose the version", versionButtonsUbuntu, this.state.selectedVersion, (version) => this.setVersion(version))
-              ),
-            },
-          ]
+              {
+                title: 'Choose the version',
+                children:
+                  this.state.selectedVersion == 'ubuntu14'
+                    ? buttonGroupWithMessage(
+                        'Choose the version',
+                        versionButtonsUbuntu,
+                        this.state.selectedVersion,
+                        version => this.setVersion(version),
+                      )
+                    : buttonGroup(
+                        'Choose the version',
+                        versionButtonsUbuntu,
+                        this.state.selectedVersion,
+                        version => this.setVersion(version),
+                      ),
+              },
+            ]
           : []),
         ...(this.state.selectedOS == 'win'
           ? [
-            {
-              title: 'Choose the version',
-              children: (
-                this.state.selectedVersion == 'windowsxp' ? buttonGroupWithMessage("Choose the version", versionButtonsWindows, this.state.selectedVersion, (version) => this.setVersion(version)) : buttonGroup("Choose the version", versionButtonsWindows, this.state.selectedVersion, (version) => this.setVersion(version))
-              ),
-            },
-          ]
+              {
+                title: 'Choose the version',
+                children:
+                  this.state.selectedVersion == 'windowsxp'
+                    ? buttonGroupWithMessage(
+                        'Choose the version',
+                        versionButtonsWindows,
+                        this.state.selectedVersion,
+                        version => this.setVersion(version),
+                      )
+                    : buttonGroup(
+                        'Choose the version',
+                        versionButtonsWindows,
+                        this.state.selectedVersion,
+                        version => this.setVersion(version),
+                      ),
+              },
+            ]
           : []),
         ...(this.state.selectedOS == 'macos'
           ? [
-            {
-              title: 'Choose the version',
-              children: (
-                selectedVersionMac("Choose the version", versionButtonsMacOS, this.state.selectedVersion, (version) => this.setVersion(version))
-              ),
-            },
-          ]
+              {
+                title: 'Choose the version',
+                children: selectedVersionMac(
+                  'Choose the version',
+                  versionButtonsMacOS,
+                  this.state.selectedVersion,
+                  version => this.setVersion(version),
+                ),
+              },
+            ]
           : []),
         ...(this.state.selectedOS == 'suse'
           ? [
-            {
-              title: 'Choose the version',
-              children: (
-                selectedVersionMac("Choose the version", versionButtonsSuse, this.state.selectedVersion, (version) => this.setVersion(version))
-              ),
-            },
-          ]
+              {
+                title: 'Choose the version',
+                children: selectedVersionMac(
+                  'Choose the version',
+                  versionButtonsSuse,
+                  this.state.selectedVersion,
+                  version => this.setVersion(version),
+                ),
+              },
+            ]
           : []),
         ...(this.state.selectedOS == 'open'
           ? [
-            {
-              title: 'Choose the version',
-              children: (
-                buttonGroup("Choose the version", versionButtonsOpenSuse, this.state.selectedVersion, (version) => this.setVersion(version))
-              ),
-            },
-          ]
+              {
+                title: 'Choose the version',
+                children: buttonGroup(
+                  'Choose the version',
+                  versionButtonsOpenSuse,
+                  this.state.selectedVersion,
+                  version => this.setVersion(version),
+                ),
+              },
+            ]
           : []),
         ...(this.state.selectedOS == 'sol'
           ? [
-            {
-              title: 'Choose the version',
-              children: (
-                this.state.selectedVersion == 'solaris10' || this.state.selectedVersion == 'solaris11' ? buttonGroupWithMessage("Choose the version", versionButtonsSolaris, this.state.selectedVersion, (version) => this.setVersion(version)) : buttonGroup("Choose the version", versionButtonsSolaris, this.state.selectedVersion, (version) => this.setVersion(version))
-              ),
-            },
-          ]
+              {
+                title: 'Choose the version',
+                children:
+                  this.state.selectedVersion == 'solaris10' ||
+                  this.state.selectedVersion == 'solaris11'
+                    ? buttonGroupWithMessage(
+                        'Choose the version',
+                        versionButtonsSolaris,
+                        this.state.selectedVersion,
+                        version => this.setVersion(version),
+                      )
+                    : buttonGroup(
+                        'Choose the version',
+                        versionButtonsSolaris,
+                        this.state.selectedVersion,
+                        version => this.setVersion(version),
+                      ),
+              },
+            ]
           : []),
         ...(this.state.selectedOS == 'aix'
           ? [
-            {
-              title: 'Choose the version',
-              children: (
-                this.state.selectedVersion == '6.1 TL9' ? buttonGroupWithMessage("Choose the version", versionButtonsAix, this.state.selectedVersion, (version) => this.setVersion(version)) : buttonGroup("Choose the version", versionButtonsAix, this.state.selectedVersion, (version) => this.setVersion(version))
-              ),
-            },
-          ]
+              {
+                title: 'Choose the version',
+                children:
+                  this.state.selectedVersion == '6.1 TL9'
+                    ? buttonGroupWithMessage(
+                        'Choose the version',
+                        versionButtonsAix,
+                        this.state.selectedVersion,
+                        version => this.setVersion(version),
+                      )
+                    : buttonGroup(
+                        'Choose the version',
+                        versionButtonsAix,
+                        this.state.selectedVersion,
+                        version => this.setVersion(version),
+                      ),
+              },
+            ]
           : []),
         ...(this.state.selectedOS == 'hp'
           ? [
-            {
-              title: 'Choose the version',
-              children: (
-                this.state.selectedVersion == '11.31' ? buttonGroupWithMessage("Choose the version", versionButtonsHPUX, this.state.selectedVersion, (version) => this.setVersion(version)) : buttonGroup("Choose the version", versionButtonsHPUX, this.state.selectedVersion, (version) => this.setVersion(version))
-              ),
-            },
-          ]
+              {
+                title: 'Choose the version',
+                children:
+                  this.state.selectedVersion == '11.31'
+                    ? buttonGroupWithMessage(
+                        'Choose the version',
+                        versionButtonsHPUX,
+                        this.state.selectedVersion,
+                        version => this.setVersion(version),
+                      )
+                    : buttonGroup(
+                        'Choose the version',
+                        versionButtonsHPUX,
+                        this.state.selectedVersion,
+                        version => this.setVersion(version),
+                      ),
+              },
+            ]
           : []),
-        ...(this.state.selectedVersion == 'centos5' || this.state.selectedVersion == 'redhat5' || this.state.selectedVersion == 'oraclelinux5' || this.state.selectedVersion == 'suse11'
+        ...(this.state.selectedVersion == 'centos5' ||
+        this.state.selectedVersion == 'redhat5' ||
+        this.state.selectedVersion == 'oraclelinux5' ||
+        this.state.selectedVersion == 'suse11'
           ? [
-            {
-              title: 'Choose the architecture',
-              children: (
-                buttonGroup("Choose the architecture", architecturei386Andx86_64, this.state.selectedArchitecture, (architecture) => this.setArchitecture(architecture))
-              ),
-            },
-          ]
+              {
+                title: 'Choose the architecture',
+                children: buttonGroup(
+                  'Choose the architecture',
+                  architecturei386Andx86_64,
+                  this.state.selectedArchitecture,
+                  architecture => this.setArchitecture(architecture),
+                ),
+              },
+            ]
           : []),
         ...(this.state.selectedVersion == 'leap15'
           ? [
-            {
-              title: 'Choose the architecture',
-              children: (
-                buttonGroup("Choose the architecture", architectureButtonsOpenSuse, this.state.selectedArchitecture, (architecture) => this.setArchitecture(architecture))
-              ),
-            },
-          ]
+              {
+                title: 'Choose the architecture',
+                children: buttonGroup(
+                  'Choose the architecture',
+                  architectureButtonsOpenSuse,
+                  this.state.selectedArchitecture,
+                  architecture => this.setArchitecture(architecture),
+                ),
+              },
+            ]
           : []),
-        ...(this.state.selectedVersion == 'centos6' || this.state.selectedVersion == 'oraclelinux6' || this.state.selectedVersion == 'amazonlinux1' || this.state.selectedVersion == 'redhat6' || this.state.selectedVersion == 'amazonlinux2022' || this.state.selectedVersion == 'debian7' || this.state.selectedVersion == 'debian8' || this.state.selectedVersion == 'ubuntu14' || this.state.selectedVersion == 'ubuntu15' || this.state.selectedVersion == 'ubuntu16'
+        ...(this.state.selectedVersion == 'centos6' ||
+        this.state.selectedVersion == 'oraclelinux6' ||
+        this.state.selectedVersion == 'amazonlinux1' ||
+        this.state.selectedVersion == 'redhat6' ||
+        this.state.selectedVersion == 'amazonlinux2022' ||
+        this.state.selectedVersion == 'debian7' ||
+        this.state.selectedVersion == 'debian8' ||
+        this.state.selectedVersion == 'ubuntu14' ||
+        this.state.selectedVersion == 'ubuntu15' ||
+        this.state.selectedVersion == 'ubuntu16'
           ? [
-            {
-              title: 'Choose the architecture',
-              children: (
-                buttonGroup("Choose the architecture", architectureButtons, this.state.selectedArchitecture, (architecture) => this.setArchitecture(architecture))
-              ),
-            },
-          ]
+              {
+                title: 'Choose the architecture',
+                children: buttonGroup(
+                  'Choose the architecture',
+                  architectureButtons,
+                  this.state.selectedArchitecture,
+                  architecture => this.setArchitecture(architecture),
+                ),
+              },
+            ]
           : []),
-        ...(this.state.selectedVersion == 'centos7' || this.state.selectedVersion == 'redhat7' || this.state.selectedVersion == 'amazonlinux2' || this.state.selectedVersion == 'suse12' || this.state.selectedVersion == '22' || this.state.selectedVersion == 'debian9' || this.state.selectedVersion == 'debian10' || this.state.selectedVersion == 'busterorgreater'
+        ...(this.state.selectedVersion == 'centos7' ||
+        this.state.selectedVersion == 'redhat7' ||
+        this.state.selectedVersion == 'amazonlinux2' ||
+        this.state.selectedVersion == 'suse12' ||
+        this.state.selectedVersion == '22' ||
+        this.state.selectedVersion == 'debian9' ||
+        this.state.selectedVersion == 'debian10' ||
+        this.state.selectedVersion == 'busterorgreater'
           ? [
-            {
-              title: 'Choose the architecture',
-              children: (
-                buttonGroup("Choose the architecture", architectureButtonsWithPPC64LE, this.state.selectedArchitecture, (architecture) => this.setArchitecture(architecture))
-              ),
-            },
-          ]
+              {
+                title: 'Choose the architecture',
+                children: buttonGroup(
+                  'Choose the architecture',
+                  architectureButtonsWithPPC64LE,
+                  this.state.selectedArchitecture,
+                  architecture => this.setArchitecture(architecture),
+                ),
+              },
+            ]
           : []),
-        ...(this.state.selectedVersion == 'windowsxp' || this.state.selectedVersion == 'windows8'
+        ...(this.state.selectedVersion == 'windowsxp' ||
+        this.state.selectedVersion == 'windows8'
           ? [
-            {
-              title: 'Choose the architecture',
-              children: (
-                buttonGroup("Choose the architecture", architectureButtonsi386, this.state.selectedArchitecture, (architecture) => this.setArchitecture(architecture))
-              ),
-            },
-          ]
+              {
+                title: 'Choose the architecture',
+                children: buttonGroup(
+                  'Choose the architecture',
+                  architectureButtonsi386,
+                  this.state.selectedArchitecture,
+                  architecture => this.setArchitecture(architecture),
+                ),
+              },
+            ]
           : []),
-        ...(this.state.selectedVersion == 'sierra' || this.state.selectedVersion == 'highSierra' || this.state.selectedVersion == 'mojave' || this.state.selectedVersion == 'catalina' || this.state.selectedVersion == 'bigSur' || this.state.selectedVersion == 'monterrey' || this.state.selectedVersion == 'ventura'
+        ...(this.state.selectedVersion == 'sierra' ||
+        this.state.selectedVersion == 'highSierra' ||
+        this.state.selectedVersion == 'mojave' ||
+        this.state.selectedVersion == 'catalina' ||
+        this.state.selectedVersion == 'bigSur' ||
+        this.state.selectedVersion == 'monterrey' ||
+        this.state.selectedVersion == 'ventura'
           ? [
-            {
-              title: 'Choose the architecture',
-              children: (
-                buttonGroup("Choose the architecture", architectureButtonsMacos, this.state.selectedArchitecture, (architecture) => this.setArchitecture(architecture))
-              ),
-            },
-          ]
+              {
+                title: 'Choose the architecture',
+                children: buttonGroup(
+                  'Choose the architecture',
+                  architectureButtonsMacos,
+                  this.state.selectedArchitecture,
+                  architecture => this.setArchitecture(architecture),
+                ),
+              },
+            ]
           : []),
-        ...(this.state.selectedVersion == 'solaris10' || this.state.selectedVersion == 'solaris11'
+        ...(this.state.selectedVersion == 'solaris10' ||
+        this.state.selectedVersion == 'solaris11'
           ? [
-            {
-              title: 'Choose the architecture',
-              children: (
-                buttonGroup("Choose the architecture", architectureButtonsSolaris, this.state.selectedArchitecture, (architecture) => this.setArchitecture(architecture))
-              ),
-            },
-          ]
+              {
+                title: 'Choose the architecture',
+                children: buttonGroup(
+                  'Choose the architecture',
+                  architectureButtonsSolaris,
+                  this.state.selectedArchitecture,
+                  architecture => this.setArchitecture(architecture),
+                ),
+              },
+            ]
           : []),
         ...(this.state.selectedVersion == '6.1 TL9'
           ? [
-            {
-              title: 'Choose the architecture',
-              children: (
-                buttonGroup("Choose the architecture", architectureButtonsAix, this.state.selectedArchitecture, (architecture) => this.setArchitecture(architecture))
-              ),
-            },
-          ]
+              {
+                title: 'Choose the architecture',
+                children: buttonGroup(
+                  'Choose the architecture',
+                  architectureButtonsAix,
+                  this.state.selectedArchitecture,
+                  architecture => this.setArchitecture(architecture),
+                ),
+              },
+            ]
           : []),
         ...(this.state.selectedVersion == '11.31'
           ? [
-            {
-              title: 'Choose the architecture',
-              children: (
-                buttonGroup("Choose the architecture", architectureButtonsHpUx, this.state.selectedArchitecture, (architecture) => this.setArchitecture(architecture))
-              ),
-            },
-          ]
+              {
+                title: 'Choose the architecture',
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the architecture'
+                    options={architectureButtonsHpUx}
+                    idSelected={this.state.selectedArchitecture}
+                    onChange={architecture =>
+                      this.setArchitecture(architecture)
+                    }
+                  />
+                ),
+              },
+            ]
+          : []),
+        ...(!(
+          this.state.selectedOS == 'hp' ||
+          this.state.selectedOS == 'sol' ||
+          this.state.selectedOS == 'alpine'
+        )
+          ? [
+              {
+                title: 'Wazuh server address',
+                children: (
+                  <Fragment>
+                    <WzManagerAddressInput
+                      defaultValue={this.state.defaultServerAddress}
+                      onChange={onChangeServerAddress}
+                    />
+                  </Fragment>
+                ),
+              },
+            ]
+          : []),
+        ...(!(
+          !this.state.needsPassword ||
+          this.state.hidePasswordInput ||
+          !!['solaris10', 'solaris11', '11.31', '3.12.12'].includes(
+            this.state.selectedVersion,
+          )
+        )
+          ? [
+              {
+                title: 'Wazuh password',
+                children: <Fragment>{passwordInput}</Fragment>,
+              },
+            ]
+          : []),
+        ...(!(
+          this.state.selectedOS == 'hp' ||
+          this.state.selectedOS == 'sol' ||
+          this.state.selectedOS == 'alpine'
+        )
+          ? [
+              {
+                title: 'Optional settings',
+                children: (
+                  <Fragment>
+                    {agentName}
+                    {groupInput}
+                    {agentGroup}
+                  </Fragment>
+                ),
+              },
+            ]
           : []),
         {
           title: 'Wazuh server address',
-          children: <Fragment>
-            <ServerAddress
-              defaultValue={this.state.defaultServerAddress}
-              onChange={onChangeServerAddress} 
-              fetchOptions={fetchClusterNodesOptions}/>
-            </Fragment>,
+          children: (
+            <Fragment>
+              <ServerAddress
+                defaultValue={this.state.defaultServerAddress}
+                onChange={onChangeServerAddress}
+                fetchOptions={fetchClusterNodesOptions}
+              />
+            </Fragment>
+          ),
         },
         ...(!(!this.state.needsPassword || this.state.hidePasswordInput)
           ? [
-            {
-              title: 'Wazuh password',
-              children: <Fragment>{passwordInput}</Fragment>,
-            },
-          ]
+              {
+                title: 'Wazuh password',
+                children: <Fragment>{passwordInput}</Fragment>,
+              },
+            ]
           : []),
         {
           title: 'Assign a name and a group to the agent',
-          children: <Fragment>{agentName}{groupInput}{agentGroup}</Fragment>,
+          children: (
+            <Fragment>
+              {agentName}
+              {groupInput}
+              {agentGroup}
+            </Fragment>
+          ),
         },
         {
           title: 'Install and enroll the agent',
-          children: this.state.gotErrorRegistrationServiceInfo ?
+          children: this.state.gotErrorRegistrationServiceInfo ? (
             calloutErrorRegistrationServiceInfo
-            : missingOSSelection.length ? (
-              <EuiCallOut
-                color="warning"
-                title={`Please select the ${missingOSSelection.join(', ')}.`}
-                iconType="iInCircle"
-              />
-            ) : (
-              <div>{guide}</div>
-            ),
+          ) : missingOSSelection.length ? (
+            <EuiCallOut
+              color='warning'
+              title={`Please select the ${missingOSSelection.join(', ')}.`}
+              iconType='iInCircle'
+            />
+          ) : (
+            <div>{guide}</div>
+          ),
         },
-        ...(this.state.selectedOS == 'rpm' || this.state.selectedOS == 'cent' || this.state.selectedOS == 'suse' || this.state.selectedOS == 'fedora' || this.state.selectedOS == 'oraclelinux' || this.state.selectedOS == 'amazonlinux' || this.state.selectedOS == 'deb' || this.state.selectedOS == 'raspbian' || this.state.selectedOS == 'ubu' || this.state.selectedOS == 'win' || this.state.selectedOS == 'macos' || this.state.selectedOS == 'open' || this.state.selectedOS == 'sol' || this.state.selectedOS == 'aix' || this.state.selectedOS == 'hp'
+        ...(this.state.selectedOS == 'rpm' ||
+        this.state.selectedOS == 'cent' ||
+        this.state.selectedOS == 'suse' ||
+        this.state.selectedOS == 'fedora' ||
+        this.state.selectedOS == 'oraclelinux' ||
+        this.state.selectedOS == 'amazonlinux' ||
+        this.state.selectedOS == 'deb' ||
+        this.state.selectedOS == 'raspbian' ||
+        this.state.selectedOS == 'ubu' ||
+        this.state.selectedOS == 'win' ||
+        this.state.selectedOS == 'macos' ||
+        this.state.selectedOS == 'open' ||
+        this.state.selectedOS == 'sol' ||
+        this.state.selectedOS == 'aix' ||
+        this.state.selectedOS == 'hp'
           ? [
-            {
-              title: 'Start the agent',
-              children: this.state.gotErrorRegistrationServiceInfo ?
-                calloutErrorRegistrationServiceInfo
-                : missingOSSelection.length ? (
+              {
+                title: 'Start the agent',
+                children: this.state.gotErrorRegistrationServiceInfo ? (
+                  calloutErrorRegistrationServiceInfo
+                ) : missingOSSelection.length ? (
                   <EuiCallOut
-                    color="warning"
-                    title={`Please select the ${missingOSSelection.join(', ')}.`}
-                    iconType="iInCircle"
+                    color='warning'
+                    title={`Please select the ${missingOSSelection.join(
+                      ', ',
+                    )}.`}
+                    iconType='iInCircle'
                   />
                 ) : (
                   <EuiTabbedContent
-                    tabs={this.state.selectedVersion == 'redhat7' || this.state.selectedVersion == 'amazonlinux2022' || this.state.selectedVersion == 'centos7' || this.state.selectedVersion == 'suse11' || this.state.selectedVersion == 'suse12' || this.state.selectedVersion == 'oraclelinux5' || this.state.selectedVersion == 'amazonlinux2' || this.state.selectedVersion == '22' || this.state.selectedVersion == 'debian8' || this.state.selectedVersion == 'debian10' || this.state.selectedVersion == 'busterorgreater' || this.state.selectedVersion == 'busterorgreater' || this.state.selectedVersion === 'ubuntu15' || this.state.selectedVersion === 'ubuntu16' || this.state.selectedVersion === 'leap15' ? tabSystemD : this.state.selectedVersion == 'windowsxp' || this.state.selectedVersion == 'windows8' ? tabNet : this.state.selectedVersion == 'sierra' || this.state.selectedVersion == 'highSierra' || this.state.selectedVersion == 'mojave' || this.state.selectedVersion == 'catalina' || this.state.selectedVersion == 'bigSur' || this.state.selectedVersion == 'monterrey' || this.state.selectedVersion == 'ventura' ? tabWazuhControlMacos : this.state.selectedVersion == 'solaris10' || this.state.selectedVersion == 'solaris11' || this.state.selectedVersion == '6.1 TL9' || this.state.selectedVersion == '11.31' ? tabWazuhControl : tabSysV}
+                    tabs={
+                      this.state.selectedVersion == 'redhat7' ||
+                      this.state.selectedVersion == 'amazonlinux2022' ||
+                      this.state.selectedVersion == 'centos7' ||
+                      this.state.selectedVersion == 'suse11' ||
+                      this.state.selectedVersion == 'suse12' ||
+                      this.state.selectedVersion == 'oraclelinux5' ||
+                      this.state.selectedVersion == 'amazonlinux2' ||
+                      this.state.selectedVersion == '22' ||
+                      this.state.selectedVersion == 'debian8' ||
+                      this.state.selectedVersion == 'debian10' ||
+                      this.state.selectedVersion == 'busterorgreater' ||
+                      this.state.selectedVersion == 'busterorgreater' ||
+                      this.state.selectedVersion === 'ubuntu15' ||
+                      this.state.selectedVersion === 'ubuntu16' ||
+                      this.state.selectedVersion === 'leap15'
+                        ? tabSystemD
+                        : this.state.selectedVersion == 'windowsxp' ||
+                          this.state.selectedVersion == 'windows8'
+                        ? tabNet
+                        : this.state.selectedVersion == 'sierra' ||
+                          this.state.selectedVersion == 'highSierra' ||
+                          this.state.selectedVersion == 'mojave' ||
+                          this.state.selectedVersion == 'catalina' ||
+                          this.state.selectedVersion == 'bigSur' ||
+                          this.state.selectedVersion == 'monterrey' ||
+                          this.state.selectedVersion == 'ventura'
+                        ? tabWazuhControlMacos
+                        : this.state.selectedVersion == 'solaris10' ||
+                          this.state.selectedVersion == 'solaris11' ||
+                          this.state.selectedVersion == '6.1 TL9' ||
+                          this.state.selectedVersion == '11.31'
+                        ? tabWazuhControl
+                        : tabSysV
+                    }
                     selectedTab={this.selectedSYS}
                     onTabClick={onTabClick}
                   />
                 ),
-            },
-          ]
+              },
+            ]
           : []),
 
         ...(!missingOSSelection.length &&
-          this.state.selectedOS !== 'rpm' &&
-          this.state.selectedOS !== 'deb' &&
-          this.state.selectedOS !== 'cent' &&
-          this.state.selectedOS !== 'ubu' &&
-          this.state.selectedOS !== 'win' &&
-          this.state.selectedOS !== 'macos' &&
-          this.state.selectedOS !== 'open' &&
-          this.state.selectedOS !== 'sol' &&
-          this.state.selectedOS !== 'aix' &&
-          this.state.selectedOS !== 'hp' &&
-          this.state.selectedOS !== 'amazonlinux' &&
-          this.state.selectedOS !== 'fedora' &&
-          this.state.selectedOS !== 'oraclelinux' &&
-          this.state.selectedOS !== 'suse' &&
-          this.state.selectedOS !== 'raspbian' &&
-          restartAgentCommand
+        this.state.selectedOS !== 'rpm' &&
+        this.state.selectedOS !== 'deb' &&
+        this.state.selectedOS !== 'cent' &&
+        this.state.selectedOS !== 'ubu' &&
+        this.state.selectedOS !== 'win' &&
+        this.state.selectedOS !== 'macos' &&
+        this.state.selectedOS !== 'open' &&
+        this.state.selectedOS !== 'sol' &&
+        this.state.selectedOS !== 'aix' &&
+        this.state.selectedOS !== 'hp' &&
+        this.state.selectedOS !== 'amazonlinux' &&
+        this.state.selectedOS !== 'fedora' &&
+        this.state.selectedOS !== 'oraclelinux' &&
+        this.state.selectedOS !== 'suse' &&
+        this.state.selectedOS !== 'raspbian' &&
+        restartAgentCommand
           ? [
-            {
-              title: 'Start the agent',
-              children: this.state.gotErrorRegistrationServiceInfo ?
-                calloutErrorRegistrationServiceInfo
-                : (
-                  <EuiFlexGroup direction="column">
+              {
+                title: 'Start the agent',
+                children: this.state.gotErrorRegistrationServiceInfo ? (
+                  calloutErrorRegistrationServiceInfo
+                ) : (
+                  <EuiFlexGroup direction='column'>
                     <EuiText>
-                      <div className="copy-codeblock-wrapper">
+                      <div className='copy-codeblock-wrapper'>
                         <EuiCodeBlock style={codeBlock} language={language}>
                           {restartAgentCommand}
                         </EuiCodeBlock>
                         <EuiCopy textToCopy={restartAgentCommand}>
-                          {(copy) => (
-                            <div className="copy-overlay" onClick={copy}>
-                              <p><EuiIcon type="copy" /> Copy command</p>
+                          {copy => (
+                            <div className='copy-overlay' onClick={copy}>
+                              <p>
+                                <EuiIcon type='copy' /> Copy command
+                              </p>
                             </div>
                           )}
                         </EuiCopy>
@@ -1553,14 +2128,14 @@ export const RegisterAgent = withErrorBoundary(
                     </EuiText>
                   </EuiFlexGroup>
                 ),
-            },
-          ]
+              },
+            ]
           : []),
       ];
 
       return (
         <div>
-          <EuiPage restrictWidth="1000px" style={{ background: 'transparent' }}>
+          <EuiPage restrictWidth='1000px' style={{ background: 'transparent' }}>
             <EuiPageBody>
               <EuiFlexGroup>
                 <EuiFlexItem>
@@ -1574,18 +2149,18 @@ export const RegisterAgent = withErrorBoundary(
                       <EuiFlexItem grow={false}>
                         {this.props.hasAgents() && (
                           <EuiButtonEmpty
-                            size="s"
+                            size='s'
                             onClick={() => this.props.addNewAgent(false)}
-                            iconType="cross"
+                            iconType='cross'
                           >
                             Close
                           </EuiButtonEmpty>
                         )}
                         {!this.props.hasAgents() && (
                           <EuiButtonEmpty
-                            size="s"
+                            size='s'
                             onClick={() => this.props.reload()}
-                            iconType="refresh"
+                            iconType='refresh'
                           >
                             Refresh
                           </EuiButtonEmpty>
@@ -1596,7 +2171,7 @@ export const RegisterAgent = withErrorBoundary(
                     {this.state.loading && (
                       <>
                         <EuiFlexItem>
-                          <EuiProgress size="xs" color="primary" />
+                          <EuiProgress size='xs' color='primary' />
                         </EuiFlexItem>
                         <EuiSpacer></EuiSpacer>
                       </>
@@ -1614,5 +2189,5 @@ export const RegisterAgent = withErrorBoundary(
         </div>
       );
     }
-  }
+  },
 );
