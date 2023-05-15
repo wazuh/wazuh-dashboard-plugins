@@ -10,11 +10,18 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added `ignore` and `restrict` options to Syslog configuration. [#5203](https://github.com/wazuh/wazuh-kibana-app/pull/5203)
 - Added the `extensions.github` and `extensions.office` settings to the default configuration file [#5376](https://github.com/wazuh/wazuh-kibana-app/pull/5376)
 - Added new global error treatment (client-side) [#4163](https://github.com/wazuh/wazuh-kibana-app/pull/4163)
+- Added a description to step 3 of the deploy a new agent section. [#5419](https://github.com/wazuh/wazuh-kibana-app/pull/5419)
+- Added a title to the agent name input of the deploy a new agent section. [#5429](https://github.com/wazuh/wazuh-kibana-app/pull/5429)
+- Added callout below the agent name entry of the deploy a new agent section. [#5429](https://github.com/wazuh/wazuh-kibana-app/pull/5429)
 
 ### Changed
 
 - Changed of regular expression in RBAC. [#5201](https://github.com/wazuh/wazuh-kibana-app/pull/5201)
 - Migrate the timeFilter, metaFields, maxBuckets health checks inside the pattern check. [#5384](https://github.com/wazuh/wazuh-kibana-app/pull/5384)
+- Changed the title to step 3 of the deploy a new agent section. [#5419](https://github.com/wazuh/wazuh-kibana-app/pull/5419)
+- Changed the title of step 3 of the deploy a new agent section. [#5429](https://github.com/wazuh/wazuh-kibana-app/pull/5429)
+- Changed the description of step 3 of the deploy a new agent section. [#5429](https://github.com/wazuh/wazuh-kibana-app/pull/5429)
+- Changed the placeholder of the agent name input of the deploy a new agent section. [#5429](https://github.com/wazuh/wazuh-kibana-app/pull/5429)
 
 ### Fixed
 
