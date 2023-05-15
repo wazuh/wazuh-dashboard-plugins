@@ -1,178 +1,215 @@
+import { fireEvent, render } from '@testing-library/react';
+import '@testing-library/jest-dom/extend-expect';
 import { renderHook, act } from '@testing-library/react-hooks';
+import React, { useState } from 'react';
 import { useForm } from './hooks';
+import { IFormFields, IInputForm } from './types';
 
 describe('[hook] useForm', () => {
+  it(`[hook] useForm. Verify the initial state`, async () => {
+    const initialFields: IFormFields = {
+      text1: {
+        type: 'text',
+        initialValue: '',
+      },
+    };
 
-	it(`[hook] useForm. Verify the initial state`, async () => {
+    const { result } = renderHook(() => useForm(initialFields));
 
-		const initialFields = {
-			text1: {
-				type: 'text',
-				initialValue: ''
-			},
-		};
+    // assert initial state
+    expect(result.current.fields.text1.changed).toBe(false);
+    expect(result.current.fields.text1.error).toBeUndefined();
+    expect(result.current.fields.text1.type).toBe('text');
+    expect(result.current.fields.text1.value).toBe('');
+    expect(result.current.fields.text1.initialValue).toBe('');
+    expect(result.current.fields.text1.onChange).toBeDefined();
+  });
 
-		const { result } = renderHook(() => useForm(initialFields));
+  it(`[hook] useForm. Verify the initial state. Multiple fields.`, async () => {
+    const initialFields: IFormFields = {
+      text1: {
+        type: 'text',
+        initialValue: '',
+      },
+      number1: {
+        type: 'number',
+        initialValue: 1,
+      },
+    };
 
-		// assert initial state
-		expect(result.current.fields.text1.changed).toBe(false);
-		expect(result.current.fields.text1.error).toBeUndefined();
-		expect(result.current.fields.text1.type).toBe('text');
-		expect(result.current.fields.text1.value).toBe('');
-		expect(result.current.fields.text1.initialValue).toBe('');
-		expect(result.current.fields.text1.onChange).toBeDefined();
-	});
+    const { result } = renderHook(() => useForm(initialFields));
 
-	it(`[hook] useForm. Verify the initial state. Multiple fields.`, async () => {
+    // assert initial state
+    expect(result.current.fields.text1.changed).toBe(false);
+    expect(result.current.fields.text1.error).toBeUndefined();
+    expect(result.current.fields.text1.type).toBe('text');
+    expect(result.current.fields.text1.value).toBe('');
+    expect(result.current.fields.text1.initialValue).toBe('');
+    expect(result.current.fields.text1.onChange).toBeDefined();
 
-		const initialFields = {
-			text1: {
-				type: 'text',
-				initialValue: ''
-			},
-			number1: {
-				type: 'number',
-				initialValue: 1
-			},
-		};
+    expect(result.current.fields.number1.changed).toBe(false);
+    expect(result.current.fields.number1.error).toBeUndefined();
+    expect(result.current.fields.number1.type).toBe('number');
+    expect(result.current.fields.number1.value).toBe(1);
+    expect(result.current.fields.number1.initialValue).toBe(1);
+    expect(result.current.fields.number1.onChange).toBeDefined();
+  });
 
-		const { result } = renderHook(() => useForm(initialFields));
+  it(`[hook] useForm lifecycle. Set the initial value. Change the field value. Undo changes. Change the field. Do changes.`, async () => {
+    const initialFieldValue = '';
+    const fieldType = 'text';
 
-		// assert initial state
-		expect(result.current.fields.text1.changed).toBe(false);
-		expect(result.current.fields.text1.error).toBeUndefined();
-		expect(result.current.fields.text1.type).toBe('text');
-		expect(result.current.fields.text1.value).toBe('');
-		expect(result.current.fields.text1.initialValue).toBe('');
-		expect(result.current.fields.text1.onChange).toBeDefined();
+    const initialFields: IFormFields = {
+      text1: {
+        type: fieldType,
+        initialValue: initialFieldValue,
+      },
+    };
 
-		expect(result.current.fields.number1.changed).toBe(false);
-		expect(result.current.fields.number1.error).toBeUndefined();
-		expect(result.current.fields.number1.type).toBe('number');
-		expect(result.current.fields.number1.value).toBe(1);
-		expect(result.current.fields.number1.initialValue).toBe(1);
-		expect(result.current.fields.number1.onChange).toBeDefined();
-	});
+    const { result } = renderHook(() => useForm(initialFields));
 
-	it(`[hook] useForm lifecycle. Set the initial value. Change the field value. Undo changes. Change the field. Do changes.`, async () => {
+    // assert initial state
+    expect(result.current.fields.text1.changed).toBe(false);
+    expect(result.current.fields.text1.error).toBeUndefined();
+    expect(result.current.fields.text1.type).toBe(fieldType);
+    expect(result.current.fields.text1.value).toBe(initialFieldValue);
+    expect(result.current.fields.text1.initialValue).toBe(initialFieldValue);
+    expect(result.current.fields.text1.onChange).toBeDefined();
 
-		const initialFieldValue = '';
-		const fieldType = 'text';
+    // change the input
+    const changedValue = 't';
+    act(() => {
+      result.current.fields.text1.onChange({
+        target: {
+          value: changedValue,
+        },
+      });
+    });
 
-		const initialFields = {
-			text1: {
-				type: fieldType,
-				initialValue: initialFieldValue
-			}
-		};
+    // assert changed state
+    expect(result.current.fields.text1.changed).toBe(true);
+    expect(result.current.fields.text1.error).toBeUndefined();
+    expect(result.current.fields.text1.type).toBe(fieldType);
+    expect(result.current.fields.text1.value).toBe(changedValue);
+    expect(result.current.fields.text1.initialValue).toBe(initialFieldValue);
 
-		const { result } = renderHook(() => useForm(initialFields));
+    // undone changes
+    act(() => {
+      result.current.undoChanges();
+    });
 
-		// assert initial state
-		expect(result.current.fields.text1.changed).toBe(false);
-		expect(result.current.fields.text1.error).toBeUndefined();
-		expect(result.current.fields.text1.type).toBe(fieldType);
-		expect(result.current.fields.text1.value).toBe(initialFieldValue);
-		expect(result.current.fields.text1.initialValue).toBe(initialFieldValue);
-		expect(result.current.fields.text1.onChange).toBeDefined();
+    // assert undo changes state
+    expect(result.current.fields.text1.changed).toBe(false);
+    expect(result.current.fields.text1.error).toBeUndefined();
+    expect(result.current.fields.text1.type).toBe(fieldType);
+    expect(result.current.fields.text1.value).toBe(initialFieldValue);
+    expect(result.current.fields.text1.initialValue).toBe(initialFieldValue);
 
-		// change the input
-		const changedValue = 't';
-		act(() => {
-			result.current.fields.text1.onChange({
-				target: {
-					value: changedValue
-				}
-			});
-		});
+    // change the input
+    const changedValue2 = 'e';
+    act(() => {
+      result.current.fields.text1.onChange({
+        target: {
+          value: changedValue2,
+        },
+      });
+    });
 
-		// assert changed state
-		expect(result.current.fields.text1.changed).toBe(true);
-		expect(result.current.fields.text1.error).toBeUndefined();
-		expect(result.current.fields.text1.type).toBe(fieldType);
-		expect(result.current.fields.text1.value).toBe(changedValue);
-		expect(result.current.fields.text1.initialValue).toBe(initialFieldValue);
+    // assert changed state
+    expect(result.current.fields.text1.changed).toBe(true);
+    expect(result.current.fields.text1.error).toBeUndefined();
+    expect(result.current.fields.text1.type).toBe(fieldType);
+    expect(result.current.fields.text1.value).toBe(changedValue2);
+    expect(result.current.fields.text1.initialValue).toBe(initialFieldValue);
 
-		// undone changes
-		act(() => {
-			result.current.undoChanges();
-		});
+    // done changes
+    act(() => {
+      result.current.doChanges();
+    });
 
-		// assert undo changes state
-		expect(result.current.fields.text1.changed).toBe(false);
-		expect(result.current.fields.text1.error).toBeUndefined();
-		expect(result.current.fields.text1.type).toBe(fieldType);
-		expect(result.current.fields.text1.value).toBe(initialFieldValue);
-		expect(result.current.fields.text1.initialValue).toBe(initialFieldValue);
+    // assert do changes state
+    expect(result.current.fields.text1.changed).toBe(false);
+    expect(result.current.fields.text1.error).toBeUndefined();
+    expect(result.current.fields.text1.type).toBe(fieldType);
+    expect(result.current.fields.text1.value).toBe(changedValue2);
+    expect(result.current.fields.text1.initialValue).toBe(changedValue2);
+  });
 
-		// change the input
-		const changedValue2 = 'e';
-		act(() => {
-			result.current.fields.text1.onChange({
-				target: {
-					value: changedValue2
-				}
-			});
-		});
+  it(`[hook] useForm lifecycle. Set the initial value. Change the field value to invalid value`, async () => {
+    const initialFieldValue = 'test';
+    const fieldType = 'text';
 
-		// assert changed state
-		expect(result.current.fields.text1.changed).toBe(true);
-		expect(result.current.fields.text1.error).toBeUndefined();
-		expect(result.current.fields.text1.type).toBe(fieldType);
-		expect(result.current.fields.text1.value).toBe(changedValue2);
-		expect(result.current.fields.text1.initialValue).toBe(initialFieldValue);
+    const initialFields: IFormFields = {
+      text1: {
+        type: fieldType,
+        initialValue: initialFieldValue,
+        validate: (value: string): string | undefined =>
+          value.length ? undefined : `Validation error: string can be empty.`,
+      },
+    };
 
-		// done changes
-		act(() => {
-			result.current.doChanges()
-		});
+    const { result } = renderHook(() => useForm(initialFields));
 
-		// assert do changes state
-		expect(result.current.fields.text1.changed).toBe(false);
-		expect(result.current.fields.text1.error).toBeUndefined();
-		expect(result.current.fields.text1.type).toBe(fieldType);
-		expect(result.current.fields.text1.value).toBe(changedValue2);
-		expect(result.current.fields.text1.initialValue).toBe(changedValue2);
-	});
+    // assert initial state
+    expect(result.current.fields.text1.changed).toBe(false);
+    expect(result.current.fields.text1.error).toBeUndefined();
+    expect(result.current.fields.text1.type).toBe(fieldType);
+    expect(result.current.fields.text1.value).toBe(initialFieldValue);
+    expect(result.current.fields.text1.initialValue).toBe(initialFieldValue);
+    expect(result.current.fields.text1.onChange).toBeDefined();
 
-	it(`[hook] useForm lifecycle. Set the initial value. Change the field value to invalid value`, async () => {
+    // change the input
+    const changedValue = '';
+    act(() => {
+      result.current.fields.text1.onChange({
+        target: {
+          value: changedValue,
+        },
+      });
+    });
 
-		const initialFieldValue = 'test';
-		const fieldType = 'text';
+    // assert changed state
+    expect(result.current.fields.text1.changed).toBe(true);
+    expect(result.current.fields.text1.error).toBeTruthy();
+    expect(result.current.fields.text1.type).toBe(fieldType);
+    expect(result.current.fields.text1.value).toBe(changedValue);
+    expect(result.current.fields.text1.initialValue).toBe(initialFieldValue);
+  });
 
-		const initialFields = {
-			text1: {
-				type: fieldType,
-				initialValue: initialFieldValue,
-				validate: (value: string): string | undefined => value.length ? undefined : `Validation error: string can be empty.`
-			}
-		};
+  it('[hook] useForm. Verify the hook behavior when receives a custom field type', async () => {
+    const CustomComponent = (props: IInputForm) => {
+      const { onChange, field, initialValue } = props;
+      const [value, setValue] = useState(initialValue || '');
 
-		const { result } = renderHook(() => useForm(initialFields));
+      const handleOnChange = (e: any) => {
+		setValue(e.target.value);
+		onChange(e);
+      };
 
-		// assert initial state
-		expect(result.current.fields.text1.changed).toBe(false);
-		expect(result.current.fields.text1.error).toBeUndefined();
-		expect(result.current.fields.text1.type).toBe(fieldType);
-		expect(result.current.fields.text1.value).toBe(initialFieldValue);
-		expect(result.current.fields.text1.initialValue).toBe(initialFieldValue);
-		expect(result.current.fields.text1.onChange).toBeDefined();
+      return (
+        <>
+          {field}
+          <input type='text' value={value} onChange={handleOnChange} />
+        </>
+      );
+    };
 
-		// change the input
-		const changedValue = '';
-		act(() => {
-			result.current.fields.text1.onChange({
-				target: {
-					value: changedValue
-				}
-			});
-		});
+    const formFields: IFormFields = {
+      customField: {
+        type: 'custom',
+        initialValue: 'default value',
+        component: props => CustomComponent(props),
+      },
+    };
 
-		// assert changed state
-		expect(result.current.fields.text1.changed).toBe(true);
-		expect(result.current.fields.text1.error).toBeTruthy();
-		expect(result.current.fields.text1.type).toBe(fieldType);
-		expect(result.current.fields.text1.value).toBe(changedValue);
-		expect(result.current.fields.text1.initialValue).toBe(initialFieldValue);
-	});
+    const { result } = renderHook(() => useForm(formFields));
+	const { container, getByRole } = render(CustomComponent(...result.current.fields.customField))
+
+	expect(container).toBeInTheDocument();
+	const input = getByRole('textbox');
+	expect(input).toHaveValue('default value');
+	fireEvent.change(input, { target: { value: 'new value' } });
+	expect(result.current.fields.customField.component).toBeInstanceOf(Function);
+	expect(result.current.fields.customField.value).toBe('new value');
+  });
 });
