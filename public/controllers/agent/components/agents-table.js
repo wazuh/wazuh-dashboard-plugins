@@ -82,14 +82,14 @@ export const AgentsTable = withErrorBoundary(
         {
           type: 'q',
           label: 'os.platform',
-          description: 'Filter by OS platform',
+          description: 'Filter by operating system platform',
           operators: ['=', '!='],
           values: async (value) => getAgentFilterValues('os.platform', value, { q: 'id!=000' }),
         },
         {
           type: 'q',
           label: 'ip',
-          description: 'Filter by agent IP',
+          description: 'Filter by agent IP address',
           operators: ['=', '!='],
           values: async (value) => getAgentFilterValues('ip', value, { q: 'id!=000' }),
         },
@@ -218,11 +218,12 @@ export const AgentsTable = withErrorBoundary(
     async getItems() {
       try {
         this._isMount && this.setState({ isLoading: true });
-        const fields = this.defaultColumns
+        const selectFieldsList = this.defaultColumns
           .filter(field => field.field != 'actions')
-          .map(field => field.field.replace('os_', 'os.')) // "os_name" subfield should be specified as 'os.name'
-          .join(',');
-        const rawAgents = await this.props.wzReq('GET', '/agents', { params: { ...this.buildFilter(), select: fields } });
+          .map(field => field.field.replace('os_', 'os.')); // "os_name" subfield should be specified as 'os.name'
+        const selectFields = [...selectFieldsList, 'os.platform', 'os.uname', 'os.version'].join(','); // Add version and uname fields to render the OS icon and version in the table
+
+        const rawAgents = await this.props.wzReq('GET', '/agents', { params: { ...this.buildFilter(), select: selectFields } });
         const formatedAgents = (((rawAgents || {}).data || {}).data || {}).affected_items.map(
           this.formatAgent.bind(this)
         );
@@ -280,9 +281,6 @@ export const AgentsTable = withErrorBoundary(
     }
 
     formatAgent(agent) {
-      const checkField = (field) => {
-        return field !== undefined ? field : '-';
-      };
       const agentVersion = agent.version !== undefined ? agent.version.split(' ')[1] : '-';
       const node_name = agent.node_name && agent.node_name !== 'unknown' ? agent.node_name : '-';
       return {
@@ -291,7 +289,7 @@ export const AgentsTable = withErrorBoundary(
         ip: compressIPv6(agent.ip),
         status: agent.status,
         group_config_status: agent.group_config_status,
-        group: checkField(agent.group),
+        group: agent?.group || '-',
         os_name: agent,
         version: agentVersion,
         node_name: node_name,
@@ -335,32 +333,26 @@ export const AgentsTable = withErrorBoundary(
     }
 
     addIconPlatformRender(agent) {
-      let icon = false;
-      const checkField = (field) => {
-        return field !== undefined ? field : '-';
-      };
-      const os = (agent || {}).os;
+      let icon = '';
+      const os = agent?.os || {};
 
-      if (((os || {}).uname || '').includes('Linux')) {
+      if ((os?.uname || '').includes('Linux')) {
         icon = 'linux';
-      } else if ((os || {}).platform === 'windows') {
+      } else if (os?.platform === 'windows') {
         icon = 'windows';
-      } else if ((os || {}).platform === 'darwin') {
+      } else if (os?.platform === 'darwin') {
         icon = 'apple';
       }
-      const os_name =
-        checkField(((agent || {}).os || {}).name) +
-        ' ' +
-        checkField(((agent || {}).os || {}).version);
+      const os_name = `${agent?.os?.name || ''} ${agent?.os?.version || ''}`;
 
       return (
-        <span className="euiTableCellContent__text euiTableCellContent--truncateText">
-          <i
+        <EuiFlexGroup gutterSize="xs">
+          <EuiFlexItem grow={false} ><i
             className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`}
             aria-hidden="true"
-          ></i>{' '}
-          {os_name === '- -' ? '-' : os_name}
-        </span>
+          ></i></EuiFlexItem>{' '}
+          <EuiFlexItem>{os_name.trim() || '-'}</EuiFlexItem>
+        </EuiFlexGroup>
       );
     }
 
@@ -460,85 +452,78 @@ export const AgentsTable = withErrorBoundary(
       window.localStorage.setItem('columnsSelectedTableAgent', JSON.stringify(data));
     }
 
+    // Columns with the property truncateText: true won't wrap the text
+    // This is added to prevent the wrap because of the table-layout: auto
     defaultColumns = [
       {
         field: 'id',
         name: 'ID',
         sortable: true,
-        width: '4%',
+        show: true,
       },
       {
         field: 'name',
         name: 'Name',
         sortable: true,
-        width: '10%',
-        truncateText: true,
+        show: true,
       },
       {
         field: 'ip',
-        name: 'IP',
-        width: '14%',
-        truncateText: true,
+        name: 'IP address',
         sortable: true,
+        show: true,
       },
       {
         field: 'group',
         name: 'Group(s)',
-        width: '12%',
-        truncateText: true,
         sortable: true,
+        show: true,
         render: (groups) => (groups !== '-' ? this.renderGroups(groups) : '-'),
       },
       {
         field: 'os_name',
-        name: 'OS',
+        name: 'Operating system',
         sortable: true,
-        width: '10%',
-        truncateText: true,
+        show: true,
         render: this.addIconPlatformRender,
       },
       {
         field: 'node_name',
         name: 'Cluster node',
-        width: '8%',
-        truncateText: true,
         sortable: true,
+        show: true,
       },
       {
         field: 'version',
         name: 'Version',
-        width: '5%',
-        truncateText: true,
         sortable: true,
+        show: true,
       },
       {
         field: 'dateAdd',
         name: 'Registration date',
-        width: '8%',
-        truncateText: true,
         sortable: true,
+        show: false,
       },
       {
         field: 'lastKeepAlive',
         name: 'Last keep alive',
-        width: '8%',
-        truncateText: true,
         sortable: true,
+        show: false,
       },
       {
         field: 'status',
         name: 'Status',
         truncateText: true,
         sortable: true,
-        width: '8%',
+        show: true,
         render: (status) => <AgentStatus status={status} labelProps={{ className: 'hide-agent-status' }} />,
       },
       {
         field: 'group_config_status',
         name: 'Synced',
-        truncateText: true,
         sortable: true,
-        width: '10%',
+        show: false,
         render: (synced) => <AgentSynced synced={synced} />,
       },
       {
@@ -546,6 +531,7 @@ export const AgentsTable = withErrorBoundary(
         width: '5%',
         field: 'actions',
         name: 'Actions',
+        show: true,
         render: (agent) => this.actionButtonsRender(agent),
       },
     ];
@@ -567,11 +553,11 @@ export const AgentsTable = withErrorBoundary(
           return {
             field: item.field,
             name: item.name,
-            show: true,
+            show: item.show,
           };
         });
         this.setTableColumnsSelected(fieldColumns);
-        return this.defaultColumns;
+        return fieldColumns;
       }
     }
 
@@ -713,10 +699,14 @@ export const AgentsTable = withErrorBoundary(
         },
       };
 
+      // The EuiBasicTable tableLayout is set to "auto" to improve the use of empty space in the component.
+      // Previously the tableLayout is set to "fixed" with percentage width for each column, but the use of space was not optimal.
+      // Important: If all the columns have the truncateText property set to true, the table cannot adjust properly when the viewport size is small.
       return (
-        <EuiFlexGroup>
+        <EuiFlexGroup className="wz-overflow-auto">
           <EuiFlexItem>
             <EuiBasicTable
+              tableLayout="auto"
               items={agents}
               itemId="id"
               columns={columns}

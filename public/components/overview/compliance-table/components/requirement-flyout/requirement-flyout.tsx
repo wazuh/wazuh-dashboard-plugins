@@ -22,9 +22,6 @@ import {
   EuiFlexGroup,
   EuiText,
   EuiFlexItem,
-  EuiLink,
-  EuiStat,
-  EuiDescriptionList,
   EuiSpacer,
 } from '@elastic/eui';
 import { Discover } from '../../../../common/modules/discover';

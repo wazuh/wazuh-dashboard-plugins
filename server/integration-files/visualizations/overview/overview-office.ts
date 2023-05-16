@@ -1175,7 +1175,7 @@ export default [
               otherBucketLabel: 'Others',
               missingBucket: false,
               missingBucketLabel: 'Missing',
-              customLabel: 'Client IP',
+              customLabel: 'Client IP address',
             },
             schema: 'bucket',
           },

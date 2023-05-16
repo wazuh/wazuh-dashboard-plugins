@@ -171,7 +171,7 @@ export class WzRequest {
    * @param message 
    * @returns error
    */
-  static returnErrorInstance(error, message){
+  static returnErrorInstance(error: any, message: string | undefined){
     if(!error || typeof error === 'string'){
       return new Error(message || error);
     }

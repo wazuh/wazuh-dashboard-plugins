@@ -22,6 +22,7 @@ import {
   EuiSpacer,
   EuiToolTip,
   EuiCard,
+  EuiLink,
 } from '@elastic/eui';
 import { AgentsTable } from './agents-table';
 import { WzRequest } from '../../../react-services/wz-request';
@@ -70,7 +71,6 @@ export const AgentsPreview = compose(
         agentStatusSummary: { active: '-', disconnected: '-', total: '-', pending: '-', never_connected: '-' },
         agentConfiguration: {},
         agentsActiveCoverage: 0,
-        agentsSynced: 0,
       };
       this.wazuhConfig = new WazuhConfig();
       this.agentStatus = UI_ORDER_AGENT_STATUS.map(agentStatus => ({
@@ -84,8 +84,8 @@ export const AgentsPreview = compose(
       this._isMount = true;
       this.fetchAgentStatusDetailsData();
       if (this.wazuhConfig.getConfig()['wazuh.monitoring.enabled']) {
-        this._isMount && this.setState({ 
-          showAgentsEvolutionVisualization: true 
+        this._isMount && this.setState({
+          showAgentsEvolutionVisualization: true
         });
         const tabVisualizations = new TabVisualizations();
         tabVisualizations.removeAll();
@@ -120,7 +120,6 @@ export const AgentsPreview = compose(
         agentStatusSummary,
         agentConfiguration,
         agentsActiveCoverage: ((agentStatusSummary.active / agentStatusSummary.total) * 100).toFixed(2),
-        agentsSynced: ((agentConfiguration.synced/agentConfiguration.total)*100).toFixed(2),
       });
     }
 
@@ -239,15 +238,6 @@ export const AgentsPreview = compose(
                             className="white-space-nowrap"
                             />
                         </EuiFlexItem>
-                        <EuiFlexItem className="agents-link-item">
-                          <EuiStat
-                            isLoading={this.state.loadingSummary}
-                            title={`${this.state.agentsSynced}%`}
-                            titleSize='s'
-                            description="Synced agents"
-                            className="white-space-nowrap"
-                          />
-                        </EuiFlexItem>
                       </EuiFlexGroup>
                       <EuiFlexGroup className="mt-0">
                           <EuiFlexItem className="agents-link-item">
@@ -256,9 +246,9 @@ export const AgentsPreview = compose(
                               isLoading={this.state.loadingAgents}
                               title={
                                 <EuiToolTip position="top" content="View agent details">
-                                  <a onClick={() => this.showAgent(this.state.lastRegisteredAgent)}>
+                                  <EuiLink onClick={() => this.showAgent(this.state.lastRegisteredAgent)}>
                                     {this.state.lastRegisteredAgent?.name || '-'}
-                                  </a>
+                                  </EuiLink>
                                 </EuiToolTip>
                               }
                               titleSize="s"
@@ -273,9 +263,9 @@ export const AgentsPreview = compose(
                               isLoading={this.state.loadingAgents}
                               title={
                                 <EuiToolTip position="top" content="View agent details">
-                                  <a onClick={() => this.showAgent(this.state.agentMostActive)}>
+                                  <EuiLink onClick={() => this.showAgent(this.state.agentMostActive)}>
                                     {this.state.agentMostActive?.name || '-'}
-                                  </a>
+                                  </EuiLink>
                                 </EuiToolTip>
                               }
                               className="last-agents-link"

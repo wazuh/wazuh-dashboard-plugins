@@ -67,11 +67,12 @@ export const Category: React.FunctionComponent<ICategoryProps> = ({
                   content="Documentation">
                   <>
                     &nbsp;
-                  <EuiButtonIcon
+                    <EuiButtonIcon
                       iconType="iInCircle"
                       iconSize="l"
                       aria-label="Help"
                       target="_blank"
+                      rel="noopener noreferrer"
                       href={webDocumentationLink(documentationLink)}
                     ></EuiButtonIcon>
                   </>

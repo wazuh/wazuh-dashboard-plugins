@@ -1,0 +1,15 @@
+server.host: 0.0.0.0
+server.port: 5601
+opensearch.hosts: https://wazuh.indexer:9200
+opensearch.ssl.verificationMode: certificate
+opensearch.requestHeadersAllowlist: ['securitytenant', 'Authorization']
+opensearch_security.multitenancy.enabled: false
+opensearch_security.readonly_mode.roles: ['kibana_read_only']
+server.ssl.enabled: true
+server.ssl.key: '/usr/share/wazuh-dashboard/certs/wazuh.dashboard.key'
+server.ssl.certificate: '/usr/share/wazuh-dashboard/certs/wazuh.dashboard.pem'
+opensearch.ssl.certificateAuthorities:
+  ['/usr/share/wazuh-dashboard/certs/ca.pem']
+uiSettings.overrides.defaultRoute: /app/wazuh
+opensearch.username: 'kibanaserver'
+opensearch.password: 'kibanaserver'
