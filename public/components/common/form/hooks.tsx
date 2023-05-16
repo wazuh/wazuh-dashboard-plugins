@@ -27,8 +27,6 @@ interface IUseFormFieldsDataCustom extends IUseFormFieldsData {
   component: (props: IInputForm) => JSX.Element;
 }
 
-
-
 interface IUseFormFields {
   [key: string]: IUseFormFieldsDataDefault | IUseFormFieldsDataCustom;
 }

@@ -182,34 +182,34 @@ describe('[hook] useForm', () => {
       const [value, setValue] = useState(initialValue || '');
 
       const handleOnChange = (e: any) => {
-		setValue(e.target.value);
-		onChange(e);
+        setValue(e.target.value);
+        onChange(e);
+          };
+
+          return (
+            <>
+              {field}
+              <input type='text' value={value} onChange={handleOnChange} />
+            </>
+          );
       };
 
-      return (
-        <>
-          {field}
-          <input type='text' value={value} onChange={handleOnChange} />
-        </>
-      );
-    };
-
-    const formFields: IFormFields = {
-      customField: {
-        type: 'custom',
-        initialValue: 'default value',
-        component: props => CustomComponent(props),
-      },
-    };
+      const formFields: IFormFields = {
+        customField: {
+          type: 'custom',
+          initialValue: 'default value',
+          component: props => CustomComponent(props),
+        },
+      };
 
     const { result } = renderHook(() => useForm(formFields));
-	const { container, getByRole } = render(CustomComponent(...result.current.fields.customField))
+    const { container, getByRole } = render(CustomComponent(...result.current.fields.customField))
 
-	expect(container).toBeInTheDocument();
-	const input = getByRole('textbox');
-	expect(input).toHaveValue('default value');
-	fireEvent.change(input, { target: { value: 'new value' } });
-	expect(result.current.fields.customField.component).toBeInstanceOf(Function);
-	expect(result.current.fields.customField.value).toBe('new value');
+    expect(container).toBeInTheDocument();
+    const input = getByRole('textbox');
+    expect(input).toHaveValue('default value');
+    fireEvent.change(input, { target: { value: 'new value' } });
+    expect(result.current.fields.customField.component).toBeInstanceOf(Function);
+    expect(result.current.fields.customField.value).toBe('new value');
   });
 });
