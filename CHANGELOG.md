@@ -39,7 +39,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Removed
 
-- Elimination of unnecessary dashboard queries caused by the deploy agent view. [#5453](https://github.com/wazuh/wazuh-kibana-app/pull/5453)
+- Removed unnecessary dashboard queries caused by the deploy agent view. [#5453](https://github.com/wazuh/wazuh-kibana-app/pull/5453)
 
 ## Wazuh v4.4.1 - OpenSearch Dashboards 2.6.0 - Revision 01
 
