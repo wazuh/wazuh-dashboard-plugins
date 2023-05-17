@@ -187,34 +187,29 @@ export class InventoryTable extends Component {
         showReload
         tablePageSizeOptions={[10, 25, 50, 100]}
         filters={this.props.filters}
-        searchBarProps={{
-          modes: [
-            {
-              id: 'wql',
-              options: searchBarWQLOptions,
-              suggestions: {
-                field(currentValue) {
-                  return [
-                    { label: 'architecture', description: 'filter by architecture' },
-                    { label: 'cve', description: 'filter by CVE ID' },
-                    { label: 'cvss2_score', description: 'filter by CVSS2' },
-                    { label: 'cvss3_score', description: 'filter by CVSS3' },
-                    { label: 'detection_time', description: 'filter by detection time' },
-                    { label: 'name', description: 'filter by package name' },
-                    { label: 'severity', description: 'filter by severity' },
-                    { label: 'version', description: 'filter by CVE version' },
-                  ];
-                },
-                value: async (currentValue, { field }) => {
-                  try{
-                    return await getFilterValues(field, currentValue, agentID, {}, label => ({label}));
-                  }catch(error){
-                    return [];
-                  };
-                },
-              },
-            }
-          ]
+        searchBarWQL={{
+          options: searchBarWQLOptions,
+          suggestions: {
+            field(currentValue) {
+              return [
+                { label: 'architecture', description: 'filter by architecture' },
+                { label: 'cve', description: 'filter by CVE ID' },
+                { label: 'cvss2_score', description: 'filter by CVSS2' },
+                { label: 'cvss3_score', description: 'filter by CVSS3' },
+                { label: 'detection_time', description: 'filter by detection time' },
+                { label: 'name', description: 'filter by package name' },
+                { label: 'severity', description: 'filter by severity' },
+                { label: 'version', description: 'filter by CVE version' },
+              ];
+            },
+            value: async (currentValue, { field }) => {
+              try{
+                return await getFilterValues(field, currentValue, agentID, {}, label => ({label}));
+              }catch(error){
+                return [];
+              };
+            },
+          },
         }}
       />
     );

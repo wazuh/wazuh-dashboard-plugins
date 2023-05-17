@@ -328,7 +328,7 @@ export default class WzDecoderInfo extends Component {
                       {currentDecoder?.filename &&
                         <TableWzAPI
                           tableColumns={this.columns}
-                          tableInitialSortingField={'name'}
+                          tableInitialSortingField='name'
                           endpoint={`/decoders?filename=${currentDecoder.filename}`}
                           tableProps={{ rowProps: this.onClickRow }}
                           tablePageSizeOptions={[10, 25]}

@@ -63,6 +63,10 @@ const columns = [
   },
 ];
 
+const searchBarWQLOptions = {
+  searchTermFields: []
+}
+
 const tableProps = {
   onSearch: () => {},
   tableColumns: columns,
@@ -73,23 +77,16 @@ const tableProps = {
   reload: () => {},
   searchBarSuggestions: [],
   rowProps: () => {},
-  searchBarProps: {
-    modes: [
-      {
-        id: 'wql',
-        options: {
-          searchTermFields: []
-        },
-        suggestions: {
-          field(currentValue) {
-            return [];
-          },
-          value: async (currentValue, { field }) => {
-            return [];
-          },
-        },
-      }
-    ]
+  searchBarWQL: {
+    options: searchBarWQLOptions,
+    suggestions: {
+      field(currentValue) {
+        return [];
+      },
+      value: async (currentValue, { field }) => {
+        return [];
+      },
+    },
   }
 };
 

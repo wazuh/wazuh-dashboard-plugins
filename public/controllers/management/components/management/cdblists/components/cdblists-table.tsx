@@ -168,33 +168,28 @@ function CDBListsTable(props) {
       <TableWzAPI
         reload={tableFootprint}
         actionButtons={actionButtons}
-        title={'CDB Lists'}
-        description={`From here you can manage your lists.`}
+        title='CDB Lists'
+        description='From here you can manage your lists.'
         tableColumns={columns}
-        tableInitialSortingField={'filename'}
+        tableInitialSortingField='filename'
         searchTable
-        searchBarProps={{
-          modes: [
-            {
-              id: 'wql',
-              options: searchBarWQLOptions,
-              suggestions: {
-                field(currentValue) {
-                  return [
-                    {label: 'filename', description: 'filter by filename'},
-                    {label: 'relative_dirname', description: 'filter by relative path'},
-                  ];
-                },
-                value: async (currentValue, { field }) => {
-                  try{ // TODO: distinct
-                    return [];
-                  }catch(error){
-                    return [];
-                  };
-                },
-              },
-            }
-          ]
+        searchBarWQL={{
+          options: searchBarWQLOptions,
+          suggestions: {
+            field(currentValue) {
+              return [
+                {label: 'filename', description: 'filter by filename'},
+                {label: 'relative_dirname', description: 'filter by relative path'},
+              ];
+            },
+            value: async (currentValue, { field }) => {
+              try{ // TODO: distinct
+                return [];
+              }catch(error){
+                return [];
+              };
+            },
+          },
         }}
         endpoint={'/lists'}
         isExpandable={true}
