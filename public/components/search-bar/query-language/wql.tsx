@@ -1007,5 +1007,14 @@ export const WQL = {
       output
     };
   },
-  transformUQLToQL: transformUQLToQL,
+  transformInput: (unifiedQuery: string, {parameters}) => {
+    const input = unifiedQuery && parameters?.options?.implicitQuery
+      ? unifiedQuery.replace(
+        new RegExp(`^${parameters.options.implicitQuery.query}${parameters.options.implicitQuery.conjunction}`),
+        ''
+      )
+      : unifiedQuery;
+
+    return transformUQLToQL(input);
+  },
 };
