@@ -243,47 +243,45 @@ export class InventoryPolicyChecksTable extends Component<Props, State> {
     const scaPolicyID = this.props?.lookingPolicy?.policy_id;
 
     return (
-      <>
-        <TableWzAPI
-          title="Checks"
-          endpoint={`/sca/${this.props.agent.id}/checks/${scaPolicyID}`}
-          tableColumns={this.columnsChecks}
-          tableInitialSortingField="id"
-          tablePageSizeOptions={[10, 25, 50, 100]}
-          rowProps={getChecksRowProps}
-          tableProps={{
-            isExpandable: true,
-            itemIdToExpandedRowMap: this.state.itemIdToExpandedRowMap,
-            itemId: 'id',
-          }}
-          downloadCsv
-          showReload
-          filters={filters}
-          searchTable
-          searchBarWQL={{
-            options: searchBarWQLOptions,
-            suggestions: {
-              field(currentValue) {
-                return searchBarWQLFieldSuggestions;
-              },
-              value: async (currentValue, { field }) => {
-                try{
-                  return await getFilterValues(
-                    field,
-                    currentValue,
-                    agentID,
-                    scaPolicyID,
-                    {},
-                    (item) => ({label: item})
-                  );
-                }catch(error){
-                  return [];
-                };
-              },
+      <TableWzAPI
+        title="Checks"
+        endpoint={`/sca/${this.props.agent.id}/checks/${scaPolicyID}`}
+        tableColumns={this.columnsChecks}
+        tableInitialSortingField="id"
+        tablePageSizeOptions={[10, 25, 50, 100]}
+        rowProps={getChecksRowProps}
+        tableProps={{
+          isExpandable: true,
+          itemIdToExpandedRowMap: this.state.itemIdToExpandedRowMap,
+          itemId: 'id',
+        }}
+        downloadCsv
+        showReload
+        filters={filters}
+        searchTable
+        searchBarWQL={{
+          options: searchBarWQLOptions,
+          suggestions: {
+            field(currentValue) {
+              return searchBarWQLFieldSuggestions;
             },
-          }}
-        />
-      </>
+            value: async (currentValue, { field }) => {
+              try{
+                return await getFilterValues(
+                  field,
+                  currentValue,
+                  agentID,
+                  scaPolicyID,
+                  {},
+                  (item) => ({label: item})
+                );
+              }catch(error){
+                return [];
+              };
+            },
+          },
+        }}
+      />
     );
   }
 }

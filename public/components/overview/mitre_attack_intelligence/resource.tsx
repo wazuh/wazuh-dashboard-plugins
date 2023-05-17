@@ -78,7 +78,6 @@ export const ModuleMitreAttackIntelligenceResource = ({
         title={label}
         tableColumns={tableColumns}
         tableInitialSortingField={initialSortingField}
-        searchBarPlaceholder={`Search in ${label}`}
         endpoint={apiEndpoint}
         tablePageSizeOptions={[10, 15, 25, 50, 100]}
         filters={resourceFilters}
