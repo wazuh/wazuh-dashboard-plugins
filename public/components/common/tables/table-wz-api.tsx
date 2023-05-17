@@ -19,6 +19,9 @@ import {
   EuiText,
   EuiButtonEmpty,
   EuiSpacer,
+  EuiToolTip,
+  EuiIcon,
+  EuiCheckboxGroup,
 } from '@elastic/eui';
 import { TableWithSearchBar } from './table-with-search-bar';
 import { TableDefault } from './table-default';
@@ -27,6 +30,7 @@ import { ExportTableCsv } from './components/export-table-csv';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
+import { useStateStorage } from '../hooks';
 
 /**
  * Search input custom filter button
@@ -68,6 +72,15 @@ export function TableWzAPI({
    * Changing the reloadFootprint timestamp will trigger reloading the table
    */
   const [reloadFootprint, setReloadFootprint] = useState(rest.reload || 0);
+
+  const [selectedFields, setSelectedFields] = useStateStorage(
+    rest.tableColumns.some(({show}) => show)
+      ? rest.tableColumns.filter(({show}) => show).map(({field}) => field)
+      : rest.tableColumns.map(({field}) => field),
+    rest?.saveStateStorage?.system,
+    rest?.saveStateStorage?.key ? `${rest?.saveStateStorage?.key}-visible-fields` : undefined
+  );
+  const [isOpenFieldSelector, setIsOpenFieldSelector] = useState(false);
 
   const onSearch = useCallback(async function (endpoint, filters, pagination, sorting) {
     try {
@@ -145,40 +158,81 @@ export function TableWzAPI({
   );
 
   const header = (
-    <EuiFlexGroup wrap>
-      <EuiFlexItem className="wz-flex-basis-auto" grow={false}>
-        {rest.title && (
-          <EuiTitle size="s">
-            <h1>
-              {rest.title}{' '}
-              {isLoading ? <EuiLoadingSpinner size="s" /> : <span>({totalItems})</span>}
-            </h1>
-          </EuiTitle>
-        )}
-        {rest.description && <EuiText color="subdued">{rest.description}</EuiText>}
-      </EuiFlexItem>
-      <EuiFlexItem>
-        <EuiFlexGroup wrap justifyContent={'flexEnd'} alignItems={'center'}>
-          {/* Render optional custom action button */}
-          {renderActionButtons}
-          {/* Render optional reload button */}
-          {rest.showReload && ReloadButton}
-          {/* Render optional export to CSV button */}
-          {rest.downloadCsv && (
-            <ExportTableCsv
-              endpoint={rest.endpoint}
-              totalItems={totalItems}
-              filters={getFilters(filters)}
-              title={typeof rest.downloadCsv === 'string' ? rest.downloadCsv : rest.title}
-            />
+    <>
+      <EuiFlexGroup wrap>
+        <EuiFlexItem className="wz-flex-basis-auto" grow={false}>
+          {rest.title && (
+            <EuiTitle size="s">
+              <h1>
+                {rest.title}{' '}
+                {isLoading ? <EuiLoadingSpinner size="s" /> : <span>({totalItems})</span>}
+              </h1>
+            </EuiTitle>
           )}
+          {rest.description && <EuiText color="subdued">{rest.description}</EuiText>}
+        </EuiFlexItem>
+        <EuiFlexItem>
+          <EuiFlexGroup wrap justifyContent={'flexEnd'} alignItems={'center'}>
+            {/* Render optional custom action button */}
+            {renderActionButtons}
+            {/* Render optional reload button */}
+            {rest.showReload && ReloadButton}
+            {/* Render optional export to CSV button */}
+            {rest.downloadCsv && (
+              <ExportTableCsv
+                endpoint={rest.endpoint}
+                totalItems={totalItems}
+                filters={getFilters(filters)}
+                title={typeof rest.downloadCsv === 'string' ? rest.downloadCsv : rest.title}
+              />
+            )}
+            {rest.showFieldSelector && (
+              <EuiFlexItem grow={false}>
+                <EuiToolTip content="Select visible fields" position="left">
+                  <EuiButtonEmpty onClick={() => setIsOpenFieldSelector(state => !state)}>
+                    <EuiIcon type="managementApp" color="primary" />
+                  </EuiButtonEmpty>
+                </EuiToolTip>
+              </EuiFlexItem>
+            )}
+          </EuiFlexGroup>
+        </EuiFlexItem>
+      </EuiFlexGroup>
+      {isOpenFieldSelector && (
+        <EuiFlexGroup>
+          <EuiFlexItem>
+            <EuiCheckboxGroup
+              options={rest.tableColumns.map(item => ({
+                id: item.field,
+                label: item.name,
+                checked: selectedFields.includes(item.field)
+              }))}
+              onChange={(optionID) => {
+                setSelectedFields(state => {
+                  if(state.includes(optionID)){
+                    if(state.length > 1){
+                      return state.filter(field => field !== optionID);
+                    }
+                    return state;
+                  };
+                  return [...state, optionID];
+                }
+                )
+              }}
+              className="columnsSelectedCheckboxs"
+              idToSelectedMap={{}}
+            />
+          </EuiFlexItem>
         </EuiFlexGroup>
-      </EuiFlexItem>
-    </EuiFlexGroup>
+      )}
+    </>
   );
 
+  const tableColumns = rest.tableColumns
+    .filter(({field}) => selectedFields.includes(field));
+
   const table = rest.searchTable ? (
-    <TableWithSearchBar onSearch={onSearch} {...{ ...rest, reload: reloadFootprint }} />
+    <TableWithSearchBar onSearch={onSearch} {...{ ...rest, reload: reloadFootprint }} tableColumns={tableColumns} selectedFields={selectedFields}/>
   ) : (
     <TableDefault onSearch={onSearch} {...{ ...rest, reload: reloadFootprint }} />
   );

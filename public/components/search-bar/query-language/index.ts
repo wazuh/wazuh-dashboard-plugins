@@ -15,7 +15,7 @@ type SearchBarQueryLanguage = {
       query: string
     }
   }>;
-  transformUQLToQL: (unifiedQuery: string) => string;
+  transformInput: (unifiedQuery: string, options: {configuration: any, parameters: any}) => string;
 };
 
 // Register the query languages

@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { EuiBasicTable, EuiSpacer } from '@elastic/eui';
 import _ from 'lodash';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
@@ -50,6 +50,13 @@ export function TableWithSearchBar({
   const [refresh, setRefresh] = useState(Date.now());
 
   const isMounted = useRef(false);
+
+  const searchBarWQLOptions = useMemo(() => ({
+    searchTermFields: tableColumns
+      .filter(({field, searchable}) => searchable && rest.selectedFields.includes(field))
+      .map(({field, composeField}) => ([composeField || field].flat())),
+    ...(rest?.searchBarWQL?.options || {})
+  }), [rest?.searchBarWQL?.options, rest?.selectedFields]);
 
   function updateRefresh() {
     setPagination({ pageIndex: 0, pageSize: pagination.pageSize });
@@ -137,6 +144,14 @@ export function TableWithSearchBar({
       <SearchBar
         defaultMode='wql'
         {...searchBarProps}
+        modes={[
+          {
+            id: 'wql',
+            options: searchBarWQLOptions,
+            ...( rest?.searchBarWQL?.suggestions ? {suggestions: rest?.searchBarWQL?.suggestions} : {}),
+            ...( rest?.searchBarWQL?.validate ? {suggestions: rest?.searchBarWQL?.validate} : {})
+          }
+        ]}
         input={rest?.filters?.q || ''}
         onSearch={({apiQuery}) => {
           // Set the query, reset the page index and update the refresh
