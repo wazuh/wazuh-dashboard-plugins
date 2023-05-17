@@ -347,9 +347,20 @@ describe('Query language - WQL', () => {
   ${'(field=value,field2'}            | ${'(field=value or field2'}
   ${'(field=value,field2>'}           | ${'(field=value or field2>'}
   ${'(field=value,field2>value2'}     | ${'(field=value or field2>value2'}
-  ${'(field=value,field2>value2)'}     | ${'(field=value or field2>value2)'}
+  ${'(field=value,field2>value2)'}    | ${'(field=value or field2>value2)'}
+  ${'implicit=value;'}                | ${''}
+  ${'implicit=value;field'}           | ${'field'}
   `('Transform the external input UQL to QL - UQL $UQL => $WQL', async ({UQL, WQL: changedInput}) => {
-    expect(WQL.transformUQLToQL(UQL)).toEqual(changedInput);
+    expect(WQL.transformInput(UQL, {
+      parameters: {
+        options: {
+          implicitQuery: {
+            query: 'implicit=value',
+            conjunction: ';'
+          }
+        }
+      }
+    })).toEqual(changedInput);
   });
 
   /* The ! and ~ characters can't be part of a value that contains examples. The tests doesn't

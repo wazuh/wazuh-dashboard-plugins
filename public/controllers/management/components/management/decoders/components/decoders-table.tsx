@@ -93,14 +93,9 @@ const DecodersFlyoutTable = ({
     tableColumns={columns}
     tableInitialSortingField='filename'
     searchTable={true}
-    searchBarProps={{
-      modes: [
-        {
-          id: 'wql',
-          options: searchBarWQLOptions,
-          suggestions: searchBarSuggestions,
-        }
-      ]
+    searchBarWQL={{
+      options: searchBarWQLOptions,
+      suggestions: searchBarSuggestions,
     }}
     endpoint='/decoders'
     isExpandable={true}

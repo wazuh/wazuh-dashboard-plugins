@@ -126,7 +126,7 @@ type SearchBarQueryLanguage = {
       query: string
     }
   }>;
-  transformUQLToQL: (unifiedQuery: string) => string;
+  transformInput: (unifiedQuery: string, options: {configuration: any, parameters: any}) => string;
 };
 ```
 
@@ -145,7 +145,7 @@ where:
     - `language`: query language ID
     - `apiQuery`: API query.
     - `query`: current query in the specified language
-- `transformUQLToQL`: method that transforms the UQL (Unified Query Language) to the specific query
+- `transformInput`: method that transforms the UQL (Unified Query Language) to the specific query
   language. This is used when receives a external input in the Unified Query Language, the returned
   value is converted to the specific query language to set the new input text of the search bar
   component.
