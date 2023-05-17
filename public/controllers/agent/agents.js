@@ -11,7 +11,6 @@
  */
 import { FilterHandler } from '../../utils/filter-handler';
 import { TabNames } from '../../utils/tab-names';
-import * as FileSaver from '../../services/file-saver';
 import { visualizations } from '../../templates/agents/visualizations';
 
 import { ConfigurationHandler } from '../../utils/config-handler';
@@ -23,7 +22,6 @@ import { getToasts, getDataPlugin } from '../../kibana-services';
 import { ShareAgent } from '../../factories/share-agent';
 import { TabVisualizations } from '../../factories/tab-visualizations';
 import { formatUIDate } from '../../react-services/time-service';
-import { GroupHandler } from '../../react-services/group-handler';
 import store from '../../redux/store';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
 import { hasAgentSupportModule } from '../../react-services/wz-agents';
@@ -65,7 +63,6 @@ export class AgentsController {
     this.reportingService = reportingService;
     this.visFactoryService = visFactoryService;
     this.csvReq = csvReq;
-    this.groupHandler = GroupHandler;
     this.wazuhConfig = new WazuhConfig();
     this.genericReq = GenericRequest;
 
@@ -78,13 +75,12 @@ export class AgentsController {
     this.$scope.integrations = {};
     this.$scope.selectedItem = 0;
     this.targetLocation = null;
-    this.ignoredTabs = ['syscollector', 'welcome', 'configuration', 'stats'];
-
-    this.$scope.showNewFim = true;
-    this.$scope.showScaScan = false;
-
-    this.$scope.editGroup = false;
-    this.$scope.addingGroupToAgent = false;
+    this.ignoredTabs = [
+      'syscollector',
+      'welcome',
+      'configuration',
+      'stats'
+    ];
 
     this.$scope.expandArray = [
       false,
@@ -304,17 +300,6 @@ export class AgentsController {
     this.$scope.getIntegration = (list) =>
       this.configurationHandler.getIntegration(list, this.$scope);
 
-    this.$scope.switchScaScan = () => {
-      this.$scope.showScaScan = !this.$scope.showScaScan;
-      if (!this.$scope.showScaScan) {
-        this.$scope.$emit('changeTabView', {
-          tabView: this.$scope.tabView,
-          tab: this.$scope.tab,
-        });
-      }
-      this.$scope.$applyAsync();
-    };
-
     this.$scope.$on('$routeChangeStart', () => {
       return AppState.removeSessionStorageItem('configSubTab');
     });
@@ -419,7 +404,6 @@ export class AgentsController {
     }
 
     try {
-      this.$scope.showScaScan = false;
 
       if (tab === 'configuration') {
         this.$scope.switchConfigurationTab('welcome');
