@@ -82,14 +82,9 @@ export const ModuleMitreAttackIntelligenceResource = ({
         endpoint={apiEndpoint}
         tablePageSizeOptions={[10, 15, 25, 50, 100]}
         filters={resourceFilters}
-        searchBarProps={{
-          modes: [
-            {
-              id: 'wql',
-              options: searchBar.wql.options,
-              suggestions: searchBar.wql.suggestions,
-            }
-          ]
+        searchBarWQL={{
+          options: searchBar.wql.options,
+          suggestions: searchBar.wql.suggestions,
         }}
       />
       {details && (
@@ -99,6 +94,6 @@ export const ModuleMitreAttackIntelligenceResource = ({
           onSelectResource={setDetails}
         />
       )}
-    </> 
-  )
+    </>
+  );
 };

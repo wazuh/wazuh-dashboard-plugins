@@ -96,14 +96,9 @@ const RulesFlyoutTable = ({
       tableColumns={columns}
       tableInitialSortingField='id'
       searchTable={true}
-      searchBarProps={{
-        modes: [
-          {
-            id: 'wql',
-            options: searchBarWQLOptions,
-            suggestions: searchBarSuggestions,
-          }
-        ]
+      searchBarWQL={{
+        options: searchBarWQLOptions,
+        suggestions: searchBarSuggestions,
       }}
       endpoint='/rules'
       isExpandable={true}

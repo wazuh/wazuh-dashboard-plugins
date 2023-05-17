@@ -260,32 +260,27 @@ export class InventoryPolicyChecksTable extends Component<Props, State> {
           showReload
           filters={filters}
           searchTable
-          searchBarProps={{
-            modes: [
-              {
-                id: 'wql',
-                options: searchBarWQLOptions,
-                suggestions: {
-                  field(currentValue) {
-                    return searchBarWQLFieldSuggestions;
-                  },
-                  value: async (currentValue, { field }) => {
-                    try{
-                      return await getFilterValues(
-                        field,
-                        currentValue,
-                        agentID,
-                        scaPolicyID,
-                        {},
-                        (item) => ({label: item})
-                      );
-                    }catch(error){
-                      return [];
-                    };
-                  },
-                },
-              }
-            ]
+          searchBarWQL={{
+            options: searchBarWQLOptions,
+            suggestions: {
+              field(currentValue) {
+                return searchBarWQLFieldSuggestions;
+              },
+              value: async (currentValue, { field }) => {
+                try{
+                  return await getFilterValues(
+                    field,
+                    currentValue,
+                    agentID,
+                    scaPolicyID,
+                    {},
+                    (item) => ({label: item})
+                  );
+                }catch(error){
+                  return [];
+                };
+              },
+            },
           }}
         />
       </>
