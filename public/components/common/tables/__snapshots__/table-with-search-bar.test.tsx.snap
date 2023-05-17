@@ -5,23 +5,18 @@ exports[`Table With Search Bar component renders correctly to match the snapshot
   onSearch={[Function]}
   reload={[Function]}
   rowProps={[Function]}
-  searchBarProps={
+  searchBarSuggestions={Array []}
+  searchBarWQL={
     Object {
-      "modes": Array [
-        Object {
-          "id": "wql",
-          "options": Object {
-            "searchTermFields": Array [],
-          },
-          "suggestions": Object {
-            "field": [Function],
-            "value": [Function],
-          },
-        },
-      ],
+      "options": Object {
+        "searchTermFields": Array [],
+      },
+      "suggestions": Object {
+        "field": [Function],
+        "value": [Function],
+      },
     }
   }
-  searchBarSuggestions={Array []}
   tableColumns={
     Array [
       Object {
