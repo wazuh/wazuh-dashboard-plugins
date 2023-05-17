@@ -2,12 +2,12 @@ import { fireEvent, render } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import { renderHook, act } from '@testing-library/react-hooks';
 import React, { useState } from 'react';
-import { useForm } from './hooks';
-import { IFormFields, IInputForm } from './types';
+import { FormConfiguration, useForm } from './hooks';
+import { IInputForm } from './types';
 
 describe('[hook] useForm', () => {
   it(`[hook] useForm. Verify the initial state`, async () => {
-    const initialFields: IFormFields = {
+    const initialFields: FormConfiguration = {
       text1: {
         type: 'text',
         initialValue: '',
@@ -26,7 +26,7 @@ describe('[hook] useForm', () => {
   });
 
   it(`[hook] useForm. Verify the initial state. Multiple fields.`, async () => {
-    const initialFields: IFormFields = {
+    const initialFields: FormConfiguration = {
       text1: {
         type: 'text',
         initialValue: '',
@@ -59,7 +59,7 @@ describe('[hook] useForm', () => {
     const initialFieldValue = '';
     const fieldType = 'text';
 
-    const initialFields: IFormFields = {
+    const initialFields: FormConfiguration = {
       text1: {
         type: fieldType,
         initialValue: initialFieldValue,
@@ -139,7 +139,7 @@ describe('[hook] useForm', () => {
     const initialFieldValue = 'test';
     const fieldType = 'text';
 
-    const initialFields: IFormFields = {
+    const initialFields: FormConfiguration = {
       text1: {
         type: fieldType,
         initialValue: initialFieldValue,
@@ -177,14 +177,14 @@ describe('[hook] useForm', () => {
   });
 
   it('[hook] useForm. Verify the hook behavior when receives a custom field type', async () => {
-    const CustomComponent = (props: IInputForm) => {
+    const CustomComponent = (props: any) => {
       const { onChange, field, initialValue } = props;
       const [value, setValue] = useState(initialValue || '');
 
       const handleOnChange = (e: any) => {
         setValue(e.target.value);
         onChange(e);
-          };
+      };
 
           return (
             <>
@@ -194,7 +194,7 @@ describe('[hook] useForm', () => {
           );
       };
 
-      const formFields: IFormFields = {
+      const formFields: FormConfiguration = {
         customField: {
           type: 'custom',
           initialValue: 'default value',
@@ -203,7 +203,7 @@ describe('[hook] useForm', () => {
       };
 
     const { result } = renderHook(() => useForm(formFields));
-    const { container, getByRole } = render(CustomComponent(...result.current.fields.customField))
+    const { container, getByRole } = render(<CustomComponent {...result.current.fields.customField} />)
 
     expect(container).toBeInTheDocument();
     const input = getByRole('textbox');
