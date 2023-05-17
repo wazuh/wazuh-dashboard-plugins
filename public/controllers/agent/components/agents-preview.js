@@ -67,7 +67,7 @@ export const AgentsPreview = compose(
         loadingAgents: false,
         loadingSummary: false,
         showAgentsEvolutionVisualization: true,
-        agentTableFilters: [],
+        agentTableFilters: {},
         agentStatusSummary: { active: '-', disconnected: '-', total: '-', pending: '-', never_connected: '-' },
         agentConfiguration: {},
         agentsActiveCoverage: 0,
@@ -157,7 +157,7 @@ export const AgentsPreview = compose(
     }
 
     removeFilters() {
-      this._isMount && this.setState({ agentTableFilters: [] });
+      this._isMount && this.setState({ agentTableFilters: {} });
     }
 
     showAgent(agent) {
@@ -167,7 +167,7 @@ export const AgentsPreview = compose(
     filterAgentByStatus(status) {
       this._isMount &&
         this.setState({
-          agentTableFilters: [{ field: 'q', value: `status=${status}` }],
+          agentTableFilters: {q: `id!=000;status=${status}`},
         });
     }
     onRenderComplete(){
