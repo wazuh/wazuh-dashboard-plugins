@@ -749,7 +749,7 @@ export default class WzRuleInfo extends Component {
                           {this.state.currentRuleInfo?.filename &&
                             <TableWzAPI
                               tableColumns={this.columns}
-                              tableInitialSortingField={'id'}
+                              tableInitialSortingField='id'
                               endpoint={`/rules?filename=${this.state.currentRuleInfo.filename}`}
                               tableProps={{ rowProps: this.onClickRow, loading: this.state.isLoading }}
                               tablePageSizeOptions={[10, 25]}

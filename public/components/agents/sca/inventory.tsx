@@ -61,7 +61,7 @@ type InventoryState = {
   loading: boolean;
   checksIsLoading: boolean;
   redirect: boolean;
-  filters: string;
+  filters: object;
   pageTableChecks: { pageIndex: number; pageSize?: number };
   policies: object[];
   checks: object[];
