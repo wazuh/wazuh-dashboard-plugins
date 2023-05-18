@@ -7,7 +7,7 @@ import { InputFormSwitch } from './input_switch';
 import { InputFormFilePicker } from './input_filepicker';
 import { InputFormTextArea } from './input_text_area';
 import { EuiFlexGroup, EuiFlexItem, EuiFormRow } from '@elastic/eui';
-import OsCard from '../../../controllers/register-agent/components/os-card';
+import { OsCard } from '../../../controllers/register-agent/components/os-card';
 
 interface InputFormProps {
   type: string;

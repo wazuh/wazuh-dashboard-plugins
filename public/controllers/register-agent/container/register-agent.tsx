@@ -1,8 +1,8 @@
 import React, { ChangeEvent } from 'react';
 import { InputForm } from '../../../components/common/form';
-import './os-card-container.scss';
+import './register-agent.scss';
 
-const Container = () => {
+export const RegisterAgent = () => {
   const handleChange = (event: ChangeEvent<any>) => {
     // ver
   };
@@ -19,5 +19,3 @@ const Container = () => {
     </div>
   );
 };
-
-export default Container;
