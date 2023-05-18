@@ -19,7 +19,6 @@ import { AgentStatus } from '../../../../components/agents/agent_status';
 import { TableWzAPI } from '../../../../components/common/tables';
 
 const searchBarWQLOptions = {
-  searchTermFields: [],
   implicitQuery: {
     query: 'id!=000',
     conjunction: ';'
@@ -38,34 +37,41 @@ export class AgentSelectionTable extends Component {
         field: 'id',
         name: 'ID',
         width: '60px',
+        searchable: true,
         sortable: true,
       },
       {
         field: 'name',
         name: 'Name',
+        searchable: true,
         sortable: true
       },
       {
         field: 'group',
         name: 'Group',
         sortable: true,
+        searchable: true,
         render: groups => this.renderGroups(groups)
       },
       {
         field: 'version',
         name: 'Version',
         width: '80px',
+        searchable: true,
         sortable: true,
       },
       {
         field: 'os.name,os.version',
+        composeField: ['os.name', 'os.version'],
         name: 'Operating system',
         sortable: true,
+        searchable: true,
         render: (field, agentData) => this.addIconPlatformRender(agentData)
       },
       {
         field: 'status',
         name: 'Status',
+        searchable: true,
         sortable: true,
         width: 'auto',
         render: status => <AgentStatus status={status} style={{ whiteSpace: 'no-wrap' }}/>,
@@ -206,41 +212,36 @@ export class AgentSelectionTable extends Component {
           rowProps={getRowProps}
           filters={this.state.filters}
           searchTable
-          searchBarProps={{
-            modes: [
-              {
-                id: 'wql',
-                options: searchBarWQLOptions,
-                suggestions: {
-                  field(currentValue) {
-                    return [
-                      {label: 'id', description: 'filter by id'},
-                      {label: 'group', description: 'filter by group'},
-                      {label: 'os.name', description: 'filter by operating system name'},
-                      {label: 'os.version', description: 'filter by operating system version'},
-                      {label: 'status', description: 'filter by status'},
-                      {label: 'name', description: 'filter by name'},
-                      {label: 'version', description: 'filter by version'},
-                    ];
-                  },
-                  value: async (currentValue, { field }) => {
-                    try{
-                      switch (field) {
-                        case 'status':
-                          return UI_ORDER_AGENT_STATUS.map(status => ({label: status}))
-                          break;
-                        default:
-                          return (await getAgentFilterValues(field, currentValue, { q: 'id!=000'}))
-                            .map(status => ({label: status}));
-                          break;
-                      }
-                    }catch(error){
-                      return [];
-                    };
-                  },
-                },
-              }
-            ]
+          searchBarWQL={{
+            options: searchBarWQLOptions,
+            suggestions: {
+              field(currentValue) {
+                return [
+                  {label: 'id', description: 'filter by id'},
+                  {label: 'group', description: 'filter by group'},
+                  {label: 'name', description: 'filter by name'},
+                  {label: 'os.name', description: 'filter by operating system name'},
+                  {label: 'os.version', description: 'filter by operating system version'},
+                  {label: 'status', description: 'filter by status'},
+                  {label: 'version', description: 'filter by version'},
+                ];
+              },
+              value: async (currentValue, { field }) => {
+                try{
+                  switch (field) {
+                    case 'status':
+                      return UI_ORDER_AGENT_STATUS.map(status => ({label: status}))
+                      break;
+                    default:
+                      return (await getAgentFilterValues(field, currentValue, { q: 'id!=000'}))
+                        .map(status => ({label: status}));
+                      break;
+                  }
+                }catch(error){
+                  return [];
+                };
+              },
+            }
           }}
         />
       </div>
