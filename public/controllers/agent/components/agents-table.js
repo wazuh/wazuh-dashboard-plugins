@@ -338,12 +338,12 @@ export const AgentsTable = withErrorBoundary(
                       {label: 'group_config_status', description: 'filter by synced'},
                       {label: 'lastKeepAlive', description: 'filter by last keep alive'},
                       {label: 'manager', description: 'filter by manager'},
+                      {label: 'name', description: 'filter by name'},
                       {label: 'node_name', description: 'filter by cluster name'},
                       {label: 'os.name', description: 'filter by operating system name'},
                       {label: 'os.platform', description: 'filter by operating platform'},
                       {label: 'os.version', description: 'filter by operating system version'},
                       {label: 'status', description: 'filter by status'},
-                      {label: 'name', description: 'filter by name'},
                       {label: 'version', description: 'filter by version'},
                     ];
                   },
