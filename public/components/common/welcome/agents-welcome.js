@@ -260,6 +260,8 @@ class AgentsWelcome extends Component {
 
   renderTitle() {
 
+      const notNeedStatus = true;
+
     return (
       <EuiFlexGroup>
         <EuiFlexItem className="wz-module-header-agent-title">
@@ -321,7 +323,7 @@ class AgentsWelcome extends Component {
               <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
                 <EuiButtonEmpty
                   iconType="inspect"
-                  onClick={() => this.props.switchTab('syscollector')}>
+                  onClick={() => this.props.switchTab('syscollector', notNeedStatus)}>
                   Inventory data
                 </EuiButtonEmpty>
               </EuiFlexItem>
@@ -335,7 +337,7 @@ class AgentsWelcome extends Component {
               <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
                 <EuiButtonEmpty
                   iconType="gear"
-                  onClick={() => this.props.switchTab('configuration')}>
+                  onClick={() => this.props.switchTab('configuration', notNeedStatus)}>
                   Configuration
                 </EuiButtonEmpty>
               </EuiFlexItem>
