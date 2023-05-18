@@ -175,6 +175,7 @@ export const AgentsTable = withErrorBoundary(
       },
       {
         field: 'os.name,os.version',
+        composeField: ['os.name', 'os.version'],
         name: 'Operating system',
         sortable: true,
         show: true,
