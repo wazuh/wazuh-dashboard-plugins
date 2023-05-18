@@ -54,7 +54,8 @@ export function TableWithSearchBar({
   const searchBarWQLOptions = useMemo(() => ({
     searchTermFields: tableColumns
       .filter(({field, searchable}) => searchable && rest.selectedFields.includes(field))
-      .map(({field, composeField}) => ([composeField || field].flat())),
+      .map(({field, composeField}) => ([composeField || field].flat()))
+      .flat(),
     ...(rest?.searchBarWQL?.options || {})
   }), [rest?.searchBarWQL?.options, rest?.selectedFields]);
 
