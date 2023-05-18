@@ -392,7 +392,7 @@ export const AgentsTable = withErrorBoundary(
       this.setState({
         filters: {
           default: {q: 'id!=000'},
-          q: `group=${group}`,
+          q: `id!=000;group=${group}`,
         }
       });
     };
