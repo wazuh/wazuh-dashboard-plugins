@@ -130,27 +130,22 @@ export function SyscollectorInventory({ agent }) {
               downloadCsv
               showReload
               tablePageSizeOptions={[10, 25, 50, 100]}
-              searchBarProps={{
-                modes: [
-                  {
-                    id: 'wql',
-                    options: searchBarWQLOptions.netiface,
-                    suggestions: {
-                      field(currentValue) {
-                        return netifaceColumns
-                          .map((item) => ({label: item.field, description: `filter by ${item.name}`}))
-                          .sort(sortFieldSuggestion);
-                      },
-                      value: async (currentValue, { field }) => {
-                        try{ // TODO: distinct
-                          return [];
-                        }catch(error){
-                          return [];
-                        };
-                      },
-                    },
-                  }
-                ]
+              searchBarWQL={{
+                options: searchBarWQLOptions.netiface,
+                suggestions: {
+                  field(currentValue) {
+                    return netifaceColumns
+                      .map((item) => ({label: item.field, description: `filter by ${item.name}`}))
+                      .sort(sortFieldSuggestion);
+                  },
+                  value: async (currentValue, { field }) => {
+                    try{ // TODO: distinct
+                      return [];
+                    }catch(error){
+                      return [];
+                    };
+                  },
+                },
               }}
             />
           </EuiPanel>
@@ -166,27 +161,22 @@ export function SyscollectorInventory({ agent }) {
               downloadCsv
               showReload
               tablePageSizeOptions={[10, 25, 50, 100]}
-              searchBarProps={{
-                modes: [
-                  {
-                    id: 'wql',
-                    options: searchBarWQLOptions.ports,
-                    suggestions: {
-                      field(currentValue) {
-                        return portsColumns[soPlatform]
-                          .map((item) => ({label: item.field, description: `filter by ${item.name}`}))
-                          .sort(sortFieldSuggestion);
-                      },
-                      value: async (currentValue, { field }) => {
-                        try{ // TODO: distinct
-                          return [];
-                        }catch(error){
-                          return [];
-                        };
-                      },
-                    },
-                  }
-                ]
+              searchBarWQL={{
+                options: searchBarWQLOptions.ports,
+                suggestions: {
+                  field(currentValue) {
+                    return portsColumns[soPlatform]
+                      .map((item) => ({label: item.field, description: `filter by ${item.name}`}))
+                      .sort(sortFieldSuggestion);
+                  },
+                  value: async (currentValue, { field }) => {
+                    try{ // TODO: distinct
+                      return [];
+                    }catch(error){
+                      return [];
+                    };
+                  },
+                },
               }}
             />
           </EuiPanel>
@@ -205,27 +195,22 @@ export function SyscollectorInventory({ agent }) {
               downloadCsv
               showReload
               tablePageSizeOptions={[10, 25, 50, 100]}
-              searchBarProps={{
-                modes: [
-                  {
-                    id: 'wql',
-                    options: searchBarWQLOptions.netaddr,
-                    suggestions: {
-                      field(currentValue) {
-                        return netaddrColumns
-                          .map((item) => ({label: item.field, description: `filter by ${item.name}`}))
-                          .sort(sortFieldSuggestion);
-                      },
-                      value: async (currentValue, { field }) => {
-                        try{ // TODO: distinct
-                          return [];
-                        }catch(error){
-                          return [];
-                        };
-                      },
-                    },
-                  }
-                ]
+              searchBarWQL={{
+                options: searchBarWQLOptions.netaddr,
+                suggestions: {
+                  field(currentValue) {
+                    return netaddrColumns
+                      .map((item) => ({label: item.field, description: `filter by ${item.name}`}))
+                      .sort(sortFieldSuggestion);
+                  },
+                  value: async (currentValue, { field }) => {
+                    try{ // TODO: distinct
+                      return [];
+                    }catch(error){
+                      return [];
+                    };
+                  },
+                },
               }}
             />
           </EuiPanel>
@@ -242,27 +227,22 @@ export function SyscollectorInventory({ agent }) {
                 downloadCsv
                 showReload
                 tablePageSizeOptions={[10, 25, 50, 100]}
-                searchBarProps={{
-                  modes: [
-                    {
-                      id: 'wql',
-                      options: searchBarWQLOptions.windowsUpdates,
-                      suggestions: {
-                        field(currentValue) {
-                          return netifaceColumns
-                            .map((item) => ({label: item.field, description: `filter by ${item.name}`}))
-                            .sort(sortFieldSuggestion);
-                        },
-                        value: async (currentValue, { field }) => {
-                          try{ // TODO: distinct
-                            return [];
-                          }catch(error){
-                            return [];
-                          };
-                        },
-                      },
-                    }
-                  ]
+                searchBarWQL={{
+                  options: searchBarWQLOptions.windowsUpdates,
+                  suggestions: {
+                    field(currentValue) {
+                      return windowsUpdatesColumns
+                        .map((item) => ({label: item.field, description: `filter by ${item.name}`}))
+                        .sort(sortFieldSuggestion);
+                    },
+                    value: async (currentValue, { field }) => {
+                      try{ // TODO: distinct
+                        return [];
+                      }catch(error){
+                        return [];
+                      };
+                    },
+                  },
                 }}
               />
             </EuiPanel>
@@ -282,27 +262,23 @@ export function SyscollectorInventory({ agent }) {
               downloadCsv
               showReload
               tablePageSizeOptions={[10, 25, 50, 100]}
-              searchBarProps={{
-                modes: [
-                  {
-                    id: 'wql',
-                    options: searchBarWQLOptions.packages,
-                    suggestions: {
-                      field(currentValue) {
-                        return netifaceColumns
-                          .map((item) => ({label: item.field, description: `filter by ${item.name}`}))
-                          .sort(sortFieldSuggestion);
-                      },
-                      value: async (currentValue, { field }) => {
-                        try{ // TODO: distinct
-                          return [];
-                        }catch(error){
-                          return [];
-                        };
-                      },
-                    },
-                  }
-                ]
+              searchBarWQL={{
+                options: searchBarWQLOptions.packages,
+                suggestions: {
+                  field(currentValue) {
+                    return packagesColumns[soPlatform]
+                      .map((item) => ({label: item.field, description: `filter by ${item.name}`}))
+                      .sort(sortFieldSuggestion);
+                  },
+                  value: async (currentValue, { field }) => {
+                    try{ // TODO: distinct
+                      return [];
+                    }catch(error){
+                      return [];
+                    };
+                  },
+                },
+
               }}
             />
           </EuiPanel>
@@ -321,27 +297,22 @@ export function SyscollectorInventory({ agent }) {
               downloadCsv
               showReload
               tablePageSizeOptions={[10, 25, 50, 100]}
-              searchBarProps={{
-                modes: [
-                  {
-                    id: 'wql',
-                    options: searchBarWQLOptions.process,
-                    suggestions: {
-                      field(currentValue) {
-                        return netifaceColumns
-                          .map((item) => ({label: item.field, description: `filter by ${item.name}`}))
-                          .sort(sortFieldSuggestion);
-                      },
-                      value: async (currentValue, { field }) => {
-                        try{ // TODO: distinct
-                          return [];
-                        }catch(error){
-                          return [];
-                        };
-                      },
-                    },
-                  }
-                ]
+              searchBarWQL={{
+                options: searchBarWQLOptions.process,
+                suggestions: {
+                  field(currentValue) {
+                    return processColumns[soPlatform]
+                      .map((item) => ({label: item.field, description: `filter by ${item.name}`}))
+                      .sort(sortFieldSuggestion);
+                  },
+                  value: async (currentValue, { field }) => {
+                    try{ // TODO: distinct
+                      return [];
+                    }catch(error){
+                      return [];
+                    };
+                  },
+                },
               }}
             />
           </EuiPanel>
