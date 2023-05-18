@@ -223,7 +223,7 @@ export class AgentSelectionTable extends Component {
     const filter = {
       ...filtersToObject(filters),
       offset: (pageIndex * itemsPerPage) || 0,
-      limit: pageIndex * itemsPerPage + itemsPerPage,
+      limit: itemsPerPage,
       ...this.buildSortFilter()
     };
     filter.q = !filter.q ? `id!=000` : `id!=000;${filter.q}`;
