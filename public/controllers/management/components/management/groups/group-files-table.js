@@ -35,9 +35,6 @@ class WzGroupFilesTable extends Component {
 
     this.searchBar = {
       wql: {
-        options: {
-          searchTermFields: ['filename', 'hash']
-        },
         suggestionsFields: [
           {label: 'filename', description: 'filter by filename'},
           {label: 'hash', description: 'filter by hash'}
@@ -60,24 +57,18 @@ class WzGroupFilesTable extends Component {
         tableColumns={columns}
         tableInitialSortingField='filename'
         endpoint={`/groups/${groupName}/files`}
-        searchBarProps={{
-          modes: [
-            {
-              id: 'wql',
-              options: searchBarWQL.options,
-              suggestions: {
-                field: () => searchBarWQL.suggestionsFields,
-                value: async (currentValue, { field }) => {
-                  return [];
-                  try{ // TODO: distinct
-                    return [];
-                  }catch(error){
-                    return [];
-                  };
-                } 
-              },
-            }
-          ]
+        searchBarWQL={{
+          suggestions: {
+            field: () => searchBarWQL.suggestionsFields,
+            value: async (currentValue, { field }) => {
+              return [];
+              try{ // TODO: distinct
+                return [];
+              }catch(error){
+                return [];
+              };
+            } 
+          },
         }}
         showReload
         downloadCsv={`files-group-${groupName}`}

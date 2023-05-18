@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import { EuiCallOut } from '@elastic/eui';
+import { EuiCallOut, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 
 import { connect } from 'react-redux';
 import GroupsHandler from './utils/groups-handler';
@@ -35,6 +35,8 @@ import { WzButtonPermissionsModalConfirm } from '../../../../../components/commo
 import { UI_LOGGER_LEVELS, UI_ORDER_AGENT_STATUS } from '../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
+import { AgentStatus } from '../../../../../components/agents/agent_status';
+import { compressIPv6 } from '../../../../../services/ipv6-services';
 
 
 class WzGroupAgentsTable extends Component {
@@ -47,47 +49,50 @@ class WzGroupAgentsTable extends Component {
         field: 'id',
         name: 'Id',
         align: 'left',
+        searchable: true,
         sortable: true,
       },
       {
         field: 'name',
         name: 'Name',
         align: 'left',
+        searchable: true,
         sortable: true,
       },
       {
         field: 'ip',
         name: 'IP address',
         align: 'left',
+        searchable: true,
+        sortable: true,
+      },
+      {
+        field: 'os.name,os.version',
+        name: 'Operating system',
+        align: 'left',
+        searchable: true,
+        sortable: true,
+        render: (field, agentData) => this.addIconPlatformRender(agentData),
+      },
+      {
+        field: 'version',
+        name: 'Version',
+        align: 'left',
+        searchable: true,
         sortable: true,
       },
       {
         field: 'status',
         name: 'Status',
         align: 'left',
+        searchable: true,
         sortable: true,
-      },
-      {
-        field: 'os.name',
-        name: 'Operating system name',
-        align: 'left',
-        sortable: true,
-      },
-      {
-        field: 'os.version',
-        name: 'Operating system version',
-        align: 'left',
-        sortable: true,
-      },
-      {
-        field: 'version',
-        name: 'Version',
-        align: 'left',
-        sortable: true,
+        render: (status) => <AgentStatus status={status} labelProps={{ className: 'hide-agent-status' }} />,
       },
       {
         name: 'Actions',
         align: 'left',
+        searchable: false,
         render: (item) => {
           return (
             <div>
@@ -156,11 +161,34 @@ class WzGroupAgentsTable extends Component {
       }
     };
 
-    this.searchBar.wql.options = this.searchBar.wql.suggestionFields.map(({label}) => label);
   }
 
   componentWillUnmount() {
     this._isMounted = false;
+  }
+
+  addIconPlatformRender(agent) {
+    let icon = '';
+    const os = agent?.os || {};
+
+    if ((os?.uname || '').includes('Linux')) {
+      icon = 'linux';
+    } else if (os?.platform === 'windows') {
+      icon = 'windows';
+    } else if (os?.platform === 'darwin') {
+      icon = 'apple';
+    }
+    const os_name = `${agent?.os?.name || ''} ${agent?.os?.version || ''}`;
+
+    return (
+      <EuiFlexGroup gutterSize="xs">
+        <EuiFlexItem grow={false} ><i
+          className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`}
+          aria-hidden="true"
+        ></i></EuiFlexItem>{' '}
+        <EuiFlexItem>{os_name.trim() || '-'}</EuiFlexItem>
+      </EuiFlexGroup>
+    );
   }
 
   render() {
@@ -175,26 +203,31 @@ class WzGroupAgentsTable extends Component {
           tableColumns={this.columns}
           tableInitialSortingField="id"
           endpoint={`/groups/${groupName}/agents`}
-          searchBarProps={{
-            modes: [
-              {
-                id: 'wql',
-                options: this.searchBar.wql.options,
-                suggestions: {
-                  field: () => searchBarSuggestionsFields,
-                  value: async (currentValue, { field }) => {
-                    try{ // TODO: distinct
-                      return await getAgentFilterValues(field, currentValue, {
-                        q: `group=${groupName}`,
-                      });
-                    }catch(error){
-                      return [];
-                    };
-                  }
-                },
+          searchBarWQL={{
+            suggestions: {
+              field: () => searchBarSuggestionsFields,
+              value: async (currentValue, { field }) => {
+                try{ // TODO: distinct
+                  return await getAgentFilterValues(field, currentValue, {
+                    q: `group=${groupName}`,
+                  });
+                }catch(error){
+                  return [];
+                };
               }
-            ]
+            },
           }}
+          mapResponseItem={(item) => ({
+            ...item,
+            ...(item.ip
+              ? {ip: compressIPv6(item.ip)}
+              : {ip: '-'}
+            ),
+            ...(typeof item.version === 'string'
+              ? {version: item.version.match(/(v\d.+)/)?.[1]}
+              : {version: '-'}
+            )
+          })}
           showReload
           downloadCsv={`agents-group-${groupName}`}
           reload={this.props.state.reload}

@@ -43,22 +43,26 @@ export class WzGroupsOverview extends Component {
         field: 'name',
         name: 'Name',
         align: 'left',
+        searchable: true,
         sortable: true
       },
       {
         field: 'count',
         name: 'Agents',
         align: 'left',
+        searchable: true,
         sortable: true
       },
       {
         field: 'configSum',
         name: 'Configuration checksum',
-        align: 'left'
+        align: 'left',
+        searchable: true,
       },
       {
         name: 'Actions',
         align: 'left',
+        searchable: false,
         render: item => {
           return (
             <div>
@@ -238,23 +242,15 @@ export class WzGroupsOverview extends Component {
             tableColumns={this.tableColumns}
             tableInitialSortingField='name'
             searchTable={true}
-            searchBarProps={{
-              modes: [
-                {
-                  id: 'wql',
-                  options: {
-                    searchTermFields: []
-                  },
-                  suggestions: {
-                    field: () => [
-                      {label: 'name', description: 'filter by name'},
-                      {label: 'count', description: 'filter by count'},
-                      {label: 'configSum', description: 'filter by configuration checksum'}
-                    ],
-                    value: () => [] // TODO:
-                  },
-                }
-              ]
+            searchBarWQL={{
+              suggestions: {
+                field: () => [
+                  {label: 'name', description: 'filter by name'},
+                  {label: 'count', description: 'filter by count'},
+                  {label: 'configSum', description: 'filter by configuration checksum'}
+                ],
+                value: () => [] // TODO:
+              },
             }}
             rowProps={getRowProps}
             endpoint={'/groups'}
