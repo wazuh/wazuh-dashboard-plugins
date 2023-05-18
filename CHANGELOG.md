@@ -36,6 +36,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed the GitHub and Office 365 modules appear in the main menu when they were not configured [#5376](https://github.com/wazuh/wazuh-kibana-app/pull/5376)
 - Fixed TypeError in FIM Inventory using new error handler [#5364](https://github.com/wazuh/wazuh-kibana-app/pull/5364)
 - Fixed error when using invalid group configuration [#5423](https://github.com/wazuh/wazuh-kibana-app/pull/5423)
+- Fixed making unnecessary requests in inventory data and configurations of an agent. [#5460](https://github.com/wazuh/wazuh-kibana-app/pull/5460)
 
 ## Wazuh v4.4.1 - OpenSearch Dashboards 2.6.0 - Revision 01
 
