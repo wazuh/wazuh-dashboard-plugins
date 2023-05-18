@@ -25,7 +25,7 @@ export const OsCard = () => {
         {REGISTER_AGENT_DATA.map((data, index) => (
           <EuiFlexItem key={index}>
             <EuiCard
-              icon={<EuiIcon size='xl' type='logoLogging' />}
+              icon={<img src={data.icon} alt='Icon' />}
               title='Bordered'
               display='plain'
               hasBorder
