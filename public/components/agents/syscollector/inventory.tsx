@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { Fragment, useMemo } from 'react';
+import React from 'react';
 import {
   EuiEmptyPrompt,
   EuiButton,
@@ -43,7 +43,7 @@ export function SyscollectorInventory({ agent }) {
         style={{ marginTop: 20 }}
         title={<h2>Agent has never connected.</h2>}
         body={
-          <Fragment>
+          <>
             <p>
               The agent has been registered but has not yet connected to the
               manager.
@@ -58,7 +58,7 @@ export function SyscollectorInventory({ agent }) {
             >
               Checking connection with the Wazuh server
             </EuiLink>
-          </Fragment>
+          </>
         }
         actions={
           <EuiButton href='#/agents-preview?' color='primary' fill>
@@ -81,27 +81,6 @@ export function SyscollectorInventory({ agent }) {
   } else if (((agent.os || {}).uname.toLowerCase() || '').includes('sunos')) {
     soPlatform = 'solaris';
   }
-
-  const searchBarWQLOptions = useMemo(() => ({
-    netiface: {
-      searchTermFields: netifaceColumns.map(({field}) => field)
-    },
-    ports: {
-      searchTermFields: portsColumns[soPlatform].map(({field}) => field)
-    },
-    netaddr: {
-      searchTermFields: netaddrColumns.map(({field}) => field)
-    },
-    windowsUpdates: {
-      searchTermFields: windowsUpdatesColumns.map(({field}) => field)
-    },
-    packages: {
-      searchTermFields: packagesColumns[soPlatform].map(({field}) => field)
-    },
-    process: {
-      searchTermFields: processColumns[soPlatform].map(({field}) => field)
-    },
-  }), [soPlatform]);
 
   return (
     <div style={{ overflow: 'hidden' }}>
@@ -131,7 +110,6 @@ export function SyscollectorInventory({ agent }) {
               showReload
               tablePageSizeOptions={[10, 25, 50, 100]}
               searchBarWQL={{
-                options: searchBarWQLOptions.netiface,
                 suggestions: {
                   field(currentValue) {
                     return netifaceColumns
@@ -162,7 +140,6 @@ export function SyscollectorInventory({ agent }) {
               showReload
               tablePageSizeOptions={[10, 25, 50, 100]}
               searchBarWQL={{
-                options: searchBarWQLOptions.ports,
                 suggestions: {
                   field(currentValue) {
                     return portsColumns[soPlatform]
@@ -196,7 +173,6 @@ export function SyscollectorInventory({ agent }) {
               showReload
               tablePageSizeOptions={[10, 25, 50, 100]}
               searchBarWQL={{
-                options: searchBarWQLOptions.netaddr,
                 suggestions: {
                   field(currentValue) {
                     return netaddrColumns
@@ -228,7 +204,6 @@ export function SyscollectorInventory({ agent }) {
                 showReload
                 tablePageSizeOptions={[10, 25, 50, 100]}
                 searchBarWQL={{
-                  options: searchBarWQLOptions.windowsUpdates,
                   suggestions: {
                     field(currentValue) {
                       return windowsUpdatesColumns
@@ -263,7 +238,6 @@ export function SyscollectorInventory({ agent }) {
               showReload
               tablePageSizeOptions={[10, 25, 50, 100]}
               searchBarWQL={{
-                options: searchBarWQLOptions.packages,
                 suggestions: {
                   field(currentValue) {
                     return packagesColumns[soPlatform]
@@ -298,7 +272,6 @@ export function SyscollectorInventory({ agent }) {
               showReload
               tablePageSizeOptions={[10, 25, 50, 100]}
               searchBarWQL={{
-                options: searchBarWQLOptions.process,
                 suggestions: {
                   field(currentValue) {
                     return processColumns[soPlatform]
