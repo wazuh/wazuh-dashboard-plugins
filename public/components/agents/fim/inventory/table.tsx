@@ -22,12 +22,13 @@ import { formatUIDate } from '../../../../react-services/time-service';
 import { TableWzAPI } from '../../../common/tables';
 
 const searchBarWQLOptions = {
-  searchTermFields: ['file', 'uname', 'uid', 'gname', 'gid', 'size'],
   implicitQuery: {
     query: 'type=file',
     conjunction: ';'
   }
 };
+
+const searchBarWQLFilters = {default: {q: 'type=file'}};
 
 export class InventoryTable extends Component {
   state: {
@@ -113,6 +114,7 @@ export class InventoryTable extends Component {
         name: 'File',
         sortable: true,
         width: '250px',
+        searchable: true
       },
       {
         field: 'mtime',
@@ -129,6 +131,7 @@ export class InventoryTable extends Component {
         sortable: true,
         width: '100px',
         render: formatUIDate,
+        searchable: false
       },
       {
         field: 'uname',
@@ -136,6 +139,7 @@ export class InventoryTable extends Component {
         sortable: true,
         truncateText: true,
         width: `${width}`,
+        searchable: true
       },
       {
         field: 'uid',
@@ -143,6 +147,7 @@ export class InventoryTable extends Component {
         sortable: true,
         truncateText: true,
         width: `${width}`,
+        searchable: true
       },
       {
         field: 'gname',
@@ -150,6 +155,7 @@ export class InventoryTable extends Component {
         sortable: true,
         truncateText: true,
         width: `${width}`,
+        searchable: true
       },
       {
         field: 'gid',
@@ -157,12 +163,14 @@ export class InventoryTable extends Component {
         sortable: true,
         truncateText: true,
         width: `${width}`,
+        searchable: true
       },
       {
         field: 'size',
         name: 'Size',
         sortable: true,
         width: `${width}`,
+        searchable: true
       },
     ];
   }
@@ -185,33 +193,28 @@ export class InventoryTable extends Component {
             tableColumns={columns}
             tableInitialSortingField='file'
             endpoint={`/syscheck/${this.props.agent.id}`}
-            searchBarProps={{
-              modes: [
-                {
-                  id: 'wql',
-                  options: searchBarWQLOptions,
-                  suggestions: {
-                    field: (currentValue) => [
-                      {label: 'file', description: 'filter by file'},
-                      {label: 'gid', description: 'filter by gid'},
-                      {label: 'gname', description: 'filter by gname'},
-                      {label: 'size', description: 'filter by size'},
-                      {label: 'uname', description: 'filter by uname'},
-                      {label: 'uid', description: 'filter by uid'}
-                    ],
-                    value: async (currentValue, { field }) => {
-                      return [];
-                      try{ // TODO distinct:
-                        return [];
-                      }catch(error){
-                        return [];
-                      };
-                    }
-                  },
+            searchBarWQL={{
+              options: searchBarWQLOptions,
+              suggestions: {
+                field: (currentValue) => [
+                  {label: 'file', description: 'filter by file'},
+                  {label: 'gid', description: 'filter by gid'},
+                  {label: 'gname', description: 'filter by gname'},
+                  {label: 'size', description: 'filter by size'},
+                  {label: 'uname', description: 'filter by uname'},
+                  {label: 'uid', description: 'filter by uid'}
+                ],
+                value: async (currentValue, { field }) => {
+                  return [];
+                  try{ // TODO distinct:
+                    return [];
+                  }catch(error){
+                    return [];
+                  };
                 }
-              ]
+              },
             }}
-            filters={{default: {q: 'type=file'}}}
+            filters={searchBarWQLFilters}
             showReload
             downloadCsv={`fim-files-${this.props.agent.id}`}
             searchTable={true}

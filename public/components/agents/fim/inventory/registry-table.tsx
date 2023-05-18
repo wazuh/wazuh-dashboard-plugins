@@ -21,6 +21,15 @@ import { FlyoutDetail } from './flyout';
 import { formatUIDate } from '../../../../react-services/time-service';
 import { TableWzAPI } from '../../../common/tables';
 
+const searchBarWQLOptions = {
+  implicitQuery: {
+    query: 'type=registry_file',
+    conjunction: ';'
+  }
+};
+
+const searchBarWQLFilters = {default: {q: 'type=registry_file'}};
+
 export class RegistryTable extends Component {
   state: {
     syscheck: [];
@@ -96,6 +105,7 @@ export class RegistryTable extends Component {
         field: 'file',
         name: 'Registry',
         sortable: true,
+        searchable: true
       },
       {
         field: 'mtime',
@@ -112,6 +122,7 @@ export class RegistryTable extends Component {
         sortable: true,
         width: '200px',
         render: formatUIDate,
+        searchable: false
       },
     ];
   }
@@ -135,34 +146,23 @@ export class RegistryTable extends Component {
             tableColumns={columns}
             tableInitialSortingField='file'
             endpoint={`/syscheck/${this.props.agent.id}`}
-            searchBarProps={{
-              modes: [
-                {
-                  id: 'wql',
-                  options: {
-                    searchTermFields: ['file'],
-                    implicitQuery: {
-                      query: 'type=registry_file',
-                      conjunction: ';'
-                    }
-                  },
-                  suggestions: {
-                    field: () => [
-                      {label: 'file', description: 'filter by file'}
-                    ],
-                    value: async (currentValue, { field }) => {
-                      return [];
-                      try{ // TODO: distinct
-                        return [];
-                      }catch(error){
-                        return [];
-                      };
-                    }
-                  },
+            searchBarWQL={{
+              options: searchBarWQLOptions,
+              suggestions: {
+                field: () => [
+                  {label: 'file', description: 'filter by file'}
+                ],
+                value: async (currentValue, { field }) => {
+                  return [];
+                  try{ // TODO: distinct
+                    return [];
+                  }catch(error){
+                    return [];
+                  };
                 }
-              ]
+              },
             }}
-            filters={{default: {q: 'type=registry_file'}}}
+            filters={searchBarWQLFilters}
             showReload
             downloadCsv={`fim-registry-${this.props.agent.id}`}
             searchTable={true}
