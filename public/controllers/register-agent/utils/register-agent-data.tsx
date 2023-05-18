@@ -1,4 +1,4 @@
-import { RegisterAgentData } from '../components/switch';
+import { RegisterAgentData } from '../components/checkbox-group';
 export const REGISTER_AGENT_DATA: RegisterAgentData[] = [
   {
     icon: 'aa',
