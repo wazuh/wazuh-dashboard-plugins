@@ -367,6 +367,17 @@ export const AgentsTable = withErrorBoundary(
                     };
                   },
                 },
+                validate: {
+                  value: ({formattedValue, value: rawValue}, {field}) => {
+                    const value = formattedValue ?? rawValue;
+                    if(value){
+                      if(['dateAdd', 'lastKeepAlive'].includes(field)){
+                        return /^\d{4}-\d{2}-\d{2}([ T]\d{2}:\d{2}:\d{2}(.\d{1,6})?Z?)?$/
+                          .test(value) ? undefined : `"${value}" is not a expected format. Valid formats: YYYY-MM-DD, YYYY-MM-DD HH:mm:ss, YYYY-MM-DDTHH:mm:ss, YYYY-MM-DDTHH:mm:ssZ.`;
+                      };
+                    };
+                  }
+                }
               }}
               searchBarProps={{
                 buttonsRender: () => (
