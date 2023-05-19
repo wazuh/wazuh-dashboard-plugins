@@ -37,7 +37,17 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed TypeError in FIM Inventory using new error handler [#5364](https://github.com/wazuh/wazuh-kibana-app/pull/5364)
 - Fixed error when using invalid group configuration [#5423](https://github.com/wazuh/wazuh-kibana-app/pull/5423)
 
-## Wazuh v4.4.1 - OpenSearch Dashboards 2.6.0 - Revision 01
+## Wazuh v4.4.2 - OpenSearch Dashboards 2.6.0 - Revision 01
+
+### Added
+
+- Support for Wazuh 4.4.2
+
+### Fixed
+
+- Fixed a problem in the backend service to get the plugin configuration [#5428](https://github.com/wazuh/wazuh-kibana-app/pull/5428) [#5432](https://github.com/wazuh/wazuh-kibana-app/pull/5432)
+
+## Wazuh v4.4.1 - OpenSearch Dashboards 2.6.0 - Revision 00
 
 ### Fixed
 

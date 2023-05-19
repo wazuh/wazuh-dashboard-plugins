@@ -21,7 +21,6 @@ export const OsCard = () => {
 
   return (
     <div>
-      <EuiSpacer size='s' />
       <EuiFlexGroup gutterSize='l' wrap>
         {REGISTER_AGENT_DATA.map((data, index) => (
           <EuiFlexItem key={index}>
