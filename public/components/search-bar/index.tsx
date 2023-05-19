@@ -14,12 +14,14 @@ import {
 import { EuiSuggest } from '../eui-suggest';
 import { searchBarQueryLanguages } from './query-language';
 import _ from 'lodash';
+import { ISearchBarModeWQL } from './query-language/wql';
 
-type SearchBarProps = {
+export interface SearchBarProps{
   defaultMode?: string;
-  modes: { id: string; [key: string]: any }[];
+  modes: ISearchBarModeWQL[];
   onChange?: (params: any) => void;
   onSearch: (params: any) => void;
+  buttonsRender?: () => React.ReactNode
   input?: string;
 };
 
@@ -71,7 +73,7 @@ export const SearchBar = ({
     setInput(event.target.value);
 
   // Handler when pressing a key
-  const onKeyPressHandler = event => {
+  const onKeyPressHandler = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
       _onSearch(queryLanguageOutputRun.output);
     }
@@ -192,7 +194,7 @@ export const SearchBar = ({
                         text: searchBarQueryLanguages[id].label,
                       }))}
                       value={queryLanguage.id}
-                      onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                      onChange={(event: React.ChangeEvent<HTMLSelectElement>) => {
                         const queryLanguageID: string = event.target.value;
                         setQueryLanguage({
                           id: queryLanguageID,

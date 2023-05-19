@@ -112,7 +112,7 @@ export function TableDefault({
   };
   return (
     <EuiBasicTable
-      columns={tableColumns}
+      columns={tableColumns.map(({show, ...rest}) => ({...rest}))}
       items={items}
       loading={loading}
       pagination={tablePagination}

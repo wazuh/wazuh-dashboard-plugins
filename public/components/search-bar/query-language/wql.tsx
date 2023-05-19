@@ -217,11 +217,21 @@ type OptionsQL = {
   options?: {
     implicitQuery?: OptionsQLImplicitQuery
     searchTermFields?: string[]
+    filterButtons: {id: string, label: string, input: string}[]
   }
   suggestions: {
     field: QLOptionSuggestionHandler;
     value: QLOptionSuggestionHandler;
   };
+  validate?: {
+    value?: {
+      [key: string]: (token: IToken, nearTokens: {field: string, operator: string}) => string | undefined
+    }
+  }
+};
+
+export interface ISearchBarModeWQL extends OptionsQL{
+  id: 'wql'
 };
 
 /**
