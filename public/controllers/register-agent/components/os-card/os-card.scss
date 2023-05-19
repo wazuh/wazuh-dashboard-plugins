@@ -6,6 +6,11 @@
 
 .cardIcon {
   margin-right: 10px;
+}
+
+.euiCard__content .euiCard__titleButton {
+  text-decoration: none !important;
+}
 
 .cardText {
   font-family: 'Inter';

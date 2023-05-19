@@ -28,15 +28,21 @@ const CheckboxGroupComponent: React.FC<Props> = ({
   };
 
   const isSingleArchitecture = data.length === 1;
+  const isFirstCardWithFourItems = cardIndex === 0 && data.length === 4;
 
   return (
     <div
       className={`checkbox-group-container${
         isSingleArchitecture ? ' single-architecture' : ''
-      }`}
+      }${isFirstCardWithFourItems ? ' first-card-four-items' : ''}`}
     >
       {data.map((arch, idx) => (
-        <div key={idx} className='checkbox-item'>
+        <div
+          key={idx}
+          className={`checkbox-item${
+            idx === 0 || idx === 2 ? ' first-of-row' : ''
+          }`}
+        >
           <span className='architecture-label'>{arch}</span>
           <EuiRadioGroup
             options={[{ id: `option-${cardIndex}-${idx}` }]}

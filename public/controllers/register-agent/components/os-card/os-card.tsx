@@ -26,7 +26,6 @@ export const OsCard = () => {
         {REGISTER_AGENT_DATA.map((data, index) => (
           <EuiFlexItem key={index}>
             <EuiCard
-              // icon={<img src={data.icon} alt='Icon' />}
               title={
                 <div className='cardTitle'>
                   <img className='cardIcon' src={data.icon} alt='Icon' />

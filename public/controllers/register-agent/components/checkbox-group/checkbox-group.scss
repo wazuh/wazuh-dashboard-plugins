@@ -2,6 +2,7 @@
   display: flex;
   flex-wrap: wrap;
   margin-top: 26px;
+  margin-bottom: 11px;
 }
 
 .checkbox-item {
@@ -13,10 +14,26 @@
 
 .checkbox-group-container.single-architecture {
   margin-top: 44px;
+  margin-bottom: 28px;
   display: flex;
   justify-content: center;
 }
 
 .architecture-label {
   margin-left: 8px;
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  color: #343741;
+}
+
+.first-card-four-items {
+  .checkbox-item:nth-child(n + 3) {
+    padding-top: 16px;
+  }
+}
+
+.first-of-row {
+  padding-right: 17px;
 }
