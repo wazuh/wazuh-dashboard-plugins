@@ -1,14 +1,14 @@
 import React, { ChangeEvent } from 'react';
 import { InputForm } from '../../../components/common/form';
-import './os-card-container.scss';
+import './register-agent.scss';
 
-const Container = () => {
+export const RegisterAgent: React.FC = () => {
   const handleChange = (event: ChangeEvent<any>) => {
     // ver
   };
-
   return (
     <div className='container'>
+      <div className='title'>Deploy new agent</div>
       <InputForm
         type='custom'
         onChange={handleChange}
@@ -19,5 +19,3 @@ const Container = () => {
     </div>
   );
 };
-
-export default Container;
