@@ -5,11 +5,7 @@
 }
 
 .checkbox-item {
-  // width: 50%;
-  // padding-left: 8px;
-
   width: 50%;
-  // padding-right: 8px;
   display: flex;
   flex-direction: row-reverse;
   justify-content: center;
@@ -21,10 +17,6 @@
   justify-content: center;
 }
 
-// .euiRadio .euiRadio__input ~ .euiRadio__label {
-//   padding-left: 8px;
-// }
-
 .architecture-label {
-  margin-left: 8px; /* Ajusta el valor según tus necesidades */
+  margin-left: 8px;
 }
