@@ -78,7 +78,16 @@ class WzGroupsTable extends Component {
   }
 
   async componentDidUpdate(prevProps, prevState) {
-    if (this.props.state.isProcessing && this._isMounted) {
+    /**
+      Is verifying that isProcessing is true and that it has changed its value,
+      since in the shouldComponentUpdate it is making it re-execute several times
+      each time a state changes, regardless of whether it is a change in isProcessing.
+     */
+    if (
+      prevProps.state.isProcessing !== this.props.state.isProcessing &&
+      this.props.state.isProcessing &&
+      this._isMounted
+    ) {
       await this.getItems();
     }
     const { filters } = this.state;
@@ -95,35 +104,37 @@ class WzGroupsTable extends Component {
    * Loads the initial information
    */
   async getItems() {
-    this.setState({ items: [], totalItems: 0 }, async () => {
-      try {
-        this.props.updateLoadingStatus(true);
-        const rawItems = await this.groupsHandler.listGroups({ params: this.buildFilter() });
-        const { affected_items, total_affected_items } = ((rawItems || {}).data || {}).data;
+    try {
+      this.props.updateLoadingStatus(true);
+      const rawItems = await this.groupsHandler.listGroups({ params: this.buildFilter() });
+      const {
+        affected_items: affectedItem,
+        total_affected_items: totalAffectedItem
+      } = rawItems?.data?.data;
+      this.setState({
+        items: affectedItem,
+        totalItems: totalAffectedItem,
+      });
+      this.props.updateLoadingStatus(false);
+      this.props.state.isProcessing && this.props.updateIsProcessing(false);
 
-        this.setState({
-          items: affected_items,
-          totalItems: total_affected_items,
-        });
-        this.props.updateLoadingStatus(false);
-        this.props.state.isProcessing && this.props.updateIsProcessing(false);
-      } catch (error) {
-        this.props.updateLoadingStatus(false);
-        this.props.state.isProcessing && this.props.updateIsProcessing(false);
-        const options = {
-          context: `${WzGroupsTable.name}.getItems`,
-          level: UI_LOGGER_LEVELS.ERROR,
-          severity: UI_ERROR_SEVERITIES.CRITICAL,
-          store: true,
-          error: {
-            error: error,
-            message: error.message || error,
-            title: `Error getting groups`,
-          },
-        };
-        getErrorOrchestrator().handleError(options);
-      }
-    });
+    } catch (error) {
+      this.props.updateLoadingStatus(false);
+      this.props.state.isProcessing && this.props.updateIsProcessing(false);
+      const options = {
+        context: `${WzGroupsTable.name}.getItems`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.CRITICAL,
+        store: true,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `Error getting groups`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+    }
+
   }
 
   buildFilter() {
