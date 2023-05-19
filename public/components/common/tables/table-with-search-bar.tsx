@@ -11,17 +11,79 @@
  */
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { EuiBasicTable, EuiSpacer } from '@elastic/eui';
+import { EuiBasicTable, EuiBasicTableProps, EuiSpacer } from '@elastic/eui';
 import _ from 'lodash';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
-import { SearchBar } from '../../search-bar';
+import { SearchBar, SearchBarProps } from '../../search-bar';
 
-export function TableWithSearchBar({
+export interface ITableWithSearcHBarProps<T>{
+  /**
+   * Function to fetch the data
+   */
+  onSearch: (
+    endpoint: string,
+    filters: Record<string, any>,
+    pagination: {pageIndex: number, pageSize: number},
+    sorting: {sort: {field: string, direction: string}}
+  ) => Promise<{items: any[], totalItems: number}>
+  /**
+   * Properties for the search bar
+   */
+  searchBarProps?: Omit<SearchBarProps, 'defaultMode' | 'modes' | 'onSearch' | 'input'>
+  /**
+   * Columns for the table
+   */
+  tableColumns: EuiBasicTableProps<T>['columns'] & {
+    composeField?: string[],
+    searchable?: string
+    show?: boolean,
+  }
+  /**
+   * Table row properties for the table
+   */
+  rowProps?: EuiBasicTableProps<T>['rowProps']
+  /**
+   * Table page size options
+   */
+  tablePageSizeOptions?: number[]
+  /**
+   * Table initial sorting direction
+   */
+  tableInitialSortingDirection?: 'asc' | 'dsc'
+  /**
+   * Table initial sorting field
+   */
+  tableInitialSortingField?: string
+  /**
+   * Table properties
+   */
+  tableProps?: Omit<EuiBasicTableProps<T>, 'columns' | 'items' | 'loading' | 'pagination' | 'sorting' | 'onChange' | 'rowProps'>
+  /**
+   * Refresh the fetch of data
+   */
+  reload?: number
+  /**
+   * API endpoint
+   */
+  endpoint: string
+  /**
+   * Search bar properties for WQL
+   */
+  searchBarWQL?: any
+  /**
+   * Visible fields
+   */
+  selectedFields: string[]
+  /**
+   * API request filters
+   */
+  filters?: any
+}
+
+export function TableWithSearchBar<T>({
   onSearch,
-  searchBarSuggestions,
-  searchBarPlaceholder = 'Filter or search',
   searchBarProps = {},
   tableColumns,
   rowProps,
@@ -32,7 +94,7 @@ export function TableWithSearchBar({
   reload,
   endpoint,
   ...rest
-}) {
+}: ITableWithSearcHBarProps<T>) {
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState([]);
   const [totalItems, setTotalItems] = useState(0);
@@ -54,7 +116,8 @@ export function TableWithSearchBar({
   const searchBarWQLOptions = useMemo(() => ({
     searchTermFields: tableColumns
       .filter(({field, searchable}) => searchable && rest.selectedFields.includes(field))
-      .map(({field, composeField}) => ([composeField || field].flat())),
+      .map(({field, composeField}) => ([composeField || field].flat()))
+      .flat(),
     ...(rest?.searchBarWQL?.options || {})
   }), [rest?.searchBarWQL?.options, rest?.selectedFields]);
 
@@ -142,14 +205,14 @@ export function TableWithSearchBar({
   return (
     <>
       <SearchBar
-        defaultMode='wql'
         {...searchBarProps}
+        defaultMode='wql'
         modes={[
           {
             id: 'wql',
             options: searchBarWQLOptions,
-            ...( rest?.searchBarWQL?.suggestions ? {suggestions: rest?.searchBarWQL?.suggestions} : {}),
-            ...( rest?.searchBarWQL?.validate ? {suggestions: rest?.searchBarWQL?.validate} : {})
+            ...( rest?.searchBarWQL?.suggestions ? {suggestions: rest.searchBarWQL.suggestions} : {}),
+            ...( rest?.searchBarWQL?.validate ? {validate: rest.searchBarWQL.validate} : {})
           }
         ]}
         input={rest?.filters?.q || ''}
@@ -161,7 +224,7 @@ export function TableWithSearchBar({
       />
       <EuiSpacer size="s" />
       <EuiBasicTable
-        columns={tableColumns}
+        columns={tableColumns.map(({searchable, show, composeField, ...rest}) => ({...rest}))}
         items={items}
         loading={loading}
         pagination={tablePagination}
