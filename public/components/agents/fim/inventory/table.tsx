@@ -198,11 +198,12 @@ export class InventoryTable extends Component {
               suggestions: {
                 field: (currentValue) => [
                   {label: 'file', description: 'filter by file'},
-                  {label: 'gid', description: 'filter by gid'},
-                  {label: 'gname', description: 'filter by gname'},
+                  {label: 'gid', description: 'filter by group id'},
+                  {label: 'gname', description: 'filter by group name'},
+                  {label: 'mtime', description: 'filter by modification time'},
                   {label: 'size', description: 'filter by size'},
-                  {label: 'uname', description: 'filter by uname'},
-                  {label: 'uid', description: 'filter by uid'}
+                  {label: 'uname', description: 'filter by user name'},
+                  {label: 'uid', description: 'filter by user id'}
                 ],
                 value: async (currentValue, { field }) => {
                   return [];
@@ -213,6 +214,17 @@ export class InventoryTable extends Component {
                   };
                 }
               },
+              validate: {
+                value: ({formattedValue, value: rawValue}, {field}) => {
+                  const value = formattedValue ?? rawValue;
+                  if(value){
+                    if(['mtime'].some(dateField => dateField === field)){
+                      return /^\d{4}-\d{2}-\d{2}([ T]\d{2}:\d{2}:\d{2}(.\d{1,6})?Z?)?$/
+                        .test(value) ? undefined : `"${value}" is not a expected format. Valid formats: YYYY-MM-DD, YYYY-MM-DD HH:mm:ss, YYYY-MM-DDTHH:mm:ss, YYYY-MM-DDTHH:mm:ssZ.`;
+                    };
+                  };
+                }
+              }
             }}
             filters={searchBarWQLFilters}
             showReload

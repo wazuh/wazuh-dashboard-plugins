@@ -150,7 +150,8 @@ export class RegistryTable extends Component {
               options: searchBarWQLOptions,
               suggestions: {
                 field: () => [
-                  {label: 'file', description: 'filter by file'}
+                  {label: 'file', description: 'filter by file'},
+                  {label: 'mtime', description: 'filter by modification time'}
                 ],
                 value: async (currentValue, { field }) => {
                   return [];
@@ -161,6 +162,17 @@ export class RegistryTable extends Component {
                   };
                 }
               },
+              validate: {
+                value: ({formattedValue, value: rawValue}, {field}) => {
+                  const value = formattedValue ?? rawValue;
+                  if(value){
+                    if(['mtime'].some(dateField => dateField === field)){
+                      return /^\d{4}-\d{2}-\d{2}([ T]\d{2}:\d{2}:\d{2}(.\d{1,6})?Z?)?$/
+                        .test(value) ? undefined : `"${value}" is not a expected format. Valid formats: YYYY-MM-DD, YYYY-MM-DD HH:mm:ss, YYYY-MM-DDTHH:mm:ss, YYYY-MM-DDTHH:mm:ssZ.`;
+                    };
+                  };
+                }
+              }
             }}
             filters={searchBarWQLFilters}
             showReload
