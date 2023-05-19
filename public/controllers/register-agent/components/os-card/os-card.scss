@@ -1,0 +1,52 @@
+.cardTitle {
+  display: flex;
+  align-items: center;
+  margin-top: 28px;
+}
+
+.cardIcon {
+  margin-right: 10px; /* Ajusta el margen derecho según tus necesidades */
+}
+
+.cardText {
+  // position: absolute;
+  // height: 24px;
+  // left: 676px;
+  // right: 1187px;
+  // top: calc(50% - 24px / 2 - 389px);
+
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 700;
+  font-size: 18px;
+  // line-height: 24px;
+  /* identical to box height, or 133% */
+
+  display: flex;
+  align-items: center;
+  text-align: center;
+  letter-spacing: 0.6px;
+  // text-transform: uppercase;
+
+  /* Black */
+
+  color: #343741;
+}
+
+.hr {
+  border: 1px solid #d3dae6;
+}
+
+.cardContent {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.checkboxGroupContainer {
+  flex-basis: 50%;
+}
+
+.architectureItem {
+  margin-bottom: 8px; /* Ajusta el margen inferior según tus necesidades */
+}
