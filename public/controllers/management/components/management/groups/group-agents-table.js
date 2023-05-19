@@ -144,6 +144,7 @@ class WzGroupAgentsTable extends Component {
         name: 'Id',
         align: 'left',
         sortable: true,
+        width: '5%',
       },
       {
         field: 'name',
@@ -154,9 +155,10 @@ class WzGroupAgentsTable extends Component {
       {
         field: 'ip',
         name: 'IP address',
-        align: 'left',
         sortable: true,
-        truncateText: true,
+        show: true,
+        truncateText: false,
+        width: '25%',
       },
       {
         field: 'status',
