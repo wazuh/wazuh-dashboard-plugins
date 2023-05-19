@@ -17,6 +17,7 @@ import { WzSearchBar } from '../../wz-search-bar/';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
+import { compressIPv6 } from '../../../services/ipv6-services';
 
 export function TableWithSearchBar({
   onSearch,
@@ -31,6 +32,7 @@ export function TableWithSearchBar({
   tableProps = {},
   reload,
   endpoint,
+  compressipv6 = false,
   ...rest
 }) {
   const [loading, setLoading] = useState(false);
@@ -79,31 +81,46 @@ export function TableWithSearchBar({
     }
   }, [endpoint, reload]);
 
-  useEffect(function () {
-    (async () => {
-      try {
-        setLoading(true);
-        const { items, totalItems } = await onSearch(endpoint, filters, pagination, sorting);
-        setItems(items);
-        setTotalItems(totalItems);
-      } catch (error) {
-        setItems([]);
-        setTotalItems(0);
-        const options = {
-          context: `${TableWithSearchBar.name}.useEffect`,
-          level: UI_LOGGER_LEVELS.ERROR,
-          severity: UI_ERROR_SEVERITIES.BUSINESS,
-          error: {
-            error: error,
-            message: error.message || error,
-            title: `${error.name}: Error fetching items`,
-          },
-        };
-        getErrorOrchestrator().handleError(options);
-      }
-      setLoading(false);
-    })();
-  }, [filters, pagination, sorting]);
+  useEffect(
+    function () {
+      (async () => {
+        try {
+          setLoading(true);
+          let { items, totalItems } = await onSearch(
+            endpoint,
+            filters,
+            pagination,
+            sorting,
+          );
+          if (compressipv6) {
+            items.forEach(item => {
+              if (item.ip) {
+                item.ip = compressIPv6(item.ip);
+              }
+            });
+          }
+          setItems(items);
+          setTotalItems(totalItems);
+        } catch (error) {
+          setItems([]);
+          setTotalItems(0);
+          const options = {
+            context: `${TableWithSearchBar.name}.useEffect`,
+            level: UI_LOGGER_LEVELS.ERROR,
+            severity: UI_ERROR_SEVERITIES.BUSINESS,
+            error: {
+              error: error,
+              message: error.message || error,
+              title: `${error.name}: Error fetching items`,
+            },
+          };
+          getErrorOrchestrator().handleError(options);
+        }
+        setLoading(false);
+      })();
+    },
+    [filters, pagination, sorting],
+  );
 
   useEffect(() => {
     // This effect is triggered when the component is mounted because of how to the useEffect hook works.
@@ -136,7 +153,7 @@ export function TableWithSearchBar({
         placeholder={searchBarPlaceholder}
         {...searchBarProps}
       />
-      <EuiSpacer size="s" />
+      <EuiSpacer size='s' />
       <EuiBasicTable
         columns={tableColumns}
         items={items}

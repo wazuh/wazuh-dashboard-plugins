@@ -156,6 +156,7 @@ class WzGroupAgentsTable extends Component {
         name: 'IP address',
         align: 'left',
         sortable: true,
+        truncateText: true,
       },
       {
         field: 'status',
@@ -254,6 +255,7 @@ class WzGroupAgentsTable extends Component {
           endpoint={`/groups/${this.props.state.itemDetail.name}/agents`}
           reload={this.props.state.reload}
           searchTable={true}
+          compressipv6={true}
         />
       );
     } else {

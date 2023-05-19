@@ -52,19 +52,27 @@ export function TableWzAPI({
   showReload?: boolean;
   searchBarProps?: any;
   reload?: boolean;
+  compressipv6?: boolean;
 }) {
   const [totalItems, setTotalItems] = useState(0);
   const [filters, setFilters] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const onFiltersChange = (filters) =>
-    typeof rest.onFiltersChange === 'function' ? rest.onFiltersChange(filters) : null;
+  const onFiltersChange = filters =>
+    typeof rest.onFiltersChange === 'function'
+      ? rest.onFiltersChange(filters)
+      : null;
 
   /**
    * Changing the reloadFootprint timestamp will trigger reloading the table
    */
   const [reloadFootprint, setReloadFootprint] = useState(rest.reload || 0);
 
-  const onSearch = useCallback(async function (endpoint, filters, pagination, sorting) {
+  const onSearch = useCallback(async function (
+    endpoint,
+    filters,
+    pagination,
+    sorting,
+  ) {
     try {
       const { pageIndex, pageSize } = pagination;
       const { field, direction } = sorting.sort;
@@ -85,7 +93,10 @@ export function TableWzAPI({
       ).data;
       setIsLoading(false);
       setTotalItems(totalItems);
-      return { items: rest.mapResponseItem ? items.map(rest.mapResponseItem) : items, totalItems };
+      return {
+        items: rest.mapResponseItem ? items.map(rest.mapResponseItem) : items,
+        totalItems,
+      };
     } catch (error) {
       setIsLoading(false);
       setTotalItems(0);
@@ -101,7 +112,8 @@ export function TableWzAPI({
       };
       getErrorOrchestrator().handleError(options);
     }
-  }, []);
+  },
+  []);
 
   const renderActionButtons = (
     <>
@@ -132,7 +144,7 @@ export function TableWzAPI({
     <EuiFlexItem grow={false}>
       <EuiButtonEmpty
         isDisabled={totalItems == 0}
-        iconType="refresh"
+        iconType='refresh'
         onClick={() => triggerReload()}
       >
         Refresh
@@ -142,16 +154,22 @@ export function TableWzAPI({
 
   const header = (
     <EuiFlexGroup wrap>
-      <EuiFlexItem className="wz-flex-basis-auto" grow={false}>
+      <EuiFlexItem className='wz-flex-basis-auto' grow={false}>
         {rest.title && (
-          <EuiTitle size="s">
+          <EuiTitle size='s'>
             <h1>
               {rest.title}{' '}
-              {isLoading ? <EuiLoadingSpinner size="s" /> : <span>({totalItems})</span>}
+              {isLoading ? (
+                <EuiLoadingSpinner size='s' />
+              ) : (
+                <span>({totalItems})</span>
+              )}
             </h1>
           </EuiTitle>
         )}
-        {rest.description && <EuiText color="subdued">{rest.description}</EuiText>}
+        {rest.description && (
+          <EuiText color='subdued'>{rest.description}</EuiText>
+        )}
       </EuiFlexItem>
       <EuiFlexItem>
         <EuiFlexGroup wrap justifyContent={'flexEnd'} alignItems={'center'}>
@@ -174,9 +192,15 @@ export function TableWzAPI({
   );
 
   const table = rest.searchTable ? (
-    <TableWithSearchBar onSearch={onSearch} {...{ ...rest, reload: reloadFootprint }} />
+    <TableWithSearchBar
+      onSearch={onSearch}
+      {...{ ...rest, reload: reloadFootprint }}
+    />
   ) : (
-    <TableDefault onSearch={onSearch} {...{ ...rest, reload: reloadFootprint }} />
+    <TableDefault
+      onSearch={onSearch}
+      {...{ ...rest, reload: reloadFootprint }}
+    />
   );
 
   return (
