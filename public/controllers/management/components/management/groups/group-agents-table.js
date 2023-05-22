@@ -252,7 +252,6 @@ class WzGroupAgentsTable extends Component {
   renderIP(ip) {
     return (
       <Fragment>
-        {compressIPv6(ip)}
         <EuiToolTip content="Copy the full IP address" position="left">
           <EuiButtonIcon
             onClick={() => {
@@ -263,6 +262,7 @@ class WzGroupAgentsTable extends Component {
             aria-label="Copy the full IP address"
           />
         </EuiToolTip>
+        {compressIPv6(ip)}
       </Fragment>
     )
   }

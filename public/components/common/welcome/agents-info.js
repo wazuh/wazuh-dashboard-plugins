@@ -104,7 +104,6 @@ export class AgentInfo extends Component {
   renderIP(item) {
     return (
       <span position='bottom' style={{ 'white-space': 'nowrap', fontSize: '12px' }}>
-        {compressIPv6(item.title)}
         <EuiToolTip content="Copy the full IP address" position="left">
           <EuiButtonIcon
             onClick={() => {
@@ -115,6 +114,7 @@ export class AgentInfo extends Component {
             aria-label="Copy the full IP address"
           />
         </EuiToolTip>
+        {compressIPv6(item.title)}
       </span>
     )
   }

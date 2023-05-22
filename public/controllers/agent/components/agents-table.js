@@ -767,7 +767,6 @@ export const AgentsTable = withErrorBoundary(
     renderIP(ip) {
       return (
         <Fragment>
-          {compressIPv6(ip)}
           <EuiToolTip content="Copy the full IP address" position="left">
             <EuiButtonIcon
               onClick={(ev) => {
@@ -779,6 +778,7 @@ export const AgentsTable = withErrorBoundary(
               aria-label="Copy the full IP address"
             />
           </EuiToolTip>
+          {compressIPv6(ip)}
         </Fragment>
       )
     }
