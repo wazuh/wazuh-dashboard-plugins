@@ -2,6 +2,12 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.4.3 - OpenSearch Dashboards 2.6.0 - Revision 00
+
+### Added
+
+- Add Apple Silicon architecture button to the register Agent wizard [#5478](https://github.com/wazuh/wazuh-kibana-app/pull/5478)
+
 ## Wazuh v4.4.2 - OpenSearch Dashboards 2.6.0 - Revision 01
 
 ### Added
