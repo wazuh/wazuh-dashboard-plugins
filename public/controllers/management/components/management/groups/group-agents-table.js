@@ -9,8 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component } from 'react';
-import { EuiCallOut } from '@elastic/eui';
+import React, { Component, Fragment } from 'react';
 
 import { connect } from 'react-redux';
 import GroupsHandler from './utils/groups-handler';
@@ -27,7 +26,11 @@ import {
   updateSortFieldAgents,
   updateReload,
 } from '../../../../../redux/actions/groupsActions';
-
+import {
+  EuiButtonIcon,
+  EuiToolTip,
+  EuiCallOut,
+} from '@elastic/eui';
 import { getAgentFilterValues } from './get-agents-filters-values';
 import { TableWzAPI } from '../../../../../components/common/tables';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
@@ -159,6 +162,22 @@ class WzGroupAgentsTable extends Component {
         show: true,
         truncateText: false,
         width: '25%',
+        render: (ip) => (
+          <Fragment>
+            {compressIPv6(ip)}
+            <EuiToolTip content="Copy the full IP address" position="left">
+              <EuiButtonIcon
+                onClick={(ev) => {
+                  ev.stopPropagation();
+                  navigator.clipboard.writeText(ip);
+                }}
+                color={'primary'}
+                iconType="copy"
+                aria-label="Copy the full IP address"
+              />
+            </EuiToolTip>
+          </Fragment>
+        ),
       },
       {
         field: 'status',
@@ -258,10 +277,7 @@ class WzGroupAgentsTable extends Component {
           reload={this.props.state.reload}
           searchTable={true}
           compressipv6={true}
-          mapResponseItem={(item) => ({
-            ...item,
-            ip: compressIPv6(item.ip)
-          })}
+
         />
       );
     } else {
