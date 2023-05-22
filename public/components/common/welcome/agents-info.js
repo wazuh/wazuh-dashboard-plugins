@@ -16,6 +16,8 @@ import {
   EuiStat,
   EuiFlexItem,
   EuiFlexGroup,
+  EuiToolTip,
+  EuiButtonIcon,
   EuiBadge
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
@@ -99,6 +101,23 @@ export class AgentInfo extends Component {
     )
   }
 
+  renderIP(item) {
+    return (
+      <span position='bottom' style={{ maxWidth: item.style.maxWidth, fontSize: '12px' }}>
+        {compressIPv6(item.title)}
+        <EuiToolTip content="Copy the full IP address" position="left">
+          <EuiButtonIcon
+            onClick={() => {
+              navigator.clipboard.writeText(item.title);
+            }}
+            color={'primary'}
+            iconType="copy"
+            aria-label="Copy the full IP address"
+          />
+        </EuiToolTip>
+      </span>
+    )
+  }
   buildStats(items) {
     const checkField = field => {
       return field !== undefined || field ? field : '-';
@@ -123,11 +142,14 @@ export class AgentInfo extends Component {
                 this.addTextPlatformRender(this.props.agent, item.style)
               ) : item.description === 'Status' ? (
                 <AgentStatus status={this.props.agent.status} style={{ ...item.style, fontSize: '12px' }} />
-              ) : (
-                <WzTextWithTooltipIfTruncated position='bottom' tooltipProps={tooltipProps} elementStyle={{ maxWidth: item.style.maxWidth, fontSize: 12 }}>
-                  {checkField(item.title)}
-                </WzTextWithTooltipIfTruncated>
+              ) : item.description === 'IP address' ? (
+                this.renderIP(item)
               )
+                : (
+                  <WzTextWithTooltipIfTruncated position='bottom' tooltipProps={tooltipProps} elementStyle={{ maxWidth: item.style.maxWidth, fontSize: 12 }}>
+                    {checkField(item.title)}
+                  </WzTextWithTooltipIfTruncated>
+                )
             }
             description={item.description}
             titleSize="xs"
@@ -157,7 +179,7 @@ export class AgentInfo extends Component {
       arrayStats = [
         { title: agent.id, description: 'ID', style: { minWidth: 30 } },
         { title: agent.status, description: 'Status', style: { minWidth: 130 } },
-        { title: compressIPv6(agent.ip), description: 'IP address', style: { width: 'fit-content' } },
+        { title: agent.ip, description: 'IP address', style: { width: 'fit-content' } },
         { title: agent.version, description: 'Version', style: { minWidth: 100 } },
         { title: agent.group, description: 'Groups', style: { minWidth: 150 } },
         { title: agent.name, description: 'Operating system', style: { minWidth: 150 } },
