@@ -103,7 +103,7 @@ export class AgentInfo extends Component {
 
   renderIP(item) {
     return (
-      <span position='bottom' style={{ maxWidth: item.style.maxWidth, fontSize: '12px' }}>
+      <span position='bottom' style={{ 'white-space': 'nowrap', fontSize: '12px' }}>
         {compressIPv6(item.title)}
         <EuiToolTip content="Copy the full IP address" position="left">
           <EuiButtonIcon
@@ -178,8 +178,8 @@ export class AgentInfo extends Component {
     } else {
       arrayStats = [
         { title: agent.id, description: 'ID', style: { minWidth: 30 } },
-        { title: agent.status, description: 'Status', style: { minWidth: 130 } },
-        { title: agent.ip, description: 'IP address', style: { width: 'fit-content' } },
+        { title: agent.status, description: 'Status', style: { minWidth: 100 } },
+        { title: agent.ip, description: 'IP address', style: { minwidth: 150 } },
         { title: agent.version, description: 'Version', style: { minWidth: 100 } },
         { title: agent.group, description: 'Groups', style: { minWidth: 150 } },
         { title: agent.name, description: 'Operating system', style: { minWidth: 150 } },
