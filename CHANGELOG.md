@@ -9,7 +9,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Support for Wazuh 4.4.3
 
 ### Fixed
-- Fix macos apple install command [#5466](https://github.com/wazuh/wazuh-kibana-app/pull/5466)
+- Fixed macos apple install command [#5466](https://github.com/wazuh/wazuh-kibana-app/pull/5466)
 
 ## Wazuh v4.4.2 - OpenSearch Dashboards 2.6.0 - Revision 01
 
