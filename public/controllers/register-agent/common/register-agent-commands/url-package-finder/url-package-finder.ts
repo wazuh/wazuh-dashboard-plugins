@@ -1,6 +1,10 @@
 
 import { OSDefinition, tOS, tPackageExtensions } from '../types';
 
+/* ToDO:
+  - Add exceptions clases with custom messages 
+  that say what option is invalid and the specific property not found
+*/
 export class NotOptionFoundException extends Error {
   constructor(osName: tOS, architecture: string, extension: tPackageExtensions) {
     super(`No OS option found for "${osName}" "${architecture}" "${extension}"`);
