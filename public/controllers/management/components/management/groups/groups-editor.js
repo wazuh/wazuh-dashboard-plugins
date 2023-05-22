@@ -112,14 +112,7 @@ class WzGroupsEditor extends Component {
       this.setState({ isSaving: true, error: false });
       let saver = this.groupsHandler.sendGroupConfiguration;
       await saver(name, groupName, content);
-      try {
-        await validateConfigAfterSent();
-      } catch (error) {
-        this.setState({ isSaving: false });
-        throw new Error(
-          (error.title = `File ${name} saved, but there were found several error while validating the configuration.`)
-        );
-      }
+      await validateConfigAfterSent();
       this.setState({ isSaving: false, hasChanges: false });
       const textSuccess = 'File successfully edited';
       this.showToast('success', 'Success', textSuccess, 3000);
@@ -127,12 +120,11 @@ class WzGroupsEditor extends Component {
       const options = {
         context: `${WzGroupsEditor.name}.save`,
         level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.CRITICAL,
-        store: true,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
         error: {
           error: error,
           message: error.message || error,
-          title: error.title || error,
+          title: "Error found saving the file.",
         },
       };
       getErrorOrchestrator().handleError(options);
