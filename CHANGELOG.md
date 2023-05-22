@@ -2,6 +2,15 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.4.3 - OpenSearch Dashboards 2.6.0 - Revision 01
+
+### Added
+
+- Support for Wazuh 4.4.3
+
+### Fixed
+- Fix macos apple install command [#5466](https://github.com/wazuh/wazuh-kibana-app/pull/5466)
+
 ## Wazuh v4.4.2 - OpenSearch Dashboards 2.6.0 - Revision 01
 
 ### Added
@@ -98,7 +107,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed events view when search bar language is `lucene` [#5286](https://github.com/wazuh/wazuh-kibana-app/pull/5286)
 - Disabled unmapped fields filter in `Security Events` alerts table [#4929](https://github.com/wazuh/wazuh-kibana-app/pull/4929)
 - Raspbian OS, Ubuntu, Amazon Linux and Amazon Linux 2 commands in the 'Deploy new agent' section now change when a different architecture is selected [#4876](https://github.com/wazuh/wazuh-kibana-app/pull/4876) [#4880](https://github.com/wazuh/wazuh-kibana-app/pull/4880)
-- Fix macos apple install command [#5466](https://github.com/wazuh/wazuh-kibana-app/pull/5466)
 
 ### Removed
 
