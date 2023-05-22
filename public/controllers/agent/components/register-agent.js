@@ -975,6 +975,16 @@ export const RegisterAgent = withErrorBoundary(
         zIndex: '100',
       };
 
+      // Select macOS installation script based on architecture
+      const macOSInstallationScript = {
+        intel: `curl -so wazuh-agent.pkg https://packages.wazuh.com/4.x/macos/wazuh-agent-${this.state.wazuhVersion
+          }-1.pkg && sudo launchctl setenv ${this.optionalDeploymentVariables()}${this.agentNameVariable()
+          }&& sudo installer -pkg ./wazuh-agent.pkg -target /`,
+        applesilicon: `curl -so wazuh-agent.pkg https://packages.wazuh.com/4.x/macos/wazuh-agent-${this.state.wazuhVersion
+          }-1.pkg && sudo launchctl setenv ${this.optionalDeploymentVariables()}${this.agentNameVariable()
+          }&& sudo installer -pkg ./wazuh-agent.pkg -target /`,
+      }
+
       const customTexts = {
         rpmText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
         alpineText: `wget -O /etc/apk/keys/alpine-devel@wazuh.com-633d7457.rsa.pub ${this.optionalPackages()} >> /etc/apk/repositories && \
@@ -983,9 +993,7 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
         centText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
         debText: `curl -so wazuh-agent.deb ${this.optionalPackages()} && sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}dpkg -i ./wazuh-agent.deb`,
         ubuText: `curl -so wazuh-agent.deb ${this.optionalPackages()} && sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}dpkg -i ./wazuh-agent.deb`,
-        macosText: `curl -so wazuh-agent.pkg https://packages.wazuh.com/4.x/macos/wazuh-agent-${
-          this.state.wazuhVersion
-        }-1.pkg && sudo launchctl setenv ${this.optionalDeploymentVariables()}${this.agentNameVariable()}&& sudo installer -pkg ./wazuh-agent.pkg -target /`,
+        macosText: macOSInstallationScript[this.state.selectedArchitecture],
         winText:
           this.state.selectedVersion == 'windowsxp' ||
           this.state.selectedVersion == 'windowsserver2008'
@@ -1539,7 +1547,7 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
             serverAddress: nodeSelected,
             udpProtocol: this.state.haveUdpProtocol,
             connectionSecure: this.state.haveConnectionSecure
-          }); 
+          });
       };
 
       const steps = [
