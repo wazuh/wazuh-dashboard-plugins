@@ -44,7 +44,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added default selected options in the 'Deploy new agent' section [#5063](https://github.com/wazuh/wazuh-kibana-app/pull/5063)
 - Added suggestions for cluster's node and protocol to use for agent enrollment in the 'Deploy new agent' section. [#4776](https://github.com/wazuh/wazuh-kibana-app/pull/4776) [#4954](https://github.com/wazuh/wazuh-kibana-app/pull/4954) [#5166](https://github.com/wazuh/wazuh-kibana-app/pull/5166)
 - Redesign the SCA table of the agent's dashboard [#4512](https://github.com/wazuh/wazuh-kibana-app/pull/4512)
-- Fix macos apple install command [#5466](https://github.com/wazuh/wazuh-kibana-app/pull/5466)
 
 ### Changed
 
@@ -99,6 +98,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed events view when search bar language is `lucene` [#5286](https://github.com/wazuh/wazuh-kibana-app/pull/5286)
 - Disabled unmapped fields filter in `Security Events` alerts table [#4929](https://github.com/wazuh/wazuh-kibana-app/pull/4929)
 - Raspbian OS, Ubuntu, Amazon Linux and Amazon Linux 2 commands in the 'Deploy new agent' section now change when a different architecture is selected [#4876](https://github.com/wazuh/wazuh-kibana-app/pull/4876) [#4880](https://github.com/wazuh/wazuh-kibana-app/pull/4880)
+- Fix macos apple install command [#5466](https://github.com/wazuh/wazuh-kibana-app/pull/5466)
 
 ### Removed
 
