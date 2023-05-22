@@ -137,6 +137,9 @@ resources:
   # List agents distinct
   - method: GET
     path: /agents/stats/distinct
+    response:
+      statusCode: 200
+      scriptFile: agents/agent_distinct.js
 
   # Summarize agents OS
   - method: GET
@@ -622,6 +625,14 @@ resources:
   # ===================================================== #
 
   # Login
+  ## Wazuh 4.3
+  - method: GET
+    path: /security/user/authenticate
+    response:
+      statusCode: 200
+      scriptFile: security/login.js
+
+  ## Wazuh >= 4.4
   - method: POST
     path: /security/user/authenticate
     response:
