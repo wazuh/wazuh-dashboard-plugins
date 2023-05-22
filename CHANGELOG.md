@@ -2,6 +2,12 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.4.2 - OpenSearch Dashboards 2.6.0 - Revision 02
+
+### Fixed
+
+- Fixed the display of IPv6 addresses [#5471](https://github.com/wazuh/wazuh-kibana-app/pull/5471)
+
 ## Wazuh v4.4.2 - OpenSearch Dashboards 2.6.0 - Revision 01
 
 ### Added
