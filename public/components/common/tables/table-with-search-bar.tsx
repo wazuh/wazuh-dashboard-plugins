@@ -17,7 +17,6 @@ import { WzSearchBar } from '../../wz-search-bar/';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
-import { compressIPv6 } from '../../../services/ipv6-services';
 
 export function TableWithSearchBar({
   onSearch,
@@ -92,13 +91,6 @@ export function TableWithSearchBar({
             pagination,
             sorting,
           );
-          if (compressipv6) {
-            items.forEach(item => {
-              if (item.ip) {
-                item.ip = compressIPv6(item.ip);
-              }
-            });
-          }
           setItems(items);
           setTotalItems(totalItems);
         } catch (error) {

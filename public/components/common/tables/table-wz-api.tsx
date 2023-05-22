@@ -52,7 +52,6 @@ export function TableWzAPI({
   showReload?: boolean;
   searchBarProps?: any;
   reload?: boolean;
-  compressipv6?: boolean;
 }) {
   const [totalItems, setTotalItems] = useState(0);
   const [filters, setFilters] = useState([]);

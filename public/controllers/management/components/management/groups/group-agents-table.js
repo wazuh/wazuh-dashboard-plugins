@@ -15,7 +15,7 @@ import { EuiCallOut } from '@elastic/eui';
 import { connect } from 'react-redux';
 import GroupsHandler from './utils/groups-handler';
 import { getToasts } from '../../../../../kibana-services';
-
+import { compressIPv6 } from '../../../../../services/ipv6-services';
 import {
   updateLoadingStatus,
   updateFileContent,
@@ -258,6 +258,10 @@ class WzGroupAgentsTable extends Component {
           reload={this.props.state.reload}
           searchTable={true}
           compressipv6={true}
+          mapResponseItem={(item) => ({
+            ...item,
+            ip: compressIPv6(item.ip)
+          })}
         />
       );
     } else {
