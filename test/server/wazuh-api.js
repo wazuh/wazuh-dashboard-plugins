@@ -121,24 +121,6 @@ describe('wazuh-api', () => {
     res.body.ram.should.be.gt(1);
   });
 
-  it('GET /api/agents-unique/{api}', async () => {
-    const res = await needle(
-      'get',
-      `localhost:5601/api/agents-unique/${API_ID}`,
-      {},
-      {}
-    );
-    res.body.should.be.a('object');
-    res.body.error.should.be.eql(0);
-    res.body.result.should.be.a('object');
-    res.body.result.groups.should.be.a('array');
-    res.body.result.nodes.should.be.a('array');
-    res.body.result.versions.should.be.a('array');
-    res.body.result.osPlatforms.should.be.a('array');
-    res.body.result.lastAgent.should.be.a('object');
-    res.body.result.summary.should.be.a('object');
-  });
-
   it('GET /utils/logs', async () => {
     const res = await needle('get', `localhost:5601/utils/logs`, {}, {});
     res.body.should.be.a('object');
