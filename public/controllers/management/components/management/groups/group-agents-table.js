@@ -162,22 +162,7 @@ class WzGroupAgentsTable extends Component {
         show: true,
         truncateText: false,
         width: '25%',
-        render: (ip) => (
-          <Fragment>
-            {compressIPv6(ip)}
-            <EuiToolTip content="Copy the full IP address" position="left">
-              <EuiButtonIcon
-                onClick={(ev) => {
-                  ev.stopPropagation();
-                  navigator.clipboard.writeText(ip);
-                }}
-                color={'primary'}
-                iconType="copy"
-                aria-label="Copy the full IP address"
-              />
-            </EuiToolTip>
-          </Fragment>
-        ),
+        render: (ip) => (this.renderIP(ip))
       },
       {
         field: 'status',
@@ -264,7 +249,23 @@ class WzGroupAgentsTable extends Component {
   componentWillUnmount() {
     this._isMounted = false;
   }
-
+  renderIP(ip) {
+    return (
+      <Fragment>
+        {compressIPv6(ip)}
+        <EuiToolTip content="Copy the full IP address" position="left">
+          <EuiButtonIcon
+            onClick={() => {
+              navigator.clipboard.writeText(ip);
+            }}
+            color={'primary'}
+            iconType="copy"
+            aria-label="Copy the full IP address"
+          />
+        </EuiToolTip>
+      </Fragment>
+    )
+  }
   render() {
     const { error } = this.props.state;
     if (!error) {

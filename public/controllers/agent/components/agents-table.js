@@ -290,7 +290,7 @@ export const AgentsTable = withErrorBoundary(
       return {
         id: agent.id,
         name: agent.name,
-        ip: compressIPv6(agent.ip),
+        ip: agent.ip,
         status: agent.status,
         group_config_status: agent.group_config_status,
         group: checkField(agent.group),
@@ -483,6 +483,7 @@ export const AgentsTable = withErrorBoundary(
         sortable: true,
         show: true,
         truncateText: true,
+        render: (ip) => (this.renderIP(ip)),
       },
       {
         field: 'group',
@@ -673,7 +674,7 @@ export const AgentsTable = withErrorBoundary(
       };
 
       const getCellProps = (item, column) => {
-        if (column.field == 'actions') {
+        if (column.field == 'actions' || column.field == 'ip') {
           return;
         }
         return {
@@ -763,6 +764,24 @@ export const AgentsTable = withErrorBoundary(
       );
     }
 
+    renderIP(ip) {
+      return (
+        <Fragment>
+          {compressIPv6(ip)}
+          <EuiToolTip content="Copy the full IP address" position="left">
+            <EuiButtonIcon
+              onClick={(ev) => {
+                ev.stopPropagation();
+                navigator.clipboard.writeText(ip);
+              }}
+              color={'primary'}
+              iconType="copy"
+              aria-label="Copy the full IP address"
+            />
+          </EuiToolTip>
+        </Fragment>
+      )
+    }
     render() {
       const title = this.headRender();
       const filter = this.filterBarRender();
