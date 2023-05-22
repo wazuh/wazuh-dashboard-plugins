@@ -37,10 +37,10 @@ import {
   withUserAuthorizationPrompt,
 } from '../../../../../components/common/hocs';
 import { compose } from 'redux';
-import { WzFieldSearch } from '../../../../../components/wz-field-search-bar/wz-field-search-bar';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
+import { WzFieldSearchDelay } from '../../../../../components/common/search';
 
 export default compose(
   withGlobalBreadcrumb([{ text: '' }, { text: 'Management', href: '#/manager' }, { text: 'Logs' }]),
@@ -480,8 +480,8 @@ export default compose(
           <EuiSpacer size={'s'} />
           <EuiFlexGroup>
             <EuiFlexItem>
-              <WzFieldSearch
-                searchDelay={500}
+              <WzFieldSearchDelay
+                delay={500}
                 onChange={this.onSearchBarChange}
                 onSearch={this.onSearchBarSearch}
                 placeholder="Filter logs"
