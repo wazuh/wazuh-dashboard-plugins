@@ -674,11 +674,11 @@ export const AgentsTable = withErrorBoundary(
       };
 
       const getCellProps = (item, column) => {
-        if (column.field == 'actions' || column.field == 'ip') {
+        if (column.field == 'actions') {
           return;
         }
         return {
-          onMouseDown: (ev) => {
+          onClick: (ev) => {
             AppNavigate.navigateToModule(ev, 'agents', { tab: 'welcome', agent: item.id });
             ev.stopPropagation();
           },
