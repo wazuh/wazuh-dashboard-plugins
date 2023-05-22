@@ -279,7 +279,7 @@ export const RegisterAgent = withErrorBoundary(
 
     systemSelectorWazuhControlMacos() {
       if (this.state.selectedVersion == 'sierra') {
-        return '/Library/Ossec/bin/wazuh-control start';
+        return 'sudo /Library/Ossec/bin/wazuh-control start';
       } else return '';
     }
 
@@ -983,7 +983,7 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
         centText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
         debText: `curl -so wazuh-agent.deb ${this.optionalPackages()} && sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}dpkg -i ./wazuh-agent.deb`,
         ubuText: `curl -so wazuh-agent.deb ${this.optionalPackages()} && sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}dpkg -i ./wazuh-agent.deb`,
-        macosText: `sudo curl -so wazuh-agent.pkg https://packages.wazuh.com/4.x/macos/wazuh-agent-${
+        macosText: `curl -so wazuh-agent.pkg https://packages.wazuh.com/4.x/macos/wazuh-agent-${
           this.state.wazuhVersion
         }-1.pkg && sudo launchctl setenv ${this.optionalDeploymentVariables()}${this.agentNameVariable()}&& sudo installer -pkg ./wazuh-agent.pkg -target /`,
         winText:
