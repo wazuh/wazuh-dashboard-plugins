@@ -1,3 +1,7 @@
+.card {
+  height: 183px;
+}
+
 .cardTitle {
   display: flex;
   align-items: center;
@@ -40,4 +44,8 @@
 
 .architectureItem {
   margin-bottom: 8px;
+}
+
+.last-card {
+  margin-right: 63px;
 }

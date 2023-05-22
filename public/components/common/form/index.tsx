@@ -13,6 +13,7 @@ interface InputFormProps {
   type: string;
   value: any;
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onOptionChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   error?: string;
   label?: string;
   header?:
@@ -37,6 +38,7 @@ export const InputForm = ({
   type,
   value,
   onChange,
+  onOptionChange,
   error,
   label,
   header,
@@ -65,7 +67,7 @@ export const InputForm = ({
   );
 
   if (type === 'custom') {
-    return <OsCard {...rest} />;
+    return <OsCard {...rest} onChange={onOptionChange} />;
   }
 
   return label ? (

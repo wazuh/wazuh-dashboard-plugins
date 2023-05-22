@@ -1,11 +1,5 @@
 import React, { useState } from 'react';
-import {
-  EuiCard,
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiIcon,
-  EuiSpacer,
-} from '@elastic/eui';
+import { EuiCard, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import { REGISTER_AGENT_DATA } from '../../utils/register-agent-data';
 import { CheckboxGroupComponent } from '../checkbox-group/checkbox-group';
 import './os-card.scss';
@@ -18,6 +12,10 @@ export const OsCard = () => {
   const handleOptionChange = (optionId: string) => {
     setSelectedOption(optionId);
   };
+
+  const isFirstCard = (index: number) => index === 0;
+  const isLastCard = (index: number) =>
+    index === REGISTER_AGENT_DATA.length - 1;
 
   return (
     <div>
@@ -34,6 +32,7 @@ export const OsCard = () => {
               display='plain'
               hasBorder
               onClick={() => {}}
+              className='card'
             >
               {data.hr && <hr className='hr' />}
               {/* <EuiSpacer size='s' /> */}
