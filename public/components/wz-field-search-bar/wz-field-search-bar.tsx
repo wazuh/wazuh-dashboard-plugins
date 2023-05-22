@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { useState, useEffect, useRef } from 'react';
-import { 
+import {
   EuiFieldSearch
 } from '@elastic/eui';
 
@@ -23,12 +23,18 @@ interface IWzFieldSearchBarProps{
 
 export const WzFieldSearch = ({searchDelay, onSearch, onChange, ...rest}: IWzFieldSearchBarProps) => {
   const [searchTerm, setSearchTerm] = useState('');
+  // The searchTermChange state is added to avoid the request when loading the component,
+  // and wait for some search to be done to make the request.
+  const [searchTermChange, setSearchTermChange] = useState(false);
   const timerRef = useRef();
-  const onChangeSearchTerm = e => setSearchTerm(e.target.value);
+  const onChangeSearchTerm = e => {
+    setSearchTermChange(true);
+    setSearchTerm(e.target.value);
+  };
 
   useEffect(() => {
     onChange && onChange(searchTerm);
-    if(searchDelay){
+    if (searchDelay && searchTermChange) {
       clearTimeout(timerRef.current);
       timerRef.current = setTimeout(() => onSearch(searchTerm), searchDelay);
     }
