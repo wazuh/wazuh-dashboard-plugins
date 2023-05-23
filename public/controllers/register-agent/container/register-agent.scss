@@ -1,0 +1,21 @@
+.container {
+  box-sizing: border-box;
+  height: 1271px;
+  margin-top: 44px;
+  background: #ffffff;
+  border: 1px solid rgba(52, 55, 65, 0.2);
+  max-width: 1030px;
+}
+
+.title {
+  margin-top: 51px;
+  margin-bottom: 51px;
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 30px;
+  line-height: 36px;
+  color: #343741;
+  display: flex;
+  justify-content: center;
+}
