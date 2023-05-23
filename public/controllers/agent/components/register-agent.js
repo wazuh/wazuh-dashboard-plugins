@@ -963,7 +963,7 @@ export const RegisterAgent = withErrorBoundary(
 
       // Select macOS installation script based on architecture
       const macOSInstallationOptions = (this.optionalDeploymentVariables() + this.agentNameVariable()).replaceAll('\' ', '\'\\n');
-      const macOSInstallationSetEnvVariablesScript = macOSInstallationOptions ? `echo -e "${macOSInstallationOptions}" > /tmp/wazuh_envs && ` : ``;
+      const macOSInstallationSetEnvVariablesScript = macOSInstallationOptions ? `echo "${macOSInstallationOptions}" > /tmp/wazuh_envs && ` : ``;
       const macOSInstallationScript = `curl -so wazuh-agent.pkg https://packages.wazuh.com/4.x/macos/wazuh-agent-${this.state.wazuhVersion
         }-1.pkg && ${macOSInstallationSetEnvVariablesScript}sudo installer -pkg ./wazuh-agent.pkg -target /`;
 
