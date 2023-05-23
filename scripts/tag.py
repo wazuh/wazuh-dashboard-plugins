@@ -15,13 +15,13 @@ import subprocess
 # ======================================================= #
 
 # Wazuh version: major.minor.patch
-version = '4.4.1'
+version = '4.4.2'
 # App's revision number (previous rev + 1)
-revision = '00'
+revision = '01'
 # One of 'pre-alpha', 'alpha', 'beta', 'release-candidate', 'stable'
-stage = 'release-candidate'
+stage = 'stable'
 # Tag suffix. Usually set to stage + stage iteration.
-tag_suffix = 'rc1'
+tag_suffix = '-rc2'
 
 # ================================================ #
 # Constants and global variables                   #
@@ -50,7 +50,7 @@ supported_versions = {
         'versions': [item for sublist in kbn_versions for item in sublist]
     },
     'Wazuh Dashboard': {
-        'branch': f'{minor}-2.4-wzd',
+        'branch': f'{minor}',
         'versions': ['2.6.0']
     }
 }
@@ -109,10 +109,11 @@ def setup():
 def main(platform: str, versions: list):
     """Main function."""
     for v in versions:
-        if stage == 'stable':
-            tag = f'v{version}-{v}'
-        else:
-            tag = f'v{version}-{v}-{tag_suffix}'
+        # if stage == 'stable':
+        #     pass    # skipped as we have been asked to
+        #     tag = f'v{version}-{v}'
+        # else:
+        tag = f'v{version}-{v}{tag_suffix}'
         logging.info(f'Generating tag "{tag}"')
         update_package_json(v)
         os.system(f'git commit -am "Bump {tag}"')
