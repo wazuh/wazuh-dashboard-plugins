@@ -2,7 +2,7 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v4.4.3 - OpenSearch Dashboards 2.6.0 - Revision 01
+## Wazuh v4.4.3 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 00
 
 ### Added
 
@@ -10,9 +10,9 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
-- Fixed macos apple install command [#5466](https://github.com/wazuh/wazuh-kibana-app/pull/5466)
+- Fixed command to starting the macOS agent on the agent wizard [#5466](https://github.com/wazuh/wazuh-kibana-app/pull/5466)
 
-## Wazuh v4.4.2 - OpenSearch Dashboards 2.6.0 - Revision 01
+## Wazuh v4.4.2 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 01
 
 ### Added
 
