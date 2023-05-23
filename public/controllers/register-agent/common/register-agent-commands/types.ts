@@ -61,7 +61,6 @@ type tPackagesArchitecture = {
 
 
 export interface IDefinitionsInput {
-  osDefinitions: OSDefinition[],
   osName: tOS,
   architecture: string,
   extension: tPackageExtensions,
