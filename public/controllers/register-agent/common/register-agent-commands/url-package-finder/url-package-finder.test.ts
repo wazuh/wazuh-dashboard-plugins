@@ -1,8 +1,8 @@
 import {
     URLPackageFinder,
-    NotOptionFoundException,
 } from './url-package-finder';
 import { defaultPackageDefinitions } from '../definitions';
+import { NoOSOptionFoundException, NoOptionFoundException } from '../exceptions';
 const packageFinder = new URLPackageFinder(defaultPackageDefinitions, '4.4.2');
 
 describe('URL Package Finder', () => {
@@ -17,19 +17,19 @@ describe('URL Package Finder', () => {
         it('should throw a NotOptionFoundException for an invalid os name', () => {
             expect(() => {
                 packageFinder.getURLPackage('wrong-os', 'amd64', 'rpm');
-            }).toThrowError(NotOptionFoundException);
+            }).toThrowError(NoOSOptionFoundException);
         });
 
         it('should throw a NotOptionFoundException for an invalid architecture', () => {
             expect(() => {
                 packageFinder.getURLPackage('linux', 'wrong-arch', 'rpm');
-            }).toThrowError(NotOptionFoundException);
+            }).toThrowError(NoOptionFoundException);
         });
 
         it('should throw a NotOptionFoundException for a package that is not available for the current platform', () => {
             expect(() => {
                 packageFinder.getURLPackage('linux', 'amd64', 'wrong-extension');
-            }).toThrowError(NotOptionFoundException);
+            }).toThrowError(NoOptionFoundException);
         });
     });
 });
