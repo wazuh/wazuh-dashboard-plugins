@@ -4,7 +4,11 @@ import { REGISTER_AGENT_DATA_STEP_ONE } from '../../utils/register-agent-data';
 import { CheckboxGroupComponent } from '../checkbox-group/checkbox-group';
 import './os-card.scss';
 
-export const OsCard = ({ setStatusCheck }) => {
+interface Props {
+  setStatusCheck: string;
+}
+
+export const OsCard = ({ setStatusCheck }: Props) => {
   const [selectedOption, setSelectedOption] = useState<string | undefined>(
     undefined,
   );
@@ -13,10 +17,6 @@ export const OsCard = ({ setStatusCheck }) => {
     setSelectedOption(optionId);
     setStatusCheck('complete');
   };
-
-  const isFirstCard = (index: number) => index === 0;
-  const isLastCard = (index: number) =>
-    index === REGISTER_AGENT_DATA_STEP_ONE.length - 1;
 
   return (
     <div>
