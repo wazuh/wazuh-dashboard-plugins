@@ -403,12 +403,23 @@ export const RegisterAgent = withErrorBoundary(
           .join(',')}' `;
       }
 
+      // macos doesnt need = param
+      if (this.state.selectedOS === 'macos') {
+        return deployment.replace(/=/g, ' ');
+      }
+
       return deployment;
     }
 
     agentNameVariable() {
       let agentName = `WAZUH_AGENT_NAME='${this.state.agentName}' `;
-
+      if (
+        this.state.selectedOS === 'macos' &&
+        this.state.selectedArchitecture &&
+        this.state.agentName !== ''
+      ) {
+        return agentName.replace(/=/g, ' ');
+      }
       if (this.state.selectedArchitecture && this.state.agentName !== '') {
         return agentName;
       } else {
@@ -418,7 +429,7 @@ export const RegisterAgent = withErrorBoundary(
 
     resolveRPMPackage() {
       switch (
-      `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
+        `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
       ) {
         case 'redhat5-i386':
           return `https://packages.wazuh.com/4.x/yum5/i386/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.el5.i386.rpm`;
@@ -449,7 +460,7 @@ export const RegisterAgent = withErrorBoundary(
 
     resolveAlpinePackage() {
       switch (
-      `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
+        `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
       ) {
         case '3.12.12-i386':
           return 'https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub && echo "https://packages.wazuh.com/4.x/alpine/v3.12/main"';
@@ -470,7 +481,7 @@ export const RegisterAgent = withErrorBoundary(
 
     resolveORACLELINUXPackage() {
       switch (
-      `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
+        `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
       ) {
         case 'oraclelinux5-i386':
           return `https://packages.wazuh.com/4.x/yum5/i386/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.el5.i386.rpm`;
@@ -491,7 +502,7 @@ export const RegisterAgent = withErrorBoundary(
 
     resolveCENTPackage() {
       switch (
-      `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
+        `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
       ) {
         case 'centos5-i386':
           return `https://packages.wazuh.com/4.x/yum5/i386/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.el5.i386.rpm`;
@@ -522,7 +533,7 @@ export const RegisterAgent = withErrorBoundary(
 
     resolveSUSEPackage() {
       switch (
-      `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
+        `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
       ) {
         case 'suse11-i386':
           return `https://packages.wazuh.com/4.x/yum5/i386/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.el5.i386.rpm`;
@@ -545,7 +556,7 @@ export const RegisterAgent = withErrorBoundary(
 
     resolveFEDORAPachage() {
       switch (
-      `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
+        `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
       ) {
         case '22-i386':
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.i386.rpm`;
@@ -564,7 +575,7 @@ export const RegisterAgent = withErrorBoundary(
 
     resolveAMAZONLPackage() {
       switch (
-      `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
+        `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
       ) {
         case 'amazonlinux1-i386':
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.i386.rpm`;
@@ -614,7 +625,7 @@ export const RegisterAgent = withErrorBoundary(
 
     resolveRASPBIANPackage() {
       switch (
-      `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
+        `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
       ) {
         case 'busterorgreater-i386':
           return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}${this.addToVersion}_i386.deb`;
@@ -633,7 +644,7 @@ export const RegisterAgent = withErrorBoundary(
 
     resolveUBUNTUPackage() {
       switch (
-      `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
+        `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
       ) {
         case 'ubuntu14-i386':
           return `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}${this.addToVersion}_i386.deb`;
@@ -658,7 +669,7 @@ export const RegisterAgent = withErrorBoundary(
 
     resolveOPENSUSEPackage() {
       switch (
-      `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
+        `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
       ) {
         case 'leap15-i386':
           return `https://packages.wazuh.com/4.x/yum/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.i386.rpm`;
@@ -677,7 +688,7 @@ export const RegisterAgent = withErrorBoundary(
 
     resolveSOLARISPackage() {
       switch (
-      `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
+        `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
       ) {
         case 'solaris10-i386':
           return `https://packages.wazuh.com/4.x/solaris/i386/10/wazuh-agent_v${this.state.wazuhVersion}-sol10-i386.pkg`;
@@ -694,7 +705,7 @@ export const RegisterAgent = withErrorBoundary(
 
     resolveAIXPackage() {
       switch (
-      `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
+        `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
       ) {
         case '6.1 TL9-powerpc':
           return `https://packages.wazuh.com/4.x/aix/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}.aix.ppc.rpm`;
@@ -705,7 +716,7 @@ export const RegisterAgent = withErrorBoundary(
 
     resolveHPPackage() {
       switch (
-      `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
+        `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
       ) {
         case '11.31-itanium2':
           return `https://packages.wazuh.com/4.x/hp-ux/wazuh-agent-${this.state.wazuhVersion}${this.addToVersion}-hpux-11v3-ia64.tar`;
@@ -904,8 +915,9 @@ export const RegisterAgent = withErrorBoundary(
             error={[
               this.state.badCharacters.length < 1
                 ? 'The minimum length is 2 characters.'
-                : `The character${this.state.badCharacters.length <= 1 ? '' : 's'
-                }
+                : `The character${
+                    this.state.badCharacters.length <= 1 ? '' : 's'
+                  }
             ${this.state.badCharacters.map(char => ` "${char}"`)}
             ${this.state.badCharacters.length <= 1 ? 'is' : 'are'}
             not valid. Allowed characters are A-Z, a-z, ".", "-", "_"`,
@@ -964,13 +976,13 @@ export const RegisterAgent = withErrorBoundary(
       };
 
       // Select macOS installation script based on architecture
-      const macOSInstallationOptions = (this.optionalDeploymentVariables() + this.agentNameVariable()).replaceAll('\' ', '\'\\n');
-      const macOSInstallationSetEnvVariablesScript = macOSInstallationOptions ? `echo -e "${macOSInstallationOptions}" > /tmp/wazuh_envs && ` : ``;
       const macOSInstallationScript = {
         intel: `curl -so wazuh-agent.pkg https://packages.wazuh.com/4.x/macos/wazuh-agent-${this.state.wazuhVersion
-          }-1.pkg && ${macOSInstallationSetEnvVariablesScript}sudo installer -pkg ./wazuh-agent.pkg -target /`,
+          }-1.pkg && sudo launchctl setenv ${this.optionalDeploymentVariables()}${this.agentNameVariable()
+          }&& sudo installer -pkg ./wazuh-agent.pkg -target /`,
         applesilicon: `curl -so wazuh-agent.pkg https://packages.wazuh.com/4.x/macos/wazuh-agent-${this.state.wazuhVersion
-          }-1.pkg && ${macOSInstallationSetEnvVariablesScript}sudo installer -pkg ./wazuh-agent.pkg -target /`,
+          }-1.pkg && sudo launchctl setenv ${this.optionalDeploymentVariables()}${this.agentNameVariable()
+          }&& sudo installer -pkg ./wazuh-agent.pkg -target /`,
       }
 
       const customTexts = {
@@ -984,19 +996,23 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
         macosText: macOSInstallationScript[this.state.selectedArchitecture],
         winText:
           this.state.selectedVersion == 'windowsxp' ||
-            this.state.selectedVersion == 'windowsserver2008'
-            ? `msiexec.exe /i wazuh-agent-${this.state.wazuhVersion
-            }-1.msi /q ${this.optionalDeploymentVariables()}${this.agentNameVariable()}`
-            : `Invoke-WebRequest -Uri https://packages.wazuh.com/4.x/windows/wazuh-agent-${this.state.wazuhVersion
-            }-1.msi -OutFile \${env:tmp}\\wazuh-agent.msi; msiexec.exe /i \${env:tmp}\\wazuh-agent.msi /q ${this.optionalDeploymentVariables()}${this.agentNameVariable()}`,
+          this.state.selectedVersion == 'windowsserver2008'
+            ? `msiexec.exe /i wazuh-agent-${
+                this.state.wazuhVersion
+              }-1.msi /q ${this.optionalDeploymentVariables()}${this.agentNameVariable()}`
+            : `Invoke-WebRequest -Uri https://packages.wazuh.com/4.x/windows/wazuh-agent-${
+                this.state.wazuhVersion
+              }-1.msi -OutFile \${env:tmp}\\wazuh-agent.msi; msiexec.exe /i \${env:tmp}\\wazuh-agent.msi /q ${this.optionalDeploymentVariables()}${this.agentNameVariable()}`,
         openText: `sudo rpm --import https://packages.wazuh.com/key/GPG-KEY-WAZUH && sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}zypper install -y ${this.optionalPackages()}`,
-        solText: `sudo curl -so ${this.state.selectedVersion == 'solaris11'
+        solText: `sudo curl -so ${
+          this.state.selectedVersion == 'solaris11'
             ? 'wazuh-agent.p5p'
             : 'wazuh-agent.pkg'
-          } ${this.optionalPackages()} && ${this.state.selectedVersion == 'solaris11'
+        } ${this.optionalPackages()} && ${
+          this.state.selectedVersion == 'solaris11'
             ? 'pkg install -g wazuh-agent.p5p wazuh-agent'
             : 'pkgadd -d wazuh-agent.pkg'
-          }`,
+        }`,
         aixText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}rpm -ivh ${this.optionalPackages()}`,
         hpText: `cd / && sudo curl -so wazuh-agent.tar ${this.optionalPackages()} && sudo groupadd wazuh && sudo useradd -G wazuh wazuh && sudo tar -xvf wazuh-agent.tar`,
         amazonlinuxText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
@@ -1131,20 +1147,20 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
               {windowsAdvice}
               {['windowsxp', 'windowsserver2008'].includes(
                 this.state.selectedVersion) && (
-                  <>
-                    <EuiCallOut
-                      color='warning'
-                      title={warningCommand}
-                      iconType='iInCircle'
-                    />
-                    <EuiSpacer />
-                  </>
-                )}
+                <>
+                  <EuiCallOut
+                    color='warning'
+                    title={warningCommand}
+                    iconType='iInCircle'
+                  />
+                  <EuiSpacer />
+                </>
+              )}
               <div className='copy-codeblock-wrapper'>
                 <EuiCodeBlock style={codeBlock} language={language}>
                   {this.state.wazuhPassword &&
-                    !this.state.showPassword &&
-                    !['sol', 'hp', 'alpine'].includes(this.state.selectedOS)
+                  !this.state.showPassword &&
+                  !['sol', 'hp', 'alpine'].includes(this.state.selectedOS)
                     ? this.obfuscatePassword(text)
                     : text}
                 </EuiCodeBlock>
@@ -1159,7 +1175,7 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
                 </EuiCopy>
               </div>
               {this.state.selectedVersion == 'solaris10' ||
-                this.state.selectedVersion == 'solaris11' ? (
+              this.state.selectedVersion == 'solaris11' ? (
                 <>
                   <EuiCallOut
                     color='warning'
@@ -1331,7 +1347,7 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
                 ''
               )}
               {this.state.needsPassword &&
-                !['sol', 'hp', 'alpine'].includes(this.state.selectedOS) ? (
+              !['sol', 'hp', 'alpine'].includes(this.state.selectedOS) ? (
                 <EuiSwitch
                   label='Show password'
                   checked={this.state.showPassword}
@@ -1527,11 +1543,11 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
       ];
 
       const onChangeServerAddress = async nodeSelected => {
-        this.setState({
-          serverAddress: nodeSelected,
-          udpProtocol: this.state.haveUdpProtocol,
-          connectionSecure: this.state.haveConnectionSecure
-        });
+          this.setState({
+            serverAddress: nodeSelected,
+            udpProtocol: this.state.haveUdpProtocol,
+            connectionSecure: this.state.haveConnectionSecure
+          });
       };
 
       const steps = [
@@ -1548,433 +1564,433 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
         },
         ...(this.state.selectedOS == 'rpm'
           ? [
-            {
-              title: 'Choose the version',
-              children: (
-                <RegisterAgentButtonGroup
-                  legend='Choose the version'
-                  options={versionButtonsRedHat}
-                  idSelected={this.state.selectedVersion}
-                  onChange={version => this.setVersion(version)}
-                />
-              ),
-            },
-          ]
+              {
+                title: 'Choose the version',
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the version'
+                    options={versionButtonsRedHat}
+                    idSelected={this.state.selectedVersion}
+                    onChange={version => this.setVersion(version)}
+                  />
+                ),
+              },
+            ]
           : []),
         ...(this.state.selectedOS == 'oraclelinux'
           ? [
-            {
-              title: 'Choose the version',
-              children: (
-                <RegisterAgentButtonGroup
-                  legend='Choose the version'
-                  options={versionButtonsOracleLinux}
-                  idSelected={this.state.selectedVersion}
-                  onChange={version => this.setVersion(version)}
-                />
-              ),
-            },
-          ]
+              {
+                title: 'Choose the version',
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the version'
+                    options={versionButtonsOracleLinux}
+                    idSelected={this.state.selectedVersion}
+                    onChange={version => this.setVersion(version)}
+                  />
+                ),
+              },
+            ]
           : []),
         ...(this.state.selectedOS == 'raspbian'
           ? [
-            {
-              title: 'Choose the version',
-              children: (
-                <RegisterAgentButtonGroup
-                  legend='Choose the version'
-                  options={versionButtonsRaspbian}
-                  idSelected={this.state.selectedVersion}
-                  onChange={version => this.setVersion(version)}
-                />
-              ),
-            },
-          ]
+              {
+                title: 'Choose the version',
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the version'
+                    options={versionButtonsRaspbian}
+                    idSelected={this.state.selectedVersion}
+                    onChange={version => this.setVersion(version)}
+                  />
+                ),
+              },
+            ]
           : []),
         ...(this.state.selectedOS == 'amazonlinux'
           ? [
-            {
-              title: 'Choose the version',
-              children: (
-                <RegisterAgentButtonGroup
-                  legend='Choose the version'
-                  options={versionButtonAmazonLinux}
-                  idSelected={this.state.selectedVersion}
-                  onChange={version => this.setVersion(version)}
-                />
-              ),
-            },
-          ]
+              {
+                title: 'Choose the version',
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the version'
+                    options={versionButtonAmazonLinux}
+                    idSelected={this.state.selectedVersion}
+                    onChange={version => this.setVersion(version)}
+                  />
+                ),
+              },
+            ]
           : []),
         ...(this.state.selectedOS == 'cent'
           ? [
-            {
-              title: 'Choose the version',
-              children: (
-                <RegisterAgentButtonGroup
-                  legend='Choose the version'
-                  options={versionButtonsCentos}
-                  idSelected={this.state.selectedVersion}
-                  onChange={version => this.setVersion(version)}
-                />
-              ),
-            },
-          ]
+              {
+                title: 'Choose the version',
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the version'
+                    options={versionButtonsCentos}
+                    idSelected={this.state.selectedVersion}
+                    onChange={version => this.setVersion(version)}
+                  />
+                ),
+              },
+            ]
           : []),
         ...(this.state.selectedOS == 'fedora'
           ? [
-            {
-              title: 'Choose the version',
-              children: (
-                <RegisterAgentButtonGroup
-                  legend='Choose the version'
-                  options={versionButtonFedora}
-                  idSelected={this.state.selectedVersion}
-                  onChange={version => this.setVersion(version)}
-                />
-              ),
-            },
-          ]
+              {
+                title: 'Choose the version',
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the version'
+                    options={versionButtonFedora}
+                    idSelected={this.state.selectedVersion}
+                    onChange={version => this.setVersion(version)}
+                  />
+                ),
+              },
+            ]
           : []),
         ...(this.state.selectedOS == 'deb'
           ? [
-            {
-              title: 'Choose the version',
-              children: (
-                <RegisterAgentButtonGroup
-                  legend='Choose the version'
-                  options={versionButtonsDebian}
-                  idSelected={this.state.selectedVersion}
-                  onChange={version => this.setVersion(version)}
-                />
-              ),
-            },
-          ]
+              {
+                title: 'Choose the version',
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the version'
+                    options={versionButtonsDebian}
+                    idSelected={this.state.selectedVersion}
+                    onChange={version => this.setVersion(version)}
+                  />
+                ),
+              },
+            ]
           : []),
         ...(this.state.selectedOS == 'ubu'
           ? [
-            {
-              title: 'Choose the version',
-              children: (
-                <RegisterAgentButtonGroup
-                  legend='Choose the version'
-                  options={versionButtonsUbuntu}
-                  idSelected={this.state.selectedVersion}
-                  onChange={version => this.setVersion(version)}
-                />
-              ),
-            },
-          ]
+              {
+                title: 'Choose the version',
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the version'
+                    options={versionButtonsUbuntu}
+                    idSelected={this.state.selectedVersion}
+                    onChange={version => this.setVersion(version)}
+                  />
+                ),
+              },
+            ]
           : []),
         ...(this.state.selectedOS == 'win'
           ? [
-            {
-              title: 'Choose the version',
-              children: (
-                <RegisterAgentButtonGroup
-                  legend='Choose the version'
-                  options={versionButtonsWindows}
-                  idSelected={this.state.selectedVersion}
-                  onChange={version => this.setVersion(version)}
-                />
-              ),
-            },
-          ]
+              {
+                title: 'Choose the version',
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the version'
+                    options={versionButtonsWindows}
+                    idSelected={this.state.selectedVersion}
+                    onChange={version => this.setVersion(version)}
+                  />
+                ),
+              },
+            ]
           : []),
         ...(this.state.selectedOS == 'macos'
           ? [
-            {
-              title: 'Choose the version',
-              children: (
-                <RegisterAgentButtonGroup
-                  legend='Choose the version'
-                  options={versionButtonsMacOS}
-                  idSelected={this.state.selectedVersion}
-                  onChange={version => this.setVersion(version)}
-                />
-              ),
-            },
-          ]
+              {
+                title: 'Choose the version',
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the version'
+                    options={versionButtonsMacOS}
+                    idSelected={this.state.selectedVersion}
+                    onChange={version => this.setVersion(version)}
+                  />
+                ),
+              },
+            ]
           : []),
         ...(this.state.selectedOS == 'suse'
           ? [
-            {
-              title: 'Choose the version',
-              children: (
-                <RegisterAgentButtonGroup
-                  legend='Choose the version'
-                  options={versionButtonsSuse}
-                  idSelected={this.state.selectedVersion}
-                  onChange={version => this.setVersion(version)}
-                />
-              ),
-            },
-          ]
+              {
+                title: 'Choose the version',
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the version'
+                    options={versionButtonsSuse}
+                    idSelected={this.state.selectedVersion}
+                    onChange={version => this.setVersion(version)}
+                  />
+                ),
+              },
+            ]
           : []),
         ...(this.state.selectedOS == 'open'
           ? [
-            {
-              title: 'Choose the version',
-              children: (
-                <RegisterAgentButtonGroup
-                  legend='Choose the version'
-                  options={versionButtonsOpenSuse}
-                  idSelected={this.state.selectedVersion}
-                  onChange={version => this.setVersion(version)}
-                />
-              ),
-            },
-          ]
+              {
+                title: 'Choose the version',
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the version'
+                    options={versionButtonsOpenSuse}
+                    idSelected={this.state.selectedVersion}
+                    onChange={version => this.setVersion(version)}
+                  />
+                ),
+              },
+            ]
           : []),
         ...(this.state.selectedOS == 'sol'
           ? [
-            {
-              title: 'Choose the version',
-              children: (
-                <RegisterAgentButtonGroup
-                  legend='Choose the version'
-                  options={versionButtonsSolaris}
-                  idSelected={this.state.selectedVersion}
-                  onChange={version => this.setVersion(version)}
-                />
-              ),
-            },
-          ]
+              {
+                title: 'Choose the version',
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the version'
+                    options={versionButtonsSolaris}
+                    idSelected={this.state.selectedVersion}
+                    onChange={version => this.setVersion(version)}
+                  />
+                ),
+              },
+            ]
           : []),
         ...(this.state.selectedOS == 'aix'
           ? [
-            {
-              title: 'Choose the version',
-              children: (
-                <RegisterAgentButtonGroup
-                  legend='Choose the version'
-                  options={versionButtonsAix}
-                  idSelected={this.state.selectedVersion}
-                  onChange={version => this.setVersion(version)}
-                />
-              ),
-            },
-          ]
+              {
+                title: 'Choose the version',
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the version'
+                    options={versionButtonsAix}
+                    idSelected={this.state.selectedVersion}
+                    onChange={version => this.setVersion(version)}
+                  />
+                ),
+              },
+            ]
           : []),
         ...(this.state.selectedOS == 'hp'
           ? [
-            {
-              title: 'Choose the version',
-              children: (
-                <RegisterAgentButtonGroup
-                  legend='Choose the version'
-                  options={versionButtonsHPUX}
-                  idSelected={this.state.selectedVersion}
-                  onChange={version => this.setVersion(version)}
-                />
-              ),
-            },
-          ]
+              {
+                title: 'Choose the version',
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the version'
+                    options={versionButtonsHPUX}
+                    idSelected={this.state.selectedVersion}
+                    onChange={version => this.setVersion(version)}
+                  />
+                ),
+              },
+            ]
           : []),
         ...(this.state.selectedOS == 'alpine'
           ? [
-            {
-              title: 'Choose the version',
-              children: (
-                <RegisterAgentButtonGroup
-                  legend='Choose the version'
-                  options={versionButtonAlpine}
-                  idSelected={this.state.selectedVersion}
-                  onChange={version => this.setVersion(version)}
-                />
-              ),
-            },
-          ]
+              {
+                title: 'Choose the version',
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the version'
+                    options={versionButtonAlpine}
+                    idSelected={this.state.selectedVersion}
+                    onChange={version => this.setVersion(version)}
+                  />
+                ),
+              },
+            ]
           : []),
         ...(this.state.selectedVersion == 'centos5' ||
-          this.state.selectedVersion == 'redhat5' ||
-          this.state.selectedVersion == 'oraclelinux5' ||
-          this.state.selectedVersion == 'suse11'
+        this.state.selectedVersion == 'redhat5' ||
+        this.state.selectedVersion == 'oraclelinux5' ||
+        this.state.selectedVersion == 'suse11'
           ? [
-            {
-              title: 'Choose the architecture',
-              children: (
-                <RegisterAgentButtonGroup
-                  legend='Choose the architecture'
-                  options={architecturei386Andx86_64}
-                  idSelected={this.state.selectedArchitecture}
-                  onChange={architecture =>
-                    this.setArchitecture(architecture)
-                  }
-                />
-              ),
-            },
-          ]
+              {
+                title: 'Choose the architecture',
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the architecture'
+                    options={architecturei386Andx86_64}
+                    idSelected={this.state.selectedArchitecture}
+                    onChange={architecture =>
+                      this.setArchitecture(architecture)
+                    }
+                  />
+                ),
+              },
+            ]
           : []),
         ...(this.state.selectedVersion == 'leap15'
           ? [
-            {
-              title: 'Choose the architecture',
-              children: (
-                <RegisterAgentButtonGroup
-                  legend='Choose the architecture'
-                  options={architectureButtonsWithPPC64LE}
-                  idSelected={this.state.selectedArchitecture}
-                  onChange={architecture =>
-                    this.setArchitecture(architecture)
-                  }
-                />
-              ),
-            },
-          ]
+              {
+                title: 'Choose the architecture',
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the architecture'
+                    options={architectureButtonsWithPPC64LE}
+                    idSelected={this.state.selectedArchitecture}
+                    onChange={architecture =>
+                      this.setArchitecture(architecture)
+                    }
+                  />
+                ),
+              },
+            ]
           : []),
         ...(this.state.selectedVersion == '3.12.12'
           ? [
-            {
-              title: 'Choose the architecture',
-              children: (
-                <RegisterAgentButtonGroup
-                  legend='Choose the architecture'
-                  options={architectureButtonsWithPPC64LEAlpine}
-                  idSelected={this.state.selectedArchitecture}
-                  onChange={architecture =>
-                    this.setArchitecture(architecture)
-                  }
-                />
-              ),
-            },
-          ]
+              {
+                title: 'Choose the architecture',
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the architecture'
+                    options={architectureButtonsWithPPC64LEAlpine}
+                    idSelected={this.state.selectedArchitecture}
+                    onChange={architecture =>
+                      this.setArchitecture(architecture)
+                    }
+                  />
+                ),
+              },
+            ]
           : []),
         ...(this.state.selectedVersion == 'centos6' ||
-          this.state.selectedVersion == 'oraclelinux6' ||
-          this.state.selectedVersion == 'amazonlinux1' ||
-          this.state.selectedVersion == 'redhat6' ||
-          this.state.selectedVersion == 'amazonlinux2022' ||
-          this.state.selectedVersion == 'amazonlinux2' ||
-          this.state.selectedVersion == 'debian7' ||
-          this.state.selectedVersion == 'debian8' ||
-          this.state.selectedVersion == 'ubuntu14' ||
-          this.state.selectedVersion == 'ubuntu15'
+        this.state.selectedVersion == 'oraclelinux6' ||
+        this.state.selectedVersion == 'amazonlinux1' ||
+        this.state.selectedVersion == 'redhat6' ||
+        this.state.selectedVersion == 'amazonlinux2022' ||
+        this.state.selectedVersion == 'amazonlinux2' ||
+        this.state.selectedVersion == 'debian7' ||
+        this.state.selectedVersion == 'debian8' ||
+        this.state.selectedVersion == 'ubuntu14' ||
+        this.state.selectedVersion == 'ubuntu15'
           ? [
-            {
-              title: 'Choose the architecture',
-              children: (
-                <RegisterAgentButtonGroup
-                  legend='Choose the architecture'
-                  options={architectureButtons}
-                  idSelected={this.state.selectedArchitecture}
-                  onChange={architecture =>
-                    this.setArchitecture(architecture)
-                  }
-                />
-              ),
-            },
-          ]
+              {
+                title: 'Choose the architecture',
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the architecture'
+                    options={architectureButtons}
+                    idSelected={this.state.selectedArchitecture}
+                    onChange={architecture =>
+                      this.setArchitecture(architecture)
+                    }
+                  />
+                ),
+              },
+            ]
           : []),
         ...(this.state.selectedVersion == 'centos7' ||
-          this.state.selectedVersion == 'redhat7' ||
-          this.state.selectedVersion == 'suse12' ||
-          this.state.selectedVersion == '22' ||
-          this.state.selectedVersion == 'debian9' ||
-          this.state.selectedVersion == 'busterorgreater'
+        this.state.selectedVersion == 'redhat7' ||
+        this.state.selectedVersion == 'suse12' ||
+        this.state.selectedVersion == '22' ||
+        this.state.selectedVersion == 'debian9' ||
+        this.state.selectedVersion == 'busterorgreater'
           ? [
-            {
-              title: 'Choose the architecture',
-              children: (
-                <RegisterAgentButtonGroup
-                  legend='Choose the architecture'
-                  options={architectureButtonsWithPPC64LE}
-                  idSelected={this.state.selectedArchitecture}
-                  onChange={architecture =>
-                    this.setArchitecture(architecture)
-                  }
-                />
-              ),
-            },
-          ]
+              {
+                title: 'Choose the architecture',
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the architecture'
+                    options={architectureButtonsWithPPC64LE}
+                    idSelected={this.state.selectedArchitecture}
+                    onChange={architecture =>
+                      this.setArchitecture(architecture)
+                    }
+                  />
+                ),
+              },
+            ]
           : []),
         ...(this.state.selectedVersion == 'windowsxp' ||
-          this.state.selectedVersion == 'windowsserver2008' ||
-          this.state.selectedVersion == 'windows7'
+        this.state.selectedVersion == 'windowsserver2008' ||
+        this.state.selectedVersion == 'windows7'
           ? [
-            {
-              title: 'Choose the architecture',
-              children: (
-                <RegisterAgentButtonGroup
-                  legend='Choose the architecture'
-                  options={architectureButtonsi386}
-                  idSelected={this.state.selectedArchitecture}
-                  onChange={architecture =>
-                    this.setArchitecture(architecture)
-                  }
-                />
-              ),
-            },
-          ]
+              {
+                title: 'Choose the architecture',
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the architecture'
+                    options={architectureButtonsi386}
+                    idSelected={this.state.selectedArchitecture}
+                    onChange={architecture =>
+                      this.setArchitecture(architecture)
+                    }
+                  />
+                ),
+              },
+            ]
           : []),
         ...(this.state.selectedVersion == 'sierra'
           ? [
-            {
-              title: 'Choose the architecture',
-              children: (
-                <RegisterAgentButtonGroup
-                  legend='Choose the architecture'
-                  options={architectureButtonsMacos}
-                  idSelected={this.state.selectedArchitecture}
-                  onChange={architecture =>
-                    this.setArchitecture(architecture)
-                  }
-                />
-              ),
-            },
-          ]
+              {
+                title: 'Choose the architecture',
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the architecture'
+                    options={architectureButtonsMacos}
+                    idSelected={this.state.selectedArchitecture}
+                    onChange={architecture =>
+                      this.setArchitecture(architecture)
+                    }
+                  />
+                ),
+              },
+            ]
           : []),
         ...(this.state.selectedVersion == 'solaris10' ||
-          this.state.selectedVersion == 'solaris11'
+        this.state.selectedVersion == 'solaris11'
           ? [
-            {
-              title: 'Choose the architecture',
-              children: (
-                <RegisterAgentButtonGroup
-                  legend='Choose the architecture'
-                  options={architectureButtonsSolaris}
-                  idSelected={this.state.selectedArchitecture}
-                  onChange={architecture =>
-                    this.setArchitecture(architecture)
-                  }
-                />
-              ),
-            },
-          ]
+              {
+                title: 'Choose the architecture',
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the architecture'
+                    options={architectureButtonsSolaris}
+                    idSelected={this.state.selectedArchitecture}
+                    onChange={architecture =>
+                      this.setArchitecture(architecture)
+                    }
+                  />
+                ),
+              },
+            ]
           : []),
         ...(this.state.selectedVersion == '6.1 TL9'
           ? [
-            {
-              title: 'Choose the architecture',
-              children: (
-                <RegisterAgentButtonGroup
-                  legend='Choose the architecture'
-                  options={architectureButtonsAix}
-                  idSelected={this.state.selectedArchitecture}
-                  onChange={architecture =>
-                    this.setArchitecture(architecture)
-                  }
-                />
-              ),
-            },
-          ]
+              {
+                title: 'Choose the architecture',
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the architecture'
+                    options={architectureButtonsAix}
+                    idSelected={this.state.selectedArchitecture}
+                    onChange={architecture =>
+                      this.setArchitecture(architecture)
+                    }
+                  />
+                ),
+              },
+            ]
           : []),
         ...(this.state.selectedVersion == '11.31'
           ? [
-            {
-              title: 'Choose the architecture',
-              children: (
-                <RegisterAgentButtonGroup
-                  legend='Choose the architecture'
-                  options={architectureButtonsHpUx}
-                  idSelected={this.state.selectedArchitecture}
-                  onChange={architecture =>
-                    this.setArchitecture(architecture)
-                  }
-                />
-              ),
-            },
-          ]
+              {
+                title: 'Choose the architecture',
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the architecture'
+                    options={architectureButtonsHpUx}
+                    idSelected={this.state.selectedArchitecture}
+                    onChange={architecture =>
+                      this.setArchitecture(architecture)
+                    }
+                  />
+                ),
+              },
+            ]
           : []),
         ...(!(
           this.state.selectedOS == 'hp' ||
@@ -1982,18 +1998,18 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
           this.state.selectedOS == 'alpine'
         )
           ? [
-            {
-              title: 'Wazuh server address',
-              children: (
-                <Fragment>
-                  <WzManagerAddressInput
-                    defaultValue={this.state.defaultServerAddress}
-                    onChange={onChangeServerAddress}
-                  />
-                </Fragment>
-              ),
-            },
-          ]
+              {
+                title: 'Wazuh server address',
+                children: (
+                  <Fragment>
+                    <WzManagerAddressInput
+                      defaultValue={this.state.defaultServerAddress}
+                      onChange={onChangeServerAddress}
+                    />
+                  </Fragment>
+                ),
+              },
+            ]
           : []),
         ...(!(
           !this.state.needsPassword ||
@@ -2003,11 +2019,11 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
           )
         )
           ? [
-            {
-              title: 'Wazuh password',
-              children: <Fragment>{passwordInput}</Fragment>,
-            },
-          ]
+              {
+                title: 'Wazuh password',
+                children: <Fragment>{passwordInput}</Fragment>,
+              },
+            ]
           : []),
         ...(!(
           this.state.selectedOS == 'hp' ||
@@ -2015,17 +2031,17 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
           this.state.selectedOS == 'alpine'
         )
           ? [
-            {
-              title: 'Assign a name and a group to the agent',
-              children: (
-                <Fragment>
-                  {agentName}
-                  {groupInput}
-                  {agentGroup}
-                </Fragment>
-              ),
-            },
-          ]
+              {
+                title: 'Assign a name and a group to the agent',
+                children: (
+                  <Fragment>
+                    {agentName}
+                    {groupInput}
+                    {agentGroup}
+                  </Fragment>
+                ),
+              },
+            ]
           : []),
         {
           title: 'Install and enroll the agent',
@@ -2049,46 +2065,46 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
           ),
         },
         ...(this.state.selectedOS == 'rpm' ||
-          this.state.selectedOS == 'cent' ||
-          this.state.selectedOS == 'suse' ||
-          this.state.selectedOS == 'fedora' ||
-          this.state.selectedOS == 'oraclelinux' ||
-          this.state.selectedOS == 'amazonlinux' ||
-          this.state.selectedOS == 'deb' ||
-          this.state.selectedOS == 'raspbian' ||
-          this.state.selectedOS == 'ubu' ||
-          this.state.selectedOS == 'win' ||
-          this.state.selectedOS == 'macos' ||
-          this.state.selectedOS == 'open' ||
-          this.state.selectedOS == 'sol' ||
-          this.state.selectedOS == 'aix' ||
-          this.state.selectedOS == 'hp' ||
-          this.state.selectedOS == 'alpine' ||
-          this.state.selectedOS == ''
+        this.state.selectedOS == 'cent' ||
+        this.state.selectedOS == 'suse' ||
+        this.state.selectedOS == 'fedora' ||
+        this.state.selectedOS == 'oraclelinux' ||
+        this.state.selectedOS == 'amazonlinux' ||
+        this.state.selectedOS == 'deb' ||
+        this.state.selectedOS == 'raspbian' ||
+        this.state.selectedOS == 'ubu' ||
+        this.state.selectedOS == 'win' ||
+        this.state.selectedOS == 'macos' ||
+        this.state.selectedOS == 'open' ||
+        this.state.selectedOS == 'sol' ||
+        this.state.selectedOS == 'aix' ||
+        this.state.selectedOS == 'hp' ||
+        this.state.selectedOS == 'alpine' ||
+        this.state.selectedOS == ''
           ? [
-            {
-              title: 'Start the agent',
-              children: this.state.gotErrorRegistrationServiceInfo ? (
-                calloutErrorRegistrationServiceInfo
-              ) : this.state.agentNameError &&
-                !['hp', 'sol', 'alpine'].includes(this.state.selectedOS) ? (
-                <EuiCallOut
-                  color='danger'
-                  title={'There are fields with errors. Please verify them.'}
-                  iconType='alert'
-                />
-              ) : missingOSSelection.length ? (
-                <EuiCallOut
-                  color='warning'
-                  title={`Please select the ${missingOSSelection.join(
-                    ', ',
-                  )}.`}
-                  iconType='iInCircle'
-                />
-              ) : (
-                <EuiTabbedContent
-                  tabs={
-                    this.state.selectedVersion == 'redhat7' ||
+              {
+                title: 'Start the agent',
+                children: this.state.gotErrorRegistrationServiceInfo ? (
+                  calloutErrorRegistrationServiceInfo
+                ) : this.state.agentNameError &&
+                  !['hp', 'sol', 'alpine'].includes(this.state.selectedOS) ? (
+                  <EuiCallOut
+                    color='danger'
+                    title={'There are fields with errors. Please verify them.'}
+                    iconType='alert'
+                  />
+                ) : missingOSSelection.length ? (
+                  <EuiCallOut
+                    color='warning'
+                    title={`Please select the ${missingOSSelection.join(
+                      ', ',
+                    )}.`}
+                    iconType='iInCircle'
+                  />
+                ) : (
+                  <EuiTabbedContent
+                    tabs={
+                      this.state.selectedVersion == 'redhat7' ||
                       this.state.selectedVersion == 'amazonlinux2022' ||
                       this.state.selectedVersion == 'centos7' ||
                       this.state.selectedVersion == 'suse11' ||
@@ -2102,10 +2118,10 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
                       this.state.selectedVersion == 'busterorgreater' ||
                       this.state.selectedVersion === 'ubuntu15' ||
                       this.state.selectedVersion === 'leap15'
-                      ? tabSystemD
-                      : this.state.selectedVersion == 'windowsxp' ||
-                        this.state.selectedVersion == 'windowsserver2008' ||
-                        this.state.selectedVersion == 'windows7'
+                        ? tabSystemD
+                        : this.state.selectedVersion == 'windowsxp' ||
+                          this.state.selectedVersion == 'windowsserver2008' ||
+                          this.state.selectedVersion == 'windows7'
                         ? tabNet
                         : this.state.selectedVersion == 'sierra' ||
                           this.state.selectedVersion == 'highSierra' ||
@@ -2114,68 +2130,68 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
                           this.state.selectedVersion == 'bigSur' ||
                           this.state.selectedVersion == 'monterrey' ||
                           this.state.selectedVersion == 'ventura'
-                          ? tabWazuhControlMacos
-                          : this.state.selectedVersion == 'solaris10' ||
-                            this.state.selectedVersion == 'solaris11' ||
-                            this.state.selectedVersion == '6.1 TL9' ||
-                            this.state.selectedVersion == '3.12.12'
-                            ? tabWazuhControl
-                            : this.state.selectedVersion == '11.31'
-                              ? tabInitD
-                              : tabSysV
-                  }
-                  selectedTab={this.selectedSYS}
-                  onTabClick={onTabClick}
-                />
-              ),
-            },
-          ]
+                        ? tabWazuhControlMacos
+                        : this.state.selectedVersion == 'solaris10' ||
+                          this.state.selectedVersion == 'solaris11' ||
+                          this.state.selectedVersion == '6.1 TL9' ||
+                          this.state.selectedVersion == '3.12.12'
+                        ? tabWazuhControl
+                        : this.state.selectedVersion == '11.31'
+                        ? tabInitD
+                        : tabSysV
+                    }
+                    selectedTab={this.selectedSYS}
+                    onTabClick={onTabClick}
+                  />
+                ),
+              },
+            ]
           : []),
         ...(!missingOSSelection.length &&
-          this.state.selectedOS !== 'rpm' &&
-          this.state.selectedOS !== 'deb' &&
-          this.state.selectedOS !== 'cent' &&
-          this.state.selectedOS !== 'ubu' &&
-          this.state.selectedOS !== 'win' &&
-          this.state.selectedOS !== 'macos' &&
-          this.state.selectedOS !== 'open' &&
-          this.state.selectedOS !== 'sol' &&
-          this.state.selectedOS !== 'aix' &&
-          this.state.selectedOS !== 'hp' &&
-          this.state.selectedOS !== 'amazonlinux' &&
-          this.state.selectedOS !== 'fedora' &&
-          this.state.selectedOS !== 'oraclelinux' &&
-          this.state.selectedOS !== 'suse' &&
-          this.state.selectedOS !== 'raspbian' &&
-          this.state.selectedOS !== 'alpine' &&
-          restartAgentCommand
+        this.state.selectedOS !== 'rpm' &&
+        this.state.selectedOS !== 'deb' &&
+        this.state.selectedOS !== 'cent' &&
+        this.state.selectedOS !== 'ubu' &&
+        this.state.selectedOS !== 'win' &&
+        this.state.selectedOS !== 'macos' &&
+        this.state.selectedOS !== 'open' &&
+        this.state.selectedOS !== 'sol' &&
+        this.state.selectedOS !== 'aix' &&
+        this.state.selectedOS !== 'hp' &&
+        this.state.selectedOS !== 'amazonlinux' &&
+        this.state.selectedOS !== 'fedora' &&
+        this.state.selectedOS !== 'oraclelinux' &&
+        this.state.selectedOS !== 'suse' &&
+        this.state.selectedOS !== 'raspbian' &&
+        this.state.selectedOS !== 'alpine' &&
+        restartAgentCommand
           ? [
-            {
-              title: 'Start the agent',
-              children: this.state.gotErrorRegistrationServiceInfo ? (
-                calloutErrorRegistrationServiceInfo
-              ) : (
-                <EuiFlexGroup direction='column'>
-                  <EuiText>
-                    <div className='copy-codeblock-wrapper'>
-                      <EuiCodeBlock style={codeBlock} language={language}>
-                        {restartAgentCommand}
-                      </EuiCodeBlock>
-                      <EuiCopy textToCopy={restartAgentCommand}>
-                        {copy => (
-                          <div className='copy-overlay' onClick={copy}>
-                            <p>
-                              <EuiIcon type='copy' /> Copy command
-                            </p>
-                          </div>
-                        )}
-                      </EuiCopy>
-                    </div>
-                  </EuiText>
-                </EuiFlexGroup>
-              ),
-            },
-          ]
+              {
+                title: 'Start the agent',
+                children: this.state.gotErrorRegistrationServiceInfo ? (
+                  calloutErrorRegistrationServiceInfo
+                ) : (
+                  <EuiFlexGroup direction='column'>
+                    <EuiText>
+                      <div className='copy-codeblock-wrapper'>
+                        <EuiCodeBlock style={codeBlock} language={language}>
+                          {restartAgentCommand}
+                        </EuiCodeBlock>
+                        <EuiCopy textToCopy={restartAgentCommand}>
+                          {copy => (
+                            <div className='copy-overlay' onClick={copy}>
+                              <p>
+                                <EuiIcon type='copy' /> Copy command
+                              </p>
+                            </div>
+                          )}
+                        </EuiCopy>
+                      </div>
+                    </EuiText>
+                  </EuiFlexGroup>
+                ),
+              },
+            ]
           : []),
       ];
 
