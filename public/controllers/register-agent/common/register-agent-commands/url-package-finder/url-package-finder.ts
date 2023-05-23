@@ -2,7 +2,8 @@ import {
   NoOSOptionFoundException,
   NoOptionFoundException,
 } from '../exceptions';
-import { OSDefinition, tOS, tPackageExtensions } from '../types';
+import { searchOSDefinitions } from '../services/search-os-definitions.service';
+import { OSDefinition, tOS, tPackageExtensions, tPackageManagerTypes } from '../types';
 /**
  * This class is responsible for finding the URL of the package to download
  * for the agent installation.
@@ -18,17 +19,17 @@ export class URLPackageFinder {
     osName: tOS,
     architecture: string,
     extension: tPackageExtensions,
+    packageManager: tPackageManagerTypes,
     currentVersion?: string,
   ): string {
-    const osDefinition = this.osDefinitions.find(def => def.name === osName);
-
-    if (!osDefinition) {
-      throw new NoOSOptionFoundException(osName);
-    }
-
-    const option = osDefinition.options.find(opt => {
-      return opt.architecture === architecture && opt.extension === extension;
-    });
+    
+    const option = searchOSDefinitions({
+      osDefinitions: this.osDefinitions,
+      osName,
+      architecture,
+      extension,
+      packageManager,
+    })
 
     if (!option) {
       throw new NoOptionFoundException(osName, architecture, extension);

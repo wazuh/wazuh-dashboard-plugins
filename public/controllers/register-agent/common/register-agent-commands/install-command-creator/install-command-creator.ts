@@ -1,5 +1,6 @@
 import { NoInstallCommandDefinitionException, NoOSOptionFoundException, NoOptionFoundException, NoPackageURLDefinitionException } from '../exceptions';
-import { OSDefinition } from '../types';
+import { searchOSDefinitions } from '../services/search-os-definitions.service';
+import { OSDefinition, tOS, tPackageExtensions, tPackageManagerTypes } from '../types';
 
 
 /* ToDO:
@@ -10,25 +11,20 @@ export class InstallCommandCreator {
   constructor(private osDefinitions: OSDefinition[], private version: string) {}
 
   getInstallCommand(
-    osName: string,
+    osName: tOS,
     architecture: string,
-    extension: string,
-    packageManager: string,
+    extension: tPackageExtensions,
+    packageManager: tPackageManagerTypes,
     packageUrl: string,
   ) {
-    const osDefinition = this.osDefinitions.find(os => os.name === osName);
-    if (!osDefinition) {
-      throw new NoOSOptionFoundException(osName)
-    }
-    const osDefinitionOption = osDefinition.options.find(
-      option =>
-        option.architecture === architecture &&
-        option.extension === extension &&
-        option.packageManager === packageManager,
-    );
-    if (!osDefinitionOption) {
-      throw new NoOptionFoundException(osName, architecture, extension);
-    }
+    
+    const osDefinitionOption = searchOSDefinitions({
+      osDefinitions: this.osDefinitions,
+      osName,
+      architecture,
+      extension,
+      packageManager,
+    })
 
     if (!osDefinitionOption.installCommand) {
       throw new NoInstallCommandDefinitionException(osName, architecture, extension, packageManager);

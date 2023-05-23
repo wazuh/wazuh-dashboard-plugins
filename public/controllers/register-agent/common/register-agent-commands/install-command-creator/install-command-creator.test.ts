@@ -7,19 +7,16 @@ import {
 } from '../exceptions';
 
 describe('InstallCommandCreator', () => {
-  describe('constructor', () => {
+  describe('get install command', () => {
+
     it('should create an instance of InstallCommandCreator', () => {
       const installCommandCreator = new InstallCommandCreator(
         defaultPackageDefinitions,
         '4.4.2',
       );
-      expect(installCommandCreator).toBeInstanceOf(
-        InstallCommandCreator,
-      );
+      expect(installCommandCreator).toBeInstanceOf(InstallCommandCreator);
     });
-  });
-
-  describe('get install command', () => {
+    
     it('should get the correct command for a given package definition', () => {
       const installCommandCreator = new InstallCommandCreator(
         defaultPackageDefinitions,

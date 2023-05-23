@@ -40,7 +40,7 @@ export interface OSDefinition {
     packageManager: tPackageManagerTypes;
     urlPackage: (props: OSDefinitionOption) => string;
     installCommand: (props: OSDefinitionOption & { urlPackage: string }) => string;
-    startCommand?: (props: OSDefinitionOption) => string;
+    startCommand: (props: OSDefinitionOption) => string;
   }[];
 }
 
@@ -58,3 +58,12 @@ export interface ICommandConstructorInput {
 type tPackagesArchitecture = {
   [key in tPackageManagerTypes]: tPackageExtensions;
 };
+
+
+export interface IDefinitionsInput {
+  osDefinitions: OSDefinition[],
+  osName: tOS,
+  architecture: string,
+  extension: tPackageExtensions,
+  packageManager: tPackageManagerTypes
+}
