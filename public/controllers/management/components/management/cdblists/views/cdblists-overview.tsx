@@ -45,7 +45,6 @@ function WzCDBListsOverview(props) {
         <EuiFlexItem>
           <CDBListsTable
             {...props}
-            clusterStatus={clusterStatus}
             updateRestartClusterManager={(showWarningRestart) => updateRestartManagers(showWarningRestart)}
           />
         </EuiFlexItem>

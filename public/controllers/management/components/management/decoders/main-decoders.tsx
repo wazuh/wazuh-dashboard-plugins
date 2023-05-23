@@ -16,7 +16,7 @@ import WzDecodersOverview from './views/decoders-overview';
 import WzFileEditor from '../common/file-editor';
 import { SECTION_DECODERS_SECTION } from '../common/constants';
 
-export default function WzDecoder({ clusterStatus, logtestProps }) {
+export default function WzDecoder({ logtestProps }) {
 
   const [fileContent, setFileContent] = useState(false);
   const [addingFile, setAddingFile] = useState(false);
@@ -36,13 +36,11 @@ export default function WzDecoder({ clusterStatus, logtestProps }) {
             fileContent={fileContent}
             addingFile={addingFile}
             logtestProps={logtestProps}
-            clusterStatus={clusterStatus}
             updateFileContent={(fileContent) => { setFileContent(fileContent) }}
             cleanEditState={() => cleanEditState()}
           />
         )) || (
           <WzDecodersOverview
-            clusterStatus={clusterStatus}
             updateFileContent={(fileContent) => { setFileContent(fileContent) }}
             updateAddingFile={(addingFile) => { setAddingFile(addingFile) }}
             setShowingFiles={() => { setShowingFiles(!showingFiles) }}

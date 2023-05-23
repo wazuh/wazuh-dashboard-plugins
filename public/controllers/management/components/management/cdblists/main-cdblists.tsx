@@ -15,7 +15,7 @@ import WzReduxProvider from '../../../../../redux/wz-redux-provider';
 import WzCDBListsOverview from './views/cdblists-overview';
 import WzListEditor from './views/list-editor';
 
-export default function WzCDBList({ clusterStatus }) {
+export default function WzCDBList() {
   const [listContent, setListContent] = useState(false);
 
   return (
@@ -24,13 +24,11 @@ export default function WzCDBList({ clusterStatus }) {
         (listContent && (
           <WzListEditor
             listContent={listContent}
-            clusterStatus={clusterStatus}
             clearContent={() => { setListContent(false) }}
             updateListContent={(listContent) => { setListContent(listContent) }}
           />
         )) || (
           <WzCDBListsOverview
-            clusterStatus={clusterStatus}
             updateListContent={(listContent) => { setListContent(listContent) }}
           />
         )
