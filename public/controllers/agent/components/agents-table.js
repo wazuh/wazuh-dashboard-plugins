@@ -348,6 +348,8 @@ export const AgentsTable = withErrorBoundary(
         icon = 'windows';
       } else if (os?.platform === 'darwin') {
         icon = 'apple';
+      } else if (os?.platform === 'freebsd') {
+        icon = 'freebsd';
       }
       const os_name =
         checkField(agent?.os?.name) +

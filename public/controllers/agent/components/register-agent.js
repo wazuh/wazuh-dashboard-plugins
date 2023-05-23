@@ -54,6 +54,7 @@ import {
   architectureButtonsWithPPC64LE,
   architectureButtonsAix,
   architectureButtonsHpUx,
+  architectureButtonsFreeBSD,
   versionButtonAmazonLinux,
   versionButtonsRedHat,
   versionButtonsCentos,
@@ -67,6 +68,7 @@ import {
   versionButtonsSolaris,
   versionButtonsAix,
   versionButtonsHPUX,
+  versionButtonsFreeBSD,
   versionButtonAlpine,
   architectureButtonsWithPPC64LEAlpine,
 } from '../wazuh-config';
@@ -157,6 +159,7 @@ export const RegisterAgent = withErrorBoundary(
           versionButtonsSuse,
           versionButtonsAix,
           versionButtonsHPUX,
+          versionButtonsFreeBSD,
           versionButtonsOracleLinux,
           versionButtonsRaspbian,
           versionButtonFedora,
@@ -166,6 +169,7 @@ export const RegisterAgent = withErrorBoundary(
           architectureButtonsSolaris,
           architectureButtonsAix,
           architectureButtonsHpUx,
+          architectureButtonsFreeBSD,
           architectureButtonsMacos,
           architectureButtonsWithPPC64LE,
           wazuhPassword,
@@ -261,7 +265,10 @@ export const RegisterAgent = withErrorBoundary(
         this.state.selectedVersion === 'oraclelinux6' ||
         this.state.selectedVersion === 'amazonlinux1' ||
         this.state.selectedVersion === 'debian7' ||
-        this.state.selectedVersion === 'ubuntu14'
+        this.state.selectedVersion === 'ubuntu14' ||
+        this.state.selectedVersion === 'freebsd12' ||
+        this.state.selectedVersion === 'freebsd13' ||
+        this.state.selectedVersion === 'freebsd14'
       ) {
         return 'service wazuh-agent start';
       } else return '';
@@ -691,6 +698,16 @@ export const RegisterAgent = withErrorBoundary(
       }
     }
 
+    resolveFreeBSDPackage() {
+      switch (
+        `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
+      ) {
+        default:
+          return `Installation from FreeBSD package: pkg install wazuh-agent`;
+      }
+    }
+
+
     resolveAIXPackage() {
       switch (
         `${this.state.selectedVersion}-${this.state.selectedArchitecture}`
@@ -731,6 +748,8 @@ export const RegisterAgent = withErrorBoundary(
           return this.resolveAIXPackage();
         case 'hp':
           return this.resolveHPPackage();
+        case 'freebsd':
+          return this.resolveFreeBSDPackage();
         case 'amazonlinux':
           return this.resolveAMAZONLPackage();
         case 'fedora':
@@ -823,6 +842,13 @@ export const RegisterAgent = withErrorBoundary(
               ? ['OS architecture']
               : []),
           ];
+         case 'freebsd':
+          return [
+            ...(!this.state.selectedVersion ? ['OS version'] : []),
+            ...(this.state.selectedVersion && !this.state.selectedArchitecture
+              ? ['OS architecture']
+              : []),
+          ];
         case 'amazonlinux':
           return [
             ...(!this.state.selectedVersion ? ['OS version'] : []),
@@ -892,6 +918,8 @@ export const RegisterAgent = withErrorBoundary(
         'user-manual/agent-enrollment/index.html',
         appVersionMajorDotMinor,
       );
+
+      const urlWazuhFreeBSDPortsPackages = 'https://ports.freebsd.org/cgi/ports.cgi?query=wazuh&stype=all';
 
       const urlWindowsPackage = `https://packages.wazuh.com/4.x/windows/wazuh-agent-${this.state.wazuhVersion}-1.msi`;
 
@@ -999,6 +1027,7 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
         }`,
         aixText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}rpm -ivh ${this.optionalPackages()}`,
         hpText: `cd / && sudo curl -so wazuh-agent.tar ${this.optionalPackages()} && sudo groupadd wazuh && sudo useradd -G wazuh wazuh && sudo tar -xvf wazuh-agent.tar`,
+        freebsdText: `${this.optionalPackages()} or from FreeBSD ports: cd /usr/ports/security/wazuh-agent && make install clean clean-depends`,
         amazonlinuxText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
         fedoraText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
         oraclelinuxText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
@@ -1144,7 +1173,7 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
                 <EuiCodeBlock style={codeBlock} language={language}>
                   {this.state.wazuhPassword &&
                   !this.state.showPassword &&
-                  !['sol', 'hp', 'alpine'].includes(this.state.selectedOS)
+                  !['freebsd','sol', 'hp', 'alpine'].includes(this.state.selectedOS)
                     ? this.obfuscatePassword(text)
                     : text}
                 </EuiCodeBlock>
@@ -1181,6 +1210,41 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
                       </span>
                     }
                   ></EuiCallOut>
+                  <EuiSpacer size='m' />
+                  <EuiCallOut
+                    color='warning'
+                    className='message'
+                    iconType='iInCircle'
+                    title={
+                      <span>
+                        After installing the agent, you need to enroll it in the
+                        Wazuh server. Check the Wazuh agent enrollment{' '}
+                        <EuiLink target='_blank' href={urlWazuhAgentEnrollment}>
+                          Wazuh agent enrollment
+                        </EuiLink>{' '}
+                        section to learn more.
+                      </span>
+                    }
+                  ></EuiCallOut>
+                </>
+              ) : this.state.selectedVersion == 'freebsd12' ||
+                  this.state.selectedVersion == 'freebsd13' ||
+                  this.state.selectedVersion == 'freebsd14' ? (
+                <>
+                 <EuiCallOut
+                    color='warning'
+                    className='message'
+                    iconType='iInCircle'
+                    title={
+                      <span>
+                        The Wazuh ports and packages are an effort of FreeBSD community for help to Wazuh users to install or test it on FreeBSD or derived projects. Check about Wazuh ports or packages on FreeBSD{' '}
+                        <EuiLink target='_blank' href={urlWazuhFreeBSDPortsPackages}>
+                          here
+                        </EuiLink>.{' '} Take on mind FreeBSD is not officially supported by Wazuh Inc.
+                      </span>
+                    }
+                  ></EuiCallOut>
+
                   <EuiSpacer size='m' />
                   <EuiCallOut
                     color='warning'
@@ -1331,7 +1395,7 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
                 ''
               )}
               {this.state.needsPassword &&
-              !['sol', 'hp', 'alpine'].includes(this.state.selectedOS) ? (
+              !['freebsd','sol', 'hp', 'alpine'].includes(this.state.selectedOS) ? (
                 <EuiSwitch
                   label='Show password'
                   checked={this.state.showPassword}
@@ -1741,6 +1805,21 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
               },
             ]
           : []),
+        ...(this.state.selectedOS == 'freebsd'
+          ? [
+              {
+                title: 'Choose the version',
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the version'
+                    options={versionButtonsFreeBSD}
+                    idSelected={this.state.selectedVersion}
+                    onChange={version => this.setVersion(version)}
+                  />
+                ),
+              },
+            ]
+          : []),
         ...(this.state.selectedOS == 'aix'
           ? [
               {
@@ -1942,6 +2021,25 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
               },
             ]
           : []),
+         ...(this.state.selectedVersion == 'freebsd12' ||
+        this.state.selectedVersion == 'freebsd13' ||
+        this.state.selectedVersion == 'freebsd14'
+          ? [
+              {
+                title: 'Choose the architecture',
+                children: (
+                  <RegisterAgentButtonGroup
+                    legend='Choose the architecture'
+                    options={architectureButtonsFreeBSD}
+                    idSelected={this.state.selectedArchitecture}
+                    onChange={architecture =>
+                      this.setArchitecture(architecture)
+                    }
+                  />
+                ),
+              },
+            ]
+          : []),
         ...(this.state.selectedVersion == '6.1 TL9'
           ? [
               {
@@ -1977,6 +2075,7 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
             ]
           : []),
         ...(!(
+          this.state.selectedOS == 'freebsd' ||
           this.state.selectedOS == 'hp' ||
           this.state.selectedOS == 'sol' ||
           this.state.selectedOS == 'alpine'
@@ -2010,6 +2109,7 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
             ]
           : []),
         ...(!(
+          this.state.selectedOS == 'freebsd' ||
           this.state.selectedOS == 'hp' ||
           this.state.selectedOS == 'sol' ||
           this.state.selectedOS == 'alpine'
@@ -2063,6 +2163,7 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
         this.state.selectedOS == 'sol' ||
         this.state.selectedOS == 'aix' ||
         this.state.selectedOS == 'hp' ||
+        this.state.selectedOS == 'freebsd' ||
         this.state.selectedOS == 'alpine' ||
         this.state.selectedOS == ''
           ? [
@@ -2071,7 +2172,7 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
                 children: this.state.gotErrorRegistrationServiceInfo ? (
                   calloutErrorRegistrationServiceInfo
                 ) : this.state.agentNameError &&
-                  !['hp', 'sol', 'alpine'].includes(this.state.selectedOS) ? (
+                  !['freebsd','hp', 'sol', 'alpine'].includes(this.state.selectedOS) ? (
                   <EuiCallOut
                     color='danger'
                     title={'There are fields with errors. Please verify them.'}
@@ -2142,6 +2243,7 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
         this.state.selectedOS !== 'sol' &&
         this.state.selectedOS !== 'aix' &&
         this.state.selectedOS !== 'hp' &&
+        this.state.selecetdOS !== 'freebsd' &&
         this.state.selectedOS !== 'amazonlinux' &&
         this.state.selectedOS !== 'fedora' &&
         this.state.selectedOS !== 'oraclelinux' &&
