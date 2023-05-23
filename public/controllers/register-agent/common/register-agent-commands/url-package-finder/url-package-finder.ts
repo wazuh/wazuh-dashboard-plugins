@@ -23,8 +23,7 @@ export class URLPackageFinder {
     currentVersion?: string,
   ): string {
     
-    const option = searchOSDefinitions({
-      osDefinitions: this.osDefinitions,
+    const option = searchOSDefinitions(this.osDefinitions, {
       osName,
       architecture,
       extension,

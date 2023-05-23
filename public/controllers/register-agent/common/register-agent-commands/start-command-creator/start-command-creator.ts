@@ -11,8 +11,7 @@ export class StartCommandCreator {
         extension: tPackageExtensions,
         packageManager: tPackageManagerTypes,
     ){
-        const osDefinitionOption = searchOSDefinitions({
-            osDefinitions: this.osDefinitions,
+        const osDefinitionOption = searchOSDefinitions(this.osDefinitions,{
             osName,
             architecture,
             extension,
