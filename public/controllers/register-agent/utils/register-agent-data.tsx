@@ -1,9 +1,9 @@
-import { RegisterAgentData } from '../components/checkbox-group/checkbox-group';
+import { RegisterAgentData } from '../interfaces/types';
 import LinuxIcon from '../../../../public/assets/images/icons/linux-icon.svg';
 import WindowsIcon from '../../../../public/assets/images/icons/windows-icon.svg';
 import MacIcon from '../../../../public/assets/images/icons/mac-icon.svg';
 
-export const REGISTER_AGENT_DATA: RegisterAgentData[] = [
+export const REGISTER_AGENT_DATA_STEP_ONE: RegisterAgentData[] = [
   {
     icon: LinuxIcon,
     title: 'LINUX',
@@ -22,4 +22,8 @@ export const REGISTER_AGENT_DATA: RegisterAgentData[] = [
     hr: true,
     architecture: ['PKG 32/64 AMB64'],
   },
+  // {
+  //   callout:
+  //     'For additional systems and architectures, please check our Wazuh agent installation guide.',
+  // },
 ];

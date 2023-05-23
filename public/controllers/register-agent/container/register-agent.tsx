@@ -1,5 +1,4 @@
-import React, { ChangeEvent } from 'react';
-import { InputForm } from '../../../components/common/form';
+import React from 'react';
 import { Steps } from '../components/steps/steps';
 import './register-agent.scss';
 

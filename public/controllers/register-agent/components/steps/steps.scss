@@ -1,15 +1,18 @@
-.titleStepOne {
-  //   position: absolute;
-  // width: 498px;
-  // height: 24px;
-  // left: 545px;
-  // top: 237px;
-
+.stepTitle {
   font-family: 'Inter';
   font-style: normal;
   font-weight: 700;
   font-size: 16px;
   line-height: 24px;
   letter-spacing: 0.6px;
+  color: #343741;
+}
+
+.stepSubtitle {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 24px;
   color: #343741;
 }

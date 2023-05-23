@@ -38,7 +38,7 @@ export const InputForm = ({
   type,
   value,
   onChange,
-  onOptionChange,
+  setStatusCheck,
   error,
   label,
   header,
@@ -67,7 +67,7 @@ export const InputForm = ({
   );
 
   if (type === 'custom') {
-    return <OsCard {...rest} onChange={onOptionChange} />;
+    return <OsCard {...rest} setStatusCheck={setStatusCheck} />;
   }
 
   return label ? (

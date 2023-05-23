@@ -2,13 +2,6 @@ import React from 'react';
 import { EuiRadioGroup } from '@elastic/eui';
 import './checkbox-group.scss';
 
-interface RegisterAgentData {
-  icon: string;
-  title: string;
-  hr: boolean;
-  architecture: string[];
-}
-
 interface Props {
   data: string[];
   cardIndex: number;
@@ -56,4 +49,3 @@ const CheckboxGroupComponent: React.FC<Props> = ({
 };
 
 export { CheckboxGroupComponent };
-export type { RegisterAgentData };

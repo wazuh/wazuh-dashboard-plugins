@@ -1,26 +1,27 @@
 import React, { useState } from 'react';
 import { EuiCard, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
-import { REGISTER_AGENT_DATA } from '../../utils/register-agent-data';
+import { REGISTER_AGENT_DATA_STEP_ONE } from '../../utils/register-agent-data';
 import { CheckboxGroupComponent } from '../checkbox-group/checkbox-group';
 import './os-card.scss';
 
-export const OsCard = () => {
+export const OsCard = ({ setStatusCheck }) => {
   const [selectedOption, setSelectedOption] = useState<string | undefined>(
     undefined,
   );
 
   const handleOptionChange = (optionId: string) => {
     setSelectedOption(optionId);
+    setStatusCheck('complete');
   };
 
   const isFirstCard = (index: number) => index === 0;
   const isLastCard = (index: number) =>
-    index === REGISTER_AGENT_DATA.length - 1;
+    index === REGISTER_AGENT_DATA_STEP_ONE.length - 1;
 
   return (
     <div>
       <EuiFlexGroup gutterSize='l' wrap>
-        {REGISTER_AGENT_DATA.map((data, index) => (
+        {REGISTER_AGENT_DATA_STEP_ONE.map((data, index) => (
           <EuiFlexItem key={index}>
             <EuiCard
               title={
