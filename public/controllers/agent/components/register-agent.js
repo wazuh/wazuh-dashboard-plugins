@@ -278,7 +278,7 @@ export const RegisterAgent = withErrorBoundary(
 
     systemSelectorWazuhControlMacos() {
       if (this.state.selectedVersion == 'sierra') {
-        return '/Library/Ossec/bin/wazuh-control start';
+        return 'sudo /Library/Ossec/bin/wazuh-control start';
       } else return '';
     }
 
