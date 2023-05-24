@@ -358,7 +358,7 @@ export const RegisterAgent = withErrorBoundary(
 
     obfuscatePassword(text) {
       let obfuscate = '';
-      const regex = /WAZUH_REGISTRATION_PASSWORD=?\040?\'(.*?)\'/gm;
+      const regex = /WAZUH_REGISTRATION_PASSWORD=?\040?\'(.*?)\'[\"| ]/gm;
       const match = regex.exec(text);
       const password = match[1];
       if (password) {
@@ -381,15 +381,16 @@ export const RegisterAgent = withErrorBoundary(
     }
 
     optionalDeploymentVariables() {
+      const escapeQuotes = (value) => value.replace(/'/g, "\\'");
       let deployment =
         this.state.serverAddress &&
-        `WAZUH_MANAGER='${this.state.serverAddress}' `;
+        `WAZUH_MANAGER='${escapeQuotes(this.state.serverAddress)}' `;
       if (this.state.selectedOS == 'win') {
-        deployment += `WAZUH_REGISTRATION_SERVER='${this.state.serverAddress}' `;
+        deployment += `WAZUH_REGISTRATION_SERVER='${escapeQuotes(this.state.serverAddress)}' `;
       }
 
       if (this.state.needsPassword) {
-        deployment += `WAZUH_REGISTRATION_PASSWORD='${this.state.wazuhPassword}' `;
+        deployment += `WAZUH_REGISTRATION_PASSWORD='${escapeQuotes(this.state.wazuhPassword)}' `;
       }
 
       if (this.state.udpProtocol) {
@@ -966,7 +967,8 @@ export const RegisterAgent = withErrorBoundary(
       // Set macOS installation script with environment variables
       const macOSInstallationOptions = `${this.optionalDeploymentVariables()}${this.agentNameVariable()}`
         .replace(/\' ([a-zA-Z])/g, '\' && $1') // Separate environment variables with &&
-        .replace(/\"/g, '\\"'); // Escape double quotes
+        .replace(/\"/g, '\\"') // Escape double quotes
+        .trim();
 
       // If no variables are set, the echo will be empty
       const macOSInstallationSetEnvVariablesScript = macOSInstallationOptions ?
