@@ -1,2 +1,1 @@
-export Container from './container/os-card-container';
-
+export { RegisterAgent } from './container/register-agent';
