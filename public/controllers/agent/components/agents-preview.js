@@ -138,25 +138,21 @@ export const AgentsPreview = compose(
 
       this.props.tableProps.updateSummary(agentStatusSummary);
 
-      /* Calculate the agents active coverage.
-        Ensure the active and total count of agents is a number and total is greater than 0 to
-        calculate the stat, otherwise set as 0.
-      */
-      const agentsActiveCoverage =
-        [agentStatusSummary.active, agentStatusSummary.total].every(
-          stat => typeof stat === 'number',
-        ) && agentStatusSummary.total > 0
-          ? (
-              (agentStatusSummary.active / agentStatusSummary.total) *
-              100
-            ).toFixed(2)
-          : 0;
+      const agentsActiveCoverage = (
+        (agentStatusSummary.active / agentStatusSummary.total) *
+        100
+      ).toFixed(2);
 
       this.setState({
         loadingSummary: false,
         agentStatusSummary,
         agentConfiguration,
-        agentsActiveCoverage,
+        /* Calculate the agents active coverage.
+          Ensure the calculated value is not a NaN, otherwise set a 0.
+        */
+        agentsActiveCoverage: isNaN(agentsActiveCoverage)
+          ? 0
+          : agentsActiveCoverage,
       });
     }
 
