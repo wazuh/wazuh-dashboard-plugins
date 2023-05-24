@@ -963,11 +963,24 @@ export const RegisterAgent = withErrorBoundary(
         zIndex: '100',
       };
 
-      // Select macOS installation script based on architecture
-      const macOSInstallationOptions = (this.optionalDeploymentVariables() + this.agentNameVariable()).replaceAll('\' ', '\'\\n');
-      const macOSInstallationSetEnvVariablesScript = macOSInstallationOptions ? `echo "${macOSInstallationOptions}" > /tmp/wazuh_envs && ` : ``;
+      /*** macOS installation script customization ***/
+
+      // Set macOS installation script with environment variables
+      const macOSInstallationOptions = `${this.optionalDeploymentVariables()}${this.agentNameVariable()}`
+        .replace(/\' ([a-zA-Z])/g, '\' && $1') // Separate environment variables with &&
+        .replace(/\"/g, '\\"'); // Escape double quotes
+
+      // If no variables are set, the echo will be empty
+      const macOSInstallationSetEnvVariablesScript = macOSInstallationOptions ?
+        `sudo echo "${macOSInstallationOptions}" > /tmp/wazuh_envs && `
+        : ``;
+
+      // Merge environment variables with installation script
       const macOSInstallationScript = `curl -so wazuh-agent.pkg https://packages.wazuh.com/4.x/macos/wazuh-agent-${this.state.wazuhVersion
         }-1.pkg && ${macOSInstallationSetEnvVariablesScript}sudo installer -pkg ./wazuh-agent.pkg -target /`;
+
+      /*** end macOS installation script customization ***/
+
 
       const customTexts = {
         rpmText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
@@ -987,8 +1000,8 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
             }-1.msi -OutFile \${env:tmp}\\wazuh-agent.msi; msiexec.exe /i \${env:tmp}\\wazuh-agent.msi /q ${this.optionalDeploymentVariables()}${this.agentNameVariable()}`,
         openText: `sudo rpm --import https://packages.wazuh.com/key/GPG-KEY-WAZUH && sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}zypper install -y ${this.optionalPackages()}`,
         solText: `sudo curl -so ${this.state.selectedVersion == 'solaris11'
-            ? 'wazuh-agent.p5p'
-            : 'wazuh-agent.pkg'
+          ? 'wazuh-agent.p5p'
+          : 'wazuh-agent.pkg'
           } ${this.optionalPackages()} && ${this.state.selectedVersion == 'solaris11'
             ? 'pkg install -g wazuh-agent.p5p wazuh-agent'
             : 'pkgadd -d wazuh-agent.pkg'
