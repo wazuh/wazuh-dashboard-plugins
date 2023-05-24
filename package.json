@@ -1,9 +1,9 @@
 {
   "name": "wazuh",
-  "version": "4.4.2",
+  "version": "4.4.3",
   "revision": "01",
   "stage": "stable",
-  "commit": "c990526ba",
+  "commit": "1ec339caf",
   "pluginPlatform": {
     "version": "2.6.0"
   },
