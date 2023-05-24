@@ -16,6 +16,7 @@ export const OsCard = ({ setStatusCheck }: Props) => {
   const handleOptionChange = (optionId: string) => {
     setSelectedOption(optionId);
     setStatusCheck('complete');
+    setSelectedOption(optionId) && setStatusCheck('disabled');
   };
 
   return (
