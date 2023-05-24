@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { EuiCard, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
-import { REGISTER_AGENT_DATA_STEP_ONE } from '../../utils/register-agent-data';
+import { REGISTER_AGENT_DATA_STEP_ONE } from '../../../utils/register-agent-data';
 import { CheckboxGroupComponent } from '../checkbox-group/checkbox-group';
 import './os-card.scss';
 

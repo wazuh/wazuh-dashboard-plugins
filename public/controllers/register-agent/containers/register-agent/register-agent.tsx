@@ -1,5 +1,5 @@
 import React from 'react';
-import { Steps } from '../components/steps/steps';
+import { Steps } from '../steps/steps';
 import './register-agent.scss';
 
 export const RegisterAgent: React.FC = () => {

@@ -1,22 +1,17 @@
 import React, { useState } from 'react';
-import {
-  EuiSpacer,
-  EuiSteps,
-  EuiStepStatus,
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiTitle,
-  EuiText,
-} from '@elastic/eui';
+import { EuiSteps, EuiStepStatus, EuiTitle } from '@elastic/eui';
 import { InputForm } from '../../../../components/common/form';
 import './steps.scss';
+import { ServerAddress } from '../../components/step-two/server-addres';
 
 export const Steps = () => {
-  // const handleChange = (event: ChangeEvent<any>) => {
-  //   // ver
-  // };
-  // const [status, setStatus] = useState<EuiStepStatus>('incomplete');
   const [statusCheck, setStatusCheck] = useState<EuiStepStatus>('current');
+  const [serverAddressStatus, setServerAddressStatus] =
+    useState<EuiStepStatus>('disabled');
+
+  const handleInputChange = (value: string) => {
+    setServerAddressStatus('complete') && setServerAddressStatus('incomplete');
+  };
 
   const firstSetOfSteps = [
     {
@@ -28,9 +23,7 @@ export const Steps = () => {
       children: (
         <InputForm
           type='custom'
-          // onChange={handleChange}
           label='Etiqueta del Campo'
-          rest={undefined}
           value={undefined}
           setStatusCheck={setStatusCheck}
         />
@@ -39,19 +32,14 @@ export const Steps = () => {
     },
     {
       title: (
-        <EuiTitle className='stepTitle'>
-          <p>Server address</p>
-        </EuiTitle>
-      ),
-      children: (
         <>
-          <p className='stepSubtitle'>
-            This is the address the agent uses to communicate with the Wazuh
-            server. Enter an IP address or a fully qualified domain name (FDQN).
-          </p>
+          <EuiTitle className='stepTitle'>
+            <p>Server address</p>
+          </EuiTitle>
         </>
       ),
-      status: 'incomplete',
+      children: <ServerAddress setStatusCheck={setServerAddressStatus} />,
+      status: serverAddressStatus,
     },
   ];
 

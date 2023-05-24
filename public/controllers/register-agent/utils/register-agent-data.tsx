@@ -27,3 +27,12 @@ export const REGISTER_AGENT_DATA_STEP_ONE: RegisterAgentData[] = [
   //     'For additional systems and architectures, please check our Wazuh agent installation guide.',
   // },
 ];
+
+export const REGISTER_AGENT_DATA_STEP_TWO = [
+  {
+    title: 'Server address',
+    subtitle:
+      'This is the address the agent uses to communicate with the Wazuh server. Enter an IP address or a fully qualified domain name (FDQN).',
+    inputText: true,
+  },
+];
