@@ -963,11 +963,24 @@ export const RegisterAgent = withErrorBoundary(
         zIndex: '100',
       };
 
-       // Select macOS installation script based on architecture
-       const macOSInstallationOptions = (this.optionalDeploymentVariables() + this.agentNameVariable()).replaceAll('\' ', '\'\\n');
-       const macOSInstallationSetEnvVariablesScript = macOSInstallationOptions ? `echo "${macOSInstallationOptions}" > /tmp/wazuh_envs && ` : ``;
+      /*** macOS installation script customization ***/
+
+       // Set macOS installation script with environment variables
+       const macOSInstallationOptions = `${this.optionalDeploymentVariables()}${this.agentNameVariable()}`
+        .replace(/\' ([a-zA-Z])/g, '\' && $1') // Separate environment variables with &&
+        .replace(/\"/g, '\\"'); // Escape double quotes
+
+       // If no variables are set, the echo will be empty
+       const macOSInstallationSetEnvVariablesScript = macOSInstallationOptions ?
+         `sudo echo "${macOSInstallationOptions}" > /tmp/wazuh_envs && `
+         : ``;
+
+       // Merge environment variables with installation script
        const macOSInstallationScript = `curl -so wazuh-agent.pkg https://packages.wazuh.com/4.x/macos/wazuh-agent-${this.state.wazuhVersion
            }-1.pkg && ${macOSInstallationSetEnvVariablesScript}sudo installer -pkg ./wazuh-agent.pkg -target /`;
+
+       /*** end macOS installation script customization ***/
+
 
       const customTexts = {
         rpmText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
