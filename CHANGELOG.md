@@ -2,6 +2,12 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.4.4 - OpenSearch Dashboards 2.6.0 - Revision 01
+
+### Fixed
+
+- Fixed the agents active coverage stat as NaN in Details panel of Agents section [#5490](https://github.com/wazuh/wazuh-kibana-app/pull/5490)
+
 ## Wazuh v4.4.3 - OpenSearch Dashboards 2.6.0 - Revision 01
 
 ### Added
