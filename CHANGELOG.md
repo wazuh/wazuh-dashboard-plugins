@@ -29,6 +29,17 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed TypeError in FIM Inventory using new error handler [#5364](https://github.com/wazuh/wazuh-kibana-app/pull/5364)
 - Fixed error when using invalid group configuration [#5423](https://github.com/wazuh/wazuh-kibana-app/pull/5423)
 
+## Wazuh v4.4.3 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 00
+
+### Added
+
+- Support for Wazuh 4.4.3
+
+### Fixed
+
+- Fixed command to install the macOS agent on the agent wizard [#5481](https://github.com/wazuh/wazuh-kibana-app/pull/5481) [#5484](https://github.com/wazuh/wazuh-kibana-app/pull/5484)
+- Fixed command to start the macOS agent on the agent wizard [#5470](https://github.com/wazuh/wazuh-kibana-app/pull/5470)
+
 ## Wazuh v4.4.2 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 01
 
 ### Added
