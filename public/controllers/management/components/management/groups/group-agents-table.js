@@ -150,7 +150,6 @@ class WzGroupAgentsTable extends Component {
         name: 'Id',
         align: 'left',
         sortable: true,
-        width: '5%',
       },
       {
         field: 'name',

@@ -49,7 +49,6 @@ export const NodeList = withErrorBoundary(
           field: 'name',
           name: 'Name',
           sortable: true,
-          truncateText: true,
         },
         {
           field: 'version',
