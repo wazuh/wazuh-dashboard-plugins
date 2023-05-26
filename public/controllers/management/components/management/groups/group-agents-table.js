@@ -14,7 +14,6 @@ import React, { Component, Fragment } from 'react';
 import { connect } from 'react-redux';
 import GroupsHandler from './utils/groups-handler';
 import { getToasts } from '../../../../../kibana-services';
-import { compressIPv6 } from '../../../../../services/ipv6-services';
 import {
   updateLoadingStatus,
   updateFileContent,
@@ -26,19 +25,17 @@ import {
   updateSortFieldAgents,
   updateReload,
 } from '../../../../../redux/actions/groupsActions';
-import {
-  EuiButtonIcon,
-  EuiToolTip,
-  EuiCallOut,
-} from '@elastic/eui';
+import { EuiCallOut } from '@elastic/eui';
 import { getAgentFilterValues } from './get-agents-filters-values';
 import { TableWzAPI } from '../../../../../components/common/tables';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 import { WzButtonPermissionsModalConfirm } from '../../../../../components/common/buttons';
-import { UI_LOGGER_LEVELS, UI_ORDER_AGENT_STATUS } from '../../../../../../common/constants';
+import {
+  UI_LOGGER_LEVELS,
+  UI_ORDER_AGENT_STATUS,
+} from '../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
-
 
 class WzGroupAgentsTable extends Component {
   _isMounted = false;
@@ -57,7 +54,7 @@ class WzGroupAgentsTable extends Component {
         label: 'os.platform',
         description: 'Filter by operating system platform',
         operators: ['=', '!='],
-        values: async (value) =>
+        values: async value =>
           getAgentFilterValues('os.platform', value, {
             q: `group=${this.props.state.itemDetail.name}`,
           }),
@@ -67,31 +64,37 @@ class WzGroupAgentsTable extends Component {
         label: 'ip',
         description: 'Filter by agent IP address',
         operators: ['=', '!='],
-        values: async (value) =>
-          getAgentFilterValues('ip', value, { q: `group=${this.props.state.itemDetail.name}` }),
+        values: async value =>
+          getAgentFilterValues('ip', value, {
+            q: `group=${this.props.state.itemDetail.name}`,
+          }),
       },
       {
         type: 'q',
         label: 'name',
         description: 'Filter by agent name',
         operators: ['=', '!='],
-        values: async (value) =>
-          getAgentFilterValues('name', value, { q: `group=${this.props.state.itemDetail.name}` }),
+        values: async value =>
+          getAgentFilterValues('name', value, {
+            q: `group=${this.props.state.itemDetail.name}`,
+          }),
       },
       {
         type: 'q',
         label: 'id',
         description: 'Filter by agent id',
         operators: ['=', '!='],
-        values: async (value) =>
-          getAgentFilterValues('id', value, { q: `group=${this.props.state.itemDetail.name}` }),
+        values: async value =>
+          getAgentFilterValues('id', value, {
+            q: `group=${this.props.state.itemDetail.name}`,
+          }),
       },
       {
         type: 'q',
         label: 'node_name',
         description: 'Filter by node name',
         operators: ['=', '!='],
-        values: async (value) =>
+        values: async value =>
           getAgentFilterValues('node_name', value, {
             q: `group=${this.props.state.itemDetail.name}`,
           }),
@@ -101,7 +104,7 @@ class WzGroupAgentsTable extends Component {
         label: 'manager',
         description: 'Filter by manager',
         operators: ['=', '!='],
-        values: async (value) =>
+        values: async value =>
           getAgentFilterValues('manager', value, {
             q: `group=${this.props.state.itemDetail.name}`,
           }),
@@ -111,7 +114,7 @@ class WzGroupAgentsTable extends Component {
         label: 'version',
         description: 'Filter by agent version',
         operators: ['=', '!='],
-        values: async (value) =>
+        values: async value =>
           getAgentFilterValues('version', value, {
             q: `group=${this.props.state.itemDetail.name}`,
           }),
@@ -121,7 +124,7 @@ class WzGroupAgentsTable extends Component {
         label: 'configSum',
         description: 'Filter by agent config sum',
         operators: ['=', '!='],
-        values: async (value) =>
+        values: async value =>
           getAgentFilterValues('configSum', value, {
             q: `group=${this.props.state.itemDetail.name}`,
           }),
@@ -131,7 +134,7 @@ class WzGroupAgentsTable extends Component {
         label: 'mergedSum',
         description: 'Filter by agent merged sum',
         operators: ['=', '!='],
-        values: async (value) =>
+        values: async value =>
           getAgentFilterValues('mergedSum', value, {
             q: `group=${this.props.state.itemDetail.name}`,
           }),
@@ -160,9 +163,6 @@ class WzGroupAgentsTable extends Component {
         name: 'IP address',
         sortable: true,
         show: true,
-        truncateText: false,
-        width: '25%',
-        render: (ip) => (this.renderIP(ip))
       },
       {
         field: 'status',
@@ -191,49 +191,57 @@ class WzGroupAgentsTable extends Component {
       {
         name: 'Actions',
         align: 'left',
-        render: (item) => {
+        render: item => {
           return (
             <div>
               <WzButtonPermissions
-                buttonType="icon"
+                buttonType='icon'
                 permissions={[
                   [
                     { action: 'agent:read', resource: `agent:id:${item.id}` },
-                    ...(item.group || []).map((group) => ({
+                    ...(item.group || []).map(group => ({
                       action: 'agent:read',
                       resource: `agent:group:${group}`,
                     })),
                   ],
                 ]}
                 tooltip={{ position: 'top', content: 'Go to the agent' }}
-                aria-label="Go to the agent"
-                iconType="eye"
+                aria-label='Go to the agent'
+                iconType='eye'
                 onClick={async () => {
                   this.props.groupsProps.showAgent(item);
                 }}
-                color="primary"
+                color='primary'
               />
               {this.props?.state?.itemDetail?.name !== 'default' && (
                 <WzButtonPermissionsModalConfirm
-                  buttonType="icon"
+                  buttonType='icon'
                   permissions={[
                     [
-                      { action: 'agent:modify_group', resource: `agent:id:${item.id}` },
-                      ...(item.group || []).map((group) => ({
+                      {
+                        action: 'agent:modify_group',
+                        resource: `agent:id:${item.id}`,
+                      },
+                      ...(item.group || []).map(group => ({
                         action: 'agent:modify_group',
                         resource: `agent:group:${group}`,
                       })),
                     ],
                   ]}
-                  tooltip={{ position: 'top', content: 'Remove agent from this group' }}
-                  aria-label="Remove agent from this group"
-                  iconType="trash"
+                  tooltip={{
+                    position: 'top',
+                    content: 'Remove agent from this group',
+                  }}
+                  aria-label='Remove agent from this group'
+                  iconType='trash'
                   onConfirm={async () => {
                     this.removeItems([item]);
                   }}
-                  color="danger"
+                  color='danger'
                   isDisabled={item.name === 'default'}
-                  modalTitle={`Remove ${item.file || item.name} agent from this group?`}
+                  modalTitle={`Remove ${
+                    item.file || item.name
+                  } agent from this group?`}
                   modalProps={{
                     buttonColor: 'danger',
                   }}
@@ -249,38 +257,22 @@ class WzGroupAgentsTable extends Component {
   componentWillUnmount() {
     this._isMounted = false;
   }
-  renderIP(ip) {
-    return (
-      <Fragment>
-        <EuiToolTip content="Copy the full IP address" position="left">
-          <EuiButtonIcon
-            onClick={() => {
-              navigator.clipboard.writeText(ip);
-            }}
-            color={'primary'}
-            iconType="copy"
-            aria-label="Copy the full IP address"
-          />
-        </EuiToolTip>
-        {compressIPv6(ip)}
-      </Fragment>
-    )
-  }
   render() {
     const { error } = this.props.state;
     if (!error) {
       return (
         <TableWzAPI
           tableColumns={this.columns}
-          tableInitialSortingField="id"
+          tableInitialSortingField='id'
           searchBarSuggestions={this.suggestions}
           endpoint={`/groups/${this.props.state.itemDetail.name}/agents`}
           reload={this.props.state.reload}
           searchTable={true}
+          tableProps={{ tableLayout: 'auto' }}
         />
       );
     } else {
-      return <EuiCallOut color="warning" title={error} iconType="gear" />;
+      return <EuiCallOut color='warning' title={error} iconType='gear' />;
     }
   }
 
@@ -297,7 +289,11 @@ class WzGroupAgentsTable extends Component {
     const { itemDetail } = this.props.state;
     this.props.updateLoadingStatus(true);
     try {
-      await Promise.all(items.map(item => this.groupsHandler.deleteAgent(item.id, itemDetail.name)));
+      await Promise.all(
+        items.map(item =>
+          this.groupsHandler.deleteAgent(item.id, itemDetail.name),
+        ),
+      );
       this.props.updateIsProcessing(true);
       this.props.updateLoadingStatus(false);
       this.props.updateReload();
@@ -322,23 +318,27 @@ class WzGroupAgentsTable extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
     state: state.groupsReducers,
   };
 };
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
-    updateLoadingStatus: (status) => dispatch(updateLoadingStatus(status)),
-    updateFileContent: (content) => dispatch(updateFileContent(content)),
-    updateIsProcessing: (isProcessing) => dispatch(updateIsProcessing(isProcessing)),
-    updatePageIndexAgents: (pageIndexAgents) => dispatch(updatePageIndexAgents(pageIndexAgents)),
-    updateShowModal: (showModal) => dispatch(updateShowModal(showModal)),
-    updateListItemsForRemove: (itemList) => dispatch(updateListItemsForRemove(itemList)),
-    updateSortDirectionAgents: (sortDirectionAgents) =>
+    updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
+    updateFileContent: content => dispatch(updateFileContent(content)),
+    updateIsProcessing: isProcessing =>
+      dispatch(updateIsProcessing(isProcessing)),
+    updatePageIndexAgents: pageIndexAgents =>
+      dispatch(updatePageIndexAgents(pageIndexAgents)),
+    updateShowModal: showModal => dispatch(updateShowModal(showModal)),
+    updateListItemsForRemove: itemList =>
+      dispatch(updateListItemsForRemove(itemList)),
+    updateSortDirectionAgents: sortDirectionAgents =>
       dispatch(updateSortDirectionAgents(sortDirectionAgents)),
-    updateSortFieldAgents: (sortFieldAgents) => dispatch(updateSortFieldAgents(sortFieldAgents)),
+    updateSortFieldAgents: sortFieldAgents =>
+      dispatch(updateSortFieldAgents(sortFieldAgents)),
     updateReload: () => dispatch(updateReload()),
   };
 };

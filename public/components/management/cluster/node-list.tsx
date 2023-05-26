@@ -11,7 +11,6 @@ import {
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
 import { withErrorBoundary } from '../../common/hocs';
-import { compressIPv6 } from '../../../services/ipv6-services';
 
 export const NodeList = withErrorBoundary(
   class NodeList extends Component {
@@ -44,23 +43,6 @@ export const NodeList = withErrorBoundary(
         this.setState({ loading: false });
       }
     }
-    renderIP(ip) {
-      return (
-        <Fragment>
-          <EuiToolTip content='Copy the full IP address' position='left'>
-            <EuiButtonIcon
-              onClick={() => {
-                navigator.clipboard.writeText(ip);
-              }}
-              color={'primary'}
-              iconType='copy'
-              aria-label='Copy the full IP address'
-            />
-          </EuiToolTip>
-          {compressIPv6(ip)}
-        </Fragment>
-      );
-    }
     render() {
       const columns = [
         {
@@ -78,7 +60,6 @@ export const NodeList = withErrorBoundary(
           field: 'ip',
           name: 'IP address',
           sortable: true,
-          render: ip => this.renderIP(ip),
         },
         {
           field: 'type',
@@ -137,6 +118,7 @@ export const NodeList = withErrorBoundary(
                 pagination={true}
                 sorting={sorting}
                 loading={this.state.loading}
+                tableLayout='auto'
               />
             </EuiFlexItem>
           </EuiFlexGroup>
