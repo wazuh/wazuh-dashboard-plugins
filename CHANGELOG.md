@@ -2,6 +2,17 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.4.3 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 00
+
+### Added
+
+- Support for Wazuh 4.4.3
+
+### Fixed
+
+- Fixed command to install the macOS agent on the agent wizard [#5481](https://github.com/wazuh/wazuh-kibana-app/pull/5481) [#5484](https://github.com/wazuh/wazuh-kibana-app/pull/5484)
+- Fixed command to start the macOS agent on the agent wizard [#5470](https://github.com/wazuh/wazuh-kibana-app/pull/5470)
+
 ## Wazuh v4.4.2 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 01
 
 ### Added
@@ -101,6 +112,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed unused file related to agent menu [#5102](https://github.com/wazuh/wazuh-kibana-app/pull/5102)
 - Removed the `angular-chart.js` dependency [#4985](https://github.com/wazuh/wazuh-kibana-app/pull/4985)
 - Removed the `pug-loader` dependency [#5062](https://github.com/wazuh/wazuh-kibana-app/pull/5062) [#5089](https://github.com/wazuh/wazuh-kibana-app/pull/5089)
+
 ## Wazuh v4.3.11 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4312
 
 ### Added
