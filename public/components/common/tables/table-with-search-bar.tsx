@@ -31,7 +31,6 @@ export function TableWithSearchBar({
   tableProps = {},
   reload,
   endpoint,
-  compressipv6 = false,
   ...rest
 }) {
   const [loading, setLoading] = useState(false);

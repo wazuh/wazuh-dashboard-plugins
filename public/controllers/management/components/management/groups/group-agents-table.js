@@ -277,8 +277,6 @@ class WzGroupAgentsTable extends Component {
           endpoint={`/groups/${this.props.state.itemDetail.name}/agents`}
           reload={this.props.state.reload}
           searchTable={true}
-          compressipv6={true}
-
         />
       );
     } else {
