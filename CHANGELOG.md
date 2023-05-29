@@ -41,6 +41,17 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Removed deprecated request and code in agent's view [#5451](https://github.com/wazuh/wazuh-kibana-app/pull/5451)
 
+## Wazuh v4.4.3 - OpenSearch Dashboards 2.6.0 - Revision 01
+
+### Added
+
+- Support for Wazuh 4.4.3
+
+### Fixed
+
+- Fixed command to install the macOS agent on the agent wizard [#5481](https://github.com/wazuh/wazuh-kibana-app/pull/5481) [#5484](https://github.com/wazuh/wazuh-kibana-app/pull/5484)
+- Fixed command to start the macOS agent on the agent wizard [#5470](https://github.com/wazuh/wazuh-kibana-app/pull/5470)
+
 ## Wazuh v4.4.2 - OpenSearch Dashboards 2.6.0 - Revision 01
 
 ### Added
