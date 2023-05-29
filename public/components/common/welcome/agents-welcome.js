@@ -347,90 +347,10 @@ class AgentsWelcome extends Component {
     );
   }
 
-  buildTabCard(tab, icon) {
-    return (
-      <EuiFlexItem>
-        <EuiCard
-          size="xs"
-          layout="horizontal"
-          icon={<EuiIcon size="xl" type={icon} color="primary" />}
-          className="homSynopsis__card"
-          title={WAZUH_MODULES[tab].title}
-          onClick={() => this.props.switchTab(tab)}
-          description={WAZUH_MODULES[tab].description}
-        />
-      </EuiFlexItem>
-    );
-  }
-  onClickRestartAgent = () => {
-    const { agent } = this.props;
-    ActionAgents.restartAgent(agent.id);
-  };
-
-  onClickUpgradeAgent = () => {
-    const { agent } = this.props;
-    ActionAgents.upgradeAgent(agent.id);
-  };
-
-  renderUpgradeButton() {
-    const { managerVersion } = this.state;
-    const { agent } = this.props;
-    let outDated = ActionAgents.compareVersions(managerVersion, agent.version);
-
-    if (outDated === true) return;
-    return (
-      <EuiFlexItem grow={false}>
-        <EuiButton
-          color="secondary"
-          iconType="sortUp"
-          onClick={this.onClickUpgradeAgent}
-        >
-          Upgrade
-        </EuiButton>
-      </EuiFlexItem>
-    );
-  }
 
   onTimeChange = (datePicker) => {
     const { start: from, end: to } = datePicker;
     this.setState({ datePicker: { from, to } });
-  }
-
-  getOptions() {
-    return [
-      { value: 'pci', text: 'PCI DSS' },
-      { value: 'gdpr', text: 'GDPR' },
-      { value: 'nist', text: 'NIST 800-53' },
-      { value: 'hipaa', text: 'HIPAA' },
-      { value: 'gpg13', text: 'GPG13' },
-      { value: 'tsc', text: 'TSC' },
-    ];
-  }
-
-  setSelectValue(e) {
-    this.setState({ selectedRequirement: e.target.value });
-  }
-
-  getRequirementVis() {
-    if (this.state.selectedRequirement === 'pci') {
-      return 'Wazuh-App-Agents-Welcome-Top-PCI';
-    }
-    if (this.state.selectedRequirement === 'gdpr') {
-      return 'Wazuh-App-Agents-Welcome-Top-GDPR';
-    }
-    if (this.state.selectedRequirement === 'hipaa') {
-      return 'Wazuh-App-Agents-Welcome-Top-HIPAA';
-    }
-    if (this.state.selectedRequirement === 'nist') {
-      return 'Wazuh-App-Agents-Welcome-Top-NIST-800-53';
-    }
-    if (this.state.selectedRequirement === 'gpg13') {
-      return 'Wazuh-App-Agents-Welcome-Top-GPG-13';
-    }
-    if (this.state.selectedRequirement === 'tsc') {
-      return 'Wazuh-App-Agents-Welcome-Top-TSC';
-    }
-    return 'Wazuh-App-Agents-Welcome-Top-PCI'
   }
 
   renderMitrePanel() {
