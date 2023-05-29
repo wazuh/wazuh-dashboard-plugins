@@ -1,8 +1,8 @@
 <div ng-controller="agentsPreviewController as actrl">
-  <div ng-init="actrl.addNewAgent(false)" ng-show="actrl.addingNewAgent">
+  <div ng-init="actrl.addNewAgent(false)" ng-if="actrl.addingNewAgent">
     <react-component name="RegisterAgent" props="actrl.registerAgentsProps"></react-component>
   </div>
-  <div ng-show="!actrl.addingNewAgent">
+  <div ng-if="!actrl.addingNewAgent">
     <div ng-controller="overviewController as octrl">
       <!-- Navigation section -->
       <div ng-show="octrl.tab && octrl.tab !== 'welcome'">

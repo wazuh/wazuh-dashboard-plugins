@@ -283,7 +283,7 @@ export class OverviewController {
         timefilter.setRefreshInterval(this.commonData.getRefreshInterval());
       }
 
-      if (typeof this.agentsCount === 'undefined') {
+      if (typeof this.agentsCount === 'undefined' && newTab === 'welcome') {
         await this.getSummary();
       }
 
