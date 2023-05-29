@@ -37,10 +37,10 @@ import {
   withUserAuthorizationPrompt,
 } from '../../../../../components/common/hocs';
 import { compose } from 'redux';
-import { WzFieldSearch } from '../../../../../components/wz-field-search-bar/wz-field-search-bar';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
+import { WzFieldSearchDelay } from '../../../../../components/common/search';
 
 export default compose(
   withGlobalBreadcrumb([{ text: '' }, { text: 'Management', href: '#/manager' }, { text: 'Logs' }]),
@@ -182,8 +182,8 @@ export default compose(
         const tmpResult = await WzRequest.apiReq('GET', logsPath, {
           params: this.buildFilters(customOffset),
         });
-        const resultItems = ((tmpResult || {}).data.data || {}).affected_items;
-        totalItems = ((tmpResult || {}).data.data || {}).total_affected_items;
+        const resultItems = tmpResult?.data?.data?.affected_items;
+        totalItems = tmpResult?.data?.data?.total_affected_items;
         result = this.parseLogsToText(resultItems) || '';
       } catch (error) {
         throw new Error('Error fetching logs: ' + error);
@@ -221,14 +221,14 @@ export default compose(
       try {
         const clusterStatus = await WzRequest.apiReq('GET', '/cluster/status', {});
         const clusterEnabled =
-          (((clusterStatus || {}).data || {}).data || {}).running === 'yes' &&
-          (((clusterStatus || {}).data || {}).data || {}).enabled === 'yes';
+          clusterStatus?.data?.data?.running === 'yes' &&
+          clusterStatus?.data?.data?.enabled === 'yes';
 
         if (clusterEnabled) {
           let nodeList = '';
           let selectedNode = '';
           const nodeListTmp = await WzRequest.apiReq('GET', '/cluster/nodes', {});
-          if (Array.isArray((((nodeListTmp || {}).data || {}).data || {}).affected_items)) {
+          if (Array.isArray(nodeListTmp?.data?.data?.affected_items)) {
             nodeList = nodeListTmp.data.data.affected_items;
             selectedNode = nodeListTmp.data.data.affected_items.filter(
               (item) => item.type === 'master'
@@ -480,8 +480,8 @@ export default compose(
           <EuiSpacer size={'s'} />
           <EuiFlexGroup>
             <EuiFlexItem>
-              <WzFieldSearch
-                searchDelay={500}
+              <WzFieldSearchDelay
+                delay={500}
                 onChange={this.onSearchBarChange}
                 onSearch={this.onSearchBarSearch}
                 placeholder="Filter logs"
@@ -515,7 +515,7 @@ export default compose(
                   fontSize="s"
                   paddingSize="m"
                   color="dark"
-                  overflowHeight={`calc(100vh - ${this.HEIGHT_WITHOUT_CODE_EDITOR}px)`}
+                  overflowHeight={window.innerHeight - this.HEIGHT_WITHOUT_CODE_EDITOR}
                 >
                   {this.state.logsList}
                 </EuiCodeBlock>
