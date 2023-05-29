@@ -28,6 +28,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed the GitHub and Office 365 modules appear in the main menu when they were not configured [#5376](https://github.com/wazuh/wazuh-kibana-app/pull/5376)
 - Fixed TypeError in FIM Inventory using new error handler [#5364](https://github.com/wazuh/wazuh-kibana-app/pull/5364)
 - Fixed error when using invalid group configuration [#5423](https://github.com/wazuh/wazuh-kibana-app/pull/5423)
+- Fixed repeated requests in the group table when adding a group or refreshing the table [#5465](https://github.com/wazuh/wazuh-kibana-app/pull/5465)
 
 ### Removed
 
@@ -55,7 +56,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Fixed a problem in the backend service to get the plugin configuration [#5428](https://github.com/wazuh/wazuh-kibana-app/pull/5428)
 
-## Wazuh v4.4.1 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 00
+## Wazuh v4.4.1 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 01
 
 ### Fixed
 
