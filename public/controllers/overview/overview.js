@@ -197,7 +197,7 @@ export class OverviewController {
         }
       };
       setTimeout(() => { this.$location.search('agentId', store.getState().appStateReducers.currentAgentData.id ? String(store.getState().appStateReducers.currentAgentData.id) : null) }, 1);
-  
+
       this.visualizeProps["isAgent"] = agentList ? agentList[0] : false;
       this.$rootScope.$applyAsync();
     }catch(error){
@@ -283,7 +283,7 @@ export class OverviewController {
         timefilter.setRefreshInterval(this.commonData.getRefreshInterval());
       }
 
-      if (typeof this.agentsCount === 'undefined') {
+      if (typeof this.agentsCount === 'undefined' && newTab === 'welcome') {
         await this.getSummary();
       }
 
