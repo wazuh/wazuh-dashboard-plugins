@@ -47,6 +47,7 @@ export class AgentsPreviewController {
     this.wazuhConfig = new WazuhConfig();
     this.errorInit = false;
     this.$window = $window;
+    this.addingNewAgent = false;
   }
 
   /**
@@ -100,9 +101,7 @@ export class AgentsPreviewController {
       updateSummary: (summary) => {
         this.summary = summary;
         if (this.summary.total === 0) {
-          if (this.addingNewAgent === undefined) {
-            this.addNewAgent(true);
-          }
+          this.addNewAgent(true);
           this.hasAgents = false;
         } else {
           this.hasAgents = true;
