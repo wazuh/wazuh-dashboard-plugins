@@ -15,9 +15,9 @@ import subprocess
 # ======================================================= #
 
 # Wazuh version: major.minor.patch
-version = '4.4.2'
+version = '4.4.3'
 # App's revision number (previous rev + 1)
-revision = '00'
+revision = '01'
 # One of 'pre-alpha', 'alpha', 'beta', 'release-candidate', 'stable'
 stage = 'stable'
 # Tag suffix. Usually set to stage + stage iteration.
@@ -110,7 +110,7 @@ def main(platform: str, versions: list):
     """Main function."""
     for v in versions:
         # if stage == 'stable':
-        #     pass    # skipped as we have been asked to 
+        #     pass    # skipped as we have been asked to
         #     tag = f'v{version}-{v}'
         # else:
         tag = f'v{version}-{v}{tag_suffix}'
