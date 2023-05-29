@@ -78,20 +78,19 @@ class WzGroupsTable extends Component {
   }
 
   async componentDidUpdate(prevProps, prevState) {
-    /**
-      Is verifying that isProcessing is true and that it has changed its value,
-      since in the shouldComponentUpdate it is making it re-execute several times
-      each time a state changes, regardless of whether it is a change in isProcessing.
-     */
-    if (
-      prevProps.state.isProcessing !== this.props.state.isProcessing &&
-      this.props.state.isProcessing &&
-      this._isMounted
-    ) {
-      await this.getItems();
-    }
     const { filters } = this.state;
-    if (JSON.stringify(filters) !== JSON.stringify(prevState.filters)) {
+    if ((JSON.stringify(filters) !== JSON.stringify(prevState.filters)) ||
+      /**
+        Is verifying that isProcessing is true and that it has changed its value,
+        since in the shouldComponentUpdate it is making it re-execute several times
+        each time a state changes, regardless of whether it is a change in isProcessing.
+      */
+      (
+        prevProps.state.isProcessing !== this.props.state.isProcessing &&
+        this.props.state.isProcessing &&
+        this._isMounted
+      )
+    ) {
       await this.getItems();
     }
   }
