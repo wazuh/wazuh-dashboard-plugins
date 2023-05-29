@@ -275,7 +275,7 @@ export const RegisterAgent = withErrorBoundary(
 
     systemSelectorWazuhControlMacos() {
       if (this.state.selectedVersion == 'sierra') {
-        return '/Library/Ossec/bin/wazuh-control start';
+        return 'sudo /Library/Ossec/bin/wazuh-control start';
       } else return '';
     }
 
@@ -355,7 +355,7 @@ export const RegisterAgent = withErrorBoundary(
 
     obfuscatePassword(text) {
       let obfuscate = '';
-      const regex = /WAZUH_REGISTRATION_PASSWORD=?\040?\'(.*?)\'/gm;
+      const regex = /WAZUH_REGISTRATION_PASSWORD=?\040?\'(.*?)\'[\"| ]/gm;
       const match = regex.exec(text);
       const password = match[1];
       if (password) {
@@ -378,15 +378,20 @@ export const RegisterAgent = withErrorBoundary(
     }
 
     optionalDeploymentVariables() {
+      const escapeQuotes = value => value.replace(/'/g, "\\'");
       let deployment =
         this.state.serverAddress &&
-        `WAZUH_MANAGER='${this.state.serverAddress}' `;
+        `WAZUH_MANAGER='${escapeQuotes(this.state.serverAddress)}' `;
       if (this.state.selectedOS == 'win') {
-        deployment += `WAZUH_REGISTRATION_SERVER='${this.state.serverAddress}' `;
+        deployment += `WAZUH_REGISTRATION_SERVER='${escapeQuotes(
+          this.state.serverAddress,
+        )}' `;
       }
 
       if (this.state.needsPassword) {
-        deployment += `WAZUH_REGISTRATION_PASSWORD='${this.state.wazuhPassword}' `;
+        deployment += `WAZUH_REGISTRATION_PASSWORD='${escapeQuotes(
+          this.state.wazuhPassword,
+        )}' `;
       }
 
       if (this.state.udpProtocol) {
@@ -399,24 +404,11 @@ export const RegisterAgent = withErrorBoundary(
           .join(',')}' `;
       }
 
-      // macos doesnt need = param
-      if (this.state.selectedOS === 'macos') {
-        return deployment.replace(/=/g, ' ');
-      }
-
       return deployment;
     }
 
     agentNameVariable() {
       let agentName = `WAZUH_AGENT_NAME='${this.state.agentName}' `;
-      if (
-        this.state.selectedOS === 'macos' &&
-        this.state.selectedArchitecture &&
-        this.state.agentName !== ''
-      ) {
-        return agentName.replace(/=/g, ' ');
-      }
-
       if (this.state.selectedArchitecture && this.state.agentName !== '') {
         return agentName;
       } else {
@@ -988,6 +980,25 @@ export const RegisterAgent = withErrorBoundary(
         zIndex: '100',
       };
 
+      /*** macOS installation script customization ***/
+
+      // Set macOS installation script with environment variables
+      const macOSInstallationOptions =
+        `${this.optionalDeploymentVariables()}${this.agentNameVariable()}`
+          .replace(/\' ([a-zA-Z])/g, "' && $1") // Separate environment variables with &&
+          .replace(/\"/g, '\\"') // Escape double quotes
+          .trim();
+
+      // If no variables are set, the echo will be empty
+      const macOSInstallationSetEnvVariablesScript = macOSInstallationOptions
+        ? `sudo echo "${macOSInstallationOptions}" > /tmp/wazuh_envs && `
+        : ``;
+
+      // Merge environment variables with installation script
+      const macOSInstallationScript = `curl -so wazuh-agent.pkg https://packages.wazuh.com/4.x/macos/wazuh-agent-${this.state.wazuhVersion}-1.pkg && ${macOSInstallationSetEnvVariablesScript}sudo installer -pkg ./wazuh-agent.pkg -target /`;
+
+      /*** end macOS installation script customization ***/
+
       const customTexts = {
         rpmText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
         alpineText: `wget -O /etc/apk/keys/alpine-devel@wazuh.com-633d7457.rsa.pub ${this.optionalPackages()} >> /etc/apk/repositories && \
@@ -996,9 +1007,7 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
         centText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
         debText: `curl -so wazuh-agent.deb ${this.optionalPackages()} && sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}dpkg -i ./wazuh-agent.deb`,
         ubuText: `curl -so wazuh-agent.deb ${this.optionalPackages()} && sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}dpkg -i ./wazuh-agent.deb`,
-        macosText: `curl -so wazuh-agent.pkg https://packages.wazuh.com/4.x/macos/wazuh-agent-${
-          this.state.wazuhVersion
-        }-1.pkg && sudo launchctl setenv ${this.optionalDeploymentVariables()}${this.agentNameVariable()}&& sudo installer -pkg ./wazuh-agent.pkg -target /`,
+        macosText: macOSInstallationScript,
         winText:
           this.state.selectedVersion == 'windowsxp' ||
           this.state.selectedVersion == 'windowsserver2008'
