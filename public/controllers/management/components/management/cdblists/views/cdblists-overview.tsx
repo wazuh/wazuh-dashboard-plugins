@@ -27,7 +27,6 @@ function WzCDBListsOverview(props) {
     setShowWarningRestart(showWarningRestart);
   }
 
-  const { clusterStatus } = props;
   return <EuiPage style={{ background: 'transparent' }}>
     <EuiPanel>
       {showWarningRestart && (
