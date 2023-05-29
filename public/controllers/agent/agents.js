@@ -11,8 +11,6 @@
  */
 import { FilterHandler } from '../../utils/filter-handler';
 import { TabNames } from '../../utils/tab-names';
-import * as FileSaver from '../../services/file-saver';
-import { WAZUH_MODULES } from '../../../common/wazuh-modules';
 import { visualizations } from '../../templates/agents/visualizations';
 
 import { ConfigurationHandler } from '../../utils/config-handler';
@@ -20,16 +18,12 @@ import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { GenericRequest } from '../../react-services/generic-request';
 import { WzRequest } from '../../react-services/wz-request';
-import { getToasts } from '../../kibana-services';
+import { getToasts, getDataPlugin } from '../../kibana-services';
 import { ShareAgent } from '../../factories/share-agent';
 import { TabVisualizations } from '../../factories/tab-visualizations';
 import { formatUIDate } from '../../react-services/time-service';
-import { ErrorHandler } from '../../react-services/error-handler';
-import { GroupHandler } from '../../react-services/group-handler';
 import store from '../../redux/store';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
-import { API_NAME_AGENT_STATUS } from '../../../common/constants';
-import { getDataPlugin } from '../../kibana-services';
 import { hasAgentSupportModule } from '../../react-services/wz-agents';
 import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
@@ -69,7 +63,6 @@ export class AgentsController {
     this.reportingService = reportingService;
     this.visFactoryService = visFactoryService;
     this.csvReq = csvReq;
-    this.groupHandler = GroupHandler;
     this.wazuhConfig = new WazuhConfig();
     this.genericReq = GenericRequest;
 
@@ -82,13 +75,12 @@ export class AgentsController {
     this.$scope.integrations = {};
     this.$scope.selectedItem = 0;
     this.targetLocation = null;
-    this.ignoredTabs = ['syscollector', 'welcome', 'configuration', 'stats'];
-
-    this.$scope.showNewFim = true;
-    this.$scope.showScaScan = false;
-
-    this.$scope.editGroup = false;
-    this.$scope.addingGroupToAgent = false;
+    this.ignoredTabs = [
+      'syscollector',
+      'welcome',
+      'configuration',
+      'stats'
+    ];
 
     this.$scope.expandArray = [
       false,
@@ -119,8 +111,6 @@ export class AgentsController {
       getDataPlugin().query.timefilter.timefilter.setTime(savedTimefilter);
       this.commonData.removeTimefilter();
     }
-
-    this.$scope.TabDescription = WAZUH_MODULES;
 
     this.$rootScope.reportStatus = false;
 
@@ -165,8 +155,6 @@ export class AgentsController {
     this.$scope.switchTab = (tab, force = false) => this.switchTab(tab, force);
     this.$scope.getAgent = async (newAgentId) => this.getAgent(newAgentId);
     this.$scope.goGroups = (agent, group) => this.goGroups(agent, group);
-    this.$scope.downloadCsv = async (path, fileName, filters = []) =>
-      this.downloadCsv(path, fileName, filters);
 
     this.$scope.search = (term, specificPath) =>
       this.$scope.$broadcast('wazuhSearch', {
@@ -186,11 +174,6 @@ export class AgentsController {
         specificFilter,
       });
 
-    this.$scope.launchRootcheckScan = () => this.launchRootcheckScan();
-    this.$scope.launchSyscheckScan = () => this.launchSyscheckScan();
-
-    this.$scope.startVis2Png = () => this.startVis2Png();
-
     this.$scope.shouldShowComponent = (component) => this.shouldShowComponent(component);
 
     this.$scope.$on('$destroy', () => {
@@ -208,37 +191,6 @@ export class AgentsController {
       this.reportingService.startConfigReport(this.$scope.agent, 'agentConfig', enabledComponents);
     };
 
-    this.$scope.restartAgent = async (agent) => {
-      this.$scope.restartingAgent = true;
-      try {
-        const data = await WzRequest.apiReq('PUT', `/agents/${agent.id}/restart`, {});
-        const result = ((data || {}).data || {}).data || false;
-        const failed = result && Array.isArray(result.failed_items) && result.failed_items.length;
-        if (failed) {
-          throw new Error(result.failed_items[0].detail);
-        } else if (result) {
-          ErrorHandler.info(result.msg);
-        } else {
-          throw new Error('Unexpected error upgrading agent');
-        }
-        this.$scope.restartingAgent = false;
-      } catch (error) {
-        const options = {
-          context: `${AgentsController.name}.restartAgent`,
-          level: UI_LOGGER_LEVELS.ERROR,
-          severity: UI_ERROR_SEVERITIES.BUSINESS,
-          store: true,
-          error: {
-            error: error,
-            message: error.message || error,
-            title: `Error restarting the agent: ${error.message || error}`,
-          },
-        };
-        getErrorOrchestrator().handleError(options);
-        this.$scope.restartingAgent = false;
-      }
-      this.$scope.$applyAsync();
-    };
 
     //Load
     try {
@@ -348,77 +300,9 @@ export class AgentsController {
     this.$scope.getIntegration = (list) =>
       this.configurationHandler.getIntegration(list, this.$scope);
 
-    this.$scope.switchScaScan = () => {
-      this.$scope.showScaScan = !this.$scope.showScaScan;
-      if (!this.$scope.showScaScan) {
-        this.$scope.$emit('changeTabView', {
-          tabView: this.$scope.tabView,
-          tab: this.$scope.tab,
-        });
-      }
-      this.$scope.$applyAsync();
-    };
-
-    this.$scope.goDiscover = () => this.goDiscover();
-    this.$scope.onClickUpgrade = () => this.onClickUpgrade();
-    this.$scope.onClickRestart = () => this.onClickRestart();
-
     this.$scope.$on('$routeChangeStart', () => {
       return AppState.removeSessionStorageItem('configSubTab');
     });
-
-    this.$scope.switchGroupEdit = () => {
-      this.$scope.addingGroupToAgent = false;
-      this.switchGroupEdit();
-    };
-
-    this.$scope.showConfirmAddGroup = (group) => {
-      this.$scope.addingGroupToAgent = this.$scope.addingGroupToAgent ? false : group;
-    };
-
-    this.$scope.cancelAddGroup = () => (this.$scope.addingGroupToAgent = false);
-
-    this.$scope.loadScaChecks = (policy) =>
-      (this.$scope.lookingSca = {
-        ...policy,
-        id: policy.policy_id,
-      });
-
-    this.$scope.closeScaChecks = () => (this.$scope.lookingSca = false);
-
-    this.$scope.confirmAddGroup = async (group) => {
-      try {
-        await this.groupHandler.addAgentToGroup(group, this.$scope.agent.id);
-        const response = await WzRequest.apiReq('GET', `/agents`, {
-          params: {
-            agents_list: this.$scope.agent.id,
-          },
-        });
-        this.$scope.agent.group = response.data.data.affected_items[0].group;
-        this.$scope.groups = this.$scope.groups.filter(
-          (item) => !responseP.data.data.affected_items[0].group.includes(item)
-        );
-        this.$scope.addingGroupToAgent = false;
-        this.$scope.editGroup = false;
-        ErrorHandler.info(`Group ${group} has been added.`);
-        this.$scope.$applyAsync();
-      } catch (error) {
-        const options = {
-          context: `${AgentsController.name}.confirmAddGroup`,
-          level: UI_LOGGER_LEVELS.ERROR,
-          severity: UI_ERROR_SEVERITIES.BUSINESS,
-          store: true,
-          error: {
-            error: error,
-            message: error.message || error,
-            title: `Error adding group: ${error.message || error}`,
-          },
-        };
-        getErrorOrchestrator().handleError(options);
-        this.$scope.editGroup = false;
-        this.$scope.addingGroupToAgent = false;
-      }
-    };
 
     this.$scope.expand = (i) => this.expand(i);
     this.setTabs();
@@ -520,22 +404,7 @@ export class AgentsController {
     }
 
     try {
-      this.$scope.showScaScan = false;
-      if (tab === 'sca') {
-        //remove to component
-        this.$scope.scaProps = {
-          agent: this.$scope.agent,
-          loadScaChecks: (policy) => this.$scope.loadScaChecks(policy),
-          downloadCsv: (path, name) => this.downloadCsv(path, name),
-        };
-      }
 
-      if (tab === 'syscollector')
-        try {
-          await this.loadSyscollector(this.$scope.agent.id);
-        } catch (error) {
-          throw new Error(error);
-        }
       if (tab === 'configuration') {
         this.$scope.switchConfigurationTab('welcome');
       } else {
@@ -674,54 +543,6 @@ export class AgentsController {
     });
   };
 
-  goDiscover() {
-    this.targetLocation = {
-      tab: 'general',
-      subTab: 'discover',
-    };
-    return this.switchTab('general');
-  }
-
-  async onClickUpgrade() {
-    try {
-      await WzRequest.apiReq('PUT', `/agents/${this.$scope.agent.id}/upgrade`, {});
-      this.showToast('success', 'The agent is being upgrade.', '', 5000);
-    } catch (error) {
-      const options = {
-        context: `${AgentsController.name}.onClickUpgrade`,
-        level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.BUSINESS,
-        store: true,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: `Error upgrading the agent: ${error.message || error}`,
-        },
-      };
-      getErrorOrchestrator().handleError(options);
-    }
-  }
-
-  async onClickRestart() {
-    try {
-      await WzRequest.apiReq('PUT', `/agents/${this.$scope.agent.id}/restart`, {});
-      this.showToast('success', 'Agent restarted.', '', 5000);
-    } catch (error) {
-      const options = {
-        context: `${AgentsController.name}.onClickRestart`,
-        level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.BUSINESS,
-        store: true,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: `Error restarting the agent: ${error.message || error}`,
-        },
-      };
-      getErrorOrchestrator().handleError(options);
-    }
-  }
-
   // Agent data
 
   /**
@@ -747,7 +568,7 @@ export class AgentsController {
   async loadSyscollector(id) {
     try {
       const syscollectorData = await this.genericReq.request('GET', `/api/syscollector/${id}`);
-      this.$scope.syscollector = (syscollectorData || {}).data || {};
+      this.$scope.syscollector = syscollectorData?.data || {};
       return;
     } catch (error) {
       throw new Error(error);
@@ -775,7 +596,7 @@ export class AgentsController {
         },
       });
 
-      const agentInfo = ((((data || {}).data || {}).data || {}).affected_items || [])[0] || false;
+      const agentInfo = data?.data?.data?.affected_items[0] || false;
       // Agent
       this.$scope.agent = agentInfo;
 
@@ -790,10 +611,6 @@ export class AgentsController {
       }
 
       await this.$scope.switchTab(this.$scope.tab, true);
-      const groups = await WzRequest.apiReq('GET', '/groups', {});
-      this.$scope.groups = groups.data.data.affected_items
-        .map((item) => item.name)
-        .filter((item) => this.$scope.agent.group && !this.$scope.agent.group.includes(item));
 
       this.loadWelcomeCardsProps();
       this.$scope.getWelcomeCardsProps = (resultState) => {
@@ -849,11 +666,6 @@ export class AgentsController {
     };
   }
 
-  switchGroupEdit() {
-    this.$scope.editGroup = !!!this.$scope.editGroup;
-    this.$scope.$applyAsync();
-  }
-
   /**
    * This adds timezone offset to a given date
    * @param {String} binding_text
@@ -895,98 +707,7 @@ export class AgentsController {
     this.$location.path('/manager');
   }
 
-  /**
-   * Get full data on CSV format from a path
-   * @param {*} path path with data to convert
-   * @param {*} fileName Output file name
-   * @param {*} filters Filters to apply
-   */
-  async downloadCsv(path, fileName, filters = []) {
-    try {
-      ErrorHandler.info('Your download should begin automatically...', 'CSV');
-      const currentApi = JSON.parse(AppState.getCurrentAPI()).id;
-      const output = await this.csvReq.fetch(path, currentApi, filters);
-      const blob = new Blob([output], {
-        type: 'text/csv',
-      }); // eslint-disable-line
-      FileSaver.saveAs(blob, fileName);
-    } catch (error) {
-      throw new Error(error);
-    }
-    return;
-  }
 
-  /**
-   * Transform a visualization into an image
-   */
-  startVis2Png() {
-    const syscollectorFilters = [];
-    if (this.$scope.tab === 'syscollector' && (this.$scope.agent || {}).id) {
-      syscollectorFilters.push(
-        this.filterHandler.managerQuery(AppState.getClusterInfo().cluster, true)
-      );
-      syscollectorFilters.push(this.filterHandler.agentQuery(this.$scope.agent.id));
-    }
-    this.reportingService.startVis2Png(
-      this.$scope.tab,
-      (this.$scope.agent || {}).id || true,
-      syscollectorFilters.length ? syscollectorFilters : null
-    );
-  }
-
-  async launchRootcheckScan() {
-    try {
-      const isActive = ((this.$scope.agent || {}).status || '') === API_NAME_AGENT_STATUS.ACTIVE;
-      if (!isActive) {
-        throw new Error('Agent is not active');
-      }
-      await WzRequest.apiReq('PUT', `/rootcheck/${this.$scope.agent.id}`, {});
-      ErrorHandler.info(
-        `Policy monitoring scan launched successfully on agent ${this.$scope.agent.id}`
-      );
-    } catch (error) {
-      const options = {
-        context: `${AgentsController.name}.launchRootcheckScan`,
-        level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.BUSINESS,
-        store: true,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: ` Policy monitoring scan failed on agent ${this.$scope.agent.id} due to: ${error.message || error}`,
-        },
-      };
-      getErrorOrchestrator().handleError(options);
-    }
-  }
-
-  async launchSyscheckScan() {
-    try {
-      const isActive = ((this.$scope.agent || {}).status || '') === API_NAME_AGENT_STATUS.ACTIVE;
-      if (!isActive) {
-        throw new Error('Agent is not active');
-      }
-      await WzRequest.apiReq('PUT', `/syscheck`, {
-        params: {
-          agents_list: this.$scope.agent.id,
-        },
-      });
-      ErrorHandler.info(`FIM scan launched successfully on agent ${this.$scope.agent.id}`, '');
-    } catch (error) {
-      const options = {
-        context: `${AgentsController.name}.launchSyscheckScan`,
-        level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.BUSINESS,
-        store: true,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: ` FIM scan failed on agent ${this.$scope.agent.id} due to: ${error.message || error}`,
-        },
-      };
-      getErrorOrchestrator().handleError(options);
-    }
-  }
 
   falseAllExpand() {
     this.$scope.expandArray = [
