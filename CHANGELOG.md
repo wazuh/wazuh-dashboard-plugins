@@ -36,6 +36,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Removed deprecated request and code in agent's view [#5451](https://github.com/wazuh/wazuh-kibana-app/pull/5451)
 - Removed unnecessary dashboard queries caused by the deploy agent view. [#5453](https://github.com/wazuh/wazuh-kibana-app/pull/5453)
+- Removed repeated and unnecessary requests in security section. [#5500](https://github.com/wazuh/wazuh-kibana-app/pull/5500)
 
 ## Wazuh v4.4.3 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 01
 
