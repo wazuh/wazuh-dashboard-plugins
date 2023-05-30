@@ -407,9 +407,9 @@ export class AgentsController {
     }
 
     // Update agent status
-    if (!force && ((this.$scope || {}).agent || false)) {
+    if (!force && this.$scope.agent) {
       try {
-        const agentInfo = await WzRequest.apiReq('GET', `/agents`, {
+        const agentInfo = await WzRequest.apiReq('GET', '/agents', {
           params: {
             agents_list: this.$scope.agent.id,
             select: 'status',
@@ -418,7 +418,6 @@ export class AgentsController {
         this.$scope.agent.status =
           agentInfo?.data?.data?.affected_items?.[0]?.status ||
           this.$scope.agent.status;
-        this.$scope.isSynchronized = this.$scope.agent.status?.synced;
 
         this.$scope.$applyAsync();
       } catch (error) {
@@ -611,7 +610,6 @@ export class AgentsController {
   async getAgent(newAgentId) {
     try {
       this.$scope.emptyAgent = false;
-      this.$scope.isSynchronized = false;
       this.$scope.load = true;
       this.changeAgent = true;
 
@@ -690,7 +688,7 @@ export class AgentsController {
    */
   loadWelcomeCardsProps() {
     this.$scope.welcomeCardsProps = {
-      switchTab: tab => this.switchTab(tab),
+      switchTab: (tab, force) => this.switchTab(tab, force),
       extensions: this.cleanExtensions(this.$scope.extensions),
       agent: this.$scope.agent,
       api: AppState.getCurrentAPI(),
