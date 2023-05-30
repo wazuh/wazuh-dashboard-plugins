@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { EuiSteps, EuiStepStatus, EuiTitle } from '@elastic/eui';
-import InputForm from '../../../../components/common/form/InputForm';
-import ServerAddress from '../../components/step-two/server-address';
+import { InputForm } from '../../../../components/common/form/index';
+import { ServerAddress } from '../../components/step-two/server-addres';
 import './steps.scss';
 
 export const Steps = () => {
