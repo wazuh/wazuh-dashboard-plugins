@@ -18,6 +18,20 @@
   justify-content: center;
 }
 
+.checkbox-group-container.double-architecture {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  .checkbox-item:first-child {
+    margin-bottom: 13px;
+  }
+  .checkbox-item {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: start;
+  }
+}
+
 .architecture-label {
   margin-left: 8px;
   font-family: 'Inter';

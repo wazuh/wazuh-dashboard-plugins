@@ -20,6 +20,6 @@ export const REGISTER_AGENT_DATA: RegisterAgentData[] = [
     icon: MacIcon,
     title: 'macOS',
     hr: true,
-    architecture: ['PKG 32/64 AMB64'],
+    architecture: ['Intel', 'Apple Silicon'],
   },
 ];
