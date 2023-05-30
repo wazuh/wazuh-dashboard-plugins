@@ -15,10 +15,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed the description of step 3 of the deploy a new agent section. [#5416](https://github.com/wazuh/wazuh-kibana-app/pull/5416)
 - Changed the placeholder of the agent name input of the deploy a new agent section. [#5416](https://github.com/wazuh/wazuh-kibana-app/pull/5416)
 
-### Fixed
-
-- Fixed macos command. This problem arose when merging changes. [5515](https://github.com/wazuh/wazuh-kibana-app/pull/5515)
-
 ## Wazuh v4.4.3 - OpenSearch Dashboards 2.6.0 - Revision 01
 
 ### Added
