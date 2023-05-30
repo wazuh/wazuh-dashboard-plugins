@@ -68,12 +68,7 @@ export const WzSecurity = compose(
   const securityTabRegExp = new RegExp(`tab=(${tabs.map((tab) => tab.id).join('|')})`);
   const tab = window.location.href.match(securityTabRegExp);
 
-  const [selectedTabId, setSelectedTabId] = useState((tab && tab[1]) || 'users');
-
-  const listenerLocationChanged = () => {
-    const tab = window.location.href.match(securityTabRegExp);
-    setSelectedTabId((tab && tab[1]) || 'users');
-  };
+  const selectedTabId = (tab && tab[1]) || 'users';
 
   const checkRunAsUser = async () => {
     const currentApi = AppState.getCurrentAPI();
@@ -108,19 +103,12 @@ export const WzSecurity = compose(
     }
   }, []);
 
-  // This allows to redirect to a Security tab if you click a Security link in menu when you're already in a Security section
-  useEffect(() => {
-    window.addEventListener('popstate', listenerLocationChanged);
-    return () => window.removeEventListener('popstate', listenerLocationChanged);
-  });
-
   useEffect(() => {
     dispatch(updateSecuritySection(selectedTabId));
-  });
+  }, []);
 
   const onSelectedTabChanged = (id) => {
     window.location.href = window.location.href.replace(`tab=${selectedTabId}`, `tab=${id}`);
-    setSelectedTabId(id);
   };
 
   const renderTabs = () => {

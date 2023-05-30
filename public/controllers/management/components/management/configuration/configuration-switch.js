@@ -53,7 +53,11 @@ import WzConfigurationPath from './util-components/configuration-path';
 import WzRefreshClusterInfoButton from './util-components/refresh-cluster-info-button';
 import { withUserAuthorizationPrompt } from '../../../../../components/common/hocs';
 
-import { clusterNodes, clusterReq } from './utils/wz-fetch';
+import {
+  clusterNodes,
+  clusterReq,
+  agentIsSynchronized,
+} from './utils/wz-fetch';
 import {
   updateClusterNodes,
   updateClusterNodeSelected,
@@ -64,7 +68,6 @@ import { compose } from 'redux';
 
 import { EuiPage, EuiPanel, EuiSpacer, EuiButtonEmpty, EuiFlexItem } from '@elastic/eui';
 
-import { agentIsSynchronized } from './utils/wz-fetch';
 import { WzRequest } from '../../../../../react-services/wz-request';
 import { API_NAME_AGENT_STATUS, UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
