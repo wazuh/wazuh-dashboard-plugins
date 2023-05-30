@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import {
   EuiButton,
   EuiTitle,
-  EuiFlyout,
   EuiFlyoutHeader,
   EuiFlyoutBody,
   EuiForm,
@@ -14,7 +13,6 @@ import {
   EuiInMemoryTable,
   EuiConfirmModal,
   EuiOverlayMask,
-  EuiOutsideClickDetector,
   EuiFieldText,
   EuiText,
 } from '@elastic/eui';
@@ -37,8 +35,6 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
   const [actions, setActions] = useState([]);
   const [actionValue, setActionValue] = useState('');
   const [policyName, setPolicyName] = useState('');
-  const [policies, setPolicies] = useState('');
-  const [loading, setLoading] = useState(false);
   const [effectValue, setEffectValue] = useState();
   const [hasChanges, setHasChanges] = useState(false);
 
@@ -98,14 +94,14 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
   ];
 
   async function getData() {
-    const resources_request = await WzRequest.apiReq('GET', '/security/resources', {});
-    const actions_request = await WzRequest.apiReq('GET', '/security/actions', {});
-    const resources_data = ((resources_request || {}).data || []).data || {};
-    setAvailableResources(resources_data);
+    const resourcesRequest = await WzRequest.apiReq('GET', '/security/resources', {});
+    const actionsRequest = await WzRequest.apiReq('GET', '/security/actions', {});
+    const resourcesData = resourcesRequest?.data?.data || {};
+    setAvailableResources(resourcesData);
 
-    const actions_data = ((actions_request || {}).data || []).data || {};
-    setAvailableActions(actions_data);
-    const actions = Object.keys(actions_data).map((x, idx) => {
+    const actionsData = actionsRequest?.data?.data || {};
+    setAvailableActions(actionsData);
+    const actions = Object.keys(actionsData).map((x, idx) => {
       return {
         id: idx,
         value: x,
@@ -114,7 +110,7 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
           <>
             <strong>{x}</strong>
             <EuiText size="s" color="subdued">
-              <p className="euiTextColor--subdued">{actions_data[x].description}</p>
+              <p className="euiTextColor--subdued">{actionsData[x].description}</p>
             </EuiText>
           </>
         ),
@@ -152,14 +148,6 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
     setAddedActions(addedActions.filter((x) => x !== action));
   };
 
-  const getPolicies = async () => {
-    setLoading(true);
-    const request = await WzRequest.apiReq('GET', '/security/policies', {});
-    const policies = (((request || {}).data || {}).data || {}).affected_items || [];
-    setPolicies(policies);
-    setLoading(false);
-  };
-
   const createPolicy = async () => {
     try {
       const result = await WzRequest.apiReq(
@@ -179,7 +167,6 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
         return;
       }
       ErrorHandler.info('Policy was successfully created', '');
-      await getPolicies();
       setPolicyName('');
       setAddedActions([]);
       setAddedResources([]);
@@ -281,10 +268,6 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
   useEffect(() => {
     loadResources();
   }, [addedActions]);
-
-  useEffect(() => {
-    getPolicies();
-  }, []);
 
   useEffect(() => {
     if (
