@@ -1,7 +1,7 @@
 import { InstallCommandCreator } from "../install-command-creator/install-command-creator";
 import { validateOSDefinitionHasDuplicatedOptions, validateOSDefinitionsDuplicated } from "../services/search-os-definitions.service";
 import { StartCommandCreator } from "../start-command-creator/start-command-creator";
-import { ICommandConstructorInput, OSDefinition, tOS, tPackageExtensions, tPackageManagerTypes } from "../types";
+import { ICommandConstructorInput, IOptionalParams, IOSDefinition, tOS, tPackageExtensions, tPackageManagerTypes } from "../types";
 import { URLPackageFinder } from "../url-package-finder/url-package-finder";
 
 interface IRegisterAgentCommandInput {
@@ -24,6 +24,10 @@ enum EStatusMessages {
   ARCHITECTURE_INCOMPLETE = 'Please select the architecture.',
 }
 
+
+
+
+
 /**
  * This class will receive the OS definition and return the commands to register agent and install the package
  */
@@ -42,7 +46,7 @@ export class RegisterAgentCommandConstructor implements IRegisterAgentCommandCon
   _packageManager: tPackageManagerTypes | null = null;
 
 
-  constructor(private osDefinitions: OSDefinition[]) {
+  constructor(private osDefinitions: IOSDefinition[], private optionsParams?: IOptionalParams) {
     this.URLpackageFinder = new URLPackageFinder(osDefinitions, this.version);
     this.installCommandCreator = new InstallCommandCreator(osDefinitions, this.version);
     this.startCommandCreator = new StartCommandCreator(osDefinitions, this.version);

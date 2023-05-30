@@ -2,9 +2,9 @@ import {
   NoOSOptionFoundException,
   NoOptionFoundException,
 } from '../exceptions';
-import { IDefinitionsInput, OSDefinition } from '../types';
+import { IDefinitionsInput, IOSDefinition } from '../types';
 
-export const searchOSDefinitions = (osDefinitions: OSDefinition[], params: IDefinitionsInput) => {
+export const searchOSDefinitions = (osDefinitions: IOSDefinition[], params: IDefinitionsInput) => {
   const { osName, architecture, extension, packageManager } =
     params;
 
@@ -28,7 +28,7 @@ export const searchOSDefinitions = (osDefinitions: OSDefinition[], params: IDefi
 };
 
 export const validateOSDefinitionsDuplicated = (
-  osDefinitions: OSDefinition[],
+  osDefinitions: IOSDefinition[],
 ) => {
   const osNames = new Set<string>();
 
@@ -41,7 +41,7 @@ export const validateOSDefinitionsDuplicated = (
 };
 
 export const validateOSDefinitionHasDuplicatedOptions = (
-  osDefinitions: OSDefinition[],
+  osDefinitions: IOSDefinition[],
 ) => {
   for (const osDefinition of osDefinitions) {
     const options = new Set<string>();

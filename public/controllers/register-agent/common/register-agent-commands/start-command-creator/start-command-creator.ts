@@ -1,9 +1,9 @@
 import { NoStartCommandDefinitionException } from "../exceptions";
 import { searchOSDefinitions } from "../services/search-os-definitions.service";
-import { OSDefinition, tOS, tPackageExtensions, tPackageManagerTypes } from "../types";
+import { IOSDefinition, tOS, tPackageExtensions, tPackageManagerTypes } from "../types";
 
 export class StartCommandCreator {
-    constructor(private osDefinitions: OSDefinition[], private version: string) {}
+    constructor(private osDefinitions: IOSDefinition[], private version: string) {}
 
     getStartCommand(
         osName: tOS,

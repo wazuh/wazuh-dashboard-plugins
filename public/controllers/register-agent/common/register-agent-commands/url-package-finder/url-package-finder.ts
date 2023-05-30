@@ -3,7 +3,7 @@ import {
   NoOptionFoundException,
 } from '../exceptions';
 import { searchOSDefinitions } from '../services/search-os-definitions.service';
-import { OSDefinition, tOS, tPackageExtensions, tPackageManagerTypes } from '../types';
+import { IOSDefinition, tOS, tPackageExtensions, tPackageManagerTypes } from '../types';
 /**
  * This class is responsible for finding the URL of the package to download
  * for the agent installation.
@@ -11,7 +11,7 @@ import { OSDefinition, tOS, tPackageExtensions, tPackageManagerTypes } from '../
  */
 export class URLPackageFinder {
   constructor(
-    private osDefinitions: OSDefinition[],
+    private osDefinitions: IOSDefinition[],
     protected currentVersion: string,
   ) {}
 

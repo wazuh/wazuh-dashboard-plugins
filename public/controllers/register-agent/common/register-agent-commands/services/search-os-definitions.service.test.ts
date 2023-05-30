@@ -10,7 +10,7 @@ const mockedInstallCommand = (props: any) => 'install command mocked';
 const mockedStartCommand = (props: any) => 'start command mocked';
 const mockedUrlPackage = (props: any) => 'https://package-url.com';
 
-const validOSDefinitions: OSDefinition[] = [
+const validOSDefinitionsIOSDefinition[] = [
     {
         name: 'linux',
         options: [
@@ -74,7 +74,7 @@ describe('search OS definitions services', () => {
 
     describe('validateOSDefinitionsDuplicated', () => {
         it('should not throw an error if there are no duplicated OS definitions', () => {
-            const osDefinitions: OSDefinition[] = [
+            const osDefinitionsIOSDefinition[] = [
                 {
                     name: 'linux',
                     options: [
@@ -107,7 +107,7 @@ describe('search OS definitions services', () => {
         });
 
         it('should throw an error if there are duplicated OS definitions', () => {
-            const osDefinition: OSDefinition = {
+            const osDefinitionIOSDefinition = {
                 name: 'linux',
                 options: [
                     {
@@ -120,7 +120,7 @@ describe('search OS definitions services', () => {
                     },
                 ],
             };
-            const osDefinitions: OSDefinition[] = [
+            const osDefinitionsIOSDefinition[] = [
                 osDefinition,
                 osDefinition,
             ];
@@ -137,7 +137,7 @@ describe('search OS definitions services', () => {
         })
 
         it('should throw an error if there are duplicated OS definitions with different options', () => {
-            const osDefinitions: OSDefinition[] = [
+            const osDefinitionsIOSDefinition[] = [
                 {
                     name: 'linux',
                     options: [

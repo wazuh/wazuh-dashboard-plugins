@@ -24,7 +24,7 @@ export type tPackageManagerTypes =
   | 'apk'
   | 'curl';
 
-export interface OSDefinitionOption {
+export interface IOSDefinitionOption {
   extension: tPackageExtensions;
   architecture: string;
   version: string;
@@ -32,22 +32,24 @@ export interface OSDefinitionOption {
   packageManager?: tPackageManagerTypes;
 }
 
-export interface OSDefinition {
+export interface IOSCommandsDefinition {
+  extension: tPackageExtensions;
+  architecture: string;
+  packageManager: tPackageManagerTypes;
+  urlPackage: (props: IOSDefinitionOption) => string;
+  installCommand: (props: IOSDefinitionOption & { urlPackage: string }) => string;
+  startCommand: (props: IOSDefinitionOption) => string;
+}
+
+export interface IOSDefinition {
   name: tOS;
-  options: {
-    extension: tPackageExtensions;
-    architecture: string;
-    packageManager: tPackageManagerTypes;
-    urlPackage: (props: OSDefinitionOption) => string;
-    installCommand: (props: OSDefinitionOption & { urlPackage: string }) => string;
-    startCommand: (props: OSDefinitionOption) => string;
-  }[];
+  options: IOSCommandsDefinition[];
 }
 
 ///////////////////////////////////////////////////////////////////
 
 export interface ICommandConstructorInput {
-  os: OSDefinition;
+  os: IOSDefinition;
   serverAddress: string;
   agentName?: string;
   groups?: string[];
@@ -66,3 +68,15 @@ export interface IDefinitionsInput {
   extension: tPackageExtensions,
   packageManager: tPackageManagerTypes
 }
+
+///////////////////////////////////////////////////////////////////
+export interface IOptionsParamConfig {
+  property: string;
+  getParamCommand: (property: string, value: string) => string;
+}
+
+export interface IOptionalParams {
+  [key: string]: IOptionsParamConfig;
+}
+
+
