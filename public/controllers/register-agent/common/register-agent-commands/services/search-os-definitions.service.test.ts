@@ -1,5 +1,5 @@
 import { NoOSOptionFoundException, NoOptionFoundException } from '../exceptions';
-import { OSDefinition } from '../types';
+import { IOSDefinition } from '../types';
 import {
     searchOSDefinitions,
     validateOSDefinitionHasDuplicatedOptions,
@@ -10,7 +10,7 @@ const mockedInstallCommand = (props: any) => 'install command mocked';
 const mockedStartCommand = (props: any) => 'start command mocked';
 const mockedUrlPackage = (props: any) => 'https://package-url.com';
 
-const validOSDefinitionsIOSDefinition[] = [
+const validOSDefinitions: IOSDefinition[] = [
     {
         name: 'linux',
         options: [
@@ -74,7 +74,7 @@ describe('search OS definitions services', () => {
 
     describe('validateOSDefinitionsDuplicated', () => {
         it('should not throw an error if there are no duplicated OS definitions', () => {
-            const osDefinitionsIOSDefinition[] = [
+            const osDefinitions: IOSDefinition[] = [
                 {
                     name: 'linux',
                     options: [
@@ -107,7 +107,7 @@ describe('search OS definitions services', () => {
         });
 
         it('should throw an error if there are duplicated OS definitions', () => {
-            const osDefinitionIOSDefinition = {
+            const osDefinition: IOSDefinition = {
                 name: 'linux',
                 options: [
                     {
@@ -120,7 +120,7 @@ describe('search OS definitions services', () => {
                     },
                 ],
             };
-            const osDefinitionsIOSDefinition[] = [
+            const osDefinitions: IOSDefinition[] = [
                 osDefinition,
                 osDefinition,
             ];
@@ -137,7 +137,7 @@ describe('search OS definitions services', () => {
         })
 
         it('should throw an error if there are duplicated OS definitions with different options', () => {
-            const osDefinitionsIOSDefinition[] = [
+            const osDefinitions: IOSDefinition[] = [
                 {
                     name: 'linux',
                     options: [

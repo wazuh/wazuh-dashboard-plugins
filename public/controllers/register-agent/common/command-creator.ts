@@ -20,7 +20,7 @@ export class CommandCreator implements ICommandCreator {
   constructor(
     public osDefinitions: IOSDefinition[],
     protected optionalParams: IOptionalParams,
-    protected version: string,
+    public version: string,
   ) {
     this.commandFinder = new CommandFinder(osDefinitions, version);
     this.installCommandCreator = new InstallCommandCreator(

@@ -1,6 +1,6 @@
-import { OSDefinition } from './types';
+import { IOSDefinition } from './types';
 
-const linuxDefinitionIOSDefinition = {
+const linuxDefinition: IOSDefinition = {
   name: 'linux',
   options: [
     {
@@ -46,7 +46,7 @@ const linuxDefinitionIOSDefinition = {
   ],
 };
 
-const windowsDefinitionIOSDefinition = {
+const windowsDefinition: IOSDefinition = {
   name: 'windows',
   options: [
     {
@@ -62,7 +62,7 @@ const windowsDefinitionIOSDefinition = {
   ],
 };
 
-const macDefinitionIOSDefinition = {
+const macDefinition: IOSDefinition = {
   name: 'mac',
   options: [
     {

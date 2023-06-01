@@ -2,6 +2,7 @@ import {
   ICommandConstructorInput,
   IDefinitionsInput,
   IOSCommandsDefinition,
+  IOSDefinition,
 } from './register-agent-commands/types';
 
 export type IOSInputs = IDefinitionsInput &
@@ -31,7 +32,7 @@ interface ICommandsResponse {
 
 export interface ICommandCreator {
   commandFinder: ICommandFinder;
-  osDefinitions: IOSCommandsDefinition[];
+  osDefinitions: IOSDefinition[];
   version: string;
   selectOS(params: IDefinitionsInput): any;
   getInstallCommand(): string;
