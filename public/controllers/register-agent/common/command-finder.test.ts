@@ -1,5 +1,0 @@
-describe('CommandFinder', () => {
-    it('', () => {
-        
-    });
-})

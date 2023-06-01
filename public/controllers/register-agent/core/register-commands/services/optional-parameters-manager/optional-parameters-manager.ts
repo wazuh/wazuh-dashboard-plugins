@@ -1,4 +1,4 @@
-import { IOptionalParams, IOptionsParamConfig } from "../types";
+import { IOptionalParams, IOptionsParamConfig } from "../../types";
 
 interface IOptionalParametersManager {
 

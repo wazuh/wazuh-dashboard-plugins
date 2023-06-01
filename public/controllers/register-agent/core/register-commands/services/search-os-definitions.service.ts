@@ -1,27 +1,27 @@
+import { IOperationSystem } from '../../domain/OperatingSystem';
 import {
   NoOSOptionFoundException,
   NoOptionFoundException,
 } from '../exceptions';
-import { IDefinitionsInput, IOSDefinition } from '../types';
+import { IOSDefinition } from '../types';
 
-export const searchOSDefinitions = (osDefinitions: IOSDefinition[], params: IDefinitionsInput) => {
-  const { osName, architecture, extension, packageManager } =
+export const searchOSDefinitions = (osDefinitions: IOSDefinition[], params: IOperationSystem) => {
+  const { name, architecture, extension } =
     params;
 
-  const osDefinition = osDefinitions.find(os => os.name === osName);
+  const osDefinition = osDefinitions.find(os => os.name === name);
   if (!osDefinition) {
-    throw new NoOSOptionFoundException(osName);
+    throw new NoOSOptionFoundException(name);
   }
 
   const osDefinitionOption = osDefinition.options.find(
     option =>
       option.architecture === architecture &&
-      option.extension === extension &&
-      option.packageManager === packageManager,
+      option.extension === extension
   );
 
   if (!osDefinitionOption) {
-    throw new NoOptionFoundException(osName, architecture, extension);
+    throw new NoOptionFoundException(name, architecture, extension);
   }
 
   return osDefinitionOption;
@@ -46,7 +46,7 @@ export const validateOSDefinitionHasDuplicatedOptions = (
   for (const osDefinition of osDefinitions) {
     const options = new Set<string>();
     for (const option of osDefinition.options) {
-      let ext_arch_manager = `${option.extension}_${option.architecture}_${option.packageManager}`;
+      let ext_arch_manager = `${option.extension}_${option.architecture}`;
       if (options.has(ext_arch_manager)) {
         throw new Error(
           `Duplicate option found for OS ${osDefinition.name}: ${option}`,

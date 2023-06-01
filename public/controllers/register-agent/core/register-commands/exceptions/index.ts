@@ -19,10 +19,9 @@ export class NoStartCommandDefinitionException extends Error {
     osName: string,
     architecture: string,
     extension: string,
-    packageManager: string,
   ) {
     super(
-      `No start command definition found for "${osName}" "${architecture}" "${extension}" "${packageManager}". Please check the OS definitions.`,
+      `No start command definition found for "${osName}" "${architecture}" "${extension}". Please check the OS definitions.`,
     );
   }
 }
@@ -32,10 +31,9 @@ export class NoInstallCommandDefinitionException extends Error {
     osName: string,
     architecture: string,
     extension: string,
-    packageManager: string,
   ) {
     super(
-      `No install command definition found for "${osName}" "${architecture}" "${extension}" "${packageManager}". Please check the OS definitions.`,
+      `No install command definition found for "${osName}" "${architecture}" "${extension}". Please check the OS definitions.`,
     );
   }
 }
@@ -45,10 +43,9 @@ export class NoPackageURLDefinitionException extends Error {
     osName: string,
     architecture: string,
     extension: string,
-    packageManager: string,
   ) {
     super(
-      `No package URL definition found for "${osName}" "${architecture}" "${extension}" "${packageManager}". Please check the OS definitions.`,
+      `No package URL definition found for "${osName}" "${architecture}" "${extension}". Please check the OS definitions.`,
     );
   }
 }

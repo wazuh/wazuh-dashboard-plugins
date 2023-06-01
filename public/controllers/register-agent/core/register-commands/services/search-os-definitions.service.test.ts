@@ -17,7 +17,6 @@ const validOSDefinitions: IOSDefinition[] = [
             {
                 extension: 'deb',
                 architecture: 'x64',
-                packageManager: 'aix',
                 installCommand: mockedInstallCommand,
                 startCommand: mockedStartCommand,
                 urlPackage: mockedUrlPackage,
@@ -30,7 +29,6 @@ const validOSDefinitions: IOSDefinition[] = [
             {
                 extension: 'msi',
                 architecture: 'x64',
-                packageManager: 'aix',
                 installCommand: mockedInstallCommand,
                 startCommand: mockedStartCommand,
                 urlPackage: mockedUrlPackage,
@@ -48,7 +46,6 @@ describe('search OS definitions services', () => {
                         osName: 'linux',
                         architecture: 'x64',
                         extension: 'deb',
-                        packageManager: 'aix',
                 });
                 expect(result).toMatchObject(validOSDefinitions[0].options[0])
         })
@@ -58,7 +55,6 @@ describe('search OS definitions services', () => {
                         osName: 'invalid-os',
                         architecture: 'x64',
                         extension: 'deb',
-                        packageManager: 'aix',
                 })).toThrow(NoOSOptionFoundException);
         })
 
@@ -67,7 +63,6 @@ describe('search OS definitions services', () => {
                         osName: 'linux',
                         architecture: 'invalid-architecture',
                         extension: 'deb',
-                        packageManager: 'aix',
                 })).toThrow(NoOptionFoundException);
         })
     });
@@ -81,7 +76,6 @@ describe('search OS definitions services', () => {
                         {
                             extension: 'deb',
                             architecture: 'x64',
-                            packageManager: 'aix',
                             installCommand: mockedInstallCommand,
                             startCommand: mockedStartCommand,
                             urlPackage: mockedUrlPackage,
@@ -94,7 +88,6 @@ describe('search OS definitions services', () => {
                         {
                             extension: 'msi',
                             architecture: 'x64',
-                            packageManager: 'aix',
                             installCommand: mockedInstallCommand,
                             startCommand: mockedStartCommand,
                             urlPackage: mockedUrlPackage,
@@ -144,7 +137,6 @@ describe('search OS definitions services', () => {
                         {
                             extension: 'deb',
                             architecture: 'x64',
-                            packageManager: 'aix',
                             installCommand: mockedInstallCommand,
                             startCommand: mockedStartCommand,
                             urlPackage: mockedUrlPackage,
@@ -157,7 +149,6 @@ describe('search OS definitions services', () => {
                         {
                             extension: 'deb',
                             architecture: 'x64',
-                            packageManager: 'aix',
                             installCommand: mockedInstallCommand,
                             startCommand: mockedStartCommand,
                             urlPackage: mockedUrlPackage,
@@ -165,7 +156,6 @@ describe('search OS definitions services', () => {
                         {
                             extension: 'deb',
                             architecture: 'x64',
-                            packageManager: 'aix',
                             installCommand: mockedInstallCommand,
                             startCommand: mockedStartCommand,
                             urlPackage: mockedUrlPackage,
