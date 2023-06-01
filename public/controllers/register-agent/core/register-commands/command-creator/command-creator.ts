@@ -7,11 +7,10 @@ import {
   tPackageExtensions,
 } from '../types';
 import { ICommandCreator } from '../types';
-import { searchOSDefinitions, validateOSDefinitionsDuplicated } from '../services/search-os-definitions.service';
+import { searchOSDefinitions, validateOSDefinitionHasDuplicatedOptions, validateOSDefinitionsDuplicated } from '../services/search-os-definitions.service';
 import { IOperationSystem } from '../../domain/OperatingSystem';
 
 export class CommandCreator implements ICommandCreator {
-  // operating system 
   os: tOS | null = null;
   osDefinitionSelected: IOSCommandsDefinition | null = null;
 
@@ -22,20 +21,31 @@ export class CommandCreator implements ICommandCreator {
   ) {
     // validate os definitions received
     validateOSDefinitionsDuplicated(this.osDefinitions);
+    validateOSDefinitionHasDuplicatedOptions(this.osDefinitions);
   }
 
+  /**
+   * This method selects the operating system to use based on the given parameters
+   * @param params - The operating system parameters to select
+   */
   selectOS(params: IOperationSystem) {
     try {
+      // Check if the selected operating system is valid
       this.osDefinitionSelected = this.checkIfOSisValid(params);
+      // Set the selected operating system
       this.os = params.name;
-    }catch(error){
+    } catch (error) {
+      // If the selected operating system is not valid, reset the selected OS and OS definition
       this.osDefinitionSelected = null;
       this.os = null;
     }
   }
+
   /**
-   * 
-   * @param params 
+   * This method checks if the selected operating system is valid
+   * @param params - The operating system parameters to check
+   * @returns The selected operating system definition
+   * @throws An error if the operating system is not valid
    */
   private checkIfOSisValid(params: IOperationSystem): IOSCommandsDefinition {
     const { name, architecture, extension } = params;
@@ -57,6 +67,11 @@ export class CommandCreator implements ICommandCreator {
     return option;
   }
 
+  /**
+   * This method gets the URL package for the selected operating system
+   * @returns The URL package for the selected operating system
+   * @throws An error if the operating system is not selected
+   */
   getUrlPackage(): string {
     if(!this.osDefinitionSelected) {
       throw new Error('OS not selected. Please select an OS');
@@ -68,6 +83,11 @@ export class CommandCreator implements ICommandCreator {
     })
   }
 
+  /**
+   * This method gets the install command for the selected operating system
+   * @returns The install command for the selected operating system
+   * @throws An error if the operating system is not selected
+   */
   getInstallCommand(): string {
     if(!this.osDefinitionSelected) {
       throw new Error('OS not selected. Please select an OS');
@@ -82,6 +102,11 @@ export class CommandCreator implements ICommandCreator {
     });
   }
 
+  /**
+   * This method gets the start command for the selected operating system
+   * @returns The start command for the selected operating system
+   * @throws An error if the operating system is not selected
+   */
   getStartCommand(): string {
     if(!this.osDefinitionSelected) {
       throw new Error('OS not selected. Please select an OS');
@@ -95,6 +120,11 @@ export class CommandCreator implements ICommandCreator {
     })
   }
 
+  /**
+   * This method gets all the commands for the selected operating system
+   * @returns An object containing all the commands for the selected operating system
+   * @throws An error if the operating system is not selected
+   */
   getAllCommands(): ICommandsResponse {
     if(!this.osDefinitionSelected) {
       throw new Error('OS not selected. Please select an OS');
@@ -111,6 +141,10 @@ export class CommandCreator implements ICommandCreator {
     }
   }
 
+  /**
+   * This method gets the optional parameters for the command creator
+   * @returns An object containing the optional parameters for the command creator
+   */
   getOptionalParams() {
     return {};
   }
