@@ -1,8 +1,6 @@
 import { NoOptionalParamFoundException } from '../exceptions';
 import { IOptionalParamInput, IOptionalParameters, IOptionalParametersManager, tOptionalParams, tOptionalParamsName } from '../types';
 
-
-
 export class OptionalParametersManager implements IOptionalParametersManager {
   constructor(private optionalParamsConfig: tOptionalParams) {}
 
