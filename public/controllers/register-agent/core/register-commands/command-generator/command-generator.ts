@@ -2,26 +2,39 @@ import {
   ICommandsResponse,
   IOSCommandsDefinition,
   IOSDefinition,
-  IOptionalParams,
+  IOperationSystem,
+  IOptionalParameters,
+  IOptionalParametersManager,
   tOS,
+  tOptionalParams,
   tPackageExtensions,
 } from '../types';
-import { ICommandCreator } from '../types';
-import { searchOSDefinitions, validateOSDefinitionHasDuplicatedOptions, validateOSDefinitionsDuplicated } from '../services/search-os-definitions.service';
-import { IOperationSystem } from '../../domain/OperatingSystem';
+import { ICommandGenerator } from '../types';
+import {
+  searchOSDefinitions,
+  validateOSDefinitionHasDuplicatedOptions,
+  validateOSDefinitionsDuplicated,
+} from '../services/search-os-definitions.service';
+import { OptionalParametersManager } from '../optional-parameters-manager/optional-parameters-manager';
+import { NoArchitectureSelectedException, NoOSSelectedException, WazuhVersionUndefinedException } from '../exceptions';
 
-export class CommandCreator implements ICommandCreator {
+export class CommandGenerator implements ICommandGenerator {
   os: tOS | null = null;
   osDefinitionSelected: IOSCommandsDefinition | null = null;
-
+  optionalsManager: IOptionalParametersManager;
+  protected optionals: IOptionalParameters | object = {};
   constructor(
     public osDefinitions: IOSDefinition[],
-    protected optionalParams: IOptionalParams,
+    protected optionalParams: tOptionalParams,
     public wazuhVersion: string,
   ) {
     // validate os definitions received
     validateOSDefinitionsDuplicated(this.osDefinitions);
     validateOSDefinitionHasDuplicatedOptions(this.osDefinitions);
+    if(wazuhVersion == ''){
+      throw new WazuhVersionUndefinedException();
+    }
+    this.optionalsManager = new OptionalParametersManager(optionalParams);
   }
 
   /**
@@ -42,6 +55,16 @@ export class CommandCreator implements ICommandCreator {
   }
 
   /**
+   * This method adds the optional parameters to use based on the given parameters
+   * @param props - The optional parameters to select
+   * @returns The selected optional parameters
+   */
+  addOptionalParams(props: IOptionalParameters): void {
+    // Get all the optional parameters based on the given parameters
+    this.optionals = this.optionalsManager.getAllOptionalParams(props);
+  }
+
+  /**
    * This method checks if the selected operating system is valid
    * @param params - The operating system parameters to check
    * @returns The selected operating system definition
@@ -50,20 +73,20 @@ export class CommandCreator implements ICommandCreator {
   private checkIfOSisValid(params: IOperationSystem): IOSCommandsDefinition {
     const { name, architecture, extension } = params;
     if (!name) {
-      throw new Error('OS not selected');
+      throw new NoOSSelectedException();
     }
-    if(!architecture) {
-      throw new Error('Architecture not selected');
+    if (!architecture) {
+      throw new NoArchitectureSelectedException();
     }
-    if(!extension) {
-      throw new Error('Extension not selected');
+    if (!extension) {
+      throw new NoArchitectureSelectedException();
     }
 
     const option = searchOSDefinitions(this.osDefinitions, {
       name,
       architecture,
       extension,
-    })
+    });
     return option;
   }
 
@@ -73,14 +96,15 @@ export class CommandCreator implements ICommandCreator {
    * @throws An error if the operating system is not selected
    */
   getUrlPackage(): string {
-    if(!this.osDefinitionSelected) {
-      throw new Error('OS not selected. Please select an OS');
+    if (!this.osDefinitionSelected) {
+      throw new NoOSSelectedException();
     }
     return this.osDefinitionSelected.urlPackage({
       wazuhVersion: this.wazuhVersion,
       architecture: this.osDefinitionSelected.architecture as string,
       extension: this.osDefinitionSelected.extension as tPackageExtensions,
-    })
+      name: this.os as tOS,
+    });
   }
 
   /**
@@ -89,8 +113,8 @@ export class CommandCreator implements ICommandCreator {
    * @throws An error if the operating system is not selected
    */
   getInstallCommand(): string {
-    if(!this.osDefinitionSelected) {
-      throw new Error('OS not selected. Please select an OS');
+    if (!this.osDefinitionSelected) {
+      throw new NoOSSelectedException();
     }
 
     return this.osDefinitionSelected.installCommand({
@@ -99,6 +123,7 @@ export class CommandCreator implements ICommandCreator {
       extension: this.osDefinitionSelected.extension as tPackageExtensions,
       urlPackage: this.getUrlPackage(),
       wazuhVersion: this.wazuhVersion,
+      optionals: this.optionals as IOptionalParameters,
     });
   }
 
@@ -108,8 +133,8 @@ export class CommandCreator implements ICommandCreator {
    * @throws An error if the operating system is not selected
    */
   getStartCommand(): string {
-    if(!this.osDefinitionSelected) {
-      throw new Error('OS not selected. Please select an OS');
+    if (!this.osDefinitionSelected) {
+      throw new NoOSSelectedException();
     }
 
     return this.osDefinitionSelected.startCommand({
@@ -117,7 +142,8 @@ export class CommandCreator implements ICommandCreator {
       architecture: this.osDefinitionSelected.architecture as string,
       extension: this.osDefinitionSelected.extension as tPackageExtensions,
       wazuhVersion: this.wazuhVersion,
-    })
+      optionals: this.optionals as IOptionalParameters,
+    });
   }
 
   /**
@@ -126,8 +152,8 @@ export class CommandCreator implements ICommandCreator {
    * @throws An error if the operating system is not selected
    */
   getAllCommands(): ICommandsResponse {
-    if(!this.osDefinitionSelected) {
-      throw new Error('OS not selected. Please select an OS');
+    if (!this.osDefinitionSelected) {
+      throw new NoOSSelectedException();
     }
 
     return {
@@ -138,14 +164,7 @@ export class CommandCreator implements ICommandCreator {
       url_package: this.getUrlPackage(),
       install_command: this.getInstallCommand(),
       start_command: this.getStartCommand(),
-    }
-  }
-
-  /**
-   * This method gets the optional parameters for the command creator
-   * @returns An object containing the optional parameters for the command creator
-   */
-  getOptionalParams() {
-    return {};
+      optionals: this.optionals,
+    };
   }
 }
