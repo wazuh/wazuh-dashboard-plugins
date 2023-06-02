@@ -1,7 +1,7 @@
-import { NoInstallCommandDefinitionException, NoPackageURLDefinitionException } from "../exceptions";
-import { IOSCommandsDefinition } from "../types";
+import { NoInstallCommandDefinitionException, NoPackageURLDefinitionException, WazuhVersionUndefinedException } from "../exceptions";
+import { IOSCommandsDefinition, IOptionalParameters, tOS } from "../types";
 
-export const getInstallCommandByOS = (osDefinition: IOSCommandsDefinition, packageUrl: string, version: string, osName: string) => {
+export const getInstallCommandByOS = (osDefinition: IOSCommandsDefinition, packageUrl: string, version: string, osName: string, optionals?: IOptionalParameters) => {
     
     if (!osDefinition.installCommand) {
         throw new NoInstallCommandDefinitionException(osName, osDefinition.architecture, osDefinition.extension);
@@ -12,12 +12,15 @@ export const getInstallCommandByOS = (osDefinition: IOSCommandsDefinition, packa
       }
 
     if(!version || version === ''){
-        throw new Error('No version found'); // create exception
+        throw new WazuhVersionUndefinedException();
     }
     
     return osDefinition.installCommand({
-        ...osDefinition,
         urlPackage: packageUrl,
-        version,
+        wazuhVersion: version,
+        name: osName as tOS,
+        architecture: osDefinition.architecture,
+        extension: osDefinition.extension,
+        optionals,
     });
 }
