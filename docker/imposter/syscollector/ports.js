@@ -178,17 +178,15 @@ if (offset || limit) {
   affected_items = affected_items.slice(offset, offset + limit);
 }
 
-respond()
-  .withStatusCode(200)
-  .withData(
-    JSON.stringify({
-      data: {
-        affected_items: affected_items,
-        total_affected_items: total_affected_items,
-        total_failed_items: 0,
-        failed_items: [],
-      },
-      message: 'All specified syscollector information was returned',
-      error: 0,
-    }),
-  );
+var response = {
+  data: {
+    affected_items: affected_items,
+    total_affected_items: total_affected_items,
+    total_failed_items: 0,
+    failed_items: [],
+  },
+  message: 'All specified syscollector information was returned',
+  error: 0,
+};
+
+respond().withStatusCode(200).withData(JSON.stringify(response));
