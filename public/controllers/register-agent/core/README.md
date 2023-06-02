@@ -14,6 +14,9 @@
             - [Validations](#validations-1)
         - [Command Generator](#command-generator)
             - [Get install command](#get-install-command)
+            - [Get start command](#get-start-command)
+            - [Get url package](#get-url-package)
+            - [Get all commands](#get-all-commands)
 
 # Register Agent
 
@@ -231,6 +234,27 @@ commandGenerator.selectOS({
 
 // get start command
 const installCommand = commandGenerator.getStartCommand();
+
+```
+
+## Get url package
+
+To generate the install command we need to call the `getUrlPackage` function. To perform this function the `Command Generator` must receive the OS name and/or the optional parameters as parameters before. The function will return the requested command.
+
+```ts
+
+import { CommandGenerator } from 'path/command-generator';
+
+const commandGenerator = new CommandGenerator(osDefinitions, optionalParameters);
+
+// specify to the command generator the OS that we want to use
+commandGenerator.selectOS({
+    name: 'linux',
+    architecture: 'amd64',
+    extension: 'rpm'
+});
+
+const urlPackage = commandGenerator.getUrlPackage();
 
 ```
 
