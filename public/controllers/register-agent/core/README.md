@@ -1,33 +1,283 @@
-# Services
-
-## searchOSDefinitions
-The purpose of the searchOSDefinitions function is to search for a specific OS definition based on the input parameters and return the corresponding option.
-
-The function takes in two parameters: osDefinitions, which is an array of OSDefinition objects, and params, which is an object containing the input parameters osName, architecture, extension, and packageManager.
-
-The function first searches for an OSDefinition object in the osDefinitions array that has a name property matching the osName parameter. If no matching OSDefinition object is found, the function throws a NoOSOptionFoundException.
-
-If a matching OSDefinition object is found, the function searches for an Option object in the options array of the OSDefinition object that has architecture, extension, and packageManager properties matching the corresponding parameters. If no matching Option object is found, the function throws a NoOptionFoundException.
-
-If a matching Option object is found, the function returns it.
-
-## validateOSDefinitionHasDuplicatedOptions
-
-The purpose of the validateOSDefinitionHasDuplicatedOptions function is to validate that there are no duplicate options for each OS definition.
-
-The function takes in an OSDefinition object as a parameter and checks if there are any duplicate options in the options array of the OSDefinition object. If there are any duplicate options, the function throws a DuplicateOptionFoundException.
-
-The function uses a Set object to keep track of the options that have already been seen. It iterates over the options array of the OSDefinition object and adds each option to the Set object. If an option is already in the Set object, it means that the option is a duplicate and the function throws a DuplicateOptionFoundException.
-
-By validating that there are no duplicate options for each OS definition, the validateOSDefinitionHasDuplicatedOptions function helps ensure that the searchOSDefinitions function can correctly find the corresponding option for a given set of input parameters.
 
 
-## validateOSDefinitionsDuplicated
 
-The purpose of the validateOSDefinitionsDuplicated function is to validate that there are no duplicate OS names in the osDefinitions array.
+# Documentation
 
-The function takes in an array of OSDefinition objects as a parameter and checks if there are any duplicate name properties in the array. If there are any duplicate name properties, the function throws a DuplicateOSFoundException.
+- [Register Agent](#register-agent)
+    - [Solution details](#solution-details)
+    - [Configuration details](#configuration-details)
+        - [OS Definitions](#os-definitions)
+            - [Configuration example](#configuration-example)
+            - [Validations](#validations)
+        - [Optional Parameters Configuration](#optional-parameters-configuration)
+            - [Configuration example](#configuration-example-1)
+            - [Validations](#validations-1)
+        - [Command Generator](#command-generator)
+            - [Get install command](#get-install-command)
 
-The function uses a Set object to keep track of the OS names that have already been seen. It iterates over the osDefinitions array and adds each name property to the Set object. If a name property is already in the Set object, it means that the OS name is a duplicate and the function throws a DuplicateOSFoundException.
+# Register Agent
 
-By validating that there are no duplicate OS names in the osDefinitions array, the validateOSDefinitionsDuplicated function helps ensure that the searchOSDefinitions function can correctly find the corresponding option for a given set of input parameters.
+The register agent is a process that will allow the user to register an agent in the Wazuh Manager. The plugin will provide a form where the user will be able to select the OS and the package that he wants to install. The plugin will generate the registration commands and will show them to the user.
+
+# Solution details
+
+To optimize and make more easier the process to generate the registration commands we have created a class called `Command Generator' that given a set of parameters it will generate the registration commands.
+
+## Configuration
+
+To make the command generator works we need to configure the following parameters and pass them to the class:
+
+## OS Definitions
+
+The OS definitions are a set of parameters that will be used to generate the registration commands. The parameters are the following:
+
+```ts
+export type tOS = 'linux' | 'windows' | 'mac';
+export type tPackageExtensions =
+  | 'rpm'
+  | 'deb'
+  | 'rpm'
+  | 'msi'
+  | 'pkg'
+  | 'p5p'
+  | 'rpm'
+  | 'tar'
+  | 'apk';
+
+export interface IOSDefinition {
+  name: tOS;
+  options: {
+    extension: tPackageExtensions;
+    architecture: string;
+    urlPackage(props): string;
+    installCommand(props): string;
+    startCommand(props): string;
+  }[];
+}
+```
+
+This configuration will define the different OS that we want to support and the different packages that we want to support for each OS. The `urlPackage` function will be used to generate the URL to download the package, the `installCommand` function will be used to generate the command to install the package and the `startCommand` function will be used to generate the command to start the agent.
+
+### Configuration example
+
+```ts
+
+const osDefinitions: IOSDefinition[] = [{
+  name: 'linux',
+  options: [
+    {
+      extension: 'rpm',
+      architecture: 'amd64',
+      urlPackage: props => 'add url package',
+      installCommand: props => 'add install command',
+      startCommand: props => `add start command`,
+    },
+    {
+      extension: 'deb',
+      architecture: 'amd64',
+      urlPackage: props => 'add url package',
+      installCommand: props => 'add install command',
+      startCommand: props => `add start command`,
+    }
+  ],
+},
+{
+    name: 'windows',
+    options: [
+        {
+        extension: 'msi',
+        architecture: '32/64',
+        urlPackage: props => 'add url package',
+        installCommand: props => 'add install command',
+        startCommand: props => `add start command`,
+        },
+    ],
+  }
+};
+```
+
+## Validations
+
+The `Command Generator` will validate the OS Definitions received and will throw an error if the configuration is not valid. The validations are the following:
+
+- The OS Definitions must not have duplicated OS names defined.
+- The OS Definitions must not have duplicated options defined.
+- The OS names would be defined in the `tOS` type.
+- The Package Extensions would be defined in the `tPackageExtensions` type.
+
+Another validations will be provided in development time and will be provided by the types added to the project. You can find the types definitions in the `types` file.
+
+
+## Optional Parameters Configuration 
+
+The optional parameters are a set of parameters that will be added to the registration commands. The parameters are the following:
+
+```ts
+
+export type tOptionalParamsName =
+  | 'server_address'
+  | 'agent_name'
+  | 'protocol'
+  | 'agent_group'
+  | 'wazuh_password';
+
+export type tOptionalParams = {
+  [key in tOptionalParamsName]: {
+        property: string;
+        getParamCommand: (props) => string;
+  };
+}
+
+```
+
+This configuration will define the different optional parameters that we want to support and the way how to we will process and show in the commands.The `getParamCommand` is the function that will process the props received and show the final command format.
+
+### Configuration example
+
+```ts
+
+export const optionalParameters: tOptionalParams = {
+  server_address: {
+      property: 'WAZUH_MANAGER',
+      getParamCommand:  props => 'returns the optional param command'
+    }
+  },
+  any_other: {
+      property: 'PARAM NAME IN THE COMMAND',
+      getParamCommand: props => 'returns the optional param command'
+  },
+}
+
+````
+
+## Validations
+
+The `Command Generator` will validate the Optional Parameters received and will throw an error if the configuration is not valid. The validations are the following:
+
+- The Optional Parameters must not have duplicated names defined.
+- The Optional Parameters name would be defined in the `tOptionalParamsName` type.
+
+
+Another validations will be provided in development time and will be provided by the types added to the project. You can find the types definitions in the `types` file.
+
+
+## Command Generator
+
+To use the command generator we need to import the class and create a new instance of the class. The class will receive the OS Definitions and the Optional Parameters as parameters.
+
+```ts
+
+import { CommandGenerator } from 'path/command-generator';
+
+// Commange Generator interface/contract
+export interface ICommandGenerator {
+  osDefinitions: IOSDefinition[];
+  wazuhVersion: string;
+  selectOS(params: IOperationSystem): void;
+  addOptionalParams(props: IOptionalParameters): void;
+  getInstallCommand(): string;
+  getStartCommand(): string;
+  getUrlPackage(): string;
+  getAllCommands(): ICommandsResponse;
+}
+
+const commandGenerator = new CommandGenerator(osDefinitions, optionalParameters);
+
+```
+
+When the class is created the definitions provided will be validated and if the configuration is not valid an error will be thrown. The errors were mentioned in the  configurations `Validations` section.
+
+### Get install command
+
+To generate the install command we need to call the `getInstallComand` function. To perform this function the `Command Generator` must receive the OS name and/or the optional parameters as parameters before. The function will return the requested command.
+
+```ts
+
+import { CommandGenerator } from 'path/command-generator';
+
+const commandGenerator = new CommandGenerator(osDefinitions, optionalParameters);
+
+// specify to the command generator the OS that we want to use
+commandGenerator.selectOS({
+    name: 'linux',
+    architecture: 'amd64',
+    extension: 'rpm'
+});
+
+// get install command
+const installCommand = commandGenerator.getInstallCommand();
+
+```
+
+The `Command Generator` will search the OS provided and search in the OS Definitions and will process the command using the `installCommand` function defined in the OS Definition. If the OS is not found an error will be thrown.
+If the `getInstallCommand` but the OS is not selected an error will be thrown.
+
+## Get start command
+
+To generate the install command we need to call the `getStartCommand` function. To perform this function the `Command Generator` must receive the OS name and/or the optional parameters as parameters before. The function will return the requested command.
+ 
+```ts
+
+import { CommandGenerator } from 'path/command-generator';
+
+const commandGenerator = new CommandGenerator(osDefinitions, optionalParameters);
+
+// specify to the command generator the OS that we want to use
+commandGenerator.selectOS({
+    name: 'linux',
+    architecture: 'amd64',
+    extension: 'rpm'
+});
+
+// get start command
+const installCommand = commandGenerator.getStartCommand();
+
+```
+
+## Get all commands
+
+To generate the install command we need to call the `getAllCommands` function. To perform this function the `Command Generator` must receive the OS name and/or the optional parameters as parameters before. The function will return the requested commands.
+
+```ts
+
+import { CommandGenerator } from 'path/command-generator';
+
+const commandGenerator = new CommandGenerator(osDefinitions, optionalParameters);
+
+// specify to the command generator the OS that we want to use
+commandGenerator.selectOS({
+    name: 'linux',
+    architecture: 'amd64',
+    extension: 'rpm'
+});
+
+// specify to the command generator the optional parameters that we want to use
+commandGenerator.addOptionalParams({
+    server_address: 'server-ip',
+    agent_name: 'agent-name',
+    any_parameter: 'any-value'
+});
+
+// get all commands
+const installCommand = commandGenerator.getAllCommands();
+
+```
+
+If we specify the optional parameters the `Command Generator` will process the commands and will add the optional parameters to the commands. The optional parameters processing will be only applied to the commands that have the optional parameters defined in the Optional Parameters Definitions. If the OS Definition does not have the optional parameters defined the `Command Generator` will ignore the optional parameters.
+
+### getAllComands output
+
+```ts
+
+export interface ICommandsResponse {
+  wazuhVersion: string;
+  os: string;
+  architecture: string;
+  extension: string;
+  url_package: string;
+  install_command: string;
+  start_command: string;
+  optionals: IOptionalParameters | object;
+}
+
+```
