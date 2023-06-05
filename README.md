@@ -89,7 +89,7 @@ This plugin for Kibana allows you to visualize and analyze Wazuh alerts stored i
 
 ## Requisites
 
-- Wazuh HIDS 4.4.2
+- Wazuh HIDS 4.4.4
 - Kibana 7.10.2
 - Elasticsearch 7.10.2
 
@@ -107,7 +107,7 @@ Install the Wazuh app plugin for Kibana
 
 ```
 cd /usr/share/kibana
-sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.4.2_7.10.2-1.zip
+sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.4.4_7.10.2-1.zip
 ```
 
 Restart Kibana
@@ -198,7 +198,7 @@ Install the Wazuh app
 
 ```
 cd /usr/share/kibana/
-sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.4.0_7.10.2-1.zip
+sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.4.4_7.10.2-1.zip
 ```
 
 Update configuration file permissions.
