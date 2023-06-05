@@ -13,7 +13,6 @@ import React, { Component, Fragment } from 'react';
 // Eui components
 import {
   EuiFlexItem,
-  EuiButtonEmpty,
   EuiSelect,
   EuiOverlayMask,
   EuiConfirmModal
@@ -68,7 +67,7 @@ class WzStatusActionButtons extends Component {
   async restartCluster() {
     this.setState({ isRestarting: true });
     try {
-      const result = await this.statusHandler.restartCluster();
+      await this.statusHandler.restartCluster();
       this.setState({ isRestarting: false });
       this.showToast(
         'success',
@@ -132,15 +131,16 @@ class WzStatusActionButtons extends Component {
       this.props.updateLoadingStatus(true);
       this.props.updateSelectedNode(node);
 
-      const [{connection: agentsCount}, agentsCountByManagerNodes] = (await Promise.all([
-        this.statusHandler.agentsSummary(),
-        this.statusHandler.clusterAgentsCount()
-      ])).map(response => response?.data?.data);
+      const agentsCountByManagerNodes = await this.statusHandler.clusterAgentsCount();
+
+      const { connection: agentsCount } = agentsCountByManagerNodes?.data?.data?.agent_status;
 
       this.props.updateStats({
-        agentsCountByManagerNodes: agentsCountByManagerNodes.nodes,
+        agentsCountByManagerNodes: agentsCountByManagerNodes?.data?.data?.nodes,
         agentsCount,
-        agentsCoverage: agentsCount.total ? ((agentsCount.active / agentsCount.total) * 100).toFixed(2) : 0,
+        agentsCoverage: agentsCount?.total
+          ? ((agentsCount?.active / agentsCount?.total) * 100).toFixed(2)
+          : 0,
       });
 
       const daemons = await this.statusHandler.clusterNodeStatus(node);
@@ -150,8 +150,8 @@ class WzStatusActionButtons extends Component {
       const nodeInfo = await this.statusHandler.clusterNodeInfo(node);
       this.props.updateNodeInfo(nodeInfo.data.data.affected_items[0]);
 
-      const lastAgentRaw = await this.statusHandler.lastAgentRaw();
-      const [lastAgent] = lastAgentRaw.data.data.affected_items;
+      const [lastAgent] =
+        agentsCountByManagerNodes?.data?.data?.last_registered_agent;
 
       this.props.updateAgentInfo(lastAgent);
 
@@ -214,7 +214,6 @@ class WzStatusActionButtons extends Component {
       listNodes,
       selectedNode,
       clusterEnabled,
-      isRestarting
     } = this.props.state;
 
     let options = this.transforToOptions(listNodes);
