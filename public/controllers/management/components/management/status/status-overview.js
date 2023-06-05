@@ -20,7 +20,6 @@ import {
   EuiPage,
   EuiSpacer,
   EuiFlexGrid,
-  EuiButton,
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
@@ -94,18 +93,23 @@ export class WzStatusOverview extends Component {
       this.props.updateLoadingStatus(true);
 
 
-      const [{connection: agentsCount, configuration}, clusterStatus, managerInfo, agentsCountByManagerNodes] = (await Promise.all([
-        this.statusHandler.agentsSummary(),
+      const [
+        clusterStatus,
+        agentsCountByManagerNodes
+      ] = (await Promise.all([
         this.statusHandler.clusterStatus(),
-        this.statusHandler.managerInfo(),
         this.statusHandler.clusterAgentsCount()
       ])).map(response => response?.data?.data);
-
+      const { connection: agentsCount, configuration } = agentsCountByManagerNodes?.agent_status;
       this.props.updateStats({
         agentsCountByManagerNodes: agentsCountByManagerNodes.nodes,
         agentsCount,
-        agentsSynced: configuration.total ? ((configuration.synced / configuration.total) * 100).toFixed(2) : 0,
-        agentsCoverage: agentsCount.total ? ((agentsCount.active / agentsCount.total) * 100).toFixed(2) : 0,
+        agentsSynced: configuration.total
+          ? ((configuration.synced / configuration.total) * 100).toFixed(2)
+          : 0,
+        agentsCoverage: agentsCount.total
+          ? ((agentsCount.active / agentsCount.total) * 100).toFixed(2)
+          : 0,
       });
 
       this.props.updateClusterEnabled(clusterStatus && clusterStatus.enabled === 'yes');
@@ -131,15 +135,16 @@ export class WzStatusOverview extends Component {
             3000
           );
         } else {
+          const managerInfo = await this.statusHandler.managerInfo();
           const daemons = await this.statusHandler.managerStatus();
-          const listDaemons = this.objToArr(daemons.data.data.affected_items[0]);
+          const listDaemons = this.objToArr(daemons?.data?.data?.affected_items?.[0]);
+          const managerInfoData = managerInfo?.data?.data?.affected_items?.[0];
           this.props.updateListDaemons(listDaemons);
           this.props.updateSelectedNode(false);
-          this.props.updateNodeInfo((managerInfo.affected_items || [])[0] || {});
+          this.props.updateNodeInfo(managerInfoData);
         }
       }
-      const lastAgentRaw = await this.statusHandler.lastAgentRaw();
-      const [lastAgent] = lastAgentRaw.data.data.affected_items;
+      const [lastAgent] = agentsCountByManagerNodes?.last_registered_agent;
 
       this.props.updateAgentInfo(lastAgent);
     } catch (error) {
