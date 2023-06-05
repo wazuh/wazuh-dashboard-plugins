@@ -176,7 +176,7 @@ export const RegisterAgent = withErrorBoundary(
           loading: false,
         });
         const options = {
-          context: `${RegisterAgent.name}.componentDidMount`,
+          context: 'RegisterAgent',
           level: UI_LOGGER_LEVELS.ERROR,
           severity: UI_ERROR_SEVERITIES.BUSINESS,
           display: true,

@@ -8,9 +8,25 @@ export const Steps = () => {
   const [statusCheck, setStatusCheck] = useState<EuiStepStatus>('current');
   const [serverAddressStatus, setServerAddressStatus] =
     useState<EuiStepStatus>('disabled');
+  const [serverAddress, setServerAddress] = useState<string>('');
+  const [udpProtocol, setUdpProtocol] = useState<boolean>(false);
+  const [connectionSecure, setConnectionSecure] = useState<boolean>(true);
+  const [defaultServerAddress, setDefaultServerAddress] = useState<string>('');
 
   const handleInputChange = (value: string) => {
-    setServerAddressStatus('complete') && setServerAddressStatus('incomplete');
+    setServerAddress(value);
+    setServerAddressStatus('complete');
+  };
+
+  // getEnrollDNSConfig = () => {
+  //   const serverAddress = this.configuration['enrollment.dns'] || '';
+  //   this.setState({ defaultServerAddress: serverAddress });
+  // };
+
+  const onChangeServerAddress = async (nodeSelected: any) => {
+    setServerAddress(nodeSelected);
+    setUdpProtocol(udpProtocol);
+    setConnectionSecure(connectionSecure);
   };
 
   const firstSetOfSteps = [
@@ -38,7 +54,14 @@ export const Steps = () => {
           </EuiTitle>
         </>
       ),
-      children: <ServerAddress setStatusCheck={setServerAddressStatus} />,
+      children: (
+        <ServerAddress
+          setStatusCheck={setServerAddressStatus}
+          serverAddress={serverAddress}
+          udpProtocol={udpProtocol}
+          connectionSecure={connectionSecure}
+        />
+      ),
       status: serverAddressStatus,
     },
   ];
