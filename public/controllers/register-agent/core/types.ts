@@ -2,6 +2,32 @@
 /// Domain
 /////////////////////////////////////////////////////////
 
+// Defined OS combinations
+export interface ILinuxOSTypes {
+  name: 'linux';
+  architecture: 'x64' | 'x86';
+  extension: 'rpm' | 'deb';
+}
+export interface IWindowsOSTypes {
+  name: 'windows';
+  architecture: 'x64' | 'x86';
+  extension: 'msi';
+}
+
+export interface IMacOSTypes {
+  name: 'mac';
+  architecture: 'x64';
+  extension: 'pkg';
+}
+
+export type tOperatingSystem = ILinuxOSTypes | IMacOSTypes | IWindowsOSTypes;
+
+export interface IOperationSystem {
+  name: tOS;
+  architecture: string;
+  extension: tPackageExtensions;
+}
+
 export type tOS = 'linux' | 'windows' | 'mac';
 export type tPackageExtensions =
   | 'rpm'
@@ -13,12 +39,6 @@ export type tPackageExtensions =
   | 'rpm'
   | 'tar'
   | 'apk';
-
-export interface IOperationSystem {
-  name: tOS;
-  architecture: string;
-  extension: tPackageExtensions;
-}
 
 export type IOptionalParameters = {
   [key in tOptionalParamsName]: string;
@@ -88,9 +108,12 @@ export interface IOptionalParametersManager {
 ///////////////////////////////////////////////////////////////////
 
 export type IOSInputs = IOperationSystem & IOptionalParameters;
-export interface ICommandGenerator {
+export interface ICommandGenerator extends ICommandGeneratorMethods {
   osDefinitions: IOSDefinition[];
   wazuhVersion: string;
+}
+
+export interface ICommandGeneratorMethods {
   selectOS(params: IOperationSystem): void;
   addOptionalParams(props: IOptionalParameters): void;
   getInstallCommand(): string;

@@ -1,7 +1,7 @@
 export class NoOptionFoundException extends Error {
   constructor(osName: string, architecture: string, extension: string) {
     super(
-      `No OS option found for "${osName}" "${architecture}" "${extension}.Please check the OS definitions."`,
+      `No OS option found for "${osName}" "${architecture}" "${extension}".Please check the OS definitions."`,
     );
   }
 }
@@ -9,7 +9,7 @@ export class NoOptionFoundException extends Error {
 export class NoOSOptionFoundException extends Error {
   constructor(osName: string) {
     super(
-      `No OS option found for "${osName}.Please check the OS definitions."`,
+      `No OS option found for "${osName}".Please check the OS definitions."`,
     );
   }
 }

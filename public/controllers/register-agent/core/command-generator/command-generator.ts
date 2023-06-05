@@ -16,7 +16,7 @@ import {
   validateOSDefinitionsDuplicated,
 } from '../services/search-os-definitions.service';
 import { OptionalParametersManager } from '../optional-parameters-manager/optional-parameters-manager';
-import { NoArchitectureSelectedException, NoOSSelectedException, WazuhVersionUndefinedException } from '../exceptions';
+import { NoArchitectureSelectedException, NoExtensionSelectedException, NoOSSelectedException, WazuhVersionUndefinedException } from '../exceptions';
 
 export class CommandGenerator implements ICommandGenerator {
   os: tOS | null = null;
@@ -51,6 +51,7 @@ export class CommandGenerator implements ICommandGenerator {
       // If the selected operating system is not valid, reset the selected OS and OS definition
       this.osDefinitionSelected = null;
       this.os = null;
+      throw error;
     }
   }
 
@@ -79,7 +80,7 @@ export class CommandGenerator implements ICommandGenerator {
       throw new NoArchitectureSelectedException();
     }
     if (!extension) {
-      throw new NoArchitectureSelectedException();
+      throw new NoExtensionSelectedException();
     }
 
     const option = searchOSDefinitions(this.osDefinitions, {

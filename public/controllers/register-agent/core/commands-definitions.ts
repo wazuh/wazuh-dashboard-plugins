@@ -76,7 +76,7 @@ const macDefinition: IOSDefinition = {
   ],
 };
 
-export const defaultPackageDefinitions = [
+export const osCommandsDefinitions = [
   linuxDefinition,
   windowsDefinition,
   macDefinition,
@@ -86,7 +86,7 @@ export const defaultPackageDefinitions = [
 /// Optional parameters definitions
 ///////////////////////////////////////////////////////////////////
 
-export const optionalParameters: tOptionalParams = {
+export const optionalParamsDefinitions: tOptionalParams = {
   server_address: {
       property: 'WAZUH_MANAGER',
       getParamCommand:  props => {
