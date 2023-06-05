@@ -45,6 +45,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed deprecated request and code in agent's view [#5451](https://github.com/wazuh/wazuh-kibana-app/pull/5451)
 - Removed unnecessary dashboard queries caused by the deploy agent view. [#5453](https://github.com/wazuh/wazuh-kibana-app/pull/5453)
 - Removed repeated and unnecessary requests in security section. [#5500](https://github.com/wazuh/wazuh-kibana-app/pull/5500)
+- Removed unnecessary requests in `Management/Status` section. [#5528](https://github.com/wazuh/wazuh-kibana-app/pull/5528)
 
 ## Wazuh v4.4.3 - OpenSearch Dashboards 2.6.0 - Revision 01
 
