@@ -101,15 +101,21 @@ export class WzStatusOverview extends Component {
         this.statusHandler.clusterAgentsCount()
       ])).map(response => response?.data?.data);
       const { connection: agentsCount, configuration } = agentsCountByManagerNodes?.agent_status;
+
+      const agentsActiveCoverage = (
+        (agentsCount.active / agentsCount.total) *
+        100
+      ).toFixed(2);
+      const agentsSyncedCoverage = (
+        (configuration.synced / configuration.total) *
+        100
+      ).toFixed(2);
+
       this.props.updateStats({
         agentsCountByManagerNodes: agentsCountByManagerNodes.nodes,
         agentsCount,
-        agentsSynced: configuration.total
-          ? ((configuration.synced / configuration.total) * 100).toFixed(2)
-          : 0,
-        agentsCoverage: agentsCount.total
-          ? ((agentsCount.active / agentsCount.total) * 100).toFixed(2)
-          : 0,
+        agentsSynced: isNaN(agentsSyncedCoverage) ? 0 : agentsSyncedCoverage,
+        agentsCoverage: isNaN(agentsActiveCoverage) ? 0 : agentsActiveCoverage,
       });
 
       this.props.updateClusterEnabled(clusterStatus && clusterStatus.enabled === 'yes');

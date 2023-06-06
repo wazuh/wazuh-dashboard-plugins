@@ -135,12 +135,15 @@ class WzStatusActionButtons extends Component {
 
       const { connection: agentsCount } = agentsCountByManagerNodes?.data?.data?.agent_status;
 
+      const agentsActiveCoverage = (
+        (agentsCount.active / agentsCount.total) *
+        100
+      ).toFixed(2);
+
       this.props.updateStats({
         agentsCountByManagerNodes: agentsCountByManagerNodes?.data?.data?.nodes,
         agentsCount,
-        agentsCoverage: agentsCount?.total
-          ? ((agentsCount?.active / agentsCount?.total) * 100).toFixed(2)
-          : 0,
+        agentsCoverage: isNaN(agentsActiveCoverage) ? 0 : agentsActiveCoverage,
       });
 
       const daemons = await this.statusHandler.clusterNodeStatus(node);
