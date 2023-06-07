@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { CommandGenerator } from '../core/command-generator/command-generator';
+import { CommandGenerator } from '../core/register-commands/command-generator/command-generator';
 import {
   osCommandsDefinitions as defaultOSCommands,
   optionalParamsDefinitions as defaultOptionalParams,
-} from '../core/commands-definitions';
+} from '../config/os-commands-definitions';
 import {
   IOSDefinition,
   IOperationSystem,
   IOptionalParameters,
   tOptionalParams,
-} from '../core/types';
+} from '../core/register-commands/types';
 
 interface IUseRegisterCommandsProps {
   osDefinitions?: IOSDefinition[];
@@ -81,7 +81,7 @@ export function useRegisterAgentCommands<T extends IOperationSystem>(props: IUse
   return {
     selectOS,
     setOptionalParams,
-    installCommand: installCommand,
-    startCommand: startCommand,
+    installCommand,
+    startCommand,
   }
 };

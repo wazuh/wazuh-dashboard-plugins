@@ -10,13 +10,13 @@ export interface ILinuxOSTypes {
 }
 export interface IWindowsOSTypes {
   name: 'windows';
-  architecture: 'x64' | 'x86';
+  architecture: 'x86';
   extension: 'msi';
 }
 
 export interface IMacOSTypes {
   name: 'mac';
-  architecture: 'x64';
+  architecture: '32/64';
   extension: 'pkg';
 }
 

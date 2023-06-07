@@ -1,4 +1,4 @@
-import { IOSDefinition, tOptionalParams } from './types';
+import { IOSDefinition, tOptionalParams } from '../core/register-commands/types';
 
 ///////////////////////////////////////////////////////////////////
 /// Operating system commands definitions
@@ -51,11 +51,11 @@ const windowsDefinition: IOSDefinition = {
   options: [
     {
       extension: 'msi',
-      architecture: '32/64',
+      architecture: 'x86',
       urlPackage: props =>
         `https://packages.wazuh.com/4.x/windows/wazuh-agent-${props.wazuhVersion}-1.${props.extension}`,
       installCommand: props =>
-        `Invoke-WebRequest -Uri ${props.urlPackage} -OutFile \${env.tmp}\\wazuh-agent.${props.extension}; msiexec.exe /i \${env.tmp}\\wazuh-agent.${props.extension} /q WAZUH_REGISTRATION_SERVER=''`,
+        `Invoke-WebRequest -Uri ${props.urlPackage} -OutFile \${env.tmp}\\wazuh-agent.${props.extension}; msiexec.exe /i \${env.tmp}\\wazuh-agent.${props.extension} /q`,
       startCommand: props => `Start-Service -Name wazuh-agent`,
     },
   ],

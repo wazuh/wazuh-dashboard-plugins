@@ -1,7 +1,7 @@
 import React from 'react';
 import { act, renderHook } from '@testing-library/react-hooks';
 import { useRegisterAgentCommands } from './use-register-agent-commands';
-import { tOperatingSystem } from '../core/types';
+import { tOperatingSystem } from '../core/register-commands/types';
 
 describe('useRegisterAgentCommands hook', () => {
   it('should return installCommand and startCommand null when the hook is initialized', () => {
@@ -32,7 +32,8 @@ describe('useRegisterAgentCommands hook', () => {
     }
   });
 
-  it.skip('should change the commands when the OS is selected successfully', async () => {
+
+  it.only('should change the commands when the OS is selected successfully', async () => {
     const hookResult = renderHook(() => useRegisterAgentCommands<tOperatingSystem>({}));
     const { selectOS, installCommand, startCommand } =
       hookResult.result.current;
@@ -40,7 +41,7 @@ describe('useRegisterAgentCommands hook', () => {
     act(() => {
       selectOS({
         name: 'windows',
-        architecture: 'x64',
+        architecture: 'x86',
         extension: 'msi',
       });
     });
