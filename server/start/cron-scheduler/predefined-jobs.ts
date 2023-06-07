@@ -24,7 +24,7 @@ export const jobs: {[key:string]: IJob} = {
   'manager-stats-remoted': {
     status: true,
     method: "GET",
-    request: '/manager/stats/remoted?pretty',
+    request: '/manager/stats/remoted',
     params: {},
     interval: '0 */5 * * * *',
     index: {
@@ -36,7 +36,7 @@ export const jobs: {[key:string]: IJob} = {
   'manager-stats-analysisd': {
     status: true,
     method: "GET",
-    request: '/manager/stats/analysisd?pretty',
+    request: '/manager/stats/analysisd',
     params: {},
     interval: '0 */5 * * * *',
     index: {
@@ -49,7 +49,7 @@ export const jobs: {[key:string]: IJob} = {
     status: true,
     method: "GET",
     request: {
-      request: '/cluster/{nodeName}/stats/remoted?pretty',
+      request: '/cluster/{nodeName}/stats/remoted',
       params: {
         nodeName: {
           request: '/cluster/nodes?select=name'
@@ -68,7 +68,7 @@ export const jobs: {[key:string]: IJob} = {
     status: true,
     method: "GET",
     request: {
-      request: '/cluster/{nodeName}/stats/analysisd?pretty',
+      request: '/cluster/{nodeName}/stats/analysisd',
       params: {
         nodeName: {
           request: '/cluster/nodes?select=name'
