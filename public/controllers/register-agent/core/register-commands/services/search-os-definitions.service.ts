@@ -6,6 +6,16 @@ import {
 } from '../exceptions';
 import { IOSDefinition, IOperationSystem } from '../types';
 
+/**
+ * Searches for the OS definition option that matches the given operation system parameters.
+ * Throws an exception if no matching option is found.
+ *
+ * @param osDefinitions - The list of OS definitions to search through.
+ * @param params - The operation system parameters to match against.
+ * @returns The matching OS definition option.
+ * @throws NoOSOptionFoundException - If no matching OS definition is found.
+ * @throws NoOptionFoundException - If no matching OS definition option is found.
+ */
 export const searchOSDefinitions = (
   osDefinitions: IOSDefinition[],
   params: IOperationSystem,
@@ -29,6 +39,13 @@ export const searchOSDefinitions = (
   return osDefinitionOption;
 };
 
+/**
+ * Validates that there are no duplicated OS definitions in the given list.
+ * Throws an exception if a duplicated OS definition is found.
+ *
+ * @param osDefinitions - The list of OS definitions to validate.
+ * @throws DuplicatedOSException - If a duplicated OS definition is found.
+ */
 export const validateOSDefinitionsDuplicated = (
   osDefinitions: IOSDefinition[],
 ) => {
@@ -42,6 +59,13 @@ export const validateOSDefinitionsDuplicated = (
   }
 };
 
+/**
+ * Validates that there are no duplicated OS definition options in the given list.
+ * Throws an exception if a duplicated OS definition option is found.
+ *
+ * @param osDefinitions - The list of OS definitions to validate.
+ * @throws DuplicatedOSOptionException - If a duplicated OS definition option is found.
+ */
 export const validateOSDefinitionHasDuplicatedOptions = (
   osDefinitions: IOSDefinition[],
 ) => {

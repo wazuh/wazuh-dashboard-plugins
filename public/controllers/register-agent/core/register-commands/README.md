@@ -1,6 +1,3 @@
-
-
-
 # Documentation
 
 - [Register Agent](#register-agent)

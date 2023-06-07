@@ -168,4 +168,13 @@ export class CommandGenerator implements ICommandGenerator {
       optionals: this.optionals,
     };
   }
+
+  /**
+   * Returns the optional paramaters processed
+   * @returns optionals
+   */
+  getOptionalParamsCommands(): IOptionalParameters | object {
+    return this.optionals;
+  }
+
 }

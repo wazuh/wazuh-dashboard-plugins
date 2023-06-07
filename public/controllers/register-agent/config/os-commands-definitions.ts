@@ -8,7 +8,7 @@ const linuxDefinition: IOSDefinition = {
   name: 'linux',
   options: [
     {
-      extension: 'rpm',
+      extension: 'apk',
       architecture: 'amd64',
       urlPackage: props =>
         `https://packages.wazuh.com/4.x/yum/wazuh-agent-${props.wazuhVersion}-1.x86_64.${props.extension}`,
