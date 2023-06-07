@@ -579,6 +579,13 @@ export class DevToolsController {
           hints = model.map(a => a.method);
         }
         const final_hints = hints.map(chain => {
+          /* This avoids the errors when the hint is not a string.
+          The request body parameters is an object and the chain.replace
+          statement causes an error
+          */
+          if(typeof chain !== 'string' ){
+            return chain;
+          };
           let t = 0;
           return chain = chain.replace(/\?/g, (match) => {
             t++;
