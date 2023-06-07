@@ -1,12 +1,35 @@
 import { getInstallCommandByOS } from './get-install-command.service';
-import { IOSCommandsDefinition, IOSDefinition } from '../types';
+import { IOSCommandsDefinition, IOSDefinition, IOptionalParameters } from '../types';
 import {
   NoInstallCommandDefinitionException,
   NoPackageURLDefinitionException,
   WazuhVersionUndefinedException,
 } from '../exceptions';
 
-const validOsDefinition: IOSCommandsDefinition = {
+
+export interface ILinuxOSTypes {
+  name: 'linux';
+  architecture: 'x64' | 'x86';
+  extension: 'rpm' | 'deb';
+}
+export interface IWindowsOSTypes {
+  name: 'windows';
+  architecture: 'x86';
+  extension: 'msi';
+}
+
+export interface IMacOSTypes {
+  name: 'mac';
+  architecture: '32/64';
+  extension: 'pkg';
+}
+
+export type tOperatingSystem = ILinuxOSTypes | IMacOSTypes | IWindowsOSTypes;
+
+
+export type tOptionalParameters = 'server_address' | 'agent_name' | 'agent_group' | 'protocol' | 'wazuh_password' | 'another_optional_parameter';
+
+const validOsDefinition: IOSCommandsDefinition<tOperatingSystem, tOptionalParameters> = {
   architecture: 'x64',
   extension: 'deb',
   installCommand: props => 'install command mocked',
@@ -38,7 +61,7 @@ describe('getInstallCommandByOS', () => {
   });
   it('should return ERROR when the OS has no install command', () => {
     // @ts-ignore
-    const osDefinition: IOSCommandsDefinition = {
+    const osDefinition: IOSCommandsDefinition<tOperatingSystem, tOptionalParameters> = {
       architecture: 'x64',
       extension: 'deb',
       startCommand: props => 'start command mocked',
@@ -65,7 +88,7 @@ describe('getInstallCommandByOS', () => {
 
   it('should return install command with optional parameters', () => {
     const mockedInstall  = jest.fn();
-    const validOsDefinition: IOSCommandsDefinition = {
+    const validOsDefinition: IOSCommandsDefinition<tOperatingSystem, tOptionalParameters> = {
       architecture: 'x64',
       extension: 'deb',
       installCommand: mockedInstall,
@@ -73,12 +96,13 @@ describe('getInstallCommandByOS', () => {
       urlPackage: props => 'https://package-url.com',
     };
 
-    const optionalParams = {
+    const optionalParams: IOptionalParameters<tOptionalParameters> = {
       agent_group: 'WAZUH_GROUP=agent_group',
       agent_name: 'WAZUH_NAME=agent_name',
       protocol: 'WAZUH_PROTOCOL=UDP',
       server_address: 'WAZUH_MANAGER=server_address',
-      wazuh_password: 'WAZUH_PASSWORD=1231323'
+      wazuh_password: 'WAZUH_PASSWORD=1231323',
+      another_optional_parameter: 'params value'
     };
 
     getInstallCommandByOS(

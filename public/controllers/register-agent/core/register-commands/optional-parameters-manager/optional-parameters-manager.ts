@@ -1,8 +1,8 @@
 import { NoOptionalParamFoundException } from '../exceptions';
-import { IOptionalParamInput, IOptionalParameters, IOptionalParametersManager, tOptionalParams, tOptionalParamsName } from '../types';
+import { IOptionalParamInput, IOptionalParameters, IOptionalParametersManager, tOptionalParams } from '../types';
 
-export class OptionalParametersManager implements IOptionalParametersManager {
-  constructor(private optionalParamsConfig: tOptionalParams) {}
+export class OptionalParametersManager<Params extends string> implements IOptionalParametersManager<Params> {
+  constructor(private optionalParamsConfig: tOptionalParams<Params>) {}
 
   /**
    * Returns the command string for a given optional parameter.
@@ -10,7 +10,7 @@ export class OptionalParametersManager implements IOptionalParametersManager {
    * @returns The command string for the given optional parameter.
    * @throws NoOptionalParamFoundException if the given optional parameter name is not found in the configuration.
    */
-  getOptionalParam(props: IOptionalParamInput) {
+  getOptionalParam(props: IOptionalParamInput<Params>) {
     const { value, name } = props;
     if (!this.optionalParamsConfig[name]) {
       throw new NoOptionalParamFoundException(name);
@@ -28,22 +28,22 @@ export class OptionalParametersManager implements IOptionalParametersManager {
    * @returns An object containing the command strings for all optional parameters with non-empty values.
    * @throws NoOptionalParamFoundException if any of the given optional parameter names is not found in the configuration.
    */
-  getAllOptionalParams(paramsValues: IOptionalParameters){
+    getAllOptionalParams(paramsValues: IOptionalParameters<Params>){
       // get keys for only the optional params with values !== ''
-      const optionalParams = Object.keys(paramsValues).filter(key => paramsValues[key as keyof typeof paramsValues] !== '') as tOptionalParamsName[];
+      const optionalParams = Object.keys(paramsValues).filter(key => paramsValues[key as keyof typeof paramsValues] !== '') as Array<keyof typeof paramsValues>;
       const resolvedOptionalParams: any = {};
       for(const param of optionalParams){
-          if(!this.optionalParamsConfig[param]){
-              throw new NoOptionalParamFoundException(param);
-          }
+        if(!this.optionalParamsConfig[param]){
+          throw new NoOptionalParamFoundException(param as string);
+        }
 
-          const paramDef = this.optionalParamsConfig[param];
-          resolvedOptionalParams[param] = paramDef.getParamCommand({
-              name: param,
-              value: paramsValues[param as keyof typeof paramsValues] as string,
-              property: paramDef.property
-          }) as string;
+        const paramDef = this.optionalParamsConfig[param];
+        resolvedOptionalParams[param as string] = paramDef.getParamCommand({
+          name: param as Params,
+          value: paramsValues[param] as string,
+          property: paramDef.property
+        }) as string;
       }
       return resolvedOptionalParams;
-  }
+    }
 }

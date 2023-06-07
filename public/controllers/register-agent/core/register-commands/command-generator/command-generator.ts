@@ -17,15 +17,14 @@ import {
 } from '../services/search-os-definitions.service';
 import { OptionalParametersManager } from '../optional-parameters-manager/optional-parameters-manager';
 import { NoArchitectureSelectedException, NoExtensionSelectedException, NoOSSelectedException, WazuhVersionUndefinedException } from '../exceptions';
-
-export class CommandGenerator implements ICommandGenerator {
-  os: tOS | null = null;
-  osDefinitionSelected: IOSCommandsDefinition | null = null;
-  optionalsManager: IOptionalParametersManager;
-  protected optionals: IOptionalParameters | object = {};
+export class CommandGenerator<OS extends IOperationSystem, Params extends string> implements ICommandGenerator<OS, Params> {
+  os: OS['name'] | null = null;
+  osDefinitionSelected: IOSCommandsDefinition<OS, Params> | null = null;
+  optionalsManager: IOptionalParametersManager<Params>;
+  protected optionals: IOptionalParameters<Params> | object = {};
   constructor(
-    public osDefinitions: IOSDefinition[],
-    protected optionalParams: tOptionalParams,
+    public osDefinitions: IOSDefinition<OS, Params>[],
+    protected optionalParams: tOptionalParams<Params>,
     public wazuhVersion: string,
   ) {
     // validate os definitions received
@@ -41,7 +40,7 @@ export class CommandGenerator implements ICommandGenerator {
    * This method selects the operating system to use based on the given parameters
    * @param params - The operating system parameters to select
    */
-  selectOS(params: IOperationSystem) {
+  selectOS(params: OS) {
     try {
       // Check if the selected operating system is valid
       this.osDefinitionSelected = this.checkIfOSisValid(params);
@@ -60,7 +59,7 @@ export class CommandGenerator implements ICommandGenerator {
    * @param props - The optional parameters to select
    * @returns The selected optional parameters
    */
-  addOptionalParams(props: IOptionalParameters): void {
+  addOptionalParams(props: IOptionalParameters<Params>): void {
     // Get all the optional parameters based on the given parameters
     this.optionals = this.optionalsManager.getAllOptionalParams(props);
   }
@@ -71,7 +70,7 @@ export class CommandGenerator implements ICommandGenerator {
    * @returns The selected operating system definition
    * @throws An error if the operating system is not valid
    */
-  private checkIfOSisValid(params: IOperationSystem): IOSCommandsDefinition {
+  private checkIfOSisValid(params: OS): IOSCommandsDefinition<OS, Params> {
     const { name, architecture, extension } = params;
     if (!name) {
       throw new NoOSSelectedException();
@@ -104,7 +103,7 @@ export class CommandGenerator implements ICommandGenerator {
       wazuhVersion: this.wazuhVersion,
       architecture: this.osDefinitionSelected.architecture as string,
       extension: this.osDefinitionSelected.extension as tPackageExtensions,
-      name: this.os as tOS,
+      name: this.os as OS['name'],
     });
   }
 
@@ -119,12 +118,12 @@ export class CommandGenerator implements ICommandGenerator {
     }
 
     return this.osDefinitionSelected.installCommand({
-      name: this.os as tOS,
+      name: this.os as OS['name'],
       architecture: this.osDefinitionSelected.architecture as string,
       extension: this.osDefinitionSelected.extension as tPackageExtensions,
       urlPackage: this.getUrlPackage(),
       wazuhVersion: this.wazuhVersion,
-      optionals: this.optionals as IOptionalParameters,
+      optionals: this.optionals as IOptionalParameters<Params>,
     });
   }
 
@@ -139,11 +138,11 @@ export class CommandGenerator implements ICommandGenerator {
     }
 
     return this.osDefinitionSelected.startCommand({
-      name: this.os as tOS,
+      name: this.os as OS['name'],
       architecture: this.osDefinitionSelected.architecture as string,
       extension: this.osDefinitionSelected.extension as tPackageExtensions,
       wazuhVersion: this.wazuhVersion,
-      optionals: this.optionals as IOptionalParameters,
+      optionals: this.optionals as IOptionalParameters<Params>,
     });
   }
 
@@ -152,14 +151,14 @@ export class CommandGenerator implements ICommandGenerator {
    * @returns An object containing all the commands for the selected operating system
    * @throws An error if the operating system is not selected
    */
-  getAllCommands(): ICommandsResponse {
+  getAllCommands(): ICommandsResponse<Params> {
     if (!this.osDefinitionSelected) {
       throw new NoOSSelectedException();
     }
 
     return {
       wazuhVersion: this.wazuhVersion,
-      os: this.os as tOS,
+      os: this.os as OS['name'],
       architecture: this.osDefinitionSelected.architecture as string,
       extension: this.osDefinitionSelected.extension as tPackageExtensions,
       url_package: this.getUrlPackage(),
@@ -173,7 +172,7 @@ export class CommandGenerator implements ICommandGenerator {
    * Returns the optional paramaters processed
    * @returns optionals
    */
-  getOptionalParamsCommands(): IOptionalParameters | object {
+  getOptionalParamsCommands(): IOptionalParameters<Params> | object {
     return this.optionals;
   }
 

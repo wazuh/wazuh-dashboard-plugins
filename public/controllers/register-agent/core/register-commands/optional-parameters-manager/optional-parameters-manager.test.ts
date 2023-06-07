@@ -3,36 +3,45 @@ import {
   IOptionalParameters,
   tOptionalParams,
   tOptionalParamsCommandProps,
-  tOptionalParamsName,
 } from '../types';
 import { OptionalParametersManager } from './optional-parameters-manager';
 
-const returnOptionalParam = (props: tOptionalParamsCommandProps) => {
+type tOptionalParamsFieldname =
+  | 'server_address'
+  | 'protocol'
+  | 'agent_group'
+  | 'wazuh_password'
+  | 'another_valid_fieldname';
+
+const returnOptionalParam = (
+  props: tOptionalParamsCommandProps<tOptionalParamsFieldname>,
+) => {
   const { property, value } = props;
   return `${property}=${value}`;
 };
-const optionalParametersDefinition: tOptionalParams = {
-  server_address: {
-    property: 'WAZUH_MANAGER',
-    getParamCommand: returnOptionalParam,
-  },
-  agent_name: {
-    property: 'WAZUH_AGENT_NAME',
-    getParamCommand: returnOptionalParam,
-  },
-  protocol: {
-    property: 'WAZUH_MANAGER_PROTOCOL',
-    getParamCommand: returnOptionalParam,
-  },
-  agent_group: {
-    property: 'WAZUH_AGENT_GROUP',
-    getParamCommand: returnOptionalParam,
-  },
-  wazuh_password: {
-    property: 'WAZUH_PASSWORD',
-    getParamCommand: returnOptionalParam,
-  },
-};
+const optionalParametersDefinition: tOptionalParams<tOptionalParamsFieldname> =
+  {
+    protocol: {
+      property: 'WAZUH_MANAGER_PROTOCOL',
+      getParamCommand: returnOptionalParam,
+    },
+    agent_group: {
+      property: 'WAZUH_AGENT_GROUP',
+      getParamCommand: returnOptionalParam,
+    },
+    wazuh_password: {
+      property: 'WAZUH_PASSWORD',
+      getParamCommand: returnOptionalParam,
+    },
+    server_address: {
+      property: 'WAZUH_MANAGER',
+      getParamCommand: returnOptionalParam,
+    },
+    another_valid_fieldname: {
+      property: 'WAZUH_ANOTHER_PROPERTY',
+      getParamCommand: returnOptionalParam,
+    },
+  };
 
 describe('Optional Parameters Manager', () => {
   it('should create an instance successfully', () => {
@@ -44,10 +53,10 @@ describe('Optional Parameters Manager', () => {
 
   it.each([
     ['server_address', '10.10.10.27'],
-    ['agent_name', 'agent1'],
     ['protocol', 'TCP'],
     ['agent_group', 'group1'],
     ['wazuh_password', '123456'],
+    ['another_valid_fieldname', 'another_valid_value']
   ])(
     `should return the corresponding command for "%s" param with "%s" value`,
     (name, value) => {
@@ -55,7 +64,7 @@ describe('Optional Parameters Manager', () => {
         optionalParametersDefinition,
       );
       const commandParam = optParamManager.getOptionalParam({
-        name: name as tOptionalParamsName,
+        name: name as tOptionalParamsFieldname,
         value,
       });
       const defs =
@@ -66,7 +75,7 @@ describe('Optional Parameters Manager', () => {
         defs.getParamCommand({
           property: defs.property,
           value,
-          name: name as tOptionalParamsName,
+          name: name as tOptionalParamsFieldname,
         }),
       );
     },
@@ -89,12 +98,12 @@ describe('Optional Parameters Manager', () => {
     const optParamManager = new OptionalParametersManager(
       optionalParametersDefinition,
     );
-    const paramsValues: IOptionalParameters = {
-      server_address: '10.10.10.27',
-      agent_name: 'agent1',
+    const paramsValues: IOptionalParameters<tOptionalParamsFieldname> = {
       protocol: 'TCP',
       agent_group: 'group1',
       wazuh_password: '123456',
+      server_address: 'server',
+      another_valid_fieldname: 'another_valid_value',
     };
     const resolvedParams = optParamManager.getAllOptionalParams(paramsValues);
     expect(resolvedParams).toEqual({
@@ -102,11 +111,6 @@ describe('Optional Parameters Manager', () => {
         name: 'agent_group',
         property: optionalParametersDefinition.agent_group.property,
         value: paramsValues.agent_group,
-      }),
-      agent_name: optionalParametersDefinition.agent_name.getParamCommand({
-        name: 'agent_name',
-        property: optionalParametersDefinition.agent_name.property,
-        value: paramsValues.agent_name,
       }),
       protocol: optionalParametersDefinition.protocol.getParamCommand({
         name: 'protocol',
@@ -125,40 +129,60 @@ describe('Optional Parameters Manager', () => {
           property: optionalParametersDefinition.wazuh_password.property,
           value: paramsValues.wazuh_password,
         }),
-    } as IOptionalParameters);
+      another_valid_fieldname:
+        optionalParametersDefinition.another_valid_fieldname.getParamCommand({
+          name: 'another_valid_fieldname',
+          property:
+            optionalParametersDefinition.another_valid_fieldname.property,
+          value: paramsValues.another_valid_fieldname,
+        }),
+    } as IOptionalParameters<tOptionalParamsFieldname>);
   });
 
   it('should return the corresponse command for all the params with NOT empty values', () => {
     const optParamManager = new OptionalParametersManager(
       optionalParametersDefinition,
     );
-    const paramsValues: IOptionalParameters = {
-      server_address: '',
-      agent_name: 'agent1',
+    const paramsValues: IOptionalParameters<tOptionalParamsFieldname> = {
       protocol: 'TCP',
-      agent_group: '',
+      agent_group: 'group1',
       wazuh_password: '123456',
+      server_address: 'server',
+      another_valid_fieldname: 'another_valid_value',
     };
 
     const resolvedParams = optParamManager.getAllOptionalParams(paramsValues);
     expect(resolvedParams).toEqual({
-      agent_name: optionalParametersDefinition.agent_name.getParamCommand({
-        name: 'agent_name',
-        property: optionalParametersDefinition.agent_name.property,
-        value: paramsValues.agent_name,
+      agent_group: optionalParametersDefinition.agent_group.getParamCommand({
+        name: 'agent_group',
+        property: optionalParametersDefinition.agent_group.property,
+        value: paramsValues.agent_group,
       }),
       protocol: optionalParametersDefinition.protocol.getParamCommand({
         name: 'protocol',
         property: optionalParametersDefinition.protocol.property,
         value: paramsValues.protocol,
       }),
+      server_address:
+        optionalParametersDefinition.server_address.getParamCommand({
+          name: 'server_address',
+          property: optionalParametersDefinition.server_address.property,
+          value: paramsValues.server_address,
+        }),
       wazuh_password:
         optionalParametersDefinition.wazuh_password.getParamCommand({
           name: 'wazuh_password',
           property: optionalParametersDefinition.wazuh_password.property,
           value: paramsValues.wazuh_password,
         }),
-    } as IOptionalParameters);
+      another_valid_fieldname:
+        optionalParametersDefinition.another_valid_fieldname.getParamCommand({
+          name: 'another_valid_fieldname',
+          property:
+            optionalParametersDefinition.another_valid_fieldname.property,
+          value: paramsValues.another_valid_fieldname,
+        }),
+    } as IOptionalParameters<tOptionalParamsFieldname>);
   });
 
   it('should return ERROR when the param received is not defined in the params definition', () => {

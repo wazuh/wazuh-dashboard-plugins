@@ -10,7 +10,32 @@ import { DuplicatedOSException, DuplicatedOSOptionException, NoOSSelectedExcepti
 const mockedCommandValue = 'mocked command';
 const mockedCommandsResponse = jest.fn().mockReturnValue(mockedCommandValue);
 
-const osDefinitions: IOSDefinition[] = [
+// Defined OS combinations
+export interface ILinuxOSTypes {
+  name: 'linux';
+  architecture: 'x64' | 'x86';
+  extension: 'rpm' | 'deb';
+}
+export interface IWindowsOSTypes {
+  name: 'windows';
+  architecture: 'x86';
+  extension: 'msi';
+}
+
+export interface IMacOSTypes {
+  name: 'mac';
+  architecture: '32/64';
+  extension: 'pkg';
+}
+
+export type tOperatingSystem = ILinuxOSTypes | IMacOSTypes | IWindowsOSTypes;
+
+// Defined Optional Parameters
+
+
+export type tOptionalParameters = 'server_address' | 'agent_name' | 'agent_group' | 'protocol' | 'wazuh_password';
+
+const osDefinitions: IOSDefinition<tOperatingSystem, tOptionalParameters>[] = [
   {
     name: 'linux',
     options: [
@@ -22,8 +47,8 @@ const osDefinitions: IOSDefinition[] = [
         urlPackage: mockedCommandsResponse,
       },
       {
-        architecture: 'x32',
-        extension: 'apk',
+        architecture: 'x64',
+        extension: 'msi',
         installCommand: mockedCommandsResponse,
         startCommand: mockedCommandsResponse,
         urlPackage: mockedCommandsResponse,
@@ -32,7 +57,7 @@ const osDefinitions: IOSDefinition[] = [
   },
 ];
 
-const optionalParams: tOptionalParams = {
+const optionalParams: tOptionalParams<tOptionalParameters> = {
   server_address: {
     property: 'WAZUH_MANAGER',
     getParamCommand: props => `${props.property}=${props.value}`,
@@ -55,7 +80,7 @@ const optionalParams: tOptionalParams = {
   },
 };
 
-const optionalValues: IOptionalParameters = {
+const optionalValues: IOptionalParameters<tOptionalParameters> = {
   server_address: '',
   agent_name: '',
   protocol: '',
@@ -137,7 +162,7 @@ describe('Command Generator', () => {
       '4.4',
     );
 
-    const selectedOs: IOperationSystem = {
+    const selectedOs: tOperatingSystem = {
       name: 'linux',
       architecture: 'x64',
       extension: 'deb',
@@ -188,7 +213,7 @@ describe('Command Generator', () => {
   });
 
   it('should return an ERROR when the os definitions received has a os with options duplicated', () => {
-    const osDefinitions: IOSDefinition[] = [
+    const osDefinitions: IOSDefinition<tOperatingSystem, tOptionalParameters>[] = [
       {
         name: 'linux',
         options: [
@@ -219,7 +244,7 @@ describe('Command Generator', () => {
   });
 
   it('should return an ERROR when the os definitions received has a os with options duplicated', () => {
-    const osDefinitions: IOSDefinition[] = [
+    const osDefinitions: IOSDefinition<tOperatingSystem, tOptionalParameters>[] = [
       {
         name: 'linux',
         options: [
@@ -312,7 +337,7 @@ describe('Command Generator', () => {
       '4.4',
     );
 
-    const selectedOs: IOperationSystem = {
+    const selectedOs: tOperatingSystem = {
       name: 'linux',
       architecture: 'x64',
       extension: 'deb',
@@ -323,7 +348,7 @@ describe('Command Generator', () => {
       server_address: 'wazuh-ip',
     };
 
-    commandGenerator.addOptionalParams(optionalValues as IOptionalParameters);
+    commandGenerator.addOptionalParams(optionalValues as IOptionalParameters<tOptionalParameters>);
     commandGenerator.getInstallCommand();
     expect(mockedCommandsResponse).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -345,7 +370,7 @@ describe('Command Generator', () => {
       '4.4',
     );
 
-    const selectedOs: IOperationSystem = {
+    const selectedOs: tOperatingSystem = {
       name: 'linux',
       architecture: 'x64',
       extension: 'deb',
@@ -356,7 +381,7 @@ describe('Command Generator', () => {
       server_address: 'wazuh-ip',
     };
 
-    commandGenerator.addOptionalParams(optionalValues as IOptionalParameters);
+    commandGenerator.addOptionalParams(optionalValues as IOptionalParameters<tOptionalParameters>);
     commandGenerator.getStartCommand();
     expect(mockedCommandsResponse).toHaveBeenCalledWith(
       expect.objectContaining({

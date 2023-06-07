@@ -1,27 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import { CommandGenerator } from '../core/register-commands/command-generator/command-generator';
 import {
-  osCommandsDefinitions as defaultOSCommands,
-  optionalParamsDefinitions as defaultOptionalParams,
-} from '../config/os-commands-definitions';
-import {
   IOSDefinition,
   IOperationSystem,
   IOptionalParameters,
   tOptionalParams,
 } from '../core/register-commands/types';
 
-interface IUseRegisterCommandsProps {
-  osDefinitions?: IOSDefinition[];
-  optionalParamsDefinitions?: tOptionalParams;
+interface IUseRegisterCommandsProps<OS extends IOperationSystem, Params extends string> {
+  osDefinitions: IOSDefinition<OS, Params>[];
+  optionalParamsDefinitions: tOptionalParams<Params>;
 }
 
-interface IUseRegisterCommandsOutput<T> {
-  selectOS: (params: T) => void;
-  setOptionalParams: (params: IOptionalParameters) => void;
+interface IUseRegisterCommandsOutput<OS extends IOperationSystem, Params extends string> {
+  selectOS: (params: OS) => void;
+  setOptionalParams: (params: IOptionalParameters<Params>) => void;
   installCommand: string;
   startCommand: string;
-  optionalParamsParsed: IOptionalParameters | {};
+  optionalParamsParsed: IOptionalParameters<Params> | {};
 }
 
 
@@ -30,25 +26,25 @@ interface IUseRegisterCommandsOutput<T> {
  * 
  * @template T - The type of the selected OS.
  * @param {IUseRegisterCommandsProps} props - The properties to configure the command generator.
- * @returns {IUseRegisterCommandsOutput<T>} - An object containing the generated commands and methods to update the selected OS and optional parameters.
+ * @returns {IUseRegisterCommandsOutput<OS,Params>} - An object containing the generated commands and methods to update the selected OS and optional parameters.
  */
-export function useRegisterAgentCommands<T extends IOperationSystem>(props: IUseRegisterCommandsProps): IUseRegisterCommandsOutput<T> {
+export function useRegisterAgentCommands<OS extends IOperationSystem, Params extends string>(props: IUseRegisterCommandsProps<OS, Params>): IUseRegisterCommandsOutput<OS,Params> {
   const { osDefinitions, optionalParamsDefinitions } = props;
   // command generator settings
   const wazuhVersion = '4.4';
-  const osCommands = osDefinitions || defaultOSCommands;
-  const optionalParams = optionalParamsDefinitions || defaultOptionalParams;
+  const osCommands: IOSDefinition<OS,Params>[] = osDefinitions as IOSDefinition<OS,Params>[];
+  const optionalParams: tOptionalParams<Params> = optionalParamsDefinitions as tOptionalParams<Params>;
   const commandGenerator = new CommandGenerator(
     osCommands,
     optionalParams,
     wazuhVersion,
   );
 
-  const [osSelected, setOsSelected] = useState<T | null>(null);
+  const [osSelected, setOsSelected] = useState<OS | null>(null);
   const [optionalParamsValues, setOptionalParamsValues] = useState<
-    IOptionalParameters | {}
+    IOptionalParameters<Params>| {}
   >({});
-  const [optionalParamsParsed, setOptionalParamsParsed] = useState<IOptionalParameters | {}>({});
+  const [optionalParamsParsed, setOptionalParamsParsed] = useState<IOptionalParameters<Params> | {}>({});
   const [installCommand, setInstallCommand] = useState('');
   const [startCommand, setStartCommand] = useState('');
 
@@ -65,7 +61,7 @@ export function useRegisterAgentCommands<T extends IOperationSystem>(props: IUse
     }
     if (optionalParamsValues) {
       commandGenerator.addOptionalParams(
-        optionalParamsValues as IOptionalParameters,
+        optionalParamsValues as IOptionalParameters<Params>,
       );
     }
     const installCommand = commandGenerator.getInstallCommand();
@@ -85,7 +81,7 @@ export function useRegisterAgentCommands<T extends IOperationSystem>(props: IUse
    * @param {T} params - The selected OS to be set.
    * @returns {void}
    */
-  const selectOS = (params: T) => {
+  const selectOS = (params: OS) => {
     commandGenerator.selectOS(params);
     setOsSelected(params);
   };
@@ -96,7 +92,7 @@ export function useRegisterAgentCommands<T extends IOperationSystem>(props: IUse
    * @param {IOptionalParameters} params - The optional parameters to be set.
    * @returns {void}
    */
-  const setOptionalParams = (params: IOptionalParameters): void => {
+  const setOptionalParams = (params: IOptionalParameters<Params>): void => {
     commandGenerator.addOptionalParams(params);
     setOptionalParamsValues(params);
     setOptionalParamsParsed(commandGenerator.getOptionalParamsCommands());

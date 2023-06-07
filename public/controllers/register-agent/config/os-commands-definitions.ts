@@ -1,15 +1,38 @@
 import { IOSDefinition, tOptionalParams } from '../core/register-commands/types';
 
+// Defined OS combinations
+export interface ILinuxOSTypes {
+  name: 'linux';
+  architecture: 'x64' | 'x86';
+  extension: 'rpm' | 'deb';
+}
+export interface IWindowsOSTypes {
+  name: 'windows';
+  architecture: 'x86';
+  extension: 'msi';
+}
+
+export interface IMacOSTypes {
+  name: 'mac';
+  architecture: '32/64';
+  extension: 'pkg';
+}
+
+export type tOperatingSystem = ILinuxOSTypes | IMacOSTypes | IWindowsOSTypes;
+
+
+export type tOptionalParameters = 'server_address' | 'agent_name' | 'agent_group' | 'protocol' | 'wazuh_password';
+
 ///////////////////////////////////////////////////////////////////
 /// Operating system commands definitions
 ///////////////////////////////////////////////////////////////////
 
-const linuxDefinition: IOSDefinition = {
+const linuxDefinition: IOSDefinition<tOperatingSystem, tOptionalParameters> = {
   name: 'linux',
   options: [
     {
-      extension: 'apk',
-      architecture: 'amd64',
+      extension: 'deb',
+      architecture: '32/64',
       urlPackage: props =>
         `https://packages.wazuh.com/4.x/yum/wazuh-agent-${props.wazuhVersion}-1.x86_64.${props.extension}`,
       installCommand: props =>
@@ -18,7 +41,7 @@ const linuxDefinition: IOSDefinition = {
     },
     {
       extension: 'deb',
-      architecture: 'amd64',
+      architecture: 'x64',
       urlPackage: props =>
         `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/ wazuh-agent_${props.wazuhVersion}-1_${props.architecture}.${props.extension}`,
       installCommand: props =>
@@ -27,7 +50,7 @@ const linuxDefinition: IOSDefinition = {
     },
     {
       extension: 'rpm',
-      architecture: 'aarch64',
+      architecture: '32/64',
       urlPackage: props =>
         `https://packages.wazuh.com/4.x/yum/wazuh-agent-${props.wazuhVersion}-1.x86_64.${props.extension}`,
       installCommand: props =>
@@ -36,7 +59,7 @@ const linuxDefinition: IOSDefinition = {
     },
     {
       extension: 'deb',
-      architecture: 'aarch64',
+      architecture: 'x64',
       urlPackage: props =>
         `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${props.wazuhVersion}-1_amd64.${props.extension}`,
       installCommand: props =>
@@ -46,7 +69,7 @@ const linuxDefinition: IOSDefinition = {
   ],
 };
 
-const windowsDefinition: IOSDefinition = {
+const windowsDefinition: IOSDefinition<tOperatingSystem, tOptionalParameters> = {
   name: 'windows',
   options: [
     {
@@ -61,7 +84,7 @@ const windowsDefinition: IOSDefinition = {
   ],
 };
 
-const macDefinition: IOSDefinition = {
+const macDefinition: IOSDefinition<tOperatingSystem, tOptionalParameters> = {
   name: 'mac',
   options: [
     {
@@ -86,7 +109,7 @@ export const osCommandsDefinitions = [
 /// Optional parameters definitions
 ///////////////////////////////////////////////////////////////////
 
-export const optionalParamsDefinitions: tOptionalParams = {
+export const optionalParamsDefinitions: tOptionalParams<tOptionalParameters> = {
   server_address: {
       property: 'WAZUH_MANAGER',
       getParamCommand:  props => {
