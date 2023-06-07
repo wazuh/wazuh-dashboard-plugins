@@ -39,6 +39,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed error when using invalid group configuration [#5423](https://github.com/wazuh/wazuh-kibana-app/pull/5423)
 - Fixed repeated requests in inventory data and configurations of an agent. [#5460](https://github.com/wazuh/wazuh-kibana-app/pull/5460)
 - Fixed repeated requests in the group table when adding a group or refreshing the table [#5465](https://github.com/wazuh/wazuh-kibana-app/pull/5465)
+- Fixed an error in the request body suggestions of API Console [#5521](https://github.com/wazuh/wazuh-kibana-app/pull/5521)
 
 ### Removed
 
@@ -46,6 +47,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed unnecessary dashboard queries caused by the deploy agent view. [#5453](https://github.com/wazuh/wazuh-kibana-app/pull/5453)
 - Removed repeated and unnecessary requests in security section. [#5500](https://github.com/wazuh/wazuh-kibana-app/pull/5500)
 - Removed pretty parameter from cron job requests. [#5532](https://github.com/wazuh/wazuh-kibana-app/pull/5532)
+- Removed unnecessary requests in `Management/Status` section. [#5528](https://github.com/wazuh/wazuh-kibana-app/pull/5528)
 
 ## Wazuh v4.4.3 - OpenSearch Dashboards 2.6.0 - Revision 01
 
