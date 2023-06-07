@@ -1,5 +1,5 @@
 import { NoInstallCommandDefinitionException, NoPackageURLDefinitionException, WazuhVersionUndefinedException } from "../exceptions";
-import { IOSCommandsDefinition, IOperationSystem, IOptionalParameters, tOS } from "../types";
+import { IOSCommandsDefinition, IOperationSystem, IOptionalParameters } from "../types";
 
 /**
  * Returns the installation command for a given operating system.
