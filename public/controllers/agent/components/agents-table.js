@@ -310,7 +310,10 @@ export const AgentsTable = withErrorBoundary(
             <EuiButtonIcon
               onClick={(ev) => {
                 ev.stopPropagation();
-                this.props.clickAction(agent, 'default');
+                AppNavigate.navigateToModule(ev, 'agents', {
+                  tab: 'welcome',
+                  agent: agent.id,
+                });
               }}
               iconType="eye"
               color={'primary'}
@@ -323,7 +326,10 @@ export const AgentsTable = withErrorBoundary(
               <EuiButtonIcon
                 onClick={(ev) => {
                   ev.stopPropagation();
-                  this.props.clickAction(agent, 'configuration');
+                  AppNavigate.navigateToModule(ev, 'agents', {
+                    tab: 'configuration',
+                    agent: agent.id,
+                  });
                 }}
                 color={'primary'}
                 iconType="wrench"
