@@ -72,9 +72,7 @@ import {
 } from '../wazuh-config';
 import './register-agent.scss';
 import WzManagerAddressInput from '../register-agent/steps/wz-manager-address';
-import {
-  getMasterRemoteConfiguration
-} from './register-agent-service';
+import { getMasterRemoteConfiguration } from './register-agent-service';
 import { PrincipalButtonGroup } from './wz-accordion';
 import RegisterAgentButtonGroup from '../register-agent/register-agent-button-group';
 import '../../../styles/common.scss';
@@ -120,7 +118,6 @@ export const RegisterAgent = withErrorBoundary(
         win: this.systemSelectorNet(),
       };
     }
-
 
     async componentDidMount() {
       try {
@@ -207,10 +204,9 @@ export const RegisterAgent = withErrorBoundary(
           haveConnectionSecure: remoteConfig.haveSecureConnection,
           udpProtocol: remoteConfig.isUdp,
           connectionSecure: remoteConfig.haveSecureConnection,
-        })
+        });
       }
-    }
-
+    };
 
     async getAuthInfo() {
       try {
@@ -264,7 +260,9 @@ export const RegisterAgent = withErrorBoundary(
         this.state.selectedVersion === 'ubuntu14'
       ) {
         return 'service wazuh-agent start';
-      } else return '';
+      } else {
+        return '';
+      }
     }
 
     systemSelectorNet() {
@@ -274,13 +272,17 @@ export const RegisterAgent = withErrorBoundary(
         this.state.selectedVersion === 'windows7'
       ) {
         return 'NET START WazuhSvc';
-      } else return '';
+      } else {
+        return '';
+      }
     }
 
     systemSelectorWazuhControlMacos() {
       if (this.state.selectedVersion == 'sierra') {
         return 'sudo /Library/Ossec/bin/wazuh-control start';
-      } else return '';
+      } else {
+        return '';
+      }
     }
 
     systemSelectorWazuhControl() {
@@ -291,13 +293,17 @@ export const RegisterAgent = withErrorBoundary(
         this.state.selectedVersion === '3.12.12'
       ) {
         return '/var/ossec/bin/wazuh-control start';
-      } else return '';
+      } else {
+        return '';
+      }
     }
 
     systemSelectorInitD() {
       if (this.state.selectedVersion === '11.31') {
         return '/sbin/init.d/wazuh-agent start';
-      } else return '';
+      } else {
+        return '';
+      }
     }
 
     selectSYS(sys) {
@@ -359,7 +365,7 @@ export const RegisterAgent = withErrorBoundary(
 
     obfuscatePassword(text) {
       let obfuscate = '';
-      const regex = /WAZUH_REGISTRATION_PASSWORD=?\040?\'(.*?)\'/gm;
+      const regex = /WAZUH_REGISTRATION_PASSWORD=?\040?\'(.*?)\'[\"| ]/gm;
       const match = regex.exec(text);
       const password = match[1];
       if (password) {
@@ -382,15 +388,20 @@ export const RegisterAgent = withErrorBoundary(
     }
 
     optionalDeploymentVariables() {
+      const escapeQuotes = value => value.replace(/'/g, "\\'");
       let deployment =
         this.state.serverAddress &&
-        `WAZUH_MANAGER='${this.state.serverAddress}' `;
+        `WAZUH_MANAGER='${escapeQuotes(this.state.serverAddress)}' `;
       if (this.state.selectedOS == 'win') {
-        deployment += `WAZUH_REGISTRATION_SERVER='${this.state.serverAddress}' `;
+        deployment += `WAZUH_REGISTRATION_SERVER='${escapeQuotes(
+          this.state.serverAddress,
+        )}' `;
       }
 
       if (this.state.needsPassword) {
-        deployment += `WAZUH_REGISTRATION_PASSWORD='${this.state.wazuhPassword}' `;
+        deployment += `WAZUH_REGISTRATION_PASSWORD='${escapeQuotes(
+          this.state.wazuhPassword,
+        )}' `;
       }
 
       if (this.state.udpProtocol) {
@@ -894,31 +905,47 @@ export const RegisterAgent = withErrorBoundary(
       );
 
       const urlWindowsPackage = `https://packages.wazuh.com/4.x/windows/wazuh-agent-${this.state.wazuhVersion}-1.msi`;
-
       const missingOSSelection = this.checkMissingOSSelection();
+      const warningForAgentName =
+        'The agent name must be unique. It can’t be changed once the agent has been enrolled.';
+
       const agentName = (
-        <EuiForm>
-          <EuiFormRow
-            isInvalid={this.state.agentNameError}
-            error={[
-              this.state.badCharacters.length < 1
-                ? 'The minimum length is 2 characters.'
-                : `The character${
-                    this.state.badCharacters.length <= 1 ? '' : 's'
-                  }
+        <EuiText>
+          <p>
+            The deployment sets the endpoint hostname as the agent name by
+            default. Optionally, you can set the agent name below.
+          </p>
+          <EuiText color='default'>Assign an agent name</EuiText>
+          <EuiSpacer />
+          <EuiForm>
+            <EuiFormRow
+              isInvalid={this.state.agentNameError}
+              error={[
+                this.state.badCharacters.length < 1
+                  ? 'The minimum length is 2 characters.'
+                  : `The character${
+                      this.state.badCharacters.length <= 1 ? '' : 's'
+                    }
             ${this.state.badCharacters.map(char => ` "${char}"`)}
             ${this.state.badCharacters.length <= 1 ? 'is' : 'are'}
             not valid. Allowed characters are A-Z, a-z, ".", "-", "_"`,
-            ]}
-          >
-            <EuiFieldText
-              isInvalid={this.state.agentNameError}
-              placeholder='Name agent'
-              value={this.state.agentName}
-              onChange={event => this.setAgentName(event)}
-            />
-          </EuiFormRow>
-        </EuiForm>
+              ]}
+            >
+              <EuiFieldText
+                isInvalid={this.state.agentNameError}
+                placeholder='Agent name'
+                value={this.state.agentName}
+                onChange={event => this.setAgentName(event)}
+              />
+            </EuiFormRow>
+          </EuiForm>
+          <EuiSpacer size='s' />
+          <EuiCallOut
+            color='warning'
+            title={warningForAgentName}
+            iconType='iInCircle'
+          />
+        </EuiText>
       );
       const groupInput = (
         <>
@@ -963,11 +990,24 @@ export const RegisterAgent = withErrorBoundary(
         zIndex: '100',
       };
 
-       // Select macOS installation script based on architecture
-       const macOSInstallationOptions = (this.optionalDeploymentVariables() + this.agentNameVariable()).replaceAll('\' ', '\'\\n');
-       const macOSInstallationSetEnvVariablesScript = macOSInstallationOptions ? `echo -e "${macOSInstallationOptions}" > /tmp/wazuh_envs && ` : ``;
-       const macOSInstallationScript = `curl -so wazuh-agent.pkg https://packages.wazuh.com/4.x/macos/wazuh-agent-${this.state.wazuhVersion
-           }-1.pkg && ${macOSInstallationSetEnvVariablesScript}sudo installer -pkg ./wazuh-agent.pkg -target /`;
+      /*** macOS installation script customization ***/
+
+      // Set macOS installation script with environment variables
+      const macOSInstallationOptions =
+        `${this.optionalDeploymentVariables()}${this.agentNameVariable()}`
+          .replace(/\' ([a-zA-Z])/g, "' && $1") // Separate environment variables with &&
+          .replace(/\"/g, '\\"') // Escape double quotes
+          .trim();
+
+      // If no variables are set, the echo will be empty
+      const macOSInstallationSetEnvVariablesScript = macOSInstallationOptions
+        ? `sudo echo "${macOSInstallationOptions}" > /tmp/wazuh_envs && `
+        : ``;
+
+      // Merge environment variables with installation script
+      const macOSInstallationScript = `curl -so wazuh-agent.pkg https://packages.wazuh.com/4.x/macos/wazuh-agent-${this.state.wazuhVersion}-1.pkg && ${macOSInstallationSetEnvVariablesScript}sudo installer -pkg ./wazuh-agent.pkg -target /`;
+
+      /*** end macOS installation script customization ***/
 
       const customTexts = {
         rpmText: `sudo ${this.optionalDeploymentVariables()}${this.agentNameVariable()}yum install -y ${this.optionalPackages()}`,
@@ -1081,267 +1121,279 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
               title='This section could not be displayed because you do not have permission to get access to the registration service.'
               iconType='iInCircle'
             />
-          ) : this.state.selectedOS && (
-            <EuiText>
-              {this.state.agentName.length > 0 ? (
-                <p>
-                  You can use this command to install and enroll the Wazuh
-                  agent.
-                </p>
-              ) : (
-                <p>
-                  You can use this command to install and enroll the Wazuh agent
-                  in one or more hosts.
-                </p>
-              )}
-              <EuiCallOut
-                color='warning'
-                title={warningUpgrade}
-                iconType='iInCircle'
-              />
-
-              {!this.state.connectionSecure && (
-                <>
-                  <EuiSpacer />
-                  {/** Warning connection NO SECURE */}
-                  <EuiCallOut
-                    color='danger'
-                    title={
-                      <>
-                        Warning: there's no{' '}
-                        <EuiLink
-                          target='_blank'
-                          href={webDocumentationLink(
-                            'user-manual/deployment-variables/deployment-variables.html',
-                            appVersionMajorDotMinor,
-                          )}
-                        >
-                          secure protocol configured
-                        </EuiLink>{' '}
-                        and agents will not be able to communicate with the
-                        manager.
-                      </>
-                    }
-                    iconType='iInCircle'
-                  />
-                  {/** END Warning connection NO SECURE */}
-                </>
-              )}
-              <EuiSpacer />
-              {windowsAdvice}
-              {['windowsxp', 'windowsserver2008'].includes(
-                this.state.selectedVersion) && (
-                <>
-                  <EuiCallOut
-                    color='warning'
-                    title={warningCommand}
-                    iconType='iInCircle'
-                  />
-                  <EuiSpacer />
-                </>
-              )}
-              <div className='copy-codeblock-wrapper'>
-                <EuiCodeBlock style={codeBlock} language={language}>
-                  {this.state.wazuhPassword &&
-                  !this.state.showPassword &&
-                  !['sol', 'hp', 'alpine'].includes(this.state.selectedOS)
-                    ? this.obfuscatePassword(text)
-                    : text}
-                </EuiCodeBlock>
-                <EuiCopy textToCopy={text || ''}>
-                  {copy => (
-                    <div className='copy-overlay' onClick={copy}>
-                      <p>
-                        <EuiIcon type='copy' /> Copy command
-                      </p>
-                    </div>
-                  )}
-                </EuiCopy>
-              </div>
-              {this.state.selectedVersion == 'solaris10' ||
-              this.state.selectedVersion == 'solaris11' ? (
-                <>
-                  <EuiCallOut
-                    color='warning'
-                    className='message'
-                    iconType='iInCircle'
-                    title={
-                      <span>
-                        Might require some extra installation{' '}
-                        <EuiLink
-                          target='_blank'
-                          href={webDocumentationLink(
-                            'installation-guide/wazuh-agent/wazuh-agent-package-solaris.html',
-                            appVersionMajorDotMinor,
-                          )}
-                        >
-                          steps
-                        </EuiLink>
-                        .
-                      </span>
-                    }
-                  ></EuiCallOut>
-                  <EuiSpacer size='m' />
-                  <EuiCallOut
-                    color='warning'
-                    className='message'
-                    iconType='iInCircle'
-                    title={
-                      <span>
-                        After installing the agent, you need to enroll it in the
-                        Wazuh server. Check the Wazuh agent enrollment{' '}
-                        <EuiLink target='_blank' href={urlWazuhAgentEnrollment}>
-                          Wazuh agent enrollment
-                        </EuiLink>{' '}
-                        section to learn more.
-                      </span>
-                    }
-                  ></EuiCallOut>
-                </>
-              ) : this.state.selectedVersion == '6.1 TL9' ? (
-                <>
-                  <EuiCallOut
-                    color='warning'
-                    className='message'
-                    iconType='iInCircle'
-                    title={
-                      <span>
-                        Might require some extra installation{' '}
-                        <EuiLink
-                          target='_blank'
-                          href={webDocumentationLink(
-                            'installation-guide/wazuh-agent/wazuh-agent-package-aix.html',
-                            appVersionMajorDotMinor,
-                          )}
-                        >
-                          steps
-                        </EuiLink>
-                        .
-                      </span>
-                    }
-                  ></EuiCallOut>
-                  <EuiSpacer />
-                </>
-              ) : this.state.selectedVersion == '11.31' ? (
-                <>
-                  <EuiCallOut
-                    color='warning'
-                    className='message'
-                    iconType='iInCircle'
-                    title={
-                      <span>
-                        Might require some extra installation{' '}
-                        <EuiLink
-                          target='_blank'
-                          href={webDocumentationLink(
-                            'installation-guide/wazuh-agent/wazuh-agent-package-hpux.html',
-                            appVersionMajorDotMinor,
-                          )}
-                        >
-                          steps
-                        </EuiLink>
-                        .
-                      </span>
-                    }
-                  ></EuiCallOut>
-                  <EuiSpacer size='m' />
-                  <EuiCallOut
-                    color='warning'
-                    className='message'
-                    iconType='iInCircle'
-                    title={
-                      <span>
-                        After installing the agent, you need to enroll it in the
-                        Wazuh server. Check the Wazuh agent enrollment{' '}
-                        <EuiLink target='_blank' href={urlWazuhAgentEnrollment}>
-                          Wazuh agent enrollment{' '}
-                        </EuiLink>
-                        section to learn more.
-                      </span>
-                    }
-                  ></EuiCallOut>
-                </>
-              ) : this.state.selectedVersion == '3.12.12' ? (
-                <>
-                  <EuiCallOut
-                    color='warning'
-                    className='message'
-                    iconType='iInCircle'
-                    title={
-                      <span>
-                        Might require some extra installation{' '}
-                        <EuiLink
-                          target='_blank'
-                          href={webDocumentationLink(
-                            'installation-guide/wazuh-agent/wazuh-agent-package-linux.html',
-                            appVersionMajorDotMinor,
-                          )}
-                        >
-                          steps
-                        </EuiLink>
-                        .
-                      </span>
-                    }
-                  ></EuiCallOut>
-                  <EuiSpacer size='m' />
-                  <EuiCallOut
-                    color='warning'
-                    className='message'
-                    iconType='iInCircle'
-                    title={
-                      <span>
-                        After installing the agent, you need to enroll it in the
-                        Wazuh server. Check the Wazuh agent enrollment{' '}
-                        <EuiLink target='_blank' href={urlWazuhAgentEnrollment}>
-                          Wazuh agent enrollment{' '}
-                        </EuiLink>
-                        section to learn more.
-                      </span>
-                    }
-                  ></EuiCallOut>
-                </>
-              ) : this.state.selectedVersion == 'debian7' ||
-                this.state.selectedVersion == 'debian8' ||
-                this.state.selectedVersion == 'debian9' ||
-                this.state.selectedVersion == 'debian10' ? (
-                <>
-                  <EuiCallOut
-                    color='warning'
-                    className='message'
-                    iconType='iInCircle'
-                    title={
-                      <span>
-                        Might require some extra installation{' '}
-                        <EuiLink
-                          target='_blank'
-                          href={webDocumentationLink(
-                            'installation-guide/wazuh-agent/wazuh-agent-package-linux.html',
-                            appVersionMajorDotMinor,
-                          )}
-                        >
-                          steps
-                        </EuiLink>
-                        .
-                      </span>
-                    }
-                  ></EuiCallOut>
-                  <EuiSpacer />
-                </>
-              ) : (
-                ''
-              )}
-              {this.state.needsPassword &&
-              !['sol', 'hp', 'alpine'].includes(this.state.selectedOS) ? (
-                <EuiSwitch
-                  label='Show password'
-                  checked={this.state.showPassword}
-                  onChange={active => this.setShowPassword(active)}
+          ) : (
+            this.state.selectedOS && (
+              <EuiText>
+                {this.state.agentName.length > 0 ? (
+                  <p>
+                    You can use this command to install and enroll the Wazuh
+                    agent.
+                  </p>
+                ) : (
+                  <p>
+                    You can use this command to install and enroll the Wazuh
+                    agent in one or more hosts.
+                  </p>
+                )}
+                <EuiCallOut
+                  color='warning'
+                  title={warningUpgrade}
+                  iconType='iInCircle'
                 />
-              ) : (
-                ''
-              )}
-              <EuiSpacer />
-            </EuiText>
+
+                {!this.state.connectionSecure && (
+                  <>
+                    <EuiSpacer />
+                    {/** Warning connection NO SECURE */}
+                    <EuiCallOut
+                      color='danger'
+                      title={
+                        <>
+                          Warning: there's no{' '}
+                          <EuiLink
+                            target='_blank'
+                            href={webDocumentationLink(
+                              'user-manual/deployment-variables/deployment-variables.html',
+                              appVersionMajorDotMinor,
+                            )}
+                          >
+                            secure protocol configured
+                          </EuiLink>{' '}
+                          and agents will not be able to communicate with the
+                          manager.
+                        </>
+                      }
+                      iconType='iInCircle'
+                    />
+                    {/** END Warning connection NO SECURE */}
+                  </>
+                )}
+                <EuiSpacer />
+                {windowsAdvice}
+                {['windowsxp', 'windowsserver2008'].includes(
+                  this.state.selectedVersion,
+                ) && (
+                  <>
+                    <EuiCallOut
+                      color='warning'
+                      title={warningCommand}
+                      iconType='iInCircle'
+                    />
+                    <EuiSpacer />
+                  </>
+                )}
+                <div className='copy-codeblock-wrapper'>
+                  <EuiCodeBlock style={codeBlock} language={language}>
+                    {this.state.wazuhPassword &&
+                    !this.state.showPassword &&
+                    !['sol', 'hp', 'alpine'].includes(this.state.selectedOS)
+                      ? this.obfuscatePassword(text)
+                      : text}
+                  </EuiCodeBlock>
+                  <EuiCopy textToCopy={text || ''}>
+                    {copy => (
+                      <div className='copy-overlay' onClick={copy}>
+                        <p>
+                          <EuiIcon type='copy' /> Copy command
+                        </p>
+                      </div>
+                    )}
+                  </EuiCopy>
+                </div>
+                {this.state.selectedVersion == 'solaris10' ||
+                this.state.selectedVersion == 'solaris11' ? (
+                  <>
+                    <EuiCallOut
+                      color='warning'
+                      className='message'
+                      iconType='iInCircle'
+                      title={
+                        <span>
+                          Might require some extra installation{' '}
+                          <EuiLink
+                            target='_blank'
+                            href={webDocumentationLink(
+                              'installation-guide/wazuh-agent/wazuh-agent-package-solaris.html',
+                              appVersionMajorDotMinor,
+                            )}
+                          >
+                            steps
+                          </EuiLink>
+                          .
+                        </span>
+                      }
+                    ></EuiCallOut>
+                    <EuiSpacer size='m' />
+                    <EuiCallOut
+                      color='warning'
+                      className='message'
+                      iconType='iInCircle'
+                      title={
+                        <span>
+                          After installing the agent, you need to enroll it in
+                          the Wazuh server. Check the Wazuh agent enrollment{' '}
+                          <EuiLink
+                            target='_blank'
+                            href={urlWazuhAgentEnrollment}
+                          >
+                            Wazuh agent enrollment
+                          </EuiLink>{' '}
+                          section to learn more.
+                        </span>
+                      }
+                    ></EuiCallOut>
+                  </>
+                ) : this.state.selectedVersion == '6.1 TL9' ? (
+                  <>
+                    <EuiCallOut
+                      color='warning'
+                      className='message'
+                      iconType='iInCircle'
+                      title={
+                        <span>
+                          Might require some extra installation{' '}
+                          <EuiLink
+                            target='_blank'
+                            href={webDocumentationLink(
+                              'installation-guide/wazuh-agent/wazuh-agent-package-aix.html',
+                              appVersionMajorDotMinor,
+                            )}
+                          >
+                            steps
+                          </EuiLink>
+                          .
+                        </span>
+                      }
+                    ></EuiCallOut>
+                    <EuiSpacer />
+                  </>
+                ) : this.state.selectedVersion == '11.31' ? (
+                  <>
+                    <EuiCallOut
+                      color='warning'
+                      className='message'
+                      iconType='iInCircle'
+                      title={
+                        <span>
+                          Might require some extra installation{' '}
+                          <EuiLink
+                            target='_blank'
+                            href={webDocumentationLink(
+                              'installation-guide/wazuh-agent/wazuh-agent-package-hpux.html',
+                              appVersionMajorDotMinor,
+                            )}
+                          >
+                            steps
+                          </EuiLink>
+                          .
+                        </span>
+                      }
+                    ></EuiCallOut>
+                    <EuiSpacer size='m' />
+                    <EuiCallOut
+                      color='warning'
+                      className='message'
+                      iconType='iInCircle'
+                      title={
+                        <span>
+                          After installing the agent, you need to enroll it in
+                          the Wazuh server. Check the Wazuh agent enrollment{' '}
+                          <EuiLink
+                            target='_blank'
+                            href={urlWazuhAgentEnrollment}
+                          >
+                            Wazuh agent enrollment{' '}
+                          </EuiLink>
+                          section to learn more.
+                        </span>
+                      }
+                    ></EuiCallOut>
+                  </>
+                ) : this.state.selectedVersion == '3.12.12' ? (
+                  <>
+                    <EuiCallOut
+                      color='warning'
+                      className='message'
+                      iconType='iInCircle'
+                      title={
+                        <span>
+                          Might require some extra installation{' '}
+                          <EuiLink
+                            target='_blank'
+                            href={webDocumentationLink(
+                              'installation-guide/wazuh-agent/wazuh-agent-package-linux.html',
+                              appVersionMajorDotMinor,
+                            )}
+                          >
+                            steps
+                          </EuiLink>
+                          .
+                        </span>
+                      }
+                    ></EuiCallOut>
+                    <EuiSpacer size='m' />
+                    <EuiCallOut
+                      color='warning'
+                      className='message'
+                      iconType='iInCircle'
+                      title={
+                        <span>
+                          After installing the agent, you need to enroll it in
+                          the Wazuh server. Check the Wazuh agent enrollment{' '}
+                          <EuiLink
+                            target='_blank'
+                            href={urlWazuhAgentEnrollment}
+                          >
+                            Wazuh agent enrollment{' '}
+                          </EuiLink>
+                          section to learn more.
+                        </span>
+                      }
+                    ></EuiCallOut>
+                  </>
+                ) : this.state.selectedVersion == 'debian7' ||
+                  this.state.selectedVersion == 'debian8' ||
+                  this.state.selectedVersion == 'debian9' ||
+                  this.state.selectedVersion == 'debian10' ? (
+                  <>
+                    <EuiCallOut
+                      color='warning'
+                      className='message'
+                      iconType='iInCircle'
+                      title={
+                        <span>
+                          Might require some extra installation{' '}
+                          <EuiLink
+                            target='_blank'
+                            href={webDocumentationLink(
+                              'installation-guide/wazuh-agent/wazuh-agent-package-linux.html',
+                              appVersionMajorDotMinor,
+                            )}
+                          >
+                            steps
+                          </EuiLink>
+                          .
+                        </span>
+                      }
+                    ></EuiCallOut>
+                    <EuiSpacer />
+                  </>
+                ) : (
+                  ''
+                )}
+                {this.state.needsPassword &&
+                !['sol', 'hp', 'alpine'].includes(this.state.selectedOS) ? (
+                  <EuiSwitch
+                    label='Show password'
+                    checked={this.state.showPassword}
+                    onChange={active => this.setShowPassword(active)}
+                  />
+                ) : (
+                  ''
+                )}
+                <EuiSpacer />
+              </EuiText>
+            )
           )}
         </div>
       );
@@ -1527,11 +1579,11 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
       ];
 
       const onChangeServerAddress = async nodeSelected => {
-          this.setState({
-            serverAddress: nodeSelected,
-            udpProtocol: this.state.haveUdpProtocol,
-            connectionSecure: this.state.haveConnectionSecure
-          });
+        this.setState({
+          serverAddress: nodeSelected,
+          udpProtocol: this.state.haveUdpProtocol,
+          connectionSecure: this.state.haveConnectionSecure,
+        });
       };
 
       const steps = [
@@ -2016,7 +2068,7 @@ apk add wazuh-agent=${this.state.wazuhVersion}-r1`,
         )
           ? [
               {
-                title: 'Assign a name and a group to the agent',
+                title: 'Optional settings',
                 children: (
                   <Fragment>
                     {agentName}
