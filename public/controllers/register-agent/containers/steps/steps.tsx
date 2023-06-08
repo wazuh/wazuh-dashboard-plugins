@@ -32,6 +32,7 @@ export const Steps = ({
   udpProtocol,
   connectionSecure,
   form,
+  osCard,
 }) => {
   const [statusCheck, setStatusCheck] = useState<EuiStepStatus>('current');
   const [serverAddressStatus, setServerAddressStatus] =
@@ -55,17 +56,15 @@ export const Steps = ({
           <p>Select the package to download and install on your system:</p>
         </EuiTitle>
       ),
-      children: (
-        <div>HOLA</div>
-        // <InputForm
-        //   type='custom'
-        //   label='Etiqueta del Campo'
-        //   value={undefined}
-        //   setStatusCheck={setStatusCheck}
-        //   wazuhVersion={wazuhVersion}
-        //   appVersionMajorDotMinor={appVersionMajorDotMinor}
-        // />
-      ),
+      children: osCard,
+      // <InputForm
+      //   type='custom'
+      //   label='Etiqueta del Campo'
+      //   value={undefined}
+      //   setStatusCheck={setStatusCheck}
+      //   wazuhVersion={wazuhVersion}
+      //   appVersionMajorDotMinor={appVersionMajorDotMinor}
+      // />
       status: statusCheck,
     },
     {

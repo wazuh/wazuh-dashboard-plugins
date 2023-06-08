@@ -35,6 +35,7 @@ import { FormConfiguration } from '../../../../components/common/form/types';
 import { useSelector } from 'react-redux';
 import { withReduxProvider } from '../../../../components/common/hocs';
 import GroupInput from '../../components/steps-three/group-input';
+import { OsCard } from '../../components/step-one/os-card/os-card';
 
 export const RegisterAgent = withReduxProvider(
   ({ getWazuhVersion, hasAgents, addNewAgent, reload }) => {
@@ -106,22 +107,26 @@ export const RegisterAgent = withReduxProvider(
         initialValue: [],
         component: props => {
           return (
-            <EuiText style={{ marginTop: '1.5rem' }}>
-              <p>Select one or more existing groups hola</p>
-              <EuiComboBox
-                placeholder={!props.value.length ? 'Default' : 'Select group'}
-                options={props.options.groups}
-                selectedOptions={props.value}
-                onChange={group => {
-                  props.onChange({
-                    target: { value: group },
-                  }); // TODO: should not need the event.target.value
-                }}
-                isDisabled={!props.options.groups.length}
-                isClearable={true}
-                data-test-subj='demoComboBox'
-              />
-            </EuiText>
+            // <EuiText style={{ marginTop: '1.5rem' }}>
+            //   <p>Select one or more existing groups hola</p>
+            //   <EuiComboBox
+            //     placeholder={!props.value.length ? 'Default' : 'Select group'}
+            //     options={props.options.groups}
+            //     selectedOptions={props.value}
+            //     onChange={group => {
+            //       props.onChange({
+            //         target: { value: group },
+            //       }); // TODO: should not need the event.target.value
+            //     }}
+            //     isDisabled={!props.options.groups.length}
+            //     isClearable={true}
+            //     data-test-subj='demoComboBox'
+            //   />
+            // </EuiText>
+            <OsCard
+              setStatusCheck={setStatusCheck}
+              appVersionMajorDotMinor={appVersionMajorDotMinor}
+            />
           );
         },
         options: {
@@ -335,6 +340,8 @@ export const RegisterAgent = withReduxProvider(
     // );
 
     const agentGroup = <InputForm {...form.fields.agentGroups}></InputForm>;
+    const osCard = <InputForm {...form.fields.osCards}></InputForm>;
+
     const passwordInput = (
       <EuiFieldText
         placeholder='Wazuh password'
@@ -395,6 +402,7 @@ export const RegisterAgent = withReduxProvider(
                         inputAgentName={inputAgentName}
                         groupInput={groupInput}
                         agentGroup={agentGroup}
+                        osCard={osCard}
                         wazuhVersion={wazuhVersion}
                         appVersionMajorDotMinor={appVersionMajorDotMinor}
                         serverAddress={serverAddress}
