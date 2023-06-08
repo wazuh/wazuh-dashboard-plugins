@@ -1,6 +1,7 @@
 import React, { Component, Fragment, useState, useEffect } from 'react';
 import {
   EuiSteps,
+  EuiText,
   EuiStepStatus,
   EuiTitle,
   EuiIconTip,
@@ -13,6 +14,7 @@ import { ServerAddress } from '../../components/step-two/server-addres';
 import WzManagerAddressInput from '../../../agent/register-agent/steps/wz-manager-address';
 import { FormConfiguration } from '../../../../components/common/form/types';
 import { useForm } from '../../../../components/common/form/hooks';
+import { REGISTER_AGENT_DATA_STEP_TWO } from '../../utils/register-agent-data';
 
 export const Steps = ({
   steps,
@@ -85,16 +87,14 @@ export const Steps = ({
       ),
       children: (
         <Fragment>
-          {/* <WzManagerAddressInput
-            defaultValue={defaultServerAddress}
-            onChange={onChangeServerAddress}
-            // isInvalid={validateInput}
-          /> */}
-
-          <InputForm
-            {...form.fields.serverAddress}
-            label='hola' // TODO: change label
-          />
+          <EuiFlexGroup gutterSize='s' wrap>
+            {REGISTER_AGENT_DATA_STEP_TWO.map((data, index) => (
+              <EuiFlexItem key={index}>
+                <EuiText className='stepSubtitle'>{data.subtitle}</EuiText>
+              </EuiFlexItem>
+            ))}
+          </EuiFlexGroup>
+          <InputForm {...form.fields.serverAddress} />
         </Fragment>
       ),
     },

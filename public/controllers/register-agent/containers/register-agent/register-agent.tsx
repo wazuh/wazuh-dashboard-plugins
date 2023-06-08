@@ -77,7 +77,37 @@ export const RegisterAgent = withReduxProvider(
       useState<EuiStepStatus>('disabled');
 
     const initialFields: FormConfiguration = {
+      osCards: {
+        type: 'custom',
+        initialValue: [],
+        component: props => {
+          return (
+            <OsCard
+              setStatusCheck={setStatusCheck}
+              appVersionMajorDotMinor={appVersionMajorDotMinor}
+            />
+          );
+        },
+        options: {
+          groups: groups,
+        },
+      },
+
       serverAddress: {
+        type: 'text',
+        initialValue: configuration['enrollment.dns'] || '',
+        validate: value => {
+          const regex =
+            /^([a-zA-Z0-9äöüéàè-]{1,63}|([a-zA-Z0-9äöüéàè-]+\.)*[a-zA-Z0-9äöüéàè-]+)$/;
+          const isLengthValid = value.length <= 255;
+          const isFormatValid = regex.test(value);
+          return isLengthValid && isFormatValid
+            ? undefined
+            : 'There is an error'; // TODO: change error validation message
+        },
+      },
+
+      agentName: {
         type: 'text',
         initialValue: configuration['enrollment.dns'] || '',
         validate: value => {
@@ -96,22 +126,6 @@ export const RegisterAgent = withReduxProvider(
         initialValue: [],
         component: props => {
           return <GroupInput {...props} />;
-        },
-        options: {
-          groups: groups,
-        },
-      },
-
-      osCards: {
-        type: 'custom',
-        initialValue: [],
-        component: props => {
-          return (
-            <OsCard
-              setStatusCheck={setStatusCheck}
-              appVersionMajorDotMinor={appVersionMajorDotMinor}
-            />
-          );
         },
         options: {
           groups: groups,

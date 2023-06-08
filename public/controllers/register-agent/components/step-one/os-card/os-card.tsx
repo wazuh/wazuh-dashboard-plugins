@@ -58,7 +58,7 @@ export const OsCard = ({ setStatusCheck, appVersionMajorDotMinor }: Props) => {
       </EuiFlexGroup>
       <EuiCallOut
         color='warning'
-        className='message'
+        className='cardsCallOut'
         iconType='iInCircle'
         title={
           <span>
