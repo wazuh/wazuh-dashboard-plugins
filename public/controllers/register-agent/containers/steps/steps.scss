@@ -22,9 +22,14 @@
   font-size: 14px;
   line-height: 24px;
   color: #343741;
+  margin-bottom: 20px;
 }
 
 .titleAndIcon {
   display: flex;
   flex-direction: row;
+}
+
+.warningForAgentName {
+  margin-top: 10px;
 }

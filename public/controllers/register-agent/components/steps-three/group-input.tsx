@@ -6,7 +6,7 @@ const groupInput = ({ value, options, onChange }) => {
     <EuiText style={{ marginTop: '1.5rem' }}>
       <p>Select one or more existing groups</p>
       <EuiComboBox
-        placeholder={!value?.length ? 'Default' : 'Select group'}
+        placeholder={!value?.length ? 'Default' : 'Select group'} //ver
         options={options?.groups}
         selectedOptions={value}
         onChange={group => {

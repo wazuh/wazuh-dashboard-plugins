@@ -7,6 +7,7 @@ import {
   EuiIconTip,
   EuiFlexGroup,
   EuiFlexItem,
+  EuiCallOut,
 } from '@elastic/eui';
 import { InputForm } from '../../../../components/common/form';
 import './steps.scss';
@@ -54,6 +55,9 @@ export const Steps = ({
     setUdpProtocol(udpProtocol);
     setConnectionSecure(connectionSecure);
   };
+
+  const warningForAgentName =
+    'The agent name must be unique. It can’t be changed once the agent has been enrolled.';
 
   const firstSetOfSteps = [
     {
@@ -131,7 +135,13 @@ export const Steps = ({
               </EuiFlexItem>
             ))}
           </EuiFlexGroup>
-          <InputForm {...form.fields.agentName} />
+          <InputForm {...form.fields.agentName} label='Assign an agent name' />
+          <EuiCallOut
+            color='warning'
+            title={warningForAgentName}
+            iconType='iInCircle'
+            className='warningForAgentName'
+          />
           {groupInput}
           {agentGroup}
         </Fragment>
