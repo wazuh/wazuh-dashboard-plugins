@@ -1,14 +1,22 @@
 import React, { useState } from 'react';
-import { EuiCard, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
+import {
+  EuiCard,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiText,
+  EuiCallOut,
+  EuiLink,
+} from '@elastic/eui';
 import { REGISTER_AGENT_DATA_STEP_ONE } from '../../../utils/register-agent-data';
 import { CheckboxGroupComponent } from '../checkbox-group/checkbox-group';
 import './os-card.scss';
+import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
 
 interface Props {
   setStatusCheck: string;
 }
 
-export const OsCard = ({ setStatusCheck }: Props) => {
+export const OsCard = ({ setStatusCheck, appVersionMajorDotMinor }: Props) => {
   const [selectedOption, setSelectedOption] = useState<string | undefined>(
     undefined,
   );
@@ -48,6 +56,32 @@ export const OsCard = ({ setStatusCheck }: Props) => {
           </EuiFlexItem>
         ))}
       </EuiFlexGroup>
+      <EuiCallOut
+        color='warning'
+        className='message'
+        iconType='iInCircle'
+        title={
+          <span>
+            For additional systems and architectures, please check our{' '}
+            <EuiLink
+              target='_blank'
+              href={webDocumentationLink(
+                'installation-guide/wazuh-agent/index.html',
+                appVersionMajorDotMinor,
+              )}
+            >
+              steps
+            </EuiLink>
+            .
+          </span>
+        }
+      ></EuiCallOut>
+      {/* <EuiCallOut
+        color='info,'
+        title={cardsCallOut}
+        iconType='iInCircle'
+        className='cardsCallOut'
+      /> */}
     </div>
   );
 };

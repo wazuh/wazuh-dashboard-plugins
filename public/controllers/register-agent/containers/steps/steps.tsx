@@ -1,27 +1,46 @@
-import React, { useState } from 'react';
-import { EuiSteps, EuiStepStatus, EuiTitle } from '@elastic/eui';
+import React, { Component, Fragment, useState, useEffect } from 'react';
+import {
+  EuiSteps,
+  EuiStepStatus,
+  EuiTitle,
+  EuiIconTip,
+  EuiFlexGroup,
+  EuiFlexItem,
+} from '@elastic/eui';
 import { InputForm } from '../../../../components/common/form';
 import './steps.scss';
 import { ServerAddress } from '../../components/step-two/server-addres';
+import WzManagerAddressInput from '../../../agent/register-agent/steps/wz-manager-address';
+import { FormConfiguration } from '../../../../components/common/form/types';
+import { useForm } from '../../../../components/common/form/hooks';
 
-export const Steps = () => {
+export const Steps = ({
+  steps,
+  needsPassword,
+  hidePasswordInput,
+  passwordInput,
+  inputAgentName,
+  groupInput,
+  agentGroup,
+  defaultServerAddress,
+  wazuhVersion,
+  appVersionMajorDotMinor,
+  serverAddress,
+  setServerAddress,
+  setUdpProtocol,
+  setConnectionSecure,
+  udpProtocol,
+  connectionSecure,
+  form,
+}) => {
   const [statusCheck, setStatusCheck] = useState<EuiStepStatus>('current');
   const [serverAddressStatus, setServerAddressStatus] =
     useState<EuiStepStatus>('disabled');
-  const [serverAddress, setServerAddress] = useState<string>('');
-  const [udpProtocol, setUdpProtocol] = useState<boolean>(false);
-  const [connectionSecure, setConnectionSecure] = useState<boolean>(true);
-  const [defaultServerAddress, setDefaultServerAddress] = useState<string>('');
 
   const handleInputChange = (value: string) => {
     setServerAddress(value);
     setServerAddressStatus('complete');
   };
-
-  // getEnrollDNSConfig = () => {
-  //   const serverAddress = this.configuration['enrollment.dns'] || '';
-  //   this.setState({ defaultServerAddress: serverAddress });
-  // };
 
   const onChangeServerAddress = async (nodeSelected: any) => {
     setServerAddress(nodeSelected);
@@ -37,32 +56,74 @@ export const Steps = () => {
         </EuiTitle>
       ),
       children: (
-        <InputForm
-          type='custom'
-          label='Etiqueta del Campo'
-          value={undefined}
-          setStatusCheck={setStatusCheck}
-        />
+        <div>HOLA</div>
+        // <InputForm
+        //   type='custom'
+        //   label='Etiqueta del Campo'
+        //   value={undefined}
+        //   setStatusCheck={setStatusCheck}
+        //   wazuhVersion={wazuhVersion}
+        //   appVersionMajorDotMinor={appVersionMajorDotMinor}
+        // />
       ),
       status: statusCheck,
     },
     {
       title: (
-        <>
-          <EuiTitle className='stepTitle'>
-            <p>Server address</p>
-          </EuiTitle>
-        </>
+        // <EuiFlexGroup>
+        //   <EuiFlexItem>
+        <EuiTitle className='stepTitle'>
+          <p>Server address</p>
+        </EuiTitle>
+        //   </EuiFlexItem>
+        //   <EuiFlexItem>
+        //     <EuiIconTip
+        //       content='Source maps allow browser dev tools to map minified code to the original source code'
+        //       position='right'
+        //     />
+        //   </EuiFlexItem>
+        // </EuiFlexGroup>
       ),
       children: (
-        <ServerAddress
-          setStatusCheck={setServerAddressStatus}
-          serverAddress={serverAddress}
-          udpProtocol={udpProtocol}
-          connectionSecure={connectionSecure}
-        />
+        <Fragment>
+          {/* <WzManagerAddressInput
+            defaultValue={defaultServerAddress}
+            onChange={onChangeServerAddress}
+            // isInvalid={validateInput}
+          /> */}
+
+          <InputForm
+            {...form.fields.serverAddress}
+            label='hola' // TODO: change label
+          />
+        </Fragment>
       ),
-      status: serverAddressStatus,
+    },
+    ...(!(!needsPassword || hidePasswordInput)
+      ? [
+          {
+            title: (
+              <EuiTitle className='stepTitle'>
+                <p>Wazuh password</p>
+              </EuiTitle>
+            ),
+            children: <Fragment>{passwordInput}</Fragment>,
+          },
+        ]
+      : []),
+    {
+      title: (
+        <EuiTitle className='stepTitle'>
+          <p>Optional settings</p>
+        </EuiTitle>
+      ),
+      children: (
+        <Fragment>
+          {inputAgentName}
+          {groupInput}
+          {agentGroup}
+        </Fragment>
+      ),
     },
   ];
 

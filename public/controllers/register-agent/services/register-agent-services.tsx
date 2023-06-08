@@ -224,3 +224,29 @@ export const getMasterRemoteConfiguration = async () => {
 };
 
 export { getConnectionConfig, getRemoteConfiguration };
+
+export const getAuthInfo = async () => {
+  try {
+    const result = await WzRequest.apiReq(
+      'GET',
+      '/agents/000/config/auth/auth',
+      {},
+    );
+    return (result.data || {}).data || {};
+  } catch (error) {
+    setGotErrorRegistrationServiceInfo(true);
+    throw new Error(error);
+  }
+};
+
+export const getGroups = async () => {
+  try {
+    const result = await WzRequest.apiReq('GET', '/groups', {});
+    return result.data.data.affected_items.map(item => ({
+      label: item.name,
+      id: item.name,
+    }));
+  } catch (error) {
+    throw new Error(error);
+  }
+};

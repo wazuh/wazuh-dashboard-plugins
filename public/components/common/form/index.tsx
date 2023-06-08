@@ -28,6 +28,8 @@ interface InputFormProps {
   postInput?:
     | React.ReactNode
     | ((props: { value: any; error?: string }) => React.ReactNode);
+  setStatusCheck: string;
+  appVersionMajorDotMinor: string;
 }
 
 interface InputFormComponentProps extends InputFormProps {
@@ -45,6 +47,7 @@ export const InputForm = ({
   footer,
   preInput,
   postInput,
+  appVersionMajorDotMinor,
   ...rest
 }: InputFormComponentProps) => {
   const ComponentInput = Input[
@@ -66,10 +69,16 @@ export const InputForm = ({
     />
   );
 
-  if (type === 'custom') {
-    return <OsCard {...rest} setStatusCheck={setStatusCheck} />;
-  }
-
+  // if (type === 'custom') {
+  //   return (
+  //     <OsCard
+  //       {...rest}
+  //       setStatusCheck={setStatusCheck}
+  //       appVersionMajorDotMinor={appVersionMajorDotMinor}
+  //     />
+  //   );
+  // }
+  console.log(rest, 'rest');
   return label ? (
     <EuiFormRow label={label} fullWidth isInvalid={isInvalid} error={error}>
       <>
@@ -99,5 +108,5 @@ const Input = {
   select: InputFormSelect,
   text: InputFormText,
   textarea: InputFormTextArea,
-  custom: OsCard,
+  custom: ({ component, ...rest }) => component(rest),
 };
