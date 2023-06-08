@@ -107,22 +107,6 @@ export const RegisterAgent = withReduxProvider(
         initialValue: [],
         component: props => {
           return (
-            // <EuiText style={{ marginTop: '1.5rem' }}>
-            //   <p>Select one or more existing groups hola</p>
-            //   <EuiComboBox
-            //     placeholder={!props.value.length ? 'Default' : 'Select group'}
-            //     options={props.options.groups}
-            //     selectedOptions={props.value}
-            //     onChange={group => {
-            //       props.onChange({
-            //         target: { value: group },
-            //       }); // TODO: should not need the event.target.value
-            //     }}
-            //     isDisabled={!props.options.groups.length}
-            //     isClearable={true}
-            //     data-test-subj='demoComboBox'
-            //   />
-            // </EuiText>
             <OsCard
               setStatusCheck={setStatusCheck}
               appVersionMajorDotMinor={appVersionMajorDotMinor}
