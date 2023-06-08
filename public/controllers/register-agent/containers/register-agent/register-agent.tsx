@@ -109,11 +109,10 @@ export const RegisterAgent = withReduxProvider(
 
       agentName: {
         type: 'text',
-        initialValue: configuration['enrollment.dns'] || '',
+        initialValue: '',
         validate: value => {
-          const regex =
-            /^([a-zA-Z0-9äöüéàè-]{1,63}|([a-zA-Z0-9äöüéàè-]+\.)*[a-zA-Z0-9äöüéàè-]+)$/;
-          const isLengthValid = value.length <= 255;
+          const regex = /^[A-Za-z\.\-_]+$/;
+          const isLengthValid = value.length > 2;
           const isFormatValid = regex.test(value);
           return isLengthValid && isFormatValid
             ? undefined
@@ -261,45 +260,45 @@ export const RegisterAgent = withReduxProvider(
     const warningForAgentName =
       'The agent name must be unique. It can’t be changed once the agent has been enrolled.';
 
-    const inputAgentName = (
-      <EuiText>
-        <p>
-          The deployment sets the endpoint hostname as the agent name by
-          default. Optionally, you can set the agent name below.
-        </p>
-        <EuiText color='default'>Assign an agent name</EuiText>
-        <EuiSpacer />
-        <EuiForm>
-          <EuiFormRow
-            isInvalid={agentNameError}
-            error={[
-              badCharacters.length < 1
-                ? 'The minimum length is 2 characters.'
-                : `The character${badCharacters.length <= 1 ? '' : 's'}
-            ${badCharacters.map(char => ` "${char}"`)}
-            ${badCharacters.length <= 1 ? 'is' : 'are'}
-            not valid. Allowed characters are A-Z, a-z, ".", "-", "_"`,
-            ]}
-          >
-            <InputForm
-              type='text'
-              label='Etiqueta del Campo'
-              // placeholder='Agent name'
-              // isInvalid={agentNameError}
-              value={agentName}
-              onChange={event => ValidationAgentName(event)}
-              // setStatusCheck={setStatusCheck}
-            />
-          </EuiFormRow>
-        </EuiForm>
-        <EuiSpacer size='s' />
-        <EuiCallOut
-          color='warning'
-          title={warningForAgentName}
-          iconType='iInCircle'
-        />
-      </EuiText>
-    );
+    // const inputAgentName = (
+    //   <EuiText>
+    //     <p>
+    //       The deployment sets the endpoint hostname as the agent name by
+    //       default. Optionally, you can set the agent name below.
+    //     </p>
+    //     <EuiText color='default'>Assign an agent name</EuiText>
+    //     <EuiSpacer />
+    //     <EuiForm>
+    //       <EuiFormRow
+    //         isInvalid={agentNameError}
+    //         error={[
+    //           badCharacters.length < 1
+    //             ? 'The minimum length is 2 characters.'
+    //             : `The character${badCharacters.length <= 1 ? '' : 's'}
+    //         ${badCharacters.map(char => ` "${char}"`)}
+    //         ${badCharacters.length <= 1 ? 'is' : 'are'}
+    //         not valid. Allowed characters are A-Z, a-z, ".", "-", "_"`,
+    //         ]}
+    //       >
+    //         <InputForm
+    //           type='text'
+    //           label='Etiqueta del Campo'
+    //           // placeholder='Agent name'
+    //           // isInvalid={agentNameError}
+    //           value={agentName}
+    //           onChange={event => ValidationAgentName(event)}
+    //           // setStatusCheck={setStatusCheck}
+    //         />
+    //       </EuiFormRow>
+    //     </EuiForm>
+    //     <EuiSpacer size='s' />
+    //     <EuiCallOut
+    //       color='warning'
+    //       title={warningForAgentName}
+    //       iconType='iInCircle'
+    //     />
+    //   </EuiText>
+    // );
     const groupInput = (
       <>
         {!groups.length && (
@@ -397,13 +396,13 @@ export const RegisterAgent = withReduxProvider(
                         needsPassword={needsPassword}
                         hidePasswordInput={hidePasswordInput}
                         passwordInput={passwordInput}
-                        inputAgentName={inputAgentName}
                         groupInput={groupInput}
                         agentGroup={agentGroup}
                         osCard={osCard}
                         wazuhVersion={wazuhVersion}
                         appVersionMajorDotMinor={appVersionMajorDotMinor}
                         serverAddress={serverAddress}
+                        agentName={agentName}
                         setServerAddress={setServerAddress}
                         setUdpProtocol={setUdpProtocol}
                         setConnectionSecure={setConnectionSecure}

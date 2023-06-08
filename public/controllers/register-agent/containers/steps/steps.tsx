@@ -35,6 +35,7 @@ export const Steps = ({
   connectionSecure,
   form,
   osCard,
+  agentName,
 }) => {
   const [statusCheck, setStatusCheck] = useState<EuiStepStatus>('current');
   const [serverAddressStatus, setServerAddressStatus] =
@@ -118,7 +119,7 @@ export const Steps = ({
       ),
       children: (
         <Fragment>
-          {inputAgentName}
+          <InputForm {...form.fields.agentName} />
           {groupInput}
           {agentGroup}
         </Fragment>
