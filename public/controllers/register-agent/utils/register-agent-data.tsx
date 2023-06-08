@@ -33,6 +33,13 @@ export const REGISTER_AGENT_DATA_STEP_TWO = [
     title: 'Server address',
     subtitle:
       'This is the address the agent uses to communicate with the Wazuh server. Enter an IP address or a fully qualified domain name (FDQN).',
-    inputText: true,
+  },
+];
+
+export const REGISTER_AGENT_DATA_STEP_THREE = [
+  {
+    title: 'Optional settings',
+    subtitle:
+      'The deployment sets the endpoint hostname as the agent name by default. Optionally, you can set your own name in the field below.',
   },
 ];

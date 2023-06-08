@@ -1,6 +1,6 @@
 .container {
   box-sizing: border-box;
-  height: 1271px;
+  max-height: 1271px;
   margin-top: 44px;
   background: #ffffff;
   border: 1px solid rgba(52, 55, 65, 0.2);
@@ -12,7 +12,6 @@
 .title {
   margin-top: 51px;
   margin-bottom: 51px;
-  font-family: 'Inter';
   font-style: normal;
   font-weight: 400;
   font-size: 30px;
