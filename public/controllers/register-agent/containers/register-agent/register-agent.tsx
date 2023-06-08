@@ -34,6 +34,7 @@ import { useForm } from '../../../../components/common/form/hooks';
 import { FormConfiguration } from '../../../../components/common/form/types';
 import { useSelector } from 'react-redux';
 import { withReduxProvider } from '../../../../components/common/hocs';
+import GroupInput from '../../components/steps-three/group-input';
 
 export const RegisterAgent = withReduxProvider(
   ({ getWazuhVersion, hasAgents, addNewAgent, reload }) => {
@@ -93,24 +94,7 @@ export const RegisterAgent = withReduxProvider(
         type: 'custom',
         initialValue: [],
         component: props => {
-          return (
-            <EuiText style={{ marginTop: '1.5rem' }}>
-              <p>Select one or more existing groups</p>
-              <EuiComboBox
-                placeholder={!props.value.length ? 'Default' : 'Select group'}
-                options={props.options.groups}
-                selectedOptions={props.value}
-                onChange={group => {
-                  props.onChange({
-                    target: { value: group },
-                  }); // TODO: should not need the event.target.value
-                }}
-                isDisabled={!props.options.groups.length}
-                isClearable={true}
-                data-test-subj='demoComboBox'
-              />
-            </EuiText>
-          );
+          return <GroupInput {...props} />;
         },
         options: {
           groups: groups,
@@ -123,7 +107,7 @@ export const RegisterAgent = withReduxProvider(
         component: props => {
           return (
             <EuiText style={{ marginTop: '1.5rem' }}>
-              <p>Select one or more existing groups</p>
+              <p>Select one or more existing groups hola</p>
               <EuiComboBox
                 placeholder={!props.value.length ? 'Default' : 'Select group'}
                 options={props.options.groups}
