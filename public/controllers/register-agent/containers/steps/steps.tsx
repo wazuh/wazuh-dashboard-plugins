@@ -58,7 +58,8 @@ export const Steps = ({
 
   const warningForAgentName =
     'The agent name must be unique. It can’t be changed once the agent has been enrolled.';
-
+  console.log(form.fields.serverAddress, 'form.fields.serverAddress');
+  console.log(form.fields.agentName.value, 'form.fields.agentName.value');
   const firstSetOfSteps = [
     {
       title: (
@@ -75,7 +76,9 @@ export const Steps = ({
       //   wazuhVersion={wazuhVersion}
       //   appVersionMajorDotMinor={appVersionMajorDotMinor}
       // />
-      status: statusCheck,
+      status: form.fields.operatingSystemSelection.value
+        ? 'complete'
+        : 'current',
     },
     {
       title: (
@@ -104,9 +107,19 @@ export const Steps = ({
               </EuiFlexItem>
             ))}
           </EuiFlexGroup>
-          <InputForm {...form.fields.serverAddress} />
+          {/* //agregar estilos */}
+          <InputForm {...form.fields.serverAddress} label={<></>} />
         </Fragment>
       ),
+      status: !form.fields.operatingSystemSelection.value
+        ? 'disabled'
+        : !form.fields.serverAddress.value &&
+          form.fields.operatingSystemSelection.value
+        ? 'current'
+        : form.fields.operatingSystemSelection.value &&
+          form.fields.serverAddress.value
+        ? 'complete'
+        : '',
     },
     ...(!(!needsPassword || hidePasswordInput)
       ? [
@@ -135,7 +148,11 @@ export const Steps = ({
               </EuiFlexItem>
             ))}
           </EuiFlexGroup>
-          <InputForm {...form.fields.agentName} label='Assign an agent name' />
+          <InputForm
+            {...form.fields.agentName}
+            label='Assign an agent name'
+            placeholder='Agent name'
+          />
           <EuiCallOut
             color='warning'
             title={warningForAgentName}
@@ -146,6 +163,15 @@ export const Steps = ({
           {agentGroup}
         </Fragment>
       ),
+      status: !form.fields.operatingSystemSelection.value
+        ? 'disabled'
+        : !form.fields.serverAddress.value
+        ? 'disabled'
+        : form.fields.serverAddress.value
+        ? 'current'
+        : form.fields.agentName.value
+        ? 'complete'
+        : '',
     },
   ];
 

@@ -16,15 +16,20 @@ interface Props {
   setStatusCheck: string;
 }
 
-export const OsCard = ({ setStatusCheck, appVersionMajorDotMinor }: Props) => {
-  const [selectedOption, setSelectedOption] = useState<string | undefined>(
-    undefined,
-  );
+export const OsCard = ({
+  // setStatusCheck,
+  appVersionMajorDotMinor,
+  onChange,
+  value,
+}: Props) => {
+  // const [selectedOption, setSelectedOption] = useState<string | undefined>(
+  //   undefined,
+  // );
 
-  const handleOptionChange = (optionId: string) => {
-    setSelectedOption(optionId);
-    setStatusCheck('complete');
-  };
+  // const handleOptionChange = (optionId: string) => {
+  //   setSelectedOption(optionId);
+  //   setStatusCheck('complete');
+  // };
 
   return (
     <div>
@@ -49,15 +54,15 @@ export const OsCard = ({ setStatusCheck, appVersionMajorDotMinor }: Props) => {
               <CheckboxGroupComponent
                 data={data.architecture}
                 cardIndex={index}
-                selectedOption={selectedOption}
-                onOptionChange={handleOptionChange}
+                selectedOption={value}
+                onOptionChange={onChange}
               />
             </EuiCard>
           </EuiFlexItem>
         ))}
       </EuiFlexGroup>
       <EuiCallOut
-        color='warning'
+        color='primary'
         className='cardsCallOut'
         iconType='iInCircle'
         title={

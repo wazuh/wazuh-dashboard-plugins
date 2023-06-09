@@ -77,13 +77,14 @@ export const RegisterAgent = withReduxProvider(
       useState<EuiStepStatus>('disabled');
 
     const initialFields: FormConfiguration = {
-      osCards: {
+      operatingSystemSelection: {
         type: 'custom',
-        initialValue: [],
+        initialValue: '',
         component: props => {
           return (
             <OsCard
-              setStatusCheck={setStatusCheck}
+              // setStatusCheck={setStatusCheck}
+              {...props}
               appVersionMajorDotMinor={appVersionMajorDotMinor}
             />
           );
@@ -93,30 +94,73 @@ export const RegisterAgent = withReduxProvider(
         },
       },
 
+      // serverAddress: {
+      //   type: 'text',
+      //   initialValue: configuration['enrollment.dns'] || '',
+      //   validate: value => {
+      //     // return 'hola';
+      //     const regex =
+      //       /^([a-zA-Z0-9äöüéàè-]{1,63}|([a-zA-Z0-9äöüéàè-]+\.)*[a-zA-Z0-9äöüéàè-]+)$/;
+      //     const isLengthValid = value.length <= 63;
+      //     const isFormatValid = regex.test(value);
+      //     return isLengthValid && isFormatValid
+      //       ? undefined
+      //       : 'Each label must have a letter or number at the beginning. The maximum lenght is 63 characters.'; // TODO: change error validation message
+      //   },
+      // },
+
       serverAddress: {
         type: 'text',
         initialValue: configuration['enrollment.dns'] || '',
         validate: value => {
           const regex =
-            /^([a-zA-Z0-9äöüéàè-]{1,63}|([a-zA-Z0-9äöüéàè-]+\.)*[a-zA-Z0-9äöüéàè-]+)$/;
-          const isLengthValid = value.length <= 255;
+            /^([a-zA-Z0-9äöüéàè-]{1}[a-zA-Z0-9äöüéàè-]{0,62}|([a-zA-Z0-9äöüéàè-]+\.)*[a-zA-Z0-9äöüéàè-]+)$/;
+          const isLengthValid = value.length <= 63;
           const isFormatValid = regex.test(value);
           return isLengthValid && isFormatValid
             ? undefined
-            : 'There is an error'; // TODO: change error validation message
+            : 'Each label must have a letter or number at the beginning. The maximum length is 63 characters.';
         },
       },
+
+      // agentName: {
+      //   type: 'text',
+      //   initialValue: '',
+      //   validate: value => {
+      //     if (value.length === 0) {
+      //       return undefined;
+      //     }
+      //     const regex = /^[A-Za-z.\-_]+$/;
+      //     const isLengthValid = value.length >= 2 && value.length <= 63;
+      //     const isFormatValid = regex.test(value);
+      //     return !isFormatValid
+      //       ? 'The character "?" is not valid. Allowed characters are A-Z, a-z, ".", "-", "_"'
+      //       : ''
+      //       ? !isLengthValid
+      //       : 'The minimum length is 2 characters.'
+      //       ? isLengthValid && isFormatValid
+      //       : '';
+      //   },
+      // },
 
       agentName: {
         type: 'text',
         initialValue: '',
         validate: value => {
-          const regex = /^[A-Za-z\.\-_]+$/;
-          const isLengthValid = value.length > 2;
+          if (value.length === 0) {
+            return undefined;
+          }
+          const regex = /^[A-Za-z.\-_]+$/;
+          const isLengthValid = value.length >= 2 && value.length <= 63;
           const isFormatValid = regex.test(value);
-          return isLengthValid && isFormatValid
-            ? undefined
-            : 'There is an error'; // TODO: change error validation message
+          if (!isFormatValid && !isLengthValid) {
+            return 'The minimum length is 2 characters. The character "?" is not valid. Allowed characters are A-Z, a-z, ".", "-", "_"';
+          } else if (!isLengthValid) {
+            return 'The minimum length is 2 characters.';
+          } else if (!isFormatValid) {
+            return 'The character "?" is not valid. Allowed characters are A-Z, a-z, ".", "-", "_"';
+          }
+          return '';
         },
       },
 
@@ -337,7 +381,9 @@ export const RegisterAgent = withReduxProvider(
     // );
 
     const agentGroup = <InputForm {...form.fields.agentGroups}></InputForm>;
-    const osCard = <InputForm {...form.fields.osCards}></InputForm>;
+    const osCard = (
+      <InputForm {...form.fields.operatingSystemSelection}></InputForm>
+    );
 
     const passwordInput = (
       <EuiFieldText

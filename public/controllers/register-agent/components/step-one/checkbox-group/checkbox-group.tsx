@@ -16,9 +16,9 @@ const CheckboxGroupComponent: React.FC<Props> = ({
   selectedOption,
   onOptionChange,
 }) => {
-  const handleOptionChange = (optionId: string) => {
-    onOptionChange(optionId);
-  };
+  // const handleOptionChange = (optionId: string) => {
+  //   onOptionChange(optionId);
+  // };
 
   const isSingleArchitecture = data.length === 1;
   const isFirstCardWithFourItems = cardIndex === 0 && data.length === 4;
@@ -40,7 +40,9 @@ const CheckboxGroupComponent: React.FC<Props> = ({
           <EuiRadioGroup
             options={[{ id: `option-${cardIndex}-${idx}` }]}
             idSelected={selectedOption}
-            onChange={(id: string) => handleOptionChange(id)}
+            onChange={(id: string) => {
+              onOptionChange({ target: { value: id } });
+            }}
           />
         </div>
       ))}
