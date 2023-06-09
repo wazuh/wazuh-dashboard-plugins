@@ -26,13 +26,21 @@ This hook makes use of the `Command Generator class` to generate the commands to
 
 import { useRegisterAgentCommands } from 'path/to/use-register-agent-commands';
 
+import { OSdefintions, paramsDefinitions} from 'path/config/os-definitions';
+
+/* 
+  the props recived by the hook must implement types:
+    - OS: IOSDefinition<tOperatingSystem, tOptionalParamsNames>[]
+    - optional parameters: tOptionalParams<tOptionalParamsNames>
+*/
+
 const { 
   selectOS,
   setOptionalParams,
   installCommand,
   startCommand,
   optionalParamsParsed
- } = useRegisterAgentCommands();
+ } = useRegisterAgentCommands<tOperatingSystem, tOptionalParameters>();
 
 // select OS depending on the specified OS defined in the hook configuration
 selectOS({
@@ -64,21 +72,35 @@ console.log('optionals params processed', optionalParamsParsed);
 ### Hook props
 
 ```ts
-interface IUseRegisterCommandsProps {
-  osDefinitions?: IOSDefinition[];
-  optionalParamsDefinitions?: tOptionalParams;
+
+export interface IOperationSystem {
+  name: string;
+  architecture: string;
+  extension: string;
+}
+
+interface IUseRegisterCommandsProps<OS extends IOperationSystem, Params extends string> {
+  osDefinitions: IOSDefinition<OS, Params>[];
+  optionalParamsDefinitions: tOptionalParams<Params>;
 }
 ```
 
 ### Hook output
 
 ```ts
-interface IUseRegisterCommandsOutput<T> {
-  selectOS: (params: T) => void;
-  setOptionalParams: (params: IOptionalParameters) => void;
+
+export interface IOperationSystem {
+  name: string;
+  architecture: string;
+  extension: string;
+}
+
+interface IUseRegisterCommandsOutput<OS extends IOperationSystem, Params extends string> {
+  selectOS: (params: OS) => void;
+  setOptionalParams: (params: IOptionalParameters<Params>) => void;
   installCommand: string;
   startCommand: string;
-  optionalParamsParsed: IOptionalParameters | {};
+  optionalParamsParsed: IOptionalParameters<Params> | {};
 }
 ```
 
@@ -90,6 +112,25 @@ And the hook will validate and show warning in compilation and development time.
 #### Operating systems types example
 
 ```ts
+// global types
+
+export interface IOptionsParamConfig<T extends string> {
+  property: string;
+  getParamCommand: (props: tOptionalParamsCommandProps<T>) => string;
+}
+
+export type tOptionalParams<T extends string> = {
+  [key in T]: IOptionsParamConfig<T>;
+};
+
+export interface IOperationSystem {
+  name: string;
+  architecture: string;
+  extension: string;
+}
+
+/// ....
+
 export interface ILinuxOSTypes {
   name: 'linux';
   architecture: 'x64' | 'x86';
@@ -109,6 +150,10 @@ export interface IMacOSTypes {
 
 export type tOperatingSystem = ILinuxOSTypes | IMacOSTypes | IWindowsOSTypes;
 
+type tOptionalParameters = 'server_address' | 'agent_name' | 'agent_group' | 'protocol' | 'wazuh_password';
+
+import { OSdefintions, paramsDefinitions} from 'path/config/os-definitions';
+
 
 // pass it to the hook and it will use the types when we are selecting the OS
 const { 
@@ -117,7 +162,7 @@ const {
   installCommand,
   startCommand,
   optionalParamsParsed
- } = useRegisterAgentCommands<tOperatingSystem>();
+ } = useRegisterAgentCommands<tOperatingSystem, tOptionalParameters>(OSdefintions, paramsDefinitions);
 
 // when the options are not valid depending on the types defined, the IDE will show a warning
 selectOS({

@@ -21,7 +21,7 @@ The register agent is a process that will allow the user to register an agent in
 
 # Solution details
 
-To optimize and make more easier the process to generate the registration commands we have created a class called `Command Generator' that given a set of parameters it will generate the registration commands.
+To optimize and make more easier the process to generate the registration commands we have created a class called `Command Generator` that given a set of parameters it will generate the registration commands.
 
 ## Configuration
 
@@ -32,28 +32,61 @@ To make the command generator works we need to configure the following parameter
 The OS definitions are a set of parameters that will be used to generate the registration commands. The parameters are the following:
 
 ```ts
-export type tOS = 'linux' | 'windows' | 'mac';
-export type tPackageExtensions =
-  | 'rpm'
-  | 'deb'
-  | 'rpm'
-  | 'msi'
-  | 'pkg'
-  | 'p5p'
-  | 'rpm'
-  | 'tar'
-  | 'apk';
 
-export interface IOSDefinition {
-  name: tOS;
-  options: {
-    extension: tPackageExtensions;
-    architecture: string;
-    urlPackage(props): string;
-    installCommand(props): string;
-    startCommand(props): string;
-  }[];
+
+// global types
+
+export interface IOptionsParamConfig<T extends string> {
+  property: string;
+  getParamCommand: (props: tOptionalParamsCommandProps<T>) => string;
 }
+
+export type tOptionalParams<T extends string> = {
+  [key in T]: IOptionsParamConfig<T>;
+};
+
+export interface IOperationSystem {
+  name: string;
+  architecture: string;
+  extension: string;
+}
+
+/// ....
+
+interface ILinuxOSTypes {
+  name: 'linux';
+  architecture: 'x64' | 'x86';
+  extension: 'rpm' | 'deb';
+}
+interface IWindowsOSTypes {
+  name: 'windows';
+  architecture: 'x86';
+  extension: 'msi';
+}
+
+interface IMacOSTypes {
+  name: 'mac';
+  architecture: '32/64';
+  extension: 'pkg';
+}
+
+type tOperatingSystem = ILinuxOSTypes | IMacOSTypes | IWindowsOSTypes; // add the necessary OS options 
+
+type tOptionalParameters = 'server_address' | 'agent_name' | 'agent_group' | 'protocol' | 'wazuh_password';
+
+export interface IOSDefinition<OS extends IOperationSystem, Params extends string> {
+  name: OS['name'];
+  options: IOSCommandsDefinition<OS,Params>[];
+}
+
+export interface IOSCommandsDefinition<OS extends IOperationSystem,Param extends string> {
+  extension: OS['extension'];
+  architecture: OS['architecture'];
+  urlPackage: (props: tOSEntryProps<Param>) => string;
+  installCommand: (props: tOSEntryProps<Param> & { urlPackage: string }) => string;
+  startCommand: (props: tOSEntryProps<Param>) => string;
+}
+
 ```
 
 This configuration will define the different OS that we want to support and the different packages that we want to support for each OS. The `urlPackage` function will be used to generate the URL to download the package, the `installCommand` function will be used to generate the command to install the package and the `startCommand` function will be used to generate the command to start the agent.
@@ -62,7 +95,7 @@ This configuration will define the different OS that we want to support and the 
 
 ```ts
 
-const osDefinitions: IOSDefinition[] = [{
+const osDefinitions: IOSDefinition<tOperatingSystem, tOptionalParameters>[] = [{
   name: 'linux',
   options: [
     {
@@ -136,7 +169,7 @@ This configuration will define the different optional parameters that we want to
 
 ```ts
 
-export const optionalParameters: tOptionalParams = {
+export const optionalParameters: tOptionalParams<tOptionalParameters> = {
   server_address: {
       property: 'WAZUH_MANAGER',
       getParamCommand:  props => 'returns the optional param command'
@@ -148,7 +181,7 @@ export const optionalParameters: tOptionalParams = {
   },
 }
 
-````
+```
 
 ## Validations
 
@@ -166,19 +199,22 @@ Another validations will be provided in development time and will be provided by
 To use the command generator we need to import the class and create a new instance of the class. The class will receive the OS Definitions and the Optional Parameters as parameters.
 
 ```ts
-
 import { CommandGenerator } from 'path/command-generator';
 
 // Commange Generator interface/contract
-export interface ICommandGenerator {
-  osDefinitions: IOSDefinition[];
+
+export interface ICommandGenerator<OS extends IOperationSystem, Params extends string> extends ICommandGeneratorMethods<Params> {
+  osDefinitions: IOSDefinition<OS, Params>[];
   wazuhVersion: string;
+}
+
+export interface ICommandGeneratorMethods<T extends string> {
   selectOS(params: IOperationSystem): void;
-  addOptionalParams(props: IOptionalParameters): void;
+  addOptionalParams(props: IOptionalParameters<T>): void;
   getInstallCommand(): string;
   getStartCommand(): string;
   getUrlPackage(): string;
-  getAllCommands(): ICommandsResponse;
+  getAllCommands(): ICommandsResponse<T>;
 }
 
 const commandGenerator = new CommandGenerator(osDefinitions, optionalParameters);
@@ -290,7 +326,7 @@ If we specify the optional parameters the `Command Generator` will process the c
 
 ```ts
 
-export interface ICommandsResponse {
+export interface ICommandsResponse<T extends string> {
   wazuhVersion: string;
   os: string;
   architecture: string;
@@ -298,7 +334,7 @@ export interface ICommandsResponse {
   url_package: string;
   install_command: string;
   start_command: string;
-  optionals: IOptionalParameters | object;
+  optionals: IOptionalParameters<T> | object;
 }
 
 ```
