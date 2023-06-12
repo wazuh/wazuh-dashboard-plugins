@@ -171,17 +171,6 @@ export const updateToastNotificationsModal = toastNotification => {
 };
 
 /**
- * Updates ClusterOrManagerConfiguration in the appState store
- * @param clusterStatus
- */
-export const updateClusterStatus = (clusterStatus) => {
-  return {
-    type: 'UPDATE_CLUSTER_STATUS',
-    clusterStatus,
-  };
-};
-
-/**
  * Updates showFlyoutLogtest in the appState store
  * @param showFlyout
  */
@@ -199,7 +188,7 @@ export const showFlyoutLogtest = (showFlyout) => {
 export const updateDockedLogtest = (dockedFlyout) => {
   return {
     type: 'UPDATE_DOCKED_LOGTEST',
-    dockedFlyoutLogtest: dockedFlyout  
+    dockedFlyoutLogtest: dockedFlyout
   };
 };
 
