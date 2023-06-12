@@ -33,7 +33,7 @@ import {
 import apiSuggestsItems from './ruleset-suggestions';
 
 /***************************************
- * Render tables 
+ * Render tables
  */
 const FilesTable = ({
   actionButtons,
@@ -115,7 +115,7 @@ function RulesetTable({ setShowingFiles, showingFiles, ...props }) {
   const [filters, setFilters] = useState([]);
   const [isFlyoutVisible, setIsFlyoutVisible] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
-  
+
   const [tableFootprint, setTableFootprint] = useState(0);
 
   const resourcesHandler = new ResourcesHandler(ResourcesConstants.RULES);
@@ -248,7 +248,6 @@ function RulesetTable({ setShowingFiles, showingFiles, ...props }) {
       buttons.push(<UploadFilesButton
         section={SECTION_RULES_SECTION}
         showingFiles={showingFiles}
-        clusterStatus={props.clusterStatus}
         onSuccess={() => { updateRestartClusterManager && updateRestartClusterManager() }}
       />);
     return buttons;

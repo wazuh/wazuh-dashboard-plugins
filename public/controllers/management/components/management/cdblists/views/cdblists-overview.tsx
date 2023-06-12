@@ -27,7 +27,6 @@ function WzCDBListsOverview(props) {
     setShowWarningRestart(showWarningRestart);
   }
 
-  const { clusterStatus } = props;
   return <EuiPage style={{ background: 'transparent' }}>
     <EuiPanel>
       {showWarningRestart && (
@@ -45,7 +44,6 @@ function WzCDBListsOverview(props) {
         <EuiFlexItem>
           <CDBListsTable
             {...props}
-            clusterStatus={clusterStatus}
             updateRestartClusterManager={(showWarningRestart) => updateRestartManagers(showWarningRestart)}
           />
         </EuiFlexItem>
