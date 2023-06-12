@@ -58,16 +58,6 @@ async function uploadFiles(files, resource, overwrite) {
   }
 }
 
-const getReadPermissionsFiles = (section) => {
-  const { permissionResource } = resourceDictionary[section];
-  return [
-    {
-      action: `${section}:read`,
-      resource: permissionResource('*'),
-    },
-  ];
-};
-
 const getUpdatePermissionsFiles = (section) => {
   const { permissionResource } = resourceDictionary[section];
   return [
@@ -125,7 +115,7 @@ export const AddNewCdbListButton = (({ section, updateListContent }) => {
 
 // Manage files
 export const ManageFiles = (({ section, showingFiles, ...props }) => {
-  
+
   /**
  * Toggle between files and rules or decoders
  */
@@ -171,11 +161,10 @@ const uploadFile = async (files, resource, overwrite) => {
   }
 };
 
-export const UploadFilesButton = (({ clusterStatus, section, showingFiles, onSuccess, ...props }) => {
-  
+export const UploadFilesButton = (({ section, showingFiles, onSuccess, ...props }) => {
+
   return (
         <UploadFiles
-          clusterStatus={clusterStatus}
           resource={section}
           path={`etc/${section}`}
           upload={uploadFile}

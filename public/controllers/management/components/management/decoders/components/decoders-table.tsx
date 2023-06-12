@@ -33,7 +33,7 @@ import {
 import apiSuggestsItems from './decoders-suggestions';
 
 /***************************************
- * Render tables 
+ * Render tables
  */
 const FilesTable = ({
   actionButtons,
@@ -238,7 +238,6 @@ export default compose(
       buttons.push(<UploadFilesButton
         section={SECTION_DECODERS_SECTION}
         showingFiles={showingFiles}
-        clusterStatus={props.clusterStatus}
         onSuccess={() => { updateRestartClusterManager && updateRestartClusterManager() }}
       />);
     return buttons;
