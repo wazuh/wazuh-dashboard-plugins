@@ -4,16 +4,7 @@ import {
   EuiPageContentHeader,
   EuiPageContentHeaderSection,
   EuiPageContentBody,
-  EuiButton,
   EuiTitle,
-  EuiOverlayMask,
-  EuiSpacer,
-  EuiText,
-  EuiModal,
-  EuiModalBody,
-  EuiModalFooter,
-  EuiModalHeader,
-  EuiModalHeaderTitle,
 } from '@elastic/eui';
 import { RolesMappingTable } from './components/roles-mapping-table';
 import { RolesMappingEdit } from './components/roles-mapping-edit';
@@ -29,17 +20,27 @@ import { useSelector } from 'react-redux';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
+import { withUserAuthorizationPrompt } from '../../common/hocs';
+import { WzButtonPermissions } from '../../common/permissions/button';
 
-export const RolesMapping = () => {
+export const RolesMapping = withUserAuthorizationPrompt([
+  { action: 'security:read', resource: 'role:id:*' },
+  { action: 'security:read', resource: 'rule:id:*' },
+])(() => {
   const [isEditingRule, setIsEditingRule] = useState(false);
   const [isCreatingRule, setIsCreatingRule] = useState(false);
   const [rules, setRules] = useState<Rule[]>([]);
   const [loadingTable, setLoadingTable] = useState(true);
   const [selectedRule, setSelectedRule] = useState({});
   const [rolesEquivalences, setRolesEquivalences] = useState({});
-  const [rolesLoading, roles, rolesError] = useApiService<Role[]>(RolesServices.GetRoles, {});
+  const [rolesLoading, roles, rolesError] = useApiService<Role[]>(
+    RolesServices.GetRoles,
+    {},
+  );
   const [internalUsers, setInternalUsers] = useState([]);
-  const currentPlatform = useSelector((state: any) => state.appStateReducers.currentPlatform);
+  const currentPlatform = useSelector(
+    (state: any) => state.appStateReducers.currentPlatform,
+  );
 
   useEffect(() => {
     initData();
@@ -49,7 +50,7 @@ export const RolesMapping = () => {
     if (!rolesLoading && (roles || [])) {
       const _rolesObject = (roles || []).reduce(
         (rolesObj, role) => ({ ...rolesObj, [role.id]: role.name }),
-        {}
+        {},
       );
       setRolesEquivalences(_rolesObject);
     }
@@ -57,7 +58,7 @@ export const RolesMapping = () => {
       ErrorHandler.handle('There was an error loading roles');
     }
   }, [rolesLoading]);
-  
+
   const getInternalUsers = async () => {
     try {
       const wazuhSecurity = new WazuhSecurity();
@@ -122,13 +123,13 @@ export const RolesMapping = () => {
   const updateRoles = async () => {
     await getRules();
   };
-  
+
   let editFlyout;
   if (isEditingRule) {
     editFlyout = (
       <RolesMappingEdit
         rule={selectedRule}
-        closeFlyout={(isVisible) => {
+        closeFlyout={isVisible => {
           setIsEditingRule(isVisible);
           initData();
         }}
@@ -142,9 +143,9 @@ export const RolesMapping = () => {
   }
   let createFlyout;
   if (isCreatingRule) {
-    editFlyout = (
+    createFlyout = (
       <RolesMappingCreate
-        closeFlyout={(isVisible) => {
+        closeFlyout={isVisible => {
           setIsCreatingRule(isVisible);
           initData();
         }}
@@ -167,13 +168,15 @@ export const RolesMapping = () => {
         <EuiPageContentHeaderSection>
           {!loadingTable && (
             <div>
-              <EuiButton
+              <WzButtonPermissions
+                buttonType='default'
+                permissions={[{ action: 'security:create', resource: '*:*:*' }]}
                 onClick={() => {
                   setIsCreatingRule(true);
                 }}
               >
                 Create Role mapping
-              </EuiButton>
+              </WzButtonPermissions>
               {createFlyout}
               {editFlyout}
             </div>
@@ -185,7 +188,7 @@ export const RolesMapping = () => {
           rolesEquivalences={rolesEquivalences}
           loading={loadingTable || rolesLoading}
           rules={rules}
-          editRule={(item) => {
+          editRule={item => {
             setSelectedRule(item);
             setIsEditingRule(true);
           }}
@@ -194,4 +197,4 @@ export const RolesMapping = () => {
       </EuiPageContentBody>
     </EuiPageContent>
   );
-};
+});
