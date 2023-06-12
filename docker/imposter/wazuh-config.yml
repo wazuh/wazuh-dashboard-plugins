@@ -657,6 +657,9 @@ resources:
   # Get current user processed policies
   - method: GET
     path: /security/users/me/policies
+    response:
+      statusCode: 200
+      scriptFile: security/security_me_policies.js
 
   # Revoke JWT tokens
   - method: PUT
@@ -677,6 +680,9 @@ resources:
   # List users
   - method: GET
     path: /security/users
+    response:
+      statusCode: 200
+      staticFile: security/users.json
 
   # Add users
   - method: POST
