@@ -6,6 +6,7 @@ import {
   IOptionalParameters,
   tOptionalParams,
 } from '../core/register-commands/types';
+import { version } from '../../../../package.json';
 
 interface IUseRegisterCommandsProps<OS extends IOperationSystem, Params extends string> {
   osDefinitions: IOSDefinition<OS, Params>[];
@@ -31,7 +32,7 @@ interface IUseRegisterCommandsOutput<OS extends IOperationSystem, Params extends
 export function useRegisterAgentCommands<OS extends IOperationSystem, Params extends string>(props: IUseRegisterCommandsProps<OS, Params>): IUseRegisterCommandsOutput<OS,Params> {
   const { osDefinitions, optionalParamsDefinitions } = props;
   // command generator settings
-  const wazuhVersion = '4.4';
+  const wazuhVersion = version;
   const osCommands: IOSDefinition<OS,Params>[] = osDefinitions as IOSDefinition<OS,Params>[];
   const optionalParams: tOptionalParams<Params> = optionalParamsDefinitions as tOptionalParams<Params>;
   const commandGenerator = new CommandGenerator(
