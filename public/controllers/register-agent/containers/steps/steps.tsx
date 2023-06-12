@@ -2,7 +2,6 @@ import React, { Fragment, useState } from 'react';
 import {
   EuiSteps,
   EuiText,
-  EuiStepStatus,
   EuiTitle,
   EuiIconTip,
   EuiFlexGroup,
@@ -21,44 +20,11 @@ export const Steps = ({
   hidePasswordInput,
   passwordInput,
   agentGroup,
-  setServerAddress,
-  setUdpProtocol,
-  setConnectionSecure,
-  udpProtocol,
-  connectionSecure,
   form,
   osCard,
-  groups,
 }) => {
-  const validationsThirdStep = fields => {
-    switch (mascota) {
-      case 'lagarto':
-        console.log('Tengo un lagarto');
-        break;
-      case 'perro':
-        console.log('Tengo un perro');
-        break;
-      case 'gato':
-        console.log('Tengo un gato');
-        break;
-      case 'serpiente':
-        console.log('Tengo una serpiente');
-        break;
-      case 'loro':
-        console.log('Tengo un loro');
-        break;
-      default:
-        console.log('No tengo mascota');
-        break;
-    }
-  };
-
-  console.log('groups===', groups);
-
   const warningForAgentName =
     'The agent name must be unique. It can’t be changed once the agent has been enrolled.';
-  console.log(form.fields.serverAddress, 'form.fields.serverAddress');
-  console.log(form.fields.agentName.value, 'form.fields.agentName.value');
   const firstSetOfSteps = [
     {
       title: (
@@ -168,7 +134,6 @@ export const Steps = ({
             iconType='iInCircle'
             className='warningForAgentName'
           />
-          {/* {groupInput} */}
           {agentGroup}
         </Fragment>
       ),

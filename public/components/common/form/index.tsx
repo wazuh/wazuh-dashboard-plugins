@@ -9,7 +9,7 @@ import { InputFormTextArea } from './input_text_area';
 import { EuiFlexGroup, EuiFlexItem, EuiFormRow } from '@elastic/eui';
 import { OsCard } from '../../../controllers/register-agent/components/step-one/os-card/os-card';
 
-interface InputFormProps {
+export interface InputFormProps {
   type: string;
   value: any;
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -78,7 +78,7 @@ export const InputForm = ({
   //     />
   //   );
   // }
-  console.log(rest, 'rest');
+
   return label ? (
     <EuiFormRow label={label} fullWidth isInvalid={isInvalid} error={error}>
       <>

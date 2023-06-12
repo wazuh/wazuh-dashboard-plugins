@@ -33,7 +33,7 @@ const WzManagerAddressInput = (props: Props) => {
     onChange(value);
     setValue(value);
   };
-  console.log(value, 'value');
+
   return (
     <EuiText>
       <p>

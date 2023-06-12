@@ -12,9 +12,6 @@ export const InputFormSelect = ({
   isClearable,
   dataTestSubj,
 }: IInputFormType) => {
-  console.log(options, 'options');
-  console.log(placeholder, 'placeholder');
-
   return (
     <EuiSelect
       options={options.select}

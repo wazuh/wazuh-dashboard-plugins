@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   EuiFlexGroup,
   EuiFlexItem,
@@ -29,15 +29,11 @@ import { OsCard } from '../../components/step-one/os-card/os-card';
 
 export const RegisterAgent = withReduxProvider(
   ({ getWazuhVersion, hasAgents, addNewAgent, reload }) => {
-    const configuration = useSelector(state => state.appConfig.data);
+    const configuration = useSelector(
+      (state: { appConfig: { data: any } }) => state.appConfig.data,
+    );
 
-    const [version, setVersion] = useState('');
     const [wazuhVersion, setWazuhVersion] = useState('');
-    const [serverAddress, setServerAddress] = useState('');
-    const [agentName, setAgentName] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [wazuhPassword, setWazuhPassword] = useState('');
-    const [groups, setGroups] = useState([]);
     const [udpProtocol, setUdpProtocol] = useState<boolean | null>(false);
     const [connectionSecure, setConnectionSecure] = useState<boolean | null>(
       true,
@@ -48,11 +44,9 @@ export const RegisterAgent = withReduxProvider(
     const [haveConnectionSecure, setHaveConnectionSecure] = useState<
       boolean | null
     >(false);
-
-    const [
-      gotErrorRegistrationServiceInfo,
-      setGotErrorRegistrationServiceInfo,
-    ] = useState<boolean | null>(false);
+    const [loading, setLoading] = useState(false);
+    const [wazuhPassword, setWazuhPassword] = useState('');
+    const [groups, setGroups] = useState([]);
     const [needsPassword, setNeedsPassword] = useState<boolean | null>(false);
     const [hidePasswordInput, setHidePasswordInput] = useState<boolean | null>(
       false,
@@ -122,8 +116,6 @@ export const RegisterAgent = withReduxProvider(
       },
     };
 
-    console.log('initialfields+++', initialFields);
-
     const form = useForm(initialFields);
 
     const getRemoteConfig = async () => {
@@ -145,8 +137,7 @@ export const RegisterAgent = withReduxProvider(
         );
         return (result.data || {}).data || {};
       } catch (error) {
-        setGotErrorRegistrationServiceInfo(true);
-        ErrorHandler(error);
+        ErrorHandler.handleError(error);
       }
     };
 
@@ -177,7 +168,7 @@ export const RegisterAgent = withReduxProvider(
           setGroups(groups);
           setLoading(false);
         } catch (error) {
-          setWazuhVersion(version);
+          setWazuhVersion(wazuhVersion);
           setLoading(false);
           const options = {
             context: 'RegisterAgent',
@@ -198,7 +189,9 @@ export const RegisterAgent = withReduxProvider(
       fetchData();
     }, []);
 
-    const handleWazuhPassword = event => {
+    const handleWazuhPassword = (event: {
+      target: { value: React.SetStateAction<string> };
+    }) => {
       setWazuhPassword(event.target.value);
     };
 
@@ -216,7 +209,7 @@ export const RegisterAgent = withReduxProvider(
       <EuiFieldText
         placeholder='Wazuh password'
         value={wazuhPassword}
-        onChange={event => handleWazuhPassword(event)}
+        onChange={(event: any) => handleWazuhPassword(event)}
       />
     );
 
@@ -270,16 +263,6 @@ export const RegisterAgent = withReduxProvider(
                         passwordInput={passwordInput}
                         agentGroup={agentGroup}
                         osCard={osCard}
-                        wazuhVersion={wazuhVersion}
-                        appVersionMajorDotMinor={appVersionMajorDotMinor}
-                        serverAddress={serverAddress}
-                        agentName={agentName}
-                        setServerAddress={setServerAddress}
-                        setUdpProtocol={setUdpProtocol}
-                        setConnectionSecure={setConnectionSecure}
-                        udpProtocol={udpProtocol}
-                        connectionSecure={connectionSecure}
-                        groups={groups}
                       />
                     </EuiFlexItem>
                   )}
