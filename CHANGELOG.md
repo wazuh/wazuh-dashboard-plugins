@@ -13,6 +13,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added a description to step 3 of the deploy a new agent section. [#5419](https://github.com/wazuh/wazuh-kibana-app/pull/5419)
 - Added a title to the agent name input of the deploy a new agent section. [#5429](https://github.com/wazuh/wazuh-kibana-app/pull/5429)
 - Added callout below the agent name entry of the deploy a new agent section. [#5429](https://github.com/wazuh/wazuh-kibana-app/pull/5429)
+- Added specific RBAC permissions to Security section [#5551](https://github.com/wazuh/wazuh-kibana-app/pull/5551)
 
 ### Changed
 
