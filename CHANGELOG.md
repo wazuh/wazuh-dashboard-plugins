@@ -22,7 +22,9 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed the title of step 3 of the deploy a new agent section. [#5429](https://github.com/wazuh/wazuh-kibana-app/pull/5429)
 - Changed the description of step 3 of the deploy a new agent section. [#5429](https://github.com/wazuh/wazuh-kibana-app/pull/5429)
 - Changed the placeholder of the agent name input of the deploy a new agent section. [#5429](https://github.com/wazuh/wazuh-kibana-app/pull/5429)
+- Changed the query to search for an agent in `management/configuration`. [#5485](https://github.com/wazuh/wazuh-kibana-app/pull/5485)
 - Changed the search bar in management/log to the one used in the rest of the app. [#5476](https://github.com/wazuh/wazuh-kibana-app/pull/5476)
+
 
 ### Fixed
 
@@ -48,6 +50,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed repeated and unnecessary requests in security section. [#5500](https://github.com/wazuh/wazuh-kibana-app/pull/5500)
 - Removed pretty parameter from cron job requests. [#5532](https://github.com/wazuh/wazuh-kibana-app/pull/5532)
 - Removed unnecessary requests in `Management/Status` section. [#5528](https://github.com/wazuh/wazuh-kibana-app/pull/5528)
+
+### Removed
+
+- Removed obsolete code that caused duplicate requests to the api in `Management`. [#5485](https://github.com/wazuh/wazuh-kibana-app/pull/5485)
 
 ## Wazuh v4.4.3 - OpenSearch Dashboards 2.6.0 - Revision 01
 

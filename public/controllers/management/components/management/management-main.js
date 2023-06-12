@@ -24,8 +24,6 @@ import WzReporting from './reporting/reporting-main';
 import WzConfiguration from './configuration/configuration-main';
 import WzStatistics from './statistics/statistics-main';
 import { connect } from 'react-redux';
-import { clusterReq } from './configuration/utils/wz-fetch';
-import { updateClusterStatus } from '../../../../redux/actions/appStateActions';
 import {
   SECTION_CDBLIST_SECTION,
   SECTION_DECODERS_SECTION,
@@ -46,33 +44,6 @@ class WzManagementMain extends Component {
     store.dispatch(updateManagementSection(''));
   }
 
-  componentDidMount() {
-    this.isClusterOrManager();
-  }
-
-  isClusterOrManager = async () => {
-    try {
-      const clusterStatus = await clusterReq();
-      if (clusterStatus.data.data.enabled === 'yes' && clusterStatus.data.data.running === 'yes') {
-        this.props.updateClusterStatus({
-          status: true,
-          contextConfigServer: 'cluster',
-        });
-      } else {
-        this.props.updateClusterStatus({
-          status: false,
-          contextConfigServer: 'manager',
-        });
-      }
-    } catch (error) {
-      console.warn(`Error when try to get cluster status`, error);
-      this.props.updateClusterStatus({
-        status: false,
-        contextConfigServer: 'manager',
-      });
-    }
-  };
-
   render() {
     const { section } = this.props;
     return (
@@ -85,16 +56,13 @@ class WzManagementMain extends Component {
           (section === 'configuration' && <WzConfiguration {...this.props.configurationProps} />) ||
           (section === SECTION_DECODERS_SECTION && <WzDecoders
             logtestProps={this.props.logtestProps}
-            clusterStatus={this.props.clusterStatus}
           />) ||
           (section === SECTION_CDBLIST_SECTION && <WzCDBLists
             logtestProps={this.props.logtestProps}
-            clusterStatus={this.props.clusterStatus}
           />) ||
           (['ruleset', SECTION_RULES_SECTION].includes(section) && (
             <WzRuleset
               logtestProps={this.props.logtestProps}
-              clusterStatus={this.props.clusterStatus}
             />
           ))}
       </Fragment>
@@ -105,14 +73,12 @@ class WzManagementMain extends Component {
 function mapStateToProps(state) {
   return {
     state: state.managementReducers,
-    clusterStatus: state.appStateReducers.clusterStatus,
   };
 }
 
 const mapDispatchToProps = (dispatch) => {
   return {
     updateManagementSection: (section) => dispatch(updateManagementSection(section)),
-    updateClusterStatus: (clusterStatus) => dispatch(updateClusterStatus(clusterStatus)),
   };
 };
 
