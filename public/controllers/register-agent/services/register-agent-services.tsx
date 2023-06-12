@@ -225,20 +225,6 @@ export const getMasterRemoteConfiguration = async () => {
 
 export { getConnectionConfig, getRemoteConfiguration };
 
-export const getAuthInfo = async () => {
-  try {
-    const result = await WzRequest.apiReq(
-      'GET',
-      '/agents/000/config/auth/auth',
-      {},
-    );
-    return (result.data || {}).data || {};
-  } catch (error) {
-    setGotErrorRegistrationServiceInfo(true);
-    throw new Error(error);
-  }
-};
-
 export const getGroups = async () => {
   try {
     const result = await WzRequest.apiReq('GET', '/groups', {});

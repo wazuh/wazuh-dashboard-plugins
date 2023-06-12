@@ -1,4 +1,4 @@
-import React, { Component, Fragment, useState, useEffect } from 'react';
+import React, { Fragment, useState } from 'react';
 import {
   EuiSteps,
   EuiText,
@@ -11,27 +11,16 @@ import {
 } from '@elastic/eui';
 import { InputForm } from '../../../../components/common/form';
 import './steps.scss';
-import { ServerAddress } from '../../components/step-two/server-addres';
-import WzManagerAddressInput from '../../../agent/register-agent/steps/wz-manager-address';
-import { FormConfiguration } from '../../../../components/common/form/types';
-import { useForm } from '../../../../components/common/form/hooks';
 import {
   REGISTER_AGENT_DATA_STEP_THREE,
   REGISTER_AGENT_DATA_STEP_TWO,
 } from '../../utils/register-agent-data';
 
 export const Steps = ({
-  steps,
   needsPassword,
   hidePasswordInput,
   passwordInput,
-  inputAgentName,
-  groupInput,
   agentGroup,
-  defaultServerAddress,
-  wazuhVersion,
-  appVersionMajorDotMinor,
-  serverAddress,
   setServerAddress,
   setUdpProtocol,
   setConnectionSecure,
@@ -39,22 +28,32 @@ export const Steps = ({
   connectionSecure,
   form,
   osCard,
-  agentName,
+  groups,
 }) => {
-  const [statusCheck, setStatusCheck] = useState<EuiStepStatus>('current');
-  const [serverAddressStatus, setServerAddressStatus] =
-    useState<EuiStepStatus>('disabled');
-
-  const handleInputChange = (value: string) => {
-    setServerAddress(value);
-    setServerAddressStatus('complete');
+  const validationsThirdStep = fields => {
+    switch (mascota) {
+      case 'lagarto':
+        console.log('Tengo un lagarto');
+        break;
+      case 'perro':
+        console.log('Tengo un perro');
+        break;
+      case 'gato':
+        console.log('Tengo un gato');
+        break;
+      case 'serpiente':
+        console.log('Tengo una serpiente');
+        break;
+      case 'loro':
+        console.log('Tengo un loro');
+        break;
+      default:
+        console.log('No tengo mascota');
+        break;
+    }
   };
 
-  const onChangeServerAddress = async (nodeSelected: any) => {
-    setServerAddress(nodeSelected);
-    setUdpProtocol(udpProtocol);
-    setConnectionSecure(connectionSecure);
-  };
+  console.log('groups===', groups);
 
   const warningForAgentName =
     'The agent name must be unique. It can’t be changed once the agent has been enrolled.';
@@ -68,33 +67,21 @@ export const Steps = ({
         </EuiTitle>
       ),
       children: osCard,
-      // <InputForm
-      //   type='custom'
-      //   label='Etiqueta del Campo'
-      //   value={undefined}
-      //   setStatusCheck={setStatusCheck}
-      //   wazuhVersion={wazuhVersion}
-      //   appVersionMajorDotMinor={appVersionMajorDotMinor}
-      // />
       status: form.fields.operatingSystemSelection.value
         ? 'complete'
         : 'current',
     },
     {
       title: (
-        // <EuiFlexGroup>
-        //   <EuiFlexItem>
-        <EuiTitle className='stepTitle'>
-          <p>Server address</p>
-        </EuiTitle>
-        //   </EuiFlexItem>
-        //   <EuiFlexItem>
-        //     <EuiIconTip
-        //       content='Source maps allow browser dev tools to map minified code to the original source code'
-        //       position='right'
-        //     />
-        //   </EuiFlexItem>
-        // </EuiFlexGroup>
+        <EuiFlexGroup>
+          <EuiFlexItem className='stepTitle'>
+            <p>Server address</p>
+            <EuiIconTip
+              content='Source maps allow browser dev tools to map minified code to the original source code'
+              position='right'
+            />
+          </EuiFlexItem>
+        </EuiFlexGroup>
       ),
       children: (
         <Fragment>
@@ -150,7 +137,29 @@ export const Steps = ({
           </EuiFlexGroup>
           <InputForm
             {...form.fields.agentName}
-            label='Assign an agent name'
+            label={
+              <>
+                <EuiFlexGroup>
+                  <EuiFlexItem
+                    style={{
+                      flexDirection: 'row',
+                      fontStyle: 'normal',
+                      fontWeight: 700,
+                      fontSize: '12px',
+                      lineHeight: '20px',
+                      color: '#343741',
+                    }}
+                  >
+                    Assign an agent name{' '}
+                    <EuiIconTip
+                      className='iconTooltip'
+                      content='Source maps allow browser dev tools to map minified code to the original source code'
+                      position='right'
+                    />
+                  </EuiFlexItem>
+                </EuiFlexGroup>
+              </>
+            }
             placeholder='Agent name'
           />
           <EuiCallOut
@@ -159,19 +168,19 @@ export const Steps = ({
             iconType='iInCircle'
             className='warningForAgentName'
           />
-          {groupInput}
+          {/* {groupInput} */}
           {agentGroup}
         </Fragment>
       ),
-      status: !form.fields.operatingSystemSelection.value
-        ? 'disabled'
-        : !form.fields.serverAddress.value
-        ? 'disabled'
-        : form.fields.serverAddress.value
-        ? 'current'
-        : form.fields.agentName.value
-        ? 'complete'
-        : '',
+      status:
+        !form.fields.operatingSystemSelection.value ||
+        !form.fields.serverAddress.value
+          ? 'disabled'
+          : form.fields.serverAddress.value !== ''
+          ? 'current'
+          : form.fields.agentGroups.value.length > 0
+          ? 'complete'
+          : '',
     },
   ];
 

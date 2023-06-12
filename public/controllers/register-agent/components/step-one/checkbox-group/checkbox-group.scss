@@ -1,8 +1,11 @@
 .checkbox-group-container {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   margin-top: 26px;
-  margin-bottom: 11px;
+  column-gap: 8px;
+  row-gap: 8px;
+  justify-content: center;
+  align-items: center;
 }
 
 .checkbox-item {
@@ -23,14 +26,4 @@
   font-weight: 400;
   font-size: 12px;
   color: #343741;
-}
-
-.first-card-four-items {
-  .checkbox-item:nth-child(n + 3) {
-    padding-top: 16px;
-  }
-}
-
-.first-of-row {
-  padding-right: 17px;
 }

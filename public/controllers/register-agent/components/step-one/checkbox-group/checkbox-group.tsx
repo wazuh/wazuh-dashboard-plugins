@@ -16,10 +16,6 @@ const CheckboxGroupComponent: React.FC<Props> = ({
   selectedOption,
   onOptionChange,
 }) => {
-  // const handleOptionChange = (optionId: string) => {
-  //   onOptionChange(optionId);
-  // };
-
   const isSingleArchitecture = data.length === 1;
   const isFirstCardWithFourItems = cardIndex === 0 && data.length === 4;
 

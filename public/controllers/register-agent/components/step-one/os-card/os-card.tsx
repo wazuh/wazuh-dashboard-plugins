@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   EuiCard,
   EuiFlexGroup,
   EuiFlexItem,
-  EuiText,
   EuiCallOut,
   EuiLink,
 } from '@elastic/eui';
@@ -16,21 +15,7 @@ interface Props {
   setStatusCheck: string;
 }
 
-export const OsCard = ({
-  // setStatusCheck,
-  appVersionMajorDotMinor,
-  onChange,
-  value,
-}: Props) => {
-  // const [selectedOption, setSelectedOption] = useState<string | undefined>(
-  //   undefined,
-  // );
-
-  // const handleOptionChange = (optionId: string) => {
-  //   setSelectedOption(optionId);
-  //   setStatusCheck('complete');
-  // };
-
+export const OsCard = ({ appVersionMajorDotMinor, onChange, value }: Props) => {
   return (
     <div>
       <EuiFlexGroup gutterSize='l' wrap>
@@ -81,12 +66,6 @@ export const OsCard = ({
           </span>
         }
       ></EuiCallOut>
-      {/* <EuiCallOut
-        color='info,'
-        title={cardsCallOut}
-        iconType='iInCircle'
-        className='cardsCallOut'
-      /> */}
     </div>
   );
 };
