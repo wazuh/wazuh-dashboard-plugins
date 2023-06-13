@@ -18,7 +18,6 @@ import {
 export const Steps = ({
   needsPassword,
   hidePasswordInput,
-  passwordInput,
   agentGroup,
   form,
   osCard,
