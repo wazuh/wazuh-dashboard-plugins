@@ -9,24 +9,32 @@ import {
   UseFormReturn,
 } from './types';
 
-function getValueFromEvent(
-  event: any,
-  type: SettingTypes | CustomSettingType,
-): any {
-  return (getValueFromEventType[type] || getValueFromEventType.default)(event);
+interface IgetValueFromEventType {
+  [key: string]: (event: any) => any;
 }
 
-const getValueFromEventType = {
+const getValueFromEventType: IgetValueFromEventType = {
   [EpluginSettingType.switch]: (event: any) => event.target.checked,
   [EpluginSettingType.editor]: (value: any) => value,
-  [EpluginSettingType.filepicker]: (value: any) => value,
-  [EpluginSettingType.select]: (event: any) => event.target.value,
-  [EpluginSettingType.text]: (event: any) => event.target.value,
-  [EpluginSettingType.textarea]: (event: any) => event.target.value,
-  [EpluginSettingType.number]: (event: any) => event.target.value,
-  custom: (event: any) => event.target.value,
+  custom: (event:any) => event.target,
   default: (event: any) => event.target.value,
 };
+
+/**
+ * Returns the value of the event according to the type of field
+ * When the type is not found, it returns the value defined in the default key
+ * 
+ * @param event 
+ * @param type 
+ * @returns event value
+ */
+function getValueFromEvent(
+  event: any,
+  type: SettingTypes | CustomSettingType | string,
+): any {
+
+  return getValueFromEventType.hasOwnProperty(type) ? getValueFromEventType[type](event) : getValueFromEventType.default(event)
+}
 
 export const useForm = (fields: FormConfiguration): UseFormReturn => {
   const [formFields, setFormFields] = useState<{
@@ -91,7 +99,7 @@ export const useForm = (fields: FormConfiguration): UseFormReturn => {
     Object.entries(enhanceFields as EnhancedFields)
       .filter(([, { error }]) => error)
       .map(([fieldKey, { error }]) => [fieldKey, error]),
-  );
+  ) as { [key: string]: string };
 
   function undoChanges() {
     setFormFields(state =>
