@@ -24,10 +24,6 @@ const initialState = {
   userPermissions: false,
   userRoles: [],
   toastNotification: false,
-  clusterStatus: {
-    status: false,
-    contextConfigServer: 'manager',
-  },
   withUserLogged: false,
   allowedAgents: [],
   logtestToken: '',
@@ -127,19 +123,12 @@ const appStateReducers = (state = initialState, action) => {
     };
   }
 
-  if (action.type === 'UPDATE_CLUSTER_STATUS') {
-    return {
-      ...state,
-      clusterStatus: action.clusterStatus,
-    };
-  }
-
   if (action.type === 'UPDATE_WITH_USER_LOGGED') {
     return {
       ...state,
      withUserLogged: action.withUserLogged,
     };
-  }  
+  }
 
   if (action.type === 'GET_ALLOWED_AGENTS') {
     return {
@@ -147,7 +136,7 @@ const appStateReducers = (state = initialState, action) => {
       allowedAgents: action.allowedAgents
     };
   }
-  
+
   if (action.type === 'UPDATE_LOGTEST_TOKEN') {
     return {
       ...state,

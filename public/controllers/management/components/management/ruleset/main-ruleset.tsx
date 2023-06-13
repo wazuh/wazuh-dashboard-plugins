@@ -16,7 +16,7 @@ import WzFileEditor from '../common/file-editor';
 import { SECTION_RULES_SECTION } from '../common/constants';
 
 
-export default function WzRuleset({ clusterStatus, logtestProps }) {
+export default function WzRuleset({ logtestProps }) {
 
   const [fileContent, setFileContent] = useState(false);
   const [addingFile, setAddingFile] = useState(false);
@@ -36,13 +36,11 @@ export default function WzRuleset({ clusterStatus, logtestProps }) {
             fileContent={fileContent}
             addingFile={addingFile}
             logtestProps={logtestProps}
-            clusterStatus={clusterStatus}
             updateFileContent={(fileContent) => { setFileContent(fileContent) }}
             cleanEditState={() => cleanEditState()}
           />
         )) || (
           <WzRulesetOverview
-            clusterStatus={clusterStatus}
             updateFileContent={(fileContent) => { setFileContent(fileContent) }}
             updateAddingFile={(addingFile) => { setAddingFile(addingFile) }}
             setShowingFiles={() => { setShowingFiles(!showingFiles) }}

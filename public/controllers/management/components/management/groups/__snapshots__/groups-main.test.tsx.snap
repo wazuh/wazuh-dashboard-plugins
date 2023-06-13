@@ -33,12 +33,6 @@ exports[`Group main component renders correctly to match the snapshot 1`] = `
   }
 >
   <Connect(WzGroups)
-    clusterStatus={
-      Object {
-        "contextConfigServer": "cluster",
-        "status": true,
-      }
-    }
     configurationProps={
       Object {
         "agent": Object {

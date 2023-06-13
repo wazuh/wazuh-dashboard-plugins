@@ -18,14 +18,12 @@ exports[`Ruleset component renders correctly to match the snapshot 1`] = `
       }
     >
       <Component
-        clusterStatus=""
         setShowingFiles={[Function]}
         showingFiles={false}
         updateAddingFile={[Function]}
         updateFileContent={[Function]}
       >
         <Component
-          clusterStatus=""
           setShowingFiles={[Function]}
           showingFiles={false}
           updateAddingFile={[Function]}
