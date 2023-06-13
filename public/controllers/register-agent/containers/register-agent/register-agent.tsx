@@ -3,7 +3,6 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiPanel,
-  EuiFieldText,
   EuiTitle,
   EuiButtonEmpty,
   EuiPage,
@@ -51,6 +50,11 @@ export const RegisterAgent = withReduxProvider(
     const [hidePasswordInput, setHidePasswordInput] = useState<boolean | null>(
       false,
     );
+
+    const appVersionMajorDotMinor = wazuhVersion
+      .split('.')
+      .slice(0, 2)
+      .join('.');
 
     const initialFields: FormConfiguration = {
       operatingSystemSelection: {
@@ -189,28 +193,9 @@ export const RegisterAgent = withReduxProvider(
       fetchData();
     }, []);
 
-    const handleWazuhPassword = (event: {
-      target: { value: React.SetStateAction<string> };
-    }) => {
-      setWazuhPassword(event.target.value);
-    };
-
-    const appVersionMajorDotMinor = wazuhVersion
-      .split('.')
-      .slice(0, 2)
-      .join('.');
-
     const agentGroup = <InputForm {...form.fields.agentGroups}></InputForm>;
     const osCard = (
       <InputForm {...form.fields.operatingSystemSelection}></InputForm>
-    );
-
-    const passwordInput = (
-      <EuiFieldText
-        placeholder='Wazuh password'
-        value={wazuhPassword}
-        onChange={(event: any) => handleWazuhPassword(event)}
-      />
     );
 
     return (
@@ -260,7 +245,6 @@ export const RegisterAgent = withReduxProvider(
                         form={form}
                         needsPassword={needsPassword}
                         hidePasswordInput={hidePasswordInput}
-                        passwordInput={passwordInput}
                         agentGroup={agentGroup}
                         osCard={osCard}
                       />

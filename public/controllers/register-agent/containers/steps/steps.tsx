@@ -82,7 +82,7 @@ export const Steps = ({
                 <p>Wazuh password</p>
               </EuiTitle>
             ),
-            children: <Fragment>{passwordInput}</Fragment>,
+            children: <Fragment>{'Phrase to define'}</Fragment>,
           },
         ]
       : []),
