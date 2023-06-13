@@ -162,7 +162,7 @@ export const RolesMapping = withUserAuthorizationPrompt([
       <EuiPageContentHeader>
         <EuiPageContentHeaderSection>
           <EuiTitle>
-            <h2>Role mapping</h2>
+            <h2>Roles mapping</h2>
           </EuiTitle>
         </EuiPageContentHeaderSection>
         <EuiPageContentHeaderSection>
