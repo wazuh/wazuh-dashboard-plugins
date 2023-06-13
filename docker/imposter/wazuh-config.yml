@@ -659,7 +659,7 @@ resources:
     path: /security/users/me/policies
     response:
       statusCode: 200
-      scriptFile: security/security_me_policies.js
+      scriptFile: security/security-me-policies.js
 
   # Revoke JWT tokens
   - method: PUT
@@ -701,7 +701,7 @@ resources:
     path: /security/roles
     response:
       statusCode: 200
-      staticFile: security/security_roles.json
+      staticFile: security/security-roles.json
 
   # Add role
   - method: POST
@@ -718,6 +718,9 @@ resources:
   # List security rules
   - method: GET
     path: /security/rules
+    response:
+      statusCode: 200
+      staticFile: security/security-rules.json
 
   # Add security rule
   - method: POST
@@ -736,7 +739,7 @@ resources:
     path: /security/policies
     response:
       statusCode: 200
-      staticFile: security/security_policies.json
+      staticFile: security/security-policies.json
 
   # Add policy
   - method: POST

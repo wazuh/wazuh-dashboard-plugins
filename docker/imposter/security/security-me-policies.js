@@ -72,8 +72,8 @@ var userPoliciesMap = {
       '*:*:*': 'allow',
     },
     'security:update': {
-      // 'user:id:*': 'allow',
-      'user:id:11': 'deny',
+      'user:id:101': 'deny',
+      'user:id:102': 'allow',
     },
     rbac_mode: 'black',
   },
@@ -87,6 +87,20 @@ var userPoliciesMap = {
     },
     'security:update': {
       'user:id:*': 'deny',
+    },
+    rbac_mode: 'black',
+  },
+  PLUGIN_SECURITY_USERS_DENY_DELETE_USER_101: {
+    'security:read': {
+      'user:id:*': 'allow',
+      'role:id:*': 'allow',
+    },
+    'security:create_user': {
+      '*:*:*': 'allow',
+    },
+    'security:delete': {
+      'user:id:100': 'allow',
+      'user:id:101': 'deny',
     },
     rbac_mode: 'black',
   },
@@ -118,7 +132,7 @@ var userPoliciesMap = {
     },
     rbac_mode: 'black',
   },
-  PLUGIN_SECURITY_ROLES_DENY_READ_POLICIES_ALLOW_READ_ROLE: {
+  PLUGIN_SECURITY_ROLES_DENY_CREATE_POLICY: {
     'security:read': {
       'role:id:*': 'allow',
       'policy:id:*': 'allow',
@@ -134,17 +148,6 @@ var userPoliciesMap = {
       'policy:id:*': 'allow',
     },
     'security:delete': {
-      'role:id:101': 'deny',
-      'role:id:102': 'allow',
-    },
-    rbac_mode: 'black',
-  },
-  PLUGIN_SECURITY_ROLES_DENY_UPDATE_ROLE_101_ALLOW_UPDATE_ROLE_102: {
-    'security:read': {
-      'role:id:*': 'allow',
-      'policy:id:*': 'allow',
-    },
-    'security:update': {
       'role:id:101': 'deny',
       'role:id:102': 'allow',
     },
@@ -209,6 +212,25 @@ var userPoliciesMap = {
   PLUGIN_SECURITY_ROLES_MAPPING_ALLOW_READ_ROLES_MAPPING: {
     'security:read': {
       'rule:id:*': 'allow',
+    },
+    rbac_mode: 'black',
+  },
+  PLUGIN_SECURITY_ROLES_MAPPING_DENY_READ_ROLES_MAPPING: {
+    'security:read': {
+      'role:id:*': 'deny',
+    },
+    rbac_mode: 'black',
+  },
+  PLUGIN_SECURITY_ROLES_MAPPING_DENY_READ_RULES_MAPPING: {
+    'security:read': {
+      'rule:id:*': 'deny',
+    },
+    rbac_mode: 'black',
+  },
+  PLUGIN_SECURITY_ROLES_MAPPING_DENY_READ_ROLE_DENY_READ_RULES_MAPPING: {
+    'security:read': {
+      'role:id:*': 'deny',
+      'rule:id:*': 'deny',
     },
     rbac_mode: 'black',
   },
