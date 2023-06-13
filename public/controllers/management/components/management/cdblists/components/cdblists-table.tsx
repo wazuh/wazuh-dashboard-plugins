@@ -153,7 +153,6 @@ function CDBListsTable(props) {
     <UploadFilesButton
       section={SECTION_CDBLIST_SECTION}
       showingFiles={showingFiles}
-      clusterStatus={props.clusterStatus}
       onSuccess={() => { updateRestartClusterManager && updateRestartClusterManager() }}
     />,
   ];

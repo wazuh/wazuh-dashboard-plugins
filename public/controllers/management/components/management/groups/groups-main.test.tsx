@@ -21,7 +21,7 @@ jest.mock('../../../../../kibana-services', () => ({
   getAngularModule: jest.fn(),
   getHttp: () => ({
     basePath: {
-      prepend: (str) => str,
+      prepend: str => str,
     },
   }),
 }));
@@ -55,10 +55,6 @@ const mockProps = {
   state: {
     section: '',
   },
-  clusterStatus: {
-    status: true,
-    contextConfigServer: 'cluster',
-  },
 };
 const mockStore = configureMockStore();
 const store = mockStore({});
@@ -68,7 +64,7 @@ describe('Group main component', () => {
     const wrapper = shallow(
       <Provider store={store}>
         <WzGroups {...mockProps} />
-      </Provider>
+      </Provider>,
     );
 
     expect(wrapper).toMatchSnapshot();

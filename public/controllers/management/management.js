@@ -368,7 +368,6 @@ export class ManagementController {
     }
     this.managementProps.section = this.tab === 'ruleset' ? this.rulesetTab : this.tab;
     this.$location.search('tab', this.tab);
-    this.loadNodeList();
   }
 
   /**
@@ -421,37 +420,6 @@ export class ManagementController {
   changeNode(node) {
     this.selectedNode = node;
     this.$scope.$broadcast('configNodeChanged');
-    this.$scope.$applyAsync();
-  }
-
-  async loadNodeList() {
-    try {
-      this.loadingNodes = true;
-      const clusterInfo = AppState.getClusterInfo() || {};
-      const clusterEnabled = clusterInfo.status === 'enabled';
-      if (clusterEnabled) {
-        const response = await WzRequest.apiReq('GET', '/cluster/nodes', {});
-        const nodeList = (((response || {}).data || {}).data || {}).items || false;
-        if (Array.isArray(nodeList) && nodeList.length) {
-          this.nodeList = nodeList.map((item) => item.name).reverse();
-          this.selectedNode = nodeList.filter((item) => item.type === 'master')[0].name;
-        }
-      }
-    } catch (error) {
-      const errorOptions = {
-        level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.BUSINESS,
-        context: `${ManagementController.name}.loadNodeList`,
-        error: {
-          error: error,
-          message: error?.message || '',
-          title: 'Error loading node list',
-        },
-      };
-
-      getErrorOrchestrator().handleError(errorOptions);
-    }
-    this.loadingNodes = false;
     this.$scope.$applyAsync();
   }
 

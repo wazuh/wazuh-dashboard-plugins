@@ -27,9 +27,8 @@ function WzDecodersOverview(props) {
   const updateRestartManagers = (showWarningRestart) => {
     setShowWarningRestart(showWarningRestart);
   }
-  
 
-  const { clusterStatus } = props;
+
   return <EuiPage style={{ background: 'transparent' }}>
   <EuiPanel>
     {showWarningRestart && (
@@ -42,12 +41,11 @@ function WzDecodersOverview(props) {
         <EuiSpacer size='s' />
       </>
     )}
-    
+
     <EuiFlexGroup>
       <EuiFlexItem>
         <DecodersTable
           {...props}
-          clusterStatus={clusterStatus}
           updateRestartClusterManager={(showWarningRestart) => updateRestartManagers(showWarningRestart)}
         />
       </EuiFlexItem>
