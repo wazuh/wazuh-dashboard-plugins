@@ -98,7 +98,7 @@ export const RegisterAgent = withReduxProvider(
           const isLengthValid = value.length >= 2 && value.length <= 63;
           const isFormatValid = regex.test(value);
           if (!isFormatValid && !isLengthValid) {
-            return 'The minimum length is 2 characters. The character "?" is not valid. Allowed characters are A-Z, a-z, ".", "-", "_"';
+            return 'The minimum length is 2 characters. The character is not valid. Allowed characters are A-Z, a-z, ".", "-", "_"';
           } else if (!isLengthValid) {
             return 'The minimum length is 2 characters.';
           } else if (!isFormatValid) {
