@@ -2,6 +2,16 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.4.6 - OpenSearch Dashboards 2.6.0 - Revision 00
+
+### Added
+
+- Support for Wazuh 4.4.6
+
+### Changed
+
+- Changed method to perform redirection on agent table buttons. [#5539](https://github.com/wazuh/wazuh-kibana-app/pull/5539)
+
 ## Wazuh v4.4.4 - OpenSearch Dashboards 2.6.0 - Revision 01
 
 ### Added
