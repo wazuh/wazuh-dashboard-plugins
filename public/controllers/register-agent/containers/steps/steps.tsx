@@ -59,7 +59,6 @@ export const Steps = ({
               </EuiFlexItem>
             ))}
           </EuiFlexGroup>
-          {/* //agregar estilos */}
           <InputForm {...form.fields.serverAddress} label={<></>} />
         </Fragment>
       ),
