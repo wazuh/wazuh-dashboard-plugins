@@ -94,7 +94,8 @@ export const RegisterAgent = withReduxProvider(
           if (value.length === 0) {
             return undefined;
           }
-          const regex = /^[A-Za-z.\-_]+$/;
+          const regex = /^[A-Za-z.\-_,]+$/;
+
           const isLengthValid = value.length >= 2 && value.length <= 63;
           const isFormatValid = regex.test(value);
           if (!isFormatValid && !isLengthValid) {
