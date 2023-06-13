@@ -7,7 +7,6 @@ import { InputFormSwitch } from './input_switch';
 import { InputFormFilePicker } from './input_filepicker';
 import { InputFormTextArea } from './input_text_area';
 import { EuiFlexGroup, EuiFlexItem, EuiFormRow } from '@elastic/eui';
-import { OsCard } from '../../../controllers/register-agent/components/step-one/os-card/os-card';
 
 export interface InputFormProps {
   type: string;
@@ -40,14 +39,12 @@ export const InputForm = ({
   type,
   value,
   onChange,
-  setStatusCheck,
   error,
   label,
   header,
   footer,
   preInput,
   postInput,
-  appVersionMajorDotMinor,
   ...rest
 }: InputFormComponentProps) => {
   const ComponentInput = Input[
@@ -68,16 +65,6 @@ export const InputForm = ({
       isInvalid={isInvalid}
     />
   );
-
-  // if (type === 'custom') {
-  //   return (
-  //     <OsCard
-  //       {...rest}
-  //       setStatusCheck={setStatusCheck}
-  //       appVersionMajorDotMinor={appVersionMajorDotMinor}
-  //     />
-  //   );
-  // }
 
   return label ? (
     <EuiFormRow label={label} fullWidth isInvalid={isInvalid} error={error}>
