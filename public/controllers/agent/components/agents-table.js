@@ -797,7 +797,6 @@ AgentsTable.propTypes = {
   wzReq: PropTypes.func,
   addingNewAgent: PropTypes.func,
   downloadCsv: PropTypes.func,
-  clickAction: PropTypes.func,
   timeService: PropTypes.func,
   reload: PropTypes.func,
 };
