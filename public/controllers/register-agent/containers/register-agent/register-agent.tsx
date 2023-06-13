@@ -102,7 +102,7 @@ export const RegisterAgent = withReduxProvider(
           } else if (!isLengthValid) {
             return 'The minimum length is 2 characters.';
           } else if (!isFormatValid) {
-            return 'The character "?" is not valid. Allowed characters are A-Z, a-z, ".", "-", "_"';
+            return 'The character is not valid. Allowed characters are A-Z, a-z, ".", "-", "_"';
           }
           return '';
         },
