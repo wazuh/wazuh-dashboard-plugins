@@ -4,6 +4,11 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ## Wazuh v4.4.5 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 00
 
+
+### Fixed
+
+- Fixed the rendering of tables that contains IPs and agent overview [#5471](https://github.com/wazuh/wazuh-kibana-app/pull/5471)
+
 ### Removed
 
 - Removed the agent name in the agent info ribbon [#5497](https://github.com/wazuh/wazuh-kibana-app/pull/5497)
