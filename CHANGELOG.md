@@ -8,6 +8,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Removed the agent name in the agent info ribbon [#5497](https://github.com/wazuh/wazuh-kibana-app/pull/5497)
 
+### Changed
+
+- Changed windows agent service name in the deploy agent wizard [#5538](https://github.com/wazuh/wazuh-kibana-app/pull/5538)
+
 ## Wazuh v4.4.4 - OpenSearch Dashboards 2.6.0 - Revision 01
 
 ### Added
