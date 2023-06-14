@@ -4,6 +4,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ## Wazuh v4.4.5 - OpenSearch Dashboards 2.6.0 - Revision 00
 
+### Fixed
+
+- Fixed the rendering of tables that contains IPs and agent overview [#5471](https://github.com/wazuh/wazuh-kibana-app/pull/5471)
+
 ### Removed
 
 - Removed the agent name in the agent info ribbon [#5497](https://github.com/wazuh/wazuh-kibana-app/pull/5497)
