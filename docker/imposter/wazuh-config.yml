@@ -370,6 +370,9 @@ resources:
   # Get agents in a group
   - method: GET
     path: /groups/{group_id}/agents
+    response:
+      statusCode: 200
+      staticFile: agents/group.json
 
   # Get group configuration
   - method: GET
@@ -805,6 +808,9 @@ resources:
   # Get agent netaddr
   - method: GET
     path: /syscollector/{agent_id}/netaddr
+    response:
+      statusCode: 200
+      scriptFile: syscollector/netaddr.js
 
   # Get agent netiface
   - method: GET
@@ -825,6 +831,9 @@ resources:
   # Get agent ports
   - method: GET
     path: /syscollector/{agent_id}/ports
+    response:
+      statusCode: 200
+      scriptFile: syscollector/ports.js
 
   # Get agent processes
   - method: GET
