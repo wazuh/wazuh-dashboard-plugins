@@ -13,9 +13,10 @@ export const RegisterAgent: React.FC = () => {
       <InputForm
         type='custom'
         onChange={handleChange}
-        label='Etiqueta del Campo'
+        label=''
         rest={undefined}
         value={undefined}
+        data-testid='input-form'
       />
     </div>
   );
