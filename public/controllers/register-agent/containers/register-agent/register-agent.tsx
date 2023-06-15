@@ -28,7 +28,6 @@ import { useSelector } from 'react-redux';
 import { withReduxProvider } from '../../../../components/common/hocs';
 import GroupInput from '../../components/steps-three/group-input';
 import { OsCard } from '../../components/step-one/os-card/os-card';
-import { PLUGIN_VERSION_SHORT } from '../../../../../common/constants';
 
 export const RegisterAgent = withReduxProvider(
   ({ getWazuhVersion, hasAgents, addNewAgent, reload }) => {
