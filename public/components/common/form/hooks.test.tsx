@@ -2,8 +2,8 @@ import { fireEvent, render } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import { renderHook, act } from '@testing-library/react-hooks';
 import React, { useState } from 'react';
-import { FormConfiguration, useForm } from './hooks';
-import { IInputForm } from './types';
+import { useForm } from './hooks';
+import { FormConfiguration, IInputForm } from './types';
 
 describe('[hook] useForm', () => {
   it(`[hook] useForm. Verify the initial state`, async () => {
@@ -186,30 +186,34 @@ describe('[hook] useForm', () => {
         onChange(e);
       };
 
-          return (
-            <>
-              {field}
-              <input type='text' value={value} onChange={handleOnChange} />
-            </>
-          );
-      };
+      return (
+        <>
+          {field}
+          <input type='text' value={value} onChange={handleOnChange} />
+        </>
+      );
+    };
 
-      const formFields: FormConfiguration = {
-        customField: {
-          type: 'custom',
-          initialValue: 'default value',
-          component: props => CustomComponent(props),
-        },
-      };
+    const formFields: FormConfiguration = {
+      customField: {
+        type: 'custom',
+        initialValue: 'default value',
+        component: props => CustomComponent(props),
+      },
+    };
 
     const { result } = renderHook(() => useForm(formFields));
-    const { container, getByRole } = render(<CustomComponent {...result.current.fields.customField} />)
+    const { container, getByRole } = render(
+      <CustomComponent {...result.current.fields.customField} />,
+    );
 
     expect(container).toBeInTheDocument();
     const input = getByRole('textbox');
     expect(input).toHaveValue('default value');
     fireEvent.change(input, { target: { value: 'new value' } });
-    expect(result.current.fields.customField.component).toBeInstanceOf(Function);
+    expect(result.current.fields.customField.component).toBeInstanceOf(
+      Function,
+    );
     expect(result.current.fields.customField.value).toBe('new value');
   });
 });

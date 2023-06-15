@@ -8,9 +8,10 @@ import { InputFormFilePicker } from './input_filepicker';
 import { InputFormTextArea } from './input_text_area';
 import { EuiFlexGroup, EuiFlexItem, EuiFormRow } from '@elastic/eui';
 import { OsCard } from '../../../controllers/register-agent/components/os-card/os-card';
+import { SettingTypes } from './types';
 
 interface InputFormProps {
-  type: string;
+  type: SettingTypes;
   value: any;
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   error?: string;
