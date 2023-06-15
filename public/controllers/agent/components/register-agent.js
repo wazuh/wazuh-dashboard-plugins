@@ -271,7 +271,7 @@ export const RegisterAgent = withErrorBoundary(
         this.state.selectedVersion === 'windowsserver2008' ||
         this.state.selectedVersion === 'windows7'
       ) {
-        return 'NET START WazuhSvc';
+        return 'NET START Wazuh';
       } else {
         return '';
       }
