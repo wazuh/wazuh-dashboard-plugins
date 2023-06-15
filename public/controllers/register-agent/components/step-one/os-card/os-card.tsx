@@ -15,7 +15,7 @@ interface Props {
   setStatusCheck: string;
 }
 
-export const OsCard = ({ appVersionMajorDotMinor, onChange, value }: Props) => {
+export const OsCard = ({ PLUGIN_VERSION_SHORT, onChange, value }: Props) => {
   return (
     <div>
       <EuiFlexGroup gutterSize='l' wrap>
@@ -57,7 +57,7 @@ export const OsCard = ({ appVersionMajorDotMinor, onChange, value }: Props) => {
               target='_blank'
               href={webDocumentationLink(
                 'installation-guide/wazuh-agent/index.html',
-                appVersionMajorDotMinor,
+                PLUGIN_VERSION_SHORT,
               )}
             >
               steps
