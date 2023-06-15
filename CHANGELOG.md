@@ -2,7 +2,17 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v4.4.3 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 00
+## Wazuh v4.4.4 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 01
+
+### Added
+
+- Support for Wazuh 4.4.4
+
+### Changed
+
+- Changed the title and added a warning in the step 3 of the deploy new agent section. [#5416](https://github.com/wazuh/wazuh-kibana-app/pull/5416)
+
+## Wazuh v4.4.3 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 01
 
 ### Added
 
