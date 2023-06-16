@@ -213,7 +213,7 @@ export const EditRole = ({ role, closeFlyout }) => {
                   />
                 </EuiFormRow>
               </EuiFlexItem>
-              <EuiFlexItem grow={true}>
+              <EuiFlexItem grow={false}>
                 <WzButtonPermissions
                   buttonType='default'
                   permissions={[
