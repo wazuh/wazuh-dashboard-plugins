@@ -63,7 +63,7 @@ export const RegisterAgent = withReduxProvider(
         },
       },
 
-      //IP: This is a set of four numbers, for example, 192.158.1.38. Each number in the set can range from 0 to 255. Therefore, the full range of IP addresses goes from 0.0.0.0.0 to 255.255.255.255.255.
+      //IP: This is a set of four numbers, for example, 192.158.1.38. Each number in the set can range from 0 to 255. Therefore, the full range of IP addresses goes from 0.0.0.0 to 255.255.255.255.
 
       //FQDN: Maximum of 63 characters per label.
       // Can only contain numbers, letters and hyphens (-)
@@ -105,7 +105,7 @@ export const RegisterAgent = withReduxProvider(
             return (validation =
               'Each label must have a letter or number at the beginning. The maximum lenght is 63 characters.'); // FQDN invalid
           } else if (areNumbersAndPoints && !isIPFormatValid) {
-            return (validation = 'Not a valid ip'); // IP invalid
+            return (validation = 'Not a valid IP'); // IP invalid
           }
         },
       },
