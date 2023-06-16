@@ -17,13 +17,16 @@ const CheckboxGroupComponent: React.FC<Props> = ({
   onOptionChange,
 }) => {
   const isSingleArchitecture = data.length === 1;
+  const isDoubleArchitecture = data.length === 2;
   const isFirstCardWithFourItems = cardIndex === 0 && data.length === 4;
 
   return (
     <div
       className={`checkbox-group-container${
         isSingleArchitecture ? ' single-architecture' : ''
-      }${isFirstCardWithFourItems ? ' first-card-four-items' : ''}`}
+      }${isFirstCardWithFourItems ? ' first-card-four-items' : ''}${
+        isDoubleArchitecture ? ' double-architecture' : ''
+      }`}
     >
       {data.map((arch, idx) => (
         <div

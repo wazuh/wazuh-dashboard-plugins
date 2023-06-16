@@ -5,9 +5,10 @@ import {
   EuiFlexItem,
   EuiCallOut,
   EuiLink,
+  EuiCheckbox,
 } from '@elastic/eui';
 import { REGISTER_AGENT_DATA_STEP_ONE } from '../../../utils/register-agent-data';
-import { CheckboxGroupComponent } from '../checkbox-group/checkbox-group';
+import { CheckboxGroupComponent } from '../../step-one/checkbox-group/checkbox-group';
 import './os-card.scss';
 import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
 
@@ -17,13 +18,13 @@ interface Props {
 
 export const OsCard = ({ onChange, value }: Props) => {
   return (
-    <div>
+    <div data-testid='os-card'>
       <EuiFlexGroup gutterSize='l' wrap>
         {REGISTER_AGENT_DATA_STEP_ONE.map((data, index) => (
           <EuiFlexItem key={index}>
             <EuiCard
               title={
-                <div className='cardTitle'>
+                <div data-testid='card-title' className='cardTitle'>
                   <img className='cardIcon' src={data.icon} alt='Icon' />
                   <span className='cardText'>{data.title}</span>
                 </div>
@@ -37,10 +38,12 @@ export const OsCard = ({ onChange, value }: Props) => {
               {/* <EuiSpacer size='s' /> */}
 
               <CheckboxGroupComponent
+                component={EuiCheckbox}
                 data={data.architecture}
                 cardIndex={index}
                 selectedOption={value}
                 onOptionChange={onChange}
+                data-testid={`checkbox-group-${index}`}
               />
             </EuiCard>
           </EuiFlexItem>
