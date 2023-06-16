@@ -21,7 +21,7 @@ revision = '01'
 # One of 'pre-alpha', 'alpha', 'beta', 'release-candidate', 'stable'
 stage = 'pre-alpha'
 # Tag suffix. Usually set to stage + stage iteration.
-tag_suffix = '-rc1'
+tag_suffix = '-rc2'
 
 # ================================================ #
 # Constants and global variables                   #
