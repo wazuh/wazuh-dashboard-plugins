@@ -14,6 +14,24 @@ import {
   REGISTER_AGENT_DATA_STEP_THREE,
   REGISTER_AGENT_DATA_STEP_TWO,
 } from '../../utils/register-agent-data';
+import { webDocumentationLink } from '../../../../../common/services/web_documentation';
+import { PLUGIN_VERSION_SHORT } from '../../../../../common/constants';
+
+const tooltipContent = (
+  <span>
+    Learn about{' '}
+    <a
+      href={webDocumentationLink(
+        'user-manual/reference/ossec-conf/client.html#groups',
+        PLUGIN_VERSION_SHORT,
+      )}
+      target='_blank'
+      rel='noopener noreferrer'
+    >
+      Server address
+    </a>
+  </span>
+);
 
 export const Steps = ({
   needsPassword,
@@ -41,10 +59,7 @@ export const Steps = ({
         <EuiFlexGroup>
           <EuiFlexItem className='stepTitle'>
             <p>Server address</p>
-            <EuiIconTip
-              content='Source maps allow browser dev tools to map minified code to the original source code'
-              position='right'
-            />
+            <EuiIconTip content={tooltipContent} position='right' />
           </EuiFlexItem>
         </EuiFlexGroup>
       ),
