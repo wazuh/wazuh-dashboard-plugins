@@ -229,6 +229,16 @@ var userPoliciesMap = {
     },
     rbac_mode: 'black',
   },
+  PLUGIN_SECURITY_POLICIES_DENY_UPDATE_POLICY: {
+    'security:read': {
+      'policy:id:*': 'allow',
+    },
+    'security:update': {
+      'policy:id:100': 'deny',
+      'policy:id:101': 'allow',
+    },
+    rbac_mode: 'black',
+  },
   PLUGIN_SECURITY_POLICIES_ALLOW_CREATE_POLICY: {
     'security:read': {
       'policy:id:*': 'allow',
