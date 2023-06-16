@@ -672,6 +672,9 @@ resources:
   # List RBAC actions
   - method: GET
     path: /security/actions
+    response:
+      statusCode: 200
+      staticFile: security/security-actions.json
 
   # List RBAC resources
   - method: GET
