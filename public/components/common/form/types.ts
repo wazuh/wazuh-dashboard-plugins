@@ -19,6 +19,7 @@ export interface IInputForm {
 }
 
 /// use form hook types
+
 export type SettingTypes =
   | 'text'
   | 'textarea'
@@ -54,7 +55,7 @@ interface EnhancedField {
   initialValue: any;
   value: any;
   changed: boolean;
-  error: string | null;
+  error: string;
   setInputRef: (reference: any) => void;
   inputRef: any;
   onChange: (event: any) => void;
