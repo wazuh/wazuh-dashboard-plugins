@@ -11,10 +11,7 @@ import {
   EuiProgress,
 } from '@elastic/eui';
 import { WzRequest } from '../../../../react-services/wz-request';
-import {
-  UI_LOGGER_LEVELS,
-  PLUGIN_VERSION_SHORT,
-} from '../../../../../common/constants';
+import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
 import { ErrorHandler } from '../../../../react-services/error-management';
 import { getMasterRemoteConfiguration } from '../../../agent/components/register-agent-service';
@@ -59,9 +56,7 @@ export const RegisterAgent = withReduxProvider(
         type: 'custom',
         initialValue: '',
         component: props => {
-          return (
-            <OsCard {...props} appVersionMajorDotMinor={PLUGIN_VERSION_SHORT} />
-          );
+          return <OsCard {...props} />;
         },
         options: {
           groups,
