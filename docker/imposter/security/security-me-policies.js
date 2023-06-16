@@ -77,6 +77,35 @@ var userPoliciesMap = {
     },
     rbac_mode: 'black',
   },
+  PLUGIN_SECURITY_USERS_ALLOW_CREATE_USER_DENY_UPDATE_USER: {
+    'security:read': {
+      'user:id:*': 'allow',
+      'role:id:*': 'allow',
+    },
+    'security:create_user': {
+      '*:*:*': 'allow',
+    },
+    'security:update': {
+      'user:id:*': 'deny',
+    },
+    rbac_mode: 'black',
+  },
+  PLUGIN_SECURITY_USERS_ALLOW_CREATE_USER_ALLOW_UPDATE_USER_DENY_EDIT_RUN_AS: {
+    'security:read': {
+      'user:id:*': 'allow',
+      'role:id:*': 'allow',
+    },
+    'security:create_user': {
+      '*:*:*': 'allow',
+    },
+    'security:update': {
+      'user:id:*': 'allow',
+    },
+    'security:edit_run_as': {
+      'user:id:*': 'deny',
+    },
+    rbac_mode: 'black',
+  },
   PLUGIN_SECURITY_USERS_DENY_EDIT_USER: {
     'security:read': {
       'user:id:*': 'allow',

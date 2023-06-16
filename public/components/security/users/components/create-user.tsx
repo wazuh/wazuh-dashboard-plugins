@@ -360,6 +360,9 @@ export const CreateUser = ({ closeFlyout }) => {
                   fill
                   permissions={[
                     { action: 'security:create_user', resource: '*:*:*' },
+                    ...(selectedRoles.length
+                      ? [{ action: 'security:update', resource: 'user:id:*' }]
+                      : []),
                     ...(allowRunAs
                       ? [{ action: 'security:edit_run_as', resource: '*:*:*' }]
                       : []),
