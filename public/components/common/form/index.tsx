@@ -27,8 +27,6 @@ export interface InputFormProps {
   postInput?:
     | React.ReactNode
     | ((props: { value: any; error?: string }) => React.ReactNode);
-  setStatusCheck: string;
-  appVersionMajorDotMinor: string;
 }
 
 interface InputFormComponentProps extends InputFormProps {

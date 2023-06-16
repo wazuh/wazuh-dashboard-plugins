@@ -20,12 +20,8 @@ export const REGISTER_AGENT_DATA_STEP_ONE: RegisterAgentData[] = [
     icon: MacIcon,
     title: 'macOS',
     hr: true,
-    architecture: ['PKG 32/64 AMB64'],
+    architecture: ['Intel', 'Apple Silicon'],
   },
-  // {
-  //   callout:
-  //     'For additional systems and architectures, please check our Wazuh agent installation guide.',
-  // },
 ];
 
 export const REGISTER_AGENT_DATA_STEP_TWO = [

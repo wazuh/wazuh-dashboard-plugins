@@ -9,6 +9,18 @@ import {
   UseFormReturn,
 } from './types';
 
+interface IgetValueFromEventType {
+  [key: string]: (event: any) => any;
+}
+
+/**
+ * Returns the value of the event according to the type of field
+ * When the type is not found, it returns the value defined in the default key
+ *
+ * @param event
+ * @param type
+ * @returns event value
+ */
 function getValueFromEvent(
   event: any,
   type: SettingTypes | CustomSettingType,
@@ -16,7 +28,7 @@ function getValueFromEvent(
   return (getValueFromEventType[type] || getValueFromEventType.default)(event);
 }
 
-const getValueFromEventType = {
+const getValueFromEventType: IgetValueFromEventType = {
   [EpluginSettingType.switch]: (event: any) => event.target.checked,
   [EpluginSettingType.editor]: (value: any) => value,
   [EpluginSettingType.filepicker]: (value: any) => value,
