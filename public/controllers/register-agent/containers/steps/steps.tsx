@@ -3,10 +3,11 @@ import {
   EuiSteps,
   EuiText,
   EuiTitle,
-  EuiIconTip,
   EuiFlexGroup,
   EuiFlexItem,
   EuiCallOut,
+  EuiPopover,
+  EuiButtonEmpty,
 } from '@elastic/eui';
 import { InputForm } from '../../../../components/common/form';
 import './steps.scss';
@@ -17,7 +18,7 @@ import {
 import { webDocumentationLink } from '../../../../../common/services/web_documentation';
 import { PLUGIN_VERSION_SHORT } from '../../../../../common/constants';
 
-const tooltipContent = (
+const popoverServerAddress = (
   <span>
     Learn about{' '}
     <a
@@ -28,7 +29,23 @@ const tooltipContent = (
       target='_blank'
       rel='noopener noreferrer'
     >
-      Server address
+      Server address.
+    </a>
+  </span>
+);
+
+const popoverAgentName = (
+  <span>
+    Learn about{' '}
+    <a
+      href={webDocumentationLink(
+        'user-manual/reference/ossec-conf/client.html#enrollment-agent-name',
+        PLUGIN_VERSION_SHORT,
+      )}
+      target='_blank'
+      rel='noopener noreferrer'
+    >
+      Assigning an agent name.
     </a>
   </span>
 );
@@ -42,6 +59,20 @@ export const Steps = ({
 }) => {
   const warningForAgentName =
     'The agent name must be unique. It can’t be changed once the agent has been enrolled.';
+
+  const [isPopoverServerAddress, setIsPopoverServerAddress] = useState(false);
+  const [isPopoverAgentName, setIsPopoverAgentName] = useState(false);
+
+  const onButtonServerAddress = () =>
+    setIsPopoverServerAddress(
+      isPopoverServerAddress => !isPopoverServerAddress,
+    );
+  const closeServerAddress = () => setIsPopoverServerAddress(false);
+
+  const onButtonAgentName = () =>
+    setIsPopoverAgentName(isPopoverAgentName => !isPopoverAgentName);
+  const closeAgentName = () => setIsPopoverAgentName(false);
+
   const firstSetOfSteps = [
     {
       title: (
@@ -57,9 +88,29 @@ export const Steps = ({
     {
       title: (
         <EuiFlexGroup>
-          <EuiFlexItem className='stepTitle'>
+          {/* <EuiFlexItem className='stepTitle'>
             <p>Server address</p>
             <EuiIconTip content={tooltipContent} position='right' />
+          </EuiFlexItem> */}
+
+          <EuiFlexItem grow={false}>
+            <EuiPopover
+              button={
+                <EuiButtonEmpty
+                  iconType='questionInCircle'
+                  iconSide='right'
+                  onClick={onButtonServerAddress}
+                  className='stepTitle'
+                >
+                  Server address
+                </EuiButtonEmpty>
+              }
+              isOpen={isPopoverServerAddress}
+              closePopover={closeServerAddress}
+              anchorPosition='rightCenter'
+            >
+              {popoverServerAddress}
+            </EuiPopover>
           </EuiFlexItem>
         </EuiFlexGroup>
       ),
@@ -119,7 +170,7 @@ export const Steps = ({
             label={
               <>
                 <EuiFlexGroup>
-                  <EuiFlexItem
+                  {/* <EuiFlexItem
                     style={{
                       flexDirection: 'row',
                       fontStyle: 'normal',
@@ -135,6 +186,33 @@ export const Steps = ({
                       content='Source maps allow browser dev tools to map minified code to the original source code'
                       position='right'
                     />
+                  </EuiFlexItem> */}
+                  <EuiFlexItem grow={false}>
+                    <EuiPopover
+                      button={
+                        <EuiButtonEmpty
+                          iconType='questionInCircle'
+                          iconSide='right'
+                          onClick={onButtonAgentName}
+                          // className='subtitleAgentName'
+                          style={{
+                            flexDirection: 'row',
+                            fontStyle: 'normal',
+                            fontWeight: 700,
+                            fontSize: '12px',
+                            lineHeight: '20px',
+                            color: '#343741',
+                          }}
+                        >
+                          Assign an agent name
+                        </EuiButtonEmpty>
+                      }
+                      isOpen={isPopoverAgentName}
+                      closePopover={closeAgentName}
+                      anchorPosition='rightCenter'
+                    >
+                      {popoverAgentName}
+                    </EuiPopover>
                   </EuiFlexItem>
                 </EuiFlexGroup>
               </>
