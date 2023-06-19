@@ -81,7 +81,7 @@ jobs:
           # Up the environment and run the command
           docker run -t --rm \
             -e ${docker_env_plugin_platform}=${platform_version} \
-            -v `pwd` ${{ env.MAIN_PLUGIN_PATH }}:/home/node/kbn/plugins/wazuh \
+            -v `pwd`/${{ env.MAIN_PLUGIN_PATH }}:/home/node/kbn/plugins/wazuh \
             ${{ inputs.docker_run_extra_args }} \
             quay.io/wazuh/${platform}-dev:${platform_version} \
             bash -c '
@@ -101,5 +101,5 @@ jobs:
         uses: AthleticNet/comment-test-coverage@1.2.2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          path: ${{ env.MAIN_PLUGIN_PATH }}/target/test-coverage/coverage-summary.json
+          path: ./${{ env.MAIN_PLUGIN_PATH }}/target/test-coverage/coverage-summary.json
           title: "Code coverage (Jest)"
