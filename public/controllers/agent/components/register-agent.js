@@ -1005,7 +1005,7 @@ export const RegisterAgent = withErrorBoundary(
         : ``;
 
       // Merge environment variables with installation script
-      const macOSInstallationScript = `curl -so wazuh-agent.pkg https://packages.wazuh.com/4.x/macos/wazuh-agent-${this.state.wazuhVersion}-1.pkg && ${macOSInstallationSetEnvVariablesScript}sudo installer -pkg ./wazuh-agent.pkg -target /`;
+      const macOSInstallationScript = `curl -so wazuh-agent.pkg https://packages.wazuh.com/4.x/macos/wazuh-agent-${this.state.wazuhVersion}-1.${this.state.selectedArchitecture}.pkg && ${macOSInstallationSetEnvVariablesScript}sudo installer -pkg ./wazuh-agent.pkg -target /`;
 
       /*** end macOS installation script customization ***/
 
