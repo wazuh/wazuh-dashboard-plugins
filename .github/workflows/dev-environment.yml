@@ -31,7 +31,7 @@ on:
         required: false
       artifact_path:
         type: string
-        default: ''
+        default: './build'
         description: Folder to include in the archive.
         required: false
       notify_jest_coverage_summary:
@@ -94,7 +94,8 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ inputs.artifact_name }}
-          path: ${{ inputs.artifact_path }}
+          path: ${{env.MAIN_PLUGIN_PATH}}/${{ inputs.artifact_path }}
+          if-no-files-found: 'error'
 
       - name: Step 05 - Upload coverage results to GitHub
         if: ${{ inputs.notify_jest_coverage_summary && github.event_name == 'pull_request' }}
