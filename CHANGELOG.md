@@ -2,7 +2,7 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v4.5.0 - OpenSearch Dashboards 2.6.0 - Revision 01
+## Wazuh v4.6.0 - OpenSearch Dashboards 2.6.0 - Revision 01
 
 ### Added
 
@@ -53,6 +53,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed pretty parameter from cron job requests. [#5532](https://github.com/wazuh/wazuh-kibana-app/pull/5532)
 - Removed unnecessary requests in `Management/Status` section. [#5528](https://github.com/wazuh/wazuh-kibana-app/pull/5528)
 - Removed obsolete code that caused duplicate requests to the api in `Management`. [#5485](https://github.com/wazuh/wazuh-kibana-app/pull/5485)
+
+## Wazuh v4.5.0 - OpenSearch Dashboards 2.6.0 - Revision 01
+
+- Support for Wazuh 4.5.0
 
 ## Wazuh v4.4.4 - OpenSearch Dashboards 2.6.0 - Revision 01
 
