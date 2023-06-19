@@ -12,3 +12,7 @@ export function agentStatusColorByAgentStatus(status: TAgentStatus): TAgentStatu
 export function agentStatusLabelByAgentStatus(status: TAgentStatus): TAgentStatusLabel{
     return UI_LABEL_NAME_AGENT_STATUS[status] || UI_LABEL_NAME_AGENT_STATUS.default;
 }
+
+export function agentStatusLabelByAgentStatusTest(status: TAgentStatus): TAgentStatusLabel{
+    return UI_LABEL_NAME_AGENT_STATUS[status] || UI_LABEL_NAME_AGENT_STATUS.default;
+}

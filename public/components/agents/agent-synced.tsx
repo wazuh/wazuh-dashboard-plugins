@@ -17,6 +17,12 @@ export const AgentSynced = ({ synced }: SyncedProps) => {
       <span className={'hide-agent-status'}>
         {synced}
       </span>
+      <span className={'hide-agent-status'}>
+        {synced}
+      </span>
+      <span className={'hide-agent-status'}>
+        {synced}
+      </span>
     </EuiHealth>
   );
 }

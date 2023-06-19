@@ -4,6 +4,11 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ## Wazuh v4.5.0 - OpenSearch Dashboards 2.6.0 - Revision 01
 
+### Test
+- Test pull request repository rename
+
+## Wazuh v4.5.0 - OpenSearch Dashboards 2.6.0 - Revision 01
+
 ### Added
 
 - Added rel="noopener noreferrer" in documentation links. [#5197](https://github.com/wazuh/wazuh-kibana-app/pull/5197) [#5274](https://github.com/wazuh/wazuh-kibana-app/pull/5274) [#5298](https://github.com/wazuh/wazuh-kibana-app/pull/5298) [#5409](https://github.com/wazuh/wazuh-kibana-app/pull/5409)
