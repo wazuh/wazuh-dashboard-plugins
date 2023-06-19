@@ -39,6 +39,9 @@ on:
         default: false
         required: false
 
+env:
+  MAIN_PLUGIN_PATH: 'wazuh/plugins/main'
+
 jobs:
   # Deploy the plugin in a development environment and run a command
   # using a pre-built Docker image, hosted in Quay.io.
@@ -62,13 +65,13 @@ jobs:
           # Detect which platform to use from source code
           platform=kbn;
           echo "Detecting platform [kbn, osd]...";
-          find wazuh/opensearch_dashboards.json && { platform=osd; };
+          find ${{ env.MAIN_PLUGIN_PATH }}/opensearch_dashboards.json && { platform=osd; };
           echo "Platform is $platform";
 
           # Read the platform version from the package.json file
           echo "Reading the platform version from the package.json...";
           # Support plugins whose version is defined under pluginPlatform or Kibana properties
-          platform_version=$(jq -r '.pluginPlatform.version, .kibana.version | select(. != null)' wazuh/package.json);
+          platform_version=$(jq -r '.pluginPlatform.version, .kibana.version | select(. != null)' ${{ env.MAIN_PLUGIN_PATH }}/package.json);
           echo "Plugin platform version: $platform_version";
 
           # Set the environment variable to the correct platform
@@ -78,7 +81,7 @@ jobs:
           # Up the environment and run the command
           docker run -t --rm \
             -e ${docker_env_plugin_platform}=${platform_version} \
-            -v `pwd`/wazuh:/home/node/kbn/plugins/wazuh \
+            -v `pwd` ${{ env.MAIN_PLUGIN_PATH }}:/home/node/kbn/plugins/wazuh \
             ${{ inputs.docker_run_extra_args }} \
             quay.io/wazuh/${platform}-dev:${platform_version} \
             bash -c '
@@ -98,5 +101,5 @@ jobs:
         uses: AthleticNet/comment-test-coverage@1.2.2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          path: ./wazuh/target/test-coverage/coverage-summary.json
+          path: ${{ env.MAIN_PLUGIN_PATH }}/target/test-coverage/coverage-summary.json
           title: "Code coverage (Jest)"
