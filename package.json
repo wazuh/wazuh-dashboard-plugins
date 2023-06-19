@@ -45,7 +45,7 @@
   },
   "dependencies": {
     "angular-animate": "1.7.8",
-    "angular-material": "1.1.18",
+    "angular-material": "1.2.5",
     "axios": "^0.21.1",
     "install": "^0.10.1",
     "js2xmlparser": "^3.0.0",
