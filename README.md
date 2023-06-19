@@ -90,8 +90,8 @@ This plugin for Kibana allows you to visualize and analyze Wazuh alerts stored i
 ## Requisites
 
 - Wazuh HIDS 4.6.0
-- Kibana 7.10.2
-- Elasticsearch 7.10.2
+- Kibana 7.16.x or 7.17.x
+- Elasticsearch 7.16.x or 7.17.x
 
 ## Installation
 
