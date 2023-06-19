@@ -42,7 +42,7 @@ export const RuleEditor = ({
   internalUsers,
   currentPlatform,
   onFormChange,
-  ruleID,
+  saveButtonPermissions = [],
 }) => {
   const [logicalOperator, setLogicalOperator] = useState('OR');
   const [isLogicalPopoverOpen, setIsLogicalPopoverOpen] = useState(false);
@@ -465,31 +465,7 @@ export const RuleEditor = ({
         <EuiFlexItem grow={false}>
           <WzButtonPermissions
             buttonType='default'
-            permissions={[
-              ...(typeof ruleID !== 'undefined'
-                ? /* Add the permission when creating a security rule */
-                  [{ action: 'security:create', resource: '*:*:*' }]
-                : []),
-              /* TODO:
-                The required permissions depends on the form. Editing could need the security:update
-                action or security:delete depending on some roles are being added or are removed. To
-                be more exact we should detect when the role is being added or removed.
-              */
-              {
-                action: 'security:update',
-                resource:
-                  typeof ruleID !== 'undefined'
-                    ? `rule:id:${ruleID}`
-                    : 'rule:id:*',
-              },
-              {
-                action: 'security:delete',
-                resource:
-                  typeof ruleID !== 'undefined'
-                    ? `rule:id:${ruleID}`
-                    : 'rule:id:*',
-              },
-            ]}
+            permissions={saveButtonPermissions}
             disabled={isReserved}
             isLoading={isLoading}
             fill
