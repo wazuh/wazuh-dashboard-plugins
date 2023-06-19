@@ -31,7 +31,7 @@ on:
         required: false
       artifact_path:
         type: string
-        default: './build'
+        default: 'build'
         description: Folder to include in the archive.
         required: false
       notify_jest_coverage_summary:
