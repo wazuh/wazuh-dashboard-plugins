@@ -104,17 +104,6 @@ If you want to contribute to our project please don't hesitate to send a pull re
 Take a look at the [branches and tags][branches] page in our Wiki, and also to our 
 [contributing](CONTRIBUTING.md) guidelines.
 
-## Software and libraries used
-
-- [Elastic](https://elastic.co)
-- [Elastic UI framework](https://elastic.github.io/eui)
-- [AngularJS](https://angularjs.org)
-- [AngularJS Material](https://material.angularjs.org)
-- [Node.js](https://nodejs.org)
-- [NPM](https://npmjs.com)
-- [React](https://reactjs.org)
-- [Redux](https://redux.js.org)
-
 ## License
 
 This project is licensed under the [GNU General Public License v2.0](LICENSE).

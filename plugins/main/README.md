@@ -67,8 +67,8 @@ deploy new agents.
 
 ## Software and libraries used
 
-- [Elastic](https://elastic.co)
-- [Elastic UI framework](https://elastic.github.io/eui)
+- [OpenSearch](https://opensearch.org/)
+- [OpenSearch OUI framework](https://github.com/opensearch-project/oui)
 - [AngularJS](https://angularjs.org)
 - [AngularJS Material](https://material.angularjs.org)
 - [Node.js](https://nodejs.org)
