@@ -25,6 +25,10 @@ import { useSelector } from 'react-redux';
 import { withReduxProvider } from '../../../../components/common/hocs';
 import GroupInput from '../../components/steps-three/group-input';
 import { OsCard } from '../../components/step-one/os-card/os-card';
+import {
+  ValidateServerAddress,
+  ValidateAgentName,
+} from '../../utils/validations';
 
 export const RegisterAgent = withReduxProvider(
   ({ getWazuhVersion, hasAgents, addNewAgent, reload }) => {
@@ -63,73 +67,24 @@ export const RegisterAgent = withReduxProvider(
         },
       },
 
-      //IP: This is a set of four numbers, for example, 192.158.1.38. Each number in the set can range from 0 to 255. Therefore, the full range of IP addresses goes from 0.0.0.0 to 255.255.255.255.
+      //IP: This is a set of four numbers, for example, 192.158.1.38. Each number in the set can range from 0 to 255. Therefore, the full range of IP addresses goes from 0.0.0.0 to 255.255.255.255
+      // O ipv6: 2001:0db8:85a3:0000:0000:8a2e:0370:7334
 
-      //FQDN: Maximum of 63 characters per label.
+      // FQDN: Maximum of 63 characters per label.
       // Can only contain numbers, letters and hyphens (-)
       // Cannot begin or end with a hyphen
       // Currently supports multilingual characters, i.e. letters not included in the English alphabet: e.g. á é í ó ú ü ñ.
+      // Minimum 3 labels
 
       serverAddress: {
         type: 'text',
         initialValue: configuration['enrollment.dns'] || '',
-        validate: value => {
-          const isFQDN =
-            /^(?!.{256})(([a-zA-Z0-9áéíóúüñ]|[a-zA-Z0-9áéíóúüñ][a-zA-Z0-9-]*[a-zA-Z0-9áéíóúüñ])\.){1,126}([a-zA-Záéíóúüñ]{2,63}|[a-zA-Z0-9-áéíóúüñ]{2,63}\.[a-zA-Záéíóúüñ]{2,63})$/;
-          const isIP =
-            /^(?:(?:[0-9]{1,3}\.){3}[0-9]{1,3}|(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4})$/;
-          const numbersAndPoints = /^[0-9.]+$/;
-          const isMaxLengthValid = value.length <= 63;
-          const isMinLengthValid = value.length >= 2;
-          const isFQDNFormatValid = isFQDN.test(value);
-          const isIPFormatValid = isIP.test(value);
-          const areNumbersAndPoints = numbersAndPoints.test(value);
-          let validation = undefined;
-          if (value.length === 0) {
-            return validation;
-          } else if (
-            isFQDNFormatValid &&
-            isMaxLengthValid &&
-            isMinLengthValid &&
-            value !== 0
-          ) {
-            return validation; // FQDN valid
-          } else if (
-            isIPFormatValid &&
-            isMaxLengthValid &&
-            isMinLengthValid &&
-            value !== 0
-          ) {
-            return validation; // IP valid
-          } else if (!areNumbersAndPoints && !isFQDNFormatValid) {
-            return (validation =
-              'Each label must have a letter or number at the beginning. The maximum lenght is 63 characters.'); // FQDN invalid
-          } else if (areNumbersAndPoints && !isIPFormatValid) {
-            return (validation = 'Not a valid IP'); // IP invalid
-          }
-        },
+        validate: value => ValidateServerAddress(value),
       },
-
       agentName: {
         type: 'text',
         initialValue: '',
-        validate: value => {
-          if (value.length === 0) {
-            return undefined;
-          }
-          const regex = /^[A-Za-z.\-_,]+$/;
-
-          const isLengthValid = value.length >= 2 && value.length <= 63;
-          const isFormatValid = regex.test(value);
-          if (!isFormatValid && !isLengthValid) {
-            return 'The minimum length is 2 characters. The character is not valid. Allowed characters are A-Z, a-z, ".", "-", "_"';
-          } else if (!isLengthValid) {
-            return 'The minimum length is 2 characters.';
-          } else if (!isFormatValid) {
-            return 'The character is not valid. Allowed characters are A-Z, a-z, ".", "-", "_"';
-          }
-          return '';
-        },
+        validate: value => ValidateAgentName(value),
       },
 
       agentGroups: {
