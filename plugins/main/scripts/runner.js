@@ -20,7 +20,7 @@ See /docker/runner/docker-compose.yml for available environment variables.
 const childProcess = require('child_process');
 const { loadPackageJson } = require('./manifest');
 
-const COMPOSE_DIR = './docker/runner';
+const COMPOSE_DIR = '../../docker/runner';
 
 function getProjectInfo() {
   const manifest = loadPackageJson();
