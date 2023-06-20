@@ -16,4 +16,3 @@ jobs:
       reference: ${{ github.ref_name }}
       command: 'yarn build'
       artifact_name: 'wazuh-${{ github.ref_name }}'
-      artifact_path: './wazuh/build'
