@@ -8,6 +8,7 @@ import {
   EuiCallOut,
   EuiPopover,
   EuiButtonEmpty,
+  EuiLink,
 } from '@elastic/eui';
 import { InputForm } from '../../../../components/common/form';
 import './steps.scss';
@@ -21,7 +22,7 @@ import { PLUGIN_VERSION_SHORT } from '../../../../../common/constants';
 const popoverServerAddress = (
   <span>
     Learn about{' '}
-    <a
+    <EuiLink
       href={webDocumentationLink(
         'user-manual/reference/ossec-conf/client.html#groups',
         PLUGIN_VERSION_SHORT,
@@ -30,14 +31,14 @@ const popoverServerAddress = (
       rel='noopener noreferrer'
     >
       Server address.
-    </a>
+    </EuiLink>
   </span>
 );
 
 const popoverAgentName = (
   <span>
     Learn about{' '}
-    <a
+    <EuiLink
       href={webDocumentationLink(
         'user-manual/reference/ossec-conf/client.html#enrollment-agent-name',
         PLUGIN_VERSION_SHORT,
@@ -46,7 +47,7 @@ const popoverAgentName = (
       rel='noopener noreferrer'
     >
       Assigning an agent name.
-    </a>
+    </EuiLink>
   </span>
 );
 

@@ -60,6 +60,7 @@ export const OsCard = ({ onChange, value }: Props) => {
               href={webDocumentationLink(
                 'installation-guide/wazuh-agent/index.html',
               )}
+              rel='noopener noreferrer'
             >
               steps
             </EuiLink>
