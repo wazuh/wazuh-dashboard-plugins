@@ -11,7 +11,7 @@ export const InputFormText = ({
 }: IInputFormType) => {
   return (
     <EuiFieldText
-      fullWidth={typeof 'fullWidth' === 'undefined' ? true : fullWidth}
+      fullWidth={typeof fullWidth === 'undefined' ? true : fullWidth}
       value={value}
       isInvalid={isInvalid}
       onChange={onChange}
