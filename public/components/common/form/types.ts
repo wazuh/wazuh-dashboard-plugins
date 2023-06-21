@@ -55,7 +55,7 @@ interface EnhancedField {
   initialValue: any;
   value: any;
   changed: boolean;
-  error: string;
+  error: string | null | undefined;
   setInputRef: (reference: any) => void;
   inputRef: any;
   onChange: (event: any) => void;
