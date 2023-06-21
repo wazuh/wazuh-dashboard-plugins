@@ -25,6 +25,5 @@ export * from './use-app-config';
 export * from './useRootScope';
 export * from './use_async_action';
 export * from './use_async_action_run_on_start';
-// export * from './use-previous';
 export { useEsSearch } from './use-es-search';
 export { useValueSuggestion, IValueSuggestion } from './use-value-suggestion';
