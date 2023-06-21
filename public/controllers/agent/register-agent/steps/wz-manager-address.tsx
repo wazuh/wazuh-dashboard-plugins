@@ -1,7 +1,5 @@
 import React, { memo, useCallback, useEffect, useState } from 'react';
 import { EuiText, EuiFieldText } from '@elastic/eui';
-import _ from '@lodash';
-// import { usePrevious } from '../../../../../public/components/common/hooks/use-previous';
 
 type Props = {
   onChange: (value: string) => void;
@@ -13,9 +11,7 @@ const WzManagerAddressInput = (props: Props) => {
   const [value, setValue] = useState('');
 
   useEffect(() => {
-    const prevDefaultValue = usePrevious(defaultValue);
-
-    if (!_.isEqual(defaultValue, prevDefaultValue) && defaultValue !== '') {
+    if (defaultValue) {
       setValue(defaultValue);
       onChange(defaultValue);
     } else {
@@ -23,7 +19,6 @@ const WzManagerAddressInput = (props: Props) => {
       onChange('');
     }
   }, []);
-
   /**
    * Handles the change of the selected node IP
    * @param value
@@ -33,7 +28,6 @@ const WzManagerAddressInput = (props: Props) => {
     onChange(value);
     setValue(value);
   };
-
   return (
     <EuiText>
       <p>
