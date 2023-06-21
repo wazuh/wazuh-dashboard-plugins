@@ -121,7 +121,12 @@ export const Steps = ({
               </EuiFlexItem>
             ))}
           </EuiFlexGroup>
-          <InputForm {...form.fields.serverAddress} label={<></>} />
+          <InputForm
+            {...form.fields.serverAddress}
+            label={<></>}
+            fullWidth={false}
+            placeholder='Server address'
+          />
         </Fragment>
       ),
       status: !form.fields.operatingSystemSelection.value
@@ -163,6 +168,7 @@ export const Steps = ({
           </EuiFlexGroup>
           <InputForm
             {...form.fields.agentName}
+            fullWidth={false}
             label={
               <>
                 <EuiFlexGroup>
