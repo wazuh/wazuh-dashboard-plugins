@@ -26,8 +26,8 @@ import { withReduxProvider } from '../../../../components/common/hocs';
 import GroupInput from '../../components/steps-three/group-input';
 import { OsCard } from '../../components/step-one/os-card/os-card';
 import {
-  ValidateServerAddress,
-  ValidateAgentName,
+  validateServerAddress,
+  validateAgentName,
 } from '../../utils/validations';
 
 export const RegisterAgent = withReduxProvider(
@@ -79,12 +79,12 @@ export const RegisterAgent = withReduxProvider(
       serverAddress: {
         type: 'text',
         initialValue: configuration['enrollment.dns'] || '',
-        validate: value => ValidateServerAddress(value),
+        validate: value => validateServerAddress(value),
       },
       agentName: {
         type: 'text',
         initialValue: '',
-        validate: value => ValidateAgentName(value),
+        validate: value => validateAgentName(value),
       },
 
       agentGroups: {

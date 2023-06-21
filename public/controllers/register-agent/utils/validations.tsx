@@ -1,4 +1,4 @@
-export const ValidateServerAddress = value => {
+export const validateServerAddress = value => {
   const isFQDN =
     /^(?!(?:[0-9-]{0,62}[0-9]|[0-9-]{0,62})\.)([a-zA-Z0-9áéíóúüñ](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9áéíóúüñ])?\.){2,}(?:[a-zA-Záéíóúüñ]{2,63}|[a-zA-Z0-9-áéíóúüñ]{2,63}\.[a-zA-Záéíóúüñ]{2,63})$/;
 
@@ -32,7 +32,7 @@ export const ValidateServerAddress = value => {
   }
 };
 
-export const ValidateAgentName = value => {
+export const validateAgentName = value => {
   if (value.length === 0) {
     return undefined;
   }

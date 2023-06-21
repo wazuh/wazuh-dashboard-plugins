@@ -1,26 +1,26 @@
-import { ValidateServerAddress, ValidateAgentName } from './validations';
+import { validateServerAddress, validateAgentName } from './validations';
 
 describe('Validations', () => {
   it('should return undefined for an empty value', () => {
-    const result = ValidateServerAddress('');
+    const result = validateServerAddress('');
     expect(result).toBeUndefined();
   });
 
   it('should return undefined for a valid FQDN', () => {
     const validFQDN = 'example.fqdn.valid';
-    const result = ValidateServerAddress(validFQDN);
+    const result = validateServerAddress(validFQDN);
     expect(result).toBeUndefined();
   });
 
   it('should return undefined for a valid IP', () => {
     const validIP = '192.168.1.1';
-    const result = ValidateServerAddress(validIP);
+    const result = validateServerAddress(validIP);
     expect(result).toBeUndefined();
   });
 
   it('should return an error message for an invalid FQDN', () => {
     const invalidFQDN = 'example.fqdn';
-    const result = ValidateServerAddress(invalidFQDN);
+    const result = validateServerAddress(invalidFQDN);
     expect(result).toBe(
       'Each label must have a letter or number at the beginning. The maximum length is 63 characters.',
     );
@@ -28,19 +28,19 @@ describe('Validations', () => {
 
   test('should return an error message for an invalid IP', () => {
     const invalidIP = '999.999.999.999.999';
-    const result = ValidateServerAddress(invalidIP);
+    const result = validateServerAddress(invalidIP);
     expect(result).toBe('Not a valid IP');
   });
 
   test('should return undefined for an empty value', () => {
     const emptyValue = '';
-    const result = ValidateAgentName(emptyValue);
+    const result = validateAgentName(emptyValue);
     expect(result).toBeUndefined();
   });
 
   test('should return an error message for invalid format and length', () => {
     const invalidAgentName = '?';
-    const result = ValidateAgentName(invalidAgentName);
+    const result = validateAgentName(invalidAgentName);
     expect(result).toBe(
       'The minimum length is 2 characters. The character is not valid. Allowed characters are A-Z, a-z, ".", "-", "_"',
     );
@@ -48,7 +48,7 @@ describe('Validations', () => {
 
   test('should return an error message for invalid format', () => {
     const invalidAgentName = 'agent$name';
-    const result = ValidateAgentName(invalidAgentName);
+    const result = validateAgentName(invalidAgentName);
     expect(result).toBe(
       'The character is not valid. Allowed characters are A-Z, a-z, ".", "-", "_"',
     );
@@ -56,13 +56,13 @@ describe('Validations', () => {
 
   test('should return an error message for invalid length', () => {
     const invalidAgentName = 'a';
-    const result = ValidateAgentName(invalidAgentName);
+    const result = validateAgentName(invalidAgentName);
     expect(result).toBe('The minimum length is 2 characters.');
   });
 
   test('should return an empty string for a valid agent name', () => {
     const validAgentName = 'agent_name';
-    const result = ValidateAgentName(validAgentName);
+    const result = validateAgentName(validAgentName);
     expect(result).toBe('');
   });
 });
