@@ -51,6 +51,9 @@ const popoverAgentName = (
   </span>
 );
 
+const warningForAgentName =
+  'The agent name must be unique. It can’t be changed once the agent has been enrolled.';
+
 export const Steps = ({
   needsPassword,
   hideTextPassword,
@@ -58,9 +61,6 @@ export const Steps = ({
   form,
   osCard,
 }) => {
-  const warningForAgentName =
-    'The agent name must be unique. It can’t be changed once the agent has been enrolled.';
-
   const [isPopoverServerAddress, setIsPopoverServerAddress] = useState(false);
   const [isPopoverAgentName, setIsPopoverAgentName] = useState(false);
 
