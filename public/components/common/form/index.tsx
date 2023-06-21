@@ -13,7 +13,6 @@ export interface InputFormProps {
   type: SettingTypes;
   value: any;
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  onOptionChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   error?: string;
   label?: string;
   header?:
