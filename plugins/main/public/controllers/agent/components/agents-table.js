@@ -224,14 +224,14 @@ export const AgentsTable = withErrorBoundary(
         const selectFields = [...selectFieldsList, 'os.platform', 'os.uname', 'os.version'].join(','); // Add version and uname fields to render the OS icon and version in the table
 
         const rawAgents = await this.props.wzReq('GET', '/agents', { params: { ...this.buildFilter(), select: selectFields } });
-        const formatedAgents = (((rawAgents || {}).data || {}).data || {}).affected_items.map(
+        const formatedAgents = rawAgents?.data?.data?.affected_items.map(
           this.formatAgent.bind(this)
         );
 
         this._isMount &&
           this.setState({
             agents: formatedAgents,
-            totalItems: (((rawAgents || {}).data || {}).data || {}).total_affected_items,
+            totalItems: rawAgents?.data?.data?.total_affected_items,
             isLoading: false,
           });
       } catch (error) {
@@ -444,8 +444,28 @@ export const AgentsTable = withErrorBoundary(
       }
     }
 
+
+    // Check in the localstorage what is the column configuration
+    // and check that the columns are valid.
+    // If it is not a valid column it ignores it and if any column is missing it adds it.
+
     getTableColumnsSelected() {
-      return JSON.parse(window.localStorage.getItem('columnsSelectedTableAgent')) || [];
+      const columnsSelected =
+        JSON.parse(window.localStorage.getItem('columnsSelectedTableAgent'));
+      if(!columnsSelected){
+        return []
+      }
+      const customColumns = this.defaultColumns.map(field => {
+        const fieldConfig = columnsSelected.filter(
+          column => column?.field === field?.field,
+        );
+        if (fieldConfig.length > 0) {
+          return fieldConfig[0];
+        }
+        return field;
+      });
+      window.localStorage.setItem('columnsSelectedTableAgent', JSON.stringify(customColumns))
+      return customColumns;
     }
 
     setTableColumnsSelected(data) {
