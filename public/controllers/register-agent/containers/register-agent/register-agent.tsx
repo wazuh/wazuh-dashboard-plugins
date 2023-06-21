@@ -210,15 +210,14 @@ export const RegisterAgent = withReduxProvider(
                     </EuiFlexItem>
                   </EuiFlexGroup>
                   <EuiSpacer />
-                  {loading && (
+                  {loading ? (
                     <>
                       <EuiFlexItem>
                         <EuiProgress size='xs' color='primary' />
                       </EuiFlexItem>
                       <EuiSpacer></EuiSpacer>
                     </>
-                  )}
-                  {!loading && (
+                  ) : (
                     <EuiFlexItem>
                       <Steps
                         form={form}
