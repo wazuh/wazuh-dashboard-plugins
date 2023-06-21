@@ -79,12 +79,12 @@ export const RegisterAgent = withReduxProvider(
       serverAddress: {
         type: 'text',
         initialValue: configuration['enrollment.dns'] || '',
-        validate: value => validateServerAddress(value),
+        validate: validateServerAddress,
       },
       agentName: {
         type: 'text',
         initialValue: '',
-        validate: value => validateAgentName(value),
+        validate: validateAgentName,
       },
 
       agentGroups: {
