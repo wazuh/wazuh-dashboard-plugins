@@ -35,24 +35,6 @@ const GroupInput = ({ value, options, onChange }) => {
   return (
     <>
       <EuiFlexGroup>
-        {/* <EuiFlexItem
-          style={{
-            marginTop: '32px',
-            flexDirection: 'row',
-            fontStyle: 'normal',
-            fontWeight: 700,
-            fontSize: '12px',
-            lineHeight: '20px',
-            color: '#343741',
-          }}
-          data-testid='group-input-label'
-        >
-          <p>Select one or more existing groups</p>
-          <EuiIconTip
-            content='Source maps allow browser dev tools to map minified code to the original source code'
-            position='right'
-          />
-        </EuiFlexItem> */}
         <EuiFlexItem grow={false}>
           <EuiPopover
             button={
@@ -60,7 +42,6 @@ const GroupInput = ({ value, options, onChange }) => {
                 iconType='questionInCircle'
                 iconSide='right'
                 onClick={onButtonAgentGroup}
-                // className='subtitleAgentName'
                 style={{
                   marginTop: '32px',
                   flexDirection: 'row',

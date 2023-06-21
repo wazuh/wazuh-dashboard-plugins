@@ -51,7 +51,7 @@ export const RegisterAgent = withReduxProvider(
     const [wazuhPassword, setWazuhPassword] = useState('');
     const [groups, setGroups] = useState([]);
     const [needsPassword, setNeedsPassword] = useState<boolean | null>(false);
-    const [hidePasswordInput, setHidePasswordInput] = useState<boolean | null>(
+    const [hideTextPassword, setHideTextPassword] = useState<boolean | null>(
       false,
     );
 
@@ -129,7 +129,7 @@ export const RegisterAgent = withReduxProvider(
         try {
           const wazuhVersion = await getWazuhVersion();
           let wazuhPassword = '';
-          let hidePasswordInput = false;
+          let hideTextPassword = false;
           await getRemoteConfig();
           const authInfo = await getAuthInfo();
           const needsPassword = (authInfo.auth || {}).use_password === 'yes';
@@ -139,13 +139,13 @@ export const RegisterAgent = withReduxProvider(
               authInfo['authd.pass'] ||
               '';
             if (wazuhPassword) {
-              hidePasswordInput = true;
+              hideTextPassword = true;
             }
           }
           const groups = await getGroups();
 
           setNeedsPassword(needsPassword);
-          setHidePasswordInput(hidePasswordInput);
+          setHideTextPassword(hideTextPassword);
           setWazuhPassword(wazuhPassword);
           setWazuhVersion(wazuhVersion);
           setGroups(groups);
@@ -223,7 +223,7 @@ export const RegisterAgent = withReduxProvider(
                       <Steps
                         form={form}
                         needsPassword={needsPassword}
-                        hidePasswordInput={hidePasswordInput}
+                        hideTextPassword={hideTextPassword}
                         agentGroup={agentGroup}
                         osCard={osCard}
                       />

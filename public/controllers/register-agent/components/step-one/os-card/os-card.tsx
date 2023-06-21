@@ -14,6 +14,7 @@ import { webDocumentationLink } from '../../../../../../common/services/web_docu
 
 interface Props {
   setStatusCheck: string;
+  onChange: React.ChangeEventHandler<HTMLInputElement>;
 }
 
 export const OsCard = ({ onChange, value }: Props) => {
@@ -35,8 +36,6 @@ export const OsCard = ({ onChange, value }: Props) => {
               className='card'
             >
               {data.hr && <hr className='hr' />}
-              {/* <EuiSpacer size='s' /> */}
-
               <CheckboxGroupComponent
                 component={EuiCheckbox}
                 data={data.architecture}

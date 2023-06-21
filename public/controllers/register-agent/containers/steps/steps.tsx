@@ -52,7 +52,7 @@ const popoverAgentName = (
 
 export const Steps = ({
   needsPassword,
-  hidePasswordInput,
+  hideTextPassword,
   agentGroup,
   form,
   osCard,
@@ -88,11 +88,6 @@ export const Steps = ({
     {
       title: (
         <EuiFlexGroup>
-          {/* <EuiFlexItem className='stepTitle'>
-            <p>Server address</p>
-            <EuiIconTip content={tooltipContent} position='right' />
-          </EuiFlexItem> */}
-
           <EuiFlexItem grow={false}>
             <EuiPopover
               button={
@@ -138,7 +133,7 @@ export const Steps = ({
         ? 'complete'
         : '',
     },
-    ...(!(!needsPassword || hidePasswordInput)
+    ...(!(!needsPassword || hideTextPassword)
       ? [
           {
             title: (
@@ -170,23 +165,6 @@ export const Steps = ({
             label={
               <>
                 <EuiFlexGroup>
-                  {/* <EuiFlexItem
-                    style={{
-                      flexDirection: 'row',
-                      fontStyle: 'normal',
-                      fontWeight: 700,
-                      fontSize: '12px',
-                      lineHeight: '20px',
-                      color: '#343741',
-                    }}
-                  >
-                    Assign an agent name{' '}
-                    <EuiIconTip
-                      className='iconTooltip'
-                      content='Source maps allow browser dev tools to map minified code to the original source code'
-                      position='right'
-                    />
-                  </EuiFlexItem> */}
                   <EuiFlexItem grow={false}>
                     <EuiPopover
                       button={
@@ -194,7 +172,6 @@ export const Steps = ({
                           iconType='questionInCircle'
                           iconSide='right'
                           onClick={onButtonAgentName}
-                          // className='subtitleAgentName'
                           style={{
                             flexDirection: 'row',
                             fontStyle: 'normal',
