@@ -180,14 +180,13 @@ export const RegisterAgent = withReduxProvider(
     return (
       <div>
         <div className='close'>
-          {hasAgents() && (
+          {hasAgents() ? (
             <EuiButtonEmpty
               size='s'
               onClick={() => addNewAgent(false)}
               iconType='cross'
             ></EuiButtonEmpty>
-          )}
-          {!hasAgents() && (
+          ) : (
             <EuiButtonEmpty
               size='s'
               onClick={() => reload()}
