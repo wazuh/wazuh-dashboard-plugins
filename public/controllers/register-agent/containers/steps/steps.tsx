@@ -147,7 +147,13 @@ export const Steps = ({
                 <p>Wazuh password</p>
               </EuiTitle>
             ),
-            children: <Fragment>{'Phrase to define'}</Fragment>,
+            children: (
+              <Fragment>
+                {
+                  'No ha establecido una contraseña. Se le asigno una por defecto'
+                }
+              </Fragment>
+            ),
           },
         ]
       : []),

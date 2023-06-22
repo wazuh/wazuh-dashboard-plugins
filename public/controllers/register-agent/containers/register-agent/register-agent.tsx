@@ -179,28 +179,28 @@ export const RegisterAgent = withReduxProvider(
 
     return (
       <div>
-        <div className='close'>
-          {hasAgents() ? (
-            <EuiButtonEmpty
-              size='s'
-              onClick={() => addNewAgent(false)}
-              iconType='cross'
-            ></EuiButtonEmpty>
-          ) : (
-            <EuiButtonEmpty
-              size='s'
-              onClick={() => reload()}
-              iconType='refresh'
-            >
-              Refresh
-            </EuiButtonEmpty>
-          )}
-        </div>
         <EuiPage restrictWidth='1000px' style={{ background: 'transparent' }}>
           <EuiPageBody>
             <EuiFlexGroup>
               <EuiFlexItem>
                 <EuiPanel className='container'>
+                  <div className='close'>
+                    {hasAgents() ? (
+                      <EuiButtonEmpty
+                        size='s'
+                        onClick={() => addNewAgent(false)}
+                        iconType='cross'
+                      ></EuiButtonEmpty>
+                    ) : (
+                      <EuiButtonEmpty
+                        size='s'
+                        onClick={() => reload()}
+                        iconType='refresh'
+                      >
+                        Refresh
+                      </EuiButtonEmpty>
+                    )}
+                  </div>
                   <EuiFlexGroup>
                     <EuiFlexItem>
                       <EuiTitle>
