@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { Component, Fragment, useEffect, useState } from 'react';
 import {
   EuiSteps,
   EuiText,
@@ -13,14 +13,27 @@ import {
 import { InputForm } from '../../../../components/common/form';
 import './steps.scss';
 import {
+  REGISTER_AGENT_DATA_STEP_ONE,
   REGISTER_AGENT_DATA_STEP_THREE,
   REGISTER_AGENT_DATA_STEP_TWO,
 } from '../../utils/register-agent-data';
 import { webDocumentationLink } from '../../../../../common/services/web_documentation';
 import { PLUGIN_VERSION_SHORT } from '../../../../../common/constants';
-import { getRegisterAgentFormValues, parseRegisterAgentFormValues } from '../../services/register-agent-services';
+import {
+  IParseRegisterFormValues,
+  getRegisterAgentFormValues,
+  parseRegisterAgentFormValues,
+  showCommandsSections,
+} from '../../services/register-agent-services';
 import { useRegisterAgentCommands } from '../../hooks/use-register-agent-commands';
-import { osCommandsDefinitions, optionalParamsDefinitions, tOperatingSystem, tOptionalParameters } from '../../config/os-commands-definitions';
+import {
+  osCommandsDefinitions,
+  optionalParamsDefinitions,
+  tOperatingSystem,
+  tOptionalParameters,
+} from '../../config/os-commands-definitions';
+import { UseFormReturn } from '../../../../components/common/form/types';
+import CommandShower from '../../components/command-shower';
 
 const popoverServerAddress = (
   <span>
@@ -57,13 +70,28 @@ const popoverAgentName = (
 const warningForAgentName =
   'The agent name must be unique. It can’t be changed once the agent has been enrolled.';
 
+interface IStepsProps {
+  needsPassword: boolean;
+  hideTextPassword: boolean;
+  agentGroup: React.ReactElement;
+  form: UseFormReturn;
+  osCard: React.ReactElement;
+  connection: {
+    isUDP: boolean;
+    isSecure: boolean;
+  };
+  wazuhPassword: string;
+}
+
 export const Steps = ({
   needsPassword,
   hideTextPassword,
   agentGroup,
   form,
   osCard,
-}) => {
+  connection,
+  wazuhPassword,
+}: IStepsProps) => {
   const [isPopoverServerAddress, setIsPopoverServerAddress] = useState(false);
   const [isPopoverAgentName, setIsPopoverAgentName] = useState(false);
 
@@ -77,25 +105,42 @@ export const Steps = ({
     setIsPopoverAgentName(isPopoverAgentName => !isPopoverAgentName);
   const closeAgentName = () => setIsPopoverAgentName(false);
 
-  const [registerAgentFormValues, setRegisterAgentFormValues] = useState({});
+  const [registerAgentFormValues, setRegisterAgentFormValues] =
+    useState<IParseRegisterFormValues>({
+      operatingSystem: {
+        name: '',
+        architecture: '',
+      },
+      optionalParams: {
+        agentGroups: '',
+        agentName: '',
+        serverAddress: '',
+        wazuhPassword: '',
+      },
+    });
 
   useEffect(() => {
-    setRegisterAgentFormValues( parseRegisterAgentFormValues(getRegisterAgentFormValues(form)));
+    // get form values and parse them divided in OS and optional params
+    setRegisterAgentFormValues(
+      parseRegisterAgentFormValues(
+        getRegisterAgentFormValues(form),
+        REGISTER_AGENT_DATA_STEP_ONE,
+      ),
+    );
   }, [form.fields]);
 
-  const { installCommand, startCommand, selectOS, setOptionalParams }  = useRegisterAgentCommands<tOperatingSystem, tOptionalParameters>({
-    osDefinitions: osCommandsDefinitions,
-    optionalParamsDefinitions: optionalParamsDefinitions,
-  });
+  const { installCommand, startCommand, selectOS, setOptionalParams } =
+    useRegisterAgentCommands<tOperatingSystem, tOptionalParameters>({
+      osDefinitions: osCommandsDefinitions,
+      optionalParamsDefinitions: optionalParamsDefinitions,
+    });
 
   useEffect(() => {
-    /*if(registerAgentFormValues?.operatingSystemSelection?.os) {
-      selectOS(registerAgentFormValues.operatingSystemSelection?.os);
+    if (registerAgentFormValues.operatingSystem.name !== '' && registerAgentFormValues.operatingSystem.architecture !== '') {
+      selectOS(registerAgentFormValues.operatingSystem);
     }
-    if(registerAgentFormValues?.optionalParams){
-      setOptionalParams(registerAgentFormValues.optionalParams);
-    }*/
-    
+
+    setOptionalParams(registerAgentFormValues.optionalParams);
   }, [registerAgentFormValues]);
 
   const firstSetOfSteps = [
@@ -249,11 +294,32 @@ export const Steps = ({
     {
       title: (
         <EuiTitle className='stepTitle'>
-          <p>Start agent</p>
+          <p>
+            Run the following commands to download and install the Wazuh Agent:
+          </p>
         </EuiTitle>
       ),
-      children: <Fragment>{JSON.stringify(registerAgentFormValues)}
-      {JSON.stringify(installCommand)}</Fragment>,
+      children: (
+        <CommandShower
+          commandText={installCommand}
+          showCommand={showCommandsSections(form.fields)}
+        />
+      ),
+      status: showCommandsSections(form.fields) ? 'current' : 'disabled',
+    },
+    {
+      title: (
+        <EuiTitle className='stepTitle'>
+          <p>Start the Wazuh agent:</p>
+        </EuiTitle>
+      ),
+      children: (
+        <CommandShower
+          commandText={startCommand}
+          showCommand={showCommandsSections(form.fields)}
+        />
+      ),
+      status: showCommandsSections(form.fields) ? 'current' : 'disabled',
     },
   ];
 

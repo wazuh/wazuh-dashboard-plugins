@@ -2,15 +2,9 @@ import { tOperatingSystem } from '../config/os-commands-definitions';
 
 interface RegisterAgentData {
   icon: string;
-  title: string;
+  title: tOperatingSystem['name'];
   hr: boolean;
-  architecture: {
-    text: string, 
-    value: {
-      os: tOperatingSystem['name'],
-      architecture: tOperatingSystem['architecture'];
-    }
-  }[];
+  architecture: tOperatingSystem['architecture'][]
 }
 
 interface CheckboxGroupComponentProps {

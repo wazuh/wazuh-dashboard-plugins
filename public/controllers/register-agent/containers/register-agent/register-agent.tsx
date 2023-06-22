@@ -9,6 +9,7 @@ import {
   EuiPageBody,
   EuiSpacer,
   EuiProgress,
+  EuiButton,
 } from '@elastic/eui';
 import { WzRequest } from '../../../../react-services/wz-request';
 import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
@@ -37,10 +38,6 @@ export const RegisterAgent = withReduxProvider(
     );
 
     const [wazuhVersion, setWazuhVersion] = useState('');
-    const [udpProtocol, setUdpProtocol] = useState<boolean | null>(false);
-    const [connectionSecure, setConnectionSecure] = useState<boolean | null>(
-      true,
-    );
     const [haveUdpProtocol, setHaveUdpProtocol] = useState<boolean | null>(
       false,
     );
@@ -50,8 +47,8 @@ export const RegisterAgent = withReduxProvider(
     const [loading, setLoading] = useState(false);
     const [wazuhPassword, setWazuhPassword] = useState('');
     const [groups, setGroups] = useState([]);
-    const [needsPassword, setNeedsPassword] = useState<boolean | null>(false);
-    const [hideTextPassword, setHideTextPassword] = useState<boolean | null>(
+    const [needsPassword, setNeedsPassword] = useState<boolean>(false);
+    const [hideTextPassword, setHideTextPassword] = useState<boolean>(
       false,
     );
 
@@ -106,8 +103,6 @@ export const RegisterAgent = withReduxProvider(
       if (remoteConfig) {
         setHaveUdpProtocol(remoteConfig.isUdp);
         setHaveConnectionSecure(remoteConfig.haveSecureConnection);
-        setUdpProtocol(remoteConfig.isUdp);
-        setConnectionSecure(remoteConfig.haveSecureConnection);
       }
     };
 
@@ -143,7 +138,6 @@ export const RegisterAgent = withReduxProvider(
             }
           }
           const groups = await getGroups();
-
           setNeedsPassword(needsPassword);
           setHideTextPassword(hideTextPassword);
           setWazuhPassword(wazuhPassword);
@@ -224,9 +218,19 @@ export const RegisterAgent = withReduxProvider(
                         hideTextPassword={hideTextPassword}
                         agentGroup={agentGroup}
                         osCard={osCard}
+                        connection={{
+                          isSecure: haveConnectionSecure ? true : false,
+                          isUDP: haveUdpProtocol ? true : false,
+                        }}
+                        wazuhPassword={wazuhPassword}
                       />
                     </EuiFlexItem>
                   )}
+                  <EuiFlexGroup justifyContent="flexEnd" style={{ marginRight: '0.3rem' }}>
+                    <EuiFlexItem grow={false}>
+                      <EuiButton className='close-button'  onClick={() => reload()}>Close</EuiButton>
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
                 </EuiPanel>
               </EuiFlexItem>
             </EuiFlexGroup>

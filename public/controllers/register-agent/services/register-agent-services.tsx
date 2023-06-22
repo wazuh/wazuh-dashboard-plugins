@@ -1,5 +1,7 @@
 import { UseFormReturn } from '../../../components/common/form/types';
 import { WzRequest } from '../../../react-services/wz-request';
+import { tOperatingSystem, tOptionalParameters } from '../config/os-commands-definitions';
+import { RegisterAgentData } from '../interfaces/types';
 import { ServerAddressOptions } from '../register-agent/steps';
 
 type Protocol = 'TCP' | 'UDP';
@@ -249,21 +251,52 @@ export const getRegisterAgentFormValues = (form: UseFormReturn) => {
   })
 }
 
-export const parseRegisterAgentFormValues = (formValues: { name: string, value: any }[]) => {
+export interface IParseRegisterFormValues {
+  operatingSystem: {
+    name: tOperatingSystem['name'] | '',
+    architecture: tOperatingSystem['architecture'] | ''
+  },
+  // optionalParams is an object that their key is defined in tOptionalParameters and value must be string
+  optionalParams: {
+    [FIELD in tOptionalParameters]: string
+  }
+}
+
+export const parseRegisterAgentFormValues = (formValues: { name: keyof UseFormReturn['fields'], value: any }[], OSOptionsDefined: RegisterAgentData[]) => {
   // return the values form the form.fields and the value property
-  return formValues.reduce((acc, curr) => {
-    if(curr.name === 'operatingSystemSelection'){
-      acc[curr.name] = {
-          os: 'linux',
-          architecture: curr.value,
+  const parsedForm = {
+    operatingSystem: {
+      architecture: '',
+      name: ''
+    },
+    optionalParams: {}
+  } as IParseRegisterFormValues
+  formValues.forEach(field => {
+    if(field.name === 'operatingSystemSelection'){
+      // search the architecture defined in architecture array and get the os name defined in title array in the same index
+      const operatingSystem = OSOptionsDefined.find(os => os.architecture.includes(field.value))
+      if(operatingSystem){
+        parsedForm.operatingSystem = {
+          name: operatingSystem.title,
+          architecture: field.value
         }
-     
+      }
     }else{
-      acc['optionalParams'] = {
-        ...acc['optionalParams'],
-        [curr.name]: curr.value
-      } ;
+      if(field.name === 'agentGroups'){
+        parsedForm.optionalParams[field.name as any] = field.value[0] ? field.value[0].id : '';
+      }else{
+        parsedForm.optionalParams[field.name as any] = field.value
+      }
     }
-    return acc;
-  }, {}) 
+  })
+
+  return parsedForm;
+}
+
+export const showCommandsSections = (formFields: UseFormReturn['fields']): boolean => {
+  return !formFields.operatingSystemSelection.value ||
+      formFields.serverAddress.value === '' ||
+      formFields.serverAddress.error
+        ? false
+        : true;
 }
