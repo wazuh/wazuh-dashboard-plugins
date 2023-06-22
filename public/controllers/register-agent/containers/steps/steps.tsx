@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import {
   EuiSteps,
   EuiText,
@@ -18,6 +18,9 @@ import {
 } from '../../utils/register-agent-data';
 import { webDocumentationLink } from '../../../../../common/services/web_documentation';
 import { PLUGIN_VERSION_SHORT } from '../../../../../common/constants';
+import { getRegisterAgentFormValues, parseRegisterAgentFormValues } from '../../services/register-agent-services';
+import { useRegisterAgentCommands } from '../../hooks/use-register-agent-commands';
+import { osCommandsDefinitions, optionalParamsDefinitions, tOperatingSystem, tOptionalParameters } from '../../config/os-commands-definitions';
 
 const popoverServerAddress = (
   <span>
@@ -73,6 +76,27 @@ export const Steps = ({
   const onButtonAgentName = () =>
     setIsPopoverAgentName(isPopoverAgentName => !isPopoverAgentName);
   const closeAgentName = () => setIsPopoverAgentName(false);
+
+  const [registerAgentFormValues, setRegisterAgentFormValues] = useState({});
+
+  useEffect(() => {
+    setRegisterAgentFormValues( parseRegisterAgentFormValues(getRegisterAgentFormValues(form)));
+  }, [form.fields]);
+
+  const { installCommand, startCommand, selectOS, setOptionalParams }  = useRegisterAgentCommands<tOperatingSystem, tOptionalParameters>({
+    osDefinitions: osCommandsDefinitions,
+    optionalParamsDefinitions: optionalParamsDefinitions,
+  });
+
+  useEffect(() => {
+    /*if(registerAgentFormValues?.operatingSystemSelection?.os) {
+      selectOS(registerAgentFormValues.operatingSystemSelection?.os);
+    }
+    if(registerAgentFormValues?.optionalParams){
+      setOptionalParams(registerAgentFormValues.optionalParams);
+    }*/
+    
+  }, [registerAgentFormValues]);
 
   const firstSetOfSteps = [
     {
@@ -221,6 +245,15 @@ export const Steps = ({
           : form.fields.agentGroups.value.length > 0
           ? 'complete'
           : '',
+    },
+    {
+      title: (
+        <EuiTitle className='stepTitle'>
+          <p>Start agent</p>
+        </EuiTitle>
+      ),
+      children: <Fragment>{JSON.stringify(registerAgentFormValues)}
+      {JSON.stringify(installCommand)}</Fragment>,
     },
   ];
 

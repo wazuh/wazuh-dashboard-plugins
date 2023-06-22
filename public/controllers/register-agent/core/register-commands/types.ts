@@ -4,7 +4,7 @@
 export interface IOperationSystem {
   name: string;
   architecture: string;
-  extension: string;
+  extension?: string;
 }
 
 export type IOptionalParameters<Params extends string> = {

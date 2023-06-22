@@ -1,3 +1,4 @@
+import { UseFormReturn } from '../../../components/common/form/types';
 import { WzRequest } from '../../../react-services/wz-request';
 import { ServerAddressOptions } from '../register-agent/steps';
 
@@ -236,3 +237,33 @@ export const getGroups = async () => {
     throw new Error(error);
   }
 };
+
+
+export const getRegisterAgentFormValues = (form: UseFormReturn) => {
+  // return the values form the form.fields and the value property
+  return Object.keys(form.fields).map(key => {
+    return {
+      name: key,
+      value: form.fields[key].value,
+    };
+  })
+}
+
+export const parseRegisterAgentFormValues = (formValues: { name: string, value: any }[]) => {
+  // return the values form the form.fields and the value property
+  return formValues.reduce((acc, curr) => {
+    if(curr.name === 'operatingSystemSelection'){
+      acc[curr.name] = {
+          os: 'linux',
+          architecture: curr.value,
+        }
+     
+    }else{
+      acc['optionalParams'] = {
+        ...acc['optionalParams'],
+        [curr.name]: curr.value
+      } ;
+    }
+    return acc;
+  }, {}) 
+}

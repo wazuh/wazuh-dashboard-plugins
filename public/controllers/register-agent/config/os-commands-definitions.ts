@@ -3,36 +3,35 @@ import { IOSDefinition, tOptionalParams } from '../core/register-commands/types'
 // Defined OS combinations
 export interface ILinuxOSTypes {
   name: 'linux';
-  architecture: 'x64' | 'x86';
+  architecture: 'amd64' | 'aarch64';
   extension: 'rpm' | 'deb';
 }
 export interface IWindowsOSTypes {
   name: 'windows';
-  architecture: 'x86';
+  architecture: '32/64';
   extension: 'msi';
 }
 
 export interface IMacOSTypes {
   name: 'mac';
-  architecture: '32/64';
-  extension: 'pkg';
+  architecture: 'intel' | 'apple-silicon';
 }
 
 export type tOperatingSystem = ILinuxOSTypes | IMacOSTypes | IWindowsOSTypes;
 
 
-export type tOptionalParameters = 'server_address' | 'agent_name' | 'agent_group' | 'protocol' | 'wazuh_password';
+export type tOptionalParameters = 'serverAddress' | 'agentName' | 'agentGroups' | 'wazuhPassword';
 
 ///////////////////////////////////////////////////////////////////
 /// Operating system commands definitions
 ///////////////////////////////////////////////////////////////////
 
-const linuxDefinition: IOSDefinition<tOperatingSystem, tOptionalParameters> = {
+const linuxDefinition: IOSDefinition<ILinuxOSTypes, tOptionalParameters> = {
   name: 'linux',
   options: [
     {
       extension: 'deb',
-      architecture: '32/64',
+      architecture: 'amd64',
       urlPackage: props =>
         `https://packages.wazuh.com/4.x/yum/wazuh-agent-${props.wazuhVersion}-1.x86_64.${props.extension}`,
       installCommand: props =>
@@ -41,7 +40,7 @@ const linuxDefinition: IOSDefinition<tOperatingSystem, tOptionalParameters> = {
     },
     {
       extension: 'deb',
-      architecture: 'x64',
+      architecture: 'aarch64',
       urlPackage: props =>
         `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/ wazuh-agent_${props.wazuhVersion}-1_${props.architecture}.${props.extension}`,
       installCommand: props =>
@@ -50,7 +49,7 @@ const linuxDefinition: IOSDefinition<tOperatingSystem, tOptionalParameters> = {
     },
     {
       extension: 'rpm',
-      architecture: '32/64',
+      architecture: 'amd64',
       urlPackage: props =>
         `https://packages.wazuh.com/4.x/yum/wazuh-agent-${props.wazuhVersion}-1.x86_64.${props.extension}`,
       installCommand: props =>
@@ -58,8 +57,8 @@ const linuxDefinition: IOSDefinition<tOperatingSystem, tOptionalParameters> = {
       startCommand: props => `sudo systemctl start wazuh-agent`,
     },
     {
-      extension: 'deb',
-      architecture: 'x64',
+      extension: 'rpm',
+      architecture: 'aarch64',
       urlPackage: props =>
         `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${props.wazuhVersion}-1_amd64.${props.extension}`,
       installCommand: props =>
@@ -69,12 +68,12 @@ const linuxDefinition: IOSDefinition<tOperatingSystem, tOptionalParameters> = {
   ],
 };
 
-const windowsDefinition: IOSDefinition<tOperatingSystem, tOptionalParameters> = {
+const windowsDefinition: IOSDefinition<IWindowsOSTypes, tOptionalParameters> = {
   name: 'windows',
   options: [
     {
       extension: 'msi',
-      architecture: 'x86',
+      architecture: '32/64',
       urlPackage: props =>
         `https://packages.wazuh.com/4.x/windows/wazuh-agent-${props.wazuhVersion}-1.${props.extension}`,
       installCommand: props =>
@@ -84,18 +83,27 @@ const windowsDefinition: IOSDefinition<tOperatingSystem, tOptionalParameters> = 
   ],
 };
 
-const macDefinition: IOSDefinition<tOperatingSystem, tOptionalParameters> = {
+const macDefinition: IOSDefinition<IMacOSTypes, tOptionalParameters> = {
   name: 'mac',
   options: [
     {
+      architecture: 'intel',
       extension: 'pkg',
-      architecture: '32/64',
       urlPackage: props =>
         `https://packages.wazuh.com/4.x/macos/wazuh-agent-${props.wazuhVersion}-1.${props.extension}`,
       installCommand: props =>
         `mac -so wazuh-agent.pkg ${props.urlPackage} && sudo launchctl setenv && sudo installer -pkg ./wazuh-agent.pkg -target /`,
       startCommand: props => `sudo /Library/Ossec/bin/wazuh-control start`,
     },
+    {
+      architecture: 'apple-silicon',
+      extension: 'pkg',
+      urlPackage: props =>
+        `https://packages.wazuh.com/4.x/macos/wazuh-agent-${props.wazuhVersion}-1.${props.extension}`,
+      installCommand: props =>
+        `mac -so wazuh-agent.pkg ${props.urlPackage} && sudo launchctl setenv && sudo installer -pkg ./wazuh-agent.pkg -target /`,
+      startCommand: props => `sudo /Library/Ossec/bin/wazuh-control start`,
+    }
   ],
 };
 
@@ -110,35 +118,28 @@ export const osCommandsDefinitions = [
 ///////////////////////////////////////////////////////////////////
 
 export const optionalParamsDefinitions: tOptionalParams<tOptionalParameters> = {
-  server_address: {
+  serverAddress: {
       property: 'WAZUH_MANAGER',
       getParamCommand:  props => {
         const { property, value } = props;
         return `${property}=${value}`;
     }
   },
-  agent_name: {
+  agentName: {
       property: 'WAZUH_AGENT_NAME',
       getParamCommand: props => {
           const { property, value } = props;
           return `${property}=${value}`;
       }
   },
-  protocol: {
-      property: 'WAZUH_MANAGER_PROTOCOL',
-      getParamCommand: props => {
-        const { property, value } = props;
-        return `${property}=${value}`;
-    }
-  },
-  agent_group: {
+  agentGroups: {
       property: 'WAZUH_AGENT_GROUP',
       getParamCommand:  props => {
         const { property, value } = props;
         return `${property}=${value}`;
     }
   },
-  wazuh_password: {
+  wazuhPassword: {
       property: 'WAZUH_PASSWORD',
       getParamCommand:  props => {
         const { property, value } = props;
