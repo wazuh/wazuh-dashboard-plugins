@@ -4,7 +4,6 @@
 export interface IOperationSystem {
   name: string;
   architecture: string;
-  extension?: string;
 }
 
 export type IOptionalParameters<Params extends string> = {
@@ -28,7 +27,6 @@ interface IOptionalParamsWithValues<Params extends string> {
 type tOSEntryProps<Param extends string> = IOSProps & IOptionalParamsWithValues<Param>;
 
 export interface IOSCommandsDefinition<OS extends IOperationSystem,Param extends string> {
-  extension: OS['extension'];
   architecture: OS['architecture'];
   urlPackage: (props: tOSEntryProps<Param>) => string;
   installCommand: (props: tOSEntryProps<Param> & { urlPackage: string }) => string;
@@ -90,7 +88,6 @@ export interface ICommandsResponse<T extends string> {
   wazuhVersion: string;
   os: string;
   architecture: string;
-  extension: string;
   url_package: string;
   install_command: string;
   start_command: string;

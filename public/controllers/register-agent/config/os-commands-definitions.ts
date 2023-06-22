@@ -4,12 +4,10 @@ import { IOSDefinition, tOptionalParams } from '../core/register-commands/types'
 export interface ILinuxOSTypes {
   name: 'linux';
   architecture: 'amd64' | 'aarch64';
-  extension: 'rpm' | 'deb';
 }
 export interface IWindowsOSTypes {
   name: 'windows';
   architecture: '32/64';
-  extension: 'msi';
 }
 
 export interface IMacOSTypes {
@@ -30,37 +28,33 @@ const linuxDefinition: IOSDefinition<ILinuxOSTypes, tOptionalParameters> = {
   name: 'linux',
   options: [
     {
-      extension: 'deb',
       architecture: 'amd64',
       urlPackage: props =>
-        `https://packages.wazuh.com/4.x/yum/wazuh-agent-${props.wazuhVersion}-1.x86_64.${props.extension}`,
+        `https://packages.wazuh.com/4.x/yum/wazuh-agent-${props.wazuhVersion}-1.x86_64`,
       installCommand: props =>
         `sudo yum install -y ${props.urlPackage}`,
       startCommand: props => `sudo systemctl start wazuh-agent`,
     },
     {
-      extension: 'deb',
       architecture: 'aarch64',
       urlPackage: props =>
-        `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/ wazuh-agent_${props.wazuhVersion}-1_${props.architecture}.${props.extension}`,
+        `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/ wazuh-agent_${props.wazuhVersion}-1_${props.architecture}`,
       installCommand: props =>
         `curl -so wazuh-agent.deb ${props.urlPackage} && sudo dpkg -i ./wazuh-agent.deb`,
       startCommand: props => `sudo systemctl start wazuh-agent`,
     },
     {
-      extension: 'rpm',
       architecture: 'amd64',
       urlPackage: props =>
-        `https://packages.wazuh.com/4.x/yum/wazuh-agent-${props.wazuhVersion}-1.x86_64.${props.extension}`,
+        `https://packages.wazuh.com/4.x/yum/wazuh-agent-${props.wazuhVersion}-1.x86_64`,
       installCommand: props =>
         `sudo yum install -y ${props.urlPackage}`,
       startCommand: props => `sudo systemctl start wazuh-agent`,
     },
     {
-      extension: 'rpm',
       architecture: 'aarch64',
       urlPackage: props =>
-        `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${props.wazuhVersion}-1_amd64.${props.extension}`,
+        `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${props.wazuhVersion}-1_amd64`,
       installCommand: props =>
         `curl -so wazuh-agent.deb ${props.urlPackage} && sudo dpkg -i ./wazuh-agent.deb`,
       startCommand: props => `sudo systemctl start wazuh-agent`,
@@ -72,12 +66,11 @@ const windowsDefinition: IOSDefinition<IWindowsOSTypes, tOptionalParameters> = {
   name: 'windows',
   options: [
     {
-      extension: 'msi',
       architecture: '32/64',
       urlPackage: props =>
-        `https://packages.wazuh.com/4.x/windows/wazuh-agent-${props.wazuhVersion}-1.${props.extension}`,
+        `https://packages.wazuh.com/4.x/windows/wazuh-agent-${props.wazuhVersion}-1`,
       installCommand: props =>
-        `Invoke-WebRequest -Uri ${props.urlPackage} -OutFile \${env.tmp}\\wazuh-agent.${props.extension}; msiexec.exe /i \${env.tmp}\\wazuh-agent.${props.extension} /q`,
+        `Invoke-WebRequest -Uri ${props.urlPackage} -OutFile \${env.tmp}\\wazuh-agent; msiexec.exe /i \${env.tmp}\\wazuh-agent /q`,
       startCommand: props => `Start-Service -Name wazuh-agent`,
     },
   ],
@@ -88,18 +81,16 @@ const macDefinition: IOSDefinition<IMacOSTypes, tOptionalParameters> = {
   options: [
     {
       architecture: 'intel',
-      extension: 'pkg',
       urlPackage: props =>
-        `https://packages.wazuh.com/4.x/macos/wazuh-agent-${props.wazuhVersion}-1.${props.extension}`,
+        `https://packages.wazuh.com/4.x/macos/wazuh-agent-${props.wazuhVersion}-1`,
       installCommand: props =>
         `mac -so wazuh-agent.pkg ${props.urlPackage} && sudo launchctl setenv && sudo installer -pkg ./wazuh-agent.pkg -target /`,
       startCommand: props => `sudo /Library/Ossec/bin/wazuh-control start`,
     },
     {
       architecture: 'apple-silicon',
-      extension: 'pkg',
       urlPackage: props =>
-        `https://packages.wazuh.com/4.x/macos/wazuh-agent-${props.wazuhVersion}-1.${props.extension}`,
+        `https://packages.wazuh.com/4.x/macos/wazuh-agent-${props.wazuhVersion}-1`,
       installCommand: props =>
         `mac -so wazuh-agent.pkg ${props.urlPackage} && sudo launchctl setenv && sudo installer -pkg ./wazuh-agent.pkg -target /`,
       startCommand: props => `sudo /Library/Ossec/bin/wazuh-control start`,

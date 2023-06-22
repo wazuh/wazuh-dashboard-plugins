@@ -10,18 +10,15 @@ import {
 export interface ILinuxOSTypes {
   name: 'linux';
   architecture: 'x64' | 'x86';
-  extension: 'rpm' | 'deb';
 }
 export interface IWindowsOSTypes {
   name: 'windows';
   architecture: 'x86';
-  extension: 'msi';
 }
 
 export interface IMacOSTypes {
   name: 'mac';
   architecture: '32/64';
-  extension: 'pkg';
 }
 
 export type tOperatingSystem = ILinuxOSTypes | IMacOSTypes | IWindowsOSTypes;
@@ -31,7 +28,6 @@ export type tOptionalParameters = 'server_address' | 'agent_name' | 'agent_group
 
 const validOsDefinition: IOSCommandsDefinition<tOperatingSystem, tOptionalParameters> = {
   architecture: 'x64',
-  extension: 'deb',
   installCommand: props => 'install command mocked',
   startCommand: props => 'start command mocked',
   urlPackage: props => 'https://package-url.com',
@@ -63,7 +59,6 @@ describe('getInstallCommandByOS', () => {
     // @ts-ignore
     const osDefinition: IOSCommandsDefinition<tOperatingSystem, tOptionalParameters> = {
       architecture: 'x64',
-      extension: 'deb',
       startCommand: props => 'start command mocked',
       urlPackage: props => 'https://package-url.com',
     };
@@ -90,7 +85,6 @@ describe('getInstallCommandByOS', () => {
     const mockedInstall  = jest.fn();
     const validOsDefinition: IOSCommandsDefinition<tOperatingSystem, tOptionalParameters> = {
       architecture: 'x64',
-      extension: 'deb',
       installCommand: mockedInstall,
       startCommand: props => 'start command mocked',
       urlPackage: props => 'https://package-url.com',

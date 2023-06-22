@@ -1,7 +1,6 @@
 import { CommandGenerator } from './command-generator';
 import {
   IOSDefinition,
-  IOperationSystem,
   IOptionalParameters,
   tOptionalParams,
 } from '../types';
@@ -14,18 +13,15 @@ const mockedCommandsResponse = jest.fn().mockReturnValue(mockedCommandValue);
 export interface ILinuxOSTypes {
   name: 'linux';
   architecture: 'x64' | 'x86';
-  extension: 'rpm' | 'deb';
 }
 export interface IWindowsOSTypes {
   name: 'windows';
   architecture: 'x86';
-  extension: 'msi';
 }
 
 export interface IMacOSTypes {
   name: 'mac';
   architecture: '32/64';
-  extension: 'pkg';
 }
 
 export type tOperatingSystem = ILinuxOSTypes | IMacOSTypes | IWindowsOSTypes;
@@ -41,14 +37,12 @@ const osDefinitions: IOSDefinition<tOperatingSystem, tOptionalParameters>[] = [
     options: [
       {
         architecture: 'x64',
-        extension: 'deb',
         installCommand: mockedCommandsResponse,
         startCommand: mockedCommandsResponse,
         urlPackage: mockedCommandsResponse,
       },
       {
-        architecture: 'x64',
-        extension: 'msi',
+        architecture: 'x86',
         installCommand: mockedCommandsResponse,
         startCommand: mockedCommandsResponse,
         urlPackage: mockedCommandsResponse,
@@ -107,7 +101,6 @@ describe('Command Generator', () => {
     commandGenerator.selectOS({
       name: 'linux',
       architecture: 'x64',
-      extension: 'deb',
     });
     commandGenerator.addOptionalParams(optionalValues);
     const command = commandGenerator.getInstallCommand();
@@ -123,7 +116,6 @@ describe('Command Generator', () => {
     commandGenerator.selectOS({
       name: 'linux',
       architecture: 'x64',
-      extension: 'deb',
     });
     commandGenerator.addOptionalParams(optionalValues);
     const command = commandGenerator.getStartCommand();
@@ -139,14 +131,12 @@ describe('Command Generator', () => {
     commandGenerator.selectOS({
       name: 'linux',
       architecture: 'x64',
-      extension: 'deb',
     });
     commandGenerator.addOptionalParams(optionalValues);
     const commands = commandGenerator.getAllCommands();
     expect(commands).toEqual({
       os: 'linux',
       architecture: 'x64',
-      extension: 'deb',
       wazuhVersion: '4.4',
       install_command: mockedCommandValue,
       start_command: mockedCommandValue,
@@ -165,7 +155,6 @@ describe('Command Generator', () => {
     const selectedOs: tOperatingSystem = {
       name: 'linux',
       architecture: 'x64',
-      extension: 'deb',
     };
     commandGenerator.selectOS(selectedOs);
 
@@ -182,7 +171,6 @@ describe('Command Generator', () => {
     expect(commands).toEqual({
       os: selectedOs.name,
       architecture: selectedOs.architecture,
-      extension: selectedOs.extension,
       wazuhVersion: '4.4',
       install_command: mockedCommandValue,
       start_command: mockedCommandValue,
@@ -219,14 +207,12 @@ describe('Command Generator', () => {
         options: [
           {
             architecture: 'x64',
-            extension: 'deb',
             installCommand: mockedCommandsResponse,
             startCommand: mockedCommandsResponse,
             urlPackage: mockedCommandsResponse,
           },
           {
             architecture: 'x64',
-            extension: 'deb',
             installCommand: mockedCommandsResponse,
             startCommand: mockedCommandsResponse,
             urlPackage: mockedCommandsResponse,
@@ -250,7 +236,6 @@ describe('Command Generator', () => {
         options: [
           {
             architecture: 'x64',
-            extension: 'deb',
             installCommand: mockedCommandsResponse,
             startCommand: mockedCommandsResponse,
             urlPackage: mockedCommandsResponse,
@@ -262,7 +247,6 @@ describe('Command Generator', () => {
         options: [
           {
             architecture: 'x64',
-            extension: 'deb',
             installCommand: mockedCommandsResponse,
             startCommand: mockedCommandsResponse,
             urlPackage: mockedCommandsResponse,
@@ -340,7 +324,6 @@ describe('Command Generator', () => {
     const selectedOs: tOperatingSystem = {
       name: 'linux',
       architecture: 'x64',
-      extension: 'deb',
     };
     commandGenerator.selectOS(selectedOs);
 
@@ -373,7 +356,6 @@ describe('Command Generator', () => {
     const selectedOs: tOperatingSystem = {
       name: 'linux',
       architecture: 'x64',
-      extension: 'deb',
     };
     commandGenerator.selectOS(selectedOs);
 

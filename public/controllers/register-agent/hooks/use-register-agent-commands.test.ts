@@ -11,18 +11,15 @@ type tOptionalParamsNames = 'optional1' | 'optional2';
 export interface ILinuxOSTypes {
   name: 'linux';
   architecture: 'x64' | 'x86';
-  extension: 'rpm' | 'deb';
 }
 export interface IWindowsOSTypes {
   name: 'windows';
   architecture: 'x86';
-  extension: 'msi';
 }
 
 export interface IMacOSTypes {
   name: 'mac';
   architecture: '32/64';
-  extension: 'pkg';
 }
 
 export type tOperatingSystem = ILinuxOSTypes | IMacOSTypes | IWindowsOSTypes;
@@ -31,18 +28,16 @@ const linuxDefinition: IOSDefinition<tOperatingSystem, tOptionalParamsNames> = {
   name: 'linux',
   options: [
     {
-      extension: 'deb',
       architecture: '32/64',
       urlPackage: props =>
-        `https://packages.wazuh.com/4.x/yum/wazuh-agent-${props.wazuhVersion}-1.x86_64.${props.extension}`,
+        `https://packages.wazuh.com/4.x/yum/wazuh-agent-${props.wazuhVersion}-1.x86_64`,
       installCommand: props => `sudo yum install -y ${props.urlPackage}`,
       startCommand: props => `sudo systemctl start wazuh-agent`,
     },
     {
-      extension: 'deb',
       architecture: 'x64',
       urlPackage: props =>
-        `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/ wazuh-agent_${props.wazuhVersion}-1_${props.architecture}.${props.extension}`,
+        `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/ wazuh-agent_${props.wazuhVersion}-1_${props.architecture}`,
       installCommand: props =>
         `curl -so wazuh-agent.deb ${props.urlPackage} && sudo dpkg -i ./wazuh-agent.deb`,
       startCommand: props => `sudo systemctl start wazuh-agent`,
@@ -102,7 +97,6 @@ describe('useRegisterAgentCommands hook', () => {
         selectOS({
           name: 'linux',
           architecture: 'x64',
-          extension: 'deb',
         });
       });
     } catch (error) {
@@ -124,7 +118,7 @@ describe('useRegisterAgentCommands hook', () => {
     const optionSelected = osCommandsDefinitions
       .find(os => os.name === 'linux')
       ?.options.find(
-        item => item.architecture === 'x64' && item.extension === 'deb',
+        item => item.architecture === 'x64',
       );
     const spyInstall = jest.spyOn(optionSelected!, 'installCommand');
     const spyStart = jest.spyOn(optionSelected!, 'startCommand');
@@ -133,7 +127,6 @@ describe('useRegisterAgentCommands hook', () => {
       selectOS({
         name: 'linux',
         architecture: 'x64',
-        extension: 'deb',
       });
     });
     expect(result.current.installCommand).not.toBe('');
@@ -211,7 +204,7 @@ describe('useRegisterAgentCommands hook', () => {
     const optionSelected = osCommandsDefinitions
       .find(os => os.name === 'linux')
       ?.options.find(
-        item => item.architecture === 'x64' && item.extension === 'deb',
+        item => item.architecture === 'x64',
       );
     const spyInstall = jest.spyOn(optionSelected!, 'installCommand');
     const spyStart = jest.spyOn(optionSelected!, 'startCommand');
@@ -220,7 +213,6 @@ describe('useRegisterAgentCommands hook', () => {
       selectOS({
         name: 'linux',
         architecture: 'x64',
-        extension: 'deb',
       });
 
       setOptionalParams({
