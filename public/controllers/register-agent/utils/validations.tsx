@@ -7,13 +7,11 @@ export const validateServerAddress = value => {
   const numbersAndPoints = /^[0-9.]+$/;
   const areLettersNumbersAndColons = /^[a-zA-Z0-9:]+$/;
   const letters = /[a-zA-Z]/;
-  const hiphens = /^-|-$|.*-.*$/;
   const isFQDNFormatValid = isFQDN.test(value);
   const isIPFormatValid = isIP.test(value);
   const areNumbersAndPoints = numbersAndPoints.test(value);
   const hasLetters = letters.test(value);
   const hasPoints = value.includes('.');
-  const hasHyphens = hiphens.test(value);
 
   let validation = undefined;
   if (value.length === 0) {
