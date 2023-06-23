@@ -1,18 +1,19 @@
 export const validateServerAddress = value => {
   const isFQDN =
-    /^(?!(?:[0-9-]{0,62}[0-9]|[0-9-]{0,62})\.)([a-zA-Z0-9áéíóúüñ](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9áéíóúüñ])?\.){2,}(?:[a-zA-Záéíóúüñ]{2,63}|[a-zA-Z0-9-áéíóúüñ]{2,63}\.[a-zA-Záéíóúüñ]{2,63})$/;
+    /^(?!-)(?!.*--)[a-zA-Z0-9áéíóúüñ]{1,63}(?:-[a-zA-Z0-9áéíóúüñ]{1,63})*(?:\.[a-zA-Z0-9áéíóúüñ]{1,63}(?:-[a-zA-Z0-9áéíóúüñ]{1,63})*){2,}$/;
 
   const isIP =
     /^(?:(?:[0-9]{1,3}\.){3}[0-9]{1,3}|(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4})$/;
   const numbersAndPoints = /^[0-9.]+$/;
   const areLettersNumbersAndColons = /^[a-zA-Z0-9:]+$/;
   const letters = /[a-zA-Z]/;
-
+  const hiphens = /^-|-$|.*-.*$/;
   const isFQDNFormatValid = isFQDN.test(value);
   const isIPFormatValid = isIP.test(value);
   const areNumbersAndPoints = numbersAndPoints.test(value);
   const hasLetters = letters.test(value);
   const hasPoints = value.includes('.');
+  const hasHyphens = hiphens.test(value);
 
   let validation = undefined;
   if (value.length === 0) {
