@@ -7,7 +7,7 @@ import {
   EuiLink,
   EuiCheckbox,
 } from '@elastic/eui';
-import { OPERATING_SYSTEM_TEXT } from '../../../utils/register-agent-data';
+import { OPERATING_SYSTEMS_OPTIONS } from '../../../utils/register-agent-data';
 import { CheckboxGroupComponent } from '../checkbox-group/checkbox-group';
 import './os-card.scss';
 import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
@@ -15,13 +15,14 @@ import { webDocumentationLink } from '../../../../../../common/services/web_docu
 interface Props {
   setStatusCheck: string;
   onChange: React.ChangeEventHandler<HTMLInputElement>;
+  value: any;
 }
 
 export const OsCard = ({ onChange, value }: Props) => {
   return (
     <div data-testid='os-card'>
       <EuiFlexGroup gutterSize='l' wrap>
-        {OPERATING_SYSTEM_TEXT.map((data, index) => (
+        {OPERATING_SYSTEMS_OPTIONS.map((data, index) => (
           <EuiFlexItem key={index}>
             <EuiCard
               title={
