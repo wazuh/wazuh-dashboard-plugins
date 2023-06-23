@@ -3,7 +3,7 @@ import LinuxIcon from '../../../../public/assets/images/icons/linux-icon.svg';
 import WindowsIcon from '../../../../public/assets/images/icons/windows-icon.svg';
 import MacIcon from '../../../../public/assets/images/icons/mac-icon.svg';
 
-export const OPERATING_SYSTEM_TEXT: RegisterAgentData[] = [
+export const OPERATING_SYSTEMS_OPTIONS: RegisterAgentData[] = [
   {
     icon: LinuxIcon,
     title: 'LINUX',

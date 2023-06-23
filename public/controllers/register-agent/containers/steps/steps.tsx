@@ -1,13 +1,7 @@
-
-import React, { Component, Fragment, useEffect, useState } from 'react';
-import {
-  EuiSteps,
-  EuiTitle,
-} from '@elastic/eui';
+import React, { Fragment, useEffect, useState } from 'react';
+import { EuiSteps, EuiTitle } from '@elastic/eui';
 import './steps.scss';
-import {
-  OPERATING_SYSTEM_TEXT
-} from '../../utils/register-agent-data';
+import { OPERATING_SYSTEMS_OPTIONS } from '../../utils/register-agent-data';
 import {
   IParseRegisterFormValues,
   getRegisterAgentFormValues,
@@ -57,18 +51,17 @@ export const Steps = ({
         agentGroups: '',
         agentName: '',
         serverAddress: '',
-        wazuhPassword: '',
+        wazuhPassword,
       },
     });
 
   useEffect(() => {
     // get form values and parse them divided in OS and optional params
-    setRegisterAgentFormValues(
-      parseRegisterAgentFormValues(
-        getRegisterAgentFormValues(form),
-        OPERATING_SYSTEM_TEXT,
-      ),
+    const registerAgentFormValuesParsed = parseRegisterAgentFormValues(
+      getRegisterAgentFormValues(form),
+      OPERATING_SYSTEMS_OPTIONS,
     );
+    setRegisterAgentFormValues(registerAgentFormValuesParsed);
   }, [form.fields]);
 
   const { installCommand, startCommand, selectOS, setOptionalParams } =
@@ -78,8 +71,11 @@ export const Steps = ({
     });
 
   useEffect(() => {
-    if (registerAgentFormValues.operatingSystem.name !== '' && registerAgentFormValues.operatingSystem.architecture !== '') {
-      selectOS(registerAgentFormValues.operatingSystem);
+    if (
+      registerAgentFormValues.operatingSystem.name !== '' &&
+      registerAgentFormValues.operatingSystem.architecture !== ''
+    ) {
+      selectOS(registerAgentFormValues.operatingSystem as tOperatingSystem);
     }
 
     setOptionalParams(registerAgentFormValues.optionalParams);
@@ -99,9 +95,7 @@ export const Steps = ({
     },
     {
       title: <ServerAddressTitle />,
-      children: (
-        <ServerAddressInput formField={form.fields.serverAddress} />
-      ),
+      children: <ServerAddressInput formField={form.fields.serverAddress} />,
       status: !form.fields.operatingSystemSelection.value
         ? 'disabled'
         : !form.fields.serverAddress.value &&
@@ -136,7 +130,7 @@ export const Steps = ({
           <p>Optional settings</p>
         </EuiTitle>
       ),
-      children: <OptionalsInputs formFields={form.fields}/>,
+      children: <OptionalsInputs formFields={form.fields} />,
       status:
         !form.fields.operatingSystemSelection.value ||
         !form.fields.serverAddress.value
