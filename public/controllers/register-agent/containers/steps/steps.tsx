@@ -4,7 +4,11 @@ import './steps.scss';
 import { OPERATING_SYSTEMS_OPTIONS } from '../../utils/register-agent-data';
 import {
   IParseRegisterFormValues,
+  getAgentCommandsStepStatus,
+  getOSSelectorStepStatus,
+  getOptionalParameterStepStatus,
   getRegisterAgentFormValues,
+  getServerAddressStepStatus,
   parseRegisterAgentFormValues,
   showCommandsSections,
 } from '../../services/register-agent-services';
@@ -81,7 +85,7 @@ export const Steps = ({
     setOptionalParams(registerAgentFormValues.optionalParams);
   }, [registerAgentFormValues]);
 
-  const firstSetOfSteps = [
+  const registerAgentFormSteps = [
     {
       title: (
         <EuiTitle className='stepTitle'>
@@ -89,22 +93,12 @@ export const Steps = ({
         </EuiTitle>
       ),
       children: osCard,
-      status: form.fields.operatingSystemSelection.value
-        ? 'complete'
-        : 'current',
+      status: getOSSelectorStepStatus(form.fields),
     },
     {
       title: <ServerAddressTitle />,
       children: <ServerAddressInput formField={form.fields.serverAddress} />,
-      status: !form.fields.operatingSystemSelection.value
-        ? 'disabled'
-        : !form.fields.serverAddress.value &&
-          form.fields.operatingSystemSelection.value
-        ? 'current'
-        : form.fields.operatingSystemSelection.value &&
-          form.fields.serverAddress.value
-        ? 'complete'
-        : '',
+      status: getServerAddressStepStatus(form.fields),
     },
     ...(!(!needsPassword || hideTextPassword)
       ? [
@@ -131,15 +125,7 @@ export const Steps = ({
         </EuiTitle>
       ),
       children: <OptionalsInputs formFields={form.fields} />,
-      status:
-        !form.fields.operatingSystemSelection.value ||
-        !form.fields.serverAddress.value
-          ? 'disabled'
-          : form.fields.serverAddress.value !== ''
-          ? 'current'
-          : form.fields.agentGroups.value.length > 0
-          ? 'complete'
-          : '',
+      status: getOptionalParameterStepStatus(form.fields)
     },
     {
       title: (
@@ -155,7 +141,7 @@ export const Steps = ({
           showCommand={showCommandsSections(form.fields)}
         />
       ),
-      status: showCommandsSections(form.fields) ? 'current' : 'disabled',
+      status: getAgentCommandsStepStatus(form.fields),
     },
     {
       title: (
@@ -169,9 +155,9 @@ export const Steps = ({
           showCommand={showCommandsSections(form.fields)}
         />
       ),
-      status: showCommandsSections(form.fields) ? 'current' : 'disabled',
+      status: getAgentCommandsStepStatus(form.fields),
     },
   ];
 
-  return <EuiSteps steps={firstSetOfSteps} />;
+  return <EuiSteps steps={registerAgentFormSteps} />;
 };

@@ -1,6 +1,10 @@
+import { EuiStepStatus } from '@elastic/eui';
 import { UseFormReturn } from '../../../components/common/form/types';
 import { WzRequest } from '../../../react-services/wz-request';
-import { tOperatingSystem, tOptionalParameters } from '../core/config/os-commands-definitions';
+import {
+  tOperatingSystem,
+  tOptionalParameters,
+} from '../core/config/os-commands-definitions';
 import { RegisterAgentData } from '../interfaces/types';
 
 type Protocol = 'TCP' | 'UDP';
@@ -176,9 +180,7 @@ export const getManagerNode = async (): Promise<any> => {
  * Parse the nodes list from the API response to a format that can be used by the EuiComboBox
  * @param nodes
  */
-export const parseNodesInOptions = (
-  nodes: NodeResponse,
-): any[] => {
+export const parseNodesInOptions = (nodes: NodeResponse): any[] => {
   return nodes.data.data.affected_items.map((item: NodeItem) => ({
     label: item.name,
     value: item.ip,
@@ -189,9 +191,7 @@ export const parseNodesInOptions = (
 /**
  * Get the list of the cluster nodes from API and parse it into a list of options
  */
-export const fetchClusterNodesOptions = async (): Promise<
-  any[]
-> => {
+export const fetchClusterNodesOptions = async (): Promise<any[]> => {
   const clusterStatus = await clusterStatusResponse();
   if (clusterStatus) {
     // Cluster mode
@@ -209,9 +209,7 @@ export const fetchClusterNodesOptions = async (): Promise<
  * Get the master node data from the list of cluster nodes
  * @param nodeIps
  */
-export const getMasterNode = (
-  nodeIps: any[],
-): any[] => {
+export const getMasterNode = (nodeIps: any[]): any[] => {
   return nodeIps.filter(nodeIp => nodeIp.nodetype === 'master');
 };
 
@@ -240,61 +238,113 @@ export const getGroups = async () => {
 };
 
 export const getRegisterAgentFormValues = (form: UseFormReturn) => {
-  // return the values form the form.fields and the value property
+  // return the values form the formFields and the value property
   return Object.keys(form.fields).map(key => {
     return {
       name: key,
       value: form.fields[key].value,
     };
-  })
-}
+  });
+};
 
 export interface IParseRegisterFormValues {
   operatingSystem: {
-    name: tOperatingSystem['name'] | '',
-    architecture: tOperatingSystem['architecture'] | ''
-  },
+    name: tOperatingSystem['name'] | '';
+    architecture: tOperatingSystem['architecture'] | '';
+  };
   // optionalParams is an object that their key is defined in tOptionalParameters and value must be string
   optionalParams: {
-    [FIELD in tOptionalParameters]: string
-  }
+    [FIELD in tOptionalParameters]: string;
+  };
 }
 
-export const parseRegisterAgentFormValues = (formValues: { name: keyof UseFormReturn['fields'], value: any }[], OSOptionsDefined: RegisterAgentData[]) => {
-  // return the values form the form.fields and the value property
+export const parseRegisterAgentFormValues = (
+  formValues: { name: keyof UseFormReturn['fields']; value: any }[],
+  OSOptionsDefined: RegisterAgentData[],
+) => {
+  // return the values form the formFields and the value property
   const parsedForm = {
     operatingSystem: {
       architecture: '',
-      name: ''
+      name: '',
     },
-    optionalParams: {}
-  } as IParseRegisterFormValues
+    optionalParams: {},
+  } as IParseRegisterFormValues;
   formValues.forEach(field => {
-    if(field.name === 'operatingSystemSelection'){
+    if (field.name === 'operatingSystemSelection') {
       // search the architecture defined in architecture array and get the os name defined in title array in the same index
-      const operatingSystem = OSOptionsDefined.find(os => os.architecture.includes(field.value))
-      if(operatingSystem){
+      const operatingSystem = OSOptionsDefined.find(os =>
+        os.architecture.includes(field.value),
+      );
+      if (operatingSystem) {
         parsedForm.operatingSystem = {
           name: operatingSystem.title,
-          architecture: field.value
-        }
+          architecture: field.value,
+        };
       }
-    }else{
-      if(field.name === 'agentGroups'){
-        parsedForm.optionalParams[field.name as any] = field.value[0] ? field.value[0].id : '';
-      }else{
-        parsedForm.optionalParams[field.name as any] = field.value
+    } else {
+      if (field.name === 'agentGroups') {
+        parsedForm.optionalParams[field.name as any] = field.value[0]
+          ? field.value[0].id
+          : '';
+      } else {
+        parsedForm.optionalParams[field.name as any] = field.value;
       }
     }
-  })
+  });
 
   return parsedForm;
-}
+};
 
-export const showCommandsSections = (formFields: UseFormReturn['fields']): boolean => {
+export const showCommandsSections = (
+  formFields: UseFormReturn['fields'],
+): boolean => {
   return !formFields.operatingSystemSelection.value ||
-      formFields.serverAddress.value === '' ||
-      formFields.serverAddress.error
-        ? false
-        : true;
-}
+    formFields.serverAddress.value === '' ||
+    formFields.serverAddress.error
+    ? false
+    : true;
+};
+
+/******** Form Steps status getters ********/
+
+type tFormStepsStatus = EuiStepStatus | 'current' | 'disabled' | '';
+
+export const getOSSelectorStepStatus = (
+  formFields: UseFormReturn['fields'],
+): tFormStepsStatus => {
+  return formFields.operatingSystemSelection.value ? 'complete' : 'current';
+};
+
+export const getAgentCommandsStepStatus = (
+  formFields: UseFormReturn['fields'],
+): tFormStepsStatus | 'disabled' => {
+  return showCommandsSections(formFields) ? 'current' : 'disabled';
+};
+
+export const getServerAddressStepStatus = (
+  formFields: UseFormReturn['fields'],
+): tFormStepsStatus => {
+  return !formFields.operatingSystemSelection.value
+    ? 'disabled'
+    : !formFields.serverAddress.value &&
+      formFields.operatingSystemSelection.value
+    ? 'current'
+    : formFields.operatingSystemSelection.value &&
+      formFields.serverAddress.value
+    ? 'complete'
+    : '';
+};
+
+export const getOptionalParameterStepStatus = (
+  formFields: UseFormReturn['fields'],
+): tFormStepsStatus => {
+  return !formFields.operatingSystemSelection.value ||
+    !formFields.serverAddress.value
+    ? 'disabled'
+    : formFields.serverAddress.value !== ''
+    ? 'current'
+    : formFields.agentGroups.value.length > 0
+    ? 'complete'
+    : '';
+};
