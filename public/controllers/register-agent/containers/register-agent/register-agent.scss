@@ -1,6 +1,6 @@
 .container {
   box-sizing: border-box;
-  min-height: 1271px;
+  max-height: 1271px;
   margin-top: 44px;
   background: #ffffff;
   border: 1px solid rgba(52, 55, 65, 0.2);
@@ -22,14 +22,5 @@
 }
 .close {
   display: flex;
-  justify-content: end;
   margin-top: 17px;
-}
-
-.close-button {
-  width: 112px;
-  height: 40px;
-  border-radius: 6px;
-  background: #CCE4F5 !important;
-  border-color: #CCE4F5 !important;
 }

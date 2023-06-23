@@ -240,7 +240,6 @@ export const getGroups = async () => {
   }
 };
 
-
 export const getRegisterAgentFormValues = (form: UseFormReturn) => {
   // return the values form the form.fields and the value property
   return Object.keys(form.fields).map(key => {

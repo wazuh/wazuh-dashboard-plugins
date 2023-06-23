@@ -28,7 +28,8 @@
   .checkbox-item {
     display: flex;
     flex-direction: row-reverse;
-    justify-content: start;
+    // justify-content: start;
+    align-self: baseline;
   }
 }
 

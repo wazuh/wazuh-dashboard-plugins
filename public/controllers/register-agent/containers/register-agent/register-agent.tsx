@@ -9,7 +9,6 @@ import {
   EuiPageBody,
   EuiSpacer,
   EuiProgress,
-  EuiButton,
 } from '@elastic/eui';
 import { WzRequest } from '../../../../react-services/wz-request';
 import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
@@ -69,7 +68,7 @@ export const RegisterAgent = withReduxProvider(
 
       // FQDN: Maximum of 63 characters per label.
       // Can only contain numbers, letters and hyphens (-)
-      // Cannot begin or end with a hyphen
+      // Labels cannot begin or end with a hyphen
       // Currently supports multilingual characters, i.e. letters not included in the English alphabet: e.g. á é í ó ú ü ñ.
       // Minimum 3 labels
 
@@ -173,28 +172,28 @@ export const RegisterAgent = withReduxProvider(
 
     return (
       <div>
-        <div className='close'>
-          {hasAgents() ? (
-            <EuiButtonEmpty
-              size='s'
-              onClick={() => addNewAgent(false)}
-              iconType='cross'
-            ></EuiButtonEmpty>
-          ) : (
-            <EuiButtonEmpty
-              size='s'
-              onClick={() => reload()}
-              iconType='refresh'
-            >
-              Refresh
-            </EuiButtonEmpty>
-          )}
-        </div>
         <EuiPage restrictWidth='1000px' style={{ background: 'transparent' }}>
           <EuiPageBody>
             <EuiFlexGroup>
               <EuiFlexItem>
                 <EuiPanel className='container'>
+                  <div className='close'>
+                    {hasAgents() ? (
+                      <EuiButtonEmpty
+                        size='s'
+                        onClick={() => addNewAgent(false)}
+                        iconType='cross'
+                      ></EuiButtonEmpty>
+                    ) : (
+                      <EuiButtonEmpty
+                        size='s'
+                        onClick={() => reload()}
+                        iconType='refresh'
+                      >
+                        Refresh
+                      </EuiButtonEmpty>
+                    )}
+                  </div>
                   <EuiFlexGroup>
                     <EuiFlexItem>
                       <EuiTitle>
