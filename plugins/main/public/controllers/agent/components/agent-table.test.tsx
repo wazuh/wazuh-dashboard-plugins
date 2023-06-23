@@ -1,5 +1,5 @@
 import React from 'react';
-import { shallow } from 'enzyme';
+import { render } from 'enzyme';
 import { AgentsTable } from './agents-table';
 import { WzRequest } from '../../../react-services/wz-request';
 import { AgentSynced } from '../../../components/agents/agent-synced';
@@ -663,6 +663,11 @@ const permissionsStore = {
 
 const mockStore = configureMockStore();
 
+jest.mock('react', () => ({
+  ...jest.requireActual('react'),
+  useLayoutEffect: jest.requireActual('react').useEffect,
+}));
+
 describe('AgentsTable component', () => {
   WzRequest.apiReq = jest.fn(AgentsTable, 'wzReq').mockResolvedValue({
     data: {
@@ -676,7 +681,7 @@ describe('AgentsTable component', () => {
 
   const store = mockStore(permissionsStore);
   it('Renders correctly to match the snapshot', () => {
-    const wrapper = shallow(
+    const wrapper = render(
       <Provider store={store}>
         <AgentsTable
           filters={[]}
@@ -690,6 +695,12 @@ describe('AgentsTable component', () => {
         />
       </Provider>,
     );
+
+    // Set table id to avoid snapshot changes
+
+    const tableId = '__table_d1f8f8c3-1198-11ee-ab9b-75fc624fc672';
+
+    wrapper.find('table')[0]['attribs']['id'] = tableId;
 
     expect(wrapper).toMatchSnapshot();
     expect(window.localStorage.getItem('columnsSelectedTableAgent')).toEqual(
@@ -702,7 +713,7 @@ describe('AgentsTable component', () => {
       'columnsSelectedTableAgent',
       JSON.stringify(lessColumns),
     );
-    const wrapper = shallow(
+    const wrapper = render(
       <Provider store={store}>
         <AgentsTable
           filters={[]}
@@ -716,6 +727,13 @@ describe('AgentsTable component', () => {
         />
       </Provider>,
     );
+
+    // Set table id to avoid snapshot changes
+
+    const tableId = '__table_d1fddac1-1198-11ee-ab9b-75fc624fc672';
+
+    wrapper.find('table')[0]['attribs']['id'] = tableId;
+
     expect(wrapper).toMatchSnapshot();
     expect(window.localStorage.getItem('columnsSelectedTableAgent')).toEqual(
       JSON.stringify(defaultColumns),
@@ -727,7 +745,7 @@ describe('AgentsTable component', () => {
       'columnsSelectedTableAgent',
       JSON.stringify(moreColumns),
     );
-    const wrapper = shallow(
+    const wrapper = render(
       <Provider store={store}>
         <AgentsTable
           filters={[]}
@@ -741,75 +759,109 @@ describe('AgentsTable component', () => {
         />
       </Provider>,
     );
+
+    // Set table id to avoid snapshot changes
+
+    const tableId = '__table_d2010f13-1198-11ee-ab9b-75fc624fc672';
+
+    wrapper.find('table')[0]['attribs']['id'] = tableId;
+
     expect(wrapper).toMatchSnapshot();
     expect(window.localStorage.getItem('columnsSelectedTableAgent')).toEqual(
       JSON.stringify(defaultColumns),
     );
   });
 
-  it.skip('Renders correctly to match the snapshot with custom columns', () => {
+  it('Renders correctly to match the snapshot with custom columns', () => {
     window.localStorage.setItem(
       'columnsSelectedTableAgent',
       JSON.stringify(customColumns),
     );
-    const wrapper = mount(
-      <AgentsTable
-        filters={[]}
-        removeFilters={() => jest.fn()}
-        wzReq={WzRequest.apiReq}
-        addingNewAgent={() => jest.fn()}
-        downloadCsv={() => jest.fn()}
-        clickAction={() => jest.fn()}
-        formatUIDate={date => jest.fn()}
-        reload={() => jest.fn()}
-      />,
+    const wrapper = render(
+      <Provider store={store}>
+        <AgentsTable
+          filters={[]}
+          removeFilters={() => jest.fn()}
+          wzReq={WzRequest.apiReq}
+          addingNewAgent={() => jest.fn()}
+          downloadCsv={() => jest.fn()}
+          clickAction={() => jest.fn()}
+          formatUIDate={date => jest.fn()}
+          reload={() => jest.fn()}
+        />
+      </Provider>,
     );
+
+    // Set table id to avoid snapshot changes
+
+    const tableId = '__table_d203a723-1198-11ee-ab9b-75fc624fc672';
+
+    wrapper.find('table')[0]['attribs']['id'] = tableId;
+
     expect(wrapper).toMatchSnapshot();
     expect(window.localStorage.getItem('columnsSelectedTableAgent')).toEqual(
       JSON.stringify(customColumns),
     );
   });
 
-  it.skip('Renders correctly to match the snapshot with less custom columns', () => {
+  it('Renders correctly to match the snapshot with less custom columns', () => {
     window.localStorage.setItem(
       'columnsSelectedTableAgent',
       JSON.stringify(lessCustomColumns),
     );
-    const wrapper = mount(
-      <AgentsTable
-        filters={[]}
-        removeFilters={() => jest.fn()}
-        wzReq={WzRequest.apiReq}
-        addingNewAgent={() => jest.fn()}
-        downloadCsv={() => jest.fn()}
-        clickAction={() => jest.fn()}
-        formatUIDate={date => jest.fn()}
-        reload={() => jest.fn()}
-      />,
+    const wrapper = render(
+      <Provider store={store}>
+        <AgentsTable
+          filters={[]}
+          removeFilters={() => jest.fn()}
+          wzReq={WzRequest.apiReq}
+          addingNewAgent={() => jest.fn()}
+          downloadCsv={() => jest.fn()}
+          clickAction={() => jest.fn()}
+          formatUIDate={date => jest.fn()}
+          reload={() => jest.fn()}
+        />
+      </Provider>,
     );
+
+    // Set table id to avoid snapshot changes
+
+    const tableId = '__table_d2068d51-1198-11ee-ab9b-75fc624fc672';
+
+    wrapper.find('table')[0]['attribs']['id'] = tableId;
+
     expect(wrapper).toMatchSnapshot();
     expect(window.localStorage.getItem('columnsSelectedTableAgent')).toEqual(
       JSON.stringify(customColumns),
     );
   });
 
-  it.skip('Renders correctly to match the snapshot with more custom columns', () => {
+  it('Renders correctly to match the snapshot with more custom columns', () => {
     window.localStorage.setItem(
       'columnsSelectedTableAgent',
       JSON.stringify(moreCustomColumns),
     );
-    const wrapper = mount(
-      <AgentsTable
-        filters={[]}
-        removeFilters={() => jest.fn()}
-        wzReq={WzRequest.apiReq}
-        addingNewAgent={() => jest.fn()}
-        downloadCsv={() => jest.fn()}
-        clickAction={() => jest.fn()}
-        formatUIDate={date => jest.fn()}
-        reload={() => jest.fn()}
-      />,
+    const wrapper = render(
+      <Provider store={store}>
+        <AgentsTable
+          filters={[]}
+          removeFilters={() => jest.fn()}
+          wzReq={WzRequest.apiReq}
+          addingNewAgent={() => jest.fn()}
+          downloadCsv={() => jest.fn()}
+          clickAction={() => jest.fn()}
+          formatUIDate={date => jest.fn()}
+          reload={() => jest.fn()}
+        />
+      </Provider>,
     );
+
+    // Set table id to avoid snapshot changes
+
+    const tableId = '__table_d2097381-1198-11ee-ab9b-75fc624fc672';
+
+    wrapper.find('table')[0]['attribs']['id'] = tableId;
+
     expect(wrapper).toMatchSnapshot();
     expect(window.localStorage.getItem('columnsSelectedTableAgent')).toEqual(
       JSON.stringify(customColumns),
