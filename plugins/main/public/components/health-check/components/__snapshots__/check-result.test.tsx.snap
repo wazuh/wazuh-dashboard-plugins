@@ -1,0 +1,92 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Check result component should render a Check result screen 1`] = `
+<CheckResult
+  awaitFor={Array []}
+  canRetry={true}
+  check={true}
+  checksReady={Object {}}
+  cleanErrors={[MockFunction]}
+  handleCheckReady={[MockFunction]}
+  handleErrors={[MockFunction]}
+  isLoading={false}
+  name="test"
+  title="Check Test"
+  validationService={[MockFunction]}
+>
+  <EuiDescriptionListTitle>
+    <dt
+      className="euiDescriptionList__title"
+    >
+      Check Test
+    </dt>
+  </EuiDescriptionListTitle>
+  <EuiDescriptionListDescription>
+    <dd
+      className="euiDescriptionList__description"
+    >
+      <p>
+        <ResultIcons
+          initCheck={[Function]}
+          result="waiting"
+        >
+          <EuiToolTip
+            content="On hold..."
+            delay="regular"
+            position="top"
+          >
+            <span
+              className="euiToolTipAnchor"
+              onKeyUp={[Function]}
+              onMouseOut={[Function]}
+              onMouseOver={[Function]}
+            >
+              <EuiIcon
+                aria-label="waiting"
+                color="#999999"
+                onBlur={[Function]}
+                onFocus={[Function]}
+                type="clock"
+              >
+                <EuiIconEmpty
+                  aria-hidden={true}
+                  aria-label="waiting"
+                  className="euiIcon euiIcon--medium euiIcon--customColor euiIcon-isLoading"
+                  focusable="false"
+                  onBlur={[Function]}
+                  onFocus={[Function]}
+                  role="img"
+                  style={
+                    Object {
+                      "color": "#999999",
+                    }
+                  }
+                >
+                  <svg
+                    aria-hidden={true}
+                    aria-label="waiting"
+                    className="euiIcon euiIcon--medium euiIcon--customColor euiIcon-isLoading"
+                    focusable="false"
+                    height={16}
+                    onBlur={[Function]}
+                    onFocus={[Function]}
+                    role="img"
+                    style={
+                      Object {
+                        "color": "#999999",
+                      }
+                    }
+                    viewBox="0 0 16 16"
+                    width={16}
+                    xmlns="http://www.w3.org/2000/svg"
+                  />
+                </EuiIconEmpty>
+              </EuiIcon>
+            </span>
+          </EuiToolTip>
+        </ResultIcons>
+      </p>
+    </dd>
+  </EuiDescriptionListDescription>
+</CheckResult>
+`;

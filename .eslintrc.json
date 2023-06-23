@@ -2,6 +2,7 @@
   "root": true,
   "env": {
     "browser": true,
+    "es2021": true,
     "node": true,
     "jest": true
   },
@@ -32,7 +33,7 @@
       "typescript": {}
     },
     "react": {
-      "version": "16.12.0"
+      "version": "16.14.0"
     }
   },
   "ignorePatterns": [
@@ -51,6 +52,15 @@
     "spaced-comment": "error",
     "no-duplicate-imports": "error",
     "no-await-in-loop": "error",
+    "no-use-before-define": [
+      "error",
+      {
+        "functions": true,
+        "classes": true,
+        "variables": true,
+        "allowNamedExports": false
+      }
+    ],
     "block-scoped-var": "error",
     "curly": "error",
     "default-case": "error",

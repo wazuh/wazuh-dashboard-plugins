@@ -1,0 +1,262 @@
+/*
+ * Wazuh app - Top nav bar stylesheet
+ * Copyright (C) 2015-2022 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
+
+/* -------------------------------------------------------------------------- */
+/* ---------------------- Wazuh top nav bar stylesheet ---------------------- */
+/* -------------------------------------------------------------------------- */
+
+/* Style to the base toolbar */
+/* Style applied to the toolbar-tools container */
+wz-menu {
+    z-index: 999;
+}
+.wz-menu {
+    margin-right: 1px;
+    background-color: #FFF;
+    margin-top: 0;
+    box-shadow: 0 2px 2px -1px rgba(152, 162, 179, 0.3);
+    border-bottom: 1px solid #d3dae6;
+    font-size: 14px;
+    position: relative !important;
+}
+
+.wz-menu a:focus{
+    text-decoration: none;
+}
+
+.wz-menu-wrapper{
+    display: flex;
+}
+
+.wz-menu-left-side{
+    width: 200px;
+    background: #f5f7fa;
+    padding: 0 16px;
+    border-right: 1px solid #d3dae6;
+}
+
+.wz-menu-left-side .euiButtonEmpty {
+    width: 100%;
+    margin-bottom: 12px;
+    padding: 0px 0px 0px 12px;
+}
+
+.wz-menu-left-side .euiButtonEmpty__content {
+    justify-content: left;
+}
+
+.wz-menu-left-side .euiButtonEmpty__text {
+    width: 100%;
+    text-align: left;
+    display: contents;
+}
+
+.wz-menu-sections {
+    margin: 0px -16px 0px -16px;
+    padding: 16px 0;
+    position: relative;
+    min-height: 300px;
+    background: #fafbfd;
+}
+
+
+
+.wz-menu-right-side{
+    padding: 0;
+    max-width: 700px;
+}
+
+.navBarLogo-wrapper {
+    margin-right: 0px;
+    max-width: 100px;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.navBarLogo {
+    width: fit-content;
+    max-width: 100%;
+    max-height: 32px;
+}
+
+.wz-menu-popover{
+    position: fixed;
+    left: 96px !important;
+    border-radius: 0px 0px 4px 0px;
+    max-height: unset!important;
+    border-right: none!important;
+}
+
+.wz-expanded-header-min {
+    top: 53px !important;
+}
+
+.wz-expanded-header-max {
+    top: 105px !important;
+}
+
+.wz-menu-popover-over .euiPopover__panelArrow.euiPopover__panelArrow--bottom:after {
+    border-bottom: 12px solid #fafbfd!important;
+}
+
+.wz-menu-popover-under .euiPopover__panelArrow.euiPopover__panelArrow--bottom:after,
+.wz-menu-popover-under .euiPopover__panelArrow.euiPopover__panelArrow--bottom:before {
+    display: none;
+}
+
+.wz-menu-popover.wz-menu-popover-over{
+    z-index: 3000!important;
+}
+
+.wz-menu-popover.wz-menu-popover-under{
+    z-index: 999!important;
+}
+
+.wz-menu-overview {
+    min-width: 716px;
+}
+
+@media only screen and (max-width: 767px){
+
+    .wz-menu-overview {
+        min-width: auto;
+    }
+
+    .wz-menu-select{
+        max-width: 20px !important;
+    }
+    .wz-menu-wrapper{
+        padding-left: 0!important;
+    }
+    .wz-menu-popover {
+        left: -1px !important;
+        width: 100vw;
+        box-shadow: none;
+        max-width: unset;
+    }
+    .wz-menu-left-side{
+        width: 70px;
+    }
+    .wz-menu-left-side .euiButtonEmpty {
+        width: 50px;
+    }
+    .wz-menu-right-side{
+        overflow-y: auto;
+        max-height: 320px;
+        margin-right: -16px;
+    }
+    .euiFormRow + .euiFormRow {
+        margin-left: 16px;
+        margin-top: 0;
+    }
+    .wz-menu-select {
+        max-width: 150px!important;
+        width: 150px!important;
+    }
+    .euiSideNav__mobileToggle.euiLink{
+        display: none;
+    }
+    .euiSideNav__content{
+        visibility: visible;
+        opacity: 1;
+        max-height: unset;
+        margin: 0;
+    }
+    .wz-menu-button-title {
+        display: none;
+    }
+  }
+
+    md-toolbar .bsTooltip-inner{
+        padding: 8px 3px;
+      }
+
+    md-toolbar .md-button {
+        margin: 0px 8px 0px 0px!important;
+      }
+
+.wz-menu-logo {
+    filter: hue-rotate(30deg) brightness(0.8);
+    margin-top: 4px;
+  }
+
+.wz-menu-button {
+    font-size: 14px !important;
+    transition: none !important;
+    min-height: 38px !important;
+    line-height: 38px !important;
+    height: 38px;
+    margin-right: 8px;
+    min-width: 45px!important;
+    font-weight: 400;
+}
+
+.wz-menu-button .euiButtonEmpty__content .euiButtonEmpty__content {
+    padding-right: 0;
+}
+
+.wz-menu-button.md-icon-button {
+    line-height: 24px !important;
+}
+.md-icon-button.md-icon-button-back {
+    border: 1px solid #d9d9d9!important;
+    border-radius: 5px!important;
+    margin-left: 0!important;
+}
+
+/* Style to mark active or when-hover buttons on the toolbar */
+.wz-menu-button.wz-menu-active{
+    background-color: #e7eaf1!important;
+}
+.wz-menu-button:not([disabled]):hover {
+    background-color: #f5f7fa;
+    text-decoration: none;
+}
+
+/* Style for index-pattern selector */
+.wz-menu-select {
+    cursor: pointer;
+    padding: 8px;
+    background: white;
+    border: 1px solid #d3dae6;
+    width: 100%;
+    max-width: 100%;
+}
+
+.wz-menu-select option {
+    color: #373a42;
+    background-color: #FFF;
+}
+
+/* Style for index-pattern selector options */
+.wz-menu-select-option {
+    color: #373a42;
+    background-color: #FFF;
+}
+
+.euiHeader {
+    box-shadow: none !important;
+}
+
+.wz-menu-button .euiIcon--medium {
+    width: 16px !important;
+    height: 16px !important;
+    margin-right: 6px;
+}
+
+.WzManagementSideMenu{
+    padding: 16px;
+}
+
+.WzManagementSideMenu span {
+    font-size: 14px!important;
+}

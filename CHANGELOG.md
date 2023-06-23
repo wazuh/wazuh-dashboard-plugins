@@ -2,7 +2,65 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v4.4.4 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 01
+## Wazuh v4.6.0 - OpenSearch Dashboards 2.6.0 - Revision 01
+
+### Added
+
+- Added rel="noopener noreferrer" in documentation links. [#5197](https://github.com/wazuh/wazuh-kibana-app/pull/5197) [#5274](https://github.com/wazuh/wazuh-kibana-app/pull/5274) [#5298](https://github.com/wazuh/wazuh-kibana-app/pull/5298) [#5409](https://github.com/wazuh/wazuh-kibana-app/pull/5409)
+- Added `ignore` and `restrict` options to Syslog configuration. [#5203](https://github.com/wazuh/wazuh-kibana-app/pull/5203)
+- Added the `extensions.github` and `extensions.office` settings to the default configuration file [#5376](https://github.com/wazuh/wazuh-kibana-app/pull/5376)
+- Added new global error treatment (client-side) [#4163](https://github.com/wazuh/wazuh-kibana-app/pull/4163)
+- Added a description to step 3 of the deploy a new agent section. [#5419](https://github.com/wazuh/wazuh-kibana-app/pull/5419)
+- Added a title to the agent name input of the deploy a new agent section. [#5429](https://github.com/wazuh/wazuh-kibana-app/pull/5429)
+- Added callout below the agent name entry of the deploy a new agent section. [#5429](https://github.com/wazuh/wazuh-kibana-app/pull/5429)
+- Added new CLI to generate API data from specification file [#5519](https://github.com/wazuh/wazuh-kibana-app/pull/5519)
+
+### Changed
+
+- Changed of regular expression in RBAC. [#5201](https://github.com/wazuh/wazuh-kibana-app/pull/5201)
+- Migrate the timeFilter, metaFields, maxBuckets health checks inside the pattern check. [#5384](https://github.com/wazuh/wazuh-kibana-app/pull/5384)
+- Changed the title to step 3 of the deploy a new agent section. [#5419](https://github.com/wazuh/wazuh-kibana-app/pull/5419)
+- Changed the title of step 3 of the deploy a new agent section. [#5429](https://github.com/wazuh/wazuh-kibana-app/pull/5429)
+- Changed the description of step 3 of the deploy a new agent section. [#5429](https://github.com/wazuh/wazuh-kibana-app/pull/5429)
+- Changed the placeholder of the agent name input of the deploy a new agent section. [#5429](https://github.com/wazuh/wazuh-kibana-app/pull/5429)
+- Changed the query to search for an agent in `management/configuration`. [#5485](https://github.com/wazuh/wazuh-kibana-app/pull/5485)
+- Changed the search bar in management/log to the one used in the rest of the app. [#5476](https://github.com/wazuh/wazuh-kibana-app/pull/5476)
+
+
+### Fixed
+
+- Fixed trailing hyphen character for OS value in the list of agents [#4828](https://github.com/wazuh/wazuh-kibana-app/pull/4828)
+- Fixed an issue that caused incorrect visualization of IPv6 addresses ([#4909](https://github.com/wazuh/wazuh-kibana-app/pull/4909)).
+- Fixed several typos in the code, by @jctello [#4911](https://github.com/wazuh/wazuh-kibana-app/pull/4911)
+- Fixed the display of more than one protocol in the Global configuration section [#4917](https://github.com/wazuh/wazuh-kibana-app/pull/4917)
+- Handling endpoint response was done when there is no data to show [#4918](https://github.com/wazuh/wazuh-kibana-app/pull/4918)
+- Fixed references to Elasticsearch in Wazuh-stack plugin [4894](https://github.com/wazuh/wazuh-kibana-app/pull/4894)
+- Fixed the 2 errors that appeared in console in Settings>Configuration section. [#5135](https://github.com/wazuh/wazuh-kibana-app/pull/5135)
+- Fixed the GitHub and Office 365 module visibility configuration for each API host was not kept when changing/upgrading the plugin [#5376](https://github.com/wazuh/wazuh-kibana-app/pull/5376)
+- Fixed the GitHub and Office 365 modules appear in the main menu when they were not configured [#5376](https://github.com/wazuh/wazuh-kibana-app/pull/5376)
+- Fixed TypeError in FIM Inventory using new error handler [#5364](https://github.com/wazuh/wazuh-kibana-app/pull/5364)
+- Fixed error when using invalid group configuration [#5423](https://github.com/wazuh/wazuh-kibana-app/pull/5423)
+- Fixed repeated requests in inventory data and configurations of an agent. [#5460](https://github.com/wazuh/wazuh-kibana-app/pull/5460)
+- Fixed repeated requests in the group table when adding a group or refreshing the table [#5465](https://github.com/wazuh/wazuh-kibana-app/pull/5465)
+- Fixed an error in the request body suggestions of API Console [#5521](https://github.com/wazuh/wazuh-kibana-app/pull/5521)
+
+### Removed
+
+- Removed deprecated request and code in agent's view [#5451](https://github.com/wazuh/wazuh-kibana-app/pull/5451)
+- Removed unnecessary dashboard queries caused by the deploy agent view. [#5453](https://github.com/wazuh/wazuh-kibana-app/pull/5453)
+- Removed repeated and unnecessary requests in security section. [#5500](https://github.com/wazuh/wazuh-kibana-app/pull/5500)
+- Removed scripts to generate API data from live Wazuh manager [#5519](https://github.com/wazuh/wazuh-kibana-app/pull/5519)
+- Removed pretty parameter from cron job requests. [#5532](https://github.com/wazuh/wazuh-kibana-app/pull/5532)
+- Removed unnecessary requests in `Management/Status` section. [#5528](https://github.com/wazuh/wazuh-kibana-app/pull/5528)
+- Removed obsolete code that caused duplicate requests to the api in `Management`. [#5485](https://github.com/wazuh/wazuh-kibana-app/pull/5485)
+
+## Wazuh v4.5.0 - OpenSearch Dashboards 2.6.0 - Revision 01
+
+### Added
+
+- Support for Wazuh 4.5.0
+
+## Wazuh v4.4.4 - OpenSearch Dashboards 2.6.0 - Revision 01
 
 ### Added
 
@@ -12,7 +70,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Changed the title and added a warning in the step 3 of the deploy new agent section. [#5416](https://github.com/wazuh/wazuh-kibana-app/pull/5416)
 
-## Wazuh v4.4.3 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 01
+## Wazuh v4.4.3 - OpenSearch Dashboards 2.6.0 - Revision 01
 
 ### Added
 
@@ -23,7 +81,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed command to install the macOS agent on the agent wizard [#5481](https://github.com/wazuh/wazuh-kibana-app/pull/5481) [#5484](https://github.com/wazuh/wazuh-kibana-app/pull/5484)
 - Fixed command to start the macOS agent on the agent wizard [#5470](https://github.com/wazuh/wazuh-kibana-app/pull/5470)
 
-## Wazuh v4.4.2 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 01
+## Wazuh v4.4.2 - OpenSearch Dashboards 2.6.0 - Revision 01
 
 ### Added
 
@@ -31,17 +89,19 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
-- Fixed a problem in the backend service to get the plugin configuration [#5428](https://github.com/wazuh/wazuh-kibana-app/pull/5428)
+- Fixed a problem in the backend service to get the plugin configuration [#5428](https://github.com/wazuh/wazuh-kibana-app/pull/5428) [#5432](https://github.com/wazuh/wazuh-kibana-app/pull/5432)
 
-## Wazuh v4.4.1 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 00
+## Wazuh v4.4.1 - OpenSearch Dashboards 2.6.0 - Revision 01
 
 ### Fixed
 
 - Fixed the search in the agent inventory data tables [#5196](https://github.com/wazuh/wazuh-kibana-app/pull/5196)
+- Fixed `Top 5 users` table overflow in `FIM::Dashboard` [#5334](https://github.com/wazuh/wazuh-kibana-app/pull/5334)
+- Fixed a visual error in the 'About' section. [#5337](https://github.com/wazuh/wazuh-kibana-app/pull/5337)
 - Fixed the `Anomaly and malware detection` link. [#5329](https://github.com/wazuh/wazuh-kibana-app/pull/5329)
 - Fixed the problem that did not allow closing the time picker when the button was clicked again in `Agents` and `Management/Statistics`. [#5341](https://github.com/wazuh/wazuh-kibana-app/pull/5341)
 
-## Wazuh v4.4.0 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 06
+## Wazuh v4.4.0 - OpenSearch Dashboards 2.4.0 - Revision 06
 
 ### Added
 
@@ -114,40 +174,41 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed a UI crash due to `external_references` field could be missing in some vulnerability data [#5200](https://github.com/wazuh/wazuh-kibana-app/pull/5200)
 - Fixed Wazuh main menu not displayed when navigation menu is locked [#5273](https://github.com/wazuh/wazuh-kibana-app/pull/5273)
 - Fixed 'Deploy new agent' section which used wrong secure connection property [#5285](https://github.com/wazuh/wazuh-kibana-app/pull/5285) [#5295](https://github.com/wazuh/wazuh-kibana-app/pull/5295)
+- Fixed events view when search bar language is `lucene` [#5286](https://github.com/wazuh/wazuh-kibana-app/pull/5286)
 - Disabled unmapped fields filter in `Security Events` alerts table [#4929](https://github.com/wazuh/wazuh-kibana-app/pull/4929)
 - Raspbian OS, Ubuntu, Amazon Linux and Amazon Linux 2 commands in the 'Deploy new agent' section now change when a different architecture is selected [#4876](https://github.com/wazuh/wazuh-kibana-app/pull/4876) [#4880](https://github.com/wazuh/wazuh-kibana-app/pull/4880)
 
 ### Removed
 
-- Removed unused file related to agent menu [#5102](https://github.com/wazuh/wazuh-kibana-app/pull/5102)
+- Removed custom styles for Kibana 7.9.0 [#4491](https://github.com/wazuh/wazuh-kibana-app/pull/4491)
 - Removed the `angular-chart.js` dependency [#4985](https://github.com/wazuh/wazuh-kibana-app/pull/4985)
 - Removed the `pug-loader` dependency [#5062](https://github.com/wazuh/wazuh-kibana-app/pull/5062) [#5089](https://github.com/wazuh/wazuh-kibana-app/pull/5089)
 
-## Wazuh v4.3.11 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4312
+## Wazuh v4.3.11 - OpenSearch Dashboards 1.2.0 - Revision 4312
 
 ### Added
 
 - Support for Wazuh 4.3.11
 
-## Wazuh v4.3.10 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4311
+## Wazuh v4.3.10 - OpenSearch Dashboards 1.2.0 - Revision 4311
 
 ### Fixed
 
 - Fixed issue when logging out from Wazuh when SAML is enabled [#4815](https://github.com/wazuh/wazuh-kibana-app/issues/4815)
 
-## Wazuh v4.3.9 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4310
+## Wazuh v4.3.9 - OpenSearch Dashboards 1.2.0 - Revision 4310
 
 ### Added
 
 - Support for Wazuh 4.3.9
 
-## Wazuh v4.3.8 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4309
+## Wazuh v4.3.8 - OpenSearch Dashboards 1.2.0 - Revision 4309
 
 ### Added
 
 - Support for Wazuh 4.3.8
 
-## Wazuh v4.3.7 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4308
+## Wazuh v4.3.7 - OpenSearch Dashboards 1.2.0 - Revision 4308
 
 ### Fixed
 
@@ -161,11 +222,11 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed searchbar error on SCA Inventory table [#4367](https://github.com/wazuh/wazuh-kibana-app/pull/4367)
 - Fixed a routes loop when reinstalling Wazuh indexer [#4373](https://github.com/wazuh/wazuh-kibana-app/pull/4373)
 
-# Removed
+### Removed
 
 - Removed the use of `manager_host` field related to agent information of Wazuh API responses, which is obsolete [#4350](https://github.com/wazuh/wazuh-kibana-app/pull/4350)
 
-## Wazuh v4.3.6 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4307
+## Wazuh v4.3.6 - OpenSearch Dashboards 1.2.0 - Revision 4307
 
 ### Fixed
 
@@ -178,7 +239,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fix Rules, Decoders and CDB lists uploaders to show errors appropriately [#4307](https://github.com/wazuh/wazuh-kibana-app/pull/4307)
 - Sanitize report's inputs and usernames [#4330](https://github.com/wazuh/wazuh-kibana-app/pull/4330)
 
-## Wazuh v4.3.5 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4306
+## Wazuh v4.3.5 - OpenSearch Dashboards 1.2.0 - Revision 4306
 
 ### Added
 
@@ -202,7 +263,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed an error related to `API not available` when saving the manager configuration and restarting the manager from `Management/Configuration/Edit configuration` on manager mode [#4264](https://github.com/wazuh/wazuh-kibana-app/pull/4264)
 - Fixed a UI problem that required scrolling to see the logs in Management/Logs and Settings/Logs [#4253](https://github.com/wazuh/wazuh-kibana-app/pull/4253)
 
-## Wazuh v4.3.4 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4305
+## Wazuh v4.3.4 - OpenSearch Dashboards 1.2.0 - Revision 4305
 
 ### Added
 
@@ -224,25 +285,19 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed import of an empty rule or decoder file [#4176](https://github.com/wazuh/wazuh-kibana-app/pull/4176)
 - Fixed overwriting of rule and decoder imports [#4180](https://github.com/wazuh/wazuh-kibana-app/pull/4180)
 
-## Wazuh v4.3.3 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4304
+## Wazuh v4.3.3 - OpenSearch Dashboards 1.2.0 - Revision 4304
 
 ### Fixed
 
-- Fixed Wazuh Dashboard troubleshooting url [#4150](https://github.com/wazuh/wazuh-kibana-app/pull/4150)
+- Fixed Wazuh Dashboard troubleshooting url [#4151](https://github.com/wazuh/wazuh-kibana-app/pull/4151)
 
-## Wazuh v4.3.2 - Kibana 7.10.2 , 7.16.x, 7.17.x - Revision 4303
+## Wazuh v4.3.2 - OpenSearch Dashboards 1.2.0 - Revision 4303
 
 ### Added
 
 - Support for Wazuh 4.3.2
 
-## Wazuh v4.2.7 - Kibana 7.10.2, 7.11.2, 7.12.1, 7.13.0, 7.13.1, 7.13.2, 7.13.3, 7.13.4, 7.14.0, 7.14.1, 7.14.2 - Revision 4208
-
-### Added
-
-- Support for Wazuh 4.2.7
-
-## Wazuh v4.3.1 - Kibana 7.10.2 , 7.16.x, 7.17.x - Revision 4302
+## Wazuh v4.3.1 - OpenSearch Dashboards 1.2.0 - Revision 4302
 
 ### Added
 
@@ -253,12 +308,11 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Fixed the falsy values are displayed as not defined and enhanced the output of `Ruleset Test` [#4141](https://github.com/wazuh/wazuh-kibana-app/pull/4141)
 
-## Wazuh v4.3.0 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 4301
+## Wazuh v4.3.0 - OpenSearch Dashboards 1.2.0 - Revision 4301
 
 ### Added
 
-- Support for Kibana 7.16.x
-- Support for Kibana 7.17.x
+- Support for OpenSearch Dashboards 1.2.0
 - Added GitHub and Office365 modules [#3557](https://github.com/wazuh/wazuh-kibana-app/pull/3557)
 - Added a new `Panel` module tab for GitHub and Office365 modules
   [#3541](https://github.com/wazuh/wazuh-kibana-app/pull/3541)

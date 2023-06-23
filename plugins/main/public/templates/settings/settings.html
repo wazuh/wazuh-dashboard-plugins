@@ -1,0 +1,189 @@
+<!-- head -->
+<div ng-cloak ng-controller="settingsController as ctrl">
+  <div ng-show="ctrl.load" style="padding: 16px">
+    <react-component
+      name="EuiProgress"
+      props="{size: 'xs', color: 'primary'}"
+    ></react-component>
+  </div>
+
+  <div
+    ng-if="!ctrl.load && ctrl.settingsTabsProps && !ctrl.apiIsDown && ctrl.apiTableProps.apiEntries.length"
+    class="wz-margin-top-16 md-margin-h"
+  >
+    <react-component
+      name="Tabs"
+      props="ctrl.settingsTabsProps"
+    ></react-component>
+  </div>
+  <!-- end head -->
+  <!-- api -->
+  <div ng-if="ctrl.tab === 'api' && !ctrl.load">
+    <!-- API table section-->
+    <div ng-if="ctrl.apiEntries.length && !ctrl.addingApi && !ctrl.apiIsDown">
+      <react-component
+        name="ApiTable"
+        props="ctrl.apiTableProps"
+      ></react-component>
+    </div>
+
+    <!-- Add API section-->
+    <div
+      layout="row"
+      layout-padding
+      ng-if="!ctrl.apiEntries.length || ctrl.addingApi"
+    >
+      <react-component
+        flex
+        name="AddApi"
+        props="ctrl.addApiProps"
+      ></react-component>
+    </div>
+
+    <!-- API is down section-->
+    <div
+      layout="column"
+      layout-padding
+      ng-if="ctrl.apiIsDown && !ctrl.addingApi"
+    >
+      <react-component
+        name="ApiIsDown"
+        props="ctrl.apiIsDownProps"
+      ></react-component>
+    </div>
+  </div>
+  <!-- End API configuration card section -->
+  <!-- end api -->
+  <!-- modules -->
+  <div ng-if="ctrl.tab === 'modules' && !ctrl.load">
+    <react-component name="EnableModules" props="{}"></react-component>
+  </div>
+  <!-- end modules -->
+  <!-- configuration -->
+  <div ng-if="ctrl.tab === 'configuration' && !ctrl.load">
+    <react-component
+      name="WzConfigurationSettings"
+      props="ctrl.settingsTabsProps"
+    ></react-component>
+  </div>
+  <!-- end configuration -->
+  <!-- logs -->
+  <div ng-if="ctrl.tab === 'logs' && !ctrl.load">
+    <react-component
+      name="SettingsLogs"
+      props="ctrl.settingsLogsProps"
+    ></react-component>
+  </div>
+  <!-- end logs -->
+  <!-- miscellaneous -->
+  <div ng-if="ctrl.tab === 'miscellaneous' && !ctrl.load">
+    <react-component name="SettingsMiscelaneous" props="{}"></react-component>
+  </div>
+  <!-- end miscellaneous -->
+  <!-- about -->
+  <div ng-if="ctrl.tab === 'about' && !ctrl.load">
+    <div class="euiPage euiPage--paddingMedium euiPageBody">
+      <!-- App information section -->
+      <div ng-if="!ctrl.load">
+        <div class="euiCallOut euiCallOut--primary" style="display: flex">
+          <div class="wz-text-truncatable" flex>
+            App version:
+            <span class="wz-text-bold">{{ctrl.appInfo["app-version"]}}</span>
+          </div>
+          <div class="wz-text-truncatable" flex>
+            App revision:
+            <span class="wz-text-bold">{{ctrl.appInfo["revision"]}}</span>
+          </div>
+          <div class="wz-text-truncatable" flex>
+            Install date:
+            <span class="wz-text-bold"
+              >{{ctrl.appInfo["installationDate"] | date : "medium"}}</span
+            >
+          </div>
+        </div>
+      </div>
+      <!-- End app information section -->
+      <div class="euiSpacer euiSpacer--l"></div>
+      <div
+        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+      >
+        <div class="euiFlexItem">
+          <div class="euiPanel euiPanel--paddingLarge">
+            <div
+              class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+            >
+              <div class="euiFlexItem euiFlexItem--flexGrowZero">
+                <div
+                  class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+                >
+                  <div class="euiFlexItem">
+                    <h2 class="euiTitle euiTitle--medium">
+                      Welcome to the {{ctrl.pluginAppName}}
+                    </h2>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="euiSpacer euiSpacer--l"></div>
+            <div class="euiText euiText--medium">
+              <p>
+                {{ctrl.pluginAppName}} provides management and monitoring
+                capabilities, giving users control over the Wazuh
+                infrastructure. You can monitor your agents status and
+                configuration, query and visualize your alert data and monitor
+                manager rules and configuration.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="euiFlexItem">
+          <div class="euiPanel euiPanel--paddingLarge">
+            <div
+              class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+            >
+              <div class="euiFlexItem euiFlexItem--flexGrowZero">
+                <div
+                  class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+                >
+                  <div class="euiFlexItem">
+                    <h2 class="euiTitle euiTitle--medium">Community</h2>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="euiSpacer euiSpacer--m"></div>
+            <div class="euiText euiText--medium">
+              <p>
+                Enjoy your Wazuh experience and please don't hesitate to give us
+                your feedback.
+              </p>
+            </div>
+            <div class="euiSpacer euiSpacer--l"></div>
+            <div layout="row" class="layout-align-center-center" flex>
+              <react-component
+                name="EuiButtonIcon"
+                props="{iconType:'logoSlack', iconSize:'xxl', href: 'https://wazuh.com/community/join-us-on-slack/', target: '_blank', 'aria-label': 'Wazuh Slack'}"
+              ></react-component>
+              <react-component
+                class="wz-margin-left-40"
+                name="EuiButtonIcon"
+                props="{iconType: googleGroupsSVG, iconSize:'xxl', href: 'https://groups.google.com/forum/#!forum/wazuh', target: '_blank', 'aria-label': 'Wazuh forum'}"
+              ></react-component>
+              <react-component
+                class="wz-margin-left-40"
+                name="EuiButtonIcon"
+                props="{iconType:'logoGithub', iconSize:'xxl', href: 'https://github.com/wazuh/wazuh-kibana-app', target: '_blank', 'aria-label': 'Wazuh dashboard Github'}"
+              ></react-component>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- end about -->
+  <!-- sample data -->
+  <div ng-if="ctrl.tab === 'sample_data' && !ctrl.load">
+    <react-component name="WzSampleDataWrapper" props="{}"></react-component>
+  </div>
+  <!-- end sample data -->
+</div>
