@@ -14,7 +14,7 @@ import {
   optionalParamsDefinitions,
   tOperatingSystem,
   tOptionalParameters,
-} from '../../config/os-commands-definitions';
+} from '../../core/config/os-commands-definitions';
 import { UseFormReturn } from '../../../../components/common/form/types';
 import CommandOutput from '../../components/command-output/command-output';
 import ServerAddressTitle from '../../components/server-address/server-address-title';

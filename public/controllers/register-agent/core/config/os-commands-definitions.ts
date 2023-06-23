@@ -1,7 +1,7 @@
 import {
   IOSDefinition,
   tOptionalParams,
-} from '../core/register-commands/types';
+} from '../register-commands/types';
 
 // Defined OS combinations
 

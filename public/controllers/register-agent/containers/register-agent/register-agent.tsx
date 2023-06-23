@@ -63,16 +63,6 @@ export const RegisterAgent = withReduxProvider(
           groups,
         },
       },
-
-      //IP: This is a set of four numbers, for example, 192.158.1.38. Each number in the set can range from 0 to 255. Therefore, the full range of IP addresses goes from 0.0.0.0 to 255.255.255.255
-      // O ipv6: 2001:0db8:85a3:0000:0000:8a2e:0370:7334
-
-      // FQDN: Maximum of 63 characters per label.
-      // Can only contain numbers, letters and hyphens (-)
-      // Labels cannot begin or end with a hyphen
-      // Currently supports multilingual characters, i.e. letters not included in the English alphabet: e.g. á é í ó ú ü ñ.
-      // Minimum 3 labels
-
       serverAddress: {
         type: 'text',
         initialValue: configuration['enrollment.dns'] || '',
