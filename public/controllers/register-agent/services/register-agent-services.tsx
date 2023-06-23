@@ -1,8 +1,7 @@
 import { UseFormReturn } from '../../../components/common/form/types';
 import { WzRequest } from '../../../react-services/wz-request';
-import { tOperatingSystem, tOptionalParameters } from '../config/os-commands-definitions';
+import { tOperatingSystem, tOptionalParameters } from '../core/config/os-commands-definitions';
 import { RegisterAgentData } from '../interfaces/types';
-import { ServerAddressOptions } from '../register-agent/steps';
 
 type Protocol = 'TCP' | 'UDP';
 
@@ -109,7 +108,7 @@ function getRemoteProtocol(protocols: Protocol[]) {
  * @param defaultServerAddress
  */
 async function getConnectionConfig(
-  nodeSelected: ServerAddressOptions,
+  nodeSelected: any,
   defaultServerAddress?: string,
 ) {
   const nodeName = nodeSelected?.label;
@@ -179,7 +178,7 @@ export const getManagerNode = async (): Promise<any> => {
  */
 export const parseNodesInOptions = (
   nodes: NodeResponse,
-): ServerAddressOptions[] => {
+): any[] => {
   return nodes.data.data.affected_items.map((item: NodeItem) => ({
     label: item.name,
     value: item.ip,
@@ -191,7 +190,7 @@ export const parseNodesInOptions = (
  * Get the list of the cluster nodes from API and parse it into a list of options
  */
 export const fetchClusterNodesOptions = async (): Promise<
-  ServerAddressOptions[]
+  any[]
 > => {
   const clusterStatus = await clusterStatusResponse();
   if (clusterStatus) {
@@ -211,8 +210,8 @@ export const fetchClusterNodesOptions = async (): Promise<
  * @param nodeIps
  */
 export const getMasterNode = (
-  nodeIps: ServerAddressOptions[],
-): ServerAddressOptions[] => {
+  nodeIps: any[],
+): any[] => {
   return nodeIps.filter(nodeIp => nodeIp.nodetype === 'master');
 };
 

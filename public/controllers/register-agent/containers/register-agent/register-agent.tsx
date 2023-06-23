@@ -31,8 +31,15 @@ import {
   validateAgentName,
 } from '../../utils/validations';
 
+interface IRegisterAgentProps {
+  getWazuhVersion: () => Promise<string>;
+  hasAgents: () => Promise<boolean>;
+  addNewAgent: (agent: any) => Promise<any>;
+  reload: () => void;
+}
+
 export const RegisterAgent = withReduxProvider(
-  ({ getWazuhVersion, hasAgents, addNewAgent, reload }) => {
+  ({ getWazuhVersion, hasAgents, addNewAgent, reload }: IRegisterAgentProps) => {
     const configuration = useSelector(
       (state: { appConfig: { data: any } }) => state.appConfig.data,
     );
