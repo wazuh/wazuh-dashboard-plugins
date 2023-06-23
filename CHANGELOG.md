@@ -8,7 +8,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Changed
 
-- Changed the deploy a new agent page from step one to step three. [#5554](https://github.com/wazuh/wazuh-kibana-app/pull/5554)
+- Changed the deploy a new agent page from step one to step three. [#5554](https://github.com/wazuh/wazuh-kibana-app/pull/5554) [5462](https://github.com/wazuh/wazuh-kibana-app/pull/5462)
 
 ### Fixed
 
