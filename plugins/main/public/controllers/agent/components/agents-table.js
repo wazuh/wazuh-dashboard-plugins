@@ -31,12 +31,20 @@ import {
 import { getToasts } from '../../../kibana-services';
 import { AppNavigate } from '../../../react-services/app-navigate';
 import { GroupTruncate } from '../../../components/common/util';
-import { WzSearchBar, filtersToObject } from '../../../components/wz-search-bar';
+import {
+  WzSearchBar,
+  filtersToObject,
+} from '../../../components/wz-search-bar';
 import { getAgentFilterValues } from '../../../controllers/management/components/management/groups/get-agents-filters-values';
 import { WzButtonPermissions } from '../../../components/common/permissions/button';
 import { formatUIDate } from '../../../react-services/time-service';
 import { withErrorBoundary } from '../../../components/common/hocs';
-import { API_NAME_AGENT_STATUS, UI_LOGGER_LEVELS, UI_ORDER_AGENT_STATUS, AGENT_SYNCED_STATUS } from '../../../../common/constants';
+import {
+  API_NAME_AGENT_STATUS,
+  UI_LOGGER_LEVELS,
+  UI_ORDER_AGENT_STATUS,
+  AGENT_SYNCED_STATUS,
+} from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { AgentStatus } from '../../../components/agents/agent_status';
@@ -61,7 +69,9 @@ export const AgentsTable = withErrorBoundary(
         purgeModal: false,
         isFilterColumnOpen: false,
         filters: sessionStorage.getItem('agents_preview_selected_options')
-          ? JSON.parse(sessionStorage.getItem('agents_preview_selected_options'))
+          ? JSON.parse(
+              sessionStorage.getItem('agents_preview_selected_options'),
+            )
           : [],
       };
       this.suggestions = [
@@ -84,84 +94,96 @@ export const AgentsTable = withErrorBoundary(
           label: 'os.platform',
           description: 'Filter by operating system platform',
           operators: ['=', '!='],
-          values: async (value) => getAgentFilterValues('os.platform', value, { q: 'id!=000' }),
+          values: async value =>
+            getAgentFilterValues('os.platform', value, { q: 'id!=000' }),
         },
         {
           type: 'q',
           label: 'ip',
           description: 'Filter by agent IP address',
           operators: ['=', '!='],
-          values: async (value) => getAgentFilterValues('ip', value, { q: 'id!=000' }),
+          values: async value =>
+            getAgentFilterValues('ip', value, { q: 'id!=000' }),
         },
         {
           type: 'q',
           label: 'name',
           description: 'Filter by agent name',
           operators: ['=', '!='],
-          values: async (value) => getAgentFilterValues('name', value, { q: 'id!=000' }),
+          values: async value =>
+            getAgentFilterValues('name', value, { q: 'id!=000' }),
         },
         {
           type: 'q',
           label: 'id',
           description: 'Filter by agent id',
           operators: ['=', '!='],
-          values: async (value) => getAgentFilterValues('id', value, { q: 'id!=000' }),
+          values: async value =>
+            getAgentFilterValues('id', value, { q: 'id!=000' }),
         },
         {
           type: 'q',
           label: 'group',
           description: 'Filter by agent group',
           operators: ['=', '!='],
-          values: async (value) => getAgentFilterValues('group', value, { q: 'id!=000' }),
+          values: async value =>
+            getAgentFilterValues('group', value, { q: 'id!=000' }),
         },
         {
           type: 'q',
           label: 'node_name',
           description: 'Filter by node name',
           operators: ['=', '!='],
-          values: async (value) => getAgentFilterValues('node_name', value, { q: 'id!=000' }),
+          values: async value =>
+            getAgentFilterValues('node_name', value, { q: 'id!=000' }),
         },
         {
           type: 'q',
           label: 'manager',
           description: 'Filter by manager',
           operators: ['=', '!='],
-          values: async (value) => getAgentFilterValues('manager', value, { q: 'id!=000' }),
+          values: async value =>
+            getAgentFilterValues('manager', value, { q: 'id!=000' }),
         },
         {
           type: 'q',
           label: 'version',
           description: 'Filter by agent version',
           operators: ['=', '!='],
-          values: async (value) => getAgentFilterValues('version', value, { q: 'id!=000' }),
+          values: async value =>
+            getAgentFilterValues('version', value, { q: 'id!=000' }),
         },
         {
           type: 'q',
           label: 'configSum',
           description: 'Filter by agent config sum',
           operators: ['=', '!='],
-          values: async (value) => getAgentFilterValues('configSum', value, { q: 'id!=000' }),
+          values: async value =>
+            getAgentFilterValues('configSum', value, { q: 'id!=000' }),
         },
         {
           type: 'q',
           label: 'mergedSum',
           description: 'Filter by agent merged sum',
           operators: ['=', '!='],
-          values: async (value) => getAgentFilterValues('mergedSum', value, { q: 'id!=000' }),
+          values: async value =>
+            getAgentFilterValues('mergedSum', value, { q: 'id!=000' }),
         },
         {
           type: 'q',
           label: 'dateAdd',
           description: 'Filter by add date',
           operators: ['=', '!='],
-          values: async (value) => getAgentFilterValues('dateAdd', value, { q: 'id!=000' }),
+          values: async value =>
+            getAgentFilterValues('dateAdd', value, { q: 'id!=000' }),
         },
         {
           type: 'q',
           label: 'lastKeepAlive',
           description: 'Filter by last keep alive',
           operators: ['=', '!='],
-          values: async (value) => getAgentFilterValues('lastKeepAlive', value, { q: 'id!=000' }),
+          values: async value =>
+            getAgentFilterValues('lastKeepAlive', value, { q: 'id!=000' }),
         },
       ];
       this.downloadCsv.bind(this);
@@ -221,11 +243,18 @@ export const AgentsTable = withErrorBoundary(
         const selectFieldsList = this.defaultColumns
           .filter(field => field.field != 'actions')
           .map(field => field.field.replace('os_', 'os.')); // "os_name" subfield should be specified as 'os.name'
-        const selectFields = [...selectFieldsList, 'os.platform', 'os.uname', 'os.version'].join(','); // Add version and uname fields to render the OS icon and version in the table
+        const selectFields = [
+          ...selectFieldsList,
+          'os.platform',
+          'os.uname',
+          'os.version',
+        ].join(','); // Add version and uname fields to render the OS icon and version in the table
 
-        const rawAgents = await this.props.wzReq('GET', '/agents', { params: { ...this.buildFilter(), select: selectFields } });
+        const rawAgents = await this.props.wzReq('GET', '/agents', {
+          params: { ...this.buildFilter(), select: selectFields },
+        });
         const formatedAgents = rawAgents?.data?.data?.affected_items.map(
-          this.formatAgent.bind(this)
+          this.formatAgent.bind(this),
         );
 
         this._isMount &&
@@ -250,7 +279,6 @@ export const AgentsTable = withErrorBoundary(
         this.setState({ isLoading: false });
       }
     }
-
 
     buildFilter() {
       const { pageIndex, pageSize, filters } = this.state;
@@ -281,8 +309,12 @@ export const AgentsTable = withErrorBoundary(
     }
 
     formatAgent(agent) {
-      const agentVersion = agent.version !== undefined ? agent.version.split(' ')[1] : '-';
-      const node_name = agent.node_name && agent.node_name !== 'unknown' ? agent.node_name : '-';
+      const agentVersion =
+        agent.version !== undefined ? agent.version.split(' ')[1] : '-';
+      const node_name =
+        agent.node_name && agent.node_name !== 'unknown'
+          ? agent.node_name
+          : '-';
       return {
         id: agent.id,
         name: agent.name,
@@ -294,7 +326,9 @@ export const AgentsTable = withErrorBoundary(
         version: agentVersion,
         node_name: node_name,
         dateAdd: agent.dateAdd ? formatUIDate(agent.dateAdd) : '-',
-        lastKeepAlive: agent.lastKeepAlive ? formatUIDate(agent.lastKeepAlive) : '-',
+        lastKeepAlive: agent.lastKeepAlive
+          ? formatUIDate(agent.lastKeepAlive)
+          : '-',
         actions: agent,
         upgrading: false,
       };
@@ -303,28 +337,34 @@ export const AgentsTable = withErrorBoundary(
     actionButtonsRender(agent) {
       return (
         <div className={'icon-box-action'}>
-          <EuiToolTip content="Open summary panel for this agent" position="left">
+          <EuiToolTip
+            content='Open summary panel for this agent'
+            position='left'
+          >
             <EuiButtonIcon
-              onClick={(ev) => {
+              onClick={ev => {
                 ev.stopPropagation();
                 this.props.clickAction(agent, 'default');
               }}
-              iconType="eye"
+              iconType='eye'
               color={'primary'}
-              aria-label="Open summary panel for this agent"
+              aria-label='Open summary panel for this agent'
             />
           </EuiToolTip>
           &nbsp;
           {agent.status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED && (
-            <EuiToolTip content="Open configuration for this agent" position="left">
+            <EuiToolTip
+              content='Open configuration for this agent'
+              position='left'
+            >
               <EuiButtonIcon
-                onClick={(ev) => {
+                onClick={ev => {
                   ev.stopPropagation();
                   this.props.clickAction(agent, 'configuration');
                 }}
                 color={'primary'}
-                iconType="wrench"
-                aria-label="Open configuration for this agent"
+                iconType='wrench'
+                aria-label='Open configuration for this agent'
               />
             </EuiToolTip>
           )}
@@ -346,11 +386,13 @@ export const AgentsTable = withErrorBoundary(
       const os_name = `${agent?.os?.name || ''} ${agent?.os?.version || ''}`;
 
       return (
-        <EuiFlexGroup gutterSize="xs">
-          <EuiFlexItem grow={false} ><i
-            className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`}
-            aria-hidden="true"
-          ></i></EuiFlexItem>{' '}
+        <EuiFlexGroup gutterSize='xs'>
+          <EuiFlexItem grow={false}>
+            <i
+              className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`}
+              aria-hidden='true'
+            ></i>
+          </EuiFlexItem>{' '}
           <EuiFlexItem>{os_name.trim() || '-'}</EuiFlexItem>
         </EuiFlexGroup>
       );
@@ -367,8 +409,8 @@ export const AgentsTable = withErrorBoundary(
     downloadCsv = () => {
       const filters = this.buildFilter();
       const formatedFilters = Object.keys(filters)
-        .filter((field) => !['limit', 'offset', 'sort'].includes(field))
-        .map((field) => ({ name: field, value: filters[field] }));
+        .filter(field => !['limit', 'offset', 'sort'].includes(field))
+        .map(field => ({ name: field, value: filters[field] }));
       this.props.downloadCsv(formatedFilters);
     };
 
@@ -382,14 +424,14 @@ export const AgentsTable = withErrorBoundary(
       return (
         <>
           <EuiFlexItem grow={false}>
-            <EuiButtonEmpty iconType="importAction" onClick={this.downloadCsv}>
+            <EuiButtonEmpty iconType='importAction' onClick={this.downloadCsv}>
               Export formatted
             </EuiButtonEmpty>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
-            <EuiToolTip content="Select columns table" position="left">
+            <EuiToolTip content='Select columns table' position='left'>
               <EuiButtonEmpty onClick={this.openColumnsFilter}>
-                <EuiIcon type="managementApp" color="primary" />
+                <EuiIcon type='managementApp' color='primary' />
               </EuiButtonEmpty>
             </EuiToolTip>
           </EuiFlexItem>
@@ -414,11 +456,13 @@ export const AgentsTable = withErrorBoundary(
       } else if (selectedItems.length === pageSize) {
         return (
           <div>
-            <EuiSpacer size="m" />
+            <EuiSpacer size='m' />
             <EuiCallOut
-              size="s"
+              size='s'
               title={
-                !allSelected ? `The ${selectedItems.length} agents on this page are selected` : ''
+                !allSelected
+                  ? `The ${selectedItems.length} agents on this page are selected`
+                  : ''
               }
             >
               <EuiFlexGroup>
@@ -426,7 +470,7 @@ export const AgentsTable = withErrorBoundary(
                   <EuiButton
                     onClick={() => {
                       this._isMount &&
-                        this.setState((prevState) => ({
+                        this.setState(prevState => ({
                           allSelected: !prevState.allSelected,
                         }));
                     }}
@@ -438,22 +482,22 @@ export const AgentsTable = withErrorBoundary(
                 </EuiFlexItem>
               </EuiFlexGroup>
             </EuiCallOut>
-            <EuiSpacer size="s" />
+            <EuiSpacer size='s' />
           </div>
         );
       }
     }
-
 
     // Check in the localstorage what is the column configuration
     // and check that the columns are valid.
     // If it is not a valid column it ignores it and if any column is missing it adds it.
 
     getTableColumnsSelected() {
-      const columnsSelected =
-        JSON.parse(window.localStorage.getItem('columnsSelectedTableAgent'));
-      if(!columnsSelected){
-        return []
+      const columnsSelected = JSON.parse(
+        window.localStorage.getItem('columnsSelectedTableAgent'),
+      );
+      if (!columnsSelected) {
+        return [];
       }
       const customColumns = this.defaultColumns.map(field => {
         const fieldConfig = columnsSelected.filter(
@@ -464,12 +508,18 @@ export const AgentsTable = withErrorBoundary(
         }
         return field;
       });
-      window.localStorage.setItem('columnsSelectedTableAgent', JSON.stringify(customColumns))
+      window.localStorage.setItem(
+        'columnsSelectedTableAgent',
+        JSON.stringify(customColumns),
+      );
       return customColumns;
     }
 
     setTableColumnsSelected(data) {
-      window.localStorage.setItem('columnsSelectedTableAgent', JSON.stringify(data));
+      window.localStorage.setItem(
+        'columnsSelectedTableAgent',
+        JSON.stringify(data),
+      );
     }
 
     // Columns with the property truncateText: true won't wrap the text
@@ -498,7 +548,7 @@ export const AgentsTable = withErrorBoundary(
         name: 'Group(s)',
         sortable: true,
         show: true,
-        render: (groups) => (groups !== '-' ? this.renderGroups(groups) : '-'),
+        render: groups => (groups !== '-' ? this.renderGroups(groups) : '-'),
       },
       {
         field: 'os_name',
@@ -537,14 +587,19 @@ export const AgentsTable = withErrorBoundary(
         truncateText: true,
         sortable: true,
         show: true,
-        render: (status) => <AgentStatus status={status} labelProps={{ className: 'hide-agent-status' }} />,
+        render: status => (
+          <AgentStatus
+            status={status}
+            labelProps={{ className: 'hide-agent-status' }}
+          />
+        ),
       },
       {
         field: 'group_config_status',
         name: 'Synced',
         sortable: true,
         show: false,
-        render: (synced) => <AgentSynced synced={synced} />,
+        render: synced => <AgentSynced synced={synced} />,
       },
       {
         align: 'right',
@@ -552,7 +607,7 @@ export const AgentsTable = withErrorBoundary(
         field: 'actions',
         name: 'Actions',
         show: true,
-        render: (agent) => this.actionButtonsRender(agent),
+        render: agent => this.actionButtonsRender(agent),
       },
     ];
 
@@ -561,15 +616,17 @@ export const AgentsTable = withErrorBoundary(
 
       if (selectedColumns.length != 0) {
         const newSelectedColumns = [];
-        selectedColumns.forEach((item) => {
+        selectedColumns.forEach(item => {
           if (item.show) {
-            const column = this.defaultColumns.find((column) => column.field === item.field);
+            const column = this.defaultColumns.find(
+              column => column.field === item.field,
+            );
             newSelectedColumns.push(column);
           }
         });
         return newSelectedColumns;
       } else {
-        const fieldColumns = this.defaultColumns.map((item) => {
+        const fieldColumns = this.defaultColumns.map(item => {
           return {
             field: item.field,
             name: item.name,
@@ -599,9 +656,9 @@ export const AgentsTable = withErrorBoundary(
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
               <WzButtonPermissions
-                buttonType="empty"
+                buttonType='empty'
                 permissions={[{ action: 'agent:create', resource: '*:*:*' }]}
-                iconType="plusInCircle"
+                iconType='plusInCircle'
                 onClick={() => this.props.addingNewAgent()}
               >
                 Deploy new agent
@@ -609,7 +666,7 @@ export const AgentsTable = withErrorBoundary(
             </EuiFlexItem>
             {formattedButton}
           </EuiFlexGroup>
-          <EuiSpacer size="xs" />
+          <EuiSpacer size='xs' />
         </div>
       );
     }
@@ -622,12 +679,18 @@ export const AgentsTable = withErrorBoundary(
               noDeleteFiltersOnUpdateSuggests
               filters={this.state.filters}
               suggestions={this.suggestions}
-              onFiltersChange={(filters) => this.setState({ filters, pageIndex: 0 })}
-              placeholder="Filter or search agent"
+              onFiltersChange={filters =>
+                this.setState({ filters, pageIndex: 0 })
+              }
+              placeholder='Filter or search agent'
             />
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
-            <EuiButton iconType="refresh" fill={true} onClick={() => this.reloadAgents()}>
+            <EuiButton
+              iconType='refresh'
+              fill={true}
+              onClick={() => this.reloadAgents()}
+            >
               Refresh
             </EuiButton>
           </EuiFlexItem>
@@ -638,15 +701,15 @@ export const AgentsTable = withErrorBoundary(
     selectColumnsRender() {
       const columnsSelected = this.getTableColumnsSelected();
 
-      const onChange = (optionId) => {
-        let item = columnsSelected.find((item) => item.field === optionId);
+      const onChange = optionId => {
+        let item = columnsSelected.find(item => item.field === optionId);
         item.show = !item.show;
         this.setTableColumnsSelected(columnsSelected);
         this.forceUpdate();
       };
 
       const options = () => {
-        return columnsSelected.map((item) => {
+        return columnsSelected.map(item => {
           return {
             id: item.field,
             label: item.name,
@@ -661,7 +724,7 @@ export const AgentsTable = withErrorBoundary(
             <EuiCheckboxGroup
               options={options()}
               onChange={onChange}
-              className="columnsSelectedCheckboxs"
+              className='columnsSelectedCheckboxs'
               idToSelectedMap={{}}
             />
           </EuiFlexItem>
@@ -672,12 +735,12 @@ export const AgentsTable = withErrorBoundary(
     }
 
     tableRender() {
-      const getRowProps = (item) => {
+      const getRowProps = item => {
         const { id } = item;
         return {
           'data-test-subj': `row-${id}`,
           className: 'customRowClass',
-          onClick: () => { },
+          onClick: () => {},
         };
       };
 
@@ -686,8 +749,11 @@ export const AgentsTable = withErrorBoundary(
           return;
         }
         return {
-          onMouseDown: (ev) => {
-            AppNavigate.navigateToModule(ev, 'agents', { tab: 'welcome', agent: item.id });
+          onMouseDown: ev => {
+            AppNavigate.navigateToModule(ev, 'agents', {
+              tab: 'welcome',
+              agent: item.id,
+            });
             ev.stopPropagation();
           },
         };
@@ -706,11 +772,11 @@ export const AgentsTable = withErrorBoundary(
       const pagination =
         totalItems > 15
           ? {
-            pageIndex: pageIndex,
-            pageSize: pageSize,
-            totalItemCount: totalItems,
-            pageSizeOptions: [15, 25, 50, 100],
-          }
+              pageIndex: pageIndex,
+              pageSize: pageSize,
+              totalItemCount: totalItems,
+              pageSizeOptions: [15, 25, 50, 100],
+            }
           : false;
       const sorting = {
         sort: {
@@ -723,19 +789,19 @@ export const AgentsTable = withErrorBoundary(
       // Previously the tableLayout is set to "fixed" with percentage width for each column, but the use of space was not optimal.
       // Important: If all the columns have the truncateText property set to true, the table cannot adjust properly when the viewport size is small.
       return (
-        <EuiFlexGroup className="wz-overflow-auto">
+        <EuiFlexGroup className='wz-overflow-auto'>
           <EuiFlexItem>
             <EuiBasicTable
-              tableLayout="auto"
+              tableLayout='auto'
               items={agents}
-              itemId="id"
+              itemId='id'
               columns={columns}
               onChange={this.onTableChange}
               sorting={sorting}
               loading={isLoading}
               rowProps={getRowProps}
               cellProps={getCellProps}
-              noItemsMessage="No agents found"
+              noItemsMessage='No agents found'
               {...(pagination && { pagination })}
             />
           </EuiFlexItem>
@@ -743,14 +809,16 @@ export const AgentsTable = withErrorBoundary(
       );
     }
 
-    filterGroupBadge = (group) => {
+    filterGroupBadge = group => {
       const { filters } = this.state;
-      let auxFilters = filters.map((filter) => filter.value.match(/group=(.*S?)/)[1]);
+      let auxFilters = filters.map(
+        filter => filter.value.match(/group=(.*S?)/)[1],
+      );
       if (filters.length > 0) {
         !auxFilters.includes(group)
           ? this.setState({
-            filters: [...filters, { field: 'q', value: `group=${group}` }],
-          })
+              filters: [...filters, { field: 'q', value: `group=${group}` }],
+            })
           : false;
       } else {
         this.setState({
@@ -783,8 +851,8 @@ export const AgentsTable = withErrorBoundary(
       return (
         <div>
           {filter}
-          <EuiSpacer size="m" />
-          <EuiPanel paddingSize="m">
+          <EuiSpacer size='m' />
+          <EuiPanel paddingSize='m'>
             {title}
             {loadItems}
             {callOut}
@@ -795,7 +863,7 @@ export const AgentsTable = withErrorBoundary(
         </div>
       );
     }
-  }
+  },
 );
 
 AgentsTable.propTypes = {
