@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
-import { OsCard } from './os-card';
+import { OsCard } from '../../step-one/os-card/os-card';
 
 describe('OsCard', () => {
   test('renders three cards with different titles', () => {

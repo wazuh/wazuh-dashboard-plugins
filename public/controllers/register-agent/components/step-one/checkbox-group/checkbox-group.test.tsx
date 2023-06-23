@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
-import { CheckboxGroupComponent } from './checkbox-group';
+import { CheckboxGroupComponent } from '../../step-one/checkbox-group/checkbox-group';
 
 describe('CheckboxGroupComponent', () => {
   const data = ['Option 1', 'Option 2', 'Option 3'];
@@ -50,6 +50,10 @@ describe('CheckboxGroupComponent', () => {
     fireEvent.click(checkboxItems[1]);
 
     expect(onOptionChange).toHaveBeenCalledTimes(1);
-    expect(onOptionChange).toHaveBeenCalledWith('option-0-1');
+    expect(onOptionChange).toHaveBeenCalledWith(
+      expect.objectContaining({
+        target: { value: `option-${cardIndex}-1` },
+      }),
+    );
   });
 });

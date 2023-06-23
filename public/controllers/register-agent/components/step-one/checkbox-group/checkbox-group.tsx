@@ -2,13 +2,6 @@ import React from 'react';
 import { EuiRadioGroup } from '@elastic/eui';
 import './checkbox-group.scss';
 
-interface RegisterAgentData {
-  icon: string;
-  title: string;
-  hr: boolean;
-  architecture: string[];
-}
-
 interface Props {
   data: string[];
   cardIndex: number;
@@ -23,14 +16,9 @@ const CheckboxGroupComponent: React.FC<Props> = ({
   selectedOption,
   onOptionChange,
 }) => {
-  const handleOptionChange = (optionId: string) => {
-    onOptionChange(optionId);
-  };
-
   const isSingleArchitecture = data.length === 1;
   const isDoubleArchitecture = data.length === 2;
   const isFirstCardWithFourItems = cardIndex === 0 && data.length === 4;
-
   return (
     <div
       className={`checkbox-group-container${
@@ -48,9 +36,11 @@ const CheckboxGroupComponent: React.FC<Props> = ({
         >
           <span className='architecture-label'>{arch}</span>
           <EuiRadioGroup
-            options={[{ id: `option-${cardIndex}-${idx}` }]}
+            options={[{ id: `${arch}` }]}
             idSelected={selectedOption}
-            onChange={(id: string) => handleOptionChange(id)}
+            onChange={(id: string) => {
+              onOptionChange({ target: { value: id } });
+            }}
           />
         </div>
       ))}
@@ -59,4 +49,3 @@ const CheckboxGroupComponent: React.FC<Props> = ({
 };
 
 export { CheckboxGroupComponent };
-export type { RegisterAgentData };

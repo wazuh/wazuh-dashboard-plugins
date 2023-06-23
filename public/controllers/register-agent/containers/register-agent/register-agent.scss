@@ -1,6 +1,6 @@
 .container {
   box-sizing: border-box;
-  height: 1271px;
+  max-height: 1271px;
   margin-top: 44px;
   background: #ffffff;
   border: 1px solid rgba(52, 55, 65, 0.2);
@@ -19,4 +19,8 @@
   color: #343741;
   display: flex;
   justify-content: center;
+}
+.close {
+  display: flex;
+  margin-top: 17px;
 }

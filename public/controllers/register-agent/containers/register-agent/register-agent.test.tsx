@@ -5,7 +5,9 @@ import { RegisterAgent } from './register-agent';
 
 describe('RegisterAgent', () => {
   test('renders the component', () => {
-    render(<RegisterAgent />);
+    const mockHasAgents = jest.fn();
+
+    render(<RegisterAgent hasAgents={mockHasAgents} />);
 
     // Verifica que el título esté presente
     const titleElement = screen.getByText('Deploy new agent');

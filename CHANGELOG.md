@@ -2,6 +2,16 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.6.0 - OpenSearch Dashboards 2.6.0 - Revision 4500
+
+### Added
+
+### Changed
+
+- Changed the deploy a new agent page from step one to step three. [#5554](https://github.com/wazuh/wazuh-kibana-app/pull/5554) [5462](https://github.com/wazuh/wazuh-kibana-app/pull/5462)
+
+### Fixed
+
 ## Wazuh v4.5.0 - OpenSearch Dashboards 2.6.0 - Revision 4500
 
 ### Added

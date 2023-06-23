@@ -103,7 +103,7 @@ export const useForm = (fields: FormConfiguration): UseFormReturn => {
     Object.entries(enhanceFields as EnhancedFields)
       .filter(([, { error }]) => error)
       .map(([fieldKey, { error }]) => [fieldKey, error]),
-  ) as { [key: string]: string };
+  );
 
   function undoChanges() {
     setFormFields(state =>

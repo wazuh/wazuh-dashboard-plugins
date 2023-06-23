@@ -7,10 +7,9 @@ import { InputFormSwitch } from './input_switch';
 import { InputFormFilePicker } from './input_filepicker';
 import { InputFormTextArea } from './input_text_area';
 import { EuiFlexGroup, EuiFlexItem, EuiFormRow } from '@elastic/eui';
-import { OsCard } from '../../../controllers/register-agent/components/os-card/os-card';
 import { SettingTypes } from './types';
 
-interface InputFormProps {
+export interface InputFormProps {
   type: SettingTypes;
   value: any;
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -65,10 +64,6 @@ export const InputForm = ({
     />
   );
 
-  if (type === 'custom') {
-    return <OsCard {...rest} />;
-  }
-
   return label ? (
     <EuiFormRow label={label} fullWidth isInvalid={isInvalid} error={error}>
       <>
@@ -98,5 +93,5 @@ const Input = {
   select: InputFormSelect,
   text: InputFormText,
   textarea: InputFormTextArea,
-  custom: OsCard,
+  custom: ({ component, ...rest }) => component(rest),
 };
