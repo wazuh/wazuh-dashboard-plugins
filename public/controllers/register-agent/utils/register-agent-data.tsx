@@ -3,7 +3,7 @@ import LinuxIcon from '../../../../public/assets/images/icons/linux-icon.svg';
 import WindowsIcon from '../../../../public/assets/images/icons/windows-icon.svg';
 import MacIcon from '../../../../public/assets/images/icons/mac-icon.svg';
 
-export const REGISTER_AGENT_DATA_STEP_ONE: RegisterAgentData[] = [
+export const OPERATING_SYSTEM_TEXT: RegisterAgentData[] = [
   {
     icon: LinuxIcon,
     title: 'LINUX',
@@ -24,7 +24,7 @@ export const REGISTER_AGENT_DATA_STEP_ONE: RegisterAgentData[] = [
   },
 ];
 
-export const REGISTER_AGENT_DATA_STEP_TWO = [
+export const SERVER_ADDRESS_TEXTS = [
   {
     title: 'Server address',
     subtitle:
@@ -32,7 +32,7 @@ export const REGISTER_AGENT_DATA_STEP_TWO = [
   },
 ];
 
-export const REGISTER_AGENT_DATA_STEP_THREE = [
+export const OPTIONAL_PARAMETERS_TEXT = [
   {
     title: 'Optional settings',
     subtitle:

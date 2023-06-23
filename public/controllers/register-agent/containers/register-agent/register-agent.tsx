@@ -9,6 +9,7 @@ import {
   EuiPageBody,
   EuiSpacer,
   EuiProgress,
+  EuiButton,
 } from '@elastic/eui';
 import { WzRequest } from '../../../../react-services/wz-request';
 import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
@@ -23,8 +24,8 @@ import { useForm } from '../../../../components/common/form/hooks';
 import { FormConfiguration } from '../../../../components/common/form/types';
 import { useSelector } from 'react-redux';
 import { withReduxProvider } from '../../../../components/common/hocs';
-import GroupInput from '../../components/steps-three/group-input';
-import { OsCard } from '../../components/step-one/os-card/os-card';
+import GroupInput from '../../components/group-input/group-input';
+import { OsCard } from '../../components/os-selector/os-card/os-card';
 import {
   validateServerAddress,
   validateAgentName,
@@ -165,7 +166,6 @@ export const RegisterAgent = withReduxProvider(
       fetchData();
     }, []);
 
-    const agentGroup = <InputForm {...form.fields.agentGroups}></InputForm>;
     const osCard = (
       <InputForm {...form.fields.operatingSystemSelection}></InputForm>
     );
@@ -215,7 +215,6 @@ export const RegisterAgent = withReduxProvider(
                         form={form}
                         needsPassword={needsPassword}
                         hideTextPassword={hideTextPassword}
-                        agentGroup={agentGroup}
                         osCard={osCard}
                         connection={{
                           isSecure: haveConnectionSecure ? true : false,

@@ -2,24 +2,12 @@
 import React, { Component, Fragment, useEffect, useState } from 'react';
 import {
   EuiSteps,
-  EuiText,
   EuiTitle,
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiCallOut,
-  EuiPopover,
-  EuiButtonEmpty,
-  EuiLink,
 } from '@elastic/eui';
-import { InputForm } from '../../../../components/common/form';
 import './steps.scss';
 import {
-  REGISTER_AGENT_DATA_STEP_ONE,
-  REGISTER_AGENT_DATA_STEP_THREE,
-  REGISTER_AGENT_DATA_STEP_TWO,
+  OPERATING_SYSTEM_TEXT
 } from '../../utils/register-agent-data';
-import { webDocumentationLink } from '../../../../../common/services/web_documentation';
-import { PLUGIN_VERSION_SHORT } from '../../../../../common/constants';
 import {
   IParseRegisterFormValues,
   getRegisterAgentFormValues,
@@ -34,47 +22,14 @@ import {
   tOptionalParameters,
 } from '../../config/os-commands-definitions';
 import { UseFormReturn } from '../../../../components/common/form/types';
-import CommandShower from '../../components/command-shower';
-
-const popoverServerAddress = (
-  <span>
-    Learn about{' '}
-    <EuiLink
-      href={webDocumentationLink(
-        'user-manual/reference/ossec-conf/client.html#groups',
-        PLUGIN_VERSION_SHORT,
-      )}
-      target='_blank'
-      rel='noopener noreferrer'
-    >
-      Server address.
-    </EuiLink>
-  </span>
-);
-
-const popoverAgentName = (
-  <span>
-    Learn about{' '}
-    <EuiLink
-      href={webDocumentationLink(
-        'user-manual/reference/ossec-conf/client.html#enrollment-agent-name',
-        PLUGIN_VERSION_SHORT,
-      )}
-      target='_blank'
-      rel='noopener noreferrer'
-    >
-      Assigning an agent name.
-    </EuiLink>
-  </span>
-);
-
-const warningForAgentName =
-  'The agent name must be unique. It can’t be changed once the agent has been enrolled.';
+import CommandOutput from '../../components/command-output/command-output';
+import ServerAddressTitle from '../../components/server-address/server-address-title';
+import ServerAddressInput from '../../components/server-address/server-address-input';
+import OptionalsInputs from '../../components/optionals-inputs/optionals-inputs';
 
 interface IStepsProps {
   needsPassword: boolean;
   hideTextPassword: boolean;
-  agentGroup: React.ReactElement;
   form: UseFormReturn;
   osCard: React.ReactElement;
   connection: {
@@ -87,25 +42,11 @@ interface IStepsProps {
 export const Steps = ({
   needsPassword,
   hideTextPassword,
-  agentGroup,
   form,
   osCard,
   connection,
   wazuhPassword,
 }: IStepsProps) => {
-  const [isPopoverServerAddress, setIsPopoverServerAddress] = useState(false);
-  const [isPopoverAgentName, setIsPopoverAgentName] = useState(false);
-
-  const onButtonServerAddress = () =>
-    setIsPopoverServerAddress(
-      isPopoverServerAddress => !isPopoverServerAddress,
-    );
-  const closeServerAddress = () => setIsPopoverServerAddress(false);
-
-  const onButtonAgentName = () =>
-    setIsPopoverAgentName(isPopoverAgentName => !isPopoverAgentName);
-  const closeAgentName = () => setIsPopoverAgentName(false);
-
   const [registerAgentFormValues, setRegisterAgentFormValues] =
     useState<IParseRegisterFormValues>({
       operatingSystem: {
@@ -125,7 +66,7 @@ export const Steps = ({
     setRegisterAgentFormValues(
       parseRegisterAgentFormValues(
         getRegisterAgentFormValues(form),
-        REGISTER_AGENT_DATA_STEP_ONE,
+        OPERATING_SYSTEM_TEXT,
       ),
     );
   }, [form.fields]);
@@ -157,47 +98,9 @@ export const Steps = ({
         : 'current',
     },
     {
-      title: (
-        <EuiFlexGroup>
-          <EuiFlexItem grow={false}>
-            <EuiPopover
-              button={
-                <EuiButtonEmpty
-                  iconType='questionInCircle'
-                  iconSide='right'
-                  onClick={onButtonServerAddress}
-                  className='stepTitle'
-                >
-                  Server address
-                </EuiButtonEmpty>
-              }
-              isOpen={isPopoverServerAddress}
-              closePopover={closeServerAddress}
-              anchorPosition='rightCenter'
-            >
-              {popoverServerAddress}
-            </EuiPopover>
-          </EuiFlexItem>
-        </EuiFlexGroup>
-      ),
+      title: <ServerAddressTitle />,
       children: (
-        <Fragment>
-          <EuiFlexGroup gutterSize='s' wrap>
-            {REGISTER_AGENT_DATA_STEP_TWO.map((data, index) => (
-              <EuiFlexItem key={index}>
-                <EuiText className='stepSubtitleServerAddress'>
-                  {data.subtitle}
-                </EuiText>
-              </EuiFlexItem>
-            ))}
-          </EuiFlexGroup>
-          <InputForm
-            {...form.fields.serverAddress}
-            label={<></>}
-            fullWidth={false}
-            placeholder='Server address'
-          />
-        </Fragment>
+        <ServerAddressInput formField={form.fields.serverAddress} />
       ),
       status: !form.fields.operatingSystemSelection.value
         ? 'disabled'
@@ -233,61 +136,7 @@ export const Steps = ({
           <p>Optional settings</p>
         </EuiTitle>
       ),
-      children: (
-        <Fragment>
-          <EuiFlexGroup gutterSize='s' wrap>
-            {REGISTER_AGENT_DATA_STEP_THREE.map((data, index) => (
-              <EuiFlexItem key={index}>
-                <EuiText className='stepSubtitle'>{data.subtitle}</EuiText>
-              </EuiFlexItem>
-            ))}
-          </EuiFlexGroup>
-          <InputForm
-            {...form.fields.agentName}
-            fullWidth={false}
-            label={
-              <>
-                <EuiFlexGroup>
-                  <EuiFlexItem grow={false}>
-                    <EuiPopover
-                      button={
-                        <EuiButtonEmpty
-                          iconType='questionInCircle'
-                          iconSide='right'
-                          onClick={onButtonAgentName}
-                          style={{
-                            flexDirection: 'row',
-                            fontStyle: 'normal',
-                            fontWeight: 700,
-                            fontSize: '12px',
-                            lineHeight: '20px',
-                            color: '#343741',
-                          }}
-                        >
-                          Assign an agent name
-                        </EuiButtonEmpty>
-                      }
-                      isOpen={isPopoverAgentName}
-                      closePopover={closeAgentName}
-                      anchorPosition='rightCenter'
-                    >
-                      {popoverAgentName}
-                    </EuiPopover>
-                  </EuiFlexItem>
-                </EuiFlexGroup>
-              </>
-            }
-            placeholder='Agent name'
-          />
-          <EuiCallOut
-            color='warning'
-            title={warningForAgentName}
-            iconType='iInCircle'
-            className='warningForAgentName'
-          />
-          {agentGroup}
-        </Fragment>
-      ),
+      children: <OptionalsInputs formFields={form.fields}/>,
       status:
         !form.fields.operatingSystemSelection.value ||
         !form.fields.serverAddress.value
@@ -307,7 +156,7 @@ export const Steps = ({
         </EuiTitle>
       ),
       children: (
-        <CommandShower
+        <CommandOutput
           commandText={installCommand}
           showCommand={showCommandsSections(form.fields)}
         />
@@ -321,7 +170,7 @@ export const Steps = ({
         </EuiTitle>
       ),
       children: (
-        <CommandShower
+        <CommandOutput
           commandText={startCommand}
           showCommand={showCommandsSections(form.fields)}
         />

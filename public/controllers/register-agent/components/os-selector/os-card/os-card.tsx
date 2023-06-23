@@ -7,8 +7,8 @@ import {
   EuiLink,
   EuiCheckbox,
 } from '@elastic/eui';
-import { REGISTER_AGENT_DATA_STEP_ONE } from '../../../utils/register-agent-data';
-import { CheckboxGroupComponent } from '../../step-one/checkbox-group/checkbox-group';
+import { OPERATING_SYSTEM_TEXT } from '../../../utils/register-agent-data';
+import { CheckboxGroupComponent } from '../checkbox-group/checkbox-group';
 import './os-card.scss';
 import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
 
@@ -21,7 +21,7 @@ export const OsCard = ({ onChange, value }: Props) => {
   return (
     <div data-testid='os-card'>
       <EuiFlexGroup gutterSize='l' wrap>
-        {REGISTER_AGENT_DATA_STEP_ONE.map((data, index) => (
+        {OPERATING_SYSTEM_TEXT.map((data, index) => (
           <EuiFlexItem key={index}>
             <EuiCard
               title={

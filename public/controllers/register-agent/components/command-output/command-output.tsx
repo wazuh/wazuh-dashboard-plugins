@@ -6,7 +6,7 @@ interface ICommandSectionProps {
   showCommand: boolean;
 }
 
-export default function CommandShower(props: ICommandSectionProps) {
+export default function CommandOutput(props: ICommandSectionProps) {
   const { commandText, showCommand } = props;
   return (
     <Fragment>
