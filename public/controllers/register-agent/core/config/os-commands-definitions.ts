@@ -198,9 +198,9 @@ export const optionalParamsDefinitions: tOptionalParams<tOptionalParameters> = {
       const { property, value } = props;
       let parsedValue = value;
       if(Array.isArray(value)){
-        parsedValue = value.length > 0 ? `${property}=${value.join(',')}` : '';
+        parsedValue = value.length > 0 ? value.join(',') : '';
       }
-      return value ? `${property}=${value}` : '';
+      return parsedValue ? `${property}=${parsedValue}` : '';
     },
   },
   wazuhPassword: {
