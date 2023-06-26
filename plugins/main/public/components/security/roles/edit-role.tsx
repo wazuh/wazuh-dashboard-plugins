@@ -67,22 +67,22 @@ export const EditRole = ({ role, closeFlyout }) => {
         {},
       );
       const selectedPoliciesCopy = [];
-      const policies = (
-        (((policies_request || {}).data || {}).data || {}).affected_items || []
-      ).map(x => {
-        const currentPolicy = {
-          label: x.name,
-          id: x.id,
-          roles: x.roles,
-          policy: x.policy,
-        };
-        if (roleData.policies.includes(x.id)) {
-          selectedPoliciesCopy.push(currentPolicy);
-          return false;
-        } else {
-          return currentPolicy;
-        }
-      });
+      const policies = (policies_request?.data?.data?.affected_items || []).map(
+        x => {
+          const currentPolicy = {
+            label: x.name,
+            id: x.id,
+            roles: x.roles,
+            policy: x.policy,
+          };
+          if (roleData.policies.includes(x.id)) {
+            selectedPoliciesCopy.push(currentPolicy);
+            return false;
+          } else {
+            return currentPolicy;
+          }
+        },
+      );
       const filteredPolicies = policies.filter(item => item !== false);
       setAssignedPolicies(selectedPoliciesCopy);
       setPolicies(filteredPolicies);
