@@ -15,13 +15,13 @@ import subprocess
 # ======================================================= #
 
 # Wazuh version: major.minor.patch
-version = '4.4.4'
+version = '4.5.0'
 # App's revision number (previous rev + 1)
 revision = '01'
 # One of 'pre-alpha', 'alpha', 'beta', 'release-candidate', 'stable'
-stage = 'stable'
+stage = 'alpha'
 # Tag suffix. Usually set to stage + stage iteration.
-tag_suffix = '-rc2'
+tag_suffix = '-alpha1'
 
 # ================================================ #
 # Constants and global variables                   #
