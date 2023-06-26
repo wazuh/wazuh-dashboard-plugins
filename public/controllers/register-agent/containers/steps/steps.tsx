@@ -52,7 +52,7 @@ export const Steps = ({
         architecture: '',
       },
       optionalParams: {
-        agentGroups: '',
+        agentGroups: [],
         agentName: '',
         serverAddress: '',
         wazuhPassword,

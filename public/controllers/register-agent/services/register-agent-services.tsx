@@ -254,7 +254,7 @@ export interface IParseRegisterFormValues {
   };
   // optionalParams is an object that their key is defined in tOptionalParameters and value must be string
   optionalParams: {
-    [FIELD in tOptionalParameters]: string;
+    [FIELD in tOptionalParameters]: any;
   };
 }
 
@@ -284,9 +284,7 @@ export const parseRegisterAgentFormValues = (
       }
     } else {
       if (field.name === 'agentGroups') {
-        parsedForm.optionalParams[field.name as any] = field.value[0]
-          ? field.value[0].id
-          : '';
+        parsedForm.optionalParams[field.name as any] = field.value.map(item => item.id)
       } else {
         parsedForm.optionalParams[field.name as any] = field.value;
       }

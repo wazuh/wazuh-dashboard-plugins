@@ -196,7 +196,11 @@ export const optionalParamsDefinitions: tOptionalParams<tOptionalParameters> = {
     property: 'WAZUH_AGENT_GROUP',
     getParamCommand: props => {
       const { property, value } = props;
-      return value !== '' ? `${property}=${value}` : '';
+      let parsedValue = value;
+      if(Array.isArray(value)){
+        parsedValue = value.length > 0 ? `${property}=${value.join(',')}` : '';
+      }
+      return value ? `${property}=${value}` : '';
     },
   },
   wazuhPassword: {

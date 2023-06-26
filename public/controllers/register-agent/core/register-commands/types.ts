@@ -58,7 +58,7 @@ export type tOptionalParams<T extends string> = {
 };
 
 export interface IOptionalParamInput<T extends string> {
-  value: string;
+  value: any;
   name: T;
 }
 export interface IOptionalParametersManager<T extends string> {
