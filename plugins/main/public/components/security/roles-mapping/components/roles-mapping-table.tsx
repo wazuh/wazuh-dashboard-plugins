@@ -12,7 +12,7 @@ import { ErrorHandler } from '../../../../react-services/error-handler';
 import { WzButtonPermissionsModalConfirm } from '../../../common/buttons';
 import { WzAPIUtils } from '../../../../react-services/wz-api-utils';
 import RulesServices from '../../rules/services';
-import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
+import { UI_LOGGER_LEVELS, WAZUH_API_RESERVED_WUI_SECURITY_RULES } from '../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
 
@@ -93,7 +93,7 @@ export const RolesMappingTable = ({
       name: 'Status',
       render(item, obj) {
         if (WzAPIUtils.isReservedID(item)) {
-          if (obj.id === 1 || obj.id === 2) {
+          if (WAZUH_API_RESERVED_WUI_SECURITY_RULES.includes(obj.id)) {
             return (
               <EuiFlexGroup>
                 <EuiBadge color='primary'>Reserved</EuiBadge>
