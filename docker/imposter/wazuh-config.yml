@@ -170,7 +170,7 @@ resources:
     path: /cluster/nodes
     response:
       statusCode: 200
-      scriptFile: cluster/cluster_node_info.js
+      scriptFile: cluster/cluster-node-info.js
 
   # Get nodes healthcheck
   - method: GET
@@ -544,6 +544,9 @@ resources:
   # Get agents overview
   - method: GET
     path: /overview/agents
+    response:
+      statusCode: 200
+      staticFile: overview/agents.json
 
   # ===================================================== #
   #   ROOTCHECK

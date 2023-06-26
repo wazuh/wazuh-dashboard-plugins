@@ -1,0 +1,831 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`GeneralTab component renders correctly to match the snapshot 1`] = `
+<GeneralTab
+  agent={
+    Object {
+      "id": "000",
+    }
+  }
+  wodleConfiguration={
+    Object {
+      "office365": Object {
+        "api_auth": Array [
+          Object {
+            "client_id": "your_client_id_test",
+            "client_secret": "your_secret_test",
+            "tenant_id": "your_tenant_id_test",
+          },
+        ],
+        "curl_max_size": 1024,
+        "enabled": "yes",
+        "interval": 600,
+        "only_future_events": "yes",
+        "subscriptions": Array [
+          "Audit.AzureActiveDirectory",
+          "Audit.Exchange",
+          "Audit.SharePoint",
+          "Audit.General",
+          "DLP.All",
+        ],
+      },
+    }
+  }
+>
+  <WzConfigurationSettingsTabSelector
+    currentConfig={
+      Object {
+        "office365": Object {
+          "api_auth": Array [
+            Object {
+              "client_id": "your_client_id_test",
+              "client_secret": "your_secret_test",
+              "tenant_id": "your_tenant_id_test",
+            },
+          ],
+          "curl_max_size": 1024,
+          "enabled": "yes",
+          "interval": 600,
+          "only_future_events": "yes",
+          "subscriptions": Array [
+            "Audit.AzureActiveDirectory",
+            "Audit.Exchange",
+            "Audit.SharePoint",
+            "Audit.General",
+            "DLP.All",
+          ],
+        },
+      }
+    }
+    description="Configuration for the Office 365 module"
+    helpLinks={
+      Array [
+        Object {
+          "href": "https://documentation.wazuh.com/4.6/office365/index.html",
+          "text": "Using Wazuh to monitor Office 365",
+        },
+        Object {
+          "href": "https://documentation.wazuh.com/4.6/user-manual/reference/ossec-conf/office365-module.html",
+          "text": "Configuration options for the module",
+        },
+      ]
+    }
+    minusHeight={370}
+    title="Main settings"
+  >
+    <WzConfigurationSettingsHeader
+      description="Configuration for the Office 365 module"
+      help={
+        Array [
+          Object {
+            "href": "https://documentation.wazuh.com/4.6/office365/index.html",
+            "text": "Using Wazuh to monitor Office 365",
+          },
+          Object {
+            "href": "https://documentation.wazuh.com/4.6/user-manual/reference/ossec-conf/office365-module.html",
+            "text": "Configuration options for the module",
+          },
+        ]
+      }
+      json={[Function]}
+      settings={[Function]}
+      title="Main settings"
+      viewSelected=""
+      xml={[Function]}
+    >
+      <EuiFlexGroup
+        alignItems="center"
+      >
+        <div
+          className="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--responsive"
+        >
+          <EuiFlexItem>
+            <div
+              className="euiFlexItem"
+            >
+              <EuiTitle
+                size="s"
+              >
+                <h2
+                  className="euiTitle euiTitle--small"
+                >
+                  Main settings
+                </h2>
+              </EuiTitle>
+              <EuiText
+                color="subdued"
+              >
+                <div
+                  className="euiText euiText--medium"
+                >
+                  <EuiTextColor
+                    color="subdued"
+                    component="div"
+                  >
+                    <div
+                      className="euiTextColor euiTextColor--subdued"
+                    >
+                      Configuration for the Office 365 module
+                    </div>
+                  </EuiTextColor>
+                </div>
+              </EuiText>
+            </div>
+          </EuiFlexItem>
+          <EuiFlexItem
+            grow={false}
+          >
+            <div
+              className="euiFlexItem euiFlexItem--flexGrowZero"
+            >
+              <EuiFlexGroup
+                alignItems="center"
+                gutterSize="none"
+                justifyContent="flexEnd"
+              >
+                <div
+                  className="euiFlexGroup euiFlexGroup--alignItemsCenter euiFlexGroup--justifyContentFlexEnd euiFlexGroup--directionRow euiFlexGroup--responsive"
+                >
+                  <span
+                    style={
+                      Object {
+                        "marginRight": "6px",
+                      }
+                    }
+                  >
+                    <ButtonLink
+                      onClick={[Function]}
+                      text="SETTINGS"
+                      view=""
+                      viewSelected=""
+                    >
+                      <EuiFlexItem>
+                        <div
+                          className="euiFlexItem"
+                        >
+                          <EuiLink
+                            onClick={[Function]}
+                            style={
+                              Object {
+                                "textDecoration": "underline",
+                              }
+                            }
+                          >
+                            <button
+                              className="euiLink euiLink--primary"
+                              disabled={false}
+                              onClick={[Function]}
+                              style={
+                                Object {
+                                  "textDecoration": "underline",
+                                }
+                              }
+                              type="button"
+                            >
+                              SETTINGS
+                            </button>
+                          </EuiLink>
+                        </div>
+                      </EuiFlexItem>
+                    </ButtonLink>
+                  </span>
+                  <span
+                    style={
+                      Object {
+                        "marginRight": "6px",
+                      }
+                    }
+                  >
+                    <ButtonLink
+                      onClick={[Function]}
+                      text="JSON"
+                      view="json"
+                      viewSelected=""
+                    >
+                      <EuiFlexItem>
+                        <div
+                          className="euiFlexItem"
+                        >
+                          <EuiLink
+                            onClick={[Function]}
+                            style={Object {}}
+                          >
+                            <button
+                              className="euiLink euiLink--primary"
+                              disabled={false}
+                              onClick={[Function]}
+                              style={Object {}}
+                              type="button"
+                            >
+                              JSON
+                            </button>
+                          </EuiLink>
+                        </div>
+                      </EuiFlexItem>
+                    </ButtonLink>
+                  </span>
+                  <span>
+                    <ButtonLink
+                      onClick={[Function]}
+                      text="XML"
+                      view="xml"
+                      viewSelected=""
+                    >
+                      <EuiFlexItem>
+                        <div
+                          className="euiFlexItem"
+                        >
+                          <EuiLink
+                            onClick={[Function]}
+                            style={Object {}}
+                          >
+                            <button
+                              className="euiLink euiLink--primary"
+                              disabled={false}
+                              onClick={[Function]}
+                              style={Object {}}
+                              type="button"
+                            >
+                              XML
+                            </button>
+                          </EuiLink>
+                        </div>
+                      </EuiFlexItem>
+                    </ButtonLink>
+                  </span>
+                  <span>
+                    <WzHelpButtonPopover
+                      links={
+                        Array [
+                          Object {
+                            "href": "https://documentation.wazuh.com/4.6/office365/index.html",
+                            "text": "Using Wazuh to monitor Office 365",
+                          },
+                          Object {
+                            "href": "https://documentation.wazuh.com/4.6/user-manual/reference/ossec-conf/office365-module.html",
+                            "text": "Configuration options for the module",
+                          },
+                        ]
+                      }
+                    >
+                      <EuiPopover
+                        anchorPosition="downCenter"
+                        button={
+                          <EuiButtonEmpty
+                            iconSide="left"
+                            iconType="questionInCircle"
+                            onClick={[Function]}
+                          />
+                        }
+                        closePopover={[Function]}
+                        display="inlineBlock"
+                        hasArrow={true}
+                        id="show-help"
+                        isOpen={false}
+                        ownFocus={true}
+                        panelPaddingSize="m"
+                      >
+                        <div
+                          className="euiPopover euiPopover--anchorDownCenter"
+                          id="show-help"
+                        >
+                          <div
+                            className="euiPopover__anchor"
+                          >
+                            <EuiButtonEmpty
+                              iconSide="left"
+                              iconType="questionInCircle"
+                              onClick={[Function]}
+                            >
+                              <button
+                                className="euiButtonEmpty euiButtonEmpty--primary"
+                                disabled={false}
+                                onClick={[Function]}
+                                type="button"
+                              >
+                                <EuiButtonContent
+                                  className="euiButtonEmpty__content"
+                                  iconSide="left"
+                                  iconSize="m"
+                                  iconType="questionInCircle"
+                                  textProps={
+                                    Object {
+                                      "className": "euiButtonEmpty__text",
+                                    }
+                                  }
+                                >
+                                  <span
+                                    className="euiButtonContent euiButtonEmpty__content"
+                                  >
+                                    <EuiIcon
+                                      className="euiButtonContent__icon"
+                                      color="inherit"
+                                      size="m"
+                                      type="questionInCircle"
+                                    >
+                                      <EuiIconEmpty
+                                        aria-hidden={true}
+                                        className="euiIcon euiIcon--medium euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
+                                        focusable="false"
+                                        role="img"
+                                        style={null}
+                                      >
+                                        <svg
+                                          aria-hidden={true}
+                                          className="euiIcon euiIcon--medium euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
+                                          focusable="false"
+                                          height={16}
+                                          role="img"
+                                          style={null}
+                                          viewBox="0 0 16 16"
+                                          width={16}
+                                          xmlns="http://www.w3.org/2000/svg"
+                                        />
+                                      </EuiIconEmpty>
+                                    </EuiIcon>
+                                    <span
+                                      className="euiButtonEmpty__text"
+                                    />
+                                  </span>
+                                </EuiButtonContent>
+                              </button>
+                            </EuiButtonEmpty>
+                          </div>
+                        </div>
+                      </EuiPopover>
+                    </WzHelpButtonPopover>
+                  </span>
+                </div>
+              </EuiFlexGroup>
+            </div>
+          </EuiFlexItem>
+        </div>
+      </EuiFlexGroup>
+      <EuiSpacer
+        size="xs"
+      >
+        <div
+          className="euiSpacer euiSpacer--xs"
+        />
+      </EuiSpacer>
+      <EuiHorizontalRule
+        margin="none"
+        style={
+          Object {
+            "marginBottom": 16,
+          }
+        }
+      >
+        <hr
+          className="euiHorizontalRule euiHorizontalRule--full"
+          style={
+            Object {
+              "marginBottom": 16,
+            }
+          }
+        />
+      </EuiHorizontalRule>
+    </WzConfigurationSettingsHeader>
+    <WzViewSelector
+      view=""
+    >
+      <WzViewSelectorSwitch
+        default={true}
+      >
+        <WzSettingsGroup
+          config={
+            Object {
+              "api_auth": Array [
+                Object {
+                  "client_id": "your_client_id_test",
+                  "client_secret": "your_secret_test",
+                  "tenant_id": "your_tenant_id_test",
+                },
+              ],
+              "curl_max_size": 1024,
+              "enabled": "yes",
+              "interval": 600,
+              "only_future_events": "yes",
+              "subscriptions": Array [
+                "Audit.AzureActiveDirectory",
+                "Audit.Exchange",
+                "Audit.SharePoint",
+                "Audit.General",
+                "DLP.All",
+              ],
+            }
+          }
+          items={
+            Array [
+              Object {
+                "field": "enabled",
+                "label": "Service status",
+                "render": [Function],
+              },
+              Object {
+                "field": "only_future_events",
+                "label": "Collect events generated since Wazuh manager is initialized",
+              },
+              Object {
+                "field": "interval",
+                "label": "Interval between Office 365 wodle executions in seconds",
+              },
+              Object {
+                "field": "curl_max_size",
+                "label": "Maximum size allowed for the Office 365 API response",
+              },
+            ]
+          }
+        >
+          <WzConfigurationSettingsHeader>
+            <EuiFlexGroup
+              alignItems="center"
+            >
+              <div
+                className="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--responsive"
+              >
+                <EuiFlexItem>
+                  <div
+                    className="euiFlexItem"
+                  >
+                    <EuiTitle
+                      size="s"
+                    >
+                      <h2
+                        className="euiTitle euiTitle--small"
+                      />
+                    </EuiTitle>
+                  </div>
+                </EuiFlexItem>
+                <EuiFlexItem
+                  grow={false}
+                >
+                  <div
+                    className="euiFlexItem euiFlexItem--flexGrowZero"
+                  >
+                    <EuiFlexGroup
+                      alignItems="center"
+                      gutterSize="none"
+                      justifyContent="flexEnd"
+                    >
+                      <div
+                        className="euiFlexGroup euiFlexGroup--alignItemsCenter euiFlexGroup--justifyContentFlexEnd euiFlexGroup--directionRow euiFlexGroup--responsive"
+                      />
+                    </EuiFlexGroup>
+                  </div>
+                </EuiFlexItem>
+              </div>
+            </EuiFlexGroup>
+            <EuiSpacer
+              size="xs"
+            >
+              <div
+                className="euiSpacer euiSpacer--xs"
+              />
+            </EuiSpacer>
+          </WzConfigurationSettingsHeader>
+          <EuiSpacer
+            size="s"
+          >
+            <div
+              className="euiSpacer euiSpacer--s"
+            />
+          </EuiSpacer>
+          <EuiFlexGroup>
+            <div
+              className="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+            >
+              <EuiFlexItem>
+                <div
+                  className="euiFlexItem"
+                >
+                  <WzConfigurationSetting
+                    key="-Service status-undefined-0"
+                    keyItem="-Service status-undefined-0"
+                    label="Service status"
+                    value="enabled"
+                  >
+                    <div
+                      style={
+                        Object {
+                          "alignItems": "center",
+                          "display": "flex",
+                          "flexDirection": "row",
+                        }
+                      }
+                    >
+                      <div
+                        style={
+                          Object {
+                            "justifySelf": "flex-end",
+                            "margin": "1em",
+                            "width": "35%",
+                          }
+                        }
+                      >
+                        <EuiTextAlign
+                          textAlign="right"
+                        >
+                          <div
+                            className="euiTextAlign euiTextAlign--right"
+                          >
+                            Service status
+                          </div>
+                        </EuiTextAlign>
+                      </div>
+                      <div
+                        style={
+                          Object {
+                            "width": "65%",
+                          }
+                        }
+                      >
+                        <EuiFieldText
+                          data-testid="service-status"
+                          readOnly={true}
+                          value="enabled"
+                        >
+                          <EuiFormControlLayout
+                            fullWidth={false}
+                            readOnly={true}
+                          >
+                            <div
+                              className="euiFormControlLayout euiFormControlLayout--readOnly"
+                            >
+                              <div
+                                className="euiFormControlLayout__childrenWrapper"
+                              >
+                                <EuiValidatableControl>
+                                  <input
+                                    className="euiFieldText"
+                                    data-testid="service-status"
+                                    readOnly={true}
+                                    type="text"
+                                    value="enabled"
+                                  />
+                                </EuiValidatableControl>
+                                <EuiFormControlLayoutIcons />
+                              </div>
+                            </div>
+                          </EuiFormControlLayout>
+                        </EuiFieldText>
+                      </div>
+                    </div>
+                    <EuiSpacer
+                      size="s"
+                    >
+                      <div
+                        className="euiSpacer euiSpacer--s"
+                      />
+                    </EuiSpacer>
+                  </WzConfigurationSetting>
+                  <WzConfigurationSetting
+                    key="-Collect events generated since Wazuh manager is initialized-undefined-1"
+                    keyItem="-Collect events generated since Wazuh manager is initialized-undefined-1"
+                    label="Collect events generated since Wazuh manager is initialized"
+                    value="yes"
+                  >
+                    <div
+                      style={
+                        Object {
+                          "alignItems": "center",
+                          "display": "flex",
+                          "flexDirection": "row",
+                        }
+                      }
+                    >
+                      <div
+                        style={
+                          Object {
+                            "justifySelf": "flex-end",
+                            "margin": "1em",
+                            "width": "35%",
+                          }
+                        }
+                      >
+                        <EuiTextAlign
+                          textAlign="right"
+                        >
+                          <div
+                            className="euiTextAlign euiTextAlign--right"
+                          >
+                            Collect events generated since Wazuh manager is initialized
+                          </div>
+                        </EuiTextAlign>
+                      </div>
+                      <div
+                        style={
+                          Object {
+                            "width": "65%",
+                          }
+                        }
+                      >
+                        <EuiFieldText
+                          data-testid="collect-events-generated-since-wazuh-manager-is-initialized"
+                          readOnly={true}
+                          value="yes"
+                        >
+                          <EuiFormControlLayout
+                            fullWidth={false}
+                            readOnly={true}
+                          >
+                            <div
+                              className="euiFormControlLayout euiFormControlLayout--readOnly"
+                            >
+                              <div
+                                className="euiFormControlLayout__childrenWrapper"
+                              >
+                                <EuiValidatableControl>
+                                  <input
+                                    className="euiFieldText"
+                                    data-testid="collect-events-generated-since-wazuh-manager-is-initialized"
+                                    readOnly={true}
+                                    type="text"
+                                    value="yes"
+                                  />
+                                </EuiValidatableControl>
+                                <EuiFormControlLayoutIcons />
+                              </div>
+                            </div>
+                          </EuiFormControlLayout>
+                        </EuiFieldText>
+                      </div>
+                    </div>
+                    <EuiSpacer
+                      size="s"
+                    >
+                      <div
+                        className="euiSpacer euiSpacer--s"
+                      />
+                    </EuiSpacer>
+                  </WzConfigurationSetting>
+                  <WzConfigurationSetting
+                    key="-Interval between Office 365 wodle executions in seconds-undefined-2"
+                    keyItem="-Interval between Office 365 wodle executions in seconds-undefined-2"
+                    label="Interval between Office 365 wodle executions in seconds"
+                    value={600}
+                  >
+                    <div
+                      style={
+                        Object {
+                          "alignItems": "center",
+                          "display": "flex",
+                          "flexDirection": "row",
+                        }
+                      }
+                    >
+                      <div
+                        style={
+                          Object {
+                            "justifySelf": "flex-end",
+                            "margin": "1em",
+                            "width": "35%",
+                          }
+                        }
+                      >
+                        <EuiTextAlign
+                          textAlign="right"
+                        >
+                          <div
+                            className="euiTextAlign euiTextAlign--right"
+                          >
+                            Interval between Office 365 wodle executions in seconds
+                          </div>
+                        </EuiTextAlign>
+                      </div>
+                      <div
+                        style={
+                          Object {
+                            "width": "65%",
+                          }
+                        }
+                      >
+                        <EuiFieldText
+                          data-testid="interval-between-office-365-wodle-executions-in-seconds"
+                          readOnly={true}
+                          value="600"
+                        >
+                          <EuiFormControlLayout
+                            fullWidth={false}
+                            readOnly={true}
+                          >
+                            <div
+                              className="euiFormControlLayout euiFormControlLayout--readOnly"
+                            >
+                              <div
+                                className="euiFormControlLayout__childrenWrapper"
+                              >
+                                <EuiValidatableControl>
+                                  <input
+                                    className="euiFieldText"
+                                    data-testid="interval-between-office-365-wodle-executions-in-seconds"
+                                    readOnly={true}
+                                    type="text"
+                                    value="600"
+                                  />
+                                </EuiValidatableControl>
+                                <EuiFormControlLayoutIcons />
+                              </div>
+                            </div>
+                          </EuiFormControlLayout>
+                        </EuiFieldText>
+                      </div>
+                    </div>
+                    <EuiSpacer
+                      size="s"
+                    >
+                      <div
+                        className="euiSpacer euiSpacer--s"
+                      />
+                    </EuiSpacer>
+                  </WzConfigurationSetting>
+                  <WzConfigurationSetting
+                    key="-Maximum size allowed for the Office 365 API response-undefined-3"
+                    keyItem="-Maximum size allowed for the Office 365 API response-undefined-3"
+                    label="Maximum size allowed for the Office 365 API response"
+                    value={1024}
+                  >
+                    <div
+                      style={
+                        Object {
+                          "alignItems": "center",
+                          "display": "flex",
+                          "flexDirection": "row",
+                        }
+                      }
+                    >
+                      <div
+                        style={
+                          Object {
+                            "justifySelf": "flex-end",
+                            "margin": "1em",
+                            "width": "35%",
+                          }
+                        }
+                      >
+                        <EuiTextAlign
+                          textAlign="right"
+                        >
+                          <div
+                            className="euiTextAlign euiTextAlign--right"
+                          >
+                            Maximum size allowed for the Office 365 API response
+                          </div>
+                        </EuiTextAlign>
+                      </div>
+                      <div
+                        style={
+                          Object {
+                            "width": "65%",
+                          }
+                        }
+                      >
+                        <EuiFieldText
+                          data-testid="maximum-size-allowed-for-the-office-365-api-response"
+                          readOnly={true}
+                          value="1024"
+                        >
+                          <EuiFormControlLayout
+                            fullWidth={false}
+                            readOnly={true}
+                          >
+                            <div
+                              className="euiFormControlLayout euiFormControlLayout--readOnly"
+                            >
+                              <div
+                                className="euiFormControlLayout__childrenWrapper"
+                              >
+                                <EuiValidatableControl>
+                                  <input
+                                    className="euiFieldText"
+                                    data-testid="maximum-size-allowed-for-the-office-365-api-response"
+                                    readOnly={true}
+                                    type="text"
+                                    value="1024"
+                                  />
+                                </EuiValidatableControl>
+                                <EuiFormControlLayoutIcons />
+                              </div>
+                            </div>
+                          </EuiFormControlLayout>
+                        </EuiFieldText>
+                      </div>
+                    </div>
+                    <EuiSpacer
+                      size="s"
+                    >
+                      <div
+                        className="euiSpacer euiSpacer--s"
+                      />
+                    </EuiSpacer>
+                  </WzConfigurationSetting>
+                </div>
+              </EuiFlexItem>
+            </div>
+          </EuiFlexGroup>
+        </WzSettingsGroup>
+      </WzViewSelectorSwitch>
+    </WzViewSelector>
+  </WzConfigurationSettingsTabSelector>
+</GeneralTab>
+`;
