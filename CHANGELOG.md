@@ -4,23 +4,33 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ## Wazuh v4.4.5 - OpenSearch Dashboards 2.6.0 - Revision 00
 
+### Added
+
+- Add Apple Silicon architecture button to the register Agent wizard [#5478](https://github.com/wazuh/wazuh-kibana-app/pull/5478)
+
 ### Fixed
 
+- Fixed the rendering of tables that contains IPs and agent overview [#5471](https://github.com/wazuh/wazuh-kibana-app/pull/5471)
 - Fixed the agents active coverage stat as NaN in Details panel of Agents section [#5490](https://github.com/wazuh/wazuh-kibana-app/pull/5490)
-- 
-## Wazuh v4.4.4 - OpenSearch Dashboards 2.6.0 - Revision 00
+
+### Removed
+
+- Removed the agent name in the agent info ribbon [#5497](https://github.com/wazuh/wazuh-kibana-app/pull/5497)
+
+### Changed
+
+- Changed windows agent service name in the deploy agent wizard [#5538](https://github.com/wazuh/wazuh-kibana-app/pull/5538)
+
+## Wazuh v4.4.4 - OpenSearch Dashboards 2.6.0 - Revision 01
+
 
 ### Added
 
 - Support for Wazuh 4.4.4
-- Added a title to the agent name input of the deploy a new agent section. [#5416](https://github.com/wazuh/wazuh-kibana-app/pull/5416)
-- Added callout below the agent name entry of the deploy a new agent section. [#5416](https://github.com/wazuh/wazuh-kibana-app/pull/5416)
 
 ### Changed
 
-- Changed the title of step 3 of the deploy a new agent section. [#5416](https://github.com/wazuh/wazuh-kibana-app/pull/5416)
-- Changed the description of step 3 of the deploy a new agent section. [#5416](https://github.com/wazuh/wazuh-kibana-app/pull/5416)
-- Changed the placeholder of the agent name input of the deploy a new agent section. [#5416](https://github.com/wazuh/wazuh-kibana-app/pull/5416)
+- Changed the title and added a warning in the step 3 of the deploy new agent section. [#5416](https://github.com/wazuh/wazuh-kibana-app/pull/5416)
 
 ## Wazuh v4.4.3 - OpenSearch Dashboards 2.6.0 - Revision 01
 
@@ -60,8 +70,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added the option to sort by the agent's count in the group table. [#4323](https://github.com/wazuh/wazuh-kibana-app/pull/4323)
 - Added agent synchronization status in the agent module. [#3874](https://github.com/wazuh/wazuh-kibana-app/pull/3874) [#5143](https://github.com/wazuh/wazuh-kibana-app/pull/5143) [#5177](https://github.com/wazuh/wazuh-kibana-app/pull/5177)
 - Added the ability to set the agent name in the installation command. [#4739](https://github.com/wazuh/wazuh-kibana-app/pull/4739)
-- Added validation to the plugin's settings [#4503](https://github.com/wazuh/wazuh-kibana-app/pull/4503)[#4785](https://github.com/wazuh/wazuh-kibana-app/pull/4785)
-- Added new settings to customize the header and footer on the PDF reports [#4505](https://github.com/wazuh/wazuh-kibana-app/pull/4505)[#4798](https://github.com/wazuh/wazuh-kibana-app/pull/4798)[#4805](https://github.com/wazuh/wazuh-kibana-app/pull/4805)
+- Added validation to the plugin's settings [#4503](https://github.com/wazuh/wazuh-kibana-app/pull/4503) [#4785](https://github.com/wazuh/wazuh-kibana-app/pull/4785)
+- Added new settings to customize the header and footer on the PDF reports [#4505](https://github.com/wazuh/wazuh-kibana-app/pull/4505) [#4798](https://github.com/wazuh/wazuh-kibana-app/pull/4798) [#4805](https://github.com/wazuh/wazuh-kibana-app/pull/4805)
 - Added a new setting to enable or disable the customization [#4507](https://github.com/wazuh/wazuh-kibana-app/pull/4507)
 - Added the ability to upload an image for the `customization.logo.*` settings in `Settings/Configuration` [#4504](https://github.com/wazuh/wazuh-kibana-app/pull/4504)
 - Added macOS support to the 'Deploy new agent' section [#4867](https://github.com/wazuh/wazuh-kibana-app/pull/4867)
