@@ -82,3 +82,6 @@ cypress/cookies.json
 
 # Customization plugin assets
 public/assets/custom/*
+
+# Mac files
+.DS_Store
