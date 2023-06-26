@@ -1,0 +1,90 @@
+{
+  "name": "wazuh",
+  "version": "4.6.0",
+  "revision": "01",
+  "stage": "stable",
+  "commit": "0e7201ff8",
+  "pluginPlatform": {
+    "version": "2.6.0"
+  },
+  "description": "Wazuh dashboard",
+  "keywords": [
+    "opensearch_dashboards",
+    "wazuh",
+    "ossec"
+  ],
+  "node_build": "10.23.1",
+  "author": "Wazuh, Inc",
+  "license": "GPL-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wazuh/wazuh-kibana-app.git"
+  },
+  "bugs": {
+    "url": "https://github.com/wazuh/wazuh-kibana-app/issues"
+  },
+  "homepage": "https://www.wazuh.com/",
+  "scripts": {
+    "lint": "eslint {public,server,common}/**/*.{js,jsx,ts,tsx,json}",
+    "lint:public": "eslint public/**/*.{js,jsx,ts,tsx,json}",
+    "lint:server": "eslint server/**/*.{js,jsx,ts,tsx,json}",
+    "lint:common": "eslint common/**/*.{js,jsx,ts,tsx,json}",
+    "lint:fix": "eslint --fix '{public,server,common}/**/*.{js,jsx,ts,tsx,json}'",
+    "format": "prettier --write '{public,server,common}/**/*.{js,jsx,ts,tsx,css,md,json}' --config ./.prettierrc",
+    "kbn": "node ../../scripts/kbn",
+    "es": "node ../../scripts/es",
+    "start": "plugin-helpers start",
+    "build": "yarn plugin-helpers build --opensearch-dashboards-version=$OPENSEARCH_DASHBOARDS_VERSION",
+    "build:runner": "node scripts/runner build",
+    "plugin-helpers": "node ../../scripts/plugin_helpers",
+    "test:ui:runner": "node ../../scripts/functional_test_runner.js",
+    "test:server": "plugin-helpers test:server",
+    "test:browser": "plugin-helpers test:browser",
+    "test:jest": "node scripts/jest",
+    "test:jest:runner": "node scripts/runner test",
+    "generate:api-data": "node scripts/generate-api-data.js --spec https://raw.githubusercontent.com/wazuh/wazuh/$(node -e \"console.log(require('./package.json').version.split('.').splice(0,2).join('.'))\")/api/api/spec/spec.yaml --output file --output-directory common/api-info --display-configuration",
+    "prebuild": "node scripts/generate-build-version"
+  },
+  "dependencies": {
+    "angular-animate": "1.8.3",
+    "angular-material": "1.2.5",
+    "axios": "^1.3.4",
+    "install": "^0.13.0",
+    "js2xmlparser": "^5.0.0",
+    "json2csv": "^4.1.2",
+    "jwt-decode": "^3.1.2",
+    "loglevel": "^1.7.1",
+    "markdown-it-link-attributes": "^4.0.1",
+    "md5": "^2.3.0",
+    "needle": "^3.2.0",
+    "node-cron": "^1.1.2",
+    "pdfmake": "0.2.7",
+    "querystring-browser": "1.0.4",
+    "react-codemirror": "^1.0.0",
+    "react-cookie": "^4.0.3",
+    "read-last-lines": "^1.7.2",
+    "timsort": "^0.3.0",
+    "typescript": "^5.0.4",
+    "winston": "3.9.0"
+  },
+  "devDependencies": {
+    "@types/node-cron": "^2.0.3",
+    "@typescript-eslint/eslint-plugin": "^5.38.1",
+    "@typescript-eslint/parser": "^5.38.1",
+    "eslint": "^8.24.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-import-resolver-typescript": "3.5.5",
+    "eslint-plugin-async-await": "^0.0.0",
+    "eslint-plugin-cypress": "^2.12.1",
+    "eslint-plugin-filenames-simple": "^0.8.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-react": "^7.31.8",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "prettier": "^2.7.1",
+    "redux-mock-store": "^1.5.4",
+    "swagger-client": "^3.19.8",
+    "tslint": "^6.1.3",
+    "typescript-eslint-parser": "^22.0.0"
+  }
+}
