@@ -1,6 +1,6 @@
 {
   "name": "wazuh",
-  "version": "4.4.4",
+  "version": "4.5.1",
   "revision": "01",
   "stage": "stable",
   "commit": "0e7201ff8",
