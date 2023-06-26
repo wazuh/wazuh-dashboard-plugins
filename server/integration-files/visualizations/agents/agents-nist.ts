@@ -81,7 +81,7 @@ export default [
           addLegend: true,
           legendPosition: 'right',
           isDonut: true,
-          labels: { show: false, values: true, last_level: true, truncate: 100 },
+          labels: { show: false },
           dimensions: {
             metric: { accessor: 0, format: { id: 'number' }, params: {}, aggType: 'count' },
           },
@@ -264,7 +264,7 @@ export default [
           addLegend: false,
           legendPosition: 'right',
           isDonut: true,
-          labels: { show: true, values: true, last_level: true, truncate: 100 },
+          labels: { show: false },
         },
         aggs: [
           { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },

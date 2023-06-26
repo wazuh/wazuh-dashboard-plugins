@@ -245,6 +245,7 @@ export default [
           addLegend: true,
           legendPosition: 'right',
           isDonut: true,
+          labels: { show: false },
         },
         aggs: [
           { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
@@ -283,6 +284,7 @@ export default [
           addLegend: true,
           legendPosition: 'right',
           isDonut: true,
+          labels: { show: false },
         },
         aggs: [
           { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
@@ -379,6 +381,7 @@ export default [
           addLegend: true,
           legendPosition: 'right',
           isDonut: true,
+          labels: { show: false },
         },
         aggs: [
           { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
@@ -470,6 +473,7 @@ export default [
           addLegend: true,
           legendPosition: 'right',
           isDonut: true,
+          labels: { show: false },
         },
         aggs: [
           { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
@@ -671,6 +675,7 @@ export default [
           addLegend: true,
           legendPosition: 'right',
           isDonut: true,
+          labels: { show: false },
         },
         aggs: [
           { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
@@ -736,6 +741,7 @@ export default [
           addLegend: true,
           legendPosition: 'right',
           isDonut: true,
+          labels: { show: false },
         },
         aggs: [
           { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
