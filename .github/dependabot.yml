@@ -2,7 +2,7 @@ version: 2
 updates:
  
   - package-ecosystem: "npm"
-    directory: "/"
+    directory: "/plugins/main"
     schedule:
       interval: "daily"
     target-branch: "4.6"
