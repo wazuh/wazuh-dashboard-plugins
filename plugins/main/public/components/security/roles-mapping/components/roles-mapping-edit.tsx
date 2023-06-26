@@ -224,20 +224,6 @@ export const RolesMappingEdit = ({
                       ]
                     : []),
                 ]}
-                savePermissionRequirements={{
-                  securityCreate: false,
-                  // security:update permission is required if we add new roles
-                  securityUpdate:
-                    selectedRoles
-                      .map(item => item.id)
-                      .filter(value => !rule.roles.includes(value)).length > 0,
-                  // security:delete permission is required if we delete roles
-                  securityDelete:
-                    rule.roles.filter(
-                      value =>
-                        !selectedRoles.map(item => item.id).includes(value),
-                    ) > 0,
-                }}
                 initialRule={rule.rule}
                 isLoading={isLoading}
                 isReserved={WzAPIUtils.isReservedID(rule.id)}
