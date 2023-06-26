@@ -297,16 +297,36 @@ export const parseRegisterAgentFormValues = (
 export const showCommandsSections = (
   formFields: UseFormReturn['fields'],
 ): boolean => {
-  return !formFields.operatingSystemSelection.value ||
+  if(!formFields.operatingSystemSelection.value ||
     formFields.serverAddress.value === '' ||
-    formFields.serverAddress.error
-    ? false
-    : true;
+    formFields.serverAddress.error || fieldsHaveErrors(['agentGroups','agentName'], formFields)){
+      return false;
+  }else{
+    return true
+  }
 };
 
 /******** Form Steps status getters ********/
 
 type tFormStepsStatus = EuiStepStatus | 'current' | 'disabled' | '';
+
+
+const fieldsHaveErrors = (fieldsToCheck: string[], formFields: UseFormReturn['fields']) => {
+  if(!fieldsToCheck){
+    return true;
+  } 
+  // check if the fieldsToCheck array NOT exists in formFields and get the field doesn't exists
+  if(!fieldsToCheck.every(key => formFields[key])){
+    return true;
+  }
+
+  const haveError = fieldsToCheck.some(
+    key => {
+      return formFields[key]?.error && formFields[key].value !== '';
+    } 
+  );
+  return haveError
+}
 
 export const getOSSelectorStepStatus = (
   formFields: UseFormReturn['fields'],
@@ -317,7 +337,7 @@ export const getOSSelectorStepStatus = (
 export const getAgentCommandsStepStatus = (
   formFields: UseFormReturn['fields'],
 ): tFormStepsStatus | 'disabled' => {
-  return showCommandsSections(formFields) ? 'current' : 'disabled';
+    return showCommandsSections(formFields) ? 'complete' : 'disabled';
 };
 
 export const getServerAddressStepStatus = (
@@ -334,15 +354,17 @@ export const getServerAddressStepStatus = (
     : '';
 };
 
+
 export const getOptionalParameterStepStatus = (
   formFields: UseFormReturn['fields'],
 ): tFormStepsStatus => {
-  return !formFields.operatingSystemSelection.value ||
-    !formFields.serverAddress.value
-    ? 'disabled'
-    : formFields.serverAddress.value !== ''
-    ? 'current'
-    : formFields.agentGroups.value.length > 0
-    ? 'complete'
-    : '';
+  // when previous step are not complete
+  if(!formFields.operatingSystemSelection.value || formFields.operatingSystemSelection.error||
+    !formFields.serverAddress.value || formFields.serverAddress.error ){
+      return 'disabled';
+  }else if(fieldsHaveErrors(['agentGroups','agentName'], formFields)){
+    return 'current';
+  }else{
+    return 'complete';
+  }
 };

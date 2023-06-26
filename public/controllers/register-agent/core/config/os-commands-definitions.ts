@@ -71,11 +71,11 @@ const linuxDefinition: IOSDefinition<ILinuxOSTypes, tOptionalParameters> = {
       urlPackage: props =>
         `https://packages.wazuh.com/4.x/yum/wazuh-agent-${props.wazuhVersion}-1.x86_64`,
       installCommand: props =>
-        `sudo yum install -y ${props.urlPackage}  ${
-          props.optionals?.serverAddress || ''
-        } ${props.optionals?.agentName || ''} ${
-          props.optionals?.agentGroups || ''
-        } ${props.optionals?.wazuhPassword || ''}`,
+        `sudo yum install -y ${props.urlPackage} 
+        ${props.optionals?.serverAddress || ''} 
+        ${props.optionals?.agentName || ''} 
+        ${props.optionals?.agentGroups || ''} 
+        ${props.optionals?.wazuhPassword || ''}`,
       startCommand: props => `sudo systemctl start wazuh-agent`,
     },
     {
@@ -83,11 +83,11 @@ const linuxDefinition: IOSDefinition<ILinuxOSTypes, tOptionalParameters> = {
       urlPackage: props =>
         `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/ wazuh-agent_${props.wazuhVersion}-1_${props.architecture}`,
       installCommand: props =>
-        `curl -so wazuh-agent.deb ${props.urlPackage} && sudo dpkg -i ./wazuh-agent.deb ${
-          props.optionals?.serverAddress || ''
-        } ${props.optionals?.agentName || ''} ${
-          props.optionals?.agentGroups || ''
-        } ${props.optionals?.wazuhPassword || ''}`,
+        `curl -so wazuh-agent.deb ${props.urlPackage} && sudo dpkg -i ./wazuh-agent.deb 
+        ${props.optionals?.serverAddress || ''} 
+        ${props.optionals?.agentName || ''} 
+        ${props.optionals?.agentGroups || ''} 
+        ${props.optionals?.wazuhPassword || ''}`,
       startCommand: props => `sudo systemctl start wazuh-agent`,
     },
     {
@@ -95,11 +95,11 @@ const linuxDefinition: IOSDefinition<ILinuxOSTypes, tOptionalParameters> = {
       urlPackage: props =>
         `https://packages.wazuh.com/4.x/yum/wazuh-agent-${props.wazuhVersion}-1.x86_64`,
       installCommand: props =>
-        `sudo yum install -y ${props.urlPackage}  ${
-          props.optionals?.serverAddress || ''
-        } ${props.optionals?.agentName || ''} ${
-          props.optionals?.agentGroups || ''
-        } ${props.optionals?.wazuhPassword || ''}`,
+        `sudo yum install -y ${props.urlPackage} 
+        ${props.optionals?.serverAddress || ''} 
+        ${props.optionals?.agentName || ''} 
+        ${props.optionals?.agentGroups || ''} 
+        ${props.optionals?.wazuhPassword || ''}`,
       startCommand: props => `sudo systemctl start wazuh-agent`,
     },
     {
@@ -109,11 +109,11 @@ const linuxDefinition: IOSDefinition<ILinuxOSTypes, tOptionalParameters> = {
       installCommand: props =>
         `curl -so wazuh-agent.deb ${
           props.urlPackage
-        } && sudo dpkg -i ./wazuh-agent.deb ${
-          props.optionals?.serverAddress || ''
-        } ${props.optionals?.agentName || ''} ${
-          props.optionals?.agentGroups || ''
-        } ${props.optionals?.wazuhPassword || ''}`,
+        } && sudo dpkg -i ./wazuh-agent.deb 
+        ${props.optionals?.serverAddress || ''} 
+        ${props.optionals?.agentName || ''} 
+        ${props.optionals?.agentGroups || ''} 
+        ${props.optionals?.wazuhPassword || ''}`,
       startCommand: props => `sudo systemctl start wazuh-agent`,
     },
   ],
@@ -127,11 +127,11 @@ const windowsDefinition: IOSDefinition<IWindowsOSTypes, tOptionalParameters> = {
       urlPackage: props =>
         `https://packages.wazuh.com/4.x/windows/wazuh-agent-${props.wazuhVersion}-1`,
       installCommand: props =>
-        `Invoke-WebRequest -Uri ${props.urlPackage} -OutFile \${env.tmp}\\wazuh-agent; msiexec.exe /i \${env.tmp}\\wazuh-agent /q  ${
-          props.optionals?.serverAddress || ''
-        } ${props.optionals?.agentName || ''} ${
-          props.optionals?.agentGroups || ''
-        } ${props.optionals?.wazuhPassword || ''}`,
+        `Invoke-WebRequest -Uri ${props.urlPackage} -OutFile \${env.tmp}\\wazuh-agent; msiexec.exe /i \${env.tmp}\\wazuh-agent /q 
+        ${props.optionals?.serverAddress || ''} 
+        ${props.optionals?.agentName || ''} 
+        ${props.optionals?.agentGroups || ''} 
+        ${props.optionals?.wazuhPassword || ''}`,
       startCommand: props => `Start-Service -Name wazuh-agent`,
     },
   ],
@@ -145,11 +145,11 @@ const macDefinition: IOSDefinition<IMacOSTypes, tOptionalParameters> = {
       urlPackage: props =>
         `https://packages.wazuh.com/4.x/macos/wazuh-agent-${props.wazuhVersion}-1`,
       installCommand: props =>
-        `mac -so wazuh-agent.pkg ${props.urlPackage} && sudo launchctl setenv && sudo installer -pkg ./wazuh-agent.pkg -target /  ${
-          props.optionals?.serverAddress || ''
-        } ${props.optionals?.agentName || ''} ${
-          props.optionals?.agentGroups || ''
-        } ${props.optionals?.wazuhPassword || ''}`,
+        `mac -so wazuh-agent.pkg ${props.urlPackage} && sudo launchctl setenv && sudo installer -pkg ./wazuh-agent.pkg -target / 
+        ${props.optionals?.serverAddress || ''} 
+        ${props.optionals?.agentName || ''} 
+        ${props.optionals?.agentGroups || ''} 
+        ${props.optionals?.wazuhPassword || ''}`,
       startCommand: props => `sudo /Library/Ossec/bin/wazuh-control start`,
     },
     {
@@ -157,11 +157,11 @@ const macDefinition: IOSDefinition<IMacOSTypes, tOptionalParameters> = {
       urlPackage: props =>
         `https://packages.wazuh.com/4.x/macos/wazuh-agent-${props.wazuhVersion}-1`,
       installCommand: props =>
-        `mac -so wazuh-agent.pkg ${props.urlPackage} && sudo launchctl setenv && sudo installer -pkg ./wazuh-agent.pkg -target  ${
-          props.optionals?.serverAddress || ''
-        } ${props.optionals?.agentName || ''} ${
-          props.optionals?.agentGroups || ''
-        } ${props.optionals?.wazuhPassword || ''}`,
+        `mac -so wazuh-agent.pkg ${props.urlPackage} && sudo launchctl setenv && sudo installer -pkg ./wazuh-agent.pkg -target 
+        ${props.optionals?.serverAddress || ''} 
+        ${props.optionals?.agentName || ''} 
+        ${props.optionals?.agentGroups || ''} 
+        ${props.optionals?.wazuhPassword || ''}`,
       startCommand: props => `sudo /Library/Ossec/bin/wazuh-control start`,
     },
   ],
@@ -182,14 +182,14 @@ export const optionalParamsDefinitions: tOptionalParams<tOptionalParameters> = {
     property: 'WAZUH_MANAGER',
     getParamCommand: props => {
       const { property, value } = props;
-      return value !== '' ? `${property}=${value}` : '';
+      return value !== '' ? `${property}='${value}'` : '';
     },
   },
   agentName: {
     property: 'WAZUH_AGENT_NAME',
     getParamCommand: props => {
       const { property, value } = props;
-      return value !== '' ? `${property}=${value}` : '';
+      return value !== '' ? `${property}='${value}'` : '';
     },
   },
   agentGroups: {
@@ -200,14 +200,14 @@ export const optionalParamsDefinitions: tOptionalParams<tOptionalParameters> = {
       if(Array.isArray(value)){
         parsedValue = value.length > 0 ? value.join(',') : '';
       }
-      return parsedValue ? `${property}=${parsedValue}` : '';
+      return parsedValue ? `${property}='${parsedValue}'` : '';
     },
   },
   wazuhPassword: {
     property: 'WAZUH_PASSWORD',
     getParamCommand: props => {
       const { property, value } = props;
-      return value !== '' ? `${property}=${value}` : '';
+      return value !== '' ? `${property}='${value}'` : '';
     },
   },
 };
