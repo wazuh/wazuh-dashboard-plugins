@@ -2,6 +2,12 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.7.0 - OpenSearch Dashboards 2.7.0 - Revision 00
+
+### Fixed
+
+- Fixed the propagation event so that the flyout data does not change when clicking on the button. [#5597](https://github.com/wazuh/wazuh-kibana-app/pull/5597)
+
 ## Wazuh v4.6.0 - OpenSearch Dashboards 2.6.0 - Revision 01
 
 ### Added
@@ -25,7 +31,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed the placeholder of the agent name input of the deploy a new agent section. [#5429](https://github.com/wazuh/wazuh-kibana-app/pull/5429)
 - Changed the query to search for an agent in `management/configuration`. [#5485](https://github.com/wazuh/wazuh-kibana-app/pull/5485)
 - Changed the search bar in management/log to the one used in the rest of the app. [#5476](https://github.com/wazuh/wazuh-kibana-app/pull/5476)
-
 
 ### Fixed
 
