@@ -11,6 +11,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Fixed
 
 - Fixed the rendering of tables that contains IPs and agent overview [#5471](https://github.com/wazuh/wazuh-kibana-app/pull/5471)
+- Fixed the agents active coverage stat as NaN in Details panel of Agents section [#5490](https://github.com/wazuh/wazuh-kibana-app/pull/5490)
 
 ### Removed
 
@@ -27,6 +28,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Support for Wazuh 4.5.0
 
 ## Wazuh v4.4.4 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 01
+
 
 ### Added
 
