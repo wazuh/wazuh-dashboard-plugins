@@ -223,7 +223,7 @@ export const RegisterAgent = withReduxProvider(
                   )}
                   <EuiFlexGroup justifyContent="flexEnd" style={{ marginRight: '0.3rem' }}>
                     <EuiFlexItem grow={false}>
-                      <EuiButton className='close-button'  onClick={() => reload()}>Close</EuiButton>
+                      <EuiButton className='close-button' fill color='primary' onClick={() => reload()}>Close</EuiButton>
                     </EuiFlexItem>
                   </EuiFlexGroup>
                 </EuiPanel>

@@ -1,25 +1,6 @@
 import { EuiStepStatus } from '@elastic/eui';
 import { UseFormReturn } from '../../../components/common/form/types';
 
-export const showCommandsSections = (
-  formFields: UseFormReturn['fields'],
-): boolean => {
-  if (
-    !formFields.operatingSystemSelection.value ||
-    formFields.serverAddress.value === '' ||
-    formFields.serverAddress.error ||
-    fieldsHaveErrors(['agentGroups', 'agentName'], formFields)
-  ) {
-    return false;
-  } else {
-    return true;
-  }
-};
-
-/******** Form Steps status getters ********/
-
-export type tFormStepsStatus = EuiStepStatus | 'current' | 'disabled' | '';
-
 const fieldsHaveErrors = (
   fieldsToCheck: string[],
   formFields: UseFormReturn['fields'],
@@ -29,14 +10,80 @@ const fieldsHaveErrors = (
   }
   // check if the fieldsToCheck array NOT exists in formFields and get the field doesn't exists
   if (!fieldsToCheck.every(key => formFields[key])) {
-    return true;
+    throw Error('fields to check are not defined in formFields');
   }
 
   const haveError = fieldsToCheck.some(key => {
-    return formFields[key]?.error && formFields[key].value !== '';
+    return formFields[key]?.error;
   });
   return haveError;
 };
+
+const anyFieldIsComplete = (
+  fieldsToCheck: string[],
+  formFields: UseFormReturn['fields'],
+) => {
+  if (!fieldsToCheck) {
+    return true;
+  }
+  // check if the fieldsToCheck array NOT exists in formFields and get the field doesn't exists
+  if (!fieldsToCheck.every(key => formFields[key])) {
+    throw Error('fields to check are not defined in formFields');
+  }
+
+  if (fieldsHaveErrors(fieldsToCheck, formFields)) {
+    return false;
+  }
+
+  if (fieldsAreEmpty(fieldsToCheck, formFields)) {
+    return false;
+  }
+
+  return true;
+};
+
+const fieldsAreEmpty = (
+  fieldsToCheck: string[],
+  formFields: UseFormReturn['fields'],
+) => {
+  if (!fieldsToCheck) {
+    return true;
+  }
+  // check if the fieldsToCheck array NOT exists in formFields and get the field doesn't exists
+  if (!fieldsToCheck.every(key => formFields[key])) {
+    throw Error('fields to check are not defined in formFields');
+  }
+
+  const notEmpty = fieldsToCheck.some(key => {
+    return formFields[key]?.value?.length > 0;
+  });
+  return !notEmpty;
+};
+
+export const showCommandsSections = (
+  formFields: UseFormReturn['fields'],
+): boolean => {
+  if (
+    !formFields.operatingSystemSelection.value ||
+    formFields.serverAddress.value === '' ||
+    formFields.serverAddress.error
+  ) {
+    return false;
+  } else if (
+    formFields.serverAddress.value === '' &&
+    formFields.agentName.value === ''
+  ) {
+    return true;
+  } else if (!fieldsHaveErrors(['agentGroups', 'agentName'], formFields)) {
+    return true;
+  } else {
+    return false;
+  }
+};
+
+/******** Form Steps status getters ********/
+
+export type tFormStepsStatus = EuiStepStatus | 'current' | 'disabled' | '';
 
 export const getOSSelectorStepStatus = (
   formFields: UseFormReturn['fields'],
@@ -77,6 +124,7 @@ export const getServerAddressStepStatus = (
 
 export const getOptionalParameterStepStatus = (
   formFields: UseFormReturn['fields'],
+  installCommandWasCopied: boolean,
 ): tFormStepsStatus => {
   // when previous step are not complete
   if (
@@ -86,9 +134,12 @@ export const getOptionalParameterStepStatus = (
     formFields.serverAddress.error
   ) {
     return 'disabled';
-  } else if (fieldsHaveErrors(['agentGroups', 'agentName'], formFields)) {
-    return 'current';
-  } else {
+  } else if (
+    installCommandWasCopied ||
+    anyFieldIsComplete(['agentName', 'agentGroups'], formFields)
+  ) {
     return 'complete';
+  } else {
+    return 'current';
   }
 };

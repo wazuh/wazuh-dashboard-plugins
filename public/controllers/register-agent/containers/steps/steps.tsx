@@ -139,13 +139,13 @@ export const Steps = ({
         </EuiTitle>
       ),
       children: <OptionalsInputs formFields={form.fields} />,
-      status: getOptionalParameterStepStatus(form.fields)
+      status: getOptionalParameterStepStatus(form.fields, installCommandWasCopied, startCommandWasCopied)
     },
     {
       title: (
         <EuiTitle className='stepTitle'>
           <p>
-            Run the following commands to download and install the Wazuh Agent:
+            Run the following commands to download and install the Wazuh agent:
           </p>
         </EuiTitle>
       ),
