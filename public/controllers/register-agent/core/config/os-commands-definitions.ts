@@ -108,11 +108,7 @@ const windowsDefinition: IOSDefinition<IWindowsOSTypes, tOptionalParameters> = {
       installCommand: props =>
         `Invoke-WebRequest -Uri ${
           props.urlPackage
-        } -OutFile \${env.tmp}\\wazuh-agent; msiexec.exe /i \${env.tmp}\\wazuh-agent /q 
-        ${props.optionals?.serverAddress || ''} 
-        ${props.optionals?.agentName || ''} 
-        ${props.optionals?.agentGroups || ''} 
-        ${props.optionals?.wazuhPassword || ''}`,
+        } -OutFile \${env.tmp}\\wazuh-agent; msiexec.exe /i \${env.tmp}\\wazuh-agent /q ${props.optionals?.serverAddress || ''} ${props.optionals?.agentName || ''} ${props.optionals?.agentGroups || ''} ${props.optionals?.wazuhPassword || ''}`,
       startCommand: props => `Start-Service -Name wazuh-agent`,
     },
   ],

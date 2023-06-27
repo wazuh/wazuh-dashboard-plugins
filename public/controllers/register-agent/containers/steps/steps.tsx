@@ -4,14 +4,10 @@ import './steps.scss';
 import { OPERATING_SYSTEMS_OPTIONS } from '../../utils/register-agent-data';
 import {
   IParseRegisterFormValues,
-  getAgentCommandsStepStatus,
-  getOSSelectorStepStatus,
-  getOptionalParameterStepStatus,
   getRegisterAgentFormValues,
-  getServerAddressStepStatus,
   parseRegisterAgentFormValues,
-  showCommandsSections,
 } from '../../services/register-agent-services';
+
 import { useRegisterAgentCommands } from '../../hooks/use-register-agent-commands';
 import {
   osCommandsDefinitions,
@@ -24,6 +20,7 @@ import CommandOutput from '../../components/command-output/command-output';
 import ServerAddressTitle from '../../components/server-address/server-address-title';
 import ServerAddressInput from '../../components/server-address/server-address-input';
 import OptionalsInputs from '../../components/optionals-inputs/optionals-inputs';
+import { getAgentCommandsStepStatus, tFormStepsStatus, getOSSelectorStepStatus, getServerAddressStepStatus, getOptionalParameterStepStatus, showCommandsSections } from '../../services/register-agent-steps-status-services';
 
 interface IStepsProps {
   needsPassword: boolean;
@@ -66,6 +63,8 @@ export const Steps = ({
       OPERATING_SYSTEMS_OPTIONS,
     );
     setRegisterAgentFormValues(registerAgentFormValuesParsed);
+    setInstallCommandStepStatus(getAgentCommandsStepStatus(form.fields, installCommandWasCopied))
+    setStartCommandStepStatus(getAgentCommandsStepStatus(form.fields, startCommandWasCopied))
   }, [form.fields]);
 
   const { installCommand, startCommand, selectOS, setOptionalParams } =
@@ -74,6 +73,12 @@ export const Steps = ({
       optionalParamsDefinitions: optionalParamsDefinitions,
     });
 
+  // install - start commands step state
+  const [installCommandWasCopied, setInstallCommandWasCopied] = useState(false);
+  const [installCommandStepStatus, setInstallCommandStepStatus] = useState<tFormStepsStatus>(getAgentCommandsStepStatus(form.fields, false))
+  const [startCommandWasCopied, setStartCommandWasCopied] = useState(false);
+  const [startCommandStepStatus, setStartCommandStepStatus] = useState<tFormStepsStatus>(getAgentCommandsStepStatus(form.fields, false))
+
   useEffect(() => {
     if (
       registerAgentFormValues.operatingSystem.name !== '' &&
@@ -81,9 +86,18 @@ export const Steps = ({
     ) {
       selectOS(registerAgentFormValues.operatingSystem as tOperatingSystem);
     }
-
     setOptionalParams(registerAgentFormValues.optionalParams);
+    setInstallCommandWasCopied(false);
+    setStartCommandWasCopied(false);
   }, [registerAgentFormValues]);
+
+  useEffect(() => {
+    setInstallCommandStepStatus(getAgentCommandsStepStatus(form.fields, installCommandWasCopied))
+  }, [installCommandWasCopied])
+
+  useEffect(() => {
+    setStartCommandStepStatus(getAgentCommandsStepStatus(form.fields, startCommandWasCopied))
+  }, [startCommandWasCopied])
 
   const registerAgentFormSteps = [
     {
@@ -139,9 +153,11 @@ export const Steps = ({
         <CommandOutput
           commandText={installCommand}
           showCommand={showCommandsSections(form.fields)}
+          os={registerAgentFormValues.operatingSystem.name}
+          onCopy={() => setInstallCommandWasCopied(true)}
         />
       ),
-      status: getAgentCommandsStepStatus(form.fields),
+      status: installCommandStepStatus,
     },
     {
       title: (
@@ -153,9 +169,11 @@ export const Steps = ({
         <CommandOutput
           commandText={startCommand}
           showCommand={showCommandsSections(form.fields)}
+          os={registerAgentFormValues.operatingSystem.name}
+          onCopy={() => setStartCommandWasCopied(true)}
         />
       ),
-      status: getAgentCommandsStepStatus(form.fields),
+      status: startCommandStepStatus,
     },
   ];
 
