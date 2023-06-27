@@ -348,7 +348,10 @@ export const AgentsTable = withErrorBoundary(
             <EuiButtonIcon
               onClick={ev => {
                 ev.stopPropagation();
-                this.props.clickAction(agent, 'default');
+                AppNavigate.navigateToModule(ev, 'agents', {
+                  tab: 'welcome',
+                  agent: agent.id,
+                });
               }}
               iconType='eye'
               color={'primary'}
@@ -364,7 +367,10 @@ export const AgentsTable = withErrorBoundary(
               <EuiButtonIcon
                 onClick={ev => {
                   ev.stopPropagation();
-                  this.props.clickAction(agent, 'configuration');
+                  AppNavigate.navigateToModule(ev, 'agents', {
+                    tab: 'configuration',
+                    agent: agent.id,
+                  });
                 }}
                 color={'primary'}
                 iconType='wrench'
@@ -857,7 +863,6 @@ AgentsTable.propTypes = {
   wzReq: PropTypes.func,
   addingNewAgent: PropTypes.func,
   downloadCsv: PropTypes.func,
-  clickAction: PropTypes.func,
   timeService: PropTypes.func,
   reload: PropTypes.func,
 };

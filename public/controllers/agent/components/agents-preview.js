@@ -320,7 +320,6 @@ export const AgentsPreview = compose(
                 wzReq={this.props.tableProps.wzReq}
                 addingNewAgent={this.props.tableProps.addingNewAgent}
                 downloadCsv={this.props.tableProps.downloadCsv}
-                clickAction={this.props.tableProps.clickAction}
                 formatUIDate={(date) => formatUIDate(date)}
                 reload={() => this.fetchAgentStatusDetailsData()}
               />
