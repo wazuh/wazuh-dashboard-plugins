@@ -10,5 +10,5 @@ test(`Generate a web documentation URL to the base URL using to the plugin short
 });
 
 test(`Generate a web documentation URL using a specific version`, () => {
-    expect(webDocumentationLink('user-manual/agent-enrollment/index.html', '4.5')).toBe(`${DOCUMENTATION_WEB_BASE_URL}/4.5/user-manual/agent-enrollment/index.html`);
+    expect(webDocumentationLink('user-manual/agent-enrollment/index.html', '4.6')).toBe(`${DOCUMENTATION_WEB_BASE_URL}/4.6/user-manual/agent-enrollment/index.html`);
 });
