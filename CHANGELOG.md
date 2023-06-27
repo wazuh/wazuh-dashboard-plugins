@@ -6,7 +6,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
-- Fixed the propagation event so that the flyout data does not change when clicking on the button. [#5597](https://github.com/wazuh/wazuh-kibana-app/pull/5597)
+- Fixed the propagation event so that the flyout data, in the decoders, does not change when the button is pressed. [#5597](https://github.com/wazuh/wazuh-kibana-app/pull/5597)
 
 ## Wazuh v4.6.0 - OpenSearch Dashboards 2.6.0 - Revision 01
 
