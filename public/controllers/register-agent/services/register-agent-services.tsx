@@ -1,5 +1,10 @@
+import { UseFormReturn } from '../../../components/common/form/types';
 import { WzRequest } from '../../../react-services/wz-request';
-import { ServerAddressOptions } from '../register-agent/steps';
+import {
+  tOperatingSystem,
+  tOptionalParameters,
+} from '../core/config/os-commands-definitions';
+import { RegisterAgentData } from '../interfaces/types';
 
 type Protocol = 'TCP' | 'UDP';
 
@@ -106,7 +111,7 @@ function getRemoteProtocol(protocols: Protocol[]) {
  * @param defaultServerAddress
  */
 async function getConnectionConfig(
-  nodeSelected: ServerAddressOptions,
+  nodeSelected: any,
   defaultServerAddress?: string,
 ) {
   const nodeName = nodeSelected?.label;
@@ -174,9 +179,7 @@ export const getManagerNode = async (): Promise<any> => {
  * Parse the nodes list from the API response to a format that can be used by the EuiComboBox
  * @param nodes
  */
-export const parseNodesInOptions = (
-  nodes: NodeResponse,
-): ServerAddressOptions[] => {
+export const parseNodesInOptions = (nodes: NodeResponse): any[] => {
   return nodes.data.data.affected_items.map((item: NodeItem) => ({
     label: item.name,
     value: item.ip,
@@ -187,9 +190,7 @@ export const parseNodesInOptions = (
 /**
  * Get the list of the cluster nodes from API and parse it into a list of options
  */
-export const fetchClusterNodesOptions = async (): Promise<
-  ServerAddressOptions[]
-> => {
+export const fetchClusterNodesOptions = async (): Promise<any[]> => {
   const clusterStatus = await clusterStatusResponse();
   if (clusterStatus) {
     // Cluster mode
@@ -207,9 +208,7 @@ export const fetchClusterNodesOptions = async (): Promise<
  * Get the master node data from the list of cluster nodes
  * @param nodeIps
  */
-export const getMasterNode = (
-  nodeIps: ServerAddressOptions[],
-): ServerAddressOptions[] => {
+export const getMasterNode = (nodeIps: any[]): any[] => {
   return nodeIps.filter(nodeIp => nodeIp.nodetype === 'master');
 };
 
@@ -235,4 +234,61 @@ export const getGroups = async () => {
   } catch (error) {
     throw new Error(error);
   }
+};
+
+export const getRegisterAgentFormValues = (form: UseFormReturn) => {
+  // return the values form the formFields and the value property
+  return Object.keys(form.fields).map(key => {
+    return {
+      name: key,
+      value: form.fields[key].value,
+    };
+  });
+};
+
+export interface IParseRegisterFormValues {
+  operatingSystem: {
+    name: tOperatingSystem['name'] | '';
+    architecture: tOperatingSystem['architecture'] | '';
+  };
+  // optionalParams is an object that their key is defined in tOptionalParameters and value must be string
+  optionalParams: {
+    [FIELD in tOptionalParameters]: any;
+  };
+}
+
+export const parseRegisterAgentFormValues = (
+  formValues: { name: keyof UseFormReturn['fields']; value: any }[],
+  OSOptionsDefined: RegisterAgentData[],
+) => {
+  // return the values form the formFields and the value property
+  const parsedForm = {
+    operatingSystem: {
+      architecture: '',
+      name: '',
+    },
+    optionalParams: {},
+  } as IParseRegisterFormValues;
+  formValues.forEach(field => {
+    if (field.name === 'operatingSystemSelection') {
+      // search the architecture defined in architecture array and get the os name defined in title array in the same index
+      const operatingSystem = OSOptionsDefined.find(os =>
+        os.architecture.includes(field.value),
+      );
+      if (operatingSystem) {
+        parsedForm.operatingSystem = {
+          name: operatingSystem.title,
+          architecture: field.value,
+        };
+      }
+    } else {
+      if (field.name === 'agentGroups') {
+        parsedForm.optionalParams[field.name as any] = field.value.map(item => item.id)
+      } else {
+        parsedForm.optionalParams[field.name as any] = field.value;
+      }
+    }
+  });
+
+  return parsedForm;
 };

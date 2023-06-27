@@ -1,7 +1,7 @@
 export class NoOptionFoundException extends Error {
-  constructor(osName: string, architecture: string, extension: string) {
+  constructor(osName: string, architecture: string) {
     super(
-      `No OS option found for "${osName}" "${architecture}" "${extension}".Please check the OS definitions."`,
+      `No OS option found for "${osName}" "${architecture}". Please check the OS definitions."`,
     );
   }
 }
@@ -9,31 +9,31 @@ export class NoOptionFoundException extends Error {
 export class NoOSOptionFoundException extends Error {
   constructor(osName: string) {
     super(
-      `No OS option found for "${osName}".Please check the OS definitions."`,
+      `No OS option found for "${osName}". Please check the OS definitions."`,
     );
   }
 }
 
 export class NoStartCommandDefinitionException extends Error {
-  constructor(osName: string, architecture: string, extension: string) {
+  constructor(osName: string, architecture: string) {
     super(
-      `No start command definition found for "${osName}" "${architecture}" "${extension}". Please check the OS definitions.`,
+      `No start command definition found for "${osName}" "${architecture}". Please check the OS definitions.`,
     );
   }
 }
 
 export class NoInstallCommandDefinitionException extends Error {
-  constructor(osName: string, architecture: string, extension: string) {
+  constructor(osName: string, architecture: string) {
     super(
-      `No install command definition found for "${osName}" "${architecture}" "${extension}". Please check the OS definitions.`,
+      `No install command definition found for "${osName}" "${architecture}". Please check the OS definitions.`,
     );
   }
 }
 
 export class NoPackageURLDefinitionException extends Error {
-  constructor(osName: string, architecture: string, extension: string) {
+  constructor(osName: string, architecture: string) {
     super(
-      `No package URL definition found for "${osName}" "${architecture}" "${extension}". Please check the OS definitions.`,
+      `No package URL definition found for "${osName}" "${architecture}". Please check the OS definitions.`,
     );
   }
 }
@@ -53,9 +53,9 @@ export class DuplicatedOSException extends Error {
 }
 
 export class DuplicatedOSOptionException extends Error {
-  constructor(osName: string, architecture: string, extension: string) {
+  constructor(osName: string, architecture: string) {
     super(
-      `Duplicate OS option found for "${osName}" "${architecture}" "${extension}"`,
+      `Duplicate OS option found for "${osName}" "${architecture}"`,
     );
   }
 }
@@ -78,8 +78,3 @@ export class NoArchitectureSelectedException extends Error {
   }
 }
 
-export class NoExtensionSelectedException extends Error {
-  constructor() {
-    super(`Extension not selected. Please select`);
-  }
-}

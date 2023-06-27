@@ -14,7 +14,7 @@ import {
   validateOSDefinitionsDuplicated,
 } from '../services/search-os-definitions.service';
 import { OptionalParametersManager } from '../optional-parameters-manager/optional-parameters-manager';
-import { NoArchitectureSelectedException, NoExtensionSelectedException, NoOSSelectedException, WazuhVersionUndefinedException } from '../exceptions';
+import { NoArchitectureSelectedException, NoOSSelectedException, WazuhVersionUndefinedException } from '../exceptions';
 import { version } from '../../../../../../package.json';
 
 export class CommandGenerator<OS extends IOperationSystem, Params extends string> implements ICommandGenerator<OS, Params> {
@@ -71,21 +71,17 @@ export class CommandGenerator<OS extends IOperationSystem, Params extends string
    * @throws An error if the operating system is not valid
    */
   private checkIfOSisValid(params: OS): IOSCommandsDefinition<OS, Params> {
-    const { name, architecture, extension } = params;
+    const { name, architecture } = params;
     if (!name) {
       throw new NoOSSelectedException();
     }
     if (!architecture) {
       throw new NoArchitectureSelectedException();
     }
-    if (!extension) {
-      throw new NoExtensionSelectedException();
-    }
 
     const option = searchOSDefinitions(this.osDefinitions, {
       name,
       architecture,
-      extension,
     });
     return option;
   }
@@ -102,7 +98,6 @@ export class CommandGenerator<OS extends IOperationSystem, Params extends string
     return this.osDefinitionSelected.urlPackage({
       wazuhVersion: this.wazuhVersion,
       architecture: this.osDefinitionSelected.architecture as OS['architecture'],
-      extension: this.osDefinitionSelected.extension as OS['extension'],
       name: this.os as OS['name'],
     });
   }
@@ -120,7 +115,6 @@ export class CommandGenerator<OS extends IOperationSystem, Params extends string
     return this.osDefinitionSelected.installCommand({
       name: this.os as OS['name'],
       architecture: this.osDefinitionSelected.architecture as OS['architecture'],
-      extension: this.osDefinitionSelected.extension as OS['extension'],
       urlPackage: this.getUrlPackage(),
       wazuhVersion: this.wazuhVersion,
       optionals: this.optionals as IOptionalParameters<Params>,
@@ -140,7 +134,6 @@ export class CommandGenerator<OS extends IOperationSystem, Params extends string
     return this.osDefinitionSelected.startCommand({
       name: this.os as OS['name'],
       architecture: this.osDefinitionSelected.architecture as OS['architecture'],
-      extension: this.osDefinitionSelected.extension as OS['extension'],
       wazuhVersion: this.wazuhVersion,
       optionals: this.optionals as IOptionalParameters<Params>,
     });
@@ -160,7 +153,6 @@ export class CommandGenerator<OS extends IOperationSystem, Params extends string
       wazuhVersion: this.wazuhVersion,
       os: this.os as OS['name'],
       architecture: this.osDefinitionSelected.architecture as OS['architecture'],
-      extension: this.osDefinitionSelected.extension as OS['extension'],
       url_package: this.getUrlPackage(),
       install_command: this.getInstallCommand(),
       start_command: this.getStartCommand(),

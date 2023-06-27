@@ -14,13 +14,12 @@ import { IOSDefinition, IOperationSystem } from '../types';
  * @param params - The operation system parameters to match against.
  * @returns The matching OS definition option.
  * @throws NoOSOptionFoundException - If no matching OS definition is found.
- * @throws NoOptionFoundException - If no matching OS definition option is found.
  */
 export function searchOSDefinitions<OS extends IOperationSystem, Params extends string>(
   osDefinitions: IOSDefinition<OS,Params>[],
   params: IOperationSystem,
 ){
-  const { name, architecture, extension } = params;
+  const { name, architecture } = params;
 
   const osDefinition = osDefinitions.find(os => os.name === name);
   if (!osDefinition) {
@@ -29,11 +28,11 @@ export function searchOSDefinitions<OS extends IOperationSystem, Params extends 
 
   const osDefinitionOption = osDefinition.options.find(
     option =>
-      option.architecture === architecture && option.extension === extension,
+      option.architecture === architecture,
   );
 
   if (!osDefinitionOption) {
-    throw new NoOptionFoundException(name, architecture, extension);
+    throw new NoOptionFoundException(name, architecture);
   }
 
   return osDefinitionOption;
@@ -72,11 +71,10 @@ export function validateOSDefinitionHasDuplicatedOptions<OS extends IOperationSy
   for (const osDefinition of osDefinitions) {
     const options = new Set<string>();
     for (const option of osDefinition.options) {
-      let ext_arch_manager = `${option.extension}_${option.architecture}`;
+      let ext_arch_manager = `${option.architecture}`;
       if (options.has(ext_arch_manager)) {
         throw new DuplicatedOSOptionException(
           osDefinition.name,
-          option.extension,
           option.architecture,
         );
       }

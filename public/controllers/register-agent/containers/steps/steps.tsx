@@ -1,80 +1,105 @@
-import React, { Fragment, useState } from 'react';
-import {
-  EuiSteps,
-  EuiText,
-  EuiTitle,
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiCallOut,
-  EuiPopover,
-  EuiButtonEmpty,
-  EuiLink,
-} from '@elastic/eui';
-import { InputForm } from '../../../../components/common/form';
+import React, { Fragment, useEffect, useState } from 'react';
+import { EuiSteps, EuiTitle } from '@elastic/eui';
 import './steps.scss';
+import { OPERATING_SYSTEMS_OPTIONS } from '../../utils/register-agent-data';
 import {
-  REGISTER_AGENT_DATA_STEP_THREE,
-  REGISTER_AGENT_DATA_STEP_TWO,
-} from '../../utils/register-agent-data';
-import { webDocumentationLink } from '../../../../../common/services/web_documentation';
-import { PLUGIN_VERSION_SHORT } from '../../../../../common/constants';
+  IParseRegisterFormValues,
+  getRegisterAgentFormValues,
+  parseRegisterAgentFormValues,
+} from '../../services/register-agent-services';
 
-const popoverServerAddress = (
-  <span>
-    Learn about{' '}
-    <EuiLink
-      href={webDocumentationLink(
-        'user-manual/reference/ossec-conf/client.html#groups',
-        PLUGIN_VERSION_SHORT,
-      )}
-      target='_blank'
-      rel='noopener noreferrer'
-    >
-      Server address.
-    </EuiLink>
-  </span>
-);
+import { useRegisterAgentCommands } from '../../hooks/use-register-agent-commands';
+import {
+  osCommandsDefinitions,
+  optionalParamsDefinitions,
+  tOperatingSystem,
+  tOptionalParameters,
+} from '../../core/config/os-commands-definitions';
+import { UseFormReturn } from '../../../../components/common/form/types';
+import CommandOutput from '../../components/command-output/command-output';
+import ServerAddressTitle from '../../components/server-address/server-address-title';
+import ServerAddressInput from '../../components/server-address/server-address-input';
+import OptionalsInputs from '../../components/optionals-inputs/optionals-inputs';
+import { getAgentCommandsStepStatus, tFormStepsStatus, getOSSelectorStepStatus, getServerAddressStepStatus, getOptionalParameterStepStatus, showCommandsSections } from '../../services/register-agent-steps-status-services';
 
-const popoverAgentName = (
-  <span>
-    Learn about{' '}
-    <EuiLink
-      href={webDocumentationLink(
-        'user-manual/reference/ossec-conf/client.html#enrollment-agent-name',
-        PLUGIN_VERSION_SHORT,
-      )}
-      target='_blank'
-      rel='noopener noreferrer'
-    >
-      Assigning an agent name.
-    </EuiLink>
-  </span>
-);
-
-const warningForAgentName =
-  'The agent name must be unique. It can’t be changed once the agent has been enrolled.';
+interface IStepsProps {
+  needsPassword: boolean;
+  hideTextPassword: boolean;
+  form: UseFormReturn;
+  osCard: React.ReactElement;
+  connection: {
+    isUDP: boolean;
+    isSecure: boolean;
+  };
+  wazuhPassword: string;
+}
 
 export const Steps = ({
   needsPassword,
   hideTextPassword,
-  agentGroup,
   form,
   osCard,
-}) => {
-  const [isPopoverServerAddress, setIsPopoverServerAddress] = useState(false);
-  const [isPopoverAgentName, setIsPopoverAgentName] = useState(false);
+  connection,
+  wazuhPassword,
+}: IStepsProps) => {
+  const [registerAgentFormValues, setRegisterAgentFormValues] =
+    useState<IParseRegisterFormValues>({
+      operatingSystem: {
+        name: '',
+        architecture: '',
+      },
+      optionalParams: {
+        agentGroups: '',
+        agentName: '',
+        serverAddress: '',
+        wazuhPassword,
+      },
+    });
 
-  const onButtonServerAddress = () =>
-    setIsPopoverServerAddress(
-      isPopoverServerAddress => !isPopoverServerAddress,
+  useEffect(() => {
+    // get form values and parse them divided in OS and optional params
+    const registerAgentFormValuesParsed = parseRegisterAgentFormValues(
+      getRegisterAgentFormValues(form),
+      OPERATING_SYSTEMS_OPTIONS,
     );
-  const closeServerAddress = () => setIsPopoverServerAddress(false);
+    setRegisterAgentFormValues(registerAgentFormValuesParsed);
+    setInstallCommandStepStatus(getAgentCommandsStepStatus(form.fields, installCommandWasCopied))
+    setStartCommandStepStatus(getAgentCommandsStepStatus(form.fields, startCommandWasCopied))
+  }, [form.fields]);
 
-  const onButtonAgentName = () =>
-    setIsPopoverAgentName(isPopoverAgentName => !isPopoverAgentName);
-  const closeAgentName = () => setIsPopoverAgentName(false);
+  const { installCommand, startCommand, selectOS, setOptionalParams } =
+    useRegisterAgentCommands<tOperatingSystem, tOptionalParameters>({
+      osDefinitions: osCommandsDefinitions,
+      optionalParamsDefinitions: optionalParamsDefinitions,
+    });
 
-  const firstSetOfSteps = [
+  // install - start commands step state
+  const [installCommandWasCopied, setInstallCommandWasCopied] = useState(false);
+  const [installCommandStepStatus, setInstallCommandStepStatus] = useState<tFormStepsStatus>(getAgentCommandsStepStatus(form.fields, false))
+  const [startCommandWasCopied, setStartCommandWasCopied] = useState(false);
+  const [startCommandStepStatus, setStartCommandStepStatus] = useState<tFormStepsStatus>(getAgentCommandsStepStatus(form.fields, false))
+
+  useEffect(() => {
+    if (
+      registerAgentFormValues.operatingSystem.name !== '' &&
+      registerAgentFormValues.operatingSystem.architecture !== ''
+    ) {
+      selectOS(registerAgentFormValues.operatingSystem as tOperatingSystem);
+    }
+    setOptionalParams(registerAgentFormValues.optionalParams);
+    setInstallCommandWasCopied(false);
+    setStartCommandWasCopied(false);
+  }, [registerAgentFormValues]);
+
+  useEffect(() => {
+    setInstallCommandStepStatus(getAgentCommandsStepStatus(form.fields, installCommandWasCopied))
+  }, [installCommandWasCopied])
+
+  useEffect(() => {
+    setStartCommandStepStatus(getAgentCommandsStepStatus(form.fields, startCommandWasCopied))
+  }, [startCommandWasCopied])
+
+  const registerAgentFormSteps = [
     {
       title: (
         <EuiTitle className='stepTitle'>
@@ -82,62 +107,12 @@ export const Steps = ({
         </EuiTitle>
       ),
       children: osCard,
-      status: form.fields.operatingSystemSelection.value
-        ? 'complete'
-        : 'current',
+      status: getOSSelectorStepStatus(form.fields),
     },
     {
-      title: (
-        <EuiFlexGroup>
-          <EuiFlexItem grow={false}>
-            <EuiPopover
-              button={
-                <EuiButtonEmpty
-                  iconType='questionInCircle'
-                  iconSide='right'
-                  onClick={onButtonServerAddress}
-                  className='stepTitle'
-                >
-                  Server address
-                </EuiButtonEmpty>
-              }
-              isOpen={isPopoverServerAddress}
-              closePopover={closeServerAddress}
-              anchorPosition='rightCenter'
-            >
-              {popoverServerAddress}
-            </EuiPopover>
-          </EuiFlexItem>
-        </EuiFlexGroup>
-      ),
-      children: (
-        <Fragment>
-          <EuiFlexGroup gutterSize='s' wrap>
-            {REGISTER_AGENT_DATA_STEP_TWO.map((data, index) => (
-              <EuiFlexItem key={index}>
-                <EuiText className='stepSubtitleServerAddress'>
-                  {data.subtitle}
-                </EuiText>
-              </EuiFlexItem>
-            ))}
-          </EuiFlexGroup>
-          <InputForm
-            {...form.fields.serverAddress}
-            label={<></>}
-            fullWidth={false}
-            placeholder='Server address'
-          />
-        </Fragment>
-      ),
-      status: !form.fields.operatingSystemSelection.value
-        ? 'disabled'
-        : !form.fields.serverAddress.value &&
-          form.fields.operatingSystemSelection.value
-        ? 'current'
-        : form.fields.operatingSystemSelection.value &&
-          form.fields.serverAddress.value
-        ? 'complete'
-        : '',
+      title: <ServerAddressTitle />,
+      children: <ServerAddressInput formField={form.fields.serverAddress} />,
+      status: getServerAddressStepStatus(form.fields),
     },
     ...(!(!needsPassword || hideTextPassword)
       ? [
@@ -163,72 +138,44 @@ export const Steps = ({
           <p>Optional settings</p>
         </EuiTitle>
       ),
-      children: (
-        <Fragment>
-          <EuiFlexGroup gutterSize='s' wrap>
-            {REGISTER_AGENT_DATA_STEP_THREE.map((data, index) => (
-              <EuiFlexItem key={index}>
-                <EuiText className='stepSubtitle'>{data.subtitle}</EuiText>
-              </EuiFlexItem>
-            ))}
-          </EuiFlexGroup>
-          <InputForm
-            {...form.fields.agentName}
-            fullWidth={false}
-            label={
-              <>
-                <EuiFlexGroup>
-                  <EuiFlexItem grow={false}>
-                    <EuiPopover
-                      button={
-                        <EuiButtonEmpty
-                          iconType='questionInCircle'
-                          iconSide='right'
-                          onClick={onButtonAgentName}
-                          style={{
-                            flexDirection: 'row',
-                            fontStyle: 'normal',
-                            fontWeight: 700,
-                            fontSize: '12px',
-                            lineHeight: '20px',
-                            color: '#343741',
-                          }}
-                        >
-                          Assign an agent name
-                        </EuiButtonEmpty>
-                      }
-                      isOpen={isPopoverAgentName}
-                      closePopover={closeAgentName}
-                      anchorPosition='rightCenter'
-                    >
-                      {popoverAgentName}
-                    </EuiPopover>
-                  </EuiFlexItem>
-                </EuiFlexGroup>
-              </>
-            }
-            placeholder='Agent name'
-          />
-          <EuiCallOut
-            color='warning'
-            title={warningForAgentName}
-            iconType='iInCircle'
-            className='warningForAgentName'
-          />
-          {agentGroup}
-        </Fragment>
+      children: <OptionalsInputs formFields={form.fields} />,
+      status: getOptionalParameterStepStatus(form.fields, installCommandWasCopied, startCommandWasCopied)
+    },
+    {
+      title: (
+        <EuiTitle className='stepTitle'>
+          <p>
+            Run the following commands to download and install the Wazuh agent:
+          </p>
+        </EuiTitle>
       ),
-      status:
-        !form.fields.operatingSystemSelection.value ||
-        !form.fields.serverAddress.value
-          ? 'disabled'
-          : form.fields.serverAddress.value !== ''
-          ? 'current'
-          : form.fields.agentGroups.value.length > 0
-          ? 'complete'
-          : '',
+      children: (
+        <CommandOutput
+          commandText={installCommand}
+          showCommand={showCommandsSections(form.fields)}
+          os={registerAgentFormValues.operatingSystem.name}
+          onCopy={() => setInstallCommandWasCopied(true)}
+        />
+      ),
+      status: installCommandStepStatus,
+    },
+    {
+      title: (
+        <EuiTitle className='stepTitle'>
+          <p>Start the Wazuh agent:</p>
+        </EuiTitle>
+      ),
+      children: (
+        <CommandOutput
+          commandText={startCommand}
+          showCommand={showCommandsSections(form.fields)}
+          os={registerAgentFormValues.operatingSystem.name}
+          onCopy={() => setStartCommandWasCopied(true)}
+        />
+      ),
+      status: startCommandStepStatus,
     },
   ];
 
-  return <EuiSteps steps={firstSetOfSteps} />;
+  return <EuiSteps steps={registerAgentFormSteps} />;
 };

@@ -48,7 +48,6 @@ export type tOptionalParams<T extends string> = {
 export interface IOperationSystem {
   name: string;
   architecture: string;
-  extension: string;
 }
 
 /// ....
@@ -56,18 +55,15 @@ export interface IOperationSystem {
 interface ILinuxOSTypes {
   name: 'linux';
   architecture: 'x64' | 'x86';
-  extension: 'rpm' | 'deb';
 }
 interface IWindowsOSTypes {
   name: 'windows';
   architecture: 'x86';
-  extension: 'msi';
 }
 
 interface IMacOSTypes {
   name: 'mac';
   architecture: '32/64';
-  extension: 'pkg';
 }
 
 type tOperatingSystem = ILinuxOSTypes | IMacOSTypes | IWindowsOSTypes; // add the necessary OS options 
@@ -80,7 +76,6 @@ export interface IOSDefinition<OS extends IOperationSystem, Params extends strin
 }
 
 export interface IOSCommandsDefinition<OS extends IOperationSystem,Param extends string> {
-  extension: OS['extension'];
   architecture: OS['architecture'];
   urlPackage: (props: tOSEntryProps<Param>) => string;
   installCommand: (props: tOSEntryProps<Param> & { urlPackage: string }) => string;
@@ -99,14 +94,12 @@ const osDefinitions: IOSDefinition<tOperatingSystem, tOptionalParameters>[] = [{
   name: 'linux',
   options: [
     {
-      extension: 'rpm',
       architecture: 'amd64',
       urlPackage: props => 'add url package',
       installCommand: props => 'add install command',
       startCommand: props => `add start command`,
     },
     {
-      extension: 'deb',
       architecture: 'amd64',
       urlPackage: props => 'add url package',
       installCommand: props => 'add install command',
@@ -118,7 +111,6 @@ const osDefinitions: IOSDefinition<tOperatingSystem, tOptionalParameters>[] = [{
     name: 'windows',
     options: [
         {
-        extension: 'msi',
         architecture: '32/64',
         urlPackage: props => 'add url package',
         installCommand: props => 'add install command',
@@ -237,7 +229,6 @@ const commandGenerator = new CommandGenerator(osDefinitions, optionalParameters)
 commandGenerator.selectOS({
     name: 'linux',
     architecture: 'amd64',
-    extension: 'rpm'
 });
 
 // get install command
@@ -262,7 +253,6 @@ const commandGenerator = new CommandGenerator(osDefinitions, optionalParameters)
 commandGenerator.selectOS({
     name: 'linux',
     architecture: 'amd64',
-    extension: 'rpm'
 });
 
 // get start command
@@ -284,7 +274,6 @@ const commandGenerator = new CommandGenerator(osDefinitions, optionalParameters)
 commandGenerator.selectOS({
     name: 'linux',
     architecture: 'amd64',
-    extension: 'rpm'
 });
 
 const urlPackage = commandGenerator.getUrlPackage();
@@ -305,7 +294,6 @@ const commandGenerator = new CommandGenerator(osDefinitions, optionalParameters)
 commandGenerator.selectOS({
     name: 'linux',
     architecture: 'amd64',
-    extension: 'rpm'
 });
 
 // specify to the command generator the optional parameters that we want to use
@@ -330,7 +318,6 @@ export interface ICommandsResponse<T extends string> {
   wazuhVersion: string;
   os: string;
   architecture: string;
-  extension: string;
   url_package: string;
   install_command: string;
   start_command: string;

@@ -16,11 +16,11 @@ import { IOSCommandsDefinition, IOperationSystem, IOptionalParameters } from "..
 export function getInstallCommandByOS<OS extends IOperationSystem, Params extends string>(osDefinition: IOSCommandsDefinition<OS, Params>, packageUrl: string, version: string, osName: string, optionals?: IOptionalParameters<Params>) {
     
     if (!osDefinition.installCommand) {
-        throw new NoInstallCommandDefinitionException(osName, osDefinition.architecture, osDefinition.extension);
+        throw new NoInstallCommandDefinitionException(osName, osDefinition.architecture);
       }
   
       if(!packageUrl || packageUrl === ''){
-          throw new NoPackageURLDefinitionException(osName, osDefinition.architecture, osDefinition.extension);
+          throw new NoPackageURLDefinitionException(osName, osDefinition.architecture);
       }
 
     if(!version || version === ''){
@@ -32,7 +32,6 @@ export function getInstallCommandByOS<OS extends IOperationSystem, Params extend
         wazuhVersion: version,
         name: osName as OS['name'],
         architecture: osDefinition.architecture,
-        extension: osDefinition.extension,
         optionals,
     });
 }
