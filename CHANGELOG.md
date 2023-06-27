@@ -18,6 +18,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Changed
 
+- Changed method to perform redirection on agent table buttons [#5539](https://github.com/wazuh/wazuh-kibana-app/pull/5539)
 - Changed windows agent service name in the deploy agent wizard [#5538](https://github.com/wazuh/wazuh-kibana-app/pull/5538)
 ## Wazuh v4.5.0 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 01
 
