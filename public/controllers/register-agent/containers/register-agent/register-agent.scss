@@ -1,4 +1,4 @@
-.container {
+.register-agent-wizard-container {
   box-sizing: border-box;
   min-height: 1271px;
   margin-top: 44px;
@@ -9,18 +9,19 @@
   padding-right: 63px;
 }
 
-.title {
+.register-agent-wizard-title {
   margin-top: 51px;
   margin-bottom: 51px;
   font-style: normal;
   font-weight: 400;
   font-size: 30px;
   line-height: 36px;
-  color: #343741;
   display: flex;
   justify-content: center;
 }
-.close {
+
+.register-agent-wizard-close {
   display: flex;
   margin-top: 17px;
+  float: right;
 }

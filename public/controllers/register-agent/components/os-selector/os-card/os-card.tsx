@@ -33,7 +33,6 @@ export const OsCard = ({ onChange, value }: Props) => {
               }
               display='plain'
               hasBorder
-              onClick={() => {}}
               className='card'
             >
               {data.hr && <hr className='hr' />}

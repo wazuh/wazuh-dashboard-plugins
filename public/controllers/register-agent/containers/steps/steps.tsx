@@ -1,5 +1,5 @@
 import React, { Fragment, useEffect, useState } from 'react';
-import { EuiSteps, EuiTitle } from '@elastic/eui';
+import { EuiSteps } from '@elastic/eui';
 import './steps.scss';
 import { OPERATING_SYSTEMS_OPTIONS } from '../../utils/register-agent-data';
 import {
@@ -20,7 +20,14 @@ import CommandOutput from '../../components/command-output/command-output';
 import ServerAddressTitle from '../../components/server-address/server-address-title';
 import ServerAddressInput from '../../components/server-address/server-address-input';
 import OptionalsInputs from '../../components/optionals-inputs/optionals-inputs';
-import { getAgentCommandsStepStatus, tFormStepsStatus, getOSSelectorStepStatus, getServerAddressStepStatus, getOptionalParameterStepStatus, showCommandsSections } from '../../services/register-agent-steps-status-services';
+import {
+  getAgentCommandsStepStatus,
+  tFormStepsStatus,
+  getOSSelectorStepStatus,
+  getServerAddressStepStatus,
+  getOptionalParameterStepStatus,
+  showCommandsSections,
+} from '../../services/register-agent-steps-status-services';
 
 interface IStepsProps {
   needsPassword: boolean;
@@ -63,8 +70,12 @@ export const Steps = ({
       OPERATING_SYSTEMS_OPTIONS,
     );
     setRegisterAgentFormValues(registerAgentFormValuesParsed);
-    setInstallCommandStepStatus(getAgentCommandsStepStatus(form.fields, installCommandWasCopied))
-    setStartCommandStepStatus(getAgentCommandsStepStatus(form.fields, startCommandWasCopied))
+    setInstallCommandStepStatus(
+      getAgentCommandsStepStatus(form.fields, installCommandWasCopied),
+    );
+    setStartCommandStepStatus(
+      getAgentCommandsStepStatus(form.fields, startCommandWasCopied),
+    );
   }, [form.fields]);
 
   const { installCommand, startCommand, selectOS, setOptionalParams } =
@@ -75,9 +86,11 @@ export const Steps = ({
 
   // install - start commands step state
   const [installCommandWasCopied, setInstallCommandWasCopied] = useState(false);
-  const [installCommandStepStatus, setInstallCommandStepStatus] = useState<tFormStepsStatus>(getAgentCommandsStepStatus(form.fields, false))
+  const [installCommandStepStatus, setInstallCommandStepStatus] =
+    useState<tFormStepsStatus>(getAgentCommandsStepStatus(form.fields, false));
   const [startCommandWasCopied, setStartCommandWasCopied] = useState(false);
-  const [startCommandStepStatus, setStartCommandStepStatus] = useState<tFormStepsStatus>(getAgentCommandsStepStatus(form.fields, false))
+  const [startCommandStepStatus, setStartCommandStepStatus] =
+    useState<tFormStepsStatus>(getAgentCommandsStepStatus(form.fields, false));
 
   useEffect(() => {
     if (
@@ -92,19 +105,23 @@ export const Steps = ({
   }, [registerAgentFormValues]);
 
   useEffect(() => {
-    setInstallCommandStepStatus(getAgentCommandsStepStatus(form.fields, installCommandWasCopied))
-  }, [installCommandWasCopied])
+    setInstallCommandStepStatus(
+      getAgentCommandsStepStatus(form.fields, installCommandWasCopied),
+    );
+  }, [installCommandWasCopied]);
 
   useEffect(() => {
-    setStartCommandStepStatus(getAgentCommandsStepStatus(form.fields, startCommandWasCopied))
-  }, [startCommandWasCopied])
+    setStartCommandStepStatus(
+      getAgentCommandsStepStatus(form.fields, startCommandWasCopied),
+    );
+  }, [startCommandWasCopied]);
 
   const registerAgentFormSteps = [
     {
       title: (
-        <EuiTitle className='stepTitle'>
-          <p>Select the package to download and install on your system:</p>
-        </EuiTitle>
+        <span className='stepTitle'>
+          Select the package to download and install on your system:
+        </span>
       ),
       children: osCard,
       status: getOSSelectorStepStatus(form.fields),
@@ -117,11 +134,7 @@ export const Steps = ({
     ...(!(!needsPassword || hideTextPassword)
       ? [
           {
-            title: (
-              <EuiTitle className='stepTitle'>
-                <p>Wazuh password</p>
-              </EuiTitle>
-            ),
+            title: <span className='stepTitle'>Wazuh password</span>,
             children: (
               <Fragment>
                 {
@@ -133,21 +146,19 @@ export const Steps = ({
         ]
       : []),
     {
-      title: (
-        <EuiTitle className='stepTitle'>
-          <p>Optional settings</p>
-        </EuiTitle>
-      ),
+      title: <span className='stepTitle'>Optional settings</span>,
       children: <OptionalsInputs formFields={form.fields} />,
-      status: getOptionalParameterStepStatus(form.fields, installCommandWasCopied, startCommandWasCopied)
+      status: getOptionalParameterStepStatus(
+        form.fields,
+        installCommandWasCopied,
+        startCommandWasCopied,
+      ),
     },
     {
       title: (
-        <EuiTitle className='stepTitle'>
-          <p>
-            Run the following commands to download and install the Wazuh agent:
-          </p>
-        </EuiTitle>
+        <span className='stepTitle'>
+          Run the following commands to download and install the Wazuh agent:
+        </span>
       ),
       children: (
         <CommandOutput
@@ -160,11 +171,7 @@ export const Steps = ({
       status: installCommandStepStatus,
     },
     {
-      title: (
-        <EuiTitle className='stepTitle'>
-          <p>Start the Wazuh agent:</p>
-        </EuiTitle>
-      ),
+      title: <span className='stepTitle'>Start the Wazuh agent:</span>,
       children: (
         <CommandOutput
           commandText={startCommand}

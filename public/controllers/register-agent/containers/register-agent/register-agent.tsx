@@ -39,7 +39,12 @@ interface IRegisterAgentProps {
 }
 
 export const RegisterAgent = withReduxProvider(
-  ({ getWazuhVersion, hasAgents, addNewAgent, reload }: IRegisterAgentProps) => {
+  ({
+    getWazuhVersion,
+    hasAgents,
+    addNewAgent,
+    reload,
+  }: IRegisterAgentProps) => {
     const configuration = useSelector(
       (state: { appConfig: { data: any } }) => state.appConfig.data,
     );
@@ -55,9 +60,7 @@ export const RegisterAgent = withReduxProvider(
     const [wazuhPassword, setWazuhPassword] = useState('');
     const [groups, setGroups] = useState([]);
     const [needsPassword, setNeedsPassword] = useState<boolean>(false);
-    const [hideTextPassword, setHideTextPassword] = useState<boolean>(
-      false,
-    );
+    const [hideTextPassword, setHideTextPassword] = useState<boolean>(false);
 
     const initialFields: FormConfiguration = {
       operatingSystemSelection: {
@@ -173,14 +176,16 @@ export const RegisterAgent = withReduxProvider(
           <EuiPageBody>
             <EuiFlexGroup>
               <EuiFlexItem>
-                <EuiPanel className='container'>
-                  <div className='close'>
+                <EuiPanel className='register-agent-wizard-container'>
+                  <div className='register-agent-wizard-close'>
                     {hasAgents() ? (
                       <EuiButtonEmpty
                         size='s'
                         onClick={() => addNewAgent(false)}
                         iconType='cross'
-                      ></EuiButtonEmpty>
+                      >
+                        Close
+                      </EuiButtonEmpty>
                     ) : (
                       <EuiButtonEmpty
                         size='s'
@@ -194,7 +199,9 @@ export const RegisterAgent = withReduxProvider(
                   <EuiFlexGroup>
                     <EuiFlexItem>
                       <EuiTitle>
-                        <h2 className='title'>Deploy new agent</h2>
+                        <h2 className='register-agent-wizard-title'>
+                          Deploy new agent
+                        </h2>
                       </EuiTitle>
                     </EuiFlexItem>
                   </EuiFlexGroup>
@@ -221,9 +228,19 @@ export const RegisterAgent = withReduxProvider(
                       />
                     </EuiFlexItem>
                   )}
-                  <EuiFlexGroup justifyContent="flexEnd" style={{ marginRight: '0.3rem' }}>
+                  <EuiFlexGroup
+                    justifyContent='flexEnd'
+                    style={{ marginRight: '0.3rem' }}
+                  >
                     <EuiFlexItem grow={false}>
-                      <EuiButton className='close-button' fill color='primary' onClick={() => reload()}>Close</EuiButton>
+                      <EuiButton
+                        className='close-button'
+                        fill
+                        color='primary'
+                        onClick={() => reload()}
+                      >
+                        Close
+                      </EuiButton>
                     </EuiFlexItem>
                   </EuiFlexGroup>
                 </EuiPanel>

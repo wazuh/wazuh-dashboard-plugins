@@ -70,7 +70,6 @@ const OptionalsInputs = (props: OptionalsInputsProps) => {
                         fontWeight: 700,
                         fontSize: '12px',
                         lineHeight: '20px',
-                        color: '#343741',
                       }}
                     >
                       Assign an agent name

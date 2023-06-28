@@ -34,7 +34,9 @@ const CheckboxGroupComponent: React.FC<Props> = ({
             idx === 0 || idx === 2 ? ' first-of-row' : ''
           }`}
         >
-          <span className='architecture-label'>{arch}</span>
+          <label className='architecture-label' htmlFor={arch}>
+            {arch}
+          </label>
           <EuiRadioGroup
             options={[{ id: `${arch}` }]}
             idSelected={selectedOption}

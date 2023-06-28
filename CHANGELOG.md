@@ -6,9 +6,12 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Added
 
+- Added development so that the images of the new agent deployment page also have dark mode. [5620](https://github.com/wazuh/wazuh-kibana-app/pull/5620)
+
 ### Changed
 
 - Changed the deploy a new agent page from step one to step three. [#5554](https://github.com/wazuh/wazuh-kibana-app/pull/5554) [5462](https://github.com/wazuh/wazuh-kibana-app/pull/5462)
+- Removed the custom colors that did not allow to activate the default dark mode of elastic. [5620](https://github.com/wazuh/wazuh-kibana-app/pull/5620)
 
 ### Fixed
 

@@ -50,7 +50,6 @@ const GroupInput = ({ value, options, onChange }) => {
                   fontWeight: 700,
                   fontSize: '12px',
                   lineHeight: '20px',
-                  color: '#343741',
                 }}
               >
                 Select one or more existing groups
