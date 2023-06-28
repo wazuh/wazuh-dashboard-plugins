@@ -1,5 +1,5 @@
 import React, { Fragment, useEffect, useState } from 'react';
-import { EuiSteps, EuiTitle } from '@elastic/eui';
+import { EuiSteps } from '@elastic/eui';
 import './steps.scss';
 import { OPERATING_SYSTEMS_OPTIONS } from '../../utils/register-agent-data';
 import {
@@ -119,9 +119,9 @@ export const Steps = ({
   const registerAgentFormSteps = [
     {
       title: (
-        <EuiTitle className='stepTitle'>
-          <p>Select the package to download and install on your system:</p>
-        </EuiTitle>
+        <h2 className='stepTitle'>
+          Select the package to download and install on your system:
+        </h2>
       ),
       children: osCard,
       status: getOSSelectorStepStatus(form.fields),
@@ -134,11 +134,7 @@ export const Steps = ({
     ...(!(!needsPassword || hideTextPassword)
       ? [
           {
-            title: (
-              <EuiTitle className='stepTitle'>
-                <p>Wazuh password</p>
-              </EuiTitle>
-            ),
+            title: <h2 className='stepTitle'>Wazuh password</h2>,
             children: (
               <Fragment>
                 {
@@ -150,11 +146,7 @@ export const Steps = ({
         ]
       : []),
     {
-      title: (
-        <EuiTitle className='stepTitle'>
-          <p>Optional settings</p>
-        </EuiTitle>
-      ),
+      title: <h2 className='stepTitle'>Optional settings</h2>,
       children: <OptionalsInputs formFields={form.fields} />,
       status: getOptionalParameterStepStatus(
         form.fields,
@@ -164,11 +156,9 @@ export const Steps = ({
     },
     {
       title: (
-        <EuiTitle className='stepTitle'>
-          <p>
-            Run the following commands to download and install the Wazuh agent:
-          </p>
-        </EuiTitle>
+        <h2 className='stepTitle'>
+          Run the following commands to download and install the Wazuh agent:
+        </h2>
       ),
       children: (
         <CommandOutput
@@ -181,11 +171,7 @@ export const Steps = ({
       status: installCommandStepStatus,
     },
     {
-      title: (
-        <EuiTitle className='stepTitle'>
-          <p>Start the Wazuh agent:</p>
-        </EuiTitle>
-      ),
+      title: <h2 className='stepTitle'>Start the Wazuh agent:</h2>,
       children: (
         <CommandOutput
           commandText={startCommand}
