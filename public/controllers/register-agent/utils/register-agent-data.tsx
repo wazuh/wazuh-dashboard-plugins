@@ -1,23 +1,29 @@
 import { RegisterAgentData } from '../interfaces/types';
-import LinuxIcon from '../../../../public/assets/images/icons/linux-icon.svg';
-import WindowsIcon from '../../../../public/assets/images/icons/windows-icon.svg';
-import MacIcon from '../../../../public/assets/images/icons/mac-icon.svg';
+import LinuxDarkIcon from '../../../../public/assets/images/themes/dark/linux-icon.svg';
+import LinuxLightIcon from '../../../../public/assets/images/themes/light/linux-icon.svg';
+import WindowsDarkIcon from '../../../../public/assets/images/themes/dark/windows-icon.svg';
+import WindowsLightIcon from '../../../../public/assets/images/themes/light/windows-icon.svg';
+import MacDarkIcon from '../../../../public/assets/images/themes/dark/mac-icon.svg';
+import MacLightIcon from '../../../../public/assets/images/themes/light/mac-icon.svg';
+import { getUiSettings } from '../../../kibana-services';
+
+const theme = getUiSettings()?.get('theme:darkMode') ? 'dark' : 'light';
 
 export const REGISTER_AGENT_DATA_STEP_ONE: RegisterAgentData[] = [
   {
-    icon: LinuxIcon,
+    icon: theme === 'dark' ? LinuxDarkIcon : LinuxLightIcon,
     title: 'LINUX',
     hr: true,
     architecture: ['RPM amd64', 'RPM aarch64', 'DEB amd64', 'DEB aarch64'],
   },
   {
-    icon: WindowsIcon,
+    icon: theme === 'dark' ? WindowsDarkIcon : WindowsLightIcon,
     title: 'WINDOWS',
     hr: true,
     architecture: ['MSI 32/64'],
   },
   {
-    icon: MacIcon,
+    icon: theme === 'dark' ? MacDarkIcon : MacLightIcon,
     title: 'macOS',
     hr: true,
     architecture: ['Intel', 'Apple Silicon'],
