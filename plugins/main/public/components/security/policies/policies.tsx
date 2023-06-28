@@ -5,15 +5,18 @@ import {
   EuiPageContentHeaderSection,
   EuiPageContentBody,
   EuiButton,
-  EuiTitle
+  EuiTitle,
 } from '@elastic/eui';
 import { PoliciesTable } from './policies-table';
 import { WzRequest } from '../../../react-services/wz-request';
 import { EditPolicyFlyout } from './edit-policy';
 import { CreatePolicyFlyout } from './create-policy';
+import { withUserAuthorizationPrompt } from '../../common/hocs';
+import { WzButtonPermissions } from '../../common/permissions/button';
 
-
-export const Policies = () => {
+export const Policies = withUserAuthorizationPrompt([
+  { action: 'security:read', resource: 'policy:id:*' },
+])(() => {
   const [policies, setPolicies] = useState('');
   const [loading, setLoading] = useState(false);
   const [isCreatingPolicy, setIsCreatingPolicy] = useState(false);
@@ -22,11 +25,7 @@ export const Policies = () => {
 
   const getPolicies = async () => {
     setLoading(true);
-    const request = await WzRequest.apiReq(
-      'GET',
-      '/security/policies',
-      {}
-    );
+    const request = await WzRequest.apiReq('GET', '/security/policies', {});
     const policies = request?.data?.data?.affected_items || [];
     setPolicies(policies);
     setLoading(false);
@@ -36,7 +35,7 @@ export const Policies = () => {
     getPolicies();
   }, []);
 
-  const editPolicy = (item) => {
+  const editPolicy = item => {
     setEditingPolicy(item);
     setIsEditingPolicy(true);
   };
@@ -51,18 +50,18 @@ export const Policies = () => {
     await getPolicies();
   };
 
-
   let editFlyout;
   if (isEditingPolicy) {
     editFlyout = (
-      <EditPolicyFlyout closeFlyout={closeEditingFlyout} policy={editingPolicy} />
+      <EditPolicyFlyout
+        closeFlyout={closeEditingFlyout}
+        policy={editingPolicy}
+      />
     );
   }
   let flyout;
   if (isCreatingPolicy) {
-    flyout = (
-      <CreatePolicyFlyout closeFlyout={closeCreatingFlyout}/>
-    );
+    flyout = <CreatePolicyFlyout closeFlyout={closeCreatingFlyout} />;
   }
 
   return (
@@ -74,18 +73,19 @@ export const Policies = () => {
           </EuiTitle>
         </EuiPageContentHeaderSection>
         <EuiPageContentHeaderSection>
-          {
-            !loading
-          &&
-          <div>
-            <EuiButton
-              onClick={() => setIsCreatingPolicy(true)}>
-              Create policy
-            </EuiButton>
-            {flyout}
-            {editFlyout}
-          </div>
-          }
+          {!loading && (
+            <div>
+              <WzButtonPermissions
+                buttonType='default'
+                permissions={[{ action: 'security:create', resource: '*:*:*' }]}
+                onClick={() => setIsCreatingPolicy(true)}
+              >
+                Create policy
+              </WzButtonPermissions>
+              {flyout}
+              {editFlyout}
+            </div>
+          )}
         </EuiPageContentHeaderSection>
       </EuiPageContentHeader>
       <EuiPageContentBody>
@@ -98,4 +98,4 @@ export const Policies = () => {
       </EuiPageContentBody>
     </EuiPageContent>
   );
-};
+});
