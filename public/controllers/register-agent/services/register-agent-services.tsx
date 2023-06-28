@@ -260,9 +260,10 @@ export interface IParseRegisterFormValues {
 export const parseRegisterAgentFormValues = (
   formValues: { name: keyof UseFormReturn['fields']; value: any }[],
   OSOptionsDefined: RegisterAgentData[],
+  initialValues?: IParseRegisterFormValues
 ) => {
   // return the values form the formFields and the value property
-  const parsedForm = {
+  const parsedForm = initialValues || {
     operatingSystem: {
       architecture: '',
       name: '',

@@ -143,3 +143,19 @@ export const getOptionalParameterStepStatus = (
     return 'current';
   }
 };
+
+
+export const getPasswordStepStatus  = (
+  formFields: UseFormReturn['fields'],
+): tFormStepsStatus => {
+  if (
+    !formFields.operatingSystemSelection.value ||
+    formFields.operatingSystemSelection.error ||
+    !formFields.serverAddress.value ||
+    formFields.serverAddress.error
+  ) {
+    return 'disabled';
+  }else{
+    return 'complete';
+  }
+}
