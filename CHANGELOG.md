@@ -2,6 +2,17 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.4.4 - OpenSearch Dashboards 2.6.0 - Revision 01-hl
+
+### Removed
+
+- Removed the visualization of agent status evolution due to performance problems in environments with heavy load
+- Removed the stat of most active agent in the agents section due to performance problems in environments with heavy load
+
+### Changed
+
+- Allowed the Details panel in Agents section to grow
+
 ## Wazuh v4.4.4 - OpenSearch Dashboards 2.6.0 - Revision 01
 
 ### Added
