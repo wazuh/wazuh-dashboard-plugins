@@ -177,7 +177,7 @@ export const RegisterAgent = withReduxProvider(
             <EuiFlexGroup>
               <EuiFlexItem>
                 <EuiPanel className='container'>
-                  <div className='register-agent-wizzard-close'>
+                  <div className='register-agent-wizard-close'>
                     {hasAgents() ? (
                       <EuiButtonEmpty
                         size='s'
