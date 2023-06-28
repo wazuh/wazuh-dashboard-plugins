@@ -65,7 +65,6 @@ export const AgentsPreview = compose(
       this.state = {
         loadingAgents: false,
         loadingSummary: false,
-        showAgentsEvolutionVisualization: true,
         agentTableFilters: [],
         agentStatusSummary: { active: '-', disconnected: '-', total: '-', pending: '-', never_connected: '-' },
         agentConfiguration: {},
@@ -82,19 +81,6 @@ export const AgentsPreview = compose(
     async componentDidMount() {
       this._isMount = true;
       this.fetchAgentStatusDetailsData();
-      if (this.wazuhConfig.getConfig()['wazuh.monitoring.enabled']) {
-        this._isMount && this.setState({
-          showAgentsEvolutionVisualization: true
-        });
-        const tabVisualizations = new TabVisualizations();
-        tabVisualizations.removeAll();
-        tabVisualizations.setTab('general');
-        tabVisualizations.assign({
-          general: 1,
-        });
-        const filterHandler = new FilterHandler(AppState.getCurrentPattern());
-        await VisFactoryHandler.buildOverviewVisualizations(filterHandler, 'general', null);
-      }
     }
 
     componentWillUnmount() {
@@ -127,11 +113,9 @@ export const AgentsPreview = compose(
       const { data: { data: { affected_items: [lastRegisteredAgent] } } } = await WzRequest.apiReq('GET', '/agents', {
         params: { limit: 1, sort: '-dateAdd', q: 'id!=000' },
       });
-      const agentMostActive = await this.props.tableProps.getMostActive();
       this.setState({
         loadingAgents: false,
-        lastRegisteredAgent,
-        agentMostActive
+        lastRegisteredAgent
       });
     }
     async fetchAgentStatusDetailsData(){
@@ -207,7 +191,7 @@ export const AgentsPreview = compose(
                       </EuiFlexGroup>
                     </EuiCard>
                   </EuiFlexItem>
-                  <EuiFlexItem grow={false} className="agents-details-card">
+                  <EuiFlexItem className="agents-details-card">
                     <EuiCard title description betaBadgeLabel="Details">
                       <EuiFlexGroup wrap={true} className="group-details">
                         {this.agentStatus.map(({status, label, color}) => (
@@ -255,61 +239,11 @@ export const AgentsPreview = compose(
                               titleColor="primary"
                             />
                           </EuiFlexItem>
-                        {
-                          <EuiFlexItem className="agents-link-item">
-                            <EuiStat
-                              className={this.state.agentMostActive?.name ? 'euiStatLink' : ''}
-                              isLoading={this.state.loadingAgents}
-                              title={
-                                <EuiToolTip position="top" content="View agent details">
-                                  <a onClick={() => this.showAgent(this.state.agentMostActive)}>
-                                    {this.state.agentMostActive?.name || '-'}
-                                  </a>
-                                </EuiToolTip>
-                              }
-                              titleSize="s"
-                              description="Most active agent"
-                              titleColor="primary"
-                            />
-                          </EuiFlexItem>
-                        }
                       </EuiFlexGroup>
                     </EuiCard>
                   </EuiFlexItem>
                 </>
               )}
-                <EuiFlexItem
-                  grow={false}
-                  className="agents-evolution-visualization"
-                  style={{
-                    margin: !this.state.loading ? '12px' : 0,
-                  }}
-                >
-                  <EuiCard
-                    title
-                    description
-                    paddingSize="none"
-                    betaBadgeLabel="Evolution"
-                  >
-                    <EuiFlexGroup>
-                      <EuiFlexItem>
-                      <div style={{ height: evolutionIsReady ? '180px' : 0 }}>
-                          <WzReduxProvider>
-                            <KibanaVis
-                              visID={'Wazuh-App-Overview-General-Agents-status'}
-                              tab={'general'}
-                            />
-                          </WzReduxProvider>
-                        </div>
-                        {!evolutionIsReady && (
-                          <div className="loading-chart-xl">
-                            <EuiLoadingChart size="xl" />
-                          </div>
-                        )}
-                      </EuiFlexItem>
-                    </EuiFlexGroup>
-                  </EuiCard>
-                </EuiFlexItem>
             </EuiFlexGroup>
             <EuiSpacer size="m" />
             <WzReduxProvider>
