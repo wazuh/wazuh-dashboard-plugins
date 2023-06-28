@@ -41,11 +41,17 @@ import { formatUIDate } from '../../../../public/react-services/time-service';
 import { compose } from 'redux';
 import { withErrorBoundary } from '../../../components/common/hocs';
 import './agents-preview.scss';
-import { UI_LOGGER_LEVELS, UI_ORDER_AGENT_STATUS } from '../../../../common/constants';
+import {
+  UI_LOGGER_LEVELS,
+  UI_ORDER_AGENT_STATUS,
+} from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { VisualizationBasic } from '../../../components/common/charts/visualizations/basic';
-import { agentStatusColorByAgentStatus, agentStatusLabelByAgentStatus } from '../../../../common/services/wz_agent_status';
+import {
+  agentStatusColorByAgentStatus,
+  agentStatusLabelByAgentStatus,
+} from '../../../../common/services/wz_agent_status';
 
 export const AgentsPreview = compose(
   withErrorBoundary,
@@ -56,7 +62,7 @@ export const AgentsPreview = compose(
       { action: 'agent:read', resource: 'agent:id:*' },
       { action: 'agent:read', resource: 'agent:group:*' },
     ],
-  ])
+  ]),
 )(
   class AgentsPreview extends Component {
     _isMount = false;
@@ -67,7 +73,13 @@ export const AgentsPreview = compose(
         loadingSummary: false,
         showAgentsEvolutionVisualization: true,
         agentTableFilters: [],
-        agentStatusSummary: { active: '-', disconnected: '-', total: '-', pending: '-', never_connected: '-' },
+        agentStatusSummary: {
+          active: '-',
+          disconnected: '-',
+          total: '-',
+          pending: '-',
+          never_connected: '-',
+        },
         agentConfiguration: {},
         agentsActiveCoverage: 0,
       };
@@ -75,7 +87,7 @@ export const AgentsPreview = compose(
       this.agentStatus = UI_ORDER_AGENT_STATUS.map(agentStatus => ({
         status: agentStatus,
         label: agentStatusLabelByAgentStatus(agentStatus),
-        color: agentStatusColorByAgentStatus(agentStatus)
+        color: agentStatusColorByAgentStatus(agentStatus),
       }));
     }
 
@@ -83,9 +95,10 @@ export const AgentsPreview = compose(
       this._isMount = true;
       this.fetchAgentStatusDetailsData();
       if (this.wazuhConfig.getConfig()['wazuh.monitoring.enabled']) {
-        this._isMount && this.setState({
-          showAgentsEvolutionVisualization: true
-        });
+        this._isMount &&
+          this.setState({
+            showAgentsEvolutionVisualization: true,
+          });
         const tabVisualizations = new TabVisualizations();
         tabVisualizations.removeAll();
         tabVisualizations.setTab('general');
@@ -93,14 +106,17 @@ export const AgentsPreview = compose(
           general: 1,
         });
         const filterHandler = new FilterHandler(AppState.getCurrentPattern());
-        await VisFactoryHandler.buildOverviewVisualizations(filterHandler, 'general', null);
+        await VisFactoryHandler.buildOverviewVisualizations(
+          filterHandler,
+          'general',
+          null,
+        );
       }
     }
 
     componentWillUnmount() {
       this._isMount = false;
     }
-
 
     groupBy = function (arr) {
       return arr.reduce(function (prev, item) {
@@ -111,30 +127,54 @@ export const AgentsPreview = compose(
     };
     async fetchSummaryStatus() {
       this.setState({ loadingSummary: true });
-      const {data: {data: { connection: agentStatusSummary, configuration: agentConfiguration }}} = await WzRequest.apiReq('GET', '/agents/summary/status', {});
+      const {
+        data: {
+          data: {
+            connection: agentStatusSummary,
+            configuration: agentConfiguration,
+          },
+        },
+      } = await WzRequest.apiReq('GET', '/agents/summary/status', {});
 
       this.props.tableProps.updateSummary(agentStatusSummary);
+
+      const agentsActiveCoverage = (
+        (agentStatusSummary.active / agentStatusSummary.total) *
+        100
+      ).toFixed(2);
+
       this.setState({
         loadingSummary: false,
         agentStatusSummary,
         agentConfiguration,
-        agentsActiveCoverage: ((agentStatusSummary.active / agentStatusSummary.total) * 100).toFixed(2),
+        /* Calculate the agents active coverage.
+          Ensure the calculated value is not a NaN, otherwise set a 0.
+        */
+        agentsActiveCoverage: isNaN(agentsActiveCoverage)
+          ? 0
+          : agentsActiveCoverage,
       });
     }
 
     async fetchAgents() {
       this.setState({ loadingAgents: true });
-      const { data: { data: { affected_items: [lastRegisteredAgent] } } } = await WzRequest.apiReq('GET', '/agents', {
+      const {
+        data: {
+          data: {
+            affected_items: [lastRegisteredAgent],
+          },
+        },
+      } = await WzRequest.apiReq('GET', '/agents', {
         params: { limit: 1, sort: '-dateAdd', q: 'id!=000' },
       });
       const agentMostActive = await this.props.tableProps.getMostActive();
       this.setState({
         loadingAgents: false,
         lastRegisteredAgent,
-        agentMostActive
+        agentMostActive,
       });
     }
-    async fetchAgentStatusDetailsData(){
+    async fetchAgentStatusDetailsData() {
       try {
         this.fetchSummaryStatus();
         this.fetchAgents();
@@ -169,37 +209,44 @@ export const AgentsPreview = compose(
           agentTableFilters: [{ field: 'q', value: `status=${status}` }],
         });
     }
-    onRenderComplete(){
+    onRenderComplete() {
       this.setState({
-        evolutionRenderComplete: true
-      })
+        evolutionRenderComplete: true,
+      });
     }
 
     render() {
       const evolutionIsReady = this.props.resultState !== 'loading';
 
       return (
-        <EuiPage className="flex-column">
+        <EuiPage className='flex-column'>
           <EuiFlexItem>
-            <EuiFlexGroup className="agents-evolution-visualization-group mt-0">
-            {
-              (
+            <EuiFlexGroup className='agents-evolution-visualization-group mt-0'>
+              {
                 <>
-                  <EuiFlexItem className="agents-status-pie" grow={false}>
-                    <EuiCard title description betaBadgeLabel="Status" className="eui-panel">
+                  <EuiFlexItem className='agents-status-pie' grow={false}>
+                    <EuiCard
+                      title
+                      description
+                      betaBadgeLabel='Status'
+                      className='eui-panel'
+                    >
                       <EuiFlexGroup>
-                        <EuiFlexItem className="align-items-center">
+                        <EuiFlexItem className='align-items-center'>
                           <VisualizationBasic
                             isLoading={this.state.loadingSummary}
                             type='donut'
                             size={{ width: '100%', height: '150px' }}
                             showLegend
-                            data={this.agentStatus.map(({status, label, color}) => ({
-                              label,
-                              value: this.state.agentStatusSummary[status] || 0,
-                              color,
-                              onClick: () => this.filterAgentByStatus(status)
-                            }))}
+                            data={this.agentStatus.map(
+                              ({ status, label, color }) => ({
+                                label,
+                                value:
+                                  this.state.agentStatusSummary[status] || 0,
+                                color,
+                                onClick: () => this.filterAgentByStatus(status),
+                              }),
+                            )}
                             noDataTitle='No results'
                             noDataMessage='No results were found.'
                           />
@@ -207,24 +254,32 @@ export const AgentsPreview = compose(
                       </EuiFlexGroup>
                     </EuiCard>
                   </EuiFlexItem>
-                  <EuiFlexItem grow={false} className="agents-details-card">
-                    <EuiCard title description betaBadgeLabel="Details">
-                      <EuiFlexGroup wrap={true} className="group-details">
-                        {this.agentStatus.map(({status, label, color}) => (
+                  <EuiFlexItem grow={false} className='agents-details-card'>
+                    <EuiCard title description betaBadgeLabel='Details'>
+                      <EuiFlexGroup wrap={true} className='group-details'>
+                        {this.agentStatus.map(({ status, label, color }) => (
                           <EuiFlexItem key={`agent-details-status-${status}`}>
                             <EuiStat
                               isLoading={this.state.loadingSummary}
                               title={
-                                <EuiToolTip position="top" content={`Filter by agent status: ${status}`}>
-                                  <span onClick={() => this.filterAgentByStatus(status)} style={{cursor: 'pointer'}}>
+                                <EuiToolTip
+                                  position='top'
+                                  content={`Filter by agent status: ${status}`}
+                                >
+                                  <span
+                                    onClick={() =>
+                                      this.filterAgentByStatus(status)
+                                    }
+                                    style={{ cursor: 'pointer' }}
+                                  >
                                     {this.state.agentStatusSummary[status]}
                                   </span>
                                 </EuiToolTip>
                               }
-                              titleSize="s"
+                              titleSize='s'
                               description={label}
                               titleColor={color}
-                              className="white-space-nowrap"
+                              className='white-space-nowrap'
                             />
                           </EuiFlexItem>
                         ))}
@@ -233,44 +288,64 @@ export const AgentsPreview = compose(
                             isLoading={this.state.loadingSummary}
                             title={`${this.state.agentsActiveCoverage}%`}
                             titleSize='s'
-                            description="Agents coverage"
-                            className="white-space-nowrap"
-                            />
+                            description='Agents coverage'
+                            className='white-space-nowrap'
+                          />
                         </EuiFlexItem>
                       </EuiFlexGroup>
-                      <EuiFlexGroup className="mt-0">
-                          <EuiFlexItem className="agents-link-item">
-                            <EuiStat
-                              className="euiStatLink last-agents-link"
-                              isLoading={this.state.loadingAgents}
-                              title={
-                                <EuiToolTip position="top" content="View agent details">
-                                  <a onClick={() => this.showAgent(this.state.lastRegisteredAgent)}>
-                                    {this.state.lastRegisteredAgent?.name || '-'}
-                                  </a>
-                                </EuiToolTip>
-                              }
-                              titleSize="s"
-                              description="Last registered agent"
-                              titleColor="primary"
-                            />
-                          </EuiFlexItem>
+                      <EuiFlexGroup className='mt-0'>
+                        <EuiFlexItem className='agents-link-item'>
+                          <EuiStat
+                            className='euiStatLink last-agents-link'
+                            isLoading={this.state.loadingAgents}
+                            title={
+                              <EuiToolTip
+                                position='top'
+                                content='View agent details'
+                              >
+                                <a
+                                  onClick={() =>
+                                    this.showAgent(
+                                      this.state.lastRegisteredAgent,
+                                    )
+                                  }
+                                >
+                                  {this.state.lastRegisteredAgent?.name || '-'}
+                                </a>
+                              </EuiToolTip>
+                            }
+                            titleSize='s'
+                            description='Last registered agent'
+                            titleColor='primary'
+                          />
+                        </EuiFlexItem>
                         {
-                          <EuiFlexItem className="agents-link-item">
+                          <EuiFlexItem className='agents-link-item'>
                             <EuiStat
-                              className={this.state.agentMostActive?.name ? 'euiStatLink' : ''}
+                              className={
+                                this.state.agentMostActive?.name
+                                  ? 'euiStatLink'
+                                  : ''
+                              }
                               isLoading={this.state.loadingAgents}
                               title={
-                                <EuiToolTip position="top" content="View agent details">
-                                  <a onClick={() => this.showAgent(this.state.agentMostActive)}>
+                                <EuiToolTip
+                                  position='top'
+                                  content='View agent details'
+                                >
+                                  <a
+                                    onClick={() =>
+                                      this.showAgent(this.state.agentMostActive)
+                                    }
+                                  >
                                     {this.state.agentMostActive?.name || '-'}
                                   </a>
                                 </EuiToolTip>
                               }
-                              className="last-agents-link"
-                              titleSize="s"
-                              description="Most active agent"
-                              titleColor="primary"
+                              className='last-agents-link'
+                              titleSize='s'
+                              description='Most active agent'
+                              titleColor='primary'
                             />
                           </EuiFlexItem>
                         }
@@ -278,41 +353,41 @@ export const AgentsPreview = compose(
                     </EuiCard>
                   </EuiFlexItem>
                 </>
-              )}
-                <EuiFlexItem
-                  grow={false}
-                  className="agents-evolution-visualization"
-                  style={{
-                    margin: !this.state.loading ? '12px' : 0,
-                  }}
+              }
+              <EuiFlexItem
+                grow={false}
+                className='agents-evolution-visualization'
+                style={{
+                  margin: !this.state.loading ? '12px' : 0,
+                }}
+              >
+                <EuiCard
+                  title
+                  description
+                  paddingSize='none'
+                  betaBadgeLabel='Evolution'
                 >
-                  <EuiCard
-                    title
-                    description
-                    paddingSize="none"
-                    betaBadgeLabel="Evolution"
-                  >
-                    <EuiFlexGroup>
-                      <EuiFlexItem>
+                  <EuiFlexGroup>
+                    <EuiFlexItem>
                       <div style={{ height: evolutionIsReady ? '180px' : 0 }}>
-                          <WzReduxProvider>
-                            <KibanaVis
-                              visID={'Wazuh-App-Overview-General-Agents-status'}
-                              tab={'general'}
-                            />
-                          </WzReduxProvider>
+                        <WzReduxProvider>
+                          <KibanaVis
+                            visID={'Wazuh-App-Overview-General-Agents-status'}
+                            tab={'general'}
+                          />
+                        </WzReduxProvider>
+                      </div>
+                      {!evolutionIsReady && (
+                        <div className='loading-chart-xl'>
+                          <EuiLoadingChart size='xl' />
                         </div>
-                        {!evolutionIsReady && (
-                          <div className="loading-chart-xl">
-                            <EuiLoadingChart size="xl" />
-                          </div>
-                        )}
-                      </EuiFlexItem>
-                    </EuiFlexGroup>
-                  </EuiCard>
-                </EuiFlexItem>
+                      )}
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
+                </EuiCard>
+              </EuiFlexItem>
             </EuiFlexGroup>
-            <EuiSpacer size="m" />
+            <EuiSpacer size='m' />
             <WzReduxProvider>
               <AgentsTable
                 filters={this.state.agentTableFilters}
@@ -328,7 +403,7 @@ export const AgentsPreview = compose(
         </EuiPage>
       );
     }
-  }
+  },
 );
 
 AgentsTable.propTypes = {
