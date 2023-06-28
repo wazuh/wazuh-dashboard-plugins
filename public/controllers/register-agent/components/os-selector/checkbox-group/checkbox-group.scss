@@ -9,7 +9,7 @@
   display: flex;
   flex-direction: row-reverse;
   align-items: center;
-  justify-content: center;
+  justify-content: left;
 }
 
 .checkbox-group-container.single-architecture {
@@ -28,7 +28,7 @@
   .checkbox-item {
     display: flex;
     flex-direction: row-reverse;
-    // justify-content: start;
+    justify-content: left;
     align-self: baseline;
   }
 }
@@ -42,6 +42,5 @@
 .first-card-four-items {
   .checkbox-item:nth-child(n + 3) {
     padding-top: 16px;
-    justify-content: center;
   }
 }
