@@ -1,8 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  EuiButton,
   EuiTitle,
-  EuiFlyout,
   EuiFlyoutHeader,
   EuiFlyoutBody,
   EuiForm,
@@ -14,7 +12,6 @@ import {
   EuiFieldPassword,
   EuiFieldText,
   EuiOverlayMask,
-  EuiOutsideClickDetector,
   EuiPanel,
   EuiConfirmModal,
 } from '@elastic/eui';
@@ -34,9 +31,12 @@ import { WzFlyout } from '../../../common/flyouts';
 
 export const CreateUser = ({ closeFlyout }) => {
   const [selectedRoles, setSelectedRole] = useState<any>([]);
-  const [rolesLoading, roles, rolesError] = useApiService<Role[]>(RolesServices.GetRoles, {});
+  const [rolesLoading, roles, rolesError] = useApiService<Role[]>(
+    RolesServices.GetRoles,
+    {},
+  );
   const rolesOptions: any = roles
-    ? roles.map((item) => {
+    ? roles.map(item => {
         return { label: item.name, id: item.id };
       })
     : [];
@@ -65,7 +65,7 @@ export const CreateUser = ({ closeFlyout }) => {
       else userNameRef.current = true;
     },
     300,
-    [userName]
+    [userName],
   );
 
   const passwordRef = useRef(false);
@@ -75,7 +75,7 @@ export const CreateUser = ({ closeFlyout }) => {
       else passwordRef.current = true;
     },
     300,
-    [password]
+    [password],
   );
 
   const confirmPasswordRef = useRef(false);
@@ -85,7 +85,7 @@ export const CreateUser = ({ closeFlyout }) => {
       else confirmPasswordRef.current = true;
     },
     300,
-    [confirmPassword]
+    [confirmPassword],
   );
 
   useDebouncedEffect(
@@ -93,13 +93,18 @@ export const CreateUser = ({ closeFlyout }) => {
       setShowApply(isValidForm(false));
     },
     300,
-    [userName, password, confirmPassword]
+    [userName, password, confirmPassword],
   );
 
   const validations = {
     userName: [
       { fn: () => (userName.trim() === '' ? 'The user name is required' : '') },
-      { fn: () => (userName.trim().includes(' ') ? 'The user name cannot contain spaces' : '') },
+      {
+        fn: () =>
+          userName.trim().includes(' ')
+            ? 'The user name cannot contain spaces'
+            : '',
+      },
       {
         fn: () =>
           !userName.match(/^.{4,20}$/)
@@ -111,21 +116,29 @@ export const CreateUser = ({ closeFlyout }) => {
       { fn: () => (password === '' ? 'The password is required' : '') },
       {
         fn: () =>
-          !password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,64}$/)
+          !password.match(
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,64}$/,
+          )
             ? 'The password must contain a length between 8 and 64 characters, and must contain at least one upper and lower case letter, a number and a symbol.'
             : '',
       },
     ],
     confirmPassword: [
-      { fn: () => (confirmPassword === '' ? 'The confirm password is required' : '') },
-      { fn: () => (confirmPassword !== password ? `Passwords don't match.` : '') },
+      {
+        fn: () =>
+          confirmPassword === '' ? 'The confirm password is required' : '',
+      },
+      {
+        fn: () =>
+          confirmPassword !== password ? `Passwords don't match.` : '',
+      },
     ],
   };
 
   const validateFields = (fields, showErrors = true) => {
     const _formErrors = { ...formErrors };
     let isValid = true;
-    fields.forEach((field) => {
+    fields.forEach(field => {
       const error = validations[field].reduce((currentError, validation) => {
         return !!currentError ? currentError : validation.fn();
       }, '');
@@ -157,7 +170,8 @@ export const CreateUser = ({ closeFlyout }) => {
     try {
       const user = await UsersServices.CreateUser(userData);
       await addRoles(user.id);
-      if (allowRunAsData) await UsersServices.UpdateAllowRunAs(user.id, allowRunAsData);
+      if (allowRunAsData)
+        await UsersServices.UpdateAllowRunAs(user.id, allowRunAsData);
 
       ErrorHandler.info('User was successfully created');
       closeFlyout(true);
@@ -178,30 +192,31 @@ export const CreateUser = ({ closeFlyout }) => {
     }
   };
 
-  const addRoles = async (userId) => {
-    const formattedRoles = selectedRoles.map((item) => {
+  const addRoles = async userId => {
+    const formattedRoles = selectedRoles.map(item => {
       return item.id;
     });
-    if (formattedRoles.length > 0) await UsersServices.AddUserRoles(userId, formattedRoles);
+    if (formattedRoles.length > 0)
+      await UsersServices.AddUserRoles(userId, formattedRoles);
   };
 
-  const onChangeRoles = (selectedRoles) => {
+  const onChangeRoles = selectedRoles => {
     setSelectedRole(selectedRoles);
   };
 
-  const onChangeUserName = (e) => {
+  const onChangeUserName = e => {
     setUserName(e.target.value);
   };
 
-  const onChangePassword = (e) => {
+  const onChangePassword = e => {
     setPassword(e.target.value);
   };
 
-  const onChangeConfirmPassword = (e) => {
+  const onChangeConfirmPassword = e => {
     setConfirmPassword(e.target.value);
   };
 
-  const onChangeAllowRunAs = (e) => {
+  const onChangeAllowRunAs = e => {
     setAllowRunAs(e.target.checked);
   };
 
@@ -210,7 +225,7 @@ export const CreateUser = ({ closeFlyout }) => {
     modal = (
       <EuiOverlayMask>
         <EuiConfirmModal
-          title="Unsubmitted changes"
+          title='Unsubmitted changes'
           onConfirm={() => {
             setIsModalVisible(false);
             closeFlyout(false);
@@ -218,7 +233,7 @@ export const CreateUser = ({ closeFlyout }) => {
           }}
           onCancel={() => setIsModalVisible(false)}
           cancelButtonText="No, don't do it"
-          confirmButtonText="Yes, do it"
+          confirmButtonText='Yes, do it'
         >
           <p style={{ textAlign: 'center' }}>
             There are unsaved changes. Are you sure you want to proceed?
@@ -250,94 +265,114 @@ export const CreateUser = ({ closeFlyout }) => {
     <>
       <WzFlyout onClose={onClose} flyoutProps={{ className: 'wzApp' }}>
         <EuiFlyoutHeader hasBorder={false}>
-          <EuiTitle size="m">
+          <EuiTitle size='m'>
             <h2>Create new user</h2>
           </EuiTitle>
         </EuiFlyoutHeader>
         <EuiFlyoutBody>
-          <EuiForm component="form" style={{ padding: 24 }}>
+          <EuiForm component='form' style={{ padding: 24 }}>
             <EuiPanel>
-              <EuiTitle size="s">
+              <EuiTitle size='s'>
                 <h2>User data</h2>
               </EuiTitle>
               <EuiSpacer />
               <EuiFormRow
-                label="User name"
+                label='User name'
                 isInvalid={!!formErrors.userName}
                 error={formErrors.userName}
-                helpText="Introduce the user name for the user."
+                helpText='Introduce the user name for the user.'
               >
                 <EuiFieldText
-                  placeholder="User name"
+                  placeholder='User name'
                   value={userName}
-                  onChange={(e) => onChangeUserName(e)}
-                  aria-label=""
+                  onChange={e => onChangeUserName(e)}
+                  aria-label=''
                   isInvalid={!!formErrors.userName}
                 />
               </EuiFormRow>
               <EuiFormRow
-                label="Password"
+                label='Password'
                 isInvalid={!!formErrors.password}
                 error={formErrors.password}
-                helpText="Introduce a new password for the user."
+                helpText='Introduce a new password for the user.'
               >
                 <EuiFieldPassword
-                  placeholder="Password"
+                  placeholder='Password'
                   value={password}
-                  onChange={(e) => onChangePassword(e)}
-                  aria-label=""
+                  onChange={e => onChangePassword(e)}
+                  aria-label=''
                   isInvalid={!!formErrors.password}
                 />
               </EuiFormRow>
               <EuiFormRow
-                label="Confirm Password"
+                label='Confirm Password'
                 isInvalid={!!formErrors.confirmPassword}
                 error={formErrors.confirmPassword}
-                helpText="Confirm the new password."
+                helpText='Confirm the new password.'
               >
                 <EuiFieldPassword
-                  placeholder="Confirm Password"
+                  placeholder='Confirm Password'
                   value={confirmPassword}
-                  onChange={(e) => onChangeConfirmPassword(e)}
-                  aria-label=""
+                  onChange={e => onChangeConfirmPassword(e)}
+                  aria-label=''
                   isInvalid={!!formErrors.confirmPassword}
                 />
               </EuiFormRow>
-              <EuiFormRow label="Allow run as" helpText="Set if the user is able to use run as">
+              <EuiFormRow
+                label='Allow run as'
+                helpText='Set if the user is able to use run as'
+              >
                 <WzButtonPermissions
-                  buttonType="switch"
-                  label="Allow run as"
+                  buttonType='switch'
+                  label='Allow run as'
                   showLabel={false}
                   checked={allowRunAs}
-                  permissions={[{ action: 'security:edit_run_as', resource: '*:*:*' }]}
-                  onChange={(e) => onChangeAllowRunAs(e)}
-                  aria-label=""
+                  permissions={[
+                    { action: 'security:edit_run_as', resource: '*:*:*' },
+                  ]}
+                  onChange={e => onChangeAllowRunAs(e)}
+                  aria-label=''
                 />
               </EuiFormRow>
             </EuiPanel>
             <EuiSpacer />
             <EuiPanel>
-              <EuiTitle size="s">
+              <EuiTitle size='s'>
                 <h2>User roles</h2>
               </EuiTitle>
-              <EuiFormRow label="" helpText="Assign roles to the selected user">
+              <EuiFormRow label='' helpText='Assign roles to the selected user'>
                 <EuiComboBox
-                  placeholder="Select roles"
+                  placeholder='Select roles'
                   options={rolesOptions}
                   selectedOptions={selectedRoles}
                   isLoading={rolesLoading || isLoading}
                   onChange={onChangeRoles}
                   isClearable={true}
-                  data-test-subj="demoComboBox"
+                  data-test-subj='demoComboBox'
                 />
               </EuiFormRow>
             </EuiPanel>
             <EuiSpacer />
             <EuiFlexGroup>
               <EuiFlexItem grow={false}>
-                <EuiButton fill isLoading={isLoading} onClick={editUser} isDisabled={!showApply}>
+                <WzButtonPermissions
+                  buttonType='default'
+                  fill
+                  permissions={[
+                    { action: 'security:create_user', resource: '*:*:*' },
+                    ...(selectedRoles.length
+                      ? [{ action: 'security:update', resource: 'user:id:*' }]
+                      : []),
+                    ...(allowRunAs
+                      ? [{ action: 'security:edit_run_as', resource: '*:*:*' }]
+                      : []),
+                  ]}
+                  isLoading={isLoading}
+                  onClick={editUser}
+                  isDisabled={!showApply}
+                >
                   Apply
-                </EuiButton>
+                </WzButtonPermissions>
               </EuiFlexItem>
             </EuiFlexGroup>
           </EuiForm>

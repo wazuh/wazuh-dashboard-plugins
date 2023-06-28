@@ -5,20 +5,25 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiToolTip,
-  EuiButtonIcon,
   EuiSpacer,
   EuiLoadingSpinner,
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
 import { ErrorHandler } from '../../../react-services/error-handler';
-import { WzButtonModalConfirm } from '../../common/buttons';
+import { WzButtonPermissionsModalConfirm } from '../../common/buttons';
 import { WzAPIUtils } from '../../../react-services/wz-api-utils';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 
-export const RolesTable = ({ roles, policiesData, loading, editRole, updateRoles }) => {
-  const getRowProps = (item) => {
+export const RolesTable = ({
+  roles,
+  policiesData,
+  loading,
+  editRole,
+  updateRoles,
+}) => {
+  const getRowProps = item => {
     const { id } = item;
     return {
       'data-test-subj': `row-${id}`,
@@ -26,7 +31,7 @@ export const RolesTable = ({ roles, policiesData, loading, editRole, updateRoles
     };
   };
 
-  const onConfirmDeleteRole = (item) => {
+  const onConfirmDeleteRole = item => {
     return async () => {
       try {
         const response = await WzRequest.apiReq('DELETE', `/security/roles/`, {
@@ -55,7 +60,7 @@ export const RolesTable = ({ roles, policiesData, loading, editRole, updateRoles
         getErrorOrchestrator().handleError(options);
       }
     };
-  }
+  };
 
   const columns = [
     {
@@ -75,32 +80,37 @@ export const RolesTable = ({ roles, policiesData, loading, editRole, updateRoles
     {
       field: 'policies',
       name: 'Policies',
-      render: (policies) => {
+      render: policies => {
         return (
           (policiesData && (
-            <EuiFlexGroup wrap responsive={false} gutterSize="xs">
-              {policies.map((policy) => {
-                const data = (policiesData || []).find((x) => x.id === policy) || {};
+            <EuiFlexGroup wrap responsive={false} gutterSize='xs'>
+              {policies.map(policy => {
+                const data =
+                  (policiesData || []).find(x => x.id === policy) || {};
                 return (
                   data.name && (
                     <EuiFlexItem grow={false} key={policy}>
                       <EuiToolTip
-                        position="top"
+                        position='top'
                         content={
                           <div>
                             <b>Actions</b>
-                            <p>{((data.policy || {}).actions || []).join(', ')}</p>
-                            <EuiSpacer size="s" />
+                            <p>
+                              {((data.policy || {}).actions || []).join(', ')}
+                            </p>
+                            <EuiSpacer size='s' />
                             <b>Resources</b>
-                            <p>{((data.policy || {}).resources || []).join(', ')}</p>
-                            <EuiSpacer size="s" />
+                            <p>
+                              {((data.policy || {}).resources || []).join(', ')}
+                            </p>
+                            <EuiSpacer size='s' />
                             <b>Effect</b>
                             <p>{(data.policy || {}).effect}</p>
                           </div>
                         }
                       >
                         <EuiBadge
-                          color="hollow"
+                          color='hollow'
                           onClick={() => {}}
                           onClickAriaLabel={`${data.name} policy`}
                           title={null}
@@ -113,7 +123,7 @@ export const RolesTable = ({ roles, policiesData, loading, editRole, updateRoles
                 );
               })}
             </EuiFlexGroup>
-          )) || <EuiLoadingSpinner size="m" />
+          )) || <EuiLoadingSpinner size='m' />
         );
       },
       sortable: true,
@@ -121,8 +131,12 @@ export const RolesTable = ({ roles, policiesData, loading, editRole, updateRoles
     {
       field: 'id',
       name: 'Status',
-      render: (item) => {
-        return WzAPIUtils.isReservedID(item) && <EuiBadge color="primary">Reserved</EuiBadge>;
+      render: item => {
+        return (
+          WzAPIUtils.isReservedID(item) && (
+            <EuiBadge color='primary'>Reserved</EuiBadge>
+          )
+        );
       },
       width: 150,
       sortable: false,
@@ -131,10 +145,13 @@ export const RolesTable = ({ roles, policiesData, loading, editRole, updateRoles
       align: 'right',
       width: '5%',
       name: 'Actions',
-      render: (item) => (
-        <div onClick={(ev) => ev.stopPropagation()}>
-          <WzButtonModalConfirm
-            buttonType="icon"
+      render: item => (
+        <div onClick={ev => ev.stopPropagation()}>
+          <WzButtonPermissionsModalConfirm
+            buttonType='icon'
+            permissions={[
+              { action: 'security:delete', resource: `role:id:${item.id}` },
+            ]}
             tooltip={{
               content: WzAPIUtils.isReservedID(item.id)
                 ? "Reserved roles can't be deleted"
@@ -145,9 +162,9 @@ export const RolesTable = ({ roles, policiesData, loading, editRole, updateRoles
             modalTitle={`Do you want to delete the ${item.name} role?`}
             onConfirm={onConfirmDeleteRole(item)}
             modalProps={{ buttonColor: 'danger' }}
-            iconType="trash"
-            color="danger"
-            aria-label="Delete role"
+            iconType='trash'
+            color='danger'
+            aria-label='Delete role'
           />
         </div>
       ),
