@@ -9,7 +9,7 @@ import { getUiSettings } from '../../../kibana-services';
 
 const theme = getUiSettings()?.get('theme:darkMode') ? 'dark' : 'light';
 
-export const REGISTER_AGENT_DATA_STEP_ONE: RegisterAgentData[] = [
+export const OPERATING_SYSTEMS_OPTIONS: RegisterAgentData[] = [
   {
     icon: theme === 'dark' ? LinuxDarkIcon : LinuxLightIcon,
     title: 'LINUX',
@@ -30,7 +30,7 @@ export const REGISTER_AGENT_DATA_STEP_ONE: RegisterAgentData[] = [
   },
 ];
 
-export const REGISTER_AGENT_DATA_STEP_TWO = [
+export const SERVER_ADDRESS_TEXTS = [
   {
     title: 'Server address',
     subtitle:
@@ -38,7 +38,7 @@ export const REGISTER_AGENT_DATA_STEP_TWO = [
   },
 ];
 
-export const REGISTER_AGENT_DATA_STEP_THREE = [
+export const OPTIONAL_PARAMETERS_TEXT = [
   {
     title: 'Optional settings',
     subtitle:

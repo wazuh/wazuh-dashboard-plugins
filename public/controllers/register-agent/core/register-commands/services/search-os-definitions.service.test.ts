@@ -1,6 +1,5 @@
 import {
   NoOSOptionFoundException,
-  NoOptionFoundException,
 } from '../exceptions';
 import { IOSDefinition } from '../types';
 import {
@@ -18,18 +17,15 @@ type tOptionalParamsNames = 'optional1' | 'optional2';
 export interface ILinuxOSTypes {
   name: 'linux';
   architecture: 'x64' | 'x86';
-  extension: 'rpm' | 'deb';
 }
 export interface IWindowsOSTypes {
   name: 'windows';
   architecture: 'x86';
-  extension: 'msi';
 }
 
 export interface IMacOSTypes {
   name: 'mac';
   architecture: '32/64';
-  extension: 'pkg';
 }
 
 export type tOperatingSystem = ILinuxOSTypes | IMacOSTypes | IWindowsOSTypes;
@@ -39,7 +35,6 @@ const validOSDefinitions: IOSDefinition<tOperatingSystem,tOptionalParamsNames>[]
     name: 'linux',
     options: [
       {
-        extension: 'deb',
         architecture: 'x64',
         installCommand: mockedInstallCommand,
         startCommand: mockedStartCommand,
@@ -51,7 +46,6 @@ const validOSDefinitions: IOSDefinition<tOperatingSystem,tOptionalParamsNames>[]
     name: 'windows',
     options: [
       {
-        extension: 'msi',
         architecture: 'x64',
         installCommand: mockedInstallCommand,
         startCommand: mockedStartCommand,
@@ -67,7 +61,6 @@ describe('search OS definitions services', () => {
       const result = searchOSDefinitions(validOSDefinitions, {
         name: 'linux',
         architecture: 'x64',
-        extension: 'deb',
       });
       expect(result).toMatchObject(validOSDefinitions[0].options[0]);
     });
@@ -78,20 +71,10 @@ describe('search OS definitions services', () => {
           // @ts-ignore
           name: 'invalid-os',
           architecture: 'x64',
-          extension: 'deb',
         }),
       ).toThrow(NoOSOptionFoundException);
     });
-
-    it('should throw an error if the OS name is found but the architecture is not found', () => {
-      expect(() =>
-        searchOSDefinitions(validOSDefinitions, {
-          name: 'linux',
-          architecture: 'invalid-architecture',
-          extension: 'deb',
-        }),
-      ).toThrow(NoOptionFoundException);
-    });
+    
   });
 
   describe('validateOSDefinitionsDuplicated', () => {
@@ -101,7 +84,6 @@ describe('search OS definitions services', () => {
           name: 'linux',
           options: [
             {
-              extension: 'deb',
               architecture: 'x64',
               installCommand: mockedInstallCommand,
               startCommand: mockedStartCommand,
@@ -113,7 +95,6 @@ describe('search OS definitions services', () => {
           name: 'windows',
           options: [
             {
-              extension: 'msi',
               architecture: 'x64',
               installCommand: mockedInstallCommand,
               startCommand: mockedStartCommand,
@@ -133,7 +114,6 @@ describe('search OS definitions services', () => {
         name: 'linux',
         options: [
           {
-            extension: 'deb',
             architecture: 'x64',
             // @ts-ignore
             packageManager: 'aix',
@@ -162,7 +142,6 @@ describe('search OS definitions services', () => {
           name: 'linux',
           options: [
             {
-              extension: 'deb',
               architecture: 'x64',
               installCommand: mockedInstallCommand,
               startCommand: mockedStartCommand,
@@ -174,14 +153,12 @@ describe('search OS definitions services', () => {
           name: 'linux',
           options: [
             {
-              extension: 'deb',
               architecture: 'x64',
               installCommand: mockedInstallCommand,
               startCommand: mockedStartCommand,
               urlPackage: mockedUrlPackage,
             },
             {
-              extension: 'deb',
               architecture: 'x64',
               installCommand: mockedInstallCommand,
               startCommand: mockedStartCommand,

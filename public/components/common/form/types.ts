@@ -70,8 +70,9 @@ interface EnhancedCustomField extends EnhancedField {
   component: (props: any) => JSX.Element;
 }
 
+export type EnhancedFieldConfiguration = EnhancedDefaultField | EnhancedCustomField;
 export interface EnhancedFields {
-  [key: string]: EnhancedDefaultField | EnhancedCustomField;
+  [key: string]: EnhancedFieldConfiguration;
 }
 
 export interface UseFormReturn {
