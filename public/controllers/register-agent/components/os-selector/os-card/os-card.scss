@@ -1,11 +1,16 @@
 .card {
   height: 183px;
+
+  label {
+    cursor: pointer;
+  }
 }
 
 .cardTitle {
   display: flex;
   align-items: center;
   margin-top: 28px;
+  justify-content: center;
 }
 
 .cardIcon {
