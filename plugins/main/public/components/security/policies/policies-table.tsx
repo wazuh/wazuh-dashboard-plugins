@@ -1,15 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { EuiInMemoryTable, EuiBadge, EuiToolTip, EuiButtonIcon } from '@elastic/eui';
+import React from 'react';
+import { EuiInMemoryTable, EuiBadge } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
 import { ErrorHandler } from '../../../react-services/error-handler';
 import { WzAPIUtils } from '../../../react-services/wz-api-utils';
-import { WzButtonModalConfirm } from '../../common/buttons';
+import { WzButtonPermissionsModalConfirm } from '../../common/buttons';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 
-export const PoliciesTable = ({ policies, loading, editPolicy, updatePolicies }) => {
-  const getRowProps = (item) => {
+export const PoliciesTable = ({
+  policies,
+  loading,
+  editPolicy,
+  updatePolicies,
+}) => {
+  const getRowProps = item => {
     const { id } = item;
     return {
       'data-test-subj': `row-${id}`,
@@ -19,14 +24,18 @@ export const PoliciesTable = ({ policies, loading, editPolicy, updatePolicies })
     };
   };
 
-  const confirmDeletePolicy = (item) => {
+  const confirmDeletePolicy = item => {
     return async () => {
       try {
-        const response = await WzRequest.apiReq('DELETE', `/security/policies/`, {
-          params: {
-            policy_ids: item.id,
+        const response = await WzRequest.apiReq(
+          'DELETE',
+          `/security/policies/`,
+          {
+            params: {
+              policy_ids: item.id,
+            },
           },
-        });
+        );
         const data = (response.data || {}).data;
         if (data.failed_items && data.failed_items.length) {
           return;
@@ -48,7 +57,7 @@ export const PoliciesTable = ({ policies, loading, editPolicy, updatePolicies })
         getErrorOrchestrator().handleError(options);
       }
     };
-  }
+  };
 
   const columns = [
     {
@@ -68,7 +77,7 @@ export const PoliciesTable = ({ policies, loading, editPolicy, updatePolicies })
       field: 'policy.actions',
       name: 'Actions',
       sortable: true,
-      render: (actions) => {
+      render: actions => {
         return (actions || []).join(', ');
       },
       truncateText: true,
@@ -88,8 +97,12 @@ export const PoliciesTable = ({ policies, loading, editPolicy, updatePolicies })
     {
       field: 'id',
       name: 'Status',
-      render: (item) => {
-        return WzAPIUtils.isReservedID(item) && <EuiBadge color="primary">Reserved</EuiBadge>;
+      render: item => {
+        return (
+          WzAPIUtils.isReservedID(item) && (
+            <EuiBadge color='primary'>Reserved</EuiBadge>
+          )
+        );
       },
       width: 150,
       sortable: false,
@@ -98,10 +111,13 @@ export const PoliciesTable = ({ policies, loading, editPolicy, updatePolicies })
       align: 'right',
       width: '5%',
       name: 'Actions',
-      render: (item) => (
-        <div onClick={(ev) => ev.stopPropagation()}>
-          <WzButtonModalConfirm
-            buttonType="icon"
+      render: item => (
+        <div onClick={ev => ev.stopPropagation()}>
+          <WzButtonPermissionsModalConfirm
+            buttonType='icon'
+            permissions={[
+              { action: 'security:delete', resource: `policy:id:${item.id}` },
+            ]}
             tooltip={{
               content: WzAPIUtils.isReservedID(item.id)
                 ? "Reserved policies can't be deleted"
@@ -112,9 +128,9 @@ export const PoliciesTable = ({ policies, loading, editPolicy, updatePolicies })
             modalTitle={`Do you want to delete the ${item.name} policy?`}
             onConfirm={confirmDeletePolicy(item)}
             modalProps={{ buttonColor: 'danger' }}
-            iconType="trash"
-            color="danger"
-            aria-label="Delete policy"
+            iconType='trash'
+            color='danger'
+            aria-label='Delete policy'
           />
         </div>
       ),

@@ -41,16 +41,16 @@ export const RolesMappingCreate = ({
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
   const getRolesList = () => {
-    const list = roles.map((item) => {
+    const list = roles.map(item => {
       return { label: rolesEquivalences[item.id], id: item.id };
     });
     return list;
   };
 
-  const createRule = async (toSaveRule) => {
+  const createRule = async toSaveRule => {
     try {
       setIsLoading(true);
-      const formattedRoles = selectedRoles.map((item) => {
+      const formattedRoles = selectedRoles.map(item => {
         return item.id;
       });
       const newRule = await RulesServices.CreateRule({
@@ -58,7 +58,9 @@ export const RolesMappingCreate = ({
         rule: toSaveRule,
       });
       await Promise.all(
-        formattedRoles.map(async (role) => await RolesServices.AddRoleRules(role, [newRule.id]))
+        formattedRoles.map(
+          async role => await RolesServices.AddRoleRules(role, [newRule.id]),
+        ),
       );
       ErrorHandler.info('Role mapping was successfully created');
     } catch (error) {
@@ -84,7 +86,7 @@ export const RolesMappingCreate = ({
     modal = (
       <EuiOverlayMask>
         <EuiConfirmModal
-          title="Unsubmitted changes"
+          title='Unsubmitted changes'
           onConfirm={() => {
             setIsModalVisible(false);
             closeFlyout(false);
@@ -92,7 +94,7 @@ export const RolesMappingCreate = ({
           }}
           onCancel={() => setIsModalVisible(false)}
           cancelButtonText="No, don't do it"
-          confirmButtonText="Yes, do it"
+          confirmButtonText='Yes, do it'
         >
           <p style={{ textAlign: 'center' }}>
             There are unsaved changes. Are you sure you want to proceed?
@@ -122,40 +124,40 @@ export const RolesMappingCreate = ({
     <>
       <WzFlyout flyoutProps={{ className: 'wzApp' }} onClose={onClose}>
         <EuiFlyoutHeader hasBorder={false}>
-          <EuiTitle size="m">
+          <EuiTitle size='m'>
             <h2>Create new role mapping &nbsp;</h2>
           </EuiTitle>
         </EuiFlyoutHeader>
         <EuiFlyoutBody>
-          <EuiForm component="form" style={{ padding: 24 }}>
+          <EuiForm component='form' style={{ padding: 24 }}>
             <EuiFormRow
-              label="Role mapping name"
+              label='Role mapping name'
               isInvalid={false}
               error={'Please provide a role mapping name'}
-              helpText="Introduce a name for this role mapping."
+              helpText='Introduce a name for this role mapping.'
             >
               <EuiFieldText
-                placeholder="Role name"
+                placeholder='Role name'
                 value={ruleName}
-                onChange={(e) => setRuleName(e.target.value)}
+                onChange={e => setRuleName(e.target.value)}
               />
             </EuiFormRow>
             <EuiFormRow
-              label="Roles"
+              label='Roles'
               isInvalid={false}
               error={'At least one role must be selected.'}
-              helpText="Assign roles to your users."
+              helpText='Assign roles to your users.'
             >
               <EuiComboBox
-                placeholder="Select roles"
+                placeholder='Select roles'
                 options={getRolesList()}
                 isDisabled={false}
                 selectedOptions={selectedRoles}
-                onChange={(roles) => {
+                onChange={roles => {
                   setSelectedRoles(roles);
                 }}
                 isClearable={true}
-                data-test-subj="demoComboBox"
+                data-test-subj='demoComboBox'
               />
             </EuiFormRow>
             <EuiSpacer />
@@ -163,13 +165,24 @@ export const RolesMappingCreate = ({
           <EuiFlexGroup style={{ padding: '0px 24px 24px 24px' }}>
             <EuiFlexItem>
               <RuleEditor
-                save={(rule) => createRule(rule)}
+                save={rule => createRule(rule)}
+                saveButtonPermissions={[
+                  { action: 'security:create', resource: '*:*:*' },
+                  ...(selectedRoles.length > 0
+                    ? [
+                        {
+                          action: 'security:update',
+                          resource: 'rule:id:*',
+                        },
+                      ]
+                    : []),
+                ]}
                 initialRule={false}
                 isReserved={false}
                 isLoading={isLoading}
                 internalUsers={internalUsers}
                 currentPlatform={currentPlatform}
-                onFormChange={(hasChange) => {
+                onFormChange={hasChange => {
                   setHasChangeMappingRules(hasChange);
                 }}
               ></RuleEditor>
