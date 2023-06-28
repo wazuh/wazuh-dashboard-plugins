@@ -6,7 +6,6 @@ export const getAssetURL = (assetURL: string) =>
 
 export const getThemeAssetURL = (asset: string, theme?: string) => {
   theme = theme || (getUiSettings()?.get('theme:darkMode') ? 'dark' : 'light');
-  console.log(`Theme: ${theme}`);
   return getAssetURL(getThemeAsset(asset, theme));
 };
 
