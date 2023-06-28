@@ -119,9 +119,9 @@ export const Steps = ({
   const registerAgentFormSteps = [
     {
       title: (
-        <h2 className='stepTitle'>
+        <span className='stepTitle'>
           Select the package to download and install on your system:
-        </h2>
+        </span>
       ),
       children: osCard,
       status: getOSSelectorStepStatus(form.fields),
@@ -134,7 +134,7 @@ export const Steps = ({
     ...(!(!needsPassword || hideTextPassword)
       ? [
           {
-            title: <h2 className='stepTitle'>Wazuh password</h2>,
+            title: <span className='stepTitle'>Wazuh password</span>,
             children: (
               <Fragment>
                 {
@@ -146,7 +146,7 @@ export const Steps = ({
         ]
       : []),
     {
-      title: <h2 className='stepTitle'>Optional settings</h2>,
+      title: <span className='stepTitle'>Optional settings</span>,
       children: <OptionalsInputs formFields={form.fields} />,
       status: getOptionalParameterStepStatus(
         form.fields,
@@ -156,9 +156,9 @@ export const Steps = ({
     },
     {
       title: (
-        <h2 className='stepTitle'>
+        <span className='stepTitle'>
           Run the following commands to download and install the Wazuh agent:
-        </h2>
+        </span>
       ),
       children: (
         <CommandOutput
@@ -171,7 +171,7 @@ export const Steps = ({
       status: installCommandStepStatus,
     },
     {
-      title: <h2 className='stepTitle'>Start the Wazuh agent:</h2>,
+      title: <span className='stepTitle'>Start the Wazuh agent:</span>,
       children: (
         <CommandOutput
           commandText={startCommand}
