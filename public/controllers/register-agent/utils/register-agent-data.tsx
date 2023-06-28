@@ -7,23 +7,23 @@ import MacDarkIcon from '../../../../public/assets/images/themes/dark/mac-icon.s
 import MacLightIcon from '../../../../public/assets/images/themes/light/mac-icon.svg';
 import { getUiSettings } from '../../../kibana-services';
 
-const theme = getUiSettings()?.get('theme:darkMode') ? 'dark' : 'light';
+const darkMode = getUiSettings()?.get('theme:darkMode');
 
 export const OPERATING_SYSTEMS_OPTIONS: RegisterAgentData[] = [
   {
-    icon: theme === 'dark' ? LinuxDarkIcon : LinuxLightIcon,
+    icon: darkMode ? LinuxDarkIcon : LinuxLightIcon,
     title: 'LINUX',
     hr: true,
     architecture: ['RPM amd64', 'RPM aarch64', 'DEB amd64', 'DEB aarch64'],
   },
   {
-    icon: theme === 'dark' ? WindowsDarkIcon : WindowsLightIcon,
+    icon: darkMode ? WindowsDarkIcon : WindowsLightIcon,
     title: 'WINDOWS',
     hr: true,
     architecture: ['MSI 32/64'],
   },
   {
-    icon: theme === 'dark' ? MacDarkIcon : MacLightIcon,
+    icon: darkMode ? MacDarkIcon : MacLightIcon,
     title: 'macOS',
     hr: true,
     architecture: ['Intel', 'Apple Silicon'],

@@ -176,7 +176,7 @@ export const RegisterAgent = withReduxProvider(
           <EuiPageBody>
             <EuiFlexGroup>
               <EuiFlexItem>
-                <EuiPanel className='container'>
+                <EuiPanel className='register-agent-wizard-container'>
                   <div className='register-agent-wizard-close'>
                     {hasAgents() ? (
                       <EuiButtonEmpty
@@ -199,7 +199,9 @@ export const RegisterAgent = withReduxProvider(
                   <EuiFlexGroup>
                     <EuiFlexItem>
                       <EuiTitle>
-                        <h2 className='title'>Deploy new agent</h2>
+                        <h2 className='register-agent-wizard-title'>
+                          Deploy new agent
+                        </h2>
                       </EuiTitle>
                     </EuiFlexItem>
                   </EuiFlexGroup>
