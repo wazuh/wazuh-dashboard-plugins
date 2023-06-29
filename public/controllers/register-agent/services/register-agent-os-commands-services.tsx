@@ -34,6 +34,25 @@ const getAllOptionals = (
   return paramsText;
 };
 
+const getAllOptionalsMacos = (
+  optionals: IOptionalParameters<tOptionalParameters>
+) => {
+  // create paramNameOrderList, which is an array of the keys of optionals add interface
+  const paramNameOrderList: (keyof IOptionalParameters<tOptionalParameters>)[] =
+    ['serverAddress', 'wazuhPassword', 'agentGroups', 'agentName', 'protocol'];
+
+  if (!optionals) return '';
+  return Object.entries(paramNameOrderList).reduce(
+    (acc, [key, value]) => {
+      if (optionals[value]) {
+        acc += `${optionals[value]}\\n`;
+      }
+      return acc;
+    },
+    '',
+  );
+};
+
 /******* Linux *******/
 
 // Install command
@@ -86,7 +105,7 @@ export const getMacOsInstallCommand = (
 ) => {
   const { optionals, urlPackage } = props;
   // Set macOS installation script with environment variables
-  const optionalsText = optionals && getAllOptionals(optionals).replaceAll('\' ', '\'\\n');
+  const optionalsText = optionals && getAllOptionalsMacos(optionals);
   const macOSInstallationOptions = `${optionalsText}`
     .replace(/\' ([a-zA-Z])/g, "' && $1") // Separate environment variables with &&
     .replace(/\"/g, '\\"') // Escape double quotes
