@@ -115,14 +115,14 @@ const macDefinition: IOSDefinition<IMacOSTypes, tOptionalParameters> = {
     {
       architecture: 'Intel',
       urlPackage: props =>
-        `https://packages.wazuh.com/4.x/macos/wazuh-agent-${props.wazuhVersion}-1.pkg`,
+        `https://packages.wazuh.com/4.x/macos/wazuh-agent-${props.wazuhVersion}-1.intel64.pkg`,
       installCommand: props => getMacOsInstallCommand(props),
       startCommand: props => getMacosStartCommand(props),
     },
     {
       architecture: 'Apple Silicon',
       urlPackage: props =>
-        `https://packages.wazuh.com/4.x/macos/wazuh-agent-${props.wazuhVersion}-1.pkg`,
+        `https://packages.wazuh.com/4.x/macos/wazuh-agent-${props.wazuhVersion}-1.arm64.pkg`,
       installCommand: props => getMacOsInstallCommand(props),
       startCommand: props => getMacosStartCommand(props),
     },
