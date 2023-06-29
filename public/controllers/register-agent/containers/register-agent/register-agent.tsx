@@ -130,7 +130,7 @@ export const RegisterAgent = withReduxProvider(
           }
           const groups = await getGroups();
           setNeedsPassword(needsPassword);
-          setWazuhPassword('wazuhPassword');
+          setWazuhPassword(wazuhPassword);
           setWazuhVersion(wazuhVersion);
           setGroups(groups);
           setLoading(false);

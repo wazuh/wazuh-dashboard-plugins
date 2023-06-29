@@ -113,7 +113,7 @@ export const getMacOsInstallCommand = (
 
   // If no variables are set, the echo will be empty
   const macOSInstallationSetEnvVariablesScript = macOSInstallationOptions
-    ? `sudo echo "${macOSInstallationOptions}" > /tmp/wazuh_envs && `
+    ? `sudo echo -e "${macOSInstallationOptions}" > /tmp/wazuh_envs && `
     : ``;
 
   // Merge environment variables with installation script
