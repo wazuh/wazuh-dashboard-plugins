@@ -56,8 +56,8 @@ export default function CommandOutput(props: ICommandSectionProps) {
     // search password in commandText and replace with * for every character
       const findPassword = commandText.search(password);
       if (findPassword > -1) {
-        const command = commandText;
-        setCommandToShow(command.replace(password, '*'.repeat(password.length)));
+        let command = commandText;
+        setCommandToShow(command.replace(/WAZUH_REGISTRATION_PASSWORD='([^']+)'/,`WAZUH_REGISTRATION_PASSWORD='${'*'.repeat(password.length)}'`));
       }
     }
   }
@@ -95,7 +95,7 @@ export default function CommandOutput(props: ICommandSectionProps) {
           )}
         </div>
         <EuiSpacer size='s' />
-        {showCommand && havePassword && <EuiSwitch checked={showPassword} label='Show password' onChange={onChangeShowPassword}/>}
+        {showCommand && havePassword ? <EuiSwitch checked={showPassword} label='Show password' onChange={onChangeShowPassword}/> : null}
       </EuiText>
     </Fragment>
   );
