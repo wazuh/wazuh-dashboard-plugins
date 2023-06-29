@@ -86,7 +86,7 @@ export const getMacOsInstallCommand = (
 ) => {
   const { optionals, urlPackage } = props;
   // Set macOS installation script with environment variables
-  const optionalsText = optionals && getAllOptionals(optionals);
+  const optionalsText = optionals && getAllOptionals(optionals).replaceAll('\' ', '\'\\n');
   const macOSInstallationOptions = `${optionalsText}`
     .replace(/\' ([a-zA-Z])/g, "' && $1") // Separate environment variables with &&
     .replace(/\"/g, '\\"') // Escape double quotes
