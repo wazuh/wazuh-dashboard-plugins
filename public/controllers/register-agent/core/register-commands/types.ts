@@ -24,12 +24,13 @@ interface IOptionalParamsWithValues<Params extends string> {
 }
 
 
-type tOSEntryProps<Param extends string> = IOSProps & IOptionalParamsWithValues<Param>;
+export type tOSEntryProps<Param extends string> = IOSProps & IOptionalParamsWithValues<Param>;
+export type tOSEntryInstallCommand<Param extends string> = tOSEntryProps<Param> & { urlPackage: string };
 
 export interface IOSCommandsDefinition<OS extends IOperationSystem,Param extends string> {
   architecture: OS['architecture'];
   urlPackage: (props: tOSEntryProps<Param>) => string;
-  installCommand: (props: tOSEntryProps<Param> & { urlPackage: string }) => string;
+  installCommand: (props: tOSEntryInstallCommand<Param>) => string;
   startCommand: (props: tOSEntryProps<Param>) => string;
 }
 

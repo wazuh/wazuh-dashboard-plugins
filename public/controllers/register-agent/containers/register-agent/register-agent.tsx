@@ -48,19 +48,14 @@ export const RegisterAgent = withReduxProvider(
     const configuration = useSelector(
       (state: { appConfig: { data: any } }) => state.appConfig.data,
     );
-
     const [wazuhVersion, setWazuhVersion] = useState('');
     const [haveUdpProtocol, setHaveUdpProtocol] = useState<boolean | null>(
       false,
     );
-    const [haveConnectionSecure, setHaveConnectionSecure] = useState<
-      boolean | null
-    >(false);
     const [loading, setLoading] = useState(false);
     const [wazuhPassword, setWazuhPassword] = useState('');
     const [groups, setGroups] = useState([]);
     const [needsPassword, setNeedsPassword] = useState<boolean>(false);
-    const [hideTextPassword, setHideTextPassword] = useState<boolean>(false);
 
     const initialFields: FormConfiguration = {
       operatingSystemSelection: {
@@ -102,7 +97,6 @@ export const RegisterAgent = withReduxProvider(
       const remoteConfig = await getMasterRemoteConfiguration();
       if (remoteConfig) {
         setHaveUdpProtocol(remoteConfig.isUdp);
-        setHaveConnectionSecure(remoteConfig.haveSecureConnection);
       }
     };
 
@@ -123,23 +117,19 @@ export const RegisterAgent = withReduxProvider(
       const fetchData = async () => {
         try {
           const wazuhVersion = await getWazuhVersion();
-          let wazuhPassword = '';
-          let hideTextPassword = false;
           await getRemoteConfig();
           const authInfo = await getAuthInfo();
+          // get wazuh password configuration
+          let wazuhPassword = '';
           const needsPassword = (authInfo.auth || {}).use_password === 'yes';
           if (needsPassword) {
             wazuhPassword =
               configuration['enrollment.password'] ||
               authInfo['authd.pass'] ||
               '';
-            if (wazuhPassword) {
-              hideTextPassword = true;
-            }
           }
           const groups = await getGroups();
           setNeedsPassword(needsPassword);
-          setHideTextPassword(hideTextPassword);
           setWazuhPassword(wazuhPassword);
           setWazuhVersion(wazuhVersion);
           setGroups(groups);
@@ -218,13 +208,11 @@ export const RegisterAgent = withReduxProvider(
                       <Steps
                         form={form}
                         needsPassword={needsPassword}
-                        hideTextPassword={hideTextPassword}
+                        wazuhPassword={wazuhPassword}
                         osCard={osCard}
                         connection={{
-                          isSecure: haveConnectionSecure ? true : false,
                           isUDP: haveUdpProtocol ? true : false,
                         }}
-                        wazuhPassword={wazuhPassword}
                       />
                     </EuiFlexItem>
                   )}

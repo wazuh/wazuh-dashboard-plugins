@@ -1,5 +1,5 @@
 import React, { Fragment, useEffect, useState } from 'react';
-import { EuiSteps } from '@elastic/eui';
+import { EuiCallOut, EuiLink, EuiSteps, EuiTitle } from '@elastic/eui';
 import './steps.scss';
 import { OPERATING_SYSTEMS_OPTIONS } from '../../utils/register-agent-data';
 import {
@@ -27,47 +27,49 @@ import {
   getServerAddressStepStatus,
   getOptionalParameterStepStatus,
   showCommandsSections,
+  getPasswordStepStatus,
 } from '../../services/register-agent-steps-status-services';
+import { webDocumentationLink } from '../../../../../common/services/web_documentation';
 
 interface IStepsProps {
   needsPassword: boolean;
-  hideTextPassword: boolean;
   form: UseFormReturn;
   osCard: React.ReactElement;
   connection: {
     isUDP: boolean;
-    isSecure: boolean;
   };
   wazuhPassword: string;
 }
 
 export const Steps = ({
   needsPassword,
-  hideTextPassword,
   form,
   osCard,
   connection,
   wazuhPassword,
 }: IStepsProps) => {
+  const initialParsedFormValues = {
+    operatingSystem: {
+      name: '',
+      architecture: '',
+    },
+    optionalParams: {
+      agentGroups: '',
+      agentName: '',
+      serverAddress: '',
+      wazuhPassword,
+      protocol: connection.isUDP ? 'UDP' : '',
+    },
+  } as IParseRegisterFormValues;
   const [registerAgentFormValues, setRegisterAgentFormValues] =
-    useState<IParseRegisterFormValues>({
-      operatingSystem: {
-        name: '',
-        architecture: '',
-      },
-      optionalParams: {
-        agentGroups: '',
-        agentName: '',
-        serverAddress: '',
-        wazuhPassword,
-      },
-    });
+    useState<IParseRegisterFormValues>(initialParsedFormValues);
 
   useEffect(() => {
     // get form values and parse them divided in OS and optional params
     const registerAgentFormValuesParsed = parseRegisterAgentFormValues(
       getRegisterAgentFormValues(form),
       OPERATING_SYSTEMS_OPTIONS,
+      initialParsedFormValues,
     );
     setRegisterAgentFormValues(registerAgentFormValuesParsed);
     setInstallCommandStepStatus(
@@ -99,7 +101,7 @@ export const Steps = ({
     ) {
       selectOS(registerAgentFormValues.operatingSystem as tOperatingSystem);
     }
-    setOptionalParams(registerAgentFormValues.optionalParams);
+    setOptionalParams({ ...registerAgentFormValues.optionalParams });
     setInstallCommandWasCopied(false);
     setStartCommandWasCopied(false);
   }, [registerAgentFormValues]);
@@ -131,17 +133,32 @@ export const Steps = ({
       children: <ServerAddressInput formField={form.fields.serverAddress} />,
       status: getServerAddressStepStatus(form.fields),
     },
-    ...(!(!needsPassword || hideTextPassword)
+    ...(needsPassword && !wazuhPassword
       ? [
           {
             title: <span className='stepTitle'>Wazuh password</span>,
             children: (
-              <Fragment>
-                {
-                  'No ha establecido una contraseña. Se le asigno una por defecto'
+              <EuiCallOut
+                color='warning'
+                title={
+                  <span>
+                    The Wazuh password is required but wasn't defined. Please check our{' '}
+                    <EuiLink
+                      target='_blank'
+                      href={webDocumentationLink(
+                        'user-manual/agent-enrollment/security-options/using-password-authentication.html',
+                      )}
+                      rel='noopener noreferrer'
+                    >
+                      steps
+                    </EuiLink>
+                  </span>
                 }
-              </Fragment>
+                iconType='iInCircle'
+                className='warningForAgentName'
+              />
             ),
+            status: getPasswordStepStatus(form.fields),
           },
         ]
       : []),
@@ -151,7 +168,6 @@ export const Steps = ({
       status: getOptionalParameterStepStatus(
         form.fields,
         installCommandWasCopied,
-        startCommandWasCopied,
       ),
     },
     {
@@ -166,6 +182,7 @@ export const Steps = ({
           showCommand={showCommandsSections(form.fields)}
           os={registerAgentFormValues.operatingSystem.name}
           onCopy={() => setInstallCommandWasCopied(true)}
+          password={registerAgentFormValues.optionalParams.wazuhPassword}
         />
       ),
       status: installCommandStepStatus,
