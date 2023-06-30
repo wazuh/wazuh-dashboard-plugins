@@ -55,6 +55,7 @@ const getAllOptionalsMacos = (
 
 /******* Linux *******/
 
+
 // Install command
 export const getLinuxRPMInstallCommand = (
   props: tOSEntryInstallCommand<tOptionalParameters>,
