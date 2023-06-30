@@ -69,7 +69,7 @@ export const getLinuxDEBInstallCommand = (
   props: tOSEntryInstallCommand<tOptionalParameters>,
 ) => {
   const { optionals, urlPackage } = props;
-  return `curl -so wazuh-agent.deb ${urlPackage} && ${
+  return `curl -so wazuh-agent.deb ${urlPackage} && sudo ${
     optionals && getAllOptionals(optionals)
   }dpkg -i ./wazuh-agent.deb`;
 };
