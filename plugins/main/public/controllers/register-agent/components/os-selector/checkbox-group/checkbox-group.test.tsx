@@ -6,7 +6,7 @@ import { CheckboxGroupComponent } from '../checkbox-group/checkbox-group';
 describe('CheckboxGroupComponent', () => {
   const data = ['Option 1', 'Option 2', 'Option 3'];
   const cardIndex = 0;
-  const selectedOption = 'option-0-0';
+  const selectedOption = 'Option 1';
   const onOptionChange = jest.fn();
 
   test('renders checkbox items with correct labels', () => {
@@ -52,7 +52,7 @@ describe('CheckboxGroupComponent', () => {
     expect(onOptionChange).toHaveBeenCalledTimes(1);
     expect(onOptionChange).toHaveBeenCalledWith(
       expect.objectContaining({
-        target: { value: `Option ${cardIndex}` },
+        target: { value: `Option 2` },
       }),
     );
   });
