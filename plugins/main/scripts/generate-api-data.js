@@ -361,7 +361,7 @@ node ${cliFilePath} --spec https://raw.githubusercontent.com/wazuh/wazuh/master/
 
             const name = formatEndpointPath(endpointPath);
             const documentation = generateEndpointDocumentationLink(
-              endpointMethodData.operationId,
+              endpointMethodData.__originalOperationId, // original operation ID
             );
             // Endpoint path parameters
             const args = endpointMethodParameters
