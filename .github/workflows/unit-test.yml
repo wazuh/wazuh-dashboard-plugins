@@ -26,9 +26,9 @@ on:
   pull_request:
     branches:
       - 'master'
-      - '*.*-*.*'
-      - '*.*-*.*-wzd'
-      - '[0-9].[0-9]+'
+      - '[345].[0-9]+'                    # Minor branches
+      - '[345].[0-9]+.[0-9]+'             # Patch branches
+      - '[345].[0-9]+.[0-9]+-7.[0-9]+'    # Minor branches - Kibana
 
 jobs:
   # Run unit tests with Jest

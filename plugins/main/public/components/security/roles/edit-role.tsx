@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import {
-  EuiButton,
   EuiTitle,
-  EuiFlyout,
   EuiFlyoutHeader,
   EuiFlyoutBody,
   EuiForm,
-  EuiFieldText,
   EuiFormRow,
   EuiSpacer,
   EuiFlexGroup,
@@ -14,7 +11,6 @@ import {
   EuiBadge,
   EuiComboBox,
   EuiOverlayMask,
-  EuiOutsideClickDetector,
   EuiConfirmModal,
 } from '@elastic/eui';
 
@@ -25,6 +21,7 @@ import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { WzFlyout } from '../../common/flyouts';
+import { WzButtonPermissions } from '../../common/permissions/button';
 
 const reservedRoles = [
   'administrator',
@@ -39,7 +36,9 @@ const reservedRoles = [
 export const EditRole = ({ role, closeFlyout }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [currentRole, setCurrentRole] = useState({});
-  const [isReserved, setIsReserved] = useState(reservedRoles.includes(role.name));
+  const [isReserved, setIsReserved] = useState(
+    reservedRoles.includes(role.name),
+  );
   const [policies, setPolicies] = useState([]);
   const [selectedPolicies, setSelectedPolicies] = useState([]);
   const [selectedPoliciesError, setSelectedPoliciesError] = useState(false);
@@ -50,27 +49,41 @@ export const EditRole = ({ role, closeFlyout }) => {
   async function getData() {
     try {
       setIsLoading(true);
-      const roleDataResponse = await WzRequest.apiReq('GET', '/security/roles', {
-        params: {
-          role_ids: role.id,
+      const roleDataResponse = await WzRequest.apiReq(
+        'GET',
+        '/security/roles',
+        {
+          params: {
+            role_ids: role.id,
+          },
         },
-      });
-      const roleData = (((roleDataResponse.data || {}).data || {}).affected_items || [])[0];
+      );
+      const roleData = (((roleDataResponse.data || {}).data || {})
+        .affected_items || [])[0];
       setCurrentRole(roleData);
-      const policies_request = await WzRequest.apiReq('GET', '/security/policies', {});
+      const policies_request = await WzRequest.apiReq(
+        'GET',
+        '/security/policies',
+        {},
+      );
       const selectedPoliciesCopy = [];
-      const policies = (
-        (((policies_request || {}).data || {}).data || {}).affected_items || []
-      ).map((x) => {
-        const currentPolicy = { label: x.name, id: x.id, roles: x.roles, policy: x.policy };
-        if (roleData.policies.includes(x.id)) {
-          selectedPoliciesCopy.push(currentPolicy);
-          return false;
-        } else {
-          return currentPolicy;
-        }
-      });
-      const filteredPolicies = policies.filter((item) => item !== false);
+      const policies = (policies_request?.data?.data?.affected_items || []).map(
+        x => {
+          const currentPolicy = {
+            label: x.name,
+            id: x.id,
+            roles: x.roles,
+            policy: x.policy,
+          };
+          if (roleData.policies.includes(x.id)) {
+            selectedPoliciesCopy.push(currentPolicy);
+            return false;
+          } else {
+            return currentPolicy;
+          }
+        },
+      );
+      const filteredPolicies = policies.filter(item => item !== false);
       setAssignedPolicies(selectedPoliciesCopy);
       setPolicies(filteredPolicies);
     } catch (error) {
@@ -94,20 +107,26 @@ export const EditRole = ({ role, closeFlyout }) => {
     try {
       let roleId = currentRole.id;
 
-      const policiesId = selectedPolicies.map((policy) => {
+      const policiesId = selectedPolicies.map(policy => {
         return policy.id;
       });
-      const policyResult = await WzRequest.apiReq('POST', `/security/roles/${roleId}/policies`, {
-        params: {
-          policy_ids: policiesId.toString(),
+      const policyResult = await WzRequest.apiReq(
+        'POST',
+        `/security/roles/${roleId}/policies`,
+        {
+          params: {
+            policy_ids: policiesId.toString(),
+          },
         },
-      });
+      );
 
       const policiesData = (policyResult.data || {}).data;
       if (policiesData.failed_items && policiesData.failed_items.length) {
         return;
       }
-      ErrorHandler.info('Role was successfully updated with the selected policies');
+      ErrorHandler.info(
+        'Role was successfully updated with the selected policies',
+      );
       setSelectedPolicies([]);
       await update();
     } catch (error) {
@@ -130,7 +149,7 @@ export const EditRole = ({ role, closeFlyout }) => {
     await getData();
   };
 
-  const onChangePolicies = (selectedPolicies) => {
+  const onChangePolicies = selectedPolicies => {
     setSelectedPolicies(selectedPolicies);
   };
 
@@ -139,14 +158,14 @@ export const EditRole = ({ role, closeFlyout }) => {
     modal = (
       <EuiOverlayMask>
         <EuiConfirmModal
-          title="Unsubmitted changes"
+          title='Unsubmitted changes'
           onConfirm={() => {
             setIsModalVisible(false);
             closeFlyout(false);
           }}
           onCancel={() => setIsModalVisible(false)}
           cancelButtonText="No, don't do it"
-          confirmButtonText="Yes, do it"
+          confirmButtonText='Yes, do it'
         >
           <p style={{ textAlign: 'center' }}>
             There are unsaved changes. Are you sure you want to proceed?
@@ -164,45 +183,52 @@ export const EditRole = ({ role, closeFlyout }) => {
 
   return (
     <>
-      <WzFlyout flyoutProps={{className:"wzApp"}} onClose={onClose}>
+      <WzFlyout flyoutProps={{ className: 'wzApp' }} onClose={onClose}>
         <EuiFlyoutHeader hasBorder={false}>
-          <EuiTitle size="m">
+          <EuiTitle size='m'>
             <h2>
               Edit {role.name} role &nbsp;
-              {isReserved && <EuiBadge color="primary">Reserved</EuiBadge>}
+              {isReserved && <EuiBadge color='primary'>Reserved</EuiBadge>}
             </h2>
           </EuiTitle>
         </EuiFlyoutHeader>
         <EuiFlyoutBody>
-          <EuiForm component="form" style={{ padding: 24 }}>
+          <EuiForm component='form' style={{ padding: 24 }}>
             <EuiFlexGroup>
               <EuiFlexItem grow={true}>
                 <EuiFormRow
-                  label="Policies"
+                  label='Policies'
                   isInvalid={selectedPoliciesError}
                   error={'At least one policy must be selected.'}
-                  helpText="Assign policies to the role."
+                  helpText='Assign policies to the role.'
                 >
                   <EuiComboBox
-                    placeholder="Select policies"
+                    placeholder='Select policies'
                     options={policies}
                     isDisabled={isReserved}
                     selectedOptions={selectedPolicies}
                     onChange={onChangePolicies}
                     isClearable={true}
-                    data-test-subj="demoComboBox"
+                    data-test-subj='demoComboBox'
                   />
                 </EuiFormRow>
               </EuiFlexItem>
-              <EuiFlexItem grow={true}>
-                <EuiButton
+              <EuiFlexItem grow={false}>
+                <WzButtonPermissions
+                  buttonType='default'
+                  permissions={[
+                    {
+                      action: 'security:update',
+                      resource: `role:id:${role.id}`,
+                    },
+                  ]}
                   style={{ marginTop: 20, maxWidth: 45 }}
                   isDisabled={isReserved}
                   fill
                   onClick={addPolicy}
                 >
                   Add policy
-                </EuiButton>
+                </WzButtonPermissions>
               </EuiFlexItem>
             </EuiFlexGroup>
 
