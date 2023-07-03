@@ -22,9 +22,9 @@ describe('CheckboxGroupComponent', () => {
     const checkboxItems = screen.getAllByRole('radio');
     expect(checkboxItems).toHaveLength(data.length);
 
-    expect(checkboxItems[0]).toHaveAttribute('id', 'option-0-0');
-    expect(checkboxItems[1]).toHaveAttribute('id', 'option-0-1');
-    expect(checkboxItems[2]).toHaveAttribute('id', 'option-0-2');
+    expect(checkboxItems[0]).toHaveAttribute('id', 'Option 1');
+    expect(checkboxItems[1]).toHaveAttribute('id', 'Option 2');
+    expect(checkboxItems[2]).toHaveAttribute('id', 'Option 3');
 
     expect(checkboxItems[0]).toBeChecked();
     expect(checkboxItems[1]).not.toBeChecked();
@@ -52,7 +52,7 @@ describe('CheckboxGroupComponent', () => {
     expect(onOptionChange).toHaveBeenCalledTimes(1);
     expect(onOptionChange).toHaveBeenCalledWith(
       expect.objectContaining({
-        target: { value: `option-${cardIndex}-1` },
+        target: { value: `Option ${cardIndex}` },
       }),
     );
   });
