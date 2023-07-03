@@ -8,6 +8,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.7.0
 
+### Fixed
+
+- Fixed the tooltips of the tables in the security section, and unnecessary requests are removed. [#5631](https://github.com/wazuh/wazuh-kibana-app/pull/5631)
+
 ## Wazuh v4.6.0 - OpenSearch Dashboards 2.6.0 - Revision 01
 
 ### Added
