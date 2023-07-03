@@ -2,6 +2,12 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.7.0 - OpenSearch Dashboards 2.6.0 - Revision 01
+
+### Added
+
+- Support for Wazuh 4.7.0
+
 ## Wazuh v4.6.0 - OpenSearch Dashboards 2.6.0 - Revision 01
 
 ### Added
@@ -14,6 +20,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added a title to the agent name input of the deploy a new agent section. [#5429](https://github.com/wazuh/wazuh-kibana-app/pull/5429)
 - Added callout below the agent name entry of the deploy a new agent section. [#5429](https://github.com/wazuh/wazuh-kibana-app/pull/5429)
 - Added new CLI to generate API data from specification file [#5519](https://github.com/wazuh/wazuh-kibana-app/pull/5519)
+- Added specific RBAC permissions to Security section [#5551](https://github.com/wazuh/wazuh-kibana-app/pull/5551)
 
 ### Changed
 
@@ -25,7 +32,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed the placeholder of the agent name input of the deploy a new agent section. [#5429](https://github.com/wazuh/wazuh-kibana-app/pull/5429)
 - Changed the query to search for an agent in `management/configuration`. [#5485](https://github.com/wazuh/wazuh-kibana-app/pull/5485)
 - Changed the search bar in management/log to the one used in the rest of the app. [#5476](https://github.com/wazuh/wazuh-kibana-app/pull/5476)
-
 
 ### Fixed
 
