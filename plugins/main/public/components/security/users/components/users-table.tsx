@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   EuiInMemoryTable,
   EuiBadge,
@@ -23,6 +23,7 @@ export const UsersTable = ({
   roles,
   onSave,
 }) => {
+  const [userState, setUserState] = useState([]);
   const getRowProps = item => {
     const { id } = item;
     return {
@@ -31,10 +32,17 @@ export const UsersTable = ({
     };
   };
 
+  useEffect(() => {
+    setUserState(users);
+  }, [users]);
+
   const onConfirmDeleteUser = item => {
     return async () => {
       try {
         await UsersServices.DeleteUsers([item.id]);
+        // Workaround for tooltip problem does not disappear
+        // when deleting a user if the following user is a reserved user
+        setUserState([]);
         ErrorHandler.info('User was successfully deleted');
         onSave();
       } catch (error) {
@@ -139,7 +147,7 @@ export const UsersTable = ({
 
   return (
     <EuiInMemoryTable
-      items={users}
+      items={userState}
       columns={columns}
       search={search}
       rowProps={getRowProps}
