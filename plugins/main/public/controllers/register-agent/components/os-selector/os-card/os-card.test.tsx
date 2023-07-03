@@ -26,6 +26,11 @@ jest.mock('../../../../../kibana-services', () => ({
       return;
     },
   }),
+  getUiSettings: jest.fn().mockReturnValue({
+    get: (name) => {
+      return true;
+    },
+  }),
 }));
 
 describe('OsCard', () => {
