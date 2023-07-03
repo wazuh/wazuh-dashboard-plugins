@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
-import { CheckboxGroupComponent } from '../../step-one/checkbox-group/checkbox-group';
+import { CheckboxGroupComponent } from '../checkbox-group/checkbox-group';
 
 describe('CheckboxGroupComponent', () => {
   const data = ['Option 1', 'Option 2', 'Option 3'];
