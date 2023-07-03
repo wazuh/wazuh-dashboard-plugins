@@ -72,14 +72,14 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
         },
       );
 
-      const data = (response.data || {}).data;
+      const data = response?.data?.data;
       if (data.failed_items && data.failed_items.length) {
         return;
       }
       ErrorHandler.info(
         'Role was successfully updated with the selected policies',
       );
-      closeFlyout();
+      closeFlyout(true);
     } catch (error) {
       const options = {
         context: `${EditPolicyFlyout.name}.updatePolicy`,
@@ -97,22 +97,22 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
   };
 
   async function getData() {
-    const resources_request = await WzRequest.apiReq(
+    const resourcesRequest = await WzRequest.apiReq(
       'GET',
       '/security/resources',
       {},
     );
-    const actions_request = await WzRequest.apiReq(
+    const actionsRequest = await WzRequest.apiReq(
       'GET',
       '/security/actions',
       {},
     );
-    const resources_data = ((resources_request || {}).data || {}).data || {};
-    setAvailableResources(resources_data);
+    const resourcesData = resourcesRequest?.data?.data || {};
+    setAvailableResources(resourcesData);
 
-    const actions_data = ((actions_request || {}).data || {}).data || {};
-    setAvailableActions(actions_data);
-    const actions = Object.keys(actions_data).map((x, idx) => {
+    const actionsData = actionsRequest?.data?.data || {};
+    setAvailableActions(actionsData);
+    const actions = Object.keys(actionsData).map((x, idx) => {
       return {
         id: idx,
         value: x,
@@ -122,7 +122,7 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
             <strong>{x}</strong>
             <EuiText size='s' color='subdued'>
               <p className='euiTextColor--subdued'>
-                {actions_data[x].description}
+                {actionsData[x].description}
               </p>
             </EuiText>
           </>
@@ -211,7 +211,7 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
     setAddedActions(addedActions.filter(x => x !== action));
   };
 
-  const actions_columns = [
+  const actionsColumns = [
     {
       field: 'action',
       name: 'Actions',
@@ -234,7 +234,7 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
     },
   ];
 
-  const resources_columns = [
+  const resourcesColumns = [
     {
       field: 'resource',
       name: 'Resources',
@@ -391,7 +391,7 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
                   <EuiFlexItem>
                     <EuiInMemoryTable
                       items={addedActions}
-                      columns={actions_columns}
+                      columns={actionsColumns}
                     />
                   </EuiFlexItem>
                 </EuiFlexGroup>
@@ -446,7 +446,7 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
                   <EuiFlexItem>
                     <EuiInMemoryTable
                       items={addedResources}
-                      columns={resources_columns}
+                      columns={resourcesColumns}
                     />
                   </EuiFlexItem>
                 </EuiFlexGroup>

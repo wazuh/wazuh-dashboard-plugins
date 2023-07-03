@@ -85,7 +85,7 @@ export const CreateRole = ({ closeFlyout }) => {
         },
       );
 
-      const policiesData = (policyResult.data || {}).data;
+      const policiesData = policyResult?.data?.data;
       if (policiesData.failed_items && policiesData.failed_items.length) {
         return;
       }
@@ -95,7 +95,7 @@ export const CreateRole = ({ closeFlyout }) => {
     } catch (error) {
       ErrorHandler.handle(error, 'There was an error');
     }
-    closeFlyout(false);
+    closeFlyout(true);
   };
 
   const onChangeRoleName = e => {

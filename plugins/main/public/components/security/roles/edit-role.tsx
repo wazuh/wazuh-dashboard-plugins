@@ -58,8 +58,7 @@ export const EditRole = ({ role, closeFlyout }) => {
           },
         },
       );
-      const roleData = (((roleDataResponse.data || {}).data || {})
-        .affected_items || [])[0];
+      const roleData = roleDataResponse?.data?.data?.affected_items?.[0];
       setCurrentRole(roleData);
       const policies_request = await WzRequest.apiReq(
         'GET',
@@ -120,7 +119,7 @@ export const EditRole = ({ role, closeFlyout }) => {
         },
       );
 
-      const policiesData = (policyResult.data || {}).data;
+      const policiesData = policyResult?.data?.data;
       if (policiesData.failed_items && policiesData.failed_items.length) {
         return;
       }

@@ -39,7 +39,7 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
   const [effectValue, setEffectValue] = useState();
   const [hasChanges, setHasChanges] = useState(false);
 
-  const actions_columns = [
+  const actionsColumns = [
     {
       field: 'action',
       name: 'Actions',
@@ -61,7 +61,7 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
     },
   ];
 
-  const resources_columns = [
+  const resourcesColumns = [
     {
       field: 'resource',
       name: 'Resources',
@@ -171,7 +171,7 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
           effect: effectValue,
         },
       });
-      const resultData = (result.data || {}).data;
+      const resultData = result?.data?.data;
       if (resultData.failed_items && resultData.failed_items.length) {
         return;
       }
@@ -194,7 +194,7 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
       };
       getErrorOrchestrator().handleError(options);
     }
-    closeFlyout();
+    closeFlyout(true);
   };
 
   const getIdentifier = () => {
@@ -360,7 +360,7 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
                   <EuiFlexItem>
                     <EuiInMemoryTable
                       items={addedActions}
-                      columns={actions_columns}
+                      columns={actionsColumns}
                     />
                   </EuiFlexItem>
                 </EuiFlexGroup>
@@ -418,7 +418,7 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
                   <EuiFlexItem>
                     <EuiInMemoryTable
                       items={addedResources}
-                      columns={resources_columns}
+                      columns={resourcesColumns}
                     />
                   </EuiFlexItem>
                 </EuiFlexGroup>
