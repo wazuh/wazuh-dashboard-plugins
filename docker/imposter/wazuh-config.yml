@@ -847,6 +847,9 @@ resources:
   # Get agent ports
   - method: GET
     path: /syscollector/{agent_id}/ports
+    response:
+      statusCode: 200
+      staticFile: syscollector/ports/ports.json
 
   # Get agent processes
   - method: GET
