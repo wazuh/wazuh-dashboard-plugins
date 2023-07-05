@@ -28,6 +28,10 @@ import {
   getOptionalParameterStepStatus,
   showCommandsSections,
   getPasswordStepStatus,
+  getIncompleteSteps,
+  getInvalidFields,
+  tFormFieldsLabel,
+  tFormStepsLabel,
 } from '../../services/register-agent-steps-status-services';
 import { webDocumentationLink } from '../../../../../common/services/web_documentation';
 
@@ -61,6 +65,12 @@ export const Steps = ({
       protocol: connection.isUDP ? 'UDP' : '',
     },
   } as IParseRegisterFormValues;
+  const [missingStepsName, setMissingStepsName] = useState<tFormStepsLabel[]>(
+    [],
+  );
+  const [invalidFieldsName, setInvalidFieldsName] = useState<
+    tFormFieldsLabel[]
+  >([]);
   const [registerAgentFormValues, setRegisterAgentFormValues] =
     useState<IParseRegisterFormValues>(initialParsedFormValues);
 
@@ -78,6 +88,8 @@ export const Steps = ({
     setStartCommandStepStatus(
       getAgentCommandsStepStatus(form.fields, startCommandWasCopied),
     );
+    setMissingStepsName(getIncompleteSteps(form.fields) || []);
+    setInvalidFieldsName(getInvalidFields(form.fields) || []);
   }, [form.fields]);
 
   const { installCommand, startCommand, selectOS, setOptionalParams } =
@@ -142,7 +154,8 @@ export const Steps = ({
                 color='warning'
                 title={
                   <span>
-                    The Wazuh password is required but wasn't defined. Please check our{' '}
+                    The Wazuh password is required but wasn't defined. Please
+                    check our{' '}
                     <EuiLink
                       target='_blank'
                       href={webDocumentationLink(
@@ -177,25 +190,63 @@ export const Steps = ({
         </span>
       ),
       children: (
-        <CommandOutput
-          commandText={installCommand}
-          showCommand={showCommandsSections(form.fields)}
-          os={registerAgentFormValues.operatingSystem.name}
-          onCopy={() => setInstallCommandWasCopied(true)}
-          password={registerAgentFormValues.optionalParams.wazuhPassword}
-        />
+        <>
+          {missingStepsName?.length ? (
+            <EuiCallOut
+              color='warning'
+              title={`Please select the ${missingStepsName?.join(', ')}.`}
+              iconType='iInCircle'
+            />
+          ) : null}
+          {invalidFieldsName?.length ? (
+            <EuiCallOut
+              color='danger'
+              title={`There are fields with errors. Please verify them: ${invalidFieldsName?.join(
+                ', ',
+              )}.`}
+              iconType='iInCircle'
+              style={{ marginTop: '1rem' }}
+            />
+          ) : null}
+          <CommandOutput
+            commandText={installCommand}
+            showCommand={showCommandsSections(form.fields)}
+            os={registerAgentFormValues.operatingSystem.name}
+            onCopy={() => setInstallCommandWasCopied(true)}
+            password={registerAgentFormValues.optionalParams.wazuhPassword}
+          />
+        </>
       ),
       status: installCommandStepStatus,
     },
     {
       title: <span className='stepTitle'>Start the Wazuh agent:</span>,
       children: (
-        <CommandOutput
-          commandText={startCommand}
-          showCommand={showCommandsSections(form.fields)}
-          os={registerAgentFormValues.operatingSystem.name}
-          onCopy={() => setStartCommandWasCopied(true)}
-        />
+        <>
+          {missingStepsName?.length ? (
+            <EuiCallOut
+              color='warning'
+              title={`Please select the ${missingStepsName?.join(', ')}.`}
+              iconType='iInCircle'
+            />
+          ) : null}
+          {invalidFieldsName?.length ? (
+            <EuiCallOut
+              color='danger'
+              title={`There are fields with errors. Please verify them: ${invalidFieldsName?.join(
+                ', ',
+              )}.`}
+              iconType='iInCircle'
+              style={{ marginTop: '1rem' }}
+            />
+          ) : null}
+          <CommandOutput
+            commandText={startCommand}
+            showCommand={showCommandsSections(form.fields)}
+            os={registerAgentFormValues.operatingSystem.name}
+            onCopy={() => setStartCommandWasCopied(true)}
+          />
+        </>
       ),
       status: startCommandStepStatus,
     },

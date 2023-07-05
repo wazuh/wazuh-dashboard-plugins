@@ -14,7 +14,7 @@ export type FormStepsDependencies = {
 
 type FormStepsStatus = {
   [key: string]: FieldStatus;
-}
+};
 
 interface FormFieldsStatusManager {
   getFieldStatus: (fieldname: FormFieldName) => FieldStatus;
@@ -22,8 +22,6 @@ interface FormFieldsStatusManager {
   getStepStatus: (stepName: string) => FieldStatus;
   getFormStepsStatus: () => FormStepsStatus;
 }
-
-
 
 export class RegisterAgentFormStatusManager implements FormFieldsStatusManager {
   constructor(
@@ -60,33 +58,35 @@ export class RegisterAgentFormStatusManager implements FormFieldsStatusManager {
   };
 
   getStepStatus = (stepName: string): FieldStatus => {
-    if(!this.formSteps) {
+    if (!this.formSteps) {
       throw Error('Form steps not defined');
     }
     const stepFields = this.formSteps[stepName];
-    if(!stepFields) {
+    if (!stepFields) {
       throw Error('Step name not found');
     }
 
     const formStepStatus: FormStepsStatus | object = {};
-    stepFields.forEach((fieldName: FormFieldName ) => {
+    stepFields.forEach((fieldName: FormFieldName) => {
       formStepStatus[fieldName] = this.getFieldStatus(fieldName);
     });
 
     const stepStatus = Object.values(formStepStatus);
 
     // if any is invalid
-    if(stepStatus.includes('invalid')) {
+    if (stepStatus.includes('invalid')) {
       return 'invalid';
-    }else if(stepStatus.includes('empty')) {  // if all are empty
+    } else if (stepStatus.includes('empty')) {
+      // if all are empty
       return 'empty';
-    }else {  // if all are complete
+    } else {
+      // if all are complete
       return 'complete';
     }
   };
 
   getFormStepsStatus = (): FormStepsStatus => {
-    if(!this.formSteps) {
+    if (!this.formSteps) {
       throw Error('Form steps not defined');
     }
 
@@ -98,5 +98,19 @@ export class RegisterAgentFormStatusManager implements FormFieldsStatusManager {
     return formStepsStatus as FormStepsStatus;
   };
 
+  getIncompleteSteps = (): string[] => {
+    const formStepsStatus = this.getFormStepsStatus();
+    const notCompleteSteps = Object.entries(formStepsStatus).filter(
+      ([ _, status ]) => status === 'empty',
+    );
+    return notCompleteSteps.map(( [ stepName, _]) => stepName);
+  };
 
+  getInvalidFields = (): string[] => {
+    const formStatus = this.getFormStatus();
+    const invalidFields = Object.entries(formStatus).filter(
+      ([ _, status ]) => status === 'invalid',
+    );
+    return invalidFields.map(([ fieldName, _ ]) => fieldName);
+  }
 }
