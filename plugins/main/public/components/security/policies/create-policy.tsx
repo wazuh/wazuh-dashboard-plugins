@@ -22,6 +22,7 @@ import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { WzFlyout } from '../../common/flyouts';
+import { WzButtonPermissions } from '../../common/permissions/button';
 
 export const CreatePolicyFlyout = ({ closeFlyout }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -54,7 +55,7 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
           type: 'icon',
           color: 'danger',
           icon: 'trash',
-          onClick: (action) => removeAction(action),
+          onClick: action => removeAction(action),
         },
       ],
     },
@@ -76,7 +77,7 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
           type: 'icon',
           color: 'danger',
           icon: 'trash',
-          onClick: (resource) => removeResource(resource),
+          onClick: resource => removeResource(resource),
         },
       ],
     },
@@ -94,8 +95,16 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
   ];
 
   async function getData() {
-    const resourcesRequest = await WzRequest.apiReq('GET', '/security/resources', {});
-    const actionsRequest = await WzRequest.apiReq('GET', '/security/actions', {});
+    const resourcesRequest = await WzRequest.apiReq(
+      'GET',
+      '/security/resources',
+      {},
+    );
+    const actionsRequest = await WzRequest.apiReq(
+      'GET',
+      '/security/actions',
+      {},
+    );
     const resourcesData = resourcesRequest?.data?.data || {};
     setAvailableResources(resourcesData);
 
@@ -109,8 +118,10 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
         dropdownDisplay: (
           <>
             <strong>{x}</strong>
-            <EuiText size="s" color="subdued">
-              <p className="euiTextColor--subdued">{actionsData[x].description}</p>
+            <EuiText size='s' color='subdued'>
+              <p className='euiTextColor--subdued'>
+                {actionsData[x].description}
+              </p>
             </EuiText>
           </>
         ),
@@ -121,7 +132,7 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
 
   const loadResources = () => {
     let allResources = [];
-    addedActions.forEach((x) => {
+    addedActions.forEach(x => {
       const res = (availableActions[x.action] || {})['resources'];
       allResources = allResources.concat(res);
     });
@@ -134,8 +145,10 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
         dropdownDisplay: (
           <>
             <strong>{x}</strong>
-            <EuiText size="s" color="subdued">
-              <p className="euiTextColor--subdued">{availableResources[x].description}</p>
+            <EuiText size='s' color='subdued'>
+              <p className='euiTextColor--subdued'>
+                {availableResources[x].description}
+              </p>
             </EuiText>
           </>
         ),
@@ -144,24 +157,20 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
     setResources(resources);
   };
 
-  const removeAction = (action) => {
-    setAddedActions(addedActions.filter((x) => x !== action));
+  const removeAction = action => {
+    setAddedActions(addedActions.filter(x => x !== action));
   };
 
   const createPolicy = async () => {
     try {
-      const result = await WzRequest.apiReq(
-        'POST',
-        '/security/policies',
-        {
-          name: policyName,
-          policy: {
-            actions: addedActions.map((x) => x.action),
-            resources: addedResources.map((x) => x.resource),
-            effect: effectValue,
-          },
-        }
-      );
+      const result = await WzRequest.apiReq('POST', '/security/policies', {
+        name: policyName,
+        policy: {
+          actions: addedActions.map(x => x.action),
+          resources: addedResources.map(x => x.resource),
+          effect: effectValue,
+        },
+      });
       const resultData = (result.data || {}).data;
       if (resultData.failed_items && resultData.failed_items.length) {
         return;
@@ -195,10 +204,11 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
 
   const addResource = () => {
     if (
-      !addedResources.filter((x) => x.resource === `${resourceValue}:${resourceIdentifierValue}`)
-        .length
+      !addedResources.filter(
+        x => x.resource === `${resourceValue}:${resourceIdentifierValue}`,
+      ).length
     ) {
-      setAddedResources((addedResources) => [
+      setAddedResources(addedResources => [
         ...addedResources,
         { resource: `${resourceValue}:${resourceIdentifierValue}` },
       ]);
@@ -207,34 +217,37 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
   };
 
   const addAction = () => {
-    if (!addedActions.filter((x) => x.action === actionValue).length) {
-      setAddedActions((addedActions) => [...addedActions, { action: actionValue }]);
+    if (!addedActions.filter(x => x.action === actionValue).length) {
+      setAddedActions(addedActions => [
+        ...addedActions,
+        { action: actionValue },
+      ]);
     }
     setActionValue('');
   };
 
-  const removeResource = (resource) => {
-    setAddedResources(addedResources.filter((x) => x !== resource));
+  const removeResource = resource => {
+    setAddedResources(addedResources.filter(x => x !== resource));
   };
 
-  const onChangePolicyName = (e) => {
+  const onChangePolicyName = e => {
     setPolicyName(e.target.value);
   };
 
-  const onChangeResourceValue = async (value) => {
+  const onChangeResourceValue = async value => {
     setResourceValue(value);
     setResourceIdentifierValue('');
   };
 
-  const onChangeActionValue = async (value) => {
+  const onChangeActionValue = async value => {
     setActionValue(value);
   };
 
-  const onEffectValueChange = (value) => {
+  const onEffectValueChange = value => {
     setEffectValue(value);
   };
 
-  const onChangeResourceIdentifierValue = async (e) => {
+  const onChangeResourceIdentifierValue = async e => {
     setResourceIdentifierValue(e.target.value);
   };
 
@@ -243,7 +256,7 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
     modal = (
       <EuiOverlayMask>
         <EuiConfirmModal
-          title="Unsubmitted changes"
+          title='Unsubmitted changes'
           onConfirm={() => {
             setIsModalVisible(false);
             closeFlyout(false);
@@ -251,7 +264,7 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
           }}
           onCancel={() => setIsModalVisible(false)}
           cancelButtonText="No, don't do it"
-          confirmButtonText="Yes, do it"
+          confirmButtonText='Yes, do it'
         >
           <p style={{ textAlign: 'center' }}>
             There are unsaved changes. Are you sure you want to proceed?
@@ -291,34 +304,37 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
     <>
       <WzFlyout flyoutProps={{ className: 'wzApp' }} onClose={onClose}>
         <EuiFlyoutHeader hasBorder={false}>
-          <EuiTitle size="m">
+          <EuiTitle size='m'>
             <h2>New policy</h2>
           </EuiTitle>
         </EuiFlyoutHeader>
         <EuiFlyoutBody>
-          <EuiForm component="form" style={{ padding: 24 }}>
-            <EuiFormRow label="Policy name" helpText="Introduce a name for this new policy.">
+          <EuiForm component='form' style={{ padding: 24 }}>
+            <EuiFormRow
+              label='Policy name'
+              helpText='Introduce a name for this new policy.'
+            >
               <EuiFieldText
-                data-test-subj="createPolicyName"
-                placeholder=""
+                data-test-subj='createPolicyName'
+                placeholder=''
                 value={policyName}
-                onChange={(e) => onChangePolicyName(e)}
-                aria-label=""
+                onChange={e => onChangePolicyName(e)}
+                aria-label=''
               />
             </EuiFormRow>
             <EuiSpacer></EuiSpacer>
             <EuiFlexGroup>
               <EuiFlexItem>
                 <EuiFormRow
-                  data-test-subj="createPolicyActionRow"
-                  label="Action"
-                  helpText="Set an action where the policy will be carried out."
+                  data-test-subj='createPolicyActionRow'
+                  label='Action'
+                  helpText='Set an action where the policy will be carried out.'
                 >
                   <EuiSuperSelect
                     options={actions}
                     valueOfSelected={actionValue}
-                    onChange={(value) => onChangeActionValue(value)}
-                    itemLayoutAlign="top"
+                    onChange={value => onChangeActionValue(value)}
+                    itemLayoutAlign='top'
                     hasDividers
                   />
                 </EuiFormRow>
@@ -327,9 +343,9 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
               <EuiFlexItem grow={false}>
                 <EuiFormRow hasEmptyLabelSpace>
                   <EuiButton
-                    data-test-subj="createPolicyAddAction"
+                    data-test-subj='createPolicyAddAction'
                     onClick={() => addAction()}
-                    iconType="plusInCircle"
+                    iconType='plusInCircle'
                     disabled={!actionValue}
                   >
                     Add
@@ -339,10 +355,13 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
             </EuiFlexGroup>
             {!!addedActions.length && (
               <>
-                <EuiSpacer size="s"></EuiSpacer>
+                <EuiSpacer size='s'></EuiSpacer>
                 <EuiFlexGroup>
                   <EuiFlexItem>
-                    <EuiInMemoryTable items={addedActions} columns={actions_columns} />
+                    <EuiInMemoryTable
+                      items={addedActions}
+                      columns={actions_columns}
+                    />
                   </EuiFlexItem>
                 </EuiFlexGroup>
               </>
@@ -351,15 +370,15 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
             <EuiFlexGroup>
               <EuiFlexItem>
                 <EuiFormRow
-                  label="Resource"
-                  helpText="Select the resource to which this policy is directed."
-                  data-test-subj="createPolicyResourceRow"
+                  label='Resource'
+                  helpText='Select the resource to which this policy is directed.'
+                  data-test-subj='createPolicyResourceRow'
                 >
                   <EuiSuperSelect
                     options={resources}
                     valueOfSelected={resourceValue}
-                    onChange={(value) => onChangeResourceValue(value)}
-                    itemLayoutAlign="top"
+                    onChange={value => onChangeResourceValue(value)}
+                    itemLayoutAlign='top'
                     hasDividers
                     disabled={!addedActions.length}
                   />
@@ -367,14 +386,14 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
               </EuiFlexItem>
               <EuiFlexItem>
                 <EuiFormRow
-                  label="Resource identifier"
-                  helpText="Introduce the resource identifier. Type * for all."
+                  label='Resource identifier'
+                  helpText='Introduce the resource identifier. Type * for all.'
                 >
                   <EuiFieldText
-                    data-test-subj="createPolicyResourceIdentifier"
+                    data-test-subj='createPolicyResourceIdentifier'
                     placeholder={getIdentifier()}
                     value={resourceIdentifierValue}
-                    onChange={(e) => onChangeResourceIdentifierValue(e)}
+                    onChange={e => onChangeResourceIdentifierValue(e)}
                     disabled={!resourceValue}
                   />
                 </EuiFormRow>
@@ -382,9 +401,9 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
               <EuiFlexItem grow={false}>
                 <EuiFormRow hasEmptyLabelSpace>
                   <EuiButton
-                    data-test-subj="createPolicyAddResource"
+                    data-test-subj='createPolicyAddResource'
                     onClick={() => addResource()}
-                    iconType="plusInCircle"
+                    iconType='plusInCircle'
                     disabled={!resourceIdentifierValue}
                   >
                     Add
@@ -394,27 +413,39 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
             </EuiFlexGroup>
             {!!addedResources.length && (
               <>
-                <EuiSpacer size="s"></EuiSpacer>
+                <EuiSpacer size='s'></EuiSpacer>
                 <EuiFlexGroup>
                   <EuiFlexItem>
-                    <EuiInMemoryTable items={addedResources} columns={resources_columns} />
+                    <EuiInMemoryTable
+                      items={addedResources}
+                      columns={resources_columns}
+                    />
                   </EuiFlexItem>
                 </EuiFlexGroup>
               </>
             )}
             <EuiSpacer></EuiSpacer>
-            <EuiFormRow label="Select an effect" helpText="Select an effect." data-test-subj="createPolicyEffectRow">
+            <EuiFormRow
+              label='Select an effect'
+              helpText='Select an effect.'
+              data-test-subj='createPolicyEffectRow'
+            >
               <EuiSuperSelect
                 options={effectOptions}
                 valueOfSelected={effectValue}
-                onChange={(value) => onEffectValueChange(value)}
+                onChange={value => onEffectValueChange(value)}
               />
             </EuiFormRow>
             <EuiSpacer />
-            <EuiButton
-              data-test-subj="createPolicyButton"
+            <WzButtonPermissions
+              buttonType='default'
+              permissions={[{ action: 'security:create', resource: '*:*:*' }]}
+              data-test-subj='createPolicyButton'
               disabled={
-                !policyName || !addedActions.length || !addedResources.length || !effectValue
+                !policyName ||
+                !addedActions.length ||
+                !addedResources.length ||
+                !effectValue
               }
               onClick={() => {
                 createPolicy();
@@ -422,7 +453,7 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
               fill
             >
               Create policy
-            </EuiButton>
+            </WzButtonPermissions>
           </EuiForm>
         </EuiFlyoutBody>
       </WzFlyout>

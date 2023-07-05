@@ -402,6 +402,26 @@
           "effect": "deny"
         },
         "roles": [100]
+      },
+      {
+        "id": 101,
+        "name": "custom_manager_deny_read",
+        "policy": {
+          "actions": ["manager:read", "cluster:read"],
+          "resources": ["*:*:*", "node:id:*"],
+          "effect": "deny"
+        },
+        "roles": [100]
+      },
+      {
+        "id": 102,
+        "name": "custom_manager_deny_read2",
+        "policy": {
+          "actions": ["manager:read", "cluster:read"],
+          "resources": ["*:*:*", "node:id:*"],
+          "effect": "deny"
+        },
+        "roles": [100]
       }
     ],
     "total_affected_items": 36,
