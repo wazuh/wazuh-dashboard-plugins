@@ -144,8 +144,7 @@ export const getOptionalParameterStepStatus = (
   }
 };
 
-
-export const getPasswordStepStatus  = (
+export const getPasswordStepStatus = (
   formFields: UseFormReturn['fields'],
 ): tFormStepsStatus => {
   if (
@@ -155,7 +154,27 @@ export const getPasswordStepStatus  = (
     formFields.serverAddress.error
   ) {
     return 'disabled';
-  }else{
+  } else {
     return 'complete';
   }
-}
+};
+
+
+type tFormFieldLabel = 'Operating System' | 'Server Address';
+
+export const getIncompleteStep = (formFields: UseFormReturn['fields']): tFormFieldLabel | null => {
+  if (
+    !formFields.operatingSystemSelection.value ||
+    formFields.operatingSystemSelection.error
+  ) {
+    return 'Operating System';
+  }
+
+  if (
+    !formFields.serverAddress.value ||
+    formFields.serverAddress.error
+  ) {
+    return 'Server Address';
+  }
+  return null;
+};
