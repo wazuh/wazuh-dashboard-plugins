@@ -14,6 +14,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added a title to the agent name input of the deploy a new agent section. [#5429](https://github.com/wazuh/wazuh-kibana-app/pull/5429)
 - Added callout below the agent name entry of the deploy a new agent section. [#5429](https://github.com/wazuh/wazuh-kibana-app/pull/5429)
 - Added new CLI to generate API data from specification file [#5519](https://github.com/wazuh/wazuh-kibana-app/pull/5519)
+- Added specific RBAC permissions to Security section [#5551](https://github.com/wazuh/wazuh-kibana-app/pull/5551)
 
 ### Changed
 
