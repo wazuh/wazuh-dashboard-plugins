@@ -74,6 +74,8 @@ export const Steps = ({
   const [registerAgentFormValues, setRegisterAgentFormValues] =
     useState<IParseRegisterFormValues>(initialParsedFormValues);
 
+  const FORM_MESSAGE_CONJUNTION = ' and ';
+
   useEffect(() => {
     // get form values and parse them divided in OS and optional params
     const registerAgentFormValuesParsed = parseRegisterAgentFormValues(
@@ -194,7 +196,7 @@ export const Steps = ({
           {missingStepsName?.length ? (
             <EuiCallOut
               color='warning'
-              title={`Please select the ${missingStepsName?.join(', ')}.`}
+              title={`Please select the ${missingStepsName?.join(FORM_MESSAGE_CONJUNTION)}.`}
               iconType='iInCircle'
             />
           ) : null}
@@ -202,7 +204,7 @@ export const Steps = ({
             <EuiCallOut
               color='danger'
               title={`There are fields with errors. Please verify them: ${invalidFieldsName?.join(
-                ', ',
+                FORM_MESSAGE_CONJUNTION,
               )}.`}
               iconType='iInCircle'
               style={{ marginTop: '1rem' }}
@@ -228,7 +230,7 @@ export const Steps = ({
           {missingStepsName?.length ? (
             <EuiCallOut
               color='warning'
-              title={`Please select the ${missingStepsName?.join(', ')}.`}
+              title={`Please select the ${missingStepsName?.join(FORM_MESSAGE_CONJUNTION)}.`}
               iconType='iInCircle'
             />
           ) : null}
@@ -236,7 +238,7 @@ export const Steps = ({
             <EuiCallOut
               color='danger'
               title={`There are fields with errors. Please verify them: ${invalidFieldsName?.join(
-                ', ',
+                FORM_MESSAGE_CONJUNTION,
               )}.`}
               iconType='iInCircle'
               style={{ marginTop: '1rem' }}

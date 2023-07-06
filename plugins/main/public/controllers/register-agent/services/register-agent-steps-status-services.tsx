@@ -165,8 +165,8 @@ export const getPasswordStepStatus = (
 };
 
 export enum tFormStepsLabel {
-  operatingSystemSelection = 'Operating System',
-  serverAddress = 'Server Address',
+  operatingSystemSelection = 'operating system',
+  serverAddress = 'server address',
 }
 
 export const getIncompleteSteps = (
@@ -184,9 +184,9 @@ export const getIncompleteSteps = (
 };
 
 export enum tFormFieldsLabel {
-  agentName = 'Agent Name',
-  agentGroups = 'Agent Groups',
-  serverAddress = 'Server Address',
+  agentName = 'agent name',
+  agentGroups = 'agent groups',
+  serverAddress = 'server address',
 }
 
 export const getInvalidFields = (
