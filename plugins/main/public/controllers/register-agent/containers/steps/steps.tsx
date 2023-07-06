@@ -208,13 +208,15 @@ export const Steps = ({
               style={{ marginTop: '1rem' }}
             />
           ) : null}
-          <CommandOutput
-            commandText={installCommand}
-            showCommand={showCommandsSections(form.fields)}
-            os={registerAgentFormValues.operatingSystem.name}
-            onCopy={() => setInstallCommandWasCopied(true)}
-            password={registerAgentFormValues.optionalParams.wazuhPassword}
-          />
+          {!missingStepsName?.length && !invalidFieldsName?.length ? (
+            <CommandOutput
+              commandText={installCommand}
+              showCommand={showCommandsSections(form.fields)}
+              os={registerAgentFormValues.operatingSystem.name}
+              onCopy={() => setInstallCommandWasCopied(true)}
+              password={registerAgentFormValues.optionalParams.wazuhPassword}
+            />
+          ) : null}
         </>
       ),
       status: installCommandStepStatus,
@@ -240,12 +242,14 @@ export const Steps = ({
               style={{ marginTop: '1rem' }}
             />
           ) : null}
-          <CommandOutput
-            commandText={startCommand}
-            showCommand={showCommandsSections(form.fields)}
-            os={registerAgentFormValues.operatingSystem.name}
-            onCopy={() => setStartCommandWasCopied(true)}
-          />
+          {!missingStepsName?.length && !invalidFieldsName?.length ? (
+            <CommandOutput
+              commandText={startCommand}
+              showCommand={showCommandsSections(form.fields)}
+              os={registerAgentFormValues.operatingSystem.name}
+              onCopy={() => setStartCommandWasCopied(true)}
+            />
+          ) : null}
         </>
       ),
       status: startCommandStepStatus,
