@@ -1,9 +1,11 @@
-.stepTitle {
-  font-style: normal;
-  font-weight: 700;
-  font-size: 16px;
-  letter-spacing: 0.6px;
-  flex-direction: row;
+.register-agent-wizard-container {
+  .euiStep__title {
+    font-style: normal;
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: 0.6px;
+    flex-direction: row;
+  }
 }
 
 .stepSubtitleServerAddress {

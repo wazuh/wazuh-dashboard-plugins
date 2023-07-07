@@ -17,8 +17,7 @@ import {
 } from '../../core/config/os-commands-definitions';
 import { UseFormReturn } from '../../../../components/common/form/types';
 import CommandOutput from '../../components/command-output/command-output';
-import ServerAddressTitle from '../../components/server-address/server-address-title';
-import ServerAddressInput from '../../components/server-address/server-address-input';
+import ServerAddress from '../../components/server-address/server-address';
 import OptionalsInputs from '../../components/optionals-inputs/optionals-inputs';
 import {
   getAgentCommandsStepStatus,
@@ -134,23 +133,19 @@ export const Steps = ({
 
   const registerAgentFormSteps = [
     {
-      title: (
-        <span className='stepTitle'>
-          Select the package to download and install on your system:
-        </span>
-      ),
+      title: 'Select the package to download and install on your system:',
       children: osCard,
       status: getOSSelectorStepStatus(form.fields),
     },
     {
-      title: <ServerAddressTitle />,
-      children: <ServerAddressInput formField={form.fields.serverAddress} />,
+      title: 'Server address',
+      children: <ServerAddress formField={form.fields.serverAddress} />,
       status: getServerAddressStepStatus(form.fields),
     },
     ...(needsPassword && !wazuhPassword
       ? [
           {
-            title: <span className='stepTitle'>Wazuh password</span>,
+            title: 'Wazuh password',
             children: (
               <EuiCallOut
                 color='warning'
@@ -178,7 +173,7 @@ export const Steps = ({
         ]
       : []),
     {
-      title: <span className='stepTitle'>Optional settings</span>,
+      title: 'Optional settings',
       children: <OptionalsInputs formFields={form.fields} />,
       status: getOptionalParameterStepStatus(
         form.fields,
@@ -186,17 +181,16 @@ export const Steps = ({
       ),
     },
     {
-      title: (
-        <span className='stepTitle'>
-          Run the following commands to download and install the Wazuh agent:
-        </span>
-      ),
+      title:
+        'Run the following commands to download and install the Wazuh agent:',
       children: (
         <>
           {missingStepsName?.length ? (
             <EuiCallOut
               color='warning'
-              title={`Please select the ${missingStepsName?.join(FORM_MESSAGE_CONJUNTION)}.`}
+              title={`Please select the ${missingStepsName?.join(
+                FORM_MESSAGE_CONJUNTION,
+              )}.`}
               iconType='iInCircle'
             />
           ) : null}
@@ -224,13 +218,15 @@ export const Steps = ({
       status: installCommandStepStatus,
     },
     {
-      title: <span className='stepTitle'>Start the Wazuh agent:</span>,
+      title: 'Start the Wazuh agent:',
       children: (
         <>
           {missingStepsName?.length ? (
             <EuiCallOut
               color='warning'
-              title={`Please select the ${missingStepsName?.join(FORM_MESSAGE_CONJUNTION)}.`}
+              title={`Please select the ${missingStepsName?.join(
+                FORM_MESSAGE_CONJUNTION,
+              )}.`}
               iconType='iInCircle'
             />
           ) : null}
