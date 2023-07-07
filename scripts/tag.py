@@ -30,7 +30,7 @@ LOG_FILE = 'output.log'
 TAGS_FILE = 'tags.log'
 # Global variable. Will be set later
 branch = None
-minor = ".".join(version.split('.')[:2])
+minor = version
 
 # Supported versions of Kibana
 kbn_versions = [
