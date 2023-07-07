@@ -8,7 +8,7 @@ import {
   EuiBasicTableColumn,
   SortDirection,
 } from '@elastic/eui';
-import { WzButtonModalConfirm } from '../../../common/buttons';
+import { WzButtonPermissionsModalConfirm } from '../../../common/buttons';
 import UsersServices from '../services';
 import { ErrorHandler } from '../../../../react-services/error-handler';
 import { WzAPIUtils } from '../../../../react-services/wz-api-utils';
@@ -16,7 +16,13 @@ import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
 
-export const UsersTable = ({ users, editUserFlyover, rolesLoading, roles, onSave }) => {
+export const UsersTable = ({
+  users,
+  editUserFlyover,
+  rolesLoading,
+  roles,
+  onSave,
+}) => {
   const getRowProps = item => {
     const { id } = item;
     return {
@@ -25,7 +31,7 @@ export const UsersTable = ({ users, editUserFlyover, rolesLoading, roles, onSave
     };
   };
 
-  const onConfirmDeleteUser = (item) => {
+  const onConfirmDeleteUser = item => {
     return async () => {
       try {
         await UsersServices.DeleteUsers([item.id]);
@@ -67,18 +73,18 @@ export const UsersTable = ({ users, editUserFlyover, rolesLoading, roles, onSave
       dataType: 'boolean',
       render: userRoles => {
         if (rolesLoading) {
-          return <EuiLoadingSpinner size="m" />;
+          return <EuiLoadingSpinner size='m' />;
         }
         if (!userRoles || !userRoles.length) return <></>;
         const tmpRoles = userRoles.map((userRole, idx) => {
           return (
             <EuiFlexItem grow={false} key={idx}>
-              <EuiBadge color="secondary">{roles[userRole]}</EuiBadge>
+              <EuiBadge color='secondary'>{roles[userRole]}</EuiBadge>
             </EuiFlexItem>
           );
         });
         return (
-          <EuiFlexGroup wrap responsive={false} gutterSize="xs">
+          <EuiFlexGroup wrap responsive={false} gutterSize='xs'>
             {tmpRoles}
           </EuiFlexGroup>
         );
@@ -91,21 +97,26 @@ export const UsersTable = ({ users, editUserFlyover, rolesLoading, roles, onSave
       name: 'Actions',
       render: item => (
         <div onClick={ev => ev.stopPropagation()}>
-          <WzButtonModalConfirm
-            buttonType="icon"
+          <WzButtonPermissionsModalConfirm
+            buttonType='icon'
+            permissions={[
+              { action: 'security:delete', resource: `user:id:${item.id}` },
+            ]}
             tooltip={{
-              content: WzAPIUtils.isReservedID(item.id) ? "Reserved users can't be deleted" : 'Delete user',
+              content: WzAPIUtils.isReservedID(item.id)
+                ? "Reserved users can't be deleted"
+                : 'Delete user',
               position: 'left',
             }}
             isDisabled={WzAPIUtils.isReservedID(item.id)}
             modalTitle={`Do you want to delete ${item.username} user?`}
             onConfirm={onConfirmDeleteUser(item)}
             modalProps={{ buttonColor: 'danger' }}
-            iconType="trash"
-            color="danger"
-            aria-label="Delete user"
-            modalCancelText="Cancel"
-            modalConfirmText="Confirm"
+            iconType='trash'
+            color='danger'
+            aria-label='Delete user'
+            modalCancelText='Cancel'
+            modalConfirmText='Confirm'
           />
         </div>
       ),

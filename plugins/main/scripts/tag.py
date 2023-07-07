@@ -15,7 +15,7 @@ import subprocess
 # ======================================================= #
 
 # Wazuh version: major.minor.patch
-version = '4.6.0'
+version = '4.7.0'
 # App's revision number (previous rev + 1)
 revision = '01'
 # One of 'pre-alpha', 'alpha', 'beta', 'release-candidate', 'stable'
