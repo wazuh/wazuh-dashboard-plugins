@@ -1,5 +1,9 @@
 import { EuiStepStatus } from '@elastic/eui';
 import { UseFormReturn } from '../../../components/common/form/types';
+import {
+  FormStepsDependencies,
+  RegisterAgentFormStatusManager,
+} from './form-status-manager';
 
 const fieldsHaveErrors = (
   fieldsToCheck: string[],
@@ -17,6 +21,24 @@ const fieldsHaveErrors = (
     return formFields[key]?.error;
   });
   return haveError;
+};
+
+const fieldsAreEmpty = (
+  fieldsToCheck: string[],
+  formFields: UseFormReturn['fields'],
+) => {
+  if (!fieldsToCheck) {
+    return true;
+  }
+  // check if the fieldsToCheck array NOT exists in formFields and get the field doesn't exists
+  if (!fieldsToCheck.every(key => formFields[key])) {
+    throw Error('fields to check are not defined in formFields');
+  }
+
+  const notEmpty = fieldsToCheck.some(key => {
+    return formFields[key]?.value?.length > 0;
+  });
+  return !notEmpty;
 };
 
 const anyFieldIsComplete = (
@@ -42,23 +64,6 @@ const anyFieldIsComplete = (
   return true;
 };
 
-const fieldsAreEmpty = (
-  fieldsToCheck: string[],
-  formFields: UseFormReturn['fields'],
-) => {
-  if (!fieldsToCheck) {
-    return true;
-  }
-  // check if the fieldsToCheck array NOT exists in formFields and get the field doesn't exists
-  if (!fieldsToCheck.every(key => formFields[key])) {
-    throw Error('fields to check are not defined in formFields');
-  }
-
-  const notEmpty = fieldsToCheck.some(key => {
-    return formFields[key]?.value?.length > 0;
-  });
-  return !notEmpty;
-};
 
 export const showCommandsSections = (
   formFields: UseFormReturn['fields'],
@@ -144,8 +149,7 @@ export const getOptionalParameterStepStatus = (
   }
 };
 
-
-export const getPasswordStepStatus  = (
+export const getPasswordStepStatus = (
   formFields: UseFormReturn['fields'],
 ): tFormStepsStatus => {
   if (
@@ -155,7 +159,42 @@ export const getPasswordStepStatus  = (
     formFields.serverAddress.error
   ) {
     return 'disabled';
-  }else{
+  } else {
     return 'complete';
   }
+};
+
+export enum tFormStepsLabel {
+  operatingSystemSelection = 'operating system',
+  serverAddress = 'server address',
 }
+
+export const getIncompleteSteps = (
+  formFields: UseFormReturn['fields'],
+): tFormStepsLabel[] => {
+  const steps: FormStepsDependencies = {
+    operatingSystemSelection: ['operatingSystemSelection'],
+    serverAddress: ['serverAddress'],
+  };
+  const statusManager = new RegisterAgentFormStatusManager(formFields, steps);
+  // replace fields array using label names
+  return statusManager.getIncompleteSteps().map(field => {
+    return tFormStepsLabel[field] || field;
+  });
+};
+
+export enum tFormFieldsLabel {
+  agentName = 'agent name',
+  agentGroups = 'agent groups',
+  serverAddress = 'server address',
+}
+
+export const getInvalidFields = (
+  formFields: UseFormReturn['fields'],
+): tFormFieldsLabel[] => {
+  const statusManager = new RegisterAgentFormStatusManager(formFields);
+
+  return statusManager.getInvalidFields().map(field => {
+    return tFormFieldsLabel[field] || field;
+  });
+};
