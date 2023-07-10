@@ -72,8 +72,6 @@ typings/
 target/
 build/
 
-yarn.lock
-
 cypress/node_modules/
 cypress/.idea/
 cypress/cypress.env.json
