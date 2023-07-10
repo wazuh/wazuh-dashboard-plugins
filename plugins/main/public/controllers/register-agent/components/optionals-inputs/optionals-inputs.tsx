@@ -13,6 +13,7 @@ import { InputForm } from '../../../../components/common/form';
 import { OPTIONAL_PARAMETERS_TEXT } from '../../utils/register-agent-data';
 import { webDocumentationLink } from '../../../../../common/services/web_documentation';
 import { PLUGIN_VERSION_SHORT } from '../../../../../common/constants';
+import '../group-input/group-input.scss';
 interface OptionalsInputsProps {
   formFields: UseFormReturn['fields'];
 }
@@ -56,24 +57,28 @@ const OptionalsInputs = (props: OptionalsInputsProps) => {
         fullWidth={false}
         label={
           <>
-            <EuiFlexGroup>
+            <EuiFlexGroup
+              alignItems='center'
+              direction='row'
+              responsive={false}
+              gutterSize='s'
+            >
+              <EuiFlexItem grow={false}>
+                <p className='registerAgentLabels'>Assign an agent name</p>
+              </EuiFlexItem>
               <EuiFlexItem grow={false}>
                 <EuiPopover
                   button={
                     <EuiButtonEmpty
                       iconType='questionInCircle'
-                      iconSide='right'
+                      iconSide='left'
                       onClick={onButtonAgentName}
                       style={{
                         flexDirection: 'row',
                         fontStyle: 'normal',
                         fontWeight: 700,
-                        fontSize: '12px',
-                        lineHeight: '20px',
                       }}
-                    >
-                      Assign an agent name
-                    </EuiButtonEmpty>
+                    ></EuiButtonEmpty>
                   }
                   isOpen={isPopoverAgentName}
                   closePopover={closeAgentName}

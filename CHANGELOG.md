@@ -18,7 +18,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added development so that the images of the new agent deployment page also have dark mode. [#5620](https://github.com/wazuh/wazuh-kibana-app/pull/5620)
 - Added register agent form status callout message [#5634](https://github.com/wazuh/wazuh-kibana-app/pull/5634)
 
-
 ### Changed
 
 - Changed of regular expression in RBAC. [#5201](https://github.com/wazuh/wazuh-kibana-app/pull/5201)

@@ -14,7 +14,7 @@ export interface InputFormProps {
   value: any;
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   error?: string;
-  label?: string;
+  label?: string | React.ReactNode;
   header?:
     | React.ReactNode
     | ((props: { value: any; error?: string }) => React.ReactNode);
