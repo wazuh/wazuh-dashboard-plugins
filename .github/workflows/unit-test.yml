@@ -24,11 +24,6 @@ on:
         options:
         - 'yarn test:jest'
   pull_request:
-    branches:
-      - 'master'
-      - '*.*-*.*'
-      - '*.*-*.*-wzd'
-      - '[0-9].[0-9]+'
 
 jobs:
   # Run unit tests with Jest
