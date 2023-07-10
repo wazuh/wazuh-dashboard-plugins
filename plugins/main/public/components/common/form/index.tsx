@@ -14,19 +14,19 @@ export interface InputFormProps {
   value: any;
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   error?: string;
-  label?: string | React.ReactNode
+  label?: string | React.ReactNode;
   header?:
-  | React.ReactNode
-  | ((props: { value: any; error?: string }) => React.ReactNode);
+    | React.ReactNode
+    | ((props: { value: any; error?: string }) => React.ReactNode);
   footer?:
-  | React.ReactNode
-  | ((props: { value: any; error?: string }) => React.ReactNode);
+    | React.ReactNode
+    | ((props: { value: any; error?: string }) => React.ReactNode);
   preInput?:
-  | React.ReactNode
-  | ((props: { value: any; error?: string }) => React.ReactNode);
+    | React.ReactNode
+    | ((props: { value: any; error?: string }) => React.ReactNode);
   postInput?:
-  | React.ReactNode
-  | ((props: { value: any; error?: string }) => React.ReactNode);
+    | React.ReactNode
+    | ((props: { value: any; error?: string }) => React.ReactNode);
 }
 
 interface InputFormComponentProps extends InputFormProps {
