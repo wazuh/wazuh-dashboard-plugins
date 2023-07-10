@@ -1,7 +1,7 @@
 const windowsColumns = [
   { id: 'local.port', sortable: false },
-  { id: 'process' },
   { id: 'local.ip', sortable: false },
+  { id: 'process' },
   { id: 'state' },
   { id: 'protocol' },
 ];
@@ -14,9 +14,9 @@ const defaultColumns = [
 
 const linuxColumns = [
   { id: 'local.port', sortable: false },
+  { id: 'local.ip', sortable: false },
   { id: 'process' },
   { id: 'pid' },
-  { id: 'local.ip', sortable: false },
   { id: 'state' },
   { id: 'protocol' },
 ];
