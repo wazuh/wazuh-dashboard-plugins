@@ -12,6 +12,7 @@ import { EnhancedFieldConfiguration } from '../../../../components/common/form/t
 import { InputForm } from '../../../../components/common/form';
 import { webDocumentationLink } from '../../../../../common/services/web_documentation';
 import { PLUGIN_VERSION_SHORT } from '../../../../../common/constants';
+import '../group-input/group-input.scss';
 
 interface ServerAddressInputProps {
   formField: EnhancedFieldConfiguration;
@@ -57,24 +58,30 @@ const ServerAddressInput = (props: ServerAddressInputProps) => {
         {...formField}
         label={
           <>
-            <EuiFlexGroup>
+            <EuiFlexGroup
+              alignItems='center'
+              direction='row'
+              responsive={false}
+              gutterSize='s'
+            >
+              <EuiFlexItem grow={false}>
+                <span className='registerAgentLabels'>
+                  Assign a server address
+                </span>
+              </EuiFlexItem>
               <EuiFlexItem grow={false}>
                 <EuiPopover
                   button={
                     <EuiButtonEmpty
                       iconType='questionInCircle'
-                      iconSide='right'
+                      iconSide='left'
                       onClick={onButtonServerAddress}
                       style={{
                         flexDirection: 'row',
                         fontStyle: 'normal',
                         fontWeight: 700,
-                        fontSize: '12px',
-                        lineHeight: '20px',
                       }}
-                    >
-                      Assign a server address
-                    </EuiButtonEmpty>
+                    ></EuiButtonEmpty>
                   }
                   isOpen={isPopoverServerAddress}
                   closePopover={closeServerAddress}

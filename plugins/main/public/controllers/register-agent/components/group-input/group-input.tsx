@@ -10,6 +10,7 @@ import {
 } from '@elastic/eui';
 import { webDocumentationLink } from '../../../../../common/services/web_documentation';
 import { PLUGIN_VERSION_SHORT } from '../../../../../common/constants';
+import './group-input.scss';
 
 const popoverAgentGroup = (
   <span>
@@ -35,25 +36,31 @@ const GroupInput = ({ value, options, onChange }) => {
   const closeAgentGroup = () => setIsPopoverAgentGroup(false);
   return (
     <>
-      <EuiFlexGroup>
+      <EuiFlexGroup
+        style={{ marginTop: '32px' }}
+        alignItems='center'
+        direction='row'
+        responsive={false}
+        gutterSize='s'
+      >
+        <EuiFlexItem grow={false}>
+          <p className='registerAgentLabels'>
+            Select one or more existing groups
+          </p>
+        </EuiFlexItem>
         <EuiFlexItem grow={false}>
           <EuiPopover
             button={
               <EuiButtonEmpty
                 iconType='questionInCircle'
-                iconSide='right'
+                iconSide='left'
                 onClick={onButtonAgentGroup}
                 style={{
-                  marginTop: '32px',
                   flexDirection: 'row',
                   fontStyle: 'normal',
                   fontWeight: 700,
-                  fontSize: '12px',
-                  lineHeight: '20px',
                 }}
-              >
-                Select one or more existing groups
-              </EuiButtonEmpty>
+              ></EuiButtonEmpty>
             }
             isOpen={isPopoverAgentGroup}
             closePopover={closeAgentGroup}

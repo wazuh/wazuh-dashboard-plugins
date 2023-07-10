@@ -29,7 +29,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed the query to search for an agent in `management/configuration`. [#5485](https://github.com/wazuh/wazuh-kibana-app/pull/5485)
 - Changed the search bar in management/log to the one used in the rest of the app. [#5476](https://github.com/wazuh/wazuh-kibana-app/pull/5476)
 - Changed the deploy a new agent page from step one to step three. [#5554](https://github.com/wazuh/wazuh-kibana-app/pull/5554) [#5462](https://github.com/wazuh/wazuh-kibana-app/pull/5462)
-- Changed the design of step 2 that caused warnings in console. [5649](https://github.com/wazuh/wazuh-kibana-app/pull/5649)
 
 ### Fixed
 
