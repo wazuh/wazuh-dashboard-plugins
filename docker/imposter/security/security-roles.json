@@ -52,6 +52,20 @@
         "policies": [29, 30],
         "users": [],
         "rules": []
+      },
+      {
+        "id": 101,
+        "name": "custom_role",
+        "policies": [29, 30],
+        "users": [],
+        "rules": []
+      },
+      {
+        "id": 102,
+        "name": "custom_role2",
+        "policies": [29, 30],
+        "users": [],
+        "rules": []
       }
     ],
     "total_affected_items": 8,

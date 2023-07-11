@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import {
   EuiButton,
   EuiTitle,
-  EuiFlyout,
   EuiFlyoutHeader,
   EuiFlyoutBody,
   EuiForm,
@@ -17,7 +16,6 @@ import {
   EuiFieldText,
   EuiConfirmModal,
   EuiOverlayMask,
-  EuiOutsideClickDetector,
 } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
 import { ErrorHandler } from '../../../react-services/error-handler';
@@ -27,6 +25,7 @@ import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import _ from 'lodash';
 import { WzFlyout } from '../../common/flyouts';
+import { WzButtonPermissions } from '../../common/permissions/button';
 
 export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
   const isReserved = WzAPIUtils.isReservedID(policy.id);
@@ -59,21 +58,27 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
 
   const updatePolicy = async () => {
     try {
-      const actions = addedActions.map((item) => item.action);
-      const resources = addedResources.map((item) => item.resource);
-      const response = await WzRequest.apiReq('PUT', `/security/policies/${policy.id}`, {
-        policy: {
-          actions: actions,
-          resources: resources,
-          effect: effectValue,
+      const actions = addedActions.map(item => item.action);
+      const resources = addedResources.map(item => item.resource);
+      const response = await WzRequest.apiReq(
+        'PUT',
+        `/security/policies/${policy.id}`,
+        {
+          policy: {
+            actions: actions,
+            resources: resources,
+            effect: effectValue,
+          },
         },
-      });
+      );
 
       const data = (response.data || {}).data;
       if (data.failed_items && data.failed_items.length) {
         return;
       }
-      ErrorHandler.info('Role was successfully updated with the selected policies');
+      ErrorHandler.info(
+        'Role was successfully updated with the selected policies',
+      );
       closeFlyout();
     } catch (error) {
       const options = {
@@ -92,8 +97,16 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
   };
 
   async function getData() {
-    const resources_request = await WzRequest.apiReq('GET', '/security/resources', {});
-    const actions_request = await WzRequest.apiReq('GET', '/security/actions', {});
+    const resources_request = await WzRequest.apiReq(
+      'GET',
+      '/security/resources',
+      {},
+    );
+    const actions_request = await WzRequest.apiReq(
+      'GET',
+      '/security/actions',
+      {},
+    );
     const resources_data = ((resources_request || {}).data || {}).data || {};
     setAvailableResources(resources_data);
 
@@ -107,8 +120,10 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
         dropdownDisplay: (
           <>
             <strong>{x}</strong>
-            <EuiText size="s" color="subdued">
-              <p className="euiTextColor--subdued">{actions_data[x].description}</p>
+            <EuiText size='s' color='subdued'>
+              <p className='euiTextColor--subdued'>
+                {actions_data[x].description}
+              </p>
             </EuiText>
           </>
         ),
@@ -119,7 +134,7 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
 
   const loadResources = () => {
     let allResources = [];
-    addedActions.forEach((x) => {
+    addedActions.forEach(x => {
       const res = (availableActions[x.action] || {})['resources'];
       allResources = allResources.concat(res);
     });
@@ -132,8 +147,10 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
         dropdownDisplay: (
           <>
             <strong>{x}</strong>
-            <EuiText size="s" color="subdued">
-              <p className="euiTextColor--subdued">{(availableResources[x] || {}).description}</p>
+            <EuiText size='s' color='subdued'>
+              <p className='euiTextColor--subdued'>
+                {(availableResources[x] || {}).description}
+              </p>
             </EuiText>
           </>
         ),
@@ -144,14 +161,14 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
 
   const initData = () => {
     const policies = ((policy || {}).policy || {}).actions || [];
-    const initPolicies = policies.map((item) => {
+    const initPolicies = policies.map(item => {
       return { action: item };
     });
     setAddedActions(initPolicies);
     setInitialAddedActions(initPolicies);
 
     const resources = ((policy || {}).policy || {}).resources || [];
-    const initResources = resources.map((item) => {
+    const initResources = resources.map(item => {
       return { resource: item };
     });
     setAddedResources(initResources);
@@ -161,7 +178,7 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
     setInitialEffectValue(policy.policy.effect);
   };
 
-  const onEffectValueChange = (value) => {
+  const onEffectValueChange = value => {
     setEffectValue(value);
   };
 
@@ -176,19 +193,22 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
     },
   ];
 
-  const onChangeActionValue = async (value) => {
+  const onChangeActionValue = async value => {
     setActionValue(value);
   };
 
   const addAction = () => {
-    if (!addedActions.filter((x) => x.action === actionValue).length) {
-      setAddedActions((addedActions) => [...addedActions, { action: actionValue }]);
+    if (!addedActions.filter(x => x.action === actionValue).length) {
+      setAddedActions(addedActions => [
+        ...addedActions,
+        { action: actionValue },
+      ]);
     }
     setActionValue('');
   };
 
-  const removeAction = (action) => {
-    setAddedActions(addedActions.filter((x) => x !== action));
+  const removeAction = action => {
+    setAddedActions(addedActions.filter(x => x !== action));
   };
 
   const actions_columns = [
@@ -208,7 +228,7 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
           enabled: () => !isReserved,
           color: 'danger',
           icon: 'trash',
-          onClick: (action) => removeAction(action),
+          onClick: action => removeAction(action),
         },
       ],
     },
@@ -231,13 +251,13 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
           color: 'danger',
           enabled: () => !isReserved,
           icon: 'trash',
-          onClick: (resource) => removeResource(resource),
+          onClick: resource => removeResource(resource),
         },
       ],
     },
   ];
 
-  const onChangeResourceValue = async (value) => {
+  const onChangeResourceValue = async value => {
     setResourceValue(value);
     setResourceIdentifierValue('');
   };
@@ -247,20 +267,21 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
     return (keys[resourceValue] || ':').split(':')[1];
   };
 
-  const onChangeResourceIdentifierValue = async (e) => {
+  const onChangeResourceIdentifierValue = async e => {
     setResourceIdentifierValue(e.target.value);
   };
 
-  const removeResource = (resource) => {
-    setAddedResources(addedResources.filter((x) => x !== resource));
+  const removeResource = resource => {
+    setAddedResources(addedResources.filter(x => x !== resource));
   };
 
   const addResource = () => {
     if (
-      !addedResources.filter((x) => x.resource === `${resourceValue}:${resourceIdentifierValue}`)
-        .length
+      !addedResources.filter(
+        x => x.resource === `${resourceValue}:${resourceIdentifierValue}`,
+      ).length
     ) {
-      setAddedResources((addedResources) => [
+      setAddedResources(addedResources => [
         ...addedResources,
         { resource: `${resourceValue}:${resourceIdentifierValue}` },
       ]);
@@ -273,14 +294,14 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
     modal = (
       <EuiOverlayMask>
         <EuiConfirmModal
-          title="Unsubmitted changes"
+          title='Unsubmitted changes'
           onConfirm={() => {
             setIsModalVisible(false);
             closeFlyout(false);
           }}
           onCancel={() => setIsModalVisible(false)}
           cancelButtonText="No, don't do it"
-          confirmButtonText="Yes, do it"
+          confirmButtonText='Yes, do it'
         >
           <p style={{ textAlign: 'center' }}>
             There are unsaved changes. Are you sure you want to proceed?
@@ -311,38 +332,41 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
     <>
       <WzFlyout flyoutProps={{ className: 'wzApp' }} onClose={onClose}>
         <EuiFlyoutHeader hasBorder={false}>
-          <EuiTitle size="m">
+          <EuiTitle size='m'>
             <h2>
               Edit policy {policy.name}&nbsp;&nbsp;
-              {isReserved && <EuiBadge color="primary">Reserved</EuiBadge>}
+              {isReserved && <EuiBadge color='primary'>Reserved</EuiBadge>}
             </h2>
           </EuiTitle>
         </EuiFlyoutHeader>
         <EuiFlyoutBody>
-          <EuiForm component="form" style={{ padding: 24 }}>
-            <EuiFormRow label="Policy name" helpText="Introduce a name for this new policy.">
+          <EuiForm component='form' style={{ padding: 24 }}>
+            <EuiFormRow
+              label='Policy name'
+              helpText='Introduce a name for this new policy.'
+            >
               <EuiFieldText
-                placeholder=""
+                placeholder=''
                 disabled={isReserved}
                 value={policy.name}
                 readOnly={true}
                 onChange={() => {}}
-                aria-label=""
+                aria-label=''
               />
             </EuiFormRow>
             <EuiSpacer></EuiSpacer>
             <EuiFlexGroup>
               <EuiFlexItem>
                 <EuiFormRow
-                  label="Action"
-                  helpText="Set an action where the policy will be carried out."
+                  label='Action'
+                  helpText='Set an action where the policy will be carried out.'
                 >
                   <EuiSuperSelect
                     options={actions}
                     disabled={isReserved}
                     valueOfSelected={actionValue}
-                    onChange={(value) => onChangeActionValue(value)}
-                    itemLayoutAlign="top"
+                    onChange={value => onChangeActionValue(value)}
+                    itemLayoutAlign='top'
                     hasDividers
                   />
                 </EuiFormRow>
@@ -352,7 +376,7 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
                 <EuiFormRow hasEmptyLabelSpace>
                   <EuiButton
                     onClick={() => addAction()}
-                    iconType="plusInCircle"
+                    iconType='plusInCircle'
                     disabled={!actionValue || isReserved}
                   >
                     Add
@@ -362,10 +386,13 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
             </EuiFlexGroup>
             {!!addedActions.length && (
               <>
-                <EuiSpacer size="s"></EuiSpacer>
+                <EuiSpacer size='s'></EuiSpacer>
                 <EuiFlexGroup>
                   <EuiFlexItem>
-                    <EuiInMemoryTable items={addedActions} columns={actions_columns} />
+                    <EuiInMemoryTable
+                      items={addedActions}
+                      columns={actions_columns}
+                    />
                   </EuiFlexItem>
                 </EuiFlexGroup>
               </>
@@ -374,14 +401,14 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
             <EuiFlexGroup>
               <EuiFlexItem>
                 <EuiFormRow
-                  label="Resource"
-                  helpText="Select the resource to which this policy is directed."
+                  label='Resource'
+                  helpText='Select the resource to which this policy is directed.'
                 >
                   <EuiSuperSelect
                     options={resources}
                     valueOfSelected={resourceValue}
-                    onChange={(value) => onChangeResourceValue(value)}
-                    itemLayoutAlign="top"
+                    onChange={value => onChangeResourceValue(value)}
+                    itemLayoutAlign='top'
                     hasDividers
                     disabled={!addedActions.length || isReserved}
                   />
@@ -389,13 +416,13 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
               </EuiFlexItem>
               <EuiFlexItem>
                 <EuiFormRow
-                  label="Resource identifier"
-                  helpText="Introduce the resource identifier. Type * for all."
+                  label='Resource identifier'
+                  helpText='Introduce the resource identifier. Type * for all.'
                 >
                   <EuiFieldText
                     placeholder={getIdentifier()}
                     value={resourceIdentifierValue}
-                    onChange={(e) => onChangeResourceIdentifierValue(e)}
+                    onChange={e => onChangeResourceIdentifierValue(e)}
                     disabled={!resourceValue || isReserved}
                   />
                 </EuiFormRow>
@@ -404,7 +431,7 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
                 <EuiFormRow hasEmptyLabelSpace>
                   <EuiButton
                     onClick={() => addResource()}
-                    iconType="plusInCircle"
+                    iconType='plusInCircle'
                     disabled={!resourceIdentifierValue || isReserved}
                   >
                     Add
@@ -414,26 +441,40 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
             </EuiFlexGroup>
             {!!addedResources.length && (
               <>
-                <EuiSpacer size="s"></EuiSpacer>
+                <EuiSpacer size='s'></EuiSpacer>
                 <EuiFlexGroup>
                   <EuiFlexItem>
-                    <EuiInMemoryTable items={addedResources} columns={resources_columns} />
+                    <EuiInMemoryTable
+                      items={addedResources}
+                      columns={resources_columns}
+                    />
                   </EuiFlexItem>
                 </EuiFlexGroup>
               </>
             )}
             <EuiSpacer></EuiSpacer>
-            <EuiFormRow label="Select an effect" helpText="Select an effect.">
+            <EuiFormRow label='Select an effect' helpText='Select an effect.'>
               <EuiSuperSelect
                 options={effectOptions}
                 valueOfSelected={effectValue}
-                onChange={(value) => onEffectValueChange(value)}
+                onChange={value => onEffectValueChange(value)}
               />
             </EuiFormRow>
             <EuiSpacer />
-            <EuiButton disabled={isReserved} onClick={updatePolicy} fill>
+            <WzButtonPermissions
+              buttonType='default'
+              permissions={[
+                {
+                  action: 'security:update',
+                  resource: `policy:id:${policy.id}`,
+                },
+              ]}
+              disabled={isReserved}
+              onClick={updatePolicy}
+              fill
+            >
               Apply
-            </EuiButton>
+            </WzButtonPermissions>
           </EuiForm>
         </EuiFlyoutBody>
       </WzFlyout>
