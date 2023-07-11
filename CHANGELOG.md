@@ -10,13 +10,9 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added `ignore` and `restrict` options to Syslog configuration. [#5203](https://github.com/wazuh/wazuh-kibana-app/pull/5203)
 - Added the `extensions.github` and `extensions.office` settings to the default configuration file [#5376](https://github.com/wazuh/wazuh-kibana-app/pull/5376)
 - Added new global error treatment (client-side) [#4163](https://github.com/wazuh/wazuh-kibana-app/pull/4163)
-- Added a description to step 3 of the deploy a new agent section. [#5419](https://github.com/wazuh/wazuh-kibana-app/pull/5419)
-- Added a title to the agent name input of the deploy a new agent section. [#5429](https://github.com/wazuh/wazuh-kibana-app/pull/5429)
-- Added callout below the agent name entry of the deploy a new agent section. [#5429](https://github.com/wazuh/wazuh-kibana-app/pull/5429)
+
 - Added new CLI to generate API data from specification file [#5519](https://github.com/wazuh/wazuh-kibana-app/pull/5519)
 - Added specific RBAC permissions to Security section [#5551](https://github.com/wazuh/wazuh-kibana-app/pull/5551)
-- Added development so that the images of the new agent deployment page also have dark mode. [#5620](https://github.com/wazuh/wazuh-kibana-app/pull/5620)
-- Added register agent form status callout message [#5634](https://github.com/wazuh/wazuh-kibana-app/pull/5634)
 
 ### Changed
 
@@ -28,7 +24,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed the placeholder of the agent name input of the deploy a new agent section. [#5429](https://github.com/wazuh/wazuh-kibana-app/pull/5429)
 - Changed the query to search for an agent in `management/configuration`. [#5485](https://github.com/wazuh/wazuh-kibana-app/pull/5485)
 - Changed the search bar in management/log to the one used in the rest of the app. [#5476](https://github.com/wazuh/wazuh-kibana-app/pull/5476)
-- Changed the deploy a new agent page from step one to step three. [#5554](https://github.com/wazuh/wazuh-kibana-app/pull/5554) [#5462](https://github.com/wazuh/wazuh-kibana-app/pull/5462)
+- Changed the design of the wizard to add agents. [#5457](https://github.com/wazuh/wazuh-kibana-app/pull/5457)
 
 ### Fixed
 
@@ -56,7 +52,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed pretty parameter from cron job requests. [#5532](https://github.com/wazuh/wazuh-kibana-app/pull/5532)
 - Removed unnecessary requests in `Management/Status` section. [#5528](https://github.com/wazuh/wazuh-kibana-app/pull/5528)
 - Removed obsolete code that caused duplicate requests to the api in `Management`. [#5485](https://github.com/wazuh/wazuh-kibana-app/pull/5485)
-- Removed the custom colors that did not allow to activate the default dark mode of elastic. [#5620](https://github.com/wazuh/wazuh-kibana-app/pull/5620)
 
 ## Wazuh v4.5.0 - OpenSearch Dashboards 2.6.0 - Revision 01
 
