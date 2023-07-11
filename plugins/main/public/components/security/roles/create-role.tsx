@@ -64,13 +64,13 @@ export const CreateRole = ({ closeFlyout }) => {
       const result = await WzRequest.apiReq('POST', '/security/roles', {
         name: roleName,
       });
-      const data = (result.data || {}).data;
-      if (data.failed_items && data.failed_items.length) {
+      const data = result?.data?.data;
+      if (data?.failed_items && data?.failed_items?.length) {
         return;
       }
       let roleId = '';
-      if (data.affected_items && data.affected_items) {
-        roleId = data.affected_items[0].id;
+      if (data?.affected_items) {
+        roleId = data.affected_items?.[0]?.id;
       }
       const policiesId = selectedPolicies.map(policy => {
         return policy.id;
@@ -86,7 +86,7 @@ export const CreateRole = ({ closeFlyout }) => {
       );
 
       const policiesData = policyResult?.data?.data;
-      if (policiesData.failed_items && policiesData.failed_items.length) {
+      if (policiesData?.failed_items && policiesData?.failed_items?.length) {
         return;
       }
       ErrorHandler.info(

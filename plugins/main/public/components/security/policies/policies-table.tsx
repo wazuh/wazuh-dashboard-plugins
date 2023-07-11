@@ -43,7 +43,7 @@ export const PoliciesTable = ({
           },
         );
         const data = response?.data?.data;
-        if (data.failed_items && data.failed_items.length) {
+        if (data?.failed_items && data?.failed_items?.length) {
           return;
         }
         // Workaround for tooltip problem does not disappear

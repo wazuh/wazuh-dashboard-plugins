@@ -120,7 +120,7 @@ export const EditRole = ({ role, closeFlyout }) => {
       );
 
       const policiesData = policyResult?.data?.data;
-      if (policiesData.failed_items && policiesData.failed_items.length) {
+      if (policiesData?.failed_items && policiesData?.failed_items?.length) {
         return;
       }
       ErrorHandler.info(
