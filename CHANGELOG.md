@@ -8,6 +8,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.7.0
 
+### Changed
+
+- Changed Network ports table columns for Linux agents. [#5636](https://github.com/wazuh/wazuh-kibana-app/pull/5636)
+
 ## Wazuh v4.6.0 - OpenSearch Dashboards 2.6.0 - Revision 01
 
 ### Added
