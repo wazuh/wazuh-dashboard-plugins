@@ -93,6 +93,7 @@ This plugin for OpenSearch Dashboards allows you to visualize and analyze Wazuh 
 - Wazuh dashboard 4.5.1
 - Wazuh indexer 4.5.1
 
+
 ## Contribute
 
 If you want to contribute to our project please don't hesitate to send a pull request. You can also join our users [mailing list](https://groups.google.com/d/forum/wazuh), by sending an email to [wazuh+subscribe@googlegroups.com](mailto:wazuh+subscribe@googlegroups.com), to ask questions and participate in discussions.
