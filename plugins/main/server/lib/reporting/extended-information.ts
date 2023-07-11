@@ -24,7 +24,7 @@ import { getSettingDefaultValue } from '../../../common/services/settings';
    * @param {Array<Strings>} ids ids of agents
    * @param {String} apiId API id
    */
- export async function buildAgentsTable(context, printer: ReportPrinter, agentIDs: string[], apiId: string, groupID: string = '') {
+export async function buildAgentsTable(context, printer: ReportPrinter, agentIDs: string[], apiId: string, groupID: string = '') {
   const dateFormat = await context.core.uiSettings.client.get('dateFormat');
   if ((!agentIDs || !agentIDs.length) && !groupID) return;
   log('reporting:buildAgentsTable', `${agentIDs.length} agents for API ${apiId}`, 'info');
@@ -32,7 +32,7 @@ import { getSettingDefaultValue } from '../../../common/services/settings';
     let agentsData = [];
     if (groupID) {
       let totalAgentsInGroup = null;
-      do{
+      do {
         const { data: { data: { affected_items, total_affected_items } } } = await context.wazuh.api.client.asCurrentUser.request(
           'GET',
           `/groups/${groupID}/agents`,
@@ -46,7 +46,7 @@ import { getSettingDefaultValue } from '../../../common/services/settings';
         );
         !totalAgentsInGroup && (totalAgentsInGroup = total_affected_items);
         agentsData = [...agentsData, ...affected_items];
-      }while(agentsData.length < totalAgentsInGroup);
+      } while (agentsData.length < totalAgentsInGroup);
     } else {
       for (const agentID of agentIDs) {
         try {
@@ -72,7 +72,7 @@ import { getSettingDefaultValue } from '../../../common/services/settings';
       }
     }
 
-    if(agentsData.length){
+    if (agentsData.length) {
       // Print a table with agent/s information
       printer.addSimpleTable({
         columns: [
@@ -96,7 +96,7 @@ import { getSettingDefaultValue } from '../../../common/services/settings';
             }
           }),
       });
-    }else if(!agentsData.length && groupID){
+    } else if (!agentsData.length && groupID) {
       // For group reports when there is no agents in the group
       printer.addContent({
         text: 'There are no agents in this group.',
@@ -181,7 +181,7 @@ export async function extendedInformation(
               return count
                 ? `${count} of ${totalAgents} agents have ${vulnerabilitiesLevel.toLocaleLowerCase()} vulnerabilities.`
                 : undefined;
-            } catch (error) {}
+            } catch (error) { }
           })
         )
       ).filter((vulnerabilitiesResponse) => vulnerabilitiesResponse);

@@ -76,7 +76,7 @@ export default class SummaryTable {
         order: {
           _count: order
         },
-        size
+        size,
       }
     };
     if (missing) {
