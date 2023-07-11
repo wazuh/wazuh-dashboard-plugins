@@ -172,7 +172,7 @@ export const CreatePolicyFlyout = ({ closeFlyout }) => {
         },
       });
       const resultData = result?.data?.data;
-      if (resultData.failed_items && resultData.failed_items.length) {
+      if (resultData?.failed_items && resultData?.failed_items?.length) {
         return;
       }
       ErrorHandler.info('Policy was successfully created', '');
