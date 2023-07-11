@@ -1,6 +1,6 @@
 ---
 plugin: openapi
-specFile: https://raw.githubusercontent.com/wazuh/wazuh/4.4/api/api/spec/spec.yaml
+specFile: https://raw.githubusercontent.com/wazuh/wazuh/master/api/api/spec/spec.yaml
 system:
   stores:
     # this store is preloaded from file
@@ -50,6 +50,9 @@ resources:
   # Get active configuration
   - method: GET
     path: /agents/{agent_id}/config/{component}/{configuration}
+    response:
+      statusCode: 200
+      scriptFile: agents/agents-configuration.js
 
   # Remove agent from groups
   - method: DELETE
@@ -134,6 +137,9 @@ resources:
   # List agents distinct
   - method: GET
     path: /agents/stats/distinct
+    response:
+      statusCode: 200
+      scriptFile: agents/agent_distinct.js
 
   # Summarize agents OS
   - method: GET
@@ -164,7 +170,7 @@ resources:
     path: /cluster/nodes
     response:
       statusCode: 200
-      scriptFile: cluster/cluster_node_info.js
+      scriptFile: cluster/cluster-node-info.js
 
   # Get nodes healthcheck
   - method: GET
@@ -541,6 +547,9 @@ resources:
   # Get agents overview
   - method: GET
     path: /overview/agents
+    response:
+      statusCode: 200
+      staticFile: overview/agents.json
 
   # ===================================================== #
   #   ROOTCHECK
@@ -622,14 +631,15 @@ resources:
   # ===================================================== #
 
   # Login
-  - method: POST
+  ## Wazuh 4.3
+  - method: GET
     path: /security/user/authenticate
     response:
       statusCode: 200
       scriptFile: security/login.js
 
-  # Login (@deprecated in 4.4.0)
-  - method: GET
+  ## Wazuh >= 4.4
+  - method: POST
     path: /security/user/authenticate
     response:
       statusCode: 200
@@ -650,6 +660,9 @@ resources:
   # Get current user processed policies
   - method: GET
     path: /security/users/me/policies
+    response:
+      statusCode: 200
+      scriptFile: security/security-me-policies.js
 
   # Revoke JWT tokens
   - method: PUT
@@ -662,6 +675,9 @@ resources:
   # List RBAC actions
   - method: GET
     path: /security/actions
+    response:
+      statusCode: 200
+      staticFile: security/security-actions.json
 
   # List RBAC resources
   - method: GET
@@ -670,6 +686,9 @@ resources:
   # List users
   - method: GET
     path: /security/users
+    response:
+      statusCode: 200
+      staticFile: security/users.json
 
   # Add users
   - method: POST
@@ -688,7 +707,7 @@ resources:
     path: /security/roles
     response:
       statusCode: 200
-      staticFile: security/security_roles.json
+      staticFile: security/security-roles.json
 
   # Add role
   - method: POST
@@ -705,6 +724,9 @@ resources:
   # List security rules
   - method: GET
     path: /security/rules
+    response:
+      statusCode: 200
+      staticFile: security/security-rules.json
 
   # Add security rule
   - method: POST
@@ -723,7 +745,7 @@ resources:
     path: /security/policies
     response:
       statusCode: 200
-      staticFile: security/security_policies.json
+      staticFile: security/security-policies.json
 
   # Add policy
   - method: POST

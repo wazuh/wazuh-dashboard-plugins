@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 elastic_versions=(
+	"7.10.2"
 	"7.16.0"
 	"7.16.1"
 	"7.16.2"

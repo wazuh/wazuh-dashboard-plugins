@@ -8,6 +8,7 @@ os_versions=(
   '2.3.0'
   '2.4.0'
   '2.4.1'
+  '2.5.0'
   '2.6.0'
 )
 
@@ -19,6 +20,7 @@ osd_versions=(
   '2.3.0'
   '2.4.0'
   '2.4.1'
+  '2.5.0'
   '2.6.0'
 )
 
@@ -78,10 +80,10 @@ profile="standard"
 export WAZUH_DASHBOARD_CONF=./config/${OSD_MAJOR}/osd/opensearch_dashboards.yml
 export SEC_CONFIG_FILE=./config/${OSD_MAJOR}/os/config.yml
 if [[ "$5" =~ "saml" ]]; then
-	cat /etc/hosts | grep -q "idp" || exit_with_message "Add idp to /etc/hosts"
+  cat /etc/hosts | grep -q "idp" || exit_with_message "Add idp to /etc/hosts"
 
   profile="saml"
-	export WAZUH_DASHBOARD_CONF=./config/${OSD_MAJOR}/osd/opensearch_dashboards_saml.yml
+  export WAZUH_DASHBOARD_CONF=./config/${OSD_MAJOR}/osd/opensearch_dashboards_saml.yml
   export SEC_CONFIG_FILE=./config/${OSD_MAJOR}/os/config-saml.yml
 fi
 
@@ -92,6 +94,7 @@ fi
 
 case "$4" in
 up)
+  /bin/bash ../scripts/create_docker_networks.sh
   docker compose --profile $profile -f dev.yml up -Vd
   ;;
 down)
