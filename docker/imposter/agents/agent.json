@@ -11,7 +11,7 @@
           "uname": "Linux |ip-10-0-1-106 |4.9.0-9-amd64 |#1 SMP Debian 4.9.168-1+deb9u2 (2019-05-13) |x86_64",
           "version": "9"
         },
-        "ip": "10.0.1.106",
+        "ip": "FE80:0034:0223:A000:0002:B3FF:0000:8329",
         "configSum": "6f4293818ef64291ca53727fb9ab8958",
         "mergedSum": "7976a83d1aebcca09bc14459b5518ed5",
         "id": "001",
