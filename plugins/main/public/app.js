@@ -26,8 +26,6 @@ import './utils/fontawesome/scss/font-awesome.scss';
 // Dev tools
 import './utils/codemirror';
 
-import './utils/jquery-ui';
-
 // Material
 import 'angular-material/angular-material.css';
 import 'angular-aria/angular-aria';
@@ -57,7 +55,9 @@ const app = getAngularModule();
 app.config([
   '$compileProvider',
   function ($compileProvider) {
-    $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|data|blob):/);
+    $compileProvider.aHrefSanitizationWhitelist(
+      /^\s*(https?|ftp|mailto|data|blob):/,
+    );
   },
 ]);
 
@@ -75,7 +75,7 @@ app.run([
 
     // Set currentSecurity platform in Redux when app starts.
     checkCurrentSecurityPlatform()
-      .then((item) => {
+      .then(item => {
         store.dispatch(updateCurrentPlatform(item));
       })
       .catch(() => {});
@@ -105,23 +105,29 @@ app.run(['$rootElement', function ($rootElement) {
   addHelpMenuToAppChrome();
 
   // Bind deleteExistentToken on Log out component.
-  $('.euiHeaderSectionItem__button, .euiHeaderSectionItemButton').on('mouseleave', function () {
-    // opendistro
-    $('button:contains(Log out)').on('click', function () {
-      WzAuthentication.deleteExistentToken();
-    });
-    // x-pack
-    $('a:contains(Log out)').on('click', function (event) {
-      // Override href's behaviour and navigate programatically
-      // to the logout path once the token has been deleted.
-      event.preventDefault();
-      WzAuthentication.deleteExistentToken()
-        .catch((err) => {
-          console.error('[ERROR] - User token could not be deprecated - ', err);
-        })
-        .finally(() => {
-          window.location = event.currentTarget.href;
-        });
-    });
-  });
-}]);
+  $('.euiHeaderSectionItem__button, .euiHeaderSectionItemButton').on(
+    'mouseleave',
+    function () {
+      // opendistro
+      $('button:contains(Log out)').on('click', function () {
+        WzAuthentication.deleteExistentToken();
+      });
+      // x-pack
+      $('a:contains(Log out)').on('click', function (event) {
+        // Override href's behaviour and navigate programatically
+        // to the logout path once the token has been deleted.
+        event.preventDefault();
+        WzAuthentication.deleteExistentToken()
+          .catch(err => {
+            console.error(
+              '[ERROR] - User token could not be deprecated - ',
+              err,
+            );
+          })
+          .finally(() => {
+            window.location = event.currentTarget.href;
+          });
+      });
+    },
+  );
+});

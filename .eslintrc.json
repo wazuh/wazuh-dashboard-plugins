@@ -39,8 +39,7 @@
   "ignorePatterns": [
     "node_modules/",
     "public/utils/codemirror/",
-    "public/kibana-integrations/",
-    "public/utils/jquery-ui.js"
+    "public/kibana-integrations/"
   ],
   "rules": {
     "filenames-simple/naming-convention": "error",
