@@ -364,7 +364,7 @@ async function run(configuration) {
 
   function execSystem(command) {
     logger.info(`Run command: ${command}`);
-    execSync(command);
+    return execSync(command);
   }
 
   for (const platformID in supportedVersions) {
@@ -384,21 +384,33 @@ async function run(configuration) {
 
       const tag = `v${version}-${pluginPlatformVersion}${tagSuffix}`;
       logger.info(`Generating tag: ${tag}...`);
-
-      logger.info(`Calling to bump script`);
-      const configuratioBump = {
+      logger.info('Calling to bump script');
+      const configurationBump = {
         ...configuration,
         manifestPlugin: manifestPluginPath,
+        platformVersion: pluginPlatformVersion,
       };
       logger.debug(
-        `Configuration to use with the bump script: ${configuratioBump}`,
+        `Configuration to use with the bump script: ${configurationBump}`,
       );
 
-      bump(configuratioBump);
+      bump(configurationBump);
 
-      logger.debug(`Commiting`);
-      execSystem(`git commit -am "Bump ${tag}"`);
-      logger.info(`Commited`);
+      logger.debug('Checking if there are changes to commit');
+      const thereChangesToCommit =
+        execSystem('git diff --exit-code --no-patch;echo -n $?').toString() ===
+        '1';
+      logger.debug(`Are there changes to commit?: ${thereChangesToCommit}`);
+
+      if (thereChangesToCommit) {
+        logger.info('There are changes to commit.');
+        logger.debug('Commiting');
+        execSystem(`git commit -am "Bump ${tag}"`);
+        logger.info('Commited');
+      } else {
+        logger.info('There are not changes to commit.');
+      }
+
       logger.debug(`Creating tag: ${tag}`);
       execSystem(
         `git tag -a ${tag} -m "Wazuh ${version} for ${platformID} ${pluginPlatformVersion}"`,
