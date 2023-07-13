@@ -229,7 +229,7 @@ const usageOptionsMessage = `Options:
   --manifest-package <manifest-package>               Set the package manifest file location.
   --manifest-plugin <manifest-plugin>                 Set the plugin platform manifest file location.
   --platform-version <platform-version>               Set the platform version.
-  --revision <revision>                               Set the revision. Default: ${defaultConfiguration.revision}.
+  --revision <revision>                               Set the revision.
   --tag-suffix <tag-suffix>                           Set the tag suffix.
   --version <version>                                 Set the version.`;
 
