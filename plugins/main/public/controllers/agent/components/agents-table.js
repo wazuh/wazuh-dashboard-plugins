@@ -50,6 +50,7 @@ import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { AgentStatus } from '../../../components/agents/agent_status';
 import { AgentSynced } from '../../../components/agents/agent-synced';
 import { compressIPv6 } from '../../../services/ipv6-services';
+import { AgentStatusCode } from '../../../components/agents/agent-status-code';
 
 export const AgentsTable = withErrorBoundary(
   class AgentsTable extends Component {
@@ -325,6 +326,7 @@ export const AgentsTable = withErrorBoundary(
         name: agent.name,
         ip: compressIPv6(agent.ip),
         status: agent.status,
+        status_code: agent.status_code,
         group_config_status: agent.group_config_status,
         group: agent?.group || '-',
         os_name: agent,
@@ -582,12 +584,14 @@ export const AgentsTable = withErrorBoundary(
         truncateText: true,
         sortable: true,
         show: true,
-        render: status => (
-          <AgentStatus
-            status={status}
-            labelProps={{ className: 'hide-agent-status' }}
-          />
-        ),
+        render: status => <AgentStatus status={status} />,
+      },
+      {
+        field: 'status_code',
+        name: 'Status detail',
+        sortable: true,
+        show: true,
+        render: statusCode => <AgentStatusCode statusCode={statusCode} />,
       },
       {
         field: 'group_config_status',
