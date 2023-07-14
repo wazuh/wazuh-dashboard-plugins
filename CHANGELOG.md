@@ -7,6 +7,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Added
 
 - Support for Wazuh 4.7.0
+- Added `status detail` column in the agents table. [#5680](https://github.com/wazuh/wazuh-kibana-app/pull/5680)
 
 ## Wazuh v4.6.0 - OpenSearch Dashboards 2.6.0 - Revision 01
 
