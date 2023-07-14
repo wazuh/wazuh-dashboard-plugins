@@ -8,7 +8,8 @@
         "node_name": "unknown",
         "registerIP": "any",
         "id": "004",
-        "ip": "any"
+        "ip": "any",
+        "status_code": 4
       }
     ],
     "total_affected_items": 1,
