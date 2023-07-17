@@ -36,19 +36,23 @@ import MenuSettings from './wz-menu-settings';
 import MenuSecurity from './wz-menu-security';
 import MenuTools from './wz-menu-tools';
 import Overview from './wz-menu-overview';
-import { getAngularModule, getHttp, getToasts } from '../../kibana-services';
+import {
+  getAngularModule,
+  getHttp,
+  getToasts,
+  getDataPlugin,
+} from '../../kibana-services';
 import { GenericRequest } from '../../react-services/generic-request';
 import { ApiCheck } from '../../react-services/wz-api-check';
 import { WzGlobalBreadcrumbWrapper } from '../common/globalBreadcrumb/globalBreadcrumbWrapper';
 import { AppNavigate } from '../../react-services/app-navigate';
 import WzTextWithTooltipIfTruncated from '../../components/common/wz-text-with-tooltip-if-truncated';
-import { getDataPlugin } from '../../kibana-services';
 import { withWindowSize } from '../../components/common/hocs/withWindowSize';
 import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services'
 import { getThemeAssetURL, getAssetURL } from '../../utils/assets';
-import { AgentStatus } from '../agents/agent_status';
+import { AgentStatus } from '../agents/agent-status';
 
 
 const sections = {
@@ -106,7 +110,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
           }
         }
       }
-    } catch (error) { 
+    } catch (error) {
       const options = {
         context: `${WzMenu.name}.componentDidMount`,
         level: UI_LOGGER_LEVELS.ERROR,
@@ -197,7 +201,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
     const { id: apiId } = JSON.parse(AppState.getCurrentAPI());
     const { currentAPI } = this.state;
     const currentTab = this.getCurrentTab();
-    
+
     if (currentTab !== this.state.currentMenuTab) {
       this.setState({ currentMenuTab: currentTab });
     }
@@ -708,7 +712,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
   render() {
     const currentAgent = store.getState().appStateReducers.currentAgentData;
     const thereAreSelectors = this.thereAreSelectors();
-    
+
     const menu = (
       <div className="wz-menu-wrapper">
         <div className="wz-menu-left-side">
@@ -901,7 +905,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
       </div>
     );
 
-    
+
     const logotypeURL = getHttp().basePath.prepend(this.wazuhConfig.getConfig()['customization.enabled'] && this.wazuhConfig.getConfig()['customization.logo.app'] ? getAssetURL(this.wazuhConfig.getConfig()['customization.logo.app']) : getThemeAssetURL('logo.svg'));
     const mainButton = (
       <button data-test-subj='menuWazuhButton' className="eui" onClick={() => this.switchMenuOpened()}>
@@ -933,7 +937,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
 
     const openSelectorsButton = (
       <EuiToolTip position="bottom" content="Show selectors">
-        <EuiButtonEmpty 
+        <EuiButtonEmpty
           iconType="boxesVertical"
           iconSide="right"
           style={{ position: 'relative', right: 0 }}
@@ -942,12 +946,12 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
           aria-label="Open selectors"></EuiButtonEmpty>
       </EuiToolTip>
     )
-   
+
 
     const container = document.getElementsByClassName('euiBreadcrumbs');
     const expandedHeader = document.getElementById('globalHeaderBars')
-    const wzExpandedHeader = expandedHeader.children.length === 1 
-      ? 'wz-expanded-header-min'  
+    const wzExpandedHeader = expandedHeader.children.length === 1
+      ? 'wz-expanded-header-min'
       : 'wz-expanded-header-max'
     return ReactDOM.createPortal(
       <WzReduxProvider>
@@ -984,34 +988,34 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
               this.getIndexPatternSelectorComponent()
             }
 
-            { !this.showSelectorsInPopover && this.state.APIlist.length > 1 &&  
-              this.getApiSelectorComponent()  
+            { !this.showSelectorsInPopover && this.state.APIlist.length > 1 &&
+              this.getApiSelectorComponent()
             }
 
-            { this.showSelectorsInPopover && 
+            { this.showSelectorsInPopover &&
               (this.state.patternList.length > 1 || this.state.APIlist.length > 1) &&
               <>
-                
+
                 <EuiFlexItem grow={false}>
                   <EuiPopover
                         ownFocus
                         anchorPosition="downCenter"
                         button={openSelectorsButton}
                         isOpen={this.state.isSelectorsPopoverOpen}
-                        closePopover={()=> this.switchSelectorsPopOver()}> 
+                        closePopover={()=> this.switchSelectorsPopOver()}>
                           { this.state.patternList.length > 1 &&
                             <EuiFlexGroup alignItems="center" style={{ paddingTop: 5 }}>
                               {this.getIndexPatternSelectorComponent()}
                             </EuiFlexGroup>
-                          } 
+                          }
                           { this.state.APIlist.length > 1 &&
                             <EuiFlexGroup alignItems="center" style={{ paddingTop: 5 }} direction="row">
                               {this.getApiSelectorComponent()}
                             </EuiFlexGroup>
-                          } 
+                          }
                   </EuiPopover>
                 </EuiFlexItem>
-                
+
               </>
 
             }
