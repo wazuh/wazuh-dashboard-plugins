@@ -10,8 +10,6 @@
           "uname": "Linux |wazuh-manager-master-0 |4.14.114-105.126.amzn2.x86_64 |#1 SMP Tue May 7 02:26:40 UTC 2019 |x86_64",
           "version": "2"
         },
-        "ip": "127.0.0.1",
-        "id": "001",
         "group": [
           "default",
           "test",
@@ -21,16 +19,20 @@
           "test5",
           "test6",
           "test7",
-          "test8"
+          "test8",
+          "test9",
+          "test10"
         ],
-        "registerIP": "127.0.0.1",
+        "ip": "FE80:0034:0223:A000:0002:B3FF:0000:8329",
+        "id": "000",
+        "registerIP": "FE80:0034:0223:A000:0002:B3FF:0000:8329",
         "dateAdd": "2022-08-25T16:17:46Z",
-        "name": "Debian agent",
+        "name": "wazuh-manager-master-0",
         "status": "active",
         "manager": "wazuh-manager-master-0",
         "node_name": "master",
         "lastKeepAlive": "9999-12-31T23:59:59Z",
-        "version": "Wazuh v4.5.0",
+        "version": "Wazuh v4.6.0",
         "group_config_status": "not synced"
       },
       {
@@ -52,7 +54,7 @@
         "manager": "wazuh-manager-master-0",
         "node_name": "master",
         "lastKeepAlive": "9999-12-31T23:59:59Z",
-        "version": "Wazuh v4.5.0",
+        "version": "Wazuh v4.6.0",
         "group_config_status": "synced"
       },
       {

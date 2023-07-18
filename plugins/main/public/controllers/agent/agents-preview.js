@@ -35,7 +35,15 @@ export class AgentsPreviewController {
    * @param {Object} errorHandler
    * @param {Object} csvReq
    */
-  constructor($scope, $location, $route, errorHandler, csvReq, commonData, $window) {
+  constructor(
+    $scope,
+    $location,
+    $route,
+    errorHandler,
+    csvReq,
+    commonData,
+    $window,
+  ) {
     this.$scope = $scope;
     this.genericReq = GenericRequest;
     this.$location = $location;
@@ -58,11 +66,15 @@ export class AgentsPreviewController {
     this.api = JSON.parse(AppState.getCurrentAPI()).id;
     const loc = this.$location.search();
     if ((loc || {}).agent && (loc || {}).agent !== '000') {
-      this.commonData.setTimefilter(getDataPlugin().timefilter.timefilter.getTime());
+      this.commonData.setTimefilter(
+        getDataPlugin().timefilter.timefilter.getTime(),
+      );
       return this.showAgent({ id: loc.agent });
     }
 
-    this.isClusterEnabled = AppState.getClusterInfo() && AppState.getClusterInfo().status === 'enabled';
+    this.isClusterEnabled =
+      AppState.getClusterInfo() &&
+      AppState.getClusterInfo().status === 'enabled';
     this.loading = true;
     this.osPlatforms = [];
     this.versions = [];
@@ -83,7 +95,7 @@ export class AgentsPreviewController {
       this.$location.search('tab', this.submenuNavItem);
     });
 
-    this.$scope.$on('wazuhFetched', (evt) => {
+    this.$scope.$on('wazuhFetched', evt => {
       evt.stopPropagation();
     });
     this.registerAgentsProps = {
@@ -91,14 +103,14 @@ export class AgentsPreviewController {
       hasAgents: () => this.hasAgents,
       reload: () => this.$route.reload(),
       getWazuhVersion: () => this.getWazuhVersion(),
-      getCurrentApiAddress: () => this.getCurrentApiAddress()
+      getCurrentApiAddress: () => this.getCurrentApiAddress(),
     };
     this.hasAgents = true;
     this.init = false;
     const instance = new DataFactory(WzRequest.apiReq, '/agents', false, false);
     //Props
     this.tableAgentsProps = {
-      updateSummary: (summary) => {
+      updateSummary: summary => {
         this.summary = summary;
         if (this.summary.total === 0) {
           this.addNewAgent(true);
@@ -116,7 +128,7 @@ export class AgentsPreviewController {
         this.downloadCsv(filters);
         this.$scope.$applyAsync();
       },
-      showAgent: (agent) => {
+      showAgent: agent => {
         this.showAgent(agent);
         this.$scope.$applyAsync();
       },
@@ -124,10 +136,17 @@ export class AgentsPreviewController {
         return await this.getMostActive();
       },
       clickAction: (item, openAction = false) => {
-        clickAction(item, openAction, instance, this.shareAgent, this.$location, this.$scope);
+        clickAction(
+          item,
+          openAction,
+          instance,
+          this.shareAgent,
+          this.$location,
+          this.$scope,
+        );
         this.$scope.$applyAsync();
       },
-      formatUIDate: (date) => formatUIDate(date),
+      formatUIDate: date => formatUIDate(date),
       summary: this.summary,
     };
     //Load
@@ -186,14 +205,18 @@ export class AgentsPreviewController {
         'GET',
         `/elastic/top/${this.firstUrlParam}/${this.secondUrlParam}/agent.name/${
           this.pattern
-        }?agentsList=${store.getState().appStateReducers.allowedAgents.toString()}`
+        }?agentsList=${store
+          .getState()
+          .appStateReducers.allowedAgents.toString()}`,
       );
       this.mostActiveAgent.name = data.data.data;
       const info = await this.genericReq.request(
         'GET',
         `/elastic/top/${this.firstUrlParam}/${this.secondUrlParam}/agent.id/${
           this.pattern
-        }?agentsList=${store.getState().appStateReducers.allowedAgents.toString()}`
+        }?agentsList=${store
+          .getState()
+          .appStateReducers.allowedAgents.toString()}`,
       );
       if (info.data.data === '' && this.mostActiveAgent.name !== '') {
         this.mostActiveAgent.id = '000';
@@ -226,9 +249,12 @@ export class AgentsPreviewController {
     try {
       this.errorInit = false;
       const clusterInfo = AppState.getClusterInfo();
-      this.firstUrlParam = clusterInfo.status === 'enabled' ? 'cluster' : 'manager';
+      this.firstUrlParam =
+        clusterInfo.status === 'enabled' ? 'cluster' : 'manager';
       this.secondUrlParam = clusterInfo[this.firstUrlParam];
-      this.pattern = (await getDataPlugin().indexPatterns.get(AppState.getCurrentPattern())).title;
+      this.pattern = (
+        await getDataPlugin().indexPatterns.get(AppState.getCurrentPattern())
+      ).title;
     } catch (error) {
       const options = {
         context: `${AgentsPreviewController.name}.load`,
@@ -251,12 +277,6 @@ export class AgentsPreviewController {
     this.addingNewAgent = flag;
   }
 
-  openRegistrationDocs() {
-    this.$window.open(webDocumentationLink(user-manual/registering/index.html),
-      '_blank'
-    );
-  }
-
   /**
    * Returns the current API address
    */
@@ -264,7 +284,7 @@ export class AgentsPreviewController {
     try {
       const result = await this.genericReq.request('GET', '/hosts/apis');
       const entries = result.data || [];
-      const host = entries.filter((e) => {
+      const host = entries.filter(e => {
         return e.id == this.api;
       });
       const url = host[0].url;
@@ -278,7 +298,9 @@ export class AgentsPreviewController {
         error: {
           error: error,
           message: error.message || error,
-          title: `Could not get the Wazuh API address: ${error.message || error}`,
+          title: `Could not get the Wazuh API address: ${
+            error.message || error
+          }`,
         },
       };
       getErrorOrchestrator().handleError(options);
