@@ -10,9 +10,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added `ignore` and `restrict` options to Syslog configuration. [#5203](https://github.com/wazuh/wazuh-kibana-app/pull/5203)
 - Added the `extensions.github` and `extensions.office` settings to the default configuration file [#5376](https://github.com/wazuh/wazuh-kibana-app/pull/5376)
 - Added new global error treatment (client-side) [#4163](https://github.com/wazuh/wazuh-kibana-app/pull/4163)
-- Added a description to step 3 of the deploy a new agent section. [#5419](https://github.com/wazuh/wazuh-kibana-app/pull/5419)
-- Added a title to the agent name input of the deploy a new agent section. [#5429](https://github.com/wazuh/wazuh-kibana-app/pull/5429)
-- Added callout below the agent name entry of the deploy a new agent section. [#5429](https://github.com/wazuh/wazuh-kibana-app/pull/5429)
 - Added new CLI to generate API data from specification file [#5519](https://github.com/wazuh/wazuh-kibana-app/pull/5519)
 - Added specific RBAC permissions to Security section [#5551](https://github.com/wazuh/wazuh-kibana-app/pull/5551)
 
@@ -20,11 +17,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Changed of regular expression in RBAC. [#5201](https://github.com/wazuh/wazuh-kibana-app/pull/5201)
 - Migrate the timeFilter, metaFields, maxBuckets health checks inside the pattern check. [#5384](https://github.com/wazuh/wazuh-kibana-app/pull/5384)
-- Changed the title to step 3 of the deploy a new agent section. [#5419](https://github.com/wazuh/wazuh-kibana-app/pull/5419)
-- Changed the title of step 3 of the deploy a new agent section. [#5429](https://github.com/wazuh/wazuh-kibana-app/pull/5429)
-- Changed the description of step 3 of the deploy a new agent section. [#5429](https://github.com/wazuh/wazuh-kibana-app/pull/5429)
-- Changed the placeholder of the agent name input of the deploy a new agent section. [#5429](https://github.com/wazuh/wazuh-kibana-app/pull/5429)
-- Changed the query to search for an agent in `management/configuration`. [#5485](https://github.com/wazuh/wazuh-kibana-app/pull/5485)
 - Changed the search bar in management/log to the one used in the rest of the app. [#5476](https://github.com/wazuh/wazuh-kibana-app/pull/5476)
 
 ### Fixed
