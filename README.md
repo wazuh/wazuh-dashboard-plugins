@@ -98,6 +98,150 @@ You can learn more about it at [wazuh.com][web]
     <img width="640px" src="screenshots/app7.png"/>
 </p>
 
+## Branches
+
+- `stable` corresponds to the latest Wazuh app stable version.
+- `master` branch contains the latest code, be aware of possible bugs on this branch.
+
+## Requisites
+
+- Wazuh HIDS 4.5.1
+- Kibana 7.16.x or 7.17.x
+- Elasticsearch 7.16.x or 7.17.x
+
+## Installation
+
+Ensure that the directory `/usr/share/kibana/data` exists
+If not create it:
+
+```
+mkdir /usr/share/kibana/data
+chown -R kibana:kibana /usr/share/kibana/data
+```
+
+Install the Wazuh app plugin for Kibana
+
+```
+cd /usr/share/kibana
+sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.5.1_7.16.0-1.zip
+```
+
+Restart Kibana
+
+- Systemd:
+
+```
+systemctl restart kibana
+```
+
+- SysV Init:
+
+```
+service kibana restart
+```
+
+## Upgrade
+
+Note: Since Wazuh 4.0.4 release revision 4016 (regardless of the Elastic Stack version) the location of the wazuh.yml has been moved from `/usr/share/kibana/optimize/wazuh/config/wazuh.yml` to `/usr/share/kibana/data/wazuh/config/wazuh.yml`.
+
+Since Wazuh 3.12.0 release (regardless of the Elastic Stack version) the location of the wazuh.yml has been moved from `/usr/share/kibana/plugins/wazuh/wazuh.yml` to `/usr/share/kibana/data/wazuh/config/wazuh.yml`.
+
+Stop Kibana
+
+- Systemd:
+
+```
+systemctl stop kibana
+```
+
+- SysV Init:
+
+```
+service kibana stop
+```
+
+Ensure that the directory `/usr/share/kibana/data` exists
+If not create it:
+
+```
+mkdir /usr/share/kibana/data
+```
+
+### From 3.11.x
+
+Copy the `wazuh.yml` to its new location.
+
+```
+mkdir -p /usr/share/kibana/data/wazuh/config
+cp /usr/share/kibana/plugins/wazuh/wazuh.yml /usr/share/kibana/optimize/wazuh/config/wazuh.yml
+```
+
+### From 4.0.4 - 4016
+
+Copy the `wazuh.yml` to its new location.
+
+```
+mkdir -p /usr/share/kibana/data/wazuh/config
+cp /usr/share/kibana/optimize/wazuh/config/wazuh.yml /usr/share/kibana/data/wazuh/config/wazuh.yml
+```
+
+```
+mkdir -p /usr/share/kibana/data/wazuh/config
+cp /usr/share/kibana/optimize/wazuh/config/wazuh.yml /usr/share/kibana/data/wazuh/config/wazuh.yml
+```
+
+Remove the Wazuh app using the kibana-plugin tool
+
+```
+cd /usr/share/kibana/
+sudo -u kibana bin/kibana-plugin remove wazuh
+```
+
+Remove generated bundles
+
+```
+rm -rf /usr/share/kibana/optimize/bundles
+```
+
+Update file permissions. This will prevent errors when generating new bundles or updating the app:
+
+```
+chown -R kibana:kibana /usr/share/kibana/data
+chown -R kibana:kibana /usr/share/kibana/plugins
+```
+
+Install the Wazuh app
+
+```
+cd /usr/share/kibana/
+sudo -u kibana bin/kibana-plugin install https://packages.wazuh.com/4.x/ui/kibana/wazuh_kibana-4.5.1_7.16.0-1.zip
+```
+
+Update configuration file permissions.
+
+```
+sudo chown kibana:kibana /usr/share/kibana/data/wazuh/config/wazuh.yml
+sudo chmod 600 /usr/share/kibana/data/wazuh/config/wazuh.yml
+```
+
+Restart Kibana
+
+- Systemd:
+
+```
+systemctl restart kibana
+```
+
+- SysV Init:
+
+```
+service kibana restart
+```
+
+## Wazuh - Kibana - Open Distro version compatibility matrix
+
+The compatibility matrix is avaliable in the repository [wiki](https://github.com/wazuh/wazuh-kibana-app/wiki/Compatibility).
+
 ## Contribute
 
 If you want to contribute to our project please don't hesitate to send a pull request. 
