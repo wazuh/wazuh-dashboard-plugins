@@ -12,6 +12,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Fixed the rendering of tables that contains IPs and agent overview [#5471](https://github.com/wazuh/wazuh-kibana-app/pull/5471)
 - Fixed the agents active coverage stat as NaN in Details panel of Agents section [#5490](https://github.com/wazuh/wazuh-kibana-app/pull/5490)
+- Fixed a broken documentation link to agent labels [#5687](https://github.com/wazuh/wazuh-kibana-app/pull/5687)
 
 ### Removed
 
@@ -35,7 +36,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Support for Wazuh 4.4.5
 
 ## Wazuh v4.4.4 - OpenSearch Dashboards 2.6.0 - Revision 01
-
 
 ### Added
 
