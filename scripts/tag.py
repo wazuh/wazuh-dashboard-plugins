@@ -17,7 +17,7 @@ import subprocess
 # Wazuh version: major.minor.patch
 version = '4.5.0'
 # App's revision number (previous rev + 1)
-revision = '01'
+revision = '02'
 # One of 'pre-alpha', 'alpha', 'beta', 'release-candidate', 'stable'
 stage = 'alpha'
 # Tag suffix. Usually set to stage + stage iteration.
@@ -30,7 +30,7 @@ LOG_FILE = 'output.log'
 TAGS_FILE = 'tags.log'
 # Global variable. Will be set later
 branch = None
-minor = ".".join(version.split('.')[:2])
+minor = version
 
 # Supported versions of Kibana
 kbn_versions = [
