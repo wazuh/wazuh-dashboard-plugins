@@ -49,56 +49,25 @@ class WzConfigurationAlertsLabels extends Component {
     const { currentConfig, agent, wazuhNotReadyYet } = this.props;
     return (
       <Fragment>
-        {currentConfig[
-          agent && agent.id !== '000' ? 'agent-labels' : 'analysis-labels'
-        ] &&
-          isString(
-            currentConfig[
-              agent && agent.id !== '000' ? 'agent-labels' : 'analysis-labels'
-            ],
-          ) && (
+        {currentConfig['agent-labels'] &&
+          isString(currentConfig['agent-labels']) && (
             <WzNoConfig
-              error={
-                currentConfig[
-                  agent && agent.id !== '000'
-                    ? 'agent-labels'
-                    : 'analysis-labels'
-                ]
-              }
+              error={currentConfig['agent-labels']}
               help={helpLinks}
             />
           )}
-        {currentConfig[
-          agent && agent.id !== '000' ? 'agent-labels' : 'analysis-labels'
-        ] &&
-          !isString(
-            currentConfig[
-              agent && agent.id !== '000' ? 'agent-labels' : 'analysis-labels'
-            ],
-          ) &&
-          !hasSize(
-            currentConfig[
-              agent && agent.id !== '000' ? 'agent-labels' : 'analysis-labels'
-            ].labels,
-          ) && <WzNoConfig error='not-present' help={helpLinks} />}
+        {currentConfig['agent-labels'] &&
+          !isString(currentConfig['agent-labels']) &&
+          !hasSize(currentConfig['agent-labels'].labels) && (
+            <WzNoConfig error='not-present' help={helpLinks} />
+          )}
         {wazuhNotReadyYet &&
-          (!currentConfig ||
-            !currentConfig[
-              agent && agent.id !== '000' ? 'agent-labels' : 'analysis-labels'
-            ]) && <WzNoConfig error='Wazuh not ready yet' />}
-        {currentConfig[
-          agent && agent.id !== '000' ? 'agent-labels' : 'analysis-labels'
-        ] &&
-        !isString(
-          currentConfig[
-            agent && agent.id !== '000' ? 'agent-labels' : 'analysis-labels'
-          ],
-        ) &&
-        hasSize(
-          currentConfig[
-            agent && agent.id !== '000' ? 'agent-labels' : 'analysis-labels'
-          ].labels,
-        ) ? (
+          (!currentConfig || !currentConfig['agent-labels']) && (
+            <WzNoConfig error='Wazuh not ready yet' />
+          )}
+        {currentConfig['agent-labels'] &&
+        !isString(currentConfig['agent-labels']) &&
+        hasSize(currentConfig['agent-labels'].labels) ? (
           <WzConfigurationSettingsTabSelector
             title='Defined labels'
             currentConfig={currentConfig}
@@ -107,13 +76,7 @@ class WzConfigurationAlertsLabels extends Component {
           >
             <EuiBasicTable
               columns={columns}
-              items={
-                currentConfig[
-                  agent && agent.id !== '000'
-                    ? 'agent-labels'
-                    : 'analysis-labels'
-                ].labels
-              }
+              items={currentConfig['agent-labels'].labels}
             />
           </WzConfigurationSettingsTabSelector>
         ) : null}
