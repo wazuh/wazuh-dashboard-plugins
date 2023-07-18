@@ -13,8 +13,7 @@
  */
 import React, { Component, Fragment } from 'react';
 import {
-  EuiCard,
-  EuiIcon,
+  EuiLink,
   EuiPanel,
   EuiFlexItem,
   EuiFlexGroup,
@@ -22,7 +21,6 @@ import {
   EuiText,
   EuiFlexGrid,
   EuiButtonEmpty,
-  EuiTitle,
   EuiPage,
   EuiButton,
   EuiPopover,
@@ -39,10 +37,8 @@ import {
   RequirementVis,
 } from './components';
 import { AgentInfo } from './agents-info';
-import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
 import store from '../../../redux/store';
 import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
-import { ActionAgents } from '../../../react-services/action-agents';
 import WzReduxProvider from '../../../redux/wz-redux-provider';
 import MenuAgent from './components/menu-agent';
 import './welcome.scss';
@@ -53,7 +49,6 @@ import { AppState } from '../../../react-services/app-state';
 import { FilterHandler } from '../../../utils/filter-handler';
 import { TabVisualizations } from '../../../factories/tab-visualizations';
 import { updateCurrentAgentData } from '../../../redux/actions/appStateActions';
-import WzTextWithTooltipIfTruncated from '../wz-text-with-tooltip-if-truncated';
 import { getAngularModule } from '../../../kibana-services';
 import { hasAgentSupportModule } from '../../../react-services/wz-agents';
 import { withErrorBoundary, withReduxProvider } from '../hocs';
@@ -296,6 +291,7 @@ export const AgentsWelcome = compose(
     }
 
     renderTitle() {
+      const notNeedStatus = true;
       return (
         <EuiFlexGroup>
           <EuiFlexItem className='wz-module-header-agent-title'>
@@ -377,43 +373,6 @@ export const AgentsWelcome = compose(
       const { start: from, end: to } = datePicker;
       this.setState({ datePicker: { from, to } });
     };
-
-    getOptions() {
-      return [
-        { value: 'pci', text: 'PCI DSS' },
-        { value: 'gdpr', text: 'GDPR' },
-        { value: 'nist', text: 'NIST 800-53' },
-        { value: 'hipaa', text: 'HIPAA' },
-        { value: 'gpg13', text: 'GPG13' },
-        { value: 'tsc', text: 'TSC' },
-      ];
-    }
-
-    setSelectValue(e) {
-      this.setState({ selectedRequirement: e.target.value });
-    }
-
-    getRequirementVis() {
-      if (this.state.selectedRequirement === 'pci') {
-        return 'Wazuh-App-Agents-Welcome-Top-PCI';
-      }
-      if (this.state.selectedRequirement === 'gdpr') {
-        return 'Wazuh-App-Agents-Welcome-Top-GDPR';
-      }
-      if (this.state.selectedRequirement === 'hipaa') {
-        return 'Wazuh-App-Agents-Welcome-Top-HIPAA';
-      }
-      if (this.state.selectedRequirement === 'nist') {
-        return 'Wazuh-App-Agents-Welcome-Top-NIST-800-53';
-      }
-      if (this.state.selectedRequirement === 'gpg13') {
-        return 'Wazuh-App-Agents-Welcome-Top-GPG-13';
-      }
-      if (this.state.selectedRequirement === 'tsc') {
-        return 'Wazuh-App-Agents-Welcome-Top-TSC';
-      }
-      return 'Wazuh-App-Agents-Welcome-Top-PCI';
-    }
 
     renderMitrePanel() {
       return (
@@ -530,14 +489,16 @@ export const AgentsWelcome = compose(
                   The agent has been registered but has not yet connected to the
                   manager.
                 </p>
-                <a
+                <EuiLink
                   href={webDocumentationLink(
                     'user-manual/agents/agent-connection.html',
                   )}
+                  external
                   target='_blank'
+                  rel='noopener noreferrer'
                 >
                   Checking connection with the Wazuh server
-                </a>
+                </EuiLink>
               </Fragment>
             }
             actions={
