@@ -8,6 +8,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Add Apple Silicon architecture button to the register Agent wizard [#5478](https://github.com/wazuh/wazuh-kibana-app/pull/5478)
 
+### Changed
+
+- Chenged the requests to get the agent labels for the managers [#5687](https://github.com/wazuh/wazuh-kibana-app/pull/5687)
+
 ### Fixed
 
 - Fixed the rendering of tables that contains IPs and agent overview [#5471](https://github.com/wazuh/wazuh-kibana-app/pull/5471)
