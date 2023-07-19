@@ -13,8 +13,6 @@
  */
 import React, { Component, Fragment } from 'react';
 import {
-  EuiCard,
-  EuiIcon,
   EuiPanel,
   EuiFlexItem,
   EuiFlexGroup,
@@ -22,7 +20,6 @@ import {
   EuiText,
   EuiFlexGrid,
   EuiButtonEmpty,
-  EuiTitle,
   EuiPage,
   EuiButton,
   EuiPopover,
@@ -31,7 +28,7 @@ import {
   EuiButtonIcon,
   EuiEmptyPrompt,
   EuiPageBody,
-  EuiLink
+  EuiLink,
 } from '@elastic/eui';
 import {
   FimEventsTable,
@@ -40,10 +37,8 @@ import {
   RequirementVis,
 } from './components';
 import { AgentInfo } from './agents-info';
-import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
 import store from '../../../redux/store';
 import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
-import { ActionAgents } from '../../../react-services/action-agents';
 import WzReduxProvider from '../../../redux/wz-redux-provider';
 import MenuAgent from './components/menu-agent';
 import './welcome.scss';
@@ -54,7 +49,6 @@ import { AppState } from '../../../react-services/app-state';
 import { FilterHandler } from '../../../utils/filter-handler';
 import { TabVisualizations } from '../../../factories/tab-visualizations';
 import { updateCurrentAgentData } from '../../../redux/actions/appStateActions';
-import WzTextWithTooltipIfTruncated from '../wz-text-with-tooltip-if-truncated';
 import { getAngularModule } from '../../../kibana-services';
 import { hasAgentSupportModule } from '../../../react-services/wz-agents';
 import { withErrorBoundary, withReduxProvider } from '../hocs';
@@ -257,81 +251,15 @@ export const AgentsWelcome = compose(
                 </EuiFlexItem>
               );
             }
-          }
-          )}
-        <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
-          <EuiPopover
-            button={
-              <EuiButtonEmpty
-                iconSide="right"
-                iconType="arrowDown"
-                onClick={() => this.setState({ switchModule: !this.state.switchModule })}>
-                More...
-              </EuiButtonEmpty>
-            }
-            isOpen={this.state.switchModule}
-            closePopover={() => this.setState({ switchModule: false })}
-            repositionOnScroll={false}
-            anchorPosition="downCenter">
-            <div>
-              <WzReduxProvider>
-                <div style={{ maxWidth: 730 }}>
-                  <MenuAgent
-                    isAgent={this.props.agent}
-                    updateMenuAgents={() => this.updateMenuAgents()}
-                    closePopover={() => {
-                      this.setState({ switchModule: false })
-                    }
-                    }
-                    switchTab={(module) => this.props.switchTab(module)}></MenuAgent>
-                </div>
-              </WzReduxProvider>
-            </div>
-          </EuiPopover>
-        </EuiFlexItem>
-      </Fragment>
-    )
-  }
-
-  renderTitle() {
-
-      const notNeedStatus = true;
-
-    return (
-      <EuiFlexGroup>
-        <EuiFlexItem className="wz-module-header-agent-title">
-          <EuiFlexGroup>
-            <EuiFlexItem grow={false}>
-              <span style={{ display: 'inline-flex' }}>
-                <EuiTitle size="s">
-                  <h1>
-                    {this.state.widthWindow >= 768?(
-                      <WzTextWithTooltipIfTruncated position='top' elementStyle={{ maxWidth: "150px" }}>
-                      {this.props.agent.name}
-                      </WzTextWithTooltipIfTruncated>
-                    ):
-                    (
-                      <WzTextWithTooltipIfTruncated position='top'>
-                      {this.props.agent.name}
-                      </WzTextWithTooltipIfTruncated>
-                    )
-                    }
-                  </h1>
-                </EuiTitle>
-              </span>
-            </EuiFlexItem>
-            {
-              (this.state.maxModules !== null &&
-                this.renderModules()) ||
-              <EuiFlexItem style={{ marginTop: 7 }}>
-                <EuiPopover
-                  button={
-                    <EuiButtonEmpty
-                      iconSide="right"
-                      iconType="arrowDown"
-                      onClick={() => this.setState({ switchModule: !this.state.switchModule })}>
-                      Modules
-                      </EuiButtonEmpty>
+          })}
+          <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
+            <EuiPopover
+              button={
+                <EuiButtonEmpty
+                  iconSide='right'
+                  iconType='arrowDown'
+                  onClick={() =>
+                    this.setState({ switchModule: !this.state.switchModule })
                   }
                 >
                   More...
@@ -363,6 +291,8 @@ export const AgentsWelcome = compose(
     }
 
     renderTitle() {
+      const notNeedStatus = true;
+
       return (
         <EuiFlexGroup>
           <EuiFlexItem className='wz-module-header-agent-title'>
@@ -408,22 +338,29 @@ export const AgentsWelcome = compose(
               <EuiFlexItem className='wz-agent-empty-item'></EuiFlexItem>
               <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
                 <EuiButtonEmpty
-                  iconType="inspect"
-                  onClick={() => this.props.switchTab('syscollector', notNeedStatus)}>
+                  iconType='inspect'
+                  onClick={() =>
+                    this.props.switchTab('syscollector', notNeedStatus)
+                  }
+                >
                   Inventory data
                 </EuiButtonEmpty>
               </EuiFlexItem>
               <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
                 <EuiButtonEmpty
-                  iconType="stats"
-                  onClick={() => this.props.switchTab('stats', notNeedStatus)}>
+                  iconType='stats'
+                  onClick={() => this.props.switchTab('stats', notNeedStatus)}
+                >
                   Stats
                 </EuiButtonEmpty>
               </EuiFlexItem>
               <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
                 <EuiButtonEmpty
-                  iconType="gear"
-                  onClick={() => this.props.switchTab('configuration', notNeedStatus)}>
+                  iconType='gear'
+                  onClick={() =>
+                    this.props.switchTab('configuration', notNeedStatus)
+                  }
+                >
                   Configuration
                 </EuiButtonEmpty>
               </EuiFlexItem>
@@ -433,16 +370,65 @@ export const AgentsWelcome = compose(
       );
     }
 
-
     onTimeChange = datePicker => {
       const { start: from, end: to } = datePicker;
       this.setState({ datePicker: { from, to } });
     };
 
-  renderMitrePanel() {
-    return (
-      <Fragment>
-        <EuiPanel paddingSize="s" height={{ height: 300 }}>
+    renderMitrePanel() {
+      return (
+        <Fragment>
+          <EuiPanel paddingSize='s' height={{ height: 300 }}>
+            <EuiFlexItem>
+              <EuiFlexGroup>
+                <EuiFlexItem>
+                  <h2 className='embPanel__title wz-headline-title'>
+                    <EuiText size='xs'>
+                      <h2>MITRE</h2>
+                    </EuiText>
+                  </h2>
+                </EuiFlexItem>
+                <EuiFlexItem grow={false} style={{ alignSelf: 'center' }}>
+                  <EuiToolTip position='top' content='Open MITRE'>
+                    <EuiButtonIcon
+                      iconType='popout'
+                      color='primary'
+                      onClick={() => {
+                        window.location.href = `#/overview?tab=mitre`;
+                        this.router.reload();
+                      }}
+                      aria-label='Open MITRE'
+                    />
+                  </EuiToolTip>
+                </EuiFlexItem>
+              </EuiFlexGroup>
+            </EuiFlexItem>
+            <EuiSpacer size='m' />
+            <EuiFlexGroup>
+              <EuiFlexItem>
+                <MitreTopTactics agentId={this.props.agent.id} />
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiPanel>
+        </Fragment>
+      );
+    }
+
+    renderCompliancePanel() {
+      return (
+        <RequirementVis
+          agent={this.props.agent}
+          width={200}
+          height={200}
+          innerRadius={70}
+          outerRadius={100}
+        />
+      );
+    }
+
+    renderEventCountVisualization() {
+      return (
+        <EuiPanel paddingSize='s'>
           <EuiFlexItem>
             <EuiFlexGroup>
               <EuiFlexItem>
@@ -478,88 +464,7 @@ export const AgentsWelcome = compose(
             </div>
           </EuiFlexItem>
         </EuiPanel>
-      </Fragment>
-
-    )
-  }
-
-  renderCompliancePanel() {
-    return (
-      <RequirementVis
-        agent={this.props.agent}
-        width={200}
-        height={200}
-        innerRadius={70}
-        outerRadius={100} />
-    )
-  }
-
-  renderEventCountVisualization() {
-    return (
-      <EuiPanel paddingSize="s" >
-        <EuiFlexItem>
-          <EuiFlexGroup>
-            <EuiFlexItem>
-              <h2 className="embPanel__title wz-headline-title">
-                <EuiText size="xs"><h2>Events count evolution</h2></EuiText>
-              </h2>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-          <EuiSpacer size="s" />
-          <div style={{ height: this.props.resultState !== 'loading' ? '350px' : 0 }}>
-            <WzReduxProvider>
-              <KibanaVis
-                visID={'Wazuh-App-Agents-Welcome-Events-Evolution'}
-                tab={'welcome'}
-              ></KibanaVis>
-            </WzReduxProvider>
-          </div>
-          <div style={{ display: this.props.resultState === 'loading' ? 'block' : 'none', alignSelf: "center", paddingTop: 100 }}>
-            <EuiLoadingChart size="xl" />
-          </div>
-        </EuiFlexItem>
-      </EuiPanel>
-    )
-  }
-
-  renderSCALastScan() {
-    return (
-      <EuiFlexGroup direction="column">
-        <ScaScan switchTab={this.props.switchTab} {...this.props} />
-      </EuiFlexGroup>
-    )
-  }
-
-  render() {
-    const title = this.renderTitle();
-
-    if (this.props.agent.status === API_NAME_AGENT_STATUS.NEVER_CONNECTED) {
-      return (
-        <EuiEmptyPrompt
-          iconType="securitySignalDetected"
-          style={{ marginTop: 20 }}
-          title={<h2>Agent has never connected.</h2>}
-          body={
-            <Fragment>
-              <p>
-                The agent has been registered but has not yet connected to the manager.
-            </p>
-              <EuiLink
-                href={webDocumentationLink('user-manual/agents/agent-connection.html')}
-                external
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Checking connection with the Wazuh server
-              </EuiLink>
-            </Fragment>
-          }
-          actions={
-            <EuiButton href='#/agents-preview?' color="primary" fill>
-              Back
-          </EuiButton>
-          }
-        />)
+      );
     }
 
     renderSCALastScan() {
@@ -585,14 +490,16 @@ export const AgentsWelcome = compose(
                   The agent has been registered but has not yet connected to the
                   manager.
                 </p>
-                <a
+                <EuiLink
                   href={webDocumentationLink(
                     'user-manual/agents/agent-connection.html',
                   )}
+                  external
                   target='_blank'
+                  rel='noopener noreferrer'
                 >
                   Checking connection with the Wazuh server
-                </a>
+                </EuiLink>
               </Fragment>
             }
             actions={

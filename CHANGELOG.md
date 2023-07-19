@@ -30,7 +30,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Fixed
 
 - Fixed trailing hyphen character for OS value in the list of agents [#4828](https://github.com/wazuh/wazuh-kibana-app/pull/4828)
-- Fixed an issue that caused incorrect visualization of IPv6 addresses ([#4909](https://github.com/wazuh/wazuh-kibana-app/pull/4909)).
 - Fixed several typos in the code, by @jctello [#4911](https://github.com/wazuh/wazuh-kibana-app/pull/4911)
 - Fixed the display of more than one protocol in the Global configuration section [#4917](https://github.com/wazuh/wazuh-kibana-app/pull/4917)
 - Handling endpoint response was done when there is no data to show [#4918]https://github.com/wazuh/wazuh-kibana-app/pull/4918
@@ -73,6 +72,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Changed method to perform redirection on agent table buttons [#5539](https://github.com/wazuh/wazuh-kibana-app/pull/5539)
 - Changed windows agent service name in the deploy agent wizard [#5538](https://github.com/wazuh/wazuh-kibana-app/pull/5538)
+
 ## Wazuh v4.5.0 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 01
 
 ### Added
@@ -86,7 +86,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Support for Wazuh 4.4.5
 
 ## Wazuh v4.4.4 - Kibana 7.10.2, 7.16.x, 7.17.x - Revision 01
-
 
 ### Added
 

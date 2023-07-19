@@ -49,7 +49,6 @@ import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { AgentStatus } from '../../../components/agents/agent_status';
 import { AgentSynced } from '../../../components/agents/agent-synced';
-import { compressIPv6 } from '../../../services/ipv6-services';
 
 export const AgentsTable = withErrorBoundary(
   class AgentsTable extends Component {
@@ -310,12 +309,16 @@ export const AgentsTable = withErrorBoundary(
     }
 
     formatAgent(agent) {
-      const agentVersion = agent.version !== undefined ? agent.version.split(' ')[1] : '-';
-      const node_name = agent.node_name && agent.node_name !== 'unknown' ? agent.node_name : '-';
+      const agentVersion =
+        agent.version !== undefined ? agent.version.split(' ')[1] : '-';
+      const node_name =
+        agent.node_name && agent.node_name !== 'unknown'
+          ? agent.node_name
+          : '-';
       return {
         id: agent.id,
         name: agent.name,
-        ip: compressIPv6(agent.ip),
+        ip: agent.ip,
         status: agent.status,
         group_config_status: agent.group_config_status,
         group: agent?.group || '-',
@@ -389,11 +392,13 @@ export const AgentsTable = withErrorBoundary(
       const os_name = `${agent?.os?.name || ''} ${agent?.os?.version || ''}`;
 
       return (
-        <EuiFlexGroup gutterSize="xs">
-          <EuiFlexItem grow={false} ><i
-            className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`}
-            aria-hidden="true"
-          ></i></EuiFlexItem>{' '}
+        <EuiFlexGroup gutterSize='xs'>
+          <EuiFlexItem grow={false}>
+            <i
+              className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`}
+              aria-hidden='true'
+            ></i>
+          </EuiFlexItem>{' '}
           <EuiFlexItem>{os_name.trim() || '-'}</EuiFlexItem>
         </EuiFlexGroup>
       );
