@@ -15,9 +15,9 @@ import subprocess
 # ======================================================= #
 
 # Wazuh version: major.minor.patch
-version = '4.5.1'
+version = '4.5.2'
 # App's revision number (previous rev + 1)
-revision = '02'
+revision = '01'
 # One of 'pre-alpha', 'alpha', 'beta', 'release-candidate', 'stable'
 stage = 'alpha'
 # Tag suffix. Usually set to stage + stage iteration.
