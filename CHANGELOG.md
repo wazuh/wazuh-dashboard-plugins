@@ -2,6 +2,12 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.5.2 - OpenSearch Dashboards 2.6.0 - Revision 01
+
+### Added
+
+- Support for Wazuh 4.5.2
+
 ## Wazuh v4.5.1 - OpenSearch Dashboards 2.6.0 - Revision 01
 
 ### Added
@@ -35,7 +41,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Support for Wazuh 4.4.5
 
 ## Wazuh v4.4.4 - OpenSearch Dashboards 2.6.0 - Revision 01
-
 
 ### Added
 
