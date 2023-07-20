@@ -341,7 +341,7 @@ export default [
           {
             id: '12',
             enabled: true,
-            type: 'max',
+            type: 'avg',
             params: {
               field: 'remoted.msg_sent',
               customLabel: 'msg_sent',
@@ -351,17 +351,17 @@ export default [
           {
             id: '13',
             enabled: true,
-            type: 'max',
+            type: 'avg',
             params: {
               field: 'remoted.ctrl_msg_count',
-              customLabel: 'ctrl_msg_count',
+              customLabel: 'msg_count',
             },
             schema: 'metric',
           },
           {
             id: '14',
             enabled: true,
-            type: 'max',
+            type: 'avg',
             params: {
               field: 'remoted.discarded_count',
               customLabel: 'discarded_count',
@@ -371,13 +371,9 @@ export default [
           {
             id: '15',
             enabled: true,
-            type: 'top_hits',
+            type: 'avg',
             params: {
               field: 'remoted.dequeued_after_close',
-              aggregate: 'max',
-              size: 1,
-              sortField: 'remoted.dequeued_after_close',
-              sortOrder: 'desc',
               customLabel: 'dequeued_after_close',
             },
             schema: 'metric',
@@ -464,7 +460,7 @@ export default [
               mode: 'normal',
               data: {
                 id: '13',
-                label: 'ctrl_msg_count',
+                label: 'msg_count',
               },
               valueAxis: 'ValueAxis-1',
               drawLinesBetweenPoints: true,
@@ -536,13 +532,131 @@ export default [
       title: 'Wazuh App Statistics remoted tcp sessions',
       visState: JSON.stringify({
         title: 'Wazuh App Statistics remoted tcp sessions',
-        type: 'timelion',
+        type: 'line',
+        aggs: [
+          {
+            id: '1',
+            enabled: true,
+            type: 'sum',
+            params: {
+              field: 'remoted.tcp_sessions',
+              customLabel: 'Count',
+            },
+            schema: 'metric',
+          },
+          {
+            id: '2',
+            enabled: true,
+            type: 'date_histogram',
+            params: {
+              field: 'timestamp',
+              timeRange: {
+                from: 'now-24h',
+                to: 'now',
+              },
+              useNormalizedOpenSearchInterval: true,
+              scaleMetricValues: false,
+              interval: 'auto',
+              drop_partials: false,
+              min_doc_count: 1,
+              extended_bounds: {},
+            },
+            schema: 'segment',
+          },
+          {
+            id: '3',
+            enabled: true,
+            type: 'filters',
+            params: {
+              filters: [
+                {
+                  input: {
+                    query: 'remoted.tcp_sessions:*',
+                    language: 'kuery',
+                  },
+                  label: 'tcp_sessions',
+                },
+              ],
+            },
+            schema: 'group',
+          },
+        ],
         params: {
-          expression:
-            ".es(index=wazuh-statistics-*, timefield=timestamp,metric=sum:remoted.tcp_sessions, q='*').label(tcp_sessions)",
-          interval: '5m',
+          type: 'line',
+          grid: {
+            categoryLines: true,
+          },
+          categoryAxes: [
+            {
+              id: 'CategoryAxis-1',
+              type: 'category',
+              position: 'bottom',
+              show: true,
+              style: {},
+              scale: {
+                type: 'linear',
+              },
+              labels: {
+                show: true,
+                filter: true,
+                truncate: 100,
+              },
+              title: {},
+            },
+          ],
+          valueAxes: [
+            {
+              id: 'ValueAxis-1',
+              name: 'LeftAxis-1',
+              type: 'value',
+              position: 'left',
+              show: true,
+              style: {},
+              scale: {
+                type: 'linear',
+                mode: 'normal',
+              },
+              labels: {
+                show: true,
+                rotate: 0,
+                filter: false,
+                truncate: 100,
+              },
+              title: {
+                text: 'Count',
+              },
+            },
+          ],
+          seriesParams: [
+            {
+              show: true,
+              type: 'line',
+              mode: 'stacked',
+              data: {
+                label: 'Count',
+                id: '1',
+              },
+              valueAxis: 'ValueAxis-1',
+              drawLinesBetweenPoints: true,
+              lineWidth: 2,
+              interpolate: 'linear',
+              showCircles: true,
+            },
+          ],
+          addTooltip: true,
+          addLegend: true,
+          legendPosition: 'right',
+          times: [],
+          addTimeMarker: false,
+          labels: {},
+          thresholdLine: {
+            show: false,
+            value: 10,
+            width: 1,
+            style: 'full',
+            color: '#E7664C',
+          },
         },
-        aggs: [],
       }),
       uiStateJSON: '{}',
       description: '',
