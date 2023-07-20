@@ -168,7 +168,7 @@ export default [
           {
             id: '1',
             enabled: true,
-            type: 'max',
+            type: 'avg',
             params: {
               field: 'remoted.evt_count',
               customLabel: 'Count',
@@ -197,16 +197,17 @@ export default [
           {
             id: '3',
             enabled: true,
-            type: 'terms',
+            type: 'filters',
             params: {
-              field: 'remoted.evt_count',
-              orderBy: '_key',
-              order: 'desc',
-              size: 5,
-              otherBucket: false,
-              otherBucketLabel: 'Other',
-              missingBucket: false,
-              missingBucketLabel: 'Missing',
+              filters: [
+                {
+                  input: {
+                    query: 'remoted.evt_count:*',
+                    language: 'kuery',
+                  },
+                  label: 'evt_count',
+                },
+              ],
             },
             schema: 'group',
           },
