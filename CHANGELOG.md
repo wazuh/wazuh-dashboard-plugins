@@ -10,7 +10,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Changed
 
-- Chenged the requests to get the agent labels for the managers [#5687](https://github.com/wazuh/wazuh-kibana-app/pull/5687)
+- Changed the requests to get the agent labels for the managers [#5687](https://github.com/wazuh/wazuh-kibana-app/pull/5687)
 
 ### Fixed
 
