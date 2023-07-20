@@ -8,10 +8,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Add Apple Silicon architecture button to the register Agent wizard [#5478](https://github.com/wazuh/wazuh-kibana-app/pull/5478)
 
-### Changed
-
-- Changed the requests to get the agent labels for the managers [#5687](https://github.com/wazuh/wazuh-kibana-app/pull/5687)
-
 ### Fixed
 
 - Fixed the rendering of tables that contains IPs and agent overview [#5471](https://github.com/wazuh/wazuh-kibana-app/pull/5471)
@@ -26,6 +22,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Changed method to perform redirection on agent table buttons [#5539](https://github.com/wazuh/wazuh-kibana-app/pull/5539)
 - Changed windows agent service name in the deploy agent wizard [#5538](https://github.com/wazuh/wazuh-kibana-app/pull/5538)
+- Changed the requests to get the agent labels for the managers [#5687](https://github.com/wazuh/wazuh-kibana-app/pull/5687)
 
 ## Wazuh v4.5.0 - OpenSearch Dashboards 2.6.0 - Revision 01
 
