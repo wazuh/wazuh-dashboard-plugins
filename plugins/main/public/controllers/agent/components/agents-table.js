@@ -310,9 +310,6 @@ export const AgentsTable = withErrorBoundary(
     }
 
     formatAgent(agent) {
-      const checkField = field => {
-        return field !== undefined ? field : '-';
-      };
       const agentVersion =
         agent.version !== undefined ? agent.version.split(' ')[1] : '-';
       const node_name =
@@ -384,11 +381,8 @@ export const AgentsTable = withErrorBoundary(
     }
 
     addIconPlatformRender(agent) {
-      let icon = false;
-      const checkField = field => {
-        return field !== undefined ? field : '-';
-      };
-      const os = (agent || {}).os;
+      let icon = '';
+      const os = agent?.os || {};
 
       if ((os?.uname || '').includes('Linux')) {
         icon = 'linux';
@@ -397,8 +391,7 @@ export const AgentsTable = withErrorBoundary(
       } else if (os?.platform === 'darwin') {
         icon = 'apple';
       }
-      const os_name =
-        checkField(agent?.os?.name) + ' ' + checkField(agent?.os?.version);
+      const os_name = `${agent?.os?.name || ''} ${agent?.os?.version || ''}`;
 
       return (
         <EuiFlexGroup gutterSize='xs'>
@@ -408,7 +401,7 @@ export const AgentsTable = withErrorBoundary(
               aria-hidden='true'
             ></i>
           </EuiFlexItem>{' '}
-          <EuiFlexItem>{os_name === '- -' ? '-' : os_name}</EuiFlexItem>
+          <EuiFlexItem>{os_name.trim() || '-'}</EuiFlexItem>
         </EuiFlexGroup>
       );
     }

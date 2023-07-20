@@ -181,7 +181,7 @@ export class AgentInfo extends Component {
         {
           title: agent.ip,
           description: 'IP address',
-          style: { minwidth: 150 },
+          style: {},
         },
         {
           title: agent.version,

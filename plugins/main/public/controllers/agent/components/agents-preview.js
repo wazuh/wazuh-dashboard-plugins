@@ -304,7 +304,7 @@ export const AgentsPreview = compose(
                                 position='top'
                                 content='View agent details'
                               >
-                                <a
+                                <EuiLink
                                   onClick={() =>
                                     this.showAgent(
                                       this.state.lastRegisteredAgent,
@@ -312,7 +312,7 @@ export const AgentsPreview = compose(
                                   }
                                 >
                                   {this.state.lastRegisteredAgent?.name || '-'}
-                                </a>
+                                </EuiLink>
                               </EuiToolTip>
                             }
                             titleSize='s'
@@ -334,7 +334,7 @@ export const AgentsPreview = compose(
                                   position='top'
                                   content='View agent details'
                                 >
-                                  <a
+                                  <EuiLink
                                     onClick={() =>
                                       this.showAgent(this.state.agentMostActive)
                                     }
@@ -396,7 +396,7 @@ export const AgentsPreview = compose(
                 wzReq={this.props.tableProps.wzReq}
                 addingNewAgent={this.props.tableProps.addingNewAgent}
                 downloadCsv={this.props.tableProps.downloadCsv}
-                formatUIDate={(date) => formatUIDate(date)}
+                formatUIDate={date => formatUIDate(date)}
                 reload={() => this.fetchAgentStatusDetailsData()}
               />
             </WzReduxProvider>

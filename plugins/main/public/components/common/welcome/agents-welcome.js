@@ -13,8 +13,6 @@
  */
 import React, { Component, Fragment } from 'react';
 import {
-  EuiCard,
-  EuiIcon,
   EuiPanel,
   EuiFlexItem,
   EuiFlexGroup,
@@ -22,7 +20,6 @@ import {
   EuiText,
   EuiFlexGrid,
   EuiButtonEmpty,
-  EuiTitle,
   EuiPage,
   EuiButton,
   EuiPopover,
@@ -31,6 +28,7 @@ import {
   EuiButtonIcon,
   EuiEmptyPrompt,
   EuiPageBody,
+  EuiLink,
 } from '@elastic/eui';
 import {
   FimEventsTable,
@@ -39,10 +37,8 @@ import {
   RequirementVis,
 } from './components';
 import { AgentInfo } from './agents-info';
-import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
 import store from '../../../redux/store';
 import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
-import { ActionAgents } from '../../../react-services/action-agents';
 import WzReduxProvider from '../../../redux/wz-redux-provider';
 import MenuAgent from './components/menu-agent';
 import './welcome.scss';
@@ -53,7 +49,6 @@ import { AppState } from '../../../react-services/app-state';
 import { FilterHandler } from '../../../utils/filter-handler';
 import { TabVisualizations } from '../../../factories/tab-visualizations';
 import { updateCurrentAgentData } from '../../../redux/actions/appStateActions';
-import WzTextWithTooltipIfTruncated from '../wz-text-with-tooltip-if-truncated';
 import { getAngularModule } from '../../../kibana-services';
 import { hasAgentSupportModule } from '../../../react-services/wz-agents';
 import { withErrorBoundary, withReduxProvider } from '../hocs';
@@ -296,6 +291,8 @@ export const AgentsWelcome = compose(
     }
 
     renderTitle() {
+      const notNeedStatus = true;
+
       return (
         <EuiFlexGroup>
           <EuiFlexItem className='wz-module-header-agent-title'>
@@ -342,7 +339,9 @@ export const AgentsWelcome = compose(
               <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
                 <EuiButtonEmpty
                   iconType='inspect'
-                  onClick={() => this.props.switchTab('syscollector')}
+                  onClick={() =>
+                    this.props.switchTab('syscollector', notNeedStatus)
+                  }
                 >
                   Inventory data
                 </EuiButtonEmpty>
@@ -350,7 +349,7 @@ export const AgentsWelcome = compose(
               <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
                 <EuiButtonEmpty
                   iconType='stats'
-                  onClick={() => this.props.switchTab('stats')}
+                  onClick={() => this.props.switchTab('stats', notNeedStatus)}
                 >
                   Stats
                 </EuiButtonEmpty>
@@ -358,7 +357,9 @@ export const AgentsWelcome = compose(
               <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
                 <EuiButtonEmpty
                   iconType='gear'
-                  onClick={() => this.props.switchTab('configuration')}
+                  onClick={() =>
+                    this.props.switchTab('configuration', notNeedStatus)
+                  }
                 >
                   Configuration
                 </EuiButtonEmpty>
@@ -369,94 +370,10 @@ export const AgentsWelcome = compose(
       );
     }
 
-    buildTabCard(tab, icon) {
-      return (
-        <EuiFlexItem>
-          <EuiCard
-            size='xs'
-            layout='horizontal'
-            icon={<EuiIcon size='xl' type={icon} color='primary' />}
-            className='homSynopsis__card'
-            title={WAZUH_MODULES[tab].title}
-            onClick={() => this.props.switchTab(tab)}
-            description={WAZUH_MODULES[tab].description}
-          />
-        </EuiFlexItem>
-      );
-    }
-    onClickRestartAgent = () => {
-      const { agent } = this.props;
-      ActionAgents.restartAgent(agent.id);
-    };
-
-    onClickUpgradeAgent = () => {
-      const { agent } = this.props;
-      ActionAgents.upgradeAgent(agent.id);
-    };
-
-    renderUpgradeButton() {
-      const { managerVersion } = this.state;
-      const { agent } = this.props;
-      let outDated = ActionAgents.compareVersions(
-        managerVersion,
-        agent.version,
-      );
-
-      if (outDated === true) return;
-      return (
-        <EuiFlexItem grow={false}>
-          <EuiButton
-            color='secondary'
-            iconType='sortUp'
-            onClick={this.onClickUpgradeAgent}
-          >
-            Upgrade
-          </EuiButton>
-        </EuiFlexItem>
-      );
-    }
-
     onTimeChange = datePicker => {
       const { start: from, end: to } = datePicker;
       this.setState({ datePicker: { from, to } });
     };
-
-    getOptions() {
-      return [
-        { value: 'pci', text: 'PCI DSS' },
-        { value: 'gdpr', text: 'GDPR' },
-        { value: 'nist', text: 'NIST 800-53' },
-        { value: 'hipaa', text: 'HIPAA' },
-        { value: 'gpg13', text: 'GPG13' },
-        { value: 'tsc', text: 'TSC' },
-      ];
-    }
-
-    setSelectValue(e) {
-      this.setState({ selectedRequirement: e.target.value });
-    }
-
-    getRequirementVis() {
-      if (this.state.selectedRequirement === 'pci') {
-        return 'Wazuh-App-Agents-Welcome-Top-PCI';
-      }
-      if (this.state.selectedRequirement === 'gdpr') {
-        return 'Wazuh-App-Agents-Welcome-Top-GDPR';
-      }
-      if (this.state.selectedRequirement === 'hipaa') {
-        return 'Wazuh-App-Agents-Welcome-Top-HIPAA';
-      }
-      if (this.state.selectedRequirement === 'nist') {
-        return 'Wazuh-App-Agents-Welcome-Top-NIST-800-53';
-      }
-      if (this.state.selectedRequirement === 'gpg13') {
-        return 'Wazuh-App-Agents-Welcome-Top-GPG-13';
-      }
-      if (this.state.selectedRequirement === 'tsc') {
-        return 'Wazuh-App-Agents-Welcome-Top-TSC';
-      }
-      return 'Wazuh-App-Agents-Welcome-Top-PCI';
-    }
 
     renderMitrePanel() {
       return (
@@ -573,14 +490,16 @@ export const AgentsWelcome = compose(
                   The agent has been registered but has not yet connected to the
                   manager.
                 </p>
-                <a
+                <EuiLink
                   href={webDocumentationLink(
                     'user-manual/agents/agent-connection.html',
                   )}
+                  external
                   target='_blank'
+                  rel='noopener noreferrer'
                 >
                   Checking connection with the Wazuh server
-                </a>
+                </EuiLink>
               </Fragment>
             }
             actions={
