@@ -5,91 +5,91 @@
         "name": "master-node",
         "type": "master",
         "version": "4.5.0",
-        "ip": "wazuh-master",
+        "ip": "FE80:0034:0223:A000:0002:B3FF:0000:8329",
         "connection_date": "2020-05-27T10:50:49.175Z"
       },
       {
         "name": "worker1",
         "type": "worker",
         "version": "4.5.0",
-        "ip": "172.26.0.7",
+        "ip": "FE80:1234:2223:A000:2202:B3FF:FE1E:8329",
         "connection_date": "2021-05-27T10:50:51.342Z"
       },
       {
         "name": "worker2",
         "type": "worker",
         "version": "4.5.0",
-        "ip": "172.26.0.6",
+        "ip": "127.0.0.2",
         "connection_date": "2021-05-27T10:48:54.093Z"
       },
       {
         "name": "worker3",
         "type": "worker",
         "version": "4.5.0",
-        "ip": "wazuh-worker",
+        "ip": "FE80:0034:0223:A000:0002:B3FF:0000:8329",
         "connection_date": "2021-05-27T10:50:51.342Z"
       },
       {
         "name": "worker4",
         "type": "worker",
         "version": "4.5.0",
-        "ip": "172.26.0.7",
+        "ip": "FE80:0034:0223:A000:0002:B3FF:0000:8329",
         "connection_date": "2021-05-27T10:50:51.342Z"
       },
       {
         "name": "worker5",
         "type": "worker",
         "version": "4.5.0",
-        "ip": "172.26.0.6",
+        "ip": "FE80:0034:0223:A000:0002:B3FF:0000:8329",
         "connection_date": "2021-05-27T10:48:54.093Z"
       },
       {
         "name": "worker6",
         "type": "worker",
         "version": "4.5.0",
-        "ip": "wazuh-worker",
+        "ip": "FE80:0034:0223:A000:0002:B3FF:0000:8329",
         "connection_date": "2021-05-27T10:50:51.342Z"
       },
       {
         "name": "worker7",
         "type": "worker",
         "version": "4.5.0",
-        "ip": "172.26.0.7",
+        "ip": "FE80:0034:0223:A000:0002:B3FF:0000:8329",
         "connection_date": "2021-05-27T10:48:54.093Z"
       },
       {
         "name": "worker8",
         "type": "worker",
         "version": "4.5.0",
-        "ip": "172.26.0.6",
+        "ip": "FE80:0034:0223:A000:0002:B3FF:0000:8329",
         "connection_date": "2021-05-27T10:50:51.342Z"
       },
       {
         "name": "worker9",
         "type": "worker",
         "version": "4.5.0",
-        "ip": "wazuh-worker",
+        "ip": "FE80:0034:0223:A000:0002:B3FF:0000:8329",
         "connection_date": "2019-05-27T10:48:54.093Z"
       },
       {
         "name": "worker10",
         "type": "worker",
         "version": "4.5.0",
-        "ip": "wazuh-worker",
+        "ip": "FE80:0034:0223:A000:0002:B3FF:0000:8329",
         "connection_date": "2022-05-27T10:48:54.093Z"
       },
       {
         "name": "worker11",
         "type": "worker",
         "version": "4.5.0",
-        "ip": "172.26.0.6",
+        "ip": "FE80:0034:0223:A000:0002:B3FF:0000:8329",
         "connection_date": "2019-05-27T10:48:54.093Z"
       },
       {
         "name": "worker12",
         "type": "worker",
         "version": "4.5.0",
-        "ip": "wazuh-worker",
+        "ip": "FE80:0034:0223:A000:0002:B3FF:0000:8329",
         "connection_date": "2021-05-27T10:50:51.342Z"
       }
     ],
