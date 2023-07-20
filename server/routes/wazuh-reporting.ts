@@ -55,30 +55,31 @@ export function WazuhReportingRoutes(router: IRouter) {
   ]);
 
   router.post({
-      path: '/reports/modules/{moduleID}',
-      validate: {
-        body: schema.object({
-          array: schema.any(),
-          browserTimezone: schema.string(),
-          filters: schema.maybe(schema.any()),
-          agents: schema.maybe(schema.oneOf([agentIDValidation, schema.boolean()])),
-          components: schema.maybe(schema.any()),
-          searchBar: schema.maybe(schema.string()),
-          section: schema.maybe(schema.string()),
-          tab: schema.string(),
-          tables: schema.maybe(schema.any()),
-          time: schema.oneOf([schema.object({
-            from: schema.string(),
-            to: schema.string()
-          }), schema.string()]),
-          indexPatternTitle: schema.string(),
-          apiId: schema.string()
-        }),
-        params: schema.object({
-          moduleID: moduleIDValidation
-        })
-      }
-    },
+    path: '/reports/modules/{moduleID}',
+    validate: {
+      body: schema.object({
+        array: schema.any(),
+        browserTimezone: schema.string(),
+        serverSideQuery: schema.string(),
+        filters: schema.maybe(schema.any()),
+        agents: schema.maybe(schema.oneOf([agentIDValidation, schema.boolean()])),
+        components: schema.maybe(schema.any()),
+        searchBar: schema.maybe(schema.string()),
+        section: schema.maybe(schema.string()),
+        tab: schema.string(),
+        tables: schema.maybe(schema.any()),
+        time: schema.oneOf([schema.object({
+          from: schema.string(),
+          to: schema.string()
+        }), schema.string()]),
+        indexPatternTitle: schema.string(),
+        apiId: schema.string()
+      }),
+      params: schema.object({
+        moduleID: moduleIDValidation
+      })
+    }
+  },
     (context, request, response) => ctrl.createReportsModules(context, request, response)
   );
 
@@ -124,6 +125,7 @@ export function WazuhReportingRoutes(router: IRouter) {
       body: schema.object({
         array: schema.any(),
         browserTimezone: schema.string(),
+        serverSideQuery: schema.string(),
         filters: schema.maybe(schema.any()),
         agents: schema.maybe(schema.oneOf([schema.string(), schema.boolean()])),
         components: schema.maybe(schema.any()),
@@ -148,33 +150,33 @@ export function WazuhReportingRoutes(router: IRouter) {
 
   // Fetch specific report
   router.get({
-      path: '/reports/{name}',
-      validate: {
-        params: schema.object({
-          name: ReportFilenameValidation
-        })
-      }
-    },
+    path: '/reports/{name}',
+    validate: {
+      params: schema.object({
+        name: ReportFilenameValidation
+      })
+    }
+  },
     (context, request, response) => ctrl.getReportByName(context, request, response)
   );
 
   // Delete specific report
   router.delete({
-      path: '/reports/{name}',
-      validate: {
-        params: schema.object({
-          name: ReportFilenameValidation
-        })
-      }
-    },
+    path: '/reports/{name}',
+    validate: {
+      params: schema.object({
+        name: ReportFilenameValidation
+      })
+    }
+  },
     (context, request, response) => ctrl.deleteReportByName(context, request, response)
   )
 
   // Fetch the reports list
   router.get({
-      path: '/reports',
-      validate: false
-    },
+    path: '/reports',
+    validate: false
+  },
     (context, request, response) => ctrl.getReports(context, request, response)
   );
 }

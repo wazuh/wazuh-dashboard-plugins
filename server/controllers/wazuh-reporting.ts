@@ -36,7 +36,7 @@ interface AgentsFilter {
 }
 
 export class WazuhReportingCtrl {
-  constructor() {}
+  constructor() { }
   /**
    * This do format to filters
    * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
@@ -70,22 +70,21 @@ export class WazuhReportingCtrl {
       const { negate, key, value, params, type } = filters[i].meta;
       str += `${negate ? 'NOT ' : ''}`;
       str += `${key}: `;
-      str += `${
-        type === 'range'
-          ? `${params.gte}-${params.lt}`
-          : type === 'phrases'
-            ? '(' + params.join(" OR ") + ')'
-            : type === 'exists'
-              ? '*'
-              : !!value
-          ? value
-          : (params || {}).query
-      }`;
+      str += `${type === 'range'
+        ? `${params.gte}-${params.lt}`
+        : type === 'phrases'
+          ? '(' + params.join(" OR ") + ')'
+          : type === 'exists'
+            ? '*'
+            : !!value
+              ? value
+              : (params || {}).query
+        }`;
       str += `${i === len - 1 ? '' : ' AND '}`;
     }
 
     if (searchBar) {
-      str += ` AND (${ searchBar})`;
+      str += ` AND (${searchBar})`;
     }
 
     agentsFilter.agentsText = agentsList.map((filter) => filter.meta.value).join(',');
@@ -211,8 +210,8 @@ export class WazuhReportingCtrl {
           plainData[key] =
             Array.isArray(data[key]) && typeof data[key][0] !== 'object'
               ? data[key].map((x) => {
-                  return typeof x === 'object' ? JSON.stringify(x) : x + '\n';
-                })
+                return typeof x === 'object' ? JSON.stringify(x) : x + '\n';
+              })
               : data[key];
         } else if (Array.isArray(data[key]) && typeof data[key][0] === 'object') {
           tableData[key] = data[key];
@@ -229,7 +228,7 @@ export class WazuhReportingCtrl {
       title: (section.options || {}).hideHeader
         ? ''
         : (section.tabs || [])[tab] ||
-          (section.isGroupConfig ? ((section.labels || [])[0] || [])[tab] : ''),
+        (section.isGroupConfig ? ((section.labels || [])[0] || [])[tab] : ''),
       columns: ['', ''],
       type: 'config',
       rows: this.getConfigRows(plainData, (section.labels || [])[0]),
@@ -247,10 +246,10 @@ export class WazuhReportingCtrl {
             typeof x[key] !== 'object'
               ? x[key]
               : Array.isArray(x[key])
-              ? x[key].map((x) => {
+                ? x[key].map((x) => {
                   return x + '\n';
                 })
-              : JSON.stringify(x[key])
+                : JSON.stringify(x[key])
           );
         }
         while (row.length < columns.length) {
@@ -291,6 +290,7 @@ export class WazuhReportingCtrl {
         browserTimezone,
         searchBar,
         filters,
+        serverSideQuery,
         time,
         tables,
         section,
@@ -327,7 +327,7 @@ export class WazuhReportingCtrl {
           apiId,
           new Date(from).getTime(),
           new Date(to).getTime(),
-          sanitizedFilters,
+          serverSideQuery,
           agentsFilter,
           indexPatternTitle,
           agents
@@ -356,7 +356,7 @@ export class WazuhReportingCtrl {
     } catch (error) {
       return ErrorResponse(error.message || error, 5029, 500, response);
     }
-  },({body:{ agents }, params: { moduleID }}) => `wazuh-module-${agents ? `agents-${agents}` : 'overview'}-${moduleID}-${this.generateReportTimestamp()}.pdf`)
+  }, ({ body: { agents }, params: { moduleID } }) => `wazuh-module-${agents ? `agents-${agents}` : 'overview'}-${moduleID}-${this.generateReportTimestamp()}.pdf`)
 
   /**
    * Create a report for the groups
@@ -365,7 +365,7 @@ export class WazuhReportingCtrl {
    * @param {Object} response
    * @returns {*} reports list or ErrorResponse
    */
-  createReportsGroups = this.checkReportsUserDirectoryIsValidRouteDecorator(async(
+  createReportsGroups = this.checkReportsUserDirectoryIsValidRouteDecorator(async (
     context: RequestHandlerContext,
     request: OpenSearchDashboardsRequest,
     response: OpenSearchDashboardsResponseFactory
@@ -486,10 +486,10 @@ export class WazuhReportingCtrl {
                           typeof x[key] !== 'object'
                             ? x[key]
                             : Array.isArray(x[key])
-                            ? x[key].map((x) => {
+                              ? x[key].map((x) => {
                                 return x + '\n';
                               })
-                            : JSON.stringify(x[key])
+                              : JSON.stringify(x[key])
                         );
                       });
                       return row;
@@ -613,7 +613,7 @@ export class WazuhReportingCtrl {
       log('reporting:createReportsGroups', error.message || error);
       return ErrorResponse(error.message || error, 5029, 500, response);
     }
-  }, ({params: { groupID }}) => `wazuh-group-configuration-${groupID}-${this.generateReportTimestamp()}.pdf`)
+  }, ({ params: { groupID } }) => `wazuh-group-configuration-${groupID}-${this.generateReportTimestamp()}.pdf`)
 
   /**
    * Create a report for the agents
@@ -622,7 +622,7 @@ export class WazuhReportingCtrl {
    * @param {Object} response
    * @returns {*} reports list or ErrorResponse
    */
-  createReportsAgentsConfiguration = this.checkReportsUserDirectoryIsValidRouteDecorator( async (
+  createReportsAgentsConfiguration = this.checkReportsUserDirectoryIsValidRouteDecorator(async (
     context: RequestHandlerContext,
     request: OpenSearchDashboardsRequest,
     response: OpenSearchDashboardsResponseFactory
@@ -745,10 +745,10 @@ export class WazuhReportingCtrl {
                                 typeof x[key] !== 'object'
                                   ? x[key]
                                   : Array.isArray(x[key])
-                                  ? x[key].map((x) => {
+                                    ? x[key].map((x) => {
                                       return x + '\n';
                                     })
-                                  : JSON.stringify(x[key])
+                                    : JSON.stringify(x[key])
                               );
                             });
                             return row;
@@ -775,13 +775,13 @@ export class WazuhReportingCtrl {
                     } else {
                       /*INTEGRITY MONITORING MONITORED DIRECTORIES */
                       if (conf.matrix) {
-                        const {directories,diff,synchronization,file_limit,...rest} = agentConfig[agentConfigKey];
+                        const { directories, diff, synchronization, file_limit, ...rest } = agentConfig[agentConfigKey];
                         tables.push(
                           ...this.getConfigTables(rest, section, idx),
-                          ...(diff && diff.disk_quota ? this.getConfigTables(diff.disk_quota, {tabs:['Disk quota']}, 0 ): []),
-                          ...(diff && diff.file_size ? this.getConfigTables(diff.file_size, {tabs:['File size']}, 0 ): []),
-                          ...(synchronization ? this.getConfigTables(synchronization, {tabs:['Synchronization']}, 0 ): []),
-                          ...(file_limit ? this.getConfigTables(file_limit, {tabs:['File limit']}, 0 ): []),
+                          ...(diff && diff.disk_quota ? this.getConfigTables(diff.disk_quota, { tabs: ['Disk quota'] }, 0) : []),
+                          ...(diff && diff.file_size ? this.getConfigTables(diff.file_size, { tabs: ['File size'] }, 0) : []),
+                          ...(synchronization ? this.getConfigTables(synchronization, { tabs: ['Synchronization'] }, 0) : []),
+                          ...(file_limit ? this.getConfigTables(file_limit, { tabs: ['File limit'] }, 0) : []),
                         );
                         let diffOpts = [];
                         Object.keys(section.opts).forEach((x) => {
@@ -860,7 +860,7 @@ export class WazuhReportingCtrl {
       log('reporting:createReportsAgentsConfiguration', error.message || error);
       return ErrorResponse(error.message || error, 5029, 500, response);
     }
-  }, ({ params: { agentID }}) => `wazuh-agent-configuration-${agentID}-${this.generateReportTimestamp()}.pdf`)
+  }, ({ params: { agentID } }) => `wazuh-agent-configuration-${agentID}-${this.generateReportTimestamp()}.pdf`)
 
   /**
    * Create a report for the agents
@@ -869,14 +869,14 @@ export class WazuhReportingCtrl {
    * @param {Object} response
    * @returns {*} reports list or ErrorResponse
    */
-  createReportsAgentsInventory = this.checkReportsUserDirectoryIsValidRouteDecorator( async (
+  createReportsAgentsInventory = this.checkReportsUserDirectoryIsValidRouteDecorator(async (
     context: RequestHandlerContext,
     request: OpenSearchDashboardsRequest,
     response: OpenSearchDashboardsResponseFactory
   ) => {
     try {
       log('reporting:createReportsAgentsInventory', `Report started`, 'info');
-      const { searchBar, filters, time, indexPatternTitle, apiId } = request.body;
+      const { searchBar, filters, time, indexPatternTitle, apiId, serverSideQuery } = request.body;
       const { agentID } = request.params;
       const { from, to } = time || {};
       // Init
@@ -924,18 +924,18 @@ export class WazuhReportingCtrl {
             columns:
               agentOs === 'windows'
                 ? [
-                    { id: 'name', label: 'Name' },
-                    { id: 'architecture', label: 'Architecture' },
-                    { id: 'version', label: 'Version' },
-                    { id: 'vendor', label: 'Vendor' },
-                  ]
+                  { id: 'name', label: 'Name' },
+                  { id: 'architecture', label: 'Architecture' },
+                  { id: 'version', label: 'Version' },
+                  { id: 'vendor', label: 'Vendor' },
+                ]
                 : [
-                    { id: 'name', label: 'Name' },
-                    { id: 'architecture', label: 'Architecture' },
-                    { id: 'version', label: 'Version' },
-                    { id: 'vendor', label: 'Vendor' },
-                    { id: 'description', label: 'Description' },
-                  ],
+                  { id: 'name', label: 'Name' },
+                  { id: 'architecture', label: 'Architecture' },
+                  { id: 'version', label: 'Version' },
+                  { id: 'vendor', label: 'Vendor' },
+                  { id: 'description', label: 'Description' },
+                ],
           },
         },
         {
@@ -946,17 +946,17 @@ export class WazuhReportingCtrl {
             columns:
               agentOs === 'windows'
                 ? [
-                    { id: 'name', label: 'Name' },
-                    { id: 'cmd', label: 'CMD' },
-                    { id: 'priority', label: 'Priority' },
-                    { id: 'nlwp', label: 'NLWP' },
-                  ]
+                  { id: 'name', label: 'Name' },
+                  { id: 'cmd', label: 'CMD' },
+                  { id: 'priority', label: 'Priority' },
+                  { id: 'nlwp', label: 'NLWP' },
+                ]
                 : [
-                    { id: 'name', label: 'Name' },
-                    { id: 'euser', label: 'Effective user' },
-                    { id: 'nice', label: 'Priority' },
-                    { id: 'state', label: 'State' },
-                  ],
+                  { id: 'name', label: 'Name' },
+                  { id: 'euser', label: 'Effective user' },
+                  { id: 'nice', label: 'Priority' },
+                  { id: 'state', label: 'State' },
+                ],
           },
           mapResponseItems: (item) =>
             agentOs === 'windows' ? item : { ...item, state: ProcessEquivalence[item.state] },
@@ -969,18 +969,18 @@ export class WazuhReportingCtrl {
             columns:
               agentOs === 'windows'
                 ? [
-                    { id: 'local_ip', label: 'Local IP address' },
-                    { id: 'local_port', label: 'Local port' },
-                    { id: 'process', label: 'Process' },
-                    { id: 'state', label: 'State' },
-                    { id: 'protocol', label: 'Protocol' },
-                  ]
+                  { id: 'local_ip', label: 'Local IP address' },
+                  { id: 'local_port', label: 'Local port' },
+                  { id: 'process', label: 'Process' },
+                  { id: 'state', label: 'State' },
+                  { id: 'protocol', label: 'Protocol' },
+                ]
                 : [
-                    { id: 'local_ip', label: 'Local IP address' },
-                    { id: 'local_port', label: 'Local port' },
-                    { id: 'state', label: 'State' },
-                    { id: 'protocol', label: 'Protocol' },
-                  ],
+                  { id: 'local_ip', label: 'Local IP address' },
+                  { id: 'local_port', label: 'Local port' },
+                  { id: 'state', label: 'State' },
+                  { id: 'protocol', label: 'Protocol' },
+                ],
           },
           mapResponseItems: (item) => ({
             ...item,
@@ -1062,6 +1062,16 @@ export class WazuhReportingCtrl {
       };
 
       if (time) {
+        // Add Vulnerability Detector filter to the Server Side Query
+        const parsedserverSideQuery = JSON.parse(serverSideQuery);
+        parsedserverSideQuery?.bool?.must?.push?.({
+          match_phrase: {
+            "rule.groups": {
+              query: "vulnerability-detector"
+            }
+          }
+        });
+
         await extendedInformation(
           context,
           printer,
@@ -1070,7 +1080,7 @@ export class WazuhReportingCtrl {
           apiId,
           from,
           to,
-          sanitizedFilters + ' AND rule.groups: "vulnerability-detector"',
+          JSON.stringify(parsedserverSideQuery),
           agentsFilter,
           indexPatternTitle,
           agentID
@@ -1095,7 +1105,7 @@ export class WazuhReportingCtrl {
       log('reporting:createReportsAgents', error.message || error);
       return ErrorResponse(error.message || error, 5029, 500, response);
     }
-  }, ({params: { agentID }}) => `wazuh-agent-inventory-${agentID}-${this.generateReportTimestamp()}.pdf`)
+  }, ({ params: { agentID } }) => `wazuh-agent-inventory-${agentID}-${this.generateReportTimestamp()}.pdf`)
 
   /**
    * Fetch the reports list
@@ -1194,21 +1204,21 @@ export class WazuhReportingCtrl {
       log('reporting:deleteReportByName', error.message || error);
       return ErrorResponse(error.message || error, 5032, 500, response);
     }
-  },(request) => request.params.name)
+  }, (request) => request.params.name)
 
-  checkReportsUserDirectoryIsValidRouteDecorator(routeHandler, reportFileNameAccessor){
+  checkReportsUserDirectoryIsValidRouteDecorator(routeHandler, reportFileNameAccessor) {
     return (async (
       context: RequestHandlerContext,
       request: OpenSearchDashboardsRequest,
       response: OpenSearchDashboardsResponseFactory
     ) => {
-      try{
+      try {
         const { username, hashUsername } = await context.wazuh.security.getCurrentUser(request, context);
         const userReportsDirectoryPath = path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, hashUsername);
         const filename = reportFileNameAccessor(request);
         const pathFilename = path.join(userReportsDirectoryPath, filename);
         log('reporting:checkReportsUserDirectoryIsValidRouteDecorator', `Checking the user ${username}(${hashUsername}) can do actions in the reports file: ${pathFilename}`, 'debug');
-        if(!pathFilename.startsWith(userReportsDirectoryPath) || pathFilename.includes('../')){
+        if (!pathFilename.startsWith(userReportsDirectoryPath) || pathFilename.includes('../')) {
           log('security:reporting:checkReportsUserDirectoryIsValidRouteDecorator', `User ${username}(${hashUsername}) tried to access to a non user report file: ${pathFilename}`, 'warn');
           return response.badRequest({
             body: {
@@ -1217,15 +1227,15 @@ export class WazuhReportingCtrl {
           });
         };
         log('reporting:checkReportsUserDirectoryIsValidRouteDecorator', 'Checking the user can do actions in the reports file', 'debug');
-        return await routeHandler.bind(this)({...context, wazuhEndpointParams: { hashUsername, filename, pathFilename }}, request, response);
-      }catch(error){
+        return await routeHandler.bind(this)({ ...context, wazuhEndpointParams: { hashUsername, filename, pathFilename } }, request, response);
+      } catch (error) {
         log('reporting:checkReportsUserDirectoryIsValidRouteDecorator', error.message || error);
         return ErrorResponse(error.message || error, 5040, 500, response);
       }
     })
   }
 
-  private generateReportTimestamp(){
+  private generateReportTimestamp() {
     return `${(Date.now() / 1000) | 0}`;
   }
 }
