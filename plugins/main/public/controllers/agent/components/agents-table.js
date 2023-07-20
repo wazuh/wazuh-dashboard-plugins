@@ -11,7 +11,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import {
   EuiBasicTable,
@@ -49,7 +49,6 @@ import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { AgentStatus } from '../../../components/agents/agent_status';
 import { AgentSynced } from '../../../components/agents/agent-synced';
-import { compressIPv6 } from '../../../services/ipv6-services';
 
 export const AgentsTable = withErrorBoundary(
   class AgentsTable extends Component {
@@ -315,10 +314,11 @@ export const AgentsTable = withErrorBoundary(
         agent.node_name && agent.node_name !== 'unknown'
           ? agent.node_name
           : '-';
+
       return {
         id: agent.id,
         name: agent.name,
-        ip: compressIPv6(agent.ip),
+        ip: agent.ip,
         status: agent.status,
         group_config_status: agent.group_config_status,
         group: agent?.group || '-',
@@ -344,7 +344,10 @@ export const AgentsTable = withErrorBoundary(
             <EuiButtonIcon
               onClick={ev => {
                 ev.stopPropagation();
-                this.props.clickAction(agent, 'default');
+                AppNavigate.navigateToModule(ev, 'agents', {
+                  tab: 'welcome',
+                  agent: agent.id,
+                });
               }}
               iconType='eye'
               color={'primary'}
@@ -360,7 +363,10 @@ export const AgentsTable = withErrorBoundary(
               <EuiButtonIcon
                 onClick={ev => {
                   ev.stopPropagation();
-                  this.props.clickAction(agent, 'configuration');
+                  AppNavigate.navigateToModule(ev, 'agents', {
+                    tab: 'configuration',
+                    agent: agent.id,
+                  });
                 }}
                 color={'primary'}
                 iconType='wrench'
@@ -749,7 +755,7 @@ export const AgentsTable = withErrorBoundary(
           return;
         }
         return {
-          onMouseDown: ev => {
+          onClick: ev => {
             AppNavigate.navigateToModule(ev, 'agents', {
               tab: 'welcome',
               agent: item.id,
@@ -839,7 +845,6 @@ export const AgentsTable = withErrorBoundary(
         />
       );
     }
-
     render() {
       const title = this.headRender();
       const filter = this.filterBarRender();
@@ -870,7 +875,6 @@ AgentsTable.propTypes = {
   wzReq: PropTypes.func,
   addingNewAgent: PropTypes.func,
   downloadCsv: PropTypes.func,
-  clickAction: PropTypes.func,
   timeService: PropTypes.func,
   reload: PropTypes.func,
 };
