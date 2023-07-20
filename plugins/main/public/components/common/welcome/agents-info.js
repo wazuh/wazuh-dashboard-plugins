@@ -19,7 +19,6 @@ import WzTextWithTooltipIfTruncated from '../wz-text-with-tooltip-if-truncated';
 import { WzStat } from '../../wz-stat';
 import { GroupTruncate } from '../util/agent-group-truncate';
 import { AgentStatus } from '../../agents/agent_status';
-import { compressIPv6 } from '../../../services/ipv6-services';
 
 export class AgentInfo extends Component {
   constructor(props) {
