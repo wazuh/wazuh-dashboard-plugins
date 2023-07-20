@@ -22,7 +22,7 @@ export default [
           {
             id: '1',
             enabled: true,
-            type: 'max',
+            type: 'avg',
             params: {
               field: 'remoted.recv_bytes',
               customLabel: 'Count',
@@ -51,16 +51,17 @@ export default [
           {
             id: '3',
             enabled: true,
-            type: 'terms',
+            type: 'filters',
             params: {
-              field: 'remoted.recv_bytes',
-              orderBy: '1',
-              order: 'desc',
-              size: 5,
-              otherBucket: false,
-              otherBucketLabel: 'Other',
-              missingBucket: false,
-              missingBucketLabel: 'Missing',
+              filters: [
+                {
+                  input: {
+                    query: 'remoted.recv_bytes:*',
+                    language: 'kuery',
+                  },
+                  label: 'recv_bytes',
+                },
+              ],
             },
             schema: 'group',
           },
@@ -98,7 +99,7 @@ export default [
               style: {},
               scale: {
                 type: 'linear',
-                mode: 'stacked',
+                mode: 'normal',
               },
               labels: {
                 show: true,
@@ -115,7 +116,7 @@ export default [
             {
               show: true,
               type: 'line',
-              mode: 'normal',
+              mode: 'stacked',
               data: {
                 label: 'Count',
                 id: '1',
