@@ -21,9 +21,9 @@
 - [Wazuh UI](#wazuh-ui)
 - [Contribute](#contribute)
 - [License](#license)
-- [Copyright](#copyright)   
+- [Copyright](#copyright)
 
-<!-- 
+<!--
 [![Slack](https://img.shields.io/badge/slack-join-blue.svg)](https://wazuh.com/community/join-us-on-slack/)
 [![Email](https://img.shields.io/badge/email-join-blue.svg)](https://groups.google.com/forum/#!forum/wazuh)
 [![Documentation](https://img.shields.io/badge/docs-view-green.svg)](https://documentation.wazuh.com)
@@ -32,10 +32,10 @@
 
 ## Welcome
 
-This repository contains a set of plugins for [Wazuh dashboard][dashboard].
+This repository contains a set of plugins for [Kibana][dashboard].
 
-Wazuh is a security detection, visibility, and compliance open source project. Wazuh helps 
-you to gain deeper security visibility into your infrastructure by monitoring hosts at an 
+Wazuh is a security detection, visibility, and compliance open source project. Wazuh helps
+you to gain deeper security visibility into your infrastructure by monitoring hosts at an
 operating system and application level.
 
 You can learn more about it at [wazuh.com][web]
@@ -49,10 +49,10 @@ You can learn more about it at [wazuh.com][web]
 - [Contributing](CONTRIBUTING.md)
 - [Styleguide](STYLEGUIDE.md)
 - [Security](SECURITY.md)
-<!-- - [Contributing](CONTRIBUTING.md) -->
-<!-- - [Maintainer Responsibilities](MAINTAINERS.md) -->
-<!-- - [Release Management](RELEASING.md) -->
-<!-- - [Testing](TESTING.md) -->
+  <!-- - [Contributing](CONTRIBUTING.md) -->
+  <!-- - [Maintainer Responsibilities](MAINTAINERS.md) -->
+  <!-- - [Release Management](RELEASING.md) -->
+  <!-- - [Testing](TESTING.md) -->
 
 ## Wazuh UI
 
@@ -100,24 +100,23 @@ You can learn more about it at [wazuh.com][web]
 
 ## Contribute
 
-If you want to contribute to our project please don't hesitate to send a pull request. 
-Take a look at the [branches and tags][branches] page in our Wiki, and also to our 
+If you want to contribute to our project please don't hesitate to send a pull request.
+Take a look at the [branches and tags][branches] page in our Wiki, and also to our
 [contributing](CONTRIBUTING.md) guidelines.
 
 ## License
 
 This project is licensed under the [GNU General Public License v2.0](LICENSE).
 
-This program is free software; you can redistribute it and/or modify it under the terms 
-of the GNU General Public License as published by the Free Software Foundation; either 
+This program is free software; you can redistribute it and/or modify it under the terms
+of the GNU General Public License as published by the Free Software Foundation; either
 version 2 of the License, or (at your option) any later version.
 
 ## Copyright
 
 - Copyright &copy; Wazuh, Inc.
 
-
-[dashboard]: https://github.com/wazuh/wazuh-dashboard
+[dashboard]: https://github.com/elastic/kibana
 [web]: https://wazuh.com
 [docs]: https://documentation.wazuh.com
 [install]: https://documentation.wazuh.com/current/installation-guide/index.html
