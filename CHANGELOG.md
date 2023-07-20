@@ -8,6 +8,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.7.0
 
+### Fixed
+
+- Fixed problem with new or missing columns in agent table. [#5591](https://github.com/wazuh/wazuh-kibana-app/pull/5591)
+
 ## Wazuh v4.6.0 - OpenSearch Dashboards 2.6.0 - Revision 01
 
 ### Added
