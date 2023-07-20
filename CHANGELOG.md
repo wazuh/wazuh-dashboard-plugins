@@ -11,6 +11,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Fixed
 
 - Fixed problem with new or missing columns in agent table. [#5591](https://github.com/wazuh/wazuh-kibana-app/pull/5591)
+- Fixed the color of the agent name in the groups section in dark mode. [#5676](https://github.com/wazuh/wazuh-kibana-app/pull/5676)
 
 ## Wazuh v4.6.0 - OpenSearch Dashboards 2.6.0 - Revision 01
 
