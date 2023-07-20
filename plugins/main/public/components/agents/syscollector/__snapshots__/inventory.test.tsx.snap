@@ -130,7 +130,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
                   d="M8 8H4.915a1.5 1.5 0 110-1H8V2.5A1.5 1.5 0 019.5 1h2.585a1.5 1.5 0 110 1H9.5a.5.5 0 00-.5.5v10a.5.5 0 00.5.5h2.585a1.5 1.5 0 110 1H9.5A1.5 1.5 0 018 12.5V8zM3.5 3a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm0 12a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm10-6a1.5 1.5 0 110-3 1.5 1.5 0 010 3z"
                 />
               </svg>
-                  
+                 
               <div
                 class="euiText euiText--medium"
               >
@@ -210,7 +210,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
                   </div>
                 </div>
                 <table
-                  class="euiTable euiTable--responsive"
+                  class="euiTable euiTable--responsive euiTable--auto"
                   id="__table_7d62db31-1cd0-11ee-8e0c-33242698a3b9"
                   tabindex="-1"
                 >
@@ -407,7 +407,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
                   d="M5.5 6.5v6l-3-3zM7 7V6h6.5v1z"
                 />
               </svg>
-                  
+                 
               <div
                 class="euiText euiText--medium"
               >
@@ -532,7 +532,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
                   </div>
                 </div>
                 <table
-                  class="euiTable euiTable--responsive"
+                  class="euiTable euiTable--responsive euiTable--auto"
                   id="__table_7d62db31-1cd0-11ee-8e0c-33242698a3b9"
                   tabindex="-1"
                 >
@@ -688,7 +688,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
                   fill-rule="evenodd"
                 />
               </svg>
-                  
+                 
               <div
                 class="euiText euiText--medium"
               >
@@ -768,7 +768,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
                   </div>
                 </div>
                 <table
-                  class="euiTable euiTable--responsive"
+                  class="euiTable euiTable--responsive euiTable--auto"
                   id="__table_7d62db31-1cd0-11ee-8e0c-33242698a3b9"
                   tabindex="-1"
                 >
@@ -962,7 +962,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
                   d="M2 4V2h2v2H2zm5 0V2h2v2H7zm5 0V2h2v2h-2zM2 9V7h2v2H2zm5 0V7h2v2H7zm5 0V7h2v2h-2zM2 14v-2h2v2H2zm5 0v-2h2v2H7zm5 0v-2h2v2h-2z"
                 />
               </svg>
-                  
+                 
               <div
                 class="euiText euiText--medium"
               >
@@ -1091,7 +1091,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
                   </div>
                 </div>
                 <table
-                  class="euiTable euiTable--responsive"
+                  class="euiTable euiTable--responsive euiTable--auto"
                   id="__table_7d62db31-1cd0-11ee-8e0c-33242698a3b9"
                   tabindex="-1"
                 >
@@ -1326,7 +1326,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
                   d="M1.157 12.224L5.768 8.32a.404.404 0 000-.64l-4.61-3.904a.407.407 0 010-.643.608.608 0 01.759 0l4.61 3.904c.631.534.63 1.393 0 1.926l-4.61 3.904a.608.608 0 01-.76 0 .407.407 0 010-.643zM9 12h6v1H9v-1z"
                 />
               </svg>
-                  
+                 
               <div
                 class="euiText euiText--medium"
               >
@@ -1455,7 +1455,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
                   </div>
                 </div>
                 <table
-                  class="euiTable euiTable--responsive"
+                  class="euiTable euiTable--responsive euiTable--auto"
                   id="__table_7d62db31-1cd0-11ee-8e0c-33242698a3b9"
                   tabindex="-1"
                 >
@@ -1832,7 +1832,7 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
                 width="16"
                 xmlns="http://www.w3.org/2000/svg"
               />
-                  
+                 
               <div
                 class="euiText euiText--medium"
               >
@@ -1907,7 +1907,7 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
                   </div>
                 </div>
                 <table
-                  class="euiTable euiTable--responsive"
+                  class="euiTable euiTable--responsive euiTable--auto"
                   id="__table_7d62db31-1cd0-11ee-8e0c-33242698a3b9"
                   tabindex="-1"
                 >
@@ -2094,7 +2094,7 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
                 width="16"
                 xmlns="http://www.w3.org/2000/svg"
               />
-                  
+                 
               <div
                 class="euiText euiText--medium"
               >
@@ -2210,7 +2210,7 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
                   </div>
                 </div>
                 <table
-                  class="euiTable euiTable--responsive"
+                  class="euiTable euiTable--responsive euiTable--auto"
                   id="__table_7d62db31-1cd0-11ee-8e0c-33242698a3b9"
                   tabindex="-1"
                 >
@@ -2409,7 +2409,7 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
                 width="16"
                 xmlns="http://www.w3.org/2000/svg"
               />
-                  
+                 
               <div
                 class="euiText euiText--medium"
               >
@@ -2484,7 +2484,7 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
                   </div>
                 </div>
                 <table
-                  class="euiTable euiTable--responsive"
+                  class="euiTable euiTable--responsive euiTable--auto"
                   id="__table_7d62db31-1cd0-11ee-8e0c-33242698a3b9"
                   tabindex="-1"
                 >
@@ -2674,7 +2674,7 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
                 width="16"
                 xmlns="http://www.w3.org/2000/svg"
               />
-                  
+                 
               <div
                 class="euiText euiText--medium"
               >
@@ -2794,7 +2794,7 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
                   </div>
                 </div>
                 <table
-                  class="euiTable euiTable--responsive"
+                  class="euiTable euiTable--responsive euiTable--auto"
                   id="__table_7d62db31-1cd0-11ee-8e0c-33242698a3b9"
                   tabindex="-1"
                 >
@@ -3022,7 +3022,7 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
                 width="16"
                 xmlns="http://www.w3.org/2000/svg"
               />
-                  
+                 
               <div
                 class="euiText euiText--medium"
               >
@@ -3142,7 +3142,7 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
                   </div>
                 </div>
                 <table
-                  class="euiTable euiTable--responsive"
+                  class="euiTable euiTable--responsive euiTable--auto"
                   id="__table_7d62db31-1cd0-11ee-8e0c-33242698a3b9"
                   tabindex="-1"
                 >
@@ -3641,7 +3641,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
                   d="M8 8H4.915a1.5 1.5 0 110-1H8V2.5A1.5 1.5 0 019.5 1h2.585a1.5 1.5 0 110 1H9.5a.5.5 0 00-.5.5v10a.5.5 0 00.5.5h2.585a1.5 1.5 0 110 1H9.5A1.5 1.5 0 018 12.5V8zM3.5 3a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm0 12a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm10-6a1.5 1.5 0 110-3 1.5 1.5 0 010 3z"
                 />
               </svg>
-                  
+                 
               <div
                 class="euiText euiText--medium"
               >
@@ -3721,7 +3721,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
                   </div>
                 </div>
                 <table
-                  class="euiTable euiTable--responsive"
+                  class="euiTable euiTable--responsive euiTable--auto"
                   id="__table_7d62db31-1cd0-11ee-8e0c-33242698a3b9"
                   tabindex="-1"
                 >
@@ -3918,7 +3918,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
                   d="M5.5 6.5v6l-3-3zM7 7V6h6.5v1z"
                 />
               </svg>
-                  
+                 
               <div
                 class="euiText euiText--medium"
               >
@@ -4043,7 +4043,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
                   </div>
                 </div>
                 <table
-                  class="euiTable euiTable--responsive"
+                  class="euiTable euiTable--responsive euiTable--auto"
                   id="__table_7d62db31-1cd0-11ee-8e0c-33242698a3b9"
                   tabindex="-1"
                 >
@@ -4223,7 +4223,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
                   fill-rule="evenodd"
                 />
               </svg>
-                  
+                 
               <div
                 class="euiText euiText--medium"
               >
@@ -4303,7 +4303,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
                   </div>
                 </div>
                 <table
-                  class="euiTable euiTable--responsive"
+                  class="euiTable euiTable--responsive euiTable--auto"
                   id="__table_7d62db31-1cd0-11ee-8e0c-33242698a3b9"
                   tabindex="-1"
                 >
@@ -4490,7 +4490,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
                 width="16"
                 xmlns="http://www.w3.org/2000/svg"
               />
-                  
+                 
               <div
                 class="euiText euiText--medium"
               >
@@ -4570,7 +4570,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
                   </div>
                 </div>
                 <table
-                  class="euiTable euiTable--responsive"
+                  class="euiTable euiTable--responsive euiTable--auto"
                   id="__table_7d62db31-1cd0-11ee-8e0c-33242698a3b9"
                   tabindex="-1"
                 >
@@ -4668,7 +4668,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
                   d="M2 4V2h2v2H2zm5 0V2h2v2H7zm5 0V2h2v2h-2zM2 9V7h2v2H2zm5 0V7h2v2H7zm5 0V7h2v2h-2zM2 14v-2h2v2H2zm5 0v-2h2v2H7zm5 0v-2h2v2h-2z"
                 />
               </svg>
-                  
+                 
               <div
                 class="euiText euiText--medium"
               >
@@ -4797,7 +4797,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
                   </div>
                 </div>
                 <table
-                  class="euiTable euiTable--responsive"
+                  class="euiTable euiTable--responsive euiTable--auto"
                   id="__table_7d62db31-1cd0-11ee-8e0c-33242698a3b9"
                   tabindex="-1"
                 >
@@ -5008,7 +5008,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
                   d="M1.157 12.224L5.768 8.32a.404.404 0 000-.64l-4.61-3.904a.407.407 0 010-.643.608.608 0 01.759 0l4.61 3.904c.631.534.63 1.393 0 1.926l-4.61 3.904a.608.608 0 01-.76 0 .407.407 0 010-.643zM9 12h6v1H9v-1z"
                 />
               </svg>
-                  
+                 
               <div
                 class="euiText euiText--medium"
               >
@@ -5137,7 +5137,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
                   </div>
                 </div>
                 <table
-                  class="euiTable euiTable--responsive"
+                  class="euiTable euiTable--responsive euiTable--auto"
                   id="__table_7d62db31-1cd0-11ee-8e0c-33242698a3b9"
                   tabindex="-1"
                 >
