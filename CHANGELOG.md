@@ -8,6 +8,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.7.0
 
+### Fixed
+
+- Fixed the color of the agent name in the groups section in dark mode. [#5676](https://github.com/wazuh/wazuh-kibana-app/pull/5676)
+
 ## Wazuh v4.6.0 - OpenSearch Dashboards 2.6.0 - Revision 01
 
 ### Added
