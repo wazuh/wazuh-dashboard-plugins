@@ -44,14 +44,7 @@
           "uname": "Linux |wazuh-manager-master-0 |4.14.114-105.126.amzn2.x86_64 |#1 SMP Tue May 7 02:26:40 UTC 2019 |x86_64",
           "version": "2"
         },
-        "group": [
-          "default",
-          "test",
-          "test2",
-          "test3",
-          "test4",
-          "test5"
-        ],
+        "group": ["default", "test", "test2", "test3", "test4", "test5"],
         "ip": "FE80:1234:2223:A000:2202:B3FF:FE1E:8329",
         "id": "001",
         "registerIP": "FE80:1234:2223:A000:2202:B3FF:FE1E:8329",

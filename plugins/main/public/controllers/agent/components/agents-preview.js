@@ -278,23 +278,32 @@ export const AgentsPreview = compose(
                           />
                         </EuiFlexItem>
                       </EuiFlexGroup>
-                      <EuiFlexGroup className="mt-0">
-                          <EuiFlexItem className="agents-link-item">
-                            <EuiStat
-                              className="euiStatLink last-agents-link"
-                              isLoading={this.state.loadingAgents}
-                              title={
-                                <EuiToolTip position="top" content="View agent details">
-                                  <EuiLink onClick={() => this.showAgent(this.state.lastRegisteredAgent)}>
-                                    {this.state.lastRegisteredAgent?.name || '-'}
-                                  </EuiLink>
-                                </EuiToolTip>
-                              }
-                              titleSize="s"
-                              description="Last registered agent"
-                              titleColor="primary"
-                            />
-                          </EuiFlexItem>
+                      <EuiFlexGroup className='mt-0'>
+                        <EuiFlexItem className='agents-link-item'>
+                          <EuiStat
+                            className='euiStatLink last-agents-link'
+                            isLoading={this.state.loadingAgents}
+                            title={
+                              <EuiToolTip
+                                position='top'
+                                content='View agent details'
+                              >
+                                <EuiLink
+                                  onClick={() =>
+                                    this.showAgent(
+                                      this.state.lastRegisteredAgent,
+                                    )
+                                  }
+                                >
+                                  {this.state.lastRegisteredAgent?.name || '-'}
+                                </EuiLink>
+                              </EuiToolTip>
+                            }
+                            titleSize='s'
+                            description='Last registered agent'
+                            titleColor='primary'
+                          />
+                        </EuiFlexItem>
                         {
                           <EuiFlexItem className='agents-link-item'>
                             <EuiStat
@@ -305,8 +314,15 @@ export const AgentsPreview = compose(
                               }
                               isLoading={this.state.loadingAgents}
                               title={
-                                <EuiToolTip position="top" content="View agent details">
-                                  <EuiLink onClick={() => this.showAgent(this.state.agentMostActive)}>
+                                <EuiToolTip
+                                  position='top'
+                                  content='View agent details'
+                                >
+                                  <EuiLink
+                                    onClick={() =>
+                                      this.showAgent(this.state.agentMostActive)
+                                    }
+                                  >
                                     {this.state.agentMostActive?.name || '-'}
                                   </EuiLink>
                                 </EuiToolTip>
@@ -397,7 +413,7 @@ export const AgentsPreview = compose(
                 wzReq={this.props.tableProps.wzReq}
                 addingNewAgent={this.props.tableProps.addingNewAgent}
                 downloadCsv={this.props.tableProps.downloadCsv}
-                formatUIDate={(date) => formatUIDate(date)}
+                formatUIDate={date => formatUIDate(date)}
                 reload={() => this.fetchAgentStatusDetailsData()}
               />
             </WzReduxProvider>
