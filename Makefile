@@ -5,6 +5,3 @@ prebuild:
 	@echo "- Updating project's versions ..."
 	@node scripts/generate-build-version
 
-tags:
-	@echo "- Generating Git tags ..."
-	@python3 scripts/tag.py
