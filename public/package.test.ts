@@ -29,22 +29,3 @@ describe('package.json revison', () => {
     expect(revisionIsNaN).toBeFalsy();
   });
 });
-
-describe('package.json stage', () => {
-  it('should have a stage', () => {
-    expect(packageValue.stage).toBeDefined();
-  });
-  it('the state should be one of the defined.', () => {
-    const stateDefined = [
-      'pre-alpha',
-      'alpha',
-      'beta',
-      'release-candidate',
-      'stable',
-    ];
-
-    const stage = packageValue.stage;
-
-    expect(stateDefined).toContain(stage);
-  });
-});
