@@ -10,8 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 export function Base(pattern: string, filters: any, gte: number, lte: number, allowedAgentsFilter: any = null) {
-  const parsedserverSideQuery = JSON.parse(filters);
-  parsedserverSideQuery?.bool?.must?.push?.({
+  filters?.bool?.must?.push?.({
     range: {
       timestamp: {
         gte: gte,
@@ -26,7 +25,7 @@ export function Base(pattern: string, filters: any, gte: number, lte: number, al
     aggs: {},
     sort: [],
     script_fields: {},
-    query: parsedserverSideQuery
+    query: filters
   };
   //Add allowed agents filter
   if (allowedAgentsFilter?.query?.bool) {

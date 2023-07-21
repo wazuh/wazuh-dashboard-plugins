@@ -1063,8 +1063,7 @@ export class WazuhReportingCtrl {
 
       if (time) {
         // Add Vulnerability Detector filter to the Server Side Query
-        const parsedserverSideQuery = JSON.parse(serverSideQuery);
-        parsedserverSideQuery?.bool?.must?.push?.({
+        serverSideQuery?.bool?.must?.push?.({
           match_phrase: {
             "rule.groups": {
               query: "vulnerability-detector"
@@ -1080,7 +1079,7 @@ export class WazuhReportingCtrl {
           apiId,
           from,
           to,
-          JSON.stringify(parsedserverSideQuery),
+          serverSideQuery,
           agentsFilter,
           indexPatternTitle,
           agentID

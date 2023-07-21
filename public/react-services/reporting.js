@@ -90,14 +90,14 @@ export class ReportingService {
 
       const appliedFilters = await this.visHandlers.getAppliedFilters(syscollectorFilters);
       const dataplugin = await getDataPlugin();
-      const serverSideQuery = JSON.stringify(dataplugin.query.getOpenSearchQuery());
+      const serverSideQuery = dataplugin.query.getOpenSearchQuery();
       const array = await this.vis2png.checkArray(visualizationIDList);
 
       const browserTimezone = moment.tz.guess(true);
 
       const data = {
         array,
-        serverSideQuery: serverSideQuery, // Used for applying the same filters on the server side requests
+        serverSideQuery, // Used for applying the same filters on the server side requests
         filters: appliedFilters.filters,
         time: appliedFilters.time,
         searchBar: appliedFilters.searchBar,
