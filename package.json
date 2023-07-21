@@ -2,8 +2,6 @@
   "name": "wazuh",
   "version": "4.5.2",
   "revision": "01",
-  "stage": "stable",
-  "commit": "fad907e97",
   "pluginPlatform": {
     "version": "7.16.0"
   },
@@ -41,6 +39,8 @@
     "test:browser": "plugin-helpers test:browser",
     "test:jest": "node scripts/jest",
     "generate:api-4.0-info": "cd scripts/generate-api-4.0-info;./generate-api-4.0-info.sh;cd ../..",
+    "release:bump": "node scripts/release/bump --manifest-package package.json --manifest-plugin kibana.json",
+    "release:tag": "node scripts/release/tag --manifest-package package.json",
     "prebuild": "node scripts/generate-build-version"
   },
   "dependencies": {
