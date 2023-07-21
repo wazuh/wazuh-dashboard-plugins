@@ -17,10 +17,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Changed of regular expression in RBAC. [#5201](https://github.com/wazuh/wazuh-kibana-app/pull/5201)
 - Migrate the timeFilter, metaFields, maxBuckets health checks inside the pattern check. [#5384](https://github.com/wazuh/wazuh-kibana-app/pull/5384)
-- Changed the title to step 3 of the deploy a new agent section. [#5419](https://github.com/wazuh/wazuh-kibana-app/pull/5419)
-- Changed the title of step 3 of the deploy a new agent section. [#5429](https://github.com/wazuh/wazuh-kibana-app/pull/5429)
-- Changed the description of step 3 of the deploy a new agent section. [#5429](https://github.com/wazuh/wazuh-kibana-app/pull/5429)
-- Changed the placeholder of the agent name input of the deploy a new agent section. [#5429](https://github.com/wazuh/wazuh-kibana-app/pull/5429)
 - Changed the query to search for an agent in `management/configuration`. [#5485](https://github.com/wazuh/wazuh-kibana-app/pull/5485)
 - Changed the search bar in management/log to the one used in the rest of the app. [#5476](https://github.com/wazuh/wazuh-kibana-app/pull/5476)
 - Changed the design of the wizard to add agents. [#5457](https://github.com/wazuh/wazuh-kibana-app/pull/5457)
@@ -28,7 +24,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Fixed
 
 - Fixed trailing hyphen character for OS value in the list of agents [#4828](https://github.com/wazuh/wazuh-kibana-app/pull/4828)
-- Fixed an issue that caused incorrect visualization of IPv6 addresses ([#4909](https://github.com/wazuh/wazuh-kibana-app/pull/4909)).
 - Fixed several typos in the code, by @jctello [#4911](https://github.com/wazuh/wazuh-kibana-app/pull/4911)
 - Fixed the display of more than one protocol in the Global configuration section [#4917](https://github.com/wazuh/wazuh-kibana-app/pull/4917)
 - Handling endpoint response was done when there is no data to show [#4918](https://github.com/wazuh/wazuh-kibana-app/pull/4918)
