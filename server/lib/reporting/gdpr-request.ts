@@ -28,10 +28,9 @@ export const topGDPRRequirements = async (
   allowedAgentsFilter,
   pattern = getSettingDefaultValue('pattern')
 ) => {
-  if (filters.includes('rule.gdpr: exists')) {
-    const [head, tail] = filters.split('AND rule.gdpr: exists');
-    filters = head + tail;
-  };
+  filters.bool.filter = filters.bool.filter.filter(filterValue => (
+    JSON.stringify(filterValue) !== '{"exists":{"field":"rule.gdpr"}}'
+  ));
 
   try {
     const base = {};
@@ -86,10 +85,13 @@ export const getRulesByRequirement = async (
   requirement,
   pattern = getSettingDefaultValue('pattern')
 ) => {
-  if (filters.includes('rule.gdpr: exists')) {
-    const [head, tail] = filters.split('AND rule.gdpr: exists');
-    filters = head + tail;
-  };
+  // if (filters.includes('rule.gdpr: exists')) {
+  //   const [head, tail] = filters.split('AND rule.gdpr: exists');
+  //   filters = head + tail;
+  // };
+  filters.bool.filter = filters.bool.filter.filter(filterValue => (
+    JSON.stringify(filterValue) !== '{"exists":{"field":"rule.gdpr"}}'
+  ));
 
   try {
     const base = {};

@@ -28,9 +28,10 @@ export const topPCIRequirements = async (
   allowedAgentsFilter,
   pattern = getSettingDefaultValue('pattern')
 ) => {
-  if (filters.includes('rule.pci_dss: exists')) {
-    filters = filters.replace('AND rule.pci_dss: exists', '');
-  };
+  // Remove the "rule.pci_dss" filter
+  filters.bool.filter = filters.bool.filter.filter(filterValue => (
+    JSON.stringify(filterValue) !== '{"exists":{"field":"rule.pci_dss"}}'
+  ));
 
   try {
     const base = {};
@@ -100,9 +101,13 @@ export const getRulesByRequirement = async (
   requirement,
   pattern = getSettingDefaultValue('pattern')
 ) => {
-  if (filters.includes('rule.pci_dss: exists')) {
-    filters = filters.replace('AND rule.pci_dss: exists', '');
-  };
+  // if (filters.includes('rule.pci_dss: exists')) {
+  //   filters = filters.replace('AND rule.pci_dss: exists', '');
+  // };
+
+  filters.bool.filter = filters.bool.filter.filter(filterValue => (
+    JSON.stringify(filterValue) !== '{"exists":{"field":"rule.pci_dss"}}'
+  ));
 
   try {
     const base = {};
@@ -154,7 +159,7 @@ export const getRulesByRequirement = async (
       ) {
         return accum;
       };
-      accum.push({ruleID: bucket['3'].buckets[0].key, ruleDescription: bucket.key});
+      accum.push({ ruleID: bucket['3'].buckets[0].key, ruleDescription: bucket.key });
       return accum;
     }, []);
   } catch (error) {
