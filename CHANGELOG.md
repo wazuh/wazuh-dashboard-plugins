@@ -57,25 +57,11 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed obsolete code that caused duplicate requests to the api in `Management`. [#5485](https://github.com/wazuh/wazuh-kibana-app/pull/5485)
 - Removed unused embedded jquery-ui [#5592](https://github.com/wazuh/wazuh-kibana-app/pull/5592)
 
-## Wazuh v4.5.1 - OpenSearch Dashboards 2.6.0 - Revision 01
+## Wazuh v4.5.2 - OpenSearch Dashboards 2.6.0 - Revision 01
 
 ### Added
 
-- Add Apple Silicon architecture button to the register Agent wizard [#5478](https://github.com/wazuh/wazuh-kibana-app/pull/5478)
-
-### Fixed
-
-- Fixed the rendering of tables that contains IPs and agent overview [#5471](https://github.com/wazuh/wazuh-kibana-app/pull/5471)
-- Fixed the agents active coverage stat as NaN in Details panel of Agents section [#5490](https://github.com/wazuh/wazuh-kibana-app/pull/5490)
-
-### Removed
-
-- Removed the agent name in the agent info ribbon [#5497](https://github.com/wazuh/wazuh-kibana-app/pull/5497)
-
-### Changed
-
-- Changed method to perform redirection on agent table buttons [#5539](https://github.com/wazuh/wazuh-kibana-app/pull/5539)
-- Changed windows agent service name in the deploy agent wizard [#5538](https://github.com/wazuh/wazuh-kibana-app/pull/5538)
+- Support for Wazuh 4.5.2
 
 ## Wazuh v4.5.1 - OpenSearch Dashboards 2.6.0 - Revision 01
 
