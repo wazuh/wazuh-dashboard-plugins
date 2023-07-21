@@ -16,6 +16,7 @@ elastic_versions=(
 	"7.17.8"
 	"7.17.9"
 	"7.17.10"
+  "7.17.11"
 )
 
 wazuh_versions=(
