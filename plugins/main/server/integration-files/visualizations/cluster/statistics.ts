@@ -17,13 +17,132 @@ export default [
       title: 'Wazuh App Statistics remoted Recv bytes',
       visState: JSON.stringify({
         title: 'Wazuh App Statistics remoted Recv bytes',
-        type: 'timelion',
+        type: 'line',
+        aggs: [
+          {
+            id: '1',
+            enabled: true,
+            type: 'avg',
+            params: {
+              field: 'remoted.recv_bytes',
+              customLabel: 'Count',
+            },
+            schema: 'metric',
+          },
+          {
+            id: '2',
+            enabled: true,
+            type: 'date_histogram',
+            params: {
+              field: 'timestamp',
+              timeRange: {
+                from: 'now-24h',
+                to: 'now',
+              },
+              useNormalizedOpenSearchInterval: true,
+              scaleMetricValues: false,
+              interval: 'auto',
+              drop_partials: false,
+              min_doc_count: 1,
+              extended_bounds: {},
+            },
+            schema: 'segment',
+          },
+          {
+            id: '3',
+            enabled: true,
+            type: 'filters',
+            params: {
+              filters: [
+                {
+                  input: {
+                    query: 'remoted.recv_bytes:*',
+                    language: 'kuery',
+                  },
+                  label: 'recv_bytes',
+                },
+              ],
+            },
+            schema: 'group',
+          },
+        ],
         params: {
-          expression:
-            ".es(index=wazuh-statistics-*, timefield=timestamp,metric=avg:remoted.recv_bytes, q='*').label(recv_bytes),.es(index=wazuh-statistics-*, timefield=timestamp,metric=avg:remoted.recv_bytes, q='*').trend().label(Trend).lines(width=1.5)",
-          interval: '5m',
+          type: 'line',
+          grid: {
+            categoryLines: true,
+          },
+          categoryAxes: [
+            {
+              id: 'CategoryAxis-1',
+              type: 'category',
+              position: 'bottom',
+              show: true,
+              style: {},
+              scale: {
+                type: 'linear',
+              },
+              labels: {
+                show: true,
+                filter: true,
+                truncate: 100,
+              },
+              title: {},
+            },
+          ],
+          valueAxes: [
+            {
+              id: 'ValueAxis-1',
+              name: 'LeftAxis-1',
+              type: 'value',
+              position: 'left',
+              show: true,
+              style: {},
+              scale: {
+                type: 'linear',
+                mode: 'normal',
+              },
+              labels: {
+                show: true,
+                rotate: 0,
+                filter: false,
+                truncate: 100,
+              },
+              title: {
+                text: 'Count',
+              },
+            },
+          ],
+          seriesParams: [
+            {
+              show: true,
+              type: 'line',
+              mode: 'stacked',
+              data: {
+                label: 'Count',
+                id: '1',
+              },
+              valueAxis: 'ValueAxis-1',
+              drawLinesBetweenPoints: true,
+              lineWidth: 2,
+              interpolate: 'linear',
+              showCircles: true,
+            },
+          ],
+          addTooltip: true,
+          addLegend: true,
+          legendPosition: 'right',
+          times: [],
+          addTimeMarker: false,
+          labels: {},
+          thresholdLine: {
+            show: false,
+            value: 10,
+            width: 1,
+            style: 'full',
+            color: '#E7664C',
+          },
+          row: true,
         },
-        aggs: [],
       }),
       uiStateJSON: '{}',
       description: '',
@@ -44,13 +163,131 @@ export default [
       title: 'Wazuh App Statistics remoted event count',
       visState: JSON.stringify({
         title: 'Wazuh App Statistics remoted event count',
-        type: 'timelion',
+        type: 'line',
+        aggs: [
+          {
+            id: '1',
+            enabled: true,
+            type: 'avg',
+            params: {
+              field: 'remoted.evt_count',
+              customLabel: 'Count',
+            },
+            schema: 'metric',
+          },
+          {
+            id: '2',
+            enabled: true,
+            type: 'date_histogram',
+            params: {
+              field: 'timestamp',
+              timeRange: {
+                from: 'now-30m',
+                to: 'now',
+              },
+              useNormalizedOpenSearchInterval: true,
+              scaleMetricValues: false,
+              interval: 'auto',
+              drop_partials: false,
+              min_doc_count: 1,
+              extended_bounds: {},
+            },
+            schema: 'segment',
+          },
+          {
+            id: '3',
+            enabled: true,
+            type: 'filters',
+            params: {
+              filters: [
+                {
+                  input: {
+                    query: 'remoted.evt_count:*',
+                    language: 'kuery',
+                  },
+                  label: 'evt_count',
+                },
+              ],
+            },
+            schema: 'group',
+          },
+        ],
         params: {
-          expression:
-            ".es(index=wazuh-statistics-*, timefield=timestamp,metric=avg:remoted.evt_count, q='*').label(evt_count),.es(index=wazuh-statistics-*, timefield=timestamp,metric=avg:remoted.evt_count, q='*').trend().label(Trend).lines(width=1.5)",
-          interval: '5m',
+          type: 'line',
+          grid: {
+            categoryLines: true,
+          },
+          categoryAxes: [
+            {
+              id: 'CategoryAxis-1',
+              type: 'category',
+              position: 'bottom',
+              show: true,
+              style: {},
+              scale: {
+                type: 'linear',
+              },
+              labels: {
+                show: true,
+                filter: true,
+                truncate: 100,
+              },
+              title: {},
+            },
+          ],
+          valueAxes: [
+            {
+              id: 'ValueAxis-1',
+              name: 'LeftAxis-1',
+              type: 'value',
+              position: 'left',
+              show: true,
+              style: {},
+              scale: {
+                type: 'linear',
+                mode: 'normal',
+              },
+              labels: {
+                show: true,
+                rotate: 0,
+                filter: false,
+                truncate: 100,
+              },
+              title: {
+                text: 'Count',
+              },
+            },
+          ],
+          seriesParams: [
+            {
+              show: true,
+              type: 'line',
+              mode: 'stacked',
+              data: {
+                label: 'Count',
+                id: '1',
+              },
+              valueAxis: 'ValueAxis-1',
+              drawLinesBetweenPoints: true,
+              lineWidth: 2,
+              interpolate: 'linear',
+              showCircles: true,
+            },
+          ],
+          addTooltip: true,
+          addLegend: true,
+          legendPosition: 'right',
+          times: [],
+          addTimeMarker: false,
+          labels: {},
+          thresholdLine: {
+            show: false,
+            value: 10,
+            width: 1,
+            style: 'full',
+            color: '#E7664C',
+          },
         },
-        aggs: [],
       }),
       uiStateJSON: '{}',
       description: '',
@@ -71,13 +308,210 @@ export default [
       title: 'Wazuh App Statistics remoted messages',
       visState: JSON.stringify({
         title: 'Wazuh App Statistics remoted messages',
-        type: 'timelion',
+        type: 'line',
+        aggs: [
+          {
+            id: '7',
+            enabled: false,
+            type: 'count',
+            params: {
+              customLabel: 'Count',
+            },
+            schema: 'metric',
+          },
+          {
+            id: '8',
+            enabled: true,
+            type: 'date_histogram',
+            params: {
+              field: 'timestamp',
+              timeRange: {
+                from: 'now-30m',
+                to: 'now',
+              },
+              useNormalizedOpenSearchInterval: true,
+              scaleMetricValues: false,
+              interval: 'auto',
+              drop_partials: false,
+              min_doc_count: 1,
+              extended_bounds: {},
+            },
+            schema: 'segment',
+          },
+          {
+            id: '12',
+            enabled: true,
+            type: 'avg',
+            params: {
+              field: 'remoted.msg_sent',
+              customLabel: 'msg_sent',
+            },
+            schema: 'metric',
+          },
+          {
+            id: '13',
+            enabled: true,
+            type: 'avg',
+            params: {
+              field: 'remoted.ctrl_msg_count',
+              customLabel: 'msg_count',
+            },
+            schema: 'metric',
+          },
+          {
+            id: '14',
+            enabled: true,
+            type: 'avg',
+            params: {
+              field: 'remoted.discarded_count',
+              customLabel: 'discarded_count',
+            },
+            schema: 'metric',
+          },
+          {
+            id: '15',
+            enabled: true,
+            type: 'avg',
+            params: {
+              field: 'remoted.dequeued_after_close',
+              customLabel: 'dequeued_after_close',
+            },
+            schema: 'metric',
+          },
+        ],
         params: {
-          expression:
-            ".es(index=wazuh-statistics-*, timefield=timestamp,metric=avg:remoted.msg_sent, q='*').label(msg_sent),.es(index=wazuh-statistics-*, timefield=timestamp,metric=avg:remoted.ctrl_msg_count, q='*').label(ctrl_msg_count),.es(index=wazuh-statistics-*,timefield=timestamp,metric=avg:remoted.discarded_count).label(discarded_count),.es(index=wazuh-statistics-*, timefield=timestamp,metric=avg:remoted.dequeued_after_close, q='*').label(dequeued_after_close)",
-          interval: '5m',
+          type: 'line',
+          grid: {
+            categoryLines: true,
+          },
+          categoryAxes: [
+            {
+              id: 'CategoryAxis-1',
+              type: 'category',
+              position: 'bottom',
+              show: true,
+              style: {},
+              scale: {
+                type: 'linear',
+              },
+              labels: {
+                show: true,
+                filter: true,
+                truncate: 100,
+              },
+              title: {},
+            },
+          ],
+          valueAxes: [
+            {
+              id: 'ValueAxis-1',
+              name: 'LeftAxis-1',
+              type: 'value',
+              position: 'left',
+              show: true,
+              style: {},
+              scale: {
+                type: 'linear',
+                mode: 'normal',
+              },
+              labels: {
+                show: true,
+                rotate: 0,
+                filter: false,
+                truncate: 100,
+              },
+              title: {
+                text: 'Count',
+              },
+            },
+          ],
+          seriesParams: [
+            {
+              show: true,
+              type: 'line',
+              mode: 'stacked',
+              data: {
+                id: '7',
+                label: 'Count',
+              },
+              valueAxis: 'ValueAxis-1',
+              drawLinesBetweenPoints: true,
+              lineWidth: 2,
+              interpolate: 'linear',
+              showCircles: true,
+            },
+            {
+              show: true,
+              type: 'line',
+              mode: 'normal',
+              data: {
+                id: '12',
+                label: 'msg_sent',
+              },
+              valueAxis: 'ValueAxis-1',
+              drawLinesBetweenPoints: true,
+              lineWidth: 2,
+              interpolate: 'linear',
+              showCircles: true,
+            },
+            {
+              show: true,
+              type: 'line',
+              mode: 'normal',
+              data: {
+                id: '13',
+                label: 'msg_count',
+              },
+              valueAxis: 'ValueAxis-1',
+              drawLinesBetweenPoints: true,
+              lineWidth: 2,
+              interpolate: 'linear',
+              showCircles: true,
+            },
+            {
+              show: true,
+              type: 'line',
+              mode: 'normal',
+              data: {
+                id: '14',
+                label: 'discarded_count',
+              },
+              valueAxis: 'ValueAxis-1',
+              drawLinesBetweenPoints: true,
+              lineWidth: 2,
+              interpolate: 'linear',
+              showCircles: true,
+            },
+            {
+              show: true,
+              type: 'line',
+              mode: 'normal',
+              data: {
+                id: '15',
+                label: 'dequeued_after_close',
+              },
+              valueAxis: 'ValueAxis-1',
+              drawLinesBetweenPoints: true,
+              lineWidth: 2,
+              interpolate: 'linear',
+              showCircles: true,
+            },
+          ],
+          addTooltip: true,
+          addLegend: true,
+          legendPosition: 'right',
+          times: [],
+          addTimeMarker: false,
+          labels: {},
+          thresholdLine: {
+            show: false,
+            value: 10,
+            width: 1,
+            style: 'full',
+            color: '#E7664C',
+          },
+          radiusRatio: 50,
         },
-        aggs: [],
       }),
       uiStateJSON: '{}',
       description: '',
@@ -98,13 +532,131 @@ export default [
       title: 'Wazuh App Statistics remoted tcp sessions',
       visState: JSON.stringify({
         title: 'Wazuh App Statistics remoted tcp sessions',
-        type: 'timelion',
+        type: 'line',
+        aggs: [
+          {
+            id: '1',
+            enabled: true,
+            type: 'sum',
+            params: {
+              field: 'remoted.tcp_sessions',
+              customLabel: 'Count',
+            },
+            schema: 'metric',
+          },
+          {
+            id: '2',
+            enabled: true,
+            type: 'date_histogram',
+            params: {
+              field: 'timestamp',
+              timeRange: {
+                from: 'now-24h',
+                to: 'now',
+              },
+              useNormalizedOpenSearchInterval: true,
+              scaleMetricValues: false,
+              interval: 'auto',
+              drop_partials: false,
+              min_doc_count: 1,
+              extended_bounds: {},
+            },
+            schema: 'segment',
+          },
+          {
+            id: '3',
+            enabled: true,
+            type: 'filters',
+            params: {
+              filters: [
+                {
+                  input: {
+                    query: 'remoted.tcp_sessions:*',
+                    language: 'kuery',
+                  },
+                  label: 'tcp_sessions',
+                },
+              ],
+            },
+            schema: 'group',
+          },
+        ],
         params: {
-          expression:
-            ".es(index=wazuh-statistics-*, timefield=timestamp,metric=sum:remoted.tcp_sessions, q='*').label(tcp_sessions)",
-          interval: '5m',
+          type: 'line',
+          grid: {
+            categoryLines: true,
+          },
+          categoryAxes: [
+            {
+              id: 'CategoryAxis-1',
+              type: 'category',
+              position: 'bottom',
+              show: true,
+              style: {},
+              scale: {
+                type: 'linear',
+              },
+              labels: {
+                show: true,
+                filter: true,
+                truncate: 100,
+              },
+              title: {},
+            },
+          ],
+          valueAxes: [
+            {
+              id: 'ValueAxis-1',
+              name: 'LeftAxis-1',
+              type: 'value',
+              position: 'left',
+              show: true,
+              style: {},
+              scale: {
+                type: 'linear',
+                mode: 'normal',
+              },
+              labels: {
+                show: true,
+                rotate: 0,
+                filter: false,
+                truncate: 100,
+              },
+              title: {
+                text: 'Count',
+              },
+            },
+          ],
+          seriesParams: [
+            {
+              show: true,
+              type: 'line',
+              mode: 'stacked',
+              data: {
+                label: 'Count',
+                id: '1',
+              },
+              valueAxis: 'ValueAxis-1',
+              drawLinesBetweenPoints: true,
+              lineWidth: 2,
+              interpolate: 'linear',
+              showCircles: true,
+            },
+          ],
+          addTooltip: true,
+          addLegend: true,
+          legendPosition: 'right',
+          times: [],
+          addTimeMarker: false,
+          labels: {},
+          thresholdLine: {
+            show: false,
+            value: 10,
+            width: 1,
+            style: 'full',
+            color: '#E7664C',
+          },
         },
-        aggs: [],
       }),
       uiStateJSON: '{}',
       description: '',
@@ -315,23 +867,148 @@ export default [
       title: 'Wazuh App Statistics Events by Node',
       visState: JSON.stringify({
         title: 'Wazuh App Statistics Events by Node',
-        type: 'timelion',
+        type: 'line',
+        aggs: [
+          {
+            id: '1',
+            enabled: true,
+            type: 'sum',
+            params: {
+              field: 'analysisd.events_processed',
+              customLabel: 'Count',
+            },
+            schema: 'metric',
+          },
+          {
+            id: '2',
+            enabled: true,
+            type: 'date_histogram',
+            params: {
+              field: 'timestamp',
+              timeRange: {
+                from: 'now-30m',
+                to: 'now',
+              },
+              useNormalizedOpenSearchInterval: true,
+              scaleMetricValues: false,
+              interval: 'auto',
+              drop_partials: false,
+              min_doc_count: 1,
+              extended_bounds: {},
+            },
+            schema: 'segment',
+          },
+          {
+            id: '4',
+            enabled: true,
+            type: 'filters',
+            params: {
+              filters: [
+                {
+                  input: {
+                    query: 'analysisd.events_processed:*',
+                    language: 'kuery',
+                  },
+                  label: 'Events processed by Node:',
+                },
+              ],
+            },
+            schema: 'group',
+          },
+          {
+            id: '3',
+            enabled: true,
+            type: 'terms',
+            params: {
+              field: 'nodeName.keyword',
+              orderBy: '1',
+              order: 'desc',
+              size: 5,
+              otherBucket: false,
+              otherBucketLabel: 'Other',
+              missingBucket: false,
+              missingBucketLabel: 'Missing',
+              customLabel: '',
+            },
+            schema: 'group',
+          },
+        ],
         params: {
-          expression:
-            ".es(index=wazuh-statistics-*, timefield=timestamp,metric=sum:analysisd.events_processed, q='*') .label('Total'), .es(index=wazuh-statistics-*, timefield=timestamp,metric=sum:analysisd.events_processed, q='*', split=nodeName.keyword:5).label('Events processed by Node: $1','^.* > nodeName.keyword:(\\\\S+) > .*')",
-          interval: '5m',
+          type: 'line',
+          grid: {
+            categoryLines: true,
+          },
+          categoryAxes: [
+            {
+              id: 'CategoryAxis-1',
+              type: 'category',
+              position: 'bottom',
+              show: true,
+              style: {},
+              scale: {
+                type: 'linear',
+              },
+              labels: {
+                show: true,
+                filter: true,
+                truncate: 100,
+              },
+              title: {},
+            },
+          ],
+          valueAxes: [
+            {
+              id: 'ValueAxis-1',
+              name: 'LeftAxis-1',
+              type: 'value',
+              position: 'left',
+              show: true,
+              style: {},
+              scale: {
+                type: 'linear',
+                mode: 'normal',
+              },
+              labels: {
+                show: true,
+                rotate: 0,
+                filter: false,
+                truncate: 100,
+              },
+              title: {
+                text: 'Count',
+              },
+            },
+          ],
+          seriesParams: [
+            {
+              show: true,
+              type: 'line',
+              mode: 'normal',
+              data: {
+                label: 'Count',
+                id: '1',
+              },
+              valueAxis: 'ValueAxis-1',
+              drawLinesBetweenPoints: true,
+              lineWidth: 2,
+              interpolate: 'linear',
+              showCircles: true,
+            },
+          ],
+          addTooltip: true,
+          addLegend: true,
+          legendPosition: 'right',
+          times: [],
+          addTimeMarker: false,
+          labels: {},
+          thresholdLine: {
+            show: false,
+            value: 10,
+            width: 1,
+            style: 'full',
+            color: '#E7664C',
+          },
         },
-        aggs: [],
-      }),
-      visStateByNode: JSON.stringify({
-        title: 'Wazuh App Statistics Events by Node',
-        type: 'timelion',
-        params: {
-          expression:
-            ".es(index=wazuh-statistics-*, timefield=timestamp,metric=sum:analysisd.events_processed, q='*') .label('Events processed by Node: NODE_NAME')",
-          interval: '5m',
-        },
-        aggs: [],
       }),
       uiStateJSON: '{}',
       description: '',
