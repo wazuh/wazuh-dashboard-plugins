@@ -116,7 +116,7 @@ export default [
             {
               show: true,
               type: 'line',
-              mode: 'stacked',
+              mode: 'normal',
               data: {
                 label: 'Count',
                 id: '1',
@@ -262,7 +262,7 @@ export default [
             {
               show: true,
               type: 'line',
-              mode: 'stacked',
+              mode: 'normal',
               data: {
                 label: 'Count',
                 id: '1',
@@ -429,7 +429,7 @@ export default [
             {
               show: true,
               type: 'line',
-              mode: 'stacked',
+              mode: 'normal',
               data: {
                 id: '7',
                 label: 'Count',
@@ -631,7 +631,7 @@ export default [
             {
               show: true,
               type: 'line',
-              mode: 'stacked',
+              mode: 'normal',
               data: {
                 label: 'Count',
                 id: '1',
