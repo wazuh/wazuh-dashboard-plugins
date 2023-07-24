@@ -28,9 +28,10 @@ export const topTSCRequirements = async (
   allowedAgentsFilter,
   pattern = getSettingDefaultValue('pattern')
 ) => {
-  if (filters.includes('rule.tsc: exists')) {
-    filters = filters.replace('AND rule.tsc: exists', '');
-  };
+  // Remove the "rule.tsc" filter
+  filters.bool.filter = filters.bool.filter.filter(filterValue => (
+    JSON.stringify(filterValue) !== '{"exists":{"field":"rule.tsc"}}'
+  ));
 
   try {
     const base = {};
@@ -92,7 +93,7 @@ export const topTSCRequirements = async (
  * @returns {Array<String>}
  */
 export const getRulesByRequirement = async (
-  context, 
+  context,
   gte,
   lte,
   filters,
@@ -100,9 +101,10 @@ export const getRulesByRequirement = async (
   requirement,
   pattern = getSettingDefaultValue('pattern')
 ) => {
-  if (filters.includes('rule.tsc: exists')) {
-    filters = filters.replace('AND rule.tsc: exists', '');
-  };
+  // Remove the "rule.tsc" filter
+  filters.bool.filter = filters.bool.filter.filter(filterValue => (
+    JSON.stringify(filterValue) !== '{"exists":{"field":"rule.tsc"}}'
+  ));
 
   try {
     const base = {};
