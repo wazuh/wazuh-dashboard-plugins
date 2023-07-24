@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ColumnWithStatusIcon component Renders status indicator with the its color and the label 1`] = `
-<div>
+Array [
   <span
     class="euiToolTipAnchor"
   >
@@ -30,17 +30,17 @@ exports[`ColumnWithStatusIcon component Renders status indicator with the its co
         />
       </div>
     </div>
-  </span>
+  </span>,
   <span
     class="hide-agent-status"
   >
     Active
-  </span>
-</div>
+  </span>,
+]
 `;
 
 exports[`ColumnWithStatusIcon component Renders status indicator with the its color and the label 2`] = `
-<div>
+Array [
   <span
     class="euiToolTipAnchor"
   >
@@ -75,11 +75,11 @@ exports[`ColumnWithStatusIcon component Renders status indicator with the its co
         />
       </div>
     </div>
-  </span>
+  </span>,
   <span
     class="hide-agent-status"
   >
     Active
-  </span>
-</div>
+  </span>,
+]
 `;
