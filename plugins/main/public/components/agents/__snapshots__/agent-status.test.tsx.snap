@@ -1,53 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`AgentStatus component Renders status indicator with the its color and a custom label - status: active 1`] = `
-<span
-  class="euiFlexGroup euiFlexGroup--gutterExtraSmall euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow"
->
-  <span
-    class="euiToolTipAnchor"
-  >
-    <div
-      class="euiHealth euiHealth--textSizeS wz-flex"
-    >
-      <div
-        class="euiFlexGroup euiFlexGroup--gutterExtraSmall euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow"
-      >
-        <div
-          class="euiFlexItem euiFlexItem--flexGrowZero"
-        >
-          <svg
-            aria-hidden="true"
-            class="euiIcon euiIcon--medium euiIcon--customColor"
-            focusable="false"
-            height="16"
-            role="img"
-            style="color:#007871"
-            viewBox="0 0 16 16"
-            width="16"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <circle
-              cx="8"
-              cy="8"
-              r="4"
-            />
-          </svg>
-        </div>
-        <div
-          class="euiFlexItem euiFlexItem--flexGrowZero"
-        />
-      </div>
-    </div>
-  </span>
-  <span
-    class="hide-agent-status"
-  >
-    custom_agent
-  </span>
-</span>
-`;
-
 exports[`AgentStatus component Renders status indicator with the its color and the label in lower case - {"status":"active","color":"#007871","label":"Active"} 1`] = `
 <span
   class="euiFlexGroup euiFlexGroup--gutterExtraSmall euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow"

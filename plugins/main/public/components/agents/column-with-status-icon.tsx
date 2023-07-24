@@ -18,7 +18,7 @@ export const ColumnWithStatusIcon = ({
       <EuiToolTip position='top' content={textTooltip}>
         <EuiHealth className='wz-flex' color={color}></EuiHealth>
       </EuiToolTip>
-      <span className={'hide-agent-status'}>{text}</span>
+      <span className='hide-agent-status'>{text}</span>
     </>
   );
 };
