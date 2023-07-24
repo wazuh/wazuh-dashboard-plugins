@@ -49,7 +49,6 @@ import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { AgentStatus } from '../../../components/agents/agent-status';
 import { AgentSynced } from '../../../components/agents/agent-synced';
-import { compressIPv6 } from '../../../services/ipv6-services';
 import { AgentStatusCode } from '../../../components/agents/agent-status-code';
 
 export const AgentsTable = withErrorBoundary(
@@ -311,9 +310,6 @@ export const AgentsTable = withErrorBoundary(
     }
 
     formatAgent(agent) {
-      const checkField = field => {
-        return field !== undefined ? field : '-';
-      };
       const agentVersion =
         agent.version !== undefined ? agent.version.split(' ')[1] : '-';
       const node_name =
@@ -324,7 +320,7 @@ export const AgentsTable = withErrorBoundary(
       return {
         id: agent.id,
         name: agent.name,
-        ip: compressIPv6(agent.ip),
+        ip: agent.ip,
         status: agent.status,
         status_code: agent.status_code,
         group_config_status: agent.group_config_status,
@@ -386,11 +382,8 @@ export const AgentsTable = withErrorBoundary(
     }
 
     addIconPlatformRender(agent) {
-      let icon = false;
-      const checkField = field => {
-        return field !== undefined ? field : '-';
-      };
-      const os = (agent || {}).os;
+      let icon = '';
+      const os = agent?.os || {};
 
       if ((os?.uname || '').includes('Linux')) {
         icon = 'linux';
@@ -399,8 +392,7 @@ export const AgentsTable = withErrorBoundary(
       } else if (os?.platform === 'darwin') {
         icon = 'apple';
       }
-      const os_name =
-        checkField(agent?.os?.name) + ' ' + checkField(agent?.os?.version);
+      const os_name = `${agent?.os?.name || ''} ${agent?.os?.version || ''}`;
 
       return (
         <EuiFlexGroup gutterSize='xs'>
@@ -410,7 +402,7 @@ export const AgentsTable = withErrorBoundary(
               aria-hidden='true'
             ></i>
           </EuiFlexItem>{' '}
-          <EuiFlexItem>{os_name === '- -' ? '-' : os_name}</EuiFlexItem>
+          <EuiFlexItem>{os_name.trim() || '-'}</EuiFlexItem>
         </EuiFlexGroup>
       );
     }
