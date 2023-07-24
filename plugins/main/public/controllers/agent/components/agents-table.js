@@ -252,7 +252,7 @@ export const AgentsTable = withErrorBoundary(
         const rawAgents = await this.props.wzReq('GET', '/agents', {
           params: { ...this.buildFilter(), select: selectFields },
         });
-        const formatedAgents = rawAgents?.data?.data?.affected_items.map(
+        const formatedAgents = rawAgents?.data?.data?.affected_items?.map(
           this.formatAgent.bind(this),
         );
 
