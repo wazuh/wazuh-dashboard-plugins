@@ -170,7 +170,7 @@ resources:
     path: /cluster/nodes
     response:
       statusCode: 200
-      scriptFile: cluster/cluster_node_info.js
+      scriptFile: cluster/cluster-node-info.js
 
   # Get nodes healthcheck
   - method: GET
@@ -376,6 +376,9 @@ resources:
   # Get agents in a group
   - method: GET
     path: /groups/{group_id}/agents
+    response:
+      statusCode: 200
+      staticFile: agents/group.json
 
   # Get group configuration
   - method: GET
@@ -544,6 +547,9 @@ resources:
   # Get agents overview
   - method: GET
     path: /overview/agents
+    response:
+      statusCode: 200
+      staticFile: overview/agents.json
 
   # ===================================================== #
   #   ROOTCHECK
@@ -654,6 +660,9 @@ resources:
   # Get current user processed policies
   - method: GET
     path: /security/users/me/policies
+    response:
+      statusCode: 200
+      scriptFile: security/security-me-policies.js
 
   # Revoke JWT tokens
   - method: PUT
@@ -666,6 +675,9 @@ resources:
   # List RBAC actions
   - method: GET
     path: /security/actions
+    response:
+      statusCode: 200
+      staticFile: security/security-actions.json
 
   # List RBAC resources
   - method: GET
@@ -674,6 +686,9 @@ resources:
   # List users
   - method: GET
     path: /security/users
+    response:
+      statusCode: 200
+      staticFile: security/users.json
 
   # Add users
   - method: POST
@@ -692,7 +707,7 @@ resources:
     path: /security/roles
     response:
       statusCode: 200
-      staticFile: security/security_roles.json
+      staticFile: security/security-roles.json
 
   # Add role
   - method: POST
@@ -709,6 +724,9 @@ resources:
   # List security rules
   - method: GET
     path: /security/rules
+    response:
+      statusCode: 200
+      staticFile: security/security-rules.json
 
   # Add security rule
   - method: POST
@@ -727,7 +745,7 @@ resources:
     path: /security/policies
     response:
       statusCode: 200
-      staticFile: security/security_policies.json
+      staticFile: security/security-policies.json
 
   # Add policy
   - method: POST
@@ -812,6 +830,9 @@ resources:
   # Get agent netaddr
   - method: GET
     path: /syscollector/{agent_id}/netaddr
+    response:
+      statusCode: 200
+      scriptFile: syscollector/netaddr.js
 
   # Get agent netiface
   - method: GET
@@ -832,6 +853,9 @@ resources:
   # Get agent ports
   - method: GET
     path: /syscollector/{agent_id}/ports
+    response:
+      statusCode: 200
+      scriptFile: syscollector/ports.js
 
   # Get agent processes
   - method: GET
