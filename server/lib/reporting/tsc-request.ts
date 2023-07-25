@@ -28,7 +28,7 @@ export const topTSCRequirements = async (
   allowedAgentsFilter,
   pattern = getSettingDefaultValue('pattern')
 ) => {
-  // Remove the "rule.tsc" filter
+  // Remove the "rule.tsc" filter and later add it as a must
   filters.bool.filter = filters.bool.filter.filter(filterValue => (
     JSON.stringify(filterValue) !== '{"exists":{"field":"rule.tsc"}}'
   ));
@@ -101,7 +101,7 @@ export const getRulesByRequirement = async (
   requirement,
   pattern = getSettingDefaultValue('pattern')
 ) => {
-  // Remove the "rule.tsc" filter
+  // Remove the "rule.tsc" filter and later add it as a must with the requirement
   filters.bool.filter = filters.bool.filter.filter(filterValue => (
     JSON.stringify(filterValue) !== '{"exists":{"field":"rule.tsc"}}'
   ));

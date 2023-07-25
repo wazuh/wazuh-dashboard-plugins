@@ -28,7 +28,7 @@ export const topPCIRequirements = async (
   allowedAgentsFilter,
   pattern = getSettingDefaultValue('pattern')
 ) => {
-  // Remove the "rule.pci_dss" filter
+  // Remove the "rule.pci_dss" filter and later add it as a must
   filters.bool.filter = filters.bool.filter.filter(filterValue => (
     JSON.stringify(filterValue) !== '{"exists":{"field":"rule.pci_dss"}}'
   ));
@@ -101,7 +101,7 @@ export const getRulesByRequirement = async (
   requirement,
   pattern = getSettingDefaultValue('pattern')
 ) => {
-  // Remove the "rule.pci_dss" filter
+  // Remove the "rule.pci_dss" filter and later add it as a must with the requirement
   filters.bool.filter = filters.bool.filter.filter(filterValue => (
     JSON.stringify(filterValue) !== '{"exists":{"field":"rule.pci_dss"}}'
   ));
