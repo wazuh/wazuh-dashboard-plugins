@@ -28,6 +28,7 @@ export const topGDPRRequirements = async (
   allowedAgentsFilter,
   pattern = getSettingDefaultValue('pattern')
 ) => {
+  // Remove the "rule.gdpr" filter and later add it as a must
   filters.bool.filter = filters.bool.filter.filter(filterValue => (
     JSON.stringify(filterValue) !== '{"exists":{"field":"rule.gdpr"}}'
   ));
@@ -85,10 +86,7 @@ export const getRulesByRequirement = async (
   requirement,
   pattern = getSettingDefaultValue('pattern')
 ) => {
-  // if (filters.includes('rule.gdpr: exists')) {
-  //   const [head, tail] = filters.split('AND rule.gdpr: exists');
-  //   filters = head + tail;
-  // };
+  // Remove the "rule.gdpr" filter and later add it as a must with the requirement
   filters.bool.filter = filters.bool.filter.filter(filterValue => (
     JSON.stringify(filterValue) !== '{"exists":{"field":"rule.gdpr"}}'
   ));

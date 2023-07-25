@@ -27,11 +27,6 @@ export function Base(pattern: string, filters: any, gte: number, lte: number, al
     script_fields: {},
     query: filters
   };
-  //Add allowed agents filter
-  // if (allowedAgentsFilter?.query?.bool) {
-  //   base.query.bool.minimum_should_match = allowedAgentsFilter.query.bool.minimum_should_match;
-  //   base.query.bool.should = allowedAgentsFilter.query.bool.should;
-  // }
 
   return base;
 }
