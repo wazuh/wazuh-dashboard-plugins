@@ -18,7 +18,7 @@ import { formatUIDate } from '../../../react-services/time-service';
 import WzTextWithTooltipIfTruncated from '../wz-text-with-tooltip-if-truncated';
 import { WzStat } from '../../wz-stat';
 import { GroupTruncate } from '../util/agent-group-truncate';
-import { AgentStatus } from '../../agents/agent_status';
+import { AgentStatus } from '../../agents/agent-status';
 
 export class AgentInfo extends Component {
   constructor(props) {
