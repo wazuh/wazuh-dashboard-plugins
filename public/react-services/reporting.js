@@ -97,7 +97,7 @@ export class ReportingService {
 
       const data = {
         array,
-        serverSideQuery,
+        serverSideQuery, // Used for applying the same filters on the server side requests
         filters: appliedFilters.filters,
         time: appliedFilters.time,
         searchBar: appliedFilters.searchBar,
