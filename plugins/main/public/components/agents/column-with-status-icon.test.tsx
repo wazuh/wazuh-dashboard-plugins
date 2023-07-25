@@ -7,19 +7,9 @@ describe('ColumnWithStatusIcon component', () => {
     const wrapper = render(
       <ColumnWithStatusIcon color='success' text='Active' />,
     );
-    console.log(wrapper.html());
 
     expect(wrapper).toMatchSnapshot();
     expect(wrapper.find('svg').prop('class')).toContain('euiIcon--success');
-    // expect(wrapper[1].children[0].data).toEqual('Active');
-  });
-  test('Renders status indicator with the its color and the label', () => {
-    const wrapper = render(
-      <ColumnWithStatusIcon color='success' text='Active' />,
-    );
-    global.innerWidth = 500;
-    global.dispatchEvent(new Event('resize'));
-
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper[1].children[0].data).toEqual('Active');
   });
 });
