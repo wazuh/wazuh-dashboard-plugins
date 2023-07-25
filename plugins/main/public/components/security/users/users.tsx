@@ -4,9 +4,7 @@ import {
   EuiPageContentHeader,
   EuiPageContentHeaderSection,
   EuiPageContentBody,
-  EuiButton,
   EuiTitle,
-  EuiOverlayMask,
   EuiEmptyPrompt,
 } from '@elastic/eui';
 import { UsersTable } from './components/users-table';
@@ -20,13 +18,21 @@ import { Role } from '../roles/types/role.type';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
+import { withUserAuthorizationPrompt } from '../../common/hocs';
+import { WzButtonPermissions } from '../../common/permissions/button';
 
-export const Users = () => {
+export const Users = withUserAuthorizationPrompt([
+  { action: 'security:read', resource: 'user:id:*' },
+  { action: 'security:read', resource: 'role:id:*' },
+])(() => {
   const [isEditFlyoutVisible, setIsEditFlyoutVisible] = useState(false);
   const [isCreateFlyoutVisible, setIsCreateFlyoutVisible] = useState(false);
   const [editingUser, setEditingUser] = useState({});
   const [users, setUsers] = useState([] as User[]);
-  const [rolesLoading, roles, rolesError] = useApiService<Role[]>(RolesServices.GetRoles, {});
+  const [rolesLoading, roles, rolesError] = useApiService<Role[]>(
+    RolesServices.GetRoles,
+    {},
+  );
   const [securityError, setSecurityError] = useState(false);
   const [rolesObject, setRolesObject] = useState({});
 
@@ -56,7 +62,7 @@ export const Users = () => {
     if (!rolesLoading && (roles || []).length) {
       const _rolesObject = (roles || []).reduce(
         (rolesObj, role) => ({ ...rolesObj, [role.id]: role.name }),
-        {}
+        {},
       );
       setRolesObject(_rolesObject);
     }
@@ -75,7 +81,7 @@ export const Users = () => {
     setIsEditFlyoutVisible(false);
   };
 
-  const closeCreateFlyout = async (refresh) => {
+  const closeCreateFlyout = async refresh => {
     if (refresh) await getUsers();
     setIsCreateFlyoutVisible(false);
   };
@@ -83,7 +89,7 @@ export const Users = () => {
   if (securityError) {
     return (
       <EuiEmptyPrompt
-        iconType="securityApp"
+        iconType='securityApp'
         title={<h2>You need permission to manage users</h2>}
         body={<p>Contact your system administrator.</p>}
       />
@@ -91,18 +97,16 @@ export const Users = () => {
   }
   if (isEditFlyoutVisible) {
     editFlyout = (
-        <EditUser
-          currentUser={editingUser}
-          closeFlyout={closeEditFlyout}
-          rolesObject={rolesObject}
-        />
+      <EditUser
+        currentUser={editingUser}
+        closeFlyout={closeEditFlyout}
+        rolesObject={rolesObject}
+      />
     );
   }
 
   if (isCreateFlyoutVisible) {
-    createFlyout = (
-        <CreateUser closeFlyout={closeCreateFlyout} />
-    );
+    createFlyout = <CreateUser closeFlyout={closeCreateFlyout} />;
   }
 
   const showEditFlyover = item => {
@@ -119,14 +123,20 @@ export const Users = () => {
           </EuiTitle>
         </EuiPageContentHeaderSection>
         <EuiPageContentHeaderSection>
-          {
-            !rolesLoading
-            &&
+          {!rolesLoading && (
             <div>
-              <EuiButton onClick={() => setIsCreateFlyoutVisible(true)}>Create user</EuiButton>
+              <WzButtonPermissions
+                buttonType='default'
+                permissions={[
+                  { action: 'security:create_user', resource: '*:*:*' },
+                ]}
+                onClick={() => setIsCreateFlyoutVisible(true)}
+              >
+                Create user
+              </WzButtonPermissions>
               {createFlyout}
             </div>
-          }
+          )}
         </EuiPageContentHeaderSection>
       </EuiPageContentHeader>
       <EuiPageContentBody>
@@ -141,4 +151,4 @@ export const Users = () => {
       {editFlyout}
     </EuiPageContent>
   );
-};
+});

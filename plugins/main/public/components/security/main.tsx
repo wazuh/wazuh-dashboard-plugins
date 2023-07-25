@@ -6,9 +6,7 @@ import {
   EuiFlexItem,
   EuiTabs,
   EuiTab,
-  EuiPanel,
   EuiCallOut,
-  EuiEmptyPrompt,
   EuiSpacer,
 } from '@elastic/eui';
 import { Users } from './users/users';
@@ -17,18 +15,18 @@ import { Policies } from './policies/policies';
 import { GenericRequest } from '../../react-services/generic-request';
 import { API_USER_STATUS_RUN_AS } from '../../../server/lib/cache-api-user-has-run-as';
 import { AppState } from '../../react-services/app-state';
-import { ErrorHandler } from '../../react-services/error-handler';
 import { RolesMapping } from './roles-mapping/roles-mapping';
 import {
   withReduxProvider,
   withGlobalBreadcrumb,
-  withUserAuthorizationPrompt,
   withErrorBoundary,
 } from '../common/hocs';
 import { compose } from 'redux';
-import { WAZUH_ROLE_ADMINISTRATOR_NAME, PLUGIN_PLATFORM_NAME } from '../../../common/constants';
+import {
+  PLUGIN_PLATFORM_NAME,
+  UI_LOGGER_LEVELS,
+} from '../../../common/constants';
 import { updateSecuritySection } from '../../redux/actions/securityActions';
-import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
 import { getPluginDataPath } from '../../../common/plugin';
@@ -60,12 +58,13 @@ export const WzSecurity = compose(
   withErrorBoundary,
   withReduxProvider,
   withGlobalBreadcrumb([{ text: '' }, { text: 'Security' }]),
-  withUserAuthorizationPrompt(null, [WAZUH_ROLE_ADMINISTRATOR_NAME])
 )(() => {
   const dispatch = useDispatch();
 
   // Get the initial tab when the component is initiated
-  const securityTabRegExp = new RegExp(`tab=(${tabs.map((tab) => tab.id).join('|')})`);
+  const securityTabRegExp = new RegExp(
+    `tab=(${tabs.map(tab => tab.id).join('|')})`,
+  );
   const tab = window.location.href.match(securityTabRegExp);
 
   const selectedTabId = (tab && tab[1]) || 'users';
@@ -73,7 +72,11 @@ export const WzSecurity = compose(
   const checkRunAsUser = async () => {
     const currentApi = AppState.getCurrentAPI();
     try {
-      const ApiCheck = await GenericRequest.request('POST', '/api/check-api', currentApi);
+      const ApiCheck = await GenericRequest.request(
+        'POST',
+        '/api/check-api',
+        currentApi,
+      );
       return ApiCheck.data.allow_run_as;
     } catch (error) {
       throw new Error(error);
@@ -107,8 +110,11 @@ export const WzSecurity = compose(
     dispatch(updateSecuritySection(selectedTabId));
   }, []);
 
-  const onSelectedTabChanged = (id) => {
-    window.location.href = window.location.href.replace(`tab=${selectedTabId}`, `tab=${id}`);
+  const onSelectedTabChanged = id => {
+    window.location.href = window.location.href.replace(
+      `tab=${selectedTabId}`,
+      `tab=${id}`,
+    );
   };
 
   const renderTabs = () => {
@@ -125,20 +131,22 @@ export const WzSecurity = compose(
     ));
   };
 
-  const isNotRunAs = (allowRunAs) => {
+  const isNotRunAs = allowRunAs => {
     let runAsWarningTxt = '';
     switch (allowRunAs) {
       case API_USER_STATUS_RUN_AS.HOST_DISABLED:
-        runAsWarningTxt =
-          `For the role mapping to take effect, enable run_as in ${getPluginDataPath('config/wazuh.yml')} configuration file, restart the ${PLUGIN_PLATFORM_NAME} service and clear your browser cache and cookies.`;
+        runAsWarningTxt = `For the role mapping to take effect, enable run_as in ${getPluginDataPath(
+          'config/wazuh.yml',
+        )} configuration file, restart the ${PLUGIN_PLATFORM_NAME} service and clear your browser cache and cookies.`;
         break;
       case API_USER_STATUS_RUN_AS.USER_NOT_ALLOWED:
         runAsWarningTxt =
           'The role mapping has no effect because the current Wazuh API user has allow_run_as disabled.';
         break;
       case API_USER_STATUS_RUN_AS.ALL_DISABLED:
-        runAsWarningTxt =
-          `For the role mapping to take effect, enable run_as in ${getPluginDataPath('config/wazuh.yml')} configuration file and set the current Wazuh API user allow_run_as to true. Restart the ${PLUGIN_PLATFORM_NAME} service and clear your browser cache and cookies.`;
+        runAsWarningTxt = `For the role mapping to take effect, enable run_as in ${getPluginDataPath(
+          'config/wazuh.yml',
+        )} configuration file and set the current Wazuh API user allow_run_as to true. Restart the ${PLUGIN_PLATFORM_NAME} service and clear your browser cache and cookies.`;
         break;
       default:
         runAsWarningTxt =
@@ -149,7 +157,11 @@ export const WzSecurity = compose(
     return (
       <EuiFlexGroup>
         <EuiFlexItem>
-          <EuiCallOut title={runAsWarningTxt} color="warning" iconType="alert"></EuiCallOut>
+          <EuiCallOut
+            title={runAsWarningTxt}
+            color='warning'
+            iconType='alert'
+          ></EuiCallOut>
           <EuiSpacer></EuiSpacer>
         </EuiFlexItem>
       </EuiFlexGroup>
@@ -161,7 +173,7 @@ export const WzSecurity = compose(
       <EuiFlexGroup>
         <EuiFlexItem>
           <EuiTabs>{renderTabs()}</EuiTabs>
-          <EuiSpacer size="m"></EuiSpacer>
+          <EuiSpacer size='m'></EuiSpacer>
           {selectedTabId === 'users' && <Users></Users>}
           {selectedTabId === 'roles' && <Roles></Roles>}
           {selectedTabId === 'policies' && <Policies></Policies>}
