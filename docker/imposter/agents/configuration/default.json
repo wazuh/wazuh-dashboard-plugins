@@ -1,0 +1,33 @@
+{
+  "data": {
+    "client": {
+      "config-profile": "ubuntu, ubuntu20, ubuntu20.04",
+      "notify_time": 10,
+      "time-reconnect": 60,
+      "force_reconnect_interval": 0,
+      "ip_update_interval": 0,
+      "auto_restart": "yes",
+      "remote_conf": "yes",
+      "crypto_method": "aes",
+      "server": [
+        {
+          "address": "nginx-lb/172.25.0.4",
+          "port": 1514,
+          "max_retries": 5,
+          "retry_interval": 10,
+          "protocol": "tcp"
+        }
+      ],
+      "enrollment": [
+        {
+          "enabled": "yes",
+          "delay_after_enrollment": 20,
+          "port": 1515,
+          "ssl_cipher": "HIGH:!ADH:!EXP:!MD5:!RC4:!3DES:!CAMELLIA:@STRENGTH",
+          "auto_method": "no"
+        }
+      ]
+    }
+  },
+  "error": 0
+}
