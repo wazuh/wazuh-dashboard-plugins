@@ -28,10 +28,6 @@ export const topTSCRequirements = async (
   allowedAgentsFilter,
   pattern = getSettingDefaultValue('pattern')
 ) => {
-  // Remove the "rule.tsc" filter and later add it as a must
-  filters.bool.filter = filters.bool.filter.filter(filterValue => (
-    JSON.stringify(filterValue) !== '{"exists":{"field":"rule.tsc"}}'
-  ));
 
   try {
     const base = {};
@@ -47,12 +43,6 @@ export const topTSCRequirements = async (
             _count: 'desc'
           }
         }
-      }
-    });
-
-    base.query.bool.must.push({
-      exists: {
-        field: 'rule.tsc'
       }
     });
 
@@ -101,10 +91,6 @@ export const getRulesByRequirement = async (
   requirement,
   pattern = getSettingDefaultValue('pattern')
 ) => {
-  // Remove the "rule.tsc" filter and later add it as a must with the requirement
-  filters.bool.filter = filters.bool.filter.filter(filterValue => (
-    JSON.stringify(filterValue) !== '{"exists":{"field":"rule.tsc"}}'
-  ));
 
   try {
     const base = {};
@@ -134,11 +120,13 @@ export const getRulesByRequirement = async (
       }
     });
 
-    base.query.bool.must[0].query_string.query =
-      base.query.bool.must[0].query_string.query +
-      ' AND rule.tsc: "' +
-      requirement +
-      '"';
+    base.query.bool.filter.push({
+      match_phrase: {
+        'rule.tsc': {
+          query: requirement
+        }
+      }
+    });
 
     const response = await context.core.opensearch.client.asCurrentUser.search({
       index: pattern,
