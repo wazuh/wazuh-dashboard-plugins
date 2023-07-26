@@ -46,9 +46,11 @@ export const top5RootkitsDetected = async (
       }
     });
 
-    base.query.bool.must[0].query_string.query =
-      base.query.bool.must[0].query_string.query +
-      ' AND "rootkit" AND "detected"';
+    base.query?.bool?.must?.push({
+      query_string: {
+        query: '"rootkit" AND "detected"'
+      }
+    });
 
     const response = await context.core.elasticsearch.client.asCurrentUser.search({
       index: pattern,
@@ -97,9 +99,11 @@ export const agentsWithHiddenPids = async (
       }
     });
 
-    base.query.bool.must[0].query_string.query =
-      base.query.bool.must[0].query_string.query +
-      ' AND "process" AND "hidden"';
+    base.query?.bool?.must?.push({
+      query_string: {
+        query: '"process" AND "hidden"'
+      }
+    });
 
     // "aggregations": { "1": { "value": 1 } }
     const response = await context.core.elasticsearch.client.asCurrentUser.search({
@@ -126,7 +130,7 @@ export const agentsWithHiddenPids = async (
  * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
  * @returns {Array<String>}
  */
-export const agentsWithHiddenPorts = async(
+export const agentsWithHiddenPorts = async (
   context,
   gte,
   lte,
@@ -147,8 +151,11 @@ export const agentsWithHiddenPorts = async(
       }
     });
 
-    base.query.bool.must[0].query_string.query =
-      base.query.bool.must[0].query_string.query + ' AND "port" AND "hidden"';
+    base.query?.bool?.must?.push({
+      query_string: {
+        query: '"port" AND "hidden"'
+      }
+    });
 
     // "aggregations": { "1": { "value": 1 } }
     const response = await context.core.elasticsearch.client.asCurrentUser.search({
