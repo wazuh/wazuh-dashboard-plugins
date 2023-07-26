@@ -12,14 +12,14 @@
 import { Base } from './base-query';
 import { getSettingDefaultValue } from '../../../common/services/settings';
 
-  /**
-   * Returns top 5 TSC requirements
-   * @param {Number} context Endpoint context
-   * @param {Number} gte Timestamp (ms) from
-   * @param {Number} lte Timestamp (ms) to
-   * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
-   * @returns {Array<String>}
-   */
+/**
+ * Returns top 5 TSC requirements
+ * @param {Number} context Endpoint context
+ * @param {Number} gte Timestamp (ms) from
+ * @param {Number} lte Timestamp (ms) to
+ * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
+ * @returns {Array<String>}
+ */
 export const topTSCRequirements = async (
   context,
   gte,
@@ -28,10 +28,6 @@ export const topTSCRequirements = async (
   allowedAgentsFilter,
   pattern = getSettingDefaultValue('pattern')
 ) => {
-  // Remove the "rule.tsc" filter and later add it as a must
-  filters.bool.filter = filters.bool.filter.filter(filterValue => (
-    JSON.stringify(filterValue) !== '{"exists":{"field":"rule.tsc"}}'
-  ));
 
   try {
     const base = {};
@@ -47,12 +43,6 @@ export const topTSCRequirements = async (
             _count: 'desc'
           }
         }
-      }
-    });
-
-    base.query.bool.must.push({
-      exists: {
-        field: 'rule.tsc'
       }
     });
 
@@ -101,10 +91,6 @@ export const getRulesByRequirement = async (
   requirement,
   pattern = getSettingDefaultValue('pattern')
 ) => {
-  // Remove the "rule.tsc" filter and later add it as a must with the requirement
-  filters.bool.filter = filters.bool.filter.filter(filterValue => (
-    JSON.stringify(filterValue) !== '{"exists":{"field":"rule.tsc"}}'
-  ));
 
   try {
     const base = {};
@@ -134,11 +120,13 @@ export const getRulesByRequirement = async (
       }
     });
 
-    base.query.bool.must[0].query_string.query =
-      base.query.bool.must[0].query_string.query +
-      ' AND rule.tsc: "' +
-      requirement +
-      '"';
+    base.query.bool.filter.push({
+      match_phrase: {
+        'rule.tsc': {
+          query: requirement
+        }
+      }
+    });
 
     const response = await context.core.elasticsearch.client.asCurrentUser.search({
       index: pattern,
@@ -157,7 +145,7 @@ export const getRulesByRequirement = async (
       ) {
         return accum;
       };
-      accum.push({ruleID: bucket['3'].buckets[0].key, ruleDescription: bucket.key});
+      accum.push({ ruleID: bucket['3'].buckets[0].key, ruleDescription: bucket.key });
       return accum;
     }, []);
   } catch (error) {

@@ -28,10 +28,6 @@ export const topGDPRRequirements = async (
   allowedAgentsFilter,
   pattern = getSettingDefaultValue('pattern')
 ) => {
-  // Remove the "rule.gdpr" filter and later add it as a must
-  filters.bool.filter = filters.bool.filter.filter(filterValue => (
-    JSON.stringify(filterValue) !== '{"exists":{"field":"rule.gdpr"}}'
-  ));
 
   try {
     const base = {};
@@ -47,12 +43,6 @@ export const topGDPRRequirements = async (
             _count: 'desc'
           }
         }
-      }
-    });
-
-    base.query.bool.must.push({
-      exists: {
-        field: 'rule.gdpr'
       }
     });
 
@@ -77,7 +67,7 @@ export const topGDPRRequirements = async (
  * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
  * @returns {Array<String>}
  */
-export const getRulesByRequirement= async (
+export const getRulesByRequirement = async (
   context,
   gte,
   lte,
@@ -86,10 +76,6 @@ export const getRulesByRequirement= async (
   requirement,
   pattern = getSettingDefaultValue('pattern')
 ) => {
-  // Remove the "rule.gdpr" filter and later add it as a must with the requirement
-  filters.bool.filter = filters.bool.filter.filter(filterValue => (
-    JSON.stringify(filterValue) !== '{"exists":{"field":"rule.gdpr"}}'
-  ));
 
   try {
     const base = {};
@@ -119,8 +105,13 @@ export const getRulesByRequirement= async (
       }
     });
 
-    base.query.bool.must[0].query_string.query =
-      base.query.bool.must[0].query_string.query + ` AND rule.gdpr: "${requirement}"`;
+    base.query.bool.filter.push({
+      match_phrase: {
+        'rule.gdpr': {
+          query: requirement
+        }
+      }
+    });
 
     const response = await context.core.elasticsearch.client.asCurrentUser.search({
       index: pattern,
@@ -138,7 +129,7 @@ export const getRulesByRequirement= async (
       ) {
         return accum;
       };
-      accum.push({ruleID: bucket['3'].buckets[0].key, ruleDescription: bucket.key});
+      accum.push({ ruleID: bucket['3'].buckets[0].key, ruleDescription: bucket.key });
       return accum;
     }, []);
   } catch (error) {

@@ -28,11 +28,7 @@ export const topPCIRequirements = async (
   allowedAgentsFilter,
   pattern = getSettingDefaultValue('pattern')
 ) => {
-  // Remove the "rule.pci_dss" filter and later add it as a must
-  filters.bool.filter = filters.bool.filter.filter(filterValue => (
-    JSON.stringify(filterValue) !== '{"exists":{"field":"rule.pci_dss"}}'
-  ));
-
+  
   try {
     const base = {};
 
@@ -49,13 +45,7 @@ export const topPCIRequirements = async (
         }
       }
     });
-
-    base.query.bool.must.push({
-      exists: {
-        field: 'rule.pci_dss'
-      }
-    });
-
+    
     const response = await context.core.elasticsearch.client.asCurrentUser.search({
       index: pattern,
       body: base
@@ -101,11 +91,7 @@ export const getRulesByRequirement = async (
   requirement,
   pattern = getSettingDefaultValue('pattern')
 ) => {
-  // Remove the "rule.pci_dss" filter and later add it as a must with the requirement
-  filters.bool.filter = filters.bool.filter.filter(filterValue => (
-    JSON.stringify(filterValue) !== '{"exists":{"field":"rule.pci_dss"}}'
-  ));
-
+  
   try {
     const base = {};
 
@@ -134,11 +120,13 @@ export const getRulesByRequirement = async (
       }
     });
 
-    base.query.bool.must[0].query_string.query =
-      base.query.bool.must[0].query_string.query +
-      ' AND rule.pci_dss: "' +
-      requirement +
-      '"';
+    base.query.bool.filter.push({
+      match_phrase: {
+        'rule.pci_dss': {
+          query: requirement
+        }
+      }
+    });
 
     const response = await context.core.elasticsearch.client.asCurrentUser.search({
       index: pattern,
