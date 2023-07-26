@@ -9,8 +9,12 @@
  *
  * Find more information about this on the LICENSE file.
  */
+
+import { cloneDeep } from 'lodash';
+
 export function Base(pattern: string, filters: any, gte: number, lte: number, allowedAgentsFilter: any = null) {
-  filters?.bool?.must?.push?.({
+  const clonedFilter = cloneDeep(filters);
+  clonedFilter?.bool?.must?.push?.({
     range: {
       timestamp: {
         gte: gte,
@@ -25,7 +29,7 @@ export function Base(pattern: string, filters: any, gte: number, lte: number, al
     aggs: {},
     sort: [],
     script_fields: {},
-    query: filters
+    query: clonedFilter
   };
 
   return base;
