@@ -32,9 +32,6 @@
         "manager": "wazuh-manager-master-0",
         "node_name": "master",
         "lastKeepAlive": "9999-12-31T23:59:59Z",
-        "version": "Wazuh v4.5.0",
-        "group_config_status": "not synced",
-        "status_code": 0
         "version": "Wazuh v4.4.0",
         "group_config_status": "synced",
         "status_code": 0
