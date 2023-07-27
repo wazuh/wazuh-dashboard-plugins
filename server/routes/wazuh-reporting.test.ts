@@ -183,7 +183,7 @@ describe('[endpoint] PUT /utils/configuration', () => {
 `(`Set custom report header and footer - Verify PDF output`, async ({footer, header, responseStatusCode, expectedMD5, tab}) => {
 
       // Mock PDF report parameters
-      const reportBody = { "array": [], "filters": [], "time": { "from": '2022-10-01T09:59:40.825Z', "to": '2022-10-04T09:59:40.825Z' }, "searchBar": "", "tables": [], "tab": tab, "section": "overview", "agents": false, "browserTimezone": "Europe/Madrid", "indexPatternTitle": "wazuh-alerts-*", "apiId": "default" };
+      const reportBody = { "array": [], "serverSideQuery": [], "filters": [], "time": { "from": '2022-10-01T09:59:40.825Z', "to": '2022-10-04T09:59:40.825Z' }, "searchBar": "", "tables": [], "tab": tab, "section": "overview", "agents": false, "browserTimezone": "Europe/Madrid", "indexPatternTitle": "wazuh-alerts-*", "apiId": "default" };
 
       // Define custom configuration
       const configurationBody = {};
