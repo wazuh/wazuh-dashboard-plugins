@@ -35,7 +35,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed repeated requests in inventory data and configurations of an agent. [#5460](https://github.com/wazuh/wazuh-kibana-app/pull/5460)
 - Fixed repeated requests in the group table when adding a group or refreshing the table [#5465](https://github.com/wazuh/wazuh-kibana-app/pull/5465)
 - Fixed an error in the request body suggestions of API Console [#5521](https://github.com/wazuh/wazuh-kibana-app/pull/5521)
-- Fixed that the limit does not change when turning the page in `Explore agent` [#5423](https://github.com/wazuh/wazuh-kibana-app/pull/5423)
+- Fixed that the limit does not change when turning the page in `Explore agent` [#5742](https://github.com/wazuh/wazuh-kibana-app/pull/5742)
 
 ### Removed
 
