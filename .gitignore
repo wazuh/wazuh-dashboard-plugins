@@ -72,8 +72,6 @@ typings/
 target/
 build/
 
-yarn.lock
-
 cypress/node_modules/
 cypress/.idea/
 cypress/cypress.env.json
@@ -82,3 +80,6 @@ cypress/cookies.json
 
 # Customization plugin assets
 public/assets/custom/*
+
+# Mac files
+.DS_Store

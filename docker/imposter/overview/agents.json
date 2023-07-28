@@ -1,0 +1,84 @@
+{
+  "data": {
+    "nodes": [
+      {
+        "node_name": "worker1",
+        "count": 1
+      },
+      {
+        "node_name": "worker2",
+        "count": 1
+      },
+      {
+        "node_name": "master-node",
+        "count": 1
+      }
+    ],
+    "groups": [
+      {
+        "name": "default",
+        "count": 6,
+        "mergedSum": "9a016508cea1e997ab8569f5cfab30f5",
+        "configSum": "ab73af41699f13fdd81903b5f23d8d00"
+      }
+    ],
+    "agent_os": [
+      {
+        "os": {
+          "name": "Ubuntu",
+          "platform": "ubuntu",
+          "version": "20.04.02 LTS"
+        },
+        "count": 6
+      }
+    ],
+    "agent_status": {
+      "connection": {
+          "active": 1,
+          "disconnected": 2,
+          "never_connected": 0,
+          "pending": 0,
+          "total": 3
+      },
+      "configuration": {
+          "synced": 3,
+          "total": 3,
+          "not_synced": 0
+      }
+    },
+    "agent_version": [
+      {
+        "version": "Wazuh v4.3.0",
+        "count": 6
+      }
+    ],
+    "last_registered_agent": [
+      {
+        "os": {
+          "arch": "x86_64",
+          "codename": "Focal Fossa",
+          "major": 20,
+          "minor": 4,
+          "name": "Ubuntu",
+          "platform": "ubuntu",
+          "uname": "Linux |77000bae7bd0 |5.8.0-45-generic |#51~20.04.1-Ubuntu SMP Tue Feb 23 13:46:31 UTC 2021 |x86_64",
+          "version": "20.04.02 LTS"
+        },
+        "node_name": "worker1",
+        "lastKeepAlive": "2021-05-31T10:56:52Z",
+        "configSum": "ab73af41699f13fdd81903b5f23d8d00",
+        "status": "active",
+        "ip": "172.18.0.7",
+        "group": ["default"],
+        "name": "77000bae7bd0",
+        "registerIP": "any",
+        "dateAdd": "2021-05-31T09:49:28Z",
+        "manager": "wazuh-worker1",
+        "id": "004",
+        "mergedSum": "9a016508cea1e997ab8569f5cfab30f5",
+        "version": "Wazuh v4.3.0"
+      }
+    ]
+  },
+  "error": 0
+}
