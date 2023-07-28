@@ -10,8 +10,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
-- Fixed the tooltips of the tables in the security section, and unnecessary requests are removed. [#5631](https://github.com/wazuh/wazuh-kibana-app/pull/5631)
+
+- Fixed the propagation event so that the flyout data, in the decoders, does not change when the button is pressed. [#5597](https://github.com/wazuh/wazuh-kibana-app/pull/5597)
 - Fixed the color of the agent name in the groups section in dark mode. [#5676](https://github.com/wazuh/wazuh-kibana-app/pull/5676)
+- Fixed the tooltips of the tables in the security section, and unnecessary requests are removed. [#5631](https://github.com/wazuh/wazuh-kibana-app/pull/5631)
 
 ## Wazuh v4.6.0 - OpenSearch Dashboards 2.6.0 - Revision 01
 
