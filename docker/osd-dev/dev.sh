@@ -9,6 +9,8 @@ os_versions=(
   '2.4.0'
   '2.4.1'
   '2.6.0'
+  '2.8.0'
+  '2.9.0'
 )
 
 osd_versions=(
@@ -20,6 +22,8 @@ osd_versions=(
   '2.4.0'
   '2.4.1'
   '2.6.0'
+  '4.6.0'
+  '4.7.0'
 )
 
 usage() {
@@ -71,8 +75,15 @@ export OSD_VERSION=$2
 export OSD_PORT=${PORT:-5601}
 export IMPOSTER_PORT=8081
 export SRC=$3
-export OSD_MAJOR=$(echo $OSD_VERSION | cut -d. -f1).x
+export OSD_MAJOR_NUMBER=$(echo $OSD_VERSION | cut -d. -f1)
 export COMPOSE_PROJECT_NAME=os-dev-${OSD_VERSION//./}
+
+if [[ "$OSD_MAJOR_NUMBER" -ge 2 ]];
+then
+  export OSD_MAJOR="2.x"
+else
+  export OSD_MAJOR="1.x"
+fi
 
 profile="standard"
 export WAZUH_DASHBOARD_CONF=./config/${OSD_MAJOR}/osd/opensearch_dashboards.yml
