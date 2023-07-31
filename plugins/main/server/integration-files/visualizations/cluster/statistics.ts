@@ -952,7 +952,7 @@ export default [
     _source: {
       title: 'Wazuh App Statistics Syscheck',
       visState: JSON.stringify({
-        title: 'Wazuh App Statistics Syscheck',
+        title: 'syscheck',
         type: 'line',
         aggs: [
           {
@@ -987,7 +987,7 @@ export default [
           },
           {
             id: '4',
-            enabled: true,
+            enabled: false,
             type: 'avg',
             params: {
               field: 'analysisd.syscheck_queue_usage',
@@ -1018,7 +1018,7 @@ export default [
           },
           {
             id: '6',
-            enabled: false,
+            enabled: true,
             type: 'avg',
             params: {
               field: 'analysisd.syscheck_queue_usage',
@@ -1123,7 +1123,7 @@ export default [
             {
               data: {
                 id: '4',
-                label: 'Queue usage',
+                label: 'Queue Usage',
               },
               drawLinesBetweenPoints: true,
               interpolate: 'linear',
@@ -1137,7 +1137,7 @@ export default [
             {
               data: {
                 id: '6',
-                label: 'Queue usage %',
+                label: 'Queue Usage %',
               },
               drawLinesBetweenPoints: true,
               interpolate: 'linear',
@@ -1151,7 +1151,7 @@ export default [
             {
               data: {
                 id: '8',
-                label: 'Queue usage 70%',
+                label: 'Queue Usage 70%',
               },
               drawLinesBetweenPoints: true,
               interpolate: 'linear',
@@ -1165,7 +1165,7 @@ export default [
             {
               data: {
                 id: '7',
-                label: 'Queue usage 90%',
+                label: 'Queue Usage 90%',
               },
               drawLinesBetweenPoints: true,
               interpolate: 'linear',
@@ -1239,7 +1239,17 @@ export default [
           radiusRatio: 22,
         },
       }),
-      uiStateJSON: '{}',
+      uiStateJSON: JSON.stringify({
+        vis: {
+          colors: {
+            'Queue Usage %': '#7EB26D',
+            'Queue Usage 70%': '#EAB839',
+            'Queue Usage 90%': '#E24D42',
+            'Syscheck EDPS': '#D683CE',
+            'Syscheck Events Decoded': '#70DBED',
+          },
+        },
+      }),
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
