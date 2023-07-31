@@ -15,7 +15,7 @@ import React, { Component, Fragment } from 'react';
 import { EuiBasicTable, EuiSpacer } from '@elastic/eui';
 
 import WzNoConfig from '../util-components/no-config';
-import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import { isString } from '../utils/utils';
 import helpLinks from './help-links.js';
 
@@ -52,12 +52,10 @@ class WzConfigurationPolicyMonitoringSystemAudit extends Component {
         currentConfig['syscheck-rootcheck'].rootcheck &&
         currentConfig['syscheck-rootcheck'].rootcheck.ignore &&
         currentConfig['syscheck-rootcheck'].rootcheck.ignore.length ? (
-          <WzConfigurationSettingsTabSelector
+          <WzConfigurationSettingsHeader
             title="Ignored files and directories"
             description="These files and directories are ignored from the rootcheck scan"
-            currentConfig={currentConfig}
-            minusHeight={this.props.agent.id === '000' ? 320 : 415}
-            helpLinks={helpLinks}
+            help={helpLinks}
           >
             {(currentConfig['syscheck-rootcheck'].rootcheck.ignore || {})
               .length && (
@@ -82,7 +80,7 @@ class WzConfigurationPolicyMonitoringSystemAudit extends Component {
                 />
               </Fragment>
             )}
-          </WzConfigurationSettingsTabSelector>
+          </WzConfigurationSettingsHeader>
         ) : null}
       </Fragment>
     );

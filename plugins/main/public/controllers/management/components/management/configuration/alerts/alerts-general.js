@@ -14,7 +14,7 @@ import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
-import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzNoConfig from '../util-components/no-config';
 import { isString, renderValueOrNo } from '../utils/utils';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
@@ -68,18 +68,16 @@ class WzConfigurationAlertsGeneral extends Component {
         {currentConfig['analysis-alerts'] &&
           !isString(currentConfig['analysis-alerts']) &&
           currentConfig['analysis-alerts'].alerts && (
-            <WzConfigurationSettingsTabSelector
+            <WzConfigurationSettingsHeader
               title="Main settings"
               description="General alert settings"
-              currentConfig={currentConfig}
-              minusHeight={320}
-              helpLinks={helpLinks}
+              help={helpLinks}
             >
               <WzConfigurationSettingsGroup
                 config={currentConfig['analysis-alerts'].alerts}
                 items={mainSettings}
               />
-            </WzConfigurationSettingsTabSelector>
+            </WzConfigurationSettingsHeader>
           )}
       </Fragment>
     );

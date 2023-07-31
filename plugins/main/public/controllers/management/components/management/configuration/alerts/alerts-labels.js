@@ -16,7 +16,7 @@ import PropTypes from 'prop-types';
 import { EuiBasicTable } from '@elastic/eui';
 
 import WzNoConfig from '../util-components/no-config';
-import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import withWzConfig from '../util-hocs/wz-config';
 import { isString, hasSize } from '../utils/utils';
 
@@ -99,11 +99,9 @@ class WzConfigurationAlertsLabels extends Component {
             agent && agent.id !== '000' ? 'agent-labels' : 'analysis-labels'
           ].labels
         ) ? (
-          <WzConfigurationSettingsTabSelector
+          <WzConfigurationSettingsHeader
             title="Defined labels"
-            currentConfig={currentConfig}
-            minusHeight={agent.id === '000' ? 320 : 355}
-            helpLinks={helpLinks}
+            help={helpLinks}
           >
             <EuiBasicTable
               columns={columns}
@@ -115,7 +113,7 @@ class WzConfigurationAlertsLabels extends Component {
                 ].labels
               }
             />
-          </WzConfigurationSettingsTabSelector>
+          </WzConfigurationSettingsHeader>
         ) : null}
       </Fragment>
     );

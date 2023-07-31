@@ -13,7 +13,7 @@
 import React, { Component, Fragment } from 'react';
 
 import WzNoConfig from '../util-components/no-config';
-import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import withWzConfig from '../util-hocs/wz-config';
 import { isString, renderValueNoThenEnabled } from '../utils/utils';
@@ -83,12 +83,10 @@ class WzConfigurationInventory extends Component {
             <WzNoConfig error="not-present" help={helpLinks} />
           )}
         {currentConfig && this.wodleConfig && this.wodleConfig.syscollector && (
-          <WzConfigurationSettingsTabSelector
+          <WzConfigurationSettingsHeader
             title="Main settings"
             description="General settings applied to all the scans"
-            currentConfig={this.wodleConfig}
-            minusHeight={this.props.agent.id === '000' ? 260 : 355}
-            helpLinks={helpLinks}
+            help={helpLinks}
           >
             <WzConfigurationSettingsGroup
               config={this.wodleConfig.syscollector}
@@ -100,7 +98,7 @@ class WzConfigurationInventory extends Component {
               config={this.wodleConfig.syscollector}
               items={scanSettings}
             />
-          </WzConfigurationSettingsTabSelector>
+          </WzConfigurationSettingsHeader>
         )}
       </Fragment>
     );

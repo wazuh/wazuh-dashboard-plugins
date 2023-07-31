@@ -13,7 +13,7 @@
 import React, { Component, Fragment } from 'react';
 
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
-import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import withWzConfig from '../util-hocs/wz-config';
 import WzNoConfig from '../util-components/no-config';
 import { isString, renderValueNoThenEnabled, renderValueYesThenEnabled } from '../utils/utils';
@@ -132,12 +132,10 @@ class WzRegistrationService extends Component {
         {currentConfig['auth-auth'] &&
           currentConfig['auth-auth'].auth &&
           !isString(currentConfig['auth-auth'].auth) && (
-            <WzConfigurationSettingsTabSelector
+            <WzConfigurationSettingsHeader
               title="Main settings"
               description="General settings applied to the registration service"
-              currentConfig={currentConfig}
-              minusHeight={260}
-              helpLinks={helpLinks}
+              help={helpLinks}
             >
               <WzConfigurationSettingsGroup
                 config={currentConfig['auth-auth'].auth}
@@ -155,7 +153,7 @@ class WzRegistrationService extends Component {
                 config={currentConfig['auth-auth'].auth}
                 items={sslSettings}
               />
-            </WzConfigurationSettingsTabSelector>
+            </WzConfigurationSettingsHeader>
           )}
       </Fragment>
     );

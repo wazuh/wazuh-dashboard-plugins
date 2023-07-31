@@ -12,7 +12,7 @@
 
 import React, { Component, Fragment } from 'react';
 
-import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import WzNoConfig from '../util-components/no-config';
 import helpLinks from './help-links';
@@ -50,18 +50,16 @@ class WzConfigurationOpenSCAPGeneral extends Component {
             <WzNoConfig error="not-present" help={helpLinks} />
           )}
         {wodleConfig['open-scap'] && (
-          <WzConfigurationSettingsTabSelector
+          <WzConfigurationSettingsHeader
             title="Main settings"
             description="These settings apply to all OpenSCAP evaluations"
-            currentConfig={wodleConfig}
-            minusHeight={this.props.agent.id === '000' ? 320 : 415}
-            helpLinks={helpLinks}
+            help={helpLinks}
           >
             <WzConfigurationSettingsGroup
               config={wodleConfig['open-scap']}
               items={mainSettings}
             />
-          </WzConfigurationSettingsTabSelector>
+          </WzConfigurationSettingsHeader>
         )}
       </Fragment>
     );

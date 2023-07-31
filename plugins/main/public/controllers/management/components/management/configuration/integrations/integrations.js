@@ -98,12 +98,6 @@ class WzConfigurationIntegrations extends Component {
           )}
         {currentConfig['integrator-integration'] &&
           !isString(currentConfig['integrator-integration']) && (
-            //   <WzConfigurationSettingsTabSelector
-            //     title='Main settings'
-            //     description='Basic alerts and logging settings'
-            //     currentConfig={currentConfig}
-            //     helpLinks={helpLinks}>
-            // </WzConfigurationSettingsTabSelector>
             <WzViewSelector view={view}>
               <WzViewSelectorSwitch default>
                 {integrations &&

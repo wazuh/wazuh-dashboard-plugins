@@ -14,7 +14,7 @@ import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 
 import WzNoConfig from '../util-components/no-config';
-import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationSettingsListSelector from '../util-components/configuration-settings-list-selector';
 import { isString, renderValueNoThenEnabled } from '../utils/utils';
 import { settingsListBuilder } from '../utils/builders';
@@ -85,18 +85,16 @@ class WzConfigurationActiveResponseActiveResponse extends Component {
         {currentConfig['analysis-active_response'] &&
         !isString(currentConfig['analysis-active_response']) &&
         currentConfig['analysis-active_response']['active-response'].length ? (
-          <WzConfigurationSettingsTabSelector
+          <WzConfigurationSettingsHeader
             title="Active response definitions"
             description="Find here all the currently defined Active responses"
-            currentConfig={currentConfig['analysis-active_response']}
-            minusHeight={320}
-            helpLinks={helpLinks}
+            help={helpLinks}
           >
             <WzConfigurationSettingsListSelector
               items={items}
               settings={mainSettings}
             />
-          </WzConfigurationSettingsTabSelector>
+          </WzConfigurationSettingsHeader>
         ) : null}
       </Fragment>
     );

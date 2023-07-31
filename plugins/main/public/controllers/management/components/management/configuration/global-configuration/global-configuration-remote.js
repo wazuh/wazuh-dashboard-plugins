@@ -14,7 +14,7 @@ import React, { Component, Fragment } from 'react';
 
 import { EuiBasicTable, EuiSpacer } from '@elastic/eui';
 
-import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzNoConfig from '../util-components/no-config';
 import {
   isString,
@@ -102,12 +102,10 @@ class WzConfigurationGlobalConfigurationRemote extends Component {
           )}
         {currentConfig['request-remote'] &&
           currentConfig['request-remote'].remote && (
-            <WzConfigurationSettingsTabSelector
+            <WzConfigurationSettingsHeader
               title='Remote settings'
               description='Configuration to listen for events from the agents or a syslog client'
-              minusHeight={320}
-              currentConfig={currentConfig}
-              helpLinks={helpLinks}
+              help={helpLinks}
             >
               <EuiSpacer size='s' />
               <EuiBasicTable
@@ -115,7 +113,7 @@ class WzConfigurationGlobalConfigurationRemote extends Component {
                 items={currentConfig['request-remote'].remote}
                 tableLayout='auto'
               />
-            </WzConfigurationSettingsTabSelector>
+            </WzConfigurationSettingsHeader>
           )}
       </Fragment>
     );

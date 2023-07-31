@@ -13,7 +13,7 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 
-import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationListSelector from '../util-components/configuration-settings-list-selector';
 import WzNoConfig from '../util-components/no-config';
 import { isString } from '../utils/utils';
@@ -81,18 +81,16 @@ class WzConfigurationAlertsReports extends Component {
           !isString(currentConfig['monitor-reports']) &&
           currentConfig['monitor-reports'].reports &&
           currentConfig['monitor-reports'].reports.length && (
-            <WzConfigurationSettingsTabSelector
+            <WzConfigurationSettingsHeader
               title="Main settings"
               description="Daily reports about alerts"
-              minusHeight={320}
-              currentConfig={currentConfig}
-              helpLinks={helpLinks}
+              help={helpLinks}
             >
               <WzConfigurationListSelector
                 items={items}
                 settings={mainSettings}
               />
-            </WzConfigurationSettingsTabSelector>
+            </WzConfigurationSettingsHeader>
           )}
       </Fragment>
     );

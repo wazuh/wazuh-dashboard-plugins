@@ -14,7 +14,7 @@ import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
-import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzNoConfig from '../util-components/no-config';
 
 import { isString } from '../utils/utils';
@@ -155,12 +155,10 @@ class WzConfigurationGlobalConfigurationGlobal extends Component {
           currentConfig['analysis-global'].global) ||
           (currentConfig['com-logging'] &&
             currentConfig['com-logging'].logging)) && (
-          <WzConfigurationSettingsTabSelector
+          <WzConfigurationSettingsHeader
             title="Main settings"
             description="Basic alerts and logging settings"
-            currentConfig={currentConfig}
-            minusHeight={agent.id === '000' ? 320 : 355}
-            helpLinks={this.helpLinks}
+            help={this.helpLinks}
           >
             <WzConfigurationSettingsGroup
               config={mainSettingsConfig}
@@ -187,7 +185,7 @@ class WzConfigurationGlobalConfigurationGlobal extends Component {
                 />
               </Fragment>
             )}
-          </WzConfigurationSettingsTabSelector>
+          </WzConfigurationSettingsHeader>
         )}
       </Fragment>
     );

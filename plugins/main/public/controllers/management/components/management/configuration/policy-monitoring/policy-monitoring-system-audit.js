@@ -15,7 +15,7 @@ import React, { Component, Fragment } from 'react';
 import { EuiBasicTable } from '@elastic/eui';
 
 import WzNoConfig from '../util-components/no-config';
-import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import { isString } from '../utils/utils';
 import helpLinks from './help-links';
 
@@ -46,12 +46,10 @@ class WzPolicyMonitoringSystemAudit extends Component {
           currentConfig['syscheck-rootcheck'] &&
           currentConfig['syscheck-rootcheck'].rootcheck &&
           currentConfig['syscheck-rootcheck'].rootcheck.system_audit && (
-            <WzConfigurationSettingsTabSelector
+            <WzConfigurationSettingsHeader
               title="UNIX audit files"
               description="Specified paths to audit definition files for Unix-like systems"
-              currentConfig={currentConfig}
-              minusHeight={this.props.agent.id === '000' ? 320 : 415}
-              helpLinks={helpLinks}
+              help={helpLinks}
             >
               <EuiBasicTable
                 items={currentConfig[
@@ -59,7 +57,7 @@ class WzPolicyMonitoringSystemAudit extends Component {
                 ].rootcheck.system_audit.map(item => ({ path: item }))}
                 columns={columns}
               />
-            </WzConfigurationSettingsTabSelector>
+            </WzConfigurationSettingsHeader>
           )}
       </Fragment>
     );

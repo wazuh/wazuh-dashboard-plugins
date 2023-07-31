@@ -12,7 +12,7 @@
 
 import React, { Component, Fragment } from 'react';
 
-import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-tab-selector';
 import WzNoConfig from '../util-components/no-config';
 import { isString } from '../utils/utils';
@@ -50,19 +50,16 @@ class WzConfigurationLogSettingsArchives extends Component {
           currentConfig['analysis-logging'].logging) ||
           (currentConfig['com-logging'] &&
             currentConfig['com-logging'].logging && (
-              <WzConfigurationSettingsTabSelector
+              <WzConfigurationSettingsHeader
                 title="Archives settings"
                 description="Basic archives log settings"
-                currentConfig={
-                  currentConfig['analysis-logging'].logging.archives
-                }
-                helpLinks={helpLinks}
+                help={helpLinks}
               >
                 <WzConfigurationSettingsGroup
                   config={currentConfig['analysis-logging'].logging.archives}
                   items={mainSettings}
                 />
-              </WzConfigurationSettingsTabSelector>
+              </WzConfigurationSettingsHeader>
             ))}
       </Fragment>
     );

@@ -11,7 +11,7 @@
  */
 
 import React, { useMemo } from 'react';
-import WzConfigurationSettingsTabSelector from '../../../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsHeader from '../../../util-components/configuration-settings-header';
 import WzConfigurationSettingsListSelector from '../../../util-components/configuration-settings-list-selector';
 import { settingsListBuilder } from '../../../utils/builders';
 import { HELP_LINKS, OFFICE_365 } from '../../constants';
@@ -36,16 +36,14 @@ export const ApiAuthTab = ({ agent, wodleConfiguration }: ApiAuthProps) => {
   ), [wodleConfiguration]);
 
   return (
-    <WzConfigurationSettingsTabSelector
+    <WzConfigurationSettingsHeader
       title="Credentials for the authentication with the API"
-      currentConfig={wodleConfiguration}
-      minusHeight={agent.id === '000' ? 370 : 320}
-      helpLinks={HELP_LINKS}
+      help={HELP_LINKS}
     >
       <WzConfigurationSettingsListSelector
         items={credentials}
         settings={columns}
       />
-    </WzConfigurationSettingsTabSelector>
+    </WzConfigurationSettingsHeader>
   );
 };

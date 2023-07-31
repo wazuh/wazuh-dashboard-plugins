@@ -14,11 +14,10 @@ import React, { Component, Fragment } from 'react';
 
 import { EuiBasicTable } from '@elastic/eui';
 
-import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import withWzConfig from '../util-hocs/wz-config';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import WzNoConfig from '../util-components/no-config';
-import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import { isString, isArray, renderValueNoThenEnabled } from '../utils/utils';
 import { wodleBuilder } from '../utils/builders';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
@@ -84,12 +83,10 @@ class WzConfigurationOsquery extends Component {
             <WzNoConfig error="not-present" help={helpLinks} />
           )}
         {currentConfig && this.wodleConfig && this.wodleConfig.osquery && (
-          <WzConfigurationSettingsTabSelector
+          <WzConfigurationSettingsHeader
             title="Main settings"
             description="General Osquery integration settings"
-            currentConfig={this.wodleConfig}
-            minusHeight={this.props.agent.id === '000' ? 260 : 355}
-            helpLinks={helpLinks}
+            help={helpLinks}
           >
             <WzConfigurationSettingsGroup
               config={this.wodleConfig.osquery}
@@ -110,7 +107,7 @@ class WzConfigurationOsquery extends Component {
                   />
                 </Fragment>
               )}
-          </WzConfigurationSettingsTabSelector>
+          </WzConfigurationSettingsHeader>
         )}
       </Fragment>
     );

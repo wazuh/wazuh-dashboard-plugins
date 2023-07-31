@@ -12,7 +12,7 @@
 
 import React, { Component, Fragment } from 'react';
 
-import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import WzNoConfig from '../util-components/no-config';
 import withWzConfig from '../util-hocs/wz-config';
@@ -90,12 +90,10 @@ class WzConfigurationAzure extends Component {
             <WzNoConfig error="not-present" help={helpLinks} />
           )}
         {currentConfig && this.wodleConfig['azure-logs'] && (
-          <WzConfigurationSettingsTabSelector
+          <WzConfigurationSettingsHeader
             title="Main settings"
             description="Configuration for the Azure logs wodle"
-            currentConfig={this.wodleConfig}
-            minusHeight={260}
-            helpLinks={helpLinks}
+            help={helpLinks}
           >
             <WzConfigurationSettingsGroup
               config={this.wodleConfig['azure-logs']}
@@ -119,7 +117,7 @@ class WzConfigurationAzure extends Component {
                 )}
               </Fragment>
             ) : null}
-          </WzConfigurationSettingsTabSelector>
+          </WzConfigurationSettingsHeader>
         )}
       </Fragment>
     );

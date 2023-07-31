@@ -13,7 +13,7 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 
-import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationSettingsListSelector from '../util-components/configuration-settings-list-selector';
 import WzNoConfig from '../util-components/no-config';
 import { isString, isArray } from '../utils/utils';
@@ -97,18 +97,16 @@ class WzConfigurationAlertsEmailAlerts extends Component {
         {currentConfig['mail-alerts'] &&
         isArray(currentConfig['mail-alerts'].email_alerts) &&
         currentConfig['mail-alerts'].email_alerts.length ? (
-          <WzConfigurationSettingsTabSelector
+          <WzConfigurationSettingsHeader
             title="Main settings"
             description="Granular email alert options"
-            currentConfig={currentConfig}
-            minusHeight={320}
-            helpLinks={helpLinks}
+            help={helpLinks}
           >
             <WzConfigurationSettingsListSelector
               items={items}
               settings={mainSettings}
             />
-          </WzConfigurationSettingsTabSelector>
+          </WzConfigurationSettingsHeader>
         ) : null}
       </Fragment>
     );

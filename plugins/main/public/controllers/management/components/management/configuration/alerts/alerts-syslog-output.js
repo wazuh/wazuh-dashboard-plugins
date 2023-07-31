@@ -15,7 +15,7 @@ import PropTypes from 'prop-types';
 
 import { EuiBasicTable } from '@elastic/eui';
 
-import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzNoConfig from '../util-components/no-config';
 import {
   isString,
@@ -77,18 +77,16 @@ class WzConfigurationAlertsReports extends Component {
           !isString(currentConfig['csyslog-csyslog']) &&
           currentConfig['csyslog-csyslog'].syslog_output &&
           currentConfig['csyslog-csyslog'].syslog_output.length && (
-            <WzConfigurationSettingsTabSelector
+            <WzConfigurationSettingsHeader
               title="Main settings"
               description="Output alerts to a syslog server"
-              currentConfig={currentConfig}
-              minusHeight={320}
               helpLinks={helpLinks}
             >
               <EuiBasicTable
                 columns={columns}
                 items={currentConfig['csyslog-csyslog'].syslog_output}
               />
-            </WzConfigurationSettingsTabSelector>
+            </WzConfigurationSettingsHeader>
           )}
       </Fragment>
     );

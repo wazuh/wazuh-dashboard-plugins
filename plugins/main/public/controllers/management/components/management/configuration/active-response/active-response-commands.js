@@ -14,7 +14,7 @@ import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 
 import WzNoConfig from '../util-components/no-config';
-import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationSettingsListSelector from '../util-components/configuration-settings-list-selector';
 import { isString, renderValueNoThenEnabled } from '../utils/utils';
 import { settingsListBuilder } from '../utils/builders';
@@ -80,18 +80,16 @@ class WzConfigurationActiveResponseCommands extends Component {
         !isString(currentConfig['analysis-command']) &&
         currentConfig['analysis-command'].command &&
         currentConfig['analysis-command'].command.length ? (
-          <WzConfigurationSettingsTabSelector
+          <WzConfigurationSettingsHeader
             title="Command definitions"
             description="Find here all the currently defined commands used for Active response"
-            currentConfig={currentConfig['analysis-command']}
-            minusHeight={320}
-            helpLinks={helpLinks}
+            help={helpLinks}
           >
             <WzConfigurationSettingsListSelector
               items={items}
               settings={mainSettings}
             />
-          </WzConfigurationSettingsTabSelector>
+          </WzConfigurationSettingsHeader>
         ) : null}
       </Fragment>
     );
