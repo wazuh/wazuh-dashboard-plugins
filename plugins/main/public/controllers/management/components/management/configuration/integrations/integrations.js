@@ -11,13 +11,7 @@
  */
 
 import React, { Component, Fragment } from 'react';
-
-import { WzConfigurationSettingsHeaderViewer } from '../util-components/configuration-settings-header';
 import WzNoConfig from '../util-components/no-config';
-import { WzSettingsViewer } from '../util-components/code-viewer';
-import WzViewSelector, {
-  WzViewSelectorSwitch
-} from '../util-components/view-selector';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import withWzConfig from '../util-hocs/wz-config';
 import { capitalize, isString } from '../utils/utils';
@@ -97,72 +91,28 @@ class WzConfigurationIntegrations extends Component {
             />
           )}
         {currentConfig['integrator-integration'] &&
-          !isString(currentConfig['integrator-integration']) && (
-            <WzViewSelector view={view}>
-              <WzViewSelectorSwitch default>
-                {integrations &&
-                  integrations.map((integrationInfo, key) => {
-                    const integration = Object.assign(
-                      this.buildIntegration(integrationInfo.name),
-                      integrationInfo
-                    );
-                    return (
-                      <Fragment key={`integration-${integration.title}`}>
-                        <WzConfigurationSettingsGroup
-                          title={integration.title}
-                          description={integration.description}
-                          items={integrationsSettings}
-                          config={integration}
-                          viewSelected={view}
-                          settings={
-                            key === 0 ? () => this.changeView('') : undefined
-                          }
-                          json={
-                            key === 0
-                              ? () => this.changeView('json')
-                              : undefined
-                          }
-                          xml={
-                            key === 0 ? () => this.changeView('xml') : undefined
-                          }
-                          help={key === 0 ? helpLinks : undefined}
-                        />
-                      </Fragment>
-                    );
-                  })}
-              </WzViewSelectorSwitch>
-              <WzViewSelectorSwitch view="json">
-                <WzConfigurationSettingsHeaderViewer
-                  mode="json"
-                  viewSelected={view}
-                  settings={() => this.changeView('')}
-                  json={() => this.changeView('json')}
-                  xml={() => this.changeView('xml')}
-                  help={helpLinks}
-                />
-                <WzSettingsViewer
-                  mode="json"
-                  value={currentConfig}
-                  minusHeight={260}
-                />
-              </WzViewSelectorSwitch>
-              <WzViewSelectorSwitch view="xml">
-                <WzConfigurationSettingsHeaderViewer
-                  mode="xml"
-                  viewSelected={view}
-                  settings={() => this.changeView('')}
-                  json={() => this.changeView('json')}
-                  xml={() => this.changeView('xml')}
-                  help={helpLinks}
-                />
-                <WzSettingsViewer
-                  mode="xml"
-                  value={currentConfig}
-                  minusHeight={260}
-                />
-              </WzViewSelectorSwitch>
-            </WzViewSelector>
-          )}
+          !isString(currentConfig['integrator-integration']) ? (
+            integrations &&
+              integrations.map((integrationInfo, key) => {
+                const integration = Object.assign(
+                  this.buildIntegration(integrationInfo.name),
+                  integrationInfo
+                );
+                return (
+                  <Fragment key={`integration-${integration.title}`}>
+                    <WzConfigurationSettingsGroup
+                      title={integration.title}
+                      description={integration.description}
+                      items={integrationsSettings}
+                      config={integration}
+                      help={key === 0 ? helpLinks : undefined}
+                    />
+                  </Fragment>
+                );
+              })
+          )
+          : null
+        }
       </Fragment>
     );
   }
