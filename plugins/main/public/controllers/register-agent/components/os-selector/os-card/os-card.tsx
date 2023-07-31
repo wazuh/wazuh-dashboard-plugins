@@ -62,7 +62,7 @@ export const OsCard = ({ onChange, value }: Props) => {
               )}
               rel='noopener noreferrer'
             >
-              steps
+              documentation
             </EuiLink>
             .
           </span>

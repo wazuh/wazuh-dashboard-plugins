@@ -20,13 +20,13 @@ export const OPERATING_SYSTEMS_OPTIONS: RegisterAgentData[] = [
     icon: darkMode ? WindowsDarkIcon : WindowsLightIcon,
     title: 'WINDOWS',
     hr: true,
-    architecture: ['MSI 32/64'],
+    architecture: ['MSI 32/64 bits'],
   },
   {
     icon: darkMode ? MacDarkIcon : MacLightIcon,
     title: 'macOS',
     hr: true,
-    architecture: ['Intel', 'Apple Silicon'],
+    architecture: ['Intel', 'Apple silicon'],
   },
 ];
 

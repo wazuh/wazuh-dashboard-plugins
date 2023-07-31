@@ -160,7 +160,7 @@ export const Steps = ({
                       )}
                       rel='noopener noreferrer'
                     >
-                      steps
+                      documentation
                     </EuiLink>
                   </span>
                 }
