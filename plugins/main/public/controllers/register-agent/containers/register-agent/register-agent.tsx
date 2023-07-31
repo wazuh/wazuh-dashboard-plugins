@@ -121,12 +121,14 @@ export const RegisterAgent = withReduxProvider(
           const authInfo = await getAuthInfo();
           // get wazuh password configuration
           let wazuhPassword = '';
-          const needsPassword = (authInfo.auth || {}).use_password === 'yes';
+          //const needsPassword = (authInfo.auth || {}).use_password === 'yes';
+          const needsPassword = true;
           if (needsPassword) {
-            wazuhPassword =
+            /*wazuhPassword =
               configuration['enrollment.password'] ||
               authInfo['authd.pass'] ||
-              '';
+              '';*/
+            wazuhPassword = `password"with"singlequote`;
           }
           const groups = await getGroups();
           setNeedsPassword(needsPassword);

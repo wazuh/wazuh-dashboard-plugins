@@ -18,7 +18,7 @@ interface ICommandSectionProps {
 }
 
 export default function CommandOutput(props: ICommandSectionProps) {
-  const { commandText, showCommand, onCopy, os, password } = props;
+  const { commandText, showCommand, onCopy, os, password} = props;
   const getHighlightCodeLanguage = (os: 'WINDOWS' | string) => {
     if (os.toLowerCase() === 'windows') {
       return 'powershell';
@@ -69,6 +69,7 @@ export default function CommandOutput(props: ICommandSectionProps) {
   return (
     <Fragment>
       <EuiSpacer />
+      { password }
       <EuiText>
         <div className='copy-codeblock-wrapper'>
           <EuiCodeBlock

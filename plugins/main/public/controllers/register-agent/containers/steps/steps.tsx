@@ -33,6 +33,7 @@ import {
   tFormStepsLabel,
 } from '../../services/register-agent-steps-status-services';
 import { webDocumentationLink } from '../../../../../common/services/web_documentation';
+import { getPasswordForCommand } from '../../services/wazuh-password-service';
 
 interface IStepsProps {
   needsPassword: boolean;
@@ -210,7 +211,17 @@ export const Steps = ({
               showCommand={showCommandsSections(form.fields)}
               os={registerAgentFormValues.operatingSystem.name}
               onCopy={() => setInstallCommandWasCopied(true)}
-              password={registerAgentFormValues.optionalParams.wazuhPassword}
+              password={
+                registerAgentFormValues.operatingSystem.name === 'macOS'
+                  ? getPasswordForCommand(
+                      registerAgentFormValues.optionalParams.wazuhPassword,
+                      'doublequote',
+                    )
+                  : getPasswordForCommand(
+                      registerAgentFormValues.optionalParams.wazuhPassword,
+                      'singlequote',
+                    )
+              }
             />
           ) : null}
         </>
