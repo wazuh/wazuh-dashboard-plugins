@@ -145,7 +145,13 @@ export default [
           row: true,
         },
       }),
-      uiStateJSON: '{}',
+      uiStateJSON: JSON.stringify({
+        vis: {
+          colors: {
+            'recv_bytes': '#70DBED', // prettier-ignore
+          },
+        },
+      }),
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
