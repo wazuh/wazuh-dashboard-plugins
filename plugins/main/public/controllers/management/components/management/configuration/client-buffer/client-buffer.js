@@ -15,9 +15,7 @@ import React, { Component, Fragment } from 'react';
 import WzNoConfig from '../util-components/no-config';
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
-
 import withWzConfig from '../util-hocs/wz-config';
-
 import {
   isString,
   renderValueNoThenEnabled,
@@ -94,9 +92,5 @@ class WzConfigurationClientBuffer extends Component {
 }
 
 const sections = [{ component: 'agent', configuration: 'buffer' }];
-
-WzConfigurationClientBuffer.propTypes = {
-  // currentConfig: PropTypes.object.isRequired
-};
 
 export default withWzConfig(sections)(WzConfigurationClientBuffer);

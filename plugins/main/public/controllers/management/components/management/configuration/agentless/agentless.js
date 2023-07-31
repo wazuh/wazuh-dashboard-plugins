@@ -21,6 +21,7 @@ import { isString } from '../utils/utils';
 
 import { connect } from 'react-redux';
 import { compose } from 'redux';
+
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
 const mainSettings = [
@@ -95,7 +96,6 @@ const mapStateToProps = state => ({
 });
 
 WzConfigurationAgentless.propTypes = {
-  // currentConfig: PropTypes.object.isRequired,
   wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string])
 };
 

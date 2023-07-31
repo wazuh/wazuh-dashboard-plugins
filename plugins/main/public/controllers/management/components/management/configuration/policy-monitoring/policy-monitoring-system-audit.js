@@ -64,8 +64,4 @@ class WzPolicyMonitoringSystemAudit extends Component {
   }
 }
 
-WzPolicyMonitoringSystemAudit.propTypes = {
-  // currentConfig: PropTypes.object.isRequired
-};
-
 export default WzPolicyMonitoringSystemAudit;

@@ -11,6 +11,7 @@
  */
 
 import React, { useMemo } from 'react';
+
 import WzConfigurationSettingsHeader from '../../../util-components/configuration-settings-header';
 import WzConfigurationSettingsListSelector from '../../../util-components/configuration-settings-list-selector';
 import { settingsListBuilder } from '../../../utils/builders';

@@ -71,8 +71,4 @@ class WzConfigurationIntegrityMonitoringWhoData extends Component {
   }
 }
 
-WzConfigurationIntegrityMonitoringWhoData.proptTypes = {
-  // currentConfig: PropTypes.object.isRequired
-};
-
 export default WzConfigurationIntegrityMonitoringWhoData;

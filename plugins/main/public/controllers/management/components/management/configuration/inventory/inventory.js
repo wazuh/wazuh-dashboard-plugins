@@ -107,8 +107,4 @@ class WzConfigurationInventory extends Component {
 
 const sections = [{ component: 'wmodules', configuration: 'wmodules' }];
 
-WzConfigurationInventory.propTypes = {
-  // currentConfig: PropTypes.object.isRequired
-};
-
 export default withWzConfig(sections)(WzConfigurationInventory);

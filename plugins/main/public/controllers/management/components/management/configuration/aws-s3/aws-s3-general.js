@@ -16,12 +16,10 @@ import PropTypes from 'prop-types';
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import WzNoConfig from '../util-components/no-config';
-
 import {
   renderValueNoThenEnabled,
   isString
 } from '../utils/utils';
-
 import helpLinks from './help-links';
 
 const mainSettings = [
@@ -78,7 +76,6 @@ class WzConfigurationAmazonS3General extends Component {
 }
 
 WzConfigurationAmazonS3General.propTypes = {
-  // currentConfig: PropTypes.object.isRequired,
   wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string])
 };
 

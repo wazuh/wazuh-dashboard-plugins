@@ -77,7 +77,6 @@ const mapStateToProps = state => ({
 });
 
 WzConfigurationAmazonS3Buckets.propTypes = {
-  // currentConfig: PropTypes.object.isRequired,
   wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string])
 };
 

@@ -22,6 +22,7 @@ import { isString, hasSize } from '../utils/utils';
 
 import { compose } from 'redux';
 import { connect } from 'react-redux';
+
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
 const columns = [
@@ -134,11 +135,9 @@ export const WzConfigurationAlertsLabelsAgent = compose(
 )(WzConfigurationAlertsLabels);
 
 WzConfigurationAlertsLabels.propTypes = {
-  // currentConfig: PropTypes.object.isRequired,
   wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string])
 };
 
 WzConfigurationAlertsLabelsAgent.propTypes = {
-  // currentConfig: PropTypes.object.isRequired,
   wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string])
 };

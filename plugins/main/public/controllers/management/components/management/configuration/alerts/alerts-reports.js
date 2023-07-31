@@ -20,6 +20,7 @@ import { isString } from '../utils/utils';
 import { settingsListBuilder } from '../utils/builders';
 
 import { connect } from 'react-redux';
+
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
 const helpLinks = [
@@ -102,7 +103,6 @@ const mapStateToProps = state => ({
 });
 
 WzConfigurationAlertsReports.propTypes = {
-  // currentConfig: PropTypes.object.isRequired,
   wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string])
 };
 

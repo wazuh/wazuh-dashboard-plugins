@@ -56,8 +56,4 @@ class WzConfigurationIntegrityMonitoringNoDiff extends Component {
   }
 }
 
-WzConfigurationIntegrityMonitoringNoDiff.proptTypes = {
-  // currentConfig: PropTypes.object.isRequired
-};
-
 export default WzConfigurationIntegrityMonitoringNoDiff;

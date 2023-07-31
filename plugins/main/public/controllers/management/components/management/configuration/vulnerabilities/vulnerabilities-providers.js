@@ -126,6 +126,4 @@ class WzConfigurationVulnerabilitiesProviders extends Component {
   }
 }
 
-WzConfigurationVulnerabilitiesProviders.propTypes = {};
-
 export default WzConfigurationVulnerabilitiesProviders;

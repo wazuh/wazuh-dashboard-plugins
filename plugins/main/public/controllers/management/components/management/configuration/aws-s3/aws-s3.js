@@ -18,7 +18,6 @@ import WzTabSelector, {
 } from '../util-components/tab-selector';
 import withWzConfig from '../util-hocs/wz-config';
 import { wodleBuilder } from '../utils/builders';
-
 import WzConfigurationAmazonS3General from './aws-s3-general';
 import WzConfigurationAmazonS3Buckets from './aws-s3-buckets';
 import WzConfigurationAmazonS3Services from './aws-s3-services';
@@ -67,7 +66,6 @@ class WzConfigurationAmazonS3 extends Component {
 const sections = [{ component: 'wmodules', configuration: 'wmodules' }];
 
 WzConfigurationAmazonS3.propTypes = {
-  // currentConfig: PropTypes.object.isRequired,
   wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string])
 };
 

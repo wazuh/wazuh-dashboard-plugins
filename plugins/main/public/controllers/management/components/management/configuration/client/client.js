@@ -17,7 +17,6 @@ import { EuiBasicTable } from '@elastic/eui';
 import WzNoConfig from '../util-components/no-config';
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
-
 import {
   isString,
   renderValueOrDefault,
@@ -123,9 +122,5 @@ class WzConfigurationClient extends Component {
 }
 
 const sections = [{ component: 'agent', configuration: 'client' }];
-
-WzConfigurationClient.propTypes = {
-  // currentConfig: PropTypes.object.isRequired
-};
 
 export default withWzConfig(sections)(WzConfigurationClient);

@@ -93,8 +93,4 @@ class WzConfigurationCommands extends Component {
 
 const sections = [{ component: 'wmodules', configuration: 'wmodules' }];
 
-WzConfigurationCommands.propTypes = {
-  // currentConfig: PropTypes.object.isRequired
-};
-
 export default withWzConfig(sections)(WzConfigurationCommands);

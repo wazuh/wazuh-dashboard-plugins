@@ -18,8 +18,10 @@ import WzConfigurationSettingsHeader from '../util-components/configuration-sett
 import WzConfigurationSettingsListSelector from '../util-components/configuration-settings-list-selector';
 import { isString, renderValueNoThenEnabled } from '../utils/utils';
 import { settingsListBuilder } from '../utils/builders';
+
 import { connect } from 'react-redux';
 import { compose } from 'redux';
+
 import withWzConfig from '../util-hocs/wz-config';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
@@ -122,6 +124,5 @@ export const WzConfigurationActiveResponseActiveResponseAgent = compose(
 )(WzConfigurationActiveResponseActiveResponse);
 
 WzConfigurationActiveResponseActiveResponseAgent.propTypes = {
-  // currentConfig: PropTypes.object.isRequired,
   wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string])
 };

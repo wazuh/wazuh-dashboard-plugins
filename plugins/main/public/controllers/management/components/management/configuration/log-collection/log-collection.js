@@ -90,8 +90,4 @@ const sections = [
   { component: 'logcollector', configuration: 'socket' }
 ];
 
-WzConfigurationLogCollection.propTypes = {
-  // currentConfig: PropTypes.object.isRequired
-};
-
 export default withWzConfig(sections)(WzConfigurationLogCollection);

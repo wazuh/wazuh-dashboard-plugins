@@ -12,6 +12,7 @@
 
 import React, { useEffect, useMemo } from 'react';
 import { compose } from 'redux';
+
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import WzConfigurationSettingsListSelector from '../util-components/configuration-settings-list-selector';

@@ -65,8 +65,4 @@ class WzConfigurationIntegrityMonitoringRegistryLimit extends Component {
   }
 }
 
-WzConfigurationIntegrityMonitoringRegistryLimit.proptTypes = {
-  // currentConfig: PropTypes.object.isRequired
-};
-
 export default WzConfigurationIntegrityMonitoringRegistryLimit;

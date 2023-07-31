@@ -116,8 +116,4 @@ class WzConfigurationOsquery extends Component {
 
 const sections = [{ component: 'wmodules', configuration: 'wmodules' }];
 
-WzConfigurationOsquery.propTypes = {
-  // currentConfig: PropTypes.object.isRequired
-};
-
 export default withWzConfig(sections)(WzConfigurationOsquery);

@@ -64,8 +64,4 @@ class WzConfigurationCisCatBenchmarks extends Component {
   }
 }
 
-WzConfigurationCisCatBenchmarks.propTypes = {
-  // currentConfig: PropTypes.object.isRequired
-};
-
 export default WzConfigurationCisCatBenchmarks;

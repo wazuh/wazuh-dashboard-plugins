@@ -11,7 +11,9 @@
  */
 
 import React from 'react';
+
 import { EuiBasicTable } from '@elastic/eui';
+
 import WzConfigurationSettingsHeader from '../../../util-components/configuration-settings-header';
 import { HELP_LINKS, OFFICE_365 } from '../../constants';
 

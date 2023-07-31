@@ -20,7 +20,6 @@ import {
   renderValueNoThenEnabled,
   renderValueOrYes
 } from '../utils/utils';
-
 import withWzConfig from '../util-hocs/wz-config';
 import { wodleBuilder } from '../utils/builders';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
@@ -111,9 +110,5 @@ class WzConfigurationDockerListener extends Component {
 }
 
 const sections = [{ component: 'wmodules', configuration: 'wmodules' }];
-
-WzConfigurationDockerListener.propTypes = {
-  // currentConfig: PropTypes.object.isRequired
-};
 
 export default withWzConfig(sections)(WzConfigurationDockerListener);

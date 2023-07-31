@@ -16,7 +16,6 @@ import PropTypes from 'prop-types';
 import WzNoConfig from '../util-components/no-config';
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
-
 import withWzConfig from '../util-hocs/wz-config';
 
 import { compose } from 'redux';
@@ -103,7 +102,6 @@ const mapStateToProps = state => ({
 const sectionsAgent = [{ component: 'com', configuration: 'active-response' }];
 
 WzConfigurationActiveResponseAgent.propTypes = {
-  // currentConfig: PropTypes.object.isRequired,
   wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string])
 };
 

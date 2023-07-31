@@ -56,8 +56,8 @@ class WzSettingsGroup extends Component {
                   keyItem={keyItem}
                   label={
                     item.renderLabel
-                    ? item.renderLabel(value, item, config)
-                    : item.label
+                      ? item.renderLabel(value, item, config)
+                      : item.label
                   }
                   value={
                     item.render

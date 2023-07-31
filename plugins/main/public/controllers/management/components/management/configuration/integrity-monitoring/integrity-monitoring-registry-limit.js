@@ -64,8 +64,4 @@ class WzConfigurationIntegrityMonitoringFileLimit extends Component {
   }
 }
 
-WzConfigurationIntegrityMonitoringFileLimit.proptTypes = {
-  // currentConfig: PropTypes.object.isRequired
-};
-
 export default WzConfigurationIntegrityMonitoringFileLimit;

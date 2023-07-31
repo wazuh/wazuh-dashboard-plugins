@@ -11,7 +11,6 @@
  */
 
 import React, { Component, Fragment } from 'react';
-import PropTypes from 'prop-types';
 
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
@@ -67,9 +66,5 @@ class WzConfigurationIntegrityMonitoringSynchronization extends Component {
     );
   }
 }
-
-WzConfigurationIntegrityMonitoringSynchronization.proptTypes = {
-  // currentConfig: PropTypes.object.isRequired
-};
 
 export default WzConfigurationIntegrityMonitoringSynchronization;

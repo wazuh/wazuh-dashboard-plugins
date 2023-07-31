@@ -74,7 +74,6 @@ class WzConfigurationIntegrations extends Component {
     );
   }
   render() {
-    const { view } = this.state;
     const { currentConfig } = this.props;
     const integrations =
       currentConfig['integrator-integration'] &&
@@ -119,9 +118,5 @@ class WzConfigurationIntegrations extends Component {
 }
 
 const sections = [{ component: 'integrator', configuration: 'integration' }];
-
-// WzConfigurationIntegrations.propTypes = {
-//   currentConfig: PropTypes.object.isRequired
-// };
 
 export default withWzConfig(sections)(WzConfigurationIntegrations);
