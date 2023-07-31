@@ -297,7 +297,13 @@ export default [
           },
         },
       }),
-      uiStateJSON: '{}',
+      uiStateJSON: JSON.stringify({
+        vis: {
+          colors: {
+            'evt_count': '#70DBED', // prettier-ignore
+          },
+        },
+      }),
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
@@ -522,7 +528,16 @@ export default [
           radiusRatio: 50,
         },
       }),
-      uiStateJSON: '{}',
+      uiStateJSON: JSON.stringify({
+        vis: {
+          colors: {
+            'dequeued_after_close': '#EAB839', // prettier-ignore
+            'discarded_count': '#E24D42', // prettier-ignore
+            'msg_count': '#D683CE', // prettier-ignore
+            'msg_sent': '#70DBED', // prettier-ignore
+          },
+        },
+      }),
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
