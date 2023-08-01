@@ -142,7 +142,7 @@ export default [
             style: 'full',
             color: '#E7664C',
           },
-          row: true,
+          // row: true,
         },
       }),
       uiStateJSON: JSON.stringify({
@@ -1243,7 +1243,7 @@ export default [
               show: true,
               style: {},
               title: {
-                text: 'Quantity',
+                text: 'Count',
               },
               type: 'value',
             },
@@ -1444,7 +1444,7 @@ export default [
                 truncate: 100,
               },
               title: {
-                text: 'Quantity',
+                text: 'Count',
               },
             },
             {
@@ -1733,7 +1733,7 @@ export default [
                 truncate: 100,
               },
               title: {
-                text: 'Quantity',
+                text: 'Count',
               },
             },
             {
@@ -1994,7 +1994,7 @@ export default [
                 truncate: 100,
               },
               title: {
-                text: 'Quantity',
+                text: 'Count',
               },
             },
             {
@@ -2353,7 +2353,7 @@ export default [
               show: true,
               style: {},
               title: {
-                text: 'Cantidad',
+                text: 'Count',
               },
               type: 'value',
             },
