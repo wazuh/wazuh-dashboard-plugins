@@ -20,16 +20,24 @@ import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 
-const getMitreAttackIntelligenceSuggestions = (endpoint: string, field: string) => async (input: string) => {
-  try{
-    const response = await WzRequest.apiReq('GET', endpoint, {}); // TODO: change to use distinct
-    return response?.data?.data.affected_items
-      .map(item => item[field])
-      .filter(item => input ? (item && item.toLowerCase().includes(input.toLowerCase())) : true)
-      .sort()
-      .slice(0, 9)
-      .map(label => ({label}));
-  }catch(error){
+const getMitreAttackIntelligenceSuggestions = async (
+  endpoint: string,
+  field: string,
+  currentValue: string,
+) => {
+  try {
+    const params = {
+      distinct: true,
+      limit: 30,
+      select: field,
+      sort: `+${field}`,
+      ...(currentValue ? { q: `${field}~${currentValue}` } : {}),
+    };
+    const response = await WzRequest.apiReq('GET', endpoint, { params });
+    return response?.data?.data.affected_items.map(item => ({
+      label: item[field],
+    }));
+  } catch (error) {
     const options = {
       context: `${ModuleMitreAttackIntelligenceResource.name}.getMitreItemToRedirect`,
       level: UI_LOGGER_LEVELS.ERROR,
@@ -44,16 +52,16 @@ const getMitreAttackIntelligenceSuggestions = (endpoint: string, field: string) 
     };
     getErrorOrchestrator().handleError(options);
     return [];
-  };
+  }
 };
 
-function buildResource(label: string, labelResource: string){
+function buildResource(label: string) {
   const id = label.toLowerCase();
   const endpoint: string = `/mitre/${id}`;
   const fieldsMitreAttactResource = [
     { field: 'description', name: 'description' },
     { field: 'external_id', name: 'external ID' },
-    { field: 'name', name: 'name' }
+    { field: 'name', name: 'name' },
   ];
   return {
     label: label,
@@ -61,47 +69,57 @@ function buildResource(label: string, labelResource: string){
     searchBar: {
       wql: {
         options: {
-          searchTermFields: fieldsMitreAttactResource.map(({field}) => field)
+          searchTermFields: fieldsMitreAttactResource.map(({ field }) => field),
         },
         suggestions: {
           field(currentValue) {
-            return fieldsMitreAttactResource
-              .map(({field, name}) => ({label: field, description: `filter by ${name}`}));
+            return fieldsMitreAttactResource.map(({ field, name }) => ({
+              label: field,
+              description: `filter by ${name}`,
+            }));
           },
           value: async (currentValue, { field }) => {
-            try{ // TODO: distinct
-              return await (getMitreAttackIntelligenceSuggestions(endpoint, field))(currentValue);
-            }catch(error){
+            try {
+              return await getMitreAttackIntelligenceSuggestions(
+                endpoint,
+                field,
+                currentValue,
+              );
+            } catch (error) {
               return [];
-            };
+            }
           },
-        }
-      }
+        },
+      },
     },
     apiEndpoint: endpoint,
     fieldName: 'name',
     initialSortingField: 'name',
-    tableColumnsCreator: (openResourceDetails) => [
+    tableColumnsCreator: openResourceDetails => [
       {
         field: 'external_id',
         name: 'ID',
         width: '12%',
-        render: (value, item) => <EuiLink onClick={() => openResourceDetails(item)}>{value}</EuiLink>
+        render: (value, item) => (
+          <EuiLink onClick={() => openResourceDetails(item)}>{value}</EuiLink>
+        ),
       },
       {
         field: 'name',
         name: 'Name',
         sortable: true,
         width: '30%',
-        render: (value, item) => <EuiLink onClick={() => openResourceDetails(item)}>{value}</EuiLink>
+        render: (value, item) => (
+          <EuiLink onClick={() => openResourceDetails(item)}>{value}</EuiLink>
+        ),
       },
       {
         field: 'description',
         name: 'Description',
         sortable: true,
-        render: (value) => value ? <Markdown markdown={value} /> : '',
-        truncateText: true
-      }
+        render: value => (value ? <Markdown markdown={value} /> : ''),
+        truncateText: true,
+      },
     ],
     mitreFlyoutHeaderProperties: [
       {
@@ -110,34 +128,30 @@ function buildResource(label: string, labelResource: string){
       },
       {
         label: 'Name',
-        id: 'name'
+        id: 'name',
       },
       {
         label: 'Created Time',
         id: 'created_time',
-        render: (value) => value ? (
-          formatUIDate(value)
-        ) : ''
+        render: value => (value ? formatUIDate(value) : ''),
       },
       {
         label: 'Modified Time',
         id: 'modified_time',
-        render: (value) => value ? (
-          formatUIDate(value)
-        ) : ''
+        render: value => (value ? formatUIDate(value) : ''),
       },
       {
         label: 'Version',
-        id: 'mitre_version'
+        id: 'mitre_version',
       },
     ],
-  }
-};
+  };
+}
 
 export const MitreAttackResources = [
-  buildResource('Groups', 'Group'),
-  buildResource('Mitigations', 'Mitigation'),
-  buildResource('Software', 'Software'),
-  buildResource('Tactics', 'Tactic'),
-  buildResource('Techniques', 'Technique')
+  buildResource('Groups'),
+  buildResource('Mitigations'),
+  buildResource('Software'),
+  buildResource('Tactics'),
+  buildResource('Techniques'),
 ];

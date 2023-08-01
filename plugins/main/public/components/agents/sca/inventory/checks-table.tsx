@@ -2,7 +2,6 @@ import { EuiButtonIcon, EuiDescriptionList, EuiHealth } from '@elastic/eui';
 import React, { Component } from 'react';
 import { MODULE_SCA_CHECK_RESULT_LABEL } from '../../../../../common/constants';
 import { TableWzAPI } from '../../../common/tables';
-import { IWzSuggestItem } from '../../../wz-search-bar';
 import { ComplianceText, RuleText } from '../components';
 import { getFilterValues } from './lib';
 
@@ -29,7 +28,7 @@ const searchBarWQLFieldSuggestions = [
   { label: 'registry', description: 'filter by check registry' },
   { label: 'remediation', description: 'filter by check remediation' },
   { label: 'result', description: 'filter by check result' },
-  { label: 'title', description: 'filter by check title' }
+  { label: 'title', description: 'filter by check title' },
 ];
 
 const searchBarWQLOptions = {
@@ -51,7 +50,7 @@ const searchBarWQLOptions = {
     'result',
     'rules.type',
     'rules.rule',
-  ]
+  ],
 };
 
 export class InventoryPolicyChecksTable extends Component<Props, State> {
@@ -83,7 +82,7 @@ export class InventoryPolicyChecksTable extends Component<Props, State> {
       {
         name: 'Target',
         truncateText: true,
-        render: (item) => (
+        render: item => (
           <div>
             {item.file ? (
               <span>
@@ -123,11 +122,17 @@ export class InventoryPolicyChecksTable extends Component<Props, State> {
         align: 'right',
         width: '40px',
         isExpander: true,
-        render: (item) => (
+        render: item => (
           <EuiButtonIcon
             onClick={() => this.toggleDetails(item)}
-            aria-label={this.state.itemIdToExpandedRowMap[item.id] ? 'Collapse' : 'Expand'}
-            iconType={this.state.itemIdToExpandedRowMap[item.id] ? 'arrowUp' : 'arrowDown'}
+            aria-label={
+              this.state.itemIdToExpandedRowMap[item.id] ? 'Collapse' : 'Expand'
+            }
+            iconType={
+              this.state.itemIdToExpandedRowMap[item.id]
+                ? 'arrowUp'
+                : 'arrowDown'
+            }
           />
         ),
       },
@@ -135,7 +140,7 @@ export class InventoryPolicyChecksTable extends Component<Props, State> {
   }
 
   async componentDidUpdate(prevProps) {
-    const { filters } =  this.props
+    const { filters } = this.props;
     if (filters !== prevProps.filters) {
       this.setState({ filters: filters });
     }
@@ -149,7 +154,7 @@ export class InventoryPolicyChecksTable extends Component<Props, State> {
    *
    * @param item
    */
-  toggleDetails = (item) => {
+  toggleDetails = item => {
     const itemIdToExpandedRowMap = { ...this.state.itemIdToExpandedRowMap };
 
     if (itemIdToExpandedRowMap[item.id]) {
@@ -160,7 +165,7 @@ export class InventoryPolicyChecksTable extends Component<Props, State> {
       checks += item.condition ? ` (Condition: ${item.condition})` : '';
       const complianceText =
         item.compliance && item.compliance.length
-          ? item.compliance.map((el) => `${el.key}: ${el.value}`).join('\n')
+          ? item.compliance.map(el => `${el.key}: ${el.value}`).join('\n')
           : '';
       const listItems = [
         {
@@ -192,10 +197,12 @@ export class InventoryPolicyChecksTable extends Component<Props, State> {
           description: <ComplianceText complianceText={complianceText} />,
         },
       ];
-      const itemsToShow = listItems.filter((x) => {
+      const itemsToShow = listItems.filter(x => {
         return x.description;
       });
-      itemIdToExpandedRowMap[item.id] = <EuiDescriptionList listItems={itemsToShow} />;
+      itemIdToExpandedRowMap[item.id] = (
+        <EuiDescriptionList listItems={itemsToShow} />
+      );
     }
     this.setState({ itemIdToExpandedRowMap });
   };
@@ -244,10 +251,10 @@ export class InventoryPolicyChecksTable extends Component<Props, State> {
 
     return (
       <TableWzAPI
-        title="Checks"
+        title='Checks'
         endpoint={`/sca/${this.props.agent.id}/checks/${scaPolicyID}`}
         tableColumns={this.columnsChecks}
-        tableInitialSortingField="id"
+        tableInitialSortingField='id'
         tablePageSizeOptions={[10, 25, 50, 100]}
         rowProps={getChecksRowProps}
         tableProps={{
@@ -266,18 +273,19 @@ export class InventoryPolicyChecksTable extends Component<Props, State> {
               return searchBarWQLFieldSuggestions;
             },
             value: async (currentValue, { field }) => {
-              try{
+              try {
                 return await getFilterValues(
                   field,
-                  currentValue,
                   agentID,
                   scaPolicyID,
-                  {},
-                  (item) => ({label: item})
+                  {
+                    ...(currentValue ? { q: `${field}~${currentValue}` } : {}),
+                  },
+                  item => ({ label: item }),
                 );
-              }catch(error){
+              } catch (error) {
                 return [];
-              };
+              }
             },
           },
         }}
