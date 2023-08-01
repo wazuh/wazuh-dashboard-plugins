@@ -13,7 +13,7 @@
 import React, { Component, Fragment } from 'react';
 
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
-import WzConfigurationSettingsGroup from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import WzNoConfig from '../util-components/no-config';
 import { isString } from '../utils/utils';
 import helpLinks from './help-links';
