@@ -11,11 +11,7 @@
  */
 
 import React, { Component } from 'react';
-import {
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiIconTip
-} from '@elastic/eui';
+import { EuiFlexGroup, EuiFlexItem, EuiIconTip } from '@elastic/eui';
 import { WzRequest } from '../../../../react-services/wz-request';
 import { FlyoutDetail } from './flyout';
 import { formatUIDate } from '../../../../react-services/time-service';
@@ -24,11 +20,11 @@ import { TableWzAPI } from '../../../common/tables';
 const searchBarWQLOptions = {
   implicitQuery: {
     query: 'type=file',
-    conjunction: ';'
-  }
+    conjunction: ';',
+  },
 };
 
-const searchBarWQLFilters = {default: {q: 'type=file'}};
+const searchBarWQLFilters = { default: { q: 'type=file' } };
 
 export class InventoryTable extends Component {
   state: {
@@ -75,28 +71,40 @@ export class InventoryTable extends Component {
   }
 
   async showFlyout(file, item, redirect = false) {
-    window.location.href = window.location.href.replace(new RegExp('&file=' + '[^&]*', 'g'), '');
+    window.location.href = window.location.href.replace(
+      new RegExp('&file=' + '[^&]*', 'g'),
+      '',
+    );
     let fileData = false; // FIX: fileData variable is unused
     if (!redirect) {
-      fileData = this.state.syscheck.filter((item) => {
+      fileData = this.state.syscheck.filter(item => {
         return item.file === file;
       });
     } else {
-      const response = await WzRequest.apiReq('GET', `/syscheck/${this.props.agent.id}`, {
-        params: {
-          file: file,
+      const response = await WzRequest.apiReq(
+        'GET',
+        `/syscheck/${this.props.agent.id}`,
+        {
+          params: {
+            file: file,
+          },
         },
-      });
+      );
       fileData = ((response.data || {}).data || {}).affected_items || [];
     }
-    if (!redirect) window.location.href = window.location.href += `&file=${file}`;
+    if (!redirect)
+      window.location.href = window.location.href += `&file=${file}`;
     //if a flyout is opened, we close it and open a new one, so the components are correctly updated on start.
     this.setState({ isFlyoutVisible: false }, () =>
-      this.setState({ isFlyoutVisible: true, currentFile: file, syscheckItem: item })
+      this.setState({
+        isFlyoutVisible: true,
+        currentFile: file,
+        syscheckItem: item,
+      }),
     );
   }
 
-  // TODO: connect to total items change on parent component 
+  // TODO: connect to total items change on parent component
   /*
     tis.props.onTotalItemsChange(
         (((syscheck || {}).data || {}).data || {}).total_affected_items
@@ -114,12 +122,13 @@ export class InventoryTable extends Component {
         name: 'File',
         sortable: true,
         width: '250px',
-        searchable: true
+        searchable: true,
       },
       {
         field: 'mtime',
         name: (
-          <span>Last Modified{' '}
+          <span>
+            Last Modified{' '}
             <EuiIconTip
               content='This is not searchable through a search term.'
               size='s'
@@ -131,7 +140,7 @@ export class InventoryTable extends Component {
         sortable: true,
         width: '100px',
         render: formatUIDate,
-        searchable: false
+        searchable: false,
       },
       {
         field: 'uname',
@@ -139,7 +148,7 @@ export class InventoryTable extends Component {
         sortable: true,
         truncateText: true,
         width: `${width}`,
-        searchable: true
+        searchable: true,
       },
       {
         field: 'uid',
@@ -147,7 +156,7 @@ export class InventoryTable extends Component {
         sortable: true,
         truncateText: true,
         width: `${width}`,
-        searchable: true
+        searchable: true,
       },
       {
         field: 'gname',
@@ -155,7 +164,7 @@ export class InventoryTable extends Component {
         sortable: true,
         truncateText: true,
         width: `${width}`,
-        searchable: true
+        searchable: true,
       },
       {
         field: 'gid',
@@ -163,20 +172,20 @@ export class InventoryTable extends Component {
         sortable: true,
         truncateText: true,
         width: `${width}`,
-        searchable: true
+        searchable: true,
       },
       {
         field: 'size',
         name: 'Size',
         sortable: true,
         width: `${width}`,
-        searchable: true
+        searchable: true,
       },
     ];
   }
 
   renderFilesTable() {
-    const getRowProps = (item) => {
+    const getRowProps = item => {
       const { file } = item;
       return {
         'data-test-subj': `row-${file}`,
@@ -196,35 +205,62 @@ export class InventoryTable extends Component {
             searchBarWQL={{
               options: searchBarWQLOptions,
               suggestions: {
-                field: (currentValue) => [
-                  {label: 'file', description: 'filter by file'},
-                  {label: 'gid', description: 'filter by group id'},
-                  {label: 'gname', description: 'filter by group name'},
-                  {label: 'mtime', description: 'filter by modification time'},
-                  {label: 'size', description: 'filter by size'},
-                  {label: 'uname', description: 'filter by user name'},
-                  {label: 'uid', description: 'filter by user id'}
+                field: currentValue => [
+                  { label: 'file', description: 'filter by file' },
+                  { label: 'gid', description: 'filter by group id' },
+                  { label: 'gname', description: 'filter by group name' },
+                  {
+                    label: 'mtime',
+                    description: 'filter by modification time',
+                  },
+                  { label: 'size', description: 'filter by size' },
+                  { label: 'uname', description: 'filter by user name' },
+                  { label: 'uid', description: 'filter by user id' },
                 ],
                 value: async (currentValue, { field }) => {
-                  return [];
-                  try{ // TODO distinct:
+                  try {
+                    const response = await WzRequest.apiReq(
+                      'GET',
+                      `/syscheck/${this.props.agent.id}`,
+                      {
+                        params: {
+                          distinct: true,
+                          limit: 30,
+                          select: field,
+                          sort: `+${field}`,
+                          ...(currentValue
+                            ? {
+                                // Add the implicit query
+                                q: `${searchBarWQLOptions.implicitQuery.query}${searchBarWQLOptions.implicitQuery.conjunction}${field}~${currentValue}`,
+                              }
+                            : {
+                                q: `${searchBarWQLOptions.implicitQuery.query}`,
+                              }),
+                        },
+                      },
+                    );
+                    return response?.data?.data.affected_items.map(item => ({
+                      label: item[field],
+                    }));
+                  } catch (error) {
                     return [];
-                  }catch(error){
-                    return [];
-                  };
-                }
+                  }
+                },
               },
               validate: {
-                value: ({formattedValue, value: rawValue}, {field}) => {
+                value: ({ formattedValue, value: rawValue }, { field }) => {
                   const value = formattedValue ?? rawValue;
-                  if(value){
-                    if(['mtime'].some(dateField => dateField === field)){
-                      return /^\d{4}-\d{2}-\d{2}([ T]\d{2}:\d{2}:\d{2}(.\d{1,6})?Z?)?$/
-                        .test(value) ? undefined : `"${value}" is not a expected format. Valid formats: YYYY-MM-DD, YYYY-MM-DD HH:mm:ss, YYYY-MM-DDTHH:mm:ss, YYYY-MM-DDTHH:mm:ssZ.`;
-                    };
-                  };
-                }
-              }
+                  if (value) {
+                    if (['mtime'].some(dateField => dateField === field)) {
+                      return /^\d{4}-\d{2}-\d{2}([ T]\d{2}:\d{2}:\d{2}(.\d{1,6})?Z?)?$/.test(
+                        value,
+                      )
+                        ? undefined
+                        : `"${value}" is not a expected format. Valid formats: YYYY-MM-DD, YYYY-MM-DD HH:mm:ss, YYYY-MM-DDTHH:mm:ss, YYYY-MM-DDTHH:mm:ssZ.`;
+                    }
+                  }
+                },
+              },
             }}
             filters={searchBarWQLFilters}
             showReload
@@ -240,7 +276,7 @@ export class InventoryTable extends Component {
   render() {
     const filesTable = this.renderFilesTable();
     return (
-      <div className="wz-inventory">
+      <div className='wz-inventory'>
         {filesTable}
         {this.state.isFlyoutVisible && (
           <FlyoutDetail
@@ -248,8 +284,8 @@ export class InventoryTable extends Component {
             agentId={this.props.agent.id}
             item={this.state.syscheckItem}
             closeFlyout={() => this.closeFlyout()}
-            type="file"
-            view="inventory"
+            type='file'
+            view='inventory'
             showViewInEvents={true}
             {...this.props}
           />
