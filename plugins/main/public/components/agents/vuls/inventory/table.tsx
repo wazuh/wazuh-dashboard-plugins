@@ -25,8 +25,8 @@ const searchBarWQLOptions = {
     'architecture',
     'severity',
     'cvss2_score',
-    'cvss3_score'
-  ]
+    'cvss3_score',
+  ],
 };
 
 export class InventoryTable extends Component {
@@ -36,7 +36,6 @@ export class InventoryTable extends Component {
     isLoading: boolean;
     currentItem: {};
   };
-
 
   props!: {
     filters: string;
@@ -50,7 +49,7 @@ export class InventoryTable extends Component {
 
     this.state = {
       isFlyoutVisible: false,
-      currentItem: {}
+      currentItem: {},
     };
   }
 
@@ -61,10 +60,9 @@ export class InventoryTable extends Component {
   async showFlyout(item, redirect = false) {
     //if a flyout is opened, we close it and open a new one, so the components are correctly updated on start.
     this.setState({ isFlyoutVisible: false }, () =>
-      this.setState({ isFlyoutVisible: true, currentItem: item })
+      this.setState({ isFlyoutVisible: true, currentItem: item }),
     );
   }
-
 
   columns() {
     let width;
@@ -119,7 +117,8 @@ export class InventoryTable extends Component {
       {
         field: 'detection_time',
         name: (
-          <span>Detection Time{' '}
+          <span>
+            Detection Time{' '}
             <EuiIconTip
               content='This is not searchable through a search term.'
               size='s'
@@ -136,7 +135,7 @@ export class InventoryTable extends Component {
   }
 
   renderTable() {
-    const getRowProps = (item) => {
+    const getRowProps = item => {
       const id = `${item.name}-${item.cve}-${item.architecture}-${item.version}-${item.severity}-${item.cvss2_score}-${item.cvss3_score}-${item.detection_time}`;
       return {
         'data-test-subj': `row-${id}`,
@@ -159,27 +158,27 @@ export class InventoryTable extends Component {
       'condition',
       'updated',
       'published',
-      'external_references'
+      'external_references',
     ].join(',')}`;
 
     const agentID = this.props.agent.id;
 
     return (
       <TableWzAPI
-        title="Vulnerabilities"
+        title='Vulnerabilities'
         tableColumns={columns}
-        tableInitialSortingField="name"
+        tableInitialSortingField='name'
         endpoint={`/vulnerability/${this.props.agent.id}?${selectFields}`}
         isExpandable={true}
         rowProps={getRowProps}
-        mapResponseItem={(item) => ({
+        mapResponseItem={item => ({
           ...item,
           // Some vulnerability data could not contain the external_references field.
           // This causes the rendering of them can crash when opening the flyout with the details.
           // So, we ensure the fields are defined with the expected data structure.
-          external_references: Array.isArray(item?.external_references) 
-          ? item?.external_references
-          : []
+          external_references: Array.isArray(item?.external_references)
+            ? item?.external_references
+            : [],
         })}
         error={error}
         searchTable
@@ -192,22 +191,36 @@ export class InventoryTable extends Component {
           suggestions: {
             field(currentValue) {
               return [
-                { label: 'architecture', description: 'filter by architecture' },
+                {
+                  label: 'architecture',
+                  description: 'filter by architecture',
+                },
                 { label: 'cve', description: 'filter by CVE ID' },
                 { label: 'cvss2_score', description: 'filter by CVSS2' },
                 { label: 'cvss3_score', description: 'filter by CVSS3' },
-                { label: 'detection_time', description: 'filter by detection time' },
+                {
+                  label: 'detection_time',
+                  description: 'filter by detection time',
+                },
                 { label: 'name', description: 'filter by package name' },
                 { label: 'severity', description: 'filter by severity' },
                 { label: 'version', description: 'filter by CVE version' },
               ];
             },
             value: async (currentValue, { field }) => {
-              try{
-                return await getFilterValues(field, currentValue, agentID, {}, label => ({label}));
-              }catch(error){
+              try {
+                return await getFilterValues(
+                  field,
+                  currentValue,
+                  agentID,
+                  {
+                    ...(currentValue ? { q: `${field}~${currentValue}` } : {}),
+                  },
+                  label => ({ label }),
+                );
+              } catch (error) {
                 return [];
-              };
+              }
             },
           },
         }}
@@ -218,7 +231,7 @@ export class InventoryTable extends Component {
   render() {
     const table = this.renderTable();
     return (
-      <div className="wz-inventory">
+      <div className='wz-inventory'>
         {table}
         {this.state.isFlyoutVisible && (
           <FlyoutDetail
@@ -226,8 +239,8 @@ export class InventoryTable extends Component {
             agentId={this.props.agent.id}
             item={this.state.currentItem}
             closeFlyout={() => this.closeFlyout()}
-            type="vulnerability"
-            view="inventory"
+            type='vulnerability'
+            view='inventory'
             showViewInEvents={true}
             outsideClickCloses={true}
             {...this.props}
