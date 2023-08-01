@@ -1,0 +1,46 @@
+.checkbox-group-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-top: 26px;
+  justify-content: center;
+}
+
+.checkbox-item {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: left;
+}
+
+.checkbox-group-container.single-architecture {
+  margin-top: 44px;
+  display: flex;
+  justify-content: center;
+}
+
+.checkbox-group-container.double-architecture {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  .checkbox-item:first-child {
+    margin-bottom: 13px;
+  }
+  .checkbox-item {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: left;
+    align-self: baseline;
+  }
+}
+
+.architecture-label {
+  margin-left: 8px;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+}
+.first-card-four-items {
+  .checkbox-item:nth-child(n + 3) {
+    padding-top: 16px;
+  }
+}
