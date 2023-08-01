@@ -26,7 +26,6 @@ import {
   updateSortFieldAgents,
   updateReload,
 } from '../../../../../redux/actions/groupsActions';
-import { EuiCallOut } from '@elastic/eui';
 import { getAgentFilterValues } from './get-agents-filters-values';
 import { TableWzAPI } from '../../../../../components/common/tables';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
@@ -38,7 +37,6 @@ import {
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 import { AgentStatus } from '../../../../../components/agents/agent_status';
-import { compressIPv6 } from '../../../../../services/ipv6-services';
 
 class WzGroupAgentsTable extends Component {
   _isMounted = false;
@@ -239,7 +237,7 @@ class WzGroupAgentsTable extends Component {
           }}
           mapResponseItem={item => ({
             ...item,
-            ...(item.ip ? { ip: compressIPv6(item.ip) } : { ip: '-' }),
+            ...(item.ip ? { ip: item.ip } : { ip: '-' }),
             ...(typeof item.version === 'string'
               ? { version: item.version.match(/(v\d.+)/)?.[1] }
               : { version: '-' }),
