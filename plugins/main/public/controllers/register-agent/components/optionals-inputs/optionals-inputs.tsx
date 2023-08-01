@@ -24,15 +24,15 @@ const OptionalsInputs = (props: OptionalsInputsProps) => {
   const onButtonAgentName = () =>
     setIsPopoverAgentName(isPopoverAgentName => !isPopoverAgentName);
   const closeAgentName = () => setIsPopoverAgentName(false);
-
+  const agentNameDocLink = webDocumentationLink(
+    'user-manual/reference/ossec-conf/client.html#enrollment-agent-name',
+    PLUGIN_VERSION_SHORT,
+  )
   const popoverAgentName = (
     <span>
       Learn about{' '}
       <EuiLink
-        href={webDocumentationLink(
-          'user-manual/reference/ossec-conf/client.html#enrollment-agent-name',
-          PLUGIN_VERSION_SHORT,
-        )}
+        href={agentNameDocLink}
         target='_blank'
         rel='noopener noreferrer'
       >
@@ -94,7 +94,11 @@ const OptionalsInputs = (props: OptionalsInputsProps) => {
       />
       <EuiCallOut
         color='warning'
-        title={warningForAgentName}
+        title={<span>{warningForAgentName}<EuiLink
+          target='_blank'
+          href={agentNameDocLink}
+          rel='noopener noreferrer'
+        /></span>}
         iconType='iInCircle'
         className='warningForAgentName'
       />
