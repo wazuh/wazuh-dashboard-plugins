@@ -32,6 +32,8 @@ import {
 import { API_NAME_AGENT_STATUS } from '../../../../common/constants';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
 import { TableWzAPI } from '../../common/tables';
+import { WzRequest } from '../../../react-services';
+import { get as getLodash } from 'lodash';
 
 const sortFieldSuggestion = (a, b) => (a.label > b.label ? 1 : -1);
 
@@ -125,8 +127,24 @@ export function SyscollectorInventory({ agent }) {
                   },
                   value: async (currentValue, { field }) => {
                     try {
-                      // TODO: distinct
-                      return [];
+                      const response = await WzRequest.apiReq(
+                        'GET',
+                        `/syscollector/${agent.id}/netiface`,
+                        {
+                          params: {
+                            distinct: true,
+                            limit: 30,
+                            select: field,
+                            sort: `+${field}`,
+                            ...(currentValue
+                              ? { q: `${field}~${currentValue}` }
+                              : {}),
+                          },
+                        },
+                      );
+                      return response?.data?.data.affected_items.map(item => ({
+                        label: getLodash(item, field),
+                      }));
                     } catch (error) {
                       return [];
                     }
@@ -166,8 +184,24 @@ export function SyscollectorInventory({ agent }) {
                   },
                   value: async (currentValue, { field }) => {
                     try {
-                      // TODO: distinct
-                      return [];
+                      const response = await WzRequest.apiReq(
+                        'GET',
+                        `/syscollector/${agent.id}/ports`,
+                        {
+                          params: {
+                            distinct: true,
+                            limit: 30,
+                            select: field,
+                            sort: `+${field}`,
+                            ...(currentValue
+                              ? { q: `${field}~${currentValue}` }
+                              : {}),
+                          },
+                        },
+                      );
+                      return response?.data?.data.affected_items.map(item => ({
+                        label: getLodash(item, field),
+                      }));
                     } catch (error) {
                       return [];
                     }
@@ -210,8 +244,24 @@ export function SyscollectorInventory({ agent }) {
                   },
                   value: async (currentValue, { field }) => {
                     try {
-                      // TODO: distinct
-                      return [];
+                      const response = await WzRequest.apiReq(
+                        'GET',
+                        `/syscollector/${agent.id}/netaddr`,
+                        {
+                          params: {
+                            distinct: true,
+                            limit: 30,
+                            select: field,
+                            sort: `+${field}`,
+                            ...(currentValue
+                              ? { q: `${field}~${currentValue}` }
+                              : {}),
+                          },
+                        },
+                      );
+                      return response?.data?.data.affected_items.map(item => ({
+                        label: getLodash(item, field),
+                      }));
                     } catch (error) {
                       return [];
                     }
@@ -252,8 +302,26 @@ export function SyscollectorInventory({ agent }) {
                     },
                     value: async (currentValue, { field }) => {
                       try {
-                        // TODO: distinct
-                        return [];
+                        const response = await WzRequest.apiReq(
+                          'GET',
+                          `/syscollector/${agent.id}/hotfixes`,
+                          {
+                            params: {
+                              distinct: true,
+                              limit: 30,
+                              select: field,
+                              sort: `+${field}`,
+                              ...(currentValue
+                                ? { q: `${field}~${currentValue}` }
+                                : {}),
+                            },
+                          },
+                        );
+                        return response?.data?.data.affected_items.map(
+                          item => ({
+                            label: getLodash(item, field),
+                          }),
+                        );
                       } catch (error) {
                         return [];
                       }
@@ -297,8 +365,24 @@ export function SyscollectorInventory({ agent }) {
                   },
                   value: async (currentValue, { field }) => {
                     try {
-                      // TODO: distinct
-                      return [];
+                      const response = await WzRequest.apiReq(
+                        'GET',
+                        `/syscollector/${agent.id}/packages`,
+                        {
+                          params: {
+                            distinct: true,
+                            limit: 30,
+                            select: field,
+                            sort: `+${field}`,
+                            ...(currentValue
+                              ? { q: `${field}~${currentValue}` }
+                              : {}),
+                          },
+                        },
+                      );
+                      return response?.data?.data.affected_items.map(item => ({
+                        label: getLodash(item, field),
+                      }));
                     } catch (error) {
                       return [];
                     }
@@ -341,8 +425,24 @@ export function SyscollectorInventory({ agent }) {
                   },
                   value: async (currentValue, { field }) => {
                     try {
-                      // TODO: distinct
-                      return [];
+                      const response = await WzRequest.apiReq(
+                        'GET',
+                        `/syscollector/${agent.id}/processes`,
+                        {
+                          params: {
+                            distinct: true,
+                            limit: 30,
+                            select: field,
+                            sort: `+${field}`,
+                            ...(currentValue
+                              ? { q: `${field}~${currentValue}` }
+                              : {}),
+                          },
+                        },
+                      );
+                      return response?.data?.data.affected_items.map(item => ({
+                        label: getLodash(item, field),
+                      }));
                     } catch (error) {
                       return [];
                     }
