@@ -532,7 +532,7 @@ export default [
         vis: {
           colors: {
             'dequeued_after_close': '#EAB839', // prettier-ignore
-            'discarded_count': '#E24D42', // prettier-ignore
+            'discarded_count': '#7EB26D', // prettier-ignore
             'msg_count': '#D683CE', // prettier-ignore
             'msg_sent': '#70DBED', // prettier-ignore
           },
@@ -683,7 +683,13 @@ export default [
           },
         },
       }),
-      uiStateJSON: '{}',
+      uiStateJSON: JSON.stringify({
+        vis: {
+          colors: {
+            "tcp_sessions": "#70DBED", // prettier-ignore
+          },
+        },
+      }),
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
@@ -739,7 +745,7 @@ export default [
             type: 'avg',
             params: {
               field: 'analysisd.syscheck_events_decoded',
-              customLabel: ' Syscheck Events Decoded',
+              customLabel: 'Syscheck Events Decoded',
             },
             schema: 'metric',
           },
@@ -861,7 +867,7 @@ export default [
               mode: 'normal',
               data: {
                 id: '3',
-                label: ' Syscheck Events Decoded',
+                label: 'Syscheck Events Decoded',
               },
               valueAxis: 'ValueAxis-1',
               drawLinesBetweenPoints: true,
@@ -955,7 +961,18 @@ export default [
           },
         },
       }),
-      uiStateJSON: '{}',
+      uiStateJSON: JSON.stringify({
+        vis: {
+          colors: {
+            'Syscheck Events Decoded': '#70DBED',
+            'Other Events Decoded': '#705DA0',
+            'Rootcheck Events Decoded': '#7EB26D',
+            'SCA Events Decoded': '#EAB839',
+            'Syscollector Events Decoded': '#D683CE',
+            'Host Info Events Decoded': '#EF843C',
+          },
+        },
+      }),
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
@@ -1333,7 +1350,7 @@ export default [
           },
           {
             id: '4',
-            enabled: true,
+            enabled: false,
             type: 'avg',
             params: {
               field: 'analysisd.syscollector_queue_usage',
@@ -1343,7 +1360,7 @@ export default [
           },
           {
             id: '7',
-            enabled: false,
+            enabled: true,
             type: 'avg',
             params: {
               field: 'analysisd.syscollector_queue_usage',
@@ -1440,6 +1457,8 @@ export default [
               scale: {
                 type: 'linear',
                 mode: 'normal',
+                setYExtents: true,
+                max: 100,
               },
               labels: {
                 show: true,
@@ -1567,7 +1586,17 @@ export default [
           },
         },
       }),
-      uiStateJSON: '{}',
+      uiStateJSON: JSON.stringify({
+        vis: {
+          colors: {
+            'Queue Usage %': '#7EB26D',
+            'Queue Usage 70%': '#EAB839',
+            'Queue Usage 90%': '#E24D42',
+            'Syscollector EDPS': '#D683CE',
+            'Syscollector Events Decoded': '#70DBED',
+          },
+        },
+      }),
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
@@ -1614,7 +1643,8 @@ export default [
             type: 'avg',
             params: {
               field: 'analysisd.rootcheck_queue_usage',
-              customLabel: 'Queue Usage',
+              json: '{\r\n  "script": {\r\n      "source": "def size = doc[\'analysisd.rootcheck_queue_size\'];def usage = doc[\'analysisd.rootcheck_queue_usage\'];def finalSize = size.size() > 0 ? size.value : 0;def finalUsage = usage.size() > 0 ? usage.value : 0;return finalUsage/finalSize * 100;"\r\n  }\r\n}',
+              customLabel: 'Queue Usage %',
             },
             schema: 'metric',
           },
@@ -1716,6 +1746,8 @@ export default [
               scale: {
                 type: 'linear',
                 mode: 'normal',
+                setYExtents: true,
+                max: 100,
               },
               labels: {
                 show: true,
@@ -1763,9 +1795,9 @@ export default [
               mode: 'normal',
               data: {
                 id: '3',
-                label: 'Queue Usage',
+                label: 'Queue Usage %',
               },
-              valueAxis: 'ValueAxis-1',
+              valueAxis: 'ValueAxis-2',
               drawLinesBetweenPoints: true,
               lineWidth: 2,
               interpolate: 'linear',
@@ -1815,7 +1847,17 @@ export default [
           },
         },
       }),
-      uiStateJSON: '{}',
+      uiStateJSON: JSON.stringify({
+        vis: {
+          colors: {
+            'Queue Usage %': '#7EB26D',
+            'Queue usage 70%': '#EAB839',
+            'Queue usage 90%': '#E24D42',
+            'Rootcheck EDPS': '#D683CE',
+            'Rootcheck Events Decoded': '#70DBED',
+          },
+        },
+      }),
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
@@ -1862,7 +1904,8 @@ export default [
             type: 'avg',
             params: {
               field: 'analysisd.sca_queue_usage',
-              customLabel: 'Queue Usage',
+              json: '{\r\n  "script": {\r\n      "source": "def size = doc[\'analysisd.sca_queue_size\'];def usage = doc[\'analysisd.sca_queue_usage\'];def finalSize = size.size() > 0 ? size.value : 0;def finalUsage = usage.size() > 0 ? usage.value : 0;return finalUsage/finalSize * 100;"\r\n  }\r\n}',
+              customLabel: 'Queue Usage %',
             },
             schema: 'metric',
           },
@@ -1964,6 +2007,8 @@ export default [
               scale: {
                 type: 'linear',
                 mode: 'normal',
+                setYExtents: true,
+                max: 100,
               },
               labels: {
                 show: true,
@@ -2011,9 +2056,9 @@ export default [
               mode: 'normal',
               data: {
                 id: '3',
-                label: 'Queue Usage',
+                label: 'Queue Usage %',
               },
-              valueAxis: 'ValueAxis-1',
+              valueAxis: 'ValueAxis-2',
               drawLinesBetweenPoints: true,
               lineWidth: 2,
               interpolate: 'linear',
@@ -2063,7 +2108,18 @@ export default [
           },
         },
       }),
-      uiStateJSON: '{}',
+      uiStateJSON: JSON.stringify({
+        vis: {
+          colors: {
+            'Queue Usage %': '#7EB26D',
+            'Queue Usage 70%': '#EAB839',
+            'Queue Usage 90%': '#E24D42',
+            'SCA EDPS': '#D683CE',
+            'SCA Events Decoded': '#70DBED',
+          },
+          legendOpen: true,
+        },
+      }),
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
@@ -2110,7 +2166,8 @@ export default [
             type: 'avg',
             params: {
               field: 'analysisd.hostinfo_queue_usage',
-              customLabel: 'Queue Usage',
+              json: '{\r\n  "script": {\r\n      "source": "def size = doc[\'analysisd.hostinfo_queue_size\'];def usage = doc[\'analysisd.hostinfo_queue_usage\'];def finalSize = size.size() > 0 ? size.value : 0;def finalUsage = usage.size() > 0 ? usage.value : 0;return finalUsage/finalSize * 100;"\r\n  }\r\n}',
+              customLabel: 'Queue Usage %',
             },
             schema: 'metric',
           },
@@ -2185,6 +2242,7 @@ export default [
           legendPosition: 'right',
           seriesParams: [
             {
+              color: '#0000FF',
               data: {
                 id: '1',
                 label: 'Host info Events Decoded',
@@ -2199,6 +2257,7 @@ export default [
               valueAxis: 'ValueAxis-1',
             },
             {
+              color: '#0000FF',
               data: {
                 id: '2',
                 label: 'Host info EDPS',
@@ -2213,9 +2272,10 @@ export default [
               valueAxis: 'ValueAxis-1',
             },
             {
+              color: '#0000FF',
               data: {
                 id: '3',
-                label: 'Queue Usage',
+                label: 'Queue Usage %',
               },
               drawLinesBetweenPoints: true,
               interpolate: 'linear',
@@ -2224,12 +2284,16 @@ export default [
               show: true,
               showCircles: true,
               type: 'line',
-              valueAxis: 'ValueAxis-1',
+              valueAxis: 'ValueAxis-2',
             },
             {
+              color: '#FFCC11',
               data: {
                 id: '5',
                 label: 'Queue Usage 70%',
+                style: {
+                  color: '#FFCC11',
+                },
               },
               drawLinesBetweenPoints: true,
               interpolate: 'linear',
@@ -2237,10 +2301,14 @@ export default [
               mode: 'normal',
               show: true,
               showCircles: false,
+              style: {
+                color: '#FFCC11',
+              },
               type: 'line',
               valueAxis: 'ValueAxis-2',
             },
             {
+              color: '#E7664C',
               data: {
                 id: '6',
                 label: 'Queue Usage 90%',
@@ -2251,6 +2319,9 @@ export default [
               mode: 'normal',
               show: true,
               showCircles: false,
+              style: {
+                color: '#E7664C',
+              },
               type: 'line',
               valueAxis: 'ValueAxis-2',
             },
@@ -2282,7 +2353,7 @@ export default [
               show: true,
               style: {},
               title: {
-                text: 'Quantity',
+                text: 'Cantidad',
               },
               type: 'value',
             },
@@ -2299,6 +2370,8 @@ export default [
               scale: {
                 mode: 'normal',
                 type: 'linear',
+                setYExtents: true,
+                max: 100,
               },
               show: true,
               style: {},
@@ -2310,7 +2383,17 @@ export default [
           ],
         },
       }),
-      uiStateJSON: '{}',
+      uiStateJSON: JSON.stringify({
+        vis: {
+          colors: {
+            'Host info EDPS': '#D683CE',
+            'Host info Events Decoded': '#70DBED',
+            'Queue Usage %': '#7EB26D',
+            'Queue Usage 70%': '#EAB839',
+            'Queue Usage 90%': '#E24D42',
+          },
+        },
+      }),
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
@@ -2500,7 +2583,17 @@ export default [
           },
         },
       }),
-      uiStateJSON: '{}',
+      uiStateJSON: JSON.stringify({
+        vis: {
+          colors: {
+            'Events processed by Node: - master-node': '#70DBED',
+            'Events processed by Node: - worker1': '#D683CE',
+            'Events processed by Node: - worker10': '#7EB26D',
+            'Events processed by Node: - worker11': '#EAB839',
+            'Events processed by Node: - worker12': '#705DA0',
+          },
+        },
+      }),
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
@@ -2662,7 +2755,17 @@ export default [
           },
         },
       }),
-      uiStateJSON: '{}',
+      uiStateJSON: JSON.stringify({
+        vis: {
+          colors: {
+            'Events dropped by Node: - master-node': '#70DBED',
+            'Events dropped by Node: - worker1': '#D683CE',
+            'Events dropped by Node: - worker10': '#7EB26D',
+            'Events dropped by Node: - worker11': '#EAB839',
+            'Events dropped by Node: - worker12': '#705DA0',
+          },
+        },
+      }),
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
@@ -2934,7 +3037,18 @@ export default [
           },
         },
       }),
-      uiStateJSON: '{}',
+      uiStateJSON: JSON.stringify({
+        vis: {
+          colors: {
+            'Alerts log queue usage': '#7EB26D',
+            'Archives queue usage': '#EF843C',
+            'Event queue usage': '#70DBED',
+            'Firewall log queue usage': '#EAB839',
+            'Rule matching queue usage': '#D683CE',
+            'Statistical log queue usage': '#705DA0',
+          },
+        },
+      }),
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
