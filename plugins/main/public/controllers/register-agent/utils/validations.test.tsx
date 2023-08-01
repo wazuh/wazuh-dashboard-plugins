@@ -19,7 +19,7 @@ describe('Validations', () => {
   });
 
   it('should return an error message for an invalid FQDN', () => {
-    const invalidFQDN = 'example.fqdn';
+    const invalidFQDN = 'example.';
     const result = validateServerAddress(invalidFQDN);
     expect(result).toBe(
       'Each label must have a letter or number at the beginning. The maximum length is 63 characters.',
