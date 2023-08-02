@@ -24,7 +24,6 @@ import {
 } from '@elastic/eui';
 import { AppNavigate } from '../../../react-services/app-navigate';
 import { GroupTruncate } from '../../../components/common/util';
-import { getAgentFilterValues } from '../../../controllers/management/components/management/groups/get-agents-filters-values';
 import { WzButtonPermissions } from '../../../components/common/permissions/button';
 import { formatUIDate } from '../../../react-services/time-service';
 import { withErrorBoundary } from '../../../components/common/hocs';
@@ -35,8 +34,9 @@ import {
 } from '../../../../common/constants';
 import { AgentStatus } from '../../../components/agents/agent_status';
 import { AgentSynced } from '../../../components/agents/agent-synced';
-import { compressIPv6 } from '../../../services/ipv6-services';
 import { TableWzAPI } from '../../../components/common/tables';
+import { WzRequest } from '../../../react-services/wz-request';
+import { get as getLodash } from 'lodash';
 
 const searchBarWQLOptions = {
   implicitQuery: {
@@ -331,7 +331,7 @@ export const AgentsTable = withErrorBoundary(
               mapResponseItem={item => {
                 return {
                   ...item,
-                  ...(item.ip ? { ip: compressIPv6(item.ip) } : { ip: '-' }),
+                  ...(item.ip ? { ip: item.ip } : { ip: '-' }),
                   ...(typeof item.dateAdd === 'string'
                     ? { dateAdd: formatUIDate(item.dateAdd) }
                     : { dateAdd: '-' }),
@@ -342,7 +342,7 @@ export const AgentsTable = withErrorBoundary(
                     ? { node_name: item.node_name }
                     : { node_name: '-' }),
                   /*
-                  The agent version contains the Wazuh word, this get the string starting with
+                  The agent version contains the Wazuh word, this gets the string starting with
                   v<NUMBER><ANYTHING>
                   */
                   ...(typeof item.version === 'string'
@@ -405,7 +405,6 @@ export const AgentsTable = withErrorBoundary(
                           return UI_ORDER_AGENT_STATUS.map(status => ({
                             label: status,
                           }));
-                          break;
                         case 'group_config_status':
                           return [
                             AGENT_SYNCED_STATUS.SYNCED,
@@ -413,14 +412,32 @@ export const AgentsTable = withErrorBoundary(
                           ].map(label => {
                             label;
                           });
-                          break;
-                        default:
-                          return (
-                            await getAgentFilterValues(field, currentValue, {
-                              q: 'id!=000',
-                            })
-                          ).map(status => ({ label: status }));
-                          break;
+                        default: {
+                          const response = await WzRequest.apiReq(
+                            'GET',
+                            '/agents',
+                            {
+                              params: {
+                                distinct: true,
+                                limit: 30,
+                                select: field,
+                                sort: `+${field}`,
+                                ...(currentValue
+                                  ? {
+                                      q: `${searchBarWQLOptions.implicitQuery.query}${searchBarWQLOptions.implicitQuery.conjunction}${field}~${currentValue}`,
+                                    }
+                                  : {
+                                      q: `${searchBarWQLOptions.implicitQuery.query}`,
+                                    }),
+                              },
+                            },
+                          );
+                          return response?.data?.data.affected_items.map(
+                            item => ({
+                              label: getLodash(item, field),
+                            }),
+                          );
+                        }
                       }
                     } catch (error) {
                       return [];
