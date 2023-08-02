@@ -13,6 +13,7 @@ import { EditPolicyFlyout } from './edit-policy';
 import { CreatePolicyFlyout } from './create-policy';
 import { withUserAuthorizationPrompt } from '../../common/hocs';
 import { WzButtonPermissions } from '../../common/permissions/button';
+import { closeFlyout } from '../../common/flyouts/close-flyout-security';
 
 export const Policies = withUserAuthorizationPrompt([
   { action: 'security:read', resource: 'policy:id:*' },
@@ -40,14 +41,12 @@ export const Policies = withUserAuthorizationPrompt([
     setIsEditingPolicy(true);
   };
 
-  const closeEditingFlyout = async () => {
-    setIsEditingPolicy(false);
-    await getPolicies();
+  const closeEditingFlyout = needRefresh => {
+    closeFlyout(needRefresh, setIsEditingPolicy, getPolicies);
   };
 
-  const closeCreatingFlyout = async () => {
-    setIsCreatingPolicy(false);
-    await getPolicies();
+  const closeCreatingFlyout = needRefresh => {
+    closeFlyout(needRefresh, setIsCreatingPolicy, getPolicies);
   };
 
   let editFlyout;

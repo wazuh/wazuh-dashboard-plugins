@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { EuiInMemoryTable, EuiBadge } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
 import { ErrorHandler } from '../../../react-services/error-handler';
@@ -14,6 +14,12 @@ export const PoliciesTable = ({
   editPolicy,
   updatePolicies,
 }) => {
+  const [policiesState, setPoliciesState] = useState([]);
+
+  useEffect(() => {
+    setPoliciesState(policies);
+  }, [policies]);
+
   const getRowProps = item => {
     const { id } = item;
     return {
@@ -36,10 +42,13 @@ export const PoliciesTable = ({
             },
           },
         );
-        const data = (response.data || {}).data;
-        if (data.failed_items && data.failed_items.length) {
+        const data = response?.data?.data;
+        if (data?.failed_items && data?.failed_items?.length) {
           return;
         }
+        // Workaround for tooltip problem does not disappear
+        // when deleting a policy if the following policy is a reserved policy
+        setPoliciesState([]);
         ErrorHandler.info('Policy was successfully deleted');
         await updatePolicies();
       } catch (error) {
@@ -153,7 +162,7 @@ export const PoliciesTable = ({
 
   return (
     <EuiInMemoryTable
-      items={policies}
+      items={policiesState}
       columns={columns}
       search={search}
       rowProps={getRowProps}

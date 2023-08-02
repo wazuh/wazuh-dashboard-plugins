@@ -688,7 +688,7 @@ resources:
     path: /security/users
     response:
       statusCode: 200
-      staticFile: security/users.json
+      scriptFile: security/users/get-users.js
 
   # Add users
   - method: POST
@@ -697,6 +697,9 @@ resources:
   # Delete users
   - method: DELETE
     path: /security/users
+    response:
+      statusCode: 200
+      scriptFile: security/users/delete-user.js
 
   # Update users
   - method: PUT
@@ -707,7 +710,7 @@ resources:
     path: /security/roles
     response:
       statusCode: 200
-      staticFile: security/security-roles.json
+      scriptFile: security/roles/get-roles.js
 
   # Add role
   - method: POST
@@ -716,6 +719,9 @@ resources:
   # Delete roles
   - method: DELETE
     path: /security/roles
+    response:
+      statusCode: 200
+      scriptFile: security/roles/delete-roles.js
 
   # Update role
   - method: PUT
@@ -726,7 +732,7 @@ resources:
     path: /security/rules
     response:
       statusCode: 200
-      staticFile: security/security-rules.json
+      scriptFile: security/roles-mapping/get-rules.js
 
   # Add security rule
   - method: POST
@@ -735,6 +741,9 @@ resources:
   # Delete security rules
   - method: DELETE
     path: /security/rules
+    response:
+      statusCode: 200
+      scriptFile: security/roles-mapping/delete-rules.js
 
   # Update security rule
   - method: PUT
@@ -745,7 +754,7 @@ resources:
     path: /security/policies
     response:
       statusCode: 200
-      staticFile: security/security-policies.json
+      scriptFile: security/policies/get-policies.js
 
   # Add policy
   - method: POST
@@ -754,6 +763,9 @@ resources:
   # Delete policies
   - method: DELETE
     path: /security/policies
+    response:
+      statusCode: 200
+      scriptFile: security/policies/delete-policies.js
 
   # Update policy
   - method: PUT
@@ -855,7 +867,7 @@ resources:
     path: /syscollector/{agent_id}/ports
     response:
       statusCode: 200
-      scriptFile: syscollector/ports.js
+      staticFile: syscollector/ports/ports.json
 
   # Get agent processes
   - method: GET
