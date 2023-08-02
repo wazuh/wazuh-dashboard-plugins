@@ -7,7 +7,7 @@ import {
   EuiCode,
 } from '@elastic/eui';
 import { tokenizer as tokenizerUQL } from './aql';
-import { PLUGIN_VERSION_SHORT } from '../../../../common/constants';
+import { PLUGIN_VERSION } from '../../../../common/constants';
 
 /* UI Query language
 https://documentation.wazuh.com/current/user-manual/api/queries.html
@@ -895,7 +895,7 @@ export const WQL = {
   label: 'WQL',
   description:
     'WQL (Wazuh Query Language) provides a human query syntax based on the Wazuh API query language.',
-  documentationLink: `https://github.com/wazuh/wazuh-kibana-app/blob/v${PLUGIN_VERSION_SHORT}/public/components/search-bar/query-language/wql.md`,
+  documentationLink: `https://github.com/wazuh/wazuh-kibana-app/blob/v${PLUGIN_VERSION}/plugins/main/public/components/search-bar/query-language/wql.md`,
   getConfiguration() {
     return {
       isOpenPopoverImplicitFilter: false,
