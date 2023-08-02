@@ -867,7 +867,7 @@ resources:
     path: /syscollector/{agent_id}/ports
     response:
       statusCode: 200
-      scriptFile: syscollector/ports.js
+      staticFile: syscollector/ports/ports.json
 
   # Get agent processes
   - method: GET
