@@ -12,13 +12,20 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { getToasts } from '../../../../../../kibana-services';
-import { resourceDictionary, ResourcesConstants, ResourcesHandler } from '../../common/resources-handler';
+import {
+  resourceDictionary,
+  ResourcesConstants,
+  ResourcesHandler,
+} from '../../common/resources-handler';
 import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
 import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
 
 import { TableWzAPI } from '../../../../../../components/common/tables';
-import { SECTION_RULES_SECTION, SECTION_RULES_KEY } from '../../common/constants';
+import {
+  SECTION_RULES_SECTION,
+  SECTION_RULES_KEY,
+} from '../../common/constants';
 import RulesetColumns from './columns';
 import { FlyoutDetail } from './flyout-detail';
 import { withUserPermissions } from '../../../../../../components/common/hocs/withUserPermissions';
@@ -28,15 +35,43 @@ import {
   ManageFiles,
   AddNewFileButton,
   UploadFilesButton,
-} from '../../common/actions-buttons'
+} from '../../common/actions-buttons';
 
 import apiSuggestsItems from './ruleset-suggestions';
 
-const searchBarWQLOptions =  {
-  searchTermFields: [], // TODO: add search term fields
+const searchBarWQLOptions = {
+  searchTermFields: [
+    'id',
+    'description',
+    'filename',
+    'gdpr',
+    'gpg13',
+    'groups',
+    'level',
+    'mitre',
+    'nist_800_53',
+    'pci_dss',
+    'relative_dirname',
+    'tsc',
+  ],
   filterButtons: [
-    {id: 'relative-dirname', input: 'relative_dirname=etc/rules', label: 'Custom rules'}
-  ]
+    {
+      id: 'relative-dirname',
+      input: 'relative_dirname=etc/rules',
+      label: 'Custom rules',
+    },
+  ],
+};
+
+const searchBarWQLOptionsFiles = {
+  searchTermFields: ['filename', 'relative_dirname'],
+  filterButtons: [
+    {
+      id: 'relative-dirname',
+      input: 'relative_dirname=etc/rules',
+      label: 'Custom rules',
+    },
+  ],
 };
 
 /***************************************
@@ -49,8 +84,9 @@ const FilesTable = ({
   searchBarSuggestions,
   filters,
   updateFilters,
-  reload
-}) => <TableWzAPI
+  reload,
+}) => (
+  <TableWzAPI
     reload={reload}
     actionButtons={actionButtons}
     title='Rules files'
@@ -58,14 +94,9 @@ const FilesTable = ({
     tableColumns={columns}
     tableInitialSortingField='filename'
     searchTable={true}
-    searchBarProps={{
-      modes: [
-        {
-          id: 'wql',
-          options: searchBarWQLOptions,
-          suggestions: searchBarSuggestions,
-        }
-      ]
+    searchBarWQL={{
+      options: searchBarWQLOptionsFiles,
+      suggestions: searchBarSuggestions,
     }}
     endpoint='/rules/files'
     isExpandable={true}
@@ -74,6 +105,7 @@ const FilesTable = ({
     filters={filters}
     tablePageSizeOptions={[10, 25, 50, 100]}
   />
+);
 
 const RulesFlyoutTable = ({
   actionButtons,
@@ -88,7 +120,8 @@ const RulesFlyoutTable = ({
   closeFlyout,
   cleanFilters,
   ...props
-}) => <>
+}) => (
+  <>
     <TableWzAPI
       actionButtons={actionButtons}
       title='Rules'
@@ -106,7 +139,6 @@ const RulesFlyoutTable = ({
       downloadCsv={true}
       showReload={true}
       filters={filters}
-      onFiltersChange={updateFilters}
       tablePageSizeOptions={[10, 25, 50, 100]}
     />
     {isFlyoutVisible && (
@@ -122,6 +154,7 @@ const RulesFlyoutTable = ({
       />
     )}
   </>
+);
 
 /***************************************
  * Main component
@@ -139,42 +172,43 @@ function RulesetTable({ setShowingFiles, showingFiles, ...props }) {
     const regex = new RegExp('redirectRule=' + '[^&]*');
     const match = window.location.href.match(regex);
     if (match && match[0]) {
-      setCurrentItem(parseInt(match[0].split('=')[1]))
-      setIsFlyoutVisible(true)
+      setCurrentItem(parseInt(match[0].split('=')[1]));
+      setIsFlyoutVisible(true);
     }
-  }, [])
+  }, []);
 
   // Table custom filter options
-  const buttonOptions = [{ label: "Custom rules", field: "relative_dirname", value: "etc/rules" },];
+  const buttonOptions = [
+    { label: 'Custom rules', field: 'relative_dirname', value: 'etc/rules' },
+  ];
 
-  const updateFilters = (filters) => {
+  const updateFilters = filters => {
     setFilters(filters);
-  }
+  };
 
   const cleanFilters = () => {
     setFilters([]);
-  }
+  };
 
   const toggleShowFiles = () => {
     setFilters([]);
     setShowingFiles(!showingFiles);
-  }
+  };
 
   const closeFlyout = () => {
     setIsFlyoutVisible(false);
-  }
-
+  };
 
   /**
    * Remove files method
    */
-  const removeItems = async (items) => {
+  const removeItems = async items => {
     try {
       const results = items.map(async (item, i) => {
         await resourcesHandler.deleteFile(item.filename || item.name);
       });
 
-      Promise.all(results).then((completed) => {
+      Promise.all(results).then(completed => {
         setTableFootprint(Date.now());
         getToasts().add({
           color: 'success',
@@ -196,7 +230,7 @@ function RulesetTable({ setShowingFiles, showingFiles, ...props }) {
       };
       getErrorOrchestrator().handleError(options);
     }
-  }
+  };
 
   /**
    * Columns and Rows properties
@@ -205,17 +239,18 @@ function RulesetTable({ setShowingFiles, showingFiles, ...props }) {
     const rulesetColumns = new RulesetColumns({
       removeItems: removeItems,
       state: {
-        section: SECTION_RULES_KEY
-      }, ...props
+        section: SECTION_RULES_KEY,
+      },
+      ...props,
     }).columns;
     const columns = rulesetColumns[showingFiles ? 'files' : SECTION_RULES_KEY];
     return columns;
-  }
+  };
 
-  const getRowProps = (item) => {
+  const getRowProps = item => {
     const { id, name } = item;
 
-    const getRequiredPermissions = (item) => {
+    const getRequiredPermissions = item => {
       const { permissionResource } = resourceDictionary[SECTION_RULES_KEY];
       return [
         {
@@ -230,12 +265,12 @@ function RulesetTable({ setShowingFiles, showingFiles, ...props }) {
       className: 'customRowClass',
       onClick: !WzUserPermissions.checkMissingUserPermissions(
         getRequiredPermissions(item),
-        props.userPermissions
+        props.userPermissions,
       )
-        ? (item) => {
-          setCurrentItem(id)
-          setIsFlyoutVisible(true);
-        }
+        ? item => {
+            setCurrentItem(id);
+            setIsFlyoutVisible(true);
+          }
         : undefined,
     };
   };
@@ -260,18 +295,22 @@ function RulesetTable({ setShowingFiles, showingFiles, ...props }) {
       />,
     ];
     if (showingFiles)
-      buttons.push(<UploadFilesButton
-        section={SECTION_RULES_SECTION}
-        showingFiles={showingFiles}
-        onSuccess={() => { updateRestartClusterManager && updateRestartClusterManager() }}
-      />);
+      buttons.push(
+        <UploadFilesButton
+          section={SECTION_RULES_SECTION}
+          showingFiles={showingFiles}
+          onSuccess={() => {
+            updateRestartClusterManager && updateRestartClusterManager();
+          }}
+        />,
+      );
     return buttons;
   }, [showingFiles]);
 
   const actionButtons = buildActionButtons();
 
   return (
-    <div className="wz-inventory">
+    <div className='wz-inventory'>
       {showingFiles ? (
         <FilesTable
           actionButtons={actionButtons}
@@ -283,27 +322,23 @@ function RulesetTable({ setShowingFiles, showingFiles, ...props }) {
           reload={tableFootprint}
         />
       ) : (
-          <RulesFlyoutTable
-            actionButtons={actionButtons}
-            buttonOptions={buttonOptions}
-            columns={columns}
-            searchBarSuggestions={apiSuggestsItems.items}
-            filters={filters}
-            updateFilters={updateFilters}
-            getRowProps={getRowProps}
-            isFlyoutVisible={isFlyoutVisible}
-            currentItem={currentItem}
-            closeFlyout={closeFlyout}
-            cleanFilters={cleanFilters}
-            updateFileContent={updateFileContent}
-          />
-        )}
+        <RulesFlyoutTable
+          actionButtons={actionButtons}
+          buttonOptions={buttonOptions}
+          columns={columns}
+          searchBarSuggestions={apiSuggestsItems.items}
+          filters={filters}
+          updateFilters={updateFilters}
+          getRowProps={getRowProps}
+          isFlyoutVisible={isFlyoutVisible}
+          currentItem={currentItem}
+          closeFlyout={closeFlyout}
+          cleanFilters={cleanFilters}
+          updateFileContent={updateFileContent}
+        />
+      )}
     </div>
   );
-
 }
 
-
-export default compose(
-  withUserPermissions
-)(RulesetTable);
+export default compose(withUserPermissions)(RulesetTable);
