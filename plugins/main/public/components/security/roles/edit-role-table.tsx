@@ -99,10 +99,10 @@ export const EditRolesTable = ({
                       },
                     },
                   );
-                  const removePolicy = (response.data || {}).data;
+                  const removePolicy = response?.data?.data;
                   if (
-                    removePolicy.failed_items &&
-                    removePolicy.failed_items.length
+                    removePolicy?.failed_items &&
+                    removePolicy?.failed_items?.length
                   ) {
                     setIsLoading(false);
                     return;
