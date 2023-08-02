@@ -274,6 +274,28 @@ export class AgentSelectionTable extends Component {
                           },
                         },
                       );
+                      if (field === 'group') {
+                        /* the group field is returned as an string[],
+                        example: ['group1', 'group2']
+
+                        Due the API request done to get the distinct values for the groups is
+                        not returning the exepected values, as workaround, the values are
+                        extracted in the frontend using the returned results.
+
+                        This API request to get the distint values of groups doesn't
+                        return the unique values for the groups, else the unique combination
+                        of groups.
+                        */
+                        return response?.data?.data.affected_items
+                          .map(item => getLodash(item, field))
+                          .flat()
+                          .filter(
+                            (item, index, array) =>
+                              array.indexOf(item) === index,
+                          )
+                          .sort()
+                          .map(group => ({ label: group }));
+                      }
                       return response?.data?.data.affected_items.map(item => ({
                         label: getLodash(item, field),
                       }));
