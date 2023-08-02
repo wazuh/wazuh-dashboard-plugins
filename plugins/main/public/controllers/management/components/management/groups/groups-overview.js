@@ -15,19 +15,27 @@ import {
   EuiPanel,
   EuiPage,
   EuiOverlayMask,
-  EuiConfirmModal
+  EuiConfirmModal,
 } from '@elastic/eui';
 
 // Wazuh components
 import WzGroupsActionButtons from './actions-buttons-main';
 
 import { connect } from 'react-redux';
-import { withUserAuthorizationPrompt, withUserPermissions } from '../../../../../components/common/hocs';
+import {
+  withUserAuthorizationPrompt,
+  withUserPermissions,
+} from '../../../../../components/common/hocs';
 import { compose } from 'redux';
 import { TableWzAPI } from '../../../../../components/common/tables';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
-import { updateFileContent, updateGroupDetail, updateListItemsForRemove, updateShowModal } from '../../../../../redux/actions/groupsActions';
-import { WzUserPermissions } from '../../../../../react-services';
+import {
+  updateFileContent,
+  updateGroupDetail,
+  updateListItemsForRemove,
+  updateShowModal,
+} from '../../../../../redux/actions/groupsActions';
+import { WzRequest, WzUserPermissions } from '../../../../../react-services';
 import { getToasts } from '../../../../../kibana-services';
 import GroupsHandler from './utils/groups-handler';
 
@@ -44,14 +52,14 @@ export class WzGroupsOverview extends Component {
         name: 'Name',
         align: 'left',
         searchable: true,
-        sortable: true
+        sortable: true,
       },
       {
         field: 'count',
         name: 'Agents',
         align: 'left',
         searchable: true,
-        sortable: true
+        sortable: true,
       },
       {
         field: 'configSum',
@@ -68,21 +76,31 @@ export class WzGroupsOverview extends Component {
             <div>
               <WzButtonPermissions
                 buttonType='icon'
-                permissions={[{action: 'group:read', resource: `group:id:${item.name}`}]}
-                tooltip={{position: 'top', content: `View ${item.name} details`}}
-                aria-label="View group details"
-                iconType="eye"
+                permissions={[
+                  { action: 'group:read', resource: `group:id:${item.name}` },
+                ]}
+                tooltip={{
+                  position: 'top',
+                  content: `View ${item.name} details`,
+                }}
+                aria-label='View group details'
+                iconType='eye'
                 onClick={async () => {
                   this.props.updateGroupDetail(item);
                 }}
-                color="primary"
+                color='primary'
               />
               <WzButtonPermissions
                 buttonType='icon'
-                permissions={[{action: 'group:read', resource: `group:id:${item.name}`}]}
-                tooltip={{position: 'top', content: 'Edit group configuration'}}
-                aria-label="Edit group configuration"
-                iconType="pencil"
+                permissions={[
+                  { action: 'group:read', resource: `group:id:${item.name}` },
+                ]}
+                tooltip={{
+                  position: 'top',
+                  content: 'Edit group configuration',
+                }}
+                aria-label='Edit group configuration'
+                iconType='pencil'
                 onClick={async ev => {
                   ev.stopPropagation();
                   this.showGroupConfiguration(item.name);
@@ -90,62 +108,72 @@ export class WzGroupsOverview extends Component {
               />
               <WzButtonPermissions
                 buttonType='icon'
-                permissions={[{action: 'group:delete', resource: `group:id:${item.name}`}]}
-                tooltip={{posiiton: 'top', content: item.name === 'default' ? `The ${item.name} group cannot be deleted`: `Delete ${item.name}`}}
-                aria-label="Delete content"
-                iconType="trash"
+                permissions={[
+                  { action: 'group:delete', resource: `group:id:${item.name}` },
+                ]}
+                tooltip={{
+                  posiiton: 'top',
+                  content:
+                    item.name === 'default'
+                      ? `The ${item.name} group cannot be deleted`
+                      : `Delete ${item.name}`,
+                }}
+                aria-label='Delete content'
+                iconType='trash'
                 onClick={async ev => {
                   ev.stopPropagation();
                   this.props.updateListItemsForRemove([item]);
                   this.props.updateShowModal(true);
                 }}
-                color="danger"
+                color='danger'
                 isDisabled={item.name === 'default'}
               />
             </div>
           );
-        }
-      }
+        },
+      },
     ];
     this.reloadTable = this.reloadTable.bind(this);
   }
 
-  reloadTable(){
-    this.setState({ reload: Date.now()});
+  reloadTable() {
+    this.setState({ reload: Date.now() });
   }
 
   async removeItems(items) {
-    try{
-      const promises = items.map(async (item, i) => await GroupsHandler.deleteGroup(item.name));
+    try {
+      const promises = items.map(
+        async (item, i) => await GroupsHandler.deleteGroup(item.name),
+      );
       await Promise.all(promises);
       getToasts().add({
         color: 'success',
         title: 'Success',
         text: 'Deleted successfully',
-        toastLifeTimeMs: 3000
+        toastLifeTimeMs: 3000,
       });
-    }catch(error){
+    } catch (error) {
       getToasts().add({
         color: 'danger',
         title: 'Error',
         text: error,
-        toastLifeTimeMs: 3000
+        toastLifeTimeMs: 3000,
       });
-    }finally{
+    } finally {
       this.reloadTable();
-    };
+    }
   }
 
   async showGroupConfiguration(groupId) {
     const result = await GroupsHandler.getFileContent(
-      `/groups/${groupId}/files/agent.conf/xml`
+      `/groups/${groupId}/files/agent.conf/xml`,
     );
 
     const file = {
       name: 'agent.conf',
       content: this.autoFormat(result),
       isEditable: true,
-      groupName: groupId
+      groupName: groupId,
     };
     this.props.updateFileContent(file);
   }
@@ -178,7 +206,7 @@ export class WzGroupsOverview extends Component {
       'other->single': 0,
       'other->closing': -1,
       'other->opening': 0,
-      'other->other': 0
+      'other->other': 0,
     };
 
     for (var i = 0; i < lines.length; i++) {
@@ -214,16 +242,18 @@ export class WzGroupsOverview extends Component {
   };
 
   render() {
-    const actionButtons = [<WzGroupsActionButtons reloadTable={this.reloadTable}/>];
+    const actionButtons = [
+      <WzGroupsActionButtons reloadTable={this.reloadTable} />,
+    ];
 
-    const getRowProps = (item) => {
+    const getRowProps = item => {
       const { id } = item;
       return {
         'data-test-subj': `row-${id}`,
         className: 'customRowClass',
         onClick: !WzUserPermissions.checkMissingUserPermissions(
           [{ action: 'group:read', resource: `group:id:${item.name}` }],
-          this.props.userPermissions
+          this.props.userPermissions,
         )
           ? () => this.props.updateGroupDetail(item)
           : undefined,
@@ -245,11 +275,33 @@ export class WzGroupsOverview extends Component {
             searchBarWQL={{
               suggestions: {
                 field: () => [
-                  {label: 'name', description: 'filter by name'},
-                  {label: 'count', description: 'filter by count'},
-                  {label: 'configSum', description: 'filter by configuration checksum'}
+                  { label: 'name', description: 'filter by name' },
+                  { label: 'count', description: 'filter by count' },
+                  {
+                    label: 'configSum',
+                    description: 'filter by configuration checksum',
+                  },
                 ],
-                value: () => [] // TODO:
+                value: async (currentValue, { field }) => {
+                  try {
+                    const response = await WzRequest.apiReq('GET', '/groups', {
+                      params: {
+                        distinct: true,
+                        limit: 30,
+                        select: field,
+                        sort: `+${field}`,
+                        ...(currentValue
+                          ? { q: `${field}~${currentValue}` }
+                          : {}),
+                      },
+                    });
+                    return response?.data?.data.affected_items.map(item => ({
+                      label: item[field],
+                    }));
+                  } catch (error) {
+                    return [];
+                  }
+                },
               },
             }}
             rowProps={getRowProps}
@@ -262,16 +314,20 @@ export class WzGroupsOverview extends Component {
         {this.props.state.showModal ? (
           <EuiOverlayMask>
             <EuiConfirmModal
-              title={`Delete ${this.props.state.itemList[0].file ? this.props.state.itemList[0].file : this.props.state.itemList[0].name} group?`}
+              title={`Delete ${
+                this.props.state.itemList[0].file
+                  ? this.props.state.itemList[0].file
+                  : this.props.state.itemList[0].name
+              } group?`}
               onCancel={() => this.props.updateShowModal(false)}
               onConfirm={() => {
                 this.removeItems(this.props.state.itemList);
                 this.props.updateShowModal(false);
               }}
-              cancelButtonText="Cancel"
-              confirmButtonText="Delete"
-              defaultFocusedButton="cancel"
-              buttonColor="danger"
+              cancelButtonText='Cancel'
+              confirmButtonText='Delete'
+              defaultFocusedButton='cancel'
+              buttonColor='danger'
             ></EuiConfirmModal>
           </EuiOverlayMask>
         ) : null}
@@ -282,23 +338,22 @@ export class WzGroupsOverview extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.groupsReducers
+    state: state.groupsReducers,
   };
 };
 
 const mapDispatchToProps = dispatch => ({
-  updateShowModal: (showModal) => dispatch(updateShowModal(showModal)),
-  updateListItemsForRemove: (itemList) => dispatch(updateListItemsForRemove(itemList)),
-  updateGroupDetail: (itemDetail) => dispatch(updateGroupDetail(itemDetail)),
-  updateFileContent: (content) => dispatch(updateFileContent(content)),
+  updateShowModal: showModal => dispatch(updateShowModal(showModal)),
+  updateListItemsForRemove: itemList =>
+    dispatch(updateListItemsForRemove(itemList)),
+  updateGroupDetail: itemDetail => dispatch(updateGroupDetail(itemDetail)),
+  updateFileContent: content => dispatch(updateFileContent(content)),
 });
 
-
 export default compose(
-  withUserAuthorizationPrompt([{action: 'group:read', resource: 'group:id:*'}]),
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  ),
-  withUserPermissions
+  withUserAuthorizationPrompt([
+    { action: 'group:read', resource: 'group:id:*' },
+  ]),
+  connect(mapStateToProps, mapDispatchToProps),
+  withUserPermissions,
 )(WzGroupsOverview);

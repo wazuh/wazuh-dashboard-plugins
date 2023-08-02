@@ -26,7 +26,6 @@ import {
   updateSortFieldAgents,
   updateReload,
 } from '../../../../../redux/actions/groupsActions';
-import { getAgentFilterValues } from './get-agents-filters-values';
 import { TableWzAPI } from '../../../../../components/common/tables';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 import { WzButtonPermissionsModalConfirm } from '../../../../../components/common/buttons';
@@ -34,9 +33,11 @@ import {
   UI_LOGGER_LEVELS,
   UI_ORDER_AGENT_STATUS,
 } from '../../../../../../common/constants';
+import { get as getLodash } from 'lodash';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 import { AgentStatus } from '../../../../../components/agents/agent_status';
+import { WzRequest } from '../../../../../react-services';
 
 class WzGroupAgentsTable extends Component {
   _isMounted = false;
@@ -79,7 +80,6 @@ class WzGroupAgentsTable extends Component {
         align: 'left',
         searchable: true,
         sortable: true,
-        show: true,
       },
       {
         field: 'status',
@@ -225,10 +225,24 @@ class WzGroupAgentsTable extends Component {
               field: () => searchBarSuggestionsFields,
               value: async (currentValue, { field }) => {
                 try {
-                  // TODO: distinct
-                  return await getAgentFilterValues(field, currentValue, {
-                    q: `group=${groupName}`,
-                  });
+                  const response = await WzRequest.apiReq(
+                    'GET',
+                    `/groups/${groupName}/agents`,
+                    {
+                      params: {
+                        distinct: true,
+                        limit: 30,
+                        select: field,
+                        sort: `+${field}`,
+                        ...(currentValue
+                          ? { q: `${field}~${currentValue}` }
+                          : {}),
+                      },
+                    },
+                  );
+                  return response?.data?.data.affected_items.map(item => ({
+                    label: getLodash(item, field),
+                  }));
                 } catch (error) {
                   return [];
                 }

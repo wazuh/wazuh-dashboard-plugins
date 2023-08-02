@@ -18,11 +18,11 @@ import {
   updatePageIndexFile,
   updateSortDirectionFile,
   updateSortFieldFile,
-  updateFileContent
+  updateFileContent,
 } from '../../../../../redux/actions/groupsActions';
 import GroupsFilesColumns from './utils/columns-files';
 import { TableWzAPI } from '../../../../../components/common/tables';
-
+import { WzRequest } from '../../../../../react-services';
 
 class WzGroupFilesTable extends Component {
   _isMounted = false;
@@ -30,15 +30,15 @@ class WzGroupFilesTable extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      filters: {}
+      filters: {},
     };
 
     this.searchBar = {
       wql: {
         suggestionsFields: [
-          {label: 'filename', description: 'filter by filename'},
-          {label: 'hash', description: 'filter by hash'}
-        ]
+          { label: 'filename', description: 'filter by filename' },
+          { label: 'hash', description: 'filter by hash' },
+        ],
       },
     };
   }
@@ -46,7 +46,7 @@ class WzGroupFilesTable extends Component {
   render() {
     this.groupsAgentsColumns = new GroupsFilesColumns(this.props);
     const columns = this.groupsAgentsColumns.columns;
-    const groupName = this.props.state?.itemDetail?.name
+    const groupName = this.props.state?.itemDetail?.name;
     const searchBarWQL = this.searchBar.wql;
 
     return (
@@ -61,13 +61,29 @@ class WzGroupFilesTable extends Component {
           suggestions: {
             field: () => searchBarWQL.suggestionsFields,
             value: async (currentValue, { field }) => {
-              return [];
-              try{ // TODO: distinct
+              try {
+                const response = await WzRequest.apiReq(
+                  'GET',
+                  `/groups/${groupName}/files`,
+                  {
+                    params: {
+                      distinct: true,
+                      limit: 30,
+                      select: field,
+                      sort: `+${field}`,
+                      ...(currentValue
+                        ? { q: `${field}~${currentValue}` }
+                        : {}),
+                    },
+                  },
+                );
+                return response?.data?.data.affected_items.map(item => ({
+                  label: item[field],
+                }));
+              } catch (error) {
                 return [];
-              }catch(error){
-                return [];
-              };
-            } 
+              }
+            },
           },
         }}
         showReload
@@ -80,7 +96,7 @@ class WzGroupFilesTable extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.groupsReducers
+    state: state.groupsReducers,
   };
 };
 
@@ -95,11 +111,8 @@ const mapDispatchToProps = dispatch => {
       dispatch(updateSortDirectionFile(sortDirectionFile)),
     updateSortFieldFile: sortFieldFile =>
       dispatch(updateSortFieldFile(sortFieldFile)),
-    updateFileContent: content => dispatch(updateFileContent(content))
+    updateFileContent: content => dispatch(updateFileContent(content)),
   };
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WzGroupFilesTable);
+export default connect(mapStateToProps, mapDispatchToProps)(WzGroupFilesTable);
