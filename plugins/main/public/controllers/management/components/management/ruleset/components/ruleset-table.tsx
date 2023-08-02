@@ -139,7 +139,6 @@ const RulesFlyoutTable = ({
       downloadCsv={true}
       showReload={true}
       filters={filters}
-      onFiltersChange={updateFilters}
       tablePageSizeOptions={[10, 25, 50, 100]}
     />
     {isFlyoutVisible && (

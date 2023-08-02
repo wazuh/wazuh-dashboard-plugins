@@ -3,6 +3,7 @@ import { WzRequest } from '../../../../../../react-services/wz-request';
 const rulesItems = {
   field(currentValue) {
     return [
+      { label: 'id', description: 'filter by ID' },
       { label: 'filename', description: 'filter by filename' },
       { label: 'gdpr', description: 'filter by GDPR requirement' },
       { label: 'gpg13', description: 'filter by GPG requirement' },
@@ -20,6 +21,21 @@ const rulesItems = {
   value: async (currentValue, { field }) => {
     try {
       switch (field) {
+        case 'id': {
+          const filter = {
+            distinct: true,
+            limit: 30,
+            select: field,
+            sort: `+${field}`,
+            ...(currentValue ? { q: `id~${currentValue}` } : {}),
+          };
+          const result = await WzRequest.apiReq('GET', '/rules', {
+            params: filter,
+          });
+          return result?.data?.data?.affected_items.map(label => ({
+            label: label[field],
+          }));
+        }
         case 'status': {
           return ['enabled', 'disabled'].map(label => ({ label }));
         }
