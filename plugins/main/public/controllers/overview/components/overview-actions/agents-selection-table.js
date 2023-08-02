@@ -10,9 +10,11 @@ import { WzRequest } from '../../../../react-services/wz-request';
 import { updateCurrentAgentData } from '../../../../redux/actions/appStateActions';
 import store from '../../../../redux/store';
 import { GroupTruncate } from '../../../../components/common/util/agent-group-truncate/';
-import { getAgentFilterValues } from '../../../../controllers/management/components/management/groups/get-agents-filters-values';
-import _ from 'lodash';
-import { UI_LOGGER_LEVELS, UI_ORDER_AGENT_STATUS } from '../../../../../common/constants';
+import { get as getLodash } from 'lodash';
+import {
+  UI_LOGGER_LEVELS,
+  UI_ORDER_AGENT_STATUS,
+} from '../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
 import { AgentStatus } from '../../../../components/agents/agent_status';
@@ -21,15 +23,15 @@ import { TableWzAPI } from '../../../../components/common/tables';
 const searchBarWQLOptions = {
   implicitQuery: {
     query: 'id!=000',
-    conjunction: ';'
-  }
+    conjunction: ';',
+  },
 };
 
 export class AgentSelectionTable extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      filters: { default: {q: 'id!=000'}}
+      filters: { default: { q: 'id!=000' } },
     };
 
     this.columns = [
@@ -44,14 +46,14 @@ export class AgentSelectionTable extends Component {
         field: 'name',
         name: 'Name',
         searchable: true,
-        sortable: true
+        sortable: true,
       },
       {
         field: 'group',
         name: 'Group',
         sortable: true,
         searchable: true,
-        render: groups => this.renderGroups(groups)
+        render: groups => this.renderGroups(groups),
       },
       {
         field: 'version',
@@ -66,7 +68,7 @@ export class AgentSelectionTable extends Component {
         name: 'Operating system',
         sortable: true,
         searchable: true,
-        render: (field, agentData) => this.addIconPlatformRender(agentData)
+        render: (field, agentData) => this.addIconPlatformRender(agentData),
       },
       {
         field: 'status',
@@ -74,23 +76,27 @@ export class AgentSelectionTable extends Component {
         searchable: true,
         sortable: true,
         width: 'auto',
-        render: status => <AgentStatus status={status} style={{ whiteSpace: 'no-wrap' }}/>,
+        render: status => (
+          <AgentStatus status={status} style={{ whiteSpace: 'no-wrap' }} />
+        ),
       },
     ];
   }
 
-  unselectAgents(){
+  unselectAgents() {
     store.dispatch(updateCurrentAgentData({}));
     this.props.removeAgentsFilter();
   }
 
-  async selectAgentAndApply(agentID){
-    try{
-      const data = await WzRequest.apiReq('GET', '/agents', { params: { q: 'id=' + agentID}});
-      const formattedData = data?.data?.data?.affected_items?.[0]
+  async selectAgentAndApply(agentID) {
+    try {
+      const data = await WzRequest.apiReq('GET', '/agents', {
+        params: { q: 'id=' + agentID },
+      });
+      const formattedData = data?.data?.data?.affected_items?.[0];
       store.dispatch(updateCurrentAgentData(formattedData));
       this.props.updateAgentSearch([agentID]);
-    } catch(error) {
+    } catch (error) {
       store.dispatch(updateCurrentAgentData({}));
       this.props.removeAgentsFilter(true);
       const options = {
@@ -108,7 +114,6 @@ export class AgentSelectionTable extends Component {
     }
   }
 
-
   addIconPlatformRender(agent) {
     let icon = '';
     const os = agent?.os || {};
@@ -123,26 +128,28 @@ export class AgentSelectionTable extends Component {
     const os_name = `${agent?.os?.name || ''} ${agent?.os?.version || ''}`;
 
     return (
-      <EuiFlexGroup gutterSize="xs">
-        <EuiFlexItem grow={false} ><i
-          className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`}
-          aria-hidden="true"
-        ></i></EuiFlexItem>{' '}
+      <EuiFlexGroup gutterSize='xs'>
+        <EuiFlexItem grow={false}>
+          <i
+            className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`}
+            aria-hidden='true'
+          ></i>
+        </EuiFlexItem>{' '}
         <EuiFlexItem>{os_name.trim() || '-'}</EuiFlexItem>
       </EuiFlexGroup>
     );
   }
 
-  filterGroupBadge = (group) => {
+  filterGroupBadge = group => {
     this.setState({
       filters: {
-        default: {q: 'id!=000'},
+        default: { q: 'id!=000' },
         q: `group=${group}`,
-      }
+      },
     });
   };
 
-  renderGroups(groups){
+  renderGroups(groups) {
     return Array.isArray(groups) ? (
       <GroupTruncate
         groups={groups}
@@ -150,8 +157,11 @@ export class AgentSelectionTable extends Component {
         label={'more'}
         action={'filter'}
         filterAction={this.filterGroupBadge}
-        {...this.props} />
-    ) : groups
+        {...this.props}
+      />
+    ) : (
+      groups
+    );
   }
 
   render() {
@@ -169,25 +179,31 @@ export class AgentSelectionTable extends Component {
       <div>
         {selectedAgent && Object.keys(selectedAgent).length > 0 && (
           <Fragment>
-            <EuiFlexGroup responsive={false} justifyContent="flexEnd">
+            <EuiFlexGroup responsive={false} justifyContent='flexEnd'>
               {/* agent name (agent id) Unpin button right aligned, require justifyContent="flexEnd" in the EuiFlexGroup */}
-              <EuiFlexItem grow={false} style={{marginRight: 0}}>
-                <AgentStatus status={selectedAgent.status} style={{ whiteSpace: 'no-wrap' }}>
+              <EuiFlexItem grow={false} style={{ marginRight: 0 }}>
+                <AgentStatus
+                  status={selectedAgent.status}
+                  style={{ whiteSpace: 'no-wrap' }}
+                >
                   {selectedAgent.name} ({selectedAgent.id})
                 </AgentStatus>
               </EuiFlexItem>
-              <EuiFlexItem grow={false} style={{marginTop: 10, marginLeft: 4}}>
+              <EuiFlexItem
+                grow={false}
+                style={{ marginTop: 10, marginLeft: 4 }}
+              >
                 <EuiToolTip position='top' content='Unpin agent'>
                   <EuiButtonIcon
                     color='danger'
                     onClick={() => this.unselectAgents()}
-                    iconType="pinFilled"
-                    aria-label="unpin agent"
+                    iconType='pinFilled'
+                    aria-label='unpin agent'
                   />
                 </EuiToolTip>
               </EuiFlexItem>
             </EuiFlexGroup>
-            <EuiSpacer size="m" />
+            <EuiSpacer size='m' />
           </Fragment>
         )}
 
@@ -196,7 +212,7 @@ export class AgentSelectionTable extends Component {
           tableColumns={this.columns}
           tableInitialSortingField='id'
           tablePageSizeOptions={[10, 25, 50, 100]}
-          mapResponseItem={(item) => {
+          mapResponseItem={item => {
             return {
               ...item,
               /*
@@ -204,9 +220,8 @@ export class AgentSelectionTable extends Component {
               v<NUMBER><ANYTHING>
               */
               ...(typeof item.version === 'string'
-                ? {version: item.version.match(/(v\d.+)/)?.[1]}
-                : {version: '-'}
-              )
+                ? { version: item.version.match(/(v\d.+)/)?.[1] }
+                : { version: '-' }),
             };
           }}
           rowProps={getRowProps}
@@ -217,31 +232,58 @@ export class AgentSelectionTable extends Component {
             suggestions: {
               field(currentValue) {
                 return [
-                  {label: 'id', description: 'filter by id'},
-                  {label: 'group', description: 'filter by group'},
-                  {label: 'name', description: 'filter by name'},
-                  {label: 'os.name', description: 'filter by operating system name'},
-                  {label: 'os.version', description: 'filter by operating system version'},
-                  {label: 'status', description: 'filter by status'},
-                  {label: 'version', description: 'filter by version'},
+                  { label: 'id', description: 'filter by id' },
+                  { label: 'group', description: 'filter by group' },
+                  { label: 'name', description: 'filter by name' },
+                  {
+                    label: 'os.name',
+                    description: 'filter by operating system name',
+                  },
+                  {
+                    label: 'os.version',
+                    description: 'filter by operating system version',
+                  },
+                  { label: 'status', description: 'filter by status' },
+                  { label: 'version', description: 'filter by version' },
                 ];
               },
               value: async (currentValue, { field }) => {
-                try{
+                try {
                   switch (field) {
                     case 'status':
-                      return UI_ORDER_AGENT_STATUS.map(status => ({label: status}))
-                      break;
-                    default:
-                      return (await getAgentFilterValues(field, currentValue, { q: 'id!=000'}))
-                        .map(status => ({label: status}));
-                      break;
+                      return UI_ORDER_AGENT_STATUS.map(status => ({
+                        label: status,
+                      }));
+                    default: {
+                      const response = await WzRequest.apiReq(
+                        'GET',
+                        '/agents',
+                        {
+                          params: {
+                            distinct: true,
+                            limit: 30,
+                            select: field,
+                            sort: `+${field}`,
+                            ...(currentValue
+                              ? {
+                                  q: `${searchBarWQLOptions.implicitQuery.query}${searchBarWQLOptions.implicitQuery.conjunction}${field}~${currentValue}`,
+                                }
+                              : {
+                                  q: `${searchBarWQLOptions.implicitQuery.query}`,
+                                }),
+                          },
+                        },
+                      );
+                      return response?.data?.data.affected_items.map(item => ({
+                        label: getLodash(item, field),
+                      }));
+                    }
                   }
-                }catch(error){
+                } catch (error) {
                   return [];
-                };
+                }
               },
-            }
+            },
           }}
         />
       </div>
