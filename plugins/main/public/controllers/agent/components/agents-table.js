@@ -409,9 +409,9 @@ export const AgentsTable = withErrorBoundary(
                           return [
                             AGENT_SYNCED_STATUS.SYNCED,
                             AGENT_SYNCED_STATUS.NOT_SYNCED,
-                          ].map(label => {
-                            label;
-                          });
+                          ].map(label => ({
+                            label,
+                          }));
                         default: {
                           const response = await WzRequest.apiReq(
                             'GET',
