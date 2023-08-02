@@ -1,0 +1,57 @@
+{
+  "data": {
+    "affected_items": [
+      {
+        "id": 1,
+        "username": "wazuh",
+        "allow_run_as": true,
+        "roles": [1]
+      },
+      {
+        "id": 2,
+        "username": "wazuh-wui",
+        "allow_run_as": true,
+        "roles": []
+      },
+      {
+        "id": 3,
+        "username": "administrator",
+        "allow_run_as": true,
+        "roles": [2]
+      },
+      {
+        "id": 4,
+        "username": "guest",
+        "allow_run_as": false,
+        "roles": []
+      },
+      {
+        "id": 5,
+        "username": "normal",
+        "allow_run_as": false,
+        "roles": [4, 5, 6]
+      },
+      {
+        "id": 6,
+        "username": "ossec",
+        "allow_run_as": true,
+        "roles": [2, 5]
+      },
+      {
+        "id": 7,
+        "username": "rbac",
+        "allow_run_as": false,
+        "roles": [3, 4, 5]
+      },
+      {
+        "id": 101,
+        "username": "custom_user",
+        "allow_run_as": true,
+        "roles": []
+      }
+    ],
+    "total_affected_items": 8,
+    "total_failed_items": 0,
+    "failed_items": []
+  }
+}
