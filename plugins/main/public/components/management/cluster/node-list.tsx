@@ -12,10 +12,10 @@ import { TableWzAPI } from '../../common/tables';
 import { WzRequest } from '../../../react-services';
 
 const searchBarWQLFieldSuggestions = [
+  { label: 'ip', description: 'filter by IP address' },
   { label: 'name', description: 'filter by name' },
-  { label: 'version', description: 'filter by version' },
-  { label: 'ip', description: 'filter by ip' },
   { label: 'type', description: 'filter by type' },
+  { label: 'version', description: 'filter by version' },
 ];
 
 export const NodeList = withErrorBoundary(
