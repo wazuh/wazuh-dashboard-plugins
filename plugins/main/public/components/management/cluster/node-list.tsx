@@ -9,6 +9,7 @@ import {
 } from '@elastic/eui';
 import { withErrorBoundary } from '../../common/hocs';
 import { TableWzAPI } from '../../common/tables';
+import { WzRequest } from '../../../react-services';
 
 const searchBarWQLFieldSuggestions = [
   { label: 'name', description: 'filter by name' },
@@ -98,8 +99,26 @@ export const NodeList = withErrorBoundary(
                     },
                     value: async (currentValue, { field }) => {
                       try {
-                        // TODO: distinct
-                        return [];
+                        const response = await WzRequest.apiReq(
+                          'GET',
+                          '/cluster/nodes',
+                          {
+                            params: {
+                              distinct: true,
+                              limit: 30,
+                              select: field,
+                              sort: `+${field}`,
+                              ...(currentValue
+                                ? { q: `${field}~${currentValue}` }
+                                : {}),
+                            },
+                          },
+                        );
+                        return response?.data?.data.affected_items.map(
+                          item => ({
+                            label: item[field],
+                          }),
+                        );
                       } catch (error) {
                         return [];
                       }
