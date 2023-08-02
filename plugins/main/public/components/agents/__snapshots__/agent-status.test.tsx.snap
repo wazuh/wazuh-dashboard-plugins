@@ -1,0 +1,260 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AgentStatus component Renders status indicator with the its color and the label in lower case - {"status":"active","color":"#007871","label":"Active","agent":{"status_code":0}} 1`] = `
+<div
+  class="euiFlexGroup euiFlexGroup--gutterExtraSmall euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow"
+>
+  <span
+    class="euiToolTipAnchor"
+  >
+    <div
+      class="euiHealth euiHealth--textSizeS wz-flex"
+    >
+      <div
+        class="euiFlexGroup euiFlexGroup--gutterExtraSmall euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow"
+      >
+        <div
+          class="euiFlexItem euiFlexItem--flexGrowZero"
+        >
+          <svg
+            aria-hidden="true"
+            class="euiIcon euiIcon--medium euiIcon--customColor euiIcon-isLoading"
+            focusable="false"
+            height="16"
+            role="img"
+            style="color:#007871"
+            viewBox="0 0 16 16"
+            width="16"
+            xmlns="http://www.w3.org/2000/svg"
+          />
+        </div>
+        <div
+          class="euiFlexItem euiFlexItem--flexGrowZero"
+        />
+      </div>
+    </div>
+  </span>
+  <span
+    class="hide-agent-status"
+  >
+    active
+  </span>
+  <span
+    class="euiToolTipAnchor wz-margin-left-10"
+  >
+    <svg
+      aria-hidden="true"
+      aria-label="Description"
+      class="euiIcon euiIcon--medium euiIcon--primary euiIcon-isLoading"
+      focusable="true"
+      height="16"
+      role="img"
+      tabindex="0"
+      viewBox="0 0 16 16"
+      width="16"
+      xmlns="http://www.w3.org/2000/svg"
+    />
+  </span>
+</div>
+`;
+
+exports[`AgentStatus component Renders status indicator with the its color and the label in lower case - {"status":"disconnected","color":"#BD271E","label":"Disconnected","agent":{"status_code":1}} 1`] = `
+<div
+  class="euiFlexGroup euiFlexGroup--gutterExtraSmall euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow"
+>
+  <span
+    class="euiToolTipAnchor"
+  >
+    <div
+      class="euiHealth euiHealth--textSizeS wz-flex"
+    >
+      <div
+        class="euiFlexGroup euiFlexGroup--gutterExtraSmall euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow"
+      >
+        <div
+          class="euiFlexItem euiFlexItem--flexGrowZero"
+        >
+          <svg
+            aria-hidden="true"
+            class="euiIcon euiIcon--medium euiIcon--customColor"
+            focusable="false"
+            height="16"
+            role="img"
+            style="color:#BD271E"
+            viewBox="0 0 16 16"
+            width="16"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle
+              cx="8"
+              cy="8"
+              r="4"
+            />
+          </svg>
+        </div>
+        <div
+          class="euiFlexItem euiFlexItem--flexGrowZero"
+        />
+      </div>
+    </div>
+  </span>
+  <span
+    class="hide-agent-status"
+  >
+    disconnected
+  </span>
+  <span
+    class="euiToolTipAnchor wz-margin-left-10"
+  >
+    <svg
+      aria-label="Description"
+      class="euiIcon euiIcon--medium euiIcon--primary"
+      focusable="true"
+      height="16"
+      role="img"
+      tabindex="0"
+      viewBox="0 0 16 16"
+      width="16"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M8 14A6 6 0 118 2a6 6 0 010 12zm0-1A5 5 0 108 3a5 5 0 000 10zm-.186-1.065A.785.785 0 017 11.12c0-.48.34-.82.814-.82.475 0 .809.34.809.82 0 .475-.334.815-.809.815zM5.9 6.317C5.96 5.168 6.755 4.4 8.048 4.4c1.218 0 2.091.759 2.091 1.8 0 .736-.36 1.304-1.03 1.707-.56.33-.717.56-.717 1.022v.305l-.1.1H7.47l-.1-.1v-.431c-.005-.646.302-1.104.987-1.514.527-.322.708-.59.708-1.047 0-.536-.416-.91-1.05-.91-.652 0-1.064.374-1.112.998l-.1.092H6l-.1-.105z"
+      />
+    </svg>
+  </span>
+</div>
+`;
+
+exports[`AgentStatus component Renders status indicator with the its color and the label in lower case - {"status":"never_connected","color":"#646A77","label":"Never connected","agent":{"status_code":3}} 1`] = `
+<div
+  class="euiFlexGroup euiFlexGroup--gutterExtraSmall euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow"
+>
+  <span
+    class="euiToolTipAnchor"
+  >
+    <div
+      class="euiHealth euiHealth--textSizeS wz-flex"
+    >
+      <div
+        class="euiFlexGroup euiFlexGroup--gutterExtraSmall euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow"
+      >
+        <div
+          class="euiFlexItem euiFlexItem--flexGrowZero"
+        >
+          <svg
+            aria-hidden="true"
+            class="euiIcon euiIcon--medium euiIcon--customColor"
+            focusable="false"
+            height="16"
+            role="img"
+            style="color:#646A77"
+            viewBox="0 0 16 16"
+            width="16"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle
+              cx="8"
+              cy="8"
+              r="4"
+            />
+          </svg>
+        </div>
+        <div
+          class="euiFlexItem euiFlexItem--flexGrowZero"
+        />
+      </div>
+    </div>
+  </span>
+  <span
+    class="hide-agent-status"
+  >
+    never connected
+  </span>
+  <span
+    class="euiToolTipAnchor wz-margin-left-10"
+  >
+    <svg
+      aria-label="Description"
+      class="euiIcon euiIcon--medium euiIcon--primary"
+      focusable="true"
+      height="16"
+      role="img"
+      tabindex="0"
+      viewBox="0 0 16 16"
+      width="16"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M8 14A6 6 0 118 2a6 6 0 010 12zm0-1A5 5 0 108 3a5 5 0 000 10zm-.186-1.065A.785.785 0 017 11.12c0-.48.34-.82.814-.82.475 0 .809.34.809.82 0 .475-.334.815-.809.815zM5.9 6.317C5.96 5.168 6.755 4.4 8.048 4.4c1.218 0 2.091.759 2.091 1.8 0 .736-.36 1.304-1.03 1.707-.56.33-.717.56-.717 1.022v.305l-.1.1H7.47l-.1-.1v-.431c-.005-.646.302-1.104.987-1.514.527-.322.708-.59.708-1.047 0-.536-.416-.91-1.05-.91-.652 0-1.064.374-1.112.998l-.1.092H6l-.1-.105z"
+      />
+    </svg>
+  </span>
+</div>
+`;
+
+exports[`AgentStatus component Renders status indicator with the its color and the label in lower case - {"status":"pending","color":"#FEC514","label":"Pending","agent":{"status_code":2}} 1`] = `
+<div
+  class="euiFlexGroup euiFlexGroup--gutterExtraSmall euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow"
+>
+  <span
+    class="euiToolTipAnchor"
+  >
+    <div
+      class="euiHealth euiHealth--textSizeS wz-flex"
+    >
+      <div
+        class="euiFlexGroup euiFlexGroup--gutterExtraSmall euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow"
+      >
+        <div
+          class="euiFlexItem euiFlexItem--flexGrowZero"
+        >
+          <svg
+            aria-hidden="true"
+            class="euiIcon euiIcon--medium euiIcon--customColor"
+            focusable="false"
+            height="16"
+            role="img"
+            style="color:#FEC514"
+            viewBox="0 0 16 16"
+            width="16"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle
+              cx="8"
+              cy="8"
+              r="4"
+            />
+          </svg>
+        </div>
+        <div
+          class="euiFlexItem euiFlexItem--flexGrowZero"
+        />
+      </div>
+    </div>
+  </span>
+  <span
+    class="hide-agent-status"
+  >
+    pending
+  </span>
+  <span
+    class="euiToolTipAnchor wz-margin-left-10"
+  >
+    <svg
+      aria-label="Description"
+      class="euiIcon euiIcon--medium euiIcon--primary"
+      focusable="true"
+      height="16"
+      role="img"
+      tabindex="0"
+      viewBox="0 0 16 16"
+      width="16"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M8 14A6 6 0 118 2a6 6 0 010 12zm0-1A5 5 0 108 3a5 5 0 000 10zm-.186-1.065A.785.785 0 017 11.12c0-.48.34-.82.814-.82.475 0 .809.34.809.82 0 .475-.334.815-.809.815zM5.9 6.317C5.96 5.168 6.755 4.4 8.048 4.4c1.218 0 2.091.759 2.091 1.8 0 .736-.36 1.304-1.03 1.707-.56.33-.717.56-.717 1.022v.305l-.1.1H7.47l-.1-.1v-.431c-.005-.646.302-1.104.987-1.514.527-.322.708-.59.708-1.047 0-.536-.416-.91-1.05-.91-.652 0-1.064.374-1.112.998l-.1.092H6l-.1-.105z"
+      />
+    </svg>
+  </span>
+</div>
+`;

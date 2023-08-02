@@ -339,6 +339,35 @@ export const AGENT_SYNCED_STATUS = {
   NOT_SYNCED: 'not synced',
 }
 
+// The status code can be seen here https://github.com/wazuh/wazuh/blob/686068a1f05d806b2e3b3d633a765320ae7ae114/src/wazuh_db/wdb.h#L55-L61
+
+export const AGENT_STATUS_CODE = [
+  {
+    STATUS_CODE: 0,
+    STATUS_DESCRIPTION: 'Agent is connected',
+  },
+  {
+    STATUS_CODE: 1,
+    STATUS_DESCRIPTION: 'Invalid agent version',
+  },
+  {
+    STATUS_CODE: 2,
+    STATUS_DESCRIPTION: 'Error retrieving version',
+  },
+  {
+    STATUS_CODE: 3,
+    STATUS_DESCRIPTION: 'Shutdown message received',
+  },
+  {
+    STATUS_CODE: 4,
+    STATUS_DESCRIPTION: 'Disconnected because no keepalive received',
+  },
+  {
+    STATUS_CODE: 5,
+    STATUS_DESCRIPTION: 'Connection reset by manager',
+  },
+];
+
 // Documentation
 export const DOCUMENTATION_WEB_BASE_URL = "https://documentation.wazuh.com";
 

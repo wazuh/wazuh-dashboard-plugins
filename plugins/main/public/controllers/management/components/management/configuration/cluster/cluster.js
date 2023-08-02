@@ -14,14 +14,14 @@ import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
-import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzNoConfig from '../util-components/no-config';
-
 import withWzConfig from '../util-hocs/wz-config';
 import { isString } from '../utils/utils';
 
 import { connect } from 'react-redux';
 import { compose } from 'redux';
+
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
 const mainSettings = [
@@ -72,17 +72,15 @@ class WzCluster extends Component {
           )}
         {currentConfig['com-cluster'] &&
           !isString(currentConfig['com-cluster']) && (
-            <WzConfigurationSettingsTabSelector
+            <WzConfigurationSettingsHeader
               title="Main settings"
-              currentConfig={currentConfig}
-              minusHeight={260}
-              helpLinks={helpLinks}
+              help={helpLinks}
             >
               <WzConfigurationSettingsGroup
                 config={mainSettingsConfig}
                 items={mainSettings}
               />
-            </WzConfigurationSettingsTabSelector>
+            </WzConfigurationSettingsHeader>
           )}
       </Fragment>
     );
@@ -96,7 +94,6 @@ const mapStateToProps = state => ({
 });
 
 WzCluster.propTypes = {
-  // currentConfig: PropTypes.object.isRequired
   wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string])
 };
 

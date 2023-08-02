@@ -11,6 +11,7 @@
  */
 
 import React, { useEffect, useMemo } from 'react';
+
 import WzNoConfig from '../util-components/no-config';
 import withWzConfig from '../util-hocs/wz-config';
 import { wodleBuilder } from '../utils/builders';

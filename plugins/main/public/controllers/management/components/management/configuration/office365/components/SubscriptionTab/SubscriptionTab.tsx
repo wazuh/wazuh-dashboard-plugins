@@ -11,8 +11,10 @@
  */
 
 import React from 'react';
+
 import { EuiBasicTable } from '@elastic/eui';
-import WzConfigurationSettingsTabSelector from '../../../util-components/configuration-settings-tab-selector';
+
+import WzConfigurationSettingsHeader from '../../../util-components/configuration-settings-header';
 import { HELP_LINKS, OFFICE_365 } from '../../constants';
 
 export type SubscriptionTabProps = {
@@ -24,16 +26,14 @@ export const SubscriptionTab = ({ agent, wodleConfiguration }: SubscriptionTabPr
   const columns = [{ field: 'subscription', name: 'Name' }];
 
   return (
-    <WzConfigurationSettingsTabSelector
+    <WzConfigurationSettingsHeader
       title="Subscriptions list"
-      currentConfig={wodleConfiguration}
-      minusHeight={agent.id === '000' ? 370 : 320}
-      helpLinks={HELP_LINKS}
+      help={HELP_LINKS}
     >
       <EuiBasicTable
         columns={columns}
         items={wodleConfiguration[OFFICE_365].subscriptions.map((item) => ({ subscription: item }))}
       />
-    </WzConfigurationSettingsTabSelector>
+    </WzConfigurationSettingsHeader>
   );
 };

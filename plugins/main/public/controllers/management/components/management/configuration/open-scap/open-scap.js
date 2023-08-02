@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 
 import WzTabSelector, {
   WzTabSelectorTab
@@ -63,10 +63,6 @@ const mapStateToProps = state => ({
 });
 
 const sections = [{ component: 'wmodules', configuration: 'wmodules' }];
-
-WzConfigurationOpenSCAP.propTypes = {
-  // currentConfig: PropTypes.object.isRequired
-};
 
 export default compose(
   connect(mapStateToProps),

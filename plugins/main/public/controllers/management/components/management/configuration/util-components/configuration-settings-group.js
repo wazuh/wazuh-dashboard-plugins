@@ -32,23 +32,15 @@ class WzSettingsGroup extends Component {
       config,
       description,
       items,
-      json,
       help,
-      title,
-      settings,
-      viewSelected,
-      xml
+      title
     } = this.props;
     return (
       <Fragment>
         <WzConfigurationSettingsHeader
           title={title}
           description={description}
-          settings={settings}
-          json={json}
-          xml={xml}
           help={help}
-          viewSelected={viewSelected}
         />
         <EuiSpacer size="s" />
         <EuiFlexGroup>
@@ -64,8 +56,8 @@ class WzSettingsGroup extends Component {
                   keyItem={keyItem}
                   label={
                     item.renderLabel
-                    ? item.renderLabel(value, item, config)
-                    : item.label
+                      ? item.renderLabel(value, item, config)
+                      : item.label
                   }
                   value={
                     item.render
