@@ -370,7 +370,7 @@ export const AgentsTable = withErrorBoundary(
                       { label: 'group', description: 'filter by group' },
                       {
                         label: 'group_config_status',
-                        description: 'filter by synced',
+                        description: 'filter by group configuration status',
                       },
                       {
                         label: 'lastKeepAlive',
