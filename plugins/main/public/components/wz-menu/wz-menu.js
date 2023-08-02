@@ -859,7 +859,7 @@ export const WzMenu = withWindowSize(class WzMenu extends Component {
           {/*this.state.hover === 'overview' */this.state.isOverviewPopoverOpen && currentAgent.id && (
             <EuiFlexGroup className="wz-menu-agent-info">
               <EuiFlexItem style={{ margin: "16px 16px 0 16px" }}>
-                <AgentStatus status={currentAgent.status}>
+                <AgentStatus status={currentAgent.status} agent={currentAgent}>
                   <WzTextWithTooltipIfTruncated position='bottom' elementStyle={{ maxWidth: "400px", height: 16 }}>
                     {currentAgent.name}
                   </WzTextWithTooltipIfTruncated>

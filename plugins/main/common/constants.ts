@@ -345,32 +345,26 @@ export const AGENT_STATUS_CODE = [
   {
     STATUS_CODE: 0,
     STATUS_DESCRIPTION: 'Agent is connected',
-    COLOR: 'success',
   },
   {
     STATUS_CODE: 1,
     STATUS_DESCRIPTION: 'Invalid agent version',
-    COLOR: 'danger',
   },
   {
     STATUS_CODE: 2,
     STATUS_DESCRIPTION: 'Error retrieving version',
-    COLOR: 'danger',
   },
   {
     STATUS_CODE: 3,
     STATUS_DESCRIPTION: 'Shutdown message received',
-    COLOR: 'danger',
   },
   {
     STATUS_CODE: 4,
     STATUS_DESCRIPTION: 'Disconnected because no keepalive received',
-    COLOR: 'danger',
   },
   {
     STATUS_CODE: 5,
     STATUS_DESCRIPTION: 'Connection reset by manager',
-    COLOR: 'danger',
   },
 ];
 

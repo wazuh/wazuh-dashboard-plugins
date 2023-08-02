@@ -49,7 +49,6 @@ import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { AgentStatus } from '../../../components/agents/agent-status';
 import { AgentSynced } from '../../../components/agents/agent-synced';
-import { AgentStatusCode } from '../../../components/agents/agent-status-code';
 
 export const AgentsTable = withErrorBoundary(
   class AgentsTable extends Component {
@@ -595,14 +594,9 @@ export const AgentsTable = withErrorBoundary(
         truncateText: true,
         sortable: true,
         show: true,
-        render: status => <AgentStatus status={status} />,
-      },
-      {
-        field: 'status_code',
-        name: 'Status detail',
-        sortable: true,
-        show: true,
-        render: statusCode => <AgentStatusCode statusCode={statusCode} />,
+        render: (status, agent) => (
+          <AgentStatus status={status} agent={agent} />
+        ),
       },
       {
         field: 'group_config_status',

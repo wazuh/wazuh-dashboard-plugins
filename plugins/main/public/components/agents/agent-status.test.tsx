@@ -9,22 +9,25 @@ import {
 
 describe('AgentStatus component', () => {
   test.each(
-    UI_ORDER_AGENT_STATUS.map(status => ({
+    UI_ORDER_AGENT_STATUS.map((status, index) => ({
       status,
       color: UI_COLOR_AGENT_STATUS[status],
       label: UI_LABEL_NAME_AGENT_STATUS[status],
+      agent: { status_code: index },
     })),
   )(
     'Renders status indicator with the its color and the label in lower case - %j',
     input => {
-      const wrapper = render(<AgentStatus status={input.status} />);
+      const wrapper = render(
+        <AgentStatus status={input.status} agent={input.agent} />,
+      );
 
       expect(wrapper).toMatchSnapshot();
       expect(wrapper.find('svg').prop('style')).toHaveProperty(
         'color',
         input.color,
       );
-      expect(wrapper.find('span').last().text()).toEqual(
+      expect(wrapper.find('.hide-agent-status').text()).toEqual(
         input.label.toLowerCase(),
       );
     },

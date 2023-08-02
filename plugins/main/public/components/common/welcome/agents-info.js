@@ -125,6 +125,7 @@ export class AgentInfo extends Component {
               ) : item.description === 'Status' ? (
                 <AgentStatus
                   status={this.props.agent.status}
+                  agent={this.props.agent}
                   style={{ ...item.style, fontSize: '12px' }}
                 />
               ) : (
