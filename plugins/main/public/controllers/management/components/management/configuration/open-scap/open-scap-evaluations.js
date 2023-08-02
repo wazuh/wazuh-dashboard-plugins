@@ -14,7 +14,7 @@ import React, { Component, Fragment } from 'react';
 
 import { EuiBasicTable } from '@elastic/eui';
 
-import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzNoConfig from '../util-components/no-config';
 import { isString } from '../utils/utils';
 import helpLinks from './help-links';
@@ -62,26 +62,20 @@ class WzConfigurationOpenScapEvaluations extends Component {
             <WzNoConfig error="not-present" help={helpLinks} />
           )}
         {wodleConfig['open-scap'] && wodleConfig['open-scap'].content && (
-          <WzConfigurationSettingsTabSelector
+          <WzConfigurationSettingsHeader
             title="Evaluations"
             description="Scans executed according to specific security policies and their profiles"
-            currentConfig={wodleConfig}
-            minusHeight={this.props.agent.id === '000' ? 320 : 415}
-            helpLinks={helpLinks}
+            help={helpLinks}
           >
             <EuiBasicTable
               columns={columns}
               items={wodleConfig['open-scap'].content}
             />
-          </WzConfigurationSettingsTabSelector>
+          </WzConfigurationSettingsHeader>
         )}
       </Fragment>
     );
   }
 }
-
-WzConfigurationOpenScapEvaluations.propTypes = {
-  // currentConfig: PropTypes.object.isRequired
-};
 
 export default WzConfigurationOpenScapEvaluations;
