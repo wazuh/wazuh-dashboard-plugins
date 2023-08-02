@@ -30,6 +30,7 @@ import {
   validateServerAddress,
   validateAgentName,
 } from '../../utils/validations';
+import { getPasswordWithScapedSpecialCharacters } from '../../services/wazuh-password-service';
 
 interface IRegisterAgentProps {
   getWazuhVersion: () => Promise<string>;
@@ -121,14 +122,13 @@ export const RegisterAgent = withReduxProvider(
           const authInfo = await getAuthInfo();
           // get wazuh password configuration
           let wazuhPassword = '';
-          //const needsPassword = (authInfo.auth || {}).use_password === 'yes';
-          const needsPassword = true;
+          const needsPassword = (authInfo.auth || {}).use_password === 'yes';
           if (needsPassword) {
-            /*wazuhPassword =
+            wazuhPassword =
               configuration['enrollment.password'] ||
               authInfo['authd.pass'] ||
-              '';*/
-            wazuhPassword = `password"with"singlequote`;
+              '';
+            wazuhPassword = getPasswordWithScapedSpecialCharacters(wazuhPassword);
           }
           const groups = await getGroups();
           setNeedsPassword(needsPassword);

@@ -211,17 +211,7 @@ export const Steps = ({
               showCommand={showCommandsSections(form.fields)}
               os={registerAgentFormValues.operatingSystem.name}
               onCopy={() => setInstallCommandWasCopied(true)}
-              password={
-                registerAgentFormValues.operatingSystem.name === 'macOS'
-                  ? getPasswordForCommand(
-                      registerAgentFormValues.optionalParams.wazuhPassword,
-                      'doublequote',
-                    )
-                  : getPasswordForCommand(
-                      registerAgentFormValues.optionalParams.wazuhPassword,
-                      'singlequote',
-                    )
-              }
+              password={registerAgentFormValues.optionalParams.wazuhPassword}
             />
           ) : null}
         </>
