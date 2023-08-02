@@ -189,7 +189,7 @@ export function tokenizer(input: string): ITokens {
         value,
         ...(key === 'value' && value && /^"(.+)"$/.test(value)
           ? { formattedValue: value.match(/^"(.+)"$/)[1] }
-          : {}),
+          : { formattedValue: value }),
       })),
     )
     .flat();
@@ -431,7 +431,7 @@ export async function getSuggestions(
       }
 
       return [
-        ...(lastToken.value
+        ...(lastToken.formattedValue
           ? [
               {
                 type: 'function_search',
@@ -441,7 +441,7 @@ export async function getSuggestions(
             ]
           : []),
         ...(
-          await options.suggestions.value(lastToken.value, {
+          await options.suggestions.value(lastToken.formattedValue, {
             field,
             operatorCompare,
           })
