@@ -22,7 +22,7 @@ type ITokenType =
   | 'value'
   | 'conjunction'
   | 'whitespace';
-type IToken = { type: ITokenType; value: string };
+type IToken = { type: ITokenType; value: string; formattedValue?: string };
 type ITokens = IToken[];
 
 /* API Query Language
@@ -187,9 +187,10 @@ export function tokenizer(input: string): ITokens {
           ? 'whitespace'
           : key,
         value,
-        ...(key === 'value' && value && /^"(.+)"$/.test(value)
-          ? { formattedValue: value.match(/^"(.+)"$/)[1] }
-          : { formattedValue: value }),
+        ...(key === 'value' &&
+          (value && /^"([\s\S]+)"$/.test(value)
+            ? { formattedValue: value.match(/^"([\s\S]+)"$/)[1] }
+            : { formattedValue: value })),
       })),
     )
     .flat();
@@ -601,16 +602,20 @@ export function transformSpecificQLToUnifiedQL(
   }
 
   return tokens
-    .filter(({ type, value }) => type !== 'whitespace' && value)
-    .map(({ type, value }) => {
+    .filter(
+      ({ type, value, formattedValue }) =>
+        type !== 'whitespace' && (formattedValue ?? value),
+    )
+    .map(({ type, value, formattedValue }) => {
       switch (type) {
         case 'value': {
-          // Value is wrapped with "
-          let [_, extractedValue] = value.match(/^"(.+)"$/) || [null, null];
-          // Replace the escaped comma (\") by comma (")
+          // If the value is wrapped with ", then replace the escaped double quotation mark (\")
+          // by double quotation marks (")
           // WARN: This could cause a problem with value that contains this sequence \"
-          extractedValue &&
-            (extractedValue = extractedValue.replace(/\\"/g, '"'));
+          const extractedValue =
+            formattedValue !== value
+              ? formattedValue.replace(/\\"/g, '"')
+              : formattedValue;
           return extractedValue || value;
           break;
         }
@@ -695,7 +700,7 @@ function validateTokenValue(token: IToken): string | undefined {
     : [
         `"${token.value}" is not a valid value.`,
         ...(invalidCharacters.length
-          ? [`Invalid characters found: ${invalidCharacters.join(', ')}`]
+          ? [`Invalid characters found: ${invalidCharacters.join('')}`]
           : []),
       ].join(' ');
 }
