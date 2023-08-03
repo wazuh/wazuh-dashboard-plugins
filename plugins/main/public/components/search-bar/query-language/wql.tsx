@@ -7,7 +7,7 @@ import {
   EuiCode,
 } from '@elastic/eui';
 import { tokenizer as tokenizerUQL } from './aql';
-import { PLUGIN_VERSION_SHORT } from '../../../../common/constants';
+import { PLUGIN_VERSION } from '../../../../common/constants';
 
 /* UI Query language
 https://documentation.wazuh.com/current/user-manual/api/queries.html
@@ -22,7 +22,7 @@ type ITokenType =
   | 'value'
   | 'conjunction'
   | 'whitespace';
-type IToken = { type: ITokenType; value: string };
+type IToken = { type: ITokenType; value: string; formattedValue?: string };
 type ITokens = IToken[];
 
 /* API Query Language
@@ -187,9 +187,10 @@ export function tokenizer(input: string): ITokens {
           ? 'whitespace'
           : key,
         value,
-        ...(key === 'value' && value && /^"(.+)"$/.test(value)
-          ? { formattedValue: value.match(/^"(.+)"$/)[1] }
-          : {}),
+        ...(key === 'value' &&
+          (value && /^"([\s\S]+)"$/.test(value)
+            ? { formattedValue: value.match(/^"([\s\S]+)"$/)[1] }
+            : { formattedValue: value })),
       })),
     )
     .flat();
@@ -431,7 +432,7 @@ export async function getSuggestions(
       }
 
       return [
-        ...(lastToken.value
+        ...(lastToken.formattedValue
           ? [
               {
                 type: 'function_search',
@@ -441,7 +442,7 @@ export async function getSuggestions(
             ]
           : []),
         ...(
-          await options.suggestions.value(lastToken.value, {
+          await options.suggestions.value(lastToken.formattedValue, {
             field,
             operatorCompare,
           })
@@ -601,16 +602,20 @@ export function transformSpecificQLToUnifiedQL(
   }
 
   return tokens
-    .filter(({ type, value }) => type !== 'whitespace' && value)
-    .map(({ type, value }) => {
+    .filter(
+      ({ type, value, formattedValue }) =>
+        type !== 'whitespace' && (formattedValue ?? value),
+    )
+    .map(({ type, value, formattedValue }) => {
       switch (type) {
         case 'value': {
-          // Value is wrapped with "
-          let [_, extractedValue] = value.match(/^"(.+)"$/) || [null, null];
-          // Replace the escaped comma (\") by comma (")
+          // If the value is wrapped with ", then replace the escaped double quotation mark (\")
+          // by double quotation marks (")
           // WARN: This could cause a problem with value that contains this sequence \"
-          extractedValue &&
-            (extractedValue = extractedValue.replace(/\\"/g, '"'));
+          const extractedValue =
+            formattedValue !== value
+              ? formattedValue.replace(/\\"/g, '"')
+              : formattedValue;
           return extractedValue || value;
           break;
         }
@@ -695,7 +700,7 @@ function validateTokenValue(token: IToken): string | undefined {
     : [
         `"${token.value}" is not a valid value.`,
         ...(invalidCharacters.length
-          ? [`Invalid characters found: ${invalidCharacters.join(', ')}`]
+          ? [`Invalid characters found: ${invalidCharacters.join('')}`]
           : []),
       ].join(' ');
 }
@@ -895,7 +900,7 @@ export const WQL = {
   label: 'WQL',
   description:
     'WQL (Wazuh Query Language) provides a human query syntax based on the Wazuh API query language.',
-  documentationLink: `https://github.com/wazuh/wazuh-kibana-app/blob/v${PLUGIN_VERSION_SHORT}/public/components/search-bar/query-language/wql.md`,
+  documentationLink: `https://github.com/wazuh/wazuh-kibana-app/blob/v${PLUGIN_VERSION}/plugins/main/public/components/search-bar/query-language/wql.md`,
   getConfiguration() {
     return {
       isOpenPopoverImplicitFilter: false,
