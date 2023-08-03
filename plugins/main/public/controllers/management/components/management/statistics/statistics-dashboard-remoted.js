@@ -68,25 +68,6 @@ export function WzStatisticsRemoted({
         <EuiFlexItem>
           <EuiPanel style={{ height: '400px' }}>
             <EuiFlexGroup>
-              <EuiFlexItem>Messages statistics</EuiFlexItem>
-            </EuiFlexGroup>
-            <EuiFlexGroup>
-              <EuiFlexItem>
-                <div style={{ height: '343px' }}>
-                  <WzReduxProvider>
-                    <KibanaVis
-                      visID={'Wazuh-App-Statistics-remoted-messages'}
-                      tab={'statistics'}
-                    ></KibanaVis>
-                  </WzReduxProvider>
-                </div>
-              </EuiFlexItem>
-            </EuiFlexGroup>
-          </EuiPanel>
-        </EuiFlexItem>
-        <EuiFlexItem>
-          <EuiPanel style={{ height: '400px' }}>
-            <EuiFlexGroup>
               <EuiFlexItem>TCP sessions</EuiFlexItem>
             </EuiFlexGroup>
             <EuiFlexGroup>

@@ -215,25 +215,6 @@ export function WzStatisticsAnalysisd({
             </EuiFlexGroup>
           </EuiPanel>
         </EuiFlexItem>
-        <EuiFlexItem>
-          <EuiPanel style={{ height: '400px' }}>
-            <EuiFlexGroup>
-              <EuiFlexItem>Other</EuiFlexItem>
-            </EuiFlexGroup>
-            <EuiFlexGroup>
-              <EuiFlexItem>
-                <div style={{ height: '365px' }}>
-                  <WzReduxProvider>
-                    <KibanaVis
-                      visID={'Wazuh-App-Statistics-Analysisd-Other'}
-                      tab={'statistics'}
-                    ></KibanaVis>
-                  </WzReduxProvider>
-                </div>
-              </EuiFlexItem>
-            </EuiFlexGroup>
-          </EuiPanel>
-        </EuiFlexItem>
       </EuiFlexGroup>
     </div>
   );
