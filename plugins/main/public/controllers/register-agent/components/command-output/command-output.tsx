@@ -18,7 +18,7 @@ interface ICommandSectionProps {
 }
 
 export default function CommandOutput(props: ICommandSectionProps) {
-  const { commandText, showCommand, onCopy, os, password} = props;
+  const { commandText, showCommand, onCopy, os, password } = props;
   const getHighlightCodeLanguage = (os: 'WINDOWS' | string) => {
     if (os.toLowerCase() === 'windows') {
       return 'powershell';
@@ -44,32 +44,33 @@ export default function CommandOutput(props: ICommandSectionProps) {
       setHavePassword(false);
       setCommandToShow(commandText);
     }
-  }, [password, commandText, showPassword])
+  }, [password, commandText, showPassword]);
 
   const osdfucatePassword = (password: string) => {
-    if(!password) return;
-    if(!commandText) return;
+    if (!password) return;
+    if (!commandText) return;
 
-    if(showPassword){
+    if (showPassword) {
       setCommandToShow(commandText);
-    }else{
-    // search password in commandText and replace with * for every character
-      const findPassword = commandText.search(password);
-      if (findPassword > -1) {
-        let command = commandText;
-        setCommandToShow(command.replace(/WAZUH_REGISTRATION_PASSWORD='([^']+)'/,`WAZUH_REGISTRATION_PASSWORD='${'*'.repeat(password.length)}'`));
-      }
+    } else {
+      let command = commandText;
+      setCommandToShow(
+        command.replace(
+          `WAZUH_REGISTRATION_PASSWORD='${password}'`,
+          `WAZUH_REGISTRATION_PASSWORD='${'*'.repeat(password.length)}'`,
+        ),
+      );
     }
-  }
+  };
 
   const onChangeShowPassword = (event: EuiSwitchEvent) => {
     setShowPassword(event.target.checked);
-  }
+  };
 
   return (
     <Fragment>
       <EuiSpacer />
-      { password }
+      {password}
       <EuiText>
         <div className='copy-codeblock-wrapper'>
           <EuiCodeBlock
@@ -96,7 +97,13 @@ export default function CommandOutput(props: ICommandSectionProps) {
           )}
         </div>
         <EuiSpacer size='s' />
-        {showCommand && havePassword ? <EuiSwitch checked={showPassword} label='Show password' onChange={onChangeShowPassword}/> : null}
+        {showCommand && havePassword ? (
+          <EuiSwitch
+            checked={showPassword}
+            label='Show password'
+            onChange={onChangeShowPassword}
+          />
+        ) : null}
       </EuiText>
     </Fragment>
   );

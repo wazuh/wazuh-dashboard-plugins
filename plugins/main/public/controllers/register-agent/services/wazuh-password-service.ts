@@ -3,13 +3,7 @@ export const getPasswordWithScapedSpecialCharacters = (
 ) => {
   let passwordScaped = password;
   // the " characters is scaped by default in the password retrieved from the API
-  const specialCharsList = ["'"];
-  specialCharsList.forEach((specialChar) => {
-    // scape every special character defined in specialCharList with a backslash
-    passwordScaped = passwordScaped.replace(
-      new RegExp(specialChar, 'g'),
-      `\\${specialChar}`
-    );
-  });
-  return passwordScaped;
+  const specialCharsList = ["'", "`"];
+  const regex = new RegExp(`[${specialCharsList.join('')}]`, 'g');
+  return passwordScaped.replace(regex, `\\$&`);
 };
