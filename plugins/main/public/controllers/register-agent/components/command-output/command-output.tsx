@@ -19,13 +19,6 @@ interface ICommandSectionProps {
 
 export default function CommandOutput(props: ICommandSectionProps) {
   const { commandText, showCommand, onCopy, os, password } = props;
-  const getHighlightCodeLanguage = (os: 'WINDOWS' | string) => {
-    if (os.toLowerCase() === 'windows') {
-      return 'powershell';
-    } else {
-      return 'bash';
-    }
-  };
   const [havePassword, setHavePassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -54,12 +47,26 @@ export default function CommandOutput(props: ICommandSectionProps) {
       setCommandToShow(commandText);
     } else {
       let command = commandText;
-      setCommandToShow(
-        command.replace(
-          `WAZUH_REGISTRATION_PASSWORD='${password}'`,
-          `WAZUH_REGISTRATION_PASSWORD='${'*'.repeat(password.length)}'`,
-        ),
-      );
+      if (os?.toLocaleLowerCase() === 'macos') {
+        const regex = /WAZUH_REGISTRATION_PASSWORD='((?:\\'|[^'])*)'/g;
+        const replacedString = command.replace(
+          regex,
+          (match, capturedGroup) => {
+            return match.replace(
+              capturedGroup,
+              '*'.repeat(capturedGroup.length),
+            );
+          },
+        );
+        setCommandToShow(replacedString);
+      } else {
+        setCommandToShow(
+          command.replace(
+            `WAZUH_REGISTRATION_PASSWORD='${password}'`,
+            `WAZUH_REGISTRATION_PASSWORD='${'*'.repeat(password.length)}'`,
+          ),
+        );
+      }
     }
   };
 
@@ -70,14 +77,13 @@ export default function CommandOutput(props: ICommandSectionProps) {
   return (
     <Fragment>
       <EuiSpacer />
-      {JSON.stringify(password)}
       <EuiText>
         <div className='copy-codeblock-wrapper'>
           <EuiCodeBlock
             style={{
               zIndex: '100',
             }}
-            language={getHighlightCodeLanguage(os || '')}
+            language='tsx'
           >
             {showCommand ? commandToShow : ''}
           </EuiCodeBlock>

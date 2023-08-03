@@ -1,5 +1,4 @@
 import { getPasswordWithScapedSpecialCharacters } from './wazuh-password-service';
-
 describe('Wazuh Password Service', () => {
   // NOTE:
   //   The password constant must be written as it comes from the backend
@@ -9,7 +8,9 @@ describe('Wazuh Password Service', () => {
     ${"password'with'special'char`acters"}   | ${"password\\'with\\'special\\'char\\`acters"}
     ${'password"with"doublequ\'sds\\"es'}    | ${'password"with"doublequ\\\'sds\\"es'}
     ${'password"with"doub``le`qu\'sds\\"es'} | ${'password"with"doub\\`\\`le\\`qu\\\'sds\\"es'}
-    ${"password\"with\"doubleq\\'usds\\\"es"}| ${"password\"with\"doubleq\\\'usds\\\"es"}
+    ${"password\"with\"doubleq\\'usds\\\"es"} | ${"password\"with\"doubleq\\\'usds\\\"es"}
+    ${"password\"with\"doubleq\\\\'usds\\\"es"} | ${"password\"with\"doubleq\\\\\'usds\\\"es"}
+    ${"pas`sw\\`ord\"with\"doubleq\\\\'\\usds\\\"\\es"} | ${"pas\\`sw\\\`ord\"with\"doubleq\\\\\'\\usds\\\"\\es"}
   `(
     ' should return password received with scaped characters: $passwordFromAPI | $scapedPassword | $expectedScapedPassword',
     ({ passwordFromAPI, expectedScapedPassword }) => {
@@ -25,7 +26,6 @@ describe('Wazuh Password Service', () => {
         '\nPASSWORD SCAPED REAL IN COMMAND EXPECTED: ',
         expectedScapedPassword
       );
-
       expect(passwordScaped).toEqual(expectedScapedPassword);
     }
   );
