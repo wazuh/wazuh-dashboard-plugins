@@ -70,7 +70,7 @@ export default function CommandOutput(props: ICommandSectionProps) {
   return (
     <Fragment>
       <EuiSpacer />
-      {password}
+      {JSON.stringify(password)}
       <EuiText>
         <div className='copy-codeblock-wrapper'>
           <EuiCodeBlock
