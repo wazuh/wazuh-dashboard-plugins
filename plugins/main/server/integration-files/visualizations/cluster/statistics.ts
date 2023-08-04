@@ -2322,17 +2322,7 @@ export default [
           },
         },
       }),
-      uiStateJSON: JSON.stringify({
-        vis: {
-          colors: {
-            'Events processed by Node: - master-node': '#70DBED',
-            'Events processed by Node: - worker1': '#D683CE',
-            'Events processed by Node: - worker10': '#7EB26D',
-            'Events processed by Node: - worker11': '#EAB839',
-            'Events processed by Node: - worker12': '#705DA0',
-          },
-        },
-      }),
+      uiStateJSON: {},
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
@@ -2494,17 +2484,7 @@ export default [
           },
         },
       }),
-      uiStateJSON: JSON.stringify({
-        vis: {
-          colors: {
-            'Events dropped by Node: - master-node': '#70DBED',
-            'Events dropped by Node: - worker1': '#D683CE',
-            'Events dropped by Node: - worker10': '#7EB26D',
-            'Events dropped by Node: - worker11': '#EAB839',
-            'Events dropped by Node: - worker12': '#705DA0',
-          },
-        },
-      }),
+      uiStateJSON: {},
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
