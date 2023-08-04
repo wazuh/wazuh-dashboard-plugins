@@ -65,8 +65,10 @@ export function TableWzAPI({
   const [totalItems, setTotalItems] = useState(0);
   const [filters, setFilters] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-  const onFiltersChange = (filters) =>
-    typeof rest.onFiltersChange === 'function' ? rest.onFiltersChange(filters) : null;
+  const onFiltersChange = filters =>
+    typeof rest.onFiltersChange === 'function'
+      ? rest.onFiltersChange(filters)
+      : null;
 
   /**
    * Changing the reloadFootprint timestamp will trigger reloading the table
@@ -74,15 +76,22 @@ export function TableWzAPI({
   const [reloadFootprint, setReloadFootprint] = useState(rest.reload || 0);
 
   const [selectedFields, setSelectedFields] = useStateStorage(
-    rest.tableColumns.some(({show}) => show)
-      ? rest.tableColumns.filter(({show}) => show).map(({field}) => field)
-      : rest.tableColumns.map(({field}) => field),
+    rest.tableColumns.some(({ show }) => show)
+      ? rest.tableColumns.filter(({ show }) => show).map(({ field }) => field)
+      : rest.tableColumns.map(({ field }) => field),
     rest?.saveStateStorage?.system,
-    rest?.saveStateStorage?.key ? `${rest?.saveStateStorage?.key}-visible-fields` : undefined
+    rest?.saveStateStorage?.key
+      ? `${rest?.saveStateStorage?.key}-visible-fields`
+      : undefined,
   );
   const [isOpenFieldSelector, setIsOpenFieldSelector] = useState(false);
 
-  const onSearch = useCallback(async function (endpoint, filters, pagination, sorting) {
+  const onSearch = useCallback(async function (
+    endpoint,
+    filters,
+    pagination,
+    sorting,
+  ) {
     try {
       const { pageIndex, pageSize } = pagination;
       const { field, direction } = sorting.sort;
@@ -103,23 +112,25 @@ export function TableWzAPI({
       ).data;
       setIsLoading(false);
       setTotalItems(totalItems);
-      return { items: rest.mapResponseItem ? items.map(rest.mapResponseItem) : items, totalItems };
+      return {
+        items: rest.mapResponseItem ? items.map(rest.mapResponseItem) : items,
+        totalItems,
+      };
     } catch (error) {
       setIsLoading(false);
       setTotalItems(0);
-      const options = {
-        context: `${TableWithSearchBar.name}.useEffect`,
-        level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.BUSINESS,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: `${error.name}: Error searching items`,
-        },
-      };
-      getErrorOrchestrator().handleError(options);
+      if (error?.name) {
+        /* This replaces the error name. The intention is that an AxiosError
+          doesn't appear in the toast message.
+          TODO: This should be managed by the service that does the request instead of only changing
+          the name in this case.
+        */
+        error.name = 'RequestError';
+      }
+      throw error;
     }
-  }, []);
+  },
+  []);
 
   const renderActionButtons = (
     <>
@@ -148,10 +159,7 @@ export function TableWzAPI({
 
   const ReloadButton = (
     <EuiFlexItem grow={false}>
-      <EuiButtonEmpty
-        iconType="refresh"
-        onClick={() => triggerReload()}
-      >
+      <EuiButtonEmpty iconType='refresh' onClick={() => triggerReload()}>
         Refresh
       </EuiButtonEmpty>
     </EuiFlexItem>
@@ -160,16 +168,22 @@ export function TableWzAPI({
   const header = (
     <>
       <EuiFlexGroup wrap>
-        <EuiFlexItem className="wz-flex-basis-auto" grow={false}>
+        <EuiFlexItem className='wz-flex-basis-auto' grow={false}>
           {rest.title && (
-            <EuiTitle size="s">
+            <EuiTitle size='s'>
               <h1>
                 {rest.title}{' '}
-                {isLoading ? <EuiLoadingSpinner size="s" /> : <span>({totalItems})</span>}
+                {isLoading ? (
+                  <EuiLoadingSpinner size='s' />
+                ) : (
+                  <span>({totalItems})</span>
+                )}
               </h1>
             </EuiTitle>
           )}
-          {rest.description && <EuiText color="subdued">{rest.description}</EuiText>}
+          {rest.description && (
+            <EuiText color='subdued'>{rest.description}</EuiText>
+          )}
         </EuiFlexItem>
         <EuiFlexItem>
           <EuiFlexGroup wrap justifyContent={'flexEnd'} alignItems={'center'}>
@@ -183,14 +197,20 @@ export function TableWzAPI({
                 endpoint={rest.endpoint}
                 totalItems={totalItems}
                 filters={getFilters(filters)}
-                title={typeof rest.downloadCsv === 'string' ? rest.downloadCsv : rest.title}
+                title={
+                  typeof rest.downloadCsv === 'string'
+                    ? rest.downloadCsv
+                    : rest.title
+                }
               />
             )}
             {rest.showFieldSelector && (
               <EuiFlexItem grow={false}>
-                <EuiToolTip content="Select visible fields" position="left">
-                  <EuiButtonEmpty onClick={() => setIsOpenFieldSelector(state => !state)}>
-                    <EuiIcon type="managementApp" color="primary" />
+                <EuiToolTip content='Select visible fields' position='left'>
+                  <EuiButtonEmpty
+                    onClick={() => setIsOpenFieldSelector(state => !state)}
+                  >
+                    <EuiIcon type='managementApp' color='primary' />
                   </EuiButtonEmpty>
                 </EuiToolTip>
               </EuiFlexItem>
@@ -205,21 +225,20 @@ export function TableWzAPI({
               options={rest.tableColumns.map(item => ({
                 id: item.field,
                 label: item.name,
-                checked: selectedFields.includes(item.field)
+                checked: selectedFields.includes(item.field),
               }))}
-              onChange={(optionID) => {
+              onChange={optionID => {
                 setSelectedFields(state => {
-                  if(state.includes(optionID)){
-                    if(state.length > 1){
+                  if (state.includes(optionID)) {
+                    if (state.length > 1) {
                       return state.filter(field => field !== optionID);
                     }
                     return state;
-                  };
+                  }
                   return [...state, optionID];
-                }
-                )
+                });
               }}
-              className="columnsSelectedCheckboxs"
+              className='columnsSelectedCheckboxs'
               idToSelectedMap={{}}
             />
           </EuiFlexItem>
@@ -228,13 +247,22 @@ export function TableWzAPI({
     </>
   );
 
-  const tableColumns = rest.tableColumns
-    .filter(({field}) => selectedFields.includes(field));
+  const tableColumns = rest.tableColumns.filter(({ field }) =>
+    selectedFields.includes(field),
+  );
 
   const table = rest.searchTable ? (
-    <TableWithSearchBar onSearch={onSearch} {...{ ...rest, reload: reloadFootprint }} tableColumns={tableColumns} selectedFields={selectedFields}/>
+    <TableWithSearchBar
+      onSearch={onSearch}
+      {...{ ...rest, reload: reloadFootprint }}
+      tableColumns={tableColumns}
+      selectedFields={selectedFields}
+    />
   ) : (
-    <TableDefault onSearch={onSearch} {...{ ...rest, reload: reloadFootprint }} />
+    <TableDefault
+      onSearch={onSearch}
+      {...{ ...rest, reload: reloadFootprint }}
+    />
   );
 
   return (
