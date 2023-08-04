@@ -397,48 +397,52 @@ describe('Query language - WQL', () => {
   */
 
   // Validate the tokens
+  // Some examples of value tokens are based on this API test: https://github.com/wazuh/wazuh/blob/813595cf58d753c1066c3e7c2018dbb4708df088/framework/wazuh/core/tests/test_utils.py#L987-L1050
   it.each`
-    WQL                                | validationError
-    ${''}                              | ${undefined}
-    ${'field1'}                        | ${undefined}
-    ${'field2'}                        | ${undefined}
-    ${'field1='}                       | ${['The value for field "field1" is missing.']}
-    ${'field2='}                       | ${['The value for field "field2" is missing.']}
-    ${'field='}                        | ${['"field" is not a valid field.']}
-    ${'custom='}                       | ${['"custom" is not a valid field.']}
-    ${'field1=value'}                  | ${undefined}
-    ${'field1=1'}                      | ${['Numbers are not valid for field1']}
-    ${'field1=value1'}                 | ${['Numbers are not valid for field1']}
-    ${'field2=value'}                  | ${undefined}
-    ${'field=value'}                   | ${['"field" is not a valid field.']}
-    ${'custom=value'}                  | ${['"custom" is not a valid field.']}
-    ${'field1=value!test'}             | ${['"value!test" is not a valid value. Invalid characters found: !']}
-    ${'field1=value&test'}             | ${['"value&test" is not a valid value. Invalid characters found: &']}
-    ${'field1=value!value&test'}       | ${['"value!value&test" is not a valid value. Invalid characters found: !&']}
-    ${'field1=value!value!test'}       | ${['"value!value!test" is not a valid value. Invalid characters found: !']}
-    ${'field1=value!value!t$&st'}      | ${['"value!value!t$&st" is not a valid value. Invalid characters found: !$&']}
-    ${'field1=value and'}              | ${['There is no whitespace after conjunction "and".', 'There is no sentence after conjunction "and".']}
-    ${'field2=value and'}              | ${['There is no whitespace after conjunction "and".', 'There is no sentence after conjunction "and".']}
-    ${'field=value and'}               | ${['"field" is not a valid field.', 'There is no whitespace after conjunction "and".', 'There is no sentence after conjunction "and".']}
-    ${'custom=value and'}              | ${['"custom" is not a valid field.', 'There is no whitespace after conjunction "and".', 'There is no sentence after conjunction "and".']}
-    ${'field1=value and '}             | ${['There is no sentence after conjunction "and".']}
-    ${'field2=value and '}             | ${['There is no sentence after conjunction "and".']}
-    ${'field=value and '}              | ${['"field" is not a valid field.', 'There is no sentence after conjunction "and".']}
-    ${'custom=value and '}             | ${['"custom" is not a valid field.', 'There is no sentence after conjunction "and".']}
-    ${'field1=value and field2'}       | ${['The operator for field "field2" is missing.']}
-    ${'field2=value and field1'}       | ${['The operator for field "field1" is missing.']}
-    ${'field1=value and field'}        | ${['"field" is not a valid field.']}
-    ${'field2=value and field'}        | ${['"field" is not a valid field.']}
-    ${'field=value and custom'}        | ${['"field" is not a valid field.', '"custom" is not a valid field.']}
-    ${'('}                             | ${undefined}
-    ${'(field'}                        | ${undefined}
-    ${'(field='}                       | ${['"field" is not a valid field.']}
-    ${'(field=value'}                  | ${['"field" is not a valid field.']}
-    ${'(field=value or'}               | ${['"field" is not a valid field.', 'There is no whitespace after conjunction "or".', 'There is no sentence after conjunction "or".']}
-    ${'(field=value or '}              | ${['"field" is not a valid field.', 'There is no sentence after conjunction "or".']}
-    ${'(field=value or field2'}        | ${['"field" is not a valid field.', 'The operator for field "field2" is missing.']}
-    ${'(field=value or field2>'}       | ${['"field" is not a valid field.', 'The value for field "field2" is missing.']}
-    ${'(field=value or field2>value2'} | ${['"field" is not a valid field.']}
+    WQL                                               | validationError
+    ${''}                                             | ${undefined}
+    ${'field1'}                                       | ${undefined}
+    ${'field2'}                                       | ${undefined}
+    ${'field1='}                                      | ${['The value for field "field1" is missing.']}
+    ${'field2='}                                      | ${['The value for field "field2" is missing.']}
+    ${'field='}                                       | ${['"field" is not a valid field.']}
+    ${'custom='}                                      | ${['"custom" is not a valid field.']}
+    ${'field1=value'}                                 | ${undefined}
+    ${'field_not_number=1'}                           | ${['Numbers are not valid for field_not_number']}
+    ${'field_not_number=value1'}                      | ${['Numbers are not valid for field_not_number']}
+    ${'field2=value'}                                 | ${undefined}
+    ${'field=value'}                                  | ${['"field" is not a valid field.']}
+    ${'custom=value'}                                 | ${['"custom" is not a valid field.']}
+    ${'field1=value!test'}                            | ${['"value!test" is not a valid value. Invalid characters found: !']}
+    ${'field1=value&test'}                            | ${['"value&test" is not a valid value. Invalid characters found: &']}
+    ${'field1=value!value&test'}                      | ${['"value!value&test" is not a valid value. Invalid characters found: !&']}
+    ${'field1=value!value!test'}                      | ${['"value!value!test" is not a valid value. Invalid characters found: !']}
+    ${'field1=value!value!t$&st'}                     | ${['"value!value!t$&st" is not a valid value. Invalid characters found: !$&']}
+    ${'field1=value,'}                                | ${['"value," is not a valid value.']}
+    ${'field1="Mozilla Firefox 53.0 (x64 en-US)"'}    | ${undefined}
+    ${'field1="[\\"https://example-link@<>=,%?\\"]"'} | ${undefined}
+    ${'field1=value and'}                             | ${['There is no whitespace after conjunction "and".', 'There is no sentence after conjunction "and".']}
+    ${'field2=value and'}                             | ${['There is no whitespace after conjunction "and".', 'There is no sentence after conjunction "and".']}
+    ${'field=value and'}                              | ${['"field" is not a valid field.', 'There is no whitespace after conjunction "and".', 'There is no sentence after conjunction "and".']}
+    ${'custom=value and'}                             | ${['"custom" is not a valid field.', 'There is no whitespace after conjunction "and".', 'There is no sentence after conjunction "and".']}
+    ${'field1=value and '}                            | ${['There is no sentence after conjunction "and".']}
+    ${'field2=value and '}                            | ${['There is no sentence after conjunction "and".']}
+    ${'field=value and '}                             | ${['"field" is not a valid field.', 'There is no sentence after conjunction "and".']}
+    ${'custom=value and '}                            | ${['"custom" is not a valid field.', 'There is no sentence after conjunction "and".']}
+    ${'field1=value and field2'}                      | ${['The operator for field "field2" is missing.']}
+    ${'field2=value and field1'}                      | ${['The operator for field "field1" is missing.']}
+    ${'field1=value and field'}                       | ${['"field" is not a valid field.']}
+    ${'field2=value and field'}                       | ${['"field" is not a valid field.']}
+    ${'field=value and custom'}                       | ${['"field" is not a valid field.', '"custom" is not a valid field.']}
+    ${'('}                                            | ${undefined}
+    ${'(field'}                                       | ${undefined}
+    ${'(field='}                                      | ${['"field" is not a valid field.']}
+    ${'(field=value'}                                 | ${['"field" is not a valid field.']}
+    ${'(field=value or'}                              | ${['"field" is not a valid field.', 'There is no whitespace after conjunction "or".', 'There is no sentence after conjunction "or".']}
+    ${'(field=value or '}                             | ${['"field" is not a valid field.', 'There is no sentence after conjunction "or".']}
+    ${'(field=value or field2'}                       | ${['"field" is not a valid field.', 'The operator for field "field2" is missing.']}
+    ${'(field=value or field2>'}                      | ${['"field" is not a valid field.', 'The value for field "field2" is missing.']}
+    ${'(field=value or field2>value2'}                | ${['"field" is not a valid field.']}
   `(
     'validate the tokens - WQL $WQL => $validationError',
     async ({ WQL: currentInput, validationError }) => {
@@ -447,12 +451,15 @@ describe('Query language - WQL', () => {
           parameters: {
             options: {},
             suggestions: {
-              field: () => ['field1', 'field2'].map(label => ({ label })),
+              field: () =>
+                ['field1', 'field2', 'field_not_number'].map(label => ({
+                  label,
+                })),
               value: () => [],
             },
             validate: {
               value: (token, { field, operator_compare }) => {
-                if (field === 'field1') {
+                if (field === 'field_not_number') {
                   const value = token.formattedValue || token.value;
                   return /\d/.test(value)
                     ? `Numbers are not valid for ${field}`
