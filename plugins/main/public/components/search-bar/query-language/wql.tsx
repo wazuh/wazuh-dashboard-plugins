@@ -685,6 +685,20 @@ function getOutput(input: string, options: OptionsQL) {
  * @returns
  */
 function validateTokenValue(token: IToken): string | undefined {
+  const re = new RegExp(
+    // Value: A string.
+    '^(?<value>(?:(?:\\((?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|[\\[\\]\\w _\\-.:?\\/\'"=@%<>{}]*)\\))*' +
+      '(?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|^[\\[\\]\\w _\\-.:?\\\\/\'"=@%<>{}]+)' +
+      '(?:\\((?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|[\\[\\]\\w _\\-.:?\\\\/\'"=@%<>{}]*)\\))*)+)$',
+  );
+
+  const value = token.formattedValue ?? token.value;
+  const match = value.match(re);
+
+  if (match?.groups?.value === value) {
+    return undefined;
+  }
+
   const invalidCharacters: string[] = token.value
     .split('')
     .filter((value, index, array) => array.indexOf(value) === index)
@@ -695,14 +709,12 @@ function validateTokenValue(token: IToken): string | undefined {
         ),
     );
 
-  return !invalidCharacters.length
-    ? undefined
-    : [
-        `"${token.value}" is not a valid value.`,
-        ...(invalidCharacters.length
-          ? [`Invalid characters found: ${invalidCharacters.join('')}`]
-          : []),
-      ].join(' ');
+  return [
+    `"${token.value}" is not a valid value.`,
+    ...(invalidCharacters.length
+      ? [`Invalid characters found: ${invalidCharacters.join('')}`]
+      : []),
+  ].join(' ');
 }
 
 type ITokenValidator = (
