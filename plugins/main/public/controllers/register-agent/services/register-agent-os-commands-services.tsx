@@ -35,19 +35,51 @@ const getAllOptionals = (
 };
 
 const getAllOptionalsMacos = (
-  optionals: IOptionalParameters<tOptionalParameters>,
+  optionals: IOptionalParameters<tOptionalParameters>
 ) => {
   // create paramNameOrderList, which is an array of the keys of optionals add interface
   const paramNameOrderList: (keyof IOptionalParameters<tOptionalParameters>)[] =
     ['serverAddress', 'agentGroups', 'agentName', 'protocol'];
 
   if (!optionals) return '';
-  return Object.entries(paramNameOrderList).reduce((acc, [key, value]) => {
-    if (optionals[value]) {
-      acc += `${optionals[value]}\\n`;
-    }
-    return acc;
-  }, '');
+  return Object.entries(paramNameOrderList).reduce(
+    (acc, [key, value]) => {
+      if (optionals[value]) {
+        acc += `${optionals[value]}\\n`;
+      }
+      return acc;
+    },
+    '',
+  );
+};
+
+
+/******* RPM *******/
+
+// curl -o wazuh-agent-4.4.5-1.x86_64.rpm https://packages.wazuh.com/4.x/yum/wazuh-agent-4.4.5-1.x86_64.rpm && sudo WAZUH_MANAGER='172.30.30.20' rpm -ihv wazuh-agent-4.4.5-1.x86_64.rpm
+
+export const getRPMInstallCommand = (
+  props: tOSEntryInstallCommand<tOptionalParameters>,
+) => {
+  const { optionals, urlPackage, wazuhVersion } = props;
+  const packageName = `wazuh-agent-${wazuhVersion}-1.x86_64.rpm`
+  return `curl -o ${packageName} ${urlPackage} && sudo ${
+    optionals && getAllOptionals(optionals)
+  }rpm -ihv ${packageName}`;
+};
+
+/******* DEB *******/
+
+// wget https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_4.4.5-1_amd64.deb && sudo WAZUH_MANAGER='172.30.30.20' dpkg -i ./wazuh-agent_4.4.5-1_amd64.deb
+
+export const getDEBInstallCommand = (
+  props: tOSEntryInstallCommand<tOptionalParameters>,
+) => {
+  const { optionals, urlPackage, wazuhVersion } = props;
+  const packageName = `wazuh-agent_${wazuhVersion}-1_amd64.deb`
+  return `wget ${urlPackage} && sudo ${
+    optionals && getAllOptionals(optionals)
+  }dpkg -i ./${packageName}`;
 };
 
 /******* Linux *******/

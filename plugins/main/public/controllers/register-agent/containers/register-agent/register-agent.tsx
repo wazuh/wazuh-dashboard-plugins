@@ -32,6 +32,7 @@ import {
 } from '../../utils/validations';
 import { getPasswordWithScapedSpecialCharacters } from '../../services/wazuh-password-service';
 
+
 interface IRegisterAgentProps {
   getWazuhVersion: () => Promise<string>;
   hasAgents: () => Promise<boolean>;

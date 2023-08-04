@@ -38,6 +38,7 @@ export default function CommandOutput(props: ICommandSectionProps) {
       setHavePassword(false);
       setCommandToShow(commandText);
     }
+
   }, [password, commandText, showPassword]);
 
   const osdfucatePassword = (password: string) => {
