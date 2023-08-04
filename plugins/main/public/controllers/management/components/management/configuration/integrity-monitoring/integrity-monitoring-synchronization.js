@@ -11,9 +11,8 @@
  */
 
 import React, { Component, Fragment } from 'react';
-import PropTypes from 'prop-types';
 
-import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import WzNoConfig from '../util-components/no-config';
 import helpLinks from './help-links';
@@ -48,12 +47,10 @@ class WzConfigurationIntegrityMonitoringSynchronization extends Component {
         currentConfig['syscheck-syscheck'] &&
         currentConfig['syscheck-syscheck'].syscheck &&
         currentConfig['syscheck-syscheck'].syscheck.synchronization ? (
-          <WzConfigurationSettingsTabSelector
+          <WzConfigurationSettingsHeader
             title="Syncronization"
             description="Database synchronization settings"
-            currentConfig={currentConfig['syscheck-syscheck']}
-            minusHeight={this.props.agent.id === '000' ? 320 : 415}
-            helpLinks={helpLinks}
+            help={helpLinks}
           >
             <WzConfigurationSettingsGroup
               config={
@@ -61,7 +58,7 @@ class WzConfigurationIntegrityMonitoringSynchronization extends Component {
               }
               items={mainSettings}
             />
-          </WzConfigurationSettingsTabSelector>
+          </WzConfigurationSettingsHeader>
         ) : (
           <WzNoConfig error="not-present" help={helpLinks} />
         )}
@@ -69,9 +66,5 @@ class WzConfigurationIntegrityMonitoringSynchronization extends Component {
     );
   }
 }
-
-WzConfigurationIntegrityMonitoringSynchronization.proptTypes = {
-  // currentConfig: PropTypes.object.isRequired
-};
 
 export default WzConfigurationIntegrityMonitoringSynchronization;

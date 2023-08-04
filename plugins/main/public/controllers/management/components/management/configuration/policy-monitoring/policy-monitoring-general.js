@@ -12,7 +12,7 @@
 
 import React, { Component, Fragment } from 'react';
 
-import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import helpLinks from './help-links';
 import { isString, renderValueNoThenEnabled } from '../utils/utils';
@@ -70,26 +70,20 @@ class WzConfigurationPolicyMonitoringGeneral extends Component {
           !isString(currentConfig['syscheck-rootcheck']) &&
           currentConfig['syscheck-rootcheck'].rootcheck) ||
           currentConfig['sca']) && (
-          <WzConfigurationSettingsTabSelector
+          <WzConfigurationSettingsHeader
             title="All settings"
             description="General settings for the rootcheck daemon"
-            currentConfig={currentConfig}
-            minusHeight={this.props.agent.id === '000' ? 320 : 415}
-            helpLinks={helpLinks}
+            help={helpLinks}
           >
             <WzConfigurationSettingsGroup
               config={currentConfig['syscheck-rootcheck'].rootcheck}
               items={allSettings}
             />
-          </WzConfigurationSettingsTabSelector>
+          </WzConfigurationSettingsHeader>
         )}
       </Fragment>
     );
   }
 }
-
-WzConfigurationPolicyMonitoringGeneral.propTypes = {
-  // currentConfig: PropTypes.object.isRequired
-};
 
 export default WzConfigurationPolicyMonitoringGeneral;

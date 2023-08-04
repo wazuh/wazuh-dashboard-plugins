@@ -12,6 +12,7 @@ import { CreateRole } from './create-role';
 import { EditRole } from './edit-role';
 import { withUserAuthorizationPrompt } from '../../common/hocs';
 import { WzButtonPermissions } from '../../common/permissions/button';
+import { closeFlyout } from '../../common/flyouts/close-flyout-security';
 
 export const Roles = withUserAuthorizationPrompt([
   { action: 'security:read', resource: 'role:id:*' },
@@ -26,17 +27,15 @@ export const Roles = withUserAuthorizationPrompt([
 
   async function getData() {
     setLoadingTable(true);
-    const roles_request = await WzRequest.apiReq('GET', '/security/roles', {});
-    const roles =
-      (((roles_request || {}).data || {}).data || {}).affected_items || [];
+    const rolesRequest = await WzRequest.apiReq('GET', '/security/roles', {});
+    const roles = rolesRequest?.data?.data?.affected_items || [];
     setRoles(roles);
-    const policies_request = await WzRequest.apiReq(
+    const policiesRequest = await WzRequest.apiReq(
       'GET',
       '/security/policies',
       {},
     );
-    const policiesData =
-      (((policies_request || {}).data || {}).data || {}).affected_items || [];
+    const policiesData = policiesRequest?.data?.data?.affected_items || [];
     setPoliciesData(policiesData);
     setLoadingTable(false);
   }
@@ -45,16 +44,17 @@ export const Roles = withUserAuthorizationPrompt([
     getData();
   }, []);
 
+  const closeEditingFlyout = needRefresh => {
+    closeFlyout(needRefresh, setIsEditFlyoutVisible, getData);
+  };
+
+  const closeCreatingFlyout = needRefresh => {
+    closeFlyout(needRefresh, setIsFlyoutVisible, getData);
+  };
+
   let flyout;
   if (isFlyoutVisible) {
-    flyout = (
-      <CreateRole
-        closeFlyout={async isVisible => {
-          setIsFlyoutVisible(isVisible);
-          await getData();
-        }}
-      />
-    );
+    flyout = <CreateRole closeFlyout={closeCreatingFlyout} />;
   }
 
   const editRole = item => {
@@ -65,13 +65,7 @@ export const Roles = withUserAuthorizationPrompt([
   let editFlyout;
   if (isEditFlyoutVisible) {
     editFlyout = (
-      <EditRole
-        role={editingRole}
-        closeFlyout={async isVisible => {
-          setIsEditFlyoutVisible(isVisible);
-          await getData();
-        }}
-      />
+      <EditRole role={editingRole} closeFlyout={closeEditingFlyout} />
     );
   }
 

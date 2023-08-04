@@ -15,10 +15,8 @@ import React, { Component, Fragment } from 'react';
 import { EuiBasicTable } from '@elastic/eui';
 
 import WzNoConfig from '../util-components/no-config';
-import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
-
 import {
   isString,
   renderValueOrDefault,
@@ -94,12 +92,10 @@ class WzConfigurationClient extends Component {
           )}
         {currentConfig['agent-client'] &&
           !isString(currentConfig['agent-client']) && (
-            <WzConfigurationSettingsTabSelector
+            <WzConfigurationSettingsHeader
               title='Main settings'
               description='Basic manager-agent communication settings'
-              currentConfig={currentConfig}
-              minusHeight={355}
-              helpLinks={helpLinks}
+              help={helpLinks}
             >
               <WzConfigurationSettingsGroup
                 config={currentConfig['agent-client'].client}
@@ -118,7 +114,7 @@ class WzConfigurationClient extends Component {
                   />
                 </Fragment>
               )}
-            </WzConfigurationSettingsTabSelector>
+            </WzConfigurationSettingsHeader>
           )}
       </Fragment>
     );
@@ -126,9 +122,5 @@ class WzConfigurationClient extends Component {
 }
 
 const sections = [{ component: 'agent', configuration: 'client' }];
-
-WzConfigurationClient.propTypes = {
-  // currentConfig: PropTypes.object.isRequired
-};
 
 export default withWzConfig(sections)(WzConfigurationClient);

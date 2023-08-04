@@ -20,6 +20,7 @@ import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { withUserAuthorizationPrompt } from '../../common/hocs';
 import { WzButtonPermissions } from '../../common/permissions/button';
+import { closeFlyout } from '../../common/flyouts/close-flyout-security';
 
 export const Users = withUserAuthorizationPrompt([
   { action: 'security:read', resource: 'user:id:*' },
@@ -76,14 +77,12 @@ export const Users = withUserAuthorizationPrompt([
   }, []);
 
   let editFlyout, createFlyout;
-  const closeEditFlyout = async refresh => {
-    if (refresh) await getUsers();
-    setIsEditFlyoutVisible(false);
+  const closeEditFlyout = refresh => {
+    closeFlyout(refresh, setIsEditFlyoutVisible, getUsers);
   };
 
-  const closeCreateFlyout = async refresh => {
-    if (refresh) await getUsers();
-    setIsCreateFlyoutVisible(false);
+  const closeCreateFlyout = refresh => {
+    closeFlyout(refresh, setIsCreateFlyoutVisible, getUsers);
   };
 
   if (securityError) {

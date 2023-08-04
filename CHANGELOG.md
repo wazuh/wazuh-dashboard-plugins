@@ -7,12 +7,23 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Added
 
 - Support for Wazuh 4.7.0
+- Added `status detail` column in the agents table. [#5680](https://github.com/wazuh/wazuh-kibana-app/pull/5680)
+
+### Changed
+
+- Changed Network ports table columns for Linux agents. [#5636](https://github.com/wazuh/wazuh-kibana-app/pull/5636)
+- Updated development dependencies (`@typescript-eslint/eslint-plugin, @typescript-eslint/parser, eslint, swagger-client`)[#5748](https://github.com/wazuh/wazuh-kibana-app/pull/5748)
 
 ### Fixed
 
 - Fixed problem with new or missing columns in agent table. [#5591](https://github.com/wazuh/wazuh-kibana-app/pull/5591)
 - Fixed the color of the agent name in the groups section in dark mode. [#5676](https://github.com/wazuh/wazuh-kibana-app/pull/5676)
 - Fixed the propagation event so that the flyout data, in the decoders, does not change when the button is pressed. [#5597](https://github.com/wazuh/wazuh-kibana-app/pull/5597)
+- Fixed the tooltips of the tables in the security section, and unnecessary requests are removed. [#5631](https://github.com/wazuh/wazuh-kibana-app/pull/5631)
+
+### Removed
+
+- Removed views in JSON and XML formats from management settings. [#5747](https://github.com/wazuh/wazuh-kibana-app/pull/5747)
 
 ## Wazuh v4.6.0 - OpenSearch Dashboards 2.6.0 - Revision 01
 

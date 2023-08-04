@@ -47,7 +47,7 @@ import {
 } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
-import { AgentStatus } from '../../../components/agents/agent_status';
+import { AgentStatus } from '../../../components/agents/agent-status';
 import { AgentSynced } from '../../../components/agents/agent-synced';
 
 export const AgentsTable = withErrorBoundary(
@@ -320,6 +320,7 @@ export const AgentsTable = withErrorBoundary(
         name: agent.name,
         ip: agent.ip,
         status: agent.status,
+        status_code: agent.status_code,
         group_config_status: agent.group_config_status,
         group: agent?.group || '-',
         os_name: agent,
@@ -593,11 +594,8 @@ export const AgentsTable = withErrorBoundary(
         truncateText: true,
         sortable: true,
         show: true,
-        render: status => (
-          <AgentStatus
-            status={status}
-            labelProps={{ className: 'hide-agent-status' }}
-          />
+        render: (status, agent) => (
+          <AgentStatus status={status} agent={agent} />
         ),
       },
       {

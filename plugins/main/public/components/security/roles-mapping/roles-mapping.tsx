@@ -22,6 +22,7 @@ import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { withUserAuthorizationPrompt } from '../../common/hocs';
 import { WzButtonPermissions } from '../../common/permissions/button';
+import { closeFlyout } from '../../common/flyouts/close-flyout-security';
 
 export const RolesMapping = withUserAuthorizationPrompt([
   { action: 'security:read', resource: 'role:id:*' },
@@ -124,15 +125,20 @@ export const RolesMapping = withUserAuthorizationPrompt([
     await getRules();
   };
 
+  const closeEditingFlyout = needRefresh => {
+    closeFlyout(needRefresh, setIsEditingRule, initData);
+  };
+
+  const closeCreatingFlyout = needRefresh => {
+    closeFlyout(needRefresh, setIsCreatingRule, initData);
+  };
+
   let editFlyout;
   if (isEditingRule) {
     editFlyout = (
       <RolesMappingEdit
         rule={selectedRule}
-        closeFlyout={isVisible => {
-          setIsEditingRule(isVisible);
-          initData();
-        }}
+        closeFlyout={closeEditingFlyout}
         rolesEquivalences={rolesEquivalences}
         roles={roles}
         internalUsers={internalUsers}
@@ -145,10 +151,7 @@ export const RolesMapping = withUserAuthorizationPrompt([
   if (isCreatingRule) {
     createFlyout = (
       <RolesMappingCreate
-        closeFlyout={isVisible => {
-          setIsCreatingRule(isVisible);
-          initData();
-        }}
+        closeFlyout={closeCreatingFlyout}
         rolesEquivalences={rolesEquivalences}
         roles={roles}
         internalUsers={internalUsers}

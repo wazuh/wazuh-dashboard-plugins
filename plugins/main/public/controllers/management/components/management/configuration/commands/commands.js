@@ -13,7 +13,7 @@
 import React, { Component, Fragment } from 'react';
 
 import WzNoConfig from '../util-components/no-config';
-import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationSettingsListSelector from '../util-components/configuration-settings-list-selector';
 import withWzConfig from '../util-hocs/wz-config';
 import { isString, renderValueNoThenEnabled } from '../utils/utils';
@@ -75,18 +75,16 @@ class WzConfigurationCommands extends Component {
         {currentConfig &&
         items &&
         !isString(currentConfig['wmodules-wmodules']) ? (
-          <WzConfigurationSettingsTabSelector
+          <WzConfigurationSettingsHeader
             title="Command definitions"
             description="Find here all the currently defined commands"
-            currentConfig={currentConfig}
-            minusHeight={this.props.agent.id === '000' ? 260 : 355}
-            helpLinks={helpLinks}
+            help={helpLinks}
           >
             <WzConfigurationSettingsListSelector
               items={items}
               settings={mainSettings}
             />
-          </WzConfigurationSettingsTabSelector>
+          </WzConfigurationSettingsHeader>
         ) : null}
       </Fragment>
     );
@@ -94,9 +92,5 @@ class WzConfigurationCommands extends Component {
 }
 
 const sections = [{ component: 'wmodules', configuration: 'wmodules' }];
-
-WzConfigurationCommands.propTypes = {
-  // currentConfig: PropTypes.object.isRequired
-};
 
 export default withWzConfig(sections)(WzConfigurationCommands);

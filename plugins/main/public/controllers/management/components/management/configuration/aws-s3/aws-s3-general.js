@@ -13,15 +13,13 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 
-import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import WzNoConfig from '../util-components/no-config';
-
 import {
   renderValueNoThenEnabled,
   isString
 } from '../utils/utils';
-
 import helpLinks from './help-links';
 
 const mainSettings = [
@@ -61,18 +59,16 @@ class WzConfigurationAmazonS3General extends Component {
             <WzNoConfig error="not-present" help={helpLinks} />
           )}
         {currentConfig && wodleConfig['aws-s3'] && (
-          <WzConfigurationSettingsTabSelector
+          <WzConfigurationSettingsHeader
             title="Main settings"
             description="Common settings applied to all Amazon S3 buckets"
-            currentConfig={wodleConfig}
-            minusHeight={320}
-            helpLinks={helpLinks}
+            help={helpLinks}
           >
             <WzConfigurationSettingsGroup
               config={wodleConfig['aws-s3']}
               items={mainSettings}
             />
-          </WzConfigurationSettingsTabSelector>
+          </WzConfigurationSettingsHeader>
         )}
       </Fragment>
     );
@@ -80,7 +76,6 @@ class WzConfigurationAmazonS3General extends Component {
 }
 
 WzConfigurationAmazonS3General.propTypes = {
-  // currentConfig: PropTypes.object.isRequired,
   wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string])
 };
 

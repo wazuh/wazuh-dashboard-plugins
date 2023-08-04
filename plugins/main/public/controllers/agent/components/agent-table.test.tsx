@@ -3,7 +3,7 @@ import { render } from 'enzyme';
 import { AgentsTable } from './agents-table';
 import { WzRequest } from '../../../react-services/wz-request';
 import { AgentSynced } from '../../../components/agents/agent-synced';
-import { AgentStatus } from '../../../components/agents/agent_status';
+import { AgentStatus } from '../../../components/agents/agent-status';
 import configureMockStore from 'redux-mock-store';
 import { Provider } from 'react-redux';
 

@@ -37,37 +37,8 @@ exports[`ApiAuthTab component renders correctly to match the snapshot 1`] = `
     }
   }
 >
-  <WzConfigurationSettingsTabSelector
-    currentConfig={
-      Object {
-        "office365": Object {
-          "api_auth": Array [
-            Object {
-              "client_id": "your_client_id_test_1",
-              "client_secret": "your_secret_test_1",
-              "tenant_id": "your_tenant_id_test_1",
-            },
-            Object {
-              "client_id": "your_client_id_test_2",
-              "client_secret": "your_secret_test_2",
-              "tenant_id": "your_tenant_id_test_2",
-            },
-          ],
-          "curl_max_size": 1024,
-          "enabled": "yes",
-          "interval": 600,
-          "only_future_events": "yes",
-          "subscriptions": Array [
-            "Audit.AzureActiveDirectory",
-            "Audit.Exchange",
-            "Audit.SharePoint",
-            "Audit.General",
-            "DLP.All",
-          ],
-        },
-      }
-    }
-    helpLinks={
+  <WzConfigurationSettingsHeader
+    help={
       Array [
         Object {
           "href": "https://documentation.wazuh.com/4.7/office365/index.html",
@@ -79,843 +50,707 @@ exports[`ApiAuthTab component renders correctly to match the snapshot 1`] = `
         },
       ]
     }
-    minusHeight={370}
     title="Credentials for the authentication with the API"
   >
-    <WzConfigurationSettingsHeader
-      help={
-        Array [
-          Object {
-            "href": "https://documentation.wazuh.com/4.7/office365/index.html",
-            "text": "Using Wazuh to monitor Office 365",
-          },
-          Object {
-            "href": "https://documentation.wazuh.com/4.7/user-manual/reference/ossec-conf/office365-module.html",
-            "text": "Configuration options for the module",
-          },
-        ]
-      }
-      json={[Function]}
-      settings={[Function]}
-      title="Credentials for the authentication with the API"
-      viewSelected=""
-      xml={[Function]}
+    <EuiFlexGroup
+      alignItems="center"
     >
-      <EuiFlexGroup
-        alignItems="center"
+      <div
+        className="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--responsive"
       >
-        <div
-          className="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--responsive"
-        >
-          <EuiFlexItem>
-            <div
-              className="euiFlexItem"
-            >
-              <EuiTitle
-                size="s"
-              >
-                <h2
-                  className="euiTitle euiTitle--small"
-                >
-                  Credentials for the authentication with the API
-                </h2>
-              </EuiTitle>
-            </div>
-          </EuiFlexItem>
-          <EuiFlexItem
-            grow={false}
+        <EuiFlexItem>
+          <div
+            className="euiFlexItem"
           >
-            <div
-              className="euiFlexItem euiFlexItem--flexGrowZero"
+            <EuiTitle
+              size="s"
             >
-              <EuiFlexGroup
-                alignItems="center"
-                gutterSize="none"
-                justifyContent="flexEnd"
+              <h2
+                className="euiTitle euiTitle--small"
               >
-                <div
-                  className="euiFlexGroup euiFlexGroup--alignItemsCenter euiFlexGroup--justifyContentFlexEnd euiFlexGroup--directionRow euiFlexGroup--responsive"
-                >
-                  <span
-                    style={
-                      Object {
-                        "marginRight": "6px",
-                      }
+                Credentials for the authentication with the API
+              </h2>
+            </EuiTitle>
+          </div>
+        </EuiFlexItem>
+        <EuiFlexItem
+          grow={false}
+        >
+          <div
+            className="euiFlexItem euiFlexItem--flexGrowZero"
+          >
+            <EuiFlexGroup
+              alignItems="center"
+              gutterSize="none"
+              justifyContent="flexEnd"
+            >
+              <div
+                className="euiFlexGroup euiFlexGroup--alignItemsCenter euiFlexGroup--justifyContentFlexEnd euiFlexGroup--directionRow euiFlexGroup--responsive"
+              >
+                <span>
+                  <WzHelpButtonPopover
+                    links={
+                      Array [
+                        Object {
+                          "href": "https://documentation.wazuh.com/4.7/office365/index.html",
+                          "text": "Using Wazuh to monitor Office 365",
+                        },
+                        Object {
+                          "href": "https://documentation.wazuh.com/4.7/user-manual/reference/ossec-conf/office365-module.html",
+                          "text": "Configuration options for the module",
+                        },
+                      ]
                     }
                   >
-                    <ButtonLink
-                      onClick={[Function]}
-                      text="SETTINGS"
-                      view=""
-                      viewSelected=""
-                    >
-                      <EuiFlexItem>
-                        <div
-                          className="euiFlexItem"
-                        >
-                          <EuiLink
-                            onClick={[Function]}
-                            style={
-                              Object {
-                                "textDecoration": "underline",
-                              }
-                            }
-                          >
-                            <button
-                              className="euiLink euiLink--primary"
-                              disabled={false}
-                              onClick={[Function]}
-                              style={
-                                Object {
-                                  "textDecoration": "underline",
-                                }
-                              }
-                              type="button"
-                            >
-                              SETTINGS
-                            </button>
-                          </EuiLink>
-                        </div>
-                      </EuiFlexItem>
-                    </ButtonLink>
-                  </span>
-                  <span
-                    style={
-                      Object {
-                        "marginRight": "6px",
+                    <EuiPopover
+                      anchorPosition="downCenter"
+                      button={
+                        <EuiButtonEmpty
+                          iconSide="left"
+                          iconType="questionInCircle"
+                          onClick={[Function]}
+                        />
                       }
-                    }
-                  >
-                    <ButtonLink
-                      onClick={[Function]}
-                      text="JSON"
-                      view="json"
-                      viewSelected=""
+                      closePopover={[Function]}
+                      display="inlineBlock"
+                      hasArrow={true}
+                      id="show-help"
+                      isOpen={false}
+                      ownFocus={true}
+                      panelPaddingSize="m"
                     >
-                      <EuiFlexItem>
+                      <div
+                        className="euiPopover euiPopover--anchorDownCenter"
+                        id="show-help"
+                      >
                         <div
-                          className="euiFlexItem"
+                          className="euiPopover__anchor"
                         >
-                          <EuiLink
-                            onClick={[Function]}
-                            style={Object {}}
-                          >
-                            <button
-                              className="euiLink euiLink--primary"
-                              disabled={false}
-                              onClick={[Function]}
-                              style={Object {}}
-                              type="button"
-                            >
-                              JSON
-                            </button>
-                          </EuiLink>
-                        </div>
-                      </EuiFlexItem>
-                    </ButtonLink>
-                  </span>
-                  <span>
-                    <ButtonLink
-                      onClick={[Function]}
-                      text="XML"
-                      view="xml"
-                      viewSelected=""
-                    >
-                      <EuiFlexItem>
-                        <div
-                          className="euiFlexItem"
-                        >
-                          <EuiLink
-                            onClick={[Function]}
-                            style={Object {}}
-                          >
-                            <button
-                              className="euiLink euiLink--primary"
-                              disabled={false}
-                              onClick={[Function]}
-                              style={Object {}}
-                              type="button"
-                            >
-                              XML
-                            </button>
-                          </EuiLink>
-                        </div>
-                      </EuiFlexItem>
-                    </ButtonLink>
-                  </span>
-                  <span>
-                    <WzHelpButtonPopover
-                      links={
-                        Array [
-                          Object {
-                            "href": "https://documentation.wazuh.com/4.7/office365/index.html",
-                            "text": "Using Wazuh to monitor Office 365",
-                          },
-                          Object {
-                            "href": "https://documentation.wazuh.com/4.7/user-manual/reference/ossec-conf/office365-module.html",
-                            "text": "Configuration options for the module",
-                          },
-                        ]
-                      }
-                    >
-                      <EuiPopover
-                        anchorPosition="downCenter"
-                        button={
                           <EuiButtonEmpty
                             iconSide="left"
                             iconType="questionInCircle"
                             onClick={[Function]}
-                          />
-                        }
-                        closePopover={[Function]}
-                        display="inlineBlock"
-                        hasArrow={true}
-                        id="show-help"
-                        isOpen={false}
-                        ownFocus={true}
-                        panelPaddingSize="m"
-                      >
-                        <div
-                          className="euiPopover euiPopover--anchorDownCenter"
-                          id="show-help"
-                        >
-                          <div
-                            className="euiPopover__anchor"
                           >
-                            <EuiButtonEmpty
-                              iconSide="left"
-                              iconType="questionInCircle"
+                            <button
+                              className="euiButtonEmpty euiButtonEmpty--primary"
+                              disabled={false}
                               onClick={[Function]}
+                              type="button"
                             >
-                              <button
-                                className="euiButtonEmpty euiButtonEmpty--primary"
-                                disabled={false}
-                                onClick={[Function]}
-                                type="button"
-                              >
-                                <EuiButtonContent
-                                  className="euiButtonEmpty__content"
-                                  iconSide="left"
-                                  iconSize="m"
-                                  iconType="questionInCircle"
-                                  textProps={
-                                    Object {
-                                      "className": "euiButtonEmpty__text",
-                                    }
+                              <EuiButtonContent
+                                className="euiButtonEmpty__content"
+                                iconSide="left"
+                                iconSize="m"
+                                iconType="questionInCircle"
+                                textProps={
+                                  Object {
+                                    "className": "euiButtonEmpty__text",
                                   }
+                                }
+                              >
+                                <span
+                                  className="euiButtonContent euiButtonEmpty__content"
                                 >
-                                  <span
-                                    className="euiButtonContent euiButtonEmpty__content"
+                                  <EuiIcon
+                                    className="euiButtonContent__icon"
+                                    color="inherit"
+                                    size="m"
+                                    type="questionInCircle"
                                   >
-                                    <EuiIcon
-                                      className="euiButtonContent__icon"
-                                      color="inherit"
-                                      size="m"
-                                      type="questionInCircle"
+                                    <EuiIconEmpty
+                                      aria-hidden={true}
+                                      className="euiIcon euiIcon--medium euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
+                                      focusable="false"
+                                      role="img"
+                                      style={null}
                                     >
-                                      <EuiIconEmpty
+                                      <svg
                                         aria-hidden={true}
                                         className="euiIcon euiIcon--medium euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
                                         focusable="false"
+                                        height={16}
                                         role="img"
                                         style={null}
-                                      >
-                                        <svg
-                                          aria-hidden={true}
-                                          className="euiIcon euiIcon--medium euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
-                                          focusable="false"
-                                          height={16}
-                                          role="img"
-                                          style={null}
-                                          viewBox="0 0 16 16"
-                                          width={16}
-                                          xmlns="http://www.w3.org/2000/svg"
-                                        />
-                                      </EuiIconEmpty>
-                                    </EuiIcon>
-                                    <span
-                                      className="euiButtonEmpty__text"
-                                    />
-                                  </span>
-                                </EuiButtonContent>
-                              </button>
-                            </EuiButtonEmpty>
-                          </div>
+                                        viewBox="0 0 16 16"
+                                        width={16}
+                                        xmlns="http://www.w3.org/2000/svg"
+                                      />
+                                    </EuiIconEmpty>
+                                  </EuiIcon>
+                                  <span
+                                    className="euiButtonEmpty__text"
+                                  />
+                                </span>
+                              </EuiButtonContent>
+                            </button>
+                          </EuiButtonEmpty>
                         </div>
-                      </EuiPopover>
-                    </WzHelpButtonPopover>
-                  </span>
-                </div>
-              </EuiFlexGroup>
-            </div>
-          </EuiFlexItem>
-        </div>
-      </EuiFlexGroup>
-      <EuiSpacer
-        size="xs"
-      >
-        <div
-          className="euiSpacer euiSpacer--xs"
-        />
-      </EuiSpacer>
-      <EuiHorizontalRule
-        margin="none"
+                      </div>
+                    </EuiPopover>
+                  </WzHelpButtonPopover>
+                </span>
+              </div>
+            </EuiFlexGroup>
+          </div>
+        </EuiFlexItem>
+      </div>
+    </EuiFlexGroup>
+    <EuiSpacer
+      size="xs"
+    >
+      <div
+        className="euiSpacer euiSpacer--xs"
+      />
+    </EuiSpacer>
+    <EuiHorizontalRule
+      margin="none"
+      style={
+        Object {
+          "marginBottom": 16,
+        }
+      }
+    >
+      <hr
+        className="euiHorizontalRule euiHorizontalRule--full"
         style={
           Object {
             "marginBottom": 16,
           }
         }
-      >
-        <hr
-          className="euiHorizontalRule euiHorizontalRule--full"
-          style={
-            Object {
-              "marginBottom": 16,
-            }
-          }
-        />
-      </EuiHorizontalRule>
-    </WzConfigurationSettingsHeader>
-    <WzViewSelector
-      view=""
+      />
+    </EuiHorizontalRule>
+    <WzConfigurationSettingsListSelector
+      items={
+        Array [
+          Object {
+            "data": Object {
+              "client_id": "your_client_id_test_1",
+              "client_secret": "your_secret_test_1",
+              "tenant_id": "your_tenant_id_test_1",
+            },
+            "label": "your_tenant_id_test_1",
+          },
+          Object {
+            "data": Object {
+              "client_id": "your_client_id_test_2",
+              "client_secret": "your_secret_test_2",
+              "tenant_id": "your_tenant_id_test_2",
+            },
+            "label": "your_tenant_id_test_2",
+          },
+        ]
+      }
+      settings={
+        Array [
+          Object {
+            "field": "tenant_id",
+            "label": "Tenant Id",
+          },
+          Object {
+            "field": "client_id",
+            "label": "Client Id",
+          },
+          Object {
+            "field": "client_secret",
+            "label": "Client Secret",
+          },
+          Object {
+            "field": "client_secret_path",
+            "label": "Client Secret Path",
+          },
+        ]
+      }
     >
-      <WzViewSelectorSwitch
-        default={true}
+      <EuiSpacer
+        size="m"
       >
-        <WzConfigurationSettingsListSelector
-          items={
-            Array [
-              Object {
-                "data": Object {
-                  "client_id": "your_client_id_test_1",
-                  "client_secret": "your_secret_test_1",
-                  "tenant_id": "your_tenant_id_test_1",
-                },
-                "label": "your_tenant_id_test_1",
-              },
-              Object {
-                "data": Object {
-                  "client_id": "your_client_id_test_2",
-                  "client_secret": "your_secret_test_2",
-                  "tenant_id": "your_tenant_id_test_2",
-                },
-                "label": "your_tenant_id_test_2",
-              },
-            ]
-          }
-          settings={
-            Array [
-              Object {
-                "field": "tenant_id",
-                "label": "Tenant Id",
-              },
-              Object {
-                "field": "client_id",
-                "label": "Client Id",
-              },
-              Object {
-                "field": "client_secret",
-                "label": "Client Secret",
-              },
-              Object {
-                "field": "client_secret_path",
-                "label": "Client Secret Path",
-              },
-            ]
-          }
+        <div
+          className="euiSpacer euiSpacer--m"
+        />
+      </EuiSpacer>
+      <EuiFlexGroup
+        alignItems="flexStart"
+      >
+        <div
+          className="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsFlexStart euiFlexGroup--directionRow euiFlexGroup--responsive"
         >
-          <EuiSpacer
-            size="m"
+          <EuiFlexItem
+            grow={false}
+            style={
+              Object {
+                "maxWidth": 25,
+                "minWidth": 250,
+              }
+            }
           >
             <div
-              className="euiSpacer euiSpacer--m"
-            />
-          </EuiSpacer>
-          <EuiFlexGroup
-            alignItems="flexStart"
-          >
-            <div
-              className="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsFlexStart euiFlexGroup--directionRow euiFlexGroup--responsive"
+              className="euiFlexItem euiFlexItem--flexGrowZero"
+              style={
+                Object {
+                  "maxWidth": 25,
+                  "minWidth": 250,
+                }
+              }
             >
-              <EuiFlexItem
-                grow={false}
+              <EuiPanel
                 style={
                   Object {
-                    "maxWidth": 25,
-                    "minWidth": 250,
+                    "background": "#fafbfd",
                   }
                 }
               >
                 <div
-                  className="euiFlexItem euiFlexItem--flexGrowZero"
+                  className="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
                   style={
                     Object {
-                      "maxWidth": 25,
-                      "minWidth": 250,
+                      "background": "#fafbfd",
                     }
                   }
                 >
-                  <EuiPanel
-                    style={
-                      Object {
-                        "background": "#fafbfd",
-                      }
-                    }
-                  >
-                    <div
-                      className="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
-                      style={
-                        Object {
-                          "background": "#fafbfd",
-                        }
-                      }
+                  <ul>
+                    <li
+                      key="undefined-0"
                     >
-                      <ul>
-                        <li
-                          key="undefined-0"
+                      <EuiButtonEmpty
+                        onClick={[Function]}
+                        style={
+                          Object {
+                            "textDecoration": "underline",
+                          }
+                        }
+                      >
+                        <button
+                          className="euiButtonEmpty euiButtonEmpty--primary"
+                          disabled={false}
+                          onClick={[Function]}
+                          style={
+                            Object {
+                              "textDecoration": "underline",
+                            }
+                          }
+                          type="button"
                         >
-                          <EuiButtonEmpty
-                            onClick={[Function]}
-                            style={
+                          <EuiButtonContent
+                            className="euiButtonEmpty__content"
+                            iconSide="left"
+                            iconSize="m"
+                            textProps={
                               Object {
-                                "textDecoration": "underline",
+                                "className": "euiButtonEmpty__text",
                               }
                             }
                           >
-                            <button
-                              className="euiButtonEmpty euiButtonEmpty--primary"
-                              disabled={false}
-                              onClick={[Function]}
-                              style={
-                                Object {
-                                  "textDecoration": "underline",
-                                }
-                              }
-                              type="button"
+                            <span
+                              className="euiButtonContent euiButtonEmpty__content"
                             >
-                              <EuiButtonContent
-                                className="euiButtonEmpty__content"
-                                iconSide="left"
-                                iconSize="m"
-                                textProps={
-                                  Object {
-                                    "className": "euiButtonEmpty__text",
-                                  }
-                                }
+                              <span
+                                className="euiButtonEmpty__text"
                               >
-                                <span
-                                  className="euiButtonContent euiButtonEmpty__content"
-                                >
-                                  <span
-                                    className="euiButtonEmpty__text"
-                                  >
-                                    your_tenant_id_test_1
-                                  </span>
-                                </span>
-                              </EuiButtonContent>
-                            </button>
-                          </EuiButtonEmpty>
-                        </li>
-                        <li
-                          key="undefined-1"
-                        >
-                          <EuiButtonEmpty
-                            onClick={[Function]}
-                            style={Object {}}
-                          >
-                            <button
-                              className="euiButtonEmpty euiButtonEmpty--primary"
-                              disabled={false}
-                              onClick={[Function]}
-                              style={Object {}}
-                              type="button"
-                            >
-                              <EuiButtonContent
-                                className="euiButtonEmpty__content"
-                                iconSide="left"
-                                iconSize="m"
-                                textProps={
-                                  Object {
-                                    "className": "euiButtonEmpty__text",
-                                  }
-                                }
-                              >
-                                <span
-                                  className="euiButtonContent euiButtonEmpty__content"
-                                >
-                                  <span
-                                    className="euiButtonEmpty__text"
-                                  >
-                                    your_tenant_id_test_2
-                                  </span>
-                                </span>
-                              </EuiButtonContent>
-                            </button>
-                          </EuiButtonEmpty>
-                        </li>
-                      </ul>
-                    </div>
-                  </EuiPanel>
-                </div>
-              </EuiFlexItem>
-              <EuiFlexItem>
-                <div
-                  className="euiFlexItem"
-                >
-                  <EuiPanel>
-                    <div
-                      className="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
+                                your_tenant_id_test_1
+                              </span>
+                            </span>
+                          </EuiButtonContent>
+                        </button>
+                      </EuiButtonEmpty>
+                    </li>
+                    <li
+                      key="undefined-1"
                     >
-                      <WzSettingsGroup
-                        config={
-                          Object {
-                            "client_id": "your_client_id_test_1",
-                            "client_secret": "your_secret_test_1",
-                            "tenant_id": "your_tenant_id_test_1",
-                          }
-                        }
-                        items={
-                          Array [
-                            Object {
-                              "field": "tenant_id",
-                              "label": "Tenant Id",
-                            },
-                            Object {
-                              "field": "client_id",
-                              "label": "Client Id",
-                            },
-                            Object {
-                              "field": "client_secret",
-                              "label": "Client Secret",
-                            },
-                            Object {
-                              "field": "client_secret_path",
-                              "label": "Client Secret Path",
-                            },
-                          ]
-                        }
+                      <EuiButtonEmpty
+                        onClick={[Function]}
+                        style={Object {}}
                       >
-                        <WzConfigurationSettingsHeader>
-                          <EuiFlexGroup
-                            alignItems="center"
-                          >
-                            <div
-                              className="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--responsive"
-                            >
-                              <EuiFlexItem>
-                                <div
-                                  className="euiFlexItem"
-                                >
-                                  <EuiTitle
-                                    size="s"
-                                  >
-                                    <h2
-                                      className="euiTitle euiTitle--small"
-                                    />
-                                  </EuiTitle>
-                                </div>
-                              </EuiFlexItem>
-                              <EuiFlexItem
-                                grow={false}
-                              >
-                                <div
-                                  className="euiFlexItem euiFlexItem--flexGrowZero"
-                                >
-                                  <EuiFlexGroup
-                                    alignItems="center"
-                                    gutterSize="none"
-                                    justifyContent="flexEnd"
-                                  >
-                                    <div
-                                      className="euiFlexGroup euiFlexGroup--alignItemsCenter euiFlexGroup--justifyContentFlexEnd euiFlexGroup--directionRow euiFlexGroup--responsive"
-                                    />
-                                  </EuiFlexGroup>
-                                </div>
-                              </EuiFlexItem>
-                            </div>
-                          </EuiFlexGroup>
-                          <EuiSpacer
-                            size="xs"
-                          >
-                            <div
-                              className="euiSpacer euiSpacer--xs"
-                            />
-                          </EuiSpacer>
-                        </WzConfigurationSettingsHeader>
-                        <EuiSpacer
-                          size="s"
+                        <button
+                          className="euiButtonEmpty euiButtonEmpty--primary"
+                          disabled={false}
+                          onClick={[Function]}
+                          style={Object {}}
+                          type="button"
                         >
-                          <div
-                            className="euiSpacer euiSpacer--s"
-                          />
-                        </EuiSpacer>
-                        <EuiFlexGroup>
-                          <div
-                            className="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+                          <EuiButtonContent
+                            className="euiButtonEmpty__content"
+                            iconSide="left"
+                            iconSize="m"
+                            textProps={
+                              Object {
+                                "className": "euiButtonEmpty__text",
+                              }
+                            }
                           >
-                            <EuiFlexItem>
-                              <div
-                                className="euiFlexItem"
+                            <span
+                              className="euiButtonContent euiButtonEmpty__content"
+                            >
+                              <span
+                                className="euiButtonEmpty__text"
                               >
-                                <WzConfigurationSetting
-                                  key="-Tenant Id-undefined-0"
-                                  keyItem="-Tenant Id-undefined-0"
-                                  label="Tenant Id"
-                                  value="your_tenant_id_test_1"
-                                >
-                                  <div
-                                    style={
-                                      Object {
-                                        "alignItems": "center",
-                                        "display": "flex",
-                                        "flexDirection": "row",
-                                      }
-                                    }
-                                  >
-                                    <div
-                                      style={
-                                        Object {
-                                          "justifySelf": "flex-end",
-                                          "margin": "1em",
-                                          "width": "35%",
-                                        }
-                                      }
-                                    >
-                                      <EuiTextAlign
-                                        textAlign="right"
-                                      >
-                                        <div
-                                          className="euiTextAlign euiTextAlign--right"
-                                        >
-                                          Tenant Id
-                                        </div>
-                                      </EuiTextAlign>
-                                    </div>
-                                    <div
-                                      style={
-                                        Object {
-                                          "width": "65%",
-                                        }
-                                      }
-                                    >
-                                      <EuiFieldText
-                                        data-testid="tenant-id"
-                                        readOnly={true}
-                                        value="your_tenant_id_test_1"
-                                      >
-                                        <EuiFormControlLayout
-                                          fullWidth={false}
-                                          readOnly={true}
-                                        >
-                                          <div
-                                            className="euiFormControlLayout euiFormControlLayout--readOnly"
-                                          >
-                                            <div
-                                              className="euiFormControlLayout__childrenWrapper"
-                                            >
-                                              <EuiValidatableControl>
-                                                <input
-                                                  className="euiFieldText"
-                                                  data-testid="tenant-id"
-                                                  readOnly={true}
-                                                  type="text"
-                                                  value="your_tenant_id_test_1"
-                                                />
-                                              </EuiValidatableControl>
-                                              <EuiFormControlLayoutIcons />
-                                            </div>
-                                          </div>
-                                        </EuiFormControlLayout>
-                                      </EuiFieldText>
-                                    </div>
-                                  </div>
-                                  <EuiSpacer
-                                    size="s"
-                                  >
-                                    <div
-                                      className="euiSpacer euiSpacer--s"
-                                    />
-                                  </EuiSpacer>
-                                </WzConfigurationSetting>
-                                <WzConfigurationSetting
-                                  key="-Client Id-undefined-1"
-                                  keyItem="-Client Id-undefined-1"
-                                  label="Client Id"
-                                  value="your_client_id_test_1"
-                                >
-                                  <div
-                                    style={
-                                      Object {
-                                        "alignItems": "center",
-                                        "display": "flex",
-                                        "flexDirection": "row",
-                                      }
-                                    }
-                                  >
-                                    <div
-                                      style={
-                                        Object {
-                                          "justifySelf": "flex-end",
-                                          "margin": "1em",
-                                          "width": "35%",
-                                        }
-                                      }
-                                    >
-                                      <EuiTextAlign
-                                        textAlign="right"
-                                      >
-                                        <div
-                                          className="euiTextAlign euiTextAlign--right"
-                                        >
-                                          Client Id
-                                        </div>
-                                      </EuiTextAlign>
-                                    </div>
-                                    <div
-                                      style={
-                                        Object {
-                                          "width": "65%",
-                                        }
-                                      }
-                                    >
-                                      <EuiFieldText
-                                        data-testid="client-id"
-                                        readOnly={true}
-                                        value="your_client_id_test_1"
-                                      >
-                                        <EuiFormControlLayout
-                                          fullWidth={false}
-                                          readOnly={true}
-                                        >
-                                          <div
-                                            className="euiFormControlLayout euiFormControlLayout--readOnly"
-                                          >
-                                            <div
-                                              className="euiFormControlLayout__childrenWrapper"
-                                            >
-                                              <EuiValidatableControl>
-                                                <input
-                                                  className="euiFieldText"
-                                                  data-testid="client-id"
-                                                  readOnly={true}
-                                                  type="text"
-                                                  value="your_client_id_test_1"
-                                                />
-                                              </EuiValidatableControl>
-                                              <EuiFormControlLayoutIcons />
-                                            </div>
-                                          </div>
-                                        </EuiFormControlLayout>
-                                      </EuiFieldText>
-                                    </div>
-                                  </div>
-                                  <EuiSpacer
-                                    size="s"
-                                  >
-                                    <div
-                                      className="euiSpacer euiSpacer--s"
-                                    />
-                                  </EuiSpacer>
-                                </WzConfigurationSetting>
-                                <WzConfigurationSetting
-                                  key="-Client Secret-undefined-2"
-                                  keyItem="-Client Secret-undefined-2"
-                                  label="Client Secret"
-                                  value="your_secret_test_1"
-                                >
-                                  <div
-                                    style={
-                                      Object {
-                                        "alignItems": "center",
-                                        "display": "flex",
-                                        "flexDirection": "row",
-                                      }
-                                    }
-                                  >
-                                    <div
-                                      style={
-                                        Object {
-                                          "justifySelf": "flex-end",
-                                          "margin": "1em",
-                                          "width": "35%",
-                                        }
-                                      }
-                                    >
-                                      <EuiTextAlign
-                                        textAlign="right"
-                                      >
-                                        <div
-                                          className="euiTextAlign euiTextAlign--right"
-                                        >
-                                          Client Secret
-                                        </div>
-                                      </EuiTextAlign>
-                                    </div>
-                                    <div
-                                      style={
-                                        Object {
-                                          "width": "65%",
-                                        }
-                                      }
-                                    >
-                                      <EuiFieldText
-                                        data-testid="client-secret"
-                                        readOnly={true}
-                                        value="your_secret_test_1"
-                                      >
-                                        <EuiFormControlLayout
-                                          fullWidth={false}
-                                          readOnly={true}
-                                        >
-                                          <div
-                                            className="euiFormControlLayout euiFormControlLayout--readOnly"
-                                          >
-                                            <div
-                                              className="euiFormControlLayout__childrenWrapper"
-                                            >
-                                              <EuiValidatableControl>
-                                                <input
-                                                  className="euiFieldText"
-                                                  data-testid="client-secret"
-                                                  readOnly={true}
-                                                  type="text"
-                                                  value="your_secret_test_1"
-                                                />
-                                              </EuiValidatableControl>
-                                              <EuiFormControlLayoutIcons />
-                                            </div>
-                                          </div>
-                                        </EuiFormControlLayout>
-                                      </EuiFieldText>
-                                    </div>
-                                  </div>
-                                  <EuiSpacer
-                                    size="s"
-                                  >
-                                    <div
-                                      className="euiSpacer euiSpacer--s"
-                                    />
-                                  </EuiSpacer>
-                                </WzConfigurationSetting>
-                                <WzConfigurationSetting
-                                  key="-Client Secret Path-undefined-3"
-                                  keyItem="-Client Secret Path-undefined-3"
-                                  label="Client Secret Path"
-                                />
-                              </div>
-                            </EuiFlexItem>
-                          </div>
-                        </EuiFlexGroup>
-                      </WzSettingsGroup>
-                    </div>
-                  </EuiPanel>
+                                your_tenant_id_test_2
+                              </span>
+                            </span>
+                          </EuiButtonContent>
+                        </button>
+                      </EuiButtonEmpty>
+                    </li>
+                  </ul>
                 </div>
-              </EuiFlexItem>
+              </EuiPanel>
             </div>
-          </EuiFlexGroup>
-        </WzConfigurationSettingsListSelector>
-      </WzViewSelectorSwitch>
-    </WzViewSelector>
-  </WzConfigurationSettingsTabSelector>
+          </EuiFlexItem>
+          <EuiFlexItem>
+            <div
+              className="euiFlexItem"
+            >
+              <EuiPanel>
+                <div
+                  className="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
+                >
+                  <WzSettingsGroup
+                    config={
+                      Object {
+                        "client_id": "your_client_id_test_1",
+                        "client_secret": "your_secret_test_1",
+                        "tenant_id": "your_tenant_id_test_1",
+                      }
+                    }
+                    items={
+                      Array [
+                        Object {
+                          "field": "tenant_id",
+                          "label": "Tenant Id",
+                        },
+                        Object {
+                          "field": "client_id",
+                          "label": "Client Id",
+                        },
+                        Object {
+                          "field": "client_secret",
+                          "label": "Client Secret",
+                        },
+                        Object {
+                          "field": "client_secret_path",
+                          "label": "Client Secret Path",
+                        },
+                      ]
+                    }
+                  >
+                    <WzConfigurationSettingsHeader>
+                      <EuiFlexGroup
+                        alignItems="center"
+                      >
+                        <div
+                          className="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--responsive"
+                        >
+                          <EuiFlexItem>
+                            <div
+                              className="euiFlexItem"
+                            >
+                              <EuiTitle
+                                size="s"
+                              >
+                                <h2
+                                  className="euiTitle euiTitle--small"
+                                />
+                              </EuiTitle>
+                            </div>
+                          </EuiFlexItem>
+                          <EuiFlexItem
+                            grow={false}
+                          >
+                            <div
+                              className="euiFlexItem euiFlexItem--flexGrowZero"
+                            >
+                              <EuiFlexGroup
+                                alignItems="center"
+                                gutterSize="none"
+                                justifyContent="flexEnd"
+                              >
+                                <div
+                                  className="euiFlexGroup euiFlexGroup--alignItemsCenter euiFlexGroup--justifyContentFlexEnd euiFlexGroup--directionRow euiFlexGroup--responsive"
+                                />
+                              </EuiFlexGroup>
+                            </div>
+                          </EuiFlexItem>
+                        </div>
+                      </EuiFlexGroup>
+                      <EuiSpacer
+                        size="xs"
+                      >
+                        <div
+                          className="euiSpacer euiSpacer--xs"
+                        />
+                      </EuiSpacer>
+                    </WzConfigurationSettingsHeader>
+                    <EuiSpacer
+                      size="s"
+                    >
+                      <div
+                        className="euiSpacer euiSpacer--s"
+                      />
+                    </EuiSpacer>
+                    <EuiFlexGroup>
+                      <div
+                        className="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive"
+                      >
+                        <EuiFlexItem>
+                          <div
+                            className="euiFlexItem"
+                          >
+                            <WzConfigurationSetting
+                              key="-Tenant Id-undefined-0"
+                              keyItem="-Tenant Id-undefined-0"
+                              label="Tenant Id"
+                              value="your_tenant_id_test_1"
+                            >
+                              <div
+                                style={
+                                  Object {
+                                    "alignItems": "center",
+                                    "display": "flex",
+                                    "flexDirection": "row",
+                                  }
+                                }
+                              >
+                                <div
+                                  style={
+                                    Object {
+                                      "justifySelf": "flex-end",
+                                      "margin": "1em",
+                                      "width": "35%",
+                                    }
+                                  }
+                                >
+                                  <EuiTextAlign
+                                    textAlign="right"
+                                  >
+                                    <div
+                                      className="euiTextAlign euiTextAlign--right"
+                                    >
+                                      Tenant Id
+                                    </div>
+                                  </EuiTextAlign>
+                                </div>
+                                <div
+                                  style={
+                                    Object {
+                                      "width": "65%",
+                                    }
+                                  }
+                                >
+                                  <EuiFieldText
+                                    data-testid="tenant-id"
+                                    readOnly={true}
+                                    value="your_tenant_id_test_1"
+                                  >
+                                    <EuiFormControlLayout
+                                      fullWidth={false}
+                                      readOnly={true}
+                                    >
+                                      <div
+                                        className="euiFormControlLayout euiFormControlLayout--readOnly"
+                                      >
+                                        <div
+                                          className="euiFormControlLayout__childrenWrapper"
+                                        >
+                                          <EuiValidatableControl>
+                                            <input
+                                              className="euiFieldText"
+                                              data-testid="tenant-id"
+                                              readOnly={true}
+                                              type="text"
+                                              value="your_tenant_id_test_1"
+                                            />
+                                          </EuiValidatableControl>
+                                          <EuiFormControlLayoutIcons />
+                                        </div>
+                                      </div>
+                                    </EuiFormControlLayout>
+                                  </EuiFieldText>
+                                </div>
+                              </div>
+                              <EuiSpacer
+                                size="s"
+                              >
+                                <div
+                                  className="euiSpacer euiSpacer--s"
+                                />
+                              </EuiSpacer>
+                            </WzConfigurationSetting>
+                            <WzConfigurationSetting
+                              key="-Client Id-undefined-1"
+                              keyItem="-Client Id-undefined-1"
+                              label="Client Id"
+                              value="your_client_id_test_1"
+                            >
+                              <div
+                                style={
+                                  Object {
+                                    "alignItems": "center",
+                                    "display": "flex",
+                                    "flexDirection": "row",
+                                  }
+                                }
+                              >
+                                <div
+                                  style={
+                                    Object {
+                                      "justifySelf": "flex-end",
+                                      "margin": "1em",
+                                      "width": "35%",
+                                    }
+                                  }
+                                >
+                                  <EuiTextAlign
+                                    textAlign="right"
+                                  >
+                                    <div
+                                      className="euiTextAlign euiTextAlign--right"
+                                    >
+                                      Client Id
+                                    </div>
+                                  </EuiTextAlign>
+                                </div>
+                                <div
+                                  style={
+                                    Object {
+                                      "width": "65%",
+                                    }
+                                  }
+                                >
+                                  <EuiFieldText
+                                    data-testid="client-id"
+                                    readOnly={true}
+                                    value="your_client_id_test_1"
+                                  >
+                                    <EuiFormControlLayout
+                                      fullWidth={false}
+                                      readOnly={true}
+                                    >
+                                      <div
+                                        className="euiFormControlLayout euiFormControlLayout--readOnly"
+                                      >
+                                        <div
+                                          className="euiFormControlLayout__childrenWrapper"
+                                        >
+                                          <EuiValidatableControl>
+                                            <input
+                                              className="euiFieldText"
+                                              data-testid="client-id"
+                                              readOnly={true}
+                                              type="text"
+                                              value="your_client_id_test_1"
+                                            />
+                                          </EuiValidatableControl>
+                                          <EuiFormControlLayoutIcons />
+                                        </div>
+                                      </div>
+                                    </EuiFormControlLayout>
+                                  </EuiFieldText>
+                                </div>
+                              </div>
+                              <EuiSpacer
+                                size="s"
+                              >
+                                <div
+                                  className="euiSpacer euiSpacer--s"
+                                />
+                              </EuiSpacer>
+                            </WzConfigurationSetting>
+                            <WzConfigurationSetting
+                              key="-Client Secret-undefined-2"
+                              keyItem="-Client Secret-undefined-2"
+                              label="Client Secret"
+                              value="your_secret_test_1"
+                            >
+                              <div
+                                style={
+                                  Object {
+                                    "alignItems": "center",
+                                    "display": "flex",
+                                    "flexDirection": "row",
+                                  }
+                                }
+                              >
+                                <div
+                                  style={
+                                    Object {
+                                      "justifySelf": "flex-end",
+                                      "margin": "1em",
+                                      "width": "35%",
+                                    }
+                                  }
+                                >
+                                  <EuiTextAlign
+                                    textAlign="right"
+                                  >
+                                    <div
+                                      className="euiTextAlign euiTextAlign--right"
+                                    >
+                                      Client Secret
+                                    </div>
+                                  </EuiTextAlign>
+                                </div>
+                                <div
+                                  style={
+                                    Object {
+                                      "width": "65%",
+                                    }
+                                  }
+                                >
+                                  <EuiFieldText
+                                    data-testid="client-secret"
+                                    readOnly={true}
+                                    value="your_secret_test_1"
+                                  >
+                                    <EuiFormControlLayout
+                                      fullWidth={false}
+                                      readOnly={true}
+                                    >
+                                      <div
+                                        className="euiFormControlLayout euiFormControlLayout--readOnly"
+                                      >
+                                        <div
+                                          className="euiFormControlLayout__childrenWrapper"
+                                        >
+                                          <EuiValidatableControl>
+                                            <input
+                                              className="euiFieldText"
+                                              data-testid="client-secret"
+                                              readOnly={true}
+                                              type="text"
+                                              value="your_secret_test_1"
+                                            />
+                                          </EuiValidatableControl>
+                                          <EuiFormControlLayoutIcons />
+                                        </div>
+                                      </div>
+                                    </EuiFormControlLayout>
+                                  </EuiFieldText>
+                                </div>
+                              </div>
+                              <EuiSpacer
+                                size="s"
+                              >
+                                <div
+                                  className="euiSpacer euiSpacer--s"
+                                />
+                              </EuiSpacer>
+                            </WzConfigurationSetting>
+                            <WzConfigurationSetting
+                              key="-Client Secret Path-undefined-3"
+                              keyItem="-Client Secret Path-undefined-3"
+                              label="Client Secret Path"
+                            />
+                          </div>
+                        </EuiFlexItem>
+                      </div>
+                    </EuiFlexGroup>
+                  </WzSettingsGroup>
+                </div>
+              </EuiPanel>
+            </div>
+          </EuiFlexItem>
+        </div>
+      </EuiFlexGroup>
+    </WzConfigurationSettingsListSelector>
+  </WzConfigurationSettingsHeader>
 </ApiAuthTab>
 `;

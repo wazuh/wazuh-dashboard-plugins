@@ -16,7 +16,7 @@ import WzNoConfig from '../util-components/no-config';
 
 import { isString } from '../utils/utils';
 import helpLinks from './help-links';
-import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 
 const mainSettings = [
@@ -49,17 +49,16 @@ class WzConfigurationLogSettingsAlerts extends Component {
           currentConfig['analysis-logging'].logging) ||
           (currentConfig['com-logging'] &&
             currentConfig['com-logging'].logging)) && (
-          <WzConfigurationSettingsTabSelector
+          <WzConfigurationSettingsHeader
             title="Alerts settings"
             description="Basic alerts log settings"
-            currentConfig={currentConfig['analysis-logging'].logging.alerts}
-            helpLinks={helpLinks}
+            help={helpLinks}
           >
             <WzConfigurationSettingsGroup
               config={currentConfig['analysis-logging'].logging.alerts}
               items={mainSettings}
             />
-          </WzConfigurationSettingsTabSelector>
+          </WzConfigurationSettingsHeader>
         )}
       </Fragment>
     );

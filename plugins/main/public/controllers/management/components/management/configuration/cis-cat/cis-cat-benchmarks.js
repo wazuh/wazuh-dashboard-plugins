@@ -15,7 +15,7 @@ import React, { Component, Fragment } from 'react';
 import { EuiBasicTable } from '@elastic/eui';
 
 import WzNoConfig from '../util-components/no-config';
-import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import { isString } from '../utils/utils';
 import helpLinks from './help-links';
 
@@ -47,27 +47,21 @@ class WzConfigurationCisCatBenchmarks extends Component {
           )}
         {wodleConfig['cis-cat'] && wodleConfig['cis-cat'].content && (
           <Fragment>
-            <WzConfigurationSettingsTabSelector
+            <WzConfigurationSettingsHeader
               title="Benchmarks"
               description="List of CIS-CAT benchmark templates to perform scans"
-              currentConfig={wodleConfig}
-              minusHeight={this.props.agent.id === '000' ? 320 : 415}
-              helpLinks={helpLinks}
+              help={helpLinks}
             >
               <EuiBasicTable
                 items={wodleConfig['cis-cat'].content}
                 columns={columns}
               />
-            </WzConfigurationSettingsTabSelector>
+            </WzConfigurationSettingsHeader>
           </Fragment>
         )}
       </Fragment>
     );
   }
 }
-
-WzConfigurationCisCatBenchmarks.propTypes = {
-  // currentConfig: PropTypes.object.isRequired
-};
 
 export default WzConfigurationCisCatBenchmarks;
