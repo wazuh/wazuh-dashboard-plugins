@@ -1,4 +1,11 @@
-import { getLinuxDEBInstallCommand, getLinuxRPMInstallCommand, getLinuxStartCommand, getMacOsInstallCommand, getMacosStartCommand, getWindowsInstallCommand, getWindowsStartCommand } from '../../services/register-agent-os-commands-services';
+import { 
+  getDEBInstallCommand,
+  getRPMInstallCommand,
+  getLinuxStartCommand, 
+  getMacOsInstallCommand, 
+  getMacosStartCommand, 
+  getWindowsInstallCommand, 
+  getWindowsStartCommand } from '../../services/register-agent-os-commands-services';
 import { IOSDefinition, tOptionalParams } from '../register-commands/types';
 
 // Defined OS combinations
@@ -33,7 +40,7 @@ type ILinuxOSTypes =
 /** Windows options **/
 export interface IWindowsOSTypes {
   name: 'WINDOWS';
-  architecture: 'MSI 32/64';
+  architecture: 'MSI 32/64 bits';
 }
 
 /** MacOS options **/
@@ -44,7 +51,7 @@ export interface IMacOSIntel {
 
 export interface IMacOSApple {
   name: 'macOS';
-  architecture: 'Apple Silicon';
+  architecture: 'Apple silicon';
 }
 
 type IMacOSTypes = IMacOSApple | IMacOSIntel;
@@ -69,28 +76,28 @@ const linuxDefinition: IOSDefinition<ILinuxOSTypes, tOptionalParameters> = {
       architecture: 'DEB amd64',
       urlPackage: props =>
         `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${props.wazuhVersion}-1_amd64.deb`,
-      installCommand: props => getLinuxDEBInstallCommand(props),
+      installCommand: props => getDEBInstallCommand(props),
       startCommand: props => getLinuxStartCommand(props),
     },
     {
       architecture: 'DEB aarch64',
       urlPackage: props =>
-        `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${props.wazuhVersion}-1_aarch64.deb`,
-      installCommand: props => getLinuxDEBInstallCommand(props),
+        `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${props.wazuhVersion}-1_amd64.deb`,
+      installCommand: props => getDEBInstallCommand(props),
       startCommand: props => getLinuxStartCommand(props),
     },
     {
       architecture: 'RPM amd64',
       urlPackage: props =>
         `https://packages.wazuh.com/4.x/yum/wazuh-agent-${props.wazuhVersion}-1.x86_64.rpm`,
-      installCommand: props => getLinuxRPMInstallCommand(props),
+      installCommand: props => getRPMInstallCommand(props),
       startCommand: props => getLinuxStartCommand(props),
     },
     {
       architecture: 'RPM aarch64',
       urlPackage: props =>
-      `https://packages.wazuh.com/4.x/yum/wazuh-agent-${props.wazuhVersion}-1.aarch64.rpm`,
-      installCommand: props => getLinuxRPMInstallCommand(props),
+      `https://packages.wazuh.com/4.x/yum/wazuh-agent-${props.wazuhVersion}-1.x86_64.rpm`,
+      installCommand: props => getRPMInstallCommand(props),
       startCommand: props => getLinuxStartCommand(props),
     },
   ],
@@ -100,7 +107,7 @@ const windowsDefinition: IOSDefinition<IWindowsOSTypes, tOptionalParameters> = {
   name: 'WINDOWS',
   options: [
     {
-      architecture: 'MSI 32/64',
+      architecture: 'MSI 32/64 bits',
       urlPackage: props =>
         `https://packages.wazuh.com/4.x/windows/wazuh-agent-${props.wazuhVersion}-1.msi`,
       installCommand: props => getWindowsInstallCommand(props),
@@ -120,7 +127,7 @@ const macDefinition: IOSDefinition<IMacOSTypes, tOptionalParameters> = {
       startCommand: props => getMacosStartCommand(props),
     },
     {
-      architecture: 'Apple Silicon',
+      architecture: 'Apple silicon',
       urlPackage: props =>
         `https://packages.wazuh.com/4.x/macos/wazuh-agent-${props.wazuhVersion}-1.arm64.pkg`,
       installCommand: props => getMacOsInstallCommand(props),

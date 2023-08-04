@@ -33,7 +33,6 @@ import {
   tFormStepsLabel,
 } from '../../services/register-agent-steps-status-services';
 import { webDocumentationLink } from '../../../../../common/services/web_documentation';
-import { getPasswordForCommand } from '../../services/wazuh-password-service';
 
 interface IStepsProps {
   needsPassword: boolean;
@@ -161,7 +160,7 @@ export const Steps = ({
                       )}
                       rel='noopener noreferrer'
                     >
-                      steps
+                      documentation
                     </EuiLink>
                   </span>
                 }

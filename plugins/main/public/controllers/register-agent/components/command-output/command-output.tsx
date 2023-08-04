@@ -8,12 +8,13 @@ import {
   EuiText,
 } from '@elastic/eui';
 import React, { Fragment, useEffect, useState } from 'react';
+import { tOperatingSystem } from '../../core/config/os-commands-definitions';
 
 interface ICommandSectionProps {
   commandText: string;
   showCommand: boolean;
   onCopy: () => void;
-  os?: 'WINDOWS' | string;
+  os?: tOperatingSystem['name'];
   password?: string;
 }
 

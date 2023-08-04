@@ -28,11 +28,7 @@ const getAllOptionals = (
   if (osName && osName.toLowerCase() === 'windows' && optionals.serverAddress) {
     // when os is windows we must to add wazuh registration server with server address
     paramsText =
-      paramsText +
-      `WAZUH_REGISTRATION_SERVER=${optionals.serverAddress.replace(
-        'WAZUH_MANAGER=',
-        '',
-      )} `;
+      paramsText + `WAZUH_REGISTRATION_SERVER=${optionals.serverAddress.replace('WAZUH_MANAGER=','')} `;
   }
 
   return paramsText;
@@ -55,25 +51,6 @@ const getAllOptionalsMacos = (
 };
 
 /******* Linux *******/
-
-// Install command
-export const getLinuxRPMInstallCommand = (
-  props: tOSEntryInstallCommand<tOptionalParameters>,
-) => {
-  const { optionals, urlPackage } = props;
-  return `sudo ${
-    optionals && getAllOptionals(optionals)
-  }yum install -y ${urlPackage}`;
-};
-
-export const getLinuxDEBInstallCommand = (
-  props: tOSEntryInstallCommand<tOptionalParameters>,
-) => {
-  const { optionals, urlPackage } = props;
-  return `curl -so wazuh-agent.deb ${urlPackage} && sudo ${
-    optionals && getAllOptionals(optionals)
-  }dpkg -i ./wazuh-agent.deb`;
-};
 
 // Start command
 export const getLinuxStartCommand = (

@@ -108,7 +108,7 @@ const architectureButtonsMacos = [
   },
   {
     id: 'arm64',
-    label: 'Apple Silicon',
+    label: 'Apple silicon',
   },
 ];
 
