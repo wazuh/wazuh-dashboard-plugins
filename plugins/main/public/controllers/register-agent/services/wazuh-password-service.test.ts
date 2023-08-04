@@ -15,7 +15,7 @@ describe('Wazuh Password Service', () => {
     ' should return password received with scaped characters: $passwordFromAPI | $scapedPassword | $expectedScapedPassword',
     ({ passwordFromAPI, expectedScapedPassword }) => {
       const passwordScaped = getPasswordWithScapedSpecialCharacters(passwordFromAPI);
-      /* log to compare passwords */
+      /* log to compare passwords 
       console.log(
         'PASSWORD REAL: ',
         passwordFromAPI,
@@ -26,6 +26,7 @@ describe('Wazuh Password Service', () => {
         '\nPASSWORD SCAPED REAL IN COMMAND EXPECTED: ',
         expectedScapedPassword
       );
+      */
       expect(passwordScaped).toEqual(expectedScapedPassword);
     }
   );
