@@ -8,6 +8,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.7.0
 - Added `status detail` column in the agents table. [#5680](https://github.com/wazuh/wazuh-kibana-app/pull/5680)
+- Added agent register wizard handle properly special characters in password [5738](https://github.com/wazuh/wazuh-kibana-app/pull/5738)
 
 ### Changed
 
