@@ -458,11 +458,6 @@ export class WazuhElasticCtrl {
         const title = visState.title;
 
         if (title.startsWith('Wazuh App Statistics')) {
-          const { searchSourceJSON } =
-            bulk_content.visualization.kibanaSavedObjectMeta;
-          bulk_content.visualization.kibanaSavedObjectMeta.searchSourceJSON =
-            searchSourceJSON.replace('wazuh-statistics-*', pattern_name);
-
           const filter =
             bulk_content.visualization.kibanaSavedObjectMeta.searchSourceJSON.replace(
               '"filter":[]',
@@ -471,32 +466,6 @@ export class WazuhElasticCtrl {
 
           bulk_content.visualization.kibanaSavedObjectMeta.searchSourceJSON =
             filter;
-          console.log(bulk_content.visualization);
-        }
-        if (
-          title.startsWith('Wazuh App Statistics') &&
-          name !== '-' &&
-          name !== 'all' &&
-          visState.params.expression.includes('q=')
-        ) {
-          const expressionRegex = /q='\*'/gi;
-          const _visStateLine = bulk_content.visualization.visStateByNode
-            ? JSON.parse(bulk_content.visualization.visStateByNode)
-            : visState;
-          query += _visStateLine.params.expression
-            .replace(/wazuh-statistics-\*/g, pattern_name)
-            .replace(
-              expressionRegex,
-              `q="nodeName.keyword:${name} AND apiName.keyword:${master_node}"`,
-            )
-            .replace('NODE_NAME', name);
-        } else if (title.startsWith('Wazuh App Statistics')) {
-          const expressionRegex = /q='\*'/gi;
-          query += visState.params.expression
-            .replace(/wazuh-statistics-\*/g, pattern_name)
-            .replace(expressionRegex, `q="apiName.keyword:${master_node}"`);
-        } else {
-          query = visState.params.expression;
         }
 
         if (visState.type && visState.type === 'timelion') {
@@ -508,38 +477,6 @@ export class WazuhElasticCtrl {
             query = query.substring(0, query.length - 1);
           } else if (title === 'Wazuh App Cluster Overview Manager') {
             query += `.es(index=${pattern_name},q="cluster.name: ${name}").label("${name} cluster")`;
-          } else {
-            if (title.startsWith('Wazuh App Statistics')) {
-              const { searchSourceJSON } =
-                bulk_content.visualization.kibanaSavedObjectMeta;
-              bulk_content.visualization.kibanaSavedObjectMeta.searchSourceJSON =
-                searchSourceJSON.replace('wazuh-statistics-*', pattern_name);
-            }
-            if (
-              title.startsWith('Wazuh App Statistics') &&
-              name !== '-' &&
-              name !== 'all' &&
-              visState.params.expression.includes('q=')
-            ) {
-              const expressionRegex = /q='\*'/gi;
-              const _visState = bulk_content.visualization.visStateByNode
-                ? JSON.parse(bulk_content.visualization.visStateByNode)
-                : visState;
-              query += _visState.params.expression
-                .replace(/wazuh-statistics-\*/g, pattern_name)
-                .replace(
-                  expressionRegex,
-                  `q="nodeName.keyword:${name} AND apiName.keyword:${master_node}"`,
-                )
-                .replace('NODE_NAME', name);
-            } else if (title.startsWith('Wazuh App Statistics')) {
-              const expressionRegex = /q='\*'/gi;
-              query += visState.params.expression
-                .replace(/wazuh-statistics-\*/g, pattern_name)
-                .replace(expressionRegex, `q="apiName.keyword:${master_node}"`);
-            } else {
-              query = visState.params.expression;
-            }
           }
 
           visState.params.expression = query.replace(/'/g, '"');
