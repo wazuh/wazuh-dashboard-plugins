@@ -183,7 +183,7 @@ export const optionalParamsDefinitions: tOptionalParams<tOptionalParameters> = {
     property: 'WAZUH_REGISTRATION_PASSWORD',
     getParamCommand: props => {
       const { property, value } = props;
-      return value !== '' ? `${property}='${value}'` : '';
+      return value !== '' ? `${property}=$'${value}'` : '';
     },
   },
 };
