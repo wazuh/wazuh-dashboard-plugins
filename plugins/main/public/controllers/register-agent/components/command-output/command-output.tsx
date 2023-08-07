@@ -64,8 +64,8 @@ export default function CommandOutput(props: ICommandSectionProps) {
       } else {
         setCommandToShow(
           command.replace(
-            `WAZUH_REGISTRATION_PASSWORD='${password}'`,
-            `WAZUH_REGISTRATION_PASSWORD='${'*'.repeat(password.length)}'`,
+            `WAZUH_REGISTRATION_PASSWORD=$'${password}'`,
+            `WAZUH_REGISTRATION_PASSWORD=$'${'*'.repeat(password.length)}'`,
           ),
         );
       }
