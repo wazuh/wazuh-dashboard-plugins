@@ -50,7 +50,7 @@ export default function CommandOutput(props: ICommandSectionProps) {
     } else {
       let command = commandText;
       if (os?.toLocaleLowerCase() === 'macos') {
-        const regex = /WAZUH_REGISTRATION_PASSWORD='((?:\\'|[^'])*)'/g;
+        const regex = /WAZUH_REGISTRATION_PASSWORD=\$'((?:\\'|[^']|[\"'])*)'/g;
         const replacedString = command.replace(
           regex,
           (match, capturedGroup) => {
@@ -58,20 +58,21 @@ export default function CommandOutput(props: ICommandSectionProps) {
               capturedGroup,
               '*'.repeat(capturedGroup.length),
             );
-          },
+          }
         );
         setCommandToShow(replacedString);
       } else {
-        setCommandToShow(
-          command.replace(
-            `WAZUH_REGISTRATION_PASSWORD=$'${password}'`,
-            `WAZUH_REGISTRATION_PASSWORD=$'${'*'.repeat(password.length)}'`,
-          ),
+        const replacedString = command.replace(
+          `WAZUH_REGISTRATION_PASSWORD=\$'${password}'`,
+          () => {
+            return `WAZUH_REGISTRATION_PASSWORD=\$\'${'*'.repeat(password.length)}\'`;
+          }
         );
+        setCommandToShow(replacedString);
       }
     }
   };
-
+  
   const onChangeShowPassword = (event: EuiSwitchEvent) => {
     setShowPassword(event.target.checked);
   };
