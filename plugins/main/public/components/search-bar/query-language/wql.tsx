@@ -710,7 +710,7 @@ function validateTokenValue(token: IToken): string | undefined {
     );
 
   return [
-    `"${token.value}" is not a valid value.`,
+    `"${value}" is not a valid value.`,
     ...(invalidCharacters.length
       ? [`Invalid characters found: ${invalidCharacters.join('')}`]
       : []),
