@@ -16,7 +16,10 @@ import { Markdown } from '../../common/util';
 import { formatUIDate } from '../../../react-services';
 import React from 'react';
 import { EuiLink } from '@elastic/eui';
-import { UI_LOGGER_LEVELS } from '../../../../common/constants';
+import {
+  SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
+  UI_LOGGER_LEVELS,
+} from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 
@@ -28,7 +31,7 @@ const getMitreAttackIntelligenceSuggestions = async (
   try {
     const params = {
       distinct: true,
-      limit: 30,
+      limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
       select: field,
       sort: `+${field}`,
       ...(currentValue ? { q: `${field}~${currentValue}` } : {}),
