@@ -31,6 +31,7 @@ import {
   API_NAME_AGENT_STATUS,
   UI_ORDER_AGENT_STATUS,
   AGENT_SYNCED_STATUS,
+  SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
 } from '../../../../common/constants';
 import { AgentStatus } from '../../../components/agents/agent_status';
 import { AgentSynced } from '../../../components/agents/agent-synced';
@@ -419,7 +420,7 @@ export const AgentsTable = withErrorBoundary(
                             {
                               params: {
                                 distinct: true,
-                                limit: 30,
+                                limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
                                 select: field,
                                 sort: `+${field}`,
                                 ...(currentValue
