@@ -127,7 +127,6 @@ const decodersFiles = {
       return result?.data?.data?.affected_items?.map(item => ({
         label: item[field],
       }));
-      }
     } catch (error) {
       return [];
     }
