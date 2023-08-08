@@ -25,8 +25,8 @@ export const scapeSpecialCharsForWindows = (password: string) => {
   const specialCharsList = ["'"];
   const regex = new RegExp(`([${specialCharsList.join('')}])`, 'g');
   // the single quote is escaped first, and then any unescaped backslashes are escaped
-  return passwordScaped.replace(regex, `\'\"$&\"\'`).replace(/(?<!\\)\\(?!["\\])/g, '\\\\');
-}
+  return passwordScaped.replace(regex, `\'\"$&\"\'`).replace(/(?<!\\)\\(?!["\\])/g, '\\');
+};
 
 export const osdfucatePasswordInCommand = (password: string, commandText: string, os: tOperatingSystem['name']): string => {
   let command = commandText;
@@ -46,8 +46,17 @@ export const osdfucatePasswordInCommand = (password: string, commandText: string
       );
     return replacedString;
     }
-    case 'linux':
     case 'windows':
+      {
+        const replacedString = command.replace(
+          `WAZUH_REGISTRATION_PASSWORD=\'${scapeSpecialCharsForWindows(password)}'`,
+          () => {
+            return `WAZUH_REGISTRATION_PASSWORD=\'${'*'.repeat(scapeSpecialCharsForWindows(password).length)}\'`;
+          }
+        );
+        return replacedString;
+      }
+    case 'linux':
     {
       const replacedString = command.replace(
         `WAZUH_REGISTRATION_PASSWORD=\$'${scapeSpecialCharsForLinux(password)}'`,

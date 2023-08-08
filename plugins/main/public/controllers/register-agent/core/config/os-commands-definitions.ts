@@ -195,7 +195,7 @@ export const optionalParamsDefinitions: tOptionalParams<tOptionalParameters> = {
           case "macos":
             return `${property}=$'${scapeSpecialCharsForMacOS(value)}'`;
           case "windows":
-            return `${property}=$'${scapeSpecialCharsForWindows(value)}'`;
+            return `${property}='${scapeSpecialCharsForWindows(value)}'`;
           default:
             return `${property}=$'${value}'`;
         }
