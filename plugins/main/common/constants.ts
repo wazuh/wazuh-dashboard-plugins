@@ -2251,4 +2251,6 @@ export const MODULE_SCA_CHECK_RESULT_LABEL = {
 };
 
 // Search bar
+
+// This limits the results in the API request
 export const SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT = 30;
