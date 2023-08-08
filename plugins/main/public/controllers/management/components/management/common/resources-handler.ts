@@ -89,35 +89,50 @@ export class ResourcesHandler {
    * @param {String} content
    * @param {Boolean} overwrite
    */
-  async updateFile(fileName: string, content: string, overwrite: boolean) {    
+  async updateFile(
+    fileName: string,
+    content: string,
+    overwrite: boolean,
+    relativeDirname: string,
+  ) {
     try {
-      const result = await WzRequest.apiReq('PUT', this.getResourceFilesPath(fileName), {
-        params: {
-          overwrite: overwrite
+      const result = await WzRequest.apiReq(
+        'PUT',
+        this.getResourceFilesPath(fileName),
+        {
+          params: {
+            overwrite: overwrite,
+            relative_dirname: relativeDirname,
+          },
+          body: content.toString(),
+          origin: 'raw',
         },
-        body: content.toString(),
-        origin: 'raw'
-      });
+      );
       return result;
     } catch (error) {
       throw error;
     }
   }
-  
 
   /**
    * Delete any type of file Rules, Decoders, CDB lists...
    * @param {Resource} resource
    * @param {String} fileName
    */
-  async deleteFile(fileName: string) {
-    let fullPath = `${resourceDictionary[this.resource].resourcePath}/files/${fileName}`;
+  async deleteFile(fileName: string, relativeDirname: string = '') {
     try {
-      const result = await WzRequest.apiReq('DELETE', fullPath, {});
+      const result = await WzRequest.apiReq(
+        'DELETE',
+        this.getResourceFilesPath(fileName),
+        {
+          params: {
+            relative_dirname: relativeDirname,
+          },
+        },
+      );
       return result;
     } catch (error) {
       throw error;
     }
   }
-
 }
