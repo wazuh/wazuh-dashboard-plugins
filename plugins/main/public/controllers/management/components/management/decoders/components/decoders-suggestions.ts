@@ -1,3 +1,4 @@
+import { SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT } from '../../../../../../../common/constants';
 import { WzRequest } from '../../../../../../react-services/wz-request';
 
 const decodersItems = {
@@ -16,7 +17,7 @@ const decodersItems = {
         case 'details.order': {
           const filter = {
             distinct: true,
-            limit: 30,
+            limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
             select: field,
             ...(currentValue ? { q: `${field}~${currentValue}` } : {}),
           };
@@ -35,7 +36,7 @@ const decodersItems = {
         case 'details.program_name': {
           const filter = {
             distinct: true,
-            limit: 30,
+            limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
             select: field,
             ...(currentValue ? { q: `${field}~${currentValue}` } : {}),
           };
@@ -44,7 +45,7 @@ const decodersItems = {
           });
           // FIX: this breaks the search bar component because returns a non-string value.
           return result?.data?.data?.affected_items
-            ?.filter(item => item?.details?.program_name)
+            ?.filter(item => typeof item?.details?.program_name === 'string')
             .map(item => ({
               label: item?.details?.program_name,
             }));
@@ -52,7 +53,7 @@ const decodersItems = {
         case 'filename': {
           const filter = {
             distinct: true,
-            limit: 30,
+            limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
             select: field,
             sort: `+${field}`,
             ...(currentValue ? { q: `${field}~${currentValue}` } : {}),
@@ -67,7 +68,7 @@ const decodersItems = {
         case 'name': {
           const filter = {
             distinct: true,
-            limit: 30,
+            limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
             select: field,
             sort: `+${field}`,
             ...(currentValue ? { q: `${field}~${currentValue}` } : {}),
@@ -82,7 +83,7 @@ const decodersItems = {
         case 'relative_dirname': {
           const filter = {
             distinct: true,
-            limit: 30,
+            limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
             select: field,
             sort: `+${field}`,
             ...(currentValue ? { q: `${field}~${currentValue}` } : {}),
@@ -113,40 +114,19 @@ const decodersFiles = {
   },
   value: async (currentValue, { field }) => {
     try {
-      switch (field) {
-        case 'filename': {
-          const filter = {
-            distinct: true,
-            limit: 30,
-            select: field,
-            sort: `+${field}`,
-            ...(currentValue ? { q: `${field}~${currentValue}` } : {}),
-          };
-          const result = await WzRequest.apiReq('GET', '/decoders/files', {
-            params: filter,
-          });
-          return result?.data?.data?.affected_items?.map(item => ({
-            label: item[field],
-          }));
-          break;
-        }
-        case 'relative_dirname': {
-          const filter = {
-            distinct: true,
-            limit: 30,
-            select: field,
-            sort: `+${field}`,
-            ...(currentValue ? { q: `${field}~${currentValue}` } : {}),
-          };
-          const result = await WzRequest.apiReq('GET', '/decoders', {
-            params: filter,
-          });
-          return result?.data?.data?.affected_items.map(item => ({
-            label: item[field],
-          }));
-        }
-        default:
-          return [];
+      const filter = {
+        distinct: true,
+        limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
+        select: field,
+        sort: `+${field}`,
+        ...(currentValue ? { q: `${field}~${currentValue}` } : {}),
+      };
+      const result = await WzRequest.apiReq('GET', '/decoders/files', {
+        params: filter,
+      });
+      return result?.data?.data?.affected_items?.map(item => ({
+        label: item[field],
+      }));
       }
     } catch (error) {
       return [];

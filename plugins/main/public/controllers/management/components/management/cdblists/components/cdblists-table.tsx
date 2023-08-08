@@ -20,7 +20,10 @@ import {
 } from '../../common/resources-handler';
 import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
 import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
-import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
+import {
+  SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
+  UI_LOGGER_LEVELS,
+} from '../../../../../../../common/constants';
 
 import {
   SECTION_CDBLIST_SECTION,
@@ -200,7 +203,7 @@ function CDBListsTable(props) {
                 const response = await WzRequest.apiReq('GET', '/lists', {
                   params: {
                     distinct: true,
-                    limit: 30,
+                    limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
                     select: field,
                     sort: `+${field}`,
                     ...(currentValue ? { q: `${field}~${currentValue}` } : {}),

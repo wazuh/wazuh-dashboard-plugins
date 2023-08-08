@@ -9,6 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT } from '../../../../../../common/constants';
 import { WzRequest } from '../../../../../react-services/wz-request';
 
 export async function getAggregation(
@@ -35,7 +36,7 @@ export async function getFilterValues(
     distinct: true,
     select: field,
     sort: `+${field}`,
-    limit: 30,
+    limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
   };
   const result = await WzRequest.apiReq('GET', `/vulnerability/${agentId}`, {
     params: filter,
