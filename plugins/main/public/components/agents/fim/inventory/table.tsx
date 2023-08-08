@@ -16,6 +16,7 @@ import { WzRequest } from '../../../../react-services/wz-request';
 import { FlyoutDetail } from './flyout';
 import { formatUIDate } from '../../../../react-services/time-service';
 import { TableWzAPI } from '../../../common/tables';
+import { SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT } from '../../../../../common/constants';
 
 const searchBarWQLOptions = {
   implicitQuery: {
@@ -225,7 +226,7 @@ export class InventoryTable extends Component {
                       {
                         params: {
                           distinct: true,
-                          limit: 30,
+                          limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
                           select: field,
                           sort: `+${field}`,
                           ...(currentValue
