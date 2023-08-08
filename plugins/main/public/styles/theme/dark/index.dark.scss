@@ -6,15 +6,15 @@ body,
 html.md-default-theme,
 html {
   color: #dfe5ef !important;
-  background-color: #1a1b20!important;
+  background-color: #1a1b20 !important;
 }
 
-.application{
+.application {
   background: #1a1b20;
 }
 
 #kibana-body {
-  background-color: #1a1b20!important;
+  background-color: #1a1b20 !important;
 }
 
 .euiHeaderSectionItem__button,
@@ -28,7 +28,7 @@ html {
 } */
 
 .wz-global-breadcrumb .euiToolTipAnchor {
-  color: #98A2B3!important;
+  color: #98a2b3 !important;
 }
 
 .app-wrapper-panel {
@@ -36,8 +36,9 @@ html {
 }
 
 .wz-md-card:not(.wz-metric-color) {
-  box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.3), 0 1px 5px -2px rgba(0, 0, 0, 0.3);
-  background-color: #1D1E24;
+  box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.3),
+    0 1px 5px -2px rgba(0, 0, 0, 0.3);
+  background-color: #1d1e24;
   border: 1px solid #343741;
 }
 
@@ -46,22 +47,23 @@ html {
   border-bottom: 1px solid #343741;
 }
 
-.wz-card-actions.wz-card-actions-top, .columns-bar-active {
-  border-bottom: 1px solid #343741!important;
+.wz-card-actions.wz-card-actions-top,
+.columns-bar-active {
+  border-bottom: 1px solid #343741 !important;
   background: #16171c;
   color: #dfe5ef;
-  border-top: none!important;
+  border-top: none !important;
 }
 
 .kuiButton--secondary:enabled:hover {
-  background: rgba(27, 169, 245, 0.1)!important;
-  color: #45b9f6!important;
-  border-color: #1BA9F5!important;
+  background: rgba(27, 169, 245, 0.1) !important;
+  color: #45b9f6 !important;
+  border-color: #1ba9f5 !important;
 }
 
 .kuiButton--secondary {
-  color: #45b9f6!important;
-  border-color: #1BA9F5;
+  color: #45b9f6 !important;
+  border-color: #1ba9f5;
   background: transparent;
 }
 
@@ -76,7 +78,7 @@ html {
 }
 
 .registerAgent {
-  background: #1a1b20!important;
+  background: #1a1b20 !important;
 }
 
 .json-beautifier {
@@ -89,7 +91,7 @@ html {
   border-color: #343741;
 }
 
-.kuiSelect{
+.kuiSelect {
   filter: invert(1);
 }
 
@@ -114,9 +116,8 @@ md-content {
 }
 
 .visLegend__toggle {
-  color: white!important;
+  color: white !important;
 }
-
 
 .euiBreadcrumbs--truncate
   .euiBreadcrumb:not(.euiBreadcrumb--collapsed).euiBreadcrumb--last,
@@ -131,11 +132,12 @@ md-content {
 
 .wz-nav-item button.md-primary {
   color: #0079a5 !important;
-  background-color: #232635!important;
-  border-bottom: 2px solid #006BB4;
+  background-color: #232635 !important;
+  border-bottom: 2px solid #006bb4;
 }
 
-md-nav-bar.md-default-theme .md-nav-bar, md-nav-bar .md-nav-bar {
+md-nav-bar.md-default-theme .md-nav-bar,
+md-nav-bar .md-nav-bar {
   border-color: rgb(52, 55, 65);
 }
 
@@ -144,8 +146,8 @@ md-nav-bar.md-default-theme .md-nav-bar, md-nav-bar .md-nav-bar {
 }
 
 .sidebar-container .index-pattern {
-  background-color: #1ba9f5!important;
-  color: white!important;
+  background-color: #1ba9f5 !important;
+  color: white !important;
 }
 
 .wz-menu {
@@ -180,7 +182,8 @@ md-nav-bar.md-default-theme .md-nav-bar, md-nav-bar .md-nav-bar {
   color: #dfe5ef;
 }
 
-.md-subheader.md-default-theme, .md-subheader {
+.md-subheader.md-default-theme,
+.md-subheader {
   color: #dfe5ef;
 }
 
@@ -205,18 +208,19 @@ table thead > tr {
   color: #dfe5ef;
 }
 
-#wz-search-filter-bar-input{
+#wz-search-filter-bar-input {
   box-shadow: none;
 }
 
-.kuiLocalSearchInput, .kuiLocalSearchInput:focus {
+.kuiLocalSearchInput,
+.kuiLocalSearchInput:focus {
   border: 1px solid #343741 !important;
   background: #16171c;
   color: #dfe5ef;
 }
 
 .wzMultipleSelector .panel-primary {
-  border: 1px solid #343741!important;
+  border: 1px solid #343741 !important;
   -webkit-box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1) !important;
   box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1) !important;
   border-radius: 2px;
@@ -239,11 +243,12 @@ table thead > tr {
   border-left: 1px dashed #343741;
 }
 
-md-dialog.md-default-theme.md-content-overflow .md-actions, 
-md-dialog.md-content-overflow .md-actions, 
-md-dialog.md-default-theme.md-content-overflow md-dialog-actions, 
-md-dialog.md-content-overflow md-dialog-actions, 
-md-divider.md-default-theme, md-divider {
+md-dialog.md-default-theme.md-content-overflow .md-actions,
+md-dialog.md-content-overflow .md-actions,
+md-dialog.md-default-theme.md-content-overflow md-dialog-actions,
+md-dialog.md-content-overflow md-dialog-actions,
+md-divider.md-default-theme,
+md-divider {
   border-top-color: rgb(52, 55, 65);
 }
 
@@ -272,18 +277,18 @@ md-divider.md-default-theme, md-divider {
   background-color: #0b4462;
 }
 
-.CodeMirror-hints{
+.CodeMirror-hints {
   background-color: #16171c !important;
   border-color: #000;
-  color: #dfe5ef!important;
+  color: #dfe5ef !important;
 }
 
-.CodeMirror-hint{
-  color: #dfe5ef!important;
+.CodeMirror-hint {
+  color: #dfe5ef !important;
 }
 
-.CodeMirror-hint:hover{
-  background-color: #25262E;
+.CodeMirror-hint:hover {
+  background-color: #25262e;
 }
 
 .wz-input-text {
@@ -293,7 +298,7 @@ md-divider.md-default-theme, md-divider {
 }
 
 .wz-menu {
-  box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.3)!important;
+  box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.3) !important;
 }
 
 .wz-menu-select {
@@ -309,29 +314,36 @@ md-divider.md-default-theme, md-divider {
 }
 
 .extraHeader {
-  border-bottom: 1px solid #2e2f34!important;
+  border-bottom: 1px solid #2e2f34 !important;
 }
 
-.wzMultipleSelectorAdding{
-  background-color: #037200!important;
+.wzMultipleSelectorAdding {
+  background-color: #037200 !important;
 }
 
-.wzMultipleSelectorRemoving{
-  background-color: #990000!important;
+.wzMultipleSelectorRemoving {
+  background-color: #990000 !important;
 }
 
-.wzMultipleSelectorSelect{
+.wzMultipleSelectorSelect {
   background-color: #16171c;
   border: 1px solid rgb(52, 55, 65);
 }
 
-.wz-button, .wz-button-groups, .refresh-agents-btn {
-  background-color: #1BA9F5 !important;
-  border-color: #1BA9F5 !important;
+.wz-button,
+.wz-button-groups,
+.refresh-agents-btn {
+  background-color: #1ba9f5 !important;
+  border-color: #1ba9f5 !important;
   color: #000 !important;
 }
 
-.wz-button-groups.active, .wz-button-groups:not([disabled]):hover, .wz-button.active, .wz-button:not([disabled]):hover, .wz-button-flat:not([disabled]):hover, .refresh-agents-btn:hover {
+.wz-button-groups.active,
+.wz-button-groups:not([disabled]):hover,
+.wz-button.active,
+.wz-button:not([disabled]):hover,
+.wz-button-flat:not([disabled]):hover,
+.refresh-agents-btn:hover {
   background-color: #0a9dec !important;
   border-color: #0a9dec !important;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.15), 0 2px 2px -1px rgba(0, 0, 0, 0.3) !important;
@@ -339,77 +351,78 @@ md-divider.md-default-theme, md-divider {
 }
 
 .kuiButton--hollow:hover {
-  color: #006E8A !important;
+  color: #006e8a !important;
   text-decoration: underline !important;
 }
 
-
 .wz-menu-select {
-  filter: invert(0) !important; 
+  filter: invert(0) !important;
 }
 
-.logtest{
-  border-left: 1px solid #343741!important;
-  box-shadow: -2px 0px 2px -1px rgba(0, 0, 0, 0.3)!important;
+.logtest {
+  border-left: 1px solid #343741 !important;
+  box-shadow: -2px 0px 2px -1px rgba(0, 0, 0, 0.3) !important;
   background: #1a1b20;
   z-index: 10;
 }
 
 .wz-menu-left-side {
-  border-right: 1px solid #343741!important;
-  background: #1d1e24!important;
+  border-right: 1px solid #343741 !important;
+  background: #1d1e24 !important;
 }
 
 .wz-menu-sections {
   background: #1a1b20;
 }
 
-
-.wz-module-header-agent, .wz-module-header-nav {
-  border-bottom: 1px solid #343741!important;
-  background: #1d1e24!important;
+.wz-module-header-agent,
+.wz-module-header-nav {
+  border-bottom: 1px solid #343741 !important;
+  background: #1d1e24 !important;
 }
 
 .wz-welcome-page-agent-info {
-  box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.3), 0 1px 5px -2px rgba(0, 0, 0, 0.3)!important;
-  background: #1d1e24!important;
+  box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.3),
+    0 1px 5px -2px rgba(0, 0, 0, 0.3) !important;
+  background: #1d1e24 !important;
 }
 
-.wz-welcome-page-agent-info .wz-welcome-page-agent-info-details{
-  background: #1a1b20!important;
-  border-bottom: 1px solid #343741!important;
+.wz-welcome-page-agent-info .wz-welcome-page-agent-info-details {
+  background: #1a1b20 !important;
+  border-bottom: 1px solid #343741 !important;
 }
 
 .details-row {
-  background: #16171c!important;
-  border-top: 1px solid #343741!important;
+  background: #16171c !important;
+  border-top: 1px solid #343741 !important;
 }
 
-.wz-inventory{
+.wz-inventory {
   .detail-tooltip {
     background-color: #16171c;
   }
 }
 
 .flyout-body .euiAccordion {
-  border-bottom: 1px solid #343741!important;
+  border-bottom: 1px solid #343741 !important;
 }
 
 .module-discover-table .euiTableRow.euiTableRow-isExpandedRow .euiTableRowCell {
-  background: #1d1e24!important;
+  background: #1d1e24 !important;
 }
 
 .module-discover-table .euiTableRow-isExpandedRow .euiTableCellContent {
-  background: #1d1e24!important;
+  background: #1d1e24 !important;
 }
 
-.wz-search-bar > div > div > div.euiComboBox__inputWrap{
-  background: #16171c!important;
-  box-shadow: 0 1px 1px -1px rgba(0, 0, 0, 0.2), 0 3px 2px -2px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.1)!important;
+.wz-search-bar > div > div > div.euiComboBox__inputWrap {
+  background: #16171c !important;
+  box-shadow: 0 1px 1px -1px rgba(0, 0, 0, 0.2),
+    0 3px 2px -2px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.1) !important;
 }
 
 .euiComboBoxPlaceholder {
-  color: #DFE5EF!important;
+  color: #dfe5ef !important;
 }
 
 svg .legend text {
@@ -418,7 +431,7 @@ svg .legend text {
 
 /* welcome-agent */
 
-.wz-welcome-page-agent-tabs{
+.wz-welcome-page-agent-tabs {
   padding: 12px 16px 1px 10px;
   min-height: 54px;
   border-bottom: 1px solid #343741;
@@ -436,15 +449,16 @@ svg .legend text {
 
 .wz-menu-agent-info {
   background-color: #1a1b20;
-  border-bottom: 1px solid #343741!important;
+  border-bottom: 1px solid #343741 !important;
 }
 
 .flyout-row {
   border: none;
 }
 
-.application .euiAccordion, .flyout-body .euiAccordion {
-  border-bottom: 1px solid #343741!important;
+.application .euiAccordion,
+.flyout-body .euiAccordion {
+  border-bottom: 1px solid #343741 !important;
 }
 
 .sidepanel-infoBtnStyle {
