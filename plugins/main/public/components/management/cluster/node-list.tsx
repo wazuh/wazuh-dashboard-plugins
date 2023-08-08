@@ -10,6 +10,7 @@ import {
 import { withErrorBoundary } from '../../common/hocs';
 import { TableWzAPI } from '../../common/tables';
 import { WzRequest } from '../../../react-services';
+import { SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT } from '../../../../common/constants';
 
 const searchBarWQLFieldSuggestions = [
   { label: 'ip', description: 'filter by IP address' },
@@ -105,7 +106,7 @@ export const NodeList = withErrorBoundary(
                           {
                             params: {
                               distinct: true,
-                              limit: 30,
+                              limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
                               select: field,
                               sort: `+${field}`,
                               ...(currentValue
