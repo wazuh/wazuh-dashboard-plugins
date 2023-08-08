@@ -38,6 +38,7 @@ import {
 import { WzRequest, WzUserPermissions } from '../../../../../react-services';
 import { getToasts } from '../../../../../kibana-services';
 import GroupsHandler from './utils/groups-handler';
+import { SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT } from '../../../../../../common/constants';
 
 export class WzGroupsOverview extends Component {
   _isMounted = false;
@@ -287,7 +288,7 @@ export class WzGroupsOverview extends Component {
                     const response = await WzRequest.apiReq('GET', '/groups', {
                       params: {
                         distinct: true,
-                        limit: 30,
+                        limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
                         select: field,
                         sort: `+${field}`,
                         ...(currentValue

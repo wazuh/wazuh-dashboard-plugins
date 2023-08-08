@@ -30,6 +30,7 @@ import { TableWzAPI } from '../../../../../components/common/tables';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 import { WzButtonPermissionsModalConfirm } from '../../../../../components/common/buttons';
 import {
+  SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
   UI_LOGGER_LEVELS,
   UI_ORDER_AGENT_STATUS,
 } from '../../../../../../common/constants';
@@ -231,7 +232,7 @@ class WzGroupAgentsTable extends Component {
                     {
                       params: {
                         distinct: true,
-                        limit: 30,
+                        limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
                         select: field,
                         sort: `+${field}`,
                         ...(currentValue

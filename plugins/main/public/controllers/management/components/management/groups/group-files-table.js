@@ -23,6 +23,7 @@ import {
 import GroupsFilesColumns from './utils/columns-files';
 import { TableWzAPI } from '../../../../../components/common/tables';
 import { WzRequest } from '../../../../../react-services';
+import { SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT } from '../../../../../../common/constants';
 
 class WzGroupFilesTable extends Component {
   _isMounted = false;
@@ -68,7 +69,7 @@ class WzGroupFilesTable extends Component {
                   {
                     params: {
                       distinct: true,
-                      limit: 30,
+                      limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
                       select: field,
                       sort: `+${field}`,
                       ...(currentValue
