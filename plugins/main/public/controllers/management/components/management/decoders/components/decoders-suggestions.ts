@@ -44,7 +44,7 @@ const decodersItems = {
           });
           // FIX: this breaks the search bar component because returns a non-string value.
           return result?.data?.data?.affected_items
-            ?.filter(item => item?.details?.program_name)
+            ?.filter(item => typeof item?.details?.program_name === 'string')
             .map(item => ({
               label: item?.details?.program_name,
             }));
