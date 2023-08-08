@@ -59,9 +59,9 @@ export class CommandGenerator<OS extends IOperationSystem, Params extends string
    * @param props - The optional parameters to select
    * @returns The selected optional parameters
    */
-  addOptionalParams(props: IOptionalParameters<Params>): void {
+  addOptionalParams(props: IOptionalParameters<Params>, selectedOS?: OS): void {
     // Get all the optional parameters based on the given parameters
-    this.optionals = this.optionalsManager.getAllOptionalParams(props);
+    this.optionals = this.optionalsManager.getAllOptionalParams(props, selectedOS);
   }
 
   /**

@@ -1,4 +1,4 @@
-import { getPasswordWithScapedSpecialCharacters } from './wazuh-password-service';
+import { scapeSpecialCharsForLinux } from './wazuh-password-service';
 describe('Wazuh Password Service', () => {
   // NOTE:
   //   The password constant must be written as it comes from the backend
@@ -14,7 +14,7 @@ describe('Wazuh Password Service', () => {
   `(
     ' should return password received with scaped characters: $passwordFromAPI | $scapedPassword | $expectedScapedPassword',
     ({ passwordFromAPI, expectedScapedPassword }) => {
-      const passwordScaped = getPasswordWithScapedSpecialCharacters(passwordFromAPI);
+      const passwordScaped = scapeSpecialCharsForLinux(passwordFromAPI);
       /* log to compare passwords */
       console.log(
         'PASSWORD REAL: ',

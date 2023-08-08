@@ -9,6 +9,7 @@ import {
 } from '@elastic/eui';
 import React, { Fragment, useEffect, useState } from 'react';
 import { tOperatingSystem } from '../../core/config/os-commands-definitions';
+import { osdfucatePasswordInCommand } from '../../services/wazuh-password-service';
 
 interface ICommandSectionProps {
   commandText: string;
@@ -48,28 +49,7 @@ export default function CommandOutput(props: ICommandSectionProps) {
     if (showPassword) {
       setCommandToShow(commandText);
     } else {
-      let command = commandText;
-      if (os?.toLocaleLowerCase() === 'macos') {
-        const regex = /WAZUH_REGISTRATION_PASSWORD=\$'((?:\\'|[^']|[\"'])*)'/g;
-        const replacedString = command.replace(
-          regex,
-          (match, capturedGroup) => {
-            return match.replace(
-              capturedGroup,
-              '*'.repeat(capturedGroup.length),
-            );
-          }
-        );
-        setCommandToShow(replacedString);
-      } else {
-        const replacedString = command.replace(
-          `WAZUH_REGISTRATION_PASSWORD=\$'${password}'`,
-          () => {
-            return `WAZUH_REGISTRATION_PASSWORD=\$\'${'*'.repeat(password.length)}\'`;
-          }
-        );
-        setCommandToShow(replacedString);
-      }
+      setCommandToShow(osdfucatePasswordInCommand(password, commandText, os));
     }
   };
   

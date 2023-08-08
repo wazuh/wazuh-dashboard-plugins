@@ -1,5 +1,8 @@
 /////////////////////////////////////////////////////////
 /// Domain
+
+import { tOperatingSystem } from "../../hooks/use-register-agent-commands.test";
+
 /////////////////////////////////////////////////////////
 export interface IOperationSystem {
   name: string;
@@ -51,7 +54,7 @@ export type tOptionalParamsCommandProps<T extends string> = IOptionalParamProps 
 };
 export interface IOptionsParamConfig<T extends string> {
   property: string;
-  getParamCommand: (props: tOptionalParamsCommandProps<T>) => string;
+  getParamCommand: (props: tOptionalParamsCommandProps<T>, selectedOS?: IOperationSystem) => string;
 }
 
 export type tOptionalParams<T extends string> = {
@@ -64,7 +67,7 @@ export interface IOptionalParamInput<T extends string> {
 }
 export interface IOptionalParametersManager<T extends string> {
   getOptionalParam(props: IOptionalParamInput<T>): string;
-  getAllOptionalParams(paramsValues: IOptionalParameters<T>): object;
+  getAllOptionalParams(paramsValues: IOptionalParameters<T>, selectedOs?: IOperationSystem): object;
 }
 
 ///////////////////////////////////////////////////////////////////
@@ -79,7 +82,7 @@ export interface ICommandGenerator<OS extends IOperationSystem, Params extends s
 
 export interface ICommandGeneratorMethods<T extends string> {
   selectOS(params: IOperationSystem): void;
-  addOptionalParams(props: IOptionalParameters<T>): void;
+  addOptionalParams(props: IOptionalParameters<T>, osSelected?: IOperationSystem): void;
   getInstallCommand(): string;
   getStartCommand(): string;
   getUrlPackage(): string;

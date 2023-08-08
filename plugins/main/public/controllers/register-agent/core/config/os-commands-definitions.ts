@@ -6,6 +6,7 @@ import {
   getMacosStartCommand, 
   getWindowsInstallCommand, 
   getWindowsStartCommand } from '../../services/register-agent-os-commands-services';
+import { scapeSpecialCharsForLinux, scapeSpecialCharsForMacOS, scapeSpecialCharsForWindows } from '../../services/wazuh-password-service';
 import { IOSDefinition, tOptionalParams } from '../register-commands/types';
 
 // Defined OS combinations
@@ -149,21 +150,21 @@ export const osCommandsDefinitions = [
 export const optionalParamsDefinitions: tOptionalParams<tOptionalParameters> = {
   serverAddress: {
     property: 'WAZUH_MANAGER',
-    getParamCommand: props => {
+    getParamCommand: (props,selectedOS) => {
       const { property, value } = props;
       return value !== '' ? `${property}='${value}'` : '';
     },
   },
   agentName: {
     property: 'WAZUH_AGENT_NAME',
-    getParamCommand: props => {
+    getParamCommand: (props,selectedOS) => {
       const { property, value } = props;
       return value !== '' ? `${property}='${value}'` : '';
     },
   },
   agentGroups: {
     property: 'WAZUH_AGENT_GROUP',
-    getParamCommand: props => {
+    getParamCommand: (props,selectedOS) => {
       const { property, value } = props;
       let parsedValue = value;
       if (Array.isArray(value)) {
@@ -174,15 +175,33 @@ export const optionalParamsDefinitions: tOptionalParams<tOptionalParameters> = {
   },
   protocol: {
     property: 'WAZUH_PROTOCOL',
-    getParamCommand: props => {
+    getParamCommand: (props,selectedOS) => {
       const { property, value } = props;
       return value !== '' ? `${property}='${value}'` : '';
     },
   },
   wazuhPassword: {
     property: 'WAZUH_REGISTRATION_PASSWORD',
-    getParamCommand: props => {
+    getParamCommand: (props,selectedOS) => {
       const { property, value } = props;
+      if(!value){
+        return '';
+      }
+      if(selectedOS){
+        let osName = selectedOS.name.toLocaleLowerCase();
+        switch(osName){
+          case "linux":
+            return `${property}=$'${scapeSpecialCharsForLinux(value)}'`;
+          case "macos":
+            return `${property}=$'${scapeSpecialCharsForMacOS(value)}'`;
+          case "windows":
+            return `${property}=$'${scapeSpecialCharsForWindows(value)}'`;
+          default:
+            return `${property}=$'${value}'`;
+        }
+
+      }
+
       return value !== '' ? `${property}=$'${value}'` : '';
     },
   },

@@ -15,7 +15,7 @@ interface IUseRegisterCommandsProps<OS extends IOperationSystem, Params extends 
 
 interface IUseRegisterCommandsOutput<OS extends IOperationSystem, Params extends string> {
   selectOS: (params: OS) => void;
-  setOptionalParams: (params: IOptionalParameters<Params>) => void;
+  setOptionalParams: (params: IOptionalParameters<Params>, selectedOS?: OS) => void;
   installCommand: string;
   startCommand: string;
   optionalParamsParsed: IOptionalParameters<Params> | {};
@@ -62,7 +62,7 @@ export function useRegisterAgentCommands<OS extends IOperationSystem, Params ext
     }
     if (optionalParamsValues) {
       commandGenerator.addOptionalParams(
-        optionalParamsValues as IOptionalParameters<Params>,
+        optionalParamsValues as IOptionalParameters<Params>, osSelected
       );
     }
     const installCommand = commandGenerator.getInstallCommand();
@@ -93,8 +93,8 @@ export function useRegisterAgentCommands<OS extends IOperationSystem, Params ext
    * @param {IOptionalParameters} params - The optional parameters to be set.
    * @returns {void}
    */
-  const setOptionalParams = (params: IOptionalParameters<Params>): void => {
-    commandGenerator.addOptionalParams(params);
+  const setOptionalParams = (params: IOptionalParameters<Params>, selectedOS?: OS): void => {
+    commandGenerator.addOptionalParams(params,selectedOS);
     setOptionalParamsValues(params);
     setOptionalParamsParsed(commandGenerator.getOptionalParamsCommands());
   };

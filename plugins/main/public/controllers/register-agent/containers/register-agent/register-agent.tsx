@@ -129,7 +129,7 @@ export const RegisterAgent = withReduxProvider(
               configuration['enrollment.password'] ||
               authInfo['authd.pass'] ||
               '';
-            wazuhPassword = getPasswordWithScapedSpecialCharacters(wazuhPassword);
+            //wazuhPassword = getPasswordWithScapedSpecialCharacters(wazuhPassword);
           }
           const groups = await getGroups();
           setNeedsPassword(needsPassword);
