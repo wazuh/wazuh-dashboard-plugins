@@ -1,3 +1,4 @@
+import { SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT } from '../../../../../../../common/constants';
 import { WzRequest } from '../../../../../../react-services/wz-request';
 
 const rulesItems = {
@@ -24,7 +25,7 @@ const rulesItems = {
         case 'id': {
           const filter = {
             distinct: true,
-            limit: 30,
+            limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
             select: field,
             sort: `+${field}`,
             ...(currentValue ? { q: `id~${currentValue}` } : {}),
@@ -41,7 +42,7 @@ const rulesItems = {
         }
         case 'groups': {
           const filter = {
-            limit: 30,
+            limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
             ...(currentValue ? { search: currentValue } : {}),
           };
           const result = await WzRequest.apiReq('GET', '/rules/groups', {
@@ -55,7 +56,7 @@ const rulesItems = {
         case 'filename': {
           const filter = {
             distinct: true,
-            limit: 30,
+            limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
             select: field,
             sort: `+${field}`,
             ...(currentValue ? { q: `${field}~${currentValue}` } : {}),
@@ -70,7 +71,7 @@ const rulesItems = {
         case 'relative_dirname': {
           const filter = {
             distinct: true,
-            limit: 30,
+            limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
             select: field,
             sort: `+${field}`,
             ...(currentValue ? { q: `${field}~${currentValue}` } : {}),
@@ -84,7 +85,7 @@ const rulesItems = {
         }
         case 'hipaa': {
           const filter = {
-            limit: 30,
+            limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
             ...(currentValue ? { search: currentValue } : {}),
           };
           const result = await WzRequest.apiReq(
@@ -96,7 +97,7 @@ const rulesItems = {
         }
         case 'gdpr': {
           const filter = {
-            limit: 30,
+            limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
             ...(currentValue ? { search: currentValue } : {}),
           };
           const result = await WzRequest.apiReq(
@@ -108,7 +109,7 @@ const rulesItems = {
         }
         case 'nist_800_53': {
           const filter = {
-            limit: 30,
+            limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
             ...(currentValue ? { search: currentValue } : {}),
           };
           const result = await WzRequest.apiReq(
@@ -120,7 +121,7 @@ const rulesItems = {
         }
         case 'gpg13': {
           const filter = {
-            limit: 30,
+            limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
             ...(currentValue ? { search: currentValue } : {}),
           };
           const result = await WzRequest.apiReq(
@@ -132,7 +133,7 @@ const rulesItems = {
         }
         case 'pci_dss': {
           const filter = {
-            limit: 30,
+            limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
             ...(currentValue ? { search: currentValue } : {}),
           };
           const result = await WzRequest.apiReq(
@@ -144,7 +145,7 @@ const rulesItems = {
         }
         case 'tsc': {
           const filter = {
-            limit: 30,
+            limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
             ...(currentValue ? { search: currentValue } : {}),
           };
           const result = await WzRequest.apiReq(
@@ -156,7 +157,7 @@ const rulesItems = {
         }
         case 'mitre': {
           const filter = {
-            limit: 30,
+            limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
             ...(currentValue ? { search: currentValue } : {}),
           };
           const result = await WzRequest.apiReq(
@@ -184,41 +185,19 @@ const rulesFiles = {
   },
   value: async (currentValue, { field }) => {
     try {
-      switch (field) {
-        case 'filename': {
-          const filter = {
-            distinct: true,
-            limit: 30,
-            select: field,
-            sort: `+${field}`,
-            ...(currentValue ? { q: `${field}~${currentValue}` } : {}),
-          };
-          const result = await WzRequest.apiReq('GET', '/rules/files', {
-            params: filter,
-          });
-          return result?.data?.data?.affected_items?.map(item => ({
-            label: item[field],
-          }));
-          break;
-        }
-        case 'relative_dirname': {
-          const filter = {
-            distinct: true,
-            limit: 30,
-            select: field,
-            sort: `+${field}`,
-            ...(currentValue ? { q: `${field}~${currentValue}` } : {}),
-          };
-          const result = await WzRequest.apiReq('GET', '/rules', {
-            params: filter,
-          });
-          return result?.data?.data?.affected_items.map(item => ({
-            label: item[field],
-          }));
-        }
-        default:
-          return [];
-      }
+      const filter = {
+        distinct: true,
+        limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
+        select: field,
+        sort: `+${field}`,
+        ...(currentValue ? { q: `${field}~${currentValue}` } : {}),
+      };
+      const result = await WzRequest.apiReq('GET', '/rules/files', {
+        params: filter,
+      });
+      return result?.data?.data?.affected_items?.map(item => ({
+        label: item[field],
+      }));
     } catch (error) {
       return [];
     }
