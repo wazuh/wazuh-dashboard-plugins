@@ -7,7 +7,10 @@ import {
   EuiCode,
 } from '@elastic/eui';
 import { tokenizer as tokenizerUQL } from './aql';
-import { PLUGIN_VERSION } from '../../../../common/constants';
+import {
+  PLUGIN_VERSION,
+  SEARCH_BAR_WQL_VALUE_SUGGESTIONS_DISPLAY_COUNT,
+} from '../../../../common/constants';
 
 /* UI Query language
 https://documentation.wazuh.com/current/user-manual/api/queries.html
@@ -315,6 +318,37 @@ function getTokenNearTo(
 }
 
 /**
+ * It returns the regular expression that validate the token of type value
+ * @returns The regular expression
+ */
+function getTokenValueRegularExpression() {
+  return new RegExp(
+    // Value: A string.
+    '^(?<value>(?:(?:\\((?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|[\\[\\]\\w _\\-.:?\\/\'"=@%<>{}]*)\\))*' +
+      '(?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|^[\\[\\]\\w _\\-.:?\\\\/\'"=@%<>{}]+)' +
+      '(?:\\((?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|[\\[\\]\\w _\\-.:?\\\\/\'"=@%<>{}]*)\\))*)+)$',
+  );
+}
+
+/**
+ * It filters the values that matche the validation regular expression and returns the first items
+ * defined by SEARCH_BAR_WQL_VALUE_SUGGESTIONS_DISPLAY_COUNT constant.
+ * @param suggestions Suggestions provided by the suggestions.value method of each instance of the
+ * search bar
+ * @returns
+ */
+function filterTokenValueSuggestion(
+  suggestions: QLOptionSuggestionEntityItemTyped[],
+) {
+  return suggestions
+    .filter(({ label }: QLOptionSuggestionEntityItemTyped) => {
+      const re = getTokenValueRegularExpression();
+      return re.test(label);
+    })
+    .slice(0, SEARCH_BAR_WQL_VALUE_SUGGESTIONS_DISPLAY_COUNT);
+}
+
+/**
  * Get the suggestions from the tokens
  * @param tokens
  * @param language
@@ -407,11 +441,18 @@ export async function getSuggestions(
           operator => operator === lastToken.value,
         )
           ? [
-              ...(
+              /*
+                WORKAROUND: When getting suggestions for the distinct values for any field, the API
+                could reply some values that doesn't match the expected regular expression. If the
+                value is invalid, a validation message is displayed and avoid the search can be run.
+                The goal of this filter is that the suggested values can be used to search. This
+                causes some values could not be displayed as suggestions.
+              */
+              ...filterTokenValueSuggestion(
                 await options.suggestions.value(undefined, {
                   field,
                   operatorCompare,
-                })
+                }),
               ).map(mapSuggestionCreatorValue),
             ]
           : []),
@@ -441,11 +482,18 @@ export async function getSuggestions(
               },
             ]
           : []),
-        ...(
+        /*
+          WORKAROUND: When getting suggestions for the distinct values for any field, the API
+          could reply some values that doesn't match the expected regular expression. If the
+          value is invalid, a validation message is displayed and avoid the search can be run.
+          The goal of this filter is that the suggested values can be used to search. This
+          causes some values could not be displayed as suggestions.
+        */
+        ...filterTokenValueSuggestion(
           await options.suggestions.value(lastToken.formattedValue, {
             field,
             operatorCompare,
-          })
+          }),
         ).map(mapSuggestionCreatorValue),
         ...Object.entries(language.tokens.conjunction.literal).map(
           ([conjunction, description]) => ({
@@ -685,12 +733,7 @@ function getOutput(input: string, options: OptionsQL) {
  * @returns
  */
 function validateTokenValue(token: IToken): string | undefined {
-  const re = new RegExp(
-    // Value: A string.
-    '^(?<value>(?:(?:\\((?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|[\\[\\]\\w _\\-.:?\\/\'"=@%<>{}]*)\\))*' +
-      '(?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|^[\\[\\]\\w _\\-.:?\\\\/\'"=@%<>{}]+)' +
-      '(?:\\((?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|[\\[\\]\\w _\\-.:?\\\\/\'"=@%<>{}]*)\\))*)+)$',
-  );
+  const re = getTokenValueRegularExpression();
 
   const value = token.formattedValue ?? token.value;
   const match = value.match(re);
