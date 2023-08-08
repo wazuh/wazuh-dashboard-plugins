@@ -12,6 +12,7 @@ import store from '../../../../redux/store';
 import { GroupTruncate } from '../../../../components/common/util/agent-group-truncate/';
 import { get as getLodash } from 'lodash';
 import {
+  SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
   UI_LOGGER_LEVELS,
   UI_ORDER_AGENT_STATUS,
 } from '../../../../../common/constants';
@@ -261,7 +262,7 @@ export class AgentSelectionTable extends Component {
                         {
                           params: {
                             distinct: true,
-                            limit: 30,
+                            limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
                             select: field,
                             sort: `+${field}`,
                             ...(currentValue
