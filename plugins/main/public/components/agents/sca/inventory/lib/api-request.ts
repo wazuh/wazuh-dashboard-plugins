@@ -1,3 +1,4 @@
+import { SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT } from '../../../../../../common/constants';
 import { WzRequest } from '../../../../../react-services/wz-request';
 
 export async function getFilterValues(
@@ -12,7 +13,7 @@ export async function getFilterValues(
     distinct: true,
     select: field,
     sort: `+${field}`,
-    limit: 30,
+    limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
   };
   const result = await WzRequest.apiReq(
     'GET',
