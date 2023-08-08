@@ -29,7 +29,10 @@ import {
   packagesColumns,
   windowsUpdatesColumns,
 } from './columns';
-import { API_NAME_AGENT_STATUS } from '../../../../common/constants';
+import {
+  API_NAME_AGENT_STATUS,
+  SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
+} from '../../../../common/constants';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
 import { TableWzAPI } from '../../common/tables';
 import { WzRequest } from '../../../react-services';
@@ -133,7 +136,7 @@ export function SyscollectorInventory({ agent }) {
                         {
                           params: {
                             distinct: true,
-                            limit: 30,
+                            limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
                             select: field,
                             sort: `+${field}`,
                             ...(currentValue
@@ -190,7 +193,7 @@ export function SyscollectorInventory({ agent }) {
                         {
                           params: {
                             distinct: true,
-                            limit: 30,
+                            limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
                             select: field,
                             sort: `+${field}`,
                             ...(currentValue
@@ -250,7 +253,7 @@ export function SyscollectorInventory({ agent }) {
                         {
                           params: {
                             distinct: true,
-                            limit: 30,
+                            limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
                             select: field,
                             sort: `+${field}`,
                             ...(currentValue
@@ -308,7 +311,7 @@ export function SyscollectorInventory({ agent }) {
                           {
                             params: {
                               distinct: true,
-                              limit: 30,
+                              limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
                               select: field,
                               sort: `+${field}`,
                               ...(currentValue
@@ -371,7 +374,7 @@ export function SyscollectorInventory({ agent }) {
                         {
                           params: {
                             distinct: true,
-                            limit: 30,
+                            limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
                             select: field,
                             sort: `+${field}`,
                             ...(currentValue
@@ -431,7 +434,7 @@ export function SyscollectorInventory({ agent }) {
                         {
                           params: {
                             distinct: true,
-                            limit: 30,
+                            limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
                             select: field,
                             sort: `+${field}`,
                             ...(currentValue
