@@ -12,7 +12,7 @@ export const scapeSpecialCharsForLinux = (password: string) => {
 export const scapeSpecialCharsForMacOS = (password: string) => {
   let passwordScaped = password;
   // The double quote is escaped first and then the backslash followed by a single quote
-  return passwordScaped.replace(/\\"/g, '\\\\\\\\\\\"').replace(/\\'/g, `\\'\"'\"'`);
+  return passwordScaped.replace(/\\"/g, '\\\"').replace(/\\'/g, `\\'\"'\"'`);
 }
 
 export const scapeSpecialCharsForWindows = (password: string) => {
