@@ -63,10 +63,10 @@ describe('Wazuh Password Service', () => {
     it.each`
     passwordFromAPI                             | expectedScapedPassword
     ${"password'with'special'characters"}       | ${"password'with'special'characters"}
-    ${'password"with"doublequ\'sds\\"es'}       | ${"password\"with\"doublequ'sds\\\\\\\\\\\"es"}
-    ${"password\"with\"doubleq\\'usds\\\"es"}   | ${"password\"with\"doubleq\\'\"'\"'usds\\\\\\\\\\\"es"}
-    ${"password\"with\"doubleq\\\\'usds\\\"es"} | ${"password\"with\"doubleq\\\\'\"'\"'usds\\\\\\\\\\\"es"}
-    ${"password\"with\"doubleq\\\\'\\usds\\\"\\es"} | ${"password\"with\"doubleq\\\\'\"'\"'\\usds\\\\\\\\\\\"\\es"}
+    ${'password"with"doublequ\'sds\\"es'}       | ${"password\"with\"doublequ'sds\\\"es"}
+    ${"password\"with\"doubleq\\'usds\\\"es"}   | ${"password\"with\"doubleq\\'\"'\"'usds\\\"es"}
+    ${"password\"with\"doubleq\\\\'usds\\\"es"} | ${"password\"with\"doubleq\\\\'\"'\"'usds\\\"es"}
+    ${"password\"with\"doubleq\\\\'\\usds\\\"\\es"} | ${"password\"with\"doubleq\\\\'\"'\"'\\usds\\\"\\es"}
   `(
     ' should return password received with scaped characters: $passwordFromAPI | $scapedPassword | $expectedScapedPassword',
     ({ passwordFromAPI, expectedScapedPassword }) => {
