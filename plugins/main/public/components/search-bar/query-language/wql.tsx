@@ -102,10 +102,14 @@ const suggestionMappingLanguageTokenType = {
  * @returns
  */
 function mapSuggestionCreator(type: ITokenType) {
-  return function ({ ...params }) {
+  return function ({ label, ...params }) {
     return {
       type,
       ...params,
+      /* WORKAROUND: ensure the label is a string. If it is not a string, an warning is
+      displayed in the console related to prop types
+      */
+      ...(typeof label !== 'undefined' ? { label: String(label) } : {}),
     };
   };
 }
