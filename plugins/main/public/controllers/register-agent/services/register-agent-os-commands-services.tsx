@@ -39,7 +39,7 @@ const getAllOptionalsMacos = (
 ) => {
   // create paramNameOrderList, which is an array of the keys of optionals add interface
   const paramNameOrderList: (keyof IOptionalParameters<tOptionalParameters>)[] =
-    ['serverAddress', 'wazuhPassword', 'agentGroups', 'agentName', 'protocol'];
+    ['serverAddress', 'agentGroups', 'agentName', 'protocol'];
 
   if (!optionals) return '';
   return Object.entries(paramNameOrderList).reduce(
@@ -110,20 +110,40 @@ export const getWindowsStartCommand = (
 
 /******** MacOS ********/
 
+export const transformOptionalsParamatersMacOSCommand = (command: string) => {
+  return command
+    .replace(/\' ([a-zA-Z])/g, "' && $1") // Separate environment variables with &&
+    .replace(/\"/g, '\\"') // Escape double quotes
+    .trim();
+};
+
 export const getMacOsInstallCommand = (
   props: tOSEntryInstallCommand<tOptionalParameters>,
 ) => {
   const { optionals, urlPackage } = props;
   // Set macOS installation script with environment variables
   const optionalsText = optionals && getAllOptionalsMacos(optionals);
-  const macOSInstallationOptions = `${optionalsText}`
-    .replace(/\' ([a-zA-Z])/g, "' && $1") // Separate environment variables with &&
-    .replace(/\"/g, '\\"') // Escape double quotes
-    .trim();
-
+  const macOSInstallationOptions = transformOptionalsParamatersMacOSCommand(
+    optionalsText || '',
+  );
+  let wazuhPasswordParamWithValue = '';
+  if (optionals?.wazuhPassword) {
+    /**
+     * We use the JSON.stringify to prevent that the scaped specials characters will be removed 
+     * and mantain the format of the password
+      The JSON.stringify mantain the password format but adds " to wrap the characters
+    */
+    const scapedPasswordLength = JSON.stringify(
+      optionals?.wazuhPassword,
+    ).length;
+    // We need to remove the " added by JSON.stringify
+    wazuhPasswordParamWithValue = `${JSON.stringify(
+      optionals?.wazuhPassword,
+    ).substring(1, scapedPasswordLength - 1)}\\n`;
+  }
   // If no variables are set, the echo will be empty
   const macOSInstallationSetEnvVariablesScript = macOSInstallationOptions
-    ? `echo -e "${macOSInstallationOptions}" > /tmp/wazuh_envs && `
+    ? `echo -e "${macOSInstallationOptions}${wazuhPasswordParamWithValue}" > /tmp/wazuh_envs && `
     : ``;
 
   // Merge environment variables with installation script
