@@ -14,6 +14,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed the agents active coverage stat as NaN in Details panel of Agents section [#5490](https://github.com/wazuh/wazuh-kibana-app/pull/5490)
 - Fixed a broken documentation link to agent labels [#5687](https://github.com/wazuh/wazuh-kibana-app/pull/5687)
 - Fixed the PDF report filters applied to tables [#5714](https://github.com/wazuh/wazuh-kibana-app/pull/5714)
+- Fixed outdated year in the PDF report footer [#5766](https://github.com/wazuh/wazuh-kibana-app/pull/5766)
 
 ### Removed
 
