@@ -9,14 +9,10 @@ export const scapeSpecialCharsForLinux = (password: string) => {
   return passwordScaped.replace(regex, `\'\"$&\"\'`).replace(/(?<!\\)\\(?!["\\])/g, '\\\\');
 };
 
-// Ex: WAZUH_REGISTRATION_PASSWORD=$'password\"with\"doubleq\\\\\\\\\'usds\\\\\\\\\\\"es'
 export const scapeSpecialCharsForMacOS = (password: string) => {
   let passwordScaped = password;
-  // the " characters is scaped by default in the password retrieved from the API
-  const specialCharsList = ["'"];
-  const regex = new RegExp(`([${specialCharsList.join('')}])`, 'g');
-  // the single quote is escaped first, and then any unescaped backslashes are escaped
-  return passwordScaped.replace(regex, `\'\"$&\"\'`).replace(/(?<!\\)\\(?!["\\])/g, '\\\\');
+  // The double quote is escaped first and then the backslash followed by a single quote
+  return passwordScaped.replace(/\\"/g, '\\\\\\\\\\\"').replace(/\\'/g, `\\'\"'\"'`);
 }
 
 export const scapeSpecialCharsForWindows = (password: string) => {
