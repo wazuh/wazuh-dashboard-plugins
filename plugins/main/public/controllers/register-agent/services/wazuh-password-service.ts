@@ -34,7 +34,7 @@ export const osdfucatePasswordInCommand = (password: string, commandText: string
   switch (osName){
     case 'macos':
     {
-      const regex = /WAZUH_REGISTRATION_PASSWORD=\$'((?:\\'|[^']|[\"'])*)'/g;
+      const regex = /WAZUH_REGISTRATION_PASSWORD=\'((?:\\'|[^']|[\"'])*)'/g;
       const replacedString = command.replace(
         regex,
         (match, capturedGroup) => {
