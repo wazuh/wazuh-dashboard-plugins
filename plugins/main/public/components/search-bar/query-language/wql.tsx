@@ -1094,10 +1094,15 @@ export const WQL = {
                   : item.label;
             } else {
               // add a whitespace for conjunction <whitespace><conjunction>
+              // add a whitespace for grouping operator <whitespace>)
               !/\s$/.test(input) &&
                 (item.type.iconType ===
                   suggestionMappingLanguageTokenType.conjunction.iconType ||
-                  lastToken?.type === 'conjunction') &&
+                  lastToken?.type === 'conjunction' ||
+                  (item.type.iconType ===
+                    suggestionMappingLanguageTokenType.operator_group
+                      .iconType &&
+                    item.label === ')')) &&
                 tokens.push({
                   type: 'whitespace',
                   value: ' ',
