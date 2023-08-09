@@ -207,7 +207,7 @@ describe('[endpoint] PUT /utils/configuration', () => {
     footer              | header                                 | responseStatusCode | expectedMD5                           | tab
     ${null}             | ${null}                                | ${200}             | ${'a261be6b2e5fb18bb7434ee46a01e174'} | ${'pm'}
     ${'Custom\nFooter'} | ${'info@company.com\nFake Avenue 123'} | ${200}             | ${'51b268066bb5107e5eb0a9d791a89d0c'} | ${'general'}
-    ${''}               | ${''}                                  | ${200}             | ${'8e8fbd90e08b810f700fcafbfdcdf638'} | ${'fim'}
+    ${''}               | ${''}                                  | ${200}             | ${'0f43c9a8c864963940803851dd810f7b'} | ${'fim'}
     ${'Custom Footer'}  | ${null}                                | ${200}             | ${'2b16be2ea88d3891cda7acb6075826d9'} | ${'aws'}
     ${null}             | ${'Custom Header'}                     | ${200}             | ${'4a55136aaf8b5f6b544a03fe46917552'} | ${'gcp'}
   `(
