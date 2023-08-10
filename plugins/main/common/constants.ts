@@ -2256,3 +2256,6 @@ export const MODULE_SCA_CHECK_RESULT_LABEL = {
 export const SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT = 30;
 // This limits the suggestions for the token of type value displayed in the search bar
 export const SEARCH_BAR_WQL_VALUE_SUGGESTIONS_DISPLAY_COUNT = 10;
+/* Time in milliseconds to debounce the analysis of search bar. This mitigates some problems related
+to changes running in parallel */
+export const SEARCH_BAR_DEBOUNCE_UPDATE_TIME = 400;
