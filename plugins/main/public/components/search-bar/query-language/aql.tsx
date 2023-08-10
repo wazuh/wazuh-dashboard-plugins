@@ -456,11 +456,13 @@ export const AQL = {
           await getSuggestions(tokens, params.queryLanguage.parameters),
         ),
         // Handler to manage when clicking in a suggestion item
-        onItemClick: input => item => {
+        onItemClick: currentInput => item => {
           // When the clicked item has the `search` iconType, run the `onSearch` function
           if (item.type.iconType === 'search') {
             // Execute the search action
-            params.onSearch(getOutput(input, params.queryLanguage.parameters));
+            params.onSearch(
+              getOutput(currentInput, params.queryLanguage.parameters),
+            );
           } else {
             // When the clicked item has another iconType
             const lastToken: IToken = getLastTokenWithValue(tokens);
