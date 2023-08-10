@@ -69,6 +69,7 @@ class WzGroupAgentsTable extends Component {
       },
       {
         field: 'os.name,os.version',
+        composeField: ['os.name', 'os.version'],
         name: 'Operating system',
         align: 'left',
         searchable: true,
