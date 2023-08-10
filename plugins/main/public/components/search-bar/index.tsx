@@ -9,21 +9,22 @@ import {
   EuiSelect,
   EuiText,
   EuiFlexGroup,
-  EuiFlexItem
+  EuiFlexItem,
 } from '@elastic/eui';
 import { EuiSuggest } from '../eui-suggest';
 import { searchBarQueryLanguages } from './query-language';
 import _ from 'lodash';
 import { ISearchBarModeWQL } from './query-language/wql';
+import { SEARCH_BAR_DEBOUNCE_UPDATE_TIME } from '../../../common/constants';
 
-export interface SearchBarProps{
+export interface SearchBarProps {
   defaultMode?: string;
   modes: ISearchBarModeWQL[];
   onChange?: (params: any) => void;
   onSearch: (params: any) => void;
-  buttonsRender?: () => React.ReactNode
+  buttonsRender?: () => React.ReactNode;
   input?: string;
-};
+}
 
 export const SearchBar = ({
   defaultMode,
@@ -54,12 +55,16 @@ export const SearchBar = ({
     output: undefined,
   });
   // Cache the previous output
-  const queryLanguageOutputRunPreviousOutput = useRef(queryLanguageOutputRun.output);
+  const queryLanguageOutputRunPreviousOutput = useRef(
+    queryLanguageOutputRun.output,
+  );
   // Controls when the suggestion popover is open/close
   const [isOpenSuggestionPopover, setIsOpenSuggestionPopover] =
     useState<boolean>(false);
   // Reference to the input
   const inputRef = useRef();
+  // Debounce update timer
+  const debounceUpdateSearchBarTimer = useRef();
 
   // Handler when searching
   const _onSearch = (output: any) => {
@@ -79,55 +84,69 @@ export const SearchBar = ({
     }
   };
 
-  const selectedQueryLanguageParameters = modes.find(({ id }) => id === queryLanguage.id);
+  const selectedQueryLanguageParameters = modes.find(
+    ({ id }) => id === queryLanguage.id,
+  );
 
   useEffect(() => {
     // React to external changes and set the internal input text. Use the `transformInput` of
     // the query language in use
-    rest.input && searchBarQueryLanguages[queryLanguage.id]?.transformInput && setInput(
-      searchBarQueryLanguages[queryLanguage.id]?.transformInput?.(
-        rest.input,
-        {
-          configuration: queryLanguage.configuration,
-          parameters: selectedQueryLanguageParameters,
-        }
-      ),
-    );
+    rest.input &&
+      searchBarQueryLanguages[queryLanguage.id]?.transformInput &&
+      setInput(
+        searchBarQueryLanguages[queryLanguage.id]?.transformInput?.(
+          rest.input,
+          {
+            configuration: queryLanguage.configuration,
+            parameters: selectedQueryLanguageParameters,
+          },
+        ),
+      );
   }, [rest.input]);
 
   useEffect(() => {
     (async () => {
       // Set the query language output
-      const queryLanguageOutput = await searchBarQueryLanguages[queryLanguage.id].run(input, {
-        onSearch: _onSearch,
-        setInput,
-        closeSuggestionPopover: () => setIsOpenSuggestionPopover(false),
-        openSuggestionPopover: () => setIsOpenSuggestionPopover(true),
-        setQueryLanguageConfiguration: (configuration: any) =>
-          setQueryLanguage(state => ({
-            ...state,
-            configuration:
-              configuration?.(state.configuration) || configuration,
-          })),
-        setQueryLanguageOutput: setQueryLanguageOutputRun,
-        inputRef,
-        queryLanguage: {
-          configuration: queryLanguage.configuration,
-          parameters: selectedQueryLanguageParameters,
-        },
-      });
-      queryLanguageOutputRunPreviousOutput.current = {
-        ...queryLanguageOutputRun.output
-      };
-      setQueryLanguageOutputRun(queryLanguageOutput);
+      debounceUpdateSearchBarTimer.current &&
+        clearTimeout(debounceUpdateSearchBarTimer.current);
+      // Debounce the updating of the search bar state
+      debounceUpdateSearchBarTimer.current = setTimeout(async () => {
+        const queryLanguageOutput = await searchBarQueryLanguages[
+          queryLanguage.id
+        ].run(input, {
+          onSearch: _onSearch,
+          setInput,
+          closeSuggestionPopover: () => setIsOpenSuggestionPopover(false),
+          openSuggestionPopover: () => setIsOpenSuggestionPopover(true),
+          setQueryLanguageConfiguration: (configuration: any) =>
+            setQueryLanguage(state => ({
+              ...state,
+              configuration:
+                configuration?.(state.configuration) || configuration,
+            })),
+          setQueryLanguageOutput: setQueryLanguageOutputRun,
+          inputRef,
+          queryLanguage: {
+            configuration: queryLanguage.configuration,
+            parameters: selectedQueryLanguageParameters,
+          },
+        });
+        queryLanguageOutputRunPreviousOutput.current = {
+          ...queryLanguageOutputRun.output,
+        };
+        setQueryLanguageOutputRun(queryLanguageOutput);
+      }, SEARCH_BAR_DEBOUNCE_UPDATE_TIME);
     })();
   }, [input, queryLanguage, selectedQueryLanguageParameters?.options]);
 
   useEffect(() => {
-    onChange
-    // Ensure the previous output is different to the new one
-    && !_.isEqual(queryLanguageOutputRun.output, queryLanguageOutputRunPreviousOutput.current)
-    && onChange(queryLanguageOutputRun.output);
+    onChange &&
+      // Ensure the previous output is different to the new one
+      !_.isEqual(
+        queryLanguageOutputRun.output,
+        queryLanguageOutputRunPreviousOutput.current,
+      ) &&
+      onChange(queryLanguageOutputRun.output);
   }, [queryLanguageOutputRun.output]);
 
   const onQueryLanguagePopoverSwitch = () =>
@@ -163,7 +182,7 @@ export const SearchBar = ({
             closePopover={onQueryLanguagePopoverSwitch}
           >
             <EuiPopoverTitle>SYNTAX OPTIONS</EuiPopoverTitle>
-            <div style={{width: '350px'}}>
+            <div style={{ width: '350px' }}>
               <EuiText>
                 {searchBarQueryLanguages[queryLanguage.id].description}
               </EuiText>
@@ -173,7 +192,8 @@ export const SearchBar = ({
                   <div>
                     <EuiLink
                       href={
-                        searchBarQueryLanguages[queryLanguage.id].documentationLink
+                        searchBarQueryLanguages[queryLanguage.id]
+                          .documentationLink
                       }
                       target='__blank'
                       rel='noopener noreferrer'
@@ -194,7 +214,9 @@ export const SearchBar = ({
                         text: searchBarQueryLanguages[id].label,
                       }))}
                       value={queryLanguage.id}
-                      onChange={(event: React.ChangeEvent<HTMLSelectElement>) => {
+                      onChange={(
+                        event: React.ChangeEvent<HTMLSelectElement>,
+                      ) => {
                         const queryLanguageID: string = event.target.value;
                         setQueryLanguage({
                           id: queryLanguageID,
@@ -217,13 +239,19 @@ export const SearchBar = ({
       />
     </>
   );
-  return rest.buttonsRender || queryLanguageOutputRun.filterButtons
-    ? (
-      <EuiFlexGroup>
-        <EuiFlexItem>{searchBar}</EuiFlexItem>
-        {rest.buttonsRender && <EuiFlexItem grow={false}>{rest.buttonsRender()}</EuiFlexItem>}
-        {queryLanguageOutputRun.filterButtons && <EuiFlexItem grow={false}>{queryLanguageOutputRun.filterButtons}</EuiFlexItem>}
-      </EuiFlexGroup>
-    )
-    : searchBar;
+  return rest.buttonsRender || queryLanguageOutputRun.filterButtons ? (
+    <EuiFlexGroup>
+      <EuiFlexItem>{searchBar}</EuiFlexItem>
+      {rest.buttonsRender && (
+        <EuiFlexItem grow={false}>{rest.buttonsRender()}</EuiFlexItem>
+      )}
+      {queryLanguageOutputRun.filterButtons && (
+        <EuiFlexItem grow={false}>
+          {queryLanguageOutputRun.filterButtons}
+        </EuiFlexItem>
+      )}
+    </EuiFlexGroup>
+  ) : (
+    searchBar
+  );
 };
