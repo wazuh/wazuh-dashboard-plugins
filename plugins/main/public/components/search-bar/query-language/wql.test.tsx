@@ -305,7 +305,7 @@ describe('Query language - WQL', () => {
     ${'(field=value or field2>value2'} | ${{ type: { iconType: 'kqlValue', color: 'tint0' }, label: 'value3' }}         | ${'(field=value or field2>value3'}
     ${'(field=value or field2>value2'} | ${{ type: { iconType: 'tokenDenseVector', color: 'tint3' }, label: ')' }}      | ${'(field=value or field2>value2 )'}
   `(
-    'click suggestion - WQL $WQL => $changedInput',
+    'click suggestion - WQL "$WQL" => "$changedInput"',
     async ({ WQL: currentInput, clikedSuggestion, changedInput }) => {
       // Mock input
       let input = currentInput;
@@ -324,7 +324,7 @@ describe('Query language - WQL', () => {
           },
         },
       });
-      qlOutput.searchBarProps.onItemClick(clikedSuggestion);
+      qlOutput.searchBarProps.onItemClick('')(clikedSuggestion);
       expect(input).toEqual(changedInput);
     },
   );
