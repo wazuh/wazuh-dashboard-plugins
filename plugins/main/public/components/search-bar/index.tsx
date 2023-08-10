@@ -236,6 +236,12 @@ export const SearchBar = ({
           </EuiPopover>
         }
         {...queryLanguageOutputRun.searchBarProps}
+        {...(queryLanguageOutputRun.searchBarProps?.onItemClick
+          ? {
+              onItemClick:
+                queryLanguageOutputRun.searchBarProps?.onItemClick(input),
+            }
+          : {})}
       />
     </>
   );

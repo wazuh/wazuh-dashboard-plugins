@@ -71,28 +71,27 @@ const suggestionMappingLanguageTokenType = {
 
 /**
  * Creator of intermediate interface of EuiSuggestItem
- * @param type 
- * @returns 
+ * @param type
+ * @returns
  */
-function mapSuggestionCreator(type: ITokenType ){
-  return function({...params}){
+function mapSuggestionCreator(type: ITokenType) {
+  return function ({ ...params }) {
     return {
       type,
-      ...params
+      ...params,
     };
   };
-};
+}
 
 const mapSuggestionCreatorField = mapSuggestionCreator('field');
 const mapSuggestionCreatorValue = mapSuggestionCreator('value');
-
 
 /**
  * Tokenize the input string. Returns an array with the tokens.
  * @param input
  * @returns
  */
-export function tokenizer(input: string): ITokens{
+export function tokenizer(input: string): ITokens {
   // API regular expression
   // https://github.com/wazuh/wazuh/blob/v4.4.0-rc1/framework/wazuh/core/utils.py#L1242-L1257
   //   self.query_regex = re.compile(
@@ -118,44 +117,50 @@ export function tokenizer(input: string): ITokens{
     // completed. This helps to tokenize the query and manage when the input is not completed.
     // A ( character.
     '(?<operator_group_open>\\()?' +
-    // Field name: name of the field to look on DB.
-    '(?<field>[\\w.]+)?' + // Added an optional find
-    // Operator: looks for '=', '!=', '<', '>' or '~'.
-    // This seems to be a bug because is not searching the literal valid operators.
-    // I guess the operator is validated after the regular expression matches
-    `(?<operator_compare>[${Object.keys(language.tokens.operator_compare.literal)}]{1,2})?` + // Added an optional find 
-    // Value: A string.
-    '(?<value>(?:(?:\\((?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|[\\[\\]\\w _\\-.:?\\/\'"=@%<>{}]*)\\))*' +
-    '(?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|[\\[\\]\\w _\\-.:?\\\\/\'"=@%<>{}]+)' +
-    '(?:\\((?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|[\\[\\]\\w _\\-.:?\\\\/\'"=@%<>{}]*)\\))*)+)?' + // Added an optional find
-    // A ) character.
-    '(?<operator_group_close>\\))?' +
-    `(?<conjunction>[${Object.keys(language.tokens.conjunction.literal)}])?`,
-    'g'
+      // Field name: name of the field to look on DB.
+      '(?<field>[\\w.]+)?' + // Added an optional find
+      // Operator: looks for '=', '!=', '<', '>' or '~'.
+      // This seems to be a bug because is not searching the literal valid operators.
+      // I guess the operator is validated after the regular expression matches
+      `(?<operator_compare>[${Object.keys(
+        language.tokens.operator_compare.literal,
+      )}]{1,2})?` + // Added an optional find
+      // Value: A string.
+      '(?<value>(?:(?:\\((?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|[\\[\\]\\w _\\-.:?\\/\'"=@%<>{}]*)\\))*' +
+      '(?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|[\\[\\]\\w _\\-.:?\\\\/\'"=@%<>{}]+)' +
+      '(?:\\((?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|[\\[\\]\\w _\\-.:?\\\\/\'"=@%<>{}]*)\\))*)+)?' + // Added an optional find
+      // A ) character.
+      '(?<operator_group_close>\\))?' +
+      `(?<conjunction>[${Object.keys(language.tokens.conjunction.literal)}])?`,
+    'g',
   );
 
-  return [
-    ...input.matchAll(re)]
-      .map(
-        ({groups}) => Object.entries(groups)
-          .map(([key, value]) => ({
-            type: key.startsWith('operator_group') ? 'operator_group' : key,
-            value})
-          )
-      ).flat();
-};
+  return [...input.matchAll(re)]
+    .map(({ groups }) =>
+      Object.entries(groups).map(([key, value]) => ({
+        type: key.startsWith('operator_group') ? 'operator_group' : key,
+        value,
+      })),
+    )
+    .flat();
+}
 
 type QLOptionSuggestionEntityItem = {
-  description?: string
-  label: string
+  description?: string;
+  label: string;
 };
 
-type QLOptionSuggestionEntityItemTyped =
-  QLOptionSuggestionEntityItem
-  & { type: 'operator_group'|'field'|'operator_compare'|'value'|'conjunction' };
+type QLOptionSuggestionEntityItemTyped = QLOptionSuggestionEntityItem & {
+  type:
+    | 'operator_group'
+    | 'field'
+    | 'operator_compare'
+    | 'value'
+    | 'conjunction';
+};
 
 type SuggestItem = QLOptionSuggestionEntityItem & {
-  type: { iconType: string, color: string }
+  type: { iconType: string; color: string };
 };
 
 type QLOptionSuggestionHandler = (
@@ -179,15 +184,11 @@ type optionsQL = {
  * @param tokenType token type to search
  * @returns
  */
-function getLastTokenWithValue(
-  tokens: ITokens
-): IToken | undefined {
+function getLastTokenWithValue(tokens: ITokens): IToken | undefined {
   // Reverse the tokens array and use the Array.protorype.find method
   const shallowCopyArray = Array.from([...tokens]);
   const shallowCopyArrayReversed = shallowCopyArray.reverse();
-  const tokenFound = shallowCopyArrayReversed.find(
-    ({ value }) => value,
-  );
+  const tokenFound = shallowCopyArrayReversed.find(({ value }) => value);
   return tokenFound;
 }
 
@@ -218,7 +219,10 @@ function getLastTokenWithValueByType(
  * @param options
  * @returns
  */
-export async function getSuggestions(tokens: ITokens, options: optionsQL): Promise<QLOptionSuggestionEntityItemTyped[]> {
+export async function getSuggestions(
+  tokens: ITokens,
+  options: optionsQL,
+): Promise<QLOptionSuggestionEntityItemTyped[]> {
   if (!tokens.length) {
     return [];
   }
@@ -227,40 +231,42 @@ export async function getSuggestions(tokens: ITokens, options: optionsQL): Promi
   const lastToken = getLastTokenWithValue(tokens);
 
   // If it can't get a token with value, then returns fields and open operator group
-  if(!lastToken?.type){
-    return  [
+  if (!lastToken?.type) {
+    return [
       // fields
       ...(await options.suggestions.field()).map(mapSuggestionCreatorField),
       {
         type: 'operator_group',
         label: '(',
         description: language.tokens.operator_group.literal['('],
-      }
+      },
     ];
-  };
+  }
 
   switch (lastToken.type) {
     case 'field':
       return [
         // fields that starts with the input but is not equals
-        ...(await options.suggestions.field()).filter(
-          ({ label }) =>
-            label.startsWith(lastToken.value) && label !== lastToken.value,
-        ).map(mapSuggestionCreatorField),
+        ...(await options.suggestions.field())
+          .filter(
+            ({ label }) =>
+              label.startsWith(lastToken.value) && label !== lastToken.value,
+          )
+          .map(mapSuggestionCreatorField),
         // operators if the input field is exact
         ...((await options.suggestions.field()).some(
           ({ label }) => label === lastToken.value,
         )
           ? [
-            ...Object.keys(language.tokens.operator_compare.literal).map(
-              operator => ({
-                type: 'operator_compare',
-                label: operator,
-                description:
-                  language.tokens.operator_compare.literal[operator],
-              }),
-            ),
-          ]
+              ...Object.keys(language.tokens.operator_compare.literal).map(
+                operator => ({
+                  type: 'operator_compare',
+                  label: operator,
+                  description:
+                    language.tokens.operator_compare.literal[operator],
+                }),
+              ),
+            ]
           : []),
       ];
       break;
@@ -281,14 +287,17 @@ export async function getSuggestions(tokens: ITokens, options: optionsQL): Promi
           operator => operator === lastToken.value,
         )
           ? [
-            ...(await options.suggestions.value(undefined, {
-              previousField: getLastTokenWithValueByType(tokens, 'field')!.value,
-              previousOperatorCompare: getLastTokenWithValueByType(
-                tokens,
-                'operator_compare',
-              )!.value,
-            })).map(mapSuggestionCreatorValue),
-          ]
+              ...(
+                await options.suggestions.value(undefined, {
+                  previousField: getLastTokenWithValueByType(tokens, 'field')!
+                    .value,
+                  previousOperatorCompare: getLastTokenWithValueByType(
+                    tokens,
+                    'operator_compare',
+                  )!.value,
+                })
+              ).map(mapSuggestionCreatorValue),
+            ]
           : []),
       ];
       break;
@@ -296,22 +305,24 @@ export async function getSuggestions(tokens: ITokens, options: optionsQL): Promi
       return [
         ...(lastToken.value
           ? [
-            {
-              type: 'function_search',
-              label: 'Search',
-              description: 'run the search query',
-            },
-          ]
+              {
+                type: 'function_search',
+                label: 'Search',
+                description: 'run the search query',
+              },
+            ]
           : []),
-        ...(await options.suggestions.value(lastToken.value, {
-          previousField: getLastTokenWithValueByType(tokens, 'field')!.value,
-          previousOperatorCompare: getLastTokenWithValueByType(
-            tokens,
-            'operator_compare',
-          )!.value,
-        })).map(mapSuggestionCreatorValue),
+        ...(
+          await options.suggestions.value(lastToken.value, {
+            previousField: getLastTokenWithValueByType(tokens, 'field')!.value,
+            previousOperatorCompare: getLastTokenWithValueByType(
+              tokens,
+              'operator_compare',
+            )!.value,
+          })
+        ).map(mapSuggestionCreatorValue),
         ...Object.entries(language.tokens.conjunction.literal).map(
-          ([ conjunction, description]) => ({
+          ([conjunction, description]) => ({
             type: 'conjunction',
             label: conjunction,
             description,
@@ -342,8 +353,10 @@ export async function getSuggestions(tokens: ITokens, options: optionsQL): Promi
           conjunction => conjunction === lastToken.value,
         )
           ? [
-            ...(await options.suggestions.field()).map(mapSuggestionCreatorField),
-          ]
+              ...(await options.suggestions.field()).map(
+                mapSuggestionCreatorField,
+              ),
+            ]
           : []),
         {
           type: 'operator_group',
@@ -381,16 +394,18 @@ export async function getSuggestions(tokens: ITokens, options: optionsQL): Promi
 
 /**
  * Transform the suggestion object to the expected object by EuiSuggestItem
- * @param param0 
- * @returns 
+ * @param param0
+ * @returns
  */
-export function transformSuggestionToEuiSuggestItem(suggestion: QLOptionSuggestionEntityItemTyped): SuggestItem{
-  const { type, ...rest} = suggestion;
+export function transformSuggestionToEuiSuggestItem(
+  suggestion: QLOptionSuggestionEntityItemTyped,
+): SuggestItem {
+  const { type, ...rest } = suggestion;
   return {
     type: { ...suggestionMappingLanguageTokenType[type] },
-    ...rest
+    ...rest,
   };
-};
+}
 
 /**
  * Transform the suggestion object to the expected object by EuiSuggestItem
@@ -398,24 +413,26 @@ export function transformSuggestionToEuiSuggestItem(suggestion: QLOptionSuggesti
  * @returns
  */
 function transformSuggestionsToEuiSuggestItem(
-  suggestions: QLOptionSuggestionEntityItemTyped[]
+  suggestions: QLOptionSuggestionEntityItemTyped[],
 ): SuggestItem[] {
   return suggestions.map(transformSuggestionToEuiSuggestItem);
-};
+}
 
 /**
  * Get the output from the input
  * @param input
  * @returns
  */
-function getOutput(input: string, options: {implicitQuery?: string} = {}) {
-  const unifiedQuery = `${options?.implicitQuery ?? ''}${options?.implicitQuery ? `(${input})` : input}`;
+function getOutput(input: string, options: { implicitQuery?: string } = {}) {
+  const unifiedQuery = `${options?.implicitQuery ?? ''}${
+    options?.implicitQuery ? `(${input})` : input
+  }`;
   return {
     language: AQL.id,
     query: unifiedQuery,
-    unifiedQuery
+    unifiedQuery,
   };
-};
+}
 
 export const AQL = {
   id: 'aql',
@@ -436,10 +453,10 @@ export const AQL = {
         // Props that will be used by the EuiSuggest component
         // Suggestions
         suggestions: transformSuggestionsToEuiSuggestItem(
-          await getSuggestions(tokens, params.queryLanguage.parameters)
+          await getSuggestions(tokens, params.queryLanguage.parameters),
         ),
         // Handler to manage when clicking in a suggestion item
-        onItemClick: item => {
+        onItemClick: input => item => {
           // When the clicked item has the `search` iconType, run the `onSearch` function
           if (item.type.iconType === 'search') {
             // Execute the search action
@@ -449,8 +466,9 @@ export const AQL = {
             const lastToken: IToken = getLastTokenWithValue(tokens);
             // if the clicked suggestion is of same type of last token
             if (
-              lastToken && suggestionMappingLanguageTokenType[lastToken.type].iconType ===
-              item.type.iconType
+              lastToken &&
+              suggestionMappingLanguageTokenType[lastToken.type].iconType ===
+                item.type.iconType
             ) {
               // replace the value of last token
               lastToken.value = item.label;
@@ -462,15 +480,17 @@ export const AQL = {
                 )[0],
                 value: item.label,
               });
-            };
+            }
 
             // Change the input
-            params.setInput(tokens
-              .filter(({ value }) => value) // Ensure the input is rebuilt using tokens with value.
-              // The input tokenization can contain tokens with no value due to the used
-              // regular expression.
-              .map(({ value }) => value)
-              .join(''));
+            params.setInput(
+              tokens
+                .filter(({ value }) => value) // Ensure the input is rebuilt using tokens with value.
+                // The input tokenization can contain tokens with no value due to the used
+                // regular expression.
+                .map(({ value }) => value)
+                .join(''),
+            );
           }
         },
         prepend: params.queryLanguage.parameters.implicitQuery ? (
@@ -512,7 +532,7 @@ export const AQL = {
         // This causes when using the Search suggestion, the suggestion popover can be closed.
         // If this is disabled, then the suggestion popover is open after a short time for this
         // use case.
-        disableFocusTrap: true
+        disableFocusTrap: true,
       },
       output: getOutput(input, params.queryLanguage.parameters),
     };
