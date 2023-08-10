@@ -211,7 +211,6 @@ export class InventoryTable extends Component {
               try {
                 return await getFilterValues(
                   field,
-                  currentValue,
                   agentID,
                   {
                     ...(currentValue ? { q: `${field}~${currentValue}` } : {}),
