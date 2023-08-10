@@ -102,10 +102,14 @@ const suggestionMappingLanguageTokenType = {
  * @returns
  */
 function mapSuggestionCreator(type: ITokenType) {
-  return function ({ ...params }) {
+  return function ({ label, ...params }) {
     return {
       type,
       ...params,
+      /* WORKAROUND: ensure the label is a string. If it is not a string, an warning is
+      displayed in the console related to prop types
+      */
+      ...(typeof label !== 'undefined' ? { label: String(label) } : {}),
     };
   };
 }
@@ -1094,10 +1098,15 @@ export const WQL = {
                   : item.label;
             } else {
               // add a whitespace for conjunction <whitespace><conjunction>
+              // add a whitespace for grouping operator <whitespace>)
               !/\s$/.test(input) &&
                 (item.type.iconType ===
                   suggestionMappingLanguageTokenType.conjunction.iconType ||
-                  lastToken?.type === 'conjunction') &&
+                  lastToken?.type === 'conjunction' ||
+                  (item.type.iconType ===
+                    suggestionMappingLanguageTokenType.operator_group
+                      .iconType &&
+                    item.label === ')')) &&
                 tokens.push({
                   type: 'whitespace',
                   value: ' ',
