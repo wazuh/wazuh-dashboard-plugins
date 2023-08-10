@@ -1072,7 +1072,7 @@ export const WQL = {
             : await getSuggestions(tokens, params.queryLanguage.parameters),
         ),
         // Handler to manage when clicking in a suggestion item
-        onItemClick: input => item => {
+        onItemClick: currentInput => item => {
           // There is an error, clicking on the item does nothing
           if (item.type.iconType === 'alert') {
             return;
@@ -1081,13 +1081,13 @@ export const WQL = {
           if (item.type.iconType === 'search') {
             // Execute the search action
             // Get the tokens from the input
-            const tokens: ITokens = tokenizer(input);
+            const tokens: ITokens = tokenizer(currentInput);
 
             const validationStrict = validate(tokens, validators);
 
             // Get the output of query language
             const output = {
-              ...getOutput(input, params.queryLanguage.parameters),
+              ...getOutput(currentInput, params.queryLanguage.parameters),
               error: validationStrict,
             };
 
