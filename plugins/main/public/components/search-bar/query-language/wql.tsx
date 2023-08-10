@@ -1006,7 +1006,7 @@ export const WQL = {
       error: validationStrict,
     };
 
-    const onSearch = () => {
+    const onSearch = output => {
       if (output?.error) {
         params.setQueryLanguageOutput(state => ({
           ...state,
@@ -1019,6 +1019,7 @@ export const WQL = {
                 description: error,
               })),
             ),
+            isInvalid: true,
           },
         }));
       } else {
@@ -1071,79 +1072,92 @@ export const WQL = {
             : await getSuggestions(tokens, params.queryLanguage.parameters),
         ),
         // Handler to manage when clicking in a suggestion item
-        onItemClick: item => {
-          // There is an error, clicking on the item does nothing
-          if (item.type.iconType === 'alert') {
-            return;
-          }
-          // When the clicked item has the `search` iconType, run the `onSearch` function
-          if (item.type.iconType === 'search') {
-            // Execute the search action
-            onSearch();
-          } else {
-            // When the clicked item has another iconType
-            const lastToken: IToken | undefined = getLastTokenDefined(tokens);
-            // if the clicked suggestion is of same type of last token
-            if (
-              lastToken &&
-              suggestionMappingLanguageTokenType[lastToken.type].iconType ===
-                item.type.iconType
-            ) {
-              // replace the value of last token with the current one.
-              // if the current token is a value, then transform it
-              lastToken.value =
-                item.type.iconType ===
-                suggestionMappingLanguageTokenType.value.iconType
-                  ? transformQLValue(item.label)
-                  : item.label;
-            } else {
-              // add a whitespace for conjunction <whitespace><conjunction>
-              // add a whitespace for grouping operator <whitespace>)
-              !/\s$/.test(input) &&
-                (item.type.iconType ===
-                  suggestionMappingLanguageTokenType.conjunction.iconType ||
-                  lastToken?.type === 'conjunction' ||
-                  (item.type.iconType ===
-                    suggestionMappingLanguageTokenType.operator_group
-                      .iconType &&
-                    item.label === ')')) &&
-                tokens.push({
-                  type: 'whitespace',
-                  value: ' ',
-                });
+        onItemClick:
+          input =>
+          (item, ...rest) => {
+            // There is an error, clicking on the item does nothing
+            if (item.type.iconType === 'alert') {
+              return;
+            }
+            // When the clicked item has the `search` iconType, run the `onSearch` function
+            if (item.type.iconType === 'search') {
+              // Execute the search action
+              // Get the tokens from the input
+              const tokens: ITokens = tokenizer(input);
 
-              // add a new token of the selected type and value
-              tokens.push({
-                type: Object.entries(suggestionMappingLanguageTokenType).find(
-                  ([, { iconType }]) => iconType === item.type.iconType,
-                )[0],
-                value:
+              const validationStrict = validate(tokens, validators);
+
+              // Get the output of query language
+              const output = {
+                ...getOutput(input, params.queryLanguage.parameters),
+                error: validationStrict,
+              };
+
+              onSearch(output);
+            } else {
+              // When the clicked item has another iconType
+              const lastToken: IToken | undefined = getLastTokenDefined(tokens);
+              // if the clicked suggestion is of same type of last token
+              if (
+                lastToken &&
+                suggestionMappingLanguageTokenType[lastToken.type].iconType ===
+                  item.type.iconType
+              ) {
+                // replace the value of last token with the current one.
+                // if the current token is a value, then transform it
+                lastToken.value =
                   item.type.iconType ===
                   suggestionMappingLanguageTokenType.value.iconType
                     ? transformQLValue(item.label)
-                    : item.label,
-              });
+                    : item.label;
+              } else {
+                // add a whitespace for conjunction <whitespace><conjunction>
+                // add a whitespace for grouping operator <whitespace>)
+                !/\s$/.test(input) &&
+                  (item.type.iconType ===
+                    suggestionMappingLanguageTokenType.conjunction.iconType ||
+                    lastToken?.type === 'conjunction' ||
+                    (item.type.iconType ===
+                      suggestionMappingLanguageTokenType.operator_group
+                        .iconType &&
+                      item.label === ')')) &&
+                  tokens.push({
+                    type: 'whitespace',
+                    value: ' ',
+                  });
 
-              // add a whitespace for conjunction <conjunction><whitespace>
-              item.type.iconType ===
-                suggestionMappingLanguageTokenType.conjunction.iconType &&
+                // add a new token of the selected type and value
                 tokens.push({
-                  type: 'whitespace',
-                  value: ' ',
+                  type: Object.entries(suggestionMappingLanguageTokenType).find(
+                    ([, { iconType }]) => iconType === item.type.iconType,
+                  )[0],
+                  value:
+                    item.type.iconType ===
+                    suggestionMappingLanguageTokenType.value.iconType
+                      ? transformQLValue(item.label)
+                      : item.label,
                 });
-            }
 
-            // Change the input
-            params.setInput(
-              tokens
-                .filter(value => value) // Ensure the input is rebuilt using tokens with value.
-                // The input tokenization can contain tokens with no value due to the used
-                // regular expression.
-                .map(({ value }) => value)
-                .join(''),
-            );
-          }
-        },
+                // add a whitespace for conjunction <conjunction><whitespace>
+                item.type.iconType ===
+                  suggestionMappingLanguageTokenType.conjunction.iconType &&
+                  tokens.push({
+                    type: 'whitespace',
+                    value: ' ',
+                  });
+              }
+
+              // Change the input
+              params.setInput(
+                tokens
+                  .filter(value => value) // Ensure the input is rebuilt using tokens with value.
+                  // The input tokenization can contain tokens with no value due to the used
+                  // regular expression.
+                  .map(({ value }) => value)
+                  .join(''),
+              );
+            }
+          },
         prepend: implicitQueryAsQL ? (
           <EuiPopover
             button={
@@ -1186,7 +1200,19 @@ export const WQL = {
         // Define the handler when the a key is pressed while the input is focused
         onKeyPress: event => {
           if (event.key === 'Enter') {
-            onSearch();
+            // Get the tokens from the input
+            const input = event.currentTarget.value;
+            const tokens: ITokens = tokenizer(input);
+
+            const validationStrict = validate(tokens, validators);
+
+            // Get the output of query language
+            const output = {
+              ...getOutput(input, params.queryLanguage.parameters),
+              error: validationStrict,
+            };
+
+            onSearch(output);
           }
         },
       },
