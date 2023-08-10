@@ -20,12 +20,12 @@ import { SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT } from '../../../../../common/co
 
 const searchBarWQLOptions = {
   implicitQuery: {
-    query: 'type=registry_file',
+    query: 'type=registry_key',
     conjunction: ';',
   },
 };
 
-const searchBarWQLFilters = { default: { q: 'type=registry_file' } };
+const searchBarWQLFilters = { default: { q: 'type=registry_key' } };
 
 export class RegistryTable extends Component {
   state: {
