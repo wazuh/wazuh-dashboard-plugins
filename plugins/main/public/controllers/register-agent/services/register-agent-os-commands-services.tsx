@@ -28,31 +28,31 @@ const getAllOptionals = (
   if (osName && osName.toLowerCase() === 'windows' && optionals.serverAddress) {
     // when os is windows we must to add wazuh registration server with server address
     paramsText =
-      paramsText + `WAZUH_REGISTRATION_SERVER=${optionals.serverAddress.replace('WAZUH_MANAGER=','')} `;
+      paramsText +
+      `WAZUH_REGISTRATION_SERVER=${optionals.serverAddress.replace(
+        'WAZUH_MANAGER=',
+        '',
+      )} `;
   }
 
   return paramsText;
 };
 
 const getAllOptionalsMacos = (
-  optionals: IOptionalParameters<tOptionalParameters>
+  optionals: IOptionalParameters<tOptionalParameters>,
 ) => {
   // create paramNameOrderList, which is an array of the keys of optionals add interface
   const paramNameOrderList: (keyof IOptionalParameters<tOptionalParameters>)[] =
     ['serverAddress', 'agentGroups', 'agentName', 'protocol'];
 
   if (!optionals) return '';
-  return Object.entries(paramNameOrderList).reduce(
-    (acc, [key, value]) => {
-      if (optionals[value]) {
-        acc += `${optionals[value]}\\n`;
-      }
-      return acc;
-    },
-    '',
-  );
+  return Object.entries(paramNameOrderList).reduce((acc, [key, value]) => {
+    if (optionals[value]) {
+      acc += `${optionals[value]}\\n`;
+    }
+    return acc;
+  }, '');
 };
-
 
 /******* RPM *******/
 
@@ -62,7 +62,7 @@ export const getRPMInstallCommand = (
   props: tOSEntryInstallCommand<tOptionalParameters>,
 ) => {
   const { optionals, urlPackage, wazuhVersion } = props;
-  const packageName = `wazuh-agent-${wazuhVersion}-1.x86_64.rpm`
+  const packageName = `wazuh-agent-${wazuhVersion}-1.x86_64.rpm`;
   return `curl -o ${packageName} ${urlPackage} && sudo ${
     optionals && getAllOptionals(optionals)
   }rpm -ihv ${packageName}`;
@@ -76,7 +76,7 @@ export const getDEBInstallCommand = (
   props: tOSEntryInstallCommand<tOptionalParameters>,
 ) => {
   const { optionals, urlPackage, wazuhVersion } = props;
-  const packageName = `wazuh-agent_${wazuhVersion}-1_amd64.deb`
+  const packageName = `wazuh-agent_${wazuhVersion}-1_amd64.deb`;
   return `wget ${urlPackage} && sudo ${
     optionals && getAllOptionals(optionals)
   }dpkg -i ./${packageName}`;
@@ -129,7 +129,7 @@ export const getMacOsInstallCommand = (
   let wazuhPasswordParamWithValue = '';
   if (optionals?.wazuhPassword) {
     /**
-     * We use the JSON.stringify to prevent that the scaped specials characters will be removed 
+     * We use the JSON.stringify to prevent that the scaped specials characters will be removed
      * and mantain the format of the password
       The JSON.stringify mantain the password format but adds " to wrap the characters
     */

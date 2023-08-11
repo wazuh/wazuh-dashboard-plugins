@@ -322,6 +322,7 @@ export class WazuhReportingCtrl {
           browserTimezone,
           searchBar,
           filters,
+          serverSideQuery,
           time,
           tables,
           section,
@@ -375,7 +376,7 @@ export class WazuhReportingCtrl {
             apiId,
             new Date(from).getTime(),
             new Date(to).getTime(),
-            sanitizedFilters,
+            serverSideQuery,
             agentsFilter,
             indexPatternTitle,
             agents,
@@ -1040,8 +1041,14 @@ export class WazuhReportingCtrl {
             `Report started`,
             'info',
           );
-          const { searchBar, filters, time, indexPatternTitle, apiId } =
-            request.body;
+          const {
+            searchBar,
+            filters,
+            time,
+            indexPatternTitle,
+            apiId,
+            serverSideQuery,
+          } = request.body;
           const { agentID } = request.params;
           const { from, to } = time || {};
           // Init
@@ -1274,6 +1281,15 @@ export class WazuhReportingCtrl {
           };
 
           if (time) {
+            // Add Vulnerability Detector filter to the Server Side Query
+            serverSideQuery?.bool?.must?.push?.({
+              match_phrase: {
+                'rule.groups': {
+                  query: 'vulnerability-detector',
+                },
+              },
+            });
+
             await extendedInformation(
               context,
               printer,
@@ -1282,7 +1298,7 @@ export class WazuhReportingCtrl {
               apiId,
               from,
               to,
-              sanitizedFilters + ' AND rule.groups: "vulnerability-detector"',
+              serverSideQuery,
               agentsFilter,
               indexPatternTitle,
               agentID,

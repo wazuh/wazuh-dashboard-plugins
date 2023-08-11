@@ -28,9 +28,6 @@ export const topPCIRequirements = async (
   allowedAgentsFilter,
   pattern = getSettingDefaultValue('pattern')
 ) => {
-  if (filters.includes('rule.pci_dss: exists')) {
-    filters = filters.replace('AND rule.pci_dss: exists', '');
-  };
 
   try {
     const base = {};
@@ -46,12 +43,6 @@ export const topPCIRequirements = async (
             _count: 'desc'
           }
         }
-      }
-    });
-
-    base.query.bool.must.push({
-      exists: {
-        field: 'rule.pci_dss'
       }
     });
 
@@ -100,9 +91,6 @@ export const getRulesByRequirement = async (
   requirement,
   pattern = getSettingDefaultValue('pattern')
 ) => {
-  if (filters.includes('rule.pci_dss: exists')) {
-    filters = filters.replace('AND rule.pci_dss: exists', '');
-  };
 
   try {
     const base = {};
@@ -132,11 +120,13 @@ export const getRulesByRequirement = async (
       }
     });
 
-    base.query.bool.must[0].query_string.query =
-      base.query.bool.must[0].query_string.query +
-      ' AND rule.pci_dss: "' +
-      requirement +
-      '"';
+    base.query.bool.filter.push({
+      match_phrase: {
+        'rule.pci_dss': {
+          query: requirement
+        }
+      }
+    });
 
     const response = await context.core.opensearch.client.asCurrentUser.search({
       index: pattern,
@@ -154,7 +144,7 @@ export const getRulesByRequirement = async (
       ) {
         return accum;
       };
-      accum.push({ruleID: bucket['3'].buckets[0].key, ruleDescription: bucket.key});
+      accum.push({ ruleID: bucket['3'].buckets[0].key, ruleDescription: bucket.key });
       return accum;
     }, []);
   } catch (error) {

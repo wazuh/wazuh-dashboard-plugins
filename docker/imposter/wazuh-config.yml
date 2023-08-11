@@ -507,6 +507,9 @@ resources:
   # Get active configuration
   - method: GET
     path: /manager/configuration/{component}/{configuration}
+    response:
+      statusCode: 200
+      scriptFile: manager/configuration.js
 
   # ===================================================== #
   #   MITRE

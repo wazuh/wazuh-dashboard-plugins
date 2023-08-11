@@ -114,7 +114,10 @@ export const Steps = ({
     ) {
       selectOS(registerAgentFormValues.operatingSystem as tOperatingSystem);
     }
-    setOptionalParams({ ...registerAgentFormValues.optionalParams }, registerAgentFormValues.operatingSystem as tOperatingSystem);
+    setOptionalParams(
+      { ...registerAgentFormValues.optionalParams },
+      registerAgentFormValues.operatingSystem as tOperatingSystem,
+    );
     setInstallCommandWasCopied(false);
     setStartCommandWasCopied(false);
   }, [registerAgentFormValues]);
