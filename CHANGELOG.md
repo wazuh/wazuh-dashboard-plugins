@@ -50,10 +50,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Migrate the timeFilter, metaFields, maxBuckets health checks inside the pattern check. [#5384](https://github.com/wazuh/wazuh-kibana-app/pull/5384)
 - Changed the query to search for an agent in `management/configuration`. [#5485](https://github.com/wazuh/wazuh-kibana-app/pull/5485)
 - Changed the search bar in management/log to the one used in the rest of the app. [#5476](https://github.com/wazuh/wazuh-kibana-app/pull/5476)
-  <<<<<<< HEAD
-  =======
 - Changed the design of the wizard to add agents. [#5457](https://github.com/wazuh/wazuh-kibana-app/pull/5457)
-  > > > > > > > ad665b6e207bae44e8472a96123952f78be5159a
 
 ### Fixed
 
