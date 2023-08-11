@@ -54,7 +54,6 @@
         "rules": []
       },
       {
-<<<<<<<< HEAD:docker/imposter/security/security-roles.json
         "id": 101,
         "name": "custom_role",
         "policies": [29, 30],
@@ -62,8 +61,6 @@
         "rules": []
       },
       {
-========
->>>>>>>> ad665b6e207bae44e8472a96123952f78be5159a:docker/imposter/security/roles/get-roles-after-delete.json
         "id": 102,
         "name": "custom_role2",
         "policies": [29, 30],
