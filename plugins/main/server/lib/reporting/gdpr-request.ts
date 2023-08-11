@@ -28,10 +28,6 @@ export const topGDPRRequirements = async (
   allowedAgentsFilter,
   pattern = getSettingDefaultValue('pattern')
 ) => {
-  if (filters.includes('rule.gdpr: exists')) {
-    const [head, tail] = filters.split('AND rule.gdpr: exists');
-    filters = head + tail;
-  };
 
   try {
     const base = {};
@@ -47,12 +43,6 @@ export const topGDPRRequirements = async (
             _count: 'desc'
           }
         }
-      }
-    });
-
-    base.query.bool.must.push({
-      exists: {
-        field: 'rule.gdpr'
       }
     });
 
@@ -86,10 +76,6 @@ export const getRulesByRequirement = async (
   requirement,
   pattern = getSettingDefaultValue('pattern')
 ) => {
-  if (filters.includes('rule.gdpr: exists')) {
-    const [head, tail] = filters.split('AND rule.gdpr: exists');
-    filters = head + tail;
-  };
 
   try {
     const base = {};
@@ -119,8 +105,13 @@ export const getRulesByRequirement = async (
       }
     });
 
-    base.query.bool.must[0].query_string.query =
-      base.query.bool.must[0].query_string.query + ` AND rule.gdpr: "${requirement}"`;
+    base.query.bool.filter.push({
+      match_phrase: {
+        'rule.gdpr': {
+          query: requirement
+        }
+      }
+    });
 
     const response = await context.core.opensearch.client.asCurrentUser.search({
       index: pattern,
