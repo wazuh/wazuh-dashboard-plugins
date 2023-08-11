@@ -499,7 +499,7 @@ export const AgentsTable = withErrorBoundary(
               }}
               tableProps={{
                 tableLayout: 'auto',
-                getCellProps,
+                cellProps: getCellProps,
               }}
             />
           </EuiFlexItem>
