@@ -18,68 +18,80 @@ import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { SearchBar, SearchBarProps } from '../../search-bar';
 
-export interface ITableWithSearcHBarProps<T>{
+export interface ITableWithSearcHBarProps<T> {
   /**
    * Function to fetch the data
    */
   onSearch: (
     endpoint: string,
     filters: Record<string, any>,
-    pagination: {pageIndex: number, pageSize: number},
-    sorting: {sort: {field: string, direction: string}}
-  ) => Promise<{items: any[], totalItems: number}>
+    pagination: { pageIndex: number; pageSize: number },
+    sorting: { sort: { field: string; direction: string } },
+  ) => Promise<{ items: any[]; totalItems: number }>;
   /**
    * Properties for the search bar
    */
-  searchBarProps?: Omit<SearchBarProps, 'defaultMode' | 'modes' | 'onSearch' | 'input'>
+  searchBarProps?: Omit<
+    SearchBarProps,
+    'defaultMode' | 'modes' | 'onSearch' | 'input'
+  >;
   /**
    * Columns for the table
    */
   tableColumns: EuiBasicTableProps<T>['columns'] & {
-    composeField?: string[],
-    searchable?: string
-    show?: boolean,
-  }
+    composeField?: string[];
+    searchable?: string;
+    show?: boolean;
+  };
   /**
    * Table row properties for the table
    */
-  rowProps?: EuiBasicTableProps<T>['rowProps']
+  rowProps?: EuiBasicTableProps<T>['rowProps'];
   /**
    * Table page size options
    */
-  tablePageSizeOptions?: number[]
+  tablePageSizeOptions?: number[];
   /**
    * Table initial sorting direction
    */
-  tableInitialSortingDirection?: 'asc' | 'dsc'
+  tableInitialSortingDirection?: 'asc' | 'desc';
   /**
    * Table initial sorting field
    */
-  tableInitialSortingField?: string
+  tableInitialSortingField?: string;
   /**
    * Table properties
    */
-  tableProps?: Omit<EuiBasicTableProps<T>, 'columns' | 'items' | 'loading' | 'pagination' | 'sorting' | 'onChange' | 'rowProps'>
+  tableProps?: Omit<
+    EuiBasicTableProps<T>,
+    | 'columns'
+    | 'items'
+    | 'loading'
+    | 'pagination'
+    | 'sorting'
+    | 'onChange'
+    | 'rowProps'
+  >;
   /**
    * Refresh the fetch of data
    */
-  reload?: number
+  reload?: number;
   /**
    * API endpoint
    */
-  endpoint: string
+  endpoint: string;
   /**
    * Search bar properties for WQL
    */
-  searchBarWQL?: any
+  searchBarWQL?: any;
   /**
    * Visible fields
    */
-  selectedFields: string[]
+  selectedFields: string[];
   /**
    * API request filters
    */
-  filters?: any
+  filters?: any;
 }
 
 export function TableWithSearchBar<T>({
@@ -113,18 +125,24 @@ export function TableWithSearchBar<T>({
 
   const isMounted = useRef(false);
 
-  const searchBarWQLOptions = useMemo(() => ({
-    searchTermFields: tableColumns
-      .filter(({field, searchable}) => searchable && rest.selectedFields.includes(field))
-      .map(({field, composeField}) => ([composeField || field].flat()))
-      .flat(),
-    ...(rest?.searchBarWQL?.options || {})
-  }), [rest?.searchBarWQL?.options, rest?.selectedFields]);
+  const searchBarWQLOptions = useMemo(
+    () => ({
+      searchTermFields: tableColumns
+        .filter(
+          ({ field, searchable }) =>
+            searchable && rest.selectedFields.includes(field),
+        )
+        .map(({ field, composeField }) => [composeField || field].flat())
+        .flat(),
+      ...(rest?.searchBarWQL?.options || {}),
+    }),
+    [rest?.searchBarWQL?.options, rest?.selectedFields],
+  );
 
   function updateRefresh() {
     setPagination({ pageIndex: 0, pageSize: pagination.pageSize });
     setRefresh(Date.now());
-  };
+  }
 
   function tableOnChange({ page = {}, sort = {} }) {
     if (isMounted.current) {
@@ -154,31 +172,39 @@ export function TableWithSearchBar<T>({
     }
   }, [endpoint, reload]);
 
-  useEffect(function () {
-    (async () => {
-      try {
-        setLoading(true);
-        const { items, totalItems } = await onSearch(endpoint, filters, pagination, sorting);
-        setItems(items);
-        setTotalItems(totalItems);
-      } catch (error) {
-        setItems([]);
-        setTotalItems(0);
-        const options = {
-          context: `${TableWithSearchBar.name}.useEffect`,
-          level: UI_LOGGER_LEVELS.ERROR,
-          severity: UI_ERROR_SEVERITIES.BUSINESS,
-          error: {
-            error: error,
-            message: error.message || error,
-            title: `${error.name}: Error fetching items`,
-          },
-        };
-        getErrorOrchestrator().handleError(options);
-      }
-      setLoading(false);
-    })();
-  }, [filters, pagination, sorting, refresh]);
+  useEffect(
+    function () {
+      (async () => {
+        try {
+          setLoading(true);
+          const { items, totalItems } = await onSearch(
+            endpoint,
+            filters,
+            pagination,
+            sorting,
+          );
+          setItems(items);
+          setTotalItems(totalItems);
+        } catch (error) {
+          setItems([]);
+          setTotalItems(0);
+          const options = {
+            context: `${TableWithSearchBar.name}.useEffect`,
+            level: UI_LOGGER_LEVELS.ERROR,
+            severity: UI_ERROR_SEVERITIES.BUSINESS,
+            error: {
+              error: error,
+              message: error.message || error,
+              title: `${error.name}: Error fetching items`,
+            },
+          };
+          getErrorOrchestrator().handleError(options);
+        }
+        setLoading(false);
+      })();
+    },
+    [filters, pagination, sorting, refresh],
+  );
 
   useEffect(() => {
     // This effect is triggered when the component is mounted because of how to the useEffect hook works.
@@ -211,20 +237,26 @@ export function TableWithSearchBar<T>({
           {
             id: 'wql',
             options: searchBarWQLOptions,
-            ...( rest?.searchBarWQL?.suggestions ? {suggestions: rest.searchBarWQL.suggestions} : {}),
-            ...( rest?.searchBarWQL?.validate ? {validate: rest.searchBarWQL.validate} : {})
-          }
+            ...(rest?.searchBarWQL?.suggestions
+              ? { suggestions: rest.searchBarWQL.suggestions }
+              : {}),
+            ...(rest?.searchBarWQL?.validate
+              ? { validate: rest.searchBarWQL.validate }
+              : {}),
+          },
         ]}
         input={rest?.filters?.q || ''}
-        onSearch={({apiQuery}) => {
+        onSearch={({ apiQuery }) => {
           // Set the query, reset the page index and update the refresh
           setFilters(apiQuery);
           updateRefresh();
         }}
       />
-      <EuiSpacer size="s" />
+      <EuiSpacer size='s' />
       <EuiBasicTable
-        columns={tableColumns.map(({searchable, show, composeField, ...rest}) => ({...rest}))}
+        columns={tableColumns.map(
+          ({ searchable, show, composeField, ...rest }) => ({ ...rest }),
+        )}
         items={items}
         loading={loading}
         pagination={tablePagination}
