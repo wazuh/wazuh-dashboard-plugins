@@ -143,6 +143,13 @@ export default class RulesetColumns {
           sortable: true,
         },
         {
+          field: 'relative_dirname',
+          name: 'Path',
+          align: 'left',
+          sortable: true,
+          width: '10%',
+        },
+        {
           name: 'Actions',
           align: 'left',
           render: item => {

@@ -16,18 +16,18 @@ export default function SCAPoliciesTable(props: Props) {
       'data-test-subj': `sca-row-${idx}`,
       className: 'customRowClass',
       onClick: rowProps ? () => rowProps(item) : null
-    }
-  }
+    };
+  };
 
   return (
     <>
-      <TableWzAPI 
+      <TableWzAPI
         tableInitialSortingField="policy_id"
-        endpoint={`/sca/${agent.id}`} 
-        tableColumns={columns} 
+        endpoint={`/sca/${agent.id}`}
+        tableColumns={columns}
         rowProps={getPoliciesRowProps}
         { ...tableProps}
-        />
+      />
     </>
   );
 }

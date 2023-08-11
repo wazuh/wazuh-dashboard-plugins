@@ -39,6 +39,41 @@ import {
 
 import apiSuggestsItems from './ruleset-suggestions';
 
+const searchBarWQLOptions = {
+  searchTermFields: [
+    'id',
+    'description',
+    'filename',
+    'gdpr',
+    'gpg13',
+    'groups',
+    'level',
+    'mitre',
+    'nist_800_53',
+    'pci_dss',
+    'relative_dirname',
+    'tsc',
+  ],
+  filterButtons: [
+    {
+      id: 'relative-dirname',
+      input: 'relative_dirname=etc/rules',
+      label: 'Custom rules',
+    },
+  ],
+};
+
+const searchBarWQLOptionsFiles = {
+  searchTermFields: ['filename', 'relative_dirname'],
+  filterButtons: [
+    {
+      id: 'relative-dirname',
+      input: 'relative_dirname=etc/rules',
+      label: 'Custom rules',
+    },
+  ],
+};
+
 /***************************************
  * Render tables
  */
@@ -54,19 +89,20 @@ const FilesTable = ({
   <TableWzAPI
     reload={reload}
     actionButtons={actionButtons}
-    title={'Rules files'}
-    searchBarProps={{ buttonOptions: buttonOptions }}
-    description={`From here you can manage your rules files.`}
+    title='Rules files'
+    description='From here you can manage your rules files.'
     tableColumns={columns}
-    tableInitialSortingField={'filename'}
+    tableInitialSortingField='filename'
     searchTable={true}
-    searchBarSuggestions={searchBarSuggestions}
-    endpoint={'/rules/files'}
+    searchBarWQL={{
+      options: searchBarWQLOptionsFiles,
+      suggestions: searchBarSuggestions,
+    }}
+    endpoint='/rules/files'
     isExpandable={true}
     downloadCsv={true}
     showReload={true}
     filters={filters}
-    onFiltersChange={updateFilters}
     tablePageSizeOptions={[10, 25, 50, 100]}
   />
 );
@@ -88,20 +124,21 @@ const RulesFlyoutTable = ({
   <>
     <TableWzAPI
       actionButtons={actionButtons}
-      title={'Rules'}
-      searchBarProps={{ buttonOptions: buttonOptions }}
-      description={`From here you can manage your rules.`}
+      title='Rules'
+      description='From here you can manage your rules.'
       tableColumns={columns}
-      tableInitialSortingField={'id'}
+      tableInitialSortingField='id'
       searchTable={true}
-      searchBarSuggestions={searchBarSuggestions}
-      endpoint={'/rules'}
+      searchBarWQL={{
+        options: searchBarWQLOptions,
+        suggestions: searchBarSuggestions,
+      }}
+      endpoint='/rules'
       isExpandable={true}
       rowProps={getRowProps}
       downloadCsv={true}
       showReload={true}
       filters={filters}
-      onFiltersChange={updateFilters}
       tablePageSizeOptions={[10, 25, 50, 100]}
     />
     {isFlyoutVisible && (

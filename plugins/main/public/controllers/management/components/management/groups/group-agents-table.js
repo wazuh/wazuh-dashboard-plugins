@@ -9,7 +9,8 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
+import { EuiCallOut, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 
 import { connect } from 'react-redux';
 import GroupsHandler from './utils/groups-handler';
@@ -25,171 +26,80 @@ import {
   updateSortFieldAgents,
   updateReload,
 } from '../../../../../redux/actions/groupsActions';
-import { EuiCallOut } from '@elastic/eui';
-import { getAgentFilterValues } from './get-agents-filters-values';
 import { TableWzAPI } from '../../../../../components/common/tables';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 import { WzButtonPermissionsModalConfirm } from '../../../../../components/common/buttons';
 import {
+  SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
   UI_LOGGER_LEVELS,
   UI_ORDER_AGENT_STATUS,
 } from '../../../../../../common/constants';
+import { get as getLodash } from 'lodash';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
+import { AgentStatus } from '../../../../../components/agents/agent_status';
+import { WzRequest } from '../../../../../react-services';
 
 class WzGroupAgentsTable extends Component {
   _isMounted = false;
   constructor(props) {
     super(props);
-    this.suggestions = [
-      {
-        type: 'q',
-        label: 'status',
-        description: 'Filter by agent connection status',
-        operators: ['=', '!='],
-        values: UI_ORDER_AGENT_STATUS,
-      },
-      {
-        type: 'q',
-        label: 'os.platform',
-        description: 'Filter by operating system platform',
-        operators: ['=', '!='],
-        values: async value =>
-          getAgentFilterValues('os.platform', value, {
-            q: `group=${this.props.state.itemDetail.name}`,
-          }),
-      },
-      {
-        type: 'q',
-        label: 'ip',
-        description: 'Filter by agent IP address',
-        operators: ['=', '!='],
-        values: async value =>
-          getAgentFilterValues('ip', value, {
-            q: `group=${this.props.state.itemDetail.name}`,
-          }),
-      },
-      {
-        type: 'q',
-        label: 'name',
-        description: 'Filter by agent name',
-        operators: ['=', '!='],
-        values: async value =>
-          getAgentFilterValues('name', value, {
-            q: `group=${this.props.state.itemDetail.name}`,
-          }),
-      },
-      {
-        type: 'q',
-        label: 'id',
-        description: 'Filter by agent id',
-        operators: ['=', '!='],
-        values: async value =>
-          getAgentFilterValues('id', value, {
-            q: `group=${this.props.state.itemDetail.name}`,
-          }),
-      },
-      {
-        type: 'q',
-        label: 'node_name',
-        description: 'Filter by node name',
-        operators: ['=', '!='],
-        values: async value =>
-          getAgentFilterValues('node_name', value, {
-            q: `group=${this.props.state.itemDetail.name}`,
-          }),
-      },
-      {
-        type: 'q',
-        label: 'manager',
-        description: 'Filter by manager',
-        operators: ['=', '!='],
-        values: async value =>
-          getAgentFilterValues('manager', value, {
-            q: `group=${this.props.state.itemDetail.name}`,
-          }),
-      },
-      {
-        type: 'q',
-        label: 'version',
-        description: 'Filter by agent version',
-        operators: ['=', '!='],
-        values: async value =>
-          getAgentFilterValues('version', value, {
-            q: `group=${this.props.state.itemDetail.name}`,
-          }),
-      },
-      {
-        type: 'q',
-        label: 'configSum',
-        description: 'Filter by agent config sum',
-        operators: ['=', '!='],
-        values: async value =>
-          getAgentFilterValues('configSum', value, {
-            q: `group=${this.props.state.itemDetail.name}`,
-          }),
-      },
-      {
-        type: 'q',
-        label: 'mergedSum',
-        description: 'Filter by agent merged sum',
-        operators: ['=', '!='],
-        values: async value =>
-          getAgentFilterValues('mergedSum', value, {
-            q: `group=${this.props.state.itemDetail.name}`,
-          }),
-      },
-      //{ type: 'q', label: 'dateAdd', description: 'Filter by add date', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('dateAdd', value,  {q: `group=${this.props.state.itemDetail.name}`})},
-      //{ type: 'q', label: 'lastKeepAlive', description: 'Filter by last keep alive', operators: ['=', '!=',], values: async (value) => getAgentFilterValues('lastKeepAlive', value,  {q: `group=${this.props.state.itemDetail.name}`})},
-    ];
-    this.groupsHandler = GroupsHandler;
 
     this.columns = [
       {
         field: 'id',
         name: 'Id',
         align: 'left',
+        searchable: true,
         sortable: true,
       },
       {
         field: 'name',
         name: 'Name',
         align: 'left',
+        searchable: true,
         sortable: true,
       },
       {
         field: 'ip',
         name: 'IP address',
-        sortable: true,
-        show: true,
-      },
-      {
-        field: 'status',
-        name: 'Status',
         align: 'left',
+        searchable: true,
         sortable: true,
       },
       {
-        field: 'os.name',
-        name: 'Operating system name',
+        field: 'os.name,os.version',
+        composeField: ['os.name', 'os.version'],
+        name: 'Operating system',
         align: 'left',
+        searchable: true,
         sortable: true,
-      },
-      {
-        field: 'os.version',
-        name: 'Operating system version',
-        align: 'left',
-        sortable: true,
+        render: (field, agentData) => this.addIconPlatformRender(agentData),
       },
       {
         field: 'version',
         name: 'Version',
         align: 'left',
+        searchable: true,
         sortable: true,
+      },
+      {
+        field: 'status',
+        name: 'Status',
+        align: 'left',
+        searchable: true,
+        sortable: true,
+        render: status => (
+          <AgentStatus
+            status={status}
+            labelProps={{ className: 'hide-agent-status' }}
+          />
+        ),
       },
       {
         name: 'Actions',
         align: 'left',
+        searchable: false,
         render: item => {
           return (
             <div>
@@ -251,20 +161,105 @@ class WzGroupAgentsTable extends Component {
         },
       },
     ];
+
+    this.searchBar = {
+      wql: {
+        suggestionFields: [
+          { label: 'id', description: `filter by ID` },
+          { label: 'ip', description: `filter by IP address` },
+          { label: 'name', description: `filter by Name` },
+          { label: 'os.name', description: `filter by Operating system name` },
+          {
+            label: 'os.version',
+            description: `filter by Operating system version`,
+          },
+          { label: 'status', description: `filter by Status` },
+          { label: 'version', description: `filter by Version` },
+        ],
+      },
+    };
   }
 
   componentWillUnmount() {
     this._isMounted = false;
   }
+
+  addIconPlatformRender(agent) {
+    let icon = '';
+    const os = agent?.os || {};
+
+    if ((os?.uname || '').includes('Linux')) {
+      icon = 'linux';
+    } else if (os?.platform === 'windows') {
+      icon = 'windows';
+    } else if (os?.platform === 'darwin') {
+      icon = 'apple';
+    }
+    const os_name = `${agent?.os?.name || ''} ${agent?.os?.version || ''}`;
+
+    return (
+      <EuiFlexGroup gutterSize='xs'>
+        <EuiFlexItem grow={false}>
+          <i
+            className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`}
+            aria-hidden='true'
+          ></i>
+        </EuiFlexItem>{' '}
+        <EuiFlexItem>{os_name.trim() || '-'}</EuiFlexItem>
+      </EuiFlexGroup>
+    );
+  }
+
   render() {
     const { error } = this.props.state;
+    const groupName = this.props.state?.itemDetail?.name;
+    const searchBarSuggestionsFields = this.searchBar.wql.suggestionFields;
     if (!error) {
       return (
         <TableWzAPI
+          title='Agents'
+          description='From here you can list and manage your agents'
           tableColumns={this.columns}
           tableInitialSortingField='id'
-          searchBarSuggestions={this.suggestions}
-          endpoint={`/groups/${this.props.state.itemDetail.name}/agents`}
+          endpoint={`/groups/${groupName}/agents`}
+          searchBarWQL={{
+            suggestions: {
+              field: () => searchBarSuggestionsFields,
+              value: async (currentValue, { field }) => {
+                try {
+                  const response = await WzRequest.apiReq(
+                    'GET',
+                    `/groups/${groupName}/agents`,
+                    {
+                      params: {
+                        distinct: true,
+                        limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
+                        select: field,
+                        sort: `+${field}`,
+                        ...(currentValue
+                          ? { q: `${field}~${currentValue}` }
+                          : {}),
+                      },
+                    },
+                  );
+                  return response?.data?.data.affected_items.map(item => ({
+                    label: getLodash(item, field),
+                  }));
+                } catch (error) {
+                  return [];
+                }
+              },
+            },
+          }}
+          mapResponseItem={item => ({
+            ...item,
+            ...(item.ip ? { ip: item.ip } : { ip: '-' }),
+            ...(typeof item.version === 'string'
+              ? { version: item.version.match(/(v\d.+)/)?.[1] }
+              : { version: '-' }),
+          })}
+          showReload
+          downloadCsv={`agents-group-${groupName}`}
           reload={this.props.state.reload}
           searchTable={true}
           tableProps={{ tableLayout: 'auto' }}
@@ -289,9 +284,7 @@ class WzGroupAgentsTable extends Component {
     this.props.updateLoadingStatus(true);
     try {
       await Promise.all(
-        items.map(item =>
-          this.groupsHandler.deleteAgent(item.id, itemDetail.name),
-        ),
+        items.map(item => GroupsHandler.deleteAgent(item.id, itemDetail.name)),
       );
       this.props.updateIsProcessing(true);
       this.props.updateLoadingStatus(false);

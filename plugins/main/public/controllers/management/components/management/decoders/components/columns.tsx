@@ -96,6 +96,12 @@ export default class DecodersColumns {
           sortable: true,
         },
         {
+          field: 'relative_dirname',
+          name: 'Path',
+          align: 'left',
+          sortable: true,
+        },
+        {
           name: 'Actions',
           align: 'left',
           render: item => {
