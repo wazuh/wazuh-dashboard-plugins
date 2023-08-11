@@ -31,7 +31,7 @@ import _ from 'lodash';
 import { UI_LOGGER_LEVELS, UI_ORDER_AGENT_STATUS } from '../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
-import { AgentStatus } from '../../../../components/agents/agent_status';
+import { AgentStatus } from '../../../../components/agents/agent-status';
 
 const checkField = field => {
   return field !== undefined ? field : '-';
@@ -73,7 +73,7 @@ export class AgentSelectionTable extends Component {
         mobileOptions: {
           show: true,
         },
-        isSortable: true
+        isSortable: true,
       },
       {
         id: 'group',
@@ -83,7 +83,7 @@ export class AgentSelectionTable extends Component {
           show: false,
         },
         isSortable: true,
-        render: groups => this.renderGroups(groups)
+        render: groups => this.renderGroups(groups),
       },
       {
         id: 'version',
@@ -103,7 +103,7 @@ export class AgentSelectionTable extends Component {
           show: false,
         },
         isSortable: true,
-        render: os => this.addIconPlatformRender(os)
+        render: os => this.addIconPlatformRender(os),
       },
       {
         id: 'status',
@@ -114,7 +114,13 @@ export class AgentSelectionTable extends Component {
         },
         isSortable: true,
         width: 'auto',
-        render: status => <AgentStatus status={status} style={{ whiteSpace: 'no-wrap' }}/>,
+        render: (status, agent) => (
+          <AgentStatus
+            status={status}
+            agent={agent}
+            style={{ whiteSpace: 'no-wrap' }}
+          />
+        ),
       },
     ];
     this.suggestions = [
@@ -633,7 +639,11 @@ export class AgentSelectionTable extends Component {
             <EuiFlexGroup responsive={false} justifyContent="flexEnd">
               {/* agent name (agent id) Unpin button right aligned, require justifyContent="flexEnd" in the EuiFlexGroup */}
               <EuiFlexItem grow={false} style={{marginRight: 0}}>
-                <AgentStatus status={selectedAgent.status} style={{ whiteSpace: 'no-wrap' }}>
+                <AgentStatus
+                  status={selectedAgent.status}
+                  agent={selectedAgent}
+                  style={{ whiteSpace: 'no-wrap' }}
+                >
                   {selectedAgent.name} ({selectedAgent.id})
                 </AgentStatus>
               </EuiFlexItem>

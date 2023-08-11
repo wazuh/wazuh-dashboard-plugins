@@ -15,7 +15,6 @@ import React, { Component, Fragment } from 'react';
 import { EuiBasicTable } from '@elastic/eui';
 
 import WzNoConfig from '../util-components/no-config';
-import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import helpLinks from './help-links';
@@ -46,11 +45,9 @@ class WzPolicyMonitoringSCA extends Component {
         {!this.wodleConfig.sca ? (
           <WzNoConfig error="not-present" help={helpLinks} />
         ) : (
-          <WzConfigurationSettingsTabSelector
+          <WzConfigurationSettingsHeader
             title="Security configuration assessment status"
-            currentConfig={this.wodleConfig}
-            minusHeight={this.props.agent.id === '000' ? 320 : 415}
-            helpLinks={helpLinks}
+            help={helpLinks}
           >
             <WzConfigurationSettingsGroup
               config={this.wodleConfig.sca}
@@ -61,15 +58,11 @@ class WzPolicyMonitoringSCA extends Component {
               items={this.wodleConfig.sca.policies.map(policy => ({ policy }))}
               columns={columns}
             />
-          </WzConfigurationSettingsTabSelector>
+          </WzConfigurationSettingsHeader>
         )}
       </Fragment>
     );
   }
 }
-
-WzPolicyMonitoringSCA.propTypes = {
-  // currentConfig: PropTypes.object.isRequired
-};
 
 export default WzPolicyMonitoringSCA;

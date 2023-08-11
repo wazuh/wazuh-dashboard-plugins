@@ -13,7 +13,7 @@
 import React, { Component, Fragment } from 'react';
 
 import WzNoConfig from '../util-components/no-config';
-import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationListSelector from '../util-components/configuration-settings-list-selector';
 import { isString, isArray, renderValueOrDefault, renderValueOrNoValue } from '../utils/utils';
 import { settingsListBuilder } from '../utils/builders';
@@ -68,15 +68,13 @@ class WzConfigurationLogCollectionSockets extends Component {
         ) : null}
         {!isString(currentConfig?.[LOGCOLLECTOR_SOCKET_PROP]) &&
         currentConfig?.[LOGCOLLECTOR_SOCKET_PROP]?.target?.length ? (
-          <WzConfigurationSettingsTabSelector
+          <WzConfigurationSettingsHeader
             title="Output sockets"
             description="Define custom outputs to send log data"
-            currentConfig={currentConfig}
-            minusHeight={this.props.agent.id === '000' ? 320 : 415}
-            helpLinks={helpLinks}
+            help={helpLinks}
           >
             <WzConfigurationListSelector items={items} settings={mainSettings} />
-          </WzConfigurationSettingsTabSelector>
+          </WzConfigurationSettingsHeader>
         ) : null}
       </Fragment>
     );

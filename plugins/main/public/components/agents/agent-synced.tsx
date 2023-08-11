@@ -1,6 +1,6 @@
 import React from 'react';
-import { EuiHealth } from "@elastic/eui";
 import { AGENT_SYNCED_STATUS } from '../../../common/constants';
+import { ColumnWithStatusIcon } from './column-with-status-icon';
 
 interface SyncedProps {
   synced: string;
@@ -12,11 +12,5 @@ export const AgentSynced = ({ synced }: SyncedProps) => {
     [AGENT_SYNCED_STATUS.NOT_SYNCED]: 'subdued',
   }[synced];
 
-  return (
-    <EuiHealth color={color}>
-      <span className={'hide-agent-status'}>
-        {synced}
-      </span>
-    </EuiHealth>
-  );
-}
+  return <ColumnWithStatusIcon color={color} text={synced} />;
+};

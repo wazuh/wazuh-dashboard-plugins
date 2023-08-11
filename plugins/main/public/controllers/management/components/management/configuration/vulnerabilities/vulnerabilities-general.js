@@ -13,7 +13,7 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 
-import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import WzNoConfig from '../util-components/no-config';
 import { isString } from '../utils/utils';
@@ -51,18 +51,16 @@ class WzConfigurationVulnerabilitiesGeneral extends Component {
             <WzNoConfig error="not-present" help={helpLinks} />
           )}
         {wodleConfig['vulnerability-detector'] && (
-          <WzConfigurationSettingsTabSelector
+          <WzConfigurationSettingsHeader
             title="Main settings"
             description="General settings applied to the vulnerability detector and its providers"
-            currentConfig={wodleConfig}
-            minusHeight={320}
-            helpLinks={helpLinks}
+            help={helpLinks}
           >
             <WzConfigurationSettingsGroup
               config={wodleConfig['vulnerability-detector']}
               items={mainSettings}
             />
-          </WzConfigurationSettingsTabSelector>
+          </WzConfigurationSettingsHeader>
         )}
       </Fragment>
     );

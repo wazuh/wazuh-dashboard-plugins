@@ -14,7 +14,7 @@ import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 
 import WzTabSelector, {
-  WzTabSelectorTab
+  WzTabSelectorTab,
 } from '../util-components/tab-selector';
 import withWzConfig from '../util-hocs/wz-config';
 import WzConfigurationAlertsGeneral from './alerts-general';
@@ -34,19 +34,19 @@ class WzConfigurationAlerts extends Component {
     return (
       <Fragment>
         <WzTabSelector>
-          <WzTabSelectorTab label="General">
+          <WzTabSelectorTab label='General'>
             <WzConfigurationAlertsGeneral {...this.props} />
           </WzTabSelectorTab>
-          <WzTabSelectorTab label="Labels">
+          <WzTabSelectorTab label='Labels'>
             <WzConfigurationAlertsLabels {...this.props} />
           </WzTabSelectorTab>
-          <WzTabSelectorTab label="Email alerts">
+          <WzTabSelectorTab label='Email alerts'>
             <WzConfigurationAlertsEmailAlerts {...this.props} />
           </WzTabSelectorTab>
-          <WzTabSelectorTab label="Reports">
+          <WzTabSelectorTab label='Reports'>
             <WzConfigurationAlertsEmailReports {...this.props} />
           </WzTabSelectorTab>
-          <WzTabSelectorTab label="Syslog output">
+          <WzTabSelectorTab label='Syslog output'>
             <WzConfigurationAlertsSyslogOutput {...this.props} />
           </WzTabSelectorTab>
         </WzTabSelector>
@@ -57,22 +57,21 @@ class WzConfigurationAlerts extends Component {
 
 const sections = [
   { component: 'analysis', configuration: 'alerts' },
-  { component: 'analysis', configuration: 'labels' },
+  { component: 'agent', configuration: 'labels' },
   { component: 'mail', configuration: 'alerts' },
   { component: 'monitor', configuration: 'reports' },
-  { component: 'csyslog', configuration: 'csyslog' }
+  { component: 'csyslog', configuration: 'csyslog' },
 ];
 
 const mapStateToProps = state => ({
-  wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet
+  wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet,
 });
 
 WzConfigurationAlerts.propTypes = {
-  // currentConfig: PropTypes.object.isRequired,
-  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string])
+  wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
 };
 
 export default compose(
   withWzConfig(sections),
-  connect(mapStateToProps)
+  connect(mapStateToProps),
 )(WzConfigurationAlerts);

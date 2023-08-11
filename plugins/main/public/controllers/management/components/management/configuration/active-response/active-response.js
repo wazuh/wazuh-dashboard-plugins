@@ -11,7 +11,6 @@
  */
 
 import React, { Component, Fragment } from 'react';
-import PropTypes from 'prop-types';
 
 import WzTabSelector, {
   WzTabSelectorTab
@@ -44,9 +43,5 @@ const sections = [
   { component: 'analysis', configuration: 'command' },
   { component: 'analysis', configuration: 'active_response' }
 ];
-
-WzConfigurationActiveResponse.propTypes = {
-  // currentConfig: PropTypes.object.isRequired
-};
 
 export default withWzConfig(sections)(WzConfigurationActiveResponse);

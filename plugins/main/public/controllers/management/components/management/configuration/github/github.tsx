@@ -11,9 +11,9 @@
  */
 
 import React, { useEffect, useMemo } from 'react';
-import { EuiBasicTable } from '@elastic/eui';
 import { compose } from 'redux';
-import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+
+import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import WzConfigurationSettingsListSelector from '../util-components/configuration-settings-list-selector';
 import WzTabSelector, {
@@ -82,18 +82,16 @@ const tabWrapper = compose(
 );
 
 const GeneralTab = tabWrapper(({agent, wodleConfiguration}) => (
-  <WzConfigurationSettingsTabSelector
+  <WzConfigurationSettingsHeader
     title="Main settings"
     description="Configuration for the GitHub module"
-    currentConfig={wodleConfiguration}
-    minusHeight={agent.id === '000' ? 370 : 420} //TODO: Review the minusHeight for the agent case
-    helpLinks={helpLinks}
+    help={helpLinks}
   >
     <WzConfigurationSettingsGroup
       config={wodleConfiguration['github']}
       items={mainSettings}
     />           
-  </WzConfigurationSettingsTabSelector>
+  </WzConfigurationSettingsHeader>
 ));
 
 
@@ -104,16 +102,14 @@ const CredentialsTab = tabWrapper(({agent, wodleConfiguration}) => {
     'org_name'
   ), [wodleConfiguration]);
   return (
-    <WzConfigurationSettingsTabSelector
+    <WzConfigurationSettingsHeader
       title="List of organizations to auditing"
-      currentConfig={wodleConfiguration}
-      minusHeight={agent.id === '000' ? 370 : 420} //TODO: Review the minusHeight for the agent case
-      helpLinks={helpLinks}
+      help={helpLinks}
     >
       <WzConfigurationSettingsListSelector
         items={credentials}
         settings={columns}
       />
-    </WzConfigurationSettingsTabSelector>
+    </WzConfigurationSettingsHeader>
   )  
 });

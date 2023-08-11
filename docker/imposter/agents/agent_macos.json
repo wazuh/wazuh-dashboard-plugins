@@ -21,7 +21,8 @@
         "node_name": "master",
         "lastKeepAlive": "9999-12-31T23:59:59Z",
         "version": "Wazuh v4.5.0",
-        "group_config_status": "synced"
+        "group_config_status": "synced",
+        "status_code": 3
       }
     ],
     "total_affected_items": 1,
