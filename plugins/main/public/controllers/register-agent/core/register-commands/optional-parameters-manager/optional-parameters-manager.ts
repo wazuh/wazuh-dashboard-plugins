@@ -1,8 +1,15 @@
-import { tOperatingSystem } from '../../config/os-commands-definitions';
 import { NoOptionalParamFoundException } from '../exceptions';
-import { IOperationSystem, IOptionalParamInput, IOptionalParameters, IOptionalParametersManager, tOptionalParams } from '../types';
+import {
+  IOperationSystem,
+  IOptionalParamInput,
+  IOptionalParameters,
+  IOptionalParametersManager,
+  tOptionalParams,
+} from '../types';
 
-export class OptionalParametersManager<Params extends string> implements IOptionalParametersManager<Params> {
+export class OptionalParametersManager<Params extends string>
+  implements IOptionalParametersManager<Params>
+{
   constructor(private optionalParamsConfig: tOptionalParams<Params>) {}
 
   /**
@@ -11,17 +18,22 @@ export class OptionalParametersManager<Params extends string> implements IOption
    * @returns The command string for the given optional parameter.
    * @throws NoOptionalParamFoundException if the given optional parameter name is not found in the configuration.
    */
-  getOptionalParam(props: IOptionalParamInput<Params>, selectedOS?: IOperationSystem) {
+  getOptionalParam(
+    props: IOptionalParamInput<Params>,
+    selectedOS?: IOperationSystem,
+  ) {
     const { value, name } = props;
     if (!this.optionalParamsConfig[name]) {
       throw new NoOptionalParamFoundException(name);
     }
-    return this.optionalParamsConfig[name].getParamCommand({
+    return this.optionalParamsConfig[name].getParamCommand(
+      {
         value,
         property: this.optionalParamsConfig[name].property,
-        name
-    },
-    selectedOS);
+        name,
+      },
+      selectedOS,
+    );
   }
 
   /**
@@ -30,22 +42,30 @@ export class OptionalParametersManager<Params extends string> implements IOption
    * @returns An object containing the command strings for all optional parameters with non-empty values.
    * @throws NoOptionalParamFoundException if any of the given optional parameter names is not found in the configuration.
    */
-    getAllOptionalParams(paramsValues: IOptionalParameters<Params>, selectedOS: IOperationSystem){
-      // get keys for only the optional params with values !== ''
-      const optionalParams = Object.keys(paramsValues).filter(key => paramsValues[key as keyof typeof paramsValues] !== '') as Array<keyof typeof paramsValues>;
-      const resolvedOptionalParams: any = {};
-      for(const param of optionalParams){
-        if(!this.optionalParamsConfig[param]){
-          throw new NoOptionalParamFoundException(param as string);
-        }
+  getAllOptionalParams(
+    paramsValues: IOptionalParameters<Params>,
+    selectedOS: IOperationSystem,
+  ) {
+    // get keys for only the optional params with values !== ''
+    const optionalParams = Object.keys(paramsValues).filter(
+      key => paramsValues[key as keyof typeof paramsValues] !== '',
+    ) as Array<keyof typeof paramsValues>;
+    const resolvedOptionalParams: any = {};
+    for (const param of optionalParams) {
+      if (!this.optionalParamsConfig[param]) {
+        throw new NoOptionalParamFoundException(param as string);
+      }
 
-        const paramDef = this.optionalParamsConfig[param];
-        resolvedOptionalParams[param as string] = paramDef.getParamCommand({
+      const paramDef = this.optionalParamsConfig[param];
+      resolvedOptionalParams[param as string] = paramDef.getParamCommand(
+        {
           name: param as Params,
           value: paramsValues[param] as string,
-          property: paramDef.property
-        }, selectedOS) as string;
-      }
-      return resolvedOptionalParams;
+          property: paramDef.property,
+        },
+        selectedOS,
+      ) as string;
     }
+    return resolvedOptionalParams;
+  }
 }

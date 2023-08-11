@@ -108,6 +108,7 @@ exports[`Table With Search Bar component renders correctly to match the snapshot
                       anchorPosition="downLeft"
                       attachToAnchor={true}
                       closePopover={[Function]}
+                      disableFocusTrap={false}
                       display="block"
                       fullWidth={true}
                       id="popover"
