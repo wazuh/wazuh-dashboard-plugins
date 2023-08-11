@@ -10,20 +10,35 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { Fragment } from 'react';
+import React from 'react';
 import {
   EuiEmptyPrompt,
   EuiButton,
   EuiFlexGroup,
   EuiFlexItem,
   EuiCallOut,
-  EuiLink
+  EuiLink,
+  EuiPanel,
 } from '@elastic/eui';
 import { InventoryMetrics } from './components/syscollector-metrics';
-import { SyscollectorTable } from './components/syscollector-table';
-import { processColumns, portsColumns, packagesColumns } from './columns';
-import { API_NAME_AGENT_STATUS } from '../../../../common/constants';
+import {
+  netaddrColumns,
+  netifaceColumns,
+  processColumns,
+  portsColumns,
+  packagesColumns,
+  windowsUpdatesColumns,
+} from './columns';
+import {
+  API_NAME_AGENT_STATUS,
+  SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
+} from '../../../../common/constants';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
+import { TableWzAPI } from '../../common/tables';
+import { WzRequest } from '../../../react-services';
+import { get as getLodash } from 'lodash';
+
+const sortFieldSuggestion = (a, b) => (a.label > b.label ? 1 : -1);
 
 export function SyscollectorInventory({ agent }) {
   if (agent && agent.status === API_NAME_AGENT_STATUS.NEVER_CONNECTED) {
@@ -33,7 +48,7 @@ export function SyscollectorInventory({ agent }) {
         style={{ marginTop: 20 }}
         title={<h2>Agent has never connected.</h2>}
         body={
-          <Fragment>
+          <>
             <p>
               The agent has been registered but has not yet connected to the
               manager.
@@ -48,7 +63,7 @@ export function SyscollectorInventory({ agent }) {
             >
               Checking connection with the Wazuh server
             </EuiLink>
-          </Fragment>
+          </>
         }
         actions={
           <EuiButton href='#/agents-preview?' color='primary' fill>
@@ -72,21 +87,6 @@ export function SyscollectorInventory({ agent }) {
     soPlatform = 'solaris';
   }
 
-  const netifaceColumns = [
-    { id: 'name' },
-    { id: 'mac' },
-    { id: 'state', value: 'State' },
-    { id: 'mtu', value: 'MTU' },
-    { id: 'type', value: 'Type' },
-  ];
-  const netaddrColumns = [
-    { id: 'iface' },
-    { id: 'address' },
-    { id: 'netmask' },
-    { id: 'proto' },
-    { id: 'broadcast' },
-  ];
-
   return (
     <div style={{ overflow: 'hidden' }}>
       {agent && agent.status === API_NAME_AGENT_STATUS.DISCONNECTED && (
@@ -104,89 +104,359 @@ export function SyscollectorInventory({ agent }) {
 
       <EuiFlexGroup gutterSize='s'>
         <EuiFlexItem grow={2} style={{ marginRight: 4, marginTop: 0 }}>
-          <SyscollectorTable
-            tableParams={{
-              path: `/syscollector/${agent.id}/netiface`,
-              title: 'Network interfaces',
-              columns: netifaceColumns,
-              icon: 'indexMapping',
-              searchBar: false,
-              exportFormatted: false,
-            }}
-          />
+          <EuiPanel paddingSize='m' style={{ margin: '12px 16px 12px 16px' }}>
+            <TableWzAPI
+              title='Network interfaces'
+              tableColumns={netifaceColumns}
+              tableInitialSortingField={netifaceColumns[0].field}
+              endpoint={`/syscollector/${
+                agent.id
+              }/netiface?select=${netifaceColumns
+                .map(({ field }) => field)
+                .join(',')}`}
+              searchTable
+              downloadCsv
+              showReload
+              tablePageSizeOptions={[10, 25, 50, 100]}
+              searchBarWQL={{
+                suggestions: {
+                  field(currentValue) {
+                    return netifaceColumns
+                      .map(item => ({
+                        label: item.field,
+                        description: `filter by ${item.name}`,
+                      }))
+                      .sort(sortFieldSuggestion);
+                  },
+                  value: async (currentValue, { field }) => {
+                    try {
+                      const response = await WzRequest.apiReq(
+                        'GET',
+                        `/syscollector/${agent.id}/netiface`,
+                        {
+                          params: {
+                            distinct: true,
+                            limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
+                            select: field,
+                            sort: `+${field}`,
+                            ...(currentValue
+                              ? { q: `${field}~${currentValue}` }
+                              : {}),
+                          },
+                        },
+                      );
+                      return response?.data?.data.affected_items.map(item => ({
+                        label: getLodash(item, field),
+                      }));
+                    } catch (error) {
+                      return [];
+                    }
+                  },
+                },
+              }}
+              tableProps={{
+                tableLayout: 'auto',
+              }}
+            />
+          </EuiPanel>
         </EuiFlexItem>
         <EuiFlexItem grow={2} style={{ marginLeft: 4, marginTop: 0 }}>
-          <SyscollectorTable
-            tableParams={{
-              path: `/syscollector/${agent.id}/ports`,
-              title: 'Network ports',
-              columns: portsColumns[soPlatform],
-              icon: 'inputOutput',
-              searchBar: true,
-              exportFormatted: false,
-            }}
-          />
+          <EuiPanel paddingSize='m' style={{ margin: '12px 16px 12px 16px' }}>
+            <TableWzAPI
+              title='Network ports'
+              tableColumns={portsColumns[soPlatform]}
+              tableInitialSortingField={portsColumns[soPlatform][0].field}
+              endpoint={`/syscollector/${agent.id}/ports?select=${portsColumns[
+                soPlatform
+              ]
+                .map(({ field }) => field)
+                .join(',')}`}
+              searchTable
+              downloadCsv
+              showReload
+              tablePageSizeOptions={[10, 25, 50, 100]}
+              searchBarWQL={{
+                suggestions: {
+                  field(currentValue) {
+                    return portsColumns[soPlatform]
+                      .map(item => ({
+                        label: item.field,
+                        description: `filter by ${item.name}`,
+                      }))
+                      .sort(sortFieldSuggestion);
+                  },
+                  value: async (currentValue, { field }) => {
+                    try {
+                      const response = await WzRequest.apiReq(
+                        'GET',
+                        `/syscollector/${agent.id}/ports`,
+                        {
+                          params: {
+                            distinct: true,
+                            limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
+                            select: field,
+                            sort: `+${field}`,
+                            ...(currentValue
+                              ? { q: `${field}~${currentValue}` }
+                              : {}),
+                          },
+                        },
+                      );
+                      return response?.data?.data.affected_items.map(item => ({
+                        label: getLodash(item, field),
+                      }));
+                    } catch (error) {
+                      return [];
+                    }
+                  },
+                },
+              }}
+              tableProps={{
+                tableLayout: 'auto',
+              }}
+            />
+          </EuiPanel>
         </EuiFlexItem>
       </EuiFlexGroup>
 
       <EuiFlexGroup gutterSize='s'>
         <EuiFlexItem grow={3} style={{ marginRight: 4 }}>
-          <SyscollectorTable
-            tableParams={{
-              path: `/syscollector/${agent.id}/netaddr`,
-              title: 'Network settings',
-              columns: netaddrColumns,
-              icon: 'controlsHorizontal',
-              searchBar: false,
-              exportFormatted: false,
-            }}
-          />
+          <EuiPanel paddingSize='m' style={{ margin: '12px 16px 12px 16px' }}>
+            <TableWzAPI
+              title='Network settings'
+              tableColumns={netaddrColumns}
+              tableInitialSortingField={netaddrColumns[0].field}
+              endpoint={`/syscollector/${
+                agent.id
+              }/netaddr?select=${netaddrColumns
+                .map(({ field }) => field)
+                .join(',')}`}
+              searchTable
+              downloadCsv
+              showReload
+              tablePageSizeOptions={[10, 25, 50, 100]}
+              searchBarWQL={{
+                suggestions: {
+                  field(currentValue) {
+                    return netaddrColumns
+                      .map(item => ({
+                        label: item.field,
+                        description: `filter by ${item.name}`,
+                      }))
+                      .sort(sortFieldSuggestion);
+                  },
+                  value: async (currentValue, { field }) => {
+                    try {
+                      const response = await WzRequest.apiReq(
+                        'GET',
+                        `/syscollector/${agent.id}/netaddr`,
+                        {
+                          params: {
+                            distinct: true,
+                            limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
+                            select: field,
+                            sort: `+${field}`,
+                            ...(currentValue
+                              ? { q: `${field}~${currentValue}` }
+                              : {}),
+                          },
+                        },
+                      );
+                      return response?.data?.data.affected_items.map(item => ({
+                        label: getLodash(item, field),
+                      }));
+                    } catch (error) {
+                      return [];
+                    }
+                  },
+                },
+              }}
+              tableProps={{
+                tableLayout: 'auto',
+              }}
+            />
+          </EuiPanel>
         </EuiFlexItem>
         {agent && agent.os && agent.os.platform === 'windows' && (
           <EuiFlexItem grow={1} style={{ marginLeft: 4 }}>
-            <SyscollectorTable
-              tableParams={{
-                path: `/syscollector/${agent.id}/hotfixes`,
-                title: 'Windows updates',
-                columns: [{ id: 'hotfix' }],
-                icon: 'logoWindows',
-                searchBar: false,
-                exportFormatted: false,
-              }}
-            />
+            <EuiPanel paddingSize='m' style={{ margin: '12px 16px 12px 16px' }}>
+              <TableWzAPI
+                title='Windows updates'
+                tableColumns={windowsUpdatesColumns}
+                tableInitialSortingField={windowsUpdatesColumns[0].field}
+                endpoint={`/syscollector/${
+                  agent.id
+                }/hotfixes?select=${windowsUpdatesColumns
+                  .map(({ field }) => field)
+                  .join(',')}`}
+                searchTable
+                downloadCsv
+                showReload
+                tablePageSizeOptions={[10, 25, 50, 100]}
+                searchBarWQL={{
+                  suggestions: {
+                    field(currentValue) {
+                      return windowsUpdatesColumns
+                        .map(item => ({
+                          label: item.field,
+                          description: `filter by ${item.name}`,
+                        }))
+                        .sort(sortFieldSuggestion);
+                    },
+                    value: async (currentValue, { field }) => {
+                      try {
+                        const response = await WzRequest.apiReq(
+                          'GET',
+                          `/syscollector/${agent.id}/hotfixes`,
+                          {
+                            params: {
+                              distinct: true,
+                              limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
+                              select: field,
+                              sort: `+${field}`,
+                              ...(currentValue
+                                ? { q: `${field}~${currentValue}` }
+                                : {}),
+                            },
+                          },
+                        );
+                        return response?.data?.data.affected_items.map(
+                          item => ({
+                            label: getLodash(item, field),
+                          }),
+                        );
+                      } catch (error) {
+                        return [];
+                      }
+                    },
+                  },
+                }}
+                tableProps={{
+                  tableLayout: 'auto',
+                }}
+              />
+            </EuiPanel>
           </EuiFlexItem>
         )}
       </EuiFlexGroup>
 
       <EuiFlexGroup gutterSize='s'>
         <EuiFlexItem>
-          <SyscollectorTable
-            tableParams={{
-              path: `/syscollector/${agent.id}/packages`,
-              hasTotal: true,
-              title: 'Packages',
-              columns: packagesColumns[soPlatform],
-              icon: 'apps',
-              searchBar: true,
-              exportFormatted: 'packages.csv',
-            }}
-          />
+          <EuiPanel paddingSize='m' style={{ margin: '12px 16px 12px 16px' }}>
+            <TableWzAPI
+              title='Packages'
+              tableColumns={packagesColumns[soPlatform]}
+              tableInitialSortingField={packagesColumns[soPlatform][0].field}
+              endpoint={`/syscollector/${
+                agent.id
+              }/packages?select=${packagesColumns[soPlatform]
+                .map(({ field }) => field)
+                .join(',')}`}
+              searchTable
+              downloadCsv
+              showReload
+              tablePageSizeOptions={[10, 25, 50, 100]}
+              searchBarWQL={{
+                suggestions: {
+                  field(currentValue) {
+                    return packagesColumns[soPlatform]
+                      .map(item => ({
+                        label: item.field,
+                        description: `filter by ${item.name}`,
+                      }))
+                      .sort(sortFieldSuggestion);
+                  },
+                  value: async (currentValue, { field }) => {
+                    try {
+                      const response = await WzRequest.apiReq(
+                        'GET',
+                        `/syscollector/${agent.id}/packages`,
+                        {
+                          params: {
+                            distinct: true,
+                            limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
+                            select: field,
+                            sort: `+${field}`,
+                            ...(currentValue
+                              ? { q: `${field}~${currentValue}` }
+                              : {}),
+                          },
+                        },
+                      );
+                      return response?.data?.data.affected_items.map(item => ({
+                        label: getLodash(item, field),
+                      }));
+                    } catch (error) {
+                      return [];
+                    }
+                  },
+                },
+              }}
+              tableProps={{
+                tableLayout: 'auto',
+              }}
+            />
+          </EuiPanel>
         </EuiFlexItem>
       </EuiFlexGroup>
 
       <EuiFlexGroup gutterSize='s'>
         <EuiFlexItem>
-          <SyscollectorTable
-            tableParams={{
-              path: `/syscollector/${agent.id}/processes`,
-              hasTotal: true,
-              title: 'Processes',
-              columns: processColumns[soPlatform],
-              icon: 'console',
-              searchBar: true,
-              exportFormatted: 'processes.csv',
-            }}
-          />
+          <EuiPanel paddingSize='m' style={{ margin: '12px 16px 12px 16px' }}>
+            <TableWzAPI
+              title='Processes'
+              tableColumns={processColumns[soPlatform]}
+              tableInitialSortingField={processColumns[soPlatform][0].field}
+              endpoint={`/syscollector/${
+                agent.id
+              }/processes?select=${processColumns[soPlatform]
+                .map(({ field }) => field)
+                .join(',')}`}
+              searchTable
+              downloadCsv
+              showReload
+              tablePageSizeOptions={[10, 25, 50, 100]}
+              searchBarWQL={{
+                suggestions: {
+                  field(currentValue) {
+                    return processColumns[soPlatform]
+                      .map(item => ({
+                        label: item.field,
+                        description: `filter by ${item.name}`,
+                      }))
+                      .sort(sortFieldSuggestion);
+                  },
+                  value: async (currentValue, { field }) => {
+                    try {
+                      const response = await WzRequest.apiReq(
+                        'GET',
+                        `/syscollector/${agent.id}/processes`,
+                        {
+                          params: {
+                            distinct: true,
+                            limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
+                            select: field,
+                            sort: `+${field}`,
+                            ...(currentValue
+                              ? { q: `${field}~${currentValue}` }
+                              : {}),
+                          },
+                        },
+                      );
+                      return response?.data?.data.affected_items.map(item => ({
+                        label: getLodash(item, field),
+                      }));
+                    } catch (error) {
+                      return [];
+                    }
+                  },
+                },
+              }}
+              tableProps={{
+                tableLayout: 'auto',
+              }}
+            />
+          </EuiPanel>
         </EuiFlexItem>
       </EuiFlexGroup>
     </div>
