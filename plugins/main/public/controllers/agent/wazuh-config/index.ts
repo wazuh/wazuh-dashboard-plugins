@@ -6,7 +6,7 @@ const architectureButtons = [
   {
     id: 'x86_64',
     label: 'x86_64',
-    default: true
+    default: true,
   },
   {
     id: 'armhf',
@@ -26,7 +26,7 @@ const architectureButtonsWithPPC64LE = [
   {
     id: 'x86_64',
     label: 'x86_64',
-    default: true
+    default: true,
   },
   {
     id: 'armhf',
@@ -54,7 +54,7 @@ const architectureButtonsWithPPC64LEAlpine = [
   {
     id: 'x86_64',
     label: 'x86_64',
-    default: true
+    default: true,
   },
   {
     id: 'armhf',
@@ -85,7 +85,7 @@ const architecturei386Andx86_64 = [
   {
     id: 'x86_64',
     label: 'x86_64',
-    default: true
+    default: true,
   },
 ];
 
@@ -93,7 +93,7 @@ const architectureButtonsSolaris = [
   {
     id: 'i386',
     label: 'i386',
-    default: true
+    default: true,
   },
   {
     id: 'sparc',
@@ -138,7 +138,7 @@ const versionButtonAmazonLinux = [
   {
     id: 'amazonlinux2022',
     label: 'Amazon Linux 2022',
-    default: true
+    default: true,
   },
 ];
 
@@ -154,7 +154,7 @@ const versionButtonsRedHat = [
   {
     id: 'redhat7',
     label: 'Red Hat 7 +',
-    default: true
+    default: true,
   },
 ];
 
@@ -170,7 +170,7 @@ const versionButtonsCentos = [
   {
     id: 'centos7',
     label: 'CentOS 7 +',
-    default: true
+    default: true,
   },
 ];
 
@@ -186,7 +186,7 @@ const versionButtonsDebian = [
   {
     id: 'debian9',
     label: 'Debian 9 +',
-    default: true
+    default: true,
   },
 ];
 
@@ -205,7 +205,7 @@ const versionButtonsUbuntu = [
   {
     id: 'ubuntu15',
     label: 'Ubuntu 15 +',
-    default: true
+    default: true,
   },
 ];
 
@@ -221,7 +221,7 @@ const versionButtonsWindows = [
   {
     id: 'windows7',
     label: 'Windows 7 +',
-    default: true
+    default: true,
   },
 ];
 
@@ -233,7 +233,7 @@ const versionButtonsSuse = [
   {
     id: 'suse12',
     label: 'SUSE 12',
-    default: true
+    default: true,
   },
 ];
 
@@ -259,7 +259,7 @@ const versionButtonsSolaris = [
   {
     id: 'solaris11',
     label: 'Solaris 11',
-    default: true
+    default: true,
   },
 ];
 
@@ -285,7 +285,7 @@ const versionButtonsOracleLinux = [
   {
     id: 'oraclelinux6',
     label: 'Oracle Linux 6 +',
-    default: true
+    default: true,
   },
 ];
 
