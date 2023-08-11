@@ -152,7 +152,7 @@ class WzFileEditor extends Component {
 
         if (this.props.addingFile != false) {
           //remove current invalid file if the file is new.
-          await this.resourcesHandler.deleteFile(name);
+          await this.resourcesHandler.deleteFile(name, relativeDirname);
           toastMessage = 'The new file was deleted.';
         } else {
           //restore file to previous version
