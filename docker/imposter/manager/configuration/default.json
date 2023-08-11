@@ -1,0 +1,35 @@
+{
+  "data": {
+    "affected_items": [
+      {
+        "global": {
+          "email_notification": "no",
+          "logall": "no",
+          "logall_json": "no",
+          "integrity_checking": 8,
+          "rootkit_detection": 8,
+          "host_information": 8,
+          "prelude_output": "no",
+          "zeromq_output": "no",
+          "jsonout_output": "yes",
+          "alerts_log": "yes",
+          "stats": 4,
+          "memory_size": 8192,
+          "white_list": [
+            "127.0.0.1",
+            "80.58.61.250",
+            "80.58.61.254",
+            "localhost.localdomain"
+          ],
+          "rotate_interval": 0,
+          "max_output_size": 0
+        }
+      }
+    ],
+    "total_affected_items": 1,
+    "total_failed_items": 0,
+    "failed_items": []
+  },
+  "message": "Active configuration was successfully read in specified node",
+  "error": 0
+}

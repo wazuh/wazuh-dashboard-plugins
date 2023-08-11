@@ -140,7 +140,7 @@ export async function extendedInformation(
   try {
     log(
       'reporting:extendedInformation',
-      `Section ${section} and tab ${tab}, API is ${apiId}. From ${from} to ${to}. Filters ${filters}. Index pattern ${pattern}`,
+      `Section ${section} and tab ${tab}, API is ${apiId}. From ${from} to ${to}. Filters ${JSON.stringify(filters)}. Index pattern ${pattern}`,
       'info'
     );
     if (section === 'agents' && !agent) {
