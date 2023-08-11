@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import {
   EuiPanel,
   EuiFlexGroup,
@@ -6,80 +6,64 @@ import {
   EuiToolTip,
   EuiButtonIcon,
   EuiTitle,
-  EuiInMemoryTable,
-  EuiFieldSearch,
 } from '@elastic/eui';
-import { WzRequest } from '../../../react-services/wz-request';
 import { withErrorBoundary } from '../../common/hocs';
+import { TableWzAPI } from '../../common/tables';
+import { WzRequest } from '../../../react-services';
+import { SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT } from '../../../../common/constants';
+
+const searchBarWQLFieldSuggestions = [
+  { label: 'ip', description: 'filter by IP address' },
+  { label: 'name', description: 'filter by name' },
+  { label: 'type', description: 'filter by type' },
+  { label: 'version', description: 'filter by version' },
+];
 
 export const NodeList = withErrorBoundary(
   class NodeList extends Component {
     constructor(props) {
       super(props);
-      this.state = {
-        nodes: [],
-        loading: false,
-      };
-    }
-    async componentDidMount() {
-      this.search();
-    }
-
-    async search(searchTerm = false) {
-      let params = {};
-      if (searchTerm) {
-        params.search = searchTerm;
-      }
-      this.setState({ loading: true });
-      try {
-        const request = await WzRequest.apiReq('GET', '/cluster/nodes', {
-          params,
-        });
-        this.setState({
-          nodes: (((request || {}).data || {}).data || {}).affected_items || [],
-          loading: false,
-        });
-      } catch (error) {
-        this.setState({ loading: false });
-      }
-    }
-    render() {
-      const columns = [
+      this.columns = [
         {
           field: 'name',
           name: 'Name',
+          searchable: true,
           sortable: true,
+          truncateText: true,
         },
         {
           field: 'version',
           name: 'Version',
+          searchable: true,
           sortable: true,
         },
         {
           field: 'ip',
           name: 'IP address',
+          searchable: true,
           sortable: true,
         },
         {
           field: 'type',
           name: 'Type',
+          searchable: true,
           sortable: true,
         },
       ];
-
-      const sorting = {
-        sort: {
-          field: 'name',
-          direction: 'asc',
-        },
+      this.state = {
+        nodes: [],
+        loading: false,
       };
+    }
+
+    render() {
       return (
         <EuiPanel>
           <EuiFlexGroup>
             <EuiFlexItem>
               <EuiFlexGroup>
                 <EuiFlexItem grow={false} style={{ marginRight: 0 }}>
-                  <EuiToolTip position='right' content={`Back to groups`}>
+                  <EuiToolTip position='right' content='Back to cluster'>
                     <EuiButtonIcon
                       aria-label='Back'
                       style={{ paddingTop: 8 }}
@@ -92,7 +76,7 @@ export const NodeList = withErrorBoundary(
                 </EuiFlexItem>
                 <EuiFlexItem grow={false}>
                   <EuiTitle>
-                    <h1>Nodes</h1>
+                    <h1>Cluster nodes</h1>
                   </EuiTitle>
                 </EuiFlexItem>
               </EuiFlexGroup>
@@ -100,24 +84,51 @@ export const NodeList = withErrorBoundary(
           </EuiFlexGroup>
           <EuiFlexGroup>
             <EuiFlexItem>
-              <EuiFieldSearch
-                placeholder='Filter nodes...'
-                onSearch={e => this.search(e)}
-                isClearable={true}
-                fullWidth={true}
-                aria-label='Filter'
-              />
-            </EuiFlexItem>
-          </EuiFlexGroup>
-          <EuiFlexGroup>
-            <EuiFlexItem>
-              <EuiInMemoryTable
-                items={this.state.nodes}
-                columns={columns}
-                pagination={true}
-                sorting={sorting}
-                loading={this.state.loading}
-                tableLayout='auto'
+              <TableWzAPI
+                title='Nodes'
+                endpoint='/cluster/nodes'
+                tableColumns={this.columns}
+                tableInitialSortingField='name'
+                tablePageSizeOptions={[10, 25, 50, 100]}
+                downloadCsv
+                showReload
+                searchTable
+                searchBarWQL={{
+                  suggestions: {
+                    field(currentValue) {
+                      return searchBarWQLFieldSuggestions;
+                    },
+                    value: async (currentValue, { field }) => {
+                      try {
+                        const response = await WzRequest.apiReq(
+                          'GET',
+                          '/cluster/nodes',
+                          {
+                            params: {
+                              distinct: true,
+                              limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
+                              select: field,
+                              sort: `+${field}`,
+                              ...(currentValue
+                                ? { q: `${field}~${currentValue}` }
+                                : {}),
+                            },
+                          },
+                        );
+                        return response?.data?.data.affected_items.map(
+                          item => ({
+                            label: item[field],
+                          }),
+                        );
+                      } catch (error) {
+                        return [];
+                      }
+                    },
+                  },
+                }}
+                tableProps={{
+                  tableLayout: 'auto',
+                }}
               />
             </EuiFlexItem>
           </EuiFlexGroup>
