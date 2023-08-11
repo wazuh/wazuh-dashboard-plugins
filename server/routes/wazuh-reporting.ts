@@ -60,6 +60,7 @@ export function WazuhReportingRoutes(router: IRouter) {
         body: schema.object({
           array: schema.any(),
           browserTimezone: schema.string(),
+          serverSideQuery: schema.maybe(schema.any()),
           filters: schema.maybe(schema.any()),
           agents: schema.maybe(schema.oneOf([agentIDValidation, schema.boolean()])),
           components: schema.maybe(schema.any()),
@@ -124,6 +125,7 @@ export function WazuhReportingRoutes(router: IRouter) {
       body: schema.object({
         array: schema.any(),
         browserTimezone: schema.string(),
+        serverSideQuery: schema.maybe(schema.any()),
         filters: schema.maybe(schema.any()),
         agents: schema.maybe(schema.oneOf([schema.string(), schema.boolean()])),
         components: schema.maybe(schema.any()),
