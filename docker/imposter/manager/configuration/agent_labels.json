@@ -1,0 +1,20 @@
+{
+  "data": {
+    "affected_items": [
+      {
+        "labels": [
+          {
+            "value": "customLabel",
+            "key": "custom",
+            "hidden": "no"
+          }
+        ]
+      }
+    ],
+    "total_affected_items": 1,
+    "total_failed_items": 0,
+    "failed_items": []
+  },
+  "message": "Active configuration was successfully read in specified node.",
+  "error": 0
+}
