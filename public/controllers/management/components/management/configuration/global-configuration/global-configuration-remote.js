@@ -19,7 +19,7 @@ import WzNoConfig from '../util-components/no-config';
 import {
   isString,
   renderValueOrNoValue,
-  renderValueOrDefault
+  renderValueOrDefault,
 } from '../utils/utils';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
@@ -40,12 +40,14 @@ const renderAllowedDeniedIPs = (items, label) => {
 const helpLinks = [
   {
     text: 'Remote daemon reference',
-    href: webDocumentationLink('user-manual/reference/daemons/wazuh-remoted.html')
+    href: webDocumentationLink(
+      'user-manual/reference/daemons/wazuh-remoted.html',
+    ),
   },
   {
     text: 'Remote configuration reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/remote.html')
-  }
+    href: webDocumentationLink('user-manual/reference/ossec-conf/remote.html'),
+  },
 ];
 
 class WzConfigurationGlobalConfigurationRemote extends Component {
@@ -57,29 +59,29 @@ class WzConfigurationGlobalConfigurationRemote extends Component {
       {
         field: 'protocol',
         name: 'Protocol',
-        render: renderValueOrDefault('udp')
+        render: renderValueOrDefault('udp'),
       },
       { field: 'ipv6', name: 'IPv6', render: renderValueOrNoValue },
       {
         field: 'allowed-ips',
         name: 'Allowed IP addresses',
-        render: item => renderAllowedDeniedIPs(item, 'allowed')
+        render: item => renderAllowedDeniedIPs(item, 'allowed'),
       },
       {
         field: 'denied-ips',
         name: 'Denied IP addresses',
-        render: item => renderAllowedDeniedIPs(item, 'denied')
+        render: item => renderAllowedDeniedIPs(item, 'denied'),
       },
       {
         field: 'local_ip',
         name: 'Local IP address',
-        render: renderValueOrDefault('All interfaces')
+        render: renderValueOrDefault('All interfaces'),
       },
       {
         field: 'queue_size',
         name: 'Queue size',
-        render: renderValueOrDefault('16384')
-      }
+        render: renderValueOrDefault('16384'),
+      },
     ];
   }
   render() {
@@ -96,21 +98,22 @@ class WzConfigurationGlobalConfigurationRemote extends Component {
         {currentConfig['request-remote'] &&
           !isString(currentConfig['request-remote']) &&
           !currentConfig['request-remote'].remote && (
-            <WzNoConfig error="not-present" help={helpLinks} />
+            <WzNoConfig error='not-present' help={helpLinks} />
           )}
         {currentConfig['request-remote'] &&
           currentConfig['request-remote'].remote && (
             <WzConfigurationSettingsTabSelector
-              title="Remote settings"
-              description="Configuration to listen for events from the agents or a syslog client"
+              title='Remote settings'
+              description='Configuration to listen for events from the agents or a syslog client'
               minusHeight={320}
               currentConfig={currentConfig}
               helpLinks={helpLinks}
             >
-              <EuiSpacer size="s" />
+              <EuiSpacer size='s' />
               <EuiBasicTable
                 columns={this.columns}
                 items={currentConfig['request-remote'].remote}
+                tableLayout='auto'
               />
             </WzConfigurationSettingsTabSelector>
           )}
