@@ -14,7 +14,7 @@ import React, { Component, Fragment } from 'react';
 
 import { EuiBasicTable } from '@elastic/eui';
 
-import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import WzNoConfig from '../util-components/no-config';
 import helpLinks from './help-links';
@@ -44,12 +44,10 @@ class WzConfigurationIntegrityMonitoringWhoData extends Component {
           currentConfig['syscheck-syscheck'] &&
           currentConfig['syscheck-syscheck'].syscheck &&
           currentConfig['syscheck-syscheck'].syscheck.whodata && (
-            <WzConfigurationSettingsTabSelector
+            <WzConfigurationSettingsHeader
               title="Who-data audit keys"
               description="Wazuh will include in its FIM baseline those events being monitored by Audit using audit_key."
-              currentConfig={currentConfig['syscheck-syscheck']}
-              minusHeight={this.props.agent.id === '000' ? 320 : 415}
-              helpLinks={helpLinks}
+              help={helpLinks}
             >
               <WzConfigurationSettingsGroup
                 config={currentConfig['syscheck-syscheck'].syscheck.whodata}
@@ -66,15 +64,11 @@ class WzConfigurationIntegrityMonitoringWhoData extends Component {
                   columns={columns}
                 />
               )}
-            </WzConfigurationSettingsTabSelector>
+            </WzConfigurationSettingsHeader>
           )}
       </Fragment>
     );
   }
 }
-
-WzConfigurationIntegrityMonitoringWhoData.proptTypes = {
-  // currentConfig: PropTypes.object.isRequired
-};
 
 export default WzConfigurationIntegrityMonitoringWhoData;

@@ -14,7 +14,7 @@ import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 
 import WzNoConfig from "../util-components/no-config";
-import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationListSelector from '../util-components/configuration-settings-list-selector';
 import { settingsListBuilder } from '../utils/builders';
 import helpLinks from './help-links';
@@ -52,18 +52,16 @@ class WzConfigurationAmazonS3Services extends Component {
         {currentConfig &&
           wodleConfig['aws-s3'] &&
           wodleConfig['aws-s3'].services && (
-            <WzConfigurationSettingsTabSelector
+            <WzConfigurationSettingsHeader
               title="Services"
               description="Amazon services from where logs are read"
-              currentConfig={wodleConfig}
-              minusHeight={320}
-              helpLinks={helpLinks}
+              help={helpLinks}
             >
               <WzConfigurationListSelector
                 items={items}
                 settings={mainSettings}
               />
-            </WzConfigurationSettingsTabSelector>
+            </WzConfigurationSettingsHeader>
           )}
       </Fragment>
     );
@@ -75,7 +73,6 @@ const mapStateToProps = state => ({
 });
 
 WzConfigurationAmazonS3Services.propTypes = {
-  // currentConfig: PropTypes.object.isRequired,
   wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string])
 };
 

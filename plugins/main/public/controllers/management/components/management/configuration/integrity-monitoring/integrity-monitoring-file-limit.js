@@ -13,7 +13,7 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 
-import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import WzNoConfig from '../util-components/no-config';
 import helpLinks from './help-links';
@@ -45,12 +45,10 @@ class WzConfigurationIntegrityMonitoringRegistryLimit extends Component {
         currentConfig['syscheck-syscheck'] &&
         currentConfig['syscheck-syscheck'].syscheck &&
         currentConfig['syscheck-syscheck'].syscheck[FILE_LIMIT_PROP] ? (
-          <WzConfigurationSettingsTabSelector
+          <WzConfigurationSettingsHeader
             title="Registry limit"
             description="Limit the maximum registries in the FIM database"
-            currentConfig={currentConfig['syscheck-syscheck']}
-            minusHeight={this.props.agent.id === '000' ? 320 : 415}
-            helpLinks={helpLinks}
+            help={helpLinks}
           >
             <WzConfigurationSettingsGroup
               config={
@@ -58,7 +56,7 @@ class WzConfigurationIntegrityMonitoringRegistryLimit extends Component {
               }
               items={mainSettings}
             />
-          </WzConfigurationSettingsTabSelector>
+          </WzConfigurationSettingsHeader>
         ) : (
           <WzNoConfig error="not-present" help={helpLinks} />
         )}
@@ -66,9 +64,5 @@ class WzConfigurationIntegrityMonitoringRegistryLimit extends Component {
     );
   }
 }
-
-WzConfigurationIntegrityMonitoringRegistryLimit.proptTypes = {
-  // currentConfig: PropTypes.object.isRequired
-};
 
 export default WzConfigurationIntegrityMonitoringRegistryLimit;

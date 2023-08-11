@@ -24,7 +24,8 @@
         "node_name": "master",
         "group": ["default", "debian"],
         "lastKeepAlive": "2022-09-12T08:48:40Z",
-        "version": "Wazuh v4.3.7"
+        "version": "Wazuh v4.3.7",
+        "status_code": 0
       }
     ],
     "total_affected_items": 1,

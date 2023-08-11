@@ -11,14 +11,14 @@ const WzManagerAddressInput = (props: Props) => {
   const [value, setValue] = useState('');
 
   useEffect(() => {
-    if(defaultValue){
+    if (defaultValue) {
       setValue(defaultValue);
       onChange(defaultValue);
-    }else{
+    } else {
       setValue('');
       onChange('');
     }
-  },[])
+  }, []);
   /**
    * Handles the change of the selected node IP
    * @param value

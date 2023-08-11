@@ -81,8 +81,4 @@ const sections = [
   { component: 'wmodules', configuration: 'wmodules' }
 ];
 
-WzPolicyMonitoring.propTypes = {
-  // currentConfig: PropTypes.object.isRequired
-};
-
 export default withWzConfig(sections)(WzPolicyMonitoring);

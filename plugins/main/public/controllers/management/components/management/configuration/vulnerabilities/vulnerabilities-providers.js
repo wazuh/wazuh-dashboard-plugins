@@ -15,7 +15,7 @@ import React, { Component, Fragment } from 'react';
 import { EuiBasicTable, } from '@elastic/eui';
 
 import WzNoConfig from '../util-components/no-config';
-import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
+import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import { isString, renderValueOrNoValue } from '../utils/utils';
 import helpLinks from './help-links';
 
@@ -109,25 +109,21 @@ class WzConfigurationVulnerabilitiesProviders extends Component {
         {wodleConfig['vulnerability-detector'] &&
         wodleConfig['vulnerability-detector'].providers ? (
           <Fragment>
-            <WzConfigurationSettingsTabSelector
+            <WzConfigurationSettingsHeader
               title="Providers"
               description="List of OVAL databases providers to check for vulnerability scans"
-              currentConfig={wodleConfig}
-              minusHeight={320}
-              helpLinks={helpLinks}
+              help={helpLinks}
             >
               <EuiBasicTable
                 items={wodleConfig['vulnerability-detector'].providers}
                 columns={columns}
               />
-            </WzConfigurationSettingsTabSelector>
+            </WzConfigurationSettingsHeader>
           </Fragment>
         ) : null}
       </Fragment>
     );
   }
 }
-
-WzConfigurationVulnerabilitiesProviders.propTypes = {};
 
 export default WzConfigurationVulnerabilitiesProviders;

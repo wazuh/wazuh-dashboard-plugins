@@ -24,7 +24,8 @@
         "status": "pending",
         "mergedSum": "x",
         "node_name": "master-node",
-        "manager": "wazuh_manager_filebeat_sources_cmake-v4.4.0-rc1-7.10.2"
+        "manager": "wazuh_manager_filebeat_sources_cmake-v4.4.0-rc1-7.10.2",
+        "status_code": 5
       }
     ],
     "total_affected_items": 1,
