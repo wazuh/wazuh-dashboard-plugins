@@ -14,7 +14,10 @@ import {
   EuiFlexGrid,
 } from '@elastic/eui';
 
-import { ResourcesHandler, ResourcesConstants } from '../../common/resources-handler';
+import {
+  ResourcesHandler,
+  ResourcesConstants,
+} from '../../common/resources-handler';
 import { colors } from '../../common/colors';
 import { TableWzAPI } from '../../../../../../components/common/tables';
 import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
@@ -26,15 +29,22 @@ export default class WzDecoderInfo extends Component {
     super(props);
     this.onClickRow = this.onClickRow.bind(this);
     this.state = {
-      currentInfo: {}
+      currentInfo: {},
     };
 
     this.resourcesHandler = new ResourcesHandler(ResourcesConstants.DECODERS);
 
     const handleFileClick = async (value, item) => {
       try {
-        const result = await this.resourcesHandler.getFileContent(value);
-        const file = { name: value, content: result, path: item.relative_dirname };
+        const result = await this.resourcesHandler.getFileContent(
+          value,
+          item.relative_dirname,
+        );
+        const file = {
+          name: value,
+          content: result,
+          path: item.relative_dirname,
+        };
         this.props.updateFileContent(file);
       } catch (error) {
         const options = {
@@ -77,8 +87,10 @@ export default class WzDecoderInfo extends Component {
         sortable: true,
         render: (value, item) => {
           return (
-            <EuiToolTip position="top" content={`Show ${value} content`}>
-              <EuiLink onClick={async () => handleFileClick(value, item)}>{value}</EuiLink>
+            <EuiToolTip position='top' content={`Show ${value} content`}>
+              <EuiLink onClick={async () => handleFileClick(value, item)}>
+                {value}
+              </EuiLink>
             </EuiToolTip>
           );
         },
@@ -97,7 +109,7 @@ export default class WzDecoderInfo extends Component {
     document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
 
     this.setState({
-      currentId: this.props.item
+      currentId: this.props.item,
     });
   }
 
@@ -119,17 +131,17 @@ export default class WzDecoderInfo extends Component {
   renderInfo(position, file, path) {
     return (
       <EuiFlexGrid columns={4}>
-        <EuiFlexItem key="position">
+        <EuiFlexItem key='position'>
           <b style={{ paddingBottom: 6 }}>Position</b>
           {position}
         </EuiFlexItem>
-        <EuiFlexItem key="file">
+        <EuiFlexItem key='file'>
           <b style={{ paddingBottom: 6 }}>File</b>
           <span>
-            <EuiToolTip position="top" content={`Filter by this file: ${file}`}>
+            <EuiToolTip position='top' content={`Filter by this file: ${file}`}>
               <EuiLink
                 onClick={async () =>
-                  this.setNewFiltersAndBack({q: `filename=${file}`})
+                  this.setNewFiltersAndBack({ q: `filename=${file}` })
                 }
               >
                 &nbsp;{file}
@@ -137,13 +149,13 @@ export default class WzDecoderInfo extends Component {
             </EuiToolTip>
           </span>
         </EuiFlexItem>
-        <EuiFlexItem key="path">
+        <EuiFlexItem key='path'>
           <b style={{ paddingBottom: 6 }}>Path</b>
           <span>
-            <EuiToolTip position="top" content={`Filter by this path: ${path}`}>
+            <EuiToolTip position='top' content={`Filter by this path: ${path}`}>
               <EuiLink
                 onClick={async () =>
-                  this.setNewFiltersAndBack({q: `relative_dirname=${path}`})
+                  this.setNewFiltersAndBack({ q: `relative_dirname=${path}` })
                 }
               >
                 &nbsp;{path}
@@ -151,7 +163,7 @@ export default class WzDecoderInfo extends Component {
             </EuiToolTip>
           </span>
         </EuiFlexItem>
-        <EuiSpacer size="s" />
+        <EuiSpacer size='s' />
       </EuiFlexGrid>
     );
   }
@@ -162,17 +174,21 @@ export default class WzDecoderInfo extends Component {
    */
   renderDetails(details) {
     const detailsToRender = [];
-    const capitalize = (str) => str[0].toUpperCase() + str.slice(1);
+    const capitalize = str => str[0].toUpperCase() + str.slice(1);
 
-    Object.keys(details).forEach((key) => {
+    Object.keys(details).forEach(key => {
       let content = details[key];
       if (key === 'order') {
         content = this.colorOrder(content);
       } else if (typeof details[key] === 'object') {
         content = (
           <ul>
-            {Object.keys(details[key]).map((k) => (
-              <li key={k} style={{ marginBottom: '4px', wordBreak: 'break-word' }} className="subdued-color">
+            {Object.keys(details[key]).map(k => (
+              <li
+                key={k}
+                style={{ marginBottom: '4px', wordBreak: 'break-word' }}
+                className='subdued-color'
+              >
                 {k}:&nbsp;
                 {details[key][k]}
                 <br />
@@ -181,7 +197,7 @@ export default class WzDecoderInfo extends Component {
           </ul>
         );
       } else {
-        content = <span className="subdued-color">{details[key]}</span>;
+        content = <span className='subdued-color'>{details[key]}</span>;
       }
       detailsToRender.push(
         <EuiFlexItem
@@ -191,7 +207,7 @@ export default class WzDecoderInfo extends Component {
         >
           <b style={{ paddingBottom: 6 }}>{capitalize(key)}</b>
           <div>{content}</div>
-        </EuiFlexItem>
+        </EuiFlexItem>,
       );
     });
 
@@ -208,8 +224,13 @@ export default class WzDecoderInfo extends Component {
     const result = [];
     for (let i = 0, len = valuesArray.length; i < len; i++) {
       const coloredString = (
-        <span key={`decoder-info-color-order-${i}`} style={{ color: colors[i] }}>
-          {valuesArray[i].startsWith(' ') ? valuesArray[i] : ` ${valuesArray[i]}`}
+        <span
+          key={`decoder-info-color-order-${i}`}
+          style={{ color: colors[i] }}
+        >
+          {valuesArray[i].startsWith(' ')
+            ? valuesArray[i]
+            : ` ${valuesArray[i]}`}
         </span>
       );
       result.push(coloredString);
@@ -224,7 +245,7 @@ export default class WzDecoderInfo extends Component {
   colorRegex(regex) {
     regex = regex.toString();
     const starts = (
-      <span key={`decoder-info-color-regex-start`} className="subdued-color">
+      <span key={`decoder-info-color-regex-start`} className='subdued-color'>
         {regex.split('(')[0]}
       </span>
     );
@@ -232,7 +253,10 @@ export default class WzDecoderInfo extends Component {
     const result = [starts];
     for (let i = 0, len = valuesArray.length; i < len; i++) {
       const coloredString = (
-        <span key={`decoder-info-color-regex-${i}`} style={{ color: colors[i] }}>
+        <span
+          key={`decoder-info-color-regex-${i}`}
+          style={{ color: colors[i] }}
+        >
           {valuesArray[i]}
         </span>
       );
@@ -241,53 +265,54 @@ export default class WzDecoderInfo extends Component {
     return result;
   }
 
-/**
- * Update decoder details with the selected detail row
- * @param decoder 
- */
+  /**
+   * Update decoder details with the selected detail row
+   * @param decoder
+   */
   onClickRow(decoder) {
     return {
       onClick: () => {
         this.setState({ currentDecoder: decoder });
       },
     };
-  };
+  }
 
   render() {
     const currentDecoder =
-      this.state && this.state.currentDecoder ? this.state.currentDecoder : this.props.item;
-    const { position, details, filename, name, relative_dirname } = currentDecoder;
+      this.state && this.state.currentDecoder
+        ? this.state.currentDecoder
+        : this.props.item;
+    const { position, details, filename, name, relative_dirname } =
+      currentDecoder;
 
     return (
       <>
-        <EuiFlyoutHeader hasBorder className="flyout-header">
+        <EuiFlyoutHeader hasBorder className='flyout-header'>
           {/* Decoder description name */}
           <EuiFlexGroup>
             <EuiFlexItem grow={false}>
               <EuiTitle>
-                <span style={{ fontSize: '22px' }}>
-                  {name}
-                </span>
+                <span style={{ fontSize: '22px' }}>{name}</span>
               </EuiTitle>
             </EuiFlexItem>
           </EuiFlexGroup>
         </EuiFlyoutHeader>
-        <EuiFlyoutBody className="flyout-body">
-        {/* Cards */}
+        <EuiFlyoutBody className='flyout-body'>
+          {/* Cards */}
           <EuiFlexGroup>
             {/* General info */}
             <EuiFlexItem style={{ marginBottom: 16, marginTop: 8 }}>
               <EuiAccordion
-                id="Info"
+                id='Info'
                 buttonContent={
-                  <EuiTitle size="s">
+                  <EuiTitle size='s'>
                     <h3>Information</h3>
                   </EuiTitle>
                 }
-                paddingSize="none"
+                paddingSize='none'
                 initialIsOpen={true}
               >
-                <div className="flyout-row details-row">
+                <div className='flyout-row details-row'>
                   {this.renderInfo(position, filename, relative_dirname)}
                 </div>
               </EuiAccordion>
@@ -296,16 +321,18 @@ export default class WzDecoderInfo extends Component {
           <EuiFlexGroup>
             <EuiFlexItem style={{ marginTop: 8 }}>
               <EuiAccordion
-                id="Details"
+                id='Details'
                 buttonContent={
-                  <EuiTitle size="s">
+                  <EuiTitle size='s'>
                     <h3>Details</h3>
                   </EuiTitle>
                 }
-                paddingSize="none"
+                paddingSize='none'
                 initialIsOpen={true}
               >
-                <div className="flyout-row details-row">{this.renderDetails(details)}</div>
+                <div className='flyout-row details-row'>
+                  {this.renderDetails(details)}
+                </div>
               </EuiAccordion>
             </EuiFlexItem>
           </EuiFlexGroup>
@@ -313,19 +340,19 @@ export default class WzDecoderInfo extends Component {
           <EuiFlexGroup>
             <EuiFlexItem style={{ marginTop: 8 }}>
               <EuiAccordion
-                id="Related"
+                id='Related'
                 buttonContent={
-                  <EuiTitle size="s">
+                  <EuiTitle size='s'>
                     <h3>Related decoders</h3>
                   </EuiTitle>
                 }
-                paddingSize="none"
+                paddingSize='none'
                 initialIsOpen={true}
               >
-                <div className="flyout-row related-rules-row">
+                <div className='flyout-row related-rules-row'>
                   <EuiFlexGroup>
                     <EuiFlexItem>
-                      {currentDecoder?.filename &&
+                      {currentDecoder?.filename && (
                         <TableWzAPI
                           tableColumns={this.columns}
                           tableInitialSortingField='name'
@@ -333,7 +360,7 @@ export default class WzDecoderInfo extends Component {
                           tableProps={{ rowProps: this.onClickRow }}
                           tablePageSizeOptions={[10, 25]}
                         />
-                      }
+                      )}
                     </EuiFlexItem>
                   </EuiFlexGroup>
                 </div>

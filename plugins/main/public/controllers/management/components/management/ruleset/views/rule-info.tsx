@@ -56,7 +56,10 @@ export default class WzRuleInfo extends Component {
     const handleFileClick = async (event, { filename, relative_dirname }) => {
       event.stopPropagation();
       try {
-        const result = await this.resourcesHandler.getFileContent(filename);
+        const result = await this.resourcesHandler.getFileContent(
+          filename,
+          relative_dirname,
+        );
         const file = {
           name: filename,
           content: result,

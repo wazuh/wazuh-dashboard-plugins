@@ -103,7 +103,10 @@ export default class RulesetColumns {
                     const resourcesHandler = new ResourcesHandler(
                       ResourcesConstants.RULES,
                     );
-                    const result = await resourcesHandler.getFileContent(value);
+                    const result = await resourcesHandler.getFileContent(
+                      value,
+                      item.relative_dirname,
+                    );
                     const file = {
                       name: value,
                       content: result,
@@ -169,6 +172,7 @@ export default class RulesetColumns {
                       );
                       const result = await resourcesHandler.getFileContent(
                         item.filename,
+                        item.relative_dirname,
                       );
                       const file = {
                         name: item.filename,
@@ -207,6 +211,7 @@ export default class RulesetColumns {
                         );
                         const result = await resourcesHandler.getFileContent(
                           item.filename,
+                          item.relative_dirname,
                         );
                         const file = {
                           name: item.filename,

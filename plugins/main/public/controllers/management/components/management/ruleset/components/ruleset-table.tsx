@@ -205,7 +205,10 @@ function RulesetTable({ setShowingFiles, showingFiles, ...props }) {
   const removeItems = async items => {
     try {
       const results = items.map(async (item, i) => {
-        await resourcesHandler.deleteFile(item.filename || item.name);
+        await resourcesHandler.deleteFile(
+          item.filename || item.name,
+          item.relative_dirname,
+        );
       });
 
       Promise.all(results).then(completed => {
