@@ -21,7 +21,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed the query to search for an agent in `management/configuration`. [#5485](https://github.com/wazuh/wazuh-kibana-app/pull/5485)
 - Changed the search bar in management/log to the one used in the rest of the app. [#5476](https://github.com/wazuh/wazuh-kibana-app/pull/5476)
 - Changed the design of the wizard to add agents. [#5457](https://github.com/wazuh/wazuh-kibana-app/pull/5457)
-- Changed the search bar in Management (Rules, Decoders, CDB List) and Modules (Vulnerabilities > Inventory, Security Configuration Assessment > Inventory > {Policy ID} > Checks, MITRE ATT&CK > Intelligence > {Resource}), Agent Inventory data [#5363](https://github.com/wazuh/wazuh-kibana-app/pull/5363) [#5442](https://github.com/wazuh/wazuh-kibana-app/pull/5442) [#5443](https://github.com/wazuh/wazuh-kibana-app/pull/5443)
+- Changed the search bar in Management (Rules, Decoders, CDB List) and Modules (Vulnerabilities > Inventory, Security Configuration Assessment > Inventory > {Policy ID} > Checks, MITRE ATT&CK > Intelligence > {Resource}, Integrity monitoring > Inventory > Files, Integrity monitoring > Inventory > Registry), Agent Inventory data [#5363](https://github.com/wazuh/wazuh-kibana-app/pull/5363) [#5442](https://github.com/wazuh/wazuh-kibana-app/pull/5442) [#5443](https://github.com/wazuh/wazuh-kibana-app/pull/5443) [#5444](https://github.com/wazuh/wazuh-kibana-app/pull/5444)
 
 ### Fixed
 
