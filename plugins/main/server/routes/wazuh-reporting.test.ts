@@ -145,7 +145,6 @@ describe('[endpoint] GET /reports', () => {
       );
       if (files) {
         Array.from(Array(files).keys()).forEach(indexFile => {
-          console.log('Generating', username, indexFile);
           fs.closeSync(
             fs.openSync(
               path.join(
