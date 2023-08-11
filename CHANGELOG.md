@@ -12,6 +12,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added new global error treatment (client-side) [#4163](https://github.com/wazuh/wazuh-kibana-app/pull/4163)
 - Added new CLI to generate API data from specification file [#5519](https://github.com/wazuh/wazuh-kibana-app/pull/5519)
 - Added specific RBAC permissions to Security section [#5551](https://github.com/wazuh/wazuh-kibana-app/pull/5551)
+- Added Refresh and Export formatted button to panels in Agents > Inventory data [#5443](https://github.com/wazuh/wazuh-kibana-app/pull/5443)
 
 ### Changed
 
@@ -20,7 +21,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed the query to search for an agent in `management/configuration`. [#5485](https://github.com/wazuh/wazuh-kibana-app/pull/5485)
 - Changed the search bar in management/log to the one used in the rest of the app. [#5476](https://github.com/wazuh/wazuh-kibana-app/pull/5476)
 - Changed the design of the wizard to add agents. [#5457](https://github.com/wazuh/wazuh-kibana-app/pull/5457)
-- Changed the search bar in Management (Rules, Decoders, CDB List) and Modules (Vulnerabilities > Inventory, Security Configuration Assessment > Inventory > {Policy ID} > Checks, MITRE ATT&CK > Intelligence > {Resource}, Integrity monitoring > Inventory > Files, Integrity monitoring > Inventory > Registry) [#5363](https://github.com/wazuh/wazuh-kibana-app/pull/5363) [#5442](https://github.com/wazuh/wazuh-kibana-app/pull/5442)
+- Changed the search bar in Management (Rules, Decoders, CDB List) and Modules (Vulnerabilities > Inventory, Security Configuration Assessment > Inventory > {Policy ID} > Checks, MITRE ATT&CK > Intelligence > {Resource}, Integrity monitoring > Inventory > Files, Integrity monitoring > Inventory > Registry), Agent Inventory data [#5363](https://github.com/wazuh/wazuh-kibana-app/pull/5363) [#5442](https://github.com/wazuh/wazuh-kibana-app/pull/5442) [#5443](https://github.com/wazuh/wazuh-kibana-app/pull/5443) [#5444](https://github.com/wazuh/wazuh-kibana-app/pull/5444)
 
 ### Fixed
 
@@ -65,6 +66,9 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Fixed the rendering of tables that contains IPs and agent overview [#5471](https://github.com/wazuh/wazuh-kibana-app/pull/5471)
 - Fixed the agents active coverage stat as NaN in Details panel of Agents section [#5490](https://github.com/wazuh/wazuh-kibana-app/pull/5490)
+- Fixed a broken documentation link to agent labels [#5687](https://github.com/wazuh/wazuh-kibana-app/pull/5687)
+- Fixed the PDF report filters applied to tables [#5714](https://github.com/wazuh/wazuh-kibana-app/pull/5714)
+- Fixed outdated year in the PDF report footer [#5766](https://github.com/wazuh/wazuh-kibana-app/pull/5766)
 
 ### Removed
 
@@ -74,6 +78,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Changed method to perform redirection on agent table buttons [#5539](https://github.com/wazuh/wazuh-kibana-app/pull/5539)
 - Changed windows agent service name in the deploy agent wizard [#5538](https://github.com/wazuh/wazuh-kibana-app/pull/5538)
+- Changed the requests to get the agent labels for the managers [#5687](https://github.com/wazuh/wazuh-kibana-app/pull/5687)
 
 ## Wazuh v4.5.0 - OpenSearch Dashboards 2.6.0 - Revision 01
 
