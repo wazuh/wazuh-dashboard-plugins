@@ -42,12 +42,14 @@ export default class GroupsFilesColumns {
           field: 'filename',
           name: 'File',
           align: 'left',
+          searchable: true,
           sortable: true
         },
         {
           field: 'hash',
           name: 'Checksum',
           align: 'left',
+          searchable: true,
           sortable: true
         }
       ];
