@@ -10,7 +10,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
-- Fixed the rendering of 7 step into deployment of news agents that show a wrongs commands. [#5713](https://github.com/wazuh/wazuh-kibana-app/issues/5713)
+- Fixed an error with the commands in the Deploy new agent section for Oracle Linux 6+ agents [#5764](https://github.com/wazuh/wazuh-kibana-app/pull/5764)
 
 ## Wazuh v4.5.1 - OpenSearch Dashboards 2.6.0 - Revision 01
 
