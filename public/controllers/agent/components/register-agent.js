@@ -239,6 +239,7 @@ export const RegisterAgent = withErrorBoundary(
         this.state.selectedVersion === 'suse11' ||
         this.state.selectedVersion === 'suse12' ||
         this.state.selectedVersion === 'oraclelinux5' ||
+        this.state.selectedVersion === 'oraclelinux6' ||
         this.state.selectedVersion === '22' ||
         this.state.selectedVersion === 'amazonlinux2' ||
         this.state.selectedVersion === 'debian8' ||
@@ -254,7 +255,6 @@ export const RegisterAgent = withErrorBoundary(
         this.state.selectedVersion === 'redhat6' ||
         this.state.selectedVersion === 'centos5' ||
         this.state.selectedVersion === 'centos6' ||
-        this.state.selectedVersion === 'oraclelinux6' ||
         this.state.selectedVersion === 'amazonlinux1' ||
         this.state.selectedVersion === 'debian7' ||
         this.state.selectedVersion === 'ubuntu14'
