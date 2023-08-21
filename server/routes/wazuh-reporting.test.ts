@@ -205,11 +205,11 @@ describe('[endpoint] PUT /utils/configuration', () => {
   // If any of the parameters is changed this variable should be updated with the new md5
   it.each`
     footer              | header                                 | responseStatusCode | expectedMD5                           | tab
-    ${null}             | ${null}                                | ${200}             | ${'1bdc0cc05cc79fdfbb9b734a4e1cc07b'} | ${'pm'}
+    ${null}             | ${null}                                | ${200}             | ${'3fb3d317e7f087ca2e46ed16db9d4e93'} | ${'pm'}
     ${'Custom\nFooter'} | ${'info@company.com\nFake Avenue 123'} | ${200}             | ${'0acbd4ee321699791b080b45c11dfe2b'} | ${'general'}
-    ${''}               | ${''}                                  | ${200}             | ${'5f9e16540e9d8109bed75b2a8f825164'} | ${'fim'}
+    ${''}               | ${''}                                  | ${200}             | ${'8871e0336733fa95a34781c07a0023d9'} | ${'fim'}
     ${'Custom Footer'}  | ${null}                                | ${200}             | ${'5bd4c559419028fd0d282c5e8408ecff'} | ${'aws'}
-    ${null}             | ${'Custom Header'}                     | ${200}             | ${'f6bfca395bc3fc78105f66120f336443'} | ${'gcp'}
+    ${null}             | ${'Custom Header'}                     | ${200}             | ${'0d1867ac30211833e5ede91cd4741a6a'} | ${'gcp'}
   `(
     `Set custom report header and footer - Verify PDF output`,
     async ({ footer, header, responseStatusCode, expectedMD5, tab }) => {
