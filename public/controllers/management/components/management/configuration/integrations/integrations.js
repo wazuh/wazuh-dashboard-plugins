@@ -16,7 +16,7 @@ import { WzConfigurationSettingsHeaderViewer } from '../util-components/configur
 import WzNoConfig from '../util-components/no-config';
 import { WzSettingsViewer } from '../util-components/code-viewer';
 import WzViewSelector, {
-  WzViewSelectorSwitch
+  WzViewSelectorSwitch,
 } from '../util-components/view-selector';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import withWzConfig from '../util-hocs/wz-config';
@@ -26,28 +26,32 @@ import { webDocumentationLink } from '../../../../../../../common/services/web_d
 const helpLinks = [
   {
     text: 'Integration with external APIs',
-    href: webDocumentationLink('user-manual/manager/manual-integration.html')
+    href: webDocumentationLink('user-manual/manager/manual-integration.html'),
   },
   {
     text: 'VirusTotal integration',
-    href: webDocumentationLink('user-manual/capabilities/virustotal-scan/index.html')
+    href: webDocumentationLink(
+      'user-manual/capabilities/malware-detection/virus-total-integration.html',
+    ),
   },
   {
     text: 'Integration reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/integration.html')
-  }
+    href: webDocumentationLink(
+      'user-manual/reference/ossec-conf/integration.html',
+    ),
+  },
 ];
 
 const defaultIntegrations = [
   { title: 'Slack', description: 'Get alerts directly on Slack' },
   {
     title: 'VirusTotal',
-    description: 'Get notified when malicious software is found'
+    description: 'Get notified when malicious software is found',
   },
   {
     title: 'PagerDuty',
-    description: 'Get alerts on this streamlined incident resolution software'
-  }
+    description: 'Get alerts on this streamlined incident resolution software',
+  },
 ];
 
 const integrationsSettings = [
@@ -57,16 +61,16 @@ const integrationsSettings = [
   { field: 'group', label: 'Filter alerts by these rule groupst' },
   {
     field: 'event_location',
-    label: 'Filter alerts by location (agent, IP address or file)'
+    label: 'Filter alerts by location (agent, IP address or file)',
   },
-  { field: 'alert_format', label: 'Used format to write alerts' }
+  { field: 'alert_format', label: 'Used format to write alerts' },
 ];
 
 class WzConfigurationIntegrations extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      view: ''
+      view: '',
     };
   }
   changeView(view) {
@@ -75,7 +79,7 @@ class WzConfigurationIntegrations extends Component {
   buildIntegration(integration) {
     return (
       defaultIntegrations.find(
-        i => i.title && i.title.toLocaleLowerCase() === integration
+        i => i.title && i.title.toLocaleLowerCase() === integration,
       ) || { title: capitalize(integration), description: 'Custom integration' }
     );
   }
@@ -110,7 +114,7 @@ class WzConfigurationIntegrations extends Component {
                   integrations.map((integrationInfo, key) => {
                     const integration = Object.assign(
                       this.buildIntegration(integrationInfo.name),
-                      integrationInfo
+                      integrationInfo,
                     );
                     return (
                       <Fragment key={`integration-${integration.title}`}>
@@ -137,9 +141,9 @@ class WzConfigurationIntegrations extends Component {
                     );
                   })}
               </WzViewSelectorSwitch>
-              <WzViewSelectorSwitch view="json">
+              <WzViewSelectorSwitch view='json'>
                 <WzConfigurationSettingsHeaderViewer
-                  mode="json"
+                  mode='json'
                   viewSelected={view}
                   settings={() => this.changeView('')}
                   json={() => this.changeView('json')}
@@ -147,14 +151,14 @@ class WzConfigurationIntegrations extends Component {
                   help={helpLinks}
                 />
                 <WzSettingsViewer
-                  mode="json"
+                  mode='json'
                   value={currentConfig}
                   minusHeight={260}
                 />
               </WzViewSelectorSwitch>
-              <WzViewSelectorSwitch view="xml">
+              <WzViewSelectorSwitch view='xml'>
                 <WzConfigurationSettingsHeaderViewer
-                  mode="xml"
+                  mode='xml'
                   viewSelected={view}
                   settings={() => this.changeView('')}
                   json={() => this.changeView('json')}
@@ -162,7 +166,7 @@ class WzConfigurationIntegrations extends Component {
                   help={helpLinks}
                 />
                 <WzSettingsViewer
-                  mode="xml"
+                  mode='xml'
                   value={currentConfig}
                   minusHeight={260}
                 />
