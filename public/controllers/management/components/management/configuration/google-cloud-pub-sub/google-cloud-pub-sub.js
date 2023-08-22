@@ -1,5 +1,3 @@
-
-
 import React, { Component, Fragment } from 'react';
 
 import WzConfigurationSettingsTabSelector from '../util-components/configuration-settings-tab-selector';
@@ -10,34 +8,33 @@ import withWzConfig from '../util-hocs/wz-config';
 
 import { wodleBuilder } from '../utils/builders';
 
-import {
-  renderValueYesThenEnabled,
-  isString
-} from '../utils/utils';
+import { renderValueYesThenEnabled, isString } from '../utils/utils';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
 const helpLinks = [
   {
     text: 'Using Wazuh to monitor GCP services',
-    href: webDocumentationLink('gcp/index.html')
+    href: webDocumentationLink('cloud-security/gcp/index.html'),
   },
   {
     text: 'Google Cloud Pub/Sub module reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/gcp-pubsub.html')
-  }
+    href: webDocumentationLink(
+      'user-manual/reference/ossec-conf/gcp-pubsub.html',
+    ),
+  },
 ];
 
 const mainSettings = [
   {
     field: 'enabled',
     label: 'Google Cloud Pub/Sub integration status',
-    render: renderValueYesThenEnabled
+    render: renderValueYesThenEnabled,
   },
   { field: 'project_id', label: 'Project ID' },
   { field: 'subscription_name', label: 'Subscription to read from' },
   {
     field: 'credentials_file',
-    label: 'Path of the credentials file'
+    label: 'Path of the credentials file',
   },
   { field: 'logging', label: 'Logging level' },
   { field: 'max_messages', label: 'Maximum messages pulled in each iteration' },
@@ -48,7 +45,7 @@ const mainSettings = [
   { field: 'time', label: 'Time of the day to fetch logs' },
 ];
 
-class WzConfigurationGoogleCloudPubSub extends Component{
+class WzConfigurationGoogleCloudPubSub extends Component {
   constructor(props) {
     super(props);
     this.wodleConfig = wodleBuilder(this.props.currentConfig, 'gcp-pubsub');
@@ -63,7 +60,7 @@ class WzConfigurationGoogleCloudPubSub extends Component{
       this.wodleConfig['gcp-pubsub'].enabled === 'yes'
     );
   }
-  render(){
+  render() {
     const { currentConfig } = this.props;
     return (
       <Fragment>
@@ -75,14 +72,14 @@ class WzConfigurationGoogleCloudPubSub extends Component{
             />
           )}
         {currentConfig &&
-          !this.wodleConfig['gcp-pubsub'] && 
+          !this.wodleConfig['gcp-pubsub'] &&
           !isString(currentConfig['wmodules-wmodules']) && (
-            <WzNoConfig error="not-present" help={helpLinks} />
-        )}
+            <WzNoConfig error='not-present' help={helpLinks} />
+          )}
         {currentConfig && this.wodleConfig['gcp-pubsub'] && (
           <WzConfigurationSettingsTabSelector
-            title="Main settings"
-            description="Configuration for the Google Cloud Pub/Sub module"
+            title='Main settings'
+            description='Configuration for the Google Cloud Pub/Sub module'
             currentConfig={this.wodleConfig}
             minusHeight={320}
             helpLinks={helpLinks}
@@ -94,7 +91,7 @@ class WzConfigurationGoogleCloudPubSub extends Component{
           </WzConfigurationSettingsTabSelector>
         )}
       </Fragment>
-    )
+    );
   }
 }
 
