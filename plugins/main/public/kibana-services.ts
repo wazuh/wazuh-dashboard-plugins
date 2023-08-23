@@ -39,6 +39,8 @@ export const [getNavigationPlugin, setNavigationPlugin] =
   createGetterSetter<NavigationPublicPluginStart>('NavigationPlugin');
 export const [getWzMainParams, setWzMainParams] =
   createGetterSetter<NavigationPublicPluginStart>('WzMainParams');
+export const [getWzCurrentAppID, setWzCurrentAppID] =
+  createGetterSetter<NavigationPublicPluginStart>('WzCurrentAppID');
 
 /**
  * set bootstrapped inner angular module
