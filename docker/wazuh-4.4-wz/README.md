@@ -1,4 +1,4 @@
-# Wazuh Stack 4.5.x
+# Wazuh Stack 4.4.x
 
 On this folder, we can find two types of environments:
 
@@ -52,12 +52,12 @@ UI and then execute:
 - For `CentOS/8` images:
 
   ```bash
-  docker run --name wz-rel-agent-4.5.0 --rm --network wz-rel-450 --label com.docker.compose.project=wz-rel-450 -d centos:8 bash -c '
+  docker run --name wz-rel-agent-4.4.0 --rm --network wz-rel-440 --label com.docker.compose.project=wz-rel-440 -d centos:8 bash -c '
     sed -i -e "s|mirrorlist=|#mirrorlist=|g" /etc/yum.repos.d/CentOS-*
     sed -i -e "s|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g" /etc/yum.repos.d/CentOS-*
 
     # Change this command by the one the UI suggests. Add the -y flag and remove the `sudo`.
-    WAZUH_MANAGER='wazuh.manager' yum install -y https://packages.wazuh.com/4.x/yum5/x86_64/wazuh-agent-4.5.0-1.el5.x86_64.rpm
+    WAZUH_MANAGER='wazuh.manager' yum install -y https://packages.wazuh.com/4.x/yum5/x86_64/wazuh-agent-4.4.0-1.el5.x86_64.rpm
 
     /etc/init.d/wazuh-agent start
     tail -f /var/ossec/logs/ossec.log
@@ -67,12 +67,12 @@ UI and then execute:
 - For `Ubuntu` images
 
   ```bash
-  docker run --name wz-rel-agent-4.5.0 --network wz-rel-450 --label com.docker.compose.project=wz-rel-450 -d ubuntu:20.04 bash -c '
+  docker run --name wz-rel-agent-4.4.0 --network wz-rel-440 --label com.docker.compose.project=wz-rel-440 -d ubuntu:20.04 bash -c '
     apt update -y
     apt install -y curl lsb-release
 
     # Change this command by the one the UI suggests to use. Remove the `sudo`.
-    curl -so wazuh-agent-4.5.0.deb https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_4.5.0-1_amd64.deb && WAZUH_MANAGER='wazuh.manager' WAZUH_AGENT_GROUP='default' dpkg -i ./wazuh-agent-4.5.0.deb
+    curl -so wazuh-agent-4.4.0.deb https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_4.4.0-1_amd64.deb && WAZUH_MANAGER='wazuh.manager' WAZUH_AGENT_GROUP='default' dpkg -i ./wazuh-agent-4.4.0.deb
 
     /etc/init.d/wazuh-agent start
     tail -f /var/ossec/logs/ossec.log
@@ -105,10 +105,10 @@ version of Wazuh with the `wazuh_version` argument, the new patch version of
 Wazuh with `wazuh_api_version` and finally follow the steps provided by the
 scripts.
 
-Example: test a package for Wazuh 4.5.0
+Example: test a package for Wazuh 4.4.0
 
 ```bash
-./pre.sh 4.5.0 9 up
+./pre.sh 4.4.0 9 up
 ```
 
 ```bash
@@ -116,7 +116,7 @@ Example: test a package for Wazuh 4.5.0
 
 where
   wazuh_version is one of
-  wazuh_api_version is the minor version of wazuh 4.5, for example  5 17
+  wazuh_api_version is the minor version of wazuh 4.4, for example  5 17
   action is one of up | down
 
 In a minor release, the API should not change the version here bumps the API
@@ -128,7 +128,7 @@ used by the mock server
 ```
 
 Please take into account that the API version for this environment will
-always be a 4.5.x version. Also consider that our application version
+always be a 4.4.x version. Also consider that our application version
 must be the same as the one selected here.
 
 ### App upgrade
