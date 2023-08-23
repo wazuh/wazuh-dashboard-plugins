@@ -23,6 +23,7 @@ import {
   setPlugins,
   setCookies,
   setWzMainParams,
+  setWzCurrentAppID,
 } from './kibana-services';
 import {
   AppPluginStartDependencies,
@@ -570,7 +571,7 @@ export class WazuhPlugin
           category: categoryServerManagement,
           id: 'wz-rbac',
           title: 'RBAC',
-          redirectTo: () => '/security/',
+          redirectTo: () => '/security/?tab=users',
         },
         {
           category: DEFAULT_APP_CATEGORIES.management,
@@ -610,6 +611,7 @@ export class WazuhPlugin
             try {
               // Set the dynamic redirection
               setWzMainParams(redirectTo());
+              setWzCurrentAppID(id);
               initializeInterceptor(core);
               if (!this.initializeInnerAngular) {
                 throw Error(
