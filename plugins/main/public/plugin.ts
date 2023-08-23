@@ -378,6 +378,19 @@ export class WazuhPlugin
         },
         {
           category: categorySecurityOperations,
+          id: 'wz-gdpr',
+          title: 'GDPR',
+          redirectTo: () =>
+            `/overview/?tab=gdpr&tabView=panels${
+              store.getState()?.appStateReducers?.currentAgentData?.id
+                ? `&agentId=${
+                    store.getState()?.appStateReducers?.currentAgentData?.id
+                  }`
+                : ''
+            }`,
+        },
+        {
+          category: categorySecurityOperations,
           id: 'wz-nist-800-53',
           title: 'NIST 800-53',
           redirectTo: () =>
