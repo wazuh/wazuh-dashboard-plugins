@@ -18,7 +18,9 @@ const initialState = {
   extensions: {},
   selected_settings_section: '',
   currentPlatform: false,
-  currentAgentData: {},
+  currentAgentData: JSON.parse(
+    window.sessionStorage.getItem('wz-shared-selected-agent') || '{}',
+  ),
   showExploreAgentModal: false,
   showExploreAgentModalGlobal: false,
   userPermissions: false,
@@ -33,114 +35,116 @@ const appStateReducers = (state = initialState, action) => {
   if (action.type === 'UPDATE_CURRENT_API') {
     return {
       ...state,
-      currentAPI: action.currentAPI
+      currentAPI: action.currentAPI,
     };
   }
 
   if (action.type === 'SHOW_MENU') {
     return {
       ...state,
-      showMenu: action.showMenu
+      showMenu: action.showMenu,
     };
   }
 
   if (action.type === 'UPDATE_WAZUH_NOT_READY_YET') {
     return {
       ...state,
-      wazuhNotReadyYet: action.wazuhNotReadyYet
+      wazuhNotReadyYet: action.wazuhNotReadyYet,
     };
   }
 
   if (action.type === 'UPDATE_WAZUH_CURRENT_TAB') {
     return {
       ...state,
-      currentTab: action.currentTab
+      currentTab: action.currentTab,
     };
   }
 
   if (action.type === 'UPDATE_EXTENSIONS') {
     return {
       ...state,
-      extensions: action.extensions
+      extensions: action.extensions,
     };
   }
 
   if (action.type === 'UPDATE_CURRENT_PLATFORM') {
     return {
       ...state,
-      currentPlatform: action.currentPlatform
+      currentPlatform: action.currentPlatform,
     };
   }
 
   if (action.type === 'UPDATE_SELECTED_AGENT_DATA') {
+    window.sessionStorage.setItem(
+      'wz-shared-selected-agent',
+      JSON.stringify(action.currentAgentData),
+    );
     return {
       ...state,
-      currentAgentData: action.currentAgentData
+      currentAgentData: action.currentAgentData,
     };
   }
-
 
   if (action.type === 'SHOW_EXPLORE_AGENT_MODAL') {
     return {
       ...state,
-      showExploreAgentModal: action.showExploreAgentModal
+      showExploreAgentModal: action.showExploreAgentModal,
     };
   }
-
 
   if (action.type === 'SHOW_EXPLORE_AGENT_MODAL_GLOBAL') {
     return {
       ...state,
-      showExploreAgentModalGlobal: action.showExploreAgentModalGlobal
+      showExploreAgentModalGlobal: action.showExploreAgentModalGlobal,
     };
   }
 
   if (action.type === 'UPDATE_USER_ROLES') {
     return {
       ...state,
-      userRoles: action.userRoles
+      userRoles: action.userRoles,
     };
   }
 
   if (action.type === 'UPDATE_USER_PERMISSIONS') {
     return {
       ...state,
-      userPermissions: action.userPermissions
+      userPermissions: action.userPermissions,
     };
   }
 
   if (action.type === 'UPDATE_SELECTED_SETTINGS_SECTION') {
     return {
       ...state,
-      selected_settings_section: action.selected_settings_section
+      selected_settings_section: action.selected_settings_section,
     };
   }
 
   if (action.type === 'UPDATE_TOAST_NOTIFICATIONS_MODAL') {
     return {
       ...state,
-      toastNotification: action.toastNotification
+      toastNotification: action.toastNotification,
     };
   }
 
   if (action.type === 'UPDATE_WITH_USER_LOGGED') {
     return {
       ...state,
-     withUserLogged: action.withUserLogged,
+      withUserLogged: action.withUserLogged,
     };
   }
 
   if (action.type === 'GET_ALLOWED_AGENTS') {
     return {
       ...state,
-      allowedAgents: action.allowedAgents
+      allowedAgents: action.allowedAgents,
     };
   }
 
   if (action.type === 'UPDATE_LOGTEST_TOKEN') {
     return {
       ...state,
-      logtestToken: action.logtestToken
+      logtestToken: action.logtestToken,
     };
   }
 
