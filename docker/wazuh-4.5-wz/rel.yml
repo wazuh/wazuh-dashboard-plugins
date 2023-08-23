@@ -166,6 +166,7 @@ services:
         condition: service_healthy
       idpsetup:
         condition: service_completed_successfully
+        required: false
     image: wazuh/wazuh-indexer:${WAZUH_STACK}
     profiles:
       - 'saml'
