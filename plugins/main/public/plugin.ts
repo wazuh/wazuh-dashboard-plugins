@@ -327,7 +327,7 @@ export class WazuhPlugin
         {
           category: categoryThreadIntelligence,
           id: 'wz-mitre-attack',
-          title: 'Mitre Att&ck',
+          title: 'MITRE ATT&CK',
           redirectTo: () =>
             `/overview/?tab=mitre&tabView=panels${
               store.getState()?.appStateReducers?.currentAgentData?.id
