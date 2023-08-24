@@ -421,9 +421,9 @@ export class WazuhPlugin
           title: 'IT Hygiene',
           // TODO: redirection
           redirectTo: () =>
-            `/overview/?tab=tsc&tabView=panels${
+            `/agents/?tab=welcome${
               store.getState()?.appStateReducers?.currentAgentData?.id
-                ? `&agentId=${
+                ? `&agent=${
                     store.getState()?.appStateReducers?.currentAgentData?.id
                   }`
                 : ''
@@ -594,6 +594,12 @@ export class WazuhPlugin
         },
         {
           category: DEFAULT_APP_CATEGORIES.management,
+          id: 'wz-modules',
+          title: 'Modules',
+          redirectTo: () => '/settings?tab=modules',
+        },
+        {
+          category: DEFAULT_APP_CATEGORIES.management,
           id: 'wz-server-data',
           title: 'Server data',
           redirectTo: () => '/settings?tab=sample_data',
@@ -603,6 +609,12 @@ export class WazuhPlugin
           id: 'wz-configuration',
           title: 'Configuration',
           redirectTo: () => '/settings?tab=configuration',
+        },
+        {
+          category: DEFAULT_APP_CATEGORIES.management,
+          id: 'wz-miscellaneous',
+          title: 'Miscellaneous',
+          redirectTo: () => '/settings?tab=miscellaneous',
         },
         {
           category: DEFAULT_APP_CATEGORIES.management,
