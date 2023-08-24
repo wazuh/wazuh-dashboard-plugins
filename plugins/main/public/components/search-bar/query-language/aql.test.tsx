@@ -15,27 +15,25 @@ describe('SearchBar component', () => {
           field(currentValue) {
             return [];
           },
-          value(currentValue, { previousField }){
+          value(currentValue, { previousField }) {
             return [];
           },
         },
-      }
+      },
     ],
     /* eslint-disable @typescript-eslint/no-empty-function */
     onChange: () => {},
-    onSearch: () => {}
+    onSearch: () => {},
     /* eslint-enable @typescript-eslint/no-empty-function */
   };
 
   it('Renders correctly to match the snapshot of query language', async () => {
-    const wrapper = render(
-      <SearchBar
-        {...componentProps}
-      />
-    );
+    const wrapper = render(<SearchBar {...componentProps} />);
 
     await waitFor(() => {
-      const elementImplicitQuery = wrapper.container.querySelector('.euiCodeBlock__code');
+      const elementImplicitQuery = wrapper.container.querySelector(
+        '.euiCodeBlock__code',
+      );
       expect(elementImplicitQuery?.innerHTML).toEqual('id!=000;');
       expect(wrapper.container).toMatchSnapshot();
     });
@@ -45,32 +43,32 @@ describe('SearchBar component', () => {
 describe('Query language - AQL', () => {
   // Tokenize the input
   it.each`
-  input                        | tokens
-  ${''}                        | ${[{ type: 'operator_group', value: undefined }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }]}
-  ${'f'}                       | ${[{ type: 'operator_group', value: undefined }, { type: 'field', value: 'f' }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }]}
-  ${'field'}                       | ${[{ type: 'operator_group', value: undefined }, { type: 'field', value: 'field' }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }]}
-  ${'field='}                       | ${[{ type: 'operator_group', value: undefined }, { type: 'field', value: 'field' }, { type: 'operator_compare', value: '=' }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }]}
-  ${'field=value'}                       | ${[{ type: 'operator_group', value: undefined }, { type: 'field', value: 'field' }, { type: 'operator_compare', value: '=' }, { type: 'value', value: 'value' }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }]}
-  ${'field=value with spaces'}                       | ${[{ type: 'operator_group', value: undefined }, { type: 'field', value: 'field' }, { type: 'operator_compare', value: '=' }, { type: 'value', value: 'value with spaces' }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }]}
-  ${'field=value with spaces<'}                       | ${[{ type: 'operator_group', value: undefined }, { type: 'field', value: 'field' }, { type: 'operator_compare', value: '=' }, { type: 'value', value: 'value with spaces<' }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }]}
-  ${'field=value with (parenthesis)'}                       | ${[{ type: 'operator_group', value: undefined }, { type: 'field', value: 'field' }, { type: 'operator_compare', value: '=' }, { type: 'value', value: 'value with (parenthesis)' }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }]}
-  ${'field=value;'}                       | ${[{ type: 'operator_group', value: undefined }, { type: 'field', value: 'field' }, { type: 'operator_compare', value: '=' }, { type: 'value', value: 'value' }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: ';' }, { type: 'operator_group', value: undefined }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }]}
-  ${'field=value;field2'}                       | ${[{ type: 'operator_group', value: undefined }, { type: 'field', value: 'field' }, { type: 'operator_compare', value: '=' }, { type: 'value', value: 'value' }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: ';' }, { type: 'operator_group', value: undefined }, { type: 'field', value: 'field2' }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }]}
-  ${'field=value;field2!='}                       | ${[{ type: 'operator_group', value: undefined }, { type: 'field', value: 'field' }, { type: 'operator_compare', value: '=' }, { type: 'value', value: 'value' }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: ';' }, { type: 'operator_group', value: undefined }, { type: 'field', value: 'field2' }, { type: 'operator_compare', value: '!=' }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }]}
-  ${'field=value;field2!=value2'}                       | ${[{ type: 'operator_group', value: undefined }, { type: 'field', value: 'field' }, { type: 'operator_compare', value: '=' }, { type: 'value', value: 'value' }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: ';' }, { type: 'operator_group', value: undefined }, { type: 'field', value: 'field2' }, { type: 'operator_compare', value: '!=' }, { type: 'value', value: 'value2' }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }]}
-  ${'('}                       | ${[{ type: 'operator_group', value: '(' }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }]}
-  ${'(field'}                       | ${[{ type: 'operator_group', value: '(' }, { type: 'field', value: 'field' }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }]}
-  ${'(field>'}                       | ${[{ type: 'operator_group', value: '(' }, { type: 'field', value: 'field' }, { type: 'operator_compare', value: '>' }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }]}
-  ${'(field>2'}                       | ${[{ type: 'operator_group', value: '(' }, { type: 'field', value: 'field' }, { type: 'operator_compare', value: '>' }, { type: 'value', value: '2' }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }]}
-  ${'(field>2)'}                       | ${[{ type: 'operator_group', value: '(' }, { type: 'field', value: 'field' }, { type: 'operator_compare', value: '>' }, { type: 'value', value: '2' }, { type: 'operator_group', value: ')' }, { type: 'conjunction', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }]}
-  ${'(field>2);'}                       | ${[{ type: 'operator_group', value: '(' }, { type: 'field', value: 'field' }, { type: 'operator_compare', value: '>' }, { type: 'value', value: '2' }, { type: 'operator_group', value: ')' }, { type: 'conjunction', value: ';' }, { type: 'operator_group', value: undefined }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }]}
-  ${'(field>2;'}                       | ${[{ type: 'operator_group', value: '(' }, { type: 'field', value: 'field' }, { type: 'operator_compare', value: '>' }, { type: 'value', value: '2' }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: ';' }, { type: 'operator_group', value: undefined }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }]}
-  ${'(field>2;field2'}                       | ${[{ type: 'operator_group', value: '(' }, { type: 'field', value: 'field' }, { type: 'operator_compare', value: '>' }, { type: 'value', value: '2' }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: ';' }, { type: 'operator_group', value: undefined }, { type: 'field', value: 'field2' }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }]}
-  ${'(field>2;field2='}                       | ${[{ type: 'operator_group', value: '(' }, { type: 'field', value: 'field' }, { type: 'operator_compare', value: '>' }, { type: 'value', value: '2' }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: ';' }, { type: 'operator_group', value: undefined }, { type: 'field', value: 'field2' }, { type: 'operator_compare', value: '=' }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }]}
-  ${'(field>2;field2=value2'}                       | ${[{ type: 'operator_group', value: '(' }, { type: 'field', value: 'field' }, { type: 'operator_compare', value: '>' }, { type: 'value', value: '2' }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: ';' }, { type: 'operator_group', value: undefined }, { type: 'field', value: 'field2' }, { type: 'operator_compare', value: '=' }, { type: 'value', value: 'value2' }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }]}
-  ${'(field>2;field2=value2)'}                       | ${[{ type: 'operator_group', value: '(' }, { type: 'field', value: 'field' }, { type: 'operator_compare', value: '>' }, { type: 'value', value: '2' }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: ';' }, { type: 'operator_group', value: undefined }, { type: 'field', value: 'field2' }, { type: 'operator_compare', value: '=' }, { type: 'value', value: 'value2' }, { type: 'operator_group', value: ')' }, { type: 'conjunction', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }]}
-  ${'(field>2;field2=custom value())'}                       | ${[{ type: 'operator_group', value: '(' }, { type: 'field', value: 'field' }, { type: 'operator_compare', value: '>' }, { type: 'value', value: '2' }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: ';' }, { type: 'operator_group', value: undefined }, { type: 'field', value: 'field2' }, { type: 'operator_compare', value: '=' }, { type: 'value', value: 'custom value()' }, { type: 'operator_group', value: ')' }, { type: 'conjunction', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }]}
-  `(`Tokenizer API input $input`, ({input, tokens}) => {
+    input                                | tokens
+    ${''}                                | ${[{ type: 'operator_group', value: undefined }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }]}
+    ${'f'}                               | ${[{ type: 'operator_group', value: undefined }, { type: 'field', value: 'f' }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }]}
+    ${'field'}                           | ${[{ type: 'operator_group', value: undefined }, { type: 'field', value: 'field' }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }]}
+    ${'field='}                          | ${[{ type: 'operator_group', value: undefined }, { type: 'field', value: 'field' }, { type: 'operator_compare', value: '=' }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }]}
+    ${'field=value'}                     | ${[{ type: 'operator_group', value: undefined }, { type: 'field', value: 'field' }, { type: 'operator_compare', value: '=' }, { type: 'value', value: 'value' }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }]}
+    ${'field=value with spaces'}         | ${[{ type: 'operator_group', value: undefined }, { type: 'field', value: 'field' }, { type: 'operator_compare', value: '=' }, { type: 'value', value: 'value with spaces' }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }]}
+    ${'field=value with spaces<'}        | ${[{ type: 'operator_group', value: undefined }, { type: 'field', value: 'field' }, { type: 'operator_compare', value: '=' }, { type: 'value', value: 'value with spaces<' }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }]}
+    ${'field=value with (parenthesis)'}  | ${[{ type: 'operator_group', value: undefined }, { type: 'field', value: 'field' }, { type: 'operator_compare', value: '=' }, { type: 'value', value: 'value with (parenthesis)' }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }]}
+    ${'field=value;'}                    | ${[{ type: 'operator_group', value: undefined }, { type: 'field', value: 'field' }, { type: 'operator_compare', value: '=' }, { type: 'value', value: 'value' }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: ';' }, { type: 'operator_group', value: undefined }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }]}
+    ${'field=value;field2'}              | ${[{ type: 'operator_group', value: undefined }, { type: 'field', value: 'field' }, { type: 'operator_compare', value: '=' }, { type: 'value', value: 'value' }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: ';' }, { type: 'operator_group', value: undefined }, { type: 'field', value: 'field2' }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }]}
+    ${'field=value;field2!='}            | ${[{ type: 'operator_group', value: undefined }, { type: 'field', value: 'field' }, { type: 'operator_compare', value: '=' }, { type: 'value', value: 'value' }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: ';' }, { type: 'operator_group', value: undefined }, { type: 'field', value: 'field2' }, { type: 'operator_compare', value: '!=' }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }]}
+    ${'field=value;field2!=value2'}      | ${[{ type: 'operator_group', value: undefined }, { type: 'field', value: 'field' }, { type: 'operator_compare', value: '=' }, { type: 'value', value: 'value' }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: ';' }, { type: 'operator_group', value: undefined }, { type: 'field', value: 'field2' }, { type: 'operator_compare', value: '!=' }, { type: 'value', value: 'value2' }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }]}
+    ${'('}                               | ${[{ type: 'operator_group', value: '(' }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }]}
+    ${'(field'}                          | ${[{ type: 'operator_group', value: '(' }, { type: 'field', value: 'field' }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }]}
+    ${'(field>'}                         | ${[{ type: 'operator_group', value: '(' }, { type: 'field', value: 'field' }, { type: 'operator_compare', value: '>' }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }]}
+    ${'(field>2'}                        | ${[{ type: 'operator_group', value: '(' }, { type: 'field', value: 'field' }, { type: 'operator_compare', value: '>' }, { type: 'value', value: '2' }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }]}
+    ${'(field>2)'}                       | ${[{ type: 'operator_group', value: '(' }, { type: 'field', value: 'field' }, { type: 'operator_compare', value: '>' }, { type: 'value', value: '2' }, { type: 'operator_group', value: ')' }, { type: 'conjunction', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }]}
+    ${'(field>2);'}                      | ${[{ type: 'operator_group', value: '(' }, { type: 'field', value: 'field' }, { type: 'operator_compare', value: '>' }, { type: 'value', value: '2' }, { type: 'operator_group', value: ')' }, { type: 'conjunction', value: ';' }, { type: 'operator_group', value: undefined }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }]}
+    ${'(field>2;'}                       | ${[{ type: 'operator_group', value: '(' }, { type: 'field', value: 'field' }, { type: 'operator_compare', value: '>' }, { type: 'value', value: '2' }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: ';' }, { type: 'operator_group', value: undefined }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }]}
+    ${'(field>2;field2'}                 | ${[{ type: 'operator_group', value: '(' }, { type: 'field', value: 'field' }, { type: 'operator_compare', value: '>' }, { type: 'value', value: '2' }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: ';' }, { type: 'operator_group', value: undefined }, { type: 'field', value: 'field2' }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }]}
+    ${'(field>2;field2='}                | ${[{ type: 'operator_group', value: '(' }, { type: 'field', value: 'field' }, { type: 'operator_compare', value: '>' }, { type: 'value', value: '2' }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: ';' }, { type: 'operator_group', value: undefined }, { type: 'field', value: 'field2' }, { type: 'operator_compare', value: '=' }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }]}
+    ${'(field>2;field2=value2'}          | ${[{ type: 'operator_group', value: '(' }, { type: 'field', value: 'field' }, { type: 'operator_compare', value: '>' }, { type: 'value', value: '2' }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: ';' }, { type: 'operator_group', value: undefined }, { type: 'field', value: 'field2' }, { type: 'operator_compare', value: '=' }, { type: 'value', value: 'value2' }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }]}
+    ${'(field>2;field2=value2)'}         | ${[{ type: 'operator_group', value: '(' }, { type: 'field', value: 'field' }, { type: 'operator_compare', value: '>' }, { type: 'value', value: '2' }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: ';' }, { type: 'operator_group', value: undefined }, { type: 'field', value: 'field2' }, { type: 'operator_compare', value: '=' }, { type: 'value', value: 'value2' }, { type: 'operator_group', value: ')' }, { type: 'conjunction', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }]}
+    ${'(field>2;field2=custom value())'} | ${[{ type: 'operator_group', value: '(' }, { type: 'field', value: 'field' }, { type: 'operator_compare', value: '>' }, { type: 'value', value: '2' }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: ';' }, { type: 'operator_group', value: undefined }, { type: 'field', value: 'field2' }, { type: 'operator_compare', value: '=' }, { type: 'value', value: 'custom value()' }, { type: 'operator_group', value: ')' }, { type: 'conjunction', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'field', value: undefined }, { type: 'operator_compare', value: undefined }, { type: 'value', value: undefined }, { type: 'operator_group', value: undefined }, { type: 'conjunction', value: undefined }]}
+  `(`Tokenizer API input $input`, ({ input, tokens }) => {
     expect(tokenizer(input)).toEqual(tokens);
   });
 
@@ -127,79 +125,87 @@ describe('Query language - AQL', () => {
 
   // When a suggestion is clicked, change the input text
   it.each`
-  AQL                              | clikedSuggestion                                                            | changedInput
-  ${''}                             | ${{type: { iconType: 'kqlField', color: 'tint4' }, label: 'field'}}        | ${'field'}
-  ${'field'}                        | ${{type: { iconType: 'kqlField', color: 'tint4' }, label: 'field2'}}       | ${'field2'}
-  ${'field'}                        | ${{type: { iconType: 'kqlOperand', color: 'tint1' }, label: '='}}          | ${'field='}
-  ${'field='}                       | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'value'}}        | ${'field=value'}
-  ${'field='}                       | ${{type: { iconType: 'kqlOperand', color: 'tint1' }, label: '!='}}         | ${'field!='}
-  ${'field=value'}                  | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'value2'}}       | ${'field=value2'}
-  ${'field=value'}                  | ${{type: { iconType: 'kqlSelector', color: 'tint3' }, label: ';'}}         | ${'field=value;'}
-  ${'field=value;'}                 | ${{type: { iconType: 'kqlField', color: 'tint4' }, label: 'field2'}}       | ${'field=value;field2'}
-  ${'field=value;field2'}           | ${{type: { iconType: 'kqlOperand', color: 'tint1' }, label: '>'}}          | ${'field=value;field2>'}
-  ${'field='}                       | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'with spaces'}}  | ${'field=with spaces'}
-  ${'field='}                       | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'with "spaces'}} | ${'field=with "spaces'}
-  ${'field='}                       | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: '"value'}}       | ${'field="value'}
-  ${''}                             | ${{type: { iconType: 'tokenDenseVector', color: 'tint3' }, label: '('}}    | ${'('}
-  ${'('}                            | ${{type: { iconType: 'kqlField', color: 'tint4' }, label: 'field'}}        | ${'(field'}
-  ${'(field'}                       | ${{type: { iconType: 'kqlField', color: 'tint4' }, label: 'field2'}}       | ${'(field2'}
-  ${'(field'}                       | ${{type: { iconType: 'kqlOperand', color: 'tint1' }, label: '='}}          | ${'(field='}
-  ${'(field='}                      | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'value'}}        | ${'(field=value'}
-  ${'(field=value'}                 | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'value2'}}       | ${'(field=value2'}
-  ${'(field=value'}                 | ${{type: { iconType: 'kqlSelector', color: 'tint3' }, label: ','}}         | ${'(field=value,'}
-  ${'(field=value,'}                | ${{type: { iconType: 'kqlField', color: 'tint4' }, label: 'field2'}}       | ${'(field=value,field2'}
-  ${'(field=value,field2'}          | ${{type: { iconType: 'kqlOperand', color: 'tint1' }, label: '>'}}          | ${'(field=value,field2>'}
-  ${'(field=value,field2>'}         | ${{type: { iconType: 'kqlOperand', color: 'tint1' }, label: '>'}}          | ${'(field=value,field2>'}
-  ${'(field=value,field2>'}         | ${{type: { iconType: 'kqlOperand', color: 'tint1' }, label: '~'}}          | ${'(field=value,field2~'}
-  ${'(field=value,field2>'}         | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'value2'}}       | ${'(field=value,field2>value2'}
-  ${'(field=value,field2>value2'}   | ${{type: { iconType: 'kqlValue', color: 'tint0' }, label: 'value3'}}       | ${'(field=value,field2>value3'}
-  ${'(field=value,field2>value2'}   | ${{type: { iconType: 'tokenDenseVector', color: 'tint3' }, label: ')'}}    | ${'(field=value,field2>value2)'}
-  `('click suggestion - AQL $AQL => $changedInput', async ({AQL: currentInput, clikedSuggestion, changedInput}) => {
-    // Mock input
-    let input = currentInput;
+    AQL                             | clikedSuggestion                                                             | changedInput
+    ${''}                           | ${{ type: { iconType: 'kqlField', color: 'tint4' }, label: 'field' }}        | ${'field'}
+    ${'field'}                      | ${{ type: { iconType: 'kqlField', color: 'tint4' }, label: 'field2' }}       | ${'field2'}
+    ${'field'}                      | ${{ type: { iconType: 'kqlOperand', color: 'tint1' }, label: '=' }}          | ${'field='}
+    ${'field='}                     | ${{ type: { iconType: 'kqlValue', color: 'tint0' }, label: 'value' }}        | ${'field=value'}
+    ${'field='}                     | ${{ type: { iconType: 'kqlOperand', color: 'tint1' }, label: '!=' }}         | ${'field!='}
+    ${'field=value'}                | ${{ type: { iconType: 'kqlValue', color: 'tint0' }, label: 'value2' }}       | ${'field=value2'}
+    ${'field=value'}                | ${{ type: { iconType: 'kqlSelector', color: 'tint3' }, label: ';' }}         | ${'field=value;'}
+    ${'field=value;'}               | ${{ type: { iconType: 'kqlField', color: 'tint4' }, label: 'field2' }}       | ${'field=value;field2'}
+    ${'field=value;field2'}         | ${{ type: { iconType: 'kqlOperand', color: 'tint1' }, label: '>' }}          | ${'field=value;field2>'}
+    ${'field='}                     | ${{ type: { iconType: 'kqlValue', color: 'tint0' }, label: 'with spaces' }}  | ${'field=with spaces'}
+    ${'field='}                     | ${{ type: { iconType: 'kqlValue', color: 'tint0' }, label: 'with "spaces' }} | ${'field=with "spaces'}
+    ${'field='}                     | ${{ type: { iconType: 'kqlValue', color: 'tint0' }, label: '"value' }}       | ${'field="value'}
+    ${''}                           | ${{ type: { iconType: 'tokenDenseVector', color: 'tint3' }, label: '(' }}    | ${'('}
+    ${'('}                          | ${{ type: { iconType: 'kqlField', color: 'tint4' }, label: 'field' }}        | ${'(field'}
+    ${'(field'}                     | ${{ type: { iconType: 'kqlField', color: 'tint4' }, label: 'field2' }}       | ${'(field2'}
+    ${'(field'}                     | ${{ type: { iconType: 'kqlOperand', color: 'tint1' }, label: '=' }}          | ${'(field='}
+    ${'(field='}                    | ${{ type: { iconType: 'kqlValue', color: 'tint0' }, label: 'value' }}        | ${'(field=value'}
+    ${'(field=value'}               | ${{ type: { iconType: 'kqlValue', color: 'tint0' }, label: 'value2' }}       | ${'(field=value2'}
+    ${'(field=value'}               | ${{ type: { iconType: 'kqlSelector', color: 'tint3' }, label: ',' }}         | ${'(field=value,'}
+    ${'(field=value,'}              | ${{ type: { iconType: 'kqlField', color: 'tint4' }, label: 'field2' }}       | ${'(field=value,field2'}
+    ${'(field=value,field2'}        | ${{ type: { iconType: 'kqlOperand', color: 'tint1' }, label: '>' }}          | ${'(field=value,field2>'}
+    ${'(field=value,field2>'}       | ${{ type: { iconType: 'kqlOperand', color: 'tint1' }, label: '>' }}          | ${'(field=value,field2>'}
+    ${'(field=value,field2>'}       | ${{ type: { iconType: 'kqlOperand', color: 'tint1' }, label: '~' }}          | ${'(field=value,field2~'}
+    ${'(field=value,field2>'}       | ${{ type: { iconType: 'kqlValue', color: 'tint0' }, label: 'value2' }}       | ${'(field=value,field2>value2'}
+    ${'(field=value,field2>value2'} | ${{ type: { iconType: 'kqlValue', color: 'tint0' }, label: 'value3' }}       | ${'(field=value,field2>value3'}
+    ${'(field=value,field2>value2'} | ${{ type: { iconType: 'tokenDenseVector', color: 'tint3' }, label: ')' }}    | ${'(field=value,field2>value2)'}
+  `(
+    'click suggestion - AQL "$AQL" => "$changedInput"',
+    async ({ AQL: currentInput, clikedSuggestion, changedInput }) => {
+      // Mock input
+      let input = currentInput;
 
-    const qlOutput = await AQL.run(input, {
-      setInput: (value: string): void => { input = value; },
-      queryLanguage: {
-        parameters: {
-          implicitQuery: '',
-          suggestions: {
-            field: () => ([]),
-            value: () => ([])
-          }
-        }
-      }
-    });
-    qlOutput.searchBarProps.onItemClick(clikedSuggestion);
-    expect(input).toEqual(changedInput);
-  });
+      const qlOutput = await AQL.run(input, {
+        setInput: (value: string): void => {
+          input = value;
+        },
+        queryLanguage: {
+          parameters: {
+            implicitQuery: '',
+            suggestions: {
+              field: () => [],
+              value: () => [],
+            },
+          },
+        },
+      });
+      qlOutput.searchBarProps.onItemClick('')(clikedSuggestion);
+      expect(input).toEqual(changedInput);
+    },
+  );
 
   // Transform the external input in UQL (Unified Query Language) to QL
   it.each`
-  UQL                                 | AQL
-  ${''}                               | ${''}
-  ${'field'}                          | ${'field'}
-  ${'field='}                         | ${'field='}
-  ${'field!='}                        | ${'field!='}
-  ${'field>'}                         | ${'field>'}
-  ${'field<'}                         | ${'field<'}
-  ${'field~'}                         | ${'field~'}
-  ${'field=value'}                    | ${'field=value'}
-  ${'field=value;'}                   | ${'field=value;'}
-  ${'field=value;field2'}             | ${'field=value;field2'}
-  ${'field="'}                        | ${'field="'}
-  ${'field=with spaces'}              | ${'field=with spaces'}
-  ${'field=with "spaces'}             | ${'field=with "spaces'}
-  ${'('}                              | ${'('}
-  ${'(field'}                         | ${'(field'}
-  ${'(field='}                        | ${'(field='}
-  ${'(field=value'}                   | ${'(field=value'}
-  ${'(field=value,'}                  | ${'(field=value,'}
-  ${'(field=value,field2'}            | ${'(field=value,field2'}
-  ${'(field=value,field2>'}           | ${'(field=value,field2>'}
-  ${'(field=value,field2>value2'}     | ${'(field=value,field2>value2'}
-  ${'(field=value,field2>value2)'}    | ${'(field=value,field2>value2)'}
-  `('Transform the external input UQL to QL - UQL $UQL => $AQL', async ({UQL, AQL: changedInput}) => {
-    expect(AQL.transformUQLToQL(UQL)).toEqual(changedInput);
-  });
+    UQL                              | AQL
+    ${''}                            | ${''}
+    ${'field'}                       | ${'field'}
+    ${'field='}                      | ${'field='}
+    ${'field!='}                     | ${'field!='}
+    ${'field>'}                      | ${'field>'}
+    ${'field<'}                      | ${'field<'}
+    ${'field~'}                      | ${'field~'}
+    ${'field=value'}                 | ${'field=value'}
+    ${'field=value;'}                | ${'field=value;'}
+    ${'field=value;field2'}          | ${'field=value;field2'}
+    ${'field="'}                     | ${'field="'}
+    ${'field=with spaces'}           | ${'field=with spaces'}
+    ${'field=with "spaces'}          | ${'field=with "spaces'}
+    ${'('}                           | ${'('}
+    ${'(field'}                      | ${'(field'}
+    ${'(field='}                     | ${'(field='}
+    ${'(field=value'}                | ${'(field=value'}
+    ${'(field=value,'}               | ${'(field=value,'}
+    ${'(field=value,field2'}         | ${'(field=value,field2'}
+    ${'(field=value,field2>'}        | ${'(field=value,field2>'}
+    ${'(field=value,field2>value2'}  | ${'(field=value,field2>value2'}
+    ${'(field=value,field2>value2)'} | ${'(field=value,field2>value2)'}
+  `(
+    'Transform the external input UQL to QL - UQL $UQL => $AQL',
+    async ({ UQL, AQL: changedInput }) => {
+      expect(AQL.transformUQLToQL(UQL)).toEqual(changedInput);
+    },
+  );
 });

@@ -36,7 +36,7 @@ exports[`SubscriptionTab component renders correctly to match the snapshot 1`] =
     help={
       Array [
         Object {
-          "href": "https://documentation.wazuh.com/4.7/office365/index.html",
+          "href": "https://documentation.wazuh.com/4.6/cloud-security/office365/index.html",
           "text": "Using Wazuh to monitor Office 365",
         },
         Object {
@@ -47,8 +47,24 @@ exports[`SubscriptionTab component renders correctly to match the snapshot 1`] =
     }
     title="Subscriptions list"
   >
-    <EuiFlexGroup
-      alignItems="center"
+    <WzConfigurationSettingsHeader
+      help={
+        Array [
+          Object {
+            "href": "https://documentation.wazuh.com/4.6/cloud-security/office365/index.html",
+            "text": "Using Wazuh to monitor Office 365",
+          },
+          Object {
+            "href": "https://documentation.wazuh.com/4.6/user-manual/reference/ossec-conf/office365-module.html",
+            "text": "Configuration options for the module",
+          },
+        ]
+      }
+      json={[Function]}
+      settings={[Function]}
+      title="Subscriptions list"
+      viewSelected=""
+      xml={[Function]}
     >
       <div
         className="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--responsive"
@@ -121,6 +137,71 @@ exports[`SubscriptionTab component renders correctly to match the snapshot 1`] =
                         <div
                           className="euiPopover__anchor"
                         >
+                          <EuiLink
+                            onClick={[Function]}
+                            style={Object {}}
+                          >
+                            <button
+                              className="euiLink euiLink--primary"
+                              disabled={false}
+                              onClick={[Function]}
+                              style={Object {}}
+                              type="button"
+                            >
+                              JSON
+                            </button>
+                          </EuiLink>
+                        </div>
+                      </EuiFlexItem>
+                    </ButtonLink>
+                  </span>
+                  <span>
+                    <ButtonLink
+                      onClick={[Function]}
+                      text="XML"
+                      view="xml"
+                      viewSelected=""
+                    >
+                      <EuiFlexItem>
+                        <div
+                          className="euiFlexItem"
+                        >
+                          <EuiLink
+                            onClick={[Function]}
+                            style={Object {}}
+                          >
+                            <button
+                              className="euiLink euiLink--primary"
+                              disabled={false}
+                              onClick={[Function]}
+                              style={Object {}}
+                              type="button"
+                            >
+                              XML
+                            </button>
+                          </EuiLink>
+                        </div>
+                      </EuiFlexItem>
+                    </ButtonLink>
+                  </span>
+                  <span>
+                    <WzHelpButtonPopover
+                      links={
+                        Array [
+                          Object {
+                            "href": "https://documentation.wazuh.com/4.6/cloud-security/office365/index.html",
+                            "text": "Using Wazuh to monitor Office 365",
+                          },
+                          Object {
+                            "href": "https://documentation.wazuh.com/4.6/user-manual/reference/ossec-conf/office365-module.html",
+                            "text": "Configuration options for the module",
+                          },
+                        ]
+                      }
+                    >
+                      <EuiPopover
+                        anchorPosition="downCenter"
+                        button={
                           <EuiButtonEmpty
                             iconSide="left"
                             iconType="questionInCircle"

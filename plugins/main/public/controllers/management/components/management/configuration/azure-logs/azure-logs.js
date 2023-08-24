@@ -23,12 +23,14 @@ import { webDocumentationLink } from '../../../../../../../common/services/web_d
 const helpLinks = [
   {
     text: 'Using Wazuh to monitor Azure',
-    href: webDocumentationLink('azure/index.html')
+    href: webDocumentationLink('cloud-security/azure/index.html'),
   },
   {
     text: 'Azure reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/wodle-azure-logs.html')
-  }
+    href: webDocumentationLink(
+      'user-manual/reference/ossec-conf/wodle-azure-logs.html',
+    ),
+  },
 ];
 
 const mainSettings = [
@@ -40,8 +42,8 @@ const mainSettings = [
   { field: 'interval', label: 'Interval between Azure-Logs executions' },
   {
     field: 'run_on_start',
-    label: 'Run evaluation immediately when service is started'
-  }
+    label: 'Run evaluation immediately when service is started',
+  },
 ];
 
 const contentSettings = [
@@ -54,8 +56,8 @@ const contentSettings = [
   {
     field: 'auth_path',
     label:
-      'Path of the file that contains the application identifier and the application key'
-  }
+      'Path of the file that contains the application identifier and the application key',
+  },
 ];
 
 class WzConfigurationAzure extends Component {
@@ -87,7 +89,7 @@ class WzConfigurationAzure extends Component {
         {currentConfig &&
           !this.wodleConfig['azure-logs'] &&
           !isString(currentConfig['wmodules-wmodules']) && (
-            <WzNoConfig error="not-present" help={helpLinks} />
+            <WzNoConfig error='not-present' help={helpLinks} />
           )}
         {currentConfig && this.wodleConfig['azure-logs'] && (
           <WzConfigurationSettingsHeader
@@ -113,7 +115,7 @@ class WzConfigurationAzure extends Component {
                         />
                       )}
                     </Fragment>
-                  )
+                  ),
                 )}
               </Fragment>
             ) : null}

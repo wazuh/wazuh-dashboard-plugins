@@ -40,7 +40,10 @@ export default class WzDecoderInfo extends Component {
     const handleFileClick = async (event, value, item) => {
       event.stopPropagation();
       try {
-        const result = await this.resourcesHandler.getFileContent(value);
+        const result = await this.resourcesHandler.getFileContent(
+          value,
+          item.relative_dirname,
+        );
         const file = {
           name: value,
           content: result,
@@ -144,9 +147,7 @@ export default class WzDecoderInfo extends Component {
             <EuiToolTip position='top' content={`Filter by this file: ${file}`}>
               <EuiLink
                 onClick={async () =>
-                  this.setNewFiltersAndBack([
-                    { field: 'filename', value: file },
-                  ])
+                  this.setNewFiltersAndBack({ q: `filename=${file}` })
                 }
               >
                 &nbsp;{file}
@@ -160,9 +161,7 @@ export default class WzDecoderInfo extends Component {
             <EuiToolTip position='top' content={`Filter by this path: ${path}`}>
               <EuiLink
                 onClick={async () =>
-                  this.setNewFiltersAndBack([
-                    { field: 'relative_dirname', value: path },
-                  ])
+                  this.setNewFiltersAndBack({ q: `relative_dirname=${path}` })
                 }
               >
                 &nbsp;{path}
@@ -362,7 +361,7 @@ export default class WzDecoderInfo extends Component {
                       {currentDecoder?.filename && (
                         <TableWzAPI
                           tableColumns={this.columns}
-                          tableInitialSortingField={'name'}
+                          tableInitialSortingField='name'
                           endpoint={`/decoders?filename=${currentDecoder.filename}`}
                           tableProps={{ rowProps: this.onClickRow }}
                           tablePageSizeOptions={[10, 25]}

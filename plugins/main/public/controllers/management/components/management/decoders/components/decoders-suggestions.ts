@@ -1,44 +1,141 @@
+import { SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT } from '../../../../../../../common/constants';
 import { WzRequest } from '../../../../../../react-services/wz-request';
 
-const decodersItems = [
-  {
-    type: 'params',
-    label: 'filename',
-    description: 'Filters the decoders by file name.',
-    values: async value => {
-      const filter = { limit: 30 };
-      if (value) {
-        filter['search'] = value;
-      }
-      const result = await WzRequest.apiReq('GET', '/decoders/files', filter);
-      return (((result || {}).data || {}).data || {}).affected_items.map((item) => { return item.filename });
-    },
+const decodersItems = {
+  field(currentValue) {
+    return [
+      { label: 'details.order', description: 'filter by program name' },
+      { label: 'details.program_name', description: 'filter by program name' },
+      { label: 'filename', description: 'filter by filename' },
+      { label: 'name', description: 'filter by name' },
+      { label: 'relative_dirname', description: 'filter by relative path' },
+    ];
   },
-  {
-    type: 'params',
-    label: 'relative_dirname',
-    description: 'Path of the decoders files.',
-    values: async () => {
-      const result = await WzRequest.apiReq('GET', '/manager/configuration', {
-        params: {
-          section: 'ruleset',
-          field: 'decoder_dir'
+  value: async (currentValue, { field }) => {
+    try {
+      switch (field) {
+        case 'details.order': {
+          const filter = {
+            distinct: true,
+            limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
+            select: field,
+            ...(currentValue ? { q: `${field}~${currentValue}` } : {}),
+          };
+          const result = await WzRequest.apiReq('GET', '/decoders', {
+            params: filter,
+          });
+          return (
+            result?.data?.data?.affected_items
+              // There are some affected items that doesn't return any value for the selected property
+              ?.filter(item => typeof item?.details?.order === 'string')
+              ?.map(item => ({
+                label: item?.details?.order,
+              }))
+          );
         }
-      });
-      return (((result || {}).data || {}).data || {}).affected_items[0].ruleset.decoder_dir;
+        case 'details.program_name': {
+          const filter = {
+            distinct: true,
+            limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
+            select: field,
+            ...(currentValue ? { q: `${field}~${currentValue}` } : {}),
+          };
+          const result = await WzRequest.apiReq('GET', '/decoders', {
+            params: filter,
+          });
+          // FIX: this breaks the search bar component because returns a non-string value.
+          return result?.data?.data?.affected_items
+            ?.filter(item => typeof item?.details?.program_name === 'string')
+            .map(item => ({
+              label: item?.details?.program_name,
+            }));
+        }
+        case 'filename': {
+          const filter = {
+            distinct: true,
+            limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
+            select: field,
+            sort: `+${field}`,
+            ...(currentValue ? { q: `${field}~${currentValue}` } : {}),
+          };
+          const result = await WzRequest.apiReq('GET', '/decoders/files', {
+            params: filter,
+          });
+          return result?.data?.data?.affected_items?.map(item => ({
+            label: item[field],
+          }));
+        }
+        case 'name': {
+          const filter = {
+            distinct: true,
+            limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
+            select: field,
+            sort: `+${field}`,
+            ...(currentValue ? { q: `${field}~${currentValue}` } : {}),
+          };
+          const result = await WzRequest.apiReq('GET', '/decoders', {
+            params: filter,
+          });
+          return result?.data?.data?.affected_items?.map(item => ({
+            label: item[field],
+          }));
+        }
+        case 'relative_dirname': {
+          const filter = {
+            distinct: true,
+            limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
+            select: field,
+            sort: `+${field}`,
+            ...(currentValue ? { q: `${field}~${currentValue}` } : {}),
+          };
+          const result = await WzRequest.apiReq('GET', '/decoders', {
+            params: filter,
+          });
+          return result?.data?.data?.affected_items.map(item => ({
+            label: item[field],
+          }));
+        }
+        default: {
+          return [];
+        }
+      }
+    } catch (error) {
+      return [];
     }
   },
-  {
-    type: 'params',
-    label: 'status',
-    description: 'Filters the decoders by status.',
-    values: ['enabled', 'disabled']
-  }
-];
+};
+
+const decodersFiles = {
+  field(currentValue) {
+    return [
+      { label: 'filename', description: 'filter by filename' },
+      { label: 'relative_dirname', description: 'filter by relative dirname' },
+    ];
+  },
+  value: async (currentValue, { field }) => {
+    try {
+      const filter = {
+        distinct: true,
+        limit: SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
+        select: field,
+        sort: `+${field}`,
+        ...(currentValue ? { q: `${field}~${currentValue}` } : {}),
+      };
+      const result = await WzRequest.apiReq('GET', '/decoders/files', {
+        params: filter,
+      });
+      return result?.data?.data?.affected_items?.map(item => ({
+        label: item[field],
+      }));
+    } catch (error) {
+      return [];
+    }
+  },
+};
 
 const apiSuggestsItems = {
   items: decodersItems,
-  files: [],
+  files: decodersFiles,
 };
 
 export default apiSuggestsItems;

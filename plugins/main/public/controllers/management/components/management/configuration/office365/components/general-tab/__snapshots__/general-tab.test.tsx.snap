@@ -256,12 +256,30 @@ exports[`GeneralTab component renders correctly to match the snapshot 1`] = `
           ],
         }
       }
-      items={
+    }
+    description="Configuration for the Office 365 module"
+    helpLinks={
+      Array [
+        Object {
+          "href": "https://documentation.wazuh.com/4.6/cloud-security/office365/index.html",
+          "text": "Using Wazuh to monitor Office 365",
+        },
+        Object {
+          "href": "https://documentation.wazuh.com/4.6/user-manual/reference/ossec-conf/office365-module.html",
+          "text": "Configuration options for the module",
+        },
+      ]
+    }
+    minusHeight={370}
+    title="Main settings"
+  >
+    <WzConfigurationSettingsHeader
+      description="Configuration for the Office 365 module"
+      help={
         Array [
           Object {
-            "field": "enabled",
-            "label": "Service status",
-            "render": [Function],
+            "href": "https://documentation.wazuh.com/4.6/cloud-security/office365/index.html",
+            "text": "Using Wazuh to monitor Office 365",
           },
           Object {
             "field": "only_future_events",
@@ -386,9 +404,88 @@ exports[`GeneralTab component renders correctly to match the snapshot 1`] = `
                       readOnly={true}
                       value="enabled"
                     >
-                      <EuiFormControlLayout
-                        fullWidth={false}
-                        readOnly={true}
+                      <EuiFlexItem>
+                        <div
+                          className="euiFlexItem"
+                        >
+                          <EuiLink
+                            onClick={[Function]}
+                            style={Object {}}
+                          >
+                            <button
+                              className="euiLink euiLink--primary"
+                              disabled={false}
+                              onClick={[Function]}
+                              style={Object {}}
+                              type="button"
+                            >
+                              JSON
+                            </button>
+                          </EuiLink>
+                        </div>
+                      </EuiFlexItem>
+                    </ButtonLink>
+                  </span>
+                  <span>
+                    <ButtonLink
+                      onClick={[Function]}
+                      text="XML"
+                      view="xml"
+                      viewSelected=""
+                    >
+                      <EuiFlexItem>
+                        <div
+                          className="euiFlexItem"
+                        >
+                          <EuiLink
+                            onClick={[Function]}
+                            style={Object {}}
+                          >
+                            <button
+                              className="euiLink euiLink--primary"
+                              disabled={false}
+                              onClick={[Function]}
+                              style={Object {}}
+                              type="button"
+                            >
+                              XML
+                            </button>
+                          </EuiLink>
+                        </div>
+                      </EuiFlexItem>
+                    </ButtonLink>
+                  </span>
+                  <span>
+                    <WzHelpButtonPopover
+                      links={
+                        Array [
+                          Object {
+                            "href": "https://documentation.wazuh.com/4.6/cloud-security/office365/index.html",
+                            "text": "Using Wazuh to monitor Office 365",
+                          },
+                          Object {
+                            "href": "https://documentation.wazuh.com/4.6/user-manual/reference/ossec-conf/office365-module.html",
+                            "text": "Configuration options for the module",
+                          },
+                        ]
+                      }
+                    >
+                      <EuiPopover
+                        anchorPosition="downCenter"
+                        button={
+                          <EuiButtonEmpty
+                            iconSide="left"
+                            iconType="questionInCircle"
+                            onClick={[Function]}
+                          />
+                        }
+                        closePopover={[Function]}
+                        display="inlineBlock"
+                        hasArrow={true}
+                        id="show-help"
+                        isOpen={false}
+                        ownFocus={true}
+                        panelPaddingSize="m"
                       >
                         <div
                           className="euiFormControlLayout euiFormControlLayout--readOnly"
