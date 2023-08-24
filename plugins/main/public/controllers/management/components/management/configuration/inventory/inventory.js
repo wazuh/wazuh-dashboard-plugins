@@ -24,10 +24,10 @@ const mainSettings = [
   {
     field: 'disabled',
     label: 'Syscollector integration status',
-    render: renderValueNoThenEnabled
+    render: renderValueNoThenEnabled,
   },
   { field: 'interval', label: 'Interval between system scans' },
-  { field: 'scan-on-start', label: 'Scan on start' }
+  { field: 'scan-on-start', label: 'Scan on start' },
 ];
 
 const scanSettings = [
@@ -37,18 +37,22 @@ const scanSettings = [
   { field: 'packages', label: 'Scan installed packages' },
   { field: 'network', label: 'Scan network interfaces' },
   { field: 'ports', label: 'Scan listening network ports' },
-  { field: 'ports_all', label: 'Scan all network ports' }
+  { field: 'ports_all', label: 'Scan all network ports' },
 ];
 
 const helpLinks = [
   {
     text: 'System inventory',
-    href: webDocumentationLink('user-manual/capabilities/syscollector.html')
+    href: webDocumentationLink(
+      'user-manual/capabilities/system-inventory/index.html',
+    ),
   },
   {
     text: 'Syscollector module reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/wodle-syscollector.html')
-  }
+    href: webDocumentationLink(
+      'user-manual/reference/ossec-conf/wodle-syscollector.html',
+    ),
+  },
 ];
 
 class WzConfigurationInventory extends Component {
@@ -80,7 +84,7 @@ class WzConfigurationInventory extends Component {
         {currentConfig &&
           !this.wodleConfig.syscollector &&
           !isString(currentConfig['wmodules-wmodules']) && (
-            <WzNoConfig error="not-present" help={helpLinks} />
+            <WzNoConfig error='not-present' help={helpLinks} />
           )}
         {currentConfig && this.wodleConfig && this.wodleConfig.syscollector && (
           <WzConfigurationSettingsHeader
@@ -93,8 +97,8 @@ class WzConfigurationInventory extends Component {
               items={mainSettings}
             />
             <WzConfigurationSettingsGroup
-              title="Scan settings"
-              description="Specific inventory scans to collect"
+              title='Scan settings'
+              description='Specific inventory scans to collect'
               config={this.wodleConfig.syscollector}
               items={scanSettings}
             />

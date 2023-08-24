@@ -37,6 +37,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added new global error treatment (client-side) [#4163](https://github.com/wazuh/wazuh-kibana-app/pull/4163)
 - Added new CLI to generate API data from specification file [#5519](https://github.com/wazuh/wazuh-kibana-app/pull/5519)
 - Added specific RBAC permissions to Security section [#5551](https://github.com/wazuh/wazuh-kibana-app/pull/5551)
+- Added Refresh and Export formatted button to panels in Agents > Inventory data [#5443](https://github.com/wazuh/wazuh-kibana-app/pull/5443)
+- Added Refresh and Export formatted buttons to Management > Cluster > Nodes [#5491](https://github.com/wazuh/wazuh-kibana-app/pull/5491)
 
 ### Changed
 
@@ -45,6 +47,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed the query to search for an agent in `management/configuration`. [#5485](https://github.com/wazuh/wazuh-kibana-app/pull/5485)
 - Changed the search bar in management/log to the one used in the rest of the app. [#5476](https://github.com/wazuh/wazuh-kibana-app/pull/5476)
 - Changed the design of the wizard to add agents. [#5457](https://github.com/wazuh/wazuh-kibana-app/pull/5457)
+- Changed the search bar in Management (Rules, Decoders, CDB List, Groups, Cluster > Nodes) and Modules (Vulnerabilities > Inventory, Security Configuration Assessment > Inventory > {Policy ID} > Checks, MITRE ATT&CK > Intelligence > {Resource}, Integrity monitoring > Inventory > Files, Integrity monitoring > Inventory > Registry), Agent Inventory data, Explore agent modal, Agents [#5363](https://github.com/wazuh/wazuh-kibana-app/pull/5363) [#5442](https://github.com/wazuh/wazuh-kibana-app/pull/5442) [#5443](https://github.com/wazuh/wazuh-kibana-app/pull/5443) [#5444](https://github.com/wazuh/wazuh-kibana-app/pull/5444) [#5445](https://github.com/wazuh/wazuh-kibana-app/pull/5445) [#5447](https://github.com/wazuh/wazuh-kibana-app/pull/5447) [#5452](https://github.com/wazuh/wazuh-kibana-app/pull/5452) [#5491](https://github.com/wazuh/wazuh-kibana-app/pull/5491) [#5785](https://github.com/wazuh/wazuh-kibana-app/pull/5785)
 
 ### Fixed
 
@@ -61,6 +64,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed repeated requests in inventory data and configurations of an agent. [#5460](https://github.com/wazuh/wazuh-kibana-app/pull/5460)
 - Fixed repeated requests in the group table when adding a group or refreshing the table [#5465](https://github.com/wazuh/wazuh-kibana-app/pull/5465)
 - Fixed an error in the request body suggestions of API Console [#5521](https://github.com/wazuh/wazuh-kibana-app/pull/5521)
+- Fixed some errors related to relative dirname of rule and decoder files [#5734](https://github.com/wazuh/wazuh-kibana-app/pull/5734)
 
 ### Removed
 
@@ -79,7 +83,12 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.5.2
 
-## Wazuh v4.5.1 - OpenSearch Dashboards 2.6.0 - Revision 01
+### Fixed
+
+- Fixed an error with the commands in the Deploy new agent section for Oracle Linux 6+ agents [#5764](https://github.com/wazuh/wazuh-kibana-app/pull/5764)
+- Fixed broken documentation links in `Management/Configuration` section [#5796](https://github.com/wazuh/wazuh-kibana-app/pull/5796)
+
+## Wazuh v4.5.1 - OpenSearch Dashboards 2.6.0 - Revision 03
 
 ### Added
 

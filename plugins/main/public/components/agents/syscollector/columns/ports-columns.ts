@@ -1,25 +1,26 @@
-const windowsColumns = [
-  { id: 'local.port', sortable: false },
-  { id: 'local.ip', sortable: false },
-  { id: 'process' },
-  { id: 'state' },
-  { id: 'protocol' },
-];
-const defaultColumns = [
-  { id: 'local.port', sortable: false },
-  { id: 'local.ip', sortable: false },
-  { id: 'state' },
-  { id: 'protocol' },
-];
+import { KeyEquivalence } from "../../../../../common/csv-key-equivalence";
 
+const windowsColumns = [
+  { field: 'local.port', searchable: true, sortable: false },
+  { field: 'local.ip', searchable: true, sortable: false },
+  { field: 'process', searchable: true, sortable: true },
+  { field: 'state', searchable: true, sortable: true },
+  { field: 'protocol', searchable: true, sortable: true },
+].map(({field, ...rest}) => ({...rest, field, name: rest.name || KeyEquivalence[field] || field}));
 const linuxColumns = [
-  { id: 'local.port', sortable: false },
-  { id: 'local.ip', sortable: false },
-  { id: 'process' },
-  { id: 'pid' },
-  { id: 'state' },
-  { id: 'protocol' },
-];
+  { field: 'local.port', searchable: true, sortable: false },
+  { field: 'local.ip', searchable: true, sortable: false },
+  { field: 'process', searchable: true, sortable: false },
+  { field: 'pid', searchable: true, sortable: false },
+  { field: 'state', searchable: true, sortable: true },
+  { field: 'protocol', searchable: true, sortable: true },
+].map(({field, ...rest}) => ({...rest, field, name: rest.name || KeyEquivalence[field] || field}));
+const defaultColumns = [
+  { field: 'local.port', searchable: true, sortable: false },
+  { field: 'local.ip', searchable: true, sortable: false },
+  { field: 'state', searchable: true, sortable: true },
+  { field: 'protocol', searchable: true, sortable: true },
+].map(({field, ...rest}) => ({...rest, field, name: rest.name || KeyEquivalence[field] || field}));
 
 export const portsColumns = {
   windows: windowsColumns,

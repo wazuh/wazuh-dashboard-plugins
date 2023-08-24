@@ -21,7 +21,7 @@ import { getErrorOrchestrator } from '../../../react-services/common-services';
 
 export const ModuleMitreAttackIntelligenceResource = ({
   label,
-  searchBarSuggestions,
+  searchBar,
   apiEndpoint,
   tableColumnsCreator,
   initialSortingField,
@@ -64,7 +64,7 @@ export const ModuleMitreAttackIntelligenceResource = ({
       getErrorOrchestrator().handleError(options);
     }
   };
-  
+
   const tableColumns = useMemo(() => tableColumnsCreator(setDetails), []);
 
   const closeFlyout = useCallback(() => {
@@ -78,11 +78,13 @@ export const ModuleMitreAttackIntelligenceResource = ({
         title={label}
         tableColumns={tableColumns}
         tableInitialSortingField={initialSortingField}
-        searchBarPlaceholder={`Search in ${label}`}
-        searchBarSuggestions={searchBarSuggestions}
         endpoint={apiEndpoint}
         tablePageSizeOptions={[10, 15, 25, 50, 100]}
         filters={resourceFilters}
+        searchBarWQL={{
+          options: searchBar.wql.options,
+          suggestions: searchBar.wql.suggestions,
+        }}
       />
       {details && (
         <ModuleMitreAttackIntelligenceFlyout
@@ -91,6 +93,6 @@ export const ModuleMitreAttackIntelligenceResource = ({
           onSelectResource={setDetails}
         />
       )}
-    </> 
-  )
+    </>
+  );
 };
