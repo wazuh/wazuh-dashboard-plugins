@@ -1,8 +1,8 @@
 {
   "diffEditor.ignoreTrimWhitespace": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "editor.formatOnPaste": true,
-  "editor.formatOnSave": true,
+  "editor.formatOnPaste": false,
+  "editor.formatOnSave": false,
   "editor.inlineSuggest.enabled": true,
   "editor.insertSpaces": true,
   "editor.minimap.enabled": true,

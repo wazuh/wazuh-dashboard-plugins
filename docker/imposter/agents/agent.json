@@ -22,7 +22,10 @@
         "status": "active",
         "manager": "wazuh-manager-master-0",
         "node_name": "master",
-        "group": ["default", "debian"],
+        "group": [
+          "default",
+          "debian"
+        ],
         "lastKeepAlive": "2022-09-12T08:48:40Z",
         "version": "Wazuh v4.3.7"
       }
