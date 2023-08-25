@@ -108,13 +108,13 @@ export const AgentsWelcome = compose(
       const breadcrumb = [
         { text: '' },
         {
-          text: 'Agents',
+          text: 'Endpoints summary',
           href: '#/agents-preview',
+          truncate: false,
         },
         {
           text: `${this.props.agent.name}`,
-          className: 'wz-global-breadcrumb-btn euiBreadcrumb--truncate',
-          truncate: false,
+          truncate: true,
         },
       ];
       store.dispatch(updateGlobalBreadcrumb(breadcrumb));

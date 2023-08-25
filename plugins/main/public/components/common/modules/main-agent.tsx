@@ -36,16 +36,16 @@ import { getAngularModule } from '../../../kibana-services';
 
 export class MainModuleAgent extends Component {
   props!: {
-    [key: string]: any
+    [key: string]: any;
   };
   state: {
-    selectView: Boolean,
-    loadingReport: Boolean,
-    switchModule: Boolean,
-    showAgentInfo: Boolean
+    selectView: Boolean;
+    loadingReport: Boolean;
+    switchModule: Boolean;
+    showAgentInfo: Boolean;
   };
   reportingService: ReportingService;
-  filterHandler: FilterHandler
+  filterHandler: FilterHandler;
 
   constructor(props) {
     super(props);
@@ -55,7 +55,7 @@ export class MainModuleAgent extends Component {
       selectView: false,
       loadingReport: false,
       switchModule: false,
-      showAgentInfo: false
+      showAgentInfo: false,
     };
   }
 
@@ -70,8 +70,8 @@ export class MainModuleAgent extends Component {
     if (this.props.section === 'welcome') {
       breadcrumb = [
         { text: '' },
-        { text: 'Agents', href: '#/agents-preview' },
-        { text: this.props.agent.id }
+        { text: 'Endpoints summary', href: '#/agents-preview' },
+        { text: this.props.agent.id },
       ];
     } else {
       breadcrumb = [
@@ -79,18 +79,17 @@ export class MainModuleAgent extends Component {
           text: '',
         },
         {
-          text: 'Agents',
-          href: "#/agents-preview"
+          text: 'Endpoints summary',
+          href: '#/agents-preview',
         },
         { agent: this.props.agent },
         {
           text: WAZUH_MODULES[this.props.section].title,
-          className: 'wz-global-breadcrumb-popover'
         },
       ];
     }
     store.dispatch(updateGlobalBreadcrumb(breadcrumb));
-    $('#breadcrumbNoTitle').attr("title","");
+    $('#breadcrumbNoTitle').attr('title', '');
   }
 
   async componentDidMount() {
@@ -103,9 +102,9 @@ export class MainModuleAgent extends Component {
     const elem = document.getElementsByClassName('wz-module-body-main')[0];
     if (elem) {
       if (!this.state.showAgentInfo) {
-        elem.classList.add("wz-module-body-main-double");
+        elem.classList.add('wz-module-body-main-double');
       } else {
-        elem.classList.remove("wz-module-body-main-double");
+        elem.classList.remove('wz-module-body-main-double');
       }
     }
     this.setState({ showAgentInfo: !this.state.showAgentInfo });
@@ -114,31 +113,33 @@ export class MainModuleAgent extends Component {
   async startReport() {
     this.setState({ loadingReport: true });
     const syscollectorFilters: any[] = [];
-    const agent = (this.props.agent || store.getState().appStateReducers.currentAgentData || {}).id || false;
+    const agent =
+      (
+        this.props.agent ||
+        store.getState().appStateReducers.currentAgentData ||
+        {}
+      ).id || false;
     if (this.props.section === 'syscollector' && agent) {
-      syscollectorFilters.push(
-        this.filterHandler.managerQuery(agent, true)
-      );
-      syscollectorFilters.push(
-        this.filterHandler.agentQuery(agent)
-      );
+      syscollectorFilters.push(this.filterHandler.managerQuery(agent, true));
+      syscollectorFilters.push(this.filterHandler.agentQuery(agent));
     }
     await this.reportingService.startVis2Png(
       this.props.section,
       agent,
-      syscollectorFilters.length ? syscollectorFilters : null
+      syscollectorFilters.length ? syscollectorFilters : null,
     );
     this.setState({ loadingReport: false });
   }
 
   renderReportButton() {
     return (
-      (this.props.section === 'syscollector' &&
+      this.props.section === 'syscollector' && (
         <EuiFlexItem grow={false} style={{ marginRight: 4, marginTop: 6 }}>
           <EuiButtonEmpty
-            iconType="document"
+            iconType='document'
             isLoading={this.state.loadingReport}
-            onClick={async () => this.startReport()}>
+            onClick={async () => this.startReport()}
+          >
             Generate report
           </EuiButtonEmpty>
         </EuiFlexItem>
@@ -149,19 +150,21 @@ export class MainModuleAgent extends Component {
   renderTitle() {
     return (
       <EuiFlexGroup>
-        <EuiFlexItem className="wz-module-header-agent-title">
+        <EuiFlexItem className='wz-module-header-agent-title'>
           <EuiFlexGroup>
             <EuiFlexItem grow={false}>
               <span style={{ display: 'inline-flex' }}>
-                <EuiTitle size="s" className="wz-module-header-agent-title-btn">
+                <EuiTitle size='s' className='wz-module-header-agent-title-btn'>
                   <h1>
                     <span
                       onClick={() => {
                         window.location.href = `#/agents?agent=${this.props.agent.id}`;
                         this.router.reload();
-                      }}>
+                      }}
+                    >
                       {/* <EuiIcon size="m" type="arrowLeft" color='primary' /> */}
-                      <span>&nbsp;{this.props.agent.name}&nbsp;&nbsp;&nbsp;
+                      <span>
+                        &nbsp;{this.props.agent.name}&nbsp;&nbsp;&nbsp;
                       </span>
                     </span>
                   </h1>
@@ -232,58 +235,96 @@ export class MainModuleAgent extends Component {
     );
   }
 
-
   render() {
     const { agent, section, selectView } = this.props;
     const title = this.renderTitle();
-    const ModuleTabView = (this.props.tabs || []).find(tab => tab.id === selectView);
+    const ModuleTabView = (this.props.tabs || []).find(
+      tab => tab.id === selectView,
+    );
     return (
-      <div className={this.state.showAgentInfo ? 'wz-module wz-module-showing-agent' : 'wz-module'}>
+      <div
+        className={
+          this.state.showAgentInfo
+            ? 'wz-module wz-module-showing-agent'
+            : 'wz-module'
+        }
+      >
         <div className='wz-module-header-agent-wrapper'>
-          <div className='wz-module-header-agent'>
-            {title}
-          </div>
+          <div className='wz-module-header-agent'>{title}</div>
         </div>
-        {(agent && agent.os) &&
+        {agent && agent.os && (
           <Fragment>
             <div className='wz-module-header-nav-wrapper'>
-              <div className={this.props.tabs && this.props.tabs.length && 'wz-module-header-nav'}>
-                {this.state.showAgentInfo &&
-                  <div className={
-                    !this.props.tabs || !this.props.tabs.length ?
-                      "wz-welcome-page-agent-info" :
-                      "wz-welcome-page-agent-info wz-welcome-page-agent-info-gray"}>
-                    <AgentInfo agent={this.props.agent} isCondensed={false} hideActions={true} {...this.props}></AgentInfo>
-                  </div>
+              <div
+                className={
+                  this.props.tabs &&
+                  this.props.tabs.length &&
+                  'wz-module-header-nav'
                 }
-                {(this.props.tabs && this.props.tabs.length) &&
-                  <div className="wz-welcome-page-agent-tabs">
+              >
+                {this.state.showAgentInfo && (
+                  <div
+                    className={
+                      !this.props.tabs || !this.props.tabs.length
+                        ? 'wz-welcome-page-agent-info'
+                        : 'wz-welcome-page-agent-info wz-welcome-page-agent-info-gray'
+                    }
+                  >
+                    <AgentInfo
+                      agent={this.props.agent}
+                      isCondensed={false}
+                      hideActions={true}
+                      {...this.props}
+                    ></AgentInfo>
+                  </div>
+                )}
+                {this.props.tabs && this.props.tabs.length && (
+                  <div className='wz-welcome-page-agent-tabs'>
                     <EuiFlexGroup>
                       {this.props.renderTabs()}
-                      <EuiFlexItem grow={false} style={{ marginTop: 6, marginRight: 5 }}>
+                      <EuiFlexItem
+                        grow={false}
+                        style={{ marginTop: 6, marginRight: 5 }}
+                      >
                         <EuiFlexGroup>
-                          {ModuleTabView && ModuleTabView.buttons && ModuleTabView.buttons.map((ModuleViewButton, index) => 
-                            typeof ModuleViewButton !== 'string' ? <EuiFlexItem key={`module_button_${index}`}><ModuleViewButton {...{ ...this.props, ...this.props.agentsSelectionProps }} moduleID={section}/></EuiFlexItem> : null)}
+                          {ModuleTabView &&
+                            ModuleTabView.buttons &&
+                            ModuleTabView.buttons.map(
+                              (ModuleViewButton, index) =>
+                                typeof ModuleViewButton !== 'string' ? (
+                                  <EuiFlexItem key={`module_button_${index}`}>
+                                    <ModuleViewButton
+                                      {...{
+                                        ...this.props,
+                                        ...this.props.agentsSelectionProps,
+                                      }}
+                                      moduleID={section}
+                                    />
+                                  </EuiFlexItem>
+                                ) : null,
+                            )}
                         </EuiFlexGroup>
                       </EuiFlexItem>
                     </EuiFlexGroup>
                   </div>
-                }
+                )}
               </div>
             </div>
             {!['syscollector', 'configuration'].includes(section) &&
-              ModuleTabView && ModuleTabView.component && <ModuleTabView.component {...this.props} moduleID={section}/> 
-            }
+              ModuleTabView &&
+              ModuleTabView.component && (
+                <ModuleTabView.component {...this.props} moduleID={section} />
+              )}
           </Fragment>
-        }
-        {(!agent || !agent.os) &&
+        )}
+        {(!agent || !agent.os) && (
           <EuiCallOut
             style={{ margin: '66px 16px 0 16px' }}
-            title="This agent has never connected"
-            color="warning"
-            iconType="alert">
-          </EuiCallOut>
-        }
+            title='This agent has never connected'
+            color='warning'
+            iconType='alert'
+          ></EuiCallOut>
+        )}
       </div>
     );
   }

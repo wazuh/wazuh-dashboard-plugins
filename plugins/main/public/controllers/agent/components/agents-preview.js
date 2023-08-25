@@ -57,7 +57,7 @@ import {
 export const AgentsPreview = compose(
   withErrorBoundary,
   withReduxProvider,
-  withGlobalBreadcrumb([{ text: '' }, { text: 'Agents' }]),
+  withGlobalBreadcrumb([{ text: '' }, { text: 'Endpoints summary' }]),
   withUserAuthorizationPrompt([
     [
       { action: 'agent:read', resource: 'agent:id:*' },
