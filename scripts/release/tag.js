@@ -50,7 +50,7 @@ function getSupportedVersions(pluginVersion) {
       branch: `${pluginVersion}-7.16`,
       versions: [
         ...[...Array(4).keys()].map(idx => `7.16.${idx}`),
-        ...[...Array(12).keys()].map(idx => `7.17.${idx}`),
+        ...[...Array(13).keys()].map(idx => `7.17.${idx}`),
       ],
       manifestPluginPath: 'kibana.json',
     },
