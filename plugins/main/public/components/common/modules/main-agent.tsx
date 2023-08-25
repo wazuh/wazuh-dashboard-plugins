@@ -11,18 +11,12 @@
  */
 
 import React, { Component, Fragment } from 'react';
-import ReactDOM from 'react-dom';
 import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiCallOut,
-  EuiHorizontalRule,
-  EuiSpacer,
   EuiTitle,
-  EuiIcon,
-  EuiPopover,
   EuiButtonEmpty,
-  EuiButton,
 } from '@elastic/eui';
 import '../../common/modules/module.scss';
 import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
@@ -162,70 +156,13 @@ export class MainModuleAgent extends Component {
                         this.router.reload();
                       }}
                     >
-                      {/* <EuiIcon size="m" type="arrowLeft" color='primary' /> */}
                       <span>
                         &nbsp;{this.props.agent.name}&nbsp;&nbsp;&nbsp;
                       </span>
                     </span>
                   </h1>
                 </EuiTitle>
-                {/*                 <EuiHealth style={{ paddingTop: 3 }} size="xl" color={this.color(this.props.agent.status)}>
-                  {this.props.agent.status}
-                </EuiHealth> */}
               </span>
-            </EuiFlexItem>
-            {/*             <EuiFlexItem grow={false} style={{ margin: '16px 0' }} className="wz-module-header-agent-title-btn">
-              <EuiIcon type="iInCircle" color="primary" size="l" onClick={() => this.showAgentInfo()} />
-            </EuiFlexItem> */}
-            <EuiFlexItem grow={false} style={{ marginLeft: 0, marginTop: 7 }}>
-              {/* {this.props.section && (
-                <Fragment>
-                  <EuiPopover
-                    button={
-                      <EuiButtonEmpty
-                        onClick={() => this.setState({ switchModule: !this.state.switchModule })} style={{ cursor: 'pointer' }}
-                        iconType="apps">
-                        <span>Navigation&nbsp;<EuiIcon type='arrowDown'></EuiIcon></span>
-                      </EuiButtonEmpty>
-                    }
-                    isOpen={this.state.switchModule}
-                    closePopover={() => this.setState({ switchModule: false })}
-                    repositionOnScroll={true}
-                    anchorPosition="downLeft">
-                    <div>
-                      <WzReduxProvider>
-                        <div style={{ maxWidth: 650 }}>
-                          <Overview isAgent={this.props.agent} closePopover={() => this.setState({ switchModule: false })}></Overview>
-                        </div>
-                      </WzReduxProvider>
-                      <EuiHorizontalRule margin="s" />
-                      <EuiSpacer size='m' />
-                      <EuiFlexGroup>
-                        <EuiFlexItem grow={false} style={{ marginRight: 0, marginTop: 0 }}>
-                          <EuiButton
-                            onClick={() => {
-                              this.props.cardsProps.switchTab('syscollector');
-                              this.setState({ switchModule: false });
-                            }}
-                            iconType="inspect">
-                            <span>Inventory data</span>
-                          </EuiButton>
-                        </EuiFlexItem>
-                        <EuiFlexItem grow={false} style={{ marginTop: 0 }}>
-                          <EuiButton
-                            onClick={() => {
-                              this.props.cardsProps.switchTab('configuration');
-                              this.setState({ switchModule: false });
-                            }}
-                            iconType="gear" >
-                            <span>Configuration</span>
-                          </EuiButton>
-                        </EuiFlexItem>
-                      </EuiFlexGroup>
-                    </div>
-                  </EuiPopover>
-                </Fragment>
-              )} */}
             </EuiFlexItem>
             <EuiFlexItem />
             {this.renderReportButton()}
