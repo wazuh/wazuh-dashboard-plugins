@@ -27,3 +27,4 @@ export * from './use_async_action';
 export * from './use_async_action_run_on_start';
 export { useEsSearch } from './use-es-search';
 export { useValueSuggestion, IValueSuggestion } from './use-value-suggestion';
+export * from './use-state-storage';

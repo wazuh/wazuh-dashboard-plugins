@@ -46,7 +46,7 @@ interface AgentsFilter {
 }
 
 export class WazuhReportingCtrl {
-  constructor() {}
+  constructor() { }
   /**
    * This do format to filters
    * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
@@ -259,7 +259,7 @@ export class WazuhReportingCtrl {
       title: (section.options || {}).hideHeader
         ? ''
         : (section.tabs || [])[tab] ||
-          (section.isGroupConfig ? ((section.labels || [])[0] || [])[tab] : ''),
+        (section.isGroupConfig ? ((section.labels || [])[0] || [])[tab] : ''),
       columns: ['', ''],
       type: 'config',
       rows: this.getConfigRows(plainData, (section.labels || [])[0]),
