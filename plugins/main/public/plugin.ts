@@ -216,6 +216,12 @@ export class WazuhPlugin
       [
         {
           category: categoryEndpointSecurity,
+          id: 'wz-home',
+          title: 'Overview',
+          redirectTo: () => '/overview/',
+        },
+        {
+          category: categoryEndpointSecurity,
           id: 'wz-endpoints-summary',
           title: 'Endpoints summary',
           redirectTo: () => '/agents-preview/',
